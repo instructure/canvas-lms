@@ -28,8 +28,8 @@ const defaultProps = () => ({
     content: true,
     points: false,
     due_dates: false,
-    availability_dates: false
-  }
+    availability_dates: false,
+  },
 })
 
 test('renders an Alert when LockBanner is locked', () => {
@@ -51,10 +51,7 @@ test('does not render Alert when LockBanner is locked', () => {
 test('displays locked description text appropriately when one attribute is locked', () => {
   const props = defaultProps()
   const tree = enzyme.mount(<LockBanner {...props} />)
-  const text = tree
-    .find('Text')
-    .at(1)
-    .text()
+  const text = tree.find('Text').at(1).text()
   equal(text, 'Content')
 })
 
@@ -62,10 +59,7 @@ test('displays locked description text appropriately when two attributes are loc
   const props = defaultProps()
   props.itemLocks.points = true
   const tree = enzyme.mount(<LockBanner {...props} />)
-  const text = tree
-    .find('Text')
-    .at(1)
-    .text()
+  const text = tree.find('Text').at(1).text()
   equal(text, 'Content & Points')
 })
 
@@ -74,9 +68,6 @@ test('displays locked description text appropriately when more than two attribut
   props.itemLocks.points = true
   props.itemLocks.due_dates = true
   const tree = enzyme.mount(<LockBanner {...props} />)
-  const text = tree
-    .find('Text')
-    .at(1)
-    .text()
+  const text = tree.find('Text').at(1).text()
   equal(text, 'Content, Points & Due Dates')
 })

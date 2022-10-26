@@ -59,7 +59,7 @@ export default class UploadViewManager {
     } else {
       message = I18n.t('file_type_error', '%{file} is not an acceptable %{type} file.', {
         file: error.file.name,
-        type: error.allowedMediaTypes[0]
+        type: error.allowedMediaTypes[0],
       })
     }
     this.resetFileDetails()
@@ -109,9 +109,7 @@ export default class UploadViewManager {
   }
 
   showProgBar() {
-    $('#media_upload_progress')
-      .css('visibility', 'visible')
-      .progressbar()
+    $('#media_upload_progress').css('visibility', 'visible').progressbar()
   }
 
   hideProgBar() {

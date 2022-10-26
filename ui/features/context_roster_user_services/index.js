@@ -20,13 +20,13 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 $(document).ready(() =>
-  $('.show_user_services_checkbox').change(function() {
+  $('.show_user_services_checkbox').change(function () {
     $.ajaxJSON(
       $('.profile_url').attr('href'),
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
-      data => {},
-      data => {}
+      _data => {},
+      _data => {}
     )
   })
 )

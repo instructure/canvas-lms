@@ -35,7 +35,7 @@ const defaultProps = (props = {}) => ({
     score: 3,
     ratings: [
       {description: 'My first rating', mastery: true},
-      {description: 'My second rating', mastery: false}
+      {description: 'My second rating', mastery: false},
     ],
     results: [
       {
@@ -47,9 +47,9 @@ const defaultProps = (props = {}) => ({
           html_url: 'http://foo',
           name: 'My assignment',
           submission_types: 'online_quiz',
-          score: 0
+          score: 0,
         },
-        submitted_or_assessed_at: time1
+        submitted_or_assessed_at: time1,
       },
       {
         id: 1,
@@ -60,22 +60,22 @@ const defaultProps = (props = {}) => ({
           html_url: 'http://bar',
           name: 'Assignment 2',
           submission_types: 'online_quiz',
-          score: 3
+          score: 3,
         },
-        submitted_or_assessed_at: time2
-      }
+        submitted_or_assessed_at: time2,
+      },
     ],
     title: 'My outcome',
-    friendly_description: ''
+    friendly_description: '',
   },
   outcomeProficiency: {
     ratings: [
       {color: 'blue', description: 'I am blue', points: 10, mastery: false},
       {color: 'green', description: 'I am Groot', points: 5, mastery: true},
-      {color: 'red', description: 'I am red', points: 0, mastery: false}
-    ]
+      {color: 'red', description: 'I am red', points: 0, mastery: false},
+    ],
   },
-  ...props
+  ...props,
 })
 
 it('renders the OutcomePopover component', () => {
@@ -162,7 +162,7 @@ describe('friendly description', () => {
   it('renders the friendly description if the outcome has one', () => {
     const friendlyDescription = {
       ...defaultProps().outcome,
-      ...{friendly_description: 'A friendly description'}
+      ...{friendly_description: 'A friendly description'},
     }
     const {baseElement, getByRole} = render(
       <OutcomePopover {...defaultProps({outcome: friendlyDescription})} />

@@ -66,12 +66,7 @@ it('renders the description if provided', () => {
   const node = tree.find('Text')
   expect(node).toHaveLength(2)
   expect(node.at(1).exists()).toBeTruthy()
-  expect(
-    node
-      .at(1)
-      .children()
-      .text()
-  ).toEqual("it's a fruit")
+  expect(node.at(1).children().text()).toEqual("it's a fruit")
 })
 
 it('does not render the description if not provided', () => {

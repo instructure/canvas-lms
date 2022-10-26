@@ -31,7 +31,7 @@ class OfficialNotFoundGame extends React.Component {
     super(props)
 
     this.state = {
-      gameTimer: 0
+      gameTimer: 0,
     }
 
     this.gameStarted = false
@@ -92,7 +92,7 @@ class OfficialNotFoundGame extends React.Component {
       width: MAIN_CHAR_LENGTH,
       height: MAIN_CHAR_LENGTH,
       x: CANVAS_WIDTH / 2 - MAIN_CHAR_LENGTH / 2,
-      y: CANVAS_HEIGHT - MAIN_CHAR_LENGTH
+      y: CANVAS_HEIGHT - MAIN_CHAR_LENGTH,
     })
 
     const ctx = this.gameCanvas.getContext('2d')
@@ -104,7 +104,7 @@ class OfficialNotFoundGame extends React.Component {
       width: MAIN_CHAR_LENGTH,
       height: MAIN_CHAR_LENGTH,
       x: randomNumberBetween(0, CANVAS_WIDTH - MAIN_CHAR_LENGTH),
-      y: 0
+      y: 0,
     })
   }
 
@@ -133,7 +133,7 @@ class OfficialNotFoundGame extends React.Component {
         height: obstacleWidth,
         x: placedX,
         y: placedY,
-        goingLeft: rightOrLeft > 3
+        goingLeft: rightOrLeft > 3,
       })
     )
   }
@@ -253,7 +253,7 @@ class OfficialNotFoundGame extends React.Component {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
       >
         <div
@@ -263,7 +263,7 @@ class OfficialNotFoundGame extends React.Component {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'flex-end',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
           }}
         >
           <div>{`Score: ${this.state.gameTimer}`}</div>
@@ -275,7 +275,7 @@ class OfficialNotFoundGame extends React.Component {
           style={{
             border: '2px',
             borderStyle: 'solid',
-            borderColor: '#394B58'
+            borderColor: '#394B58',
           }}
         />
       </div>

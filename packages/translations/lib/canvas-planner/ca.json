@@ -109,8 +109,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Un fòrum fascinant" },
   "excused_cf8792eb": { "message": "Excusat" },
+  "extended_9a58dcb6": { "message": "Ampliada" },
   "failed_getting_course_list_49846a93": {
     "message": "No s’ha pogut obtenir la llista d''assignatures"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "No s’ha pogut obtenir la llista de tasques pendents"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "S’ha produït un error en revisar el teu futur"
@@ -135,6 +139,9 @@
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "No s''han pogut desar les tasques pendents"
+  },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "No s’ha pogut carregar la llista de tasques pendents"
   },
   "feedback_6dcc1991": { "message": "Suggeriments" },
   "fun_quiz_47ab0b0": { "message": "Una prova divertida" },
@@ -264,6 +271,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "De { startTime } a { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Tasques pendents de l''estudiant" },
   "submitted_318fad53": { "message": "Entregat" },
   "success_to_do_created_e34ed395": {
     "message": "Operació correcta: S''han creat tasques pendents"

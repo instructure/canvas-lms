@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ExternalToolCollection from 'ui/features/submit_assignment/backbone/collections/ExternalToolCollection.js'
+import ExternalToolCollection from 'ui/features/submit_assignment/backbone/collections/ExternalToolCollection'
 
 const data = [
   {
     description: 'Embed files from Box.net',
     domain: 'localhost',
     id: '1',
-    name: 'Box'
+    name: 'Box',
   },
   {
     description: 'This example LTI Tool Provider supports LIS Outcome...',
     domain: 'lti-tool-provider.herokuapp.com',
     id: '2',
-    name: "Brad's Tool"
-  }
+    name: "Brad's Tool",
+  },
 ]
 
 QUnit.module('ExternalToolCollection', {
   setup() {
     this.externalToolCollection = new ExternalToolCollection()
     this.externalToolCollection.add(data)
-  }
+  },
 })
 
-test('finds a tool by id', function() {
+test('finds a tool by id', function () {
   const tool = this.externalToolCollection.findWhere({id: '1'})
   equal(tool.get('name'), 'Box')
 })

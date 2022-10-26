@@ -22,10 +22,11 @@ import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/util/templateData'
+
 const I18n = useI18nScope('find_outcome')
 /* fillTemplateData, getTemplateData */
 
-var find_outcome = (function() {
+var find_outcome = (function () {
   return {
     find(callback, options) {
       options = options || {}
@@ -102,10 +103,7 @@ var find_outcome = (function() {
                 if (outcome.data && outcome.data.rubric_criterion) {
                   for (const jdx in outcome.data.rubric_criterion.ratings) {
                     const rating = outcome.data.rubric_criterion.ratings[jdx]
-                    const $rating = $outcome
-                      .find('.rating.blank')
-                      .clone(true)
-                      .removeClass('blank')
+                    const $rating = $outcome.find('.rating.blank').clone(true).removeClass('blank')
                     $rating.fillTemplateData({data: rating})
                     $outcome.find('tr').append($rating.show())
                   }
@@ -131,14 +129,14 @@ var find_outcome = (function() {
         modal: true,
         title: I18n.t('titles.find_outcome', 'Find Outcome'),
         width: 700,
-        height: 400
+        height: 400,
       })
-    }
+    },
   }
 })()
 window.find_outcome = find_outcome
-$(document).ready(function() {
-  $('#find_outcome_criterion_dialog .outcomes_select').click(function(event) {
+$(document).ready(function () {
+  $('#find_outcome_criterion_dialog .outcomes_select').click(function (event) {
     event.preventDefault()
     $('#find_outcome_criterion_dialog .outcomes_select.selected_side_tab').removeClass(
       'selected_side_tab'
@@ -148,7 +146,7 @@ $(document).ready(function() {
     $('#find_outcome_criterion_dialog .outcomes_list .outcome').hide()
     $('#find_outcome_criterion_dialog .outcomes_list .outcome_' + id).show()
   })
-  $('#find_outcome_criterion_dialog .select_outcome_link').click(function(event) {
+  $('#find_outcome_criterion_dialog .select_outcome_link').click(function (event) {
     event.preventDefault()
     const $outcome = $(this).parents('.outcome')
     $('#find_outcome_criterion_dialog').dialog('close')

@@ -327,7 +327,7 @@ export default function BulkEditTable({
             onChange={handleSelectAllAssignments}
           />
         </div>
-        <Table caption={I18n.t('Assignment Dates')} hover layout={layoutProp}>
+        <Table caption={I18n.t('Assignment Dates')} hover={true} layout={layoutProp}>
           <Table.Head>
             <Table.Row>
               <Table.ColHeader id="select" width={checkboxWidthProp}>

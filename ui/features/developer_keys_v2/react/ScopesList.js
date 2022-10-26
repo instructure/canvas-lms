@@ -33,14 +33,14 @@ export default class ScopesList extends React.Component {
   constructor(props) {
     super(props)
     const formattedScopesArray = Object.keys(this.props.availableScopes).map(k => ({
-      [k]: this.props.availableScopes[k]
+      [k]: this.props.availableScopes[k],
     }))
 
     this.state = {
       formattedScopesArray,
       availableScopes: formattedScopesArray.slice(0, 8), // Only load 8 groups on initial render
       selectedScopes: this.props.selectedScopes,
-      readOnlySelected: this.onlySelectGet(this.uniqueSelectedScopes(this.props.selectedScopes))
+      readOnlySelected: this.onlySelectGet(this.uniqueSelectedScopes(this.props.selectedScopes)),
     }
   }
 
@@ -64,7 +64,7 @@ export default class ScopesList extends React.Component {
     const selectedScopes = this.uniqueSelectedScopes(scope)
     this.setState({
       selectedScopes,
-      readOnlySelected: this.onlySelectGet(selectedScopes)
+      readOnlySelected: this.onlySelectGet(selectedScopes),
     })
     this.props.dispatch(this.props.listDeveloperKeyScopesSet(selectedScopes))
   }
@@ -90,7 +90,7 @@ export default class ScopesList extends React.Component {
 
     this.setState({
       selectedScopes: newScopes,
-      readOnlySelected: event.currentTarget.checked
+      readOnlySelected: event.currentTarget.checked,
     })
 
     this.props.dispatch(this.props.listDeveloperKeyScopesSet(newScopes))
@@ -185,14 +185,14 @@ ScopesList.propTypes = {
     PropTypes.arrayOf(
       PropTypes.shape({
         resource: PropTypes.string,
-        scope: PropTypes.string
+        scope: PropTypes.string,
       })
     )
   ).isRequired,
   filter: PropTypes.string.isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string)
+  selectedScopes: PropTypes.arrayOf(PropTypes.string),
 }
 
 ScopesList.defaultProps = {
-  selectedScopes: []
+  selectedScopes: [],
 }

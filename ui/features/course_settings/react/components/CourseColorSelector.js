@@ -44,7 +44,7 @@ export const COLOR_OPTIONS = [
   '#8F982E',
   '#CC7D2D',
   '#EB6730',
-  '#DF6B91'
+  '#DF6B91',
 ]
 const PREVIEW_SIZE = 16
 
@@ -57,7 +57,7 @@ function ColorPreview({color = '#FFF'}) {
         border: '1px solid #73818C',
         borderRadius: '3px',
         height: `${PREVIEW_SIZE}px`,
-        width: `${PREVIEW_SIZE}px`
+        width: `${PREVIEW_SIZE}px`,
       }}
       data-testid="course-color-preview"
     >
@@ -107,7 +107,7 @@ function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
             secondaryBackground: option,
             secondaryBorderColor: option,
             secondaryHoverBackground: darken(option, 10),
-            secondaryActiveBackground: darken(option, 10)
+            secondaryActiveBackground: darken(option, 10),
           }}
           tabIndex={focusedColorIndex === i ? 0 : -1}
           aria-pressed={color === option}
@@ -154,12 +154,12 @@ export default function CourseColorSelector({courseColor}) {
         onChange={(_, newColor) => setColor(validateColorString(color, newColor))}
         display="inline-block"
         width="10rem"
-        shouldNotWrap
+        shouldNotWrap={true}
       />
     </View>
   )
 }
 
 CourseColorSelector.propTypes = {
-  courseColor: string
+  courseColor: string,
 }

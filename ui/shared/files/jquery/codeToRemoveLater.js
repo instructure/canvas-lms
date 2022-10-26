@@ -27,7 +27,7 @@ const codeToRemoveLater = {
   },
   revertJawsChangesBackToNormal() {
     $("aside ul[role='presentation']").attr('role', 'tree')
-  }
+  },
 }
 
 export default codeToRemoveLater

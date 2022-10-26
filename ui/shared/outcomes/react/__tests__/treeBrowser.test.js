@@ -81,7 +81,7 @@ describe('useManageOutcomes', () => {
     act(() => result.current.queryCollections({id: '100', parentGroupId: '1'}))
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'Loading Account folder 0.',
-      srOnly: true
+      srOnly: true,
     })
   })
 })

@@ -29,7 +29,7 @@ class CustomError extends Error {
   constructor(message) {
     super()
     this.response = {
-      data: message
+      data: message,
     }
   }
 }
@@ -43,7 +43,7 @@ describe('GroupRemoveModal', () => {
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onSuccess: onSuccessMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -103,7 +103,7 @@ describe('GroupRemoveModal', () => {
 
   it('renders component with proper text for Course context', () => {
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />, {
-      contextType: 'Course'
+      contextType: 'Course',
     })
     expect(
       getByText(
@@ -124,7 +124,7 @@ describe('GroupRemoveModal', () => {
       expect(onSuccessMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This group was successfully removed.',
-        type: 'success'
+        type: 'success',
       })
     })
   })
@@ -138,7 +138,7 @@ describe('GroupRemoveModal', () => {
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this group. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
   })
@@ -155,7 +155,7 @@ describe('GroupRemoveModal', () => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message:
           'An error occurred while removing this group: "Fancy group" contains one or more Outcomes that are currently aligned to content.',
-        type: 'error'
+        type: 'error',
       })
     })
   })

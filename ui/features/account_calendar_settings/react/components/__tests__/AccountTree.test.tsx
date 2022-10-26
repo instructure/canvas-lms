@@ -27,7 +27,7 @@ const defaultProps = {
   originAccountId: 1,
   visibilityChanges: [],
   onAccountToggled: jest.fn(),
-  showSpinner: false
+  showSpinner: false,
 }
 
 beforeEach(() => {
@@ -55,7 +55,7 @@ describe('AccountTree', () => {
     expect(await findByRole('button', {name: 'University, 24 accounts'})).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
     const mccCheckbox = getByRole('checkbox', {
-      name: 'Show account calendar for Manually-Created Courses'
+      name: 'Show account calendar for Manually-Created Courses',
     })
     expect(universityCheckbox).toBeInTheDocument()
     expect(mccCheckbox).toBeInTheDocument()
@@ -93,8 +93,8 @@ describe('AccountTree', () => {
     fetchMock.getOnce(/\/api\/v1\/accounts\/1\/account_calendars.*/, {
       body: RESPONSE_ACCOUNT_1.slice(0, 3),
       headers: {
-        Link: '</api/v1/accounts/1/account_calendars?page=2&per_page=100>; rel="next"'
-      }
+        Link: '</api/v1/accounts/1/account_calendars?page=2&per_page=100>; rel="next"',
+      },
     })
     fetchMock.getOnce(
       '/api/v1/accounts/1/account_calendars?page=2&per_page=100',

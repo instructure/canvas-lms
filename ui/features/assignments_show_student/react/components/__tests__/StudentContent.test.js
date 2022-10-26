@@ -237,7 +237,7 @@ describe('Assignment Student Content View', () => {
     }
 
     // https://instructure.atlassian.net/browse/USERS-385
-    // eslint-disable-next-line jest/no-disabled-tests
+
     it.skip('renders Comments', async () => {
       // To be unskipped in EVAL-1679
       const mocks = await makeMocks()

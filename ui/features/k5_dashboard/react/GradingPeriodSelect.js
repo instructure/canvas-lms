@@ -33,14 +33,14 @@ export const ALL_PERIODS_OPTION = 'all'
 const GradingPeriodSelect = ({
   gradingPeriods,
   handleSelectGradingPeriod,
-  selectedGradingPeriodId
+  selectedGradingPeriodId,
 }) => (
   <View as="div">
     <SimpleSelect
       id="grading-period-select"
       renderLabel={I18n.t('Select Grading Period')}
       assistiveText={I18n.t('Use arrow keys to navigate options.')}
-      isInline
+      isInline={true}
       onChange={handleSelectGradingPeriod}
       width="20rem"
       value={selectedGradingPeriodId}
@@ -65,7 +65,7 @@ const GradingPeriodSelect = ({
 GradingPeriodSelect.propTypes = {
   gradingPeriods: PropTypes.arrayOf(PropTypes.shape(GradingPeriodShape)).isRequired,
   handleSelectGradingPeriod: PropTypes.func.isRequired,
-  selectedGradingPeriodId: PropTypes.string
+  selectedGradingPeriodId: PropTypes.string,
 }
 
 export default GradingPeriodSelect

@@ -74,7 +74,7 @@ const itemTypeLabels = {
   },
   get course_pace() {
     return I18n.t('Course Pace')
-  }
+  },
 }
 
 const itemTypeLabelPlurals = {
@@ -95,7 +95,7 @@ const itemTypeLabelPlurals = {
   },
   get course_pace() {
     return I18n.t('Course Pace')
-  }
+  },
 }
 
 const changeTypeLabels = {
@@ -110,7 +110,7 @@ const changeTypeLabels = {
   },
   get initial_sync() {
     return I18n.t('Initial Sync Incomplete')
-  }
+  },
 }
 
 const exceptionTypeLabels = {
@@ -131,7 +131,7 @@ const exceptionTypeLabels = {
   },
   get deleted() {
     return I18n.t('Deleted content exceptions:')
-  }
+  },
 }
 
 const lockTypeLabel = {
@@ -140,7 +140,7 @@ const lockTypeLabel = {
   },
   get unlocked() {
     return I18n.t('Unlocked')
-  }
+  },
 }
 
 const lockLabels = {
@@ -158,7 +158,7 @@ const lockLabels = {
   },
   get availability_dates() {
     return I18n.t('Availability Dates')
-  }
+  },
 }
 
 export {
@@ -167,5 +167,5 @@ export {
   exceptionTypeLabels,
   lockTypeLabel,
   lockLabels,
-  itemTypeLabelPlurals
+  itemTypeLabelPlurals,
 }

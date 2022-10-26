@@ -24,7 +24,7 @@ import StudentLastAttended from '../StudentLastAttended'
 const defaultProps = () => ({
   defaultDate: '2018-03-04T07:00:00.000Z',
   courseID: '1',
-  studentID: '1'
+  studentID: '1',
 })
 
 test('renders the StudentLastAttended component', () => {

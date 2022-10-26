@@ -34,11 +34,11 @@ export function BackButton({onClick, ...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={responsiveProps => (
         <span className="discussions-back-button">
@@ -66,9 +66,9 @@ BackButton.propTypes = {
   /**
    * Behavior for going back to the parent's thread.
    */
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
 }
 
 BackButton.defaultProps = {
-  onClick: () => {}
+  onClick: () => {},
 }

@@ -431,6 +431,7 @@ RSpec.shared_examples "a submission update action" do |controller|
         before do
           @assignment.update!(peer_reviews: true, anonymous_peer_reviews: true)
           @peer_reviewer = @course.enroll_student(User.create!, enrollment_state: :active).user
+          @assignment.submit_homework(@peer_reviewer, submission_type: "online_url", url: "http://www.google.com")
           peer_reviewer_submission = @assignment.submissions.find_by(user: @peer_reviewer)
           AssessmentRequest.create!(
             assessor: @peer_reviewer,

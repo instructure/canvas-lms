@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec/apis/lti/lti2_api_spec_helper"
-require "lib/lti/plagiarism_subscriptions_helper"
+require_relative "../../apis/lti/lti2_api_spec_helper"
 
 describe Lti::PlagiarismSubscriptionsHelper do
   include_context "lti2_api_spec_helper"

@@ -40,7 +40,7 @@ export default [
           {I18n.t(`Hello%{name}!`, {
             name: window.ENV?.current_user?.display_name
               ? `, ${window.ENV?.current_user?.display_name}`
-              : ''
+              : '',
           })}
         </Heading>
         <Text as="p">{I18n.t("Here's some quick tips to get you started in Canvas!")}</Text>
@@ -49,11 +49,11 @@ export default [
           <li>{I18n.t('How do I contact my instructor?')}</li>
           <li>{I18n.t('How do I download the Student App?')}</li>
         </ol>
-        <div className="tour-star-image" aria-hidden>
+        <div className="tour-star-image" aria-hidden={true}>
           <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
-    )
+    ),
   },
   {
     selector: '#global_nav_dashboard_link',
@@ -62,7 +62,7 @@ export default [
         <Heading level="h3">{I18n.t('How do I find my courses?')}</Heading>
         <Text as="p">{I18n.t('Find your classes or subjects in the Dashboard...')}</Text>
       </section>
-    )
+    ),
   },
   {
     selector: '.navigation-tray-container',
@@ -74,7 +74,7 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('courses')
-    }
+    },
   },
   {
     selector: '#global_nav_conversations_link',
@@ -85,7 +85,7 @@ export default [
           {I18n.t('Start a conversation with your instructor in the Canvas Inbox.')}
         </Text>
       </section>
-    )
+    ),
   },
   {
     selector: '.navigation-tray-container',
@@ -127,6 +127,6 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('help')
-    }
-  }
+    },
+  },
 ]

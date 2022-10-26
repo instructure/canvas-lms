@@ -172,7 +172,7 @@ export default class SyllabusView extends Backbone.View {
           date: start_date,
           orig_date: orig_start_date,
           passed: start_date && start_date < today,
-          events: []
+          events: [],
         }
 
         memo.push(lastDate)
@@ -201,7 +201,7 @@ export default class SyllabusView extends Backbone.View {
         last: true,
         override,
         json,
-        workflow_state: json.workflow_state
+        workflow_state: json.workflow_state,
       }
 
       lastDate.events.push(lastEvent)
@@ -239,7 +239,7 @@ export default class SyllabusView extends Backbone.View {
     // Return the dates and events in a handlebars friendly way
     return {
       dates,
-      overrides_present
+      overrides_present,
     }
   }
 }

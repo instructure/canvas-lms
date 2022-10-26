@@ -28,15 +28,15 @@ const getProps = () => ({
     links: {
       current: {
         url: 'abc',
-        page: '5'
+        page: '5',
       },
       last: {
         url: 'abc10',
-        page: '10'
-      }
-    }
+        page: '10',
+      },
+    },
   },
-  dataType: 'Course'
+  dataType: 'Course',
 })
 beforeEach(() => {
   flashElements = document.createElement('div')

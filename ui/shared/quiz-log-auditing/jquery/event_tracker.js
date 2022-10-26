@@ -113,7 +113,7 @@ export default class EventTracker {
     if (throttleMs > 0) {
       callback = throttle(callback, throttleMs, {
         leading: true,
-        trailing: false
+        trailing: false,
       })
     }
 

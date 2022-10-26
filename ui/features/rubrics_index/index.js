@@ -22,17 +22,17 @@ import '@canvas/outcomes/find_outcome'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 $(document).ready(() =>
-  $('#rubrics ul .delete_rubric_link').click(function(event) {
+  $('#rubrics ul .delete_rubric_link').click(function (event) {
     event.preventDefault()
     const $rubric = $(this).parents('li')
     return $rubric.confirmDelete({
       url: $(this).attr('href'),
       message: confirmationMessage(),
       success() {
-        $(this).slideUp(function() {
+        $(this).slideUp(function () {
           $(this).remove()
         })
-      }
+      },
     })
   })
 )

@@ -38,7 +38,7 @@ describe('MessageListActionContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -55,7 +55,7 @@ describe('MessageListActionContainer', () => {
 
   beforeEach(() => {
     window.ENV = {
-      current_user_id: 1
+      current_user_id: 1,
     }
   })
 
@@ -99,7 +99,7 @@ describe('MessageListActionContainer', () => {
       const mock = jest.fn()
 
       const component = setup({
-        onCourseFilterSelect: mock
+        onCourseFilterSelect: mock,
       })
 
       const courseDropdown = await component.findByTestId('course-select')
@@ -115,7 +115,7 @@ describe('MessageListActionContainer', () => {
       const mock = jest.fn()
 
       const component = setup({
-        onSelectMailbox: mock
+        onSelectMailbox: mock,
       })
 
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
@@ -132,7 +132,7 @@ describe('MessageListActionContainer', () => {
       const mock = jest.fn()
 
       const component = setup({
-        onSelectMailbox: mock
+        onSelectMailbox: mock,
       })
 
       const mailboxDropdown = await component.findByLabelText('Mailbox Selection')
@@ -147,7 +147,7 @@ describe('MessageListActionContainer', () => {
 
     it('should load with selected mailbox set via props', async () => {
       const component = setup({
-        activeMailbox: 'sent'
+        activeMailbox: 'sent',
       })
 
       const mailboxDropdown = await component.findByDisplayValue('Sent')
@@ -158,7 +158,7 @@ describe('MessageListActionContainer', () => {
   describe('reply buttons', () => {
     it('should disable replying when no conversations are selected', async () => {
       const component = setup({
-        selectedConversations: []
+        selectedConversations: [],
       })
 
       const replyButton = await component.findByTestId('reply')
@@ -169,7 +169,7 @@ describe('MessageListActionContainer', () => {
 
     it('should enable replying when conversations are selected', async () => {
       const component = setup({
-        selectedConversations: [{}]
+        selectedConversations: [{}],
       })
 
       const replyButton = await component.findByTestId('reply')
@@ -181,7 +181,7 @@ describe('MessageListActionContainer', () => {
     it('should disable replying when canReply is false', async () => {
       const component = setup({
         selectedConversations: [{}],
-        canReply: false
+        canReply: false,
       })
 
       const replyButton = await component.findByTestId('reply')
@@ -194,7 +194,7 @@ describe('MessageListActionContainer', () => {
   it('should have buttons disabled when their disabled states are true', async () => {
     const component = setup({
       deleteDisabled: true,
-      archiveDisabled: true
+      archiveDisabled: true,
     })
 
     const delBtn = await component.findByTestId('delete')
@@ -206,7 +206,7 @@ describe('MessageListActionContainer', () => {
   it('should have buttons enabled when their disabled states are false', async () => {
     const component = setup({
       deleteDisabled: false,
-      archiveDisabled: false
+      archiveDisabled: false,
     })
 
     const delBtn = await component.findByTestId('delete')
@@ -220,7 +220,7 @@ describe('MessageListActionContainer', () => {
     const component = setup({
       archiveDisabled: false,
       activeMailbox: 'sent',
-      onArchive: archiveMock
+      onArchive: archiveMock,
     })
 
     const archBtn = await component.findByTestId('archive')
@@ -232,7 +232,7 @@ describe('MessageListActionContainer', () => {
     const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true,
-      onUnarchive: unArchiveMock
+      onUnarchive: unArchiveMock,
     })
 
     const unarchBtn = await component.findByTestId('unarchive')
@@ -245,7 +245,7 @@ describe('MessageListActionContainer', () => {
       archiveDisabled: false,
       displayUnarchiveButton: true,
       selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],
-      onUnarchive: unArchiveMock
+      onUnarchive: unArchiveMock,
     })
 
     const unarchBtn = await component.findByTestId('unarchive')
@@ -258,7 +258,7 @@ describe('MessageListActionContainer', () => {
     const component = setup({
       deleteDisabled: false,
       selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],
-      onDelete: deleteMock
+      onDelete: deleteMock,
     })
 
     const deleteBtn = await component.findByTestId('delete')

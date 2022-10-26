@@ -71,7 +71,7 @@ export const SelfSignup = ({onChange}) => {
           </IconButton>
         </Tooltip>
       </Flex.Item>
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         <View display="block" padding="x-small x-small">
           <Checkbox
             checked={selfSignup}
@@ -99,5 +99,5 @@ export const SelfSignup = ({onChange}) => {
 }
 
 SelfSignup.propTypes = {
-  onChange: func.isRequired
+  onChange: func.isRequired,
 }

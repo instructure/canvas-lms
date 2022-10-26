@@ -46,14 +46,14 @@ class MessageStudents extends React.Component {
 
     // Callbacks
     onExited: PropTypes.func,
-    onRequestClose: PropTypes.func.isRequired
+    onRequestClose: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     bulkMessage: true,
     groupConversation: true,
     mode: 'async',
-    recipients: []
+    recipients: [],
   }
 
   constructor(props) {
@@ -68,13 +68,13 @@ class MessageStudents extends React.Component {
       data: {
         body: '',
         recipients: this.props.recipients,
-        subject: ''
+        subject: '',
       },
       errors: {},
       hideAlert: false,
       open: true,
       sending: false,
-      success: false
+      success: false,
     }
   }
 
@@ -85,7 +85,7 @@ class MessageStudents extends React.Component {
       bulk_message: this.props.bulkMessage,
       context_code: this.props.contextCode,
       group_conversation: this.props.groupConversation,
-      mode: this.props.mode
+      mode: this.props.mode,
     }
   }
 
@@ -94,8 +94,8 @@ class MessageStudents extends React.Component {
       ? [
           {
             text: this.state.errors[field],
-            type: 'error'
-          }
+            type: 'error',
+          },
         ]
       : null
   }
@@ -103,13 +103,13 @@ class MessageStudents extends React.Component {
   sendMessage(data) {
     const config = {
       headers: {
-        Accept: 'application/json'
-      }
+        Accept: 'application/json',
+      },
     }
 
     this.setState({
       hideAlert: false,
-      sending: true
+      sending: true,
     })
 
     axios
@@ -124,7 +124,7 @@ class MessageStudents extends React.Component {
     fields.forEach(field => {
       if (data[field].length === 0) {
         errors[field] = I18n.t('Please provide a %{field}', {
-          field
+          field,
         })
       }
     })
@@ -140,7 +140,7 @@ class MessageStudents extends React.Component {
 
   handleAlertClose = e => {
     this.setState({
-      hideAlert: true
+      hideAlert: true,
     })
   }
 
@@ -160,7 +160,7 @@ class MessageStudents extends React.Component {
 
     this.setState(
       {
-        open: false
+        open: false,
       },
       () => {
         this.props.onRequestClose()
@@ -175,7 +175,7 @@ class MessageStudents extends React.Component {
     if (Object.keys(errors).length > 0) {
       this.setState({
         errors,
-        hideAlert: false
+        hideAlert: false,
       })
     } else {
       this.sendMessage(data)
@@ -196,7 +196,7 @@ class MessageStudents extends React.Component {
     }
     this.setState({
       errors: serverErrors,
-      sending: false
+      sending: false,
     })
   }
 
@@ -204,13 +204,13 @@ class MessageStudents extends React.Component {
     setTimeout(() => {
       this.setState({
         ...this.initialState,
-        open: false
+        open: false,
       })
     }, 2500)
     this.setState({
       hideAlert: false,
       success: true,
-      sending: false
+      sending: false,
     })
   }
 

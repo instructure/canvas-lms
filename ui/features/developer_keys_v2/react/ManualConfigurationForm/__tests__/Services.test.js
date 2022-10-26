@@ -25,7 +25,7 @@ const props = (overrides = {}) => {
   return {
     validScopes: {ascope: 'ascope', bscope: 'bscope'},
     scopes: ['ascope'],
-    ...overrides
+    ...overrides,
   }
 }
 

@@ -37,36 +37,36 @@ const modes = {
     label: I18n.t('Locked'),
     icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Unlock'),
-    color: 'primary'
+    color: 'primary',
   },
   ADMIN_UNLOCKED: {
     label: I18n.t('Blueprint'),
     icon: IconBlueprintSolid,
     tooltip: I18n.t('Lock'),
-    color: 'secondary'
+    color: 'secondary',
   },
   ADMIN_WILLUNLOCK: {
     label: I18n.t('Blueprint'),
     icon: IconBlueprintSolid,
     tooltip: I18n.t('Unlock'),
-    color: 'secondary'
+    color: 'secondary',
   },
   ADMIN_WILLLOCK: {
     label: I18n.t('Locked'),
     icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Lock'),
-    color: 'primary'
+    color: 'primary',
   },
   TEACH_LOCKED: {
     label: I18n.t('Locked'),
     icon: IconBlueprintLockSolid,
-    color: 'secondary'
+    color: 'secondary',
   },
   TEACH_UNLOCKED: {
     label: I18n.t('Blueprint'),
     icon: IconBlueprintSolid,
-    color: 'secondary'
-  }
+    color: 'secondary',
+  },
 }
 
 const biggestLabelLength = Math.max(...Object.values(modes).map(mode => mode.label.length))
@@ -76,13 +76,13 @@ class LockToggle extends Component {
     isLocked: PropTypes.bool.isRequired,
     isToggleable: PropTypes.bool,
     onClick: PropTypes.func,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
     isToggleable: false,
     onClick: () => {},
-    breakpoints: {}
+    breakpoints: {},
   }
 
   static setupRootNode(wrapperSelector, childIndex, cb) {
@@ -113,7 +113,7 @@ class LockToggle extends Component {
   onEnter = () => {
     if (this.props.isToggleable) {
       this.setState({
-        mode: this.props.isLocked ? modes.ADMIN_WILLUNLOCK : modes.ADMIN_WILLLOCK
+        mode: this.props.isLocked ? modes.ADMIN_WILLUNLOCK : modes.ADMIN_WILLLOCK,
       })
     }
   }
@@ -121,7 +121,7 @@ class LockToggle extends Component {
   onExit = () => {
     if (this.props.isToggleable) {
       this.setState({
-        mode: this.props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED
+        mode: this.props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED,
       })
     }
   }

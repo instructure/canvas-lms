@@ -22,13 +22,14 @@ import moveQuestionTemplate from '../jst/move_question.handlebars'
 import htmlEscape from 'html-escape'
 import loadBanks from './loadBanks'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, .dim */
-import '@canvas/keycodes'/* keycodes */
-import '@canvas/loading-image'/* loadingImage */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
+import '@canvas/keycodes' /* keycodes */
+import '@canvas/loading-image' /* loadingImage */
 import '@canvas/util/templateData'
+
 const I18n = useI18nScope('question_bank')
 /* fillTemplateData, getTemplateData */
 
@@ -36,12 +37,12 @@ const moveQuestions = {
   elements: {
     $dialog: () => $('#move_question_dialog'),
     $questions: () => $('#move_question_dialog .questions'),
-    $loadMessage: $('<li />').append(htmlEscape(I18n.t('load_questions', 'Loading Questions...')))
+    $loadMessage: $('<li />').append(htmlEscape(I18n.t('load_questions', 'Loading Questions...'))),
   },
   messages: {
     move_copy_questions: I18n.t('title.move_copy_questions', 'Move/Copy Questions'),
     move_questions: I18n.t('move_questions', 'Move Questions'),
-    multiple_questions: I18n.t('multiple_questions', 'Multiple Questions')
+    multiple_questions: I18n.t('multiple_questions', 'Multiple Questions'),
   },
   page: 1,
   addEvents() {
@@ -53,55 +54,28 @@ const moveQuestions = {
     this.prepDialog()
     this.showDialog()
     this.loadData()
-    this.elements
-      .$dialog()
-      .parent()
-      .find('.ui-dialog-titlebar-close')[0]
-      .focus()
+    this.elements.$dialog().parent().find('.ui-dialog-titlebar-close')[0].focus()
   },
   prepDialog() {
-    this.elements
-      .$dialog()
-      .find('.question_text')
-      .hide()
+    this.elements.$dialog().find('.question_text').hide()
     this.elements.$questions().show()
-    this.elements
-      .$questions()
-      .find('.list_question:not(.blank)')
-      .remove()
-    this.elements
-      .$dialog()
-      .find('.question_name')
-      .text(this.messages.multiple_questions)
-    this.elements
-      .$dialog()
-      .find('.copy_option')
-      .hide()
-      .find(':checkbox')
-      .attr('checked', false)
-    this.elements
-      .$dialog()
-      .find('.submit_button')
-      .text(this.messages.move_questions)
-    this.elements
-      .$dialog()
-      .find('.multiple_questions')
-      .val('1')
+    this.elements.$questions().find('.list_question:not(.blank)').remove()
+    this.elements.$dialog().find('.question_name').text(this.messages.multiple_questions)
+    this.elements.$dialog().find('.copy_option').hide().find(':checkbox').attr('checked', false)
+    this.elements.$dialog().find('.submit_button').text(this.messages.move_questions)
+    this.elements.$dialog().find('.multiple_questions').val('1')
     this.elements.$dialog().data('question', null)
   },
   showDialog() {
     if (!this.elements.$dialog().hasClass('loaded')) {
       loadBanks(this.elements.$dialog())
     } else {
-      this.elements
-        .$dialog()
-        .find('li message')
-        .hide()
+      this.elements.$dialog().find('li message').hide()
     }
 
     this.elements.$dialog().dialog({
       title: this.messages.move_copy_questions,
-      width: 600
+      width: 600,
     })
   },
   loadData() {
@@ -124,7 +98,7 @@ const moveQuestions = {
     } else {
       this.page = 1
     }
-  }
+  },
 }
 
 export default moveQuestions

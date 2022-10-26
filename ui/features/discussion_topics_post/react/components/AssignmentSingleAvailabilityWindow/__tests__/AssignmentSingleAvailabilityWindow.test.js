@@ -33,7 +33,7 @@ const mockOverrides = [
     dueAt: '2021-03-30T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-24T00:00:00-06:00',
-    title: 'assignment override 1'
+    title: 'assignment override 1',
   },
   {
     id: 'ZXMzaWdebTubeC0x',
@@ -41,7 +41,7 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 2'
+    title: 'assignment override 2',
   },
   {
     id: 'BXMzaWdebTVubC0x',
@@ -49,8 +49,8 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 3'
-  }
+    title: 'assignment override 3',
+  },
 ]
 
 beforeAll(() => {
@@ -60,14 +60,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -76,7 +76,7 @@ const setup = (props = {}) => {
     <AssignmentSingleAvailabilityWindow
       assignmentOverrides={mockOverrides}
       assignment={Assignment.mock()}
-      isAdmin
+      isAdmin={true}
       singleOverrideWithNoDefault={false}
       onSetDueDateTrayOpen={jest.fn()}
       {...props}
@@ -107,12 +107,12 @@ describe('AssignmentSingleAvailabilityWindow', () => {
             title: '1 student',
             set: {
               students: [{shortName: 'Tom Jones', __typename: 'User'}],
-              __typename: 'AdhocStudents'
+              __typename: 'AdhocStudents',
             },
-            __typename: 'AssignmentOverride'
-          }
+            __typename: 'AssignmentOverride',
+          },
         ],
-        singleOverrideWithNoDefault: true
+        singleOverrideWithNoDefault: true,
       })
 
       expect(container.getByText('Tom Jones')).toBeInTheDocument()
@@ -122,7 +122,7 @@ describe('AssignmentSingleAvailabilityWindow', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '767px'}
+        tablet: {maxWidth: '767px'},
       }))
     })
 

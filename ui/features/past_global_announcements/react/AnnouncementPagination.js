@@ -31,7 +31,7 @@ const I18n = useI18nScope('past_global_announcements')
  */
 export default class AnnouncementPagination extends React.Component {
   state = {
-    currentPage: 0
+    currentPage: 0,
   }
 
   render() {

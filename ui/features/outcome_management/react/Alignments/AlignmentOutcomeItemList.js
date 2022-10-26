@@ -90,14 +90,14 @@ const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer
 }
 
 AlignmentOutcomeItemList.defaultProps = {
-  loadMore: () => {}
+  loadMore: () => {},
 }
 
 AlignmentOutcomeItemList.propTypes = {
   rootGroup: groupDataShape,
   scrollContainer: PropTypes.instanceOf(Element),
   loading: PropTypes.bool,
-  loadMore: PropTypes.func
+  loadMore: PropTypes.func,
 }
 
 export default AlignmentOutcomeItemList

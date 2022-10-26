@@ -134,6 +134,18 @@ describe "teacher k5 dashboard" do
       expect(announcement_button).to be_displayed
     end
 
+    it "opens up the announcement when announcement title is clicked" do
+      announcement = new_announcement(@homeroom_course, "Cool title", "Content...")
+      get "/"
+
+      click_announcement_title("Cool title")
+      wait_for_ajaximations
+
+      expect(driver.current_url).to include(
+        "/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}"
+      )
+    end
+
     it_behaves_like "k5 homeroom announcements"
 
     it_behaves_like "k5 homeroom announcements with multiple homerooms", :teacher

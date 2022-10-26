@@ -29,14 +29,14 @@ const visibleEventTypes = [
   K.EVT_QUESTION_ANSWERED,
   K.EVT_QUESTION_FLAGGED,
   K.EVT_QUESTION_VIEWED,
-  K.EVT_SESSION_STARTED
+  K.EVT_SESSION_STARTED,
 ]
 
 class EventStream extends React.Component {
   static defaultProps = {
     events: [],
     submission: {},
-    questions: []
+    questions: [],
   }
 
   render() {
@@ -65,14 +65,14 @@ class EventStream extends React.Component {
       ...e,
       startedAt: this.props.submission.startedAt,
       questions: this.props.questions,
-      attempt: this.props.attempt
+      attempt: this.props.attempt,
     }
 
     return <Event key={e.id} {...props} />
   }
 
   getVisibleEvents(events) {
-    return events.filter(function(e) {
+    return events.filter(function (e) {
       if (visibleEventTypes.indexOf(e.type) === -1) {
         return false
       }

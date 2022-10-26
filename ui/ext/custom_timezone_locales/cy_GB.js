@@ -27,8 +27,8 @@ module.exports = {
       'Dydd Mercher',
       'Dydd Iau',
       'Dydd Gwener',
-      'Dydd Sadwrn'
-    ]
+      'Dydd Sadwrn',
+    ],
   },
   month: {
     abbrev: ['Ion', 'Chwe', 'Maw', 'Ebr', 'Mai', 'Meh', 'Gor', 'Aws', 'Med', 'Hyd', 'Tach', 'Rhag'],
@@ -44,13 +44,13 @@ module.exports = {
       'Medi',
       'Hydref',
       'Tachwedd',
-      'Rhagfyr'
-    ]
+      'Rhagfyr',
+    ],
   },
   meridiem: ['AM', 'PM'],
   date: '%d/%m/%y',
   time24: '%T',
   dateTime: '%a %d %b %Y %T %Z',
   time12: '%l:%M:%S %P %Z',
-  full: '%a %b %e %H:%M:%S %Z %Y'
+  full: '%a %b %e %H:%M:%S %Z %Y',
 }

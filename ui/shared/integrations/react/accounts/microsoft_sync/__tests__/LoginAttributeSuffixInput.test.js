@@ -36,11 +36,11 @@ describe('LoginAttributeSuffixInput', () => {
   it('calls the provided input handler on input', () => {
     const handlerMock = jest.fn()
     const container = setup({
-      suffixInputHandler: handlerMock
+      suffixInputHandler: handlerMock,
     })
     userEvent.type(
       container.getByRole('textbox', {
-        name: /login attribute suffix input area/i
+        name: /login attribute suffix input area/i,
       }),
       testSuffix
     )
@@ -53,9 +53,9 @@ describe('LoginAttributeSuffixInput', () => {
       messages: [
         {
           text: 'error message!',
-          type: 'error'
-        }
-      ]
+          type: 'error',
+        },
+      ],
     })
 
     expect(container.getByText(/error message!/i)).toBeInTheDocument()
@@ -63,12 +63,12 @@ describe('LoginAttributeSuffixInput', () => {
 
   it('renders the provided suffix', () => {
     const container = setup({
-      loginAttributeSuffix: testSuffix
+      loginAttributeSuffix: testSuffix,
     })
 
     expect(
       container.getByRole('textbox', {
-        name: /login attribute suffix input area/i
+        name: /login attribute suffix input area/i,
       }).value
     ).toBe(testSuffix)
   })

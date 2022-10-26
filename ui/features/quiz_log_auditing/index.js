@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { configure, mount } from './react/index'
+import {configure, mount} from './react/index'
 import ready from '@instructure/ready'
 
 ready(() => {
@@ -28,7 +28,7 @@ ready(() => {
     questionsUrl: ENV.questions_url,
     submissionUrl: ENV.submission_url,
     eventsUrl: ENV.events_url,
-    allowMatrixView: ENV.can_view_answer_audits
+    allowMatrixView: ENV.can_view_answer_audits,
   })
 
   mount(document.body.querySelector('#content')).then(() =>

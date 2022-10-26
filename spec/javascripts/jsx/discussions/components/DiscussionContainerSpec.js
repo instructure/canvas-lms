@@ -23,8 +23,8 @@ import moment from 'moment'
 import {
   DiscussionsContainer,
   mapState,
-  discussionTarget
-} from 'ui/features/discussion_topics_index/react/components/DiscussionContainer.js'
+  discussionTarget,
+} from 'ui/features/discussion_topics_index/react/components/DiscussionContainer'
 
 const defaultProps = () => ({
   title: 'discussions',
@@ -36,7 +36,7 @@ const defaultProps = () => ({
   hasLoadedDiscussions: false,
   getDiscussions: () => {},
   roles: ['student', 'user'],
-  renderContainerBackground: () => {}
+  renderContainerBackground: () => {},
 })
 
 QUnit.module('DiscussionsContainer component')
@@ -128,8 +128,8 @@ test('connected mapStateToProps filters out filtered discussions', () => {
   const ownProps = {
     discussions: [
       {id: 1, filtered: true},
-      {id: 2, filtered: false}
-    ]
+      {id: 2, filtered: false},
+    ],
   }
   const connectedProps = mapState(state, ownProps)
   deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])

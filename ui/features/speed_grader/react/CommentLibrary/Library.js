@@ -50,7 +50,7 @@ const Library = ({
   setFocusToTextArea,
   updateComment,
   suggestionsRef,
-  setRemovedItemIndex
+  setRemovedItemIndex,
 }) => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [showResults, setShowResults] = useState(false)
@@ -79,7 +79,7 @@ const Library = ({
         message: I18n.t(
           'There are new comment suggestions available. Press Tab to access the suggestions menu.'
         ),
-        srOnly: true
+        srOnly: true,
       })
       setShowResults(true)
     }
@@ -156,7 +156,7 @@ Library.propTypes = {
   comments: PropTypes.arrayOf(
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
-      _id: PropTypes.string.isRequired
+      _id: PropTypes.string.isRequired,
     })
   ).isRequired,
   setComment: PropTypes.func.isRequired,
@@ -170,7 +170,7 @@ Library.propTypes = {
   setFocusToTextArea: PropTypes.func.isRequired,
   updateComment: PropTypes.func.isRequired,
   suggestionsRef: PropTypes.object,
-  setRemovedItemIndex: PropTypes.func.isRequired
+  setRemovedItemIndex: PropTypes.func.isRequired,
 }
 
 export default Library

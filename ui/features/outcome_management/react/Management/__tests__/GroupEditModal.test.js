@@ -34,13 +34,13 @@ describe('GroupEditModal', () => {
   const group = {
     _id: '100',
     title: 'Group title',
-    description: 'Group description'
+    description: 'Group description',
   }
   const defaultProps = (props = {}) => ({
     outcomeGroup: group,
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
-    ...props
+    ...props,
   })
 
   const render = (
@@ -48,7 +48,7 @@ describe('GroupEditModal', () => {
     {
       contextType = 'Account',
       contextId = '1',
-      mocks = [updateOutcomeGroupMock({description: group.description})]
+      mocks = [updateOutcomeGroupMock({description: group.description})],
     } = {}
   ) => {
     return realRender(
@@ -82,9 +82,9 @@ describe('GroupEditModal', () => {
         updateOutcomeGroupMock({
           vendorGuid: null,
           parentOutcomeGroupId: null,
-          description: group.description
-        })
-      ]
+          description: group.description,
+        }),
+      ],
     })
     await act(async () => jest.runOnlyPendingTimers())
     const titleField = getByDisplayValue('Group title')
@@ -94,7 +94,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'success',
-      message: '"Updated title" was successfully updated.'
+      message: '"Updated title" was successfully updated.',
     })
   })
 
@@ -104,9 +104,9 @@ describe('GroupEditModal', () => {
         updateOutcomeGroupMock({
           vendorGuid: null,
           parentOutcomeGroupId: null,
-          description: group.description
-        })
-      ]
+          description: group.description,
+        }),
+      ],
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
@@ -115,7 +115,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'success',
-      message: '"Updated title" was successfully updated.'
+      message: '"Updated title" was successfully updated.',
     })
   })
 
@@ -135,9 +135,9 @@ describe('GroupEditModal', () => {
           vendorGuid: null,
           parentOutcomeGroupId: null,
           failResponse: true,
-          description: group.description
-        })
-      ]
+          description: group.description,
+        }),
+      ],
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
@@ -146,7 +146,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while editing this group. Please try again.'
+      message: 'An error occurred while editing this group. Please try again.',
     })
   })
 
@@ -157,9 +157,9 @@ describe('GroupEditModal', () => {
           vendorGuid: null,
           parentOutcomeGroupId: null,
           failMutation: true,
-          description: group.description
-        })
-      ]
+          description: group.description,
+        }),
+      ],
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
@@ -168,7 +168,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while editing this group. Please try again.'
+      message: 'An error occurred while editing this group. Please try again.',
     })
   })
 
@@ -179,9 +179,9 @@ describe('GroupEditModal', () => {
           vendorGuid: null,
           parentOutcomeGroupId: null,
           failMutationNoErrMsg: true,
-          description: group.description
-        })
-      ]
+          description: group.description,
+        }),
+      ],
     })
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
@@ -190,7 +190,7 @@ describe('GroupEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalled()
     expect(showFlashAlert).toHaveBeenCalledWith({
       type: 'error',
-      message: 'An error occurred while editing this group. Please try again.'
+      message: 'An error occurred while editing this group. Please try again.',
     })
   })
 })

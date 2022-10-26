@@ -26,20 +26,20 @@ describe('ProficiencyFilter', () => {
       color: 'blue',
       description: 'great!',
       masteryAt: 1,
-      points: 2
+      points: 2,
     },
     {
       color: 'green',
       description: 'mastery!',
       masteryAt: 1,
-      points: 1
+      points: 1,
     },
     {
       color: 'red',
       description: 'not great',
       masteryAt: 1,
-      points: 0
-    }
+      points: 0,
+    },
   ]
 
   let visibleRatings
@@ -50,7 +50,7 @@ describe('ProficiencyFilter', () => {
       ratings,
       visibleRatings,
       setVisibleRatings,
-      ...props
+      ...props,
     }
   }
 

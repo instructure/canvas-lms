@@ -21,7 +21,7 @@ import React from 'react'
 import RosterTableRowMenuButton from '../RosterTableRowMenuButton'
 
 const DEFAULT_PROPS = {
-  name: 'Test User'
+  name: 'Test User',
 }
 
 describe('RowMenuButton', () => {

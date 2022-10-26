@@ -27,7 +27,7 @@ import {
   IconMiniArrowDownLine,
   IconMiniArrowEndLine,
   IconWarningLine,
-  IconInfoLine
+  IconInfoLine,
 } from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
@@ -87,7 +87,11 @@ export const Module: React.FC<ComponentProps> = props => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader data-testid="pp-due-date-columnheader" width={actuallyExpanded ? 'auto' : '0'} id={`module-${props.module.id}-duration`}>
+      <ColHeader
+        data-testid="pp-due-date-columnheader"
+        width={actuallyExpanded ? 'auto' : '0'}
+        id={`module-${props.module.id}-duration`}
+      >
         <Flex
           as="div"
           aria-labelledby="due-date-column-title"
@@ -169,11 +173,11 @@ export const Module: React.FC<ComponentProps> = props => {
           [(Button as any).theme]: {
             borderRadius: '0',
             mediumPaddingTop: '1rem',
-            mediumPaddingBottom: '1rem'
+            mediumPaddingBottom: '1rem',
           },
           [(ColHeader as any).theme]: {
-            padding: '0'
-          }
+            padding: '0',
+          },
         }}
       >
         <ToggleDetails
@@ -181,13 +185,13 @@ export const Module: React.FC<ComponentProps> = props => {
           icon={() => <IconMiniArrowEndLine />}
           iconExpanded={() => <IconMiniArrowDownLine />}
           variant="filled"
-          defaultExpanded
+          defaultExpanded={true}
           size="large"
           theme={{
             iconMargin: '0.5rem',
             filledBorderRadius: '0',
             filledPadding: '2rem',
-            togglePadding: '0'
+            togglePadding: '0',
           }}
         >
           <View as="div" borderWidth="0 small">
@@ -210,9 +214,8 @@ export const Module: React.FC<ComponentProps> = props => {
                       as="div"
                       aria-labelledby="days-column-title"
                       alignItems="end"
-                      justifyItems={isStudentPace ? 'center' : 'start'}
+                      justifyItems="center"
                       padding={headerPadding}
-                      margin={`0 0 0 ${isStudentPace || isTableStacked ? '0' : 'xx-small'}`}
                     >
                       <View id="days-column-title">{I18n.t('Days')}</View>
                       <Tooltip
@@ -233,7 +236,11 @@ export const Module: React.FC<ComponentProps> = props => {
                     </Flex>
                   </ColHeader>
                   {renderDateColHeader()}
-                  <ColHeader data-testid="pp-status-columnheader" id={`module-${props.module.id}-status`} textAlign="center">
+                  <ColHeader
+                    data-testid="pp-status-columnheader"
+                    id={`module-${props.module.id}-status`}
+                    textAlign="center"
+                  >
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>

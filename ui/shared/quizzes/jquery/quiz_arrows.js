@@ -71,13 +71,13 @@ export default class QuizArrowApplicator {
   applyCSS() {
     $.each(
       [this.rightTpl, this.wrongTpl, this.correctTpl, this.shortTpl, this.surveyAnswerTpl],
-      function() {
+      function () {
         this.css({[direction('left')]: -128, top: 5})
       }
     )
     $.each(
       [this.unansweredTpl, this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl],
-      function() {
+      function () {
         this.css({[direction('left')]: -108, top: 9})
       }
     )
@@ -120,7 +120,7 @@ export default class QuizArrowApplicator {
     //
     // Enable a11y for <input /> elements that receive focus by speaking the
     // answer result which is contained in the arrow marker.
-    $('#questions .answer_arrow').each(function() {
+    $('#questions .answer_arrow').each(function () {
       const $arrow = $(this)
 
       // This might be either an ".answer", or an ".answers_wrapper" in case

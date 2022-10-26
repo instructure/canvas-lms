@@ -26,11 +26,11 @@ import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import newYork from 'timezone/America/New_York'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
-import SyllabusCollection from 'ui/features/syllabus/backbone/collections/SyllabusCollection.js'
-import SyllabusCalendarEventsCollection from 'ui/features/syllabus/backbone/collections/SyllabusCalendarEventsCollection.js'
-import SyllabusAppointmentGroupsCollection from 'ui/features/syllabus/backbone/collections/SyllabusAppointmentGroupsCollection.js'
-import SyllabusPlannerCollection from 'ui/features/syllabus/backbone/collections/SyllabusPlannerCollection.js'
-import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView.js'
+import SyllabusCollection from 'ui/features/syllabus/backbone/collections/SyllabusCollection'
+import SyllabusCalendarEventsCollection from 'ui/features/syllabus/backbone/collections/SyllabusCalendarEventsCollection'
+import SyllabusAppointmentGroupsCollection from 'ui/features/syllabus/backbone/collections/SyllabusAppointmentGroupsCollection'
+import SyllabusPlannerCollection from 'ui/features/syllabus/backbone/collections/SyllabusPlannerCollection'
+import SyllabusView from 'ui/features/syllabus/backbone/views/SyllabusView'
 import SyllabusViewPrerendered from './SyllabusViewPrerendered'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
@@ -63,7 +63,7 @@ function setupServerResponses() {
       200,
       {
         'Content-Type': 'application/json',
-        Link: links
+        Link: links,
       },
       JSON.stringify(response)
     )
@@ -85,7 +85,7 @@ function setupServerResponses() {
       200,
       {
         'Content-Type': 'application/json',
-        Link: links
+        Link: links,
       },
       JSON.stringify(response)
     )
@@ -106,7 +106,7 @@ function setupServerResponses() {
       200,
       {
         'Content-Type': 'application/json',
-        Link: links
+        Link: links,
       },
       JSON.stringify(response)
     )
@@ -128,9 +128,9 @@ QUnit.module('Syllabus', {
       tz: timezone(denver, 'America/Denver'),
       tzData: {
         'America/Denver': denver,
-        'America/New_York': newYork
+        'America/New_York': newYork,
       },
-      formats: getI18nFormats()
+      formats: getI18nFormats(),
     })
 
     this.clock = sinon.useFakeTimers(new Date(2012, 0, 23, 15, 30).getTime())
@@ -153,7 +153,7 @@ QUnit.module('Syllabus', {
       new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
       new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
       new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
-      new SyllabusPlannerCollection([ENV.context_asset_string])
+      new SyllabusPlannerCollection([ENV.context_asset_string]),
     ]
 
     const acollection = new SyllabusCollection(collections)
@@ -168,7 +168,7 @@ QUnit.module('Syllabus', {
           collection.fetch({
             page: 'next',
             success,
-            error
+            error,
           })
 
           // need to manually respond to calls made during a previous response
@@ -178,10 +178,10 @@ QUnit.module('Syllabus', {
 
       return collection.fetch({
         data: {
-          per_page: 2
+          per_page: 2,
         },
         success,
-        error
+        error,
       })
     })
 
@@ -190,7 +190,7 @@ QUnit.module('Syllabus', {
     // Render and bind behaviors
     this.view = new SyllabusView({
       el: '#syllabusTableBody',
-      collection: acollection
+      collection: acollection,
     })
   },
 
@@ -308,7 +308,7 @@ QUnit.module('Syllabus', {
       'Local: Jan 1 at 8am<br>Course: Jan 1 at 10am',
       'event - correct local and course times given'
     )
-  }
+  },
 })
 
 test('render (user public course)', function () {

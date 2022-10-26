@@ -30,7 +30,7 @@ describe('useResize', () => {
     width: 1000,
     height: 500,
     right: 1000,
-    bottom: 500
+    bottom: 500,
   }
   const mockDelimiter = {
     x: 250,
@@ -40,7 +40,7 @@ describe('useResize', () => {
     width: 10,
     height: 500,
     right: 260,
-    bottom: 500
+    bottom: 500,
   }
   const mockElement = () => {
     Element.prototype.getBoundingClientRect = jest
@@ -58,7 +58,7 @@ describe('useResize', () => {
       setLeftColumnRef,
       setDelimiterRef,
       setRightColumnRef,
-      onKeyDownHandler
+      onKeyDownHandler,
     } = useResize()
     return (
       <div ref={setContainerRef}>
@@ -99,18 +99,18 @@ describe('useResize', () => {
       expect(rightColumn).toHaveStyle('width: 74%')
       fireEvent.mouseDown(delimiter)
       fireEvent.mouseMove(delimiter, {
-        clientX: 400
+        clientX: 400,
       })
       expect(leftColumn).toHaveStyle('width: 400px')
       expect(rightColumn).toHaveStyle('width: 588px')
       fireEvent.mouseMove(delimiter, {
-        clientX: 500
+        clientX: 500,
       })
       expect(leftColumn).toHaveStyle('width: 500px')
       expect(rightColumn).toHaveStyle('width: 488px')
       fireEvent.mouseUp(delimiter)
       fireEvent.mouseMove(delimiter, {
-        clientX: 600
+        clientX: 600,
       })
       expect(leftColumn).toHaveStyle('width: 500px')
       expect(rightColumn).toHaveStyle('width: 488px')
@@ -124,7 +124,7 @@ describe('useResize', () => {
       expect(rightColumn).toHaveStyle('width: 74%')
       fireEvent.mouseDown(document)
       fireEvent.mouseMove(document, {
-        clientX: 200
+        clientX: 200,
       })
       expect(leftColumn).toHaveStyle('width: 25%')
       expect(rightColumn).toHaveStyle('width: 74%')
@@ -140,7 +140,7 @@ describe('useResize', () => {
       expect(rightColumn).toHaveStyle('width: 74%')
       fireEvent.mouseDown(delimiter)
       fireEvent.mouseMove(delimiter, {
-        clientX: 400
+        clientX: 400,
       })
       expect(leftColumn).toHaveStyle('width: 588px')
       expect(rightColumn).toHaveStyle('width: 400px')
@@ -154,7 +154,7 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
       fireEvent.keyDown(getByTestId('delimiter'), {
         key: 'ArrowLeft',
-        keyCode: 37
+        keyCode: 37,
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 245px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 743px')
@@ -166,7 +166,7 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
       fireEvent.keyDown(getByTestId('delimiter'), {
         key: 'ArrowRight',
-        keyCode: 39
+        keyCode: 39,
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 255px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 733px')
@@ -178,7 +178,7 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
       fireEvent.keyDown(getByTestId('delimiter'), {
         key: 'PageDown',
-        keyCode: 34
+        keyCode: 34,
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 225px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 763px')
@@ -190,7 +190,7 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
       fireEvent.keyDown(getByTestId('delimiter'), {
         key: 'PageUp',
-        keyCode: 33
+        keyCode: 33,
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 275px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 713px')
@@ -203,7 +203,7 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 74%')
       fireEvent.keyDown(getByTestId('delimiter'), {
         key: 'ArrowLeft',
-        keyCode: 37
+        keyCode: 37,
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 743px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 245px')

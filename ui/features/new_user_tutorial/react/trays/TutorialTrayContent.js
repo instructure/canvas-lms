@@ -55,7 +55,7 @@ const TutorialTrayContent = props => (
                 <Flex.Item padding="xxx-small small none none">
                   <IconQuestionLine inline={false} size="x-small" />
                 </Flex.Item>
-                <Flex.Item shouldGrow shouldShrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Link href={link.href} isWithinText={false} display="block" target="_blank">
                     {link.label}
                   </Link>
@@ -91,7 +91,7 @@ TutorialTrayContent.propTypes = {
   image: PropTypes.string,
   imageWidth: PropTypes.string,
   links: PropTypes.array,
-  seeAllLink: PropTypes.object
+  seeAllLink: PropTypes.object,
 }
 TutorialTrayContent.defaultProps = {
   children: [],
@@ -99,7 +99,7 @@ TutorialTrayContent.defaultProps = {
   imageWidth: '7.5rem',
   name: '',
   links: undefined,
-  seeAllLink: undefined
+  seeAllLink: undefined,
 }
 
 export default TutorialTrayContent

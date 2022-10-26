@@ -27,7 +27,7 @@ const valuesToSort = [
   {id: 6, name: 'âbel'},
   {id: 7, name: 'Abel'},
   {id: 8, name: 'joh, jonny'},
-  {id: 9, name: 'joh  jonny'}
+  {id: 9, name: 'joh  jonny'},
 ]
 
 QUnit.module('sorts values properly when used to compare strings')
@@ -42,7 +42,7 @@ test('puts remaining words in the right order since there are no collisions poss
     'joh, jonny',
     'john, john',
     'John, John',
-    'johnson, john'
+    'johnson, john',
   ]
   const sortedValueNames = valuesToSort.sort(natcompare.byKey('name')).map(item => item.name)
 

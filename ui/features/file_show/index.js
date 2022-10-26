@@ -24,8 +24,8 @@ import ready from '@instructure/ready'
 const previewDefaults = {
   height: '100%',
   scribdParams: {
-    auto_size: true
-  }
+    auto_size: true,
+  },
 }
 
 ready(() => {

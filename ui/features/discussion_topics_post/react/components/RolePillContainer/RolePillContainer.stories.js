@@ -22,14 +22,14 @@ import {RolePillContainer} from './RolePillContainer'
 export default {
   title: 'Examples/Discussion Posts/Components/Role Pill Container',
   component: RolePillContainer,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <RolePillContainer {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']
+  discussionRoles: ['Author', 'TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
 }
 
 export const SingleAuthorRole = Template.bind({})

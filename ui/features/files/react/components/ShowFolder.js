@@ -39,7 +39,7 @@ const I18n = useI18nScope('react_files')
 
 ShowFolder.getInitialState = function () {
   return {
-    hideToggleAll: true
+    hideToggleAll: true,
   }
 }
 
@@ -55,7 +55,7 @@ ShowFolder.renderFilePreview = function () {
   if (this.props.query.preview != null) {
     return (
       <FilePreview
-        isOpen
+        isOpen={true}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
         currentFolder={this.props.currentFolder}
         params={this.props.params}
@@ -123,19 +123,12 @@ ShowFolder.render = function () {
     return <div ref="emptyDiv" />
   }
 
-  let folderOrRootFolder
-  if (this.props.params.splat) {
-    folderOrRootFolder = 'folder'
-  } else {
-    folderOrRootFolder = 'rootFolder'
-  }
-
   const foldersNextPageOrFilesNextPage =
     this.props.currentFolder.folders.fetchingNextPage ||
     this.props.currentFolder.files.fetchingNextPage
 
   const selectAllLabelClass = classnames({
-    'screenreader-only': this.state.hideToggleAll
+    'screenreader-only': this.state.hideToggleAll,
   })
 
   const hasLoadedAll = !!(
@@ -153,8 +146,8 @@ ShowFolder.render = function () {
         id="selectAllCheckbox"
         className={selectAllLabelClass}
         type="checkbox"
-        onFocus={event => this.setState({hideToggleAll: false})}
-        onBlur={event => this.setState({hideToggleAll: true})}
+        onFocus={_event => this.setState({hideToggleAll: false})}
+        onBlur={_event => this.setState({hideToggleAll: true})}
         checked={this.props.areAllItemsSelected()}
         onChange={event => this.props.toggleAllSelected(event.target.checked)}
       />

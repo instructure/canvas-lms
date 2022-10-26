@@ -27,7 +27,7 @@ export default class SandboxFactory {
 
     this._sandboxes = {
       fetch: new FetchSandbox(options),
-      sinon: new SinonSandbox(options)
+      sinon: new SinonSandbox(options),
     }
 
     this._options.contextTracker.onContextStart(() => {

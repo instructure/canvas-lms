@@ -29,21 +29,15 @@ const I18n = useI18nScope('terms.index')
 const dateOpts = {format: 'full'}
 
 $(document).ready(() => {
-  $('.submit_button').click(function(event) {
+  $('.submit_button').click(function (event) {
     const $term = $(this).closest('.term')
     return $term.find('.enrollment_term_form').submit()
   })
 
-  $('.edit_term_link').click(function(event) {
+  $('.edit_term_link').click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.term')
-      .addClass('editing_term')
-    $(this)
-      .parents('.term')
-      .find(':text:visible:first')
-      .focus()
-      .select()
+    $(this).parents('.term').addClass('editing_term')
+    $(this).parents('.term').find(':text:visible:first').focus().select()
     $(this)
       .parents('.term')
       .find('.date_field')
@@ -52,7 +46,7 @@ $(document).ready(() => {
       .date_field()
   })
 
-  $('.term .cancel_button').click(function() {
+  $('.term .cancel_button').click(function () {
     const $term = $(this).closest('.term')
     $term.removeClass('editing_term')
     if ($term.attr('id') === 'term_new') {
@@ -70,7 +64,7 @@ $(document).ready(() => {
     )
   })
 
-  $('.delete_term_link').click(function(event) {
+  $('.delete_term_link').click(function (event) {
     event.preventDefault()
     const $term = $(this).closest('.term')
     let $focusTerm = $term.prev()
@@ -85,11 +79,11 @@ $(document).ready(() => {
       url,
       message: I18n.t('prompts.delete', 'Are you sure you want to delete this term?'),
       success() {
-        $(this).fadeOut(function() {
+        $(this).fadeOut(function () {
           $(this).remove()
           $toFocus.focus()
         })
-      }
+      },
     })
   })
 
@@ -167,15 +161,13 @@ $(document).ready(() => {
       }
       $tr.find('.submit_button').text(button_text)
       $('.edit_term_link', $(this).closest('term')).focus()
-    }
+    },
   })
 
   $('.add_term_link').click(event => {
     event.preventDefault()
     if ($('#term_new').length > 0) return
-    const $term = $('#term_blank')
-      .clone(true)
-      .attr('id', 'term_new')
+    const $term = $('#term_blank').clone(true).attr('id', 'term_new')
     $('#terms').prepend($term.show())
     $term.find('.edit_term_link').click()
   })

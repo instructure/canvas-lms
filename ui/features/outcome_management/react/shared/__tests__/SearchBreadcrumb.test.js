@@ -25,7 +25,7 @@ describe('SearchBreadcrumb', () => {
     groupTitle: 'Outcome Group',
     searchString: '',
     loading: false,
-    ...props
+    ...props,
   })
 
   it('renders component', () => {

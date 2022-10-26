@@ -37,7 +37,7 @@ QUnit.module('Fetch all pages component', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('passes records through by default', assert => {
@@ -62,7 +62,7 @@ test('calls process if provided', assert => {
   return fetchAllPages(ENV.numbers_url, {
     process(response) {
       return response.map(x => x * 2)
-    }
+    },
   }).promise.then(records => {
     start()
     deepEqual(records.get('content'), [2, 4, 6])

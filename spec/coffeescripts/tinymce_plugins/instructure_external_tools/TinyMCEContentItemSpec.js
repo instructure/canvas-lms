@@ -20,7 +20,7 @@
 //       with the upgrade to tinymce from 5.3.1 to 5.6.2, from though I can't
 //       figure out why.
 //       You'll also see console.error messages in the output
-//       "ERROR LOG: 'Failed to load icons: default from url http://localhost:9876/base/spec/javascripts/icons/default/icons.js'"
+//       "ERROR LOG: 'Failed to load icons: default from url http://localhost:9876/base/spec/javascripts/icons/default/icons'"
 //       You can't stop tinymce from trying to load its default icons, and I can't figure
 //       out how to point it somewhere that won't fail. It doesn't affect the tests.
 
@@ -37,13 +37,13 @@ QUnit.module('TinyMCEContentItem LTI Link', {
     return tinymce.init({
       selector: '#fixtures textarea#a42',
       theme: null,
-      content_css: []
+      content_css: [],
     })
   },
   teardown() {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
     $('#fixtures').empty()
-  }
+  },
 })
 
 test("Handles LTI link with presentation target of 'embed' and thumbnail is set", () => {
@@ -142,9 +142,7 @@ QUnit.skip(
   "Handles LTI link with presentation target of 'window' and thumbnail is *NOT* set",
   () => {
     const iframe = $('.mce-tinymce').find('iframe')[0]
-    const tinymce_element = $(iframe)
-      .find('body')
-      .append('<p>&nbsp;</p>')
+    const tinymce_element = $(iframe).find('body').append('<p>&nbsp;</p>')
     tinymce_element.click()
     const contentItem = TinyMCEContentItem.fromJSON(contentItems.lti_window)
     equal(contentItem.text, 'Arch Linux plain window')
@@ -165,7 +163,7 @@ QUnit.module('TinyMCEContentItem File Item', {
   },
   teardown() {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test("Handles File item with presentation target of 'embed' and thumbnail is set", () => {

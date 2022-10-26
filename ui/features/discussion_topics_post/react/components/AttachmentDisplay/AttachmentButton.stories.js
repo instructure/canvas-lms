@@ -22,7 +22,7 @@ import {AttachmentButton} from './AttachmentButton'
 export default {
   title: 'Examples/Discussion Posts/Components/AttachmentButton',
   component: AttachmentButton,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AttachmentButton {...args} />
@@ -32,7 +32,7 @@ Default.args = {
   attachment: {
     id: 1,
     display_name: 'file_name.file',
-    url: 'file_download_example.com'
+    url: 'file_download_example.com',
   },
-  onDeleteItem: () => {}
+  onDeleteItem: () => {},
 }

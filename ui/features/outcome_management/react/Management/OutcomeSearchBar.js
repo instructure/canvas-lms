@@ -33,7 +33,7 @@ const OutcomeSearchBar = ({
   label,
   enabled,
   onChangeHandler,
-  onClearHandler
+  onClearHandler,
 }) => {
   const [isFocused, setIsFocused] = useState(false)
 
@@ -49,7 +49,7 @@ const OutcomeSearchBar = ({
         placeholder={placeholder}
         value={searchString}
         renderLabel={label || <ScreenReaderContent>{I18n.t('Search field')}</ScreenReaderContent>}
-        shouldNotWrap
+        shouldNotWrap={true}
         onChange={onChangeHandler}
         onFocus={focusHandler}
         onBlur={focusHandler}
@@ -76,7 +76,7 @@ const OutcomeSearchBar = ({
 
 OutcomeSearchBar.defaultProps = {
   enabled: true,
-  placeholder: ''
+  placeholder: '',
 }
 
 OutcomeSearchBar.propTypes = {
@@ -85,7 +85,7 @@ OutcomeSearchBar.propTypes = {
   placeholder: PropTypes.string,
   searchString: PropTypes.string.isRequired,
   onChangeHandler: PropTypes.func.isRequired,
-  onClearHandler: PropTypes.func.isRequired
+  onClearHandler: PropTypes.func.isRequired,
 }
 
 export default OutcomeSearchBar

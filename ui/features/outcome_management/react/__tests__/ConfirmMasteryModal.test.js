@@ -24,7 +24,7 @@ const defaultProps = () => ({
   isOpen: true,
   onClose: () => {},
   title: 'title',
-  modalText: 'body!!'
+  modalText: 'body!!',
 })
 
 it('calls onClose and does not call onConfirm when canceled', () => {

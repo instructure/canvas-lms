@@ -901,6 +901,19 @@ fi:
           description: 
             text: "Tämä raportti näyttää kaikkien opiskelijoiden lopulliset arvosanat  määrätyn lukukauden aikana. Tuloksena saadussa csv-tiedostossa on yksi rivi per ilmoittautuminen, ja se näyttää nykyisen ja lopullisen arvosanan, joka näkyy kurssin arvosanakirjassa."
     group_type: ryhmä
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Kurssit
+              order: 
+                label: Järjestys
+              outcome: 
+                radio: Osaamistulokset
+              user: 
+                radio: Käyttäjät
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1224,6 +1237,7 @@ fi:
         equella_teaser: Equella-kommentit
         global_includes: "Mukautetut CSS/JavaScript-korvaukset"
         include_students_in_global_survey: "Sisällytä opiskelijat globaaleihin kyselyihin"
+        kill_joy: "Poista piilotettu peli 404-sivulta"
         limit_parent_app_web_access: "Rajoita pääsyä Canvas webiin Canvas Parent-sovelluksesta"
         locked: "Lukitse tämä asetus alatileille ja kursseille"
         login_handle_name: Sisäänkirjautumismerkki
@@ -1508,7 +1522,7 @@ fi:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: "Kurssin tunnukset"
+                header: "Kurssin SIS-tunnukset"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -2767,6 +2781,7 @@ fi:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Ilmeni virhe tulosta luodessa. %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Ilmeni virhe tulosta luodessa. Yritä uudelleen."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Ilmoitusten poistamisessa tapahtui virhe"
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Tapaamisryhmän poistossa ilmeni virhe"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Ilmeni virhe tätä ryhmää muokatessa. Yritä uudelleen."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Ilmeni virhe tätä tulosta muokatessa. Yritä uudelleen."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Ilmeni virhe näitä tuloksia tuotaessa."
@@ -2824,6 +2839,7 @@ fi:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Pätevyyden luokituksia tallennettaessa ilmeni virhe: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Liitosten tallentamisen yhteydessä tapahtui virhe"
   an_error_occurred_while_saving_changes_b42c9b84: "Muutosten tallentamisen yhteydessä tapahtui virhe"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "Tapaamisryhmän tallennuksessa ilmeni virhe"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ilmeni virhe tallennettaessa tehtävän lähetyskäytäntöä"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ilmeni virhe tallennettaessa kurssin lähetyskäytäntöä"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Ilmeni virhe tallennettaessa hallinnan asteikkoa: %{message}"
@@ -4035,6 +4051,7 @@ fi:
   attempt_3dd42b18: yritys
   attempt_attempt_d3911720: "Yritys %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Yritys %{attempt} Palaute"
+  attempt_attempt_feedback_549683ba: "Yritys %{attempt} Palaute:"
   attempt_attempt_grade_c01f45df: "Yritys %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Yritys %{attempt} Pistemäärä:"
   attempt_count_267a4fc5: "Yritys %{count}"
@@ -4271,6 +4288,7 @@ fi:
   beta_lti_launch_c200ffdf: "Beta LTI käynnistys:"
   beta_url_3c7b88ec: "Beta URL:"
   better_error_handling_for_file_uploads_in_the_ags__9bb4fb28: "Parempi virheidenkäsittely tiedoston latauksille AGS Scores API:ssa"
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Paremmat LTI AGS -vastauskoodit päätetyille kursseille"
   between_1_and_10_7118bf2d: "1 ja 10 välillä"
   between_1_and_5_f2a74bcf: "1 ja 5 välillä"
   between_1_and_99_d421a4c0: "1-99 % välillä"
@@ -5098,6 +5116,7 @@ fi:
       asetus päivittää sitä, kuinka URL:n uudelleenkirjoitus tapahtuu esikatselemalla
       tiedostot Canvasissa ilman niiden lataamista.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: Canvas-tukikeskus
   canvas_thinks_response_is_valid_8cc4a67d: "Canvasin mielestä vastaus on kelvollinen"
   canvas_ticketing_email_connector_27e253ae: "Canvas tukipyyntöjen sähköpostiosoitteen liitin"
   canvas_ticketing_web_post_connector_11158897: "Canvas tukipyyntöjen verkkolähetyksen liitin"
@@ -5469,6 +5488,7 @@ fi:
   collapse_discussion_thread_52bab65a: "Kutista keskusteluketju"
   collapse_discussion_thread_from_author_34f9cd18: "Kutista keskusteluketju %{author}"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kutista ryhmän jäsenten lista kohteelle %{groupName}"
+  collapse_name_fdea035c: "Kutista %{name}"
   collapse_outcome_description_de471564: "Kutista tuloksen kuvaus"
   collapse_replies_20f2faf7: "Kutista vastaukset"
   collapse_replies_ef4fc36b: "Kutista vastaukset"
@@ -5494,6 +5514,7 @@ fi:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentoi vastaamalla tähän viestiin tai liity keskusteluun tämän linkin kautta: %{link}. Kun sallittu, jos sinun täytyy lisätä liite, kirjaudu sisään Canvasiin ja vastaa siellä keskusteluun."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentoi vastaamalla tähän viestiin tai liity keskusteluun tämän linkin kautta: %{link}Kun sallittu, jos sinun täytyy lisätä liite, kirjaudu sisään Canvasiin ja vastaa siellä ilmoitukseen."
   comment_destroyed_5cfc922d: "Kommentti tuhottu"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Kommentin lähettäminen epäonnistui! Yritä myöhemmin uudelleen."
   comment_input_box_b8c7e58b: "Kommenttien syöttöruutu"
   comment_library_84735835: Huomautuskirjasto
@@ -7753,6 +7774,7 @@ fi:
   create_new_group_set_13b1f62a: "Luo uusi ryhmäjoukko"
   create_number_of_groups_groups_now_f89f220e: "Luo heti %{number_of_groups} ryhmää"
   create_outcome_4dac05a0: "Luo tulos"
+  create_pace_4ff3e9c: "Luo tahditus"
   create_pages_581a4d59: "Luo sivuja"
   create_slots_71dbb2f8: "Luo tapaamisajat"
   create_subject_86de5618: "Luo aihe"
@@ -8273,6 +8295,7 @@ fi:
   delete_this_section_380338: "Poista tämä osio"
   delete_this_submission_type_37a0809c: "Poista tämä tehtävän palautustapa"
   delete_this_theme_46d95edc: "Poistetaanko tämä teema?"
+  delete_time_range_e14461a0: "Poista aikaväli"
   delete_title_6c18eba5: "Poista %{title}"
   delete_tool_90ca44da: Poistotyökalu
   delete_tool_app_9c9f6d35: "Poistetaanko %{tool} sovellus?"
@@ -8746,6 +8769,7 @@ fi:
   discussions_redesign_b505952d: "Keskustelujen uudelleensuunnittelu"
   discussions_redesign_isolated_view_78626c74: "Keskustelujen uudelleenmuotoilu - Eristetty näkymä"
   discussions_redesign_reporting_f4abcc37: "Keskusteluiden uudelleensuunnittelu - raportointi"
+  discussions_redesign_split_screen_view_d1b88d0e: "Keskustelujen uudelleenmuotoilu - Jaettu näkymä"
   discussions_tutorial_tray_4ef79bcc: "Keskustelujen ohjetietopaneeli"
   discussions_view_c6818792: "Keskustelut - tarkastele"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Keskustelut ryhmien kanssa eivät voi olla osiokohtaisia"
@@ -8764,11 +8788,13 @@ fi:
             myöhässä olevilla tehtäville, ja piilota arvosanat helposti, kunnes olet valmis antamaan opiskelijoiden
             tarkastelevan niitä. Käytä yksinkertaistettuun arvosanojen antoon SpeedGrader tarkastellaksesi lähetyksiä ja antaaksesi niille arvosanoja.
   display_historical_view_of_achievements_of_users_53db5938: "Näytä käyttäjien saavutusten historiallinen näkymä"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Näytettävä nimi:"
   display_name_b80c243e: "Näytettävä nimi"
   display_student_filter_options_ab034cfa: "Näytön opiskelijan suodatusasetukset"
   display_to_students_e1301f99: "Näytä opiskelijoille"
   display_totals_for_all_grading_periods_option_4a72586: "Näytä kaikkien arvosanojen antojaksojen summat -asetus"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Näytettävät arvot"
   displaying_to_students_b1e92058: "Näytetään opiskelijoille"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -8951,10 +8977,11 @@ fi:
   duplication_failed_3351ffb1: "Kopiointi epäonnistui"
   duplication_of_title_succeeded_2e0bd645: "%{title} kopiointi onnistui"
   duration_1_minute_29c7d5ab: "Kesto: 1 minuutti"
+  duration_for_assignment_name_851ca365: "Tehtävän kesto %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Kesto: %{hours} tuntia ja %{minutes} minuuttia"
   duration_in_minutes_8959f63e: "Kesto minuuteissa"
   duration_minutes_minutes_d7b9182b: "Kesto: %{minutes} minuuttia"
-  duration_must_be_less_than_99_999_999_minutes_ec7b116d: "Keston on oltava alle 99 999 999 minuuttia pitkä"
+  duration_must_be_less_than_99_999_999_minutes_ec7b116d: "Keston on oltava alle 99 999 999 minuuttia pitkä"
   dutch_6d05cee5: hollanti
   dynamic_concurrency_231dbdc5: "Dynaaminen rinnakkaisuus"
   e_c2991d1b: e
@@ -9920,6 +9947,7 @@ fi:
   expand_discussion_thread_from_author_829cfae1: "Laajenna keskusteluketju %{author}"
   expand_global_navigation_2c28d5d4: "Laajenna päävalikkoa"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Laajenna ryhmän jäsenten lista kohteelle %{groupName}"
+  expand_name_71d944fd: "Laajenna %{name}"
   expand_outcome_description_c5bdd70b: "Laajenna tuloksen kuvaus"
   expand_permission_b45bf097: "Laajenna %{permission}"
   expand_permission_c61d5958: "Laajenna käyttöoikeutta"
@@ -10170,6 +10198,7 @@ fi:
   federated_attributes_5cbe6441: "sovelluksen ulkopuoliset määritteet"
   federated_attributes_are_information_sent_from_you_2116fb61: "Sovelluksen ulkopuoliset määritteet ovat todennuksen tarjoajasi lähettämiä tietoja, joita voidaan käyttää päivittämään vastaavat tiedot käyttäjille Canvasissa automaattisesi joka kerta, kun he kirjautuvat sisään."
   feed_url_8a433438: "Syötteen url"
+  feedback_6dcc1991: Palaute
   feeds_9f1c5c76: Syötteet
   field_9ec0ec01: Kenttä
   field_cannot_be_blank_afb5b332: "Kenttä ei voi olla tyhjä."
@@ -10563,6 +10592,7 @@ fi:
   grade_grade_7e52dd1c: "Arvosana: %{grade}"
   grade_high_to_low_1cea0381: "Arvosana - korkeasta alhaiseen"
   grade_info_19fb9875: "Tietoja arvosanasta"
+  grade_loading_bc1ad721: "Arvosana ladattu"
   grade_low_to_high_1678b713: "Arvosana - alhaisesta korkeaan"
   grade_out_of_percentage_1972bf52: "Pisteet /%{percentage}"
   grade_out_of_points_d401b79d: "Pisteet /%{points}"
@@ -11200,6 +11230,7 @@ fi:
   group_membership_count_is_invalid_cc6b2d47: "Ryhmän jäsenyyden määrä ei kelpaa"
   group_membership_limit_54e165b: "Ryhmän jäsenraja"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Ryhmän jäsenyysrajan täytyy olla yhtä suuri tai suurempi kuin nykyinen jäsenten määrä."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Ryhmän jäsenten määrän rajoituksen täytyy olla suurempi kuin 1."
   group_name_b69c144: "Ryhmän nimi"
   group_name_e4066daa: "ryhmän nimi"
   group_name_group_announcements_5ce81c6d: "%{group_name} - Ryhmän ilmoitukset"
@@ -11469,6 +11500,7 @@ fi:
   has_submissions_6c12ef4c: "On lähetyksiä"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "On arvostelemattomia lähetyksiä"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Onko sinulla kysyttävää Canvasista? Kysy täällä."
   have_not_been_graded_df2a5fd2: "Ei ole annettu arvosanaa"
   have_not_yet_submitted_57e6a58b: "Ei ole vielä palautettu"
   haven_t_been_graded_d7dee5bb: "Ei ole vielä arvioitu"
@@ -11907,6 +11939,12 @@ fi:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Jos synkronisointi on käytössä, synkronisointikurssin rekisteröitymiset Microsoft Groups -konserniin ovat
       saatavissa. Tilin pääkäyttäjät voivat ottaa tämän käyttöön tiliasetuksissa.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Jos AGS API on käytössä, se palauttaa hyödyllisen vastauskoodin aina, kun
+      LTI-työkalu yrittää käyttää tai muokata tietoja kurssilla, joka on jo suoritettu.
+      Sen sijasta, että API palauttaisi viestin "Yleinen 404 ei löytynyt", API palauttaa koodin 422
+      ja sen kanssa hyödyllisen viestin, joka ilmaisee, että työkalu ei voi siirtyä päätettyihin
+      kursseihin.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Jos OAuth 2.0 on käytössä, se palauttaa nyt oikein 4xx-tilakoodit
       pyytämällä asiakkaalta sen sijaan, että uudelleenohjaisivat ne itselleen
@@ -16815,6 +16853,7 @@ fi:
   pace_plans_4bb9c5ff: Toteutustahtisuunnitelmat
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Toteutustahtisuunnitelmat lisäävät ilmoittautumisten lisäämisen tukea Canvasiin; minkä ansiosta määräpäivät opiskelijoille, joilla on eri aloituspäivät, voidaan jakaa erinomaisesti opettajan määrittämällä tahdilla. Lue lisää ja anna palautetta liittymällä tahtisuunnitelmien käyttäjäryhmään."
   pace_plans_is_in_active_development_f6c20046: "Toteutustahtisuunnitelmat ovat aktiivisessa kehityksessä."
+  pace_removed_8e625df7: "Tahdistus poistettu"
   package_error: "Virhe pakkauksen tyypin tunnistuksessa: %{error}"
   package_export_from_d6e2b073: "Paketin vienti lähteestä"
   page_50c4823d: Sivu
@@ -17293,6 +17332,7 @@ fi:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Lisää linkki ohje-valikkoon"
         default_domain: "Verkkotunnus (oletus)"
         default_key: "Avain (oletus)"
         tier_1_domain: "Verkkotunnus (Tason 1 tuki)"
@@ -19698,6 +19738,7 @@ fi:
   remove_outcomes_9abcc8fd: 
     one: "Poistetaanko tulos?"
     other: "Poistetaanko tulokset?"
+  remove_pace_97381e05: "Poista tahditus"
   remove_placement_90862c13: "Poista %{placement}"
   remove_points_from_rubric_dcd4b585: "Poista pisteet arviointitaulukosta"
   remove_pronouns_5ff760ff: "Poista pronomineja"
@@ -19721,12 +19762,15 @@ fi:
   remove_these_dates_48453a81: "Poista nämä päivämäärät"
   remove_this_item_from_the_module_4b2ceab7: "Poista tämä kohde moduulista"
   remove_this_rubric_from_my_list_c7d80704: "Poista tämä arviointitaulukko luettelostani"
+  remove_this_section_pace_ba87ad3c: "Poistetaanko tämä osion tahditus?"
+  remove_this_student_pace_a5e7b3c5: "Poistetaanko tämä opiskelijan tahditus?"
   remove_user_from_section_5556f465: "Poista käyttäjä osiosta"
   remove_webcam_image_count_efee4a11: "Poista verkkokameran kuva %{count}"
   removed_assignment_assignment_name_835cc776: "Poistettu tehtävä %{assignment_name}"
   removed_course_association_course_a233342c: "Kurssin liitos %{course} poistettu"
   removed_filename_a8634af3: "poistettu %{filename}"
   removed_user_as_group_leader_bb69330f: "Poistettu %{user} ryhmän johtajana"
+  removing_pace_9493910c: "Tahditusta poistetaan..."
   rename_45608f54: "Nimeä uudelleen"
   rename_filter_c6cc8efc: "Nimeä suodatin uudelleen"
   rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Muuta sivun nimeä tai sijaintia sivun nimen vieressä olevasta asetusvalikosta. Vaihtoehtoisesti voit napsauttaa sivun nimeä muuttaaksesi sen nimeä tai raahata sen otsikosta haluamaasi kohtaan."
@@ -20420,6 +20464,7 @@ fi:
   section_level_calendar_permissions_6aff8cdb: "Toissijaiset kalenterin käyttöoikeudet"
   section_name_b6d82574: "Osion nimi"
   section_name_edb51b2: "osion nimi"
+  section_pace_989d2856: "Osion tahditus"
   section_removed_2ac72a79: "%{section} poistettu"
   section_section_names_98f172e6: "Osio: %{section_names}"
   section_sis_2a80d2fa: "Osion sis"
@@ -20487,6 +20532,7 @@ fi:
   security_7a7e8808: Tietoturva
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Tietoturva-asetus, jolla rajoitetaan URL-linkkien liittymistä konferenssiin"
   security_tab_failed_to_load_2d2242a: "Tietoturva-välilehden lataus epäonnistui"
+  see_comments_details_44f460d9: "Katso kommenttien tiedot"
   see_example_below_to_see_how_different_calculation_618de98d: "Katso alla oleva esimerkki siitä, kuinka erilaiset laskentaparametrit vaikuttavat opiskelijan hallinnan laskentaan."
   see_more_in_canvas_guides_fc90a457: "Katso lisää Canvas-oppaista"
   see_other_users_primary_email_address_59c8473f: "Näytä muiden käyttäjien ensisijainen sähköpostiosoite"
@@ -21566,6 +21612,7 @@ fi:
   size_b30e1077: Koko
   size_f1873a2: ", koko: "
   size_size_a77bd760: "koko: %{size}"
+  skillcode_685526a6: taitokoodi
   skip_bcb86160: Ohita
   skip_weekends_13cbd889: "Ohita viikonloput"
   skipped_file_filename_due_to_error_94f0194: "Tiedosto %{filename} ohitettiin virheen vuoksi"
@@ -21940,6 +21987,7 @@ fi:
       edistymistä kurssin osaamisen hallinnassa. Tulokset esitetään Arvosanakirjan kaltaisessa
       muodossa ja edistyminen näytetään sekä numeerisena pistemääränä, että hyvä osaaminen /tyydyttävä
       osaaminen/osaamisessa parannettavaa.
+  student_pace_2200bf85: "Opiskelijan tahditus"
   student_page_history_ce86b3c2: "Näytä sivuhistoria"
   student_page_history_pages_update_ae55fa03: "Opiskelijasivun historia (Sivut - Päivitys)"
   student_paired_successfully_a88def61: "Opiskelijoiden yhdistäminen onnistui"
@@ -22078,6 +22126,7 @@ fi:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Tehtäväpalautuksen kommentti: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Lähetyksen kommentit"
   submission_comments_b6d65841: "Tehtäväpalautuksen kommentit"
+  submission_comments_tray_290fad59: "Tehtäväpalautuksen kommentin ilmoitusalue"
   submission_completed_ba0e552e: "Lähetys valmis"
   submission_data_88085815: Palautuspäivämäärä
   submission_date_8f659c0c: "Tehtäväpalautuksen päivämäärä"
@@ -22371,6 +22420,7 @@ fi:
   sync_to_posttosisname_9837a8bf: "Synkronoi kohteeseen %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synkronoi kohteeseen %{postToSISName}"
   sync_to_sisname_f343e59: "Synkronoi kohteeseen %{sisName}"
+  sync_uris_50c59540: "Synkronoi URI-osoitteita"
   synced_97764882: Synkronoitu
   synced_message_20469c8f: "Synkronoitu: %{message}"
   syncing_3061cc8d: Synkronoidaan...
@@ -22953,6 +23003,7 @@ fi:
   there_was_an_error_fetching_custom_columns_542014ef: "Mukautettujen sarakkeiden noudossa ilmeni virhe"
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Ilmeni virhe arvosanakirjojen noudossa"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Arvosanakirjan suodattimien noudossa ilmeni virhe."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Arvosana-antojakson tehtävätietojen tietojen noutamisessa tapahtui virhe."
   there_was_an_error_fetching_modules_8ee451bb: "Moduulien noudossa ilmeni virhe."
   there_was_an_error_fetching_outcome_results_45c57590: "Osaamistulosten noudossa ilmeni virhe"
   there_was_an_error_fetching_student_data_87463510: "Opiskelijan tietojen noutamisessa tapahtui virhe."
@@ -23124,6 +23175,9 @@ fi:
       Tämä ominaisuuden merkki mahdollistaa eristetyn näkymän uuden
       keskustelun uudelleensuunnittelutyöön sisällä.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Tämä ominaisuuden merkki ottaa käyttöön React/InstUI- ja GraphQL Ihmiset -sivun päivityksen."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Tämä ominaisuuden merkki mahdollistaa eristetyn näkymän uuden
+      keskustelun uudelleensuunnittelutyön sisällä.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Tämän ominaisuuden merkki mahdollistaa päivitetyn
       keskustelun luonti-/muokkaussivun käytön
@@ -23318,9 +23372,11 @@ fi:
   this_report_shows_the_student_final_grade_results__5a508b55: "Tämä raportti näyttää kaikkien opiskelijoiden lopulliset arvosanat  määrätyn lukukauden aikana. Tuloksena saadussa csv-tiedostossa on yksi rivi per ilmoittautuminen, ja se näyttää nykyisen ja lopullisen arvosanan, joka näkyy kurssin arvosanakirjassa."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Tämä näytesivu sisältää yleisiä käyttöliittymän elementtejä Canvasissa, joiden avulla voit rakentaa mukautetun brändäyksesi. Kun ryhdyt tekemään muutoksia värien ja kuvien arvoihin vasemmassa sivupalkissa, näet *Esikatsele muutoksiasi* -painikkeen. Päivitä tämä sivu napsauttamalla sitä ja katso, miltä muutoksesi näyttävät."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Tällä esimerkkisivulla on yleisiä Canvasin käyttöliittymän elementtejä, jotka auttavat sinua rakentamaan brändin mukaisen ilmeen sivustolle. Kun ryhdyt tekemään muutoksia värien ja kuvien arvoihin, näet *Esikatsele muutoksiasi* -painikkeen. Päivitä tämä sivu napsauttamalla sitä ja katso, miltä muutoksesi näyttävät."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Tämä osion tahditus poistetaan ja tahditus palautuu takaisin oletusarvoiseen."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Nämä asetukset vaikuttuvat näkymääsi opiskelijoiden arvosanoista ja näyttää arvosanat, jos kaikista arvostelemattomista tehtävistä annetaan pistemääräksi nolla. Tämä asetus on vain visuaalinen muutos eikä vaikuta opiskelijoiden tai muiden tämän arvosanakirjan käyttäjien arvosanoihin. Kun tämä asetus on käytössä, Canvas ei esitäytä nollia arvosanakirjaan opiskelijan yksittäisten tehtävien lähetyksistä. Vain tehtäväryhmät ja yhteensä sarakkeet antavat automaattisesti nollapisteet jokaisen opiskelijan kokonaisprosenttilukuun."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Tämä asetus muuttaa Canvas-kokemusta opiskelijoille ja opettajille merkittävästi."
   this_settings_only_impact_enrollments_this_include_7f51358: "Nämä asetukset vaikuttavat vain ilmoittautumisiin. Tämä sisältää kohteet, joiden last_activity_at aikaleima on suurempi kuin Päivitetty jälkeen -parametri. Oletus on pois päältä"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Tämä opiskelijan tahditus poistetaan ja tahditus palautuu takaisin oletusarvoiseen."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Tämän opiskelijan ilmoittautuminen on viety loppuun"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Opiskelija sai juuri epätavallisen korkean arvosanan."
   this_student_was_just_awarded_negative_points_55741a37: "Tämä opiskelija sai juuri negatiivisia pisteitä."
@@ -24556,6 +24612,7 @@ fi:
   unregister_service_985238e9: "Kumoa palvelun rekisteröinti"
   unreserved_e86b7425: Varaamaton
   unsafe_file_link_8a18eceb: "epäluotettava tiedostolinkki"
+  unsaved_change_eb23d452: "Tallentamaton muutos"
   unselected_all_courses_99a9d35c: "Poistettiin valinta kaikista kursseista"
   unselected_course_course_89995a83: "Ei-valittu kurssi %{course}"
   unselected_external_tool_tool_1bd68403: "Ulkoinen työkalu %{tool}, jota ei ole valittu"
@@ -25812,6 +25869,9 @@ fi:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Et voi julkaista, kun toteutustahtisuunnitelmaa ladataan"
   you_cannot_publish_while_loading_the_plan_685405e5: "Et voi julkaista, kun suunnitelmaa ladataan"
   you_cannot_publish_while_publishing_2f65264b: "Et voi julkaista, kun julkaisua suoritetaan"
+  you_cannot_remove_a_locked_pace_150675e9: "Et voi siirtää lukittua sivua"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Et voi siirtää tahditusta, kun se latautuu yhä."
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Et voi siirtää tahditusta, kun sitä julkaistaan."
   you_cannot_remove_this_enrollment_c87be1cb: "Et voi poistaa tätä ilmoittautumista."
   you_cannot_remove_your_default_email_address_8ed68e52: "Et voi poistaa oletussähköpostiosoitetta"
   you_cannot_save_while_there_are_errors_b86585e9: "Et voi tallentaa, koska ilmenee virheitä"

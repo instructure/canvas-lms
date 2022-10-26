@@ -34,11 +34,11 @@ describe('TenantInput', () => {
   it('calls the provided input handler on input', () => {
     const inputHandlerMock = jest.fn()
     const container = setup({
-      tenantInputHandler: inputHandlerMock
+      tenantInputHandler: inputHandlerMock,
     })
     fireEvent.input(
       container.getByRole('textbox', {
-        name: /tenant name input area/i
+        name: /tenant name input area/i,
       }),
       {target: {value: 'testtenant.com'}}
     )
@@ -51,13 +51,13 @@ describe('TenantInput', () => {
       messages: [
         {
           text: 'error message!',
-          type: 'error'
+          type: 'error',
         },
         {
           text: 'hint message!',
-          type: 'hint'
-        }
-      ]
+          type: 'hint',
+        },
+      ],
     })
 
     expect(container.getByText(/error message/i)).toBeInTheDocument()
@@ -66,12 +66,12 @@ describe('TenantInput', () => {
 
   it('renders the provided tenant', () => {
     const container = setup({
-      tenant
+      tenant,
     })
 
     expect(
       container.getByRole('textbox', {
-        name: /tenant name input area/i
+        name: /tenant name input area/i,
       }).value
     ).toBe(tenant)
   })

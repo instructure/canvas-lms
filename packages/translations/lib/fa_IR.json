@@ -11,8 +11,14 @@
     "all_day_fb42c4fc": {
         "message": "تمام روز"
     },
+    "alpha_15d59033": {
+        "message": "آلفا"
+    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "برای یک  درخواست شبکه خطا رخ داده است"
+    },
+    "and_7fcc2911": {
+        "message": "و "
     },
     "announcement_fb4cb645": {
         "message": "اطلاعیه"
@@ -50,8 +56,14 @@
     "basic_554cdc0a": {
         "message": "اصلی"
     },
+    "beta_cb5f307e": {
+        "message": "بتا"
+    },
     "blue_daf8fea9": {
         "message": "آبی"
+    },
+    "bottom_15a2a9be": {
+        "message": "پایین"
     },
     "brick_f2656265": {
         "message": "آجر"
@@ -137,10 +149,7 @@
     "date_ee500367": {
         "message": "تاریخ"
     },
-    "decorative_image_3c28aa7d": {
-        "message": "تصویر تزیینی"
-    },
-    "decrease_indent_de6343ab": {
+    "decrease_indent_d9cf469d": {
         "message": "کاهش تورفتگی"
     },
     "deep_purple_bb3e2907": {
@@ -248,13 +257,22 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "حق نشر دارم"
     },
+    "icon_215a1dc6": {
+        "message": "نماد"
+    },
+    "icon_maker_icons_cc560f7e": {
+        "message": "نمادهای سازنده آیکون"
+    },
     "image_8ad06": {
+        "message": "تصویر"
+    },
+    "image_c1c98202": {
         "message": "تصویر"
     },
     "images_7ce26570": {
         "message": "تصاویر"
     },
-    "increase_indent_6d550a4a": {
+    "increase_indent_6af90f7c": {
         "message": "افزایش تورفتگی"
     },
     "indigo_2035fc55": {
@@ -301,9 +319,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "بارگذاری بیشتر"
-    },
-    "load_more_results_460f49a9": {
-        "message": "Load more results"
     },
     "loading_25990131": {
         "message": "در حال بارگذاری..."
@@ -380,6 +395,9 @@
     "operators_a2ef9a93": {
         "message": "عملگرها"
     },
+    "or_9b70ccaa": {
+        "message": "یا"
+    },
     "orange_81386a62": {
         "message": "نارنجی"
     },
@@ -439,6 +457,12 @@
     },
     "relationships_6602af70": {
         "message": "روابط"
+    },
+    "replace_e61834a7": {
+        "message": "جایگزین کردن"
+    },
+    "reset_95a81614": {
+        "message": "بازنشانی"
     },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"
@@ -509,14 +533,23 @@
     "today_76e10f9c": {
         "message": "امروز"
     },
+    "toggle_tooltip_d3b7cb86": {
+        "message": "تغییر ابزار راهنما"
+    },
     "tomorrow_9a6c9a00": {
         "message": "فردا"
+    },
+    "top_66e0adb6": {
+        "message": "بالا"
     },
     "unpublished_dfd8801": {
         "message": "منتشر نشده"
     },
     "upload_file_fd2361b8": {
         "message": "بارگذاری فایل"
+    },
+    "upload_image_6120b609": {
+        "message": "بارگذاری عکس"
     },
     "upload_media_ce31135a": {
         "message": "بارگذاری رسانه"
@@ -533,6 +566,9 @@
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
     },
+    "user_files_78e21703": {
+        "message": "فایل های کاربر"
+    },
     "view_ba339f93": {
         "message": "مشاهده"
     },
@@ -544,5 +580,8 @@
     },
     "yesterday_c6bd6abf": {
         "message": "دیروز"
+    },
+    "zoom_f3e54d69": {
+        "message": "بزرگنمایی"
     }
 }

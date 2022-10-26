@@ -22,7 +22,7 @@ describe('filterConferenceTypes', () => {
   const contextTypes = [
     {id: 1, contexts: ['course_1', 'group_2', 'acccount_3', 'course_4', 'group_5']},
     {id: 2, contexts: ['group_2', 'acccount_3', 'course_4']},
-    {id: 3, contexts: ['course_1', 'group_5']}
+    {id: 3, contexts: ['course_1', 'group_5']},
   ]
 
   it('returns for course contexts', () => {

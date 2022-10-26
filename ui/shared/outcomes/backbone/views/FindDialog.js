@@ -44,14 +44,14 @@ export default class FindDialog extends DialogBaseView {
       buttons: [
         {
           text: I18n.t('#buttons.cancel', 'Cancel'),
-          click: e => this.cancel(e)
+          click: e => this.cancel(e),
         },
         {
           text: I18n.t('#buttons.import', 'Import'),
           class: 'btn-primary',
-          click: e => this.import(e)
-        }
-      ]
+          click: e => this.import(e),
+        },
+      ],
     }
   }
 
@@ -67,17 +67,14 @@ export default class FindDialog extends DialogBaseView {
     super.initialize(...arguments)
     this.render()
     // so we don't mess with other jquery dialogs
-    this.dialog
-      .parent()
-      .find('.ui-dialog-buttonpane')
-      .css('margin-top', 0)
+    this.dialog.parent().find('.ui-dialog-buttonpane').css('margin-top', 0)
 
     this.sidebar = new SidebarView({
       el: this.$el.find('.outcomes-sidebar .wrapper'),
       directoryView: opts.directoryView,
       rootOutcomeGroup: opts.rootOutcomeGroup,
       readOnly: true,
-      inFindDialog: true
+      inFindDialog: true,
     })
     this.content = new ContentView({
       el: this.$el.find('.outcomes-content'),
@@ -85,7 +82,7 @@ export default class FindDialog extends DialogBaseView {
       readOnly: true,
       inFindDialog: true,
       setQuizMastery: opts.setQuizMastery,
-      useForScoring: opts.useForScoring
+      useForScoring: opts.useForScoring,
     })
 
     // sidebar events
@@ -125,7 +122,7 @@ export default class FindDialog extends DialogBaseView {
         const progress = new Progress()
         dfd = $.ajaxJSON(url, 'POST', {
           source_outcome_group_id: model.get('id'),
-          async: true
+          async: true,
         })
           .pipe(resp => {
             progress.set('url', resp.url)
@@ -149,7 +146,7 @@ export default class FindDialog extends DialogBaseView {
             importedModel.outcomeLink.url = response.url
             importedModel.set({
               context_id: response.context_id,
-              context_type: response.context_type
+              context_type: response.context_type,
             })
           }
           this.trigger('import', importedModel)
@@ -190,12 +187,12 @@ export default class FindDialog extends DialogBaseView {
     if (model instanceof OutcomeGroup) {
       return I18n.t('confirm.import_group', 'Import group "%{group}" to group "%{target}"?', {
         group: model.get('title'),
-        target
+        target,
       })
     } else {
       return I18n.t('confirm.import_outcome', 'Import outcome "%{outcome}" to group "%{target}"?', {
         outcome: model.get('title'),
-        target
+        target,
       })
     }
   }

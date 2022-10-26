@@ -17,15 +17,15 @@
 //
 
 import $ from 'jquery'
-import TokenInput from 'ui/features/roster/jquery/TokenInput.js'
+import TokenInput from 'ui/features/roster/jquery/TokenInput'
 
 test('allows the browse link to receive focus', () => {
   const $top = $('<div><div /></div>')
   const $node = $top.children()
   const options = {
     selector: {
-      browser: 'mock'
-    }
+      browser: 'mock',
+    },
   }
   new TokenInput($node, options)
   const $browseLink = $top.find('a')

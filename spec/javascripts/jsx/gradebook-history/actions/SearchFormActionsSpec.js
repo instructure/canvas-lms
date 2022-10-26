@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import environment from 'ui/features/gradebook_history/react/environment.js'
-import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore.js'
-import * as HistoryActions from 'ui/features/gradebook_history/react/actions/HistoryActions.js'
-import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi.js'
+import environment from 'ui/features/gradebook_history/react/environment'
+import GradebookHistoryStore from 'ui/features/gradebook_history/react/store/GradebookHistoryStore'
+import * as HistoryActions from 'ui/features/gradebook_history/react/actions/HistoryActions'
+import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi'
 import SearchFormActions, {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -28,8 +28,8 @@ import SearchFormActions, {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE,
-} from 'ui/features/gradebook_history/react/actions/SearchFormActions.js'
-import UserApi from 'ui/features/gradebook_history/react/api/UserApi.js'
+} from 'ui/features/gradebook_history/react/actions/SearchFormActions'
+import UserApi from 'ui/features/gradebook_history/react/api/UserApi'
 import Fixtures from '../Fixtures'
 
 QUnit.module('SearchFormActions', () => {

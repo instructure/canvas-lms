@@ -78,12 +78,6 @@ apply_score_to_ungraded:
   environments:
     development:
       state: allowed
-speedgrader_dialog_for_unposted_comments:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Draft Comment Warning Modal in SpeedGrader
-  description: Enables modal to warn user when a draft comment is left unposted
-    in SpeedGrader.
 enhanced_grade_statistics:
   state: hidden
   applies_to: SiteAdmin

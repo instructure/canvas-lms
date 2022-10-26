@@ -37,8 +37,8 @@ const I18n = useI18nScope('conferences_alternatives')
 
 const theme = {
   [Alert.theme]: {
-    boxShadow: 'none'
-  }
+    boxShadow: 'none',
+  },
 }
 
 const visitZoomUrl = 'https://zoom.com/meeting/schedule'
@@ -60,7 +60,7 @@ function ConferenceProvider({imageSource, title, text, responsiveSize}) {
           </Flex.Item>
         </Flex>
       </Flex.Item>
-      <Flex.Item shouldShrink padding="small x-small">
+      <Flex.Item shouldShrink={true} padding="small x-small">
         <Text size="large" weight="bold">
           {title}
         </Text>
@@ -81,7 +81,7 @@ ConferenceProvider.propTypes = {
   imageSource: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   text: PropTypes.arrayOf(PropTypes.node).isRequired,
-  responsiveSize: PropTypes.oneOf(['small', 'medium', 'large']).isRequired
+  responsiveSize: PropTypes.oneOf(['small', 'medium', 'large']).isRequired,
 }
 
 const Zoom = props => (
@@ -97,8 +97,8 @@ const Zoom = props => (
         <Link href={visitZoomUrl}>{I18n.t('Visit Zoom')}</Link>,
         I18n.t(
           'to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one.'
-        )
-      ]
+        ),
+      ],
       // <Link href={learnZoomUrl}>{I18n.t('Learn how to use Zoom in Canvas.')}</Link>
     ]}
   />
@@ -117,11 +117,11 @@ const Meet = props => (
         <Link href={visitMeetUrl}>{I18n.t('Visit Google Meet')}</Link>,
         I18n.t(
           'to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.'
-        )
+        ),
       ],
       <Link href={I18n.t('#community.admin_hangouts_meet_lti')}>
         {I18n.t('Learn how to use Google Meet in Canvas')}
-      </Link>
+      </Link>,
     ]}
   />
 )
@@ -137,7 +137,7 @@ const Teams = props => (
       ),
       <Link href={I18n.t('#community.admin_teams_meetings')}>
         {I18n.t('Learn how to use Microsoft Teams in Canvas')}
-      </Link>
+      </Link>,
     ]}
   />
 )
@@ -152,17 +152,17 @@ function ConferenceAlternatives({responsiveSize}) {
       </Alert>
       <View as="div" borderWidth="small 0 0 0" borderColor="primary" padding="medium 0 0 0">
         <Flex direction={responsiveSize === 'large' ? 'row' : 'column'} alignItems="start">
-          <Flex.Item shouldGrow size={responsiveSize === 'large' ? '0' : null}>
+          <Flex.Item shouldGrow={true} size={responsiveSize === 'large' ? '0' : null}>
             <Zoom responsiveSize={responsiveSize} />
           </Flex.Item>
           <Flex.Item
-            shouldGrow
+            shouldGrow={true}
             size={responsiveSize === 'large' ? '0' : null}
             padding={responsiveSize === 'large' ? '0 large' : 'large 0'}
           >
             <Meet responsiveSize={responsiveSize} />
           </Flex.Item>
-          <Flex.Item shouldGrow size={responsiveSize === 'large' ? '0' : null}>
+          <Flex.Item shouldGrow={true} size={responsiveSize === 'large' ? '0' : null}>
             <Teams responsiveSize={responsiveSize} />
           </Flex.Item>
         </Flex>
@@ -172,7 +172,7 @@ function ConferenceAlternatives({responsiveSize}) {
 }
 
 ConferenceAlternatives.propTypes = {
-  responsiveSize: PropTypes.oneOf(['small', 'medium', 'large'])
+  responsiveSize: PropTypes.oneOf(['small', 'medium', 'large']),
 }
 
 const ResponsiveConferenceAlternatives = responsiviser()(ConferenceAlternatives)

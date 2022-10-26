@@ -32,14 +32,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 const mockProps = {
   dueDate: '2021-03-30T23:59:59-06:00',
-  onSetDueDateTrayOpen: jest.fn()
+  onSetDueDateTrayOpen: jest.fn(),
 }
 
 const setup = props => {
@@ -50,7 +50,7 @@ describe('AssignmentDueDate', () => {
   describe('Desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
 
@@ -67,7 +67,7 @@ describe('AssignmentDueDate', () => {
   describe('Tablet', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'},
       }))
     })
 

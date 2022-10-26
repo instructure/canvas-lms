@@ -22,7 +22,7 @@ import K from '../../../../constants'
 class MultipleChoice extends React.Component {
   static defaultProps = {
     answer: [],
-    question: {answers: []}
+    question: {answers: []},
   }
 
   render() {
@@ -41,7 +41,7 @@ class MultipleChoice extends React.Component {
         <input
           data-testid={`answer-${answer.id}`}
           type="radio"
-          readOnly
+          readOnly={true}
           disabled={!isSelected}
           checked={isSelected}
         />

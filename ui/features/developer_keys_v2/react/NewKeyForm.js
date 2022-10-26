@@ -37,7 +37,7 @@ import ToolConfigurationForm from './ToolConfigurationForm'
 const I18n = useI18nScope('react_developer_keys')
 
 const validationMessage = [
-  {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}
+  {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'},
 ]
 
 const clientCredentialsAudienceTooltip = I18n.t(
@@ -45,6 +45,11 @@ const clientCredentialsAudienceTooltip = I18n.t(
 )
 
 export default class NewKeyForm extends React.Component {
+  state = {
+    invalidJson: null,
+    parsedJson: null,
+  }
+
   generateToolConfiguration = () => {
     return this.toolConfigRef.generateToolConfiguration()
   }
@@ -73,6 +78,31 @@ export default class NewKeyForm extends React.Component {
     this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
+  updatePastedJson = value => {
+    try {
+      const settings = JSON.parse(value)
+      this.setState({invalidJson: null, parsedJson: settings})
+
+      if (!this.props.hasRedirectUris) {
+        this.props.updateDeveloperKey('redirect_uris', settings.target_link_uri || '')
+      }
+
+      this.updateToolConfiguration(settings)
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        this.setState({invalidJson: value})
+      }
+    }
+  }
+
+  updateToolConfiguration = update => {
+    this.props.updateToolConfiguration(update)
+  }
+
+  syncRedirectUris = () => {
+    this.props.syncRedirectUris()
+  }
+
   render() {
     const {
       isLtiKey,
@@ -81,10 +111,9 @@ export default class NewKeyForm extends React.Component {
       editing,
       showRequiredMessages,
       showMissingRedirectUrisMessage,
-      updateToolConfiguration,
       updateToolConfigurationUrl,
       toolConfigurationUrl,
-      updateDeveloperKey
+      updateDeveloperKey,
     } = this.props
 
     return (
@@ -122,6 +151,13 @@ export default class NewKeyForm extends React.Component {
                   resize="both"
                   messages={showMissingRedirectUrisMessage ? validationMessage : []}
                 />
+                {this.props.configurationMethod === 'json' && (
+                  <div>
+                    <Button onClick={this.syncRedirectUris} color="primary">
+                      {I18n.t('Sync URIs')}
+                    </Button>
+                  </div>
+                )}
                 {!isLtiKey && (
                   <div>
                     <TextInput
@@ -201,13 +237,15 @@ export default class NewKeyForm extends React.Component {
                   toolConfiguration={this.props.tool_configuration}
                   editing={editing}
                   showRequiredMessages={showRequiredMessages}
-                  updateToolConfiguration={updateToolConfiguration}
                   updateToolConfigurationUrl={updateToolConfigurationUrl}
                   toolConfigurationUrl={toolConfigurationUrl}
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
                   validScopes={ENV.validLtiScopes}
                   validPlacements={ENV.validLtiPlacements}
+                  invalidJson={this.state.invalidJson}
+                  parsedJson={this.state.parsedJson}
+                  updatePastedJson={this.updatePastedJson}
                 />
               ) : (
                 <Scopes
@@ -230,7 +268,7 @@ export default class NewKeyForm extends React.Component {
 }
 
 NewKeyForm.defaultProps = {
-  developerKey: {}
+  developerKey: {},
 }
 
 NewKeyForm.propTypes = {
@@ -248,23 +286,23 @@ NewKeyForm.propTypes = {
     name: PropTypes.string,
     require_scopes: PropTypes.bool,
     tool_configuration: PropTypes.shape({
-      oidc_initiation_url: PropTypes.string
+      oidc_initiation_url: PropTypes.string,
     }),
     test_cluster_only: PropTypes.bool,
-    client_credentials_audience: PropTypes.string
+    client_credentials_audience: PropTypes.string,
   }),
   availableScopes: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
         resource: PropTypes.string,
-        scope: PropTypes.string
+        scope: PropTypes.string,
       })
     )
   ).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
   editing: PropTypes.bool.isRequired,
   tool_configuration: PropTypes.shape({
-    oidc_initiation_url: PropTypes.string
+    oidc_initiation_url: PropTypes.string,
   }),
   showRequiredMessages: PropTypes.bool,
   showMissingRedirectUrisMessage: PropTypes.bool,
@@ -273,5 +311,7 @@ NewKeyForm.propTypes = {
   updateDeveloperKey: PropTypes.func.isRequired,
   toolConfigurationUrl: PropTypes.string,
   configurationMethod: PropTypes.string.isRequired,
-  updateConfigurationMethod: PropTypes.func.isRequired
+  updateConfigurationMethod: PropTypes.func.isRequired,
+  hasRedirectUris: PropTypes.bool.isRequired,
+  syncRedirectUris: PropTypes.func.isRequired,
 }

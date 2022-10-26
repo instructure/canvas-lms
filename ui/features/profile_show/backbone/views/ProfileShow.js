@@ -34,7 +34,7 @@ export default class ProfileShow extends Backbone.View {
       'click [data-event]': 'handleDeclarativeClick',
       'submit #edit_profile_form': 'validateForm',
       'click #report_avatar_link': 'reportAvatarLink',
-      'click #remove_avatar_link': 'removeAvatarLink'
+      'click #remove_avatar_link': 'removeAvatarLink',
     }
 
     this.prototype.attemptedDependencyLoads = 0
@@ -50,7 +50,7 @@ export default class ProfileShow extends Backbone.View {
     const link = $(e.currentTarget)
     const result = await showConfirmationDialog({
       label: I18n.t('Confirm Removal'),
-      body: I18n.t("Are you sure you want to remove this user's profile picture?")
+      body: I18n.t("Are you sure you want to remove this user's profile picture?"),
     })
     if (!result) {
       return
@@ -75,7 +75,7 @@ export default class ProfileShow extends Backbone.View {
       label: I18n.t('Report Profile Picture'),
       body: I18n.t(
         'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.'
-      )
+      ),
     })
     if (!result) {
       return
@@ -176,8 +176,8 @@ export default class ProfileShow extends Backbone.View {
           if (value && /\s/.test(value)) {
             return I18n.t('invalid_url', 'Invalid URL')
           }
-        }
-      }
+        },
+      },
     }
     if (!$(event.target).validateForm(validations)) {
       return event.preventDefault()

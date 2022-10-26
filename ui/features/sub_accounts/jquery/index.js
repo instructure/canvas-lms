@@ -19,44 +19,35 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import jQuery from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 
 const I18n = useI18nScope('sub_accounts')
 
-jQuery(function($) {
-  $('.add_sub_account_link').click(function() {
+jQuery(function ($) {
+  $('.add_sub_account_link').click(function () {
     $("<li class='sub_account'/>")
-      .append(
-        $('#account_blank')
-          .clone(true)
-          .attr('id', 'account_new')
-          .show()
-      )
-      .appendTo(
-        $(this)
-          .parents('.account:first')
-          .children('.sub_accounts')
-      )
+      .append($('#account_blank').clone(true).attr('id', 'account_new').show())
+      .appendTo($(this).parents('.account:first').children('.sub_accounts'))
       .find('.edit_account_link')
       .click()
     return false
   })
 
   $('.account .header').hover(
-    function() {
+    function () {
       $(this).addClass('header_hover')
     },
-    function() {
+    function () {
       $(this).removeClass('header_hover')
     }
   )
 
-  $('.edit_account_link').click(function() {
+  $('.edit_account_link').click(function () {
     $(this)
       .parents('.account:first')
       .addClass('editing_account')
@@ -67,25 +58,17 @@ jQuery(function($) {
   })
 
   $('.account_name')
-    .blur(function() {
-      if (
-        !$(this)
-          .parents('form')
-          .hasClass('saving')
-      ) {
+    .blur(function () {
+      if (!$(this).parents('form').hasClass('saving')) {
         if (
-          $(this)
-            .parents('.account:first')
-            .removeClass('editing_account')
-            .attr('id') == 'account_new'
+          $(this).parents('.account:first').removeClass('editing_account').attr('id') ==
+          'account_new'
         ) {
-          $(this)
-            .parents('.sub_account:first')
-            .remove()
+          $(this).parents('.sub_account:first').remove()
         }
       }
     })
-    .keycodes('esc', function() {
+    .keycodes('esc', function () {
       $(this).triggerHandler('blur')
     })
 
@@ -99,20 +82,16 @@ jQuery(function($) {
       return data
     },
     beforeSubmit(data) {
-      $(this)
-        .loadingImage({image_size: 'small'})
-        .addClass('saving')
+      $(this).loadingImage({image_size: 'small'}).addClass('saving')
     },
     success(data) {
       const account = data
-      $(this)
-        .loadingImage('remove')
-        .removeClass('saving')
+      $(this).loadingImage('remove').removeClass('saving')
       $(this)
         .parents('.header')
         .fillTemplateData({
           data: account,
-          hrefValues: ['id']
+          hrefValues: ['id'],
         })
         .fillFormData(account, {object_name: 'account'})
         .parents('.account:first')
@@ -130,11 +109,11 @@ jQuery(function($) {
 
       const expand_link = $('#account_' + account.id + ' .expand_sub_accounts_link')
       expand_link.attr({
-        'data-link': $.replaceTags(expand_link.attr('data-link'), 'id', account.id)
+        'data-link': $.replaceTags(expand_link.attr('data-link'), 'id', account.id),
       })
 
       $('#account_' + account.id + ' > .header .name').focus()
-    }
+    },
   })
 
   $('.cant_delete_account_link').click(() => {
@@ -147,12 +126,8 @@ jQuery(function($) {
     return false
   })
 
-  $('.delete_account_link').click(function() {
-    if (
-      $(this)
-        .parents('.account:first')
-        .children('.sub_account > li').length
-    ) {
+  $('.delete_account_link').click(function () {
+    if ($(this).parents('.account:first').children('.sub_account > li').length) {
       alert(
         I18n.t(
           'alerts.subaccount_has_subaccounts',
@@ -163,10 +138,7 @@ jQuery(function($) {
       $(this)
         .parents('li:first')
         .confirmDelete({
-          url: $(this)
-            .parents('.header')
-            .find('form')
-            .attr('action'),
+          url: $(this).parents('.header').find('form').attr('action'),
           message: I18n.t(
             'confirms.delete_subaccount',
             'Are you sure you want to delete this sub-account?'
@@ -177,7 +149,7 @@ jQuery(function($) {
             const $focusTo = $prev_entry.length
               ? $('> .account > .header .name', $prev_entry)
               : $('> .header .name', $list_entry.closest('.account'))
-            $(this).slideUp(function() {
+            $(this).slideUp(function () {
               $(this).remove()
               $focusTo.focus()
             })
@@ -187,38 +159,24 @@ jQuery(function($) {
             if (data.hasOwnProperty('message')) {
               alert(data.message)
             }
-          }
+          },
         })
     }
     return false
   })
 
-  $('.collapse_sub_accounts_link').click(function() {
+  $('.collapse_sub_accounts_link').click(function () {
     const $header = $(this).parents('.header:first')
-    $header
-      .closest('.account')
-      .children('ul')
-      .slideUp()
-    $header
-      .find('.expand_sub_accounts_link')
-      .show()
-      .focus()
+    $header.closest('.account').children('ul').slideUp()
+    $header.find('.expand_sub_accounts_link').show().focus()
     $header.find('.collapse_sub_accounts_link, .add_sub_account_link').hide()
     return false
   })
 
-  $('.expand_sub_accounts_link').click(function() {
+  $('.expand_sub_accounts_link').click(function () {
     const $header = $(this).parents('.header:first')
-    if (
-      $header
-        .parent('.account')
-        .children('ul')
-        .children('.sub_account').length
-    ) {
-      $header
-        .parent('.account')
-        .children('ul')
-        .slideDown()
+    if ($header.parent('.account').children('ul').children('.sub_account').length) {
+      $header.parent('.account').children('ul').slideDown()
       $header.find('.expand_sub_accounts_link').hide()
       $header.find('.collapse_sub_accounts_link, .add_sub_account_link').show()
       $header.find('.collapse_sub_accounts_link').focus()
@@ -229,16 +187,9 @@ jQuery(function($) {
         'GET',
         {},
         data => {
-          $header
-            .loadingImage('remove')
-            .find('.expand_sub_accounts_link')
-            .hide()
+          $header.loadingImage('remove').find('.expand_sub_accounts_link').hide()
           $header.find('.collapse_sub_accounts_link, .add_sub_account_link').show()
-          $header
-            .parent('.account')
-            .children('ul')
-            .empty()
-            .hide()
+          $header.parent('.account').children('ul').empty().hide()
           let account = null
           for (var idx in data) {
             account = data[idx]
@@ -272,7 +223,7 @@ jQuery(function($) {
               )
               .fillTemplateData({
                 data: sub_account,
-                hrefValues: ['id']
+                hrefValues: ['id'],
               })
               .appendTo($header.parent('.account').children('ul'))
               .find('.sub_accounts_count')
@@ -291,7 +242,7 @@ jQuery(function($) {
                   sub_account_node.find('.expand_sub_accounts_link').attr('data-link'),
                   'id',
                   sub_account.id
-                )
+                ),
               })
               .end()
               .find('.add_sub_account_link')
@@ -304,13 +255,10 @@ jQuery(function($) {
                   'id',
                   sub_account.id
                 ),
-                method: 'PUT'
+                method: 'PUT',
               })
           }
-          $header
-            .parent('.account')
-            .children('ul')
-            .slideDown()
+          $header.parent('.account').children('ul').slideDown()
           $header.find('.collapse_sub_accounts_link').focus()
         },
         data => {}

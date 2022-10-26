@@ -116,7 +116,7 @@ $.fn.loadingImg = function (options) {
       zIndex,
       position: 'absolute',
       top,
-      left
+      left,
     })
     $('body').append($imageHolder)
   } else {
@@ -124,7 +124,7 @@ $.fn.loadingImg = function (options) {
       zIndex,
       position: 'absolute',
       top: paddingTop,
-      left: paddingLeft
+      left: paddingLeft,
     })
     $obj.append($imageHolder)
   }
@@ -133,6 +133,6 @@ $.fn.loadingImg = function (options) {
 $.fn.loadingImg.defaults = {paddingTop: 0, image_size: 'normal', vertical: 0, horizontal: 0}
 $.fn.loadingImg.image_files = {
   normal: {url: '/images/ajax-loader.gif', width: 32, height: 32},
-  small: {url: '/images/ajax-loader-small.gif', width: 16, height: 16}
+  small: {url: '/images/ajax-loader-small.gif', width: 16, height: 16},
 }
 $.fn.loadingImage = $.fn.loadingImg

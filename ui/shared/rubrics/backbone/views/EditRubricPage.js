@@ -48,7 +48,7 @@ export default class EditRubricPage {
       useForScoring: true,
       shouldImport: false,
       disableGroupImport: true,
-      rootOutcomeGroup: this.rootOutcomeGroup
+      rootOutcomeGroup: this.rootOutcomeGroup,
     })
     this.$els.dialog.on('import', this.onOutcomeImport)
     return (this.dialogCreated = true)

@@ -49,7 +49,7 @@ describe('SearchItemSelector', () => {
     )
     expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: {}
+        params: {},
       })
     )
   })
@@ -85,7 +85,7 @@ describe('SearchItemSelector', () => {
     expect(loadingTextForSpinner).toBeInTheDocument()
     expect(testSearchFunction).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: {term: 'abc', search_term: 'abc'}
+        params: {term: 'abc', search_term: 'abc'},
       })
     )
   })
@@ -194,7 +194,7 @@ describe('SearchItemSelector', () => {
     expect(selectInput.value).toBe('bar')
     expect(testSearchFunction).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        params: {}
+        params: {},
       })
     )
 
@@ -203,7 +203,7 @@ describe('SearchItemSelector', () => {
     act(() => jest.runAllTimers())
     expect(testSearchFunction).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        params: {term: 'baz', search_term: 'baz'}
+        params: {term: 'baz', search_term: 'baz'},
       })
     )
   })

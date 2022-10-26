@@ -53,7 +53,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       assignment: {
         anonymousGrading: false,
         gradesPublished: true,
-        ...assignment
+        ...assignment,
       },
       dismiss() {},
       postBySections: true,
@@ -62,11 +62,14 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
       postType: EVERYONE,
       postTypeChanged() {},
       onPostClick() {},
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'},
+      ],
       sectionSelectionChanged() {},
       selectedSectionIds: [],
       unpostedCount: 0,
-      ...props
+      ...props,
     }
   }
 
@@ -139,7 +142,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
     contextHooks.beforeEach(() => {
       assignment = {
         gradesPublished: true,
-        anonymousGrading: true
+        anonymousGrading: true,
       }
     })
 

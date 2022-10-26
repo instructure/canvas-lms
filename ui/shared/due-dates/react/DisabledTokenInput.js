@@ -22,17 +22,17 @@ import _ from 'underscore'
 
 const styles = {
   list: {
-    backgroundColor: '#eeeeee'
+    backgroundColor: '#eeeeee',
   },
   label: {
     backgroundColor: 'white',
-    borderRadius: '3px'
-  }
+    borderRadius: '3px',
+  },
 }
 
 class DisabledTokenInput extends React.Component {
   static propTypes = {
-    tokens: PropTypes.arrayOf(PropTypes.string)
+    tokens: PropTypes.arrayOf(PropTypes.string),
   }
 
   renderTokens() {

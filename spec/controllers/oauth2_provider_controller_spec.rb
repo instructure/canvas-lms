@@ -485,7 +485,7 @@ describe OAuth2ProviderController do
         let(:success_setup) do
           expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
         end
-        let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type] }
+        let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type canvas_region] }
       end
 
       it "renders a 302 if a code is not provided for an authorization_code grant" do
@@ -511,7 +511,7 @@ describe OAuth2ProviderController do
         post :token, params: base_params.merge(code: valid_code)
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to match_array %w[access_token refresh_token user expires_in token_type]
+        expect(json.keys.sort).to match_array %w[access_token refresh_token user expires_in token_type canvas_region]
         expect(json.dig("user", "effective_locale")).to eq "zh-Hant"
       end
 
@@ -536,7 +536,7 @@ describe OAuth2ProviderController do
 
       it_behaves_like "common oauth2 token checks" do
         let(:success_params) { { refresh_token: refresh_token } }
-        let(:success_token_keys) { %w[access_token user expires_in token_type] }
+        let(:success_token_keys) { %w[access_token user expires_in token_type canvas_region] }
       end
 
       it "does not generate a new access_token with an invalid refresh_token" do

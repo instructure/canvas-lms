@@ -35,7 +35,7 @@ export default class UploadMediaTrackForm {
     const templateVars = {
       languages: _.map(mejs.language.codes, (name, code) => ({name, code})),
       video_url: this.video_url,
-      is_amazon_url: this.video_url.search(/.mp4/) !== -1
+      is_amazon_url: this.video_url.search(/.mp4/) !== -1,
     }
     this.$dialog = $(template(templateVars))
       .appendTo('body')
@@ -47,15 +47,15 @@ export default class UploadMediaTrackForm {
           {
             'data-text-while-loading': I18n.t('cancel', 'Cancel'),
             text: I18n.t('cancel', 'Cancel'),
-            click: () => this.$dialog.remove()
+            click: () => this.$dialog.remove(),
           },
           {
             class: 'btn-primary',
             'data-text-while-loading': I18n.t('uploading', 'Uploading...'),
             text: I18n.t('upload', 'Upload'),
-            click: this.onSubmit
-          }
-        ]
+            click: this.onSubmit,
+          },
+        ],
       })
 
     ReactDOM.render(
@@ -74,7 +74,7 @@ export default class UploadMediaTrackForm {
       .done(content => {
         const params = {
           content,
-          locale: this.$dialog.find('[name="locale"]').val()
+          locale: this.$dialog.find('[name="locale"]').val(),
         }
 
         if (!params.content || !params.locale) return submitDfd.reject()
@@ -105,7 +105,7 @@ export default class UploadMediaTrackForm {
     const file = this.$dialog.find('input[name="content"]')[0].files[0]
     if (file) {
       const reader = new FileReader()
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const content = e.target.result
         return dfd.resolve(content)
       }

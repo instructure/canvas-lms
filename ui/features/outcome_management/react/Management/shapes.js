@@ -23,14 +23,14 @@ export const outcomeGroupShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   contextId: PropTypes.string,
-  contextType: PropTypes.string
+  contextType: PropTypes.string,
 })
 
 export const outcomeShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   linkId: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  canUnlink: PropTypes.bool.isRequired
+  canUnlink: PropTypes.bool.isRequired,
 })
 
 export const groupCollectionShape = PropTypes.shape({
@@ -39,7 +39,7 @@ export const groupCollectionShape = PropTypes.shape({
   isRootGroup: PropTypes.bool,
   name: PropTypes.string,
   outcomesCount: PropTypes.number,
-  parentGroupId: PropTypes.string
+  parentGroupId: PropTypes.string,
 })
 
 export const outcomeEdgesNodeShape = PropTypes.shape({
@@ -47,22 +47,22 @@ export const outcomeEdgesNodeShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
   isImported: PropTypes.bool,
   description: PropTypes.string,
-  displayName: PropTypes.string
+  displayName: PropTypes.string,
 })
 
 export const outcomeEdgeShape = PropTypes.shape({
-  node: outcomeEdgesNodeShape
+  node: outcomeEdgesNodeShape,
 })
 
 export const outcomePageInfoShape = PropTypes.shape({
   endCursor: PropTypes.string,
-  hasNextPage: PropTypes.bool.isRequired
+  hasNextPage: PropTypes.bool.isRequired,
 })
 
 export const ratingsShape = PropTypes.arrayOf(
   PropTypes.shape({
     description: PropTypes.string,
-    points: PropTypes.number.isRequired
+    points: PropTypes.number.isRequired,
   })
 )
 
@@ -76,9 +76,9 @@ export const outcomeEditShape = PropTypes.shape({
   calculationMethod: PropTypes.string,
   calculationInt: PropTypes.number,
   friendlyDescription: PropTypes.shape({
-    description: PropTypes.string.isRequired
+    description: PropTypes.string.isRequired,
   }),
   masteryPoints: PropTypes.number,
   pointsPossible: PropTypes.number,
-  ratings: ratingsShape
+  ratings: ratingsShape,
 })

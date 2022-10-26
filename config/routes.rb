@@ -333,7 +333,6 @@ CanvasRails::Application.routes.draw do
 
       get "lti/resource/:resource_link_id", controller: "lti/message",
                                             action: "resource", as: :resource_link_id
-      post "deep_linking_response", controller: "lti/ims/deep_linking", action: :deep_linking_response
     end
 
     resources :grading_standards, only: %i[index create update destroy]
@@ -1224,6 +1223,7 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read/:item", action: :mark_submission_item_read, as: "#{context}_submission_mark_item_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_assessments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
@@ -2448,6 +2448,18 @@ CanvasRails::Application.routes.draw do
       patch "courses/:course_id/sections/:course_section_id/pace", action: :update, as: :patch_section_pace
       delete "courses/:course_id/sections/:course_section_id/pace", action: :delete, as: :delete_section_pace
     end
+
+    scope(controller: "course_pacing/student_enrollment_paces_api") do
+      get "courses/:course_id/student_enrollment_paces", action: :index, as: :student_enrollment_paces
+      get "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :show, as: :student_enrollment_pace
+      post "courses/:course_id/student_enrollments/:student_enrollment_id/paces", action: :create, as: :new_student_enrollment_pace
+      patch "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :update, as: :patch_student_enrollment_pace
+      delete "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :delete, as: :delete_student_enrollment_pace
+    end
+
+    scope(controller: "course_pacing/pace_contexts_api") do
+      get "courses/:course_id/pace_contexts", action: :index, as: :pace_contexts
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2487,6 +2499,8 @@ CanvasRails::Application.routes.draw do
   get "login/oauth2/deny" => "oauth2_provider#deny", :as => :oauth2_auth_deny
   delete "login/oauth2/token" => "oauth2_provider#destroy", :as => :oauth2_logout
   get "login/oauth2/jwks" => "security#jwks", :as => :oauth2_jwks
+
+  get "post_message_forwarding", controller: "lti/platform_storage", action: :post_message_forwarding, as: :lti_post_message_forwarding
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"

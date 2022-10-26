@@ -43,12 +43,12 @@ class Outcome extends React.Component {
     expanded: PropTypes.bool.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
     outcomeProficiency: null,
-    breakpoints: {}
+    breakpoints: {},
   }
 
   handleToggle = (_event, expanded) => {
@@ -76,7 +76,7 @@ class Outcome extends React.Component {
               <ScreenReaderContent>
                 {I18n.t('%{score} out of %{points_possible} points', {
                   score,
-                  points_possible
+                  points_possible,
                 })}
               </ScreenReaderContent>
             </span>
@@ -120,7 +120,7 @@ class Outcome extends React.Component {
                 {
                   zero: 'No alignments',
                   one: '%{count} alignment',
-                  other: '%{count} alignments'
+                  other: '%{count} alignments',
                 },
                 {count: I18n.n(numAlignments)}
               )}

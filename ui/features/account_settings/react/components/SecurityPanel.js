@@ -31,7 +31,7 @@ import {
   setCspEnabled,
   getCurrentWhitelist,
   getCspInherited,
-  setCspInherited
+  setCspInherited,
 } from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
 
@@ -52,11 +52,11 @@ export class SecurityPanel extends Component {
     whitelistsHaveLoaded: bool,
     maxDomains: number.isRequired,
     accountId: string.isRequired,
-    liveRegion: arrayOf(element).isRequired
+    liveRegion: arrayOf(element).isRequired,
   }
 
   static defaultProps = {
-    isSubAccount: false
+    isSubAccount: false,
   }
 
   handleCspToggleChange = e => {
@@ -90,7 +90,7 @@ export class SecurityPanel extends Component {
                (e.g. *.instructure.com). Canvas and Instructure domains are included
                automatically and do not count against your 50 domain limit.`,
               {
-                max_domains: this.props.maxDomains
+                max_domains: this.props.maxDomains,
               }
             )}
           </Text>
@@ -147,7 +147,7 @@ function mapStateToProps(state, ownProps) {
     ...ownProps,
     cspEnabled: state.cspEnabled,
     cspInherited: state.cspInherited,
-    whitelistsHaveLoaded: state.whitelistsHaveLoaded
+    whitelistsHaveLoaded: state.whitelistsHaveLoaded,
   }
 }
 
@@ -156,7 +156,7 @@ const mapDispatchToProps = {
   setCspEnabled,
   getCspInherited,
   setCspInherited,
-  getCurrentWhitelist
+  getCurrentWhitelist,
 }
 
 export const ConnectedSecurityPanel = connect(mapStateToProps, mapDispatchToProps)(SecurityPanel)

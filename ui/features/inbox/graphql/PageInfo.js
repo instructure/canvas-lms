@@ -29,12 +29,12 @@ export const PageInfo = {
 
   shape: shape({
     endCursor: string,
-    hasNextPage: bool
+    hasNextPage: bool,
   }),
 
   mock: ({endCursor = 'MjA', hasNextPage = true} = {}) => ({
     endCursor,
     hasNextPage,
-    __typename: 'PageInfo'
-  })
+    __typename: 'PageInfo',
+  }),
 }

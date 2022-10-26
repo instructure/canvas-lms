@@ -25,7 +25,7 @@ test('makePromisePool respects the pool size', assert => {
   const dataList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   const options = {
     internvalTime: 10,
-    poolSize: 2
+    poolSize: 2,
   }
 
   let activeWorkers = 0
@@ -51,7 +51,7 @@ test('makePromisePool reports successes and failures correctly', assert => {
   const dataList = [1, 2, 3, 4, 5]
   const options = {
     internvalTime: 100,
-    poolSize: 3
+    poolSize: 3,
   }
 
   // fail on odd numbers
@@ -65,12 +65,15 @@ test('makePromisePool reports successes and failures correctly', assert => {
 
   makePromisePool(dataList, makePromise, options).then(results => {
     deepEqual(results, {
-      successes: [{data: 2, res: {}}, {data: 4, res: {}}],
+      successes: [
+        {data: 2, res: {}},
+        {data: 4, res: {}},
+      ],
       failures: [
         {data: 1, err: 'odd number'},
         {data: 3, err: 'odd number'},
-        {data: 5, err: 'odd number'}
-      ]
+        {data: 5, err: 'odd number'},
+      ],
     })
     done()
   })

@@ -21,7 +21,7 @@ import assignmentHelper from 'ui/features/gradebook/react/shared/helpers/assignm
 
 QUnit.module('assignmentHelper#getComparator', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('returns the correct function when passed "due_date"', () => {
@@ -38,13 +38,13 @@ test('returns the correct function when passed "assignment_group"', () => {
 
 QUnit.module('assignmentHelper#compareByDueDate', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 const generateAssignment = function (options) {
   options = options || {}
   return _.defaults(options, {
     name: 'assignment',
-    due_at: new Date('Mon May 11 2015')
+    due_at: new Date('Mon May 11 2015'),
   })
 }
 
@@ -88,11 +88,11 @@ test('ignores case when comparing by name', () => {
 test('compares by name if dates are both null', () => {
   const assignment1 = {
     name: 'Banana',
-    due_at: null
+    due_at: null,
   }
   const assignment2 = {
     name: 'Apple',
-    due_at: null
+    due_at: null,
   }
   let comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
   ok(comparisonVal > 0)
@@ -130,17 +130,17 @@ test('handles both due_ats passed in as strings', () => {
 
 QUnit.module('assignmentHelper#compareByAssignmentGroup', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('compares assignments by their assignment group position', () => {
   const assignment1 = {
     assignment_group_position: 1,
-    position: 1
+    position: 1,
   }
   const assignment2 = {
     assignment_group_position: 2,
-    position: 1
+    position: 1,
   }
   let comparisonVal = assignmentHelper.compareByAssignmentGroup(assignment1, assignment2)
   ok(comparisonVal < 0)
@@ -152,11 +152,11 @@ test('compares assignments by their assignment group position', () => {
 test('compares by assignment position if assignment group position is the same', () => {
   const assignment1 = {
     assignment_group_position: 1,
-    position: 2
+    position: 2,
   }
   const assignment2 = {
     assignment_group_position: 1,
-    position: 1
+    position: 1,
   }
   let comparisonVal = assignmentHelper.compareByAssignmentGroup(assignment1, assignment2)
   ok(comparisonVal > 0)
@@ -168,11 +168,11 @@ test('compares by assignment position if assignment group position is the same',
 test('treats assignments with the same position and group position as equal', () => {
   const assignment1 = {
     assignment_group_position: 1,
-    position: 1
+    position: 1,
   }
   const assignment2 = {
     assignment_group_position: 1,
-    position: 1
+    position: 1,
   }
   const comparisonVal = assignmentHelper.compareByAssignmentGroup(assignment1, assignment2)
   strictEqual(comparisonVal, 0)
@@ -185,7 +185,7 @@ QUnit.module('assignmentHelper#gradeByGroup', hooks => {
     assignment = {
       grade_group_students_individually: false,
       group_category_id: null,
-      id: '2301'
+      id: '2301',
     }
   })
 

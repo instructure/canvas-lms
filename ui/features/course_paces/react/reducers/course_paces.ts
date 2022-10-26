@@ -38,7 +38,7 @@ import {
   Enrollments,
   Section,
   Module,
-  OptionalDate
+  OptionalDate,
 } from '../types'
 import {BlackoutDate, Course} from '../shared/types'
 import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
@@ -54,7 +54,7 @@ const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 export const initialState: CoursePacesState = ({
   ...getInitialCoursePace(),
   course: window.ENV.COURSE,
-  publishingProgress: initialProgress
+  publishingProgress: initialProgress,
 } || {}) as CoursePacesState
 
 const getModuleItems = (modules: Module[]) =>
@@ -110,7 +110,7 @@ export const getSettingChanges = createDeepEqualSelector(
       changes.push({
         id: 'exclude_weekends',
         oldValue: originalPace.exclude_weekends,
-        newValue: excludeWeekends
+        newValue: excludeWeekends,
       })
 
     const blackoutChanges = getBlackoutDateChanges(originalBlackoutDates, blackoutDates)
@@ -142,7 +142,7 @@ export function getBlackoutDateChanges(
         changes.push({
           id: 'blackout_date',
           oldValue: null,
-          newValue: bod
+          newValue: bod,
         })
       }
     })
@@ -160,7 +160,7 @@ export function getBlackoutDateChanges(
         changes.push({
           id: 'blackout_date',
           oldValue: bod,
-          newValue: null
+          newValue: null,
         })
       }
     })
@@ -443,7 +443,7 @@ export const mergeAssignmentsAndBlackoutDates = (
     .map(bd => ({
       ...bd,
       date: bd.start_date,
-      type: 'blackout_date'
+      type: 'blackout_date',
     }))
 
   // merge due dates into module items
@@ -461,7 +461,7 @@ export const mergeAssignmentsAndBlackoutDates = (
       runningValue.push({
         ...module,
         itemsWithDates: assignmentsWithDueDate,
-        moduleKey: `${module.id}-${Date.now()}`
+        moduleKey: `${module.id}-${Date.now()}`,
       })
       return runningValue
     },
@@ -523,7 +523,7 @@ export default (
     case CoursePaceConstants.SET_END_DATE:
       return {
         ...state,
-        end_date: action.payload ? DateHelpers.formatDate(action.payload) : undefined
+        end_date: action.payload ? DateHelpers.formatDate(action.payload) : undefined,
       }
     case CoursePaceConstants.PACE_CREATED:
       // Could use a *REFACTOR* to better handle new paces and updating the ui properly
@@ -531,7 +531,7 @@ export default (
         ...state,
         id: action.payload.id,
         modules: action.payload.modules,
-        published_at: action.payload.published_at
+        published_at: action.payload.published_at,
       }
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
       return {...action.payload.newSelectedPace}
@@ -544,7 +544,7 @@ export default (
     case CoursePaceConstants.RESET_PACE:
       return {
         ...(action.payload as CoursePace),
-        updated_at: new Date().toISOString() // kicks react into re-rendering the assignment_rows
+        updated_at: new Date().toISOString(), // kicks react into re-rendering the assignment_rows
       }
     case CoursePaceConstants.SET_PROGRESS:
       return {...state, publishingProgress: action.payload}
@@ -558,7 +558,7 @@ export default (
     default:
       return {
         ...state,
-        modules: coursePaceItemsReducer(state.modules, action as CoursePaceItemAction)
+        modules: coursePaceItemsReducer(state.modules, action as CoursePaceItemAction),
       }
   }
 }

@@ -27,14 +27,14 @@ describe('SubmissionTypeButton', () => {
   describe('when selected', () => {
     it('renders a read-only button', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />
       )
       expect(getByRole('button')).toBeDisabled()
     })
 
     it('shows screen-reader content indicating the type is selected', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />
       )
       expect(getByRole('button')).toHaveTextContent(
         'Submission type Carrier Pigeon, currently selected'

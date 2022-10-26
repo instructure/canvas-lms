@@ -37,12 +37,12 @@ const I18n = useI18nScope('blueprint_coursesChildChangeLog')
 export default class ChildChangeLog extends Component {
   static propTypes = {
     status: PropTypes.oneOf(LoadStates.statesList),
-    migration: propTypes.migration
+    migration: propTypes.migration,
   }
 
   static defaultProps = {
     migration: null,
-    status: null
+    status: null,
   }
 
   renderLoading() {
@@ -69,7 +69,7 @@ export default class ChildChangeLog extends Component {
           migration={migration}
           heading={
             <ChangeLogRow
-              isHeading
+              isHeading={true}
               col1={I18n.t('Learning Object')}
               col2={I18n.t('Object Type')}
               col3={I18n.t('Change Applied')}
@@ -91,7 +91,7 @@ export default class ChildChangeLog extends Component {
 
 const connectState = state => ({
   status: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].status,
-  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data
+  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data,
 })
 const connectActions = () => ({})
 export const ConnectedChildChangeLog = connect(connectState, connectActions)(ChildChangeLog)

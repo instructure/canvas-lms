@@ -41,7 +41,7 @@ export const Footer: React.FC<ComponentProps> = ({
   originAccountId,
   visibilityChanges,
   onApplyClicked,
-  enableSaveButton
+  enableSaveButton,
 }) => {
   const [initialEnabledCalendarsCount, setInitialEnabledCalendarsCount] = useState<
     number | undefined
@@ -51,7 +51,7 @@ export const Footer: React.FC<ComponentProps> = ({
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/visible_calendars_count`,
     success: useCallback(response => setInitialEnabledCalendarsCount(response.count), []),
-    error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), [])
+    error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), []),
   })
 
   return (
@@ -62,13 +62,13 @@ export const Footer: React.FC<ComponentProps> = ({
             {
               zero: 'No account calendars selected',
               one: '1 Account calendar selected',
-              other: '%{count} Account calendars selected'
+              other: '%{count} Account calendars selected',
             },
             {
               count:
                 initialEnabledCalendarsCount +
                 visibilityChanges.filter(c => c.visible).length -
-                visibilityChanges.filter(c => !c.visible).length
+                visibilityChanges.filter(c => !c.visible).length,
             }
           )}
         </Text>

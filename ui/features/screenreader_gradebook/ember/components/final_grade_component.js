@@ -22,29 +22,29 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('sr_gradebook')
 
 const FinalGradeComponent = Ember.Component.extend({
-  percent: function() {
+  percent: function () {
     const percent = this.get('student.total_percent')
     return I18n.n(percent, {percentage: true})
   }.property('student.total_percent', 'student'),
 
-  pointRatioDisplay: function() {
+  pointRatioDisplay: function () {
     return I18n.t('final_point_ratio', '%{pointRatio} points', {pointRatio: this.get('pointRatio')})
   }.property('pointRatio'),
 
-  pointRatio: function() {
+  pointRatio: function () {
     return `${I18n.n(this.get('student.total_grade.score'))} / ${I18n.n(
       this.get('student.total_grade.possible')
     )}`
   }.property('hide_points_possible', 'student.total_grade.score', 'student.total_grade.possible'),
 
-  letterGrade: function() {
+  letterGrade: function () {
     const percent = this.get('student.total_percent')
     return scoreToGrade(percent, this.get('gradingStandard'))
   }.property('gradingStandard', 'percent'),
 
   showGrade: Ember.computed.bool('student.total_grade.possible'),
 
-  showPoints: function() {
+  showPoints: function () {
     return !!(!this.get('hide_points_possible') && this.get('student.total_grade'))
   }.property('hide_points_possible', 'student.total_grade'),
 
@@ -53,8 +53,8 @@ const FinalGradeComponent = Ember.Component.extend({
   actions: {
     onEditFinalGradeOverride(grade) {
       this.sendAction('onEditFinalGradeOverride', grade)
-    }
-  }
+    },
+  },
 })
 
 export default FinalGradeComponent

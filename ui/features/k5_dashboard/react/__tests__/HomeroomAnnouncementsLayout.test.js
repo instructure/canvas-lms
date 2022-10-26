@@ -37,10 +37,10 @@ const homeroomAnnouncements = [
       attachment: {
         display_name: 'exam1.pdf',
         url: 'http://google.com/download',
-        filename: '1608134586_366__exam1.pdf'
-      }
+        filename: '1608134586_366__exam1.pdf',
+      },
     },
-    published: true
+    published: true,
   },
   {
     courseId: '1235',
@@ -53,9 +53,9 @@ const homeroomAnnouncements = [
       title: 'Sign the permission slip!',
       message: '<p>Hello</p>',
       url: 'http://google.com/otherclass',
-      postedDate: new Date()
+      postedDate: new Date(),
     },
-    published: true
+    published: true,
   },
   {
     courseId: '1236',
@@ -63,15 +63,15 @@ const homeroomAnnouncements = [
     courseUrl: 'http://google.com',
     canEdit: true,
     canReadAnnouncements: true,
-    published: true
-  }
+    published: true,
+  },
 ]
 
 describe('HomeroomAnnouncementsLayout', () => {
   const getProps = (overrides = {}) => ({
     homeroomAnnouncements,
     loading: false,
-    ...overrides
+    ...overrides,
   })
 
   beforeEach(() => {
@@ -80,8 +80,8 @@ describe('HomeroomAnnouncementsLayout', () => {
       {
         body: '[]',
         headers: {
-          Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-        }
+          Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+        },
       },
       {}
     )
@@ -109,9 +109,9 @@ describe('HomeroomAnnouncementsLayout', () => {
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
               canEdit: true,
-              canReadAnnouncements: true
-            }
-          ]
+              canReadAnnouncements: true,
+            },
+          ],
         })}
       />
     )
@@ -131,9 +131,9 @@ describe('HomeroomAnnouncementsLayout', () => {
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
               canEdit: false,
-              canReadAnnouncements: true
-            }
-          ]
+              canReadAnnouncements: true,
+            },
+          ],
         })}
       />
     )

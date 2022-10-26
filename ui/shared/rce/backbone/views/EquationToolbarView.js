@@ -38,7 +38,7 @@ export default class EquationToolbarView extends Backbone.View {
 
     this.prototype.els = {
       '#mathjax-view .mathquill-toolbar': '$toolbar',
-      '#mathjax-editor': '$matheditor'
+      '#mathjax-editor': '$matheditor',
     }
   }
 
@@ -48,21 +48,16 @@ export default class EquationToolbarView extends Backbone.View {
 
     const $tabLinks = $('#mathjax-view .mathquill-tab-bar li a')
     $tabLinks
-      .click(function(e) {
+      .click(function (e) {
         e.preventDefault()
         $('#mathjax-view .mathquill-tab-bar li').removeClass('mathquill-tab-selected')
         $tabLinks.attr('aria-selected', 'false').attr('tabindex', '-1')
         $('#mathjax-view .mathquill-tab-pane').removeClass('mathquill-tab-pane-selected')
-        $(this)
-          .parent()
-          .addClass('mathquill-tab-selected')
-        $(this)
-          .attr('aria-selected', 'true')
-          .attr('tabindex', 0)
-          .focus()
+        $(this).parent().addClass('mathquill-tab-selected')
+        $(this).attr('aria-selected', 'true').attr('tabindex', 0).focus()
         $(this.href.replace(/.*#/, '#')).addClass('mathquill-tab-pane-selected')
       })
-      .keydown(function(e) {
+      .keydown(function (e) {
         let direction
         switch (e.keyCode) {
           case 37:
@@ -84,9 +79,7 @@ export default class EquationToolbarView extends Backbone.View {
         } else {
           listIndex--
         }
-        $($tabLinks.get(listIndex))
-          .focus()
-          .click()
+        $($tabLinks.get(listIndex)).focus().click()
       })
 
     $('#mathjax-view .mathquill-tab-bar li:first-child').addClass('mathquill-tab-selected')
@@ -105,7 +98,7 @@ export default class EquationToolbarView extends Backbone.View {
 
     $('#mathjax-view a.mathquill-rendered-math')
       .mousedown(e => e.stopPropagation())
-      .click(function(e) {
+      .click(function (e) {
         e.preventDefault()
         const text = this.title + ' '
         const field = document.getElementById('mathjax-editor')

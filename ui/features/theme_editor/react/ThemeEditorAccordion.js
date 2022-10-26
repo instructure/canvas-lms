@@ -36,11 +36,11 @@ export default class ThemeEditorAccordion extends React.Component {
     changeSomething: PropTypes.func.isRequired,
     getDisplayValue: PropTypes.func.isRequired,
     themeState: PropTypes.object,
-    handleThemeStateChange: PropTypes.func
+    handleThemeStateChange: PropTypes.func,
   }
 
   state = {
-    expandedIndex: Number(window.sessionStorage.getItem(activeIndexKey))
+    expandedIndex: Number(window.sessionStorage.getItem(activeIndexKey)),
   }
 
   setStoredAccordionIndex(index) {
@@ -50,7 +50,7 @@ export default class ThemeEditorAccordion extends React.Component {
   handleToggle = (event, expanded, index) => {
     this.setState(
       {
-        expandedIndex: index
+        expandedIndex: index,
       },
       () => {
         this.setStoredAccordionIndex(index)
@@ -67,7 +67,7 @@ export default class ThemeEditorAccordion extends React.Component {
       placeholder: this.props.getDisplayValue(varDef.variable_name),
       themeState: this.props.themeState,
       handleThemeStateChange: this.props.handleThemeStateChange,
-      varDef
+      varDef,
     }
 
     switch (varDef.type) {
@@ -75,7 +75,7 @@ export default class ThemeEditorAccordion extends React.Component {
         return <ThemeEditorColorRow {...props} />
       case 'image':
         return <ThemeEditorImageRow {...props} />
-      case 'percentage':
+      case 'percentage': {
         const defaultValue = props.currentValue || props.placeholder
         return (
           <RangeInput
@@ -93,6 +93,7 @@ export default class ThemeEditorAccordion extends React.Component {
             formatValue={value => I18n.toPercentage(value * 100, {precision: 0})}
           />
         )
+      }
       default:
         return null
     }

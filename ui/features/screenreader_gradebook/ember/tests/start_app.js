@@ -35,7 +35,7 @@ export default function startApp() {
 
   Ember.run.join(() => {
     App = Application.create({
-      rootElement: '#fixtures'
+      rootElement: '#fixtures',
     })
     App.Router.reopen({history: 'none'})
     App.setupForTesting()

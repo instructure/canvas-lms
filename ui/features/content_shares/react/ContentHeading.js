@@ -27,7 +27,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 ContentHeading.propTypes = {
   svgUrl: string,
   heading: string,
-  description: string
+  description: string,
 }
 
 export default function ContentHeading(props) {

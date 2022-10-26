@@ -27,7 +27,7 @@ import {
   IconMoveUpLine,
   IconMoveDownLine,
   IconMoveDownBottomLine,
-  IconStarSolid
+  IconStarSolid,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('dashcards')
@@ -43,16 +43,16 @@ class DashboardCardMovementMenu extends React.Component {
       canMoveLeft: PropTypes.bool,
       canMoveRight: PropTypes.bool,
       canMoveToBeginning: PropTypes.bool,
-      canMoveToEnd: PropTypes.bool
+      canMoveToEnd: PropTypes.bool,
     }).isRequired,
     lastPosition: PropTypes.number,
-    currentPosition: PropTypes.number
+    currentPosition: PropTypes.number,
   }
 
   static defaultProps = {
     onMenuSelect: () => {},
     lastPosition: 0,
-    currentPosition: 0
+    currentPosition: 0,
   }
 
   handleMoveCard = positionToMoveTo => () =>

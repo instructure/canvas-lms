@@ -60,11 +60,11 @@ const editView = function (assignmentOpts = {}) {
   const defaultAssignmentOpts = {
     name: 'Test Assignment',
     secure_params: s_params,
-    assignment_overrides: []
+    assignment_overrides: [],
   }
   assignmentOpts = {
     ...defaultAssignmentOpts,
-    ...assignmentOpts
+    ...assignmentOpts,
   }
   const assignment = new Assignment(assignmentOpts)
 
@@ -78,17 +78,17 @@ const editView = function (assignmentOpts = {}) {
   const assignmentGroupSelector = new AssignmentGroupSelector({
     parentModel: assignment,
     assignmentGroups:
-      (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
+      (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || [],
   })
   const gradingTypeSelector = new GradingTypeSelector({
     parentModel: assignment,
-    canEditGrades: ENV == null || ENV.PERMISSIONS.can_edit_grades
+    canEditGrades: ENV == null || ENV.PERMISSIONS.can_edit_grades,
   })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories:
       (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
-    inClosedGradingPeriod: assignment.inClosedGradingPeriod()
+    inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
   const app = new EditView({
@@ -100,10 +100,10 @@ const editView = function (assignmentOpts = {}) {
     views: {
       'js-assignment-overrides': new DueDateOverrideView({
         model: dueDateList,
-        views: {}
-      })
+        views: {},
+      }),
     },
-    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist()
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist(),
   })
 
   return app.render()
@@ -134,7 +134,7 @@ QUnit.module('EditView', {
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
       COURSE_ID: 1,
-      USAGE_RIGHTS_REQUIRED: true
+      USAGE_RIGHTS_REQUIRED: true,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -153,7 +153,7 @@ QUnit.module('EditView', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('should be accessible', function (assert) {
@@ -383,7 +383,7 @@ test('removes group_category_id if an external tool is selected', function () {
   const view = this.editView()
   let data = {
     submission_type: 'external_tool',
-    group_category_id: '1'
+    group_category_id: '1',
   }
   data = view._unsetGroupsIfExternalTool(data)
   equal(data.group_category_id, null)
@@ -426,7 +426,7 @@ test('cancels to env normally', function () {
 
 test('cancels to referrer if allowed', function () {
   Object.defineProperty(document, 'referrer', {
-    value: currentOrigin + '/foo'
+    value: currentOrigin + '/foo',
   })
   ENV.CAN_CANCEL_TO = [currentOrigin + '/foo']
   ENV.CANCEL_TO = currentOrigin + '/bar'
@@ -436,7 +436,7 @@ test('cancels to referrer if allowed', function () {
 
 test('cancels to CANCEL_TO if referrer not allowed', function () {
   Object.defineProperty(document, 'referrer', {
-    value: currentOrigin + '/foo'
+    value: currentOrigin + '/foo',
   })
   ENV.CAN_CANCEL_TO = [currentOrigin + '/baz']
   ENV.CANCEL_TO = currentOrigin + '/bar'
@@ -594,7 +594,7 @@ test('rounds points_possible', function () {
 
 test('sets seconds of due_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -603,7 +603,7 @@ test('sets seconds of due_at to 59 if the new minute value is 59', function () {
 
 test('sets seconds of due_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
@@ -612,7 +612,7 @@ test('sets seconds of due_at to 00 if the new minute value is not 59', function 
 
 test('getFormData returns custom_params as a JSON object, not a string', function () {
   const custom_params = {
-    hello: 'world'
+    hello: 'world',
   }
   const view = this.editView()
   // You have to stringify this, as the custom_params are not stored in memory as an object. Oh no,
@@ -628,7 +628,7 @@ test('getFormData returns custom_params as a JSON object, not a string', functio
 // that value.
 test('keeps original due_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
@@ -637,7 +637,7 @@ test('keeps original due_at seconds if only the seconds value has changed', func
 
 test('keeps original due_at seconds if the date has not changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -646,7 +646,7 @@ test('keeps original due_at seconds if the date has not changed', function () {
 
 test('sets seconds of unlock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -655,7 +655,7 @@ test('sets seconds of unlock_at to 59 if the new minute value is 59', function (
 
 test('sets seconds of unlock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
@@ -667,7 +667,7 @@ test('sets seconds of unlock_at to 00 if the new minute value is not 59', functi
 // that value.
 test('keeps original unlock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
@@ -676,7 +676,7 @@ test('keeps original unlock_at seconds if only the seconds value has changed', f
 
 test('keeps original unlock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -685,7 +685,7 @@ test('keeps original unlock_at seconds if the date has not changed', function ()
 
 test('sets seconds of lock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -694,7 +694,7 @@ test('sets seconds of lock_at to 59 if the new minute value is 59', function () 
 
 test('sets seconds of lock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
@@ -706,7 +706,7 @@ test('sets seconds of lock_at to 00 if the new minute value is not 59', function
 // that value.
 test('keeps original lock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
@@ -715,7 +715,7 @@ test('keeps original lock_at seconds if only the seconds value has changed', fun
 
 test('keeps original lock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
@@ -743,7 +743,7 @@ QUnit.module('EditView: handleGroupCategoryChange', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -755,7 +755,7 @@ QUnit.module('EditView: handleGroupCategoryChange', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('unchecks the group category checkbox if the anonymous grading checkbox is checked', function () {
@@ -810,7 +810,7 @@ QUnit.module('#handleAnonymousGradingChange', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -888,7 +888,7 @@ QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -948,7 +948,7 @@ QUnit.module('EditView: group category inClosedGradingPeriod', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -960,7 +960,7 @@ QUnit.module('EditView: group category inClosedGradingPeriod', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('lock down group category after students submit', function () {
@@ -988,7 +988,7 @@ QUnit.module('EditView: enableCheckbox', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1002,7 +1002,7 @@ QUnit.module('EditView: enableCheckbox', {
 
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('enables checkbox', function () {
@@ -1036,7 +1036,7 @@ QUnit.module('EditView: setDefaultsIfNew', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1048,7 +1048,7 @@ QUnit.module('EditView: setDefaultsIfNew', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('returns values from localstorage', function () {
@@ -1105,7 +1105,7 @@ QUnit.module('EditView: setDefaultsIfNew: no localStorage', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     sandbox.stub(userSettings, 'contextGet').returns(null)
     this.server = sinon.fakeServer.create()
@@ -1118,7 +1118,7 @@ QUnit.module('EditView: setDefaultsIfNew: no localStorage', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('submission_type is online if no cache', function () {
@@ -1138,7 +1138,7 @@ QUnit.module('EditView: cacheAssignmentSettings', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1150,7 +1150,7 @@ QUnit.module('EditView: cacheAssignmentSettings', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('saves valid attributes to localstorage', function () {
@@ -1182,7 +1182,7 @@ QUnit.module('EditView: Conditional Release', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create()
@@ -1198,7 +1198,7 @@ QUnit.module('EditView: Conditional Release', {
 
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('attaches conditional release editor', function () {
@@ -1272,7 +1272,7 @@ QUnit.module('Editview: Intra-Group Peer Review toggle', {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1284,14 +1284,14 @@ QUnit.module('Editview: Intra-Group Peer Review toggle', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('only appears for group assignments', function () {
   sandbox.stub(userSettings, 'contextGet').returns({
     peer_reviews: '1',
     group_category_id: 1,
-    automatic_peer_reviews: '1'
+    automatic_peer_reviews: '1',
   })
   const view = this.editView()
   view.$el.appendTo($('#fixtures'))
@@ -1301,7 +1301,7 @@ test('only appears for group assignments', function () {
 test('does not appear when reviews are being assigned manually', function () {
   sandbox.stub(userSettings, 'contextGet').returns({
     peer_reviews: '1',
-    group_category_id: 1
+    group_category_id: 1,
   })
   const view = this.editView()
   view.$el.appendTo($('#fixtures'))
@@ -1327,7 +1327,7 @@ QUnit.module('EditView: Assignment Configuration Tools', {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       PLAGIARISM_DETECTION_PLATFORM: true,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1341,7 +1341,7 @@ QUnit.module('EditView: Assignment Configuration Tools', {
 
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('it attaches assignment configuration component', function () {
@@ -1396,7 +1396,7 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
 QUnit.module('EditView: Assignment External Tools', {
   setup() {
     fakeENV.setup({
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1409,7 +1409,7 @@ QUnit.module('EditView: Assignment External Tools', {
 
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('it attaches assignment external tools component', function () {
@@ -1427,7 +1427,7 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
     'item[new_tab]': '1',
     'item[iframe][width]': '111',
-    'item[iframe][height]': '222'
+    'item[iframe][height]': '222',
   }
   const view = editView()
 
@@ -1501,7 +1501,7 @@ QUnit.module('EditView: Quizzes 2', {
       NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
       VALID_DATE_RANGE: {},
       COURSE_ID: 1,
-      CANCEL_TO: currentOrigin + '/cancel'
+      CANCEL_TO: currentOrigin + '/cancel',
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1509,14 +1509,14 @@ QUnit.module('EditView: Quizzes 2', {
       html_url: 'http://foo',
       submission_types: ['external_tool'],
       is_quiz_lti_assignment: true,
-      frozen_attributes: ['submission_types']
+      frozen_attributes: ['submission_types'],
     })
   },
   teardown() {
     this.server.restore()
     fakeENV.teardown()
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('does not show the description textarea', function () {
@@ -1568,7 +1568,7 @@ QUnit.module('EditView: anonymous grading', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1625,7 +1625,7 @@ QUnit.module('EditView: Anonymous Instructor Annotations', hooks => {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       COURSE_ID: 1,
-      ...envOptions
+      ...envOptions,
     })
   }
 
@@ -1673,7 +1673,7 @@ QUnit.module('EditView: Anonymous Moderated Marking', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1709,7 +1709,7 @@ QUnit.module('EditView#validateFinalGrader', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1755,7 +1755,7 @@ QUnit.module('EditView#validateGraderCount', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1799,7 +1799,7 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', suiteHooks => {
   let server
   const availableModerators = [
     {name: 'John Doe', id: '21'},
-    {name: 'Jane Doe', id: '89'}
+    {name: 'Jane Doe', id: '89'},
   ]
 
   suiteHooks.beforeEach(() => {
@@ -1817,7 +1817,7 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', suiteHooks => {
       MODERATED_GRADING_ENABLED: false,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -1953,7 +1953,7 @@ QUnit.module('EditView#handleModeratedGradingChanged', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2029,7 +2029,7 @@ QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2082,7 +2082,7 @@ QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', hooks => {
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2136,7 +2136,7 @@ QUnit.module('EditView student annotation submission', hooks => {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2174,7 +2174,7 @@ QUnit.module('EditView student annotation submission', hooks => {
     const serverResponse200 = data => [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(data)
+      JSON.stringify(data),
     ]
     let assignmentOpts
 
@@ -2183,7 +2183,7 @@ QUnit.module('EditView student annotation submission', hooks => {
         id: '1',
         display_name: filename,
         context_type: 'Course',
-        context_id: '1'
+        context_id: '1',
       }
       ENV.context_asset_string = 'course_1'
       assignmentOpts = {submissionTypes: ['student_annotation']}
@@ -2285,25 +2285,25 @@ QUnit.module('EditView student annotation submission', hooks => {
         usage_rights: {
           use_justification: 'creative_commons',
           license: 'cc_by',
-          legal_copyright: 'Test copyright'
-        }
+          legal_copyright: 'Test copyright',
+        },
       }
       const licensesData = [
         {
           id: 'public_domain',
           name: 'Public Domain',
-          url: 'http://en.wikipedia.org/wiki/Public_domain'
+          url: 'http://en.wikipedia.org/wiki/Public_domain',
         },
         {
           id: 'cc_by',
           name: 'CC Attribution',
-          url: 'http://creativecommons.org/licenses/by/4.0'
+          url: 'http://creativecommons.org/licenses/by/4.0',
         },
         {
           id: 'cc_by_sa',
           name: 'CC Attribution Share Alike',
-          url: 'http://creativecommons.org/licenses/by-sa/4.0'
-        }
+          url: 'http://creativecommons.org/licenses/by-sa/4.0',
+        },
       ]
       server.respondWith('GET', defaultCourseUrl, serverResponse200(fileData))
       server.respondWith('GET', contentLicensesUrl, serverResponse200(licensesData))

@@ -25,32 +25,32 @@ const GradingTypes = {
     get label() {
       return I18n.t('points')
     },
-    key: 'points'
+    key: 'points',
   },
   percent: {
     get label() {
       return I18n.t('percent')
     },
-    key: 'percent'
+    key: 'percent',
   },
   letter_grade: {
     get label() {
       return I18n.t('letter grade')
     },
-    key: 'letter_grade'
+    key: 'letter_grade',
   },
   gpa_scale: {
     get label() {
       return I18n.t('GPA scale')
     },
-    key: 'gpa_scale'
+    key: 'gpa_scale',
   },
   other: {
     get label() {
       return I18n.t('other')
     },
-    key: 'other'
-  }
+    key: 'other',
+  },
 }
 
 export default GradingTypes

@@ -86,7 +86,7 @@ CommentEditView.propTypes = {
   comment: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   updateComment: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 }
 
 export default CommentEditView

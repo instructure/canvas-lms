@@ -38,7 +38,7 @@ const props = {
   accountId: ENV.ACCOUNT_ID.toString(),
   roles: Array.prototype.slice.call(ENV.COURSE_ROLES),
   addUserUrls: ENV.URLS,
-  store
+  store,
 }
 
 // this is where we take care of the 3 things we need to do outside of the
@@ -48,7 +48,7 @@ const props = {
 const originalDocumentTitle = document.title
 function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
   // give the correct left nav item an active class
-  $('#section-tabs .section a').each(function() {
+  $('#section-tabs .section a').each(function () {
     const $tab = $(this)
     $tab[$tab.hasClass(activeTab.button_class) ? 'addClass' : 'removeClass']('active')
   })

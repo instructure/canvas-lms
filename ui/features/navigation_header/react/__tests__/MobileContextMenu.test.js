@@ -23,36 +23,36 @@ const tabsFromApi = [
     id: 'home',
     html_url: '/courses/1',
     label: 'Home',
-    type: 'internal'
+    type: 'internal',
   },
   {
     id: 'context_external_tool',
     html_url: '/courses/1/external_tools/1',
     hidden: true,
     label: 'Course Navigation',
-    type: 'external'
+    type: 'external',
   },
   {
     id: 'discussions',
     html_url: '/courses/1/discussion_topics',
     hidden: true,
     label: 'Discussions',
-    type: 'internal'
+    type: 'internal',
   },
   {
     id: 'grades',
     html_url: '/courses/1/grades',
     unused: true,
     label: 'Grades',
-    type: 'internal'
+    type: 'internal',
   },
   {
     id: 'dig',
     html_url: '/courses/1/external_tools/2',
     unused: true,
     label: 'DIG',
-    type: 'external'
-  }
+    type: 'external',
+  },
 ]
 const spinner = 'Spinner'
 const contextType = 'Course'
@@ -61,7 +61,7 @@ const contextId = '1'
 const props = {
   spinner,
   contextType,
-  contextId
+  contextId,
 }
 
 describe('MobileContextMenu', () => {

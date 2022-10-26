@@ -29,7 +29,6 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
   let $container
   let gradebook
   let renderer
-  let component
 
   function render() {
     renderer.render(
@@ -37,9 +36,7 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
       $container,
       {} /* gridSupport */,
       {
-        ref(ref) {
-          component = ref
-        },
+        ref(_ref) {},
       }
     )
   }
@@ -232,15 +229,6 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       render()
       component.props.removeGradebookElement()
       strictEqual(gradebook.keyboardNav.removeGradebookElement.callCount, 1)
-    })
-
-    test('sets sectionsEnabled to true when sections are in use', () => {
-      gradebook.gotSections([
-        {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'},
-      ])
-      render()
-      strictEqual(component.props.sectionsEnabled, true)
     })
 
     test('sets sectionsEnabled to false when sections are not in use', () => {

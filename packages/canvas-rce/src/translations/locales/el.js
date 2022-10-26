@@ -22,6 +22,7 @@ import '../tinymce/el'
 const locale = {
   "add_8523c19b": { "message": "Πρόσθεση" },
   "all_4321c3a1": { "message": "Όλα" },
+  "alpha_15d59033": { "message": "Alpha" },
   "announcement_list_da155734": { "message": "Λίστα Ανακοινώσεων" },
   "announcements_a4b8ed4a": { "message": "Ανακοινώσεις" },
   "apply_781a2546": { "message": "Εφαρμογή" },
@@ -59,7 +60,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "Πλοήγηση στο μάθημα" },
   "creative_commons_license_725584ae": { "message": "Άδεια Creative Commons:" },
   "cyan_c1d5f68a": { "message": "Κυανό" },
-  "decrease_indent_de6343ab": { "message": "Μείωση Εσοχής Κειμένου" },
+  "decrease_indent_d9cf469d": { "message": "Μείωση Εσοχής Κειμένου" },
   "deep_purple_bb3e2907": { "message": "Βαθύ μοβ" },
   "delimiters_4db4840d": { "message": "Οριοθέτες" },
   "details_98a31b68": { "message": "Λεπτομέρειες" },
@@ -70,7 +71,6 @@ const locale = {
   "due_multiple_dates_cc0ee3f5": {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
   },
-  "edit_c5fbea07": { "message": "Διαμόρφωση" },
   "embed_image_1080badc": { "message": "Ενσωμάτωση εικόνας" },
   "external_tools_6e77821": { "message": "Εξωτερικά Εργαλεία" },
   "files_c300e900": { "message": "Αρχεία" },
@@ -90,9 +90,10 @@ const locale = {
   "i_hold_the_copyright_71ee91b1": {
     "message": "Έχω τα πνευματικά δικαιώματα"
   },
+  "icon_215a1dc6": { "message": "Εικονίδιο" },
   "image_8ad06": { "message": "Εικόνα" },
   "images_7ce26570": { "message": "Εικόνες" },
-  "increase_indent_6d550a4a": { "message": "Αύξηση Εσοχής Κειμένου" },
+  "increase_indent_6af90f7c": { "message": "Αύξηση Εσοχής Κειμένου" },
   "indigo_2035fc55": { "message": "Λουλακί" },
   "insert_593145ef": { "message": "Εισαγωγή" },
   "insert_equella_links_49a8dacd": {
@@ -108,9 +109,6 @@ const locale = {
   "light_blue_5374f600": { "message": "Μπλε Ανοιχτό" },
   "link_7262adec": { "message": "Σύνδεσμος" },
   "links_14b70841": { "message": "Σύνδεσμοι" },
-  "load_more_results_460f49a9": {
-    "message": "Φόρτωση περισσότερων αποτελεσμάτων"
-  },
   "loading_25990131": { "message": "Φόρτωση..." },
   "loading_bde52856": { "message": "Φόρτωση" },
   "loading_failed_b3524381": { "message": "Η Φόρτωση Απέτυχε" },
@@ -139,6 +137,8 @@ const locale = {
   "record_7c9448b": { "message": "Ηχογράφηση" },
   "red_8258edf3": { "message": "Κόκκινο" },
   "relationships_6602af70": { "message": "Σχέσεις" },
+  "replace_e61834a7": { "message": "Αντικατάσταση" },
+  "reset_95a81614": { "message": "Επαναφορά" },
   "rich_content_editor_2708ef21": {
     "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
   },
@@ -168,7 +168,8 @@ const locale = {
   "view_ba339f93": { "message": "Προβολή" },
   "white_87fa64fd": { "message": "Λευκό" },
   "wiki_home_9cd54d0": { "message": "Αρχική Σελίδα Wiki" },
-  "yes_dde87d5": { "message": "Ναι" }
+  "yes_dde87d5": { "message": "Ναι" },
+  "zoom_f3e54d69": { "message": "Μεγένθυνση" }
 }
 
 

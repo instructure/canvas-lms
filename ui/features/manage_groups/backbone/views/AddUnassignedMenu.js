@@ -33,7 +33,7 @@ export default class AddUnassignedMenu extends PopoverMenuView {
 
     this.prototype.events = {
       ...PopoverMenuView.prototype.events,
-      'click .assign-user-to-group': 'setGroup'
+      'click .assign-user-to-group': 'setGroup',
     }
   }
 
@@ -44,7 +44,7 @@ export default class AddUnassignedMenu extends PopoverMenuView {
     if (options.inputFilterView == null)
       options.inputFilterView = new InputFilterView({
         collection: this.collection,
-        setParamOnInvalid: true
+        setParamOnInvalid: true,
       })
     this.my = 'right-8 top-47'
     this.at = 'left center'
@@ -73,7 +73,7 @@ export default class AddUnassignedMenu extends PopoverMenuView {
   toJSON() {
     return {
       users: this.collection.toJSON(),
-      ENV
+      ENV,
     }
   }
 

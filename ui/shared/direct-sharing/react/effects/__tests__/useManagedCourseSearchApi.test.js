@@ -24,19 +24,19 @@ function setupManagedCoursesResponse() {
   const response = [
     {
       id: '1',
-      label: 'Board Game Basics'
+      label: 'Board Game Basics',
     },
     {
       id: '2',
-      label: 'Settlers of Catan 101'
-    }
+      label: 'Settlers of Catan 101',
+    },
   ]
   fetchMock.mock('path:/users/self/manageable_courses', response)
   return response
 }
 
 const defaultEnv = {
-  current_user_roles: ['user', 'teacher']
+  current_user_roles: ['user', 'teacher'],
 }
 
 describe('useManagedCourseSearchApi', () => {
@@ -58,7 +58,7 @@ describe('useManagedCourseSearchApi', () => {
     expect(error).not.toHaveBeenCalled()
     expect(success).toHaveBeenCalledWith([
       expect.objectContaining({id: '1', name: 'Board Game Basics'}),
-      expect.objectContaining({id: '2', name: 'Settlers of Catan 101'})
+      expect.objectContaining({id: '2', name: 'Settlers of Catan 101'}),
     ])
   })
 
@@ -66,7 +66,7 @@ describe('useManagedCourseSearchApi', () => {
     setupManagedCoursesResponse()
     renderHook(() =>
       useManagedCourseSearchApi({
-        params: {term: 'game', enforce_manage_grant_filter: true}
+        params: {term: 'game', enforce_manage_grant_filter: true},
       })
     )
     await fetchMock.flush(true)

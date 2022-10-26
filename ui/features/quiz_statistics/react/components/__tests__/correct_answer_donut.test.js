@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import CorrectAnswerDonut from '../correct_answer_donut'
 
 describe('canvas_quizzes/statistics/views/correct_answer_donut', () => {
   it('renders', () => {
-    render(
-      <CorrectAnswerDonut correctResponseRatio={0.7} />
-    )
+    render(<CorrectAnswerDonut correctResponseRatio={0.7} />)
   })
 })

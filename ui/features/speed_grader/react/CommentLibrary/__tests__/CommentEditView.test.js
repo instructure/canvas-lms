@@ -31,7 +31,7 @@ describe('Comment', () => {
       id: '1',
       updateComment: updateCommentMock,
       onClose: onCloseMock,
-      ...props
+      ...props,
     }
   }
 

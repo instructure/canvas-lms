@@ -38,7 +38,7 @@ export default function ErrorTextInputForm(props) {
         <TextInput
           onChange={props.handleChangeEmail}
           renderLabel={I18n.t('Your Email Address')}
-          isRequired
+          isRequired={true}
           placeholder={I18n.t('email@example.com')}
           value={props.email}
         />
@@ -62,5 +62,5 @@ ErrorTextInputForm.propTypes = {
   email: string.isRequired,
   handleChangeCommentBox: func.isRequired,
   handleSubmitErrorReport: func.isRequired,
-  handleChangeEmail: func.isRequired
+  handleChangeEmail: func.isRequired,
 }

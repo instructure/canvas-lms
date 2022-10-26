@@ -22,19 +22,15 @@ $(document).ready(() => {
   $('body,html').css({
     height: '100%',
     overflow: 'auto',
-    '-webkit-overflow-scrolling': 'touch'
+    '-webkit-overflow-scrolling': 'touch',
   })
 
   $('.data_view')
-    .change(function() {
+    .change(function () {
       if ($(this).val() === 'paper') {
-        $('#submission_preview')
-          .removeClass('plain_text')
-          .addClass('paper')
+        $('#submission_preview').removeClass('plain_text').addClass('paper')
       } else {
-        $('#submission_preview')
-          .removeClass('paper')
-          .addClass('plain_text')
+        $('#submission_preview').removeClass('paper').addClass('plain_text')
       }
     })
     .change()

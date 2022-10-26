@@ -70,6 +70,10 @@ describe CoursePace do
     it "has a working section_paces scope" do
       expect(@course.course_paces.section_paces).to match_array([@section_plan])
     end
+
+    it "has a working student_enrollment_paces scope" do
+      expect(@course.course_paces.student_enrollment_paces).to match_array([@student_plan])
+    end
   end
 
   context "course_pace_context" do
@@ -114,6 +118,62 @@ describe CoursePace do
   context "root_account" do
     it "infers root_account_id from course" do
       expect(@course_pace.root_account).to eq @course.root_account
+    end
+  end
+
+  describe "#effective_name" do
+    before :once do
+      @section_plan = @course.course_paces.create! course_section: @course_section
+      @student_plan = @course.course_paces.create! user: @student
+    end
+
+    it "returns the user's name for a student pace" do
+      expect(@student_plan.effective_name).to eq @student.name
+    end
+
+    it "returns the section's name for a section pace" do
+      expect(@section_plan.effective_name).to eq @course_section.name
+    end
+
+    it "returns the course's name for a course pace" do
+      expect(@course_pace.effective_name).to eq @course.name
+    end
+  end
+
+  describe "#type" do
+    before :once do
+      @section_plan = @course.course_paces.create! course_section: @course_section
+      @student_plan = @course.course_paces.create! user: @student
+    end
+
+    it "returns 'StudentEnrollment' for a student pace" do
+      expect(@student_plan.type).to eq "StudentEnrollment"
+    end
+
+    it "returns 'Section' for a section pace" do
+      expect(@section_plan.type).to eq "Section"
+    end
+
+    it "returns 'Course' for a course pace" do
+      expect(@course_pace.type).to eq "Course"
+    end
+  end
+
+  describe "#duration" do
+    it "returns 0 if there are no module items" do
+      expect(@course_pace.duration).to eq 0
+    end
+
+    context "multiple paced module items exist" do
+      before do
+        @course.context_module_tags.each do |tag|
+          @course_pace.course_pace_module_items.create! module_item: tag, duration: 1
+        end
+      end
+
+      it "returns the sum of all item durations" do
+        expect(@course_pace.duration).to eq 2
+      end
     end
   end
 
@@ -560,6 +620,43 @@ describe CoursePace do
     end
   end
 
+  context "course pace deletes" do
+    before :once do
+      Account.site_admin.enable_feature!(:course_paces_redesign)
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "increments the course pace deletion to statsd" do
+      # This destroy does work and we log it here, but in general, the code doesn't allow for the default
+      # course pace to be deleted for now.
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      course_pace = @course.course_paces.create! workflow_state: "active"
+      course_pace.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_course_pace").once
+    end
+
+    it "increments the section-type course pace deletion to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      new_section = @course.course_sections.create! name: "new_section"
+      section_plan = @course.course_paces.create! course_section: new_section
+      section_plan.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_section_pace").once
+    end
+
+    it "increments the student-type course pace deletion to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      user_plan = @course.course_paces.create!(user: @student, workflow_state: "active")
+      user_plan.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_user_pace").once
+    end
+  end
+
   context "course pace publish logs statsd for various values" do
     before :once do
       course_with_student active_all: true
@@ -658,6 +755,117 @@ describe CoursePace do
       course_pace.publish
 
       expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 0)
+    end
+  end
+
+  context "course pace blackout date counts logging" do
+    before do
+      Account.site_admin.enable_feature! :account_level_blackout_dates
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "logs the count of course blackout dates when pace is created" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @course,
+                              blackout_date: true
+                            })
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1)
+    end
+
+    it "logs course and account logs separately when course pace is created" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @course,
+                              blackout_date: true
+                            })
+      CalendarEvent.create!({
+                              title: "account event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: Account.find(@course.root_account.id),
+                              blackout_date: true
+                            })
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1).once
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 1).once
+    end
+
+    it "logs a zero value if no course blackout dates" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 0)
+    end
+
+    it "logs the count of account blackout dates when pace is created" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: Account.find(@course.root_account.id),
+                              blackout_date: true
+                            })
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 1)
+    end
+
+    it "logs a zero value if no account blackout dates" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 0)
+    end
+
+    it "creates a course in a subaccount with its own calendar events and counts all the account calendar events" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      @subaccount1 = Account.find((@course.root_account.id)).sub_accounts.create!
+      @subaccount1.enable_feature!(:course_paces)
+      @course1 = course_factory(account: @subaccount1, active_all: true)
+      @course1.enable_course_paces = true
+      @course1.save!
+      @module1 = @course1.context_modules.create!
+      @assignment1 = @course1.assignments.create!
+      @tag = @assignment1.context_module_tags.create! context_module: @module1, context: @course1, tag_type: "context_module"
+
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @course1,
+                              blackout_date: true
+                            })
+      CalendarEvent.create!({
+                              title: "account event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: Account.find(@course1.root_account.id),
+                              blackout_date: true
+                            })
+      CalendarEvent.create!({
+                              title: "subaccount event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @subaccount1,
+                              blackout_date: true
+                            })
+      @course1.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1).once
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 2).once
     end
   end
 

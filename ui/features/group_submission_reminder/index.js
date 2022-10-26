@@ -30,14 +30,14 @@ export default function GroupSubmissionAlert({groupType}) {
   return (
     <Alert variant="warning" margin="medium 0">
       {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {
-        groupType
+        groupType,
       })}
     </Alert>
   )
 }
 
 GroupSubmissionAlert.propTypes = {
-  groupType: string.isRequired
+  groupType: string.isRequired,
 }
 
 ready(() => {

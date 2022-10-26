@@ -24,7 +24,7 @@ import {
   MARKER_ID,
   MENTION_MENU_ID,
   MENTION_MENU_SELECTOR,
-  KEY_CODES
+  KEY_CODES,
 } from './constants'
 import MentionsUI from './components/MentionAutoComplete/MentionsUI'
 import broadcastMessage, {inputChangeMessage, navigationMessage} from './broadcastMessage'
@@ -184,7 +184,7 @@ export const onKeyUp = e => {
   if (inMentionsMarker(editor)) {
     broadcastMessage(inputChangeMessage(editor.selection.getNode().textContent), [
       editor.getWin(),
-      window
+      window,
     ])
   }
 }
@@ -220,8 +220,8 @@ export const onFocusedUserChange = (focusedUser, ed) => {
     activeDescendant: focusedUser?.ariaActiveDescendantId,
     user: {
       shortName: focusedUser?.name,
-      id: focusedUser?._id
-    }
+      id: focusedUser?._id,
+    },
   }
 
   markerEl?.setAttribute('aria-activedescendant', focusedUser?.ariaActiveDescendantId || '')

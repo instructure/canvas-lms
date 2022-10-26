@@ -36,8 +36,8 @@ export function updateProvisionalGrade(courseId, submission) {
   const data = {
     submission: {
       ...underscore(submission),
-      provisional: true
-    }
+      provisional: true,
+    },
   }
 
   return axios.post(url, data).then(response => camelize(response.data[0].submission))

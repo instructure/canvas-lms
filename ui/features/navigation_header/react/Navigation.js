@@ -79,11 +79,11 @@ const TYPE_URL_MAP = {
   accounts: '/api/v1/accounts',
   profile: '/api/v1/users/self/tabs',
   history: '/api/v1/users/self/history',
-  help: '/help_links'
+  help: '/help_links',
 }
 
 const TYPE_FILTER_MAP = {
-  groups: group => group.can_access && !group.concluded
+  groups: group => group.can_access && !group.concluded,
 }
 
 const RESOURCE_COUNT = 10
@@ -108,11 +108,11 @@ function noop() {}
 export default class Navigation extends React.Component {
   static propTypes = {
     unreadComponent: func, // for testing only
-    onDataReceived: func
+    onDataReceived: func,
   }
 
   static defaultProps = {
-    unreadComponent: UnreadCounts
+    unreadComponent: UnreadCounts,
   }
 
   state = {
@@ -139,7 +139,7 @@ export default class Navigation extends React.Component {
     historyAreLoaded: false,
     releaseNotesPollInterval: 30000,
     releaseNotesBadgeDisabled:
-      !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled
+      !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled,
   }
 
   componentDidMount() {
@@ -223,7 +223,7 @@ export default class Navigation extends React.Component {
           this.setState({
             observedUserId: k5_observed_user_id,
             [`${type}AreLoaded}`]: false,
-            [`${type}Loading`]: false
+            [`${type}Loading`]: false,
           })
           forceLoad = true
         }
@@ -254,7 +254,7 @@ export default class Navigation extends React.Component {
         {
           [type]: newData,
           [`${type}Loading`]: false,
-          [`${type}AreLoaded`]: true
+          [`${type}AreLoaded`]: true,
         },
         this.props.onDataReceived
       )
@@ -426,7 +426,7 @@ export default class Navigation extends React.Component {
     return I18n.t(
       {
         one: 'One unread message.',
-        other: '%{count} unread messages.'
+        other: '%{count} unread messages.',
       },
       {count}
     )
@@ -436,7 +436,7 @@ export default class Navigation extends React.Component {
     return I18n.t(
       {
         one: 'One unread share.',
-        other: '%{count} unread shares.'
+        other: '%{count} unread shares.',
       },
       {count}
     )
@@ -446,7 +446,7 @@ export default class Navigation extends React.Component {
     return I18n.t(
       {
         one: 'One unread release note.',
-        other: '%{count} release notes.'
+        other: '%{count} release notes.',
       },
       {count}
     )
@@ -466,7 +466,7 @@ export default class Navigation extends React.Component {
           // so the tour can properly go through them
           // without them unexpectedly closing.
           onDismiss={this.state.overrideDismiss ? noop : this.closeTray}
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={true}
           shouldContainFocus={!this.state.noFocus}
           mountNode={getPortal()}
           theme={{smallWidth: '28em'}}

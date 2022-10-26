@@ -31,14 +31,14 @@ const props = {
     {
       id: '1',
       name: 'Teacher, Testing',
-      display_name: 'Testing Teacher'
-    }
+      display_name: 'Testing Teacher',
+    },
   ],
   term: {
-    name: 'A Term'
+    name: 'A Term',
   },
   workflow_state: 'alive',
-  concluded: false
+  concluded: false,
 }
 
 it('indicates if a course is a blueprint course', () => {
@@ -50,7 +50,7 @@ it('indicates if a course is a blueprint course', () => {
   ).toBe(false)
 
   expect(
-    shallow(<CoursesListRow {...props} blueprint />)
+    shallow(<CoursesListRow {...props} blueprint={true} />)
       .find(tooltip)
       .exists()
   ).toBe(true)
@@ -65,7 +65,7 @@ it('indicates if a course is a course template', () => {
   ).toBe(false)
 
   expect(
-    shallow(<CoursesListRow {...props} template />)
+    shallow(<CoursesListRow {...props} template={true} />)
       .find(tooltip)
       .exists()
   ).toBe(true)
@@ -74,7 +74,7 @@ it('indicates if a course is a course template', () => {
 it('shows add-enrollment if it makes sense', () => {
   const tooltip = 'Tooltip[renderTip="Add Users to A"] IconPlusLine'
   expect(
-    shallow(<CoursesListRow {...props} can_create_enrollments concluded={false} />)
+    shallow(<CoursesListRow {...props} can_create_enrollments={true} concluded={false} />)
       .find(tooltip)
       .exists()
   ).toBe(true)
@@ -97,14 +97,19 @@ it('does not show add-enrollment when not allowed', () => {
 
   expect(
     shallow(
-      <CoursesListRow {...props} can_create_enrollments workflow_state="completed" concluded />
+      <CoursesListRow
+        {...props}
+        can_create_enrollments={true}
+        workflow_state="completed"
+        concluded={true}
+      />
     )
       .find(tooltip)
       .exists()
   ).toBe(false)
 
   expect(
-    shallow(<CoursesListRow {...props} can_create_enrollments template />)
+    shallow(<CoursesListRow {...props} can_create_enrollments={true} template={true} />)
       .find(tooltip)
       .exists()
   ).toBe(false)

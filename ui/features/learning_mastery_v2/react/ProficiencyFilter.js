@@ -59,6 +59,6 @@ const ProficiencyFilter = ({ratings, visibleRatings, setVisibleRatings}) => {
 ProficiencyFilter.propTypes = {
   ratings: PropTypes.arrayOf(PropTypes.shape(proficiencyRatingShape)).isRequired,
   visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
-  setVisibleRatings: PropTypes.func.isRequired
+  setVisibleRatings: PropTypes.func.isRequired,
 }
 export default ProficiencyFilter

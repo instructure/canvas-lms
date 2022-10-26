@@ -40,7 +40,7 @@ export const DiscussionTopicRepliesContainer = props => {
 
   const updateCache = (cache, result) => {
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length
+      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length,
     })
   }
 
@@ -51,7 +51,7 @@ export const DiscussionTopicRepliesContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while updating the replies'))
-    }
+    },
   })
 
   useEffect(() => {
@@ -67,14 +67,14 @@ export const DiscussionTopicRepliesContainer = props => {
         updateDiscussionEntriesReadState({
           variables: {
             discussionEntryIds: entryIds,
-            read: true
+            read: true,
           },
           optimisticResponse: {
             updateDiscussionEntriesReadState: {
               discussionEntries: entries,
-              __typename: 'UpdateDiscussionEntriesReadStatePayload'
-            }
-          }
+              __typename: 'UpdateDiscussionEntriesReadStatePayload',
+            },
+          },
         })
       }, AUTO_MARK_AS_READ_DELAY)
 
@@ -85,7 +85,7 @@ export const DiscussionTopicRepliesContainer = props => {
     props.discussionTopic.discussionEntriesConnection.nodes,
     updateDiscussionEntriesReadState,
     filter,
-    searchTerm
+    searchTerm,
   ])
 
   const markAsRead = entryId => {
@@ -138,7 +138,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   highlightEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
-  isSearchResults: PropTypes.bool
+  isSearchResults: PropTypes.bool,
 }
 
 export default DiscussionTopicRepliesContainer

@@ -19,6 +19,7 @@
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
+import type {CustomColumn} from '../gradebook.d'
 
 export default class CustomColumnsLoader {
   _gradebook: Gradebook
@@ -42,7 +43,7 @@ export default class CustomColumnsLoader {
       per_page: this._performanceControls.customColumnsPerPage,
     }
 
-    return this._dispatch.getDepaginated(url, params).then(customColumns => {
+    return this._dispatch.getDepaginated<CustomColumn[]>(url, params).then(customColumns => {
       this._gradebook.gotCustomColumns(customColumns)
     })
   }

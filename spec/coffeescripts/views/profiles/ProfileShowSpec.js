@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import ProfileShow from 'ui/features/profile_show/backbone/views/ProfileShow.js'
+import ProfileShow from 'ui/features/profile_show/backbone/views/ProfileShow'
 import assertions from 'helpers/assertions'
 
 QUnit.module('ProfileShow', {
@@ -31,15 +31,15 @@ QUnit.module('ProfileShow', {
   },
   teardown() {
     this.fixtures.innerHTML = ''
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.view, done, {a11yReport: true})
 })
 
-test('manages focus on link removal', function() {
+test('manages focus on link removal', function () {
   this.view.addLinkField()
   const $row1 = $('#profile_link_fields tr:last-child')
   this.view.addLinkField()
@@ -50,18 +50,18 @@ test('manages focus on link removal', function() {
   equal(document.activeElement, $('#profile_bio')[0])
 })
 
-test('focuses the name input when it is available and edit is clicked', function() {
+test('focuses the name input when it is available and edit is clicked', function () {
   this.fixtures.innerHTML += "<input id='name_input' />"
   this.view.showEditForm()
   equal(document.activeElement, $('#name_input')[0])
 })
 
-test('focuses the bio text area when the name input is not available and edit is clicked', function() {
+test('focuses the bio text area when the name input is not available and edit is clicked', function () {
   this.view.showEditForm()
   equal(document.activeElement, $('#profile_bio')[0])
 })
 
-test('validates input length', function() {
+test('validates input length', function () {
   const oldInnerHTML = this.fixtures.innerHTML
   this.fixtures.innerHTML =
     "<form id='profile_form'><input id='profile_title' name='user_profile[title]'></input><textarea id='profile_bio' name='user_profile[bio]'></textarea></form>"
@@ -70,7 +70,7 @@ test('validates input length', function() {
   $('#profile_title').val('a'.repeat(255))
   let event = {
     preventDefault: sinon.spy(),
-    target: $('#profile_form')
+    target: $('#profile_form'),
   }
   this.view.validateForm(event)
   ok(!event.preventDefault.called)
@@ -79,14 +79,14 @@ test('validates input length', function() {
   $('#profile_title').val('a'.repeat(256))
   event = {
     preventDefault: sinon.spy(),
-    target: $('#profile_form')
+    target: $('#profile_form'),
   }
   this.view.validateForm(event)
   ok(event.preventDefault.called)
   this.fixtures.innerHTML = oldInnerHTML
 })
 
-test('validates no spaces in URL', function() {
+test('validates no spaces in URL', function () {
   const oldInnerHTML = this.fixtures.innerHTML
   this.fixtures.innerHTML =
     "<form id='profile_form'><table id='profile_link_fields'><input id='profile_link' type='text' name='link_urls[]'></input></table></form>"
@@ -95,7 +95,7 @@ test('validates no spaces in URL', function() {
   $('#profile_link').val('yahoo')
   let event = {
     preventDefault: sinon.spy(),
-    target: $('#profile_form')
+    target: $('#profile_form'),
   }
   this.view.validateForm(event)
   ok(!event.preventDefault.called)
@@ -104,7 +104,7 @@ test('validates no spaces in URL', function() {
   $('#profile_link').val('ya hoo')
   event = {
     preventDefault: sinon.spy(),
-    target: $('#profile_form')
+    target: $('#profile_form'),
   }
   this.view.validateForm(event)
   ok(event.preventDefault.called)

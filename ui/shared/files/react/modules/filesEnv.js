@@ -38,33 +38,34 @@ const filesEnv = {
       const folder = new Folder({
         custom_name: contextData.name,
         context_type: contextData.contextType.replace(/s$/, ''),
-        context_id: contextData.contextId
+        context_id: contextData.contextId,
       })
       folder.url = `/api/v1/${contextData.contextType}/${contextData.contextId}/folders/root`
       folder.fetch()
       return folder
     }
-  })
+  }),
 }
 
 filesEnv.enableVisibility = filesEnv.contextType === 'courses'
 
-filesEnv.contextFor = function(folderOrFile) {
+filesEnv.contextFor = function (folderOrFile) {
   let assetString
   if (folderOrFile.collection && folderOrFile.collection.parentFolder) {
     folderOrFile = folderOrFile.collection.parentFolder
   }
   if (folderOrFile instanceof Folder) {
     const folder = folderOrFile
-    assetString = `${folder && folder.get('context_type')}s_${folder &&
-      folder.get('context_id')}`.toLowerCase()
+    assetString = `${folder && folder.get('context_type')}s_${
+      folder && folder.get('context_id')
+    }`.toLowerCase()
   } else if (folderOrFile.contextType && folderOrFile.contextId) {
     assetString = `${folderOrFile.contextType}_${folderOrFile.contextId}`.toLowerCase()
   }
   return filesEnv.contextsDictionary && filesEnv.contextsDictionary[assetString]
 }
 
-filesEnv.userHasPermission = function(folderOrFile, action) {
+filesEnv.userHasPermission = function (folderOrFile, action) {
   if (!folderOrFile) return false
   return (
     filesEnv.contextFor(folderOrFile) &&

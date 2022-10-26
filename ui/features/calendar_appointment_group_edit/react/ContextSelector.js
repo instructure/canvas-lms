@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
 
@@ -29,7 +29,7 @@ class ContextSelector extends React.Component {
   static propTypes = {
     appointmentGroup: PropTypes.object,
     contexts: PropTypes.array,
-    className: PropTypes.string
+    className: PropTypes.string,
   }
 
   constructor() {
@@ -40,7 +40,7 @@ class ContextSelector extends React.Component {
       showDropdown: false,
       selectedContexts: new Set(),
       selectedSubContexts: new Set(),
-      expandedContexts: new Set()
+      expandedContexts: new Set(),
     }
   }
 
@@ -52,11 +52,11 @@ class ContextSelector extends React.Component {
     this.setState({
       selectedContexts: new Set(nextProps.appointmentGroup.context_codes),
       selectedSubContexts: new Set(nextProps.appointmentGroup.sub_context_codes),
-      expandedContexts: new Set()
+      expandedContexts: new Set(),
     })
   }
 
-  componentDidUpdate(previousProps) {
+  componentDidUpdate(_previousProps) {
     this.setIndeterminates()
   }
 
@@ -71,7 +71,7 @@ class ContextSelector extends React.Component {
   handleContextSelectorButtonClick = e => {
     e.preventDefault()
     this.setState({
-      showDropdown: !this.state.showDropdown
+      showDropdown: !this.state.showDropdown,
     })
   }
 
@@ -79,7 +79,7 @@ class ContextSelector extends React.Component {
     e.preventDefault()
     this.dropdownButton.focus()
     this.setState({
-      showDropdown: false
+      showDropdown: false,
     })
   }
 
@@ -134,7 +134,7 @@ class ContextSelector extends React.Component {
     }
     this.setState({
       selectedContexts: contexts,
-      selectedSubContexts: subContexts
+      selectedSubContexts: subContexts,
     })
   }
 
@@ -181,7 +181,7 @@ class ContextSelector extends React.Component {
     }
     this.setState({
       selectedContexts: contexts,
-      selectedSubContexts: subContexts
+      selectedSubContexts: subContexts,
     })
   }
 
@@ -286,10 +286,18 @@ class ContextSelector extends React.Component {
           return (
             <div key={context.asset_string} className="CourseListItem">
               <div className="CourseListItem-horizontal">
-                <Button onClick={() => this.toggleCourseExpanded(context)} variant="icon">
-                  {expanded ? <IconMiniArrowDownSolid /> : <IconMiniArrowEndSolid />}
-                </Button>
-                <span className="screenreader-only">{context.name}</span>
+                <IconButton
+                  screenReaderLabel={
+                    expanded
+                      ? I18n.t('Collapse %{name}', {name: context.name})
+                      : I18n.t('Expand %{name}', {name: context.name})
+                  }
+                  renderIcon={expanded ? <IconMiniArrowDownSolid /> : <IconMiniArrowEndSolid />}
+                  onClick={() => this.toggleCourseExpanded(context)}
+                  withBorder={false}
+                  withBackground={false}
+                  margin="0 x-small 0 0"
+                />
                 <input
                   className="CourseListItem-item CourseListItem-item-checkbox"
                   ref={checkbox => {

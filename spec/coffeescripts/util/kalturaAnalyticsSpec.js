@@ -29,24 +29,21 @@ QUnit.module('kaltura analytics helper', {
       kcw_ui_conf: 'cobb',
       domain: 'example.com',
       do_analytics: true,
-      parallel_api_calls: 1
+      parallel_api_calls: 1,
     }
   },
   teardown() {
     $('.kaltura-analytics').remove()
     $.cookie('kaltura_analytic_tracker', null, {path: '/'})
-  }
+  },
 })
 
-test('adds event listeners', function() {
-  sandbox
-    .mock(this.player)
-    .expects('addEventListener')
-    .atLeast(6)
+test('adds event listeners', function () {
+  sandbox.mock(this.player).expects('addEventListener').atLeast(6)
   return kalturaAnalytics('1', this.player, this.pluginSettings)
 })
 
-test('generate api url', function() {
+test('generate api url', function () {
   const ka = kalturaAnalytics('1', this.player, this.pluginSettings)
   if (window.location.protocol === 'http:') {
     equal(ka.generateApiUrl(), 'http://example.com/api_v3/index.php?', 'generated bad url')
@@ -55,7 +52,7 @@ test('generate api url', function() {
   }
 })
 
-test('queue new analytics call', function() {
+test('queue new analytics call', function () {
   const ka = kalturaAnalytics('1', this.player, this.pluginSettings)
   const exp = sinon.expectation.create([]).once()
   ka.iframes[0].pinger = exp
@@ -79,13 +76,13 @@ test('queue new analytics call', function() {
   return exp.verify()
 })
 
-test("don't load if disabled", function() {
+test("don't load if disabled", function () {
   equal(kalturaAnalytics('1', this.player, {do_analytics: false}), null)
   equal(kalturaAnalytics('1', this.player, {}), null)
   equal(kalturaAnalytics('1', this.player, null), null)
 })
 
-test('iframe created', function() {
+test('iframe created', function () {
   const ka = kalturaAnalytics('1', this.player, this.pluginSettings)
   const iframe = $('.kaltura-analytics')
   equal(iframe.length, ka.iframes.length)

@@ -53,7 +53,7 @@ const DeleteCalendarEventDialog: React.FC<Props> = ({
   onDeleting,
   onDeleted,
   delUrl,
-  isRepeating
+  isRepeating,
 }) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -72,8 +72,8 @@ const DeleteCalendarEventDialog: React.FC<Props> = ({
       ...defaultOptions,
       body: JSON.stringify({
         which,
-        authenticity_token: authenticity_token()
-      })
+        authenticity_token: authenticity_token(),
+      }),
     })
       .then(checkStatus)
       .then(res => res.json())

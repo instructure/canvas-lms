@@ -56,7 +56,7 @@ const ApiClient = {
       {'include[]': 'teachers'},
       {teacher_limit: '5'},
       {search_term: search},
-      {enrollment_term_id: term}
+      {enrollment_term_id: term},
     ])
 
     return this._depaginate(`/api/v1/accounts/${subAccount || accountId}/courses?${params}`, 1)
@@ -75,7 +75,7 @@ const ApiClient = {
       `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/update_associations`,
       {
         course_ids_to_add: addedAssociations.map(c => c.id),
-        course_ids_to_remove: removedAssociations.map(c => c.id)
+        course_ids_to_remove: removedAssociations.map(c => c.id),
       }
     )
   },
@@ -90,10 +90,10 @@ const ApiClient = {
     willIncludeCustomNotificationMessage,
     notificationMessage,
     willIncludeCourseSettings,
-    willPublishCourses
+    willPublishCourses,
   }) {
     const params = {
-      send_notification: willSendNotification
+      send_notification: willSendNotification,
     }
     if (willIncludeCourseSettings) {
       params.copy_settings = true // don't send parameter if not checked
@@ -146,7 +146,7 @@ const ApiClient = {
       this.getMigrationDetails({course}, params).then(res =>
         Object.assign(data, {
           changeId: params.changeId,
-          changes: res.data
+          changes: res.data,
         })
       )
     )
@@ -171,7 +171,7 @@ const ApiClient = {
     return axios.put(`/api/v1/courses/${courseId}/blueprint_templates/default/restrict_item`, {
       content_type: itemType,
       content_id: itemId,
-      restricted: isLocked
+      restricted: isLocked,
     })
   },
 
@@ -179,7 +179,7 @@ const ApiClient = {
     return axios.get(
       `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/unsynced_changes`
     )
-  }
+  },
 }
 
 export default ApiClient

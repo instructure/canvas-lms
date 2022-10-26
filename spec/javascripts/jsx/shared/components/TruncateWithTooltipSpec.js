@@ -42,7 +42,7 @@ QUnit.module('TruncateWithTooltip', {
     if (tooltipHost) {
       tooltipHost.remove()
     }
-  }
+  },
 })
 
 const render = (text, width = null) =>
@@ -51,7 +51,7 @@ const render = (text, width = null) =>
       <TruncateWithTooltip mountNode={tooltipHost}>{text}</TruncateWithTooltip>
     </div>,
     {
-      attachTo: componentHost
+      attachTo: componentHost,
     }
   )
 

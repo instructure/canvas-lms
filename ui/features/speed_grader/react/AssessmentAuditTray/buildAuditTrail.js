@@ -38,7 +38,7 @@ function buildUnknownUser(userId) {
     key: `user-${userId}`,
     name: I18n.t('Unknown User'),
     role: 'unknown',
-    type: 'user'
+    type: 'user',
   }
 }
 
@@ -48,7 +48,7 @@ function buildUnknownExternalTool(externalToolId) {
     key: `externalTool-${externalToolId}`,
     name: I18n.t('Unknown External Tool'),
     role: 'grader',
-    type: 'externalTool'
+    type: 'externalTool',
   }
 }
 
@@ -58,7 +58,7 @@ function buildUnknownQuiz(quizId) {
     key: `quiz-${quizId}`,
     name: I18n.t('Unknown Quiz'),
     role: 'grader',
-    type: 'quiz'
+    type: 'quiz',
   }
 }
 
@@ -88,7 +88,7 @@ function trackFeaturesOverall(auditEvents) {
   return {
     anonymousGradingWasUsed,
     moderatedGradingWasUsed,
-    mutingWasUsed
+    mutingWasUsed,
   }
 }
 
@@ -105,16 +105,16 @@ function extractEvent(eventDatum, eventType, payload) {
       ...auditEvent,
       eventType,
       id: `${auditEvent.id}.${eventType}`,
-      payload
+      payload,
     },
-    studentAnonymity: specificAnonymity
+    studentAnonymity: specificAnonymity,
   }
 }
 
 function extractEvents(eventDatum, featureTracking) {
   const eventData = [eventDatum]
   const {
-    auditEvent: {eventType, payload}
+    auditEvent: {eventType, payload},
   } = eventDatum
 
   if (eventType === 'assignment_created') {
@@ -241,7 +241,7 @@ function buildAnonymityTracker() {
   const anonymityTurnedOnCounts = {
     graderToFinalGrader: 0,
     graderToGrader: 0,
-    student: 0
+    student: 0,
   }
 
   let anonymityDate = null
@@ -292,7 +292,7 @@ function buildAnonymityTracker() {
   return {
     getAnonymityDate,
     getOverallAnonymity,
-    update
+    update,
   }
 }
 
@@ -399,7 +399,7 @@ export default function buildAuditTrail(auditData) {
     creatorEventGroupsByCreatorId[creatorKey] = creatorEventGroupsByCreatorId[creatorKey] || {
       anonymousOnly: currentlyAnonymous,
       dateEventGroups: [],
-      creator
+      creator,
     }
     creatorEventGroupsByCreatorId[creatorKey].anonymousOnly =
       creatorEventGroupsByCreatorId[creatorKey].anonymousOnly && currentlyAnonymous
@@ -428,7 +428,7 @@ export default function buildAuditTrail(auditData) {
       dateEventGroups.push({
         auditEvents: eventData,
         startDate: createdAt,
-        startDateKey: dateKey
+        startDateKey: dateKey,
       })
     }
   })
@@ -451,6 +451,6 @@ export default function buildAuditTrail(auditData) {
     anonymityDate: anonymityTracker.getAnonymityDate(),
     finalGradeDate,
     overallAnonymity: anonymityTracker.getOverallAnonymity(),
-    creatorEventGroups
+    creatorEventGroups,
   }
 }

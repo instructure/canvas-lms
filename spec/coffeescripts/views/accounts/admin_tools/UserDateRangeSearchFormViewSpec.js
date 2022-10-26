@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import usersTemplate from 'ui/features/account_admin_tools/jst/usersList.handlebars'
-import CommMessageCollection from 'ui/features/account_admin_tools/backbone/collections/CommMessageCollection.js'
-import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection.js'
-import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView.js'
+import CommMessageCollection from 'ui/features/account_admin_tools/backbone/collections/CommMessageCollection'
+import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection'
+import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView'
 import InputFilterView from 'backbone-input-filter-view'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
 import UserView from 'ui/features/account_admin_tools/backbone/views/UserView.coffee'
@@ -36,9 +36,9 @@ QUnit.module('UserDateRangeSearchFormView', {
         collection: messagesUsers,
         itemView: UserView,
         buffer: 1000,
-        template: usersTemplate
+        template: usersTemplate,
       }),
-      collection: messages
+      collection: messages,
     })
     $('#fixtures').append(this.searchForm.render().el)
   },
@@ -52,16 +52,16 @@ QUnit.module('UserDateRangeSearchFormView', {
     this.searchForm.$dateEndSearchField.val(endDate)
     this.searchForm.$dateStartSearchField.trigger('change')
     this.searchForm.$dateEndSearchField.trigger('change')
-  }
+  },
 })
 
-test('find with no dates is valid', function() {
+test('find with no dates is valid', function () {
   this.changeDate('', '')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 })
 
-test('find with one date selected is valid', function() {
+test('find with one date selected is valid', function () {
   this.changeDate('Jan 16, 2018', '')
   let errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
@@ -71,13 +71,13 @@ test('find with one date selected is valid', function() {
   strictEqual(Object.keys(errors).length, 0)
 })
 
-test('find with start date before end date is valid', function() {
+test('find with start date before end date is valid', function () {
   this.changeDate('Jan 04, 2018', 'Jan 12, 2018')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 0)
 })
 
-test('find with invalid dates is invalid', function() {
+test('find with invalid dates is invalid', function () {
   this.changeDate('', 'banana')
   let errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 1)
@@ -95,7 +95,7 @@ test('find with invalid dates is invalid', function() {
   strictEqual(errors.messages_end_time[0].message, 'Not a valid date')
 })
 
-test('find with start date after end date is invalid', function() {
+test('find with start date after end date is invalid', function () {
   this.changeDate('Jan 12, 2018', 'Jan 1, 2018')
   const errors = this.searchForm.datesValidation()
   strictEqual(Object.keys(errors).length, 1)

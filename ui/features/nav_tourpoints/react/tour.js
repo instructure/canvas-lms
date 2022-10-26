@@ -33,7 +33,7 @@ const I18n = useI18nScope('TourPoints')
 const allSteps = {
   admin: adminTour,
   teacher: teacherTour,
-  student: studentTour
+  student: studentTour,
 }
 
 const softCloseSteps = [
@@ -44,8 +44,8 @@ const softCloseSteps = [
         <Heading level="h3">{I18n.t('Come back later!')}</Heading>
         {I18n.t('You can access the Welcome Tour here any time as well as other new resources.')}
       </section>
-    )
-  }
+    ),
+  },
 ]
 
 const Tour = ({roles}) => {
@@ -194,7 +194,7 @@ const Tour = ({roles}) => {
   const firstStepLabels = {
     student: I18n.t('Student Tour'),
     teacher: I18n.t('Teacher Tour'),
-    admin: I18n.t('Admin Tour')
+    admin: I18n.t('Admin Tour'),
   }
   if (!open) return null
   return (

@@ -47,7 +47,7 @@ describe('useGetSettings', () => {
 
   it('tries to get current account settings', () => {
     ENV = {
-      CONTEXT_BASE_URL
+      CONTEXT_BASE_URL,
     }
     const {result} = subject()
     const call = useFetchApi.mock.calls.pop()[0]
@@ -75,7 +75,7 @@ describe('useGetSettings', () => {
         microsoft_sync_login_attribute: 'email',
         microsoft_sync_login_attribute_suffix: '@example.com',
         microsoft_sync_remote_attribute: 'mailNickname',
-        loading: false
+        loading: false,
       }
       useFetchApi.mockImplementationOnce(({success, loading}) => {
         loading(false)

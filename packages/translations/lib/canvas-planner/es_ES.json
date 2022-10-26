@@ -14,7 +14,7 @@
   },
   "announcement_fb4cb645": { "message": "Anuncio" },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "¿Está seguro de que desea eliminar este ítem del planificador?"
+    "message": "¿Estás seguro de que quieres eliminar este ítem del planificador?"
   },
   "assignment_976578a8": { "message": "Actividad" },
   "assignmenttype_title_6612d008": {
@@ -48,7 +48,7 @@
     "message": "{ assignmentType } { title }, recordatorio { datetime }."
   },
   "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Inicio de su Historial de cosas pendientes"
+    "message": "Inicio de tu Historial de cosas pendientes"
   },
   "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
     "message": "A continuación se muestra un ejemplo de cómo verán los estudiantes su cronograma."
@@ -72,7 +72,7 @@
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
     "message": "{ count, plural,\n    one {Mostrar # ítem no presentado}\n  other {Mostrar # ítems no presentados}\n}"
   },
-  "course_8a63b4a3": { "message": "Curso" },
+  "course_8a63b4a3": { "message": "Asignatura" },
   "course_to_do_bcbbab54": { "message": "{ course } TAREAS PENDIENTES" },
   "date_at_time_dbdb1b99": { "message": "{ date } a las { time }" },
   "date_ee500367": { "message": "Fecha" },
@@ -107,14 +107,18 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Foro de discusión animado" },
   "excused_cf8792eb": { "message": "Justificado" },
+  "extended_9a58dcb6": { "message": "Ampliado" },
   "failed_getting_course_list_49846a93": {
     "message": "Ha habido un error al acceder a la lista de la asignatura"
   },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Ha habido un error al acceder a la lista de tareas pendientes"
+  },
   "failed_peeking_into_your_future_e95b9306": {
-    "message": "Error al echar un vistazo a su futuro"
+    "message": "Error al echar un vistazo a tu futuro"
   },
   "failed_peeking_into_your_past_5bec2323": {
-    "message": "Error al echar un vistazo a su pasado"
+    "message": "Error al echar un vistazo a tu pasado"
   },
   "failed_saving_changes_on_name_1e100ad": {
     "message": "No se han podido guardar los cambios en { name }."
@@ -134,10 +138,13 @@
   "failed_to_save_to_do_ddc7503b": {
     "message": "Error al guardar tareas pendientes"
   },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Ha habido un error al cargar la lista de tareas pendientes"
+  },
   "feedback_6dcc1991": { "message": "Comentarios" },
-  "fun_quiz_47ab0b0": { "message": "Prueba divertido" },
+  "fun_quiz_47ab0b0": { "message": "Prueba divertida" },
   "go_to_card_view_dashboard_9d03970e": {
-    "message": "Vaya a la vista de tarjetas en el cuadro de mando"
+    "message": "Ir a la vista de tarjetas en el panel de control"
   },
   "graded_25cd3fcd": { "message": "Evaluado" },
   "grades_are_loading_c899652d": { "message": "Se están cargando las notas" },
@@ -147,17 +154,15 @@
   },
   "join_6cafecca": { "message": "Unirse" },
   "join_active_online_meeting_d9d892b2": {
-    "message": "Unirse a una reunión en línea activa"
+    "message": "Unirse a una reunión online activa"
   },
-  "join_online_meeting_b1725843": {
-    "message": "Unirse a una reunión en línea"
-  },
+  "join_online_meeting_b1725843": { "message": "Unirse a una reunión online" },
   "jump_to_navigation_toolbar_2952cd8b": {
-    "message": "Salte a la barra de herramientas de navegación"
+    "message": "Salta a la barra de herramientas de navegación"
   },
   "jump_to_today_254ccf41": { "message": "Hoy" },
   "language_arts_35b79a8b": { "message": "Artes del idioma" },
-  "late_2be42b88": { "message": "Con atraso" },
+  "late_2be42b88": { "message": "Con retraso" },
   "load_more_a36f9cf9": { "message": "Cargar más" },
   "load_prior_dates_f2b0f6f0": { "message": "Cargar fechas anteriores" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -214,7 +219,7 @@
   "opportunities_popup_f6703842": {
     "message": "Ventana emergente de oportunidades"
   },
-  "optional_add_course_ef0d70fc": { "message": "Opcional: Añadir curso" },
+  "optional_add_course_ef0d70fc": { "message": "Opcional: Añadir asignatura" },
   "page_50c4823d": { "message": "Página" },
   "peer_review_74f26a13": { "message": "Revisión entre compañeros" },
   "peer_review_for_itemtitle_358cb413": {
@@ -223,7 +228,7 @@
   "points_bceb5005": { "message": "puntos" },
   "points_points_63e59cce": { "message": "{ points } puntos" },
   "previous_month_bb1e3c84": { "message": "Mes anterior" },
-  "pts_699bd9aa": { "message": "puntos" },
+  "pts_699bd9aa": { "message": "pts" },
   "quiz_e0dcce8f": { "message": "Prueba" },
   "redo_363c58b7": { "message": "Rehacer" },
   "reminder_date_4564d12d": { "message": "Recordatorio: { date }" },
@@ -232,7 +237,7 @@
   "schedule_preview_3bcda153": { "message": "Vista previa del horario" },
   "science_8d92214a": { "message": "Ciencia" },
   "scroll_up_to_see_your_history_19b14cad": {
-    "message": "Desplácese para ver su historial"
+    "message": "Desplázate para ver tu historial"
   },
   "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
     "message": "Se desplaza hasta el ítem anterior con nueva actividad."
@@ -248,6 +253,7 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": { "message": "{ startTime } a { endTime }" },
+  "student_to_do_c018c835": { "message": "Tareas pendientes del estudiante" },
   "submitted_318fad53": { "message": "Entregado" },
   "success_to_do_created_e34ed395": {
     "message": "Hecho: Tarea pendiente creada"
@@ -279,22 +285,22 @@
     "message": "No se puede marcar como completada."
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
-    "message": "Use las flechas de dirección para desplazarse entre las opciones."
+    "message": "Usa las flechas de dirección para desplazarte entre las opciones."
   },
-  "view_next_week_7f61f755": { "message": "Ver semana próxima" },
-  "view_previous_week_6f83849f": { "message": "Ver semana anterior" },
+  "view_next_week_7f61f755": { "message": "Ver la próxima semana" },
+  "view_previous_week_6f83849f": { "message": "Ver la semana anterior" },
   "weekly_schedule_navigation_6b042645": {
     "message": "Navegación de programación semanal"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ayer a las { date }" },
   "yesterday_c6bd6abf": { "message": "Ayer" },
   "you_have_media_feedback_f5f9aba8": {
-    "message": "Tiene comentarios multimedia."
+    "message": "Tienes comentarios multimedia."
   },
   "you_must_provide_a_date_and_time_a86839d2": {
-    "message": "Debe proporcionar una fecha y una hora."
+    "message": "Debes proporcionar una fecha y una hora."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Ha retrocedido a su primera actividad pendiente."
+    "message": "Has retrocedido a tu primera tarea pendiente."
   }
 }

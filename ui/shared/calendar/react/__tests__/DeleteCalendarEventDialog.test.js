@@ -23,7 +23,7 @@ import {getByText as domGetByText} from '@testing-library/dom'
 
 import {
   DeleteCalendarEventDialog,
-  renderDeleteCalendarEventDialog
+  renderDeleteCalendarEventDialog,
 } from '../DeleteCalendarEventDialog'
 
 const handleCancel = jest.fn()
@@ -36,7 +36,7 @@ const defaultProps = {
   onDeleting: handleDeleting,
   onDeleted: handleDeleted,
   delUrl: '.',
-  isRepeating: true
+  isRepeating: true,
 }
 
 function renderDialog(overrideProps = {}) {

@@ -22,7 +22,7 @@ const isSettingsModalOpenReducer = handleActions(
   {
     [actionTypes.TOGGLE_MODAL_OPEN]: state => !state,
     [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
-    [actionTypes.SAVING_SETTINGS_FAIL]: () => true
+    [actionTypes.SAVING_SETTINGS_FAIL]: () => true,
   },
   false
 )

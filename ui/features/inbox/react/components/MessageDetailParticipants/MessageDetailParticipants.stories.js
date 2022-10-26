@@ -22,7 +22,7 @@ import {MessageDetailParticipants} from './MessageDetailParticipants'
 
 export default {
   title: 'Examples/Canvas Inbox/MessageDetailParticipants',
-  component: MessageDetailParticipants
+  component: MessageDetailParticipants,
 }
 
 const Template = args => <MessageDetailParticipants {...args} />
@@ -48,11 +48,11 @@ WithMultipleRecipients.args = {
       {name: 'Cristoforo Gülnarə'},
       {name: 'Katka Lauge'},
       {name: 'Sofia Fernanda'},
-      {name: 'Orestes Etheldreda'}
+      {name: 'Orestes Etheldreda'},
     ],
     createdAt: 'November 5, 2020 at 2:25pm',
-    body: 'This is the body text for the message.'
-  }
+    body: 'This is the body text for the message.',
+  },
 }
 
 export const WithOneRecipient = Template.bind({})
@@ -61,6 +61,6 @@ WithOneRecipient.args = {
     author: {name: 'Bob Barker'},
     recipients: [{name: 'Bob Barker'}, {name: 'Sally Ford'}],
     createdAt: 'November 5, 2020 at 2:25pm',
-    body: 'This is the body text for the message.'
-  }
+    body: 'This is the body text for the message.',
+  },
 }

@@ -23,14 +23,20 @@ import PeopleSearch from '@canvas/add-people/react/components/people_search'
 QUnit.module('PeopleSearch')
 
 const searchProps = {
-  roles: [{id: '1', label: 'Student'}, {id: '2', label: 'TA'}],
-  sections: [{id: '1', name: 'Section 2'}, {id: '2', name: 'Section 10'}],
+  roles: [
+    {id: '1', label: 'Student'},
+    {id: '2', label: 'TA'},
+  ],
+  sections: [
+    {id: '1', name: 'Section 2'},
+    {id: '2', name: 'Section 10'},
+  ],
   section: '1',
   role: '2',
   limitPrivilege: true,
   searchType: 'unique_id',
   nameList: 'foo, bar, baz',
-  canReadSIS: true
+  canReadSIS: true,
 }
 
 test('renders the component', () => {

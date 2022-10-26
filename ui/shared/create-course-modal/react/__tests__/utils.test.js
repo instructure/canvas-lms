@@ -42,9 +42,9 @@ describe('getAccountsFromEnrollments', () => {
         account: {
           id: 6,
           name: 'Elementary',
-          workflow_state: 'active'
-        }
-      }
+          workflow_state: 'active',
+        },
+      },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)
@@ -58,15 +58,15 @@ describe('getAccountsFromEnrollments', () => {
       {
         account: {
           id: 12,
-          name: 'FFES'
-        }
+          name: 'FFES',
+        },
       },
       {
         account: {
           id: 12,
-          name: 'FFES'
-        }
-      }
+          name: 'FFES',
+        },
+      },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)
@@ -78,13 +78,13 @@ describe('getAccountsFromEnrollments', () => {
         id: 10,
         account: {
           id: 1,
-          name: 'School'
-        }
+          name: 'School',
+        },
       },
       {
         id: 11,
-        access_restricted_by_date: true
-      }
+        access_restricted_by_date: true,
+      },
     ]
     const accounts = getAccountsFromEnrollments(enrollments)
     expect(accounts.length).toBe(1)

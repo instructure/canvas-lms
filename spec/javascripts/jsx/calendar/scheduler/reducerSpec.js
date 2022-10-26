@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/calendar/react/scheduler/reducer.js'
+import reducer from 'ui/features/calendar/react/scheduler/reducer'
 
 QUnit.module('Scheduler Reducer')
 
 test('sets inFindAppointmentMode on SET_FIND_APPOINTMENT_MODE', () => {
   const initialState = {
     inFindAppointmentMode: false,
-    setCourse: {}
+    setCourse: {},
   }
 
   const newState = reducer(initialState, {
     type: 'SET_FIND_APPOINTMENT_MODE',
-    payload: true
+    payload: true,
   })
 
   ok(newState.inFindAppointmentMode)
@@ -37,12 +37,12 @@ test('sets inFindAppointmentMode on SET_FIND_APPOINTMENT_MODE', () => {
 test('sets selectedCourse on SET_COURSE', () => {
   const initialState = {
     inFindAppointmentMode: false,
-    selectedCourse: null
+    selectedCourse: null,
   }
 
   const newState = reducer(initialState, {
     type: 'SET_COURSE',
-    payload: {id: 1, name: 'blah'}
+    payload: {id: 1, name: 'blah'},
   })
 
   ok(newState.selectedCourse)

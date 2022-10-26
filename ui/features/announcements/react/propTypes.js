@@ -24,14 +24,14 @@ propTypes.permissions = shape({
   create: bool.isRequired,
   manage_course_content_edit: bool.isRequired,
   manage_course_content_delete: bool.isRequired,
-  moderate: bool.isRequired
+  moderate: bool.isRequired,
 })
 
 propTypes.rssFeed = shape({
   id: string.isRequired,
   display_name: string.isRequired,
   external_feed_entries_count: number.isRequired,
-  url: string.isRequired
+  url: string.isRequired,
 })
 
 export default propTypes

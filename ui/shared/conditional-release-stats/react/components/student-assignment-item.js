@@ -29,7 +29,7 @@ export default class StudentAssignmentItem extends React.Component {
   static propTypes = {
     assignment: assignmentShape.isRequired,
     trend: number,
-    score: number
+    score: number,
   }
 
   render() {
@@ -39,7 +39,7 @@ export default class StudentAssignmentItem extends React.Component {
       'crs-student__trend-icon': true,
       'crs-student__trend-icon__positive': trend === 1,
       'crs-student__trend-icon__neutral': trend === 0,
-      'crs-student__trend-icon__negative': trend === -1
+      'crs-student__trend-icon__negative': trend === -1,
     })
 
     const showTrend = trend !== null && trend !== undefined

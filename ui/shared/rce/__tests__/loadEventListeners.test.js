@@ -28,7 +28,7 @@ describe('loadEventListeners', () => {
     window.INST.editorButtons = [{id: '__BUTTON_ID__'}]
 
     ENV = {
-      context_asset_string: 'course_1'
+      context_asset_string: 'course_1',
     }
 
     fakeEditor = {
@@ -41,7 +41,7 @@ describe('loadEventListeners', () => {
         getBookmark: () => ({}),
         getNode: () => ({}),
         getContent: () => ({}),
-        moveToBookmark: _prevSelect => (fakeEditor.bookmarkMoved = true)
+        moveToBookmark: _prevSelect => (fakeEditor.bookmarkMoved = true),
       },
       addCommand: () => ({}),
       addButton: () => ({}),
@@ -50,16 +50,16 @@ describe('loadEventListeners', () => {
           addButton: () => {},
           addMenuButton: () => {},
           addIcon: () => {},
-          addNestedMenuItem: () => {}
-        }
-      }
+          addNestedMenuItem: () => {},
+        },
+      },
     }
 
     dispatchEvent = name => {
       const event = document.createEvent('CustomEvent')
       const eventData = {
         ed: fakeEditor,
-        selectNode: '<div></div>'
+        selectNode: '<div></div>',
       }
       event.initCustomEvent(`tinyRCE/${name}`, true, true, eventData)
       document.dispatchEvent(event)
@@ -83,7 +83,7 @@ describe('loadEventListeners', () => {
         expect(view instanceof EquationEditorView).toBeTruthy()
         expect(view.$editor.selector).toEqual('#someId')
         done()
-      }
+      },
     })
     dispatchEvent('initEquation')
   })
@@ -97,12 +97,12 @@ describe('loadEventListeners', () => {
           'Equella is not properly configured for this account, please notify your system administrator.'
         )
         done()
-      }
+      },
     })
     const event = document.createEvent('CustomEvent')
     const eventData = {
       ed: fakeEditor,
-      selectNode: '<div></div>'
+      selectNode: '<div></div>',
     }
     event.initCustomEvent('tinyRCE/initEquella', true, true, eventData)
     document.dispatchEvent(event)
@@ -114,7 +114,7 @@ describe('loadEventListeners', () => {
     const event = document.createEvent('CustomEvent')
     const eventData = {
       ed: fakeEditor,
-      url: 'someurl.com'
+      url: 'someurl.com',
     }
     event.initCustomEvent('tinyRCE/initExternalTools', true, true, eventData)
     document.dispatchEvent(event)

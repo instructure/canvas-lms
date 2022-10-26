@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import _ from 'underscore'
-import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriod.js'
+import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriod'
 import fakeENV from 'helpers/fakeENV'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
@@ -46,15 +46,15 @@ QUnit.module('GradingPeriod', {
           weight: null,
           permissions: {
             update: true,
-            delete: true
-          }
-        }
-      ]
+            delete: true,
+          },
+        },
+      ],
     }
     this.server.respondWith('PUT', `${ENV.GRADING_PERIODS_URL}/1`, [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.updatedPeriodData)
+      JSON.stringify(this.updatedPeriodData),
     ])
     return this.server.respond()
   },
@@ -73,10 +73,10 @@ QUnit.module('GradingPeriod', {
         read: true,
         update: true,
         create: true,
-        delete: true
+        delete: true,
       },
       onDeleteGradingPeriod() {},
-      updateGradingPeriodCollection: sinon.spy()
+      updateGradingPeriodCollection: sinon.spy(),
     }
     const props = _.defaults(opts, exampleProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
@@ -86,10 +86,10 @@ QUnit.module('GradingPeriod', {
     ReactDOM.unmountComponentAtNode(wrapper)
     ENV.GRADING_PERIODS_URL = null
     return this.server.restore()
-  }
+  },
 })
 
-test('sets initial state properly', function() {
+test('sets initial state properly', function () {
   const gradingPeriod = this.renderComponent()
   equal(gradingPeriod.state.title, 'Spring')
   deepEqual(gradingPeriod.state.startDate, new Date('2015-03-01T00:00:00Z'))
@@ -97,81 +97,81 @@ test('sets initial state properly', function() {
   equal(gradingPeriod.state.weight, 50)
 })
 
-test('onDateChange calls replaceInputWithDate', function() {
+test('onDateChange calls replaceInputWithDate', function () {
   const gradingPeriod = this.renderComponent()
   const replaceInputWithDate = sandbox.stub(gradingPeriod, 'replaceInputWithDate')
   gradingPeriod.onDateChange('startDate', 'period_start_date_1')
   ok(replaceInputWithDate.calledOnce)
 })
 
-test('onDateChange calls updateGradingPeriodCollection', function() {
+test('onDateChange calls updateGradingPeriodCollection', function () {
   const gradingPeriod = this.renderComponent()
   gradingPeriod.onDateChange('startDate', 'period_start_date_1')
   ok(gradingPeriod.props.updateGradingPeriodCollection.calledOnce)
 })
 
-test('onTitleChange changes the title state', function() {
+test('onTitleChange changes the title state', function () {
   const gradingPeriod = this.renderComponent()
   const fakeEvent = {
     target: {
       name: 'title',
-      value: 'MXP: Most Xtreme Primate'
-    }
+      value: 'MXP: Most Xtreme Primate',
+    },
   }
   gradingPeriod.onTitleChange(fakeEvent)
   equal(gradingPeriod.state.title, 'MXP: Most Xtreme Primate')
 })
 
-test('onTitleChange calls updateGradingPeriodCollection', function() {
+test('onTitleChange calls updateGradingPeriodCollection', function () {
   const gradingPeriod = this.renderComponent()
   const fakeEvent = {
     target: {
       name: 'title',
-      value: 'MXP: Most Xtreme Primate'
-    }
+      value: 'MXP: Most Xtreme Primate',
+    },
   }
   gradingPeriod.onTitleChange(fakeEvent)
   ok(gradingPeriod.props.updateGradingPeriodCollection.calledOnce)
 })
 
-test('replaceInputWithDate calls formatDatetimeForDisplay', function() {
+test('replaceInputWithDate calls formatDatetimeForDisplay', function () {
   const gradingPeriod = this.renderComponent()
   const formatDatetime = sandbox.stub(DateHelper, 'formatDatetimeForDisplay')
   const fakeDateElement = {
-    val() {}
+    val() {},
   }
   gradingPeriod.replaceInputWithDate('startDate', fakeDateElement)
   ok(formatDatetime.calledOnce)
 })
 
-test("assigns the 'readOnly' property on the template when false", function() {
+test("assigns the 'readOnly' property on the template when false", function () {
   const gradingPeriod = this.renderComponent()
   equal(gradingPeriod.refs.template.props.readOnly, false)
 })
 
-test("assigns the 'readOnly' property on the template when true", function() {
+test("assigns the 'readOnly' property on the template when true", function () {
   const gradingPeriod = this.renderComponent({readOnly: true})
   equal(gradingPeriod.refs.template.props.readOnly, true)
 })
 
-test("assigns the 'weight' and 'weighted' properties", function() {
+test("assigns the 'weight' and 'weighted' properties", function () {
   const gradingPeriod = this.renderComponent()
   equal(gradingPeriod.refs.template.props.weight, 50)
   equal(gradingPeriod.refs.template.props.weighted, true)
 })
 
-test("assigns the 'weight' and 'weighted' properties when weighted is false", function() {
+test("assigns the 'weight' and 'weighted' properties when weighted is false", function () {
   const gradingPeriod = this.renderComponent({weighted: false})
   equal(gradingPeriod.refs.template.props.weight, 50)
   equal(gradingPeriod.refs.template.props.weighted, false)
 })
 
-test("assigns the 'closeDate' property", function() {
+test("assigns the 'closeDate' property", function () {
   const gradingPeriod = this.renderComponent()
   deepEqual(gradingPeriod.refs.template.props.closeDate, new Date('2015-06-07T00:00:00Z'))
 })
 
-test("assigns 'endDate' as 'closeDate' when 'closeDate' is not defined", function() {
+test("assigns 'endDate' as 'closeDate' when 'closeDate' is not defined", function () {
   const gradingPeriod = this.renderComponent({closeDate: null})
   deepEqual(gradingPeriod.refs.template.props.closeDate, new Date('2015-05-31T00:00:00Z'))
 })

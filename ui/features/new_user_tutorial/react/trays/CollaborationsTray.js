@@ -29,25 +29,25 @@ const CollaborationsTray = () => (
     image="/images/tutorial-tray-images/Panda_Collaborations.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('What are collaborations?'),
-        href: I18n.t('#community.basics_collaborations')
+        href: I18n.t('#community.basics_collaborations'),
       },
       {
         label: I18n.t('How do I use the Collaborations Index Page?'),
-        href: I18n.t('#community.instructor_use_collaborations_index')
+        href: I18n.t('#community.instructor_use_collaborations_index'),
       },
       {
         label: I18n.t('How do I create a Google Drive collaboration as an instructor?'),
-        href: I18n.t('#community.instructor_create_gdrive_collaboration')
+        href: I18n.t('#community.instructor_create_gdrive_collaboration'),
       },
       {
         label: I18n.t('How do I create a Microsoft Office 365 collaboration as an instructor?'),
-        href: I18n.t('#community.instructor_create_o365_collaboration')
-      }
+        href: I18n.t('#community.instructor_create_o365_collaboration'),
+      },
     ]}
   >
     {I18n.t(`Canvas helps you leverage collaborative technology so multiple

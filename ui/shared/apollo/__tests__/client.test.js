@@ -27,7 +27,7 @@ describe('host configuration', () => {
   const fakeResponse = {
     text: async () => {
       return '{"data": { "aField": "aValue" }, "errors": []}'
-    }
+    },
   }
 
   it('builds an apollo client', () => {
@@ -71,7 +71,7 @@ describe('host configuration', () => {
           return {
             ok: true,
             status: 200,
-            json: async () => ({token: 'my-fake-token'})
+            json: async () => ({token: 'my-fake-token'}),
           }
         }
         case 'http://my-gateway/graphql': {
@@ -82,7 +82,7 @@ describe('host configuration', () => {
             status: 200,
             text: async () => {
               return '{"data": { "aField": "aValue" }, "errors": []}'
-            }
+            },
           }
         }
         default: {

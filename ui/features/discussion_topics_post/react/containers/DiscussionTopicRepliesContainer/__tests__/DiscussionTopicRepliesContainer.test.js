@@ -28,18 +28,18 @@ import React from 'react'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 jest.mock('../../../utils/constants', () => ({
   ...jest.requireActual('../../../utils/constants'),
-  AUTO_MARK_AS_READ_DELAY: 0
+  AUTO_MARK_AS_READ_DELAY: 0,
 }))
 
 describe('DiscussionTopicRepliesContainer', () => {
   beforeAll(() => {
     window.ENV = {
       course_id: '1',
-      per_page: 20
+      per_page: 20,
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -48,7 +48,7 @@ describe('DiscussionTopicRepliesContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -60,14 +60,14 @@ describe('DiscussionTopicRepliesContainer', () => {
         discussionEntriesConnection: {
           nodes: [
             DiscussionEntry.mock({
-              entryParticipant: {read: false, forcedReadState: null, rating: false}
-            })
+              entryParticipant: {read: false, forcedReadState: null, rating: false},
+            }),
           ],
           pageInfo: PageInfo.mock(),
-          __typename: 'DiscussionEntriesConnection'
-        }
+          __typename: 'DiscussionEntriesConnection',
+        },
       },
-      searchTerm: ''
+      searchTerm: '',
     }
   }
 
@@ -89,7 +89,7 @@ describe('DiscussionTopicRepliesContainer', () => {
   it('should render when threads are empty', () => {
     const {container} = setup({
       ...defaultProps(),
-      threads: []
+      threads: [],
     })
     expect(container).toBeTruthy()
   })

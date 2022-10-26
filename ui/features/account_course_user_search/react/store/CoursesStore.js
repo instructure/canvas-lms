@@ -34,11 +34,11 @@ export default createStore({
         'subaccount',
         'term',
         'concluded',
-        'ui_invoked'
+        'ui_invoked',
       ],
       teacher_limit: 25,
       per_page: COURSES_TO_FETCH_PER_PAGE,
-      no_avatar_fallback: '1'
+      no_avatar_fallback: '1',
     }
     const propsToCleanUp = [
       'enrollment_term_id',
@@ -47,11 +47,11 @@ export default createStore({
       'order',
       'search_by',
       'page',
-      'blueprint'
+      'blueprint',
     ]
     propsToCleanUp.forEach(p => {
       if (!originalParams[p]) delete params[p]
     })
     return params
-  }
+  },
 })

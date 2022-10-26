@@ -93,7 +93,7 @@ function toggleRegion($region, showRegion, $trigger) {
           autoOpen: false,
           close() {
             toggleRegion($region, false)
-          }
+          },
         },
         dialogOpts
       )
@@ -149,7 +149,7 @@ const elementTogglerBehavior = {
         $icon.toggleClass('icon-mini-arrow-right')
       }
     })
-  }
+  },
 }
 
 elementTogglerBehavior.bind()

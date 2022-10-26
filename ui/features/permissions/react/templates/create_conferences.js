@@ -25,55 +25,55 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Conferences'),
-      description: I18n.t('Allows user to create new conferences in courses and groups.')
+      description: I18n.t('Allows user to create new conferences in courses and groups.'),
     },
     {
-      description: I18n.t('Allows user to start conferences they created.')
-    }
+      description: I18n.t('Allows user to start conferences they created.'),
+    },
   ],
   [
     {
       title: I18n.t('Conferences'),
       description: I18n.t(
         'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To end a long-running conference, the Course Content permission must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Conferences'),
-      description: I18n.t('Allows user to create new conferences in courses and groups.')
+      description: I18n.t('Allows user to create new conferences in courses and groups.'),
     },
     {
-      description: I18n.t('Allows user to start conferences they created.')
-    }
+      description: I18n.t('Allows user to start conferences they created.'),
+    },
   ],
   [
     {
       title: I18n.t('Conferences'),
       description: I18n.t(
         'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To end a long-running conference, the Course Content permission must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.'
-      )
-    }
+      ),
+    },
   ]
 )

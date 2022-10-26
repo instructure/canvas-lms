@@ -24,7 +24,7 @@ describe('ExternalToolsHelper', () => {
     let fakeEditor
     beforeAll(() => {
       fakeEditor = {
-        execCommand: () => {}
+        execCommand: () => {},
       }
     })
 
@@ -34,7 +34,7 @@ describe('ExternalToolsHelper', () => {
         name: 'some tool',
         description: 'this is a cool tool',
         favorite: true,
-        icon_url: '/path/to/cool_icon'
+        icon_url: '/path/to/cool_icon',
       }
 
       const result = ExternalToolsHelper.buttonConfig(button, fakeEditor)
@@ -44,7 +44,7 @@ describe('ExternalToolsHelper', () => {
           id: button.id,
           description: button.description,
           title: button.name,
-          image: expect.stringContaining(button.icon_url)
+          image: expect.stringContaining(button.icon_url),
         })
       )
     })
@@ -55,7 +55,7 @@ describe('ExternalToolsHelper', () => {
         name: 'some tool',
         description: 'this is a cool tool',
         favorite: true,
-        icon_url: 'path/to/icon'
+        icon_url: 'path/to/icon',
       }
 
       const result = ExternalToolsHelper.buttonConfig(button, fakeEditor)
@@ -65,12 +65,12 @@ describe('ExternalToolsHelper', () => {
           id: button.id,
           description: button.description,
           title: button.name,
-          image: button.icon_url
+          image: button.icon_url,
         })
       )
       expect(result).toEqual(
         expect.not.objectContaining({
-          icon: expect.anything()
+          icon: expect.anything(),
         })
       )
     })
@@ -84,7 +84,7 @@ describe('ExternalToolsHelper', () => {
 
       fakeEditor = {
         $,
-        editorContainer: edContainer
+        editorContainer: edContainer,
       }
     })
     beforeEach(() => {

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import {SearchFormComponent} from 'ui/features/gradebook_history/react/SearchForm.js'
+import {SearchFormComponent} from 'ui/features/gradebook_history/react/SearchForm'
 import {Button} from '@instructure/ui-buttons'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'

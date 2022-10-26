@@ -28,11 +28,11 @@ QUnit.module('StudentGroupStore', {
     this.server = sinon.fakeServer.create()
     this.responseA = [
       {id: 1, title: 'group A', group_category_id: 1},
-      {id: 2, title: 'group B', group_category_id: 1}
+      {id: 2, title: 'group B', group_category_id: 1},
     ]
     this.responseB = [
       {id: 3, title: 'group C', group_category_id: 1},
-      {id: 4, title: 'group D', group_category_id: 1}
+      {id: 4, title: 'group D', group_category_id: 1},
     ]
 
     // single page
@@ -40,9 +40,9 @@ QUnit.module('StudentGroupStore', {
       200,
       {
         'Content-Type': 'application/json',
-        Link: {}
+        Link: {},
       },
-      JSON.stringify(this.responseA)
+      JSON.stringify(this.responseA),
     ])
 
     const linkHeaders1 =
@@ -55,19 +55,19 @@ QUnit.module('StudentGroupStore', {
     this.server.respondWith('GET', '/api/v1/courses/2/groups', [
       200,
       {'Content-Type': 'application/json', Link: linkHeaders1},
-      JSON.stringify(this.responseA)
+      JSON.stringify(this.responseA),
     ])
     this.server.respondWith('GET', 'http://api/v1/courses/2/groups?page=2&per_page=2', [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.responseB)
+      JSON.stringify(this.responseB),
     ])
   },
   teardown() {
     this.server.restore()
     StudentGroupStore.reset()
     fakeENV.teardown()
-  }
+  },
 })
 
 // ==================
@@ -90,11 +90,11 @@ test('returns groupls filtered by selected group set', () => {
   const groups = {
     1: {id: 1, title: 'group A', group_category_id: 1},
     2: {id: 2, title: 'group B', group_category_id: 1},
-    3: g3
+    3: g3,
   }
   StudentGroupStore.setState({
     groups,
-    selectedGroupSetId: 3
+    selectedGroupSetId: 3,
   })
   deepEqual(StudentGroupStore.groupsFilteredForSelectedSet(), [g3])
 })
@@ -115,13 +115,13 @@ test('adding groups works', () => {
 // ==================
 //  FETCHING GROUPS
 // ==================
-test('groups are added to state once fetched', function() {
+test('groups are added to state once fetched', function () {
   StudentGroupStore.fetchGroupsForCourse('/api/v1/courses/1/groups')
   this.server.respond()
   equal(StudentGroupStore.getGroups()[1].title, 'group A')
 })
 
-test('multiple calls are made if server has multiple pages', function() {
+test('multiple calls are made if server has multiple pages', function () {
   ENV.context_asset_string = 'course_2'
   StudentGroupStore.fetchGroupsForCourse()
   this.server.respond()

@@ -27,7 +27,7 @@ import $ from 'jquery'
 QUnit.module('SyncChange component')
 
 const defaultProps = () => ({
-  change: getSampleData().history[0].changes[0]
+  change: getSampleData().history[0].changes[0],
 })
 
 test('renders the SyncChange component', () => {

@@ -56,7 +56,7 @@ class DeveloperKeyActionButtons extends React.Component {
       developerKeysModalOpen,
       developerKey,
       ltiKeysSetLtiKey,
-      developerKey: {is_lti_key}
+      developerKey: {is_lti_key},
     } = this.props
 
     event.preventDefault()
@@ -178,16 +178,16 @@ DeveloperKeyActionButtons.propTypes = {
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string,
     created_at: PropTypes.string.isRequired,
-    is_lti_key: PropTypes.bool
+    is_lti_key: PropTypes.bool,
   }).isRequired,
   visible: PropTypes.bool.isRequired,
   developerName: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
-  showVisibilityToggle: PropTypes.bool
+  showVisibilityToggle: PropTypes.bool,
 }
 
 DeveloperKeyActionButtons.defaultProps = {
-  showVisibilityToggle: true
+  showVisibilityToggle: true,
 }
 
 export default DeveloperKeyActionButtons

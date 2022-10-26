@@ -23,12 +23,12 @@ import fakeENV from 'helpers/fakeENV'
 const TEST_COLORS = {
   '#008400': '#008400',
   '#91349B': '#91349B',
-  '#E1185C': '#E1185C'
+  '#E1185C': '#E1185C',
 }
 DashboardCardBackgroundStore.reset = function () {
   return this.setState({
     courseColors: TEST_COLORS,
-    usedDefaults: []
+    usedDefaults: [],
   })
 }
 
@@ -41,24 +41,24 @@ QUnit.module('DashboardCardBackgroundStore', {
     fetchMock.put('path:/api/v1/users/22/colors/course_1', {
       status: 200,
       headers: {'Content-Type': 'application/json'},
-      body: ''
+      body: '',
     })
     fetchMock.put('path:/api/v1/users/22/colors/course_2', {
       status: 200,
       headers: {'Content-Type': 'application/json'},
-      body: ''
+      body: '',
     })
     fetchMock.put('path:/api/v1/users/22/colors/course_3', {
       status: 200,
       headers: {'Content-Type': 'application/json'},
-      body: ''
+      body: '',
     })
   },
   teardown() {
     fetchMock.restore()
     DashboardCardBackgroundStore.reset()
     fakeENV.teardown()
-  }
+  },
 })
 
 // ================================

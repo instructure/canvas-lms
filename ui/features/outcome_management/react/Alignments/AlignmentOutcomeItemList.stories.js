@@ -24,8 +24,8 @@ export default {
   title: 'Examples/Outcomes/AlignmentOutcomeItemList',
   component: AlignmentOutcomeItemList,
   args: {
-    outcomes: generateOutcomes(5)
-  }
+    outcomes: generateOutcomes(5),
+  },
 }
 
 const Template = args => <AlignmentOutcomeItemList {...args} />

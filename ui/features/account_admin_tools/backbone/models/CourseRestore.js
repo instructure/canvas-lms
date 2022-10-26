@@ -45,10 +45,9 @@ export default class CourseRestore extends Backbone.Model {
         const account_id = this.get('account_id')
         this.clear({silent: true})
         this.set('account_id', account_id, {silent: true})
-        const message = $.parseJSON(response.responseText)
         this.set(response)
         return model.trigger('doneSearching')
-      }
+      },
     })
   }
 
@@ -81,10 +80,10 @@ export default class CourseRestore extends Backbone.Model {
         url,
         type: method,
         success: restoreSuccess,
-        error: restoreError
+        error: restoreError,
       })
 
-    var restoreError = (response = {}) => {
+    var restoreError = (_response = {}) => {
       $.flashError(
         I18n.t(
           'restore_error',

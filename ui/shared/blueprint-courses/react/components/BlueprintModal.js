@@ -42,7 +42,7 @@ export default class BlueprintModal extends Component {
     canAutoPublishCourses: PropTypes.bool,
     willAddAssociations: PropTypes.bool,
     willPublishCourses: PropTypes.bool,
-    enablePublishCourses: PropTypes.func
+    enablePublishCourses: PropTypes.func,
   }
 
   static defaultProps = {
@@ -52,7 +52,7 @@ export default class BlueprintModal extends Component {
     onSave: () => {},
     onCancel: () => {},
     saveButton: null,
-    wide: false
+    wide: false,
   }
 
   componentDidMount() {
@@ -95,7 +95,7 @@ export default class BlueprintModal extends Component {
 
   render() {
     const classes = cx('bcs__modal-content-wrapper', {
-      'bcs__modal-content-wrapper__wide': this.props.wide
+      'bcs__modal-content-wrapper__wide': this.props.wide,
     })
 
     return (

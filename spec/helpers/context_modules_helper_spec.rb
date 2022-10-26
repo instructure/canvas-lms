@@ -246,8 +246,12 @@ describe ContextModulesHelper do
 
   describe "add_mastery_paths_to_cache_key" do
     before do
+      @rules = [
+        { id: 27, assignment_sets: [{ id: 45 }, { id: 36 }] },
+        { id: 28, assignment_sets: [] }
+      ]
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([1, 2, 3])
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return(@rules)
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([1, 2, 3])
     end
 
@@ -258,22 +262,23 @@ describe ContextModulesHelper do
       expect(cache).to eq "foo"
     end
 
-    it "creates the same key for the same mastery paths rules for a student" do
-      s1 = student_in_course(course: t_course, active_all: true)
-      s2 = student_in_course(course: t_course, active_all: true)
-      cache1 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
-      cache2 = add_mastery_paths_to_cache_key("foo", t_course, s2.user)
-      expect(cache1).not_to eq "foo"
-      expect(cache1).to eq cache2
-    end
-
     it "creates different keys for different mastery paths rules for a student" do
       s1 = student_in_course(course: t_course, active_all: true)
       s2 = student_in_course(course: t_course, active_all: true)
       cache1 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return([3, 2, 1])
+      allow(ConditionalRelease::Service).to receive(:rules_for).and_return(@rules.reverse)
       cache2 = add_mastery_paths_to_cache_key("foo", t_course, s2.user)
       expect(cache1).not_to eq cache2
+    end
+
+    it "includes student's AssignmentSetActions in cache key" do
+      s1 = student_in_course(course: t_course, active_all: true)
+      cache1 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
+      cache2 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
+      expect(cache1).to eq cache2
+      allow_any_instance_of(CyoeHelper).to receive(:assignment_set_action_ids).and_return([11, 22])
+      cache3 = add_mastery_paths_to_cache_key("foo", t_course, s1.user)
+      expect(cache3).not_to eq cache1
     end
 
     it "creates the same key for the same mastery paths rules for a teacher" do

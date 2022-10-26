@@ -31,7 +31,7 @@ const getProps = overrides => ({
   timeZone: 'America/Denver',
   visible: true,
   openTodosInNewTab: true,
-  ...overrides
+  ...overrides,
 })
 
 describe('TodosPage', () => {
@@ -102,7 +102,7 @@ describe('sortTodos', () => {
   const TODO_DATES = [
     {id: 3, due_at: '2021-07-13T16:22:00.000Z'},
     {id: 1, due_at: '2021-07-01T16:22:00.000Z'},
-    {id: 2, due_at: '2021-07-05T16:22:00.000Z'}
+    {id: 2, due_at: '2021-07-05T16:22:00.000Z'},
   ]
   const mockTodos = dates =>
     dates.map(({id, due_at}) => ({
@@ -111,10 +111,10 @@ describe('sortTodos', () => {
         all_dates: [
           {
             base: true,
-            due_at
-          }
-        ]
-      }
+            due_at,
+          },
+        ],
+      },
     }))
 
   it('sorts to-dos by assignment due date ascending', () => {

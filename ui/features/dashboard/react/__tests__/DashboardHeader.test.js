@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import {DashboardHeader} from '../DashboardHeader'
 import {
   SHOW_K5_DASHBOARD_ROUTE,
-  showK5DashboardResponse
+  showK5DashboardResponse,
 } from '@canvas/observer-picker/react/__tests__/fixtures'
 
 jest.useFakeTimers()
@@ -31,23 +31,20 @@ jest.useFakeTimers()
 const defaultEnv = {
   current_user: {id: '1'},
   current_user_roles: ['user', 'student', 'observer'],
-  FEATURES: {
-    observer_picker: true
-  },
   OBSERVED_USERS_LIST: [
     {id: '2', name: 'Student 2', avatar_url: undefined},
-    {id: '3', name: 'Student 3', avatar_url: undefined}
+    {id: '3', name: 'Student 3', avatar_url: undefined},
   ],
   CAN_ADD_OBSERVEE: false,
   MOMENT_LOCALE: 'en',
-  TIMEZONE: 'UTC'
+  TIMEZONE: 'UTC',
 }
 
 const defaultProps = {
   dashboard_view: 'planner',
   planner_enabled: true,
   allowElementaryDashboard: false,
-  env: defaultEnv
+  env: defaultEnv,
 }
 
 const FakeDashboardHeader = props => (

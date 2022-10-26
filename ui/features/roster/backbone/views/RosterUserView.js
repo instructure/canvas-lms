@@ -49,7 +49,7 @@ export default class RosterUserView extends Backbone.View {
     this.prototype.events = {
       'click .admin-links [data-event]': 'handleMenuEvent',
       'focus *': 'focus',
-      'blur *': 'blur'
+      'blur *': 'blur',
     }
   }
 
@@ -162,7 +162,7 @@ export default class RosterUserView extends Backbone.View {
         for (const id in users) {
           user = users[id]
           const ob = {
-            role: I18n.t('observing_user', 'Observing: %{user_name}', {user_name: user.name})
+            role: I18n.t('observing_user', 'Observing: %{user_name}', {user_name: user.name}),
           }
           result.push(json.enrollments.push(ob))
         }

@@ -23,9 +23,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {EditableCodeValue} from './EditableCodeValue'
 import {InternalSettingActionButtons} from './InternalSettingActionButtons'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import exportFromJSON from 'export-from-json'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('internal-settings')
 
@@ -37,7 +37,7 @@ const {Item} = Menu as any
 const tableHeaders: [string, string, string, boolean][] = [
   ['name', I18n.t('Name'), '45%', true],
   ['value', I18n.t('Value'), '40%', true],
-  ['actions', I18n.t('Actions'), '15%', false]
+  ['actions', I18n.t('Actions'), '15%', false],
 ]
 
 export type InternalSettingsTableProps = {
@@ -56,7 +56,7 @@ export type InternalSettingsTableProps = {
 export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   const [sort, setSort] = useState<{ascending: boolean; sortBy: string}>({
     ascending: true,
-    sortBy: 'name'
+    sortBy: 'name',
   })
 
   const handleSort = (_, {id}: {id: string}) => {
@@ -65,7 +65,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
     } else {
       setSort({
         sortBy: id,
-        ascending: true
+        ascending: true,
       })
     }
   }
@@ -107,7 +107,13 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   return (
     <div>
       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-        <Menu trigger={<CondensedButton>{I18n.t('Download as...')}</CondensedButton>}>
+        <Menu
+          trigger={
+            <Link isWithinText={false} as="button">
+              <Text>{I18n.t('Download as...')}</Text>
+            </Link>
+          }
+        >
           <Item onClick={() => exportFromJSON({...exportParams, exportType: 'json'})}>JSON</Item>
           <Item onClick={() => exportFromJSON({...exportParams, exportType: 'csv'})}>CSV</Item>
         </Menu>
@@ -198,7 +204,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   onSubmitPendingChange={() => props.onSubmitPendingChange(internalSetting.id)}
                   onClearPendingChange={() => props.onClearPendingChange(internalSetting.id)}
                   onDelete={() => props.onDelete(internalSetting.id)}
-                  allowCopy
+                  allowCopy={true}
                 />
               </Cell>
             </Row>

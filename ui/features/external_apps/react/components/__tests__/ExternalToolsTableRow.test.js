@@ -32,7 +32,7 @@ const tools = [
     is_rce_favorite: false,
     editor_button_settings: {enabled: true},
     installed_locally: true,
-    restricted_by_master_course: false
+    restricted_by_master_course: false,
   },
   {
     app_id: 2,
@@ -41,14 +41,14 @@ const tools = [
     description: 'This is tool 2',
     name: 'Tool 2',
     is_rce_favorite: true,
-    editor_button_settings: {enabled: true}
+    editor_button_settings: {enabled: true},
   },
   {
     app_id: 3,
     context: 'Account',
     context_id: 1,
     description: 'This is tool 3',
-    name: 'Tool 3'
+    name: 'Tool 3',
   },
   {
     app_id: 4,
@@ -57,8 +57,8 @@ const tools = [
     description: 'This is tool 4',
     name: 'Tool 4',
     is_rce_favorite: true,
-    editor_button_settings: {enabled: false}
-  }
+    editor_button_settings: {enabled: false},
+  },
 ]
 
 const ajax = $.ajax
@@ -67,7 +67,7 @@ beforeEach(() => {
     externalTools: tools,
     hasMore: false,
     isLoaded: true,
-    isLoading: false
+    isLoading: false,
   })
 })
 
@@ -83,17 +83,17 @@ function renderRow(props) {
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
-      canAdd
-      canEdit
-      canDelete
-      canAddEdit
+      canAdd={true}
+      canEdit={true}
+      canDelete={true}
+      canAddEdit={true}
       setFocusAbove={() => {}}
       favoriteCount={0}
       contextType="account"
       {...props}
     />,
     {
-      container: tbody
+      container: tbody,
     }
   )
 }
@@ -111,7 +111,7 @@ describe('ExternalToolsTableRow', () => {
       const {queryByText} = renderRow({
         canEdit: false,
         canDelete: false,
-        canAddEdit: false
+        canAddEdit: false,
       })
       expect(queryByText(`${tools[0].name} Settings`)).not.toBeInTheDocument()
     })
@@ -142,7 +142,7 @@ describe('ExternalToolsTableRow', () => {
     it('does not show the toggle when tool cannot be a favorite', () => {
       const {getByText, queryByLabelText} = renderRow({
         tool: tools[2],
-        showLTIFavoriteToggles: true
+        showLTIFavoriteToggles: true,
       })
       expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
       expect(getByText('NA')).toBeInTheDocument()
@@ -151,7 +151,7 @@ describe('ExternalToolsTableRow', () => {
     it('does not show the toggle when Editor button placement is inactive', () => {
       const {getByText, queryByLabelText} = renderRow({
         tool: tools[3],
-        showLTIFavoriteToggles: true
+        showLTIFavoriteToggles: true,
       })
       expect(queryByLabelText('Favorite')).not.toBeInTheDocument()
       expect(getByText('NA')).toBeInTheDocument()
@@ -168,7 +168,7 @@ describe('ExternalToolsTableRow', () => {
       const {getByLabelText} = renderRow({
         tool: tools[1],
         favoriteCount: 2,
-        showLTIFavoriteToggles: true
+        showLTIFavoriteToggles: true,
       })
 
       const checkbox = getByLabelText('Favorite').closest('input[type="checkbox"]')

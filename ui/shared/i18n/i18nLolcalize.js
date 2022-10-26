@@ -17,7 +17,7 @@
 
 const formatter = {
   0: 'toUpperCase',
-  1: 'toLowerCase'
+  1: 'toLowerCase',
 }
 
 // see also lib/i18n/lolcalize.rb

@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import merge from 'lodash/merge'
 
-import IndexHeader from 'ui/features/discussion_topics_index/react/components/IndexHeader.js'
+import IndexHeader from 'ui/features/discussion_topics_index/react/components/IndexHeader'
 
 const makeProps = (props = {}) =>
   merge(
@@ -32,11 +32,11 @@ const makeProps = (props = {}) =>
       permissions: {
         create: true,
         manage_content: true,
-        moderate: true
+        moderate: true,
       },
       isBusy: false,
       selectedCount: 0,
-      applicationElement: () => document.getElementById('fixtures')
+      applicationElement: () => document.getElementById('fixtures'),
     },
     props
   )

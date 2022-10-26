@@ -84,7 +84,6 @@ function failADate(whichDate) {
   }
   const errMessages = {}
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip(`renders the error message when ${whichDate} date is invalid`, async () => {
     const override = mockOverride({
       dueAt: '2018-12-25T23:59:59-05:00',

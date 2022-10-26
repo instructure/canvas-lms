@@ -38,7 +38,7 @@ export const ConversationParticipant = {
     id: string,
     label: string,
     user: User.shape,
-    workflowState: string
+    workflowState: string,
   }),
 
   mock: ({
@@ -46,13 +46,13 @@ export const ConversationParticipant = {
     id = 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUx',
     label = null,
     user = User.mock(),
-    workflowState = 'read'
+    workflowState = 'read',
   } = {}) => ({
     _id,
     id,
     label,
     user,
     workflowState,
-    __typename: 'ConversationParticipant'
-  })
+    __typename: 'ConversationParticipant',
+  }),
 }

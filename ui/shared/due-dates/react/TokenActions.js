@@ -44,7 +44,7 @@ const TokenActions = {
   handleSectionTokenAdd(token, overridesFromRow) {
     const newOverride = this.newOverrideForRow({
       course_section_id: token.course_section_id,
-      title: token.name
+      title: token.name,
     })
 
     return _.union(overridesFromRow, [newOverride])
@@ -55,7 +55,7 @@ const TokenActions = {
   handleGroupTokenAdd(token, overridesFromRow) {
     const newOverride = this.newOverrideForRow({
       group_id: token.group_id,
-      title: token.name
+      title: token.name,
     })
 
     return _.union(overridesFromRow, [newOverride])
@@ -76,10 +76,7 @@ const TokenActions = {
     const newOverride = existingOverride.set('student_ids', newStudentIds)
     newOverride.unset('title', {silent: true})
 
-    return _.chain(overridesFromRow)
-      .difference([existingOverride])
-      .union([newOverride])
-      .value()
+    return _.chain(overridesFromRow).difference([existingOverride]).union([newOverride]).value()
   },
 
   createNewAdhocOverrideForRow(newToken, overridesFromRow) {
@@ -92,7 +89,7 @@ const TokenActions = {
   handleNoopTokenAdd(token, overridesFromRow) {
     const newOverride = this.newOverrideForRow({
       noop_id: token.noop_id,
-      title: token.name
+      title: token.name,
     })
 
     if (token == AssignmentOverride.conditionalRelease) {
@@ -156,10 +153,7 @@ const TokenActions = {
 
     const newOverride = adhocOverride.set('student_ids', newStudentIds)
     newOverride.unset('title', {silent: true})
-    return _.chain(overridesFromRow)
-      .difference([adhocOverride])
-      .union([newOverride])
-      .value()
+    return _.chain(overridesFromRow).difference([adhocOverride]).union([newOverride]).value()
   },
 
   setOverrideInitializer(rowKey, dates) {
@@ -172,10 +166,10 @@ const TokenActions = {
       lock_at_overridden: !!dates.lock_at,
       unlock_at: dates.unlock_at,
       unlock_at_overridden: !!dates.unlock_at,
-      rowKey
+      rowKey,
     }
 
-    this.newOverrideForRow = function(attributes) {
+    this.newOverrideForRow = function (attributes) {
       const all_attrs = _.extend(date_attrs, attributes)
       return new AssignmentOverride(all_attrs)
     }
@@ -192,7 +186,7 @@ const TokenActions = {
         (idToRemove ? _.includes(ov.get('student_ids'), idToRemove) : true)
       )
     })
-  }
+  },
 }
 
 export default TokenActions

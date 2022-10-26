@@ -30,7 +30,7 @@ export default {
       outcomesCount: 3,
       outcomes: {
         pageInfo: {
-          hasNextPage: false
+          hasNextPage: false,
         },
         edges: [
           {
@@ -39,8 +39,8 @@ export default {
               id: '2',
               title: 'Outcome Child 1',
               description: 'Outcome Child 1 Description',
-              canEdit: true
-            }
+              canEdit: true,
+            },
           },
           {
             canUnlink: true,
@@ -48,8 +48,8 @@ export default {
               id: '3',
               title: 'Outcome Child 2',
               description: 'Outcome Child 2 Description',
-              canEdit: true
-            }
+              canEdit: true,
+            },
           },
           {
             canUnlink: true,
@@ -57,11 +57,11 @@ export default {
               id: '4',
               title: 'Outcome Child 2',
               description: 'Outcome Child 2 Description',
-              canEdit: true
-            }
-          }
-        ]
-      }
+              canEdit: true,
+            },
+          },
+        ],
+      },
     },
     selectedOutcomes: {2: false, 3: false, 4: true},
     searchString: '',
@@ -71,8 +71,8 @@ export default {
     onSearchChangeHandler: () => {},
     onSearchClearHandler: () => {},
     loadMore: false,
-    loading: false
-  }
+    loading: false,
+  },
 }
 
 const Template = args => <ManageOutcomesView {...args} />

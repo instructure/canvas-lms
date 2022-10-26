@@ -23,7 +23,7 @@ import DetailsToggle from '../DetailsToggle'
 
 const defaultProps = () => ({
   title: "Aaron's best toggler",
-  detailItems: []
+  detailItems: [],
 })
 
 it('renders DetailsToggle component', () => {
@@ -40,24 +40,24 @@ it('renders correct number of permission details when given list of permissions'
     {
       title: 'Account Settings:',
       description:
-        'Allows user to view and manage the Settings and Notifications tabs in account settings.'
+        'Allows user to view and manage the Settings and Notifications tabs in account settings.',
     },
     {
       title: 'Authentication (Account Navigation:)',
-      description: 'Allows user to view and manage Authentication for the whole account.'
+      description: 'Allows user to view and manage Authentication for the whole account.',
     },
     {
       title: 'Subaccounts:',
-      description: 'Allows user to view and manage subaccounts for the root account.'
+      description: 'Allows user to view and manage subaccounts for the root account.',
     },
     {
       title: 'Terms:',
-      description: 'Allows user to view and manage terms for the root account.'
+      description: 'Allows user to view and manage terms for the root account.',
     },
     {
       title: 'Theme Editor:',
-      description: 'Allows user to access the Theme Editor.'
-    }
+      description: 'Allows user to access the Theme Editor.',
+    },
   ]
   const tree = shallow(<DetailsToggle {...props} />)
   const node = tree.find('View')

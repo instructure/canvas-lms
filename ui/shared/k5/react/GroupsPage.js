@@ -36,7 +36,7 @@ const GroupsPage = ({canManageGroups, groupsPath, showTeacherPage}) => {
 GroupsPage.propTypes = {
   groupsPath: string.isRequired,
   canManageGroups: bool,
-  showTeacherPage: bool
+  showTeacherPage: bool,
 }
 
 export default GroupsPage

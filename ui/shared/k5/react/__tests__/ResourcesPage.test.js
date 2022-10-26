@@ -29,8 +29,8 @@ const defaultImportantInfoResponse = [
     courseId: '2',
     courseName: 'Homeroom A',
     canEdit: true,
-    content: '<p>Bring your calculators today</p>'
-  }
+    content: '<p>Bring your calculators today</p>',
+  },
 ]
 
 const defaultAppsResponse = [
@@ -38,20 +38,20 @@ const defaultAppsResponse = [
     id: '3',
     course_navigation: {
       text: 'Google Apps',
-      icon_url: 'google.png'
+      icon_url: 'google.png',
     },
     context_id: '100',
-    context_name: 'new course'
+    context_name: 'new course',
   },
   {
     id: '4',
     course_navigation: {
       text: 'Attendance',
-      icon_url: 'xyz123.png'
+      icon_url: 'xyz123.png',
     },
     context_id: '100',
-    context_name: 'new course 2'
-  }
+    context_name: 'new course 2',
+  },
 ]
 
 const defaultStaffResponse = [
@@ -62,10 +62,10 @@ const defaultStaffResponse = [
     avatar_url: '/images/avatar1.png',
     enrollments: [
       {
-        role: 'TeacherEnrollment'
-      }
-    ]
-  }
+        role: 'TeacherEnrollment',
+      },
+    ],
+  },
 ]
 
 describe('ResourcesPage', () => {
@@ -75,18 +75,18 @@ describe('ResourcesPage', () => {
       {
         id: '2',
         isHomeroom: true,
-        originalName: 'Homeroom A'
+        originalName: 'Homeroom A',
       },
       {
         id: '6',
         isHomeroom: false,
-        originalName: 'English Class'
-      }
+        originalName: 'English Class',
+      },
     ],
     cardsSettled: true,
     showStaff: true,
     isSingleCourse: false,
-    ...overrides
+    ...overrides,
   })
 
   beforeEach(() => {
@@ -136,7 +136,7 @@ describe('ResourcesPage', () => {
       await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())
       const assign = window.location.assign
       Object.defineProperty(window, 'location', {
-        value: {assign: jest.fn()}
+        value: {assign: jest.fn()},
       })
       fireEvent.click(getByText('Google Apps'))
       expect(queryByText('Choose a Course')).not.toBeInTheDocument()
@@ -149,9 +149,9 @@ describe('ResourcesPage', () => {
           {
             id: '2',
             isHomeroom: true,
-            originalName: 'Homeroom A'
-          }
-        ]
+            originalName: 'Homeroom A',
+          },
+        ],
       })
       render(<ResourcesPage {...props} />)
       expect(utils.fetchCourseApps).not.toHaveBeenCalled()
@@ -162,12 +162,12 @@ describe('ResourcesPage', () => {
         {
           id: '3',
           course_navigation: {
-            text: 'Google Apps'
+            text: 'Google Apps',
           },
           icon_url: '2.png',
           context_id: '100',
-          context_name: 'new course'
-        }
+          context_name: 'new course',
+        },
       ]
       utils.fetchCourseApps.mockReturnValue(Promise.resolve(response))
       const {getByText, getByTestId} = render(<ResourcesPage {...getProps()} />)
@@ -183,8 +183,8 @@ describe('ResourcesPage', () => {
           id: '3',
           context_id: '100',
           context_name: 'Biology',
-          name: 'App'
-        }
+          name: 'App',
+        },
       ]
       utils.fetchCourseApps.mockReturnValue(Promise.resolve(response))
       const {getByText, queryByText} = render(<ResourcesPage {...getProps()} />)

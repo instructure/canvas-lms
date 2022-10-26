@@ -33,9 +33,9 @@ const props = (overrides = {}, placementOverrides = {}) => {
       text: 'asdf',
       selection_height: 10,
       selection_width: 10,
-      ...placementOverrides
+      ...placementOverrides,
     },
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -83,7 +83,7 @@ it('changes the output when selection_width changes', () => {
 it('changes the output when message_type changes', () => {
   checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', [
     null,
-    'LtiDeepLinkingRequest'
+    'LtiDeepLinkingRequest',
   ])
 })
 
@@ -116,7 +116,7 @@ const alwaysDeeplinkingPlacements = [
   'migration_selection',
   'homework_submission',
   'conference_selection',
-  'submission_type_selection'
+  'submission_type_selection',
 ]
 
 alwaysDeeplinkingPlacements.forEach(placementName => {
@@ -133,7 +133,7 @@ const couldBeEither = [
   'course_assignments_menu',
   'collaboration',
   'module_index_menu_modal',
-  'module_menu_modal'
+  'module_menu_modal',
 ]
 
 couldBeEither.forEach(placementName => {

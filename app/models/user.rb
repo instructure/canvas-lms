@@ -69,6 +69,7 @@ class User < ActiveRecord::Base
   has_many :viewed_submission_comments, dependent: :destroy
 
   has_many :enrollments, dependent: :destroy
+  has_many :course_paces, dependent: :destroy
 
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: "Enrollment", multishard: true
   has_many :not_removed_enrollments, -> { where.not(workflow_state: %w[rejected deleted inactive]) }, class_name: "Enrollment", multishard: true
@@ -435,8 +436,7 @@ class User < ActiveRecord::Base
                     .merge(enrollment_scope.except(:joins))
                     .where(enrollments: { associated_user_id: associated_user.id })
     else
-      enrollments_association = Account.site_admin.feature_enabled?(:observer_picker) ? :enrollments_excluding_linked_observers : :non_observer_enrollments
-      join = associated_user == self ? enrollments_association : :all_enrollments
+      join = associated_user == self ? :enrollments_excluding_linked_observers : :all_enrollments
       scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
     end
 
@@ -1908,12 +1908,6 @@ class User < ActiveRecord::Base
     pseudonym.account rescue Account.default
   end
 
-  def sub_account_for_course_creation(domain_root_account)
-    Rails.cache.fetch_with_batched_keys(["sub_account_for_course_creation", domain_root_account].cache_key, batch_object: self, batched_keys: %i[account_users]) do
-      account_users.active.detect { |au| break au if au.root_account_id == domain_root_account.id }&.account || domain_root_account.manually_created_courses_account
-    end
-  end
-
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     cache_key = [association, enrollment_uuid, options].cache_key
     @courses_with_primary_enrollment ||= {}
@@ -3050,6 +3044,14 @@ class User < ActiveRecord::Base
     associated_shards.select { |shard| shard.in_current_region? || shard.default? }
   end
 
+  def adminable_accounts_cache_key
+    ["adminable_accounts_1", self, ApplicationController.region].cache_key
+  end
+
+  def clear_adminable_accounts_cache!
+    Rails.cache.delete(adminable_accounts_cache_key)
+  end
+
   def adminable_accounts_scope
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
     account_ids = account_users.active.shard(in_region_associated_shards).distinct.pluck(:account_id)
@@ -3058,7 +3060,7 @@ class User < ActiveRecord::Base
 
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
-      Rails.cache.fetch(["adminable_accounts_1", self, ApplicationController.region].cache_key) do
+      Rails.cache.fetch(adminable_accounts_cache_key) do
         adminable_accounts_scope.order(:id).to_a
       end
     end

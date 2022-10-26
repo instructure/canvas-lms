@@ -54,7 +54,7 @@ class Reply {
       .find('form.discussion-reply-form:first')
       .submit(preventDefault(this.submit))
     this.textArea = this.getEditingElement()
-    this.form.find('.cancel_button').click(e => {
+    this.form.find('.cancel_button').click(_e => {
       RichContentEditor.closeRCE(this.textArea)
       this.hide()
     })
@@ -101,8 +101,8 @@ class Reply {
         focus: true,
         manageParent: true,
         tinyOptions: {
-          width: '100%'
-        }
+          width: '100%',
+        },
       })
       this.editing = true
     }
@@ -166,7 +166,7 @@ class Reply {
       success: this.onPostReplySuccess,
       error: this.onPostReplyError,
       multipart: entry.get('attachment'),
-      proxyAttachment: true
+      proxyAttachment: true,
     })
     return this.removeAttachments()
   }
@@ -195,7 +195,7 @@ class Reply {
       created_at: now,
       updated_at: now,
       attachment: this.form.find('input[type=file]')[0],
-      new: true
+      new: true,
     }
   }
 
@@ -226,7 +226,7 @@ class Reply {
       `<div class='alert alert-info'>${I18n.t(
         '*An error occurred*, please post your reply again later',
         {
-          wrapper: '<strong>$1</strong>'
+          wrapper: '<strong>$1</strong>',
         }
       )}</div>`
     )
@@ -236,7 +236,7 @@ class Reply {
 
   // #
   // Adds an attachment
-  addAttachment($el) {
+  addAttachment(_$el) {
     this.form.find('ul.discussion-reply-attachments').append(replyAttachmentTemplate())
     this.form.find('ul.discussion-reply-attachments input').focus()
     return this.form.find('a.discussion-reply-add-attachment').hide() // TODO: when the data model allows it, tweak this to support multiple in the UI

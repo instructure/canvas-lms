@@ -99,7 +99,7 @@ export default function ContentFilter(props) {
     <Select
       assistiveText={I18n.t('Use arrow keys to navigate options.')}
       inputValue={selectedItemLabel}
-      isInline
+      isInline={true}
       isShowingOptions={isShowingOptions}
       onRequestHideOptions={() => setIsShowingOptions(false)}
       onRequestHighlightOption={handleHighlightOption}
@@ -127,21 +127,21 @@ ContentFilter.propTypes = {
       children: arrayOf(
         shape({
           id: string.isRequired,
-          name: string.isRequired
+          name: string.isRequired,
         })
       ),
 
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
 
   onSelect: func.isRequired,
   selectedItemId: string,
-  sortAlphabetically: bool
+  sortAlphabetically: bool,
 }
 
 ContentFilter.defaultProps = {
   selectedItemId: null,
-  sortAlphabetically: false
+  sortAlphabetically: false,
 }

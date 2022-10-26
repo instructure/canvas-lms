@@ -22,7 +22,7 @@ import formatNumber from '../../../util/format_number'
 import Help from './help'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import K from '../../../constants'
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 import SightedUserContent from '@canvas/quiz-legacy-client-apps/react/components/sighted_user_content'
 import {IconQuestionLine} from '@instructure/ui-icons'
@@ -36,7 +36,7 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
   const className = {
     index: true,
     positive: passing === '+',
-    negative: passing !== '+'
+    negative: passing !== '+',
   }
 
   return (
@@ -70,14 +70,14 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
               onDismiss={() => displayHelp(false)}
               label={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
             >
-              <Help style={{ width: 480 }} />
+              <Help style={{width: 480}} />
             </CanvasModal>
           </p>
         </SightedUserContent>
 
         <ScreenReaderContent>
           {I18n.t('audible_discrimination_index', 'Discrimination Index: %{number}.', {
-            number: formatNumber(di)
+            number: formatNumber(di),
           })}
         </ScreenReaderContent>
       </div>

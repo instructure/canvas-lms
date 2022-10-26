@@ -37,13 +37,13 @@ const I18n = useI18nScope('speed_grader')
 
 const themeOverride = {
   [View.theme]: {
-    borderStyle: 'dashed'
-  }
+    borderStyle: 'dashed',
+  },
 }
 
 export default class CreatorEventGroup extends PureComponent {
   static propTypes = {
-    creatorEventGroup: propTypes.creatorEventGroup.isRequired
+    creatorEventGroup: propTypes.creatorEventGroup.isRequired,
   }
 
   render() {

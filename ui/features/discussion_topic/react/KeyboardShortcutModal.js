@@ -28,17 +28,17 @@ export default class KeyboardShortcutModal extends React.Component {
     shortcuts: arrayOf(
       shape({
         keycode: string.isRequired,
-        description: string.isRequired
+        description: string.isRequired,
       })
-    )
+    ),
   }
 
   static defaultProps = {
-    shortcuts: []
+    shortcuts: [],
   }
 
   state = {
-    isOpen: false
+    isOpen: false,
   }
 
   componentDidMount() {
@@ -64,7 +64,7 @@ export default class KeyboardShortcutModal extends React.Component {
   render() {
     return (
       <Modal
-        data-canvas-component
+        data-canvas-component={true}
         open={this.state.isOpen}
         label={I18n.t('Keyboard Shortcuts')}
         onDismiss={this.closeModal}

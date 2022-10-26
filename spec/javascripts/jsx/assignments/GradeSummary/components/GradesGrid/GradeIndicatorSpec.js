@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import GradeIndicator from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GradeIndicator.js'
+import GradeIndicator from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GradeIndicator'
 
 QUnit.module('GradeSummary GradeIndicator', suiteHooks => {
   let $container

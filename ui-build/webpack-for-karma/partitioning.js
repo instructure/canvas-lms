@@ -18,7 +18,7 @@
 
 const assert = require('assert')
 const fs = require('fs')
-const { IgnorePlugin } = require('webpack')
+const {IgnorePlugin} = require('webpack')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
 const CONTEXT_EMBER_GRADEBOOK_SPEC = 'ui/features/screenreader_gradebook/ember'
@@ -32,7 +32,7 @@ const RESOURCE_JSA_SPLIT_SPEC = /^\.\/[a-f].*Spec$/
 const RESOURCE_JSG_SPLIT_SPEC = /^\.\/g.*Spec$/
 const RESOURCE_JSH_SPLIT_SPEC = /^\.\/[h-z].*Spec$/
 
-exports.createPlugin = ({ group, nodeIndex, nodeTotal }) => {
+exports.createPlugin = ({group, nodeIndex, nodeTotal}) => {
   let ignoreResource = () => {
     throw new Error(`Unknown JSPEC_GROUP ${group}`)
   }
@@ -126,7 +126,7 @@ exports.createPlugin = ({ group, nodeIndex, nodeTotal }) => {
     }
   }
 
-  return new IgnorePlugin({ checkResource: ignoreResource })
+  return new IgnorePlugin({checkResource: ignoreResource})
 }
 
 const getAllFiles = (dirPath, arrayOfFiles, callback) => {

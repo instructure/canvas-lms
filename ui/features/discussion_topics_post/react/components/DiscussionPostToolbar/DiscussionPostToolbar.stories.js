@@ -28,16 +28,16 @@ export default {
     selectedView: {
       control: {
         type: 'select',
-        options: Object.keys(getMenuConfig({enableDeleteFilter: true}))
-      }
+        options: Object.keys(getMenuConfig({enableDeleteFilter: true})),
+      },
     },
     sortDirection: {
       control: {
         type: 'select',
-        options: ['asc', 'desc']
-      }
-    }
-  }
+        options: ['asc', 'desc'],
+      },
+    },
+  },
 }
 
 const Template = args => <DiscussionPostToolbar {...args} />
@@ -46,12 +46,12 @@ export const Default = Template.bind({})
 
 export const SortedDesc = Template.bind({})
 SortedDesc.args = {
-  sortDirection: 'desc'
+  sortDirection: 'desc',
 }
 
 export const ShowDeleted = Template.bind({})
 ShowDeleted.args = {
-  enableDeleteFilter: true
+  enableDeleteFilter: true,
 }
 
 export const WithChildTopics = Template.bind({})
@@ -59,6 +59,6 @@ WithChildTopics.args = {
   childTopics: [
     ChildTopic.mock(),
     ChildTopic.mock({_id: '2', contextName: 'Group 2', contextId: '2'}),
-    ChildTopic.mock({_id: '3', contextName: 'Group 3', contextId: '3'})
-  ]
+    ChildTopic.mock({_id: '3', contextName: 'Group 3', contextId: '3'}),
+  ],
 }

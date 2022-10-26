@@ -38,9 +38,9 @@ function mockUnstuckApi({path, params}) {
           progress: {
             id: 101,
             url: 'http://example.com/api/v1/progress/101',
-            workflow_state: 'queued'
-          }
-        }
+            workflow_state: 'queued',
+          },
+        },
       })
     }
   } else {

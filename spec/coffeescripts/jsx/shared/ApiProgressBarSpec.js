@@ -33,7 +33,7 @@ QUnit.module('ApiProgressBarSpec', {
       user_id: 1,
       tag: 'epub_export',
       completion: 0,
-      workflow_state: 'queued'
+      workflow_state: 'queued',
     }
     this.store_state = {}
     this.store_state[this.progress_id] = this.progress
@@ -46,10 +46,10 @@ QUnit.module('ApiProgressBarSpec', {
     ProgressStore.get.restore()
     ProgressStore.clearState()
     return this.clock.restore()
-  }
+  },
 })
 
-test('shouldComponentUpdate', function() {
+test('shouldComponentUpdate', function () {
   let ApiProgressBarElement = <ApiProgressBar />
   let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   ok(
@@ -73,14 +73,14 @@ test('shouldComponentUpdate', function() {
       {progress_id: this.progress_id},
       {
         completion: component.state.completion,
-        workflow_state: component.state.workflow_state
+        workflow_state: component.state.workflow_state,
       }
     ),
     'should not update if state & props are the same'
   )
 })
 
-test('componentDidUpdate', function() {
+test('componentDidUpdate', function () {
   const onCompleteSpy = sinon.spy()
   const ApiProgressBarElement = (
     <ApiProgressBar onComplete={onCompleteSpy} progress_id={this.progress_id} />
@@ -97,7 +97,7 @@ test('componentDidUpdate', function() {
   ok(onCompleteSpy.called, 'should call callback on update if complete')
 })
 
-test('handleStoreChange', function() {
+test('handleStoreChange', function () {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   this.clock.tick(component.props.delay + 5)
@@ -121,7 +121,7 @@ test('handleStoreChange', function() {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('isComplete', function() {
+test('isComplete', function () {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   this.clock.tick(component.props.delay + 5)
@@ -134,7 +134,7 @@ test('isComplete', function() {
   ok(component.isComplete(), 'is complete if state is completed')
 })
 
-test('isInProgress', function() {
+test('isInProgress', function () {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   this.clock.tick(component.props.delay + 5)
@@ -147,7 +147,7 @@ test('isInProgress', function() {
   ok(!component.isInProgress(), 'is not in progress if state is completed')
 })
 
-test('poll', function() {
+test('poll', function () {
   let ApiProgressBarElement = <ApiProgressBar />
   let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
@@ -160,7 +160,7 @@ test('poll', function() {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('render', function() {
+test('render', function () {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   ok(isNull(ReactDOM.findDOMNode(component)), 'should not render to DOM if is not in progress')

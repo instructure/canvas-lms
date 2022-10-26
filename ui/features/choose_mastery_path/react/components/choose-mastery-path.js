@@ -30,7 +30,7 @@ export default class ChooseMasteryPath extends React.Component {
   static propTypes = {
     options: arrayOf(optionShape).isRequired,
     selectedOption: number,
-    selectOption: func.isRequired
+    selectOption: func.isRequired,
   }
 
   renderHeader() {

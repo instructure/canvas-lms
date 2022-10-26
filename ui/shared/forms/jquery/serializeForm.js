@@ -20,7 +20,8 @@ import {send} from '@canvas/rce/RceCommandShim'
 
 const rselectTextarea = /^(?:select|textarea)/i
 const rCRLF = /\r?\n/g
-const rinput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|file)$/i
+const rinput =
+  /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week|file)$/i
 // radio / checkbox are not included, since they are handled by the @checked check
 
 function elements() {
@@ -79,9 +80,6 @@ function getValue() {
 // identical to $.fn.serializeArray, except:
 // 1. it works on non-forms (see elements)
 // 2. it handles file, date picker and tinymce inputs (see getValue)
-export default $.fn.serializeForm = function() {
-  return this.map(elements)
-    .filter(isSerializable)
-    .map(getValue)
-    .get()
+export default $.fn.serializeForm = function () {
+  return this.map(elements).filter(isSerializable).map(getValue).get()
 }

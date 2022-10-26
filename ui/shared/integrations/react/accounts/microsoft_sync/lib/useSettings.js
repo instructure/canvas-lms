@@ -32,7 +32,7 @@ export default function useSettings() {
     success: useCallback(data => {
       dispatch({
         type: reducerActions.fetchSuccess,
-        payload: sliceSyncSettings(data)
+        payload: sliceSyncSettings(data),
       })
     }, []),
     path: `/api/v1/${ENV.CONTEXT_BASE_URL}/settings`,
@@ -41,7 +41,7 @@ export default function useSettings() {
     }, []),
     error: useCallback(() => {
       dispatch({type: reducerActions.fetchError})
-    }, [])
+    }, []),
   })
 
   return [state, dispatch]

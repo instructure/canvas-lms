@@ -106,7 +106,7 @@ class CanvasSelect extends React.Component<Props, State> {
       isShowingOptions: false,
       highlightedOptionId: null,
       selectedOptionId: option ? option.props.id : null,
-      announcement: null
+      announcement: null,
     }
   }
 
@@ -116,7 +116,7 @@ class CanvasSelect extends React.Component<Props, State> {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
         inputValue: option ? option.props.children : '',
-        selectedOptionId: option ? option.props.id : ''
+        selectedOptionId: option ? option.props.id : '',
       })
     }
   }
@@ -144,7 +144,7 @@ class CanvasSelect extends React.Component<Props, State> {
         <Alert
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
           liveRegionPoliteness="assertive"
-          screenReaderOnly
+          screenReaderOnly={true}
         >
           {this.state.announcement}
         </Alert>
@@ -229,7 +229,7 @@ class CanvasSelect extends React.Component<Props, State> {
 
   handleShowOptions = (): void => {
     this.setState({
-      isShowingOptions: true
+      isShowingOptions: true,
     })
   }
 
@@ -240,7 +240,7 @@ class CanvasSelect extends React.Component<Props, State> {
         isShowingOptions: false,
         highlightedOptionId: null,
         inputValue: text,
-        announcement: I18n.t('List collapsed.')
+        announcement: I18n.t('List collapsed.'),
       }
     })
   }
@@ -260,7 +260,7 @@ class CanvasSelect extends React.Component<Props, State> {
     this.setState({
       highlightedOptionId: id,
       inputValue,
-      announcement: `${text} ${nowOpen}`
+      announcement: `${text} ${nowOpen}`,
     })
   }
   /* eslint-enable react/no-access-state-in-setstate */
@@ -269,7 +269,7 @@ class CanvasSelect extends React.Component<Props, State> {
     if (id === noOptionsOptionId) {
       this.setState({
         isShowingOptions: false,
-        announcement: I18n.t('List collapsed')
+        announcement: I18n.t('List collapsed'),
       })
     } else {
       const text = this.getOptionLabelById(id)
@@ -278,7 +278,7 @@ class CanvasSelect extends React.Component<Props, State> {
         selectedOptionId: id,
         inputValue: text,
         isShowingOptions: false,
-        announcement: I18n.t('%{option} selected. List collapsed.', {option: text})
+        announcement: I18n.t('%{option} selected. List collapsed.', {option: text}),
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {

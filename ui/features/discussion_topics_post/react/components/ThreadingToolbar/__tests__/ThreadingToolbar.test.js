@@ -31,14 +31,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -82,7 +82,7 @@ describe('PostToolbar', () => {
   it('should not render go to reply button when isIsolatedView prop is true', () => {
     window.ENV.isolated_view = true
     const {queryByText} = render(
-      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView>
+      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView={true}>
         <>First</>
         <>Second</>
       </ThreadingToolbar>
@@ -102,7 +102,7 @@ describe('PostToolbar', () => {
             _id: '1',
             rootEntryId: '2',
             isolatedEntryId: '3',
-            parentId: '3'
+            parentId: '3',
           })}
           searchTerm="neato"
           onOpenIsolatedView={onOpenIsolatedView}
@@ -126,7 +126,7 @@ describe('PostToolbar', () => {
             _id: '1',
             rootEntryId: null,
             isolatedEntryId: null,
-            parentId: null
+            parentId: null,
           })}
           searchTerm="neato"
           onOpenIsolatedView={onOpenIsolatedView}
@@ -149,7 +149,7 @@ describe('PostToolbar', () => {
           id: '1',
           _id: '1',
           isolatedEntryId: null,
-          rootEntryId: null
+          rootEntryId: null,
         })}
         searchTerm="neato"
         onOpenIsolatedView={onOpenIsolatedView}
@@ -165,7 +165,7 @@ describe('PostToolbar', () => {
   describe('Mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'}
+        mobile: {maxWidth: '1024px'},
       }))
     })
 

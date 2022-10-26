@@ -27,5 +27,5 @@ export default {
       $('i', button).toggleClass('icon-empty icon-complete')
       $('.mark-done-labels span', button).toggleClass('visible')
     })
-  }
+  },
 }

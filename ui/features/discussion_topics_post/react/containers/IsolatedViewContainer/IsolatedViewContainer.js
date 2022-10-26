@@ -22,7 +22,7 @@ import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
   getOptimisticResponse,
-  getDisplayName
+  getDisplayName,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import {
   CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
-  UPDATE_DISCUSSION_ENTRY
+  UPDATE_DISCUSSION_ENTRY,
 } from '../../../graphql/Mutations'
 import {Discussion} from '../../../graphql/Discussion'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../../graphql/Queries'
@@ -65,7 +65,7 @@ export const IsolatedViewContainer = props => {
       last: ENV.isolated_view_initial_page_size,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      includeRelativeEntry: false
+      includeRelativeEntry: false,
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
@@ -92,7 +92,7 @@ export const IsolatedViewContainer = props => {
       }
     },
     onError: () =>
-      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
+      setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.')),
   })
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
@@ -103,7 +103,7 @@ export const IsolatedViewContainer = props => {
         setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
       }
     },
-    onError: () => setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
+    onError: () => setOnFailure(I18n.t('There was an unexpected error while deleting the reply.')),
   })
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
@@ -114,13 +114,13 @@ export const IsolatedViewContainer = props => {
         setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
       }
     },
-    onError: () => setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+    onError: () => setOnFailure(I18n.t('There was an unexpected error while updating the reply.')),
   })
 
   const updateDiscussionEntryParticipantCache = (cache, result) => {
     const entry = [
       ...(isolatedEntryOlderDirection.data?.legacyNode.discussionSubentriesConnection.nodes || []),
-      ...(isolatedEntryNewerDirection.data?.legacyNode.discussionSubentriesConnection.nodes || [])
+      ...(isolatedEntryNewerDirection.data?.legacyNode.discussionSubentriesConnection.nodes || []),
     ].find(
       oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
     )
@@ -134,7 +134,7 @@ export const IsolatedViewContainer = props => {
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountChange
+        unreadCountChange: discussionUnreadCountChange,
       })
       updateDiscussionEntryRootEntryCounts(cache, result, discussionUnreadCountChange)
     }
@@ -150,15 +150,15 @@ export const IsolatedViewContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
-    }
+    },
   })
 
   const toggleRating = discussionEntry => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: discussionEntry._id,
-        rating: discussionEntry.entryParticipants?.rating ? 'not_liked' : 'liked'
-      }
+        rating: discussionEntry.entryParticipants?.rating ? 'not_liked' : 'liked',
+      },
     })
   }
 
@@ -167,8 +167,8 @@ export const IsolatedViewContainer = props => {
       variables: {
         discussionEntryId: discussionEntry._id,
         read: !discussionEntry.entryParticipant?.read,
-        forcedReadState: discussionEntry.entryParticipant?.read || null
-      }
+        forcedReadState: discussionEntry.entryParticipant?.read || null,
+      },
     })
   }
 
@@ -177,8 +177,8 @@ export const IsolatedViewContainer = props => {
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
-          id: discussionEntry._id
-        }
+          id: discussionEntry._id,
+        },
       })
     }
   }
@@ -188,8 +188,8 @@ export const IsolatedViewContainer = props => {
       variables: {
         discussionEntryId: discussionEntry._id,
         message,
-        removeAttachment: !fileId
-      }
+        removeAttachment: !fileId,
+      },
     })
   }
 
@@ -205,7 +205,7 @@ export const IsolatedViewContainer = props => {
         isAnonymousAuthor,
         message,
         includeReplyPreview,
-        courseID: ENV.course_id
+        courseID: ENV.course_id,
       },
       optimisticResponse: getOptimisticResponse({
         message,
@@ -216,8 +216,8 @@ export const IsolatedViewContainer = props => {
           props.replyFromId
         ),
         isAnonymous:
-          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously
-      })
+          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
+      }),
     })
   }
 
@@ -229,7 +229,7 @@ export const IsolatedViewContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
-    }
+    },
   })
 
   const findDraftMessage = rootId => {
@@ -256,10 +256,10 @@ export const IsolatedViewContainer = props => {
       courseID: window.ENV?.course_id,
       ...(props.relativeEntryId &&
         props.relativeEntryId !== props.discussionEntryId && {
-          relativeEntryId: props.relativeEntryId
+          relativeEntryId: props.relativeEntryId,
         }),
-      includeRelativeEntry: !!props.relativeEntryId
-    }
+      includeRelativeEntry: !!props.relativeEntryId,
+    },
   })
 
   const isolatedEntryNewerDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
@@ -271,8 +271,8 @@ export const IsolatedViewContainer = props => {
       courseID: window.ENV?.course_id,
       ...(props.relativeEntryId && {relativeEntryId: props.relativeEntryId}),
       includeRelativeEntry: false,
-      beforeRelativeEntry: false
-    }
+      beforeRelativeEntry: false,
+    },
   })
 
   const fetchOlderEntries = () => {
@@ -284,7 +284,7 @@ export const IsolatedViewContainer = props => {
           isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.pageInfo
             .startCursor,
         sort: 'asc',
-        courseID: window.ENV?.course_id
+        courseID: window.ENV?.course_id,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         setFetchingMoreOlderReplies(false)
@@ -294,14 +294,14 @@ export const IsolatedViewContainer = props => {
             discussionSubentriesConnection: {
               nodes: [
                 ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes,
-                ...previousResult.legacyNode.discussionSubentriesConnection.nodes
+                ...previousResult.legacyNode.discussionSubentriesConnection.nodes,
               ],
               pageInfo: fetchMoreResult.legacyNode.discussionSubentriesConnection.pageInfo,
-              __typename: 'DiscussionEntryConnection'
-            }
-          }
+              __typename: 'DiscussionEntryConnection',
+            },
+          },
         }
-      }
+      },
     })
   }
 
@@ -316,12 +316,12 @@ export const IsolatedViewContainer = props => {
         sort: 'asc',
         courseID: window.ENV?.course_id,
         beforeRelativeEntry: false,
-        includeRelativeEntry: false
+        includeRelativeEntry: false,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes = [
           ...isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes,
-          ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes
+          ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes,
         ]
         setFetchingMoreNewerReplies(false)
         return {
@@ -330,14 +330,14 @@ export const IsolatedViewContainer = props => {
             discussionSubentriesConnection: {
               nodes: [
                 ...previousResult.legacyNode.discussionSubentriesConnection.nodes,
-                ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes
+                ...fetchMoreResult.legacyNode.discussionSubentriesConnection.nodes,
               ],
               pageInfo: fetchMoreResult.legacyNode.discussionSubentriesConnection.pageInfo,
-              __typename: 'DiscussionEntryConnection'
-            }
-          }
+              __typename: 'DiscussionEntryConnection',
+            },
+          },
         }
-      }
+      },
     })
   }
 
@@ -349,7 +349,7 @@ export const IsolatedViewContainer = props => {
         preview = {
           author: {shortName: getDisplayName(reply)},
           createdAt: reply.createdAt,
-          previewMessage: reply.message.replace(/<[^>]*>?/gm, '')
+          previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
         }
         return false
       }
@@ -463,8 +463,8 @@ export const IsolatedViewContainer = props => {
                     variables: {
                       discussionTopicId: props.discussionTopic._id,
                       message: newDraftMessage,
-                      parentId: props.replyFromId
-                    }
+                      parentId: props.replyFromId,
+                    },
                   })
                 }}
                 onInit={() => {
@@ -524,7 +524,7 @@ export const IsolatedViewContainer = props => {
       size="medium"
       offset="large"
       label="Isolated View"
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
       onDismiss={e => {
         // When the RCE is open, it steals the mouse position when using it and we do this trick
         // to avoid the whole Tray getting closed because of a click inside the RCE area.
@@ -544,7 +544,7 @@ export const IsolatedViewContainer = props => {
     >
       <span className="discussions-isolated-view-content">
         <Flex>
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
               Thread
             </Heading>
@@ -582,7 +582,7 @@ IsolatedViewContainer.propTypes = {
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }
 
 export default IsolatedViewContainer

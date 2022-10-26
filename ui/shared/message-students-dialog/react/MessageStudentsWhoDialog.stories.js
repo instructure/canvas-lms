@@ -25,23 +25,23 @@ const students = [
   {
     id: '100',
     name: 'Adam Jones',
-    sortableName: 'Jones, Adam'
+    sortableName: 'Jones, Adam',
   },
   {
     id: '101',
     name: 'Betty Ford',
-    sortableName: 'Ford, Betty'
+    sortableName: 'Ford, Betty',
   },
   {
     id: '102',
     name: 'Charlie Xi',
-    sortableName: 'Xi, Charlie'
+    sortableName: 'Xi, Charlie',
   },
   {
     id: '103',
     name: 'Dana Smith',
-    sortableName: 'Smith, Dana'
-  }
+    sortableName: 'Smith, Dana',
+  },
 ]
 
 export default {
@@ -52,14 +52,14 @@ export default {
       gradingType: 'points',
       id: '100',
       name: 'Some assignment',
-      nonDigitalSubmission: false
+      nonDigitalSubmission: false,
     },
     userId: '123',
-    students
+    students,
   },
   argTypes: {
-    onClose: {action: 'closed'}
-  }
+    onClose: {action: 'closed'},
+  },
 }
 
 const Template = args => (
@@ -73,9 +73,9 @@ ScoredAssignment.args = {
     gradingType: 'points',
     id: '100',
     name: 'A pointed assignment',
-    nonDigitalSubmission: false
+    nonDigitalSubmission: false,
   },
-  students
+  students,
 }
 
 export const UngradedAssignment = Template.bind({})
@@ -84,9 +84,9 @@ UngradedAssignment.args = {
     gradingType: 'not_graded',
     id: '200',
     name: 'A pointless assignment',
-    nonDigitalSubmission: false
+    nonDigitalSubmission: false,
   },
-  students
+  students,
 }
 
 export const PassFailAssignment = Template.bind({})
@@ -95,9 +95,9 @@ PassFailAssignment.args = {
     gradingType: 'pass_fail',
     id: '300',
     name: 'A pass-fail assignment',
-    nonDigitalSubmission: false
+    nonDigitalSubmission: false,
   },
-  students
+  students,
 }
 
 export const UnsubmittableAssignment = Template.bind({})
@@ -106,7 +106,7 @@ UnsubmittableAssignment.args = {
     gradingType: 'no_submission',
     id: '400',
     name: 'An unsubmittable assignment',
-    nonDigitalSubmission: true
+    nonDigitalSubmission: true,
   },
-  students
+  students,
 }

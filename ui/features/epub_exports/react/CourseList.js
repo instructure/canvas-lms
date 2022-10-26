@@ -32,5 +32,5 @@ export default function CourseList(props) {
 }
 
 CourseList.propTypes = {
-  courses: PropTypes.object
+  courses: PropTypes.object,
 }

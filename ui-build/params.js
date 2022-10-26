@@ -26,5 +26,5 @@ exports.canvasComponents = [
   'canvas-media',
   'core',
   'permissions',
-  'user_split_merge'
+  'user_split_merge',
 ]

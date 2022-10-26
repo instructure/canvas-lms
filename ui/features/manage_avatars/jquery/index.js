@@ -20,21 +20,22 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
 const I18n = useI18nScope('manage_avatars')
 /* showIf */
 
-$(document).ready(function() {
-  $('.update_avatar_link').live('click', function(event) {
+$(document).ready(function () {
+  $('.update_avatar_link').live('click', function (event) {
     event.preventDefault()
     const $link = $(this)
-    if ($link.attr('data-state') == 'none') {
+    if ($link.attr('data-state') === 'none') {
       var result = confirm(
         I18n.t('prompts.delete_avatar', "Are you sure you want to delete this user's profile pic?")
       )
       if (!result) {
         return
       }
-    } else if ($link.attr('data-state') == 'locked') {
+    } else if ($link.attr('data-state') === 'locked') {
       var result = confirm(
         I18n.t(
           'prompts.lock_avatar',
@@ -58,21 +59,18 @@ $(document).ready(function() {
       data => {
         $td
           .find('.lock_avatar_link')
-          .showIf(data.avatar_state != 'locked')
+          .showIf(data.avatar_state !== 'locked')
           .end()
           .find('.unlock_avatar_link')
-          .showIf(data.avatar_state == 'locked')
+          .showIf(data.avatar_state === 'locked')
           .end()
           .find('.reject_avatar_link')
-          .showIf(data.avatar_state != 'none')
+          .showIf(data.avatar_state !== 'none')
           .end()
           .find('.approve_avatar_link')
           .hide()
-        if (data.avatar_state == 'none') {
-          $td
-            .parents('tr')
-            .find('.avatar img')
-            .attr('src', '/images/dotted_pic.png')
+        if (data.avatar_state === 'none') {
+          $td.parents('tr').find('.avatar img').attr('src', '/images/dotted_pic.png')
         }
         $td.parents('tr').attr('class', data.avatar_state)
         $td.find('.progress').css('visibility', 'hidden')

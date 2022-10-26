@@ -30,7 +30,7 @@ class ImageSearchItem extends React.Component {
     confirmationId: PropTypes.string,
     selectImage: PropTypes.func,
     userUrl: PropTypes.string,
-    userName: PropTypes.string
+    userName: PropTypes.string,
   }
 
   handleClick = () => {
@@ -48,7 +48,7 @@ class ImageSearchItem extends React.Component {
             <ScreenReaderContent>
               {I18n.t('Artist info for %{userName} for %{description}', {
                 userName: this.props.userName,
-                description: this.props.description
+                description: this.props.description,
               })}
             </ScreenReaderContent>
             <PresentationContent>{this.props.userName}</PresentationContent>

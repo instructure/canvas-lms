@@ -49,10 +49,10 @@ ShowMoreRepliesButton.propTypes = {
   /**
    * Boolean that controls if the button is disabled.
    */
-  fetchingMoreReplies: PropTypes.bool
+  fetchingMoreReplies: PropTypes.bool,
 }
 
 ShowMoreRepliesButton.defaultProps = {
   onClick: () => {},
-  fetchingMoreReplies: false
+  fetchingMoreReplies: false,
 }

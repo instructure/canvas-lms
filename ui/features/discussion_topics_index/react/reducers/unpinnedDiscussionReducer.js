@@ -57,7 +57,7 @@ const reducerMap = {
   [actionTypes.DRAG_AND_DROP_START]: (state, action) =>
     copyAndUpdateDiscussionState(state, action.payload.discussion),
   [actionTypes.DRAG_AND_DROP_FAIL]: (state, action) =>
-    copyAndUpdateDiscussionState(state, action.payload.discussion)
+    copyAndUpdateDiscussionState(state, action.payload.discussion),
 }
 
 Object.assign(reducerMap, duplicationReducerMap, deleteReducerMap)

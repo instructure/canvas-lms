@@ -21,7 +21,7 @@ import processEditorContentItems, {processHandler} from '../processEditorContent
 import {send} from '@canvas/rce/RceCommandShim'
 
 jest.mock('@canvas/rce/RceCommandShim', () => ({
-  send: jest.fn()
+  send: jest.fn(),
 }))
 
 describe('processEditorContentItems', () => {
@@ -29,23 +29,23 @@ describe('processEditorContentItems', () => {
     type: 'link',
     url: 'http://www.test.com',
     title: 'link title',
-    text: 'link text'
+    text: 'link text',
   }
   const resourceLinkContentItem = {
     type: 'ltiResourceLink',
     url: 'http://www.test.com',
     title: 'link title',
-    text: 'link text'
+    text: 'link text',
   }
   const imageContentItem = {
     type: 'image',
     url: 'http://www.test.com/image',
     width: 100,
-    height: 200
+    height: 200,
   }
   const htmlFragmentItem = {
     type: 'html',
-    html: '<a href="www.html.com">test</a>'
+    html: '<a href="www.html.com">test</a>',
   }
   const invalidContentItem = {type: 'banana'}
   const contentItems = [
@@ -53,14 +53,14 @@ describe('processEditorContentItems', () => {
     invalidContentItem,
     resourceLinkContentItem,
     imageContentItem,
-    htmlFragmentItem
+    htmlFragmentItem,
   ]
   const editor = {id: 'editor_id'}
   const editorWithSelection = {
     ...editor,
     selection: {
-      getContent: () => 'user selection'
-    }
+      getContent: () => 'user selection',
+    },
   }
 
   describe('static', () => {

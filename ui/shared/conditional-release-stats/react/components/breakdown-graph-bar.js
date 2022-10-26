@@ -32,7 +32,7 @@ class BreakdownGraph extends React.Component {
     upperBound: string.isRequired,
     rangeIndex: number.isRequired,
     openSidebar: func.isRequired,
-    selectRange: func.isRequired
+    selectRange: func.isRequired,
   }
 
   selectRange = e => {
@@ -62,7 +62,7 @@ class BreakdownGraph extends React.Component {
           <span className="crs-bar__info">
             {I18n.t('%{lowerBound}+ to %{upperBound}', {
               upperBound: this.props.upperBound,
-              lowerBound: this.props.lowerBound
+              lowerBound: this.props.lowerBound,
             })}
           </span>
           <button
@@ -72,7 +72,7 @@ class BreakdownGraph extends React.Component {
           >
             {I18n.t('%{rangeStudents} out of %{totalStudents} students', {
               rangeStudents,
-              totalStudents
+              totalStudents,
             })}
           </button>
         </div>

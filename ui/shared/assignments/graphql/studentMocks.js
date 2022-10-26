@@ -83,7 +83,7 @@ export async function mockAssignment(overrides = []) {
     currentUser: {id: '1', display_name: 'bob', avatar_image_url: 'awesome.avatar.url'},
     enrollmentState: 'active',
     modulePrereq: null,
-    moduleUrl: 'mocked-module-url'
+    moduleUrl: 'mocked-module-url',
   }
   return assignment
 }
@@ -98,6 +98,6 @@ export async function mockAssignmentAndSubmission(overrides = []) {
   return {
     assignment: result[0],
     submission: result[1],
-    onChangeSubmission: () => {}
+    onChangeSubmission: () => {},
   }
 }

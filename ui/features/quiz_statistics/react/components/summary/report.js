@@ -63,27 +63,27 @@ class Report extends React.Component {
           generatable={this.props.generatable}
           progress={this.props.progress}
           file={this.props.file}
-          reactivePositioning
+          reactivePositioning={true}
           anchorSelector=".btn"
           popupOptions={{
             show: {
               event: 'mouseenter focusin',
               delay: 0,
               effect: false,
-              solo: true
+              solo: true,
             },
 
             hide: {
               event: 'mouseleave focusout',
               delay: 350,
               effect: false,
-              fixed: true
+              fixed: true,
             },
 
             position: {
               my: 'bottom center',
-              at: 'top center'
-            }
+              at: 'top center',
+            },
           }}
         >
           {this.props.isGenerated ? this.renderDownloader() : this.renderGenerator()}

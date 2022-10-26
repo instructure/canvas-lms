@@ -26,7 +26,7 @@ const defaultValues = {
   students_can_create_courses: false,
   no_enrollments_can_create_courses: false,
   teachers_can_create_courses_anywhere: true,
-  students_can_create_courses_anywhere: true
+  students_can_create_courses_anywhere: true,
 }
 
 describe('CourseCreationSettings', () => {
@@ -54,7 +54,7 @@ describe('CourseCreationSettings', () => {
           ...defaultValues,
           teachers_can_create_courses: true,
           students_can_create_courses: true,
-          no_enrollments_can_create_courses: true
+          no_enrollments_can_create_courses: true,
         }}
       />
     )
@@ -72,7 +72,7 @@ describe('CourseCreationSettings', () => {
       <CourseCreationSettings
         currentValues={{
           ...defaultValues,
-          students_can_create_courses: true
+          students_can_create_courses: true,
         }}
       />
     )
@@ -81,10 +81,10 @@ describe('CourseCreationSettings', () => {
     act(() => teacherCheckbox.click())
     expect(getByText('Where can teachers create courses?')).toBeInTheDocument()
     const teacherRadio1 = getAllByRole('radio', {
-      name: 'Allow creation anywhere the user has active enrollments'
+      name: 'Allow creation anywhere the user has active enrollments',
     })[0]
     const teacherRadio2 = getAllByRole('radio', {
-      name: 'Allow creation only in the Manually-Created Courses sub-account'
+      name: 'Allow creation only in the Manually-Created Courses sub-account',
     })[0]
     expect(teacherRadio1).toBeInTheDocument()
     expect(teacherRadio2).toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('CourseCreationSettings', () => {
       <CourseCreationSettings
         currentValues={{
           ...defaultValues,
-          teachers_can_create_courses: true
+          teachers_can_create_courses: true,
         }}
       />
     )
@@ -106,10 +106,10 @@ describe('CourseCreationSettings', () => {
     act(() => studentCheckbox.click())
     expect(getByText('Where can students create courses?')).toBeInTheDocument()
     const studentRadio1 = getAllByRole('radio', {
-      name: 'Allow creation anywhere the user has active enrollments'
+      name: 'Allow creation anywhere the user has active enrollments',
     })[1]
     const studentRadio2 = getAllByRole('radio', {
-      name: 'Allow creation only in the Manually-Created Courses sub-account'
+      name: 'Allow creation only in the Manually-Created Courses sub-account',
     })[1]
     expect(studentRadio1).toBeInTheDocument()
     expect(studentRadio2).toBeInTheDocument()
@@ -124,17 +124,17 @@ describe('CourseCreationSettings', () => {
           ...defaultValues,
           teachers_can_create_courses: true,
           teachers_can_create_courses_anywhere: false,
-          students_can_create_courses_anywhere: false
+          students_can_create_courses_anywhere: false,
         }}
       />
     )
     const studentCheckbox = getByRole('checkbox', {name: 'Students'})
     act(() => studentCheckbox.click())
     const anywhereRadios = getAllByRole('radio', {
-      name: 'Allow creation anywhere the user has active enrollments'
+      name: 'Allow creation anywhere the user has active enrollments',
     })
     const mccRadios = getAllByRole('radio', {
-      name: 'Allow creation only in the Manually-Created Courses sub-account'
+      name: 'Allow creation only in the Manually-Created Courses sub-account',
     })
     expect(anywhereRadios[0]).not.toBeChecked()
     expect(anywhereRadios[1]).not.toBeChecked()

@@ -87,6 +87,7 @@ module SIS
         end
 
         create_or_find_admin(user, state)
+        user.clear_adminable_accounts_cache!
         @success_count += 1
       end
 

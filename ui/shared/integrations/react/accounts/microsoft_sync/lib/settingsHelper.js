@@ -27,7 +27,7 @@ export const SYNC_SETTINGS = [
   'microsoft_sync_tenant',
   'microsoft_sync_login_attribute',
   'microsoft_sync_login_attribute_suffix',
-  'microsoft_sync_remote_attribute'
+  'microsoft_sync_remote_attribute',
 ]
 
 /**
@@ -42,9 +42,9 @@ export async function doUpdateSettings(state) {
     method: 'PUT',
     body: {
       account: {
-        settings: sliceSyncSettings(state)
-      }
-    }
+        settings: sliceSyncSettings(state),
+      },
+    },
   })
 }
 
@@ -76,8 +76,8 @@ export function getTenantErrorMessages(state) {
     return [
       {
         text: I18n.t('To toggle Microsoft Teams Sync you need to input a tenant domain.'),
-        type: 'error'
-      }
+        type: 'error',
+      },
     ]
   } else if (!regex.test(state.microsoft_sync_tenant)) {
     return [
@@ -85,8 +85,8 @@ export function getTenantErrorMessages(state) {
         text: I18n.t(
           'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
         ),
-        type: 'error'
-      }
+        type: 'error',
+      },
     ]
   }
   return []
@@ -106,15 +106,15 @@ export function getSuffixErrorMessages(state) {
         text: I18n.t(
           'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.'
         ),
-        type: 'error'
-      }
+        type: 'error',
+      },
     ]
   } else if (regex.test(state.microsoft_sync_login_attribute_suffix.trim())) {
     return [
       {
         text: I18n.t('A suffix cannot have any tabs or spaces. Please remove them and try again.'),
-        type: 'error'
-      }
+        type: 'error',
+      },
     ]
   } else {
     return []
@@ -136,8 +136,8 @@ export function setTenantInfoMessages(state, payload) {
     tenantInfoMessages = [
       {
         text: I18n.t('Changing the tenant will delete existing groups.'),
-        type: 'hint'
-      }
+        type: 'hint',
+      },
     ]
   }
 

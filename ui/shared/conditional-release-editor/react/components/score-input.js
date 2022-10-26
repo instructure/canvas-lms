@@ -31,7 +31,7 @@ import {
   percentToScore,
   transformScore,
   getGradingType,
-  isNumeric
+  isNumeric,
 } from '../score-helpers'
 
 const I18n = useI18nScope('conditional_release')
@@ -45,7 +45,7 @@ export default class ScoreInput extends React.Component {
       triggerAssignment: object.isRequired,
       label: string,
       error: string,
-      onScoreChanged: func.isRequired
+      onScoreChanged: func.isRequired,
     }
   }
 
@@ -53,7 +53,7 @@ export default class ScoreInput extends React.Component {
     super()
     this.state = {
       focused: false,
-      editingValue: null
+      editingValue: null,
     }
 
     this.shortid = shortid()
@@ -125,7 +125,7 @@ export default class ScoreInput extends React.Component {
       'cr-percent-input': true,
       'cr-percent-input--error': this.hasError(),
       'ic-Form-control': true,
-      'ic-Form-control--has-error': this.hasError()
+      'ic-Form-control--has-error': this.hasError(),
     }
 
     const optionalProps = {}
@@ -139,7 +139,7 @@ export default class ScoreInput extends React.Component {
     if (gradingType && GradingTypes[gradingType]) {
       srLabel = I18n.t('%{label}, as %{gradingType}', {
         label: this.props.label,
-        gradingType: GradingTypes[gradingType].label()
+        gradingType: GradingTypes[gradingType].label(),
       })
     }
 

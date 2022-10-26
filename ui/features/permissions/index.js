@@ -21,7 +21,7 @@ import {
   COURSE,
   ACCOUNT,
   ALL_ROLES_VALUE,
-  ALL_ROLES_LABEL
+  ALL_ROLES_LABEL,
 } from '@canvas/permissions/react/propTypes'
 import {getSortedRoles, groupGranularPermissionsInRole} from '@canvas/permissions/util'
 import ready from '@instructure/ready'
@@ -37,7 +37,7 @@ ready(() => {
   function groupGranularPermissions(permissions) {
     const [permissionsList, groups] = permissions.reduce(
       (acc, p) => {
-        const [permissionsList, groups] = acc // eslint-disable-line no-shadow
+        const [permissionsList, groups] = acc
 
         if (p.granular_permission_group) {
           if (!groups[p.granular_permission_group]) {
@@ -57,7 +57,7 @@ ready(() => {
       permissionsList.push({
         label: group_permissions[0].granular_permission_group_label,
         permission_name: group_name,
-        granular_permissions: group_permissions
+        granular_permissions: group_permissions,
       })
     })
 
@@ -99,7 +99,7 @@ ready(() => {
       groupGranularPermissions(flattenPermissions(ENV.ACCOUNT_PERMISSIONS))
     ),
     roles: getSortedRoles(roles, accountAdmin),
-    selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}]
+    selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
   }
 
   const app = createPermissionsIndex(root, initialState)

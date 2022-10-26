@@ -30,25 +30,25 @@ const AssignmentsTray = () => (
     imageWidth="11rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I create an assignment?'),
-        href: I18n.t('#community.instructor_create_assignment')
+        href: I18n.t('#community.instructor_create_assignment'),
       },
       {
         label: I18n.t('How do I publish or unpublish an assignment as an instructor?'),
-        href: I18n.t('#community.instructor_publish_assignment')
+        href: I18n.t('#community.instructor_publish_assignment'),
       },
       {
         label: I18n.t('What assignment types can I create in a course?'),
-        href: I18n.t('#community.instructor_assignment_types')
+        href: I18n.t('#community.instructor_assignment_types'),
       },
       {
         label: I18n.t('How do I add or edit details in an assignment?'),
-        href: I18n.t('#community.instructor_assignment_details')
-      }
+        href: I18n.t('#community.instructor_assignment_details'),
+      },
     ]}
   >
     {I18n.t(`Assignments include quizzes, graded discussions, and many types

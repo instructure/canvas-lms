@@ -41,12 +41,12 @@ describe('CanvasMultiSelect', () => {
       id: 'veggies-multi-select',
       label: 'Vegetables',
       onChange() {},
-      selectedOptionIds: []
+      selectedOptionIds: [],
     }
 
     options = [
       {id: '1', text: 'Cucumber'},
-      {id: '2', text: 'Broccoli'}
+      {id: '2', text: 'Broccoli'},
     ]
   })
 

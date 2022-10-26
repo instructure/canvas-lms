@@ -22,7 +22,7 @@ import {LockedDiscussion} from '../LockedDiscussion'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 const setup = props => {

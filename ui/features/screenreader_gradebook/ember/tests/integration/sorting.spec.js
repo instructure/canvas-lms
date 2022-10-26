@@ -32,7 +32,7 @@ QUnit.module('screenreader_gradebook assignment sorting: no saved setting', {
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('defaults to assignment group', () => checkSelection('assignment_group'))
@@ -46,7 +46,7 @@ QUnit.module('screenreader_gradebook assignment sorting: toggle settings', {
   teardown() {
     setSelection('assignment_group')
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('loads alphabetical sorting', () => {

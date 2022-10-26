@@ -19,7 +19,7 @@
 const glob = require('glob')
 const path = require('path')
 const fs = require('fs')
-const { canvasDir } = require('#params')
+const {canvasDir} = require('#params')
 const momentLocaleBundles = require('./momentBundles')
 
 const entries = {}

@@ -32,7 +32,7 @@ QUnit.module('mediaComment', {
     this.server.restore()
     this.$holder.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 const mockServerResponse = (server, id, type = 'video') => {
   const resp = {
@@ -40,19 +40,19 @@ const mockServerResponse = (server, id, type = 'video') => {
       {
         content_type: 'flv',
         url: 'http://some_flash_url.com',
-        bitrate: '200'
+        bitrate: '200',
       },
       {
         content_type: 'mp4',
         url: 'http://some_mp4_url.com',
-        bitrate: '100'
-      }
-    ]
+        bitrate: '100',
+      },
+    ],
   }
   return server.respond('GET', `/media_objects/${id}/info`, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(resp)
+    JSON.stringify(resp),
   ])
 }
 const mockXssServerResponse = (server, id) => {
@@ -61,22 +61,22 @@ const mockXssServerResponse = (server, id) => {
       {
         content_type: 'flv',
         url: 'javascript:alert(document.cookie);//',
-        bitrate: '200'
+        bitrate: '200',
       },
       {
         content_type: 'mp4',
         url: 'javascript:alert(document.cookie);//',
-        bitrate: '100'
-      }
-    ]
+        bitrate: '100',
+      },
+    ],
   }
   return server.respond('GET', `/media_objects/${id}/info`, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(resp)
+    JSON.stringify(resp),
   ])
 }
-test('video player is displayed inline', function() {
+test('video player is displayed inline', function () {
   const id = 10 // ID doesn't matter since we mock out the server
   this.$holder.mediaComment('show_inline', id)
   mockServerResponse(this.server, id)
@@ -84,7 +84,7 @@ test('video player is displayed inline', function() {
   ok(video_tag_exists, 'There should be a video tag')
 })
 
-test('audio player is displayed correctly', function() {
+test('audio player is displayed correctly', function () {
   const id = 10 // ID doesn't matter since we mock out the server
   this.$holder.mediaComment('show_inline', id, 'audio')
   mockServerResponse(this.server, id, 'audio')
@@ -92,7 +92,7 @@ test('audio player is displayed correctly', function() {
   equal(this.$holder.find('video').length, 0, 'There should not be a video tag')
 })
 
-test('video player includes url sources provided by the server', function() {
+test('video player includes url sources provided by the server', function () {
   const id = 10
   this.$holder.mediaComment('show_inline', id)
   mockServerResponse(this.server, id)
@@ -108,7 +108,7 @@ test('video player includes url sources provided by the server', function() {
   )
 })
 
-test('video player sorts sources asc by bitrate', function() {
+test('video player sorts sources asc by bitrate', function () {
   const id = 10
   this.$holder.mediaComment('show_inline', id)
   mockServerResponse(this.server, id)
@@ -117,7 +117,7 @@ test('video player sorts sources asc by bitrate', function() {
   equal($sources[1].getAttribute('type'), 'flv')
 })
 
-test('blocks xss javascript included in url', function() {
+test('blocks xss javascript included in url', function () {
   const id = 10
   this.$holder.mediaComment('show_inline', id)
   mockXssServerResponse(this.server, id)
@@ -133,7 +133,7 @@ test('blocks xss javascript included in url', function() {
   )
 })
 
-test('dialog returns focus to opening element when closed', function() {
+test('dialog returns focus to opening element when closed', function () {
   $('<span id="opening-element"></span>').appendTo('#fixtures')
   const openingElement = document.getElementById('opening-element')
   sinon.spy(openingElement, 'focus')
@@ -148,7 +148,7 @@ test('dialog returns focus to opening element when closed', function() {
 
 QUnit.module('MediaCommentUtils functions', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('getElement includes width and height for video elements', () => {

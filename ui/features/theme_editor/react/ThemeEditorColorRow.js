@@ -32,13 +32,13 @@ export default class ThemeEditorColorRow extends Component {
     userInput: customTypes.userVariableInput,
     placeholder: PropTypes.string.isRequired,
     themeState: PropTypes.object,
-    handleThemeStateChange: PropTypes.func
+    handleThemeStateChange: PropTypes.func,
   }
 
   static defaultProps = {
     userInput: {},
     themeState: {},
-    handleThemeStateChange() {}
+    handleThemeStateChange() {},
   }
 
   state = {}
@@ -53,7 +53,7 @@ export default class ThemeEditorColorRow extends Component {
             <div className="ic-Form-message__Layout">
               <i className="icon-warning" role="presentation" />
               {I18n.t("'%{chosenColor}' is not a valid color.", {
-                chosenColor: this.props.userInput.val
+                chosenColor: this.props.userInput.val,
               })}
             </div>
           </div>
@@ -91,7 +91,7 @@ export default class ThemeEditorColorRow extends Component {
   }
 
   invalidHexString(colorString) {
-    return colorString.match(/#/) ? !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) : false;
+    return colorString.match(/#/) ? !colorString.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) : false
   }
 
   inputChange = value => {
@@ -117,7 +117,7 @@ export default class ThemeEditorColorRow extends Component {
         className={classnames({
           'Theme__editor-color-block_input-text': true,
           'Theme__editor-color-block_input': true,
-          'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
+          'Theme__editor-color-block_input--has-error': this.props.userInput.invalid,
         })}
         placeholder={this.props.placeholder}
         value={this.props.themeState[this.props.varDef.variable_name]}

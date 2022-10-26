@@ -60,7 +60,7 @@ class ProficiencyRating extends React.Component {
     isMobileView: PropTypes.bool,
     position: PropTypes.number.isRequired,
     canManage: PropTypes.bool,
-    individualOutcome: PropTypes.bool
+    individualOutcome: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -70,14 +70,14 @@ class ProficiencyRating extends React.Component {
     pointsError: null,
     canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     isMobileView: false,
-    individualOutcome: false
+    individualOutcome: false,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       showColorPopover: false,
-      showDeleteModal: false
+      showDeleteModal: false,
     }
     this.descriptionInput = null
     this.pointsInput = null
@@ -199,7 +199,7 @@ class ProficiencyRating extends React.Component {
             <ScreenReaderContent>
               {I18n.t(`Description for mastery level %{position}: %{description}`, {
                 position,
-                description
+                description,
               })}
             </ScreenReaderContent>
 
@@ -220,7 +220,7 @@ class ProficiencyRating extends React.Component {
               <ScreenReaderContent>
                 {I18n.t(`Mastery %{mastery} for mastery level %{position}`, {
                   position,
-                  mastery
+                  mastery,
                 })}
               </ScreenReaderContent>
             }
@@ -265,7 +265,7 @@ class ProficiencyRating extends React.Component {
             <ScreenReaderContent>
               {I18n.t(`Points for mastery level %{position}: %{points}`, {
                 position,
-                points
+                points,
               })}
             </ScreenReaderContent>
 
@@ -341,13 +341,13 @@ class ProficiencyRating extends React.Component {
               className="colorPickerIcon"
               style={{
                 background: formatColor(color),
-                marginLeft: isMobileView ? 0 : '2rem'
+                marginLeft: isMobileView ? 0 : '2rem',
               }}
             >
               <ScreenReaderContent>
                 {I18n.t(`Color %{color} for mastery level %{position}`, {
                   color: ColorPicker.getColorName(color) || formatColor(color),
-                  position
+                  position,
                 })}
               </ScreenReaderContent>
             </span>

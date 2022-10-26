@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/lti_collaborations/react/reducers/listCollaborationsReducer.js'
+import reducer from 'ui/features/lti_collaborations/react/reducers/listCollaborationsReducer'
 
-import actions from 'ui/features/lti_collaborations/react/actions.js'
+import actions from 'ui/features/lti_collaborations/react/actions'
 
 QUnit.module('collaborationsReducer')
 
@@ -36,7 +36,7 @@ test('responds to listCollaborationsStart', () => {
   const state = {
     listCollaborationsPending: false,
     listCollaborationsSuccessful: true,
-    listCollaborationsError: {}
+    listCollaborationsError: {},
   }
 
   const action = actions.listCollaborationsStart()
@@ -50,7 +50,7 @@ test('responds to listCollaborationsSuccessful', () => {
   const state = {
     listCollaborationsPending: true,
     listCollaborationsSuccessful: false,
-    list: []
+    list: [],
   }
   const payload = {collaborations: []}
   const action = actions.listCollaborationsSuccessful(payload)
@@ -63,7 +63,7 @@ test('responds to listCollaborationsSuccessful', () => {
 test('responds to listCollaborationsFailed', () => {
   const state = {
     listCollaborationsPending: true,
-    listCollaborationsError: null
+    listCollaborationsError: null,
   }
   const error = {}
 

@@ -111,6 +111,7 @@ class Account::HelpLinks
         link[:text] ||= default_link[:text]
         link[:subtext] ||= default_link[:subtext]
         link[:url] ||= default_link[:url]
+        link[:no_new_window] ||= default_link[:no_new_window]
         link[:is_featured] = default_link[:is_featured] unless link.key?(:is_featured)
         link[:is_new] = default_link[:is_new] unless link.key?(:is_new)
         link[:feature_headline] ||= default_link[:feature_headline]

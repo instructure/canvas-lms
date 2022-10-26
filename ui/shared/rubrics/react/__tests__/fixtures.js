@@ -42,23 +42,23 @@ export const rubric = {
           long_description: '',
           points: 8,
           criterion_id: '_1384',
-          id: 'blank'
+          id: 'blank',
         },
         {
           description: 'bleh',
           long_description: 'blah',
           points: 3,
           criterion_id: '_1384',
-          id: '7_4778'
+          id: '7_4778',
         },
         {
           description: 'No Marks',
           long_description: '',
           points: 0,
           criterion_id: '_1384',
-          id: 'blank_2'
-        }
-      ]
+          id: 'blank_2',
+        },
+      ],
     },
     {
       description:
@@ -76,7 +76,7 @@ export const rubric = {
           long_description: '',
           points: 3,
           criterion_id: '7_391',
-          id: '7_6639'
+          id: '7_6639',
         },
         {
           description:
@@ -84,7 +84,7 @@ export const rubric = {
           long_description: '',
           points: 2,
           criterion_id: '7_391',
-          id: '7_194'
+          id: '7_194',
         },
         {
           description:
@@ -92,11 +92,11 @@ export const rubric = {
           long_description: '',
           points: 1,
           criterion_id: '7_391',
-          id: '7_8479'
-        }
-      ]
-    }
-  ]
+          id: '7_8479',
+        },
+      ],
+    },
+  ],
 }
 
 const pointsAssessment = {
@@ -117,7 +117,7 @@ const pointsAssessment = {
       description: 'bleh',
       comments_enabled: true,
       comments: "i'd like to say some things",
-      id: '7_4778'
+      id: '7_4778',
     },
     {
       points: 3,
@@ -127,8 +127,8 @@ const pointsAssessment = {
       comments_enabled: true,
       comments: 'here too',
       above_threshold: false,
-      id: '7_6639'
-    }
+      id: '7_6639',
+    },
   ],
   rubric_association: {
     id: '8',
@@ -148,8 +148,8 @@ const pointsAssessment = {
     bookmarked: true,
     context_code: 'course_6',
     hide_points: false,
-    hide_outcome_results: false
-  }
+    hide_outcome_results: false,
+  },
 }
 
 const freeFormAssessment = {
@@ -170,7 +170,7 @@ const freeFormAssessment = {
       description: 'No Marks',
       comments_enabled: true,
       comments: '',
-      id: 'blank_2'
+      id: 'blank_2',
     },
     {
       points: 0,
@@ -180,8 +180,8 @@ const freeFormAssessment = {
       comments_enabled: true,
       comments: 'I award you no points, and may God have mercy on your soul.',
       above_threshold: false,
-      comments_html: 'I award you <b>no</b> points, and may God have mercy on your soul.'
-    }
+      comments_html: 'I award you <b>no</b> points, and may God have mercy on your soul.',
+    },
   ],
   rubric_association: {
     id: '8',
@@ -201,8 +201,8 @@ const freeFormAssessment = {
     bookmarked: true,
     context_code: 'course_6',
     hide_points: false,
-    hide_outcome_results: false
-  }
+    hide_outcome_results: false,
+  },
 }
 
 export const rubrics = {
@@ -210,8 +210,8 @@ export const rubrics = {
   freeForm: {
     ..._.cloneDeep(rubric),
     title: 'Free-form Rubric',
-    free_form_criterion_comments: true
-  }
+    free_form_criterion_comments: true,
+  },
 }
 
 export const assessments = {
@@ -219,6 +219,6 @@ export const assessments = {
   freeForm: fillAssessment(rubrics.freeForm, freeFormAssessment),
   server: {
     points: pointsAssessment,
-    freeForm: freeFormAssessment
-  }
+    freeForm: freeFormAssessment,
+  },
 }

@@ -33,7 +33,7 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/112/folders',
         files_url: 'http://canvas.dev/api/v1/folders/112/files',
         files_count: 0,
-        folders_count: 3
+        folders_count: 3,
       },
       {
         full_name: 'course files/A new special folder',
@@ -45,8 +45,8 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/103/folders',
         files_url: 'http://canvas.dev/api/v1/folders/103/files',
         files_count: 0,
-        folders_count: 0
-      }
+        folders_count: 0,
+      },
     ]
     this.foldersPageTwo = [
       {
@@ -59,7 +59,7 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/325/folders',
         files_url: 'http://canvas.dev/api/v1/folders/325/files',
         files_count: 0,
-        folders_count: 0
+        folders_count: 0,
       },
       {
         full_name: 'course files/A new special folder',
@@ -71,8 +71,8 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/326/folders',
         files_url: 'http://canvas.dev/api/v1/folders/326/files',
         files_count: 0,
-        folders_count: 0
-      }
+        folders_count: 0,
+      },
     ]
     this.foldersPageThree = [
       {
@@ -85,7 +85,7 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/325/folders',
         files_url: 'http://canvas.dev/api/v1/folders/325/files',
         files_count: 0,
-        folders_count: 0
+        folders_count: 0,
       },
       {
         full_name: 'course files/A new special folder',
@@ -97,29 +97,29 @@ QUnit.module('ObjectStore', {
         folders_url: 'http://canvas.dev/api/v1/folders/326/folders',
         files_url: 'http://canvas.dev/api/v1/folders/326/files',
         files_count: 0,
-        folders_count: 0
-      }
+        folders_count: 0,
+      },
     ]
     return this.testStore.reset()
   },
   teardown() {
     this.server.restore()
     return this.testStore.reset()
-  }
+  },
 })
 
-test('fetch', function() {
+test('fetch', function () {
   this.server.respondWith('GET', /\/folders/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.foldersPageOne)
+    JSON.stringify(this.foldersPageOne),
   ])
   this.testStore.fetch()
   this.server.respond()
   deepEqual(this.testStore.getState().items, this.foldersPageOne, 'Should get one page of items')
 })
 
-test('fetch with fetchAll', function() {
+test('fetch with fetchAll', function () {
   const linkHeaders =
     '<http://folders?page=1&per_page=2>; rel="current",' +
     '<http://page2>; rel="next",' +
@@ -134,9 +134,9 @@ test('fetch with fetchAll', function() {
     200,
     {
       'Content-Type': 'application/json',
-      Link: linkHeaders
+      Link: linkHeaders,
     },
-    JSON.stringify(this.foldersPageOne)
+    JSON.stringify(this.foldersPageOne),
   ])
   this.testStore.fetch({fetchAll: true})
   this.server.respond()
@@ -144,15 +144,15 @@ test('fetch with fetchAll', function() {
     200,
     {
       'Content-Type': 'application/json',
-      Link: linkHeaders2
+      Link: linkHeaders2,
     },
-    JSON.stringify(this.foldersPageTwo)
+    JSON.stringify(this.foldersPageTwo),
   ])
   this.server.respond()
   this.server.respondWith('GET', /page3/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.foldersPageThree)
+    JSON.stringify(this.foldersPageThree),
   ])
   this.server.respond()
   deepEqual(
@@ -162,7 +162,7 @@ test('fetch with fetchAll', function() {
   )
 })
 
-test('fetch with error', function() {
+test('fetch with error', function () {
   this.server.respondWith('GET', /\/folders/, [500, {}, ''])
   this.testStore.fetch()
   this.server.respond()

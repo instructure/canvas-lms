@@ -40,7 +40,7 @@ describe('router', () => {
           event.stopImmediatePropagation()
           const eventWithOrigin = new MessageEvent('message', {
             data: event.data,
-            origin: windowOrigin
+            origin: windowOrigin,
           })
           window.dispatchEvent(eventWithOrigin)
         }
@@ -77,7 +77,7 @@ describe('router', () => {
         window.postMessage(
           {
             subject: 'LtiDeepLinkingResponse',
-            content_items: [item]
+            content_items: [item],
           },
           ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
         )
@@ -85,7 +85,7 @@ describe('router', () => {
 
         expect(actions.externalContentReady).toHaveBeenCalledWith({
           service_id: item.service_id,
-          contentItems: [item]
+          contentItems: [item],
         })
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()
       })
@@ -96,13 +96,13 @@ describe('router', () => {
         const item = {service_id: 1, hello: 'world'}
         $(window).trigger('externalContentReady', {
           contentItems: [item],
-          service_id: item.service_id
+          service_id: item.service_id,
         })
         await sleep(100)
 
         expect(actions.externalContentReady).toHaveBeenCalledWith({
           service_id: item.service_id,
-          contentItems: [item]
+          contentItems: [item],
         })
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()
       })

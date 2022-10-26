@@ -40,16 +40,16 @@ const I18n = useI18nScope('student_context_trayStudentContextTray')
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,
   submissionsConnection: PropTypes.shape({
-    edges: PropTypes.arrayOf(PropTypes.shape({}))
-  }).isRequired
+    edges: PropTypes.arrayOf(PropTypes.shape({})),
+  }).isRequired,
 })
 const userShape = PropTypes.shape({
-  enrollments: PropTypes.arrayOf(PropTypes.object).isRequired
+  enrollments: PropTypes.arrayOf(PropTypes.object).isRequired,
 })
 const dataShape = PropTypes.shape({
   loading: PropTypes.bool.isRequired,
   course: courseShape,
-  user: userShape
+  user: userShape,
 })
 
 export default class StudentContextTray extends React.Component {
@@ -61,9 +61,9 @@ export default class StudentContextTray extends React.Component {
     externalTools: PropTypes.arrayOf(
       PropTypes.shape({
         base_url: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired
+        title: PropTypes.string.isRequired,
       })
-    )
+    ),
   }
 
   static renderQuickLink(key, label, srLabel, url, showIf) {
@@ -88,7 +88,7 @@ export default class StudentContextTray extends React.Component {
     super(props)
     this.state = {
       isOpen: true,
-      messageFormOpen: false
+      messageFormOpen: false,
     }
   }
 
@@ -109,7 +109,7 @@ export default class StudentContextTray extends React.Component {
   handleRequestClose = e => {
     e.preventDefault()
     this.setState({
-      isOpen: false
+      isOpen: false,
     })
     if (this.props.returnFocusTo) {
       const focusableItems = this.props.returnFocusTo()
@@ -124,7 +124,7 @@ export default class StudentContextTray extends React.Component {
   handleMessageButtonClick = e => {
     e.preventDefault()
     this.setState({
-      messageFormOpen: true
+      messageFormOpen: true,
     })
   }
 
@@ -135,7 +135,7 @@ export default class StudentContextTray extends React.Component {
 
     this.setState(
       {
-        messageFormOpen: false
+        messageFormOpen: false,
       },
       () => {
         this.messageStudentsButton.focus()
@@ -191,7 +191,7 @@ export default class StudentContextTray extends React.Component {
 
   render() {
     const {
-      data: {loading, course, user}
+      data: {loading, course, user},
     } = this.props
 
     return (
@@ -204,8 +204,8 @@ export default class StudentContextTray extends React.Component {
             recipients={[
               {
                 id: user._id,
-                displayName: user.short_name
-              }
+                displayName: user.short_name,
+              },
             ]}
             title="Send a message"
           />
@@ -256,7 +256,7 @@ export default class StudentContextTray extends React.Component {
                                 name:
                                   user.pronouns != null
                                     ? `${user.short_name} ${user.pronouns}`
-                                    : user.short_name
+                                    : user.short_name,
                               })}
                               theme={{largePadding: '0', largeHeight: 'normal'}}
                               display="block"

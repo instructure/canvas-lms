@@ -39,7 +39,7 @@ export function isRTL(element) {
 
 const flipped = {
   left: 'right',
-  right: 'left'
+  right: 'left',
 }
 
 /**

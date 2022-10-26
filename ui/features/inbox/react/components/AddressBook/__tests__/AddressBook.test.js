@@ -43,7 +43,7 @@ afterAll(() => {
 
 beforeEach(() => {
   window.ENV = {
-    current_user_id: 1
+    current_user_id: 1,
   }
 })
 
@@ -51,7 +51,7 @@ const demoData = {
   contextData: [
     {id: 'course_11', name: 'Test 101', itemType: CONTEXT_TYPE},
     {id: 'course_12', name: 'History 101', itemType: CONTEXT_TYPE},
-    {id: 'course_13', name: 'English 101', itemType: CONTEXT_TYPE, isLast: true}
+    {id: 'course_13', name: 'English 101', itemType: CONTEXT_TYPE, isLast: true},
   ],
   userData: [
     {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null, itemType: USER_TYPE},
@@ -60,14 +60,14 @@ const demoData = {
       name: 'Matthew Lemon',
       full_name: 'Matthew Lemon',
       pronouns: null,
-      itemType: USER_TYPE
+      itemType: USER_TYPE,
     },
     {
       id: '3',
       name: 'Drake Harper',
       full_name: 'Drake Harpert',
       pronouns: null,
-      itemType: USER_TYPE
+      itemType: USER_TYPE,
     },
     {
       id: '4',
@@ -75,14 +75,14 @@ const demoData = {
       full_name: 'Davis Hyer',
       pronouns: null,
       isLast: true,
-      itemType: USER_TYPE
-    }
-  ]
+      itemType: USER_TYPE,
+    },
+  ],
 }
 
 const defaultProps = {
   menuData: demoData,
-  onUserFilterSelect: jest.fn()
+  onUserFilterSelect: jest.fn(),
 }
 
 const setup = props => {
@@ -201,7 +201,7 @@ describe('Address Book Component', () => {
         ...defaultProps,
         open: true,
         isLoading: true,
-        isLoadingMoreMenuData: true
+        isLoadingMoreMenuData: true,
       })
       const items = await screen.findAllByTestId('address-book-item')
       expect(items.length > 0).toBe(true)
@@ -213,7 +213,7 @@ describe('Address Book Component', () => {
         ...defaultProps,
         open: true,
         isLoading: true,
-        isLoadingMoreMenuData: false
+        isLoadingMoreMenuData: false,
       })
 
       expect(queryAllByTestId('address-book-item').length).toBe(0)
@@ -236,15 +236,15 @@ describe('Address Book Component', () => {
       const current_filter = {
         context: {
           contextID: 'course_11',
-          contextName: 'Chawns Course'
-        }
+          contextName: 'Chawns Course',
+        },
       }
       setup({
         ...defaultProps,
         open: true,
         isSubMenu: true,
         hasSelectAllFilterOption: true,
-        currentFilter: current_filter
+        currentFilter: current_filter,
       })
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -296,7 +296,7 @@ describe('Address Book Component', () => {
         open: true,
         limitTagCount: 1,
         onSelectedIdsChange: onSelectedIdsChangeMock,
-        isSubMenu: true
+        isSubMenu: true,
       })
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -343,7 +343,7 @@ describe('Address Book Component', () => {
         open: true,
         onSelect: onSelectSpy,
         onUserFilterSelect: onUserFilterSelectSpy,
-        isSubMenu: true
+        isSubMenu: true,
       })
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
@@ -385,7 +385,7 @@ describe('Address Book Component', () => {
   describe('Intersection Observer', () => {
     const intersectionObserverMock = () => ({
       observe: () => null,
-      unobserve: () => null
+      unobserve: () => null,
     })
     beforeEach(() => {
       window.IntersectionObserver = jest.fn().mockImplementation(intersectionObserverMock)
@@ -394,7 +394,7 @@ describe('Address Book Component', () => {
       const component = setup({
         ...defaultProps,
         open: true,
-        hasMoreMenuData: true
+        hasMoreMenuData: true,
       })
       expect(component).toBeTruthy()
       const items = await screen.findAllByTestId('address-book-item')
@@ -407,7 +407,7 @@ describe('Address Book Component', () => {
       const component = setup({
         ...defaultProps,
         open: true,
-        hasMoreMenuData: false
+        hasMoreMenuData: false,
       })
       expect(component).toBeTruthy()
       const items = await screen.findAllByTestId('address-book-item')

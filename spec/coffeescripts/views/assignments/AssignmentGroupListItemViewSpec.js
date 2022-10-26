@@ -27,11 +27,11 @@ import elementToggler from '../../../../ui/boot/initializers/activateElementTogg
 const assignment1 = function () {
   const date1 = {
     due_at: '2013-08-28T23:59:00-06:00',
-    title: 'Summer Session'
+    title: 'Summer Session',
   }
   const date2 = {
     due_at: '2013-08-28T23:59:00-06:00',
-    title: 'Winter Session'
+    title: 'Winter Session',
   }
 
   return buildAssignment({
@@ -41,7 +41,7 @@ const assignment1 = function () {
     due_at: '2013-08-21T23:59:00-06:00',
     points_possible: 2,
     position: 1,
-    all_dates: [date1, date2]
+    all_dates: [date1, date2],
   })
 }
 
@@ -51,7 +51,7 @@ const assignment2 = () =>
     name: 'Math Quiz',
     due_at: '2013-08-23T23:59:00-06:00',
     points_possible: 10,
-    position: 2
+    position: 2,
   })
 
 const assignment3 = () =>
@@ -59,7 +59,7 @@ const assignment3 = () =>
     id: 2,
     name: 'Science Quiz',
     points_possible: 5,
-    position: 3
+    position: 3,
   })
 
 const buildAssignment = function (options) {
@@ -79,7 +79,7 @@ const buildAssignment = function (options) {
     html_url: `http://localhost:3000/courses/1/assignments/${options.id}`,
     needs_grading_count: 0,
     all_dates: [],
-    published: true
+    published: true,
   }
   return Object.assign(base, options)
 }
@@ -89,7 +89,7 @@ const group2 = () =>
     id: 2,
     name: 'Other Assignments',
     position: 2,
-    rules: {drop_lowest: 1, drop_highest: 2, never_drop: [3, 4]}
+    rules: {drop_lowest: 1, drop_highest: 2, never_drop: [3, 4]},
   }) // intentionally include an invalid assignment id
 
 const group3 = () =>
@@ -97,7 +97,7 @@ const group3 = () =>
     id: 3,
     name: 'Even more Assignments',
     position: 3,
-    rules: {drop_lowest: 1, drop_highest: 1}
+    rules: {drop_lowest: 1, drop_highest: 1},
   })
 
 const buildGroup = function (options) {
@@ -112,7 +112,7 @@ const buildGroup = function (options) {
     position: 1,
     rules: {},
     group_weight: 1,
-    assignments
+    assignments,
   }
   return Object.assign(base, options)
 }
@@ -128,18 +128,18 @@ const createAssignmentGroup = function (group) {
 const createView = function (model, options) {
   options = {
     canManage: true,
-    ...options
+    ...options,
   }
   ENV.PERMISSIONS = {
     manage: options.canManage,
     manage_assignments_add: options.canAdd || options.canManage,
-    manage_assignments_delete: options.canDelete || options.canManage
+    manage_assignments_delete: options.canDelete || options.canManage,
   }
 
   const view = new AssignmentGroupListItemView({
     model,
     course: new Backbone.Model({id: 1}),
-    userIsAdmin: options.userIsAdmin
+    userIsAdmin: options.userIsAdmin,
   })
   view.$el.appendTo($('#fixtures'))
   view.render()
@@ -151,19 +151,19 @@ const createCollectionView = function (options) {
   const model = group3()
   options = {
     canManage: true,
-    ...options
+    ...options,
   }
   ENV.PERMISSIONS = {
     manage: options.canManage,
     manage_assignments_add: options.canAdd || options.canManage,
-    manage_assignments_delete: options.canDelete || options.canManage
+    manage_assignments_delete: options.canDelete || options.canManage,
   }
   const groupCollection = new AssignmentGroupCollection([model])
   const assignmentGroupsView = new AssignmentGroupListView({
     collection: groupCollection,
     sortURL: 'http://localhost:3000/courses/1/assignments/',
     assignment_sort_base_url: 'http://localhost:3000/courses/1/assignments/',
-    course: new Backbone.Model({id: 1})
+    course: new Backbone.Model({id: 1}),
   })
   assignmentGroupsView.$el.appendTo($('#fixtures'))
   assignmentGroupsView.render()
@@ -208,7 +208,7 @@ QUnit.module('AssignmentGroupListItemView as a teacher', {
   setup() {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      URLS: {sort_url: 'test'}
+      URLS: {sort_url: 'test'},
     })
 
     this.model = createAssignmentGroup()
@@ -220,7 +220,7 @@ QUnit.module('AssignmentGroupListItemView as a teacher', {
     fakeENV.teardown()
     $('#fixtures').empty()
     return $('form.dialogFormView').remove()
-  }
+  },
 })
 
 test('initializes collection', function () {
@@ -415,7 +415,7 @@ QUnit.module('AssignmentGroupListItemView as an admin', {
     $('form.dialogFormView').remove()
     $('#fixtures').empty()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('provides a view to delete a group when canDelete is true', function () {

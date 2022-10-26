@@ -172,7 +172,7 @@ export default function WebcamCapture({onSelectImage}) {
 
   const savePhotoControls = (
     <Flex width="100%">
-      <Flex.Item shouldGrow margin="auto medium auto 0">
+      <Flex.Item shouldGrow={true} margin="auto medium auto 0">
         <TextInput
           inputRef={el => {
             filenameInputRef.current = el
@@ -207,7 +207,7 @@ export default function WebcamCapture({onSelectImage}) {
         <Flex.Item as="div" size={`${videoHeight}px`}>
           {/* eslint-disable jsx-a11y/media-has-caption */}
           <video
-            autoPlay
+            autoPlay={true}
             data-testid="webcam-capture-video"
             height={videoHeight}
             ref={videoRef}

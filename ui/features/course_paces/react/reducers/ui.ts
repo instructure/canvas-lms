@@ -33,8 +33,9 @@ export const initialState: UIState = {
   loadingMessage: '',
   editingBlackoutDates: false,
   showLoadingOverlay: false,
+  showPaceModal: false,
   responsiveSize: 'large',
-  showProjections: true
+  showProjections: true,
 }
 
 /* Selectors */
@@ -62,6 +63,7 @@ export const getSelectedContextId = (state: StoreState) => state.ui.selectedCont
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
+export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 
 export const getShowProjections = createSelector(
@@ -97,7 +99,7 @@ export default (state = initialState, action: UIAction): UIState => {
       return {
         ...state,
         selectedContextType: action.payload.contextType,
-        selectedContextId: action.payload.contextId
+        selectedContextId: action.payload.contextId,
       }
     case UIConstants.SET_RESPONSIVE_SIZE:
       return {...state, responsiveSize: action.payload}
@@ -105,6 +107,10 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, showLoadingOverlay: true, loadingMessage: action.payload}
     case UIConstants.HIDE_LOADING_OVERLAY:
       return {...state, showLoadingOverlay: false, loadingMessage: ''}
+    case UIConstants.HIDE_PACE_MODAL:
+      return {...state, showPaceModal: false}
+    case UIConstants.SHOW_PACE_MODAL:
+      return {...state, showPaceModal: true}
     default:
       return state
   }

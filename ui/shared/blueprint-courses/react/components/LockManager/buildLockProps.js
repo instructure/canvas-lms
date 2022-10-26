@@ -22,45 +22,45 @@ const buildProps = options =>
       assignment: {
         toggleWrapperSelector: {
           show: '.assignment-buttons',
-          edit: '.header-bar .header-bar-right .header-group-left'
+          edit: '.header-bar .header-bar-right .header-group-left',
         }[options.page],
         itemIdPath: {
           show: 'ASSIGNMENT_ID',
-          edit: 'ASSIGNMENT.id'
-        }[options.page]
+          edit: 'ASSIGNMENT.id',
+        }[options.page],
       },
       quiz: {
         toggleWrapperSelector: {
           show: '.header-group-left',
-          edit: '.header-bar .header-bar-right .header-group-left'
+          edit: '.header-bar .header-bar-right .header-group-left',
         }[options.page],
         toggleWrapperChildIndex: {
-          edit: 2
+          edit: 2,
         }[options.page],
-        itemIdPath: 'QUIZ.id'
+        itemIdPath: 'QUIZ.id',
       },
       discussion_topic: {
         toggleWrapperSelector: {
           show: '.form-inline .pull-right',
-          edit: '.discussion-edit-header .text-right'
+          edit: '.discussion-edit-header .text-right',
         }[options.page],
         itemIdPath: {
           show: 'DISCUSSION.TOPIC.ID',
-          edit: 'DISCUSSION_TOPIC.ATTRIBUTES.id'
-        }[options.page]
+          edit: 'DISCUSSION_TOPIC.ATTRIBUTES.id',
+        }[options.page],
       },
       wiki_page: {
         toggleWrapperSelector: {
-          show: '.blueprint-label'
+          show: '.blueprint-label',
         }[options.page],
-        itemIdPath: 'WIKI_PAGE.page_id'
+        itemIdPath: 'WIKI_PAGE.page_id',
       },
       course_pace: {
         toggleWrapperSelector: {
-          show: '.blueprint-label'
+          show: '.blueprint-label',
         }[options.page],
-        itemIdPath: 'COURSE_PACE_ID'
-      }
+        itemIdPath: 'COURSE_PACE_ID',
+      },
     }[options.itemType],
     options
   )

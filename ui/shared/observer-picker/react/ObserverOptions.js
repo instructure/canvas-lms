@@ -44,7 +44,7 @@ const ObserverOptions = ({
   canAddObservee,
   currentUserRoles,
   autoFocus,
-  renderLabel
+  renderLabel,
 }) => {
   const [observedUsers, setObservedUsers] = useState(() =>
     parseObservedUsersList(observedUsersList)
@@ -88,8 +88,8 @@ const ObserverOptions = ({
         params: {
           type: ['ObserverEnrollment'],
           include: ['avatar_url', 'observed_users'],
-          per_page: 100
-        }
+          per_page: 100,
+        },
       })
       const observees = parseObservedUsersResponse(json, isOnlyObserver, currentUser)
       const newObservee = observees.reduce((previous, current) => {
@@ -105,7 +105,7 @@ const ObserverOptions = ({
       showFlashAlert({
         message: I18n.t('Unable to get observed students'),
         err: ex,
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -182,7 +182,7 @@ const ObserverOptions = ({
           }}
           selectedOptionId={selectedUser?.id}
           renderBeforeInput={selectAvatar}
-          shouldNotWrap
+          shouldNotWrap={true}
         >
           {userPickerOptions}
         </CanvasAsyncSelect>
@@ -217,7 +217,7 @@ export const ObservedUsersListShape = PropTypes.arrayOf(
   PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    avatar_url: PropTypes.string
+    avatar_url: PropTypes.string,
   })
 )
 
@@ -230,14 +230,14 @@ ObserverOptions.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,
-    avatar_image_url: PropTypes.string
+    avatar_image_url: PropTypes.string,
   }).isRequired,
   handleChangeObservedUser: PropTypes.func.isRequired,
   margin: PropTypes.string,
   canAddObservee: PropTypes.bool.isRequired,
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
   autoFocus: PropTypes.bool,
-  renderLabel: PropTypes.string
+  renderLabel: PropTypes.string,
 }
 
 export default ObserverOptions

@@ -29,9 +29,9 @@ describe('ImportantInfo', () => {
       courseName: 'Homeroom',
       canEdit: true,
       content: '<p>Hello class!</p>',
-      ...infoDetailsOverrides
+      ...infoDetailsOverrides,
     },
-    ...mainOverrides
+    ...mainOverrides,
   })
 
   it('shows a title with edit button if showTitle and canEdit', () => {

@@ -34,7 +34,7 @@ const QuizSubmissionEvent = Backbone.Model.extend({
     delete attrs.eventData
 
     if (attrs.type === K.EVT_QUESTION_ANSWERED) {
-      attrs.data = attrs.data.map(function(record) {
+      attrs.data = attrs.data.map(function (record) {
         return pickAndNormalize(record, K.EVENT_DATA_ATTRS)
       })
     }
@@ -46,7 +46,7 @@ const QuizSubmissionEvent = Backbone.Model.extend({
     }
 
     return attrs
-  }
+  },
 })
 
 export default QuizSubmissionEvent

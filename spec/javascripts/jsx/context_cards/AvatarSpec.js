@@ -49,7 +49,7 @@ QUnit.module('StudentContextTray/Avatar', hooks => {
     const user = {
       name: userName,
       avatar_url: avatarUrl,
-      _id: '17'
+      _id: '17',
     }
     subject = TestUtils.renderIntoDocument(
       <Avatar name="" user={user} courseId="1" canMasquerade />

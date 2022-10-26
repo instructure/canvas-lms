@@ -106,12 +106,12 @@ SpeedGraderSettingsMenu.propTypes = {
   openKeyboardShortcutsModal: func.isRequired,
   showHelpMenuItem: bool.isRequired,
   showModerationMenuItem: bool.isRequired,
-  showKeyboardShortcutsMenuItem: bool.isRequired
+  showKeyboardShortcutsMenuItem: bool.isRequired,
 }
 
 SpeedGraderSettingsMenu.defaultProps = {
   menuContentRef: null,
-  onMenuShow() {}
+  onMenuShow() {},
 }
 
 SpeedGraderSettingsMenu.setURL = function (url) {

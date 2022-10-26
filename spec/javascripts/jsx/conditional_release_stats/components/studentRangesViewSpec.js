@@ -26,7 +26,7 @@ const container = document.getElementById('fixtures')
 QUnit.module('Student Ranges View', {
   teardown() {
     ReactDOM.unmountComponentAtNode(container)
-  }
+  },
 })
 
 const defaultProps = () => ({
@@ -39,10 +39,10 @@ const defaultProps = () => ({
         upper_bound: 1.0,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
+      students: [],
     },
     {
       scoring_range: {
@@ -52,10 +52,10 @@ const defaultProps = () => ({
         upper_bound: 0.7,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
+      students: [],
     },
     {
       scoring_range: {
@@ -65,11 +65,11 @@ const defaultProps = () => ({
         upper_bound: 0.4,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
-    }
+      students: [],
+    },
   ],
   assignment: {
     id: 7,
@@ -78,15 +78,15 @@ const defaultProps = () => ({
     points_possible: 15,
     grading_type: 'points',
     submission_types: 'on_paper',
-    grading_scheme: null
+    grading_scheme: null,
   },
   selectedPath: {
     range: 0,
-    student: null
+    student: null,
   },
   loadStudent: () => {},
   selectRange: () => {},
-  selectStudent: () => {}
+  selectStudent: () => {},
 })
 
 // using ReactDOM instead of TestUtils to render because of InstUI

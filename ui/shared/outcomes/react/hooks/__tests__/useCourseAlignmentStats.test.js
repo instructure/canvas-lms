@@ -37,7 +37,7 @@ describe('useCourseAlignmentStats', () => {
       totalAlignments,
       totalArtifacts,
       alignedArtifacts,
-      artifactAlignments
+      artifactAlignments,
     } = result.current.data.course.outcomeAlignmentStats
     return [
       totalOutcomes,
@@ -45,7 +45,7 @@ describe('useCourseAlignmentStats', () => {
       totalAlignments,
       totalArtifacts,
       alignedArtifacts,
-      artifactAlignments
+      artifactAlignments,
     ]
   }
 
@@ -63,7 +63,7 @@ describe('useCourseAlignmentStats', () => {
     children,
     mocks = courseAlignmentStatsMocks(),
     contextId = '1',
-    contextType = 'Course'
+    contextType = 'Course',
   }) => (
     <MockedProvider cache={cache} mocks={mocks}>
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
@@ -74,7 +74,7 @@ describe('useCourseAlignmentStats', () => {
 
   it('loads properly course alignments stats', async () => {
     const {result} = renderHook(() => useCourseAlignmentStats(), {
-      wrapper
+      wrapper,
     })
     expect(result.current.loading).toBe(true)
     expect(result.current.data).toEqual({})
@@ -87,13 +87,13 @@ describe('useCourseAlignmentStats', () => {
     const {result} = renderHook(() => useCourseAlignmentStats(), {
       wrapper,
       initialProps: {
-        mocks: []
-      }
+        mocks: [],
+      },
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading course alignment statistics.',
-      type: 'error'
+      type: 'error',
     })
     expect(result.current.error).not.toBe(null)
   })
@@ -102,8 +102,8 @@ describe('useCourseAlignmentStats', () => {
     const hook = renderHook(() => useCourseAlignmentStats(), {
       wrapper,
       initialProps: {
-        mocks: refetchMocks
-      }
+        mocks: refetchMocks,
+      },
     })
     expect(hook.result.current.loading).toBe(true)
     expect(hook.result.current.data).toEqual({})

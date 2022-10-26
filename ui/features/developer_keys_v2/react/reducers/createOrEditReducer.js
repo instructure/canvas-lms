@@ -24,49 +24,49 @@ const initialState = {
   developerKeyCreateOrEditFailed: false,
   developerKeyCreateOrEditPending: false,
   developerKey: undefined,
-  editing: false
+  editing: false,
 }
 
 const developerKeysHandlers = {
   [ACTION_NAMES.DEVELOPER_KEYS_MODAL_OPEN]: state => ({
     ...state,
-    developerKeyModalOpen: true
+    developerKeyModalOpen: true,
   }),
   [ACTION_NAMES.DEVELOPER_KEYS_MODAL_CLOSE]: state => ({
     ...state,
-    developerKeyModalOpen: false
+    developerKeyModalOpen: false,
   }),
   [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_START]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: false,
     developerKeyCreateOrEditFailed: false,
-    developerKeyCreateOrEditPending: true
+    developerKeyCreateOrEditPending: true,
   }),
   [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: true,
     developerKeyCreateOrEditFailed: false,
-    developerKeyCreateOrEditPending: false
+    developerKeyCreateOrEditPending: false,
   }),
   [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: false,
     developerKeyCreateOrEditFailed: true,
-    developerKeyCreateOrEditPending: false
+    developerKeyCreateOrEditPending: false,
   }),
   [ACTION_NAMES.SET_EDITING_DEVELOPER_KEY]: (state, action) => ({
     ...state,
     developerKey: action.payload,
-    editing: !!action.payload
+    editing: !!action.payload,
   }),
   [ACTION_NAMES.RESET_LTI_STATE]: state => ({
     ...state,
-    isLtiKey: false
+    isLtiKey: false,
   }),
   [ACTION_NAMES.LTI_KEYS_SET_LTI_KEY]: (state, action) => ({
     ...state,
-    isLtiKey: action.payload
-  })
+    isLtiKey: action.payload,
+  }),
 }
 
 export default (state = initialState, action) => {

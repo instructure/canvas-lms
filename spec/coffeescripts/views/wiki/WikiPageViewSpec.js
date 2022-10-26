@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView.js'
+import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'helpers/jquery.simulate'
@@ -37,7 +37,7 @@ QUnit.module('WikiPageView', hooks => {
     const model = new WikiPage()
     const view = new WikiPageView({
       model,
-      display_show_all_pages: true
+      display_show_all_pages: true,
     })
     equal(view.display_show_all_pages, true)
   })
@@ -70,7 +70,7 @@ QUnit.module('WikiPageView', hooks => {
       const model = new WikiPage()
       const view = new WikiPageView({
         model,
-        modules_path: '/courses/73/modules'
+        modules_path: '/courses/73/modules',
       })
       strictEqual(
         view.toJSON().modules_path,
@@ -83,7 +83,7 @@ QUnit.module('WikiPageView', hooks => {
       const model = new WikiPage()
       const view = new WikiPageView({
         model,
-        wiki_pages_path: '/groups/73/pages'
+        wiki_pages_path: '/groups/73/pages',
       })
       strictEqual(
         view.toJSON().wiki_pages_path,
@@ -96,7 +96,7 @@ QUnit.module('WikiPageView', hooks => {
       const model = new WikiPage()
       const view = new WikiPageView({
         model,
-        wiki_page_edit_path: '/groups/73/pages/37'
+        wiki_page_edit_path: '/groups/73/pages/37',
       })
       strictEqual(
         view.toJSON().wiki_page_edit_path,
@@ -109,7 +109,7 @@ QUnit.module('WikiPageView', hooks => {
       const model = new WikiPage()
       const view = new WikiPageView({
         model,
-        wiki_page_edit_path: '/groups/73/pages/37/revisions'
+        wiki_page_edit_path: '/groups/73/pages/37/revisions',
       })
       strictEqual(
         view.toJSON().wiki_page_edit_path,
@@ -122,7 +122,7 @@ QUnit.module('WikiPageView', hooks => {
       const clock = sinon.useFakeTimers(new Date(2012, 0, 31).getTime())
       const model = new WikiPage({
         locked_for_user: true,
-        lock_info: {unlock_at: '2012-02-15T12:00:00Z'}
+        lock_info: {unlock_at: '2012-02-15T12:00:00Z'},
       })
       const view = new WikiPageView({model})
       const lockInfo = view.toJSON().lock_info
@@ -136,7 +136,7 @@ QUnit.module('WikiPageView', hooks => {
     test('useAsFrontPage for published wiki_pages_path', () => {
       const model = new WikiPage({
         front_page: false,
-        published: true
+        published: true,
       })
       const view = new WikiPageView({model})
       const stub = sandbox.stub(model, 'setFrontPage')
@@ -147,7 +147,7 @@ QUnit.module('WikiPageView', hooks => {
     test('useAsFrontPage should not work on unpublished wiki_pages_path', () => {
       const model = new WikiPage({
         front_page: false,
-        published: false
+        published: false,
       })
       const view = new WikiPageView({model})
       const stub = sandbox.stub(model, 'setFrontPage')
@@ -172,7 +172,7 @@ QUnit.module('WikiPageView', hooks => {
     test('opens and closes user share modal', () => {
       const model = new WikiPage({
         page_id: '42',
-        url: 'foo'
+        url: 'foo',
       })
       const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
       view.render()
@@ -189,7 +189,7 @@ QUnit.module('WikiPageView', hooks => {
     test('opens and closes copy to tray', () => {
       const model = new WikiPage({
         page_id: '42',
-        url: 'foo'
+        url: 'foo',
       })
       const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
       view.render()
@@ -212,7 +212,7 @@ const testRights = (subject, options) => {
       model,
       WIKI_RIGHTS: options.WIKI_RIGHTS,
       PAGE_RIGHTS: options.PAGE_RIGHTS,
-      course_home: options.course_home
+      course_home: options.course_home,
     })
     const json = view.toJSON()
     for (const key in options.CAN) {
@@ -226,12 +226,12 @@ testRights('CAN (manage)', {
   WIKI_RIGHTS: {
     read: true,
     publish_page: true,
-    manage: true
+    manage: true,
   },
   PAGE_RIGHTS: {
     update: true,
     delete: true,
-    read_revisions: true
+    read_revisions: true,
   },
   CAN: {
     VIEW_PAGES: true,
@@ -240,19 +240,19 @@ testRights('CAN (manage)', {
     UPDATE_CONTENT: true,
     DELETE: true,
     READ_REVISIONS: true,
-    ACCESS_GEAR_MENU: true
-  }
+    ACCESS_GEAR_MENU: true,
+  },
 })
 
 testRights('CAN (update)', {
   contextAssetString: 'group_73',
   WIKI_RIGHTS: {
     read: true,
-    manage: true
+    manage: true,
   },
   PAGE_RIGHTS: {
     update_content: true,
-    read_revisions: true
+    read_revisions: true,
   },
   CAN: {
     VIEW_PAGES: true,
@@ -261,8 +261,8 @@ testRights('CAN (update)', {
     UPDATE_CONTENT: true,
     DELETE: false,
     READ_REVISIONS: true,
-    ACCESS_GEAR_MENU: true
-  }
+    ACCESS_GEAR_MENU: true,
+  },
 })
 
 testRights('CAN (read)', {
@@ -276,8 +276,8 @@ testRights('CAN (read)', {
     UPDATE_CONTENT: false,
     DELETE: false,
     READ_REVISIONS: false,
-    ACCESS_GEAR_MENU: false
-  }
+    ACCESS_GEAR_MENU: false,
+  },
 })
 
 testRights('CAN (null)', {
@@ -288,8 +288,8 @@ testRights('CAN (null)', {
     UPDATE_CONTENT: false,
     DELETE: false,
     READ_REVISIONS: false,
-    ACCESS_GEAR_MENU: false
-  }
+    ACCESS_GEAR_MENU: false,
+  },
 })
 
 testRights('CAN (manage, course home page)', {
@@ -298,12 +298,12 @@ testRights('CAN (manage, course home page)', {
   WIKI_RIGHTS: {
     read: true,
     publish_page: true,
-    manage: true
+    manage: true,
   },
   PAGE_RIGHTS: {
     update: true,
     delete: true,
-    read_revisions: true
+    read_revisions: true,
   },
   CAN: {
     VIEW_PAGES: true,
@@ -312,17 +312,17 @@ testRights('CAN (manage, course home page)', {
     UPDATE_CONTENT: true,
     DELETE: false,
     READ_REVISIONS: true,
-    ACCESS_GEAR_MENU: true
-  }
+    ACCESS_GEAR_MENU: true,
+  },
 })
 
 testRights('CAN (view toolbar on course_home)', {
   course_home: true,
   display_show_all_pages: false,
   WIKI_RIGHTS: {
-    manage: false
+    manage: false,
   },
   CAN: {
-    VIEW_TOOLBAR: true
-  }
+    VIEW_TOOLBAR: true,
+  },
 })

@@ -22,7 +22,6 @@ import Subject from '../SearchableSelect'
 
 const LABEL = 'Start typing, fool'
 
-/* eslint-disable react/jsx-curly-brace-presence */
 const options = [
   <Subject.Option key="1" id="1" value="1">
     one is lonely
@@ -35,7 +34,7 @@ const options = [
   </Subject.Option>,
   <Subject.Option key="4" id="4" value="4">
     {'    four score and seven'}
-  </Subject.Option>
+  </Subject.Option>,
 ]
 /* eslint-enable react/jsx-curly-brace-presence */
 
@@ -44,7 +43,7 @@ function makeProps(isLoading) {
     id: 'device-under-test',
     isLoading,
     onChange: jest.fn(),
-    label: LABEL
+    label: LABEL,
   }
 }
 
@@ -195,7 +194,7 @@ const groupOptions = [
     <Subject.Option id="g2o2" value="g2o2">
       grp 2 option 2
     </Subject.Option>
-  </Subject.Group>
+  </Subject.Group>,
 ]
 
 describe('SearchableSelect::Groups', () => {

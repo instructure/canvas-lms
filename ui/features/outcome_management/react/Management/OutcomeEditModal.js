@@ -34,7 +34,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {titleValidator, displayNameValidator} from '../../validators/outcomeValidators'
 import {
   UPDATE_LEARNING_OUTCOME,
-  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
@@ -67,10 +67,10 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     ratingsError,
     masteryPointsError,
     clearRatingsFocus,
-    focusOnRatingsError
+    focusOnRatingsError,
   } = useRatings({
     initialRatings: outcome.ratings,
-    initialMasteryPoints: outcome.masteryPoints
+    initialMasteryPoints: outcome.masteryPoints,
   })
   const {
     validateForm,
@@ -79,12 +79,12 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     setDisplayNameRef,
     setFriendlyDescriptionRef,
     setMasteryPointsRef,
-    setCalcIntRef
+    setCalcIntRef,
   } = useOutcomeFormValidate({focusOnRatingsError, clearRatingsFocus})
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
-    friendlyDescription: true
+    friendlyDescription: true,
   }
   if (outcome.contextType === contextType && outcome.contextId?.toString() === contextId) {
     attributesEditable = {
@@ -93,18 +93,18 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       displayName: true,
       description: true,
       calculationMethod: true,
-      individualRatings: true
+      individualRatings: true,
     }
   }
   const [
     proficiencyCalculationMethod,
     setProficiencyCalculationMethod,
-    proficiencyCalculationMethodChanged
+    proficiencyCalculationMethodChanged,
   ] = useInput(outcome.calculationMethod)
   const [
     proficiencyCalculationInt,
     setProficiencyCalculationInt,
-    proficiencyCalculationIntChanged
+    proficiencyCalculationIntChanged,
   ] = useInput(outcome.calculationInt)
   const calculationInt = parseInt(proficiencyCalculationInt, 10) || null
   const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
@@ -116,7 +116,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   if (friendlyDescriptionChanged && friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error'
+      type: 'error',
     })
   }
 
@@ -127,7 +127,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
       ratingsError,
       friendlyDescriptionError: friendlyDescriptionMessages.length > 0,
       displayNameError: invalidDisplayName,
-      titleError: invalidTitle
+      titleError: invalidTitle,
     })
       ? onUpdateOutcomeHandler()
       : focusOnError()
@@ -162,8 +162,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
           promises.push(
             updateLearningOutcomeMutation({
               variables: {
-                input
-              }
+                input,
+              },
             })
           )
         }
@@ -176,9 +176,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   description: friendlyDescription,
                   contextId,
                   contextType,
-                  outcomeId: outcome._id
-                }
-              }
+                  outcomeId: outcome._id,
+                },
+              },
             })
           )
         }
@@ -188,14 +188,14 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         onEditLearningOutcomeHandler()
         showFlashAlert({
           message: I18n.t('"%{title}" was successfully updated.', {
-            title
+            title,
           }),
-          type: 'success'
+          type: 'success',
         })
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while editing this outcome. Please try again.'),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -208,7 +208,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         size="medium"
         label={I18n.t('Edit Outcome')}
         open={isOpen}
-        shouldReturnFocus
+        shouldReturnFocus={true}
         onDismiss={onCloseHandler}
         shouldCloseOnDocumentClick={false}
       >
@@ -275,7 +275,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
           {friendlyDescriptionFF && (
             <View as="div" padding="small 0">
               <TextArea
-                autoGrow
+                autoGrow={true}
                 size="medium"
                 height="8rem"
                 maxHeight="8rem"
@@ -311,7 +311,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                 <ProficiencyCalculation
                   method={{
                     calculationMethod: proficiencyCalculationMethod,
-                    calculationInt
+                    calculationInt,
                   }}
                   masteryPoints={masteryPoints.value}
                   individualOutcome={attributesEditable.calculationMethod ? 'edit' : 'display'}
@@ -347,7 +347,7 @@ OutcomeEditModal.propTypes = {
   outcome: outcomeEditShape.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onEditLearningOutcomeHandler: PropTypes.func.isRequired
+  onEditLearningOutcomeHandler: PropTypes.func.isRequired,
 }
 
 export default OutcomeEditModal

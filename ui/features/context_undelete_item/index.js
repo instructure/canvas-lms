@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 const I18n = useI18nScope('context.undelete_index')
 
 $(document).ready(() =>
-  $('.restore_link').click(function(event) {
+  $('.restore_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     const $item = $link.parents('.item')

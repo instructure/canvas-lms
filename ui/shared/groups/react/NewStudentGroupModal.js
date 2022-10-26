@@ -58,7 +58,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
     doFetchApi({
       method: 'POST',
       path: `/courses/${ENV.course_id}/groups`,
-      body: payload
+      body: payload,
     })
       .then(notifyDidSave)
       .catch(err => {
@@ -103,7 +103,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
   const alert = alertMessage ? (
     <Alert variant={status}>
       {status === 'error' ? (
-        <div role="alert" aria-live="assertive" aria-atomic>
+        <div role="alert" aria-live="assertive" aria-atomic={true}>
           {alertMessage}
         </div>
       ) : (
@@ -125,7 +125,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
   }
 
   const multiSelectSearch = {
-    options: users.map(user => ({id: user.id, text: user.name}))
+    options: users.map(user => ({id: user.id, text: user.name})),
   }
 
   const onScroll = event => {
@@ -163,7 +163,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
               renderLabel={I18n.t('Group Name')}
               value={name}
               onChange={(_event, value) => setName(value)}
-              isRequired
+              isRequired={true}
             />
           </Flex.Item>
           <Flex.Item padding="small">
@@ -212,12 +212,12 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
 NewStudentGroupModal.propTypes = {
   userCollection: shape({
     length: number.isRequired,
-    models: array.isRequired
+    models: array.isRequired,
   }),
   loadMore: func.isRequired,
   onSave: func.isRequired,
   modalProps: shape({
     open: bool.isRequired,
-    onDismiss: func.isRequired
-  })
+    onDismiss: func.isRequired,
+  }),
 }

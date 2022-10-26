@@ -58,12 +58,12 @@ const renderUploadButtons = props => {
         ref={input => (attachmentInput = input)}
         type="file"
         style={{display: 'none'}}
-        aria-hidden
+        aria-hidden={true}
         onChange={e => {
           props.onAttachmentUpload(e)
           attachmentInput.value = ''
         }}
-        multiple
+        multiple={true}
       />
       {props.onMediaUpload && (
         <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
@@ -130,7 +130,7 @@ ComposeActionButtons.propTypes = {
   /**
    * Indicates whether or not there is a media comment already attached
    */
-  hasMediaComment: PropTypes.bool
+  hasMediaComment: PropTypes.bool,
 }
 
 export default ComposeActionButtons

@@ -30,14 +30,14 @@ export default class MasterChildStack extends Component {
   static propTypes = {
     terms: propTypes.termList.isRequired,
     child: propTypes.courseInfo.isRequired,
-    master: propTypes.courseInfo.isRequired
+    master: propTypes.courseInfo.isRequired,
   }
 
   renderBox(course, isMaster) {
     const term = this.props.terms.find(t => t.id === course.enrollment_term_id)
     const termName = term ? term.name : ''
     const classes = cx('bcc__master-child-stack__box', {
-      'bcc__master-child-stack__box__master': isMaster
+      'bcc__master-child-stack__box__master': isMaster,
     })
 
     return (

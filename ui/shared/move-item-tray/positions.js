@@ -43,7 +43,7 @@ export const positions = {
     get label() {
       return I18n.t('At the Top')
     },
-    apply: ({items, order}) => [...items, ...removeAllFromOrder(order, items)]
+    apply: ({items, order}) => [...items, ...removeAllFromOrder(order, items)],
   },
   before: {
     type: 'relative',
@@ -53,7 +53,7 @@ export const positions = {
     apply: ({order, items, relativeTo}) => {
       const cleanedOrder = removeAllFromOrder(order, items)
       return [...cleanedOrder.slice(0, relativeTo), ...items, ...cleanedOrder.slice(relativeTo)]
-    }
+    },
   },
   after: {
     type: 'relative',
@@ -65,15 +65,15 @@ export const positions = {
       return [
         ...cleanedOrder.slice(0, relativeTo + 1),
         ...items,
-        ...cleanedOrder.slice(relativeTo + 1)
+        ...cleanedOrder.slice(relativeTo + 1),
       ]
-    }
+    },
   },
   last: {
     type: 'absolute',
     get label() {
       return I18n.t('At the Bottom')
     },
-    apply: ({order, items}) => [...removeAllFromOrder(order, items), ...items]
-  }
+    apply: ({order, items}) => [...removeAllFromOrder(order, items), ...items],
+  },
 }

@@ -23,7 +23,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import select from 'obj-select'
 
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -68,19 +68,19 @@ export default class CourseSidebar extends Component {
     clearAssociations: PropTypes.func.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     loadUnsyncedChanges: PropTypes.func.isRequired,
-    contentRef: PropTypes.func // to get reference to the content of the Tray facilitates unit testing
+    contentRef: PropTypes.func, // to get reference to the content of the Tray facilitates unit testing
   }
 
   static defaultProps = {
     unsyncedChanges: [],
     contentRef: null,
     migrationStatus: MigrationStates.states.unknown,
-    realRef: () => {}
+    realRef: () => {},
   }
 
   state = {
     isModalOpen: false,
-    modalId: null
+    modalId: null,
   }
 
   componentDidMount() {
@@ -123,7 +123,7 @@ export default class CourseSidebar extends Component {
           this.closeModal(() => {
             this.asscBtn.focus()
             this.props.clearAssociations()
-          })
+          }),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading associations...')}</div>}>
@@ -134,7 +134,7 @@ export default class CourseSidebar extends Component {
         this.closeModal(() => {
           this.asscBtn.focus()
           this.props.clearAssociations()
-        })
+        }),
     }),
     syncHistory: () => ({
       props: {
@@ -142,13 +142,13 @@ export default class CourseSidebar extends Component {
         onCancel: () =>
           this.closeModal(() => {
             if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
-          })
+          }),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading sync history...')}</div>}>
           <SyncHistory />
         </Suspense>
-      )
+      ),
     }),
     unsyncedChanges: () => ({
       props: {
@@ -172,14 +172,14 @@ export default class CourseSidebar extends Component {
               })
             }
           />
-        )
+        ),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading unsynced changes...')}</div>}>
           <UnsyncedChanges />
         </Suspense>
-      )
-    })
+      ),
+    }),
   }
 
   closeModal = cb => {
@@ -190,7 +190,7 @@ export default class CourseSidebar extends Component {
   handleAssociationsClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'associations'
+      modalId: 'associations',
     })
   }
 
@@ -201,7 +201,7 @@ export default class CourseSidebar extends Component {
   handleUnsyncedChangesClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'unsyncedChanges'
+      modalId: 'unsyncedChanges',
     })
   }
 
@@ -217,7 +217,7 @@ export default class CourseSidebar extends Component {
   openHistoryModal() {
     this.setState({
       isModalOpen: true,
-      modalId: 'syncHistory'
+      modalId: 'syncHistory',
     })
   }
 
@@ -266,7 +266,7 @@ export default class CourseSidebar extends Component {
     if (this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0) {
       return (
         <div className="bcs__row">
-          <Button
+          <Link
             aria-label={I18n.t(
               {one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes'},
               {count: this.props.unsyncedChanges.length}
@@ -275,11 +275,12 @@ export default class CourseSidebar extends Component {
             ref={c => {
               this.unsyncedChangesBtn = c
             }}
-            variant="link"
             onClick={this.handleUnsyncedChangesClick}
+            isWithinText={false}
+            margin="x-small 0"
           >
             <Text>{I18n.t('Unsynced Changes')}</Text>
-          </Button>
+          </Link>
           <PresentationContent>
             <Text>
               <span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span>
@@ -301,7 +302,7 @@ export default class CourseSidebar extends Component {
     const length = this.props.associations.length
     const button = (
       <div className="bcs__row bcs__row__associations">
-        <Button
+        <Link
           aria-label={I18n.t(
             {one: 'There is 1 Association', other: 'There are %{count} Associations'},
             {count: length}
@@ -311,11 +312,12 @@ export default class CourseSidebar extends Component {
           ref={c => {
             this.asscBtn = c
           }}
-          variant="link"
           onClick={this.handleAssociationsClick}
+          isWithinText={false}
+          margin="x-small 0"
         >
           <Text>{I18n.t('Associations')}</Text>
-        </Button>
+        </Link>
         <PresentationContent>
           <Text>
             <span className="bcs__row-right-content">{length}</span>
@@ -369,16 +371,17 @@ export default class CourseSidebar extends Component {
         <div>
           {this.maybeRenderAssociations()}
           <div className="bcs__row">
-            <Button
+            <Link
               id="mcSyncHistoryBtn"
               ref={c => {
                 this.syncHistoryBtn = c
               }}
-              variant="link"
               onClick={this.handleSyncHistoryClick}
+              isWithinText={false}
+              margin="x-small 0"
             >
               <Text>{I18n.t('Sync History')}</Text>
-            </Button>
+            </Link>
           </div>
           {this.maybeRenderUnsyncedChanges()}
           {this.maybeRenderSyncButton()}
@@ -401,11 +404,11 @@ const connectState = state =>
       'unsyncedChanges',
       'isLoadingUnsyncedChanges',
       'hasLoadedUnsyncedChanges',
-      'migrationStatus'
+      'migrationStatus',
     ]),
     {
       hasAssociationChanges: state.addedAssociations.length + state.removedAssociations.length > 0,
-      willAddAssociations: state.addedAssociations.length > 0
+      willAddAssociations: state.addedAssociations.length > 0,
     }
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)

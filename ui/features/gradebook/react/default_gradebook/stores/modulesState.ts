@@ -25,12 +25,15 @@ const I18n = useI18nScope('gradebook')
 
 export type ModulesState = {
   modules: Module[]
+  hasModules: boolean
   isModulesLoading: boolean
   fetchModules: () => Promise<any>
 }
 
 export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): ModulesState => ({
   modules: [],
+
+  hasModules: false,
 
   isModulesLoading: false,
 
@@ -43,7 +46,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): M
     const url = `/api/v1/courses/${courseId}/modules`
     const params = {per_page: contextModulesPerPage}
     return dispatch
-      .getDepaginated(url, params)
+      .getDepaginated<Module[]>(url, params)
       .then(modules => {
         set({modules, isModulesLoading: false})
       })

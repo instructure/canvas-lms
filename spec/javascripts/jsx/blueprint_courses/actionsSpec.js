@@ -36,7 +36,7 @@ QUnit.module('Blueprint Course redux actions', {
   teardown() {
     if (sandbox) sandbox.restore()
     sandbox = null
-  }
+  },
 })
 
 test('notifyInfo dispatches NOTIFY_INFO with type "info" and payload', () => {
@@ -216,7 +216,7 @@ test('loadCourses dispatches LOAD_COURSES_SUCCESS if API returns successfully', 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'LOAD_COURSES_SUCCESS', payload: [{foo: 'bar'}]}
+      {type: 'LOAD_COURSES_SUCCESS', payload: [{foo: 'bar'}]},
     ])
     done()
   }, 1)
@@ -262,7 +262,7 @@ test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_SUCCESS if API return
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'LOAD_UNSYNCED_CHANGES_SUCCESS', payload: [{foo: 'bar'}]}
+      {type: 'LOAD_UNSYNCED_CHANGES_SUCCESS', payload: [{foo: 'bar'}]},
     ])
     done()
   }, 1)
@@ -320,8 +320,8 @@ test('loadAssociations dispatches LOAD_ASSOCIATIONS_SUCCESS if API returns succe
     deepEqual(dispatchSpy.secondCall.args, [
       {
         type: 'LOAD_ASSOCIATIONS_SUCCESS',
-        payload: [{foo: 'bar', term: {id: '0', name: 'Foo Term'}}]
-      }
+        payload: [{foo: 'bar', term: {id: '0', name: 'Foo Term'}}],
+      },
     ])
     done()
   }, 1)
@@ -366,7 +366,7 @@ test('saveAssociations dispatches SAVE_ASSOCIATIONS_SUCCESS if API returns succe
 
   setTimeout(() => {
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'SAVE_ASSOCIATIONS_SUCCESS', payload: {added: ['2'], removed: ['1']}}
+      {type: 'SAVE_ASSOCIATIONS_SUCCESS', payload: {added: ['2'], removed: ['1']}},
     ])
     done()
   }, 1)
@@ -460,7 +460,7 @@ test('beginMigration dispatches BEGIN_MIGRATION_SUCCESS if API returns successfu
 
   setTimeout(() => {
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'BEGIN_MIGRATION_SUCCESS', payload: {workflow_state: MigrationStates.states.queued}}
+      {type: 'BEGIN_MIGRATION_SUCCESS', payload: {workflow_state: MigrationStates.states.queued}},
     ])
     done()
   }, 1)
@@ -569,7 +569,10 @@ test('checkMigration dispatches CHECK_MIGRATION_SUCCESS if API returns successfu
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'CHECK_MIGRATION_SUCCESS', payload: {workflow_state: MigrationStates.states.completed}}
+      {
+        type: 'CHECK_MIGRATION_SUCCESS',
+        payload: {workflow_state: MigrationStates.states.completed},
+      },
     ])
     done()
   }, 1)
@@ -594,22 +597,28 @@ test('checkMigration dispatches CHECK_MIGRATION_FAIL if API returns error', asse
 
 test('addAssociations dispatches ADD_COURSE_ASSOCIATIONS when added associations are new', () => {
   const getState = () => ({
-    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
-    existingAssociations: []
+    courses: [
+      {id: '1', name: 'First Course'},
+      {id: '2', name: 'Second Course'},
+    ],
+    existingAssociations: [],
   })
   const dispatchSpy = sinon.spy()
   actions.addAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
   deepEqual(dispatchSpy.firstCall.args, [
-    {type: 'ADD_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]}
+    {type: 'ADD_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]},
   ])
 })
 
 test('addAssociations dispatches UNDO_REMOVE_COURSE_ASSOCIATIONS when added associations are existing', () => {
   const getState = () => ({
-    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
-    existingAssociations: [{id: '1', name: 'First Course'}]
+    courses: [
+      {id: '1', name: 'First Course'},
+      {id: '2', name: 'Second Course'},
+    ],
+    existingAssociations: [{id: '1', name: 'First Course'}],
   })
   const dispatchSpy = sinon.spy()
   actions.addAssociations(['1'])(dispatchSpy, getState)
@@ -620,22 +629,28 @@ test('addAssociations dispatches UNDO_REMOVE_COURSE_ASSOCIATIONS when added asso
 
 test('removeAssociations dispatches REMOVE_COURSE_ASSOCIATIONS when removed associations are existing', () => {
   const getState = () => ({
-    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
-    existingAssociations: [{id: '1', name: 'First Course'}]
+    courses: [
+      {id: '1', name: 'First Course'},
+      {id: '2', name: 'Second Course'},
+    ],
+    existingAssociations: [{id: '1', name: 'First Course'}],
   })
   const dispatchSpy = sinon.spy()
   actions.removeAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
   deepEqual(dispatchSpy.firstCall.args, [
-    {type: 'REMOVE_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]}
+    {type: 'REMOVE_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]},
   ])
 })
 
 test('removeAssociations dispatches UNDO_ADD_COURSE_ASSOCIATIONS when removed associations are new', () => {
   const getState = () => ({
-    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
-    existingAssociations: []
+    courses: [
+      {id: '1', name: 'First Course'},
+      {id: '2', name: 'Second Course'},
+    ],
+    existingAssociations: [],
   })
   const dispatchSpy = sinon.spy()
   actions.removeAssociations(['1'])(dispatchSpy, getState)
@@ -676,7 +691,7 @@ test('pollMigrationStatus calls checkMigration if is not checking migration and 
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.queued
+    migrationStatus: MigrationStates.states.queued,
   })
 
   mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
@@ -690,7 +705,7 @@ test('pollMigrationStatus does not call checkMigration if is not checking migrat
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.unknown
+    migrationStatus: MigrationStates.states.unknown,
   })
 
   mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
@@ -704,7 +719,7 @@ test('pollMigrationStatus does not call checkMigration if is checking migration 
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: true,
-    migrationStatus: MigrationStates.states.unknown
+    migrationStatus: MigrationStates.states.unknown,
   })
 
   mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
@@ -718,7 +733,7 @@ test('pollMigrationStatus calls stopMigrationStatusPoll if last migration is in 
   const stopMigrationSpy = sinon.spy(actions, 'stopMigrationStatusPoll')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.completed
+    migrationStatus: MigrationStates.states.completed,
   })
   actions.pollMigrationStatus()(() => {}, getState)
 
@@ -730,7 +745,7 @@ test('pollMigrationStatus dispatched NOTIFY_INFO if last migration state is comp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.completed
+    migrationStatus: MigrationStates.states.completed,
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 
@@ -742,7 +757,7 @@ test('pollMigrationStatus dispatched NOTIFY_ERROR if last migration state is exp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.exports_failed
+    migrationStatus: MigrationStates.states.exports_failed,
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 
@@ -754,7 +769,7 @@ test('pollMigrationStatus dispatched NOTIFY_ERROR if last migration state is imp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.imports_failed
+    migrationStatus: MigrationStates.states.imports_failed,
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 

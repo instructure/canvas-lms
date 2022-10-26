@@ -24,6 +24,9 @@ import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
+import type Gradebook from '../../Gradebook'
+import type {Assignment} from '../../../../../../api.d'
+import type {GradingScheme} from '../../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
@@ -41,7 +44,7 @@ function buildHiddenAssignmentsWarning() {
   }
 }
 
-function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups) {
+function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: string}[]) {
   const names = invalidAssignmentGroups.map(group => htmlEscape(group.name))
   const warningText = I18n.t(
     {
@@ -121,8 +124,19 @@ function render(options) {
   `
 }
 
+type Getters = {
+  getTotalPointsPossible(): ReturnType<Gradebook['getTotalPointsPossible']>
+  gradesAreWeighted: ReturnType<Gradebook['weightedGrades']>
+  getGradingStandard(): GradingScheme[]
+  listInvalidAssignmentGroups(): ReturnType<Gradebook['listInvalidAssignmentGroups']>
+  listHiddenAssignments(studentId: string): Assignment[]
+  shouldShowPoints(): boolean
+}
+
 export default class TotalGradeCellFormatter {
-  constructor(gradebook) {
+  options: Getters
+
+  constructor(gradebook: Gradebook) {
     this.options = {
       getTotalPointsPossible() {
         return gradebook.getTotalPointsPossible()

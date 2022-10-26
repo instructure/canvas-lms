@@ -39,7 +39,9 @@ import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
 import SelectMenuGroup from '../react/SelectMenuGroup'
+import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
+import useStore from '../react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
@@ -62,21 +64,25 @@ const GradeSummary = {
     const defaultNumericalValue = typeof numericalDefault === 'number' ? numericalDefault : null
     const defaultFormattedValue = typeof formattedDefault === 'string' ? formattedDefault : '-'
     let numericalValue = numberHelper.parse(text)
-    numericalValue = isNaN(numericalValue) ? defaultNumericalValue : numericalValue
+    numericalValue =
+      numericalValue === undefined || Number.isNaN(numericalValue)
+        ? defaultNumericalValue
+        : numericalValue
     return {
       numericalValue,
       formattedValue: GradeFormatHelper.formatGrade(numericalValue, {
-        defaultValue: defaultFormattedValue
-      })
+        defaultValue: defaultFormattedValue,
+      }),
     }
   },
 
   getOriginalScore($assignment) {
     let numericalValue = parseFloat($assignment.find('.original_points').text())
-    numericalValue = isNaN(numericalValue) ? null : numericalValue
+    numericalValue =
+      numericalValue === undefined || Number.isNaN(numericalValue) ? null : numericalValue
     return {
       numericalValue,
-      formattedValue: $assignment.find('.original_score').text()
+      formattedValue: $assignment.find('.original_score').text(),
     }
   },
 
@@ -250,7 +256,7 @@ const GradeSummary = {
         $assignment.find('.grade').focus()
       }, 0)
     }
-  }
+  },
 }
 
 function addTooltipElementForAssignment($assignment) {
@@ -324,7 +330,7 @@ function calculateGrades() {
 }
 
 function canBeConvertedToGrade(score, possible) {
-  return possible > 0 && !isNaN(score)
+  return possible > 0 && score !== undefined && !Number.isNaN(score)
 }
 
 function calculatePercentGrade(score, possible) {
@@ -357,13 +363,13 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
     params = {
       bins: ENV.grading_periods,
       grades: calculatedGrades.gradingPeriods,
-      elementIdPrefix: '#submission_period'
+      elementIdPrefix: '#submission_period',
     }
   } else {
     params = {
       bins: ENV.assignment_groups,
       grades: calculatedGrades.assignmentGroups,
-      elementIdPrefix: '#submission_group'
+      elementIdPrefix: '#submission_group',
     }
   }
   if (params.grades) {
@@ -380,7 +386,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
       const subtotal = {
         teaserText: `${scoreText} / ${possibleText}`,
         gradeText: calculateGrade(grade.score, grade.possible),
-        rowElementId: `${params.elementIdPrefix}-${binId}`
+        rowElementId: `${params.elementIdPrefix}-${binId}`,
       }
       subtotals.push(subtotal)
     }
@@ -459,7 +465,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   if (gradeChanged) {
     // User changed their points for an assignment => let's let them know their updated points
     const msg = I18n.t('Based on What-If scores, the new total is now %{grade}', {
-      grade: finalGrade
+      grade: finalGrade,
     })
     $.screenReaderFlashMessageExclusive(msg)
   }
@@ -581,7 +587,7 @@ function getSelectMenuGroupProps() {
     selectedCourseID: ENV.context_asset_string.match(/.*_(\d+)$/)[1],
     selectedGradingPeriodID: ENV.current_grading_period_id,
     selectedStudentID: ENV.student_id,
-    students: ENV.students
+    students: ENV.students,
   }
 }
 
@@ -589,6 +595,50 @@ function renderSelectMenuGroup() {
   ReactDOM.render(
     <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
     document.getElementById('GradeSummarySelectMenuGroup')
+  )
+}
+
+function handleSubmissionsCommentTray(assignmentId) {
+  const {submissionTrayAssignmentId, submissionTrayOpen} = useStore.getState()
+
+  if (submissionTrayAssignmentId === assignmentId && submissionTrayOpen) {
+    useStore.setState({submissionTrayOpen: false, submissionTrayAssignmentId: undefined})
+  } else {
+    const {attempts, assignmentUrl} = getSubmissionCommentsTrayProps(assignmentId)
+    useStore.setState({
+      submissionCommentsTray: {attempts},
+      submissionTrayOpen: true,
+      submissionTrayAssignmentId: assignmentId,
+      submissionTrayAssignmentUrl: assignmentUrl,
+    })
+  }
+}
+
+function getSubmissionCommentsTrayProps(assignmentId) {
+  const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)
+  const {submission_comments, assignment_url: assignmentUrl} = matchingSubmission
+  const attempts = submission_comments.reduce((attemptsMessages, comment) => {
+    const currentAttempt = comment.attempt ?? 1
+
+    if (attemptsMessages[currentAttempt]) {
+      attemptsMessages[currentAttempt].push(comment)
+    } else {
+      attemptsMessages[currentAttempt] = [comment]
+    }
+
+    return attemptsMessages
+  }, {})
+  return {
+    attempts,
+    assignmentUrl,
+  }
+}
+
+function renderSubmissionCommentsTray() {
+  ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
+  ReactDOM.render(
+    <SubmissionCommentsTray />,
+    document.getElementById('GradeSummarySubmissionCommentsTray')
   )
 }
 
@@ -638,6 +688,11 @@ function setup() {
           $.ajaxJSON(mark_comments_read_url, 'PUT', {}, () => {})
           $unreadIcon.remove()
         }
+
+        const assignmentIdPrefix = 'assignment_comment_'
+        const eventId = event.currentTarget.id
+        const assignmentId = eventId.substring(assignmentIdPrefix.length)
+        handleSubmissionsCommentTray(assignmentId)
       })
 
       $('.toggle_rubric_assessments_link').on('click', function (event) {
@@ -788,6 +843,9 @@ export default _.extend(GradeSummary, {
   formatPercentGrade,
   getSelectMenuGroupProps,
   renderSelectMenuGroup,
+  getSubmissionCommentsTrayProps,
+  handleSubmissionsCommentTray,
+  renderSubmissionCommentsTray,
   updateScoreForAssignment,
-  updateStudentGrades
+  updateStudentGrades,
 })

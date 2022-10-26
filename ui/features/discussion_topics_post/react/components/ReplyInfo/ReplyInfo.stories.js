@@ -22,7 +22,7 @@ import {ReplyInfo} from './ReplyInfo'
 export default {
   title: 'Examples/Discussion Posts/Components/ReplyInfo',
   component: ReplyInfo,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <ReplyInfo {...args} />
@@ -30,5 +30,5 @@ const Template = args => <ReplyInfo {...args} />
 export const Default = Template.bind({})
 Default.args = {
   replyCount: 24,
-  unreadCount: 4
+  unreadCount: 4,
 }

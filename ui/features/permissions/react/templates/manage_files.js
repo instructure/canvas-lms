@@ -25,78 +25,78 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Course Files - add'),
-      description: I18n.t('Allows user to add course files and folders.')
+      description: I18n.t('Allows user to add course files and folders.'),
     },
     {
-      description: I18n.t('Allows user to import a zip file.')
+      description: I18n.t('Allows user to import a zip file.'),
     },
     {
       title: I18n.t('Course Files - edit'),
-      description: I18n.t('Allows user to edit course files and folders.')
+      description: I18n.t('Allows user to edit course files and folders.'),
     },
     {
       title: I18n.t('Course Files - delete'),
-      description: I18n.t('Allows user to delete course files and folders.')
-    }
+      description: I18n.t('Allows user to delete course files and folders.'),
+    },
   ],
   [
     {
       title: I18n.t('Course Files'),
       description: I18n.t(
         'If one or all permissions are disabled, user can still view and download files into a zip file.'
-      )
+      ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
         'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
         'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Course Files - add'),
-      description: I18n.t('Allows user to add course files and folders.')
+      description: I18n.t('Allows user to add course files and folders.'),
     },
     {
-      description: I18n.t('Allows user to import a zip file.')
+      description: I18n.t('Allows user to import a zip file.'),
     },
     {
       title: I18n.t('Course Files - edit'),
-      description: I18n.t('Allows user to edit course files and folders.')
+      description: I18n.t('Allows user to edit course files and folders.'),
     },
     {
       title: I18n.t('Course Files - delete'),
-      description: I18n.t('Allows user to delete course files and folders.')
-    }
+      description: I18n.t('Allows user to delete course files and folders.'),
+    },
   ],
   [
     {
       title: I18n.t('Course Files'),
       description: I18n.t(
         'If one or all permissions are disabled, user can still view and download files into a zip file.'
-      )
+      ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
         'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Blueprint Courses'),
-      description: I18n.t('Blueprint courses must be enabled for an account by an admin.')
+      description: I18n.t('Blueprint courses must be enabled for an account by an admin.'),
     },
     {
       description: I18n.t(
         'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
-      )
-    }
+      ),
+    },
   ]
 )

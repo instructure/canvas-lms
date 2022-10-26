@@ -20,8 +20,8 @@ import {mapStateToProps} from '../redux-helpers'
 
 jest.mock('moment-timezone', () => ({
   tz: jest.fn(() => ({
-    format: () => '2021-02-06'
-  }))
+    format: () => '2021-02-06',
+  })),
 }))
 
 const state = weekOverrides => ({
@@ -31,21 +31,21 @@ const state = weekOverrides => ({
         id: '14',
         course_id: 'science',
         planner_override: {
-          dismissed: false
-        }
+          dismissed: false,
+        },
       },
       {
         id: '22',
-        course_id: 'math'
+        course_id: 'math',
       },
       {
         id: '37',
         course_id: 'science',
         planner_override: {
-          dismissed: true
-        }
-      }
-    ]
+          dismissed: true,
+        },
+      },
+    ],
   },
   timeZone: 'America/Denver',
   weeklyDashboard: {
@@ -57,28 +57,28 @@ const state = weekOverrides => ({
             {
               type: 'Assignment',
               course_id: 'science',
-              status: {submitted: true}
+              status: {submitted: true},
             },
             {
               type: 'Discussion',
               course_id: 'science',
-              status: {submitted: false}
+              status: {submitted: false},
             },
             {
               type: 'Assignment',
               course_id: 'math',
-              status: {submitted: false}
+              status: {submitted: false},
             },
             {
               type: 'Assignment',
               course_id: 'science',
-              status: {submitted: false}
-            }
-          ]
-        ]
-      ]
-    }
-  }
+              status: {submitted: false},
+            },
+          ],
+        ],
+      ],
+    },
+  },
 })
 
 describe('K-5 Dashboard redux-helpers', () => {

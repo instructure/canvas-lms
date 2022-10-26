@@ -20,15 +20,15 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import FileNotFound from 'ui/features/file_not_found/react/FileNotFound.js'
+import FileNotFound from 'ui/features/file_not_found/react/FileNotFound'
 
 QUnit.module('FileNotFoundSpec', {
   setup() {
     this.element = <FileNotFound contextCode="fakeContextCode" />
-  }
+  },
 })
 
-test('it renders', function() {
+test('it renders', function () {
   const rendered = TestUtils.renderIntoDocument(this.element)
   ok(rendered, 'the component rendered')
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(rendered).parentNode)

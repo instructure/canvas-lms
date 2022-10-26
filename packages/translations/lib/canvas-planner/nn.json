@@ -109,6 +109,13 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Engasjerande diskusjon" },
   "excused_cf8792eb": { "message": "Fritak er innvilga" },
+  "extended_9a58dcb6": { "message": "Utvida" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Henting av emnelista mislukkast"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Henting av gjerelista mislukkast"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Eg kunne ikkje sjå inn i framtida di"
   },
@@ -127,6 +134,9 @@
   },
   "failed_to_load_opportunities_52ab6404": { "message": "Kan ikkje laste val" },
   "failed_to_save_to_do_ddc7503b": { "message": "Kan ikke lagre gjeremål" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Lasting av gjerelista mislukkast"
+  },
   "feedback_6dcc1991": { "message": "Tilbakemelding" },
   "fun_quiz_47ab0b0": { "message": "Underhaldande quiz" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -237,6 +247,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } til { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Student å gjere" },
   "submitted_318fad53": { "message": "Innlevert" },
   "success_to_do_created_e34ed395": {
     "message": "Vellukka: Gjeremålsliste er oppretta"

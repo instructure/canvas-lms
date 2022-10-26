@@ -44,7 +44,7 @@ export default class EditAppointmentGroupDetails {
     this.currentContextInfo = null
     this.appointment_group = {
       use_group_signup: this.apptGroup.participant_type === 'Group',
-      ...this.apptGroup
+      ...this.apptGroup,
     }
 
     $(selector).html(
@@ -80,7 +80,7 @@ export default class EditAppointmentGroupDetails {
           aria-label="${htmlEscape(
             I18n.t('Maximum number of appointments a participant can attend')
           )}"
-        />`
+        />`,
       })
     )
 
@@ -104,10 +104,7 @@ export default class EditAppointmentGroupDetails {
       this.form.attr('action', this.apptGroup.url)
 
       // Don't let them change a bunch of fields once it's created
-      this.form
-        .find('.context_id')
-        .val(this.apptGroup.context_code)
-        .attr('disabled', true)
+      this.form.find('.context_id').val(this.apptGroup.context_code).attr('disabled', true)
       this.form.find('select.context_id').change()
 
       this.disableGroups()
@@ -130,7 +127,7 @@ export default class EditAppointmentGroupDetails {
     const timeBlocks = (this.apptGroup.appointments || []).map(appt => [
       fcUtil.wrap(appt.start_at),
       fcUtil.wrap(appt.end_at),
-      true
+      true,
     ])
     this.timeBlockList = new TimeBlockList(
       this.form.find('.time-block-list-body'),
@@ -160,7 +157,7 @@ export default class EditAppointmentGroupDetails {
 
     const $perSlotCheckbox = this.form.find('.appointment-blocks-per-slot-option-button')
     const $perSlotInput = this.form.find('[name="participants_per_appointment"]')
-    const slotChangeHandler = e => this.perSlotChange($perSlotCheckbox, $perSlotInput)
+    const slotChangeHandler = _e => this.perSlotChange($perSlotCheckbox, $perSlotInput)
     $.merge($perSlotCheckbox, $perSlotInput).on('change', slotChangeHandler)
     if (this.apptGroup.participants_per_appointment > 0) {
       $perSlotCheckbox.prop('checked', true)
@@ -171,7 +168,7 @@ export default class EditAppointmentGroupDetails {
 
     const $maxPerStudentCheckbox = this.form.find('.max-per-student-option')
     const $maxPerStudentInput = this.form.find('[name="max_appointments_per_participant"]')
-    const maxApptHandler = e =>
+    const maxApptHandler = _e =>
       this.maxStudentAppointmentsChange($maxPerStudentCheckbox, $maxPerStudentInput)
     $.merge($maxPerStudentCheckbox, $maxPerStudentInput).on('change', maxApptHandler)
     const maxAppointmentsPerStudent = this.apptGroup.max_appointments_per_participant
@@ -210,7 +207,7 @@ export default class EditAppointmentGroupDetails {
 
   perSlotChange(checkbox, input) {
     this.checkBoxInputChange(checkbox, input)
-    const slotLimit = parseInt(input.val())
+    const slotLimit = parseInt(input.val(), 10)
     return this.helpIconShowIf(
       checkbox,
       _.some(this.apptGroup.appointments, a => a.child_events_count > slotLimit)
@@ -219,7 +216,7 @@ export default class EditAppointmentGroupDetails {
 
   maxStudentAppointmentsChange(checkbox, input) {
     this.checkBoxInputChange(checkbox, input)
-    const apptLimit = parseInt(input.val())
+    const apptLimit = parseInt(input.val(), 10)
     const apptCounts = {}
     this.apptGroup.appointments &&
       this.apptGroup.appointments.forEach(a => {
@@ -230,7 +227,7 @@ export default class EditAppointmentGroupDetails {
       })
     return this.helpIconShowIf(
       checkbox,
-      _.some(apptCounts, (count, userId) => count > apptLimit)
+      _.some(apptCounts, (count, _userId) => count > apptLimit)
     )
   }
 
@@ -256,7 +253,7 @@ export default class EditAppointmentGroupDetails {
     e.preventDefault()
     return $('#options_help_dialog').dialog({
       title: I18n.t('affect_reservations', 'How will this affect reservations?'),
-      width: 400
+      width: 400,
     })
   }
 
@@ -281,7 +278,7 @@ export default class EditAppointmentGroupDetails {
     const params = {
       'appointment_group[title]': data.title,
       'appointment_group[description]': data.description,
-      'appointment_group[location_name]': data.location
+      'appointment_group[location_name]': data.location,
     }
 
     if (data.max_appointments_per_participant_option === '1') {
@@ -305,7 +302,7 @@ export default class EditAppointmentGroupDetails {
     this.timeBlockList.blocks().forEach(range => {
       params['appointment_group[new_appointments]'].push([
         $.unfudgeDateForProfileTimezone(range[0]).toISOString(),
-        $.unfudgeDateForProfileTimezone(range[1]).toISOString()
+        $.unfudgeDateForProfileTimezone(range[1]).toISOString(),
       ])
     })
 
@@ -386,7 +383,7 @@ export default class EditAppointmentGroupDetails {
         text = this.contextsHash[contextCode].name
         if (contextCodes.length > 1) {
           text += ` ${I18n.t('and_n_contexts', 'and %{n} others', {
-            n: I18n.n(contextCodes.length - 1)
+            n: I18n.n(contextCodes.length - 1),
           })}`
         }
         this.form.find('.ag_contexts_selector').text(text)
@@ -401,7 +398,7 @@ export default class EditAppointmentGroupDetails {
         text = section.name
         if (sectionCodes.length > 1) {
           text += ` ${I18n.t('and_n_sectionCodes', 'and %{n} others', {
-            n: I18n.n(sectionCodes.length - 1)
+            n: I18n.n(sectionCodes.length - 1),
           })}`
         }
         this.form.find('.ag_contexts_selector').text(text)
@@ -426,10 +423,7 @@ export default class EditAppointmentGroupDetails {
   }
 
   disableGroups() {
-    this.form
-      .find('.group-signup-checkbox')
-      .attr('disabled', true)
-      .prop('checked', false)
+    this.form.find('.group-signup-checkbox').attr('disabled', true).prop('checked', false)
     this.form.find('.group-signup').hide()
   }
 
@@ -438,12 +432,12 @@ export default class EditAppointmentGroupDetails {
     const groupsInfo = {
       cssClass: 'group_category',
       name: 'group_category_id',
-      collection: contextInfo.group_categories
+      collection: contextInfo.group_categories,
     }
     this.form.find('.group_select').html(genericSelectTemplate(groupsInfo))
   }
 
-  toggleContextsMenu = jsEvent => {
+  toggleContextsMenu = _jsEvent => {
     const $menu = $('.ag_contexts_menu').toggleClass('hidden')
     // For accessibility: put the user back where they started.
     if ($menu.hasClass('hidden')) $('.ag_contexts_selector').focus()

@@ -24,30 +24,30 @@ import Scopes from '../Scopes'
 function props(pending = false, requireScopes = true, onRequireScopesChange = () => {}) {
   return {
     developerKey: {
-      allow_includes: true
+      allow_includes: true,
     },
     availableScopes: {
       oauth: [
         {
           resource: 'oauth',
           verb: 'GET',
-          scope: '/auth/userinfo'
-        }
+          scope: '/auth/userinfo',
+        },
       ],
       account_domain_lookups: [
         {
           resource: 'account_domain_lookups',
           verb: 'GET',
           path: '/api/v1/accounts/search',
-          scope: 'url:GET|/api/v1/accounts/search'
+          scope: 'url:GET|/api/v1/accounts/search',
         },
         {
           resource: 'account_domain_lookups',
           verb: 'POST',
           path: '/api/v1/account_domain_lookups',
-          scope: 'url:POST|/api/v1/account_domain_lookups'
-        }
-      ]
+          scope: 'url:POST|/api/v1/account_domain_lookups',
+        },
+      ],
     },
     availableScopesPending: pending,
     dispatch: () => {},
@@ -55,7 +55,7 @@ function props(pending = false, requireScopes = true, onRequireScopesChange = ()
     updateDeveloperKey: () => {},
     listDeveloperKeyScopesSet: () => {},
     requireScopes,
-    onRequireScopesChange
+    onRequireScopesChange,
   }
 }
 
@@ -64,7 +64,7 @@ describe('when the "includes" checkbox FF is set in the ENV', () => {
 
   beforeEach(() => {
     window.ENV = {
-      includesFeatureFlagEnabled: true
+      includesFeatureFlagEnabled: true,
     }
 
     wrapper = mount(<Scopes {...props()} />)

@@ -39,11 +39,11 @@ export default class StudentLastAttended extends React.Component {
   static propTypes = {
     defaultDate: PropTypes.string,
     courseID: PropTypes.string.isRequired,
-    studentID: PropTypes.string.isRequired
+    studentID: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
-    defaultDate: null
+    defaultDate: null,
   }
 
   constructor(props) {
@@ -52,7 +52,7 @@ export default class StudentLastAttended extends React.Component {
     const currentDate = defaultDate.isValid() ? defaultDate.toISOString() : null
     this.state = {
       selectedDate: currentDate,
-      loading: false
+      loading: false,
     }
   }
 
@@ -82,7 +82,7 @@ export default class StudentLastAttended extends React.Component {
     axios
       .put(`/api/v1/courses/${this.props.courseID}/users/${this.props.studentID}/last_attended`, {
         date: currentDate,
-        cancelToken: this.source.token
+        cancelToken: this.source.token,
       })
       .then(r => {
         this.setState({loading: false, selectedDate: r?.data?.date})
@@ -125,7 +125,7 @@ export default class StudentLastAttended extends React.Component {
           formatDate={formatDate}
           invalidDateMessage={value => I18n.t('%{value} is not a valid date', {value})}
           selectedDate={this.state.selectedDate}
-          withRunningValue
+          withRunningValue={true}
         />
       </View>
     )

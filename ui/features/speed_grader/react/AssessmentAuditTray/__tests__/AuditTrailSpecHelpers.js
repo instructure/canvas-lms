@@ -28,7 +28,7 @@ export function buildEvent(attr = {}, payload = {}) {
     userId: '1101',
     ...attr,
     createdAt: attr.createdAt ? new Date(attr.createdAt) : new Date(),
-    payload
+    payload,
   }
 }
 
@@ -45,7 +45,7 @@ export function buildAssignmentCreatedEvent(attr = {}, payload = {}) {
     muted: true,
     omit_from_final_grade: false,
     points_possible: 10,
-    ...payload
+    ...payload,
   }
 
   return buildEvent({...attr, eventType: 'assignment_created'}, fullPayload)

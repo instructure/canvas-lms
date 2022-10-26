@@ -42,7 +42,7 @@ const I18n = useI18nScope('discussions_v2')
 
 const filters = {
   all: I18n.t('All'),
-  unread: I18n.t('Unread')
+  unread: I18n.t('Unread'),
 }
 
 const SEARCH_DELAY = 350
@@ -61,16 +61,16 @@ export default class IndexHeader extends Component {
     saveSettings: func.isRequired,
     searchDiscussions: func.isRequired,
     toggleModalOpen: func.isRequired,
-    userSettings: propTypes.userSettings.isRequired
+    userSettings: propTypes.userSettings.isRequired,
   }
 
   static defaultProps = {
-    courseSettings: {}
+    courseSettings: {},
   }
 
   state = {
     searchTerm: '',
-    filter: 'all'
+    filter: 'all',
   }
 
   componentDidMount() {
@@ -92,7 +92,7 @@ export default class IndexHeader extends Component {
   // other off when typing fasting and using a screen reader
   filterDiscussions = debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
     leading: false,
-    trailing: true
+    trailing: true,
   })
 
   renderTrayToolsMenu = () => {
@@ -179,7 +179,7 @@ export default class IndexHeader extends Component {
                 onChange={this.onFilterChange}
                 style={{
                   margin: '0',
-                  width: '100%'
+                  width: '100%',
                 }}
               >
                 {Object.keys(filters).map(filter => (
@@ -243,15 +243,15 @@ const connectState = state => ({
     'userSettings',
     'courseSettings',
     'isSavingSettings',
-    'isSettingsModalOpen'
-  ])
+    'isSettingsModalOpen',
+  ]),
 })
 const selectedActions = [
   'fetchUserSettings',
   'searchDiscussions',
   'fetchCourseSettings',
   'saveSettings',
-  'toggleModalOpen'
+  'toggleModalOpen',
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

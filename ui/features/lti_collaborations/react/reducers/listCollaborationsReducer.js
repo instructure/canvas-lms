@@ -22,7 +22,7 @@ const initialState = {
   listCollaborationsPending: false,
   listCollaborationsSuccessful: false,
   listCollaborationsError: null,
-  list: []
+  list: [],
 }
 
 const collaborationsHandlers = {
@@ -32,7 +32,7 @@ const collaborationsHandlers = {
       list: action.payload ? [] : state.list,
       listCollaborationsPending: true,
       listCollaborationsSuccessful: false,
-      listCollaborationsError: null
+      listCollaborationsError: null,
     }
   },
   [ACTION_NAMES.LIST_COLLABORATIONS_SUCCESSFUL]: (state, action) => {
@@ -43,30 +43,30 @@ const collaborationsHandlers = {
       listCollaborationsPending: false,
       listCollaborationsSuccessful: true,
       list,
-      nextPage: action.payload.next
+      nextPage: action.payload.next,
     }
   },
   [ACTION_NAMES.LIST_COLLABORATIONS_FAILED]: (state, action) => {
     return {
       ...state,
       listCollaborationsPending: false,
-      listCollaborationsError: action.payload
+      listCollaborationsError: action.payload,
     }
   },
-  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       list: [],
-      nextPage: null
+      nextPage: null,
     }
   },
-  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       list: [],
-      nextPage: null
+      nextPage: null,
     }
-  }
+  },
 }
 
 export default (state = initialState, action) => {

@@ -49,5 +49,5 @@ export default {
 
   // Answer text longer than this will be truncated for questions of types
   // "essay" and other free-form input ones. This applies to the table view.
-  MAX_VISIBLE_CHARS: 50
+  MAX_VISIBLE_CHARS: 50,
 }

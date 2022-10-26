@@ -54,5 +54,5 @@ export default function EmptyCourse({canManage, name, id}) {
 EmptyCourse.propTypes = {
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  canManage: PropTypes.bool.isRequired
+  canManage: PropTypes.bool.isRequired,
 }

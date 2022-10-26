@@ -29,15 +29,15 @@ const folderWithFiles = {
       models: [
         {
           display_name: 'foo.txt',
-          get: what => (what === 'display_name' ? 'foo.txt' : false)
-        }
-      ]
-    }
-  }
+          get: what => (what === 'display_name' ? 'foo.txt' : false),
+        },
+      ],
+    },
+  },
 }
 
 const folderWithoutFiles = {
-  currentFolder: {id: 1, files: {models: []}}
+  currentFolder: {id: 1, files: {models: []}},
 }
 
 function formProps(overrides) {
@@ -45,7 +45,7 @@ function formProps(overrides) {
     ...folderWithoutFiles,
     contextId: '1',
     contextType: 'user',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -74,7 +74,7 @@ describe('Files UploadForm', () => {
     expect(form.classList.contains('hidden')).toBeTruthy()
   })
 
-  it('enqueues uploads when files are available', function() {
+  it('enqueues uploads when files are available', function () {
     const {getByTestId} = render(<UploadForm {...formProps()} />)
     expect(UploadForm.prototype._actualQueueUploads).toHaveBeenCalledTimes(0)
     setFile(getByTestId)
@@ -93,7 +93,7 @@ describe('Files UploadForm', () => {
       <UploadForm
         {...formProps({
           autoUpload: false,
-          ...folderWithFiles
+          ...folderWithFiles,
         })}
       />
     )
@@ -111,11 +111,11 @@ describe('Files UploadForm', () => {
               models: [
                 {
                   display_name: 'foo.txt',
-                  get: what => (what === 'display_name' ? 'foo.txt' : false)
-                }
-              ]
-            }
-          }
+                  get: what => (what === 'display_name' ? 'foo.txt' : false),
+                },
+              ],
+            },
+          },
         })}
       />
     )
@@ -127,7 +127,7 @@ describe('Files UploadForm', () => {
     fireEvent.change(fileInput, {target: {files: [file]}})
 
     const renameModal = getByText('An item named "foo.txt" already exists in this location.', {
-      exact: false
+      exact: false,
     })
     expect(renameModal).toBeInTheDocument()
     fireEvent.click(getByText('Replace'))

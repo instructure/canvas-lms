@@ -30,8 +30,8 @@ export default {
     groupId: '2',
     parentGroupId: '1',
     setTargetGroup: () => {},
-    modalName: 'groupMoveModal'
-  }
+    modalName: 'groupMoveModal',
+  },
 }
 
 const Template = args => (

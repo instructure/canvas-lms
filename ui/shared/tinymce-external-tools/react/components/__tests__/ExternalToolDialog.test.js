@@ -32,13 +32,13 @@ const content_items = [
   {
     type: 'link',
     title: 'title',
-    url: 'http://www.tool.com'
+    url: 'http://www.tool.com',
   },
   {
     type: 'ltiResourceLink',
     title: 'LTI Link',
-    url: 'http://www.tool.com/lti'
-  }
+    url: 'http://www.tool.com/lti',
+  },
 ]
 
 let container, submit, originalSubmit, originalScroll
@@ -60,7 +60,7 @@ function fakeWindow() {
     confirm: jest.fn().mockReturnValue(true),
     height: 1000,
     innerHeight: 200,
-    $: jest.fn().mockReturnValue({bind: noop, unbind: noop})
+    $: jest.fn().mockReturnValue({bind: noop, unbind: noop}),
   }
 }
 
@@ -68,27 +68,27 @@ function fakeEditor() {
   return {
     id: 'editor-id',
     selection: {
-      getContent: jest.fn()
+      getContent: jest.fn(),
     },
     getContent: jest.fn(),
-    focus: () => {}
+    focus: () => {},
   }
 }
 
 function fakeContentItem(text) {
   return {
     placementAdvice: {presentationDocumentTarget: 'embed'},
-    text
+    text,
   }
 }
 
 function fakeRCEReplaceContentItem(text) {
   return {
     placementAdvice: {
-      presentationDocumentTarget: 'embed'
+      presentationDocumentTarget: 'embed',
     },
     '@type': 'lti_replace',
-    text
+    text,
   }
 }
 
@@ -102,7 +102,7 @@ function getInstance(_container, overrides) {
       resourceSelectionUrl: 'http://url/with/{{id}}',
       deepLinkingOrigin: 'deepOrigin',
       ...overrides,
-      ref: resolve
+      ref: resolve,
     }
     ReactDOM.render(
       <ApplyTheme theme={{[Transition.theme]: {duration: '0ms'}}}>
@@ -117,7 +117,7 @@ const data = overrides => ({
   content_items,
   ltiEndpoint: 'https://www.instructure.com/lti',
   subject: 'LtiDeepLinkingResponse',
-  ...overrides
+  ...overrides,
 })
 
 beforeEach(() => {
@@ -339,7 +339,7 @@ describe('handleExternalContentReady', () => {
     win.$.mockReturnValue(jqObj)
     const instance = await getInstance(container, {win})
     const data = {
-      contentItems: [fakeContentItem('foo'), fakeContentItem('bar')]
+      contentItems: [fakeContentItem('foo'), fakeContentItem('bar')],
     }
     instance.handleExternalContentReady({}, data)
     expect(win.$).toHaveBeenCalledWith('#editor-id')
@@ -350,14 +350,14 @@ describe('handleExternalContentReady', () => {
   it('replaces content items in the editor', async () => {
     const win = fakeWindow()
     const jqObj = {
-      unbind: noop
+      unbind: noop,
     }
     win.$.mockReturnValue(jqObj)
     const instance = await getInstance(container, {
-      win
+      win,
     })
     const data = {
-      contentItems: [fakeRCEReplaceContentItem('foo')]
+      contentItems: [fakeRCEReplaceContentItem('foo')],
     }
     instance.handleExternalContentReady({}, data)
     expect(win.$).toHaveBeenCalledWith('#editor-id')

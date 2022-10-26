@@ -27,12 +27,12 @@ import {RESPONSE_ACCOUNT_1} from './fixtures'
 
 jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
-    alertForMatchingAccounts: jest.fn()
+    alertForMatchingAccounts: jest.fn(),
   }
 })
 
 const defaultProps = {
-  accountId: 1
+  accountId: 1,
 }
 
 beforeEach(() => {
@@ -95,8 +95,8 @@ describe('AccountCalendarSettings', () => {
         parent_account_id: '1',
         root_account_id: '0',
         visible: true,
-        sub_account_count: 0
-      }
+        sub_account_count: 0,
+      },
     ])
     const search = getByPlaceholderText('Search Calendars')
     fireEvent.change(search, {target: {value: 'elemen'}})

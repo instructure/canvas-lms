@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import ExternalToolPlacementButton from 'ui/features/external_apps/react/components/ExternalToolPlacementButton.js'
+import ExternalToolPlacementButton from 'ui/features/external_apps/react/components/ExternalToolPlacementButton'
 
 QUnit.module('ExternalToolPlacementButton')
 
@@ -27,7 +27,7 @@ test('normally renders with a menuitem role', () => {
     <ExternalToolPlacementButton
       tool={{
         app_type: 'ContextExternalTool',
-        name: 'A Tool'
+        name: 'A Tool',
       }}
       returnFocus={() => {}}
       onSuccess={() => {}}
@@ -42,7 +42,7 @@ test('renders as a button when specified', () => {
       type="button"
       tool={{
         app_type: 'ContextExternalTool',
-        name: 'A Tool'
+        name: 'A Tool',
       }}
       returnFocus={() => {}}
       onSuccess={() => {}}
@@ -57,7 +57,7 @@ test('does not attempt to open an opened modal', () => {
       type="button"
       tool={{
         app_type: 'ContextExternalTool',
-        name: 'A Tool'
+        name: 'A Tool',
       }}
       returnFocus={() => {}}
       onSuccess={() => {}}

@@ -41,7 +41,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       id: '1401',
       startDate: new Date('2015-11-01T12:00:00Z'),
       title: 'Q1',
-      weight: 30
+      weight: 30,
     }
 
     props = {
@@ -49,7 +49,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       onCancel: sinon.spy(),
       onSave: sinon.spy(),
       period: gradingPeriod,
-      weighted: true
+      weighted: true,
     }
   })
 
@@ -123,9 +123,9 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
         tzInTest.configureAndRestoreLater({
           tz: timezone('UTC'),
           tzData: {
-            'America/Chicago': chicago
+            'America/Chicago': chicago,
           },
-          formats: getI18nFormats()
+          formats: getI18nFormats(),
         })
         mountComponent()
       })
@@ -171,9 +171,9 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
         tzInTest.configureAndRestoreLater({
           tz: timezone('UTC'),
           tzData: {
-            'America/Chicago': chicago
+            'America/Chicago': chicago,
           },
-          formats: getI18nFormats()
+          formats: getI18nFormats(),
         })
         mountComponent()
       })
@@ -219,9 +219,9 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
         tzInTest.configureAndRestoreLater({
           tz: timezone('UTC'),
           tzData: {
-            'America/Chicago': chicago
+            'America/Chicago': chicago,
           },
-          formats: getI18nFormats()
+          formats: getI18nFormats(),
         })
         mountComponent()
       })

@@ -19,7 +19,7 @@
 #
 
 require "spec_helper"
-require "spec/views/views_helper"
+require_relative "../views_helper"
 
 describe "/gradebooks/show_submissions_upload", type: :view do
   let(:assignment) { @course.assignments.create!(title: "Example Assignment") }

@@ -20,7 +20,7 @@ import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import {
   DELETE_COMMENT_MUTATION,
   CREATE_COMMENT_MUTATION,
-  UPDATE_COMMENT_MUTATION
+  UPDATE_COMMENT_MUTATION,
 } from '../graphql/Mutations'
 import {COMMENTS_QUERY} from '../graphql/Queries'
 
@@ -29,8 +29,8 @@ export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {})
     request: {
       query: COMMENTS_QUERY,
       variables: {
-        userId
-      }
+        userId,
+      },
     },
     result: {
       data: {
@@ -41,13 +41,13 @@ export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {})
             nodes: new Array(numberOfComments).fill(0).map((_v, i) => ({
               __typename: 'CommentBankItem',
               _id: i.toString(),
-              comment: `Comment item ${i}`
-            }))
-          }
-        }
-      }
-    }
-  }
+              comment: `Comment item ${i}`,
+            })),
+          },
+        },
+      },
+    },
+  },
 ]
 
 export async function makeCreateMutationMock({overrides = {}, variables = {}} = {}) {
@@ -57,10 +57,10 @@ export async function makeCreateMutationMock({overrides = {}, variables = {}} = 
     {
       request: {
         query: CREATE_COMMENT_MUTATION,
-        variables
+        variables,
       },
-      result
-    }
+      result,
+    },
   ]
 }
 
@@ -71,10 +71,10 @@ export async function makeDeleteCommentMutation({overrides = {}, variables = {}}
     {
       request: {
         query: DELETE_COMMENT_MUTATION,
-        variables
+        variables,
       },
-      result
-    }
+      result,
+    },
   ]
 }
 
@@ -85,8 +85,8 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
       variables: {
         userId,
         query,
-        maxResults
-      }
+        maxResults,
+      },
     },
     result: {
       data: {
@@ -97,13 +97,13 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
             nodes: new Array(maxResults).fill(0).map((_v, i) => ({
               __typename: 'CommentBankItem',
               _id: i.toString(),
-              comment: `search result ${i}`
-            }))
-          }
-        }
-      }
-    }
-  }
+              comment: `search result ${i}`,
+            })),
+          },
+        },
+      },
+    },
+  },
 ]
 
 export async function makeUpdateMutationMock({overrides = {}, variables = {}} = {}) {
@@ -113,9 +113,9 @@ export async function makeUpdateMutationMock({overrides = {}, variables = {}} = 
     {
       request: {
         query: UPDATE_COMMENT_MUTATION,
-        variables
+        variables,
       },
-      result
-    }
+      result,
+    },
   ]
 }

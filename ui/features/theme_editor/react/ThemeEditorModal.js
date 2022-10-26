@@ -36,7 +36,7 @@ function SubAccountProgressBar({message, completion}) {
         <ProgressBar
           progress={completion}
           title={I18n.t('Progress for %{account_name}', {
-            account_name: messageToName(message)
+            account_name: messageToName(message),
           })}
         />
       </div>
@@ -45,7 +45,7 @@ function SubAccountProgressBar({message, completion}) {
 }
 SubAccountProgressBar.propTypes = {
   message: PropTypes.string,
-  completion: ProgressBar.propTypes.completion
+  completion: ProgressBar.propTypes.completion,
 }
 
 export default function ThemeEditorModal(props) {
@@ -66,8 +66,8 @@ export default function ThemeEditorModal(props) {
             progress={props.progress}
             title={I18n.t('%{percent} complete', {
               percent: I18n.toPercentage(props.progress, {
-                precision: 0
-              })
+                precision: 0,
+              }),
             })}
           />
         ) : (
@@ -89,5 +89,5 @@ ThemeEditorModal.propTypes = {
   showProgressModal: PropTypes.bool,
   showSubAccountProgress: PropTypes.bool,
   progress: PropTypes.number,
-  activeSubAccountProgresses: PropTypes.arrayOf(PropTypes.shape(SubAccountProgressBar.propTypes))
+  activeSubAccountProgresses: PropTypes.arrayOf(PropTypes.shape(SubAccountProgressBar.propTypes)),
 }

@@ -41,23 +41,23 @@ export const PeerReview = props => {
           textNotCompleted: props.dueAtDisplayText
             ? I18n.t('Peer review due %{dueAtText}', {
                 name: props.revieweeName,
-                dueAtText: DateHelper.formatDateForDisplay(props.dueAtDisplayText, 'short')
+                dueAtText: DateHelper.formatDateForDisplay(props.dueAtDisplayText, 'short'),
               })
             : I18n.t('Peer review due', {name: props.revieweeName}),
-          textSize: 'x-small'
+          textSize: 'x-small',
         },
         desktop: {
           textCompleted: I18n.t('You have completed a peer review for %{name}', {
-            name: props.revieweeName
+            name: props.revieweeName,
           }),
           textNotCompleted: props.dueAtDisplayText
             ? I18n.t('Peer review for %{name} Due: %{dueAtText}', {
                 name: props.revieweeName,
-                dueAtText: DateHelper.formatDatetimeForDiscussions(props.dueAtDisplayText)
+                dueAtText: DateHelper.formatDatetimeForDiscussions(props.dueAtDisplayText),
               })
             : I18n.t('Peer review for %{name}', {name: props.revieweeName}),
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={(responsiveProps, matches) => {
         let icon, message
@@ -113,5 +113,5 @@ PeerReview.propTypes = {
   dueAtDisplayText: PropTypes.string,
   revieweeName: PropTypes.string.isRequired,
   reviewLinkUrl: PropTypes.string,
-  workflowState: PropTypes.string.isRequired
+  workflowState: PropTypes.string.isRequired,
 }

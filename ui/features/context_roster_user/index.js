@@ -31,27 +31,27 @@ import '@canvas/link-enrollment'
 const I18n = useI18nScope('context.roster_user')
 
 $(document).ready(() => {
-  $('.show_user_services_checkbox').change(function() {
+  $('.show_user_services_checkbox').change(function () {
     $.ajaxJSON(
       $('.profile_url').attr('href'),
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
-      data => {},
-      data => {}
+      _data => {},
+      _data => {}
     )
   })
 
-  $('.unconclude_enrollment_link').click(function(event) {
+  $('.unconclude_enrollment_link').click(function (event) {
     event.preventDefault()
     const $enrollment = $(this).parents('.enrollment')
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, _data => {
       $enrollment.find('.conclude_enrollment_link_holder').show()
       $enrollment.find('.unconclude_enrollment_link_holder').hide()
       $enrollment.find('.completed_at_holder').hide()
     })
   })
 
-  $('.conclude_enrollment_link').click(function(event) {
+  $('.conclude_enrollment_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.enrollment')
@@ -66,11 +66,11 @@ $(document).ready(() => {
           $enrollment.find('.unconclude_enrollment_link_holder').show()
           $enrollment.find('.completed_at_holder .completed_at').text(comp_at)
           $enrollment.find('.completed_at_holder').show()
-        }
+        },
       })
   })
 
-  $('.elevate_enrollment_link,.restrict_enrollment_link').click(function(event) {
+  $('.elevate_enrollment_link,.restrict_enrollment_link').click(function (event) {
     const limit = $(this).hasClass('restrict_enrollment_link') ? '1' : '0'
     const $user = $(this).parents('.tr')
     $user.loadingImage()
@@ -78,11 +78,11 @@ $(document).ready(() => {
       $(this).attr('href'),
       'POST',
       {limit},
-      data => {
+      _data => {
         $user.loadingImage('remove')
         $('.elevate_enrollment_link_holder,.restrict_enrollment_link_holder').slideToggle()
       },
-      data => {
+      _data => {
         $.flashError(
           I18n.t('enrollment_change_failed', 'Enrollment privilege change failed, please try again')
         )
@@ -92,7 +92,7 @@ $(document).ready(() => {
     event.preventDefault()
   })
 
-  $('.delete_enrollment_link').click(function(event) {
+  $('.delete_enrollment_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.enrollment')
@@ -102,15 +102,13 @@ $(document).ready(() => {
           'Are you sure you want to delete this enrollment?'
         ),
         url: $(this).attr('href'),
-        success(data) {
-          $(this)
-            .closest('.enrollment')
-            .hide()
-        }
+        success(_data) {
+          $(this).closest('.enrollment').hide()
+        },
       })
   })
 
-  $('.more_user_information_link').click(function(event) {
+  $('.more_user_information_link').click(function (event) {
     event.preventDefault()
     $('.more_user_information').slideDown()
     $(this).hide()

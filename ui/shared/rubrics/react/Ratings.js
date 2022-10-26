@@ -35,12 +35,12 @@ const pointString = (points, endOfRangePoints) => {
       points: I18n.toNumber(points, {precision: 2, strip_insignificant_zeros: true}),
       endOfRangePoints: I18n.toNumber(endOfRangePoints, {
         precision: 2,
-        strip_insignificant_zeros: true
-      })
+        strip_insignificant_zeros: true,
+      }),
     })
   } else {
     return I18n.t('%{points} pts', {
-      points: I18n.toNumber(points, {precision: 2, strip_insignificant_zeros: true})
+      points: I18n.toNumber(points, {precision: 2, strip_insignificant_zeros: true}),
     })
   }
 }
@@ -59,7 +59,7 @@ export const Rating = props => {
     tierColor,
     hidePoints,
     isSummary,
-    selected
+    selected,
   } = props
 
   const shaderStyle = {backgroundColor: tierColor}
@@ -126,14 +126,14 @@ Rating.propTypes = {
   selected: PropTypes.bool,
   hidePoints: PropTypes.bool,
   isSummary: PropTypes.bool.isRequired,
-  shaderClass: PropTypes.string
+  shaderClass: PropTypes.string,
 }
 Rating.defaultProps = {
   footer: null,
   selected: false,
   endOfRangePoints: null, // eslint-disable-line react/default-props-match-prop-types
   hidePoints: false,
-  shaderClass: null
+  shaderClass: null,
 }
 
 const Ratings = props => {
@@ -149,7 +149,7 @@ const Ratings = props => {
     hidePoints,
     onPointChange,
     isSummary,
-    useRange
+    useRange,
   } = props
 
   const pairs = tiers.map((tier, index) => {
@@ -222,7 +222,7 @@ const Ratings = props => {
     .map((tier, index) => ({
       tier,
       index,
-      selected: selectedIndex === index
+      selected: selectedIndex === index,
     }))
     .filter(({selected}) => (isSummary ? selected : true))
 
@@ -232,7 +232,7 @@ const Ratings = props => {
       const classes = classNames({
         'rating-tier': true,
         selected,
-        assessing
+        assessing,
       })
 
       return (
@@ -285,12 +285,12 @@ Ratings.propTypes = {
   footer: PropTypes.node,
   onPointChange: PropTypes.func,
   isSummary: PropTypes.bool.isRequired,
-  hidePoints: PropTypes.bool
+  hidePoints: PropTypes.bool,
 }
 Ratings.defaultProps = {
   footer: null,
   hidePoints: false,
-  onPointChange: () => {}
+  onPointChange: () => {},
 }
 
 export default Ratings

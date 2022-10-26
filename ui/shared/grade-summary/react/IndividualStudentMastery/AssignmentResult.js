@@ -115,11 +115,11 @@ const AssignmentResult = ({outcome, result, outcomeProficiency}) => {
 AssignmentResult.propTypes = {
   result: shapes.outcomeResultShape.isRequired,
   outcome: shapes.outcomeShape.isRequired,
-  outcomeProficiency: shapes.outcomeProficiencyShape
+  outcomeProficiency: shapes.outcomeProficiencyShape,
 }
 
 AssignmentResult.defaultProps = {
-  outcomeProficiency: null
+  outcomeProficiency: null,
 }
 
 export default AssignmentResult

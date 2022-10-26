@@ -29,7 +29,7 @@ describe('GroupEditForm', () => {
     isOpen: true,
     onSubmit,
     onCloseHandler,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -49,7 +49,7 @@ describe('GroupEditForm', () => {
   it('renders form with initial title', () => {
     const initialValues = {
       title: 'The Group Name',
-      description: 'The Group Description'
+      description: 'The Group Description',
     }
     const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     expect(getByDisplayValue('The Group Name')).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('GroupEditForm', () => {
   it('renders form with initial description', async () => {
     const initialValues = {
       title: 'The Group Name',
-      description: 'The Group Description'
+      description: 'The Group Description',
     }
 
     const {getByDisplayValue} = render(<GroupEditForm {...defaultProps({initialValues})} />)
@@ -69,7 +69,7 @@ describe('GroupEditForm', () => {
   it('calls onSubmit when submission', async () => {
     const initialValues = {
       title: 'The Group Name',
-      description: 'The Group Description'
+      description: 'The Group Description',
     }
     const {getByLabelText, getByText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     await act(async () => jest.runAllTimers())
@@ -78,7 +78,7 @@ describe('GroupEditForm', () => {
     fireEvent.click(getByText('Save'))
     expect(onSubmit.mock.calls[0][0]).toEqual({
       title: 'New group name',
-      description: 'Updated description'
+      description: 'Updated description',
     })
   })
 
@@ -91,7 +91,7 @@ describe('GroupEditForm', () => {
   it('only enable submission if form is edited', () => {
     const initialValues = {
       title: 'The Group Name',
-      description: 'The Group Description'
+      description: 'The Group Description',
     }
     const {getByText, getByLabelText} = render(<GroupEditForm {...defaultProps({initialValues})} />)
     expect(getByText('Save').closest('button')).toBeDisabled()

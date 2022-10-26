@@ -28,12 +28,17 @@ describe('canvas_quizzes/components/screen_reader_content', () => {
   })
 
   it('forces sentence delimiter', () => {
-    render(<ScreenReaderContent forceSentenceDelimiter>yea!</ScreenReaderContent>)
+    render(<ScreenReaderContent forceSentenceDelimiter={true}>yea!</ScreenReaderContent>)
     expect(document.body.textContent).toMatch('yea!')
   })
 
   it('rejects html', () => {
-    render(<ScreenReaderContent forceSentenceDelimiter dangerouslySetInnerHTML={{__html: '<span>yea!</span>'}} />)
+    render(
+      <ScreenReaderContent
+        forceSentenceDelimiter={true}
+        dangerouslySetInnerHTML={{__html: '<span>yea!</span>'}}
+      />
+    )
 
     expect(document.body.textContent).not.toMatch('yea!')
   })

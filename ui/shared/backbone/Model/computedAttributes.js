@@ -75,7 +75,7 @@ _.extend(Backbone.Model.prototype, {
         return this.bind(eventName, () => set(methodName.name))
       }
     })
-  }
+  },
 })
 
 export default Backbone.Model

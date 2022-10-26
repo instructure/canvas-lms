@@ -41,7 +41,7 @@ const attachListeners = () => {
         store.dispatch(
           actions.externalContentReady({
             service_id: item.service_id,
-            contentItems: [item]
+            contentItems: [item],
           })
         )
       )
@@ -115,5 +115,5 @@ export default {
     attachListeners()
     page.start()
   },
-  attachListeners
+  attachListeners,
 }

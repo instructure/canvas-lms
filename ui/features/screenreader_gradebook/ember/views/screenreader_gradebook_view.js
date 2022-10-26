@@ -22,7 +22,7 @@ const ScreenreaderGradebookView = Ember.View.extend({
   didInsertElement() {
     // horrible hack to get disabled instead of disabled="disabled" on buttons
     return this.$('button:disabled').prop('disabled', true)
-  }
+  },
 })
 
 export default ScreenreaderGradebookView

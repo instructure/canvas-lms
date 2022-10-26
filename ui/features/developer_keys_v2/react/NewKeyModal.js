@@ -37,7 +37,7 @@ export default class DeveloperKeyModal extends React.Component {
     developerKey: {},
     toolConfigurationUrl: '',
     isSaving: false,
-    configurationMethod: 'manual'
+    configurationMethod: 'manual',
   }
 
   developerKeyUrl() {
@@ -58,7 +58,7 @@ export default class DeveloperKeyModal extends React.Component {
           valid: () => true,
           generateToolConfiguration: () => {
             return this.toolConfiguration
-          }
+          },
         }
   }
 
@@ -73,7 +73,7 @@ export default class DeveloperKeyModal extends React.Component {
       ...(this.developerKey.tool_configuration || {}),
       ...this.state.toolConfiguration,
       ...public_jwk,
-      ...public_jwk_url
+      ...public_jwk_url,
     }
   }
 
@@ -95,7 +95,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   get hasRedirectUris() {
     const redirect_uris = this.developerKey.redirect_uris
-    return redirect_uris && redirect_uris.trim().length !== 0
+    return Boolean(redirect_uris && redirect_uris.trim().length !== 0)
   }
 
   updateConfigurationMethod = configurationMethod => this.setState({configurationMethod})
@@ -104,7 +104,7 @@ export default class DeveloperKeyModal extends React.Component {
     const {
       store: {dispatch},
       actions: {createOrEditDeveloperKey},
-      createOrEditDeveloperKeyState: {editing}
+      createOrEditDeveloperKeyState: {editing},
     } = this.props
     const method = editing ? 'put' : 'post'
     const toSubmit = this.developerKey
@@ -133,7 +133,7 @@ export default class DeveloperKeyModal extends React.Component {
   saveLTIKeyEdit(settings, developerKey) {
     const {
       store: {dispatch},
-      actions
+      actions,
     } = this.props
     this.setState({toolConfiguration: settings, isSaving: true})
     return actions
@@ -155,7 +155,7 @@ export default class DeveloperKeyModal extends React.Component {
   saveLtiToolConfiguration = () => {
     const {
       store: {dispatch},
-      actions
+      actions,
     } = this.props
     const developer_key = {...this.developerKey}
     if (!this.hasRedirectUris && !this.isUrlConfig) {
@@ -185,7 +185,7 @@ export default class DeveloperKeyModal extends React.Component {
     } else {
       const toSave = {
         account_id: this.props.ctx.params.contextId,
-        developer_key
+        developer_key,
       }
       if (this.isUrlConfig) {
         if (!this.state.toolConfigurationUrl) {
@@ -214,16 +214,24 @@ export default class DeveloperKeyModal extends React.Component {
     this.setState({toolConfigurationUrl})
   }
 
-  updateToolConfiguration = (update, field = null) => {
+  updateToolConfiguration = (update, field = null, sync = false) => {
     if (field) {
       this.setState(state => ({toolConfiguration: {...state.toolConfiguration, [field]: update}}))
     } else {
       this.setState({toolConfiguration: update})
     }
 
-    if (!this.state?.developerKey?.redirect_uris?.trim()) {
+    if (sync) {
+      this.updateDeveloperKey('redirect_uris', this.developerKey.tool_configuration.target_link_uri)
+    }
+
+    if (!this.hasRedirectUris) {
       this.updateDeveloperKey('redirect_uris', update.target_link_uri || '')
     }
+  }
+
+  syncRedirectUris = () => {
+    this.updateToolConfiguration(this.toolConfiguration, null, true)
   }
 
   updateDeveloperKey = (field, update) => {
@@ -243,7 +251,7 @@ export default class DeveloperKeyModal extends React.Component {
       toolConfiguration: null,
       submitted: false,
       toolConfigurationUrl: null,
-      developerKey: {}
+      developerKey: {},
     })
   }
 
@@ -252,7 +260,7 @@ export default class DeveloperKeyModal extends React.Component {
       availableScopes,
       availableScopesPending,
       actions,
-      createOrEditDeveloperKeyState: {editing, developerKeyModalOpen, isLtiKey}
+      createOrEditDeveloperKeyState: {editing, developerKeyModalOpen, isLtiKey},
     } = this.props
     return (
       <div>
@@ -294,6 +302,8 @@ export default class DeveloperKeyModal extends React.Component {
                 showMissingRedirectUrisMessage={
                   this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
                 }
+                hasRedirectUris={this.hasRedirectUris}
+                syncRedirectUris={this.syncRedirectUris}
                 updateToolConfiguration={this.updateToolConfiguration}
                 updateDeveloperKey={this.updateDeveloperKey}
                 updateToolConfigurationUrl={this.updateToolConfigurationUrl}
@@ -328,12 +338,12 @@ DeveloperKeyModal.propTypes = {
     PropTypes.arrayOf(
       PropTypes.shape({
         resource: PropTypes.string,
-        scope: PropTypes.string
+        scope: PropTypes.string,
       })
     )
   ).isRequired,
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.func.isRequired,
@@ -343,7 +353,7 @@ DeveloperKeyModal.propTypes = {
     saveLtiToolConfiguration: PropTypes.func.isRequired,
     resetLtiState: PropTypes.func.isRequired,
     updateLtiKey: PropTypes.func.isRequired,
-    listDeveloperKeysReplace: PropTypes.func.isRequired
+    listDeveloperKeysReplace: PropTypes.func.isRequired,
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
     isLtiKey: PropTypes.bool.isRequired,
@@ -352,13 +362,13 @@ DeveloperKeyModal.propTypes = {
     developerKeyCreateOrEditPending: PropTypes.bool.isRequired,
     developerKeyModalOpen: PropTypes.bool.isRequired,
     developerKey: NewKeyForm.propTypes.developerKey,
-    editing: PropTypes.bool.isRequired
+    editing: PropTypes.bool.isRequired,
   }).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
-    })
+      contextId: PropTypes.string.isRequired,
+    }),
   }).isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
   handleSuccessfulSave: PropTypes.func.isRequired,

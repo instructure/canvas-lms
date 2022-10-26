@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import addAriaDescription from 'ui/features/quizzes/jquery/quiz_labels.js'
+import addAriaDescription from 'ui/features/quizzes/jquery/quiz_labels'
 import fixtures from 'helpers/fixtures'
 
 let $elem = null
@@ -38,7 +38,7 @@ QUnit.module('Add aria descriptions', {
 
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('add aria descriptions to quiz answer options', () => {

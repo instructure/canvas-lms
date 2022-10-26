@@ -37,7 +37,7 @@ export default class {
   static errorForUrlItem(item, expectedType = 'LtiLinkItem') {
     if (item['@type'] !== expectedType) {
       return I18n.t('Error: The tool returned an invalid content type "%{contentType}"', {
-        contentType: item['@type']
+        contentType: item['@type'],
       })
     }
 

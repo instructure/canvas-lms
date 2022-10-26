@@ -41,7 +41,7 @@ import FocusManager from '../focusManager'
 
 const I18n = useI18nScope('BlueprintAssociations')
 
-const {string, arrayOf, func, bool} = PropTypes
+const {func, bool} = PropTypes
 
 export default class BlueprintAssociations extends React.Component {
   static propTypes = {
@@ -62,11 +62,11 @@ export default class BlueprintAssociations extends React.Component {
     isSavingAssociations: bool.isRequired,
     hasUnsyncedChanges: bool.isRequired,
 
-    isExpanded: bool
+    isExpanded: bool,
   }
 
   static defaultProps = {
-    isExpanded: false
+    isExpanded: false,
   }
 
   componentDidMount() {
@@ -186,10 +186,10 @@ const connectState = state =>
       'hasLoadedCourses',
       'isLoadingCourses',
       'isLoadingAssociations',
-      'isSavingAssociations'
+      'isSavingAssociations',
     ]),
     {
-      hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0
+      hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
     }
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)

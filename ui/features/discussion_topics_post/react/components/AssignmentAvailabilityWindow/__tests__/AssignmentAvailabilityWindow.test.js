@@ -32,14 +32,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -48,13 +48,13 @@ const mockProps = ({
   untilDate = '2021-04-03T23:59:59-06:00',
   showOnMobile = false,
   showDateWithTime = false,
-  anonymousState = null
+  anonymousState = null,
 } = {}) => ({
   availableDate,
   untilDate,
   showOnMobile,
   showDateWithTime,
-  anonymousState
+  anonymousState,
 })
 
 const setup = props => {
@@ -65,7 +65,7 @@ describe('AssignmentAvailabilityWindow', () => {
   describe('Desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
 
@@ -109,7 +109,7 @@ describe('AssignmentAvailabilityWindow', () => {
   describe('Tablet', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'},
       }))
     })
 

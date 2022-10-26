@@ -29,30 +29,30 @@ QUnit.module('Entry', {
       DELETE_URL: 'discussions/:id/',
       PERMISSIONS: {
         CAN_ATTACH: true,
-        CAN_MANAGE_OWN: true
+        CAN_MANAGE_OWN: true,
       },
-      SPEEDGRADER_URL_TEMPLATE: 'speed_grader?assignment_id=1&student_id=%3Astudent_id'
+      SPEEDGRADER_URL_TEMPLATE: 'speed_grader?assignment_id=1&student_id=%3Astudent_id',
     }
     this.entry = new Entry({
       id: 1,
       message: 'a comment, wooper',
-      user_id: this.user_id
+      user_id: this.user_id,
     })
   },
   teardown() {
     fakeENV.teardown()
     return this.server.restore()
-  }
+  },
 })
 
-test('should persist replies locally, and call provided onComplete callback', function() {
+test('should persist replies locally, and call provided onComplete callback', function () {
   this.server.respondWith([200, {}, ''])
   const replies = [
     new Entry({
       id: 2,
       message: 'a reply',
-      parent_id: 1
-    })
+      parent_id: 1,
+    }),
   ]
   this.entry.set('replies', replies)
   this.setSpy = sandbox.spy(this.entry, 'set')
@@ -69,18 +69,18 @@ test('speedgraderUrl replaces :student_id in SPEEDGRADER_URL_TEMPLATE with the u
     id: 2,
     message: 'a reply',
     parent_id: 1,
-    user_id: 100
+    user_id: 100,
   })
 
   strictEqual(studentEntry.speedgraderUrl(), 'speed_grader?assignment_id=1&student_id=100')
 })
 
-test('recognizes current user as its original author', function() {
+test('recognizes current user as its original author', function () {
   const nonAuthorEntry = new Entry({
     id: 2,
     message: 'a reply',
     parent_id: 1,
-    user_id: 100
+    user_id: 100,
   })
 
   ok(!nonAuthorEntry.isAuthorsEntry())

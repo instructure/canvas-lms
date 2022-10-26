@@ -114,7 +114,7 @@ export default class StudentsTable extends React.Component {
           src={student.avatarUrl}
           size="small"
           margin="0 small 0 0"
-          data-fs-exclude
+          data-fs-exclude={true}
         />
         {displayName}
       </>

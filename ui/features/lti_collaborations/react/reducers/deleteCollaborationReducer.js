@@ -21,32 +21,32 @@ import ACTION_NAMES from '../actions'
 const initialState = {
   deleteCollaborationPending: false,
   deleteCollaborationSuccessful: false,
-  deleteCollaborationError: null
+  deleteCollaborationError: null,
 }
 
 const deleteHandlers = {
-  [ACTION_NAMES.DELETE_COLLABORATION_START]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_START]: (state, _action) => {
     return {
       ...state,
       deleteCollaborationPending: true,
       deleteCollaborationSuccessful: false,
-      deleteCollaborationError: null
+      deleteCollaborationError: null,
     }
   },
-  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       deleteCollaborationPending: false,
-      deleteCollaborationSuccessful: true
+      deleteCollaborationSuccessful: true,
     }
   },
   [ACTION_NAMES.DELETE_COLLABORATION_FAILED]: (state, action) => {
     return {
       ...state,
       deleteCollaborationPending: false,
-      deleteCollaborationError: action.payload
+      deleteCollaborationError: action.payload,
     }
-  }
+  },
 }
 
 export default (state = initialState, action) => {

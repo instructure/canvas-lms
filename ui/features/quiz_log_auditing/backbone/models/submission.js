@@ -34,5 +34,5 @@ export default Backbone.Model.extend({
     attrs = pickAndNormalize(attrs, K.SUBMISSION_ATTRS)
 
     return attrs
-  }
+  },
 })

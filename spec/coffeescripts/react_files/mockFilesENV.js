@@ -26,7 +26,7 @@ export default window.ENV.FILES_CONTEXTS = [
     root_folder_id: '2',
     permissions: {
       manage_files: true,
-      read_contents: true
-    }
-  }
+      read_contents: true,
+    },
+  },
 ]

@@ -38,7 +38,7 @@ export default class ContextTracker {
     this._contextCallbacks = {
       beforeContextEnd: [],
       onContextEnd: [],
-      onContextStart: []
+      onContextStart: [],
     }
   }
 
@@ -81,7 +81,7 @@ export default class ContextTracker {
         maybeAddFailure(message, tracker.sourceStack, () => {
           logTrackers([tracker], () => ({
             logType: 'error',
-            message
+            message,
           }))
         })
       },
@@ -90,7 +90,7 @@ export default class ContextTracker {
         return stack.length ? new Date() - stack[0].startTime : 0
       },
 
-      stack
+      stack,
     }
   }
 
@@ -105,13 +105,13 @@ export default class ContextTracker {
 
           const {beforeEach, afterEach} = testEnvironment
 
-          testEnvironment.beforeEach = function() {
+          testEnvironment.beforeEach = function () {
             return runAllOneAtATime(onContextStart).then(() => {
               if (beforeEach) return beforeEach.call(this)
             })
           }
 
-          testEnvironment.afterEach = function() {
+          testEnvironment.afterEach = function () {
             return runAllOneAtATime(beforeContextEnd)
               .then(() => {
                 if (afterEach) return afterEach.call(this)
@@ -127,7 +127,7 @@ export default class ContextTracker {
         description: moduleInfo.name,
         failures: [],
         startTime: new Date(),
-        type: 'module'
+        type: 'module',
       })
     })
 
@@ -136,7 +136,7 @@ export default class ContextTracker {
         description: testInfo.name,
         failures: [],
         startTime: new Date(),
-        type: 'test'
+        type: 'test',
       })
     })
 

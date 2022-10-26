@@ -31,7 +31,7 @@ import {ConversationContext} from '../../../util/constants'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('ComposeModalContainer', () => {
@@ -48,13 +48,13 @@ describe('ComposeModalContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -74,8 +74,8 @@ describe('ComposeModalContainer', () => {
       current_user_id: '1',
       CONVERSATIONS: {
         ATTACHMENTS_FOLDER_ID: 1,
-        CAN_MESSAGE_ACCOUNT_CONTEXT: false
-      }
+        CAN_MESSAGE_ACCOUNT_CONTEXT: false,
+      },
     }
   })
 
@@ -87,14 +87,14 @@ describe('ComposeModalContainer', () => {
     isForward,
     conversation,
     selectedIds = ['1'],
-    isSubmissionCommentsType = false
+    isSubmissionCommentsType = false,
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <ComposeModalManager
-              open
+              open={true}
               onDismiss={jest.fn()}
               isReply={isReply}
               isReplyAll={isReplyAll}
@@ -111,8 +111,8 @@ describe('ComposeModalContainer', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
-        files
-      }
+        files,
+      },
     })
   }
 
@@ -140,7 +140,7 @@ describe('ComposeModalContainer', () => {
     it('allows uploading multiple files', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([
         {id: '1', name: 'file1.jpg'},
-        {id: '2', name: 'file2.jpg'}
+        {id: '2', name: 'file2.jpg'},
       ])
       const {findByTestId} = setup()
       const fileInput = await findByTestId('attachment-input')
@@ -245,10 +245,10 @@ describe('ComposeModalContainer', () => {
       messages: [
         {
           author: {
-            _id: '1337'
-          }
-        }
-      ]
+            _id: '1337',
+          },
+        },
+      ],
     }
 
     it('does not allow changing the context', async () => {
@@ -274,7 +274,7 @@ describe('ComposeModalContainer', () => {
       const component = setup({
         setOnSuccess: mockedSetOnSuccess,
         isReply: true,
-        conversation: mockConversation
+        conversation: mockConversation,
       })
 
       // Set body
@@ -296,16 +296,16 @@ describe('ComposeModalContainer', () => {
         messages: [
           {
             author: {
-              _id: '1337'
-            }
-          }
-        ]
+              _id: '1337',
+            },
+          },
+        ],
       }
 
       const component = setup({
         setOnSuccess: mockedSetOnSuccess,
         isReply: true,
-        conversation: mockConversationWithError
+        conversation: mockConversationWithError,
       })
 
       // Set body
@@ -331,16 +331,16 @@ describe('ComposeModalContainer', () => {
         messages: [
           {
             author: {
-              _id: '1337'
-            }
-          }
-        ]
+              _id: '1337',
+            },
+          },
+        ],
       }
       it('should replace compose message with submission subject', async () => {
         const component = setup({
           isReply: true,
           conversation: mockSubmission,
-          isSubmissionCommentsType: true
+          isSubmissionCommentsType: true,
         })
         await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
         expect(component.queryByText(mockSubmission.subject)).toBeInTheDocument()
@@ -351,7 +351,7 @@ describe('ComposeModalContainer', () => {
         const component = setup({
           isReply: true,
           conversation: mockSubmission,
-          isSubmissionCommentsType: true
+          isSubmissionCommentsType: true,
         })
         await waitFor(() => expect(component.queryByText('Loading')).toBeNull())
 
@@ -371,7 +371,7 @@ describe('ComposeModalContainer', () => {
           setOnSuccess: mockedSetOnSuccess,
           isReply: true,
           conversation: mockSubmission,
-          isSubmissionCommentsType: true
+          isSubmissionCommentsType: true,
         })
 
         // Set body
@@ -393,10 +393,10 @@ describe('ComposeModalContainer', () => {
           messages: [
             {
               author: {
-                _id: '1337'
-              }
-            }
-          ]
+                _id: '1337',
+              },
+            },
+          ],
         }
         const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
 
@@ -404,7 +404,7 @@ describe('ComposeModalContainer', () => {
           setOnSuccess: mockedSetOnSuccess,
           isReply: true,
           conversation: mockErrorSubmission,
-          isSubmissionCommentsType: true
+          isSubmissionCommentsType: true,
         })
 
         // Set body
@@ -428,24 +428,24 @@ describe('ComposeModalContainer', () => {
         messages: [
           {
             author: {
-              _id: '1337'
+              _id: '1337',
             },
             recipients: [
               {
-                _id: '1337'
+                _id: '1337',
               },
               {
-                _id: '1338'
-              }
-            ]
-          }
-        ]
+                _id: '1338',
+              },
+            ],
+          },
+        ],
       }
 
       const component = setup({
         setOnSuccess: mockedSetOnSuccess,
         isReplyAll: true,
-        conversation: mockConversation
+        conversation: mockConversation,
       })
 
       // Set body
@@ -468,24 +468,24 @@ describe('ComposeModalContainer', () => {
         messages: [
           {
             author: {
-              _id: '1337'
+              _id: '1337',
             },
             recipients: [
               {
-                _id: '1337'
+                _id: '1337',
               },
               {
-                _id: '1338'
-              }
-            ]
-          }
-        ]
+                _id: '1338',
+              },
+            ],
+          },
+        ],
       }
 
       const component = setup({
         setOnSuccess: mockedSetOnSuccess,
         isReplyAll: true,
-        conversation: mockConversation
+        conversation: mockConversation,
       })
 
       // Set body
@@ -504,7 +504,7 @@ describe('ComposeModalContainer', () => {
     describe('Mobile', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'}
+          mobile: {maxWidth: '67'},
         }))
       })
 
@@ -518,7 +518,7 @@ describe('ComposeModalContainer', () => {
     describe('Desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {minWidth: '768'}
+          desktop: {minWidth: '768'},
         }))
       })
 
@@ -536,18 +536,18 @@ describe('ComposeModalContainer', () => {
       messages: [
         {
           author: {
-            _id: '1337'
+            _id: '1337',
           },
           recipients: [
             {
-              _id: '1337'
+              _id: '1337',
             },
             {
-              _id: '1338'
-            }
-          ]
-        }
-      ]
+              _id: '1338',
+            },
+          ],
+        },
+      ],
     }
     const component = setup({conversation: mockConversation, isForward: true})
 

@@ -19,13 +19,13 @@
 import React from 'react'
 
 class FlickrImage extends React.Component {
-  handleClick = event => {
+  handleClick = _event => {
     this.props.selectImage(this.props.url)
   }
 
   render() {
     const imageStyle = {
-      backgroundImage: `url(${this.props.url})`
+      backgroundImage: `url(${this.props.url})`,
     }
 
     return (

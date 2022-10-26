@@ -62,5 +62,5 @@ GroupsMenu.propTypes = {
   /**
    * Link to discussions RSS feed
    */
-  childTopics: PropTypes.arrayOf(ChildTopic.shape).isRequired
+  childTopics: PropTypes.arrayOf(ChildTopic.shape).isRequired,
 }

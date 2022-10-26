@@ -61,7 +61,7 @@ describe('EditableHeading', () => {
         label="Edit title"
         value="Even Cowgirls Get the Blues"
         level="h3"
-        readOnly
+        readOnly={true}
       />
     )
     expect(queryByText('Edit title')).toBeNull()

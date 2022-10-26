@@ -36,8 +36,8 @@ export default class GroupUsersView extends PaginatedCollectionView {
       itemViewOptions: {
         canAssignToGroup: false,
         canEditGroupAssignment: true,
-        markInactiveStudents: false
-      }
+        markInactiveStudents: false,
+      },
     }
 
     this.prototype.dragOptions = {
@@ -50,7 +50,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       start(event, ui) {
         // hide AssignToGroupMenu (original and helper)
         $('.assign-to-group-menu').hide()
-      }
+      },
     }
 
     this.prototype.template = template
@@ -59,7 +59,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       'click .remove-from-group': 'removeUserFromGroup',
       'click .remove-as-leader': 'removeLeader',
       'click .set-as-leader': 'setLeader',
-      'click .edit-group-assignment': 'editGroupAssignment'
+      'click .edit-group-assignment': 'editGroupAssignment',
     }
   }
 
@@ -91,7 +91,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
     if (groupHasSubmissions(this.model)) {
       this.cloneCategoryView = new GroupCategoryCloneView({
         model: this.model.collection.category,
-        openedFromCaution: true
+        openedFromCaution: true,
       })
       this.cloneCategoryView.open()
       return this.cloneCategoryView.on('close', () => {
@@ -116,10 +116,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
     e.preventDefault()
     e.stopPropagation()
     const $target = $(e.currentTarget)
-    const user_id = $target
-      .data('user-id')
-      .toString()
-      .replace('user_', '')
+    const user_id = $target.data('user-id').toString().replace('user_', '')
     const user_name = this.model.get('leader').display_name
     return this.model.save(
       {leader: null},
@@ -127,7 +124,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
         success: () => {
           $.screenReaderFlashMessage(I18n.t('Removed %{user} as group leader', {user: user_name}))
           $(`.group-user-actions[data-user-id='user_${user_id}']`, this.el).focus()
-        }
+        },
       }
     )
   }
@@ -136,10 +133,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
     e.preventDefault()
     e.stopPropagation()
     const $target = $(e.currentTarget)
-    const user_id = $target
-      .data('user-id')
-      .toString()
-      .replace('user_', '')
+    const user_id = $target.data('user-id').toString().replace('user_', '')
     return this.model.save(
       {leader: {id: user_id}},
       {
@@ -148,7 +142,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
             I18n.t('%{user} is now group leader', {user: this.model.get('leader').display_name})
           )
           $(`.group-user-actions[data-user-id='user_${user_id}']`, this.el).focus()
-        }
+        },
       }
     )
   }
@@ -166,13 +160,13 @@ export default class GroupUsersView extends PaginatedCollectionView {
         {
           id: user.get('id'),
           title: user.get('name'),
-          groupId: this.model.get('id')
-        }
+          groupId: this.model.get('id'),
+        },
       ],
       moveOptions: {
         groupsLabel: I18n.t('Groups'),
         groups: backbone.collectionToGroups(this.model.collection, col => ({models: []})),
-        excludeCurrent: true
+        excludeCurrent: true,
       },
       onMoveSuccess: res => {
         const groupsHaveSubs =
@@ -183,7 +177,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
         if (groupsHaveSubs || (userHasSubs && newGroupNotEmpty)) {
           this.cloneCategoryView = new GroupCategoryCloneView({
             model: user.collection.category,
-            openedFromCaution: true
+            openedFromCaution: true,
           })
           this.cloneCategoryView.open()
           return this.cloneCategoryView.on('close', () => {
@@ -199,7 +193,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       },
 
       focusOnExit: item =>
-        document.querySelector(`.group[data-id=\"${item.groupId}\"] .group-heading`)
+        document.querySelector(`.group[data-id=\"${item.groupId}\"] .group-heading`),
     }
 
     return renderTray(this.moveTrayProps, document.getElementById('not_right_side'))
@@ -213,7 +207,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
     return {
       count: this.model.usersCount(),
       locked: this.model.isLocked(),
-      ENV
+      ENV,
     }
   }
 
@@ -228,9 +222,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
     return view.$el.on('dragstart', (event, ui) => {
       ui.helper.css('width', view.$el.width())
       $(event.target).draggable('option', 'containment', 'document')
-      $(event.target)
-        .data('draggable')
-        ._setContainment()
+      $(event.target).data('draggable')._setContainment()
     })
   }
 

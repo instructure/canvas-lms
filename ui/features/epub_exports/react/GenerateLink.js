@@ -29,7 +29,7 @@ class GenerateLink extends React.Component {
   static displayName = 'GenerateLink'
 
   static propTypes = {
-    course: PropTypes.object.isRequired
+    course: PropTypes.object.isRequired,
   }
 
   //
@@ -37,7 +37,7 @@ class GenerateLink extends React.Component {
   //
 
   state = {
-    triggered: false
+    triggered: false,
   }
 
   epubExport = () => this.props.course.epub_export || {}
@@ -85,11 +85,11 @@ class GenerateLink extends React.Component {
   _onClick = e => {
     e.preventDefault()
     this.setState({
-      triggered: true
+      triggered: true,
     })
     setTimeout(() => {
       this.setState({
-        triggered: false
+        triggered: false,
       })
     }, 800)
     CourseEpubExportStore.create(this.props.course.id)

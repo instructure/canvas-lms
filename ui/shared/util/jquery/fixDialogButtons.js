@@ -20,8 +20,8 @@ import _ from 'underscore'
 import preventDefault from 'prevent-default'
 import 'jqueryui/dialog'
 
-$.fn.fixDialogButtons = function() {
-  return this.each(function() {
+$.fn.fixDialogButtons = function () {
+  return this.each(function () {
     const $dialog = $(this)
     const $buttons = $dialog.find('.button-container:last .btn, button[type=submit]')
     if ($buttons.length) {
@@ -35,7 +35,10 @@ $.fn.fixDialogButtons = function() {
         // clicking it will cause the dialog to close
         if ($button.is('.dialog_closer')) {
           $button.off('.fixdialogbuttons')
-          $button.on('click.fixdialogbuttons', preventDefault(() => $dialog.dialog('close')))
+          $button.on(
+            'click.fixdialogbuttons',
+            preventDefault(() => $dialog.dialog('close'))
+          )
         }
 
         if ($button.prop('type') === 'submit' && $button[0].form) {
@@ -47,7 +50,7 @@ $.fn.fixDialogButtons = function() {
           'data-text-while-loading': $button.data('textWhileLoading'),
           click: () => $button.click(),
           class: classes,
-          id
+          id,
         }
       })
       // put the primary button(s) on the far right

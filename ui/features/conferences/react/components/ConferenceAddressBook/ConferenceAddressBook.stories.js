@@ -29,13 +29,13 @@ const menuItemList = [
   {displayName: 'Jeffrey Johnson', id: '0'},
   {displayName: 'Jewel Pearson', id: '8'},
   {displayName: 'Nic Nolan', id: '6'},
-  {displayName: 'Omar Soto Fortuno', id: '4'}
+  {displayName: 'Omar Soto Fortuno', id: '4'},
 ]
 
 export default {
   title: 'Examples/Conferences/ConferenceAddressBook',
   component: ConferenceAddressBook,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <ConferenceAddressBook menuItemList={menuItemList} {...args} />
@@ -45,5 +45,5 @@ Default.args = {}
 
 export const SelectedUsers = Template.bind({})
 SelectedUsers.args = {
-  selectedIds: ['1', '2', '3']
+  selectedIds: ['1', '2', '3'],
 }

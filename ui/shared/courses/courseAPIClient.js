@@ -25,7 +25,7 @@ const I18n = useI18nScope('modules_home_page')
 export const publishCourse = ({courseId}) => {
   axios
     .put(`/api/v1/courses/${courseId}`, {
-      course: {event: 'offer'}
+      course: {event: 'offer'},
     })
     .then(() => {
       window.location.reload()

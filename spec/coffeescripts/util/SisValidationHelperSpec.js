@@ -55,104 +55,104 @@ AssignmentStub.prototype.url = '/fake'
 
 QUnit.module('SisValidationHelper')
 
-test('nameTooLong returns true if name is too long AND postToSIS is true', function() {
+test('nameTooLong returns true if name is too long AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     name: 'Too Much Tuna',
     maxNameLength: 5,
-    maxNameLengthRequired: true
+    maxNameLengthRequired: true,
   })
   ok(this.helper.nameTooLong())
 })
 
-test('nameTooLong returns false if name is too long AND postToSIS is false', function() {
+test('nameTooLong returns false if name is too long AND postToSIS is false', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: false,
     name: 'Too Much Tuna',
     maxNameLength: 5,
-    maxNameLengthRequired: false
+    maxNameLengthRequired: false,
   })
   ok(!this.helper.nameTooLong())
 })
 
-test('dueDateMissing returns true if dueAt is null AND postToSIS is true', function() {
+test('dueDateMissing returns true if dueAt is null AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns false if dueAt is null AND postToSIS is false', function() {
+test('dueDateMissing returns false if dueAt is null AND postToSIS is false', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
-    dueDateRequired: false
+    dueDateRequired: false,
   })
   ok(!this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', function() {
+test('dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     allDates: [{dueAt: 'Something'}, {dueAt: null}],
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', function() {
+test('dueDateMissing returns true if dueAt is null with multiple sections AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     allDates: [{dueAt: 'Something'}, {dueAt: 'Something2'}],
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(!this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns false if dueAt is valid AND postToSIS is true', function() {
+test('dueDateMissing returns false if dueAt is valid AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     dueDate: 'Due Date',
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(!this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns false if dueAt is valid AND postToSIS is false', function() {
+test('dueDateMissing returns false if dueAt is valid AND postToSIS is false', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: false,
     dueDate: 'Due Date',
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(!this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns false if dueAt is valid with multiple section overrides AND postToSIS is true', function() {
+test('dueDateMissing returns false if dueAt is valid with multiple section overrides AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     dueDate: 'Due Date',
     allDates: [{dueAt: 'Something'}, {dueAt: 'Something2'}],
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(!this.helper.dueDateMissing())
 })
 
-test('dueDateMissing returns true if dueAt is valid with multiple section overrides as null AND postToSIS is true', function() {
+test('dueDateMissing returns true if dueAt is valid with multiple section overrides as null AND postToSIS is true', function () {
   this.helper = new SisValidationHelper({
     model: new AssignmentStub(),
     postToSIS: true,
     dueDate: 'Due Date',
     allDates: [{dueAt: null}, {dueAt: null}],
-    dueDateRequired: true
+    dueDateRequired: true,
   })
   ok(this.helper.dueDateMissing())
 })

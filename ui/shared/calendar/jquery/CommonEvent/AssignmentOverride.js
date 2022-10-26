@@ -109,7 +109,7 @@ Object.assign(AssignmentOverride.prototype, {
   methodAndURLForSave() {
     const url = $.replaceTags(this.contextInfo.assignment_override_url, {
       assignment_id: this.assignment.id,
-      id: this.override.id
+      id: this.override.id,
     })
     return ['PUT', url]
   },
@@ -118,5 +118,5 @@ Object.assign(AssignmentOverride.prototype, {
     return (
       this.assignment.user_submitted || (this.isPast() && this.assignment.needs_grading_count === 0)
     )
-  }
+  },
 })

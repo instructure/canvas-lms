@@ -40,7 +40,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         'click .cancel_button': 'cancel',
         'click .delete_button': 'delete',
         'click .move_button': 'move',
-        'keyup input.outcome_title': 'updateTitle'
+        'keyup input.outcome_title': 'updateTitle',
       },
       ValidatedFormView.prototype.events
     )
@@ -57,7 +57,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         } else if (data.title.length > 255) {
           return I18n.t('length_error', 'Must be 255 characters or less')
         }
-      }
+      },
     }
   }
 
@@ -90,7 +90,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
           success: () => {
             this.state = opts.state
             return this.render()
-          }
+          },
         })
       )
     }
@@ -232,9 +232,9 @@ export default class OutcomeContentBase extends ValidatedFormView {
               )
             )
           }
-        }
+        },
       })
-    );
+    )
   }
 
   move(e) {
@@ -253,7 +253,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         getRenderingTarget(t) {
           const wrappedTextarea = $(t).wrap(`<div id='parent-of-${t.id}'></div>`).get(0)
           return wrappedTextarea.parentNode
-        }
+        },
       })
       return this.$('input:first').focus()
     })

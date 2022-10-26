@@ -60,64 +60,64 @@ describe('Attachment', () => {
       const supportedFileIcons = [
         {
           mime_class: 'audio',
-          name: 'IconAttachMedia'
+          name: 'IconAttachMedia',
         },
         {
           mime_class: 'code',
-          name: 'IconCode'
+          name: 'IconCode',
         },
         {
           mime_class: 'doc',
-          name: 'IconDocument'
+          name: 'IconDocument',
         },
         {
           mime_class: 'file',
-          name: 'IconPaperclip'
+          name: 'IconPaperclip',
         },
         {
           mime_class: 'flash',
-          name: 'IconPaperclip'
+          name: 'IconPaperclip',
         },
         {
           mime_class: 'folder',
-          name: 'IconFolder'
+          name: 'IconFolder',
         },
         {
           mime_class: 'folder-locked',
-          name: 'IconFolderLocked'
+          name: 'IconFolderLocked',
         },
         {
           mime_class: 'html',
-          name: 'IconCode'
+          name: 'IconCode',
         },
         {
           mime_class: 'image',
-          name: 'IconImage'
+          name: 'IconImage',
         },
         {
           mime_class: 'pdf',
-          name: 'IconPdf'
+          name: 'IconPdf',
         },
         {
           mime_class: 'ppt',
-          name: 'IconMsPpt'
+          name: 'IconMsPpt',
         },
         {
           mime_class: 'text',
-          name: 'IconDocument'
+          name: 'IconDocument',
         },
         {
           mime_class: 'video',
-          name: 'IconAttachMedia'
+          name: 'IconAttachMedia',
         },
         {
           mime_class: 'xls',
-          name: 'IconMsExcel'
+          name: 'IconMsExcel',
         },
         {
           mime_class: 'zip',
-          name: 'IconZipped'
-        }
+          name: 'IconZipped',
+        },
       ]
 
       supportedFileIcons.forEach(fileType => {
@@ -125,8 +125,8 @@ describe('Attachment', () => {
           attachment: {
             id: '1',
             display_name: `${fileType.mime_class} file`,
-            mime_class: fileType.mime_class
-          }
+            mime_class: fileType.mime_class,
+          },
         })
         expect(container.querySelector('svg').getAttribute('name')).toEqual(fileType.name)
       })
@@ -139,8 +139,8 @@ describe('Attachment', () => {
             id: '1',
             display_name: 'has thumbnail',
             thumbnail_url: 'foo.bar/thumbnail',
-            mime_class: 'image'
-          }
+            mime_class: 'image',
+          },
         })
         expect(container.querySelector('svg')).toBe(null)
         expect(getByAltText('has thumbnail preview')).toBeTruthy()

@@ -31,7 +31,7 @@ describe('LoadingWrapper', () => {
     height: '5em',
     isLoading: false,
     allowZeroSkeletons: true,
-    ...props
+    ...props,
   })
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('LoadingWrapper', () => {
           isLoading: true,
           skeletonsNum: null,
           defaultSkeletonsNum: 3,
-          renderCustomSkeleton
+          renderCustomSkeleton,
         })}
       />
     )
@@ -123,7 +123,7 @@ describe('LoadingWrapper', () => {
           id: 'loading-wrapper-1',
           defaultSkeletonsNum: 5,
           skeletonsNum: null,
-          isLoading: true
+          isLoading: true,
         })}
       />
     )
@@ -140,7 +140,7 @@ describe('LoadingWrapper', () => {
           defaultSkeletonsNum: 5,
           skeletonsNum: null,
           allowZeroSkeletons: false,
-          isLoading: true
+          isLoading: true,
         })}
       />
     )
@@ -154,7 +154,7 @@ describe('LoadingWrapper', () => {
         {...getProps({
           id: 'wrapper-1',
           skeletonsNum: null,
-          isLoading: true
+          isLoading: true,
         })}
       />
     )
@@ -164,7 +164,7 @@ describe('LoadingWrapper', () => {
         {...getProps({
           id: 'wrapper-1',
           skeletonsNum: 4,
-          isLoading: false
+          isLoading: false,
         })}
       >
         <View>This is the loaded child component</View>
@@ -182,7 +182,7 @@ describe('LoadingWrapper', () => {
           skeletonsNum: 3,
           allowZeroSkeletons: false,
           isLoading: true,
-          persistInCache: false
+          persistInCache: false,
         })}
       />
     )
@@ -196,7 +196,7 @@ describe('LoadingWrapper', () => {
           skeletonsNum: 3,
           allowZeroSkeletons: false,
           isLoading: false,
-          persistInCache: false
+          persistInCache: false,
         })}
       >
         <View>This is the loaded child component</View>

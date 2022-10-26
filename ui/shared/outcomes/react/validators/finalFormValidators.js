@@ -26,5 +26,7 @@ export const requiredValidator = value => (!value ? I18n.t('This field is requir
 export const maxLengthValidator = length => value =>
   value && value.length > length ? I18n.t('Must be %{length} characters or less', {length}) : null
 
-export const composeValidators = (...validators) => value =>
-  validators.reduce((error, validator) => error || validator(value), undefined)
+export const composeValidators =
+  (...validators) =>
+  value =>
+    validators.reduce((error, validator) => error || validator(value), undefined)

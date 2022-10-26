@@ -27,12 +27,12 @@ const link = new HttpLink({
 
   // Use explicit `window.fetch` so that outgoing requests
   // are captured and deferred until the Service Worker is ready.
-  fetch: (...args) => fetch(...args)
+  fetch: (...args) => fetch(...args),
 })
 
 // Isolate Apollo client so it could be reused
 // in both application runtime and tests.
 export const mswClient = new ApolloClient({
   cache,
-  link
+  link,
 })

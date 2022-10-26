@@ -25,20 +25,20 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Quizzes'),
-      description: I18n.t('Allows user to view student quiz logs.')
-    }
+      description: I18n.t('Allows user to view student quiz logs.'),
+    },
   ],
   [
     {
       title: I18n.t('Grades'),
-      description: I18n.t('Grades - edit must also be enabled.')
+      description: I18n.t('Grades - edit must also be enabled.'),
     },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
         'The Quiz Log Auditing feature option must be enabled in Course Settings.'
-      )
-    }
+      ),
+    },
   ],
   [],
   []

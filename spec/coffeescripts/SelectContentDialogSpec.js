@@ -36,7 +36,7 @@ QUnit.module('SelectContentDialog', {
       type: 'click',
       timeStamp: 1433863761376,
       jQuery17209791898143012077: true,
-      preventDefault() {}
+      preventDefault() {},
     }
     $l.data('tool', {name: 'mytool', placements: {resource_selection: {}}})
     sandbox.stub(window, 'confirm').returns(true)
@@ -47,7 +47,7 @@ QUnit.module('SelectContentDialog', {
     clickEvent = {}
     fixtures.innerHTML = ''
     $('#resource_selection_dialog').parent().remove()
-  }
+  },
 })
 
 test('it creates a confirm alert before closing the modal', () => {
@@ -82,9 +82,9 @@ test('it removes the confirm alert if a selection is passed back', () => {
       {
         '@type': 'LtiLinkItem',
         url: 'http://canvas.instructure.com/test',
-        placementAdvice: {presentationDocumentTarget: ''}
-      }
-    ]
+        placementAdvice: {presentationDocumentTarget: ''},
+      },
+    ],
   })
   $dialog.trigger(selectionEvent)
   strictEqual(window.confirm.callCount, 0)
@@ -102,8 +102,8 @@ test('close resource selection dialog when content items attribute is empty', as
     data: {
       subject: 'LtiDeepLinkingResponse',
       content_items: [],
-      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
-    }
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+    },
   }
 
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)

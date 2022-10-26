@@ -28,11 +28,11 @@ describe('GroupDescriptionModal', () => {
     outcomeGroup: {
       _id: '1',
       title: 'Group Title',
-      description: 'Group Description'
+      description: 'Group Description',
     },
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {

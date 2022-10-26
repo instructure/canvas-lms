@@ -29,27 +29,27 @@ describe('DeveloperKeys App', () => {
     access_token_count: 0,
     developer_key_account_binding: {
       account_owns_binding,
-      workflow_state: 'on'
-    }
+      workflow_state: 'on',
+    },
   })
 
   const siteAdminKeys = [
     makeKey({id: '1', name: 'Site Admin 1'}),
-    makeKey({id: '2', name: 'Site Admin 2'})
+    makeKey({id: '2', name: 'Site Admin 2'}),
   ]
   const parentKeys = [
     makeKey({
       id: '3',
       name: 'Parent 1',
       inherited_from: 'federated_parent',
-      account_owns_binding: false
+      account_owns_binding: false,
     }),
     makeKey({
       id: '4',
       name: 'Parent 2',
       inherited_from: 'federated_parent',
-      account_owns_binding: false
-    })
+      account_owns_binding: false,
+    }),
   ]
 
   const initialApplicationState = inheritedList => {
@@ -61,12 +61,12 @@ describe('DeveloperKeys App', () => {
         developerKeyCreateOrEditPending: false,
         developerKeyModalOpen: false,
         developerKey: {},
-        editing: false
+        editing: false,
       },
       listDeveloperKeyScopes: {
         availableScopes: {},
         listDeveloperKeyScopesPending: false,
-        selectedScopes: []
+        selectedScopes: [],
       },
       listDeveloperKeys: {
         listDeveloperKeysPending: false,
@@ -76,8 +76,8 @@ describe('DeveloperKeys App', () => {
         nextPage: 'http://...',
         inheritedNextPage: 'http://...',
         listInheritedDeveloperKeysPending: false,
-        listInheritedDeveloperKeysSuccessful: false
-      }
+        listInheritedDeveloperKeysSuccessful: false,
+      },
     }
   }
 
@@ -102,15 +102,15 @@ describe('DeveloperKeys App', () => {
         makeInvisibleDeveloperKey: () => {},
         activateDeveloperKey: () => {},
         deactivateDeveloperKey: () => {},
-        deleteDeveloperKey: () => {}
+        deleteDeveloperKey: () => {},
       },
       store: {dispatch: () => {}},
       ctx: {
         params: {
-          contextId: ''
-        }
+          contextId: '',
+        },
       },
-      ...overrides
+      ...overrides,
     }
     return render(<App {...props} />)
   }

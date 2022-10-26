@@ -25,37 +25,37 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to reply to a discussion post.')
-    }
+      description: I18n.t('Allows user to reply to a discussion post.'),
+    },
   ],
   [
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
         'To view discussions in a course, Discussions - view must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If the option requiring users to post before seeing replies is selected in a discussion, users must post a reply to view all posts unless Discussions - moderate is also enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to reply to a discussion post.')
-    }
+      description: I18n.t('Allows user to reply to a discussion post.'),
+    },
   ],
   [
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
         'To view discussions in a course, Discussions - view must also be enabled.'
-      )
+      ),
     },
     {
-      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.')
-    }
+      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
+    },
   ]
 )

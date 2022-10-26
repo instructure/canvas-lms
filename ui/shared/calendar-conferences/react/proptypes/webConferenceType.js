@@ -22,6 +22,6 @@ const webConferenceType = shape({
   name: string.isRequired,
   type: string.isRequired,
   contexts: arrayOf(string),
-  lti_settings: object
+  lti_settings: object,
 })
 export default webConferenceType

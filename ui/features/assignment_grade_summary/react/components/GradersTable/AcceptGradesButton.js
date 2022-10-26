@@ -56,7 +56,6 @@ function startedButton(props) {
 }
 
 function successButton(props) {
-  /* eslint-disable react/prop-types */
   return (
     <Button
       {...buttonProps(props)}
@@ -77,7 +76,7 @@ export default function AcceptGradesButton(props) {
     ...otherProps,
     'aria-readonly': actionReady ? null : true,
     disabled: selectionDetails.allowed ? null : true,
-    onClick: selectionDetails.allowed && actionReady ? onClick : null
+    onClick: selectionDetails.allowed && actionReady ? onClick : null,
   }
 
   if (acceptGradesStatus === STARTED) {
@@ -103,10 +102,10 @@ AcceptGradesButton.propTypes = {
   onClick: func.isRequired,
   selectionDetails: shape({
     allowed: bool.isRequired,
-    provisionalGradeIds: arrayOf(string).isRequired
-  }).isRequired
+    provisionalGradeIds: arrayOf(string).isRequired,
+  }).isRequired,
 }
 
 AcceptGradesButton.defaultProps = {
-  acceptGradesStatus: null
+  acceptGradesStatus: null,
 }

@@ -24,7 +24,7 @@ import Categories from '@canvas/assignments/assignment-categories'
 export default combineReducers({
   error: handleActions(
     {
-      [actions.SET_ERROR]: (state, action) => action.payload
+      [actions.SET_ERROR]: (state, action) => action.payload,
     },
     ''
   ),
@@ -41,17 +41,17 @@ export default combineReducers({
           })
         })
         return options
-      }
+      },
     },
     []
   ),
   selectedOption: handleActions(
     {
-      [actions.SELECT_OPTION]: (state, action) => action.payload
+      [actions.SELECT_OPTION]: (state, action) => action.payload,
     },
     null
   ),
-  courseId: (state = '', action) => state,
-  moduleId: (state = '', action) => state,
-  itemId: (state = '', action) => state
+  courseId: (state = '', _action) => state,
+  moduleId: (state = '', _action) => state,
+  itemId: (state = '', _action) => state,
 })

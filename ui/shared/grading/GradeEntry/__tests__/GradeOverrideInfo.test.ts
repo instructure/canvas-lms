@@ -28,9 +28,9 @@ describe('GradeOverrideInfo', () => {
       enteredAs: EnterGradesAs.PERCENTAGE,
       grade: new GradeOverride({
         percentage: 91.1,
-        schemeKey: 'A'
+        schemeKey: 'A',
       }),
-      valid: true
+      valid: true,
     }
   })
 

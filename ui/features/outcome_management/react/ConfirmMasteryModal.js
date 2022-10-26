@@ -32,11 +32,11 @@ export default class ConfirmMasteryModal extends Component {
     isOpen: bool.isRequired,
     onClose: func.isRequired,
     title: string.isRequired,
-    confirmButtonText: string
+    confirmButtonText: string,
   }
 
   static defaultProps = {
-    confirmButtonText: I18n.t('Save')
+    confirmButtonText: I18n.t('Save'),
   }
 
   onConfirm = () => {

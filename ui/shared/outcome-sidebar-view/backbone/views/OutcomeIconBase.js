@@ -35,7 +35,7 @@ export default class OutcomeIconBase extends Backbone.View {
     this.prototype.events = {
       click: 'triggerSelect',
       keydown: 'onKeydown',
-      focus: 'onFocus'
+      focus: 'onFocus',
     }
 
     this.prototype.keyCodes = {
@@ -44,7 +44,7 @@ export default class OutcomeIconBase extends Backbone.View {
       37: 'LeftArrow',
       38: 'UpArrow',
       39: 'RightArrow',
-      40: 'DownArrow'
+      40: 'DownArrow',
     }
   }
 
@@ -140,10 +140,7 @@ export default class OutcomeIconBase extends Backbone.View {
   // Returns nothing.
   onFocus(e) {
     const $target = $(e.target)
-    $target
-      .parents('.wrapper:first')
-      .find('[tabindex=0]')
-      .attr('tabindex', -1)
+    $target.parents('.wrapper:first').find('[tabindex=0]').attr('tabindex', -1)
     return $target.attr('tabindex', 0)
   }
 
@@ -151,10 +148,7 @@ export default class OutcomeIconBase extends Backbone.View {
   //
   // Returns jQuery element
   makeFocusable() {
-    this.$el
-      .parent()
-      .find('[tabindex=0]')
-      .attr('tabindex', -1)
+    this.$el.parent().find('[tabindex=0]').attr('tabindex', -1)
     return this.$el.attr('tabindex', 0)
   }
 
@@ -228,7 +222,7 @@ export default class OutcomeIconBase extends Backbone.View {
         if (scrolled !== false && $.ui.ddmanager && !o.dropBehaviour) {
           return $.ui.ddmanager.prepareOffsets(i, event)
         }
-      }
+      },
     })
   }
 }

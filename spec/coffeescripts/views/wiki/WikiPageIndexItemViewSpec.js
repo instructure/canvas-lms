@@ -17,7 +17,7 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageIndexItemView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexItemView.js'
+import WikiPageIndexItemView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexItemView'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('WikiPageIndexItemView', {
@@ -26,7 +26,7 @@ QUnit.module('WikiPageIndexItemView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('model.view maintained by item view', () => {
@@ -34,7 +34,7 @@ test('model.view maintained by item view', () => {
   const view = new WikiPageIndexItemView({
     model,
     collectionHasTodoDate: () => {},
-    selectedPages: {}
+    selectedPages: {},
   })
   strictEqual(model.view, view, 'model.view is set to the item view')
   view.render()
@@ -46,7 +46,7 @@ test('detach/reattach the publish icon view', () => {
   const view = new WikiPageIndexItemView({
     model,
     collectionHasTodoDate: () => {},
-    selectedPages: {}
+    selectedPages: {},
   })
   view.render()
   const $previousEl = view.$el.find('> *:first-child')
@@ -63,12 +63,12 @@ test('detach/reattach the publish icon view', () => {
 test('delegate useAsFrontPage to the model', () => {
   const model = new WikiPage({
     front_page: false,
-    published: true
+    published: true,
   })
   const view = new WikiPageIndexItemView({
     model,
     collectionHasTodoDate: () => {},
-    selectedPages: {}
+    selectedPages: {},
   })
   const stub = sandbox.stub(model, 'setFrontPage')
   view.useAsFrontPage()
@@ -81,7 +81,7 @@ test('only shows direct share menu items if enabled', () => {
     collectionHasTodoDate: () => {},
     selectedPages: {},
     WIKI_RIGHTS: {read: true, manage: true, update: true},
-    CAN: {MANAGE: true}
+    CAN: {MANAGE: true},
   })
   view.render()
   strictEqual(view.$('.send-wiki-page-to').length, 0)
@@ -103,7 +103,7 @@ const testRights = (subject, options) =>
       contextName: options.contextName,
       WIKI_RIGHTS: options.WIKI_RIGHTS,
       collectionHasTodoDate: () => {},
-      selectedPages: {}
+      selectedPages: {},
     })
     const json = view.toJSON()
     for (const key in options.CAN) {
@@ -117,13 +117,13 @@ testRights('CAN (manage course)', {
     read: true,
     manage: true,
     publish_page: true,
-    create_page: true
+    create_page: true,
   },
   CAN: {
     MANAGE: true,
     PUBLISH: true,
-    DUPLICATE: true
-  }
+    DUPLICATE: true,
+  },
 })
 
 testRights('CAN (manage group)', {
@@ -132,13 +132,13 @@ testRights('CAN (manage group)', {
     read: true,
     manage: true,
     publish_page: false,
-    create_page: true
+    create_page: true,
   },
   CAN: {
     MANAGE: true,
     PUBLISH: false,
-    DUPLICATE: false
-  }
+    DUPLICATE: false,
+  },
 })
 
 testRights('CAN (read)', {
@@ -146,15 +146,15 @@ testRights('CAN (read)', {
   WIKI_RIGHTS: {read: true},
   CAN: {
     MANAGE: false,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 testRights('CAN (null)', {
   CAN: {
     MANAGE: false,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 // Tests for granular permissions, with manage permission removed
@@ -167,8 +167,8 @@ testRights('CAN (create page - course)', {
     PUBLISH: false,
     DUPLICATE: true,
     UPDATE: false,
-    DELETE: false
-  }
+    DELETE: false,
+  },
 })
 
 testRights('CAN (create page - group)', {
@@ -179,8 +179,8 @@ testRights('CAN (create page - group)', {
     PUBLISH: false,
     DUPLICATE: false,
     UPDATE: false,
-    DELETE: false
-  }
+    DELETE: false,
+  },
 })
 
 testRights('CAN (delete page)', {
@@ -191,8 +191,8 @@ testRights('CAN (delete page)', {
     PUBLISH: false,
     DUPLICATE: false,
     UPDATE: false,
-    DELETE: true
-  }
+    DELETE: true,
+  },
 })
 
 testRights('CAN (update page)', {
@@ -203,18 +203,18 @@ testRights('CAN (update page)', {
     PUBLISH: true,
     DUPLICATE: false,
     UPDATE: true,
-    DELETE: false
-  }
+    DELETE: false,
+  },
 })
 
 test('includes is_checked', () => {
   const model = new WikiPage({
-    page_id: '42'
+    page_id: '42',
   })
   const view = new WikiPageIndexItemView({
     model,
     collectionHasTodoDate: () => {},
-    selectedPages: {'42': model}
+    selectedPages: {42: model},
   })
   strictEqual(view.toJSON().isChecked, true)
 })

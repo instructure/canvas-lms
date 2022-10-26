@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n, { useTranslations } from '@canvas/i18n'
+import I18n, {useTranslations} from '@canvas/i18n'
 import enTranslations from 'translations/en.json'
 
 const frames = []
@@ -25,7 +25,7 @@ export default {
   pushFrame() {
     frames.push({
       locale: I18n.locale,
-      translations: I18n.translations
+      translations: I18n.translations,
     })
     I18n.locale = null
     I18n.translations = {en: {}}
@@ -44,7 +44,7 @@ export default {
   useInitialTranslations() {
     this.pushFrame()
     I18n.locale = 'en'
-    I18n.translations = { en: enTranslations }
+    I18n.translations = {en: enTranslations}
   },
   stub(locale, translations, cb) {
     if (cb) {
@@ -55,8 +55,7 @@ export default {
     // don't merge into a given locale, just replace everything wholesale
     if (typeof locale === 'object') {
       I18n.translations = locale
-    }
-    else {
+    } else {
       I18n.translations[locale] = translations
     }
   },
@@ -68,5 +67,5 @@ export default {
     this.pushFrame()
     cbs.forEach(cb => cb())
     return this.popFrame()
-  }
+  },
 }

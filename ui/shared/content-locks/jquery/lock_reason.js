@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/datetime'/* datetimeString */
+import '@canvas/datetime' /* datetimeString */
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import INST from 'browser-sniffer'
@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('content_locks')
 
-INST.lockExplanation = function(data, type) {
+INST.lockExplanation = function (data, type) {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb
   if (data.lock_at) {
     const lock_at = $.datetimeString(data.lock_at)
@@ -33,7 +33,7 @@ INST.lockExplanation = function(data, type) {
         return I18n.t('messages.quiz_locked_at', 'This quiz was locked %{at}.', {at: lock_at})
       case 'assignment':
         return I18n.t('messages.assignment_locked_at', 'This assignment was locked %{at}.', {
-          at: lock_at
+          at: lock_at,
         })
       case 'topic':
         return I18n.t('messages.topic_locked_at', 'This topic was locked %{at}.', {at: lock_at})
@@ -49,7 +49,7 @@ INST.lockExplanation = function(data, type) {
     switch (type) {
       case 'quiz':
         return I18n.t('messages.quiz_locked_until', 'This quiz is locked until %{date}.', {
-          date: unlock_at
+          date: unlock_at,
         })
       case 'assignment':
         return I18n.t(
@@ -59,19 +59,19 @@ INST.lockExplanation = function(data, type) {
         )
       case 'topic':
         return I18n.t('messages.topic_locked_until', 'This topic is locked until %{date}.', {
-          date: unlock_at
+          date: unlock_at,
         })
       case 'file':
         return I18n.t('messages.file_locked_until', 'This file is locked until %{date}.', {
-          date: unlock_at
+          date: unlock_at,
         })
       case 'page':
         return I18n.t('messages.page_locked_until', 'This page is locked until %{date}.', {
-          date: unlock_at
+          date: unlock_at,
         })
       default:
         return I18n.t('messages.content_locked_until', 'This content is locked until %{date}.', {
-          date: unlock_at
+          date: unlock_at,
         })
     }
   } else if (data.context_module) {

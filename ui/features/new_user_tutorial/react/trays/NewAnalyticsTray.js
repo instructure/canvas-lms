@@ -30,23 +30,23 @@ const NewAnalyticsTray = () => (
     image="/images/tutorial-tray-images/Panda_Analytics.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t(
           'How do I send a message to all students based on specific course criteria in New Analytics?'
         ),
-        href: I18n.t('#community.instructor_message_all_criteria_new_analytics')
+        href: I18n.t('#community.instructor_message_all_criteria_new_analytics'),
       },
       {
         label: I18n.t('How do I send a message to an individual student in New Analytics?'),
-        href: I18n.t('#community.instructor_message_individual_new_analytics')
+        href: I18n.t('#community.instructor_message_individual_new_analytics'),
       },
       {
         label: I18n.t('How do I view analytics for an individual student?'),
-        href: I18n.t('#community.instructor_individual_new_analytics')
-      }
+        href: I18n.t('#community.instructor_individual_new_analytics'),
+      },
     ]}
   >
     {I18n.t(`New Analytics is an interactive tool that helps you and your students better

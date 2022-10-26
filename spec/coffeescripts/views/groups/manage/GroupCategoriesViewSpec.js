@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import GroupCategoriesView from 'ui/features/manage_groups/backbone/views/GroupCategoriesView.js'
+import GroupCategoriesView from 'ui/features/manage_groups/backbone/views/GroupCategoriesView'
 import GroupCategoryCollection from '@canvas/groups/backbone/collections/GroupCategoryCollection'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import fakeENV from 'helpers/fakeENV'
@@ -36,12 +36,12 @@ QUnit.module('GroupCategoriesView', {
     categories = new GroupCategoryCollection([
       {
         id: 1,
-        name: 'group set 1'
+        name: 'group set 1',
       },
       {
         id: 2,
-        name: 'group set 2'
-      }
+        name: 'group set 2',
+      },
     ])
     sandbox.stub(categories, 'fetch').returns([])
     view = new GroupCategoriesView({collection: categories})
@@ -55,7 +55,7 @@ QUnit.module('GroupCategoriesView', {
     clock.restore()
     view.remove()
     wrapper.innerHTML = ''
-  }
+  },
 })
 
 test('render tab and panel elements', () => {
@@ -70,7 +70,7 @@ test('adding new GroupCategory should display new tab and panel', () => {
   categories.add(
     new GroupCategory({
       id: 3,
-      name: 'Newly Added'
+      name: 'Newly Added',
     })
   )
   equal(view.$el.find('.collectionViewItems > li').length, 3)

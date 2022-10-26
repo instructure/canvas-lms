@@ -44,7 +44,7 @@ const useOutcomeFormValidate = ({focusOnRatingsError, clearRatingsFocus}) => {
     ratingsError,
     friendlyDescriptionError,
     displayNameError,
-    titleError
+    titleError,
   }) => {
     let errField = null
     typeof clearRatingsFocus === 'function' && clearRatingsFocus()
@@ -85,7 +85,7 @@ const useOutcomeFormValidate = ({focusOnRatingsError, clearRatingsFocus}) => {
     setDisplayNameRef,
     setFriendlyDescriptionRef,
     setMasteryPointsRef,
-    setCalcIntRef
+    setCalcIntRef,
   }
 }
 

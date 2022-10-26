@@ -54,11 +54,7 @@ export default function AppTile({baseUrl, app}: AppTileProps) {
       <div id={appId}>
         {installedRibbon()}
 
-        <img
-          className="banner_image"
-          alt={app.name}
-          src={app.banner_image_url}
-        />
+        <img className="banner_image" alt={app.name} src={app.banner_image_url} />
         <div className="details">
           <div className="content">
             <span className="name">{app.name}</span>
@@ -71,4 +67,3 @@ export default function AppTile({baseUrl, app}: AppTileProps) {
     </a>
   )
 }
-

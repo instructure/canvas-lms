@@ -23,7 +23,7 @@ import {ThreadingToolbar} from './ThreadingToolbar'
 export default {
   title: 'Examples/Discussion Posts/Components/ThreadingToolbar/Reply',
   component: ThreadingToolbar.Reply,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => (

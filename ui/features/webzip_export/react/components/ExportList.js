@@ -30,14 +30,15 @@ class ExportList extends React.Component {
         date: PropTypes.string.isRequired,
         link: PropTypes.string,
         workflowState: PropTypes.string.isRequired,
-        newExport: PropTypes.bool.isRequired
+        newExport: PropTypes.bool.isRequired,
       })
-    ).isRequired
+    ).isRequired,
   }
 
   renderExportListItems() {
     return this.props.exports.map((webzip, key) => (
       <ExportListItem
+        // eslint-disable-next-line react/no-array-index-key
         key={key}
         link={webzip.link}
         date={webzip.date}

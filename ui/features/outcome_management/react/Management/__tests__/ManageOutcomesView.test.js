@@ -35,7 +35,7 @@ describe('ManageOutcomesView', () => {
       _id: '1',
       title: 'Group Title',
       outcomesCount: 0,
-      outcomes: {edges: [], pageInfo: {hasNextPage: false}}
+      outcomes: {edges: [], pageInfo: {hasNextPage: false}},
     },
     selectedOutcomes: {1: true},
     searchString: 'abc',
@@ -48,7 +48,7 @@ describe('ManageOutcomesView', () => {
     loadMore,
     removeOutcomesStatus,
     isRootGroup: false,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -109,7 +109,7 @@ describe('ManageOutcomesView', () => {
   describe('kebab menu', () => {
     it('is not rendered if canManage is false', () => {
       const {queryByText} = renderWithContext(<ManageOutcomesView {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(queryByText('Menu for group Group Title')).not.toBeInTheDocument()
     })
@@ -121,7 +121,7 @@ describe('ManageOutcomesView', () => {
 
     it('rendered if canManage is true', () => {
       const {getByText} = renderWithContext(<ManageOutcomesView {...defaultProps()} />, {
-        canManage: true
+        canManage: true,
       })
       expect(getByText('Menu for group Group Title')).toBeInTheDocument()
     })
@@ -159,8 +159,8 @@ describe('ManageOutcomesView', () => {
             _id: '1',
             title: 'Group Title',
             outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: true}}
-          }
+            outcomes: {edges: [], pageInfo: {hasNextPage: true}},
+          },
         })}
       />
     )
@@ -179,7 +179,7 @@ describe('ManageOutcomesView', () => {
     render(
       <ManageOutcomesView
         {...defaultProps({
-          scrollContainer
+          scrollContainer,
         })}
       />
     )

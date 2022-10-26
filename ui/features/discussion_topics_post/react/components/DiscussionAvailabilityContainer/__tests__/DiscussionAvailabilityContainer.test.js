@@ -29,14 +29,14 @@ const mockSections = [
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 99,
-    name: 'section 2'
+    name: 'section 2',
   },
   {
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 990,
-    name: 'section 25'
-  }
+    name: 'section 25',
+  },
 ]
 const mockLockAt = '2022-01-19T23:59:59-07:00'
 const mockDelayedPost = '2022-01-12T00:00:00-07:00'
@@ -48,14 +48,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -100,7 +100,7 @@ describe('DiscussionAvailabilityContainer', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '767px'}
+        tablet: {maxWidth: '767px'},
       }))
     })
 

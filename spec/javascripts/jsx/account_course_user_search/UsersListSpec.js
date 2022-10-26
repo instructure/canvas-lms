@@ -29,38 +29,38 @@ const usersProps = {
     {
       id: '1',
       name: 'UserA',
-      avatar_url: 'http://someurl'
+      avatar_url: 'http://someurl',
     },
     {
       id: '2',
       name: 'UserB',
-      avatar_url: 'http://someurl'
+      avatar_url: 'http://someurl',
     },
     {
       id: '3',
       name: 'UserC',
-      avatar_url: 'http://someurl'
-    }
+      avatar_url: 'http://someurl',
+    },
   ],
   handlers: {
     handleOpenEditUserDialog() {},
     handleSubmitEditUserForm() {},
-    handleCloseEditUserDialog() {}
+    handleCloseEditUserDialog() {},
   },
   permissions: {
     can_masquerade: true,
     can_message_users: true,
-    can_edit_users: true
+    can_edit_users: true,
   },
   searchFilter: {
     search_term: 'User',
     sort: 'username',
-    order: 'asc'
+    order: 'asc',
   },
   onUpdateFilters: sinon.spy(),
   onApplyFilters: sinon.spy(),
   columnHeaderRef: sinon.spy(),
-  roles: {}
+  roles: {},
 }
 
 test('displays users that are passed in as props', () => {
@@ -76,27 +76,27 @@ Object.entries({
   username: 'Name',
   email: 'Email',
   sis_id: 'SIS ID',
-  last_login: 'Last Login'
+  last_login: 'Last Login',
 }).forEach(([columnID, label]) => {
   Object.entries({
     asc: {
       expectedArrow: 'Up',
       unexpectedArrow: 'Down',
-      expectedTip: `Click to sort by ${label} descending`
+      expectedTip: `Click to sort by ${label} descending`,
     },
     desc: {
       expectedArrow: 'Down',
       unexpectedArrow: 'Up',
-      expectedTip: `Click to sort by ${label} ascending`
-    }
+      expectedTip: `Click to sort by ${label} ascending`,
+    },
   }).forEach(([sortOrder, {expectedArrow, unexpectedArrow, expectedTip}]) => {
     const props = {
       ...usersProps,
       searchFilter: {
         search_term: 'User',
         sort: columnID,
-        order: sortOrder
-      }
+        order: sortOrder,
+      },
     }
 
     test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
@@ -122,7 +122,7 @@ Object.entries({
         <UsersList
           {...{
             ...props,
-            onUpdateFilters: sortSpy
+            onUpdateFilters: sortSpy,
           }}
         />
       )
@@ -137,7 +137,7 @@ Object.entries({
           search_term: 'User',
           sort: columnID,
           order: sortOrder === 'asc' ? 'desc' : 'asc',
-          role_filter_id: undefined
+          role_filter_id: undefined,
         })
       )
     })

@@ -36,7 +36,7 @@ describe('AlignmentSummaryHeader', () => {
     updateSearchHandler: updateSearchHandlerMock,
     clearSearchHandler: clearSearchHandlerMock,
     updateFilterHandler: updateFilterHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {

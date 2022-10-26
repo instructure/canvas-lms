@@ -31,7 +31,7 @@ export default class ScoreLabel extends React.Component {
       score: string,
       label: string,
       isUpperBound: bool,
-      triggerAssignment: object
+      triggerAssignment: object,
     }
   }
 

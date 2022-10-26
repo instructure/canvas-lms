@@ -29,11 +29,11 @@ const I18n = useI18nScope('context_modulesFileSelectBox')
 
 export default class FileSelectBox extends React.Component {
   static propTypes = {
-    contextString: string.isRequired
+    contextString: string.isRequired,
   }
 
   state = {
-    folders: []
+    folders: [],
   }
 
   isDirty = true
@@ -56,12 +56,12 @@ export default class FileSelectBox extends React.Component {
       this.folderStore = new FolderStore(contextUrl, {perPage: 50})
       this.fileStore.addChangeListener(() => {
         this.setState({
-          files: this.fileStore.getState().items
+          files: this.fileStore.getState().items,
         })
       })
       this.folderStore.addChangeListener(() => {
         this.setState({
-          folders: this.folderStore.getState().items
+          folders: this.folderStore.getState().items,
         })
       })
 
@@ -142,7 +142,7 @@ export default class FileSelectBox extends React.Component {
           aria-busy={this.isLoading()}
           className="module_item_select"
           aria-label={ariaLabel}
-          multiple
+          multiple={true}
         >
           <option value="new">{newFile}</option>
           {this.renderFilesAndFolders()}

@@ -36,13 +36,13 @@ export const GroupSet = {
   shape: shape({
     name: string,
     id: string,
-    _id: string
+    _id: string,
   }),
 
   mock: ({name = 'my group set', id = 'QXNzaWHGVJBkn0x22', _id = '1'} = {}) => ({
     name,
     id,
     _id,
-    __typename: 'GroupSet'
-  })
+    __typename: 'GroupSet',
+  }),
 }

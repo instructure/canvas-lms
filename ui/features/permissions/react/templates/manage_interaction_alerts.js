@@ -25,29 +25,29 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('Allows user to configure alerts in Course Settings.')
-    }
+      description: I18n.t('Allows user to configure alerts in Course Settings.'),
+    },
   ],
   [
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
         'This is an account setting that must be enabled by a Customer Success Manager. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('Allows user to configure alerts in Course Settings.')
-    }
+      description: I18n.t('Allows user to configure alerts in Course Settings.'),
+    },
   ],
   [
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
         'Alerts must be configured for the institution. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved.'
-      )
-    }
+      ),
+    },
   ]
 )

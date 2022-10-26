@@ -37,13 +37,13 @@ const options = [
   {
     id: '1',
     label: I18n.t('Split students by number of groups'),
-    dataTestid: 'group-structure-num-groups'
+    dataTestid: 'group-structure-num-groups',
   },
   {
     id: '2',
     label: I18n.t('Split number of students per group'),
-    dataTestid: 'group-structure-students-per-group'
-  }
+    dataTestid: 'group-structure-students-per-group',
+  },
 ]
 
 const GroupStructureSelfSignup = ({onChange, errormsg}) => {
@@ -244,14 +244,8 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
 
 export const GroupStructure = ({onChange, errormsg}) => {
   /* eslint-disable prettier/prettier */
-  const {
-    selfSignup,
-    createGroupCount,
-    createGroupMemberCount,
-    bySection,
-    splitGroups,
-    groupLimit
-  } = useContext(GroupContext)
+  const {selfSignup, createGroupCount, createGroupMemberCount, bySection, splitGroups, groupLimit} =
+    useContext(GroupContext)
   /* eslint-enable prettier/prettier */
 
   function handleChange(key, val) {
@@ -271,7 +265,7 @@ export const GroupStructure = ({onChange, errormsg}) => {
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Structure')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         {selfSignup ? (
           <GroupStructureSelfSignup onChange={handleChange} errormsg={errormsg} />
         ) : (
@@ -284,5 +278,5 @@ export const GroupStructure = ({onChange, errormsg}) => {
 
 GroupStructure.propTypes = {
   onChange: func.isRequired,
-  errormsg: string
+  errormsg: string,
 }

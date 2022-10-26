@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import fakeENV from 'helpers/fakeENV'
-import Lti2Iframe from 'ui/features/external_apps/react/components/Lti2Iframe.js'
+import Lti2Iframe from 'ui/features/external_apps/react/components/Lti2Iframe'
 
 QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
   let $container
@@ -38,7 +38,7 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
       handleInstall() {},
       registrationUrl: 'http://localhost/register',
       reregistration: false,
-      toolName: 'The best LTI tool ever'
+      toolName: 'The best LTI tool ever',
     }
   })
 

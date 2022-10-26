@@ -28,7 +28,7 @@ import {
   DEFAULT_STORE_STATE,
   PRIMARY_PACE,
   PROGRESS_FAILED,
-  PROGRESS_RUNNING
+  PROGRESS_RUNNING,
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
 
@@ -36,6 +36,7 @@ const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 const PROGRESS_API = `/api/v1/progress/${PROGRESS_RUNNING.id}`
 const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_pacing/compress_dates`
+const DESTROY_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 
 const dispatch = jest.fn()
 
@@ -52,8 +53,8 @@ const mockGetState =
     blackoutDates,
     original: {
       coursePace: originalPace,
-      blackoutDates: originalBlackoutDates
-    }
+      blackoutDates: originalBlackoutDates,
+    },
   })
 
 beforeEach(() => {
@@ -74,7 +75,7 @@ describe('Course paces actions', () => {
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
       fetchMock.put(UPDATE_API, {
         course_pace: updatedPace,
-        progress: PROGRESS_RUNNING
+        progress: PROGRESS_RUNNING,
       })
 
       const thunkedAction = coursePaceActions.publishPace()
@@ -108,7 +109,7 @@ describe('Course paces actions', () => {
       const error = new Error("You don't actually want to publish this")
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
       fetchMock.put(UPDATE_API, {
-        throws: error
+        throws: error,
       })
 
       const thunkedAction = coursePaceActions.publishPace()
@@ -118,7 +119,7 @@ describe('Course paces actions', () => {
         [uiActions.startSyncing()],
         [uiActions.clearCategoryError('publish')],
         [uiActions.setCategoryError('publish', error.toString())],
-        [uiActions.syncingCompleted()]
+        [uiActions.syncingCompleted()],
       ])
     })
   })
@@ -130,13 +131,13 @@ describe('Course paces actions', () => {
 
       const getStateFailed = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: PROGRESS_FAILED}
+        coursePace: {publishingProgress: PROGRESS_FAILED},
       })
       coursePaceActions.pollForPublishStatus()(dispatch, getStateFailed)
 
       const getStateCompleted = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_FAILED, workflow_state: 'completed'}}
+        coursePace: {publishingProgress: {...PROGRESS_FAILED, workflow_state: 'completed'}},
       })
       coursePaceActions.pollForPublishStatus()(dispatch, getStateCompleted)
 
@@ -146,7 +147,7 @@ describe('Course paces actions', () => {
     it('sets a timeout that updates progress status and clears when a terminal status is reached', async () => {
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_RUNNING}}
+        coursePace: {publishingProgress: {...PROGRESS_RUNNING}},
       })
       const progressUpdated = {...PROGRESS_RUNNING, completion: 60}
       fetchMock.get(PROGRESS_API, progressUpdated)
@@ -167,7 +168,7 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
         expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.setProgress(undefined)])
         expect(dispatch.mock.calls[4]).toEqual([
-          coursePaceActions.coursePaceSaved(getState().coursePace)
+          coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
         expect(screen.getByText('Finished publishing pace')).toBeInTheDocument()
       })
@@ -176,7 +177,7 @@ describe('Course paces actions', () => {
     it('stops polling and displays an error message if checking the progress API fails', async () => {
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_RUNNING}}
+        coursePace: {publishingProgress: {...PROGRESS_RUNNING}},
       })
       const error = new Error('Progress? What progress?')
       fetchMock.get(PROGRESS_API, {throws: error})
@@ -184,7 +185,7 @@ describe('Course paces actions', () => {
       await coursePaceActions.pollForPublishStatus()(dispatch, getState)
 
       expect(dispatch.mock.calls).toEqual([
-        [uiActions.setCategoryError('checkPublishStatus', error?.toString())]
+        [uiActions.setCategoryError('checkPublishStatus', error?.toString())],
       ])
       expect(setTimeout).not.toHaveBeenCalled()
     })
@@ -196,7 +197,7 @@ describe('Course paces actions', () => {
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
       const compressResponse = {
         1: 'a date',
-        2: 'another date'
+        2: 'another date',
       }
       fetchMock.post(COMPRESS_API, compressResponse)
 
@@ -206,7 +207,7 @@ describe('Course paces actions', () => {
       expect(dispatch.mock.calls[0]).toEqual([uiActions.showLoadingOverlay('Compressing...')])
       expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('compress')])
       expect(dispatch.mock.calls[2]).toEqual([
-        coursePaceActions.setCompressedItemDates(compressResponse)
+        coursePaceActions.setCompressedItemDates(compressResponse),
       ])
       // Compare dispatched functions by name since they won't be directly equal
       expect(dispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
@@ -217,8 +218,8 @@ describe('Course paces actions', () => {
             {
               event_title: 'Spring break',
               start_date: '2022-03-21T00:00:00.000-06:00',
-              end_date: '2022-03-25T00:00:00.000-06:00'
-            }
+              end_date: '2022-03-25T00:00:00.000-06:00',
+            },
           ],
           course_pace: {
             start_date: updatedPace.start_date,
@@ -230,13 +231,13 @@ describe('Course paces actions', () => {
                   module.items.map(item => ({
                     id: item.id,
                     duration: item.duration,
-                    module_item_id: item.module_item_id
+                    module_item_id: item.module_item_id,
                   }))
                 )
               },
               []
-            )
-          }
+            ),
+          },
         })
       )
       expect(fetchMock.called(COMPRESS_API, 'POST')).toBe(true)
@@ -247,7 +248,7 @@ describe('Course paces actions', () => {
       const error = new Error('Whoops!')
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
       fetchMock.post(COMPRESS_API, {
-        throws: error
+        throws: error,
       })
 
       const thunkedAction = coursePaceActions.compressDates()
@@ -257,7 +258,7 @@ describe('Course paces actions', () => {
         [uiActions.showLoadingOverlay('Compressing...')],
         [uiActions.clearCategoryError('compress')],
         [uiActions.hideLoadingOverlay()],
-        [uiActions.setCategoryError('compress', error.toString())]
+        [uiActions.setCategoryError('compress', error.toString())],
       ])
     })
   })
@@ -268,7 +269,7 @@ describe('Course paces actions', () => {
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
       const getState = mockGetState(updatedPace, PRIMARY_PACE, {
         syncing: SyncState.UNSYNCED,
-        blackoutDates: BLACKOUT_DATES
+        blackoutDates: BLACKOUT_DATES,
       })
 
       const thunkedAction = coursePaceActions.syncUnpublishedChanges()
@@ -291,6 +292,59 @@ describe('Course paces actions', () => {
       await thunkedAction(asyncDispatch, getState)
 
       expect(asyncDispatch.mock.calls.length).toBe(2)
+    })
+  })
+
+  describe('removePace', () => {
+    it('shows and hides loading overlay properly', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls[0]).toEqual([
+        uiActions.showLoadingOverlay('Removing pace...'),
+      ])
+      expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('removePace')])
+      expect(asyncDispatch.mock.calls[2]).toEqual([uiActions.hidePaceModal()])
+      expect(asyncDispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
+    })
+
+    it('calls the destroy pace API', async () => {
+      fetchMock.delete(DESTROY_API, {course_pace: {...PRIMARY_PACE}})
+      const updatedPace = {...PRIMARY_PACE}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(dispatch, getState)
+
+      expect(fetchMock.called(DESTROY_API, 'DELETE')).toBe(true)
+    })
+
+    it('sets an error if the request fails', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE}
+      const error = new Error('Bad!')
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+      fetchMock.delete(DESTROY_API, {
+        throws: error,
+      })
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls[0]).toEqual([
+        uiActions.showLoadingOverlay('Removing pace...'),
+      ])
+      expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('removePace')])
+      expect(asyncDispatch.mock.calls[2]).toEqual([
+        uiActions.setCategoryError('removePace', error.toString()),
+      ])
+      expect(asyncDispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
     })
   })
 })

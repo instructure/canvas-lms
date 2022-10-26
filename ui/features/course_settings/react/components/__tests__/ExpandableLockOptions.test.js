@@ -28,8 +28,8 @@ const defaultProps = () => ({
     content: false,
     points: false,
     due_dates: false,
-    availability_dates: false
-  }
+    availability_dates: false,
+  },
 })
 
 describe('ExpandableLockOptions', () => {

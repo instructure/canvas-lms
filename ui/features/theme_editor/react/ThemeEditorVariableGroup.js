@@ -33,7 +33,7 @@ export default function ThemeEditorVariableGroup(props) {
       onToggle={handleToggle}
       icon={IconArrowOpenUpSolid}
       iconPosition="end"
-      fluidWidth
+      fluidWidth={true}
     >
       {props.children}
     </ToggleDetails>
@@ -45,9 +45,9 @@ ThemeEditorVariableGroup.propTypes = {
   expanded: bool,
   children: node.isRequired,
   onToggle: func.isRequired,
-  index: number.isRequired
+  index: number.isRequired,
 }
 
 ThemeEditorVariableGroup.defaultProps = {
-  expanded: false
+  expanded: false,
 }

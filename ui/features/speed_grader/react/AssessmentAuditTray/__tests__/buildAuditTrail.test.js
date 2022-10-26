@@ -17,7 +17,6 @@
  */
 
 import tz from 'timezone'
-import timezone from '@canvas/timezone'
 import tzInTest from 'datetime/specHelpers'
 import newYork from 'timezone/America/New_York'
 
@@ -27,7 +26,7 @@ import buildAuditTrail from '../buildAuditTrail'
 import {
   buildAssignmentCreatedEvent,
   buildAssignmentUpdatedEvent,
-  buildEvent
+  buildEvent,
 } from './AuditTrailSpecHelpers'
 
 describe('AssessmentAuditTray buildAuditTrail()', () => {
@@ -46,8 +45,8 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     tzInTest.configureAndRestoreLater({
       tz: tz(newYork, 'America/New_York'),
       tzData: {
-        'America/New_York': newYork
-      }
+        'America/New_York': newYork,
+      },
     })
 
     auditEvents = []
@@ -72,7 +71,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       graders_anonymous_to_graders: false,
       moderated_grading: false,
       muted: false,
-      ...payloadValues
+      ...payloadValues,
     }
     auditEvents.push(
       buildAssignmentCreatedEvent({id: '4901', createdAt: '2018-09-01T12:00:00Z'}, payload)
@@ -130,8 +129,8 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             createdAt: '2018-09-17T12:00:00Z',
             eventType: 'provisional_grade_selected',
             id: '4911',
-            userId: '1101'
-          })
+            userId: '1101',
+          }),
         ]
       })
 
@@ -145,12 +144,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildEvent({
             createdAt: '2018-09-17T12:01:00Z',
             eventType: 'provisional_grade_selected',
-            id: '4912'
+            id: '4912',
           }),
           buildEvent({
             createdAt: '2018-09-17T12:08:00Z',
             eventType: 'provisional_grade_selected',
-            id: '4913'
+            id: '4913',
           })
         )
         auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
@@ -164,7 +163,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildAssignmentCreatedEvent(
             {id: '4901', createdAt: '2018-09-01T12:00:00Z'},
             {moderated_grading: false}
-          )
+          ),
         ]
       })
 
@@ -204,7 +203,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         1104: {id: '1104', name: 'Dana Young', key: 'user-1104'},
         1105: {id: '1105', name: 'Ed Valiant', key: 'user-1105'},
         1106: {id: '1106', name: 'Fay Aldrin', key: 'user-1107'},
-        1107: {id: '1107', key: 'user-1107'}
+        1107: {id: '1107', key: 'user-1107'},
       }
 
       users = []
@@ -214,7 +213,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       const event = buildEvent({
         createdAt: `2018-09-0${day}T12:00:00Z`,
         id: `490${auditEvents.length + 1}`,
-        userId
+        userId,
       })
       users.push({...availableUsers[userId], role})
       auditEvents.push(event)
@@ -231,7 +230,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         createdAt: `2018-09-0${day}T12:00:00Z`,
         id: `490${auditEvents.length + 1}`,
         userId: null,
-        externalToolId: tool.id
+        externalToolId: tool.id,
       })
       auditEvents.push(event)
     }
@@ -241,7 +240,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         createdAt: `2018-09-0${day}T12:00:00Z`,
         id: `490${auditEvents.length + 1}`,
         userId: null,
-        quizId: quiz.id
+        quizId: quiz.id,
       })
       auditEvents.push(event)
     }
@@ -306,7 +305,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           'externalTool-21',
           'user-1102',
           'user-1104',
-          'user-1106'
+          'user-1106',
         ])
       })
 
@@ -315,7 +314,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           'user-1104',
           'externalTool-21',
           'user-1106',
-          'user-1102'
+          'user-1102',
         ])
       })
     })
@@ -342,7 +341,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           'user-1104',
           'quiz-123',
           'user-1106',
-          'user-1102'
+          'user-1102',
         ])
       })
     })
@@ -413,7 +412,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
         users: [firstUser],
         externalTools: [tool],
-        quizzes: [quiz]
+        quizzes: [quiz],
       })
       expect(getCreatorEventGroup('user-1109')).toBeUndefined()
     })
@@ -423,7 +422,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: [secondUser],
         externalTools: [tool],
-        quizzes: [quiz]
+        quizzes: [quiz],
       })
       expect(getCreatorEventGroup('user-1101').creator).toEqual(secondUser)
     })
@@ -433,14 +432,14 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: [],
         externalTools: [tool],
-        quizzes: [quiz]
+        quizzes: [quiz],
       })
       expect(getCreatorEventGroup('user-1101').creator).toEqual({
         id: '1101',
         key: 'user-1101',
         name: 'Unknown User',
         role: 'unknown',
-        type: 'user'
+        type: 'user',
       })
     })
 
@@ -450,7 +449,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
           users: [firstUser],
           externalTools: [tool],
-          quizzes: [quiz]
+          quizzes: [quiz],
         })
       })
 
@@ -470,7 +469,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents = [
           buildUnknownEvent('4903', '2018-09-01T14:00:00Z'),
           buildUnknownEvent('4901', '2018-09-01T12:00:00Z'),
-          buildUnknownEvent('4902', '2018-09-01T13:00:00Z')
+          buildUnknownEvent('4902', '2018-09-01T13:00:00Z'),
         ]
         users = [firstUser, secondUser]
 
@@ -500,7 +499,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildUnknownEvent('4904', '2018-09-02T13:00:00Z'),
           buildUnknownEvent('4901', '2018-09-01T12:00:00Z'),
           buildUnknownEvent('4903', '2018-09-02T12:00:00Z'),
-          buildUnknownEvent('4902', '2018-09-01T13:00:00Z')
+          buildUnknownEvent('4902', '2018-09-01T13:00:00Z'),
         ]
         users = [firstUser, secondUser]
       })
@@ -518,7 +517,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         const startDates = getDateEventGroups().map(dateEventGroup => dateEventGroup.startDate)
         expect(startDates).toEqual([
           new Date('2018-09-01T12:00:00Z'),
-          new Date('2018-09-02T12:00:00Z')
+          new Date('2018-09-02T12:00:00Z'),
         ])
       })
 
@@ -526,14 +525,20 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         const eventIds = getDateEventGroups().map(dateEventGroup =>
           getDateGroupEventIds(dateEventGroup).sort()
         )
-        expect(eventIds).toEqual([['4901', '4902'], ['4903', '4904']])
+        expect(eventIds).toEqual([
+          ['4901', '4902'],
+          ['4903', '4904'],
+        ])
       })
 
       it('orders events within date event groups by ascending date', () => {
         const eventIds = getDateEventGroups().map(dateEventGroup =>
           getDateGroupEventIds(dateEventGroup)
         )
-        expect(eventIds).toEqual([['4901', '4902'], ['4903', '4904']])
+        expect(eventIds).toEqual([
+          ['4901', '4902'],
+          ['4903', '4904'],
+        ])
       })
 
       it('partitions event groups at midnight in the timezone of the current user', () => {
@@ -541,12 +546,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildUnknownEvent('4904', '2018-09-03T03:59:59Z'),
           buildUnknownEvent('4901', '2018-09-01T04:00:00Z'),
           buildUnknownEvent('4903', '2018-09-02T04:00:00Z'),
-          buildUnknownEvent('4902', '2018-09-02T03:59:59Z')
+          buildUnknownEvent('4902', '2018-09-02T03:59:59Z'),
         ]
         const eventIds = getDateEventGroups().map(dateEventGroup =>
           getDateGroupEventIds(dateEventGroup)
         )
-        expect(eventIds).toEqual([['4901', '4902'], ['4903', '4904']])
+        expect(eventIds).toEqual([
+          ['4901', '4902'],
+          ['4903', '4904'],
+        ])
       })
     })
   })
@@ -865,7 +873,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_names_visible_to_final_grader: false
+            grader_names_visible_to_final_grader: false,
           })
         })
 
@@ -876,7 +884,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_names_visible_to_final_grader: false
+            grader_names_visible_to_final_grader: false,
           })
         })
 
@@ -931,7 +939,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_comments_visible_to_graders: false
+            grader_comments_visible_to_graders: false,
           })
         })
 
@@ -942,7 +950,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_comments_visible_to_graders: false
+            grader_comments_visible_to_graders: false,
           })
         })
 
@@ -1037,7 +1045,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       function enabledModeratedGradingWith(payload) {
         buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
           moderated_grading: [false, true],
-          ...payload
+          ...payload,
         })
       }
 
@@ -1166,7 +1174,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_names_visible_to_final_grader: true
+            grader_names_visible_to_final_grader: true,
           })
         })
 
@@ -1220,7 +1228,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-02T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_names_visible_to_final_grader: true
+            grader_names_visible_to_final_grader: true,
           })
         })
 
@@ -1274,7 +1282,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_comments_visible_to_graders: true
+            grader_comments_visible_to_graders: true,
           })
         })
 
@@ -1328,7 +1336,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-02T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_comments_visible_to_graders: true
+            grader_comments_visible_to_graders: true,
           })
         })
 
@@ -1462,7 +1470,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       function disabledModeratedGradingWith(payload) {
         buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
           moderated_grading: [true, false],
-          ...payload
+          ...payload,
         })
       }
 
@@ -1535,7 +1543,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-02T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
-            grader_names_visible_to_final_grader: true
+            grader_names_visible_to_final_grader: true,
           })
         })
 
@@ -1997,7 +2005,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       beforeEach(() => {
         buildCreateEvent({muted: true})
         buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
-          graders_anonymous_to_graders: [false, true]
+          graders_anonymous_to_graders: [false, true],
         })
         buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
         gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
@@ -2017,10 +2025,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when anonymity was temporarily disabled', () => {
         beforeEach(() => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            graders_anonymous_to_graders: [true, false]
+            graders_anonymous_to_graders: [true, false],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            graders_anonymous_to_graders: [false, true]
+            graders_anonymous_to_graders: [false, true],
           })
         })
 
@@ -2036,20 +2044,20 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when anonymity was disabled at the end of the audit trail', () => {
         it('is fully anonymous when anonymity was not interrupted', () => {
           buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
-            graders_anonymous_to_graders: [true, false]
+            graders_anonymous_to_graders: [true, false],
           })
           expect(getOverallAnonymity()).toEqual(FULL)
         })
 
         it('is partially anonymous when anonymity was temporarily disabled', () => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            graders_anonymous_to_graders: [true, false]
+            graders_anonymous_to_graders: [true, false],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            graders_anonymous_to_graders: [false, true]
+            graders_anonymous_to_graders: [false, true],
           })
           buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
-            graders_anonymous_to_graders: [true, false]
+            graders_anonymous_to_graders: [true, false],
           })
           expect(getOverallAnonymity()).toEqual(PARTIAL)
         })
@@ -2060,7 +2068,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       beforeEach(() => {
         buildCreateEvent({muted: true})
         buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
-          grader_names_visible_to_final_grader: [true, false]
+          grader_names_visible_to_final_grader: [true, false],
         })
         buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
         gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
@@ -2080,10 +2088,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when anonymity was temporarily disabled', () => {
         beforeEach(() => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            grader_names_visible_to_final_grader: [false, true]
+            grader_names_visible_to_final_grader: [false, true],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            grader_names_visible_to_final_grader: [true, false]
+            grader_names_visible_to_final_grader: [true, false],
           })
         })
 
@@ -2099,20 +2107,20 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when anonymity was disabled at the end of the audit trail', () => {
         it('is fully anonymous when anonymity was not interrupted', () => {
           buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
-            grader_names_visible_to_final_grader: [false, true]
+            grader_names_visible_to_final_grader: [false, true],
           })
           expect(getOverallAnonymity()).toEqual(FULL)
         })
 
         it('is partially anonymous when anonymity was temporarily disabled', () => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            grader_names_visible_to_final_grader: [false, true]
+            grader_names_visible_to_final_grader: [false, true],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            grader_names_visible_to_final_grader: [true, false]
+            grader_names_visible_to_final_grader: [true, false],
           })
           buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
-            grader_names_visible_to_final_grader: [false, true]
+            grader_names_visible_to_final_grader: [false, true],
           })
           expect(getOverallAnonymity()).toEqual(PARTIAL)
         })
@@ -2124,17 +2132,17 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         buildCreateEvent({muted: true})
         buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
           anonymous_grading: [false, true],
-          graders_anonymous_to_graders: [false, true]
+          graders_anonymous_to_graders: [false, true],
         })
         buildUpdateEvent('4903', '2018-09-02T12:10:00Z', {
-          grader_names_visible_to_final_grader: [true, false]
+          grader_names_visible_to_final_grader: [true, false],
         })
         buildUpdateEvent('4905', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
         gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
         buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
           anonymous_grading: [true, false],
           grader_names_visible_to_final_grader: [false, true],
-          graders_anonymous_to_graders: [true, false]
+          graders_anonymous_to_graders: [true, false],
         })
         buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
       })
@@ -2167,10 +2175,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when grader-to-grader anonymity was temporarily disabled', () => {
         beforeEach(() => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            graders_anonymous_to_graders: [true, false]
+            graders_anonymous_to_graders: [true, false],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            graders_anonymous_to_graders: [false, true]
+            graders_anonymous_to_graders: [false, true],
           })
         })
 
@@ -2186,10 +2194,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       describe('when grader-to-final-grader anonymity was temporarily disabled', () => {
         beforeEach(() => {
           buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
-            grader_names_visible_to_final_grader: [false, true]
+            grader_names_visible_to_final_grader: [false, true],
           })
           buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
-            grader_names_visible_to_final_grader: [true, false]
+            grader_names_visible_to_final_grader: [true, false],
           })
         })
 

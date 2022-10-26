@@ -47,7 +47,7 @@ The quiz taking police has arrived.
        });
      }
 */
-define([], function() {
+define([], function () {
   if (!window.Worker) {
     // if this browser doesn't support web workers, this module does nothing
     return
@@ -58,11 +58,11 @@ define([], function() {
 
     self.addEventListener(
       'message',
-      function(e) {
+      function (e) {
         const message = e.data || {}
         switch (message.code) {
           case 'startStopwatch':
-            stopwatch = setInterval(function() {
+            stopwatch = setInterval(function () {
               self.postMessage('stopwatchTick')
             }, message.frequency || 1000)
             break

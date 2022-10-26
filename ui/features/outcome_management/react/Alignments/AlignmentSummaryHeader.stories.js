@@ -30,8 +30,8 @@ export default {
     alignedArtifacts: 60,
     searchString: '',
     updateSearchHandler: () => {},
-    clearSearchHandler: () => {}
-  }
+    clearSearchHandler: () => {},
+  },
 }
 
 const Template = args => <AlignmentSummaryHeader {...args} />
@@ -41,10 +41,10 @@ export const Default = Template.bind({})
 export const withNoOutcomes = Template.bind({})
 withNoOutcomes.args = {
   totalOutcomes: 0,
-  alignedOutcomes: 0
+  alignedOutcomes: 0,
 }
 
 export const withNoArtifacts = Template.bind({})
 withNoArtifacts.args = {
-  totalArtifacts: 0
+  totalArtifacts: 0,
 }

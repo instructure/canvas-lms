@@ -30,5 +30,5 @@ export default Backbone.Collection.extend({
 
   parse(payload) {
     return fromJSONAPI(payload, 'quiz_statistics')
-  }
+  },
 })

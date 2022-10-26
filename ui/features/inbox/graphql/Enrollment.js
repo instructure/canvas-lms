@@ -33,12 +33,12 @@ export const Enrollment = {
 
   shape: shape({
     type: string,
-    course: Course.shape
+    course: Course.shape,
   }),
 
   mock: ({type = 'StudentEnrollment', course = Course.mock()} = {}) => ({
     type,
     course,
-    __typename: 'Enrollment'
-  })
+    __typename: 'Enrollment',
+  }),
 }

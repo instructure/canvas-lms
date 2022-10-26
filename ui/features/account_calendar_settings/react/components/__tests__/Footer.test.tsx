@@ -31,10 +31,10 @@ const defaultProps = {
   visibilityChanges: [
     {id: 1, visible: true},
     {id: 2, visible: false},
-    {id: 10, visible: true}
+    {id: 10, visible: true},
   ],
   onApplyClicked: jest.fn(),
-  enableSaveButton: true
+  enableSaveButton: true,
 }
 
 describe('Footer', () => {

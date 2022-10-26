@@ -46,7 +46,7 @@ export function makeSubmissionUpdateRequest(submission, isAnonymous, courseId, u
   const data = {}
   const submissionData = {
     assignmentId: submission.assignment_id,
-    ...updateData
+    ...updateData,
   }
 
   let url

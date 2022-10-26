@@ -31,15 +31,8 @@ module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk
 
-    # TODO: someday we can use this line, which will NOT
-    # add anything on the autoload paths the actual ruby
-    # $LOAD_PATH because zeitwerk will take care of anything
-    # we autolaod.  This will make ACTUAL require statements
-    # that are necessary work faster because they'll have a smaller
-    # load path to scan.
-    # config.add_autoload_paths_to_load_path = false
+    config.add_autoload_paths_to_load_path = false
 
-    $LOAD_PATH << config.root.to_s
     config.encoding = "utf-8"
     require "logging_filter"
     config.filter_parameters.concat LoggingFilter.filtered_parameters
@@ -110,6 +103,7 @@ module CanvasRails
     # The main autoloader should ignore it so the `once` autoloader can happily load it
     Rails.autoloaders.main.ignore("#{__dir__}/../lib/base")
     config.paths.add("lib/base", eager_load: true, autoload_once: true)
+    $LOAD_PATH << "#{__dir__}/../lib/base"
 
     # This needs to be set for things in the `once` autoloader really early
     Rails.autoloaders.each do |autoloader|

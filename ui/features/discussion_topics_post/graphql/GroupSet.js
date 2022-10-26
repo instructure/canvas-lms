@@ -37,7 +37,7 @@ export const GroupSet = {
     id: string,
     _id: string,
     name: string,
-    currentGroup: Group.shape
+    currentGroup: Group.shape,
   }),
 
   mock: ({
@@ -47,14 +47,14 @@ export const GroupSet = {
     currentGroup = null,
     groupsConnection = {
       nodes: [Group.mock()],
-      __typename: 'groupsConnection'
-    }
+      __typename: 'groupsConnection',
+    },
   } = {}) => ({
     id,
     _id,
     name,
     currentGroup,
     groupsConnection,
-    __typename: 'GroupSet'
-  })
+    __typename: 'GroupSet',
+  }),
 }

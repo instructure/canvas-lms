@@ -26,16 +26,16 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 const MANAGEABLE_COURSES = [
   {
     id: 4,
-    name: 'CPMS'
+    name: 'CPMS',
   },
   {
     id: 5,
-    name: 'CS'
+    name: 'CS',
   },
   {
     id: 6,
-    name: 'Elementary'
-  }
+    name: 'Elementary',
+  },
 ]
 
 const ENROLLMENTS = [
@@ -44,31 +44,31 @@ const ENROLLMENTS = [
     name: 'Algebra Honors',
     account: {
       id: 6,
-      name: 'Orange Elementary'
-    }
+      name: 'Orange Elementary',
+    },
   },
   {
     id: 74,
     name: 'Math',
     account: {
       id: 6,
-      name: 'Orange Elementary'
-    }
+      name: 'Orange Elementary',
+    },
   },
   {
     id: 105,
     name: 'English 11',
     account: {
       id: 13,
-      name: 'Clark HS'
-    }
-  }
+      name: 'Clark HS',
+    },
+  },
 ]
 
 const MCC_ACCOUNT = {
   id: 3,
   name: 'Manually-Created Courses',
-  workflow_state: 'active'
+  workflow_state: 'active',
 }
 
 const MANAGEABLE_COURSES_URL = '/api/v1/manageable_accounts?per_page=100'
@@ -89,7 +89,7 @@ describe('CreateCourseModal', () => {
     permissions: 'admin',
     restrictToMCCAccount: false,
     isK5User: true,
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {
@@ -144,22 +144,22 @@ describe('CreateCourseModal', () => {
     for (let i = 0; i < 50; i++) {
       accountsPage1.push({
         id: String(i),
-        name: String(i)
+        name: String(i),
       })
     }
     const accountsPage2 = [
       {
         id: '51',
-        name: '51'
+        name: '51',
       },
       {
         id: '52',
-        name: '52'
-      }
+        name: '52',
+      },
     ]
     const response1 = {
       headers: {Link: '</api/v1/manageable_accounts?page=2&per_page=100>; rel="next"'},
-      body: accountsPage1
+      body: accountsPage1,
     }
     fetchMock.mock(MANAGEABLE_COURSES_URL, response1)
     fetchMock.get('/api/v1/manageable_accounts?per_page=100&page=2', accountsPage2)
@@ -177,7 +177,7 @@ describe('CreateCourseModal', () => {
   it('creates new subject and enrolls user in that subject', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     fetchMock.post(encodeURI('/api/v1/accounts/6/courses?course[name]=Science&enroll_me=true'), {
-      id: '14'
+      id: '14',
     })
     const {getByText, getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
@@ -233,8 +233,8 @@ describe('CreateCourseModal', () => {
         ...ENROLLMENTS,
         {
           id: 1033,
-          access_restricted_by_date: true
-        }
+          access_restricted_by_date: true,
+        },
       ])
       const {getByLabelText, queryByText, getByText} = render(
         <CreateCourseModal {...getProps({permissions: 'teacher'})} />

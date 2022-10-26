@@ -33,7 +33,7 @@ QUnit.module('grading_cell_component integration test for isPoints', {
         this.controller.setProperties({
           submissions: Ember.copy(fixtures.submissions, true),
           selectedAssignment: this.assignment,
-          selectedStudent: this.student
+          selectedStudent: this.student,
         })
       )
     })
@@ -41,7 +41,7 @@ QUnit.module('grading_cell_component integration test for isPoints', {
 
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('fast-select instance is used for grade input', () => {

@@ -27,17 +27,20 @@ const defaultProps = () => ({
   items: [
     {
       id: '10',
-      title: 'Foo Bar'
-    }
+      title: 'Foo Bar',
+    },
   ],
   moveOptions: {
-    siblings: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    siblings: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   },
   focusOnExit: () => {},
   formatSaveUrl: () => {},
   onMoveSuccess: () => {},
   onExited: () => {},
-  applicationElement: () => document.getElementById('fixtures')
+  applicationElement: () => document.getElementById('fixtures'),
 })
 
 test('renders the MoveItemTray component', () => {

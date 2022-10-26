@@ -28,10 +28,10 @@ describe('StudentCell', () => {
         display_name: 'Student Test',
         sortable_name: 'Test, Student',
         avatar_url: '/avatar-url',
-        id: '1'
+        id: '1',
       },
       courseId: '100',
-      ...props
+      ...props,
     }
   }
 

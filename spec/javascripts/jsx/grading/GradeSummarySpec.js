@@ -25,6 +25,7 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from 'ui/features/grade_summary/jquery/index'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
+import useStore from 'ui/features/grade_summary/react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
@@ -38,10 +39,10 @@ function createAssignmentGroups() {
       id: '301',
       assignments: [
         {id: '201', muted: false},
-        {id: '202', muted: true}
-      ]
+        {id: '202', muted: true},
+      ],
     },
-    {id: '302', assignments: [{id: '203', muted: true}]}
+    {id: '302', assignments: [{id: '203', muted: true}]},
   ]
 }
 
@@ -54,12 +55,12 @@ function createExampleGrades() {
     assignmentGroups: {},
     current: {
       score: 0,
-      possible: 0
+      possible: 0,
     },
     final: {
       score: 0,
-      possible: 20
-    }
+      possible: 20,
+    },
   }
 }
 
@@ -69,8 +70,8 @@ function createSubtotalsByAssignmentGroup() {
   const calculatedGrades = {
     assignmentGroups: {
       1: {current: {score: 6, possible: 10}},
-      2: {current: {score: 7, possible: 10}}
-    }
+      2: {current: {score: 7, possible: 10}},
+    },
   }
   const byGradingPeriod = false
   return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'current')
@@ -82,8 +83,8 @@ function createSubtotalsByGradingPeriod() {
   const calculatedGrades = {
     gradingPeriods: {
       1: {final: {score: 8, possible: 10}},
-      2: {final: {score: 9, possible: 10}}
-    }
+      2: {final: {score: 9, possible: 10}},
+    },
   }
   const byGradingPeriod = true
   return GradeSummary.calculateSubtotals(byGradingPeriod, calculatedGrades, 'final')
@@ -182,6 +183,7 @@ function setPageHtmlFixture() {
       <input type="text" id="grade_entry" style="display: none;" />
       <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
       <a href="/assignments/{{ assignment_id }}" class="update_submission_url">&nbsp;</a>
+      <div id="GradeSummarySelectMenuGroup"></div>
     </div>
   `)
 }
@@ -212,7 +214,7 @@ QUnit.module('GradeSummary.getGradingPeriodSet', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('normalizes the grading period set from the env', () => {
@@ -220,9 +222,9 @@ test('normalizes the grading period set from the env', () => {
     id: '1501',
     grading_periods: [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ],
-    weighted: true
+    weighted: true,
   }
   const gradingPeriodSet = GradeSummary.getGradingPeriodSet()
   deepEqual(gradingPeriodSet.id, '1501')
@@ -244,7 +246,7 @@ QUnit.module('GradeSummary.getAssignmentId', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('returns the assignment id for the given .student_assignment element', () => {
@@ -342,7 +344,7 @@ QUnit.module('GradeSummary.getOriginalScore', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('parses the text of the .original_points element', function () {
@@ -404,7 +406,7 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
         ['B', 0.8],
         ['C', 0.7],
         ['D', 0.6],
-        ['F', 0]
+        ['F', 0],
       ]
     })
 
@@ -478,7 +480,7 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
 QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
   setup() {
     this.subtotals = createSubtotalsByGradingPeriod()
-  }
+  },
 })
 
 test('calculates subtotals by grading period', function () {
@@ -511,7 +513,7 @@ test('assigns row element ids for subtotals by grading period', function () {
 QUnit.module('GradeSummary.calculateSubtotalsByAssignmentGroup', {
   setup() {
     this.subtotals = createSubtotalsByAssignmentGroup()
-  }
+  },
 })
 
 test('calculates subtotals by assignment group', function () {
@@ -600,9 +602,9 @@ QUnit.module('GradeSummary.calculateGrades', {
       id: '1501',
       grading_periods: [
         {id: '701', weight: 50},
-        {id: '702', weight: 50}
+        {id: '702', weight: 50},
       ],
-      weighted: true
+      weighted: true,
     }
     ENV.effective_due_dates = {201: {101: {grading_period_id: '701'}}}
     ENV.student_id = '101'
@@ -612,7 +614,7 @@ QUnit.module('GradeSummary.calculateGrades', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('calculates grades using data in the env', () => {
@@ -684,7 +686,7 @@ QUnit.module('GradeSummary.setup', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function () {
@@ -733,7 +735,7 @@ QUnit.module('Grade Summary "Show Saved What-If Scores" button', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('reveals all What-If scores when clicked', function () {
@@ -847,7 +849,7 @@ QUnit.module('Grade Summary "Show All Details" button', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('announces "assignment details expanded" when clicked', () => {
@@ -885,7 +887,7 @@ QUnit.module('GradeSummary.onEditWhatIfScore', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('stores the original score when editing the the first time', function () {
@@ -989,7 +991,7 @@ QUnit.module('GradeSummary.onScoreChange', {
 
   teardown() {
     commonTeardown()
-  }
+  },
 })
 
 test('updates .what_if_score with the parsed value from #grade_entry', function () {
@@ -1261,7 +1263,7 @@ QUnit.module('GradeSummary.updateScoreForAssignment', {
 
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('updates the score for an existing submission', () => {
@@ -1288,7 +1290,7 @@ QUnit.module('GradeSummary.finalGradePointsPossibleText', {
 
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns an empty string if assignment groups are weighted', () => {
@@ -1306,9 +1308,9 @@ test('returns an empty string if grading periods are weighted and "All Grading P
     id: '1501',
     grading_periods: [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ],
-    weighted: true
+    weighted: true,
   }
   ENV.current_grading_period_id = '0'
   const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
@@ -1320,9 +1322,9 @@ test('returns the score with points possible if grading periods are weighted and
     id: '1501',
     grading_periods: [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ],
-    weighted: true
+    weighted: true,
   }
   ENV.current_grading_period_id = '701'
   const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
@@ -1334,9 +1336,9 @@ test('returns the score with points possible if grading periods are not weighted
     id: '1501',
     grading_periods: [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ],
-    weighted: false
+    weighted: false,
   }
 
   const text = GradeSummary.finalGradePointsPossibleText('equal', '50.00 / 100.00')
@@ -1383,7 +1385,7 @@ QUnit.module('GradeSummary', () => {
       selectedCourseID: '2',
       selectedGradingPeriodID: '3',
       selectedStudentID: '4',
-      students: []
+      students: [],
     }
 
     hooks.beforeEach(() => {
@@ -1409,7 +1411,7 @@ QUnit.module('GradeSummary', () => {
       fakeENV.setup({
         context_asset_string: 'course_42',
         current_user: {},
-        courses_with_grades: []
+        courses_with_grades: [],
       })
     })
 
@@ -1421,7 +1423,7 @@ QUnit.module('GradeSummary', () => {
       ENV.assignment_sort_options = [
         ['Assignment Group', 'assignment_group'],
         ['Due Date', 'due_at'],
-        ['Name', 'title']
+        ['Name', 'title'],
       ]
 
       deepEqual(
@@ -1433,12 +1435,12 @@ QUnit.module('GradeSummary', () => {
     test('sets courses to camelized version of courses_with_grades', () => {
       ENV.courses_with_grades = [
         {grading_period_set: null, id: '15', nickname: 'Course #1', url: '/courses/15/grades'},
-        {grading_period_set: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'}
+        {grading_period_set: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'},
       ]
 
       const expectedCourses = [
         {gradingPeriodSet: null, id: '15', nickname: 'Course #1', url: '/courses/15/grades'},
-        {gradingPeriodSet: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'}
+        {gradingPeriodSet: 3, id: '42', nickname: 'Course #2', url: '/courses/42/grades'},
       ]
 
       deepEqual(GradeSummary.getSelectMenuGroupProps().courses, expectedCourses)
@@ -1462,12 +1464,12 @@ QUnit.module('GradeSummary', () => {
             create: false,
             delete: false,
             read: true,
-            update: false
+            update: false,
           },
           start_date: '2017-08-01T06:00:00Z',
           title: 'Summer 2017',
-          weight: 10
-        }
+          weight: 10,
+        },
       ]
 
       deepEqual(GradeSummary.getSelectMenuGroupProps().gradingPeriods, ENV.grading_periods)
@@ -1508,10 +1510,159 @@ QUnit.module('GradeSummary', () => {
     test('sets students to the students environment variable', () => {
       ENV.students = [
         {id: 42, name: 'Abel'},
-        {id: 43, name: 'Baker'}
+        {id: 43, name: 'Baker'},
       ]
 
       deepEqual(GradeSummary.getSelectMenuGroupProps().students, ENV.students)
+    })
+  })
+
+  QUnit.module('SubmissionCommentsTray', hooks => {
+    hooks.beforeEach(() => {
+      ENV.submissions = [
+        {
+          assignment_id: '22',
+          submission_comments: [
+            {
+              id: '2',
+              attempt: null,
+              author_name: 'test user',
+              created_at: '2022-09-27T16:34:17Z',
+              edited_at: '2022-09-27T19:32:02Z',
+              comment: 'Lorem ipsum dolor sit amet',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '3',
+              attempt: null,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+          ],
+          excused: false,
+          score: 10,
+          workflow_state: 'graded',
+        },
+        {
+          assignment_id: '17',
+          submission_comments: [
+            {
+              id: '1',
+              attempt: 4,
+              author_name: 'test user 2',
+              created_at: '2022-09-27T16:34:00Z',
+              edited_at: null,
+              comment: 'This is another test comment',
+              display_updated_at: 'Sep 27 at 10:34am',
+            },
+          ],
+          excused: false,
+          score: 19,
+          workflow_state: 'graded',
+          assignment_url: 'assignment.url',
+        },
+      ]
+    })
+    hooks.afterEach(() => {
+      commonTeardown()
+    })
+    const expectedCommentTrayProps = {
+      attempts: {
+        4: [
+          {
+            id: '1',
+            attempt: 4,
+            author_name: 'test user 2',
+            created_at: '2022-09-27T16:34:00Z',
+            edited_at: null,
+            comment: 'This is another test comment',
+            display_updated_at: 'Sep 27 at 10:34am',
+          },
+        ],
+      },
+      assignmentUrl: 'assignment.url',
+    }
+    QUnit.module('getSubmissionCommentsTrayProps', () => {
+      test('gets props getSubmissionCommentsTrayProps for correct assignmentId', () => {
+        const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('17')
+        deepEqual(commentTrayProps, expectedCommentTrayProps)
+      })
+    })
+    QUnit.module('handleSubmissionsCommentTray', () => {
+      test('should open tray with no prior assignmentId', () => {
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should open tray with different prior assignmentId', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '22',
+          submissionTrayOpen: false,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should close tray if same assignmentId and trey is open', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '17',
+          submissionTrayOpen: true,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const expectedState = {
+          submissionTrayOpen: false,
+          submissionTrayAssignmentId: undefined,
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should keep tray open and switch assignmentId for different assignment and tray open', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '22',
+          submissionTrayOpen: true,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
     })
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import OutcomeAlignmentDeleteLink from 'ui/features/outcome_alignment_v2/react/OutcomeAlignmentDeleteLink.js'
+import OutcomeAlignmentDeleteLink from 'ui/features/outcome_alignment_v2/react/OutcomeAlignmentDeleteLink'
 import React from 'react'
 import {mount} from 'enzyme'
 

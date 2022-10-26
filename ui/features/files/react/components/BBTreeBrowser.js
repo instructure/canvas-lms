@@ -31,12 +31,12 @@ class BBTreeBrowser extends React.Component {
 
   static propTypes = {
     rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
-    onSelectFolder: PropTypes.func.isRequired
+    onSelectFolder: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
     const rootFoldersFinder = new RootFoldersFinder({
-      rootFoldersToShow: this.props.rootFoldersToShow
+      rootFoldersToShow: this.props.rootFoldersToShow,
     })
 
     this.treeBrowserViewId = BBTreeBrowserView.create(
@@ -46,10 +46,10 @@ class BBTreeBrowser extends React.Component {
         rootFoldersToShow: this.props.rootFoldersToShow,
         onClick: this.props.onSelectFolder,
         focusStyleClass: 'MoveDialog__folderItem--focused',
-        selectedStyleClass: 'MoveDialog__folderItem--selected'
+        selectedStyleClass: 'MoveDialog__folderItem--selected',
       },
       {
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder)
+        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
       }
     ).index
 

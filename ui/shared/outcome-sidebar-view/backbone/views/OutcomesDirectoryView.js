@@ -96,7 +96,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
         if (ui.draggable.parent().get(0) === e.target) return
         const {model} = ui.draggable.data('view')
         return this.moveModelHere(model)
-      }
+      },
     })
   }
 

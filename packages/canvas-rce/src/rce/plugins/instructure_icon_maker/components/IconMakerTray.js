@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -114,7 +114,16 @@ function renderBody(
   )
 }
 
-function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef) {
+function renderFooter(
+  status,
+  onClose,
+  handleSubmit,
+  editing,
+  replaceAll,
+  setReplaceAll,
+  applyRef,
+  isModified
+) {
   return (
     <View as="div" background="primary">
       <Footer
@@ -125,22 +134,10 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
         onReplaceAllChanged={setReplaceAll}
         editing={editing}
         applyRef={applyRef}
+        isModified={isModified}
       />
     </View>
   )
-}
-
-const checkIfAnyUnsavedChanges = (initialSettings, currentSettings) => {
-  let shouldCloseTray = true
-  const imFormHasChanges = new IconMakerFormHasChanges(initialSettings, currentSettings)
-  if (imFormHasChanges.hasChanges()) {
-    // RCE already uses browser's confirm dialog for unsaved changes
-    // Its use here in the Icon Maker tray keeps that consistency
-    // eslint-disable-next-line no-restricted-globals, no-alert
-    shouldCloseTray = confirm(UNSAVED_CHANGES_MESSAGE)
-  }
-
-  return shouldCloseTray
 }
 
 export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
@@ -156,36 +153,42 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const [status, setStatus] = useState(statuses.IDLE)
 
   const [initialSettings, setInitialSettings] = useState({...defaultState})
+  const isModified = useRef(false)
 
   // These useRef objects are needed because when the tray is closed using the escape key
   // objects created by useState are not available, causing the comparison between
   // initialSettings and settings to behave unexpectedly
   const initialSettingsRef = useRef(initialSettings)
   const settingsRef = useRef(settings)
+
+  settingsRef.current = useMemo(() => settings, [settings])
+
+  initialSettingsRef.current = useMemo(() => initialSettings, [initialSettings])
+
   useEffect(() => {
-    settingsRef.current = settings
-  }, [settings])
-  useEffect(() => {
-    initialSettingsRef.current = initialSettings
-  }, [initialSettings])
+    const formHasChanges = new IconMakerFormHasChanges(
+      initialSettingsRef.current,
+      settingsRef.current
+    )
+    isModified.current = formHasChanges.hasChanges()
+  }, [settings, initialSettings])
 
   const storeProps = useStoreProps()
 
   const onClose = () => {
-    const shouldCloseTray = checkIfAnyUnsavedChanges(
-      initialSettingsRef.current,
-      settingsRef.current
-    )
-    if (shouldCloseTray) {
-      setIsOpen(false)
+    // RCE already uses browser's confirm dialog for unsaved changes
+    // Its use here in the Icon Maker tray keeps that consistency
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    if (isModified.current && !confirm(UNSAVED_CHANGES_MESSAGE)) {
+      return
     }
+    setIsOpen(false)
   }
 
   const isLoading = () => status === statuses.LOADING
 
   const onKeyDown = event => {
     if (event.keyCode !== 9) return
-
     event.preventDefault()
     event.shiftKey ? applyRef.current?.focus() : nameRef.current?.focus()
   }
@@ -206,7 +209,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     settings.text,
     settings.encodedImage,
     settings.outlineColor,
-    settings.outlineSize
+    settings.outlineSize,
   ])
 
   const handleSubmit = ({replaceFile = false}) => {
@@ -224,10 +227,10 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       .startIconMakerUpload(
         {
           name: `${settings.name || formatMessage('untitled')}.svg`,
-          domElement: svg
+          domElement: svg,
         },
         {
-          onDuplicate: replaceFile && 'overwrite'
+          onDuplicate: replaceFile && 'overwrite',
         }
       )
       .then(writeIconToRCE)
@@ -248,7 +251,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       // passing along a string here. Using the style attribute
       // with all caps makes React ignore this fact
       STYLE: externalStyle,
-      width: externalWidth
+      width: externalWidth,
     }
 
     // Mark the image as an icon maker icon.
@@ -269,12 +272,12 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       imageName: '',
       icon: '',
       iconFillColor: '#000000',
-      cropperSettings: null
+      cropperSettings: editing ? {shape: settings.shape} : null,
     }
   }
 
   const replaceInitialSettings = () => {
-    const name = editing ? settings.name : ''
+    const name = editing ? settings.name : undefined
     const textPosition = editing ? settings.textPosition : defaultState.textPosition
     const imageSettings =
       settings.imageSettings && !!settings.imageSettings.mode
@@ -294,7 +297,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       textColor: settings.textColor,
       textBackgroundColor: settings.textBackgroundColor,
       textPosition,
-      imageSettings
+      imageSettings,
     })
   }
 
@@ -318,7 +321,16 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
         renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig, isLoading)
       }
       renderFooter={() =>
-        renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)
+        renderFooter(
+          status,
+          onClose,
+          handleSubmit,
+          editing,
+          replaceAll,
+          setReplaceAll,
+          applyRef,
+          isModified.current
+        )
       }
       bodyAs="form"
       shouldJoinBodyAndFooter={true}
@@ -330,10 +342,10 @@ IconMakerTray.propTypes = {
   editor: PropTypes.object.isRequired,
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
-  rcsConfig: PropTypes.object.isRequired
+  rcsConfig: PropTypes.object.isRequired,
 }
 
 IconMakerTray.defaultProps = {
   onUnmount: () => {},
-  editing: false
+  editing: false,
 }

@@ -38,19 +38,19 @@ class GradingPeriod extends React.Component {
     readOnly: PropTypes.bool.isRequired,
     permissions: PropTypes.shape({
       update: PropTypes.bool.isRequired,
-      delete: PropTypes.bool.isRequired
-    }).isRequired
+      delete: PropTypes.bool.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
-    weight: null
+    weight: null,
   }
 
   state = {
     title: this.props.title,
     startDate: this.props.startDate,
     endDate: this.props.endDate,
-    weight: this.props.weight
+    weight: this.props.weight,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -58,12 +58,12 @@ class GradingPeriod extends React.Component {
       title: nextProps.title,
       startDate: nextProps.startDate,
       endDate: nextProps.endDate,
-      weight: nextProps.weight
+      weight: nextProps.weight,
     })
   }
 
   onTitleChange = event => {
-    this.setState({title: event.target.value}, function() {
+    this.setState({title: event.target.value}, function () {
       this.props.updateGradingPeriodCollection(this)
     })
   }
@@ -79,7 +79,7 @@ class GradingPeriod extends React.Component {
 
     const updatedState = {}
     updatedState[dateType] = updatedDate
-    this.setState(updatedState, function() {
+    this.setState(updatedState, function () {
       this.replaceInputWithDate(dateType, $date)
       this.props.updateGradingPeriodCollection(this)
     })

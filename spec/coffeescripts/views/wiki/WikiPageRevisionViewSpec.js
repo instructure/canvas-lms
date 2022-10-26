@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
-import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
-import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView.js'
+import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
+import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView'
 import {waitFor} from '@testing-library/react'
 
 QUnit.module('WikiPageRevisionView')
@@ -39,7 +39,7 @@ test('restore delegates to model.restore', async () => {
     href: '',
     reload() {
       return true
-    }
+    },
   })
   view.restore()
   $('button[data-testid="confirm-button"]').trigger('click')
@@ -52,7 +52,7 @@ test('toJSON serializes expected values', () => {
     latest: true,
     selected: true,
     title: 'Title',
-    body: 'Body'
+    body: 'Body',
   }
   const revision = new WikiPageRevision(attributes)
   const collection = new WikiPageRevisionsCollection([revision])

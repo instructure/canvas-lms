@@ -31,7 +31,7 @@ class UploadDropZone extends React.Component {
   static displayName = 'UploadDropZone'
 
   static propTypes = {
-    currentFolder: PropTypes.instanceOf(Folder)
+    currentFolder: PropTypes.instanceOf(Folder),
   }
 
   state = {active: false}
@@ -62,7 +62,7 @@ class UploadDropZone extends React.Component {
     }
   }
 
-  onDragLeave = e => {
+  onDragLeave = _e => {
     this.setState({active: false})
   }
 

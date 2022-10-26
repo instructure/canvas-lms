@@ -31,10 +31,10 @@ const props = (overrides = {}) => {
       oidc_initiation_url: 'http://example.com/initiate',
       // public_jwk is first stringified in the constructor before being JSON.parse()d again:
       public_jwk: {kty: 'RSA', alg: 'RSA256', n: '', e: '', kid: '', use: ''},
-      ...overrides
+      ...overrides,
     },
     flashError: () => {},
-    ...overrides
+    ...overrides,
   }
 }
 

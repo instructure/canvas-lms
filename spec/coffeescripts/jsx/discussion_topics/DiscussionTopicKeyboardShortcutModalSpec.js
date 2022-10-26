@@ -16,40 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal.js'
+import DiscussionTopicKeyboardShortcutModal from 'ui/features/discussion_topic/react/DiscussionTopicKeyboardShortcutModal'
 import React from 'react'
 import {mount} from 'enzyme'
 
 const SHORTCUTS = [
   {
     keycode: 'j',
-    description: 'Next Message'
+    description: 'Next Message',
   },
   {
     keycode: 'k',
-    description: 'Previous Message'
+    description: 'Previous Message',
   },
   {
     keycode: 'e',
-    description: 'Edit Current Message'
+    description: 'Edit Current Message',
   },
   {
     keycode: 'd',
-    description: 'Delete Current Message'
+    description: 'Delete Current Message',
   },
   {
     keycode: 'r',
-    description: 'Reply to Current Message'
+    description: 'Reply to Current Message',
   },
   {
     keycode: 'n',
-    description: 'Reply to Topic'
-  }
+    description: 'Reply to Topic',
+  },
 ]
 
 QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 
-test('renders shortcuts', async function() {
+test('renders shortcuts', async function () {
   const wrapper = mount(<DiscussionTopicKeyboardShortcutModal />)
 
   // open the modal by pressing "ALT + f8"
@@ -66,12 +66,8 @@ test('renders shortcuts', async function() {
   ok(
     SHORTCUTS.every(sc =>
       list.toArray().some(li => {
-        const keycode = $(li)
-          .find('.keycode')
-          .text()
-        const description = $(li)
-          .find('.description')
-          .text()
+        const keycode = $(li).find('.keycode').text()
+        const description = $(li).find('.description').text()
         return sc.keycode === keycode && sc.description === description
       })
     )

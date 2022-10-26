@@ -26,7 +26,7 @@ export default class ConfigOptionField extends React.Component {
     type: PropTypes.string.isRequired,
     value: PropTypes.any,
     required: PropTypes.bool,
-    description: PropTypes.string.isRequired
+    description: PropTypes.string.isRequired,
   }
 
   checkbox = () => {

@@ -39,12 +39,12 @@ const ratingsShape = PropTypes.shape({
   points: PropTypes.number,
   descriptionError: PropTypes.string,
   pointsError: PropTypes.string,
-  focusField: PropTypes.string
+  focusField: PropTypes.string,
 })
 
 const masteryPointsShape = PropTypes.shape({
   value: PropTypes.number,
-  error: PropTypes.string
+  error: PropTypes.string,
 })
 
 const Ratings = ({
@@ -54,7 +54,7 @@ const Ratings = ({
   onChangeMasteryPoints,
   canManage,
   masteryInputRef,
-  clearRatingsFocus
+  clearRatingsFocus,
 }) => {
   const {isMobileView} = useCanvasContext()
   const addRow = () => {
@@ -80,7 +80,7 @@ const Ratings = ({
 
       const newRating = {
         ...ratingsCopy[index],
-        [field]: value
+        [field]: value,
       }
 
       const oldRating = ratingsCopy[index]
@@ -90,7 +90,7 @@ const Ratings = ({
       if (newRating.mastery && !oldRating.mastery) {
         ratingsCopy = ratingsCopy.map(r => ({
           ...r,
-          mastery: false
+          mastery: false,
         }))
       }
 
@@ -112,7 +112,7 @@ const Ratings = ({
           const newMasteryIndex = Math.max(currentIndex - 1, 0)
           ratingsCopy[newMasteryIndex] = {
             ...ratingsCopy[newMasteryIndex],
-            mastery: true
+            mastery: true,
           }
         }
 
@@ -227,7 +227,7 @@ const Ratings = ({
       <ScreenReaderContent>
         {I18n.t(`Description for mastery level %{position}: %{description}`, {
           position,
-          description
+          description,
         })}
       </ScreenReaderContent>
 
@@ -241,7 +241,7 @@ const Ratings = ({
         <ScreenReaderContent>
           {I18n.t(`Points for mastery level %{position}: %{points}`, {
             position,
-            points
+            points,
           })}
         </ScreenReaderContent>
 
@@ -349,7 +349,7 @@ const Ratings = ({
                 isMobileView={isMobileView}
                 position={index + 1}
                 canManage={canManage}
-                individualOutcome
+                individualOutcome={true}
               />
             )
           )}
@@ -367,7 +367,7 @@ Ratings.propTypes = {
   onChangeRatings: PropTypes.func,
   onChangeMasteryPoints: PropTypes.func,
   masteryInputRef: PropTypes.func,
-  clearRatingsFocus: PropTypes.func
+  clearRatingsFocus: PropTypes.func,
 }
 
 Ratings.defaultProps = {
@@ -378,8 +378,8 @@ Ratings.defaultProps = {
   ratings: [],
   masteryPoints: {
     value: null,
-    error: null
-  }
+    error: null,
+  },
 }
 
 export default Ratings

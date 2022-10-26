@@ -25,7 +25,7 @@ import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
-  UPDATE_DISCUSSION_TOPIC
+  UPDATE_DISCUSSION_TOPIC,
 } from './Mutations'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
@@ -46,7 +46,7 @@ export const getDiscussionQueryMock = ({
   searchTerm = '',
   sort = 'desc',
   shouldError = false,
-  isGroup = true
+  isGroup = true,
 } = {}) => [
   {
     request: {
@@ -60,8 +60,8 @@ export const getDiscussionQueryMock = ({
         rolePillTypes,
         rootEntries,
         searchTerm,
-        sort
-      }
+        sort,
+      },
     },
     result: {
       data: {
@@ -73,12 +73,12 @@ export const getDiscussionQueryMock = ({
                   DiscussionEntry.mock({
                     _id: '101',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwMQo=',
-                    message: '<p>This is an Unread Reply</p>'
-                  })
+                    message: '<p>This is an Unread Reply</p>',
+                  }),
                 ],
                 pageInfo: PageInfo.mock(),
-                __typename: 'DiscussionSubentriesConnection'
-              }
+                __typename: 'DiscussionSubentriesConnection',
+              },
             })
           }
           if (sort === 'asc') {
@@ -88,34 +88,34 @@ export const getDiscussionQueryMock = ({
                   DiscussionEntry.mock({
                     _id: '102',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwMgo=',
-                    message: '<p>This is a Reply asc</p>'
-                  })
+                    message: '<p>This is a Reply asc</p>',
+                  }),
                 ],
                 pageInfo: PageInfo.mock(),
-                __typename: 'DiscussionSubentriesConnection'
-              }
+                __typename: 'DiscussionSubentriesConnection',
+              },
             })
           }
           if (!isGroup) {
             return Discussion.mock({
               author: User.mock({
                 courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
-                id: 'role-user'
+                id: 'role-user',
               }),
-              groupSet: null
+              groupSet: null,
             })
           }
           return Discussion.mock({
             author: User.mock({
               courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
-              id: 'role-user'
-            })
+              id: 'role-user',
+            }),
           })
-        })()
-      }
+        })(),
+      },
     },
-    ...(shouldError && {error: new Error('graphql error')})
-  }
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
 ]
 
 export const getAnonymousDiscussionQueryMock = ({
@@ -128,7 +128,7 @@ export const getAnonymousDiscussionQueryMock = ({
   rootEntries = true,
   searchTerm = '',
   sort = 'desc',
-  shouldError = false
+  shouldError = false,
 } = {}) => [
   {
     request: {
@@ -142,8 +142,8 @@ export const getAnonymousDiscussionQueryMock = ({
         rolePillTypes,
         rootEntries,
         searchTerm,
-        sort
-      }
+        sort,
+      },
     },
     result: {
       data: {
@@ -151,7 +151,7 @@ export const getAnonymousDiscussionQueryMock = ({
           return Discussion.mock({
             author: User.mock({
               courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
-              id: 'role-user'
+              id: 'role-user',
             }),
             anonymousState: 'partial_anonymity',
             canReplyAnonymously: true,
@@ -159,18 +159,18 @@ export const getAnonymousDiscussionQueryMock = ({
               nodes: [
                 DiscussionEntry.mock({
                   author: null,
-                  anonymousAuthor: AnonymousUser.mock({shortName: 'current_user'})
-                })
+                  anonymousAuthor: AnonymousUser.mock({shortName: 'current_user'}),
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionEntriesConnection'
-            }
+              __typename: 'DiscussionEntriesConnection',
+            },
           })
-        })()
-      }
+        })(),
+      },
     },
-    ...(shouldError && {error: new Error('graphql error')})
-  }
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
 ]
 
 export const getDiscussionSubentriesQueryMock = ({
@@ -185,7 +185,7 @@ export const getDiscussionSubentriesQueryMock = ({
   relativeEntryId = null,
   rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   sort = 'asc',
-  shouldError = false
+  shouldError = false,
 } = {}) => [
   {
     request: {
@@ -201,8 +201,8 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(last !== null && {last}),
         ...(relativeEntryId !== null && {relativeEntryId}),
         ...(rolePillTypes !== null && {rolePillTypes}),
-        sort
-      }
+        sort,
+      },
     },
     result: {
       data: {
@@ -216,18 +216,18 @@ export const getDiscussionSubentriesQueryMock = ({
                   DiscussionEntry.mock({
                     _id: '103',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwMwo=',
-                    message: '<p>This is the search result child reply</p>'
-                  })
+                    message: '<p>This is the search result child reply</p>',
+                  }),
                 ],
                 pageInfo: PageInfo.mock(),
-                __typename: 'DiscussionSubentriesConnection'
-              }
+                __typename: 'DiscussionSubentriesConnection',
+              },
             })
           }
           if (first !== null && first === 0) {
             return DiscussionEntry.mock({
               id: btoa(`DiscussionEntry-${discussionEntryID}`),
-              _id: discussionEntryID
+              _id: discussionEntryID,
             })
           }
           if (sort === 'asc') {
@@ -240,12 +240,12 @@ export const getDiscussionSubentriesQueryMock = ({
                     _id: '104',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwNAo=',
                     message: '<p>This is the child reply asc</p>',
-                    rootEntryId: discussionEntryID
-                  })
+                    rootEntryId: discussionEntryID,
+                  }),
                 ],
                 pageInfo: PageInfo.mock(),
-                __typename: 'DiscussionSubentriesConnection'
-              }
+                __typename: 'DiscussionSubentriesConnection',
+              },
             })
           }
           return DiscussionEntry.mock({
@@ -256,18 +256,18 @@ export const getDiscussionSubentriesQueryMock = ({
                 DiscussionEntry.mock({
                   _id: '105',
                   id: 'RGlzY3Vzc2lvbkVudHJ5LTEwNQo=',
-                  message: '<p>This is the child reply</p>'
-                })
+                  message: '<p>This is the child reply</p>',
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionSubentriesConnection'
-            }
+              __typename: 'DiscussionSubentriesConnection',
+            },
           })
-        })()
-      }
+        })(),
+      },
     },
-    ...(shouldError && {error: new Error('graphql error')})
-  }
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
 ]
 
 /* Mutation Mocks */
@@ -275,7 +275,7 @@ export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
   {
     request: {
       query: DELETE_DISCUSSION_ENTRY,
-      variables: {id}
+      variables: {id},
     },
     result: {
       data: {
@@ -283,14 +283,14 @@ export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
           discussionEntry: DiscussionEntry.mock({
             id: btoa(`DiscussionEntry-${id}`),
             _id: id,
-            deleted: true
+            deleted: true,
           }),
           errors: null,
-          __typename: 'DeleteDiscussionEntryPayload'
-        }
-      }
-    }
-  }
+          __typename: 'DeleteDiscussionEntryPayload',
+        },
+      },
+    },
+  },
 ]
 
 export const updateDiscussionEntryParticipantMock = ({
@@ -299,7 +299,7 @@ export const updateDiscussionEntryParticipantMock = ({
   rating = null,
   forcedReadState = null,
   reportType = null,
-  shouldError = false
+  shouldError = false,
 } = {}) => [
   {
     request: {
@@ -309,8 +309,8 @@ export const updateDiscussionEntryParticipantMock = ({
         ...(read !== null && {read}),
         ...(rating !== null && {rating}),
         ...(forcedReadState !== null && {forcedReadState}),
-        ...(reportType !== null && {reportType})
-      }
+        ...(reportType !== null && {reportType}),
+      },
     },
     result: {
       data: {
@@ -324,21 +324,21 @@ export const updateDiscussionEntryParticipantMock = ({
               read: read !== null ? read : true,
               forcedReadState: forcedReadState !== null ? forcedReadState : false,
               reportType: reportType !== null ? reportType : null,
-              __typename: 'EntryParticipant'
-            }
+              __typename: 'EntryParticipant',
+            },
           }),
-          __typename: 'UpdateDiscussionEntryParticipantPayload'
-        }
-      }
+          __typename: 'UpdateDiscussionEntryParticipantPayload',
+        },
+      },
     },
-    ...(shouldError && {error: new Error('graphql error')})
-  }
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
 ]
 
 export const updateDiscussionEntryMock = ({
   discussionEntryId = '1',
   message = '<p>This is the parent reply</p>',
-  removeAttachment = !'7'
+  removeAttachment = !'7',
 } = {}) => [
   {
     request: {
@@ -346,8 +346,8 @@ export const updateDiscussionEntryMock = ({
       variables: {
         discussionEntryId,
         message,
-        removeAttachment
-      }
+        removeAttachment,
+      },
     },
     result: {
       data: {
@@ -356,27 +356,27 @@ export const updateDiscussionEntryMock = ({
             id: btoa(`DiscussionEntry-${discussionEntryId}`),
             _id: discussionEntryId,
             message,
-            attachment: removeAttachment ? null : Attachment.mock()
+            attachment: removeAttachment ? null : Attachment.mock(),
           }),
           errors: null,
-          __typename: 'UpdateDiscussionEntryPayload'
-        }
-      }
-    }
-  }
+          __typename: 'UpdateDiscussionEntryPayload',
+        },
+      },
+    },
+  },
 ]
 
 export const subscribeToDiscussionTopicMock = ({
   discussionTopicId = '1',
-  subscribed = true
+  subscribed = true,
 } = {}) => [
   {
     request: {
       query: SUBSCRIBE_TO_DISCUSSION_TOPIC,
       variables: {
         discussionTopicId,
-        subscribed
-      }
+        subscribed,
+      },
     },
     result: {
       data: {
@@ -385,13 +385,13 @@ export const subscribeToDiscussionTopicMock = ({
             id: btoa(`Discussion-${discussionTopicId}`),
             _id: discussionTopicId,
             subscribed,
-            groupSet: null
+            groupSet: null,
           }),
-          __typename: 'SubscribeToDiscussionTopicPayload'
-        }
-      }
-    }
-  }
+          __typename: 'SubscribeToDiscussionTopicPayload',
+        },
+      },
+    },
+  },
 ]
 
 export const createDiscussionEntryMock = ({
@@ -400,7 +400,7 @@ export const createDiscussionEntryMock = ({
   replyFromEntryId = null,
   includeReplyPreview = null,
   isAnonymousAuthor = false,
-  courseID = '1'
+  courseID = '1',
 } = {}) => [
   {
     request: {
@@ -411,8 +411,8 @@ export const createDiscussionEntryMock = ({
         isAnonymousAuthor,
         ...(replyFromEntryId !== null && {replyFromEntryId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
-        ...(courseID !== null && {courseID})
-      }
+        ...(courseID !== null && {courseID}),
+      },
     },
     result: {
       data: {
@@ -420,32 +420,32 @@ export const createDiscussionEntryMock = ({
           discussionEntry: DiscussionEntry.mock({
             id: btoa(`DiscussionEntry-1`),
             _id: '1',
-            message
+            message,
           }),
           errors: null,
-          __typename: 'CreateDiscussionEntryPayload'
-        }
-      }
-    }
-  }
+          __typename: 'CreateDiscussionEntryPayload',
+        },
+      },
+    },
+  },
 ]
 
 export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
   {
     request: {
       query: DELETE_DISCUSSION_TOPIC,
-      variables: {id}
+      variables: {id},
     },
     result: {
       data: {
         deleteDiscussionTopic: {
           discussionTopicId: id,
           errors: null,
-          __typename: 'DeleteDiscussionTopicPayload'
-        }
-      }
-    }
-  }
+          __typename: 'DeleteDiscussionTopicPayload',
+        },
+      },
+    },
+  },
 ]
 
 export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = true} = {}) => [
@@ -454,27 +454,27 @@ export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = t
       query: UPDATE_DISCUSSION_READ_STATE,
       variables: {
         discussionTopicId,
-        read
-      }
+        read,
+      },
     },
     result: {
       data: {
         updateDiscussionReadState: {
           discussionTopic: Discussion.mock({
             id: btoa(`Discussion-${discussionTopicId}`),
-            _id: discussionTopicId
+            _id: discussionTopicId,
           }),
-          __typename: 'UpdateDiscussionReadStatePayload'
-        }
-      }
-    }
-  }
+          __typename: 'UpdateDiscussionReadStatePayload',
+        },
+      },
+    },
+  },
 ]
 
 export const updateDiscussionTopicMock = ({
   discussionTopicId = '1',
   published = null,
-  locked = null
+  locked = null,
 } = {}) => [
   {
     request: {
@@ -482,19 +482,19 @@ export const updateDiscussionTopicMock = ({
       variables: {
         discussionTopicId,
         ...(published !== null && {published}),
-        ...(locked !== null && {locked})
-      }
+        ...(locked !== null && {locked}),
+      },
     },
     result: {
       data: {
         updateDiscussionTopic: {
           discussionTopic: Discussion.mock({
             id: btoa(`Discussion-${discussionTopicId}`),
-            _id: discussionTopicId
+            _id: discussionTopicId,
           }),
-          __typename: 'UpdateDiscussionTopicPayload'
-        }
-      }
-    }
-  }
+          __typename: 'UpdateDiscussionTopicPayload',
+        },
+      },
+    },
+  },
 ]

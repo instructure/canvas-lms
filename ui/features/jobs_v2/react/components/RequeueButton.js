@@ -37,7 +37,7 @@ export default function RequeueButton({id, onRequeue}) {
     setLoading(true)
     return doFetchApi({
       method: 'POST',
-      path: `/api/v1/jobs2/${id}/requeue`
+      path: `/api/v1/jobs2/${id}/requeue`,
     }).then(
       response => {
         onRequeue(response.json)

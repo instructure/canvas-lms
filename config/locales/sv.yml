@@ -1126,6 +1126,19 @@ sv:
           description: 
             text: "Den här rapporten visar slutbedömning för alla studenter under en viss termin. Den färdiga csv filen har en rad per kursregistrering och visar det nuvarande bedömning och slutbedömning i kursens omdömesbok."
     group_type: grupp
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Kurser
+              order: 
+                label: Beställning
+              outcome: 
+                radio: Lärandemål
+              user: 
+                radio: Användare
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1487,6 +1500,7 @@ sv:
         help_link_text: "Text att visa för länken"
         help_link_url: URL
         include_students_in_global_survey: "Inkludera studenter i globala undersökningar"
+        kill_joy: "Ta bort dolt spel från 404-sidan"
         limit_parent_app_web_access: "Begränsa åtkomsten till Canvas-webbplatsen från Canvas Parent-appen"
         lock_all_announcements: "Avaktivera kommentarer på meddelanden"
         locked: "Lås den här inställningen för underkonton och kurser"
@@ -1798,7 +1812,7 @@ sv:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: "Kurs-ID:n"
+                header: "SIS-ID:n för kurs"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -3135,6 +3149,7 @@ sv:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Ett fel inträffade när lärandemålet skulle skapas: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Ett fel inträffade när lärandemålet skulle skapas. Försök igen."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Ett fel uppstod vid borttagning av anslag."
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Ett fel inträffade vid radering av den här mötesgruppen."
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Ett fel inträffade när den här gruppen redigerades. Försök igen."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Ett fel inträffade när det här lärandemålet redigerades. Försök igen."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Ett fel inträffade vid import av dessa lärandemål."
@@ -3192,6 +3207,7 @@ sv:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Ett fel uppstod när kontots kompetensbedömningar skulle sparas: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Ett fel uppstod när associationerna skulle sparas"
   an_error_occurred_while_saving_changes_b42c9b84: "Ett fel inträffade när ändringar sparades"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "Ett fel inträffade när den här mötesgruppen skulle sparas."
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ett fel uppstod när uppgiftens publiceringspolicy skulle sparas."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ett fel uppstod när kursens publiceringspolicy skulle sparas"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Ett fel uppstod vid inläsning av måluppfyllelseskala: %{message}"
@@ -4633,6 +4649,7 @@ sv:
   attempt_3dd42b18: försök
   attempt_attempt_d3911720: "Försök %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Försök %{attempt} Feedback"
+  attempt_attempt_feedback_549683ba: "Försök %{attempt} Feedback:"
   attempt_attempt_grade_c01f45df: "Försök %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Poäng för försök %{attempt}:"
   attempt_count_267a4fc5: "Försök %{count}"
@@ -4934,6 +4951,7 @@ sv:
       Ett nytt, mer användarvänligt gränsnitt för att visa filer. Om du vill aktivera det här på kursnivå
       kommer alla kursens användare se det nya gränsnittet. För att få det visas när någon
       går till en användares sida för personliga filer ('/files'), måste de aktivera det för kontot de är medlemmar i.
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Bättre LTI AGS-svarskoder för slutförda kurser"
   between_1_and_10_7118bf2d: "Mellan 1 och 10"
   between_1_and_5_f2a74bcf: "Mellan 1 och 5"
   between_1_and_99_d421a4c0: "Mellan 1 % och 99 %"
@@ -5862,6 +5880,7 @@ sv:
       inställningen uppdaterar hur URL skrivs om för att tillhandahålla förhandsgranskning
       av filer inom Canvas utan nedladdning.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: Canvas-supportcenter
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas anser att svaret är giltigt"
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
@@ -6281,6 +6300,7 @@ sv:
   collapse_discussion_thread_from_author_34f9cd18: "Dölj diskussionstråden från %{author}"
   collapse_group_c2af7cad: "Komprimera grupp"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Stäng listan av gruppmedlemmar för %{groupName}"
+  collapse_name_fdea035c: "Stäng %{name}"
   collapse_outcome_description_de471564: "Dölj beskrivningen för lärandemål"
   collapse_replies_20f2faf7: "Dölj svar"
   collapse_replies_ef4fc36b: "Dölj svar"
@@ -6308,6 +6328,7 @@ sv:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}. Om det är tillåtet och du behöver inkludera en bilaga kan du logga in på Canvas och svara på diskussionen."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}.Om det tillåts när du behöver bifoga en bilaga kan du logga in på Canvas och svara på anslaget."
   comment_destroyed_5cfc922d: "Kommentaren förstördes"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Det gick inte att publicera kommentaren! Försök igen senare."
   comment_input_box_b8c7e58b: "Inmatningsruta för kommentarer"
   comment_library_84735835: Kommentarbibliotek
@@ -9012,6 +9033,7 @@ sv:
   create_new_group_set_13b1f62a: "Skapa ny gruppuppsättning"
   create_number_of_groups_groups_now_f89f220e: "Skapa %{number_of_groups} grupper nu"
   create_outcome_4dac05a0: "Skapa ett lärandemål"
+  create_pace_4ff3e9c: "Skapa takt"
   create_pages_581a4d59: "Skapa sidor"
   create_slots_71dbb2f8: "Skapa tider"
   create_subject_86de5618: "Skapa ämne"
@@ -9555,7 +9577,7 @@ sv:
   delete_this_submission_type_37a0809c: "Ta bort den här inlämningstypen"
   delete_this_theme_46d95edc: "Ta bort det här temat?"
   delete_this_token_f5962a4f: "Ta bort den här polletten"
-  delete_time_range_e14461a0: "Radera tidsomfång"
+  delete_time_range_e14461a0: "Ta bort tidsintervall"
   delete_title_6c18eba5: "Radera %{title}"
   delete_tool_90ca44da: "Ta bort verktyg"
   delete_tool_app_9c9f6d35: "Radera %{tool} app?"
@@ -10246,6 +10268,7 @@ sv:
   discussions_redesign_b505952d: "Ny design för Diskussioner"
   discussions_redesign_isolated_view_78626c74: "Ny design för Diskussioner – isolerad vy"
   discussions_redesign_reporting_f4abcc37: "Ny design för Diskussioner – rapportering"
+  discussions_redesign_split_screen_view_d1b88d0e: "Ny design för Diskussioner – Delad skärm-vy"
   discussions_tutorial_tray_4ef79bcc: "Självstudiefack för diskussioner"
   discussions_view_c6818792: "Diskussioner – visa"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskussioner med grupper får inte vara sektionsspecifika"
@@ -10267,6 +10290,7 @@ sv:
             bedömning av alla inlämningar.
             Via Omdömesboken kan du också nå SpeedGrader, för att den vägen läsa och bedöma inlämningar.
   display_historical_view_of_achievements_of_users_53db5938: "Visa historisk vy av användares prestationer"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Visa namn:"
   display_name_b80c243e: "Visa namn"
   display_student_filter_options_ab034cfa: "Visa filteralternativ för studenter"
@@ -10275,6 +10299,7 @@ sv:
   display_total_grades_when_the_all_grading_periods__4e6add83: "Visa totala betyg när ”Alla Betygsperioder” rullgardinslista alternativen väljs (betygsperioder måste finnas)."
   display_totals_for_all_grading_periods_ad1ea050: "Visa totalt för \"Alla betygsperioder\""
   display_totals_for_all_grading_periods_option_4a72586: "Visa totalsumma för alternativet Alla bedömningsperioder"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Visa värden"
   displaying_to_students_b1e92058: "Visa för studenter"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -10475,10 +10500,11 @@ sv:
   duplication_failed_3351ffb1: "Duplicering misslyckades"
   duplication_of_title_succeeded_2e0bd645: "Duplicering av %{title} klar"
   duration_1_minute_29c7d5ab: "Varaktighet: 1 minut"
+  duration_for_assignment_name_851ca365: "Uppgiftsvaraktighet %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Varaktighet: %{hours} timmar och %{minutes} minuter"
   duration_in_minutes_8959f63e: "Varaktighet i minuter"
   duration_minutes_minutes_d7b9182b: "Varaktighet: %{minutes} minuter"
-  duration_must_be_less_than_99_999_999_minutes_ec7b116d: "Varaktigheten måste vara kortare än 99 999 999 minuter"
+  duration_must_be_less_than_99_999_999_minutes_ec7b116d: "Varaktigheten måste vara kortare än 99 999 999 minuter"
   dutch_6d05cee5: Holländska
   dynamic_concurrency_231dbdc5: "Dynamisk samtidighet"
   e_c2991d1b: e
@@ -11524,6 +11550,7 @@ sv:
   expand_global_navigation_2c28d5d4: "Ta fram global navigering"
   expand_group_53765272: "Expandera Grupp"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Ta fram listan av gruppmedlemmar för %{groupName}"
+  expand_name_71d944fd: "Expandera %{name}"
   expand_or_collapse_calendars_9854b0d0: "Förstora eller minska kalendrar"
   expand_or_collapse_undated_items_b901de09: "Förstora elle minska odaterade föremål"
   expand_outcome_description_c5bdd70b: "Visa beskrivningen för lärandemål"
@@ -11916,6 +11943,7 @@ sv:
   federated_attributes_are_information_sent_from_you_2116fb61: "Federerade attribut är information som skickats från ditt externa verifieringssystem som kan användas för att automatiskt uppdatera överensstämmande information för användare i Canvas varje gång de loggar in."
   feed_url_8a433438: Flödes-URL
   feed_url_is_required_253fda4e: "Flödes-URL krävs"
+  feedback_6dcc1991: Feedback
   feeds_9f1c5c76: Flöden
   field_9ec0ec01: Fält
   field_cannot_be_blank_afb5b332: "Fältet får inte vara tomt."
@@ -12388,6 +12416,7 @@ sv:
   grade_history_9c51ad49: Betygshistorik...
   grade_history_ccc09fde: Betygshistorik
   grade_info_19fb9875: Bedömningsinformation
+  grade_loading_bc1ad721: "Inläsning av omdöme"
   grade_low_to_high_1678b713: "Omdöme – lågt till högt"
   grade_out_of_percentage_1972bf52: "Omdöme av %{percentage}"
   grade_out_of_points_d401b79d: "Omdöme av %{points}"
@@ -13399,6 +13428,7 @@ sv:
   group_membership_count_is_invalid_cc6b2d47: "Antalet gruppmedlemskap är ogiltigt"
   group_membership_limit_54e165b: "Gräns för gruppmedlemskap"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Gränsen för gruppmedlemskap måste vara lika med eller större än det aktuella medlemsantalet."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Gränsen för gruppmedlemskap måste vara större än 1."
   group_name_b69c144: Gruppnamn
   group_name_e4066daa: gruppnamn
   group_name_group_announcements_5ce81c6d: "%{group_name} – Gruppanslag"
@@ -13826,6 +13856,7 @@ sv:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turinitinpoäng"
   has_ungraded_submissions_2bff87df: "Har ej bedömda inlämningar"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Har du någon fråga om Canvas? Ställ den här."
   have_not_been_graded_df2a5fd2: "Har inte bedömts"
   have_not_yet_submitted_57e6a58b: "Har ännu inte lämnat in"
   haven_t_been_graded_d7dee5bb: "Inte har bedömts ännu"
@@ -14300,6 +14331,12 @@ sv:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Om aktiverad, blir synkronisering av kursregistreringar till Microsoft Groups
       tillgängligt. Kontoadministratörer kan aktivera detta i kontoinställningarna.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Om aktiverad returnerar AGS API:et en mer användbar svarskod när ett LTI
+      -verktyg försöker ansluta till eller ändra data i en kurs som redan har slutförts.
+      Hellre än att returnera en generisk 404-Hittades inte-sida, kommer API:t istället att returnera en 422
+      tillsammans med ett användbart meddelande som indikerar att verktyget inte kan nås när kursen är
+      slutförd.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Om OAuth 2.0 aktiveras kommer 4xx-statuskoder att returneras korrekt till den
       begärande klienten istället för att omdirigera till sig själva
@@ -19888,6 +19925,7 @@ sv:
   pace_plans_4bb9c5ff: Taktplaner
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Taktplaner har stöd för rullande registrering i Canvas. Detta möjliggör en magisk distribution av inlämningsdatum för studenter med olika startdatum som baseras på den takt som läraren har definierat. Läs mer och få feedback i användargruppen Taktplaner."
   pace_plans_is_in_active_development_f6c20046: "Taktplaner är i aktiv utveckling."
+  pace_removed_8e625df7: "Takt borttagen"
   package_error: "Fel vid identifiering av pakettyp: %{error}"
   package_export_from_d6e2b073: "Paketexport från"
   page_50c4823d: Sida
@@ -20420,6 +20458,7 @@ sv:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Lägg till länk till hjälpmenyn"
         default_domain: "Domän (standard)"
         default_key: "Nyckel (standard)"
         tier_1_domain: "Domän (supportnivå 1)"
@@ -23202,6 +23241,7 @@ sv:
   remove_outcomes_9abcc8fd: 
     one: "Vill du ta bort lärandemålet?"
     other: "Vill du ta bort lärandemål?"
+  remove_pace_97381e05: "Ta bort takt"
   remove_placement_90862c13: "Ta bort %{placement}"
   remove_points_from_rubric_dcd4b585: "Ta bort poäng från matris"
   remove_pronouns_5ff760ff: "Ta bort pronomen"
@@ -23227,12 +23267,15 @@ sv:
   remove_this_item_from_the_module_4b2ceab7: "Ta bort det här objektet från modulen"
   remove_this_rubric_from_my_list_c7d80704: "Ta bort den här matrisen från min lista"
   remove_this_section_9a88ca43: "Ta bort den här sektionen"
+  remove_this_section_pace_ba87ad3c: "Vill du ta bort den här sektionstakten?"
+  remove_this_student_pace_a5e7b3c5: "Vill du ta bort den här studenttakten?"
   remove_user_from_section_5556f465: "Ta bort användaren från sektionen"
   remove_webcam_image_count_efee4a11: "Ta bort webbkamerabilden %{count}"
   removed_assignment_assignment_name_835cc776: "Uppgiften togs bort %{assignment_name}"
   removed_course_association_course_a233342c: "Kursassociation har tagits bort %{course}"
   removed_filename_a8634af3: "tog bort %{filename}"
   removed_user_as_group_leader_bb69330f: "Tog bort %{user} som gruppledare"
+  removing_pace_9493910c: "Tar bort takt..."
   rename_45608f54: "Ändra namn"
   rename_c_name_section_e0e92c97: "Döp om %{c.name} sektionen"
   rename_filter_c6cc8efc: "Byt namn på filter"
@@ -24025,6 +24068,7 @@ sv:
   section_level_calendar_permissions_6aff8cdb: "Kalenderbehörigheter på sektionsnivå"
   section_name_b6d82574: "Sektionens namn"
   section_name_edb51b2: "sektionens namn"
+  section_pace_989d2856: Sektionstakt
   section_removed_2ac72a79: "%{section} har tagits bort"
   section_section_names_98f172e6: "Sektion: %{section_names}"
   section_sis_2a80d2fa: Sektions-SIS
@@ -24099,6 +24143,7 @@ sv:
   security_7a7e8808: Säkerhet
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Säkerhetsinställning som begränsar sammankoppling av URL:er till en konferens"
   security_tab_failed_to_load_2d2242a: "Det gick inte att läsa in säkerhetsfliken"
+  see_comments_details_44f460d9: "Se kommenteringsinformationen"
   see_example_below_to_see_how_different_calculation_618de98d: "Se i exemplet nedan hur olika beräkningsparametrar påverkar måluppfyllelseberäkningen för studenten."
   see_more_in_canvas_guides_fc90a457: "Se mer i Canvas-guider"
   see_other_users_primary_email_address_59c8473f: "Se andra användares primära e-postadress"
@@ -25436,6 +25481,7 @@ sv:
   size_b30e1077: Storlek
   size_f1873a2: ", storlek: "
   size_size_a77bd760: "storlek: %{size}"
+  skillcode_685526a6: kompetenskod
   skip_bcb86160: "Hoppa över"
   skip_to_content_22ad1d00: "Hoppa över till innehåll"
   skip_weekends_13cbd889: "Hoppa över veckoslut"
@@ -25850,6 +25896,7 @@ sv:
       . Lärandemålen presenteras i ett format som påminner om omdömesboken
       och framsteg visas både som ett numeriskt värde och som  måluppfyllelse/nära
       måluppfyllelse/stödåtgärd.
+  student_pace_2200bf85: Studenttakt
   student_page_history_ce86b3c2: "Sidhistorik för student"
   student_page_history_pages_update_ae55fa03: "Sidhistorik för student (Sidor – uppdatera)"
   student_paired_successfully_a88def61: "Student parkopplades"
@@ -25997,6 +26044,7 @@ sv:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Inlämningskommentar: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: Inlämningskommentarer
   submission_comments_b6d65841: Inlämningskommentarer
+  submission_comments_tray_290fad59: Inlämningskommentarsfacket
   submission_completed_ba0e552e: "Inlämningen slutförd"
   submission_data_88085815: Inlämningsdata
   submission_date_8f659c0c: Inlämningsdatum
@@ -26325,6 +26373,7 @@ sv:
   sync_to_posttosisname_9837a8bf: "Synkronisera med %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synkronisera med %{postToSISName}"
   sync_to_sisname_f343e59: "Synkronisera med %{sisName}"
+  sync_uris_50c59540: "Synkronisera URI:er"
   synced_97764882: Synkroniserad
   synced_message_20469c8f: "Synkroniserad: %{message}"
   syncing_3061cc8d: "Synkroniserar ..."
@@ -26944,6 +26993,7 @@ sv:
   there_was_an_error_fetching_custom_columns_542014ef: "Ett fel inträffade när de anpassade kolumnerna skulle hämtas."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Ett fel inträffade när data skulle hämtas från omdömesboken."
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Ett fel inträffade när omdömesbokens filter skulle hämtas."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Ett fel inträffade när uppgiftsdata för omdömesperioden skulle hämtas."
   there_was_an_error_fetching_modules_8ee451bb: "Ett fel inträffade när moduler skulle hämtas."
   there_was_an_error_fetching_outcome_results_45c57590: "Det uppstod ett fel vid hämtning av lärandemålen"
   there_was_an_error_fetching_student_data_87463510: "Ett fel inträffade när studentdata skulle hämtas."
@@ -27139,6 +27189,9 @@ sv:
       Denna funktionsflagga aktiverar isolerade vyer inuti jobb i
       Ny design för Diskussioner.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Den här funktionsflaggan aktiverar uppgradering av React/InstUI och sidan GraphQL-Personer."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Den här funktionsflaggan aktiverar vyn Delad skärm inuti det nya
+      arbetet Ny design för Diskussioner.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Den här funktionsflaggan aktiverar användningen av den uppdaterade
       sidan för skapande/redigering av diskussion
@@ -27342,9 +27395,11 @@ sv:
   this_report_shows_the_student_final_grade_results__5a508b55: "Den här rapporten visar slutbedömning för alla studenter under en viss termin. CSV-filen visar en rad per registrering och visar aktuellt samt slutligt omdöme i kursens omdömesbok."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna exempelsida inkluderar vanliga UI element i Canvas för att hjälpa dig skapa ditt eget varumärke. När du börjar ändra färgvärden och bilder i den vänstra menyn, får du se knappen *Förhandsgranska dina ändringar*. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Denna exempelsida inkluderar vanliga UI element i Canvas för att hjälpa dig skapa ditt eget varumärke. När du börjar göra ändringar i färgvärden och bilder visas knappen *Förhandsgranska dina ändringar*. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Den här sektionstakt kommer att tas bort och takten återställs till standardtakt."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Den här inställningen påverkar endast din vy av studentomdömen och visar omdömen som om alla uppgifter som inte bedömts fått resultatet noll. Inställningen innebär endast en visuell ändring och påverkar inte omdömen för studenter eller andra användare av den här omdömesboken. Om den här inställningen aktiveras fyller inte Canvas i nollor i omdömesboken för studentinlämningar i individuella uppgifter. Endast uppgiftsgrupperna och Total-kolumnerna kommer automatiskt att räkna med noll-resultat i det totala procentvärdet för varje student."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Den här inställningen ändrar väsentligen Canvas-upplevelsen för studenter och lärare."
   this_settings_only_impact_enrollments_this_include_7f51358: "Den här inställningen berör endast registreringar. Detta inkluderar objekt med en last_activity_at-tidsstämpel som är större än parametern Uppdaterad efter. Som standard är inställningen inaktiverad"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Den här studenttakt kommer att tas bort och takten återställs till den tidigare tilldelade takten."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Denna studentens registrering har avslutats."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Den här studentens registrering har slutförts"
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Elevens respons är dold efter som uppgiften är anonym."
@@ -28645,6 +28700,7 @@ sv:
   unregister_service_985238e9: "Oregistrerad tjänst"
   unreserved_e86b7425: "Ej reserverad"
   unsafe_file_link_8a18eceb: "osäker fillänk"
+  unsaved_change_eb23d452: "Osparade ändringar"
   unselected_all_courses_99a9d35c: "Avmarkerade alla kurser"
   unselected_course_course_89995a83: "Avmarkerade kurser %{course}"
   unselected_external_tool_tool_1bd68403: "Det externa verktyget avmarkerades %{tool}"
@@ -30056,6 +30112,9 @@ sv:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Det går inte att publicera under inläsning av takten"
   you_cannot_publish_while_loading_the_plan_685405e5: "Det går inte att publicera uder inläsning av planen"
   you_cannot_publish_while_publishing_2f65264b: "Det går inte att publicera när en publicering pågår"
+  you_cannot_remove_a_locked_pace_150675e9: "Det går inte att ta bort en låst takt."
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Det går inte att ta bort takten medan den fortfarande läses in"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Det går inte att ta bort takten medan den publiceras"
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan inte ta bort den här registreringen."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan inte ta bort din standard e-postadress"
   you_cannot_save_while_there_are_errors_b86585e9: "Det går inte att spara med fel"

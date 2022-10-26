@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {basicUser} from '@canvas/users/react/proptypes/user'
 
 UserSearchSelectorItem.propTypes = {
-  user: basicUser
+  user: basicUser,
 }
 
 export default function UserSearchSelectorItem({user}) {

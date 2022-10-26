@@ -26,12 +26,12 @@ import * as submitHtmlForm from '@canvas/theme-editor/submitHtmlForm'
 const OUR_ACCOUNT_ID = '123'
 const ACTIVE_BASIS = {
   name: 'Account-shared Theme',
-  md5: '00112233445566778899aabbccddeeff'
+  md5: '00112233445566778899aabbccddeeff',
 }
 const DELETABLE_ID = 9847
 const DELETABLE_BASIS = {
   name: 'Deletable Theme',
-  md5: '01234567012345670123456701234567'
+  md5: '01234567012345670123456701234567',
 }
 
 const props = {
@@ -43,9 +43,9 @@ const props = {
       brand_config: {
         md5: '001122334455667788990022446688aa',
         variables: {
-          foo: '#123'
-        }
-      }
+          foo: '#123',
+        },
+      },
     },
     {
       account_id: null,
@@ -54,9 +54,9 @@ const props = {
       brand_config: {
         md5: '00112233445566778899001122334455',
         variables: {
-          foo: '#123'
-        }
-      }
+          foo: '#123',
+        },
+      },
     },
     {
       account_id: OUR_ACCOUNT_ID,
@@ -65,9 +65,9 @@ const props = {
       brand_config: {
         md5: ACTIVE_BASIS.md5,
         variables: {
-          foo: '#123'
-        }
-      }
+          foo: '#123',
+        },
+      },
     },
     {
       account_id: OUR_ACCOUNT_ID,
@@ -76,31 +76,31 @@ const props = {
       brand_config: {
         md5: DELETABLE_BASIS.md5,
         variables: {
-          foo: '#fff'
-        }
-      }
-    }
+          foo: '#fff',
+        },
+      },
+    },
   ],
   activeBrandConfig: {
     md5: ACTIVE_BASIS.md5,
-    variables: {}
+    variables: {},
   },
   accountID: OUR_ACCOUNT_ID,
   brandableVariableDefaults: {
     foo: {
       default: '#321',
       type: 'color',
-      variable_name: 'foo'
+      variable_name: 'foo',
     },
     otherFoo: {
       default: '$foo',
       type: 'color',
-      variable_name: 'Other Foo'
-    }
+      variable_name: 'Other Foo',
+    },
   },
   baseBrandableVariables: {
-    foo: 'red'
-  }
+    foo: 'red',
+  },
 }
 
 describe('CollectionView', () => {
@@ -164,7 +164,7 @@ describe('CollectionView', () => {
     const activeBrandConfig = {
       md5: '43214321432143214321432143124312',
       name: 'Very Special',
-      variables: {}
+      variables: {},
     }
     const newProps = {...props, activeBrandConfig}
     const {getAllByTestId} = render(<Subject {...newProps} />)
@@ -241,9 +241,9 @@ describe('CollectionView', () => {
       brand_config: {
         md5: ACTIVE_BASIS.md5,
         variables: {
-          foo: '#123'
-        }
-      }
+          foo: '#123',
+        },
+      },
     }
     const sharedBrandConfigs = [...props.sharedBrandConfigs, dupOfActive]
     const newProps = {...props, sharedBrandConfigs}
@@ -285,9 +285,7 @@ describe('CollectionView', () => {
     const deleteButton = getByText('Delete theme').closest('button')
     fireEvent.click(deleteButton)
     const deleteConfirmModal = getByLabelText('Delete Theme?')
-    const confirmButton = within(deleteConfirmModal)
-      .getByText('Delete')
-      .closest('button')
+    const confirmButton = within(deleteConfirmModal).getByText('Delete').closest('button')
     fireEvent.click(confirmButton)
     await fetchMock.flush(false)
     expect(fetchMock.done()).toBe(true)
@@ -300,9 +298,7 @@ describe('CollectionView', () => {
     const deleteButton = getByText('Delete theme').closest('button')
     fireEvent.click(deleteButton)
     const deleteConfirmModal = getByLabelText('Delete Theme?')
-    const confirmButton = within(deleteConfirmModal)
-      .getByText('Cancel')
-      .closest('button')
+    const confirmButton = within(deleteConfirmModal).getByText('Cancel').closest('button')
     fireEvent.click(confirmButton)
     await fetchMock.flush(false)
     expect(fetchMock.done()).toBe(false)

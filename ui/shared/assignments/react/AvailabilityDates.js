@@ -66,11 +66,11 @@ export default function AvailabilityDates({assignment, formatStyle}) {
 AvailabilityDates.propTypes = {
   assignment: PropTypes.shape({
     lockAt: PropTypes.string,
-    unlockAt: PropTypes.string
+    unlockAt: PropTypes.string,
   }).isRequired,
-  formatStyle: PropTypes.oneOf(['short', 'long'])
+  formatStyle: PropTypes.oneOf(['short', 'long']),
 }
 
 AvailabilityDates.defaultProps = {
-  formatStyle: 'long'
+  formatStyle: 'long',
 }

@@ -42,7 +42,7 @@ const changeRating = (result, ratingIndex, attrs) => {
   const rating = newRatings[ratingIndex]
   newRatings.splice(ratingIndex, 1, {
     ...rating,
-    ...attrs
+    ...attrs,
   })
   result.current.setRatings(newRatings)
 }
@@ -68,7 +68,7 @@ describe('useRatings', () => {
       'Mastery',
       'Near Mastery',
       'Below Mastery',
-      'No Evidence'
+      'No Evidence',
     ])
     expectPoints(result, [4, 3, 2, 1, 0])
     expect(result.current.masteryPoints.value).toEqual(initialMasteryPoints)
@@ -86,7 +86,7 @@ describe('useRatings', () => {
         'New Mastery',
         'Near Mastery',
         'Below Mastery',
-        'No Evidence'
+        'No Evidence',
       ])
 
       expectPoints(result, [5, 4, 2, 1, 0])
@@ -277,7 +277,7 @@ describe('useRatings', () => {
         const {result} = renderHook(() =>
           useRatings({
             initialRatings: defaultRatings.filter(r => r.points !== 0),
-            initialMasteryPoints
+            initialMasteryPoints,
           })
         )
 
@@ -291,7 +291,7 @@ describe('useRatings', () => {
         const {result} = renderHook(() =>
           useRatings({
             initialRatings: null,
-            initialMasteryPoints
+            initialMasteryPoints,
           })
         )
 

@@ -132,6 +132,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when the tool is launched from the editor_button placement"
       when "FILE_UPLOAD_GUARD"
         "when the tool is used to upload a file as an assignment submission"
+      when "INTERNAL_TOOL_GUARD"
+        "internal LTI tools"
       end
     end
     "**Availability**: *#{all_availabilities.join(" and ")}*  " if all_availabilities.size

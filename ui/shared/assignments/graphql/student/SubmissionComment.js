@@ -50,8 +50,8 @@ export const SubmissionComment = {
     comment: string,
     mediaObject: MediaObject.shape,
     read: bool,
-    updatedAt: string
-  })
+    updatedAt: string,
+  }),
 }
 
 export const DefaultMocks = {
@@ -59,7 +59,7 @@ export const DefaultMocks = {
     return {
       _id: 1,
       attachments: [{}],
-      read: true
+      read: true,
     }
-  }
+  },
 }

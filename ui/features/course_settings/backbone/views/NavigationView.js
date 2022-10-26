@@ -19,6 +19,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
+
 const I18n = useI18nScope('course_navigation')
 /*
 xsslint jqueryObject.identifier dragObject current_item
@@ -29,13 +30,13 @@ export default class NavigationView extends Backbone.View {
     this.prototype.events = {
       'click .disable_nav_item_link': 'disableNavLink',
       'click .move_nav_item_link': 'moveNavLink',
-      'click .enable_nav_item_link': 'enableNavLink'
+      'click .enable_nav_item_link': 'enableNavLink',
     }
 
     this.prototype.els = {
       '#nav_enabled_list': '$enabled_list',
       '#nav_disabled_list': '$disabled_list',
-      '.navitem': '$navitems'
+      '.navitem': '$navitems',
     }
   }
 
@@ -66,7 +67,7 @@ export default class NavigationView extends Backbone.View {
       .children('.navitem')
       .map((key, item) => ({
         id: item.getAttribute('id'),
-        title: item.getAttribute('aria-label')
+        title: item.getAttribute('aria-label'),
       }))
       .toArray()
 
@@ -75,30 +76,30 @@ export default class NavigationView extends Backbone.View {
       items: [
         {
           id: selectedItem.attr('id'),
-          title: selectedItem.attr('aria-label')
-        }
+          title: selectedItem.attr('aria-label'),
+        },
       ],
       moveOptions: {
-        siblings: navOptions
+        siblings: navOptions,
       },
       onMoveSuccess: res => reorderElements(res.data, this.$enabled_list[0], id => `#${id}`),
-      focusOnExit: item => document.querySelector(`#${item.id} a.al-trigger`)
+      focusOnExit: item => document.querySelector(`#${item.id} a.al-trigger`),
     }
 
     return renderTray(this.moveTrayProps, document.getElementById('not_right_side'))
   }
 
-  resetReadState(e) {
+  resetReadState(_e) {
     $('.drag_and_drop_warning').removeClass('read')
   }
 
-  focusKeyboardHelp(e) {
+  focusKeyboardHelp(_e) {
     if (!$('.drag_and_drop_warning').hasClass('read')) {
       $('.drag_and_drop_warning').removeClass('screenreader-only')
     }
   }
 
-  hideKeyboardHelp(e) {
+  hideKeyboardHelp(_e) {
     $('.drag_and_drop_warning').addClass('screenreader-only read')
   }
 

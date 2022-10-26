@@ -35,7 +35,7 @@ describe('SubmissionCompletedModal', () => {
         count={1}
         onRedirect={onRedirect}
         onClose={onClose}
-        open
+        open={true}
         {...overrides}
       />
     )

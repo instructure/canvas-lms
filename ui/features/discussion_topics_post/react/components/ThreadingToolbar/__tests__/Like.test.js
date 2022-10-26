@@ -30,21 +30,21 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
 const setup = props => {
   return render(
     <Like
-      isLiked
+      isLiked={true}
       onClick={Function.prototype}
       delimiterKey="like"
       likeCount={0}
@@ -75,7 +75,7 @@ describe('Like', () => {
 
   it('indicates like status', () => {
     const {queryByTestId, queryByText, rerender} = setup({
-      isLiked: false
+      isLiked: false,
     })
     expect(queryByTestId('not-liked-icon')).toBeTruthy()
     expect(queryByTestId('liked-icon')).toBeFalsy()
@@ -85,7 +85,7 @@ describe('Like', () => {
     rerender(
       <Like
         onClick={Function.prototype}
-        isLiked
+        isLiked={true}
         authorName="Xerxes"
         delimiterKey="like"
         likeCount={0}
@@ -101,7 +101,7 @@ describe('Like', () => {
   describe('Mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'}
+        mobile: {maxWidth: '1024px'},
       }))
     })
 

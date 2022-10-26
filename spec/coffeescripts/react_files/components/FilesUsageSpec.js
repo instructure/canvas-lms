@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import FilesUsage from 'ui/features/files/react/components/FilesUsage.js'
+import FilesUsage from 'ui/features/files/react/components/FilesUsage'
 
 QUnit.module('FilesUsage#update', {
   filesUpdateTest(props, test) {
@@ -29,15 +29,15 @@ QUnit.module('FilesUsage#update', {
     test()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.filesUsage).parentNode)
     return this.server.restore()
-  }
+  },
 })
 
-test('makes a get request with contextType and contextId', function() {
+test('makes a get request with contextType and contextId', function () {
   sandbox.stub($, 'get')
   return this.filesUpdateTest(
     {
       contextType: 'users',
-      contextId: 4
+      contextId: 4,
     },
     () => {
       this.filesUsage.update()
@@ -46,18 +46,18 @@ test('makes a get request with contextType and contextId', function() {
   )
 })
 
-test('sets state with ajax requests returned data', function() {
+test('sets state with ajax requests returned data', function () {
   const data = {foo: 'bar'}
   return this.filesUpdateTest(
     {
       contextType: 'users',
-      contextId: 4
+      contextId: 4,
     },
     () => {
       this.server.respondWith(this.filesUsage.url(), [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(data)
+        JSON.stringify(data),
       ])
       sandbox.spy(this.filesUsage, 'setState')
       this.filesUsage.update()
@@ -70,11 +70,11 @@ test('sets state with ajax requests returned data', function() {
   )
 })
 
-test('update called after component mounted', function() {
+test('update called after component mounted', function () {
   return this.filesUpdateTest(
     {
       contextType: 'users',
-      contextId: 4
+      contextId: 4,
     },
     () => {
       sandbox.stub(this.filesUsage, 'update').returns(true)

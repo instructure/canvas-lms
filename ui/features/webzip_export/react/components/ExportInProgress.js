@@ -26,9 +26,9 @@ const I18n = useI18nScope('webzip_exports')
 class ExportInProgress extends React.Component {
   static propTypes = {
     webzip: PropTypes.shape({
-      progressId: PropTypes.string.isRequired
+      progressId: PropTypes.string.isRequired,
     }),
-    loadExports: PropTypes.func.isRequired
+    loadExports: PropTypes.func.isRequired,
   }
 
   constructor(props) {

@@ -30,13 +30,13 @@ export const Assignment = {
   shape: shape({
     _id: string,
     id: string,
-    name: string
+    name: string,
   }),
 
   mock: ({id = 'gfhrgsjaksa==', _id = '9', name = 'This is an Assignment'} = {}) => ({
     id,
     _id,
     name,
-    __typename: 'Assignment'
-  })
+    __typename: 'Assignment',
+  }),
 }

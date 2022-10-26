@@ -23,7 +23,7 @@ import {
   getData,
   getLimit,
   putData,
-  removeFromLimit
+  removeFromLimit,
 } from '../platform_storage'
 
 describe('platform_storage', () => {

@@ -28,7 +28,7 @@ const defaultCourse = {
   currentGradingPeriodId: '1',
   enrollmentType: 'student',
   finalGradesHidden: false,
-  score: 90
+  score: 90,
 }
 
 describe('GradesSummary', () => {

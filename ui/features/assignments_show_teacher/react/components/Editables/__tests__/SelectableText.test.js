@@ -52,7 +52,6 @@ describe('SelectableText, single', () => {
     expect(getByText('Mongo Santamaria')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders the value in edit mode', () => {
     const renderView = jest.fn()
     const {getByDisplayValue} = render(
@@ -83,7 +82,7 @@ describe('SelectableText, single', () => {
         label="Pick one"
         value={options[1]}
         options={options}
-        readOnly
+        readOnly={true}
       />
     )
     expect(queryByText('Pick one')).toBeNull()
@@ -103,13 +102,12 @@ describe('SelectableText, multiple', () => {
         label="Pick one"
         value={[options[1], options[0]]}
         options={options}
-        multiple
+        multiple={true}
       />
     )
     expect(getByText('Mongo Santamaria|Pancho Sanchez')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders the value in edit mode', async () => {
     function findCongero(name) {
       return (content, element) =>
@@ -125,7 +123,7 @@ describe('SelectableText, multiple', () => {
         label="Pick one"
         value={[options[1], options[2]]}
         options={options}
-        multiple
+        multiple={true}
       />
     )
 

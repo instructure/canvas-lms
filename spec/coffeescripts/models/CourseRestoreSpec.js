@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
+import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
 import $ from 'jquery'
 
 const progressCompletedJSON = {
@@ -31,7 +31,7 @@ const progressCompletedJSON = {
   updated_at: '2013-03-08T16:37:46-07:00',
   url: 'http://localhost:3000/api/v1/progress/28',
   user_id: 51,
-  workflow_state: 'completed'
+  workflow_state: 'completed',
 }
 const progressQueuedJSON = {
   completion: 0,
@@ -44,7 +44,7 @@ const progressQueuedJSON = {
   updated_at: '2013-03-08T16:37:46-07:00',
   url: 'http://localhost:3000/api/v1/progress/28',
   user_id: 51,
-  workflow_state: 'queued'
+  workflow_state: 'queued',
 }
 const courseJSON = {
   account_id: 6,
@@ -57,7 +57,7 @@ const courseJSON = {
   name: 'Super Fun Deleted Course',
   sis_course_id: null,
   start_at: null,
-  workflow_state: 'deleted'
+  workflow_state: 'deleted',
 }
 
 QUnit.module('CourseRestore', {
@@ -74,50 +74,50 @@ QUnit.module('CourseRestore', {
     this.clock.restore()
     this.account_id = null
     $('#fixtures').empty()
-  }
+  },
 })
 
 // Describes searching for a course by ID
-test("triggers 'searching' when search is called", function() {
+test("triggers 'searching' when search is called", function () {
   const callback = sinon.spy()
   this.courseRestore.on('searching', callback)
   this.courseRestore.search(this.account_id)
   ok(callback.called, 'Searching event is called when searching')
 })
 
-test('populates CourseRestore model with response, keeping its original account_id', function() {
+test('populates CourseRestore model with response, keeping its original account_id', function () {
   this.courseRestore.search(this.course_id)
   this.server.respond('GET', this.courseRestore.searchUrl(), [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(courseJSON)
+    JSON.stringify(courseJSON),
   ])
   equal(this.courseRestore.get('account_id'), this.account_id, 'account id stayed the same')
   equal(this.courseRestore.get('id'), courseJSON.id, 'course id was updated')
 })
 
-test('set status when course not found', function() {
+test('set status when course not found', function () {
   this.courseRestore.search('a')
   this.server.respond('GET', this.courseRestore.searchUrl(), [
     404,
     {'Content-Type': 'application/json'},
-    JSON.stringify({})
+    JSON.stringify({}),
   ])
   equal(this.courseRestore.get('status'), 404)
 })
 
-test('responds with a deferred object', function() {
+test('responds with a deferred object', function () {
   const dfd = this.courseRestore.restore()
   ok($.isFunction(dfd.done, 'This is a deferred object'))
 })
 
 // a restored course should be populated with a deleted course with an after a search was made.
-test('restores a course after search finds a deleted course', 2, function() {
+test('restores a course after search finds a deleted course', 2, function () {
   this.courseRestore.search(this.course_id)
   this.server.respond('GET', this.courseRestore.searchUrl(), [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(courseJSON)
+    JSON.stringify(courseJSON),
   ])
   const dfd = this.courseRestore.restore()
   this.server.respond(
@@ -129,7 +129,7 @@ test('restores a course after search finds a deleted course', 2, function() {
   this.server.respond('GET', progressQueuedJSON.url, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(progressCompletedJSON)
+    JSON.stringify(progressCompletedJSON),
   ])
   ok(dfd.isResolved(), 'All ajax request in this deferred object should be resolved')
   equal(this.courseRestore.get('workflow_state'), 'unpublished')

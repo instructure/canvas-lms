@@ -23,26 +23,26 @@ const PERMISSIONS = [
     permission_name: 'add_section',
     label: 'add section',
     contextType: COURSE,
-    displayed: true
+    displayed: true,
   },
   {
     permission_name: 'delete_section',
     label: 'delete section',
     contextType: COURSE,
-    displayed: true
+    displayed: true,
   },
   {
     permission_name: 'add_course',
     label: 'add course',
     contextType: ACCOUNT,
-    displayed: false
+    displayed: false,
   },
   {
     permission_name: 'delete_course',
     label: 'delete course',
     contextType: ACCOUNT,
-    displayed: false
-  }
+    displayed: false,
+  },
 ]
 
 const BASIC_ROLE_PERMISSION = {
@@ -51,7 +51,7 @@ const BASIC_ROLE_PERMISSION = {
   locked: true,
   readonly: true,
   applies_to_decendants: true,
-  applies_to_self: true
+  applies_to_self: true,
 }
 
 const ROLES = [
@@ -64,8 +64,8 @@ const ROLES = [
     displayed: true,
     permissions: {
       add_section: BASIC_ROLE_PERMISSION,
-      delete_section: BASIC_ROLE_PERMISSION
-    }
+      delete_section: BASIC_ROLE_PERMISSION,
+    },
   },
   {
     id: '2',
@@ -76,8 +76,8 @@ const ROLES = [
     displayed: true,
     permissions: {
       add_section: BASIC_ROLE_PERMISSION,
-      delete_section: BASIC_ROLE_PERMISSION
-    }
+      delete_section: BASIC_ROLE_PERMISSION,
+    },
   },
   {
     id: '3',
@@ -86,7 +86,7 @@ const ROLES = [
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,
     displayed: false,
-    permissions: {add_course: BASIC_ROLE_PERMISSION, delete_course: BASIC_ROLE_PERMISSION}
+    permissions: {add_course: BASIC_ROLE_PERMISSION, delete_course: BASIC_ROLE_PERMISSION},
   },
   {
     id: '4',
@@ -95,8 +95,8 @@ const ROLES = [
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,
     displayed: false,
-    permissions: {add_course: BASIC_ROLE_PERMISSION, delete_course: BASIC_ROLE_PERMISSION}
-  }
+    permissions: {add_course: BASIC_ROLE_PERMISSION, delete_course: BASIC_ROLE_PERMISSION},
+  },
 ]
 
 const DEFAULT_PROPS = () => ({
@@ -107,7 +107,7 @@ const DEFAULT_PROPS = () => ({
   filterRoles: () => {},
   tabChanged: () => {},
   setAndOpenAddTray: () => {},
-  selectedRoles: [{value: '0', label: 'All Roles'}]
+  selectedRoles: [{value: '0', label: 'All Roles'}],
 })
 
 export {DEFAULT_PROPS, PERMISSIONS, ROLES, BASIC_ROLE_PERMISSION}

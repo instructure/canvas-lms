@@ -25,7 +25,7 @@ QUnit.module('AvatarWidget', {
     $('.avatar-nav').remove()
     $('.ui-dialog').remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('opens dialog on element click', () => {

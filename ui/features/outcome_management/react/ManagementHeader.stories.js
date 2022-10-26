@@ -23,7 +23,7 @@ import {createCache} from '@canvas/apollo'
 
 export default {
   title: 'Examples/Outcomes/ManagementHeader',
-  component: ManagementHeader
+  component: ManagementHeader,
 }
 
 const Template = args => {

@@ -29,7 +29,7 @@ const I18n = useI18nScope('account_settings_jsx_bundle')
 export default function MicrosoftSyncTitle(props) {
   return (
     <Flex margin="auto small" justifyItems="space-between">
-      <Flex.Item shouldShrink>
+      <Flex.Item shouldShrink={true}>
         <Heading value="h2">{I18n.t('Microsoft Teams Sync')}</Heading>
       </Flex.Item>
       <Flex.Item>
@@ -55,5 +55,5 @@ export default function MicrosoftSyncTitle(props) {
 MicrosoftSyncTitle.propTypes = {
   syncEnabled: PropTypes.bool,
   interactionDisabled: PropTypes.bool,
-  handleClick: PropTypes.func
+  handleClick: PropTypes.func,
 }

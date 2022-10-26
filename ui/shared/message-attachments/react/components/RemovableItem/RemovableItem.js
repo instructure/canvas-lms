@@ -84,7 +84,7 @@ RemovableItem.propTypes = {
   /**
    * The item that is able to be removed
    */
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default RemovableItem

@@ -24,7 +24,7 @@ import {SubmissionComment} from '../../../../graphql/SubmissionComment'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 const submissionsCommentsMock = () => {
@@ -34,7 +34,7 @@ const submissionsCommentsMock = () => {
     lastMessageCreatedAt: '2022-02-15T06:50:54-07:00',
     lastMessageContent: 'Hey!',
     participantString: 'Hank Mccoy',
-    messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()]
+    messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
   }
 }
 
@@ -56,12 +56,12 @@ describe('ConversationListItem', () => {
                 [
                   {user: {name: 'Bob Barker'}},
                   {user: {name: 'Sally Ford'}},
-                  {user: {name: 'Russel Franks'}}
-                ]
-              ]
+                  {user: {name: 'Russel Franks'}},
+                ],
+              ],
             },
             createdAt: 'November 5, 2020 at 2:25pm',
-            body: 'This is the body text for the message.'
+            body: 'This is the body text for the message.',
           },
           {
             author: {name: 'Sally Ford'},
@@ -69,18 +69,18 @@ describe('ConversationListItem', () => {
               nodes: [
                 {user: {name: 'Sally Ford'}},
                 {user: {name: 'Bob Barker'}},
-                {user: {name: 'Russel Franks'}}
-              ]
+                {user: {name: 'Russel Franks'}},
+              ],
             },
             createdAt: 'November 4, 2020 at 2:25pm',
-            body: 'This is the body text for the message.'
-          }
+            body: 'This is the body text for the message.',
+          },
         ],
         participants: [
           {user: {name: 'Bob Barker'}},
           {user: {name: 'Sally Ford'}},
-          {user: {name: 'Russel Franks'}}
-        ]
+          {user: {name: 'Russel Franks'}},
+        ],
       },
       isUnread: false,
       onSelect: jest.fn(),
@@ -89,7 +89,7 @@ describe('ConversationListItem', () => {
       onMarkAsRead: jest.fn(),
       onMarkAsUnRead: jest.fn(),
       readStateChangeConversationParticipants: jest.fn(),
-      ...overrides
+      ...overrides,
     }
   }
 
@@ -101,13 +101,13 @@ describe('ConversationListItem', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -158,7 +158,7 @@ describe('ConversationListItem', () => {
 
       const clickEvent = new MouseEvent('click', {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       })
       Object.assign(clickEvent, {stopPropagation: jest.fn()})
       fireEvent(unreadBadge, clickEvent)
@@ -180,7 +180,7 @@ describe('ConversationListItem', () => {
       const onMarkAsUnread = jest.fn()
 
       const props = createProps({
-        onMarkAsUnread
+        onMarkAsUnread,
       })
 
       const container = render(<ConversationListItem {...props} />)
@@ -195,7 +195,7 @@ describe('ConversationListItem', () => {
   describe('submission comments', () => {
     it('renders subject', () => {
       const props = createProps({
-        conversation: submissionsCommentsMock()
+        conversation: submissionsCommentsMock(),
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -204,7 +204,7 @@ describe('ConversationListItem', () => {
 
     it('renders create date', () => {
       const props = createProps({
-        conversation: submissionsCommentsMock()
+        conversation: submissionsCommentsMock(),
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -213,7 +213,7 @@ describe('ConversationListItem', () => {
 
     it('renders author', () => {
       const props = createProps({
-        conversation: submissionsCommentsMock()
+        conversation: submissionsCommentsMock(),
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -222,7 +222,7 @@ describe('ConversationListItem', () => {
 
     it('renders comment', () => {
       const props = createProps({
-        conversation: submissionsCommentsMock()
+        conversation: submissionsCommentsMock(),
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -232,7 +232,7 @@ describe('ConversationListItem', () => {
     it('renders read state', () => {
       const props = createProps({
         conversation: submissionsCommentsMock(),
-        isUnread: true
+        isUnread: true,
       })
       const {getByTestId} = render(<ConversationListItem {...props} />)
 
@@ -244,7 +244,7 @@ describe('ConversationListItem', () => {
       const props = createProps({
         conversation: submissionsCommentsMock(),
         isUnread: true,
-        onMarkAsRead
+        onMarkAsRead,
       })
       const {getByTestId} = render(<ConversationListItem {...props} />)
       const unreadBadge = getByTestId('unread-badge')

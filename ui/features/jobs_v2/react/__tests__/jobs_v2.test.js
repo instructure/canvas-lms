@@ -41,8 +41,8 @@ describe('JobsIndex', () => {
         jobs_server: 'jobs1',
         cluster: 'cluster74',
         shard: 'cluster74_shard_1096',
-        account: 'Test Academy'
-      }
+        account: 'Test Academy',
+      },
     }
 
     doFetchApi.mockImplementation(mockJobsApi)
@@ -105,7 +105,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running/by_tag',
-        params: expect.objectContaining({page: 5})
+        params: expect.objectContaining({page: 5}),
       })
     )
   })
@@ -118,7 +118,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({page: 2})
+        params: expect.objectContaining({page: 2}),
       })
     )
   })
@@ -131,7 +131,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({tag: 'fake_job_list_group_value'})
+        params: expect.objectContaining({tag: 'fake_job_list_group_value'}),
       })
     )
   })
@@ -144,7 +144,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({tag: 'fake_job_list_tag_value'})
+        params: expect.objectContaining({tag: 'fake_job_list_tag_value'}),
       })
     )
   })
@@ -158,7 +158,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({strand: 'fake_job_list_strand_value'})
+        params: expect.objectContaining({strand: 'fake_job_list_strand_value'}),
       })
     )
   })
@@ -172,7 +172,7 @@ describe('JobsIndex', () => {
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({singleton: 'fake_job_list_singleton_value'})
+        params: expect.objectContaining({singleton: 'fake_job_list_singleton_value'}),
       })
     )
   })
@@ -189,14 +189,14 @@ describe('JobsIndex', () => {
   it('searches for a tag', async () => {
     const {getByText, getByLabelText} = render(<JobsIndex />)
     fireEvent.change(getByLabelText('Filter running jobs by tag'), {
-      target: {value: 'fake_group_search'}
+      target: {value: 'fake_group_search'},
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('fake_group_search_value_1 (106)'))
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
-        params: expect.objectContaining({tag: 'fake_group_search_value_1'})
+        params: expect.objectContaining({tag: 'fake_group_search_value_1'}),
       })
     )
   })
@@ -204,7 +204,7 @@ describe('JobsIndex', () => {
   it('looks up a job by id', async () => {
     const {getByText, getByLabelText} = render(<JobsIndex />)
     fireEvent.change(getByLabelText('Job lookup'), {
-      target: {value: '3606'}
+      target: {value: '3606'},
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('3606', {selector: 'button'}))
@@ -230,8 +230,8 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         params: expect.objectContaining({
           start_date: '2022-04-02T13:00:00.000Z',
-          end_date: '2022-04-03T03:00:00.000Z'
-        })
+          end_date: '2022-04-03T03:00:00.000Z',
+        }),
       })
     )
 
@@ -256,8 +256,8 @@ describe('JobsIndex', () => {
           page: 2,
           scope: 'account',
           start_date: '2022-04-01T01:00:00.000Z',
-          end_date: '2022-04-02T01:00:00.000Z'
-        })
+          end_date: '2022-04-02T01:00:00.000Z',
+        }),
       })
     )
     expect(doFetchApi).toHaveBeenCalledWith(
@@ -268,8 +268,8 @@ describe('JobsIndex', () => {
           page: 3,
           scope: 'account',
           start_date: '2022-04-01T01:00:00.000Z',
-          end_date: '2022-04-02T01:00:00.000Z'
-        })
+          end_date: '2022-04-02T01:00:00.000Z',
+        }),
       })
     )
   })

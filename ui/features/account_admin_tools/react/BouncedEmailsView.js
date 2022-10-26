@@ -36,7 +36,7 @@ import $ from 'jquery'
 const I18n = useI18nScope('bounced_emails')
 
 BouncedEmailsView.propTypes = {
-  accountId: string.isRequired
+  accountId: string.isRequired,
 }
 
 export default function BouncedEmailsView({accountId}) {

@@ -34,5 +34,5 @@ export default combineReducers<StoreState>({
   ui: uiReducer,
   course: courseReducer,
   blackoutDates: blackoutDatesReducer,
-  original: originalReducer
+  original: originalReducer,
 })

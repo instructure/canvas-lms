@@ -28,7 +28,7 @@ describe('getOutcomeGroupAncestorsWithSelf', () => {
     [parentGroupId]: {parentGroupId: null},
     [groupId]: {parentGroupId},
     [siblingGroupId]: {parentGroupId},
-    [childGroupId]: {parentGroupId: groupId}
+    [childGroupId]: {parentGroupId: groupId},
   }
 
   it('returns self if group not in collections', () => {

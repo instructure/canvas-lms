@@ -71,7 +71,7 @@ const formatScore = (score, assignment) => {
   const gradingType = getGradingType(assignment)
   if (gradingType === GradingTypes.points.key) {
     return I18n.t('%{score} pts', {
-      score: I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
+      score: I18n.n(score, {precision: 2, strip_insignificant_zeros: true}),
     })
   } else if (
     gradingType === GradingTypes.letter_grade.key ||

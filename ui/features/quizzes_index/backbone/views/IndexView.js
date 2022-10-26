@@ -49,7 +49,7 @@ export default class IndexView extends Backbone.View {
       'mouseup #searchTerm': 'keyUpSearch',
       'click .header-bar-right .menu_tool_link': 'openExternalTool',
       'click .choose-quiz-engine': 'createNewQuiz',
-      'click .reset-quiz-engine': 'resetQuizEngine'
+      'click .reset-quiz-engine': 'resetQuizEngine',
     }
 
     this.prototype.keyUpSearch = _.debounce(function () {
@@ -100,7 +100,7 @@ export default class IndexView extends Backbone.View {
       {
         one: '1 quiz found.',
         other: '%{count} quizzes found.',
-        zero: 'No matching quizzes found.'
+        zero: 'No matching quizzes found.',
       },
       {count: numQuizzes}
     )
@@ -144,7 +144,7 @@ export default class IndexView extends Backbone.View {
       ENV.URLS.new_quizzes_selection,
       'PUT',
       {
-        newquizzes_engine_selected: newquizzes_engine
+        newquizzes_engine_selected: newquizzes_engine,
       },
       () => {
         window.location.reload()

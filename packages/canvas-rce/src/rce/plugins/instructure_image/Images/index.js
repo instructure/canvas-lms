@@ -22,12 +22,11 @@ import {fileShape} from '../../shared/fileShape'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-
 import {
   LoadMoreButton,
   LoadingIndicator,
   LoadingStatus,
-  useIncrementalLoading
+  useIncrementalLoading,
 } from '../../../../common/incremental-loading'
 import ImageList from '../ImageList'
 import formatMessage from '../../../../format-message'
@@ -39,6 +38,7 @@ function hasFiles(images) {
 function isEmpty(images) {
   return !hasFiles(images) && !images.hasMore && !images.isLoading
 }
+
 export default function Images(props) {
   const {fetchInitialImages, fetchNextImages, contextType, sortBy, searchString, isIconMaker} =
     props
@@ -55,7 +55,7 @@ export default function Images(props) {
     records: files,
     contextType,
     sortBy,
-    searchString
+    searchString,
   })
 
   return (
@@ -92,7 +92,7 @@ export default function Images(props) {
       )}
 
       {isEmpty(images) && (
-        <View as="div" padding="medium">
+        <View as="div" role="alert" padding="medium">
           {formatMessage('No results.')}
         </View>
       )}
@@ -110,18 +110,18 @@ Images.propTypes = {
       bookmark: string,
       hasMore: bool.isRequired,
       isLoading: bool.isRequired,
-      error: string
+      error: string,
     })
   ).isRequired,
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
-    order: oneOf(['asc', 'desc']).isRequired
+    order: oneOf(['asc', 'desc']).isRequired,
   }),
   searchString: string,
   onImageEmbed: func.isRequired,
-  isIconMaker: bool
+  isIconMaker: bool,
 }
 
 Images.defaultProps = {
-  isIconMaker: false
+  isIconMaker: false,
 }

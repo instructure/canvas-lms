@@ -24,9 +24,9 @@ function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit
   window.ENV = {
     context_asset_string: 'account_1',
     ACCOUNT: {
-      site_admin: false
+      site_admin: false,
     },
-    FEATURES: {}
+    FEATURES: {},
   }
 
   const setFocusAbove = jest.fn()

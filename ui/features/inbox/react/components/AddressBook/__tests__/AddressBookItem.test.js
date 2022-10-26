@@ -21,7 +21,7 @@ import {AddressBookItem} from '../AddressBookItem'
 
 const defaultProps = {
   id: '1',
-  name: 'Test Entry'
+  name: 'Test Entry',
 }
 
 const setup = props => {

@@ -25,7 +25,7 @@ import {Assignment} from '../../../../graphql/Assignment'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 const setup = props => {
@@ -36,8 +36,8 @@ describe('DiscussionTopicAlertManager', () => {
   it('should render post required alert', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        initialPostRequiredForCurrentUser: true
-      })
+        initialPostRequiredForCurrentUser: true,
+      }),
     })
     expect(container.getByTestId('post-required')).toBeTruthy()
   })
@@ -45,8 +45,8 @@ describe('DiscussionTopicAlertManager', () => {
   it('should render differentiated group topics alert', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        assignment: Assignment.mock({onlyVisibleToOverrides: true})
-      })
+        assignment: Assignment.mock({onlyVisibleToOverrides: true}),
+      }),
     })
     expect(container.queryByTestId('differentiated-group-topics')).toBeTruthy()
   })
@@ -55,8 +55,8 @@ describe('DiscussionTopicAlertManager', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
         delayedPostAt: '3020-11-23T11:40:44-07:00',
-        isAnnouncement: true
-      })
+        isAnnouncement: true,
+      }),
     })
     expect(container.queryByTestId('delayed-until')).toBeTruthy()
   })
@@ -64,8 +64,8 @@ describe('DiscussionTopicAlertManager', () => {
   it('should render not avalable for user alert', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        availableForUser: false
-      })
+        availableForUser: false,
+      }),
     })
     expect(container.queryByTestId('locked-for-user')).toBeTruthy()
   })
@@ -75,8 +75,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
-          canReplyAnonymously: true
-        })
+          canReplyAnonymously: true,
+        }),
       })
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(
@@ -88,8 +88,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
-          canReplyAnonymously: false
-        })
+          canReplyAnonymously: false,
+        }),
       })
 
       const anonAlert = await findByTestId('anon-conversation')
@@ -103,8 +103,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
-          canReplyAnonymously: false
-        })
+          canReplyAnonymously: false,
+        }),
       })
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(
@@ -119,8 +119,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
-          canReplyAnonymously: true
-        })
+          canReplyAnonymously: true,
+        }),
       })
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(
@@ -133,8 +133,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
-          canReplyAnonymously: false
-        })
+          canReplyAnonymously: false,
+        }),
       })
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(
@@ -147,8 +147,8 @@ describe('DiscussionTopicAlertManager', () => {
       const {findByTestId} = setup({
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
-          canReplyAnonymously: false
-        })
+          canReplyAnonymously: false,
+        }),
       })
       const anonAlert = await findByTestId('anon-conversation')
       expect(anonAlert.textContent).toEqual(

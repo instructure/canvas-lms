@@ -30,7 +30,7 @@ const PastMessage = props => (
     <Flex direction="column" margin="medium">
       <Flex.Item>
         <Flex wrap="wrap">
-          <Flex.Item shouldShrink shouldGrow>
+          <Flex.Item shouldShrink={true} shouldGrow={true}>
             <Text>{props.author.name}</Text>
           </Flex.Item>
           <Flex.Item>
@@ -58,5 +58,5 @@ export const PastMessages = props => {
 }
 
 PastMessages.propTypes = {
-  messages: PropTypes.arrayOf(ConversationMessage.shape)
+  messages: PropTypes.arrayOf(ConversationMessage.shape),
 }

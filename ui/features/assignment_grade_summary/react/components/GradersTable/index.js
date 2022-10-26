@@ -44,7 +44,7 @@ function GradersTable(props) {
       onAccept() {
         props.onGradesAccept(graderId)
       },
-      selectionDetails: props.bulkSelectionDetails[graderId]
+      selectionDetails: props.bulkSelectionDetails[graderId],
     }
 
     return row
@@ -104,10 +104,10 @@ GradersTable.propTypes = {
   graders: arrayOf(
     shape({
       graderName: string,
-      graderId: string.isRequired
+      graderId: string.isRequired,
     })
   ).isRequired,
-  gradesLoading: bool.isRequired
+  gradesLoading: bool.isRequired,
 }
 
 function mapStateToProps(state) {
@@ -118,7 +118,7 @@ function mapStateToProps(state) {
     bulkSelectionDetails,
     graders: state.context.graders,
     gradesLoading: state.students.loadStudentsStatus !== StudentActions.SUCCESS,
-    provisionalGrades
+    provisionalGrades,
   }
 }
 
@@ -126,7 +126,7 @@ function mapDispatchToProps(dispatch) {
   return {
     onGradesAccept(graderId) {
       dispatch(GradeActions.acceptGraderGrades(graderId))
-    }
+    },
   }
 }
 

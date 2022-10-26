@@ -18,12 +18,12 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsNavigation from 'ui/features/lti_collaborations/react/CollaborationsNavigation.js'
+import CollaborationsNavigation from 'ui/features/lti_collaborations/react/CollaborationsNavigation'
 
 QUnit.module('CollaborationsNavigation')
 
 const defaultProps = {
-  ltiCollaborators: [{name: 'A name', id: '1'}]
+  ltiCollaborators: [{name: 'A name', id: '1'}],
 }
 
 test('button hidden if create permission is false', () => {

@@ -29,8 +29,10 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 jest.mock('@canvas/alerts/react/FlashAlert')
 
 const flushAllTimersAndPromises = async () => {
-  while(jest.getTimerCount() > 0) {
-    await act(async () => { jest.runAllTimers() })
+  while (jest.getTimerCount() > 0) {
+    await act(async () => {
+      jest.runAllTimers()
+    })
   }
 }
 
@@ -44,8 +46,8 @@ describe('groupDetailHook', () => {
     ...groupDetailMocks(),
     ...groupDetailMocks({
       groupId: '1',
-      searchQuery: 'search'
-    })
+      searchQuery: 'search',
+    }),
   ]
 
   beforeEach(() => {
@@ -66,10 +68,10 @@ describe('groupDetailHook', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            rootIds: [ACCOUNT_GROUP_ID]
-          }
+            rootIds: [ACCOUNT_GROUP_ID],
+          },
         }}
-        f
+        f={true}
       >
         {children}
       </OutcomesContext.Provider>
@@ -78,7 +80,7 @@ describe('groupDetailHook', () => {
 
   it('should load group info correctly with pagination', async () => {
     const {result} = renderHook(() => useGroupDetail({id: '1'}), {
-      wrapper
+      wrapper,
     })
     expect(result.current.loading).toBe(true)
     expect(result.current.group).toBe(null)
@@ -93,7 +95,7 @@ describe('groupDetailHook', () => {
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
       'Outcome 3 - Group 1',
-      'Outcome 4 - Group 1'
+      'Outcome 4 - Group 1',
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -101,30 +103,30 @@ describe('groupDetailHook', () => {
   it('should move the outcomes to correct order when loading the same outcome', async () => {
     mocks = groupDetailMocksFetchMore()
     const {result} = renderHook(() => useGroupDetail({id: '1'}), {
-      wrapper
+      wrapper,
     })
     await act(async () => jest.runAllTimers())
     expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 1',
-      'Outcome 2 - Group 1'
+      'Outcome 2 - Group 1',
     ])
     act(() => result.current.loadMore())
     await act(async () => jest.runAllTimers())
     expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 2 - Group 1',
       'New Outcome 1 - Group 1',
-      'Outcome 3 - Group 1'
+      'Outcome 3 - Group 1',
     ])
   })
 
   it("should flash an error message and return the error when coudn't load by default", async () => {
     const {result} = renderHook(() => useGroupDetail({id: '2'}), {
-      wrapper
+      wrapper,
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading selected group.',
-      type: 'error'
+      type: 'error',
     })
     expect(result.current.error).not.toBe(null)
   })
@@ -136,7 +138,7 @@ describe('groupDetailHook', () => {
       expect(result.current.group.title).toBe('Group 1')
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Showing 2 outcomes for Group 1.',
-        srOnly: true
+        srOnly: true,
       })
     })
 
@@ -147,7 +149,7 @@ describe('groupDetailHook', () => {
       expect(result.current.group.title).toBe('Group 1')
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Showing 1 outcome for Group 1.',
-        srOnly: true
+        srOnly: true,
       })
     })
   })
@@ -167,7 +169,7 @@ describe('groupDetailHook', () => {
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2',
       'Outcome 3 - Group 2',
-      'Outcome 4 - Group 2'
+      'Outcome 4 - Group 2',
     ])
   })
 
@@ -187,7 +189,7 @@ describe('groupDetailHook', () => {
     expect(outcomeTitles(result)).toEqual([
       'Refetched Outcome 1 - Group 200',
       'Refetched Outcome 2 - Group 200',
-      'Newly Created Outcome - Group 200'
+      'Newly Created Outcome - Group 200',
     ])
     expect(outcomeFriendlyDescriptions(result)).toEqual(['friendly', '', ''])
   })
@@ -209,7 +211,7 @@ describe('groupDetailHook', () => {
           id: '1',
           query: FIND_GROUP_OUTCOMES,
           loadOutcomesIsImported: false,
-          searchString: search
+          searchString: search,
         }),
       {wrapper}
     )
@@ -238,7 +240,7 @@ describe('groupDetailHook', () => {
           id: '1',
           query: FIND_GROUP_OUTCOMES,
           loadOutcomesIsImported: false,
-          searchString: 'search'
+          searchString: 'search',
         }),
       {wrapper}
     )
@@ -251,14 +253,14 @@ describe('groupDetailHook', () => {
       'Outcome 1 - Group 1',
       'Outcome 3 - Group 1',
       'Outcome 5 - Group 1',
-      'Outcome 6 - Group 1'
+      'Outcome 6 - Group 1',
     ])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(false)
   })
 
   it('Remove outcomes correctly', async () => {
     const {result} = renderHook(() => useGroupDetail({id: '1'}), {
-      wrapper
+      wrapper,
     })
 
     await act(async () => jest.runAllTimers())
@@ -282,7 +284,7 @@ describe('groupDetailHook', () => {
           id: '1',
           query: FIND_GROUP_OUTCOMES,
           loadOutcomesIsImported: false,
-          searchString: search
+          searchString: search,
         }),
       {wrapper}
     )

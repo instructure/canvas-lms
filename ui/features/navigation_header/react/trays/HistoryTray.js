@@ -28,11 +28,11 @@ const I18n = useI18nScope('new_nav')
 
 HistoryTray.propTypes = {
   history: HistoryShape.isRequired,
-  hasLoaded: bool.isRequired
+  hasLoaded: bool.isRequired,
 }
 
 HistoryTray.defaultProps = {
-  history: []
+  history: [],
 }
 
 export default function HistoryTray({hasLoaded, history}) {

@@ -32,19 +32,19 @@ QUnit.module('UniqueDropdownCollection', {
     })()
     this.coll = new UniqueDropdownCollection(this.records, {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString())
+      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
     })
-  }
+  },
 })
 
-test('#intialize', function() {
+test('#intialize', function () {
   ok(this.coll.length === this.records.length, 'stores all the records')
   equal(this.coll.takenValues.length, 3)
   equal(this.coll.availableValues.length, 1)
   ok(this.coll.availableValues instanceof Backbone.Collection)
 })
 
-test('updates available/taken when models change', function() {
+test('updates available/taken when models change', function () {
   this.coll.availableValues.on('remove', model => strictEqual(model.get('value'), '4'))
   this.coll.availableValues.on('add', model => strictEqual(model.get('value'), '1'))
 
@@ -55,14 +55,14 @@ test('updates available/taken when models change', function() {
   return this.records[0].set('state', '4')
 })
 
-test('removing a model updates the available/taken values', function() {
+test('removing a model updates the available/taken values', function () {
   this.coll.availableValues.on('add', model => strictEqual(model.get('value'), '1'))
   this.coll.takenValues.on('remove', model => strictEqual(model.get('value'), '1'))
 
   return this.coll.remove(this.coll.get(1))
 })
 
-test('overrides add to munge params with an available value', function() {
+test('overrides add to munge params with an available value', function () {
   this.coll.model = Backbone.Model
 
   this.coll.add({})
@@ -73,7 +73,7 @@ test('overrides add to munge params with an available value', function() {
   equal(this.coll.at(this.coll.length - 1).get('state'), 4)
 })
 
-test('add should take the value from the front of the available values collection', function() {
+test('add should take the value from the front of the available values collection', function () {
   // remove one so there's only two taken
   this.coll.remove(this.coll.at(0))
 
@@ -97,12 +97,12 @@ QUnit.module('UniqueDropdownCollection, lazy setup', {
     })()
     this.coll = new UniqueDropdownCollection([], {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString())
+      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
     })
-  }
+  },
 })
 
-test('reset of collection recalculates availableValues', function() {
+test('reset of collection recalculates availableValues', function () {
   equal(this.coll.availableValues.length, 4, 'has the 4 default items on init')
   this.coll.reset(this.records)
   equal(this.coll.availableValues.length, 1, '`availableValues` is recalculated on reset')

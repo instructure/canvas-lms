@@ -203,4 +203,57 @@ describe CoursesHelper do
       expect(user_type(course, teacher, enrollments)).to eq "teacher"
     end
   end
+
+  describe "#sortable_tabs" do
+    it "returns tool tabs" do
+      tool = external_tool_model(context: course_model)
+      tool.course_navigation = { enabled: true }
+      tool.save
+      controller = CoursesController.new
+      controller.instance_variable_set(:@context, tool.context)
+      tabs = controller.sortable_tabs
+
+      tool_tab = tabs.find { |t| Lti::ExternalToolTab.tool_for_tab(t) == tool }
+      expect(tool_tab[:args][1]).to eq(tool.id)
+    end
+
+    context "when given a quizzes tool tab" do
+      before do
+        allow_any_instance_of(ContextExternalTool).to receive(:quiz_lti?).and_return(true)
+      end
+
+      context "quizzes is enabled for the course" do
+        it "includes the tab" do
+          tool = external_tool_model(context: course_model)
+          tool.course_navigation = { enabled: true }
+          tool.save
+          controller = CoursesController.new
+          controller.instance_variable_set(:@context, tool.context)
+
+          Account.site_admin.enable_feature! :assignments_2_teacher
+          allow(controller).to receive(:new_quizzes_navigation_placements_enabled?).with(tool.context).and_return(true)
+
+          tabs = controller.sortable_tabs
+          tool_tab = tabs.find { |t| Lti::ExternalToolTab.tool_for_tab(t) == tool }
+          expect(tool_tab[:args][1]).to eq(tool.id)
+        end
+      end
+
+      context "quizzes is disabled for the account/course" do
+        it "doesn't include the tab" do
+          tool = external_tool_model(context: course_model)
+          tool.course_navigation = { enabled: true }
+          tool.save
+          controller = CoursesController.new
+          controller.instance_variable_set(:@context, tool.context)
+
+          Account.site_admin.disable_feature! :assignments_2_teacher
+
+          tabs = controller.sortable_tabs
+          tool_tab = tabs.find { |t| Lti::ExternalToolTab.tool_for_tab(t) == tool }
+          expect(tool_tab).to eq(nil)
+        end
+      end
+    end
+  end
 end

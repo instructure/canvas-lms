@@ -71,7 +71,8 @@ export default class CollaborationView extends View
     $iframe = $(editIframe({
       id: @id,
       url: url,
-      allowances: iframeAllowances()
+      allowances: iframeAllowances(),
+      shouldRenderForwardingIframe: ENV?.FEATURES?.lti_platform_storage
     }))
     $iframe.on 'keydown', (e) =>
       if e.which == 27

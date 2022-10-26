@@ -105,8 +105,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "Excused" },
+  "extended_9a58dcb6": { "message": "Extended" },
   "failed_getting_course_list_49846a93": {
     "message": "Failed getting course list"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Failed getting To Do list"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Failed peeking into your future"
@@ -126,6 +130,9 @@
     "message": "Failed to load opportunities"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Failed to save ‘to-do’" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Failure loading the To Do list"
+  },
   "feedback_6dcc1991": { "message": "Feedback" },
   "fun_quiz_47ab0b0": { "message": "Fun quiz" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -236,6 +243,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } to { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Student To Do" },
   "submitted_318fad53": { "message": "Submitted" },
   "success_to_do_created_e34ed395": { "message": "Success: ‘To-do’ created" },
   "task_16b0ef38": { "message": "Task" },

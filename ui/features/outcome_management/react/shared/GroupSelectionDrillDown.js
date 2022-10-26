@@ -32,14 +32,14 @@ const SELECTED_GROUP_INDEX = -1
 const keyCodes = {
   ARROW_UP: 38,
   ARROW_DOWN: 40,
-  ENTER: 13
+  ENTER: 13,
 }
 
 const buildTreeBrowserParentGroup = id => ({
   collections: [],
   id,
   isRootGroup: false,
-  name: null
+  name: null,
 })
 
 const GroupSelectionDrillDown = ({
@@ -48,7 +48,7 @@ const GroupSelectionDrillDown = ({
   selectedGroupId,
   onCollectionClick,
   loadedGroups,
-  movingGroupId
+  movingGroupId,
 }) => {
   const [highlighted, setHighlighted] = useState(SELECTED_GROUP_INDEX)
   // the selectedGroupId can't be in the collections, this will happen when moving a deep
@@ -154,7 +154,7 @@ GroupSelectionDrillDown.propTypes = {
   selectedGroupId: PropTypes.string,
   onCollectionClick: PropTypes.func.isRequired,
   loadedGroups: PropTypes.array.isRequired,
-  movingGroupId: PropTypes.string
+  movingGroupId: PropTypes.string,
 }
 
 export default GroupSelectionDrillDown

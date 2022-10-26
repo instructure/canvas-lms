@@ -46,7 +46,7 @@ export default class ExternalToolsTableRow extends React.Component {
     canAddEdit: bool.isRequired,
     setFocusAbove: func.isRequired,
     favoriteCount: number.isRequired,
-    showLTIFavoriteToggles: bool
+    showLTIFavoriteToggles: bool,
   }
 
   get is13Tool() {
@@ -69,7 +69,7 @@ export default class ExternalToolsTableRow extends React.Component {
             className="icon-lock"
             data-tooltip="top"
             title={I18n.t('%{app} was installed by Admin and is locked', {
-              app: this.props.tool.name
+              app: this.props.tool.name,
             })}
           />
         </span>
@@ -82,7 +82,7 @@ export default class ExternalToolsTableRow extends React.Component {
               className="icon-blueprint-lock"
               data-tooltip="top"
               title={I18n.t('%{app} was installed by the master course and is locked', {
-                app: this.props.tool.name
+                app: this.props.tool.name,
               })}
             />
           </span>
@@ -94,7 +94,7 @@ export default class ExternalToolsTableRow extends React.Component {
               className="icon-blueprint"
               data-tooltip="top"
               title={I18n.t('%{app} was installed by the master course', {
-                app: this.props.tool.name
+                app: this.props.tool.name,
               })}
             />
           </span>
@@ -133,7 +133,7 @@ export default class ExternalToolsTableRow extends React.Component {
       showFlashAlert({
         message: I18n.t('We were unable to update the app.'),
         err,
-        type: 'error'
+        type: 'error',
       })
     }
 
@@ -174,7 +174,7 @@ export default class ExternalToolsTableRow extends React.Component {
 
       if (tool.has_update) {
         const badgeAriaLabel = I18n.t('An update is available for %{toolName}', {
-          toolName: tool.name
+          toolName: tool.name,
         })
         updateBadge = <i className="icon-upload tool-update-badge" aria-label={badgeAriaLabel} />
       }

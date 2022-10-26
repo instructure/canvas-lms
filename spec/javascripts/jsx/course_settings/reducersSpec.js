@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/course_settings/react/reducer.js'
+import reducer from 'ui/features/course_settings/react/reducer'
 
 QUnit.module('Course Settings Reducer')
 
 test('Unknown action types return initialState', () => {
   const initialState = {
-    courseImage: 'abc'
+    courseImage: 'abc',
   }
 
   const action = {
-    type: 'I_AM_NOT_A_REAL_ACTION'
+    type: 'I_AM_NOT_A_REAL_ACTION',
   }
 
   const newState = reducer(initialState, action)
@@ -38,12 +38,12 @@ test('sets the modal visibility properly', () => {
   const action = {
     type: 'MODAL_VISIBILITY',
     payload: {
-      showModal: true
-    }
+      showModal: true,
+    },
   }
 
   const initialState = {
-    showModal: false
+    showModal: false,
   }
 
   const newState = reducer(initialState, action)
@@ -52,11 +52,11 @@ test('sets the modal visibility properly', () => {
 
 test('sets uploading image properly', () => {
   const action = {
-    type: 'UPLOADING_IMAGE'
+    type: 'UPLOADING_IMAGE',
   }
 
   const initialState = {
-    uploadingImage: false
+    uploadingImage: false,
   }
 
   const newState = reducer(initialState, action)
@@ -68,13 +68,13 @@ test('sets course image properly', () => {
     type: 'GOT_COURSE_IMAGE',
     payload: {
       imageString: '123',
-      imageUrl: 'http://imageUrl'
-    }
+      imageUrl: 'http://imageUrl',
+    },
   }
 
   const initialState = {
     courseImage: 'abc',
-    imageUrl: ''
+    imageUrl: '',
   }
 
   const newState = reducer(initialState, action)
@@ -87,14 +87,14 @@ test('SET_COURSE_IMAGE_ID', () => {
     type: 'SET_COURSE_IMAGE_ID',
     payload: {
       imageUrl: 'http://imageUrl',
-      imageId: 42
-    }
+      imageId: 42,
+    },
   }
 
   const initialState = {
     imageUrl: '',
     courseImage: '',
-    showModal: true
+    showModal: true,
   }
 
   const newState = reducer(initialState, action)
@@ -105,11 +105,11 @@ test('SET_COURSE_IMAGE_ID', () => {
 
 test('sets removing image properly', () => {
   const action = {
-    type: 'REMOVING_IMAGE'
+    type: 'REMOVING_IMAGE',
   }
 
   const initialState = {
-    removingImage: false
+    removingImage: false,
   }
 
   const newState = reducer(initialState, action)
@@ -118,13 +118,13 @@ test('sets removing image properly', () => {
 
 test('sets removed image properly', () => {
   const action = {
-    type: 'REMOVED_IMAGE'
+    type: 'REMOVED_IMAGE',
   }
 
   const initialState = {
     imageUrl: 'http://imageUrl',
     courseImage: '24',
-    removingImage: true
+    removingImage: true,
   }
 
   const newState = reducer(initialState, action)
@@ -135,11 +135,11 @@ test('sets removed image properly', () => {
 
 test('sets removing image to false on error', () => {
   const action = {
-    type: 'ERROR_REMOVING_IMAGE'
+    type: 'ERROR_REMOVING_IMAGE',
   }
 
   const initialState = {
-    removingImage: true
+    removingImage: true,
   }
 
   const newState = reducer(initialState, action)

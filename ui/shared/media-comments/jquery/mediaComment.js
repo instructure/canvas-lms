@@ -59,7 +59,7 @@ const MediaCommentUtils = {
     const dimensions = tagType === 'video' ? ` width="${width}" height="${height}"` : ''
     const html = `<${tagType} ${dimensions} preload="metadata" controls>${st_tags}</${tagType}>`
     return $(html)
-  }
+  },
 }
 
 const VIDEO_WIDTH = 550
@@ -72,10 +72,10 @@ $.extend(mejs.MediaElementDefaults, {
   // default if the <video width> is not specified
   defaultVideoWidth: VIDEO_WIDTH,
   // default if the <video height> is not specified
-  defaultVideoHeight: VIDEO_HEIGHT
+  defaultVideoHeight: VIDEO_HEIGHT,
 })
 
-mejs.MepDefaults.success = function(mediaElement, domObject) {
+mejs.MepDefaults.success = function (mediaElement, domObject) {
   import('./kalturaAnalytics').then(({default: kalturaAnalytics}) => {
     kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
   })
@@ -179,13 +179,10 @@ const mediaCommentActions = {
 
   show_inline(id, mediaType = 'video', downloadUrl) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    const $holder = $(this)
-      .closest('.instructure_file_link_holder')
-      .andSelf()
-      .first()
+    const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
     $holder.text(I18n.t('loading', 'Loading media...'))
 
-    const showInline = function(id, holder) {
+    const showInline = function (id, holder) {
       const width = Math.min(holder.closest('div,p,table').width() || VIDEO_WIDTH, VIDEO_WIDTH)
       const height = Math.round((width / 336) * 240)
       return getSourcesAndTracks(id).done(sourcesAndTracks => {
@@ -209,9 +206,9 @@ const mediaCommentActions = {
 
                   const handler = new MediaElementKeyActionHandler(mejs, player, media, event)
                   handler.dispatch()
-                }
-              }
-            ]
+                },
+              },
+            ],
           }
 
           const $mediaTag = createMediaTag({
@@ -219,7 +216,7 @@ const mediaCommentActions = {
             mediaPlayerOptions,
             mediaType,
             height,
-            width
+            width,
           })
           $mediaTag.appendTo(holder.html(''))
           const player = new MediaElementPlayer($mediaTag, mediaPlayerOptions)
@@ -241,7 +238,7 @@ const mediaCommentActions = {
         $holder.text(
           I18n.t('Media has been queued for conversion, please try again in a little bit.')
         )
-      const onSuccess = function(data) {
+      const onSuccess = function (data) {
         if (data.attachment && data.attachment.media_entry_id !== 'maybe') {
           $holder.text('')
           return showInline(data.attachment.media_entry_id, $holder)
@@ -257,9 +254,7 @@ const mediaCommentActions = {
 
   show(id, mediaType = 'video', openingElement = null) {
     // if a media comment is still open, close it.
-    $('.play_media_comment')
-      .find('.ui-dialog-titlebar-close')
-      .click()
+    $('.play_media_comment').find('.ui-dialog-titlebar-close').click()
 
     const $this = $(this)
 
@@ -300,11 +295,8 @@ const mediaCommentActions = {
             .closest('.ui-dialog')
             .attr('role', 'dialog')
             .attr('aria-label', I18n.t('Play Media Comment'))
-          $(event.currentTarget)
-            .parent()
-            .find('.ui-dialog-titlebar-close')
-            .focus()
-        }
+          $(event.currentTarget).parent().find('.ui-dialog-titlebar-close').focus()
+        },
       })
 
       // Populate dialog box with a video
@@ -313,7 +305,7 @@ const mediaCommentActions = {
           if (sourcesAndTracks.sources.length) {
             const mediaPlayerOptions = {
               can_add_captions: sourcesAndTracks.can_add_captions,
-              mediaCommentId: id
+              mediaCommentId: id,
             }
 
             const $mediaTag = createMediaTag({
@@ -321,13 +313,13 @@ const mediaCommentActions = {
               mediaPlayerOptions,
               mediaType,
               height,
-              width
+              width,
             })
             $mediaTag.appendTo($dialog.html(''))
 
             $this.data({
               mediaelementplayer: new MediaElementPlayer($mediaTag, mediaPlayerOptions),
-              media_comment_dialog: $dialog
+              media_comment_dialog: $dialog,
             })
           } else {
             $dialog.text(
@@ -340,10 +332,10 @@ const mediaCommentActions = {
         })
       )
     }
-  }
+  },
 }
 
-$.fn.mediaComment = function(command, ...restArgs) {
+$.fn.mediaComment = function (command, ...restArgs) {
   if (!INST.kalturaSettings) {
     return console.log('Kaltura has not been enabled for this account')
   } else {

@@ -40,7 +40,7 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
       hasGradesOrPostableComments: true,
       onHideGrades: () => {},
       onPostGrades: () => {},
-      ...customProps
+      ...customProps,
     }
 
     ReactDOM.render(<SpeedGraderPostGradesMenu {...props} />, $container)

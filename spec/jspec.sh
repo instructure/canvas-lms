@@ -9,12 +9,12 @@ export JSPEC_WD=$(pwd)
 # "...npm ERR! Tell the author that this fails on your system..."
 # error messages if there is a spec that fails.
 if [ "$1" == "--watch" ]; then
-  export JSPEC_PATH=$2
+  export JSPEC_PATH="${@:2}"
   yarn test:karma:watch --silent || true
 elif [ "$1" == "--a11y" ]; then
-  export JSPEC_PATH=$2
+  export JSPEC_PATH="${@:2}"
   A11Y_REPORT=1 yarn test:karma:watch --silent || true
 else
-  export JSPEC_PATH=$1
+  export JSPEC_PATH="${@:1}"
   yarn test:karma || true
 fi

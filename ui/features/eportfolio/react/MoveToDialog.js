@@ -33,11 +33,11 @@ class MoveToDialog extends React.Component {
     onMove: PropTypes.func,
     onClose: PropTypes.func,
     appElement: PropTypes.object,
-    triggerElement: PropTypes.object
+    triggerElement: PropTypes.object,
   }
 
   state = {
-    isOpen: true
+    isOpen: true,
   }
 
   handleMove = () => {
@@ -71,7 +71,7 @@ class MoveToDialog extends React.Component {
 
   renderBody = () => {
     const selectLabel = I18n.t('Place "%{section}" before:', {
-      section: this.props.source.label
+      section: this.props.source.label,
     })
 
     return (

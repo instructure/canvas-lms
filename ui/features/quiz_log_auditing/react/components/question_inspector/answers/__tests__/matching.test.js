@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import Matching from '../matching'
-import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/events/views/question_inspector/answers/matching', () => {
   it('renders', () => {
-    render(<Matching
-      question={{
-        answers: [{ id: 1, match_id: 2, left: '[match one]', right: 'nope' }],
-        matches: [{ match_id: 2, text: '[did match]' }]
-      }}
-      answer={[{ answer_id: 1, match_id: 2 }]}
-    />)
+    render(
+      <Matching
+        question={{
+          answers: [{id: 1, match_id: 2, left: '[match one]', right: 'nope'}],
+          matches: [{match_id: 2, text: '[did match]'}],
+        }}
+        answer={[{answer_id: 1, match_id: 2}]}
+      />
+    )
 
     expect(document.body.textContent).toMatch('[match one]')
     expect(document.body.textContent).toMatch('[did match]')

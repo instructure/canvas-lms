@@ -35,20 +35,20 @@ describe('ProfileTray', () => {
         {
           id: 'foo',
           label: 'Foo',
-          html_url: '/foo'
+          html_url: '/foo',
         },
         {
           id: 'bar',
           label: 'Bar',
-          html_url: '/bar'
+          html_url: '/bar',
         },
         {
           id: 'content_shares',
           label: 'Shared Content',
-          html_url: '/shared'
-        }
+          html_url: '/shared',
+        },
       ],
-      loaded: true
+      loaded: true,
     }
   })
 

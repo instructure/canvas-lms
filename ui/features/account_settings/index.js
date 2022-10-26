@@ -43,7 +43,7 @@ ready(() => {
           name: window.ENV.help_link_name,
           icon: window.ENV.help_link_icon,
           links: window.ENV.CUSTOM_HELP_LINKS,
-          defaultLinks: window.ENV.DEFAULT_HELP_LINKS
+          defaultLinks: window.ENV.DEFAULT_HELP_LINKS,
         }}
       />,
       document.getElementById('custom_help_link_settings')

@@ -30,29 +30,29 @@ const QuizzesTray = () => (
     imageWidth="8rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the Quizzes Index Page?'),
-        href: I18n.t('#community.instructor_use_quizzes_index')
+        href: I18n.t('#community.instructor_use_quizzes_index'),
       },
       {
         label: I18n.t('How do I create an assessment using New Quizzes?'),
-        href: I18n.t('#community.instructor_create_new_quiz')
+        href: I18n.t('#community.instructor_create_new_quiz'),
       },
       {
         label: I18n.t('How do I manage settings for an assessment in New Quizzes?'),
-        href: I18n.t('#community.instructor_manage_new_quizzes_settings')
+        href: I18n.t('#community.instructor_manage_new_quizzes_settings'),
       },
       {
         label: I18n.t('How do I create a quiz with individual questions?'),
-        href: I18n.t('#community.instructor_create_quiz_questions')
+        href: I18n.t('#community.instructor_create_quiz_questions'),
       },
       {
         label: I18n.t('What options can I set in a quiz?'),
-        href: I18n.t('#community.instructor_quiz_options')
-      }
+        href: I18n.t('#community.instructor_quiz_options'),
+      },
     ]}
   >
     {I18n.t(`Use quizzes to challenge student understanding and assess comprehension

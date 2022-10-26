@@ -88,32 +88,32 @@ test('tests cache student', () => {
       data: {
         trigger_assignment: {
           assignment: {id: '1'},
-          submission: {grade: '100'}
+          submission: {grade: '100'},
         },
         follow_on_assignments: [
           {
             score: 100,
-            assignment: {id: '2'}
-          }
-        ]
-      }
+            assignment: {id: '2'},
+          },
+        ],
+      },
     })
   )
   deepEqual(
     newState.studentCache,
     {
-      '1': {
+      1: {
         triggerAssignment: {
           assignment: {id: '1'},
-          submission: {grade: '100'}
+          submission: {grade: '100'},
         },
         followOnAssignments: [
           {
             score: 100,
-            assignment: {id: '2'}
-          }
-        ]
-      }
+            assignment: {id: '2'},
+          },
+        ],
+      },
     },
     'caches correct student'
   )

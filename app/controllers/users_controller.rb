@@ -523,6 +523,8 @@ class UsersController < ApplicationController
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
     # things needed on both k5 and classic dashboards
+    create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
+    create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -534,8 +536,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
              ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
-               PERMISSION: ccr = @current_user.create_courses_right(@current_user.sub_account_for_course_creation(@domain_root_account)),
-               RESTRICT_TO_MCC_ACCOUNT: ccr && !@domain_root_account.grants_any_right?(@current_user, session, :manage_courses, :create_courses)
+               PERMISSION: create_permission_root_account || create_permission_mcc_account,
+               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -583,7 +585,7 @@ class UsersController < ApplicationController
   def dashboard_stream_items
     cancel_cache_buster
 
-    @user = params[:observed_user_id].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user_id]) : @current_user
+    @user = params[:observed_user_id].present? ? api_find(User, params[:observed_user_id]) : @current_user
     @is_observing_student = @current_user != @user
     course_ids = nil
     if @is_observing_student
@@ -646,7 +648,7 @@ class UsersController < ApplicationController
 
   def dashboard_sidebar
     GuardRail.activate(:secondary) do
-      @user = params[:observed_user_id].present? && Account.site_admin.feature_enabled?(:observer_picker) ? api_find(User, params[:observed_user_id]) : @current_user
+      @user = params[:observed_user_id].present? ? api_find(User, params[:observed_user_id]) : @current_user
       @is_observing_student = @current_user != @user
       course_ids = nil
 

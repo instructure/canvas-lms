@@ -19,7 +19,7 @@
 #
 
 require "spec_helper"
-require "db/migrate/20210830223331_clear_sms_overrides"
+require_relative "../../db/migrate/20210830223331_clear_sms_overrides"
 
 describe ClearSmsOverrides do
   let(:migration) { described_class.new }

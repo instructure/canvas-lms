@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import '@canvas/rubrics/jquery/rubricEditBinding'
 
-const initEditRubricPage = function() {
+const initEditRubricPage = function () {
   const event = document.createEvent('Event')
   event.initEvent('rubricEditDataReady', true, true)
   document.dispatchEvent(event)

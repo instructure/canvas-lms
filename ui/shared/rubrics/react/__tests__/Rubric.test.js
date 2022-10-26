@@ -85,18 +85,16 @@ describe('the Rubric component', () => {
 
     const el = renderAssessing(assessments.points)
     const updated = {...assessments.points.data[0], points: {valid: true, value: 2}}
-    findCriteria(el)
-      .first()
-      .prop('onAssessmentChange')(updated)
+    findCriteria(el).first().prop('onAssessmentChange')(updated)
 
     expect(onAssessmentChange.args).toEqual([
       [
         {
           ...assessments.points,
           data: [updated, assessments.points.data[1]],
-          score: 2 + assessments.points.data[1].points.value
-        }
-      ]
+          score: 2 + assessments.points.data[1].points.value,
+        },
+      ],
     ])
 
     expect(renderAssessing(onAssessmentChange.args[0][0])).toMatchSnapshot()
@@ -117,11 +115,7 @@ describe('the Rubric component', () => {
         />
       )
       expect(el.find(Table.ColHeader)).toHaveLength(expected ? 7 : 5)
-      expect(
-        findCriteria(el)
-          .at(0)
-          .prop('hasPointsColumn')
-      ).toBe(expected)
+      expect(findCriteria(el).at(0).prop('hasPointsColumn')).toBe(expected)
       expect(el).toMatchSnapshot()
     }
 
@@ -136,7 +130,7 @@ describe('the Rubric component', () => {
     it('does not have a points column if points hidden and freeform', () => {
       hasPointsColumn(false, {
         rubricProps: {free_form_criterion_comments: true},
-        associationProps: {hide_points: true}
+        associationProps: {hide_points: true},
       })
     })
 
@@ -155,7 +149,7 @@ describe('the Rubric component', () => {
     const ignored = {
       ...assessments.points.data[1],
       points: {value: 2, valid: true},
-      criterion_id: '_invalid'
+      criterion_id: '_invalid',
     }
     const assessment = setCloned(assessments.points, 'data.2', ignored)
     const el = shallow(
@@ -168,18 +162,16 @@ describe('the Rubric component', () => {
     )
 
     const updated = {...assessment.data[1], points: 2}
-    findCriteria(el)
-      .at(1)
-      .prop('onAssessmentChange')(updated)
+    findCriteria(el).at(1).prop('onAssessmentChange')(updated)
 
     expect(onAssessmentChange.args).toEqual([
       [
         {
           ...assessment,
           data: [assessment.data[0], updated, ignored],
-          score: assessment.data[0].points.value
-        }
-      ]
+          score: assessment.data[0].points.value,
+        },
+      ],
     ])
   })
 })

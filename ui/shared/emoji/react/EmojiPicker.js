@@ -42,7 +42,7 @@ export default function EmojiPicker(props) {
       objects: I18n.t('Objects'),
       symbols: I18n.t('Symbols'),
       flags: I18n.t('Flags'),
-      custom: I18n.t('Custom')
+      custom: I18n.t('Custom'),
     },
     categorieslabel: I18n.t('Emoji categories'),
     skintones: {
@@ -51,8 +51,8 @@ export default function EmojiPicker(props) {
       3: I18n.t('Medium-Light Skin Tone'),
       4: I18n.t('Medium Skin Tone'),
       5: I18n.t('Medium-Dark Skin Tone'),
-      6: I18n.t('Dark Skin Tone')
-    }
+      6: I18n.t('Dark Skin Tone'),
+    },
   }
 
   const defaultExcludedEmojis = [
@@ -101,13 +101,13 @@ export default function EmojiPicker(props) {
     'tropical_drink',
     'tumbler_glass',
     'v',
-    'wine_glass'
+    'wine_glass',
   ]
 
   const accountExcludedEmojis = ENV.EMOJI_DENY_LIST ? ENV.EMOJI_DENY_LIST.split(',') : []
   const excludedEmojis = [
     ...defaultExcludedEmojis,
-    ...(props.excludedEmojis.length ? props.excludedEmojis : accountExcludedEmojis)
+    ...(props.excludedEmojis.length ? props.excludedEmojis : accountExcludedEmojis),
   ]
 
   const closeAndInsertEmoji = emoji => {
@@ -146,9 +146,9 @@ export default function EmojiPicker(props) {
       onHideContent={() => setShowPicker(false)}
       placement={window.matchMedia('(max-width: 415px)').matches ? 'top' : 'start'}
       screenReaderLabel={I18n.t('Emoji picker')}
-      shouldContainFocus
-      shouldReturnFocus
-      shouldCloseOnDocumentClick
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
+      shouldCloseOnDocumentClick={true}
     >
       <span className="emoji-picker">
         <Picker
@@ -163,7 +163,7 @@ export default function EmojiPicker(props) {
           title={I18n.t('Pick an emoji...')}
           showSkinTones={props.showSkinTones}
           skin={props.skin || undefined}
-          showPreview
+          showPreview={true}
         />
       </span>
     </Popover>
@@ -176,5 +176,5 @@ EmojiPicker.defaultProps = {
   excludedEmojis: [],
   opaque: false,
   showSkinTones: true,
-  skin: null
+  skin: null,
 }

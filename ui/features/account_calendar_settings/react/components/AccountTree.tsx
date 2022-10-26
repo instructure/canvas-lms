@@ -42,7 +42,7 @@ type ComponentProps = {
 export const AccountTree: React.FC<ComponentProps> = ({
   originAccountId,
   visibilityChanges,
-  onAccountToggled
+  onAccountToggled,
 }) => {
   const [collections, setCollections] = useState<Collection>({})
   const [loadingCollectionIds, setLoadingCollectionIds] = useState<number[]>([originAccountId])
@@ -60,8 +60,8 @@ export const AccountTree: React.FC<ComponentProps> = ({
     doFetchApi({
       path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
       params: {
-        ...(nextLink == null && {per_page: 100})
-      }
+        ...(nextLink == null && {per_page: 100}),
+      },
     })
       .then(({json, link}) => {
         const accountData = accumulatedResults.concat(json || [])

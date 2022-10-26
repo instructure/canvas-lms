@@ -26,11 +26,11 @@ const I18n = useI18nScope('OutcomeAlignmentDeleteLink')
 class OutcomeAlignmentDeleteLink extends React.Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    has_rubric_association: PropTypes.string
+    has_rubric_association: PropTypes.string,
   }
 
   static defaultProps = {
-    has_rubric_association: null
+    has_rubric_association: null,
   }
 
   handleClick = e => {
@@ -39,11 +39,11 @@ class OutcomeAlignmentDeleteLink extends React.Component {
     e.preventDefault()
     $(e.target).confirmDelete({
       success() {
-        $li.fadeOut('slow', function() {
+        $li.fadeOut('slow', function () {
           this.remove()
         })
       },
-      url: this.props.url
+      url: this.props.url,
     })
   }
 

@@ -33,8 +33,8 @@ export const TurnitinData = {
     reportUrl: string,
     score: number,
     status: string,
-    state: string
-  })
+    state: string,
+  }),
 }
 
 export const DefaultMocks = {
@@ -42,6 +42,6 @@ export const DefaultMocks = {
     reportUrl: 'example.com',
     score: 50,
     status: 'scored',
-    state: 'acceptable'
-  })
+    state: 'acceptable',
+  }),
 }

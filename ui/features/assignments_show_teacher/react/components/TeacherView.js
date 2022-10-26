@@ -447,7 +447,7 @@ export default class TeacherView extends React.Component {
               )}
             </Mutation>
             <Portal open={this.state.isSaving}>
-              <Mask fullscreen>
+              <Mask fullscreen={true}>
                 <Spinner size="large" renderTitle={I18n.t('Saving assignment')} />
               </Mask>
             </Portal>

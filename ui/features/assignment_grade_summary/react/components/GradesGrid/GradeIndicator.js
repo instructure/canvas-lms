@@ -33,12 +33,12 @@ export default class GradeIndicator extends Component {
       id: string.isRequired,
       score: number,
       selected: bool.isRequired,
-      studentId: string.isRequired
-    })
+      studentId: string.isRequired,
+    }),
   }
 
   static defaultProps = {
-    gradeInfo: null
+    gradeInfo: null,
   }
 
   shouldComponentUpdate(nextProps) {

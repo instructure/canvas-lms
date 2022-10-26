@@ -20,7 +20,7 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import DownloadLink from 'ui/features/epub_exports/react/DownloadLink.js'
+import DownloadLink from 'ui/features/epub_exports/react/DownloadLink'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('epub_exports')
@@ -30,13 +30,13 @@ QUnit.module('DownloadLink', {
     this.props = {
       course: {
         name: 'Maths 101',
-        id: 1
-      }
+        id: 1,
+      },
     }
-  }
+  },
 })
 
-test('state showDownloadLink', function() {
+test('state showDownloadLink', function () {
   let DownloadLinkElement = <DownloadLink {...this.props} />
   let component = TestUtils.renderIntoDocument(DownloadLinkElement)
   ok(!component.showDownloadLink(), 'should be false without epub_export object')
@@ -46,7 +46,7 @@ test('state showDownloadLink', function() {
   ok(!component.showDownloadLink(), 'should be false without permissions to download')
   this.props.course.epub_export = {
     epub_attachment: {url: 'http://download.url'},
-    permissions: {download: true}
+    permissions: {download: true},
   }
   DownloadLinkElement = <DownloadLink {...this.props} />
   component = TestUtils.renderIntoDocument(DownloadLinkElement)
@@ -54,14 +54,14 @@ test('state showDownloadLink', function() {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('render', function() {
+test('render', function () {
   let DownloadLinkElement = <DownloadLink {...this.props} />
   let component = TestUtils.renderIntoDocument(DownloadLinkElement)
   let node = ReactDOM.findDOMNode(component)
   ok(isNull(node))
   this.props.course.epub_export = {
     epub_attachment: {url: 'http://download.url'},
-    permissions: {download: true}
+    permissions: {download: true},
   }
   DownloadLinkElement = <DownloadLink {...this.props} />
   component = TestUtils.renderIntoDocument(DownloadLinkElement)

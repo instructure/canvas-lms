@@ -22,7 +22,7 @@ import React from 'react'
 export default {
   title: 'Examples/Discussion Posts/Components/Peer Review',
   component: PeerReview,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <PeerReview {...args} />
@@ -32,18 +32,18 @@ PeerReviewAssigned.args = {
   dueAtDisplayText: 'Jan 26 11:49pm',
   revieweeName: 'Morty Smith',
   reviewLinkUrl: '#',
-  workflowState: 'assigned'
+  workflowState: 'assigned',
 }
 
 export const PeerReviewAssignedNoDueDate = Template.bind({})
 PeerReviewAssignedNoDueDate.args = {
   revieweeName: 'Morty Smith',
   reviewLinkUrl: '#',
-  workflowState: 'assigned'
+  workflowState: 'assigned',
 }
 
 export const PeerReviewComplete = Template.bind({})
 PeerReviewComplete.args = {
   revieweeName: 'Rick Sanchez',
-  workflowState: 'completed'
+  workflowState: 'completed',
 }

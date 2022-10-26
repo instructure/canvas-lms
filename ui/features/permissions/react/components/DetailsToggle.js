@@ -28,7 +28,7 @@ import propTypes from '@canvas/permissions/react/propTypes'
 class DetailsToggle extends React.Component {
   static propTypes = {
     title: string.isRequired,
-    detailItems: arrayOf(propTypes.permissionDetails).isRequired
+    detailItems: arrayOf(propTypes.permissionDetails).isRequired,
   }
 
   renderDetailGroup(item, key) {

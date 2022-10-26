@@ -20,7 +20,7 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import FolderTree from '../legacy/components/FolderTree'
 
-FolderTree.render = function() {
+FolderTree.render = function () {
   return <div className="ef-folder-list" ref="FolderTreeHolder" />
 }
 

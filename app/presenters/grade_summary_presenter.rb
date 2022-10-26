@@ -200,14 +200,20 @@ class GradeSummaryPresenter
   end
 
   def submissions
+    preload_params = [
+      :visible_submission_comments,
+      { rubric_assessments: [:rubric, :rubric_association] },
+      :content_participations,
+      { assignment: [:context, :post_policy] }
+    ]
+
+    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+      preload_params << { submission_comments: :viewed_submission_comments }
+    end
+
     @submissions ||= begin
       ss = @context.submissions
-                   .preload(
-                     :visible_submission_comments,
-                     { rubric_assessments: [:rubric, :rubric_association] },
-                     :content_participations,
-                     { assignment: [:context, :post_policy] }
-                   )
+                   .preload(*preload_params)
                    .joins(:assignment)
                    .where("assignments.workflow_state != 'deleted'")
                    .where(user_id: student).to_a
@@ -302,6 +308,15 @@ class GradeSummaryPresenter
                                else
                                  []
                                end
+  end
+
+  def unread_submission_items
+    @unread_submission_items ||= if student_is_user?
+                                   participations = submissions.map(&:content_participations).flatten
+                                   ContentParticipation.items_by_submission(participations, "unread")
+                                 else
+                                   {}
+                                 end
   end
 
   def no_calculations?

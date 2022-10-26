@@ -132,9 +132,19 @@ declare -A YARN_RUNNER_TAGS; compute_tags "YARN_RUNNER_TAGS" $YARN_RUNNER_PREFIX
 declare -A WEBPACK_BUILDER_TAGS; compute_tags "WEBPACK_BUILDER_TAGS" $WEBPACK_BUILDER_PREFIX ${WEBPACK_BUILDER_PARTS[@]}
 declare -A WEBPACK_ASSETS_TAGS; compute_tags "WEBPACK_ASSETS_TAGS" $WEBPACK_ASSETS_PREFIX ${WEBPACK_ASSETS_PARTS[@]}
 
+# Patchsets don't currently save their own webpack cache - so if we are reusing the patchset webpack-assets
+# image, then we should also make sure the previously built fuzzy image is at least reusable.
+if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then
+  ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_FUZZY_SAVE_TAG || true
+
+  if ! image_label_eq $WEBPACK_CACHE_FUZZY_SAVE_TAG "WEBPACK_CACHE_ID" $WEBPACK_CACHE_ID; then
+    export FORCE_BUILD_WEBPACK=1
+  fi
+fi
+
 WEBPACK_ASSETS_SELECTED_TAG=""; pull_first_tag "WEBPACK_ASSETS_SELECTED_TAG" ${WEBPACK_ASSETS_TAGS[LOAD_TAG]} ${WEBPACK_ASSETS_TAGS[LOAD_FALLBACK_TAG]}
 
-if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
+if [[ -z "${WEBPACK_ASSETS_SELECTED_TAG}" || "${FORCE_BUILD_WEBPACK-0}" == "1" ]]; then
   WEBPACK_BUILDER_SELECTED_TAG=""; pull_first_tag "WEBPACK_BUILDER_SELECTED_TAG" ${WEBPACK_BUILDER_TAGS[LOAD_TAG]} ${WEBPACK_BUILDER_TAGS[LOAD_FALLBACK_TAG]}
 
   if [ -z "${WEBPACK_BUILDER_SELECTED_TAG}" ]; then

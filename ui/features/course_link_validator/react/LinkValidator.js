@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatorResults from './ValidatorResults'
 import {number} from 'prop-types'
 import {Confetti} from '@canvas/confetti'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('link_validator')
 
@@ -31,7 +32,7 @@ class LinkValidator extends React.Component {
     results: [],
     displayResults: false,
     error: false,
-    showConfetti: false
+    showConfetti: false,
   }
 
   componentWillMount() {
@@ -56,26 +57,26 @@ class LinkValidator extends React.Component {
             results: data.results.issues,
             displayResults: true,
             error: false,
-            showConfetti: !initial_load && data.results.issues.length === 0
+            showConfetti: !initial_load && data.results.issues.length === 0,
           })
           $('#all-results').show()
         } else {
           this.setState({
             buttonMessage: I18n.t('Start Link Validation'),
-            buttonDisabled: false
+            buttonDisabled: false,
           })
           if (data.workflow_state === 'failed' && !initial_load) {
             this.setState({
-              error: true
+              error: true,
             })
           }
         }
       },
       error: () => {
         this.setState({
-          error: true
+          error: true,
         })
-      }
+      },
     })
   }
 
@@ -84,7 +85,7 @@ class LinkValidator extends React.Component {
       buttonMessage: I18n.t('Loading...'),
       buttonDisabled: true,
       displayResults: false,
-      results: []
+      results: [],
     })
   }
 
@@ -92,7 +93,7 @@ class LinkValidator extends React.Component {
     $('#all-results').hide()
 
     this.setState({
-      showConfetti: false
+      showConfetti: false,
     })
 
     this.setLoadingState()
@@ -111,20 +112,13 @@ class LinkValidator extends React.Component {
       },
       error: () => {
         this.setState({
-          error: true
+          error: true,
         })
-      }
+      },
     })
   }
 
   render() {
-    let loadingImage
-    if (this.state.buttonDisabled) {
-      loadingImage = (
-        <img src="/images/ajax-loader.gif" alt={I18n.t('Link validation is running')} />
-      )
-    }
-
     return (
       <div>
         <button
@@ -138,7 +132,13 @@ class LinkValidator extends React.Component {
         >
           {this.state.buttonMessage}
         </button>
-        {loadingImage}
+        {this.state.buttonDisabled && (
+          <Spinner
+            renderTitle={I18n.t('Link validation is running')}
+            size="x-small"
+            margin="0 0 0 x-small"
+          />
+        )}
         {window.ENV.VALIDATION_CONFETTI_ENABLED && this.state.showConfetti && <Confetti />}
         <ValidatorResults
           results={this.state.results}
@@ -152,7 +152,7 @@ class LinkValidator extends React.Component {
 
 LinkValidator.propTypes = {
   pollTimeout: number.isRequired,
-  pollTimeoutInitial: number.isRequired
+  pollTimeoutInitial: number.isRequired,
 }
 
 export default LinkValidator

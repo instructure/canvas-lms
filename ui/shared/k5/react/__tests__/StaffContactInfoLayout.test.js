@@ -30,7 +30,7 @@ describe('StaffContactInfoLayout', () => {
         bio: 'Office Hours: 1-3pm W',
         email: 't@abc.edu',
         avatarUrl: '/images/avatar1.png',
-        role: 'TeacherEnrollment'
+        role: 'TeacherEnrollment',
       },
       {
         id: '2',
@@ -38,7 +38,7 @@ describe('StaffContactInfoLayout', () => {
         bio: null,
         email: 'tommy@abc.edu',
         avatarUrl: '/images/avatar2.png',
-        role: 'TaEnrollment'
+        role: 'TaEnrollment',
       },
       {
         id: '3',
@@ -46,10 +46,10 @@ describe('StaffContactInfoLayout', () => {
         bio: 'Office Hours: 1-3pm F',
         email: 'tammy@abc.edu',
         avatarUrl: null,
-        role: 'Super Cool TA'
-      }
+        role: 'Super Cool TA',
+      },
     ],
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {

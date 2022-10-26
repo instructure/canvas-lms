@@ -18,7 +18,7 @@
 
 import CommonEvent from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
-import CalendarEventFilter from 'ui/features/calendar/CalendarEventFilter.js'
+import CalendarEventFilter from 'ui/features/calendar/CalendarEventFilter'
 import fakeENV from 'helpers/fakeENV'
 
 const test_events = (
@@ -44,13 +44,13 @@ const test_events = (
       parent_event_id: null,
       hidden: false,
       child_events: [],
-      url: 'http://example.org/api/v1/calendar_events/1'
+      url: 'http://example.org/api/v1/calendar_events/1',
     },
     [
       {
         asset_string: 'course_1',
-        id: 1
-      }
+        id: 1,
+      },
     ]
   ),
   commonEventFactory(
@@ -75,21 +75,21 @@ const test_events = (
       child_events: [],
       url: 'http://example.org/api/v1/calendar_events/20',
       available_slots,
-      reserved
+      reserved,
     },
     [
       {
         asset_string: 'course_1',
         id: 1,
-        can_create_calendar_events: can_edit
-      }
+        can_create_calendar_events: can_edit,
+      },
     ]
-  )
+  ),
 ]
 
 QUnit.module('CalendarEventFilter', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('CalendarEventFilter: hides appointment slots and grays nothing when schedulerState is not provided', () => {
@@ -102,7 +102,7 @@ test('CalendarEventFilter: hides appointment slots and grays nothing when schedu
 test('CalendarEventFilter: hides appointment slots and grays nothing when not in find-appointment mode', () => {
   const filteredEvents = CalendarEventFilter(null, test_events(false, 0), {
     inFindAppointmentMode: false,
-    selectedCourse: null
+    selectedCourse: null,
   })
   equal(filteredEvents.length, 1)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -114,8 +114,8 @@ test('CalendarEventFilter: grays non-appointment events when in find-appointment
     inFindAppointmentMode: true,
     selectedCourse: {
       id: 789,
-      asset_string: 'course_789'
-    }
+      asset_string: 'course_789',
+    },
   })
   equal(filteredEvents.length, 1)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -127,8 +127,8 @@ test('CalendarEventFilter: unhides appointment slots when in find-appointment mo
     inFindAppointmentMode: true,
     selectedCourse: {
       id: 1,
-      asset_string: 'course_1'
-    }
+      asset_string: 'course_1',
+    },
   })
   equal(filteredEvents.length, 2)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -142,8 +142,8 @@ test('CalendarEventFilter: grays appointment events for created appointments tha
     inFindAppointmentMode: false,
     selectedCourse: {
       id: 789,
-      asset_string: 'course_789'
-    }
+      asset_string: 'course_789',
+    },
   })
   equal(filteredEvents.length, 2)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -155,8 +155,8 @@ test('CalendarEventFilter: does not gray appointment events for created appointm
   const filteredEvents = CalendarEventFilter(null, test_events(true, 2), {
     selectedCourse: {
       id: 789,
-      asset_string: 'course_789'
-    }
+      asset_string: 'course_789',
+    },
   })
   equal(filteredEvents.length, 2)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -170,8 +170,8 @@ test('CalendarEventFilter: hides filled slots', () => {
     inFindAppointmentMode: true,
     selectedCourse: {
       id: 1,
-      asset_string: 'course_1'
-    }
+      asset_string: 'course_1',
+    },
   })
   equal(filteredEvents.length, 1)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -183,8 +183,8 @@ test('CalendarEventFilter: hides already-reserved appointments that still have a
     inFindAppointmentMode: true,
     selectedCourse: {
       id: 1,
-      asset_string: 'course_1'
-    }
+      asset_string: 'course_1',
+    },
   })
   equal(filteredEvents.length, 1)
   equal(filteredEvents[0].id, 'calendar_event_1')
@@ -196,8 +196,8 @@ test('CalendarEventFilter: hides past appointments', () => {
     inFindAppointmentMode: true,
     selectedCourse: {
       id: 1,
-      asset_string: 'course_1'
-    }
+      asset_string: 'course_1',
+    },
   })
   equal(filteredEvents.length, 1)
   equal(filteredEvents[0].id, 'calendar_event_1')

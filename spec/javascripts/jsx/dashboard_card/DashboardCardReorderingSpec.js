@@ -40,7 +40,7 @@ QUnit.module('DashboardCard Reordering', {
         position: 0,
         originalName: 'Intro to Dashcards 1',
         shortName: 'Dash 101',
-        href: '/course/1'
+        href: '/course/1',
       },
       {
         id: '2',
@@ -49,7 +49,7 @@ QUnit.module('DashboardCard Reordering', {
         position: 1,
         originalName: 'Intermediate Dashcarding',
         shortName: 'Dash 201',
-        href: '/course/2'
+        href: '/course/2',
       },
       {
         id: '3',
@@ -57,8 +57,8 @@ QUnit.module('DashboardCard Reordering', {
         courseCode: 'DASH-301',
         originalName: 'Advanced Dashcards',
         shortName: 'Dash 301',
-        href: '/course/3'
-      }
+        href: '/course/3',
+      },
     ]
 
     fakeServer = sinon.fakeServer.create()
@@ -67,14 +67,14 @@ QUnit.module('DashboardCard Reordering', {
     sandbox.fetch.mock('path:/api/v1/courses/3/activity_stream/summary', 200)
     sandbox.fetch.mock(new RegExp(`\/api\/v1\/users\/${ENV.current_user_id}\/colors.*`), {
       status: 200,
-      body: '{}'
+      body: '{}',
     })
   },
   teardown() {
     fakeENV.teardown()
     cards = null
     fakeServer.restore()
-  }
+  },
 })
 
 test('it renders', () => {

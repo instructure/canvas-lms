@@ -51,5 +51,5 @@ export default {
     forEachNode(extendedMountPoints, mountPoint => {
       ReactDOM.render(<Pill color="alert">{I18n.t('extended')}</Pill>, mountPoint)
     })
-  }
+  },
 }

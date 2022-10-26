@@ -46,7 +46,7 @@ export const Leadership = ({onChange}) => {
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Leadership')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         <Flex direction="column">
           <Flex.Item padding="x-small">
             <Checkbox
@@ -85,5 +85,5 @@ export const Leadership = ({onChange}) => {
 }
 
 Leadership.propTypes = {
-  onChange: func.isRequired
+  onChange: func.isRequired,
 }

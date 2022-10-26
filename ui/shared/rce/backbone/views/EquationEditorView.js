@@ -41,7 +41,7 @@ export default class EquationEditorView extends Backbone.View {
       '#mathquill-container': '$mathquillContainer',
       '#mathjax-view': '$mathjaxView',
       '#mathjax-editor': '$mathjaxEditor',
-      '#mathjax-message': '$mathjaxMessage'
+      '#mathjax-message': '$mathjaxMessage',
     }
   }
 
@@ -66,7 +66,7 @@ export default class EquationEditorView extends Backbone.View {
         } else {
           // if we're editing inline LaTex, strip the delimiters
           // if the selection included them
-          return elem.nodeValue.trim().replace(/^(?:\\\(|\$\$)(.*)*(?:\\\)|\$\$)$/g, '$1');
+          return elem.nodeValue.trim().replace(/^(?:\\\(|\$\$)(.*)*(?:\\\)|\$\$)$/g, '$1')
         }
 
         // Get alt attributes from IMG nodes
@@ -83,7 +83,7 @@ export default class EquationEditorView extends Backbone.View {
       }
     })
       .join('')
-      .trim();
+      .trim()
   }
 
   getEquationText(elems) {
@@ -122,9 +122,9 @@ export default class EquationEditorView extends Backbone.View {
         {
           class: 'btn-primary',
           text: I18n.t('button.insert_equation', 'Insert Equation'),
-          click: e => this.onSubmit(e)
-        }
-      ]
+          click: e => this.onSubmit(e),
+        },
+      ],
     })
   }
 
@@ -158,7 +158,7 @@ export default class EquationEditorView extends Backbone.View {
       `<script type='math/tex; mode=display'>${htmlEscape(equation)}</script>`
     )
     this.toolbar = new EquationToolbarView({
-      el: this.$el
+      el: this.$el,
     })
     this.toolbar.render()
 

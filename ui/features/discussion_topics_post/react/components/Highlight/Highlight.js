@@ -36,7 +36,7 @@ export function Highlight({...props}) {
   return (
     <div
       style={{
-        borderRadius: theme.variables.borders.radiusLarge
+        borderRadius: theme.variables.borders.radiusLarge,
       }}
       className={classNames({'highlight-fadeout': props.isHighlighted})}
       data-testid={props.isHighlighted ? 'isHighlighted' : 'notHighlighted'}
@@ -52,11 +52,11 @@ Highlight.propTypes = {
    * Boolean to define if the Highlight is highlighted.
    */
   isHighlighted: PropTypes.bool,
-  children: PropTypes.node
+  children: PropTypes.node,
 }
 
 Highlight.defaultProps = {
-  isHighlighted: false
+  isHighlighted: false,
 }
 
 export default Highlight

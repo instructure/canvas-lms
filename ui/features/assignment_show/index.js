@@ -66,9 +66,9 @@ function onStudentGroupSelected(selectedStudentGroupId) {
         qs.stringify({
           gradebook_settings: {
             filter_rows_by: {
-              student_group_id: selectedStudentGroupId
-            }
-          }
+              student_group_id: selectedStudentGroupId,
+            },
+          },
         })
       )
       .finally(() => {
@@ -149,7 +149,7 @@ ready(() => {
         if (immersive_reader_mobile_mount_point) {
           ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
             content,
-            title
+            title,
           })
         }
       })
@@ -166,7 +166,7 @@ $(() => {
     const model = new Assignment({
       id: $el.attr('data-id'),
       unpublishable: !$el.hasClass('disabled'),
-      published: $el.hasClass('published')
+      published: $el.hasClass('published'),
     })
     model.doNotParse()
 
@@ -185,7 +185,7 @@ $(() => {
       courseID: ENV.COURSE_ID,
       assetType: 'Assignment',
       assetID: ENV.ASSIGNMENT_ID,
-      location: window.location
+      location: window.location,
     })
   })
 

@@ -32,7 +32,7 @@ import {
   IconModuleLine,
   IconStarLightLine,
   IconStudentViewLine,
-  IconXLine
+  IconXLine,
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -55,7 +55,7 @@ import {
   dropCourse,
   DEFAULT_COURSE_COLOR,
   TAB_IDS,
-  MOBILE_NAV_BREAKPOINT_PX
+  MOBILE_NAV_BREAKPOINT_PX,
 } from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import EmptyCourse from './EmptyCourse'
@@ -68,7 +68,7 @@ import EmptyModules from './EmptyModules'
 import EmptyHome from './EmptyHome'
 import ObserverOptions, {
   ObservedUsersListShape,
-  shouldShowObserverOptions
+  shouldShowObserverOptions,
 } from '@canvas/observer-picker'
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -85,33 +85,33 @@ const COURSE_TABS = [
   {
     id: TAB_IDS.HOME,
     icon: IconHomeLine,
-    label: I18n.t('Home')
+    label: I18n.t('Home'),
   },
   {
     id: TAB_IDS.SCHEDULE,
     icon: IconCalendarMonthLine,
-    label: I18n.t('Schedule')
+    label: I18n.t('Schedule'),
   },
   {
     id: TAB_IDS.MODULES,
     icon: IconModuleLine,
-    label: I18n.t('Modules')
+    label: I18n.t('Modules'),
   },
   {
     id: TAB_IDS.GRADES,
     icon: IconStarLightLine,
-    label: I18n.t('Grades')
+    label: I18n.t('Grades'),
   },
   {
     id: TAB_IDS.RESOURCES,
     icon: IconBankLine,
-    label: I18n.t('Resources')
+    label: I18n.t('Resources'),
   },
   {
     id: TAB_IDS.GROUPS,
     icon: IconGroupLine,
-    label: I18n.t('Groups')
-  }
+    label: I18n.t('Groups'),
+  },
 ]
 
 // Translates server-side tab IDs to their associated frontend IDs
@@ -143,7 +143,7 @@ const toRenderTabs = (tabs, hasSyllabusBody) => {
 
 const getWindowSize = () => ({
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
 })
 
 const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
@@ -209,7 +209,7 @@ ConfirmDropModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   courseName: PropTypes.string.isRequired,
-  dropLink: PropTypes.string.isRequired
+  dropLink: PropTypes.string.isRequired,
 }
 
 export const CourseHeaderHero = forwardRef(
@@ -222,7 +222,7 @@ export const CourseHeaderHero = forwardRef(
       selfEnrollment,
       showingMobileNav,
       observerMode,
-      shouldShrink
+      shouldShrink,
     },
     ref
   ) => {
@@ -244,7 +244,7 @@ export const CourseHeaderHero = forwardRef(
           height: `${height}px`,
           width: '100%',
           marginBottom: '1rem',
-          overflowY: 'hidden'
+          overflowY: 'hidden',
         }}
         data-testid="k5-course-header-hero"
         ref={ref}
@@ -254,7 +254,7 @@ export const CourseHeaderHero = forwardRef(
             style={{
               background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.7), transparent)',
               height: shouldShrink ? `${HERO_STICKY_HEIGHT_PX}px` : undefined,
-              maxHeight: shouldShrink ? undefined : `${height}px`
+              maxHeight: shouldShrink ? undefined : `${height}px`,
             }}
           >
             <Flex alignItems="center" padding="small medium" height="100%">
@@ -301,7 +301,7 @@ CourseHeaderHero.propTypes = {
   selfEnrollment: PropTypes.object,
   showingMobileNav: PropTypes.bool.isRequired,
   observerMode: PropTypes.bool.isRequired,
-  shouldShrink: PropTypes.bool.isRequired
+  shouldShrink: PropTypes.bool.isRequired,
 }
 
 export const CourseHeaderOptions = forwardRef(
@@ -318,7 +318,7 @@ export const CourseHeaderOptions = forwardRef(
       showingMobileNav,
       showObserverOptions,
       isMasterCourse,
-      windowWidth
+      windowWidth,
     },
     ref
   ) => {
@@ -327,7 +327,7 @@ export const CourseHeaderOptions = forwardRef(
         id: 'manage-subject-btn',
         'data-testid': 'manage-button',
         href: settingsPath,
-        renderIcon: <IconEditSolid />
+        renderIcon: <IconEditSolid />,
       }
       const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
       if (showingMobileNav && showObserverOptions) {
@@ -413,7 +413,7 @@ CourseHeaderOptions.propTypes = {
   showingMobileNav: PropTypes.bool.isRequired,
   showObserverOptions: PropTypes.bool.isRequired,
   isMasterCourse: PropTypes.bool.isRequired,
-  windowWidth: PropTypes.number.isRequired
+  windowWidth: PropTypes.number.isRequired,
 }
 
 export function K5Course({
@@ -451,7 +451,7 @@ export function K5Course({
   selfEnrollment,
   tabContentOnly,
   isMasterCourse,
-  showImmersiveReader
+  showImmersiveReader,
 }) {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -469,7 +469,7 @@ export function K5Course({
     observedUserId,
     isObserver:
       observedUsersList.length > 1 ||
-      (observedUsersList.length === 1 && observedUsersList[0].id !== currentUser.id)
+      (observedUsersList.length === 1 && observedUsersList[0].id !== currentUser.id),
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
@@ -587,7 +587,7 @@ export function K5Course({
     shortName: name,
     href: `/courses/${id}`,
     canManage,
-    canReadAnnouncements
+    canReadAnnouncements,
   })
 
   return (
@@ -596,7 +596,7 @@ export function K5Course({
         assignmentsDueToday,
         assignmentsMissing,
         assignmentsCompletedForToday,
-        isStudent: plannerEnabled
+        isStudent: plannerEnabled,
       }}
     >
       <View
@@ -708,7 +708,7 @@ K5Course.propTypes = {
   courseOverview: PropTypes.shape({
     body: PropTypes.string,
     url: PropTypes.string,
-    canEdit: PropTypes.bool
+    canEdit: PropTypes.bool,
   }).isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
@@ -728,7 +728,7 @@ K5Course.propTypes = {
   selfEnrollment: PropTypes.object,
   tabContentOnly: PropTypes.bool,
   isMasterCourse: PropTypes.bool.isRequired,
-  showImmersiveReader: PropTypes.bool.isRequired
+  showImmersiveReader: PropTypes.bool.isRequired,
 }
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)

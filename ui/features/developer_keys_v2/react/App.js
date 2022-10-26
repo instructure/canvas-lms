@@ -45,7 +45,7 @@ const ALERT_WAIT_TIME = 2000
 class DeveloperKeysApp extends React.Component {
   state = {
     focusTab: false,
-    selectedTab: 'tab-panel-account'
+    selectedTab: 'tab-panel-account',
   }
 
   get isSiteAdmin() {
@@ -79,10 +79,10 @@ class DeveloperKeysApp extends React.Component {
   showMoreButtonHandler = _event => {
     const {
       applicationState: {
-        listDeveloperKeys: {nextPage}
+        listDeveloperKeys: {nextPage},
       },
       store: {dispatch},
-      actions: {getRemainingDeveloperKeys}
+      actions: {getRemainingDeveloperKeys},
     } = this.props
     const callBack = this.mainTableRef.setFocusCallback()
     getRemainingDeveloperKeys(nextPage, [], callBack)(dispatch)
@@ -91,8 +91,8 @@ class DeveloperKeysApp extends React.Component {
   showMoreButton() {
     const {
       applicationState: {
-        listDeveloperKeys: {listDeveloperKeysPending, nextPage}
-      }
+        listDeveloperKeys: {listDeveloperKeysPending, nextPage},
+      },
     } = this.props
 
     if (nextPage && !listDeveloperKeysPending) {
@@ -104,10 +104,10 @@ class DeveloperKeysApp extends React.Component {
   showMoreInheritedButtonHandler = _event => {
     const {
       applicationState: {
-        listDeveloperKeys: {inheritedNextPage}
+        listDeveloperKeys: {inheritedNextPage},
       },
       store: {dispatch},
-      actions: {getRemainingInheritedDeveloperKeys}
+      actions: {getRemainingInheritedDeveloperKeys},
     } = this.props
 
     const callBack = this.inheritedTableRef.setFocusCallback()
@@ -117,8 +117,8 @@ class DeveloperKeysApp extends React.Component {
   showMoreInheritedButton() {
     const {
       applicationState: {
-        listDeveloperKeys: {listInheritedDeveloperKeysPending, inheritedNextPage}
-      }
+        listDeveloperKeys: {listInheritedDeveloperKeysPending, inheritedNextPage},
+      },
     } = this.props
 
     if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
@@ -156,14 +156,14 @@ class DeveloperKeysApp extends React.Component {
           list,
           inheritedList,
           listDeveloperKeysPending,
-          listInheritedDeveloperKeysPending
+          listInheritedDeveloperKeysPending,
         },
         createOrEditDeveloperKey,
-        listDeveloperKeyScopes
+        listDeveloperKeyScopes,
       },
       store,
       actions,
-      ctx
+      ctx,
     } = this.props
     const tab = this.state.selectedTab
     const globalInheritedList = (inheritedList || []).filter(key => key.inherited_from === 'global')
@@ -264,18 +264,18 @@ class DeveloperKeysApp extends React.Component {
 
 DeveloperKeysApp.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
     developerKeysModalOpen: PropTypes.func.isRequired,
     getRemainingDeveloperKeys: PropTypes.func.isRequired,
     getRemainingInheritedDeveloperKeys: PropTypes.func.isRequired,
-    editDeveloperKey: PropTypes.func.isRequired
+    editDeveloperKey: PropTypes.func.isRequired,
   }).isRequired,
   applicationState: PropTypes.shape({
     createOrEditDeveloperKey: PropTypes.shape({
       developerKeyCreateOrEditFailed: PropTypes.bool.isRequired,
-      developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired
+      developerKeyCreateOrEditSuccessful: PropTypes.bool.isRequired,
     }),
     listDeveloperKeys: PropTypes.shape({
       nextPage: PropTypes.string,
@@ -285,14 +285,14 @@ DeveloperKeysApp.propTypes = {
       listInheritedDeveloperKeysPending: PropTypes.bool.isRequired,
       listInheritedDeveloperKeysSuccessful: PropTypes.bool.isRequired,
       list: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
-      inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired
-    }).isRequired
+      inheritedList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+    }).isRequired,
   }).isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
-    })
-  }).isRequired
+      contextId: PropTypes.string.isRequired,
+    }),
+  }).isRequired,
 }
 
 export default DeveloperKeysApp

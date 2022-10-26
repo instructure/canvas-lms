@@ -35,7 +35,7 @@ const structFromGroup = g => ({
   name: g.title,
   collections: [],
   isRootGroup: g.isRootGroup,
-  parentGroupId: g.parentOutcomeGroup?._id
+  parentGroupId: g.parentOutcomeGroup?._id,
 })
 
 const formatNewGroup = g => ({
@@ -45,9 +45,9 @@ const formatNewGroup = g => ({
   isRootGroup: false,
   parentOutcomeGroup: {
     _id: g.parentOutcomeGroup._id,
-    __typename: 'LearningOutcomeGroup'
+    __typename: 'LearningOutcomeGroup',
   },
-  __typename: 'LearningOutcomeGroup'
+  __typename: 'LearningOutcomeGroup',
 })
 
 const ensureAllGroupFields = group => ({
@@ -56,7 +56,7 @@ const ensureAllGroupFields = group => ({
   title: null,
   parentOutcomeGroup: null,
   isRootGroup: false,
-  ...group
+  ...group,
 })
 
 const extractGroups = parentGroup =>
@@ -65,8 +65,8 @@ const extractGroups = parentGroup =>
       ...g,
       parentOutcomeGroup: {
         _id: parentGroup._id,
-        __typename: 'LearningOutcomeGroup'
-      }
+        __typename: 'LearningOutcomeGroup',
+      },
     }))
     .concat(parentGroup)
     .map(ensureAllGroupFields)
@@ -113,11 +113,11 @@ const useTreeBrowser = queryVariables => {
   const [selectedParentGroupId, setSelectedParentGroupId] = useState(null)
   const {data: cacheData} = useQuery(GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
-    variables: queryVariables
+    variables: queryVariables,
   })
   const {data: loadedGroupsData} = useQuery(LOADED_GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
-    variables: queryVariables
+    variables: queryVariables,
   })
   const groups = cacheData.groups || []
   const loadedGroups = loadedGroupsData.loadedGroups || []
@@ -127,8 +127,8 @@ const useTreeBrowser = queryVariables => {
       query: LOADED_GROUPS_QUERY,
       variables: queryVariables,
       data: {
-        loadedGroups: uniq([...loadedGroups, ...ids])
-      }
+        loadedGroups: uniq([...loadedGroups, ...ids]),
+      },
     })
   }
 
@@ -138,8 +138,8 @@ const useTreeBrowser = queryVariables => {
       query: LOADED_GROUPS_QUERY,
       variables: queryVariables,
       data: {
-        loadedGroups: [...newLoadedGroups]
-      }
+        loadedGroups: [...newLoadedGroups],
+      },
     })
   }
 
@@ -154,8 +154,8 @@ const useTreeBrowser = queryVariables => {
         ...memo,
         [g._id]: {
           ...structFromGroup(g),
-          collections: collectionsByParentId[g._id] || []
-        }
+          collections: collectionsByParentId[g._id] || [],
+        },
       }),
       {}
     )
@@ -180,15 +180,15 @@ const useTreeBrowser = queryVariables => {
       query: GROUPS_QUERY,
       variables: queryVariables,
       data: {
-        groups: newGroups
-      }
+        groups: newGroups,
+      },
     })
   }
 
   const queryCollections = ({
     id,
     parentGroupId = collections[id]?.parentGroupId,
-    shouldLoad = true
+    shouldLoad = true,
   }) => {
     setSelectedGroupId(id)
     setSelectedParentGroupId(parentGroupId)
@@ -200,7 +200,7 @@ const useTreeBrowser = queryVariables => {
       // screenreader only alert for when a user clicks on a group to load in the RHS (Find modal & Main Outcome Management)
       showFlashAlert({
         message: I18n.t(`Loading %{groupTitle}.`, {groupTitle: collections[id].name}),
-        srOnly: true
+        srOnly: true,
       })
     }
 
@@ -218,9 +218,9 @@ const useTreeBrowser = queryVariables => {
         query: CHILD_GROUPS_QUERY,
         variables: {
           id,
-          type: 'LearningOutcomeGroup'
+          type: 'LearningOutcomeGroup',
         },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
       .then(({data}) => {
         setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
@@ -238,9 +238,9 @@ const useTreeBrowser = queryVariables => {
         query: CHILD_GROUPS_QUERY,
         variables: {
           id,
-          type: 'LearningOutcomeGroup'
+          type: 'LearningOutcomeGroup',
         },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
       .then(({data}) => {
         addGroups(extractGroups(data.context))
@@ -257,9 +257,9 @@ const useTreeBrowser = queryVariables => {
         id: groupId,
         outcomeIsImported: false,
         outcomesContextId: contextId,
-        outcomesContextType: contextType
+        outcomesContextType: contextType,
       },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
     })
   }
   useEffect(() => {
@@ -269,12 +269,12 @@ const useTreeBrowser = queryVariables => {
         ? showFlashAlert({
             message: I18n.t('An error occurred while loading course learning outcome groups.'),
             type: 'error',
-            srOnly: srOnlyAlert
+            srOnly: srOnlyAlert,
           })
         : showFlashAlert({
             message: I18n.t('An error occurred while loading account learning outcome groups.'),
             type: 'error',
-            srOnly: srOnlyAlert
+            srOnly: srOnlyAlert,
           })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,7 +301,7 @@ const useTreeBrowser = queryVariables => {
     removeGroup,
     setSelectedParentGroupId,
     refetchGroup,
-    refetchGroupOutcome
+    refetchGroupOutcome,
   }
 }
 
@@ -311,7 +311,7 @@ export const useManageOutcomes = ({
   importNumber = 0,
   lhsGroupIdsToRefetch = [],
   lhsGroupId = null,
-  parentsToUnload = []
+  parentsToUnload = [],
 } = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
@@ -336,9 +336,9 @@ export const useManageOutcomes = ({
     loadedGroups,
     setSelectedParentGroupId,
     refetchGroup,
-    refetchGroupOutcome
+    refetchGroupOutcome,
   } = useTreeBrowser({
-    collection
+    collection,
   })
   const {createGroup: graphqlGroupCreate} = useGroupCreate()
 
@@ -346,8 +346,8 @@ export const useManageOutcomes = ({
     fetchPolicy: 'cache-only',
     variables: {
       contextId,
-      contextType
-    }
+      contextType,
+    },
   })
 
   const clearCache = () => {
@@ -355,11 +355,11 @@ export const useManageOutcomes = ({
       query: CONTEXT_GROUPS_QUERY,
       variables: {
         contextType,
-        contextId
+        contextId,
       },
       data: {
-        rootGroupId: null
-      }
+        rootGroupId: null,
+      },
     })
     clearTreeBrowserCache()
   }
@@ -370,7 +370,7 @@ export const useManageOutcomes = ({
     search: searchString,
     debouncedSearch: debouncedSearchString,
     onChangeHandler: updateSearch,
-    onClearHandler: clearSearch
+    onClearHandler: clearSearch,
   } = useSearch()
 
   const queryCollections = props => {
@@ -409,9 +409,9 @@ export const useManageOutcomes = ({
           query: CHILD_GROUPS_QUERY,
           variables: {
             id: initialGroupId,
-            type: 'LearningOutcomeGroup'
+            type: 'LearningOutcomeGroup',
           },
-          fetchPolicy: 'network-only'
+          fetchPolicy: 'network-only',
         })
         .then(({data}) => {
           setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
@@ -427,9 +427,9 @@ export const useManageOutcomes = ({
           query: CHILD_GROUPS_QUERY,
           variables: {
             id: contextId,
-            type: contextType
+            type: contextType,
           },
-          fetchPolicy: 'network-only'
+          fetchPolicy: 'network-only',
         })
         .then(({data}) => {
           const rootGroup = data.context.rootOutcomeGroup
@@ -437,11 +437,11 @@ export const useManageOutcomes = ({
             query: CONTEXT_GROUPS_QUERY,
             variables: {
               contextId,
-              contextType
+              contextType,
             },
             data: {
-              rootGroupId: rootGroup._id
-            }
+              rootGroupId: rootGroup._id,
+            },
           })
           saveRootGroupId(rootGroup._id)
           addGroups(extractGroups({...rootGroup, isRootGroup: true}))
@@ -496,7 +496,7 @@ export const useManageOutcomes = ({
     searchString,
     debouncedSearchString,
     updateSearch,
-    clearSearch
+    clearSearch,
   }
 }
 
@@ -507,7 +507,7 @@ export const useFindOutcomeModal = open => {
     isCourse,
     globalRootId,
     treeBrowserRootGroupId: ROOT_GROUP_ID,
-    treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
+    treeBrowserAccountGroupId: ACCOUNT_GROUP_ID,
   } = useCanvasContext()
   const client = useApolloClient()
   const {
@@ -523,9 +523,9 @@ export const useFindOutcomeModal = open => {
     setRootId,
     rootId,
     addLoadedGroups,
-    loadedGroups
+    loadedGroups,
   } = useTreeBrowser({
-    collection: 'findOutcomesView'
+    collection: 'findOutcomesView',
   })
 
   useEffect(() => {
@@ -540,7 +540,7 @@ export const useFindOutcomeModal = open => {
     search: searchString,
     debouncedSearch: debouncedSearchString,
     onChangeHandler: updateSearch,
-    onClearHandler: clearSearch
+    onClearHandler: clearSearch,
   } = useSearch()
 
   const toggleGroupId = props => {
@@ -567,8 +567,8 @@ export const useFindOutcomeModal = open => {
           id: contextId,
           type: contextType,
           rootGroupId: globalRootId || '0',
-          includeGlobalRootGroup: !!globalRootId
-        }
+          includeGlobalRootGroup: !!globalRootId,
+        },
       })
       .then(({data}) => {
         const {context, globalRootGroup} = data
@@ -586,7 +586,7 @@ export const useFindOutcomeModal = open => {
           childGroups.push({
             _id: ACCOUNT_GROUP_ID,
             title: I18n.t('Account Standards'),
-            isRootGroup: true
+            isRootGroup: true,
           })
         }
 
@@ -599,7 +599,7 @@ export const useFindOutcomeModal = open => {
             // because useDetail will load this group with a title
             // of "ROOT" and will update this cache. We don't want
             // to update cache for this group
-            __typename: 'BuildGroup'
+            __typename: 'BuildGroup',
           })
         }
 
@@ -610,8 +610,8 @@ export const useFindOutcomeModal = open => {
               isRootGroup: true,
               parentOutcomeGroup: {
                 _id: ACCOUNT_GROUP_ID,
-                __typename: 'LearningOutcomeGroup'
-              }
+                __typename: 'LearningOutcomeGroup',
+              },
             })
           ),
           ...extractGroups({
@@ -619,9 +619,9 @@ export const useFindOutcomeModal = open => {
             isRootGroup: true,
             title: I18n.t('Root Learning Outcome Groups'),
             childGroups: {
-              nodes: childGroups
-            }
-          })
+              nodes: childGroups,
+            },
+          }),
         ]
 
         addLoadedGroups([ACCOUNT_GROUP_ID, ROOT_GROUP_ID])
@@ -646,7 +646,7 @@ export const useFindOutcomeModal = open => {
     debouncedSearchString,
     updateSearch,
     clearSearch,
-    loadedGroups
+    loadedGroups,
   }
 }
 
@@ -663,6 +663,6 @@ export const useTargetGroupSelector = ({skipGroupId, initialGroupId}) => {
 
   return {
     ...useManageOutcomesProps,
-    queryCollections
+    queryCollections,
   }
 }

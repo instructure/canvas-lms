@@ -52,7 +52,7 @@ export function DashboardCardHeaderHero({image, backgroundColor, onClick}) {
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
         height: `${CARD_SIZE_PX / 2}px`,
-        cursor: 'pointer'
+        cursor: 'pointer',
       }}
       onClick={onClick}
       aria-hidden="true"
@@ -65,13 +65,13 @@ DashboardCardHeaderHero.displayName = 'DashboardCardHeaderHero'
 DashboardCardHeaderHero.propTypes = {
   backgroundColor: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
-  image: PropTypes.string
+  image: PropTypes.string,
 }
 
 export const LatestAnnouncementLink = ({courseId, color, loading, title, html_url}) => {
   const customSkeleton = props => (
     <Flex alignItems="start" margin="xx-small small xx-small small" {...props}>
-      <Flex.Item shouldGrow shouldShrink>
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <LoadingSkeleton
           screenReaderLabel={I18n.t('Loading latest announcement link')}
           width="100%"
@@ -102,7 +102,7 @@ export const LatestAnnouncementLink = ({courseId, color, loading, title, html_ur
             <Flex.Item margin="0 small 0 0">
               <IconAnnouncementLine style={{color}} size="x-small" />
             </Flex.Item>
-            <Flex.Item shouldGrow shouldShrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <AccessibleContent alt={I18n.t('New announcement: %{title}', {title})}>
                 <Text color="primary">
                   <TruncateText maxLines={2}>{title}</TruncateText>
@@ -122,7 +122,7 @@ LatestAnnouncementLink.propTypes = {
   color: PropTypes.string.isRequired,
   loading: PropTypes.bool.isRequired,
   html_url: PropTypes.string,
-  title: PropTypes.string
+  title: PropTypes.string,
 }
 
 export const AssignmentLinks = ({
@@ -132,7 +132,7 @@ export const AssignmentLinks = ({
   numDueToday = 0,
   numMissing = 0,
   numSubmittedToday = 0,
-  loading
+  loading,
 }) => {
   const noneDueMessage =
     numSubmittedToday > 0 ? (
@@ -157,13 +157,13 @@ export const AssignmentLinks = ({
             isWithinText={false}
             theme={{
               color: k5Theme.variables.colors.textDarkest,
-              hoverColor: k5Theme.variables.colors.textDarkest
+              hoverColor: k5Theme.variables.colors.textDarkest,
             }}
           >
             <AccessibleContent
               alt={I18n.t('View %{due} items due today for course %{courseName}', {
                 due: numDueToday,
-                courseName
+                courseName,
               })}
             >
               <Text>{I18n.t('%{due} due today', {due: numDueToday})}</Text>
@@ -188,13 +188,13 @@ export const AssignmentLinks = ({
               isWithinText={false}
               theme={{
                 color: k5Theme.variables.colors.textDanger,
-                hoverColor: k5Theme.variables.colors.textDanger
+                hoverColor: k5Theme.variables.colors.textDanger,
               }}
             >
               <AccessibleContent
                 alt={I18n.t('View %{missing} missing items for course %{courseName}', {
                   missing: numMissing,
-                  courseName
+                  courseName,
                 })}
               >
                 <Text color="danger">{I18n.t('%{missing} missing', {missing: numMissing})}</Text>
@@ -208,7 +208,7 @@ export const AssignmentLinks = ({
   return (
     <Flex alignItems="center" margin="small small xx-small small">
       {loading ? (
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <LoadingSkeleton
             screenReaderLabel={I18n.t('Loading missing assignments link')}
             width="100%"
@@ -235,7 +235,7 @@ AssignmentLinks.propTypes = {
   numDueToday: PropTypes.number,
   numMissing: PropTypes.number,
   numSubmittedToday: PropTypes.number,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
 }
 
 const K5DashboardCard = ({
@@ -247,7 +247,7 @@ const K5DashboardCard = ({
   connectDropTarget = c => c,
   headingLevel = 'h3',
   image,
-  isDragging = false
+  isDragging = false,
 }) => {
   const backgroundColor = courseColor || DEFAULT_COURSE_COLOR
 
@@ -284,7 +284,7 @@ const K5DashboardCard = ({
         opacity: isDragging ? 0 : 1,
         transform: 'translate3d(0,0,0)',
         minHeight: `${CARD_SIZE_PX}px`,
-        minWidth: `${CARD_SIZE_PX}px`
+        minWidth: `${CARD_SIZE_PX}px`,
       }}
       aria-label={shortName}
       data-testid="k5-dashboard-card"
@@ -310,7 +310,7 @@ const K5DashboardCard = ({
             theme={{
               color: k5Theme.variables.colors.textDarkest,
               hoverColor: k5Theme.variables.colors.textDarkest,
-              fontWeight: 700
+              fontWeight: 700,
             }}
           >
             <div
@@ -318,7 +318,7 @@ const K5DashboardCard = ({
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 textTransform: 'uppercase',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
               }}
               title={shortName}
             >
@@ -362,7 +362,7 @@ K5DashboardCard.propTypes = {
   connectDropTarget: PropTypes.func,
   headingLevel: PropTypes.string,
   image: PropTypes.string,
-  isDragging: PropTypes.bool
+  isDragging: PropTypes.bool,
 }
 
 export default K5DashboardCard

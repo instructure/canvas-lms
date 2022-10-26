@@ -214,7 +214,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
     $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
     RichContentEditor.loadNewEditor($course_syllabus_body, {
       focus: true,
-      manageParent: true
+      manageParent: true,
     })
 
     $('.jump_to_today_link').focus()
@@ -295,12 +295,12 @@ const bindToEditSyllabus = function (course_summary_enabled) {
 
     error(data) {
       return $edit_course_syllabus_form.triggerHandler('edit').formErrors(data)
-    }
+    },
   })
 }
 
 export default {
   bindToEditSyllabus,
   bindToMiniCalendar,
-  bindToSyllabus
+  bindToSyllabus,
 }

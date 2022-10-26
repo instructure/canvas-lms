@@ -64,7 +64,7 @@ export default function CustomEmojiDenyList() {
                   </div>
                 </AccessibleContent>
               }
-              dismissible
+              dismissible={true}
               margin="xx-small"
               onClick={() => removeEmoji(emoji.id)}
               key={`emoji-${emoji.id}`}
@@ -81,7 +81,7 @@ export default function CustomEmojiDenyList() {
         }}
         showSkinTones={false}
         skin={1}
-        opaque
+        opaque={true}
       />
       <input
         data-testid="account-settings-emoji-deny-list"

@@ -55,5 +55,5 @@ RolesCollection.prototype.sortOrder = [
   'TaEnrollment',
   'TeacherEnrollment',
   'DesignerEnrollment',
-  'ObserverEnrollment'
+  'ObserverEnrollment',
 ]

@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import applyPermissions from 'ui/features/account_course_user_search/react/helpers/permissionFilter.js'
+import applyPermissions from 'ui/features/account_course_user_search/react/helpers/permissionFilter'
 
 QUnit.module('Permissions Filter Helper Function')
 
 test('Item requires no permissions', () => {
   const items = [
     {
-      permissions: []
-    }
+      permissions: [],
+    },
   ]
 
   const permissions = {}
@@ -36,13 +36,13 @@ test('Item requires no permissions', () => {
 test('User permissions fully match item permissions', () => {
   const items = [
     {
-      permissions: ['perm1', 'perm2']
-    }
+      permissions: ['perm1', 'perm2'],
+    },
   ]
 
   const permissions = {
     perm2: true,
-    perm1: true
+    perm1: true,
   }
 
   const results = applyPermissions(items, permissions)
@@ -53,12 +53,12 @@ test('User permissions fully match item permissions', () => {
 test('User permissions partially match item permissions', () => {
   const items = [
     {
-      permissions: ['perm1', 'perm2']
-    }
+      permissions: ['perm1', 'perm2'],
+    },
   ]
 
   const permissions = {
-    perm1: true
+    perm1: true,
   }
 
   const results = applyPermissions(items, permissions)
@@ -69,8 +69,8 @@ test('User permissions partially match item permissions', () => {
 test('User permissions fully mismatch required permissions', () => {
   const items = [
     {
-      permissions: ['perm1', 'perm2']
-    }
+      permissions: ['perm1', 'perm2'],
+    },
   ]
 
   const permissions = {}

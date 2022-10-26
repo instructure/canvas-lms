@@ -27,13 +27,13 @@ QUnit.module('Calendar', {
     tzInTest.configureAndRestoreLater({
       tz: timezone(denver, 'America/Denver'),
       tzData: {
-        'America/Denver': denver
-      }
+        'America/Denver': denver,
+      },
     })
   },
   teardown() {
     tzInTest.restore()
-  }
+  },
 })
 
 test('addMinuteDelta: works with no DST shift', () => {

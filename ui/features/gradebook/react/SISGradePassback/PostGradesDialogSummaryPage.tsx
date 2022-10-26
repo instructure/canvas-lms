@@ -38,7 +38,7 @@ export default function PostGradesDialogSummaryPage(props) {
 
       <h4 style={{color: '#AAAAAA'}}>
         {props.needsGradingCount > 0 ? (
-          <button className="btn btn-link" onClick={props.advanceToNeedsGradingPage}>
+          <button type="button" className="btn btn-link" onClick={props.advanceToNeedsGradingPage}>
             {I18n.t(
               'assignments_to_grade',
               {

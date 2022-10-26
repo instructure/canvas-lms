@@ -34,12 +34,12 @@ export default {
 
   propTypes: {
     rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
-    rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder)
+    rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder),
   },
 
   componentDidMount() {
     const rootFoldersFinder = new RootFoldersFinder({
-      rootFoldersToShow: this.props.rootFoldersToShow
+      rootFoldersToShow: this.props.rootFoldersToShow,
     })
 
     this.treeBrowserId = BBTreeBrowserView.create(
@@ -52,11 +52,11 @@ export default {
         focusStyleClass: this.focusStyleClass,
         selectedStyleClass: this.selectedStyleClass,
         autoFetch: true,
-        fetchItAll: 'to heck'
+        fetchItAll: 'to heck',
       },
       {
         render: true,
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder)
+        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
       }
     ).index
 
@@ -89,7 +89,7 @@ export default {
     }
   },
 
-  hrefFor(folder) {},
+  hrefFor(_folder) {},
   // @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
   focusStyleClass: 'FolderTree__folderItem--focused',
@@ -105,5 +105,5 @@ export default {
     }
 
     return expandFolder(0)
-  }
+  },
 }

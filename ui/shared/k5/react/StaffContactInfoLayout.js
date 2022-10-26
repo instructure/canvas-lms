@@ -56,7 +56,7 @@ const StaffContactInfoLayout = ({isLoading, staff}) => {
 
 StaffContactInfoLayout.propTypes = {
   isLoading: PropTypes.bool,
-  staff: PropTypes.arrayOf(PropTypes.shape(StaffShape)).isRequired
+  staff: PropTypes.arrayOf(PropTypes.shape(StaffShape)).isRequired,
 }
 
 export default StaffContactInfoLayout

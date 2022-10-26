@@ -29,7 +29,7 @@ class DialogPreview extends React.Component {
   static displayName = 'DialogPreview'
 
   static propTypes = {
-    itemsToShow: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+    itemsToShow: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
   }
 
   renderPreview = () => {
@@ -47,7 +47,7 @@ class DialogPreview extends React.Component {
           className="media-object ef-big-icon FilesystemObjectThumbnail mimeClass-file DialogPreview__thumbnail"
           style={{
             left: 10 * index,
-            top: -140 * index
+            top: -140 * index,
           }}
         />
       ))

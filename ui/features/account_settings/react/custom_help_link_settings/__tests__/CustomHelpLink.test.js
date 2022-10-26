@@ -34,9 +34,9 @@ function makeProps(overrides = {}) {
       is_featured: false,
       is_new: false,
       feature_headline: '',
-      ...linkOverride
+      ...linkOverride,
     },
-    ...overrides
+    ...overrides,
   }
 }
 

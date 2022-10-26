@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GraderCountNumberInput from 'ui/features/assignment_edit/react/GraderCountNumberInput.js'
+import GraderCountNumberInput from 'ui/features/assignment_edit/react/GraderCountNumberInput'
 
 QUnit.module('GraderCountNumberInput', hooks => {
   let props

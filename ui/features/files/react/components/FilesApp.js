@@ -97,7 +97,7 @@ FilesApp.render = function () {
             type="button"
             id="courseMenuToggle"
             aria-label={I18n.t('Show and hide courses menu')}
-            aria-hidden
+            aria-hidden={true}
           >
             <i className="icon-hamburger" aria-hidden="true" />
           </button>
@@ -131,7 +131,7 @@ FilesApp.render = function () {
         modalOptions={{
           isOpen: this.state.showingModal,
           openModal: this.openModal,
-          closeModal: this.closeModal
+          closeModal: this.closeModal,
         }}
         showingSearchResults={this.state.showingSearchResults}
       />
@@ -147,7 +147,7 @@ FilesApp.render = function () {
             dndOptions={{
               onItemDragEnterOrOver: this.onItemDragEnterOrOver,
               onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
-              onItemDrop: this.onItemDrop
+              onItemDrop: this.onItemDrop,
             }}
           />
         </aside>
@@ -182,16 +182,16 @@ FilesApp.render = function () {
             modalOptions: {
               isOpen: this.state.showingModal,
               openModal: this.openModal,
-              closeModal: this.closeModal
+              closeModal: this.closeModal,
             },
             dndOptions: {
               onItemDragStart: this.onItemDragStart,
               onItemDragEnterOrOver: this.onItemDragEnterOrOver,
               onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
-              onItemDrop: this.onItemDrop
+              onItemDrop: this.onItemDrop,
             },
             clearSelectedItems: this.clearSelectedItems,
-            filesDirectoryRef: this.filesDirectory
+            filesDirectoryRef: this.filesDirectory,
           })}
         </div>
       </div>

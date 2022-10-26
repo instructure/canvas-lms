@@ -28,7 +28,7 @@ import {
   CREATE_COMMENT_MUTATION,
   UPDATE_COMMENT_MUTATION,
   addCommentToCache,
-  removeDeletedCommentFromCache
+  removeDeletedCommentFromCache,
 } from './graphql/Mutations'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {COMMENTS_QUERY} from './graphql/Queries'
@@ -41,7 +41,7 @@ function persistCheckbox(state) {
   doFetchApi({
     path: '/api/v1/users/self/settings',
     method: 'PUT',
-    body: {comment_library_suggestions_enabled: state}
+    body: {comment_library_suggestions_enabled: state},
   })
     .then(
       ({json}) =>
@@ -50,7 +50,7 @@ function persistCheckbox(state) {
     .catch(() =>
       showFlashAlert({
         message: I18n.t('Error saving suggestion preference'),
-        type: 'error'
+        type: 'error',
       })
     )
 }
@@ -61,7 +61,7 @@ const LibraryManager = ({
   setFocusToTextArea,
   userId,
   commentAreaText,
-  suggestionsRef
+  suggestionsRef,
 }) => {
   const abortController = useRef()
   const [removedItemIndex, setRemovedItemIndex] = useState(null)
@@ -74,14 +74,14 @@ const LibraryManager = ({
   const [changeSearchTerm, setChangeSearchTerm] = useState(true)
 
   const {loading, error, data} = useQuery(COMMENTS_QUERY, {
-    variables: {userId}
+    variables: {userId},
   })
 
   useEffect(() => {
     if (error) {
       showFlashAlert({
         message: I18n.t('Error loading comment library'),
-        type: 'error'
+        type: 'error',
       })
     }
   }, [error])
@@ -106,9 +106,9 @@ const LibraryManager = ({
         variables: {
           userId,
           query: searchTerm,
-          maxResults: 5
+          maxResults: 5,
         },
-        context: {fetchOptions: {signal: controller.signal}}
+        context: {fetchOptions: {signal: controller.signal}},
       })
     }
   }, [searchTerm]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,15 +130,15 @@ const LibraryManager = ({
     onCompleted(_data) {
       showFlashAlert({
         message: I18n.t('Comment destroyed'),
-        type: 'success'
+        type: 'success',
       })
     },
     onError(_error) {
       showFlashAlert({
         message: I18n.t('Error deleting comment'),
-        type: 'error'
+        type: 'error',
       })
-    }
+    },
   })
 
   const [addComment, {loading: isAddingComment}] = useMutation(CREATE_COMMENT_MUTATION, {
@@ -146,15 +146,15 @@ const LibraryManager = ({
     onCompleted(_data) {
       showFlashAlert({
         message: I18n.t('Comment added'),
-        type: 'success'
+        type: 'success',
       })
     },
     onError(_error) {
       showFlashAlert({
         message: I18n.t('Error creating comment'),
-        type: 'error'
+        type: 'error',
       })
-    }
+    },
   })
 
   const handleAddComment = comment => {
@@ -165,15 +165,15 @@ const LibraryManager = ({
     onCompleted(_data) {
       showFlashAlert({
         message: I18n.t('Comment updated'),
-        type: 'success'
+        type: 'success',
       })
     },
     onError(_error) {
       showFlashAlert({
         message: I18n.t('Error updating comment'),
-        type: 'error'
+        type: 'error',
       })
-    }
+    },
   })
 
   if (loading) {
@@ -222,7 +222,7 @@ LibraryManager.propTypes = {
   setFocusToTextArea: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   commentAreaText: PropTypes.string.isRequired,
-  suggestionsRef: PropTypes.object
+  suggestionsRef: PropTypes.object,
 }
 
 export default LibraryManager

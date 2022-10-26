@@ -109,5 +109,5 @@ Object.assign(Assignment.prototype, {
     return (
       this.assignment.user_submitted || (this.isPast() && this.assignment.needs_grading_count === 0)
     )
-  }
+  },
 })

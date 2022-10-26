@@ -25,8 +25,8 @@ export default {
   args: {
     title: 'Outcome Title',
     description: 'Outcome Description',
-    alignmentCount: 15
-  }
+    alignmentCount: 15,
+  },
 }
 
 const Template = args => <AlignmentOutcomeItem {...args} />
@@ -35,5 +35,5 @@ export const Default = Template.bind({})
 
 export const withLongDescription = Template.bind({})
 withLongDescription.args = {
-  description: 'Long Outcome Description '.repeat(10)
+  description: 'Long Outcome Description '.repeat(10),
 }

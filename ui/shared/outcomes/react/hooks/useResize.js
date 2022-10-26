@@ -31,13 +31,13 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
     PAGE_UP: 33,
     PAGE_DOWN: 34,
     ARROW_LEFT: 37,
-    ARROW_RIGHT: 39
+    ARROW_RIGHT: 39,
   }
   const step = {
     [keyCodes.PAGE_UP]: largeStep,
     [keyCodes.PAGE_DOWN]: -largeStep,
     [keyCodes.ARROW_RIGHT]: smallStep,
-    [keyCodes.ARROW_LEFT]: -smallStep
+    [keyCodes.ARROW_LEFT]: -smallStep,
   }
   let isHandlerDragging = false
 
@@ -117,7 +117,7 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
     setDelimiterRef,
     setLeftColumnRef,
     setRightColumnRef,
-    onKeyDownHandler
+    onKeyDownHandler,
   }
 }
 

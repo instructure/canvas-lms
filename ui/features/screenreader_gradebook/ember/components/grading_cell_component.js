@@ -44,20 +44,20 @@ const GradingCellComponent = Ember.Component.extend({
   passFailGrades: [
     {
       label: I18n.t('grade_ungraded', 'Ungraded'),
-      value: '-'
+      value: '-',
     },
     {
       label: I18n.t('grade_complete', 'Complete'),
-      value: 'complete'
+      value: 'complete',
     },
     {
       label: I18n.t('grade_incomplete', 'Incomplete'),
-      value: 'incomplete'
+      value: 'incomplete',
     },
     {
       label: I18n.t('Excused'),
-      value: 'EX'
-    }
+      value: 'EX',
+    },
   ],
 
   outOfText: function () {
@@ -68,7 +68,7 @@ const GradingCellComponent = Ember.Component.extend({
     } else if (this.get('isLetterGrade') || this.get('isPassFail')) {
       return I18n.t('(%{score} out of %{points})', {
         points: I18n.n(this.assignment.points_possible),
-        score: this.get('entered_score')
+        score: this.get('entered_score'),
       })
     } else if (this.get('nilPointsPossible')) {
       return I18n.t('No points possible')
@@ -153,7 +153,7 @@ const GradingCellComponent = Ember.Component.extend({
 
     const save = this.ajax(url, {
       type: 'PUT',
-      data: {'submission[excuse]': value}
+      data: {'submission[excuse]': value},
     })
     return save.then(this.boundUpdateSuccess, this.onUpdateError)
   },
@@ -241,7 +241,7 @@ const GradingCellComponent = Ember.Component.extend({
       : {'submission[posted_grade]': value}
     const save = this.ajax(url, {
       type: 'PUT',
-      data
+      data,
     })
     return save.then(this.boundUpdateSuccess, this.onUpdateError)
   },
@@ -264,7 +264,7 @@ const GradingCellComponent = Ember.Component.extend({
 
   focus() {
     return this.$('input, select').select()
-  }
+  },
 })
 
 export default GradingCellComponent

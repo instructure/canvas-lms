@@ -25,18 +25,18 @@ describe('CoursesTray', () => {
     {
       id: '1',
       name: 'Course1',
-      wokrflow_state: 'published'
+      wokrflow_state: 'published',
     },
     {
       id: '2',
       name: 'Course2',
-      workflow_state: 'published'
+      workflow_state: 'published',
     },
     {
       id: '3',
       name: 'Course3',
-      workflow_state: 'unpublished'
-    }
+      workflow_state: 'unpublished',
+    },
   ]
 
   function makeProps(overrides = {}) {
@@ -44,7 +44,7 @@ describe('CoursesTray', () => {
       courses,
       hasLoaded: true,
       k5User: false,
-      ...overrides
+      ...overrides,
     }
   }
 

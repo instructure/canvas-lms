@@ -320,7 +320,7 @@
 
 <% if @is_student && @context.feature_enabled?(:peer_reviews_for_a2) && module_item && module_item.content_type == 'Assignment' %>
   <% current_user_submission = module_item.assignment.submission_for_student(@current_user) %>
-  <% assigned_assessments = current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || [] %>
+  <% assigned_assessments = current_user_submission&.assigned_assessments&.preload([:asset, assessor_asset: :assignment]).select { |request| request.submission.grants_right?(@current_user, session, :read) } || [] %>
   <% assigned_assessments.each.with_index(1) do |assessment, index| %>
     <%
       locals = {

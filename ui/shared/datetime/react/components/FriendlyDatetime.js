@@ -30,14 +30,14 @@ class FriendlyDatetime extends Component {
     format: PropTypes.string,
     prefix: PropTypes.string,
     prefixMobile: PropTypes.string,
-    showTime: PropTypes.bool
+    showTime: PropTypes.bool,
   }
 
   static defaultProps = {
     format: null,
     prefix: '',
     prefixMobile: null,
-    showTime: false
+    showTime: false,
   }
 
   // The original render function is really slow because of all
@@ -69,7 +69,7 @@ class FriendlyDatetime extends Component {
       const timeProps = {
         ...timeElementProps,
         title: $.datetimeString(datetime),
-        dateTime: datetime.toISOString()
+        dateTime: datetime.toISOString(),
       }
 
       let fixedPrefix = this.props.prefix

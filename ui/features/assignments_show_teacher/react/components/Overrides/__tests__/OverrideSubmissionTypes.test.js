@@ -48,7 +48,6 @@ it('renders an OverrideSubmissionType summary', () => {
  *  resumes on A2.
  */
 
-// eslint-disable-next-line jest/no-disabled-tests
 it.skip('renders details of a file submission type', () => {
   const override = mockOverride({
     submissionTypes: ['online_upload'],
@@ -61,7 +60,6 @@ it.skip('renders details of a file submission type', () => {
   expect(getByText('All Types Allowed')).toBeInTheDocument()
 })
 
-// eslint-disable-next-line jest/no-disabled-tests
 it.skip('renders details of a restricted-type file submission type', () => {
   const override = mockOverride({
     submissionTypes: ['online_upload'],
@@ -109,7 +107,6 @@ it('renders details of a url submission type', () => {
   expect(getByText('URL')).toBeInTheDocument()
 })
 
-// eslint-disable-next-line jest/no-disabled-tests
 it.skip('renders details of multiple submission types', () => {
   const override = mockOverride({
     submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],

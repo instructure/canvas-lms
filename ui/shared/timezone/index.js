@@ -21,14 +21,14 @@ import {
   format,
   adjustFormat,
   shift,
-  hasMeridiem as hasMeridian // TODO: rename instances of 'meridian' to 'meridiem'
+  hasMeridiem as hasMeridian, // TODO: rename instances of 'meridian' to 'meridiem'
 } from 'datetime'
 
 import {
   changeToTheSecondBeforeMidnight,
   isMidnight,
   mergeTimeAndDate,
-  setToEndOfMinute
+  setToEndOfMinute,
 } from '@canvas/datetime'
 
 // TODO: remove this module and redirect callers to @canvas/datetime
@@ -41,5 +41,5 @@ export default {
   mergeTimeAndDate,
   parse,
   setToEndOfMinute,
-  shift
+  shift,
 }

@@ -27,47 +27,47 @@ describe('PastMessages', () => {
       messages: [
         {
           author: {
-            name: 'Gandalf'
+            name: 'Gandalf',
           },
           body: "No. No, it isn't",
-          createdAt: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
           author: {
-            name: 'Pippin'
+            name: 'Pippin',
           },
           body: "Well, that isn't so bad.",
-          createdAt: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
           author: {
-            name: 'Gandalf'
+            name: 'Gandalf',
           },
           body: 'White shores, and beyond, a far green country under a swift sunrise.',
-          createdAt: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
           author: {
-            name: 'Pippin'
+            name: 'Pippin',
           },
           body: 'What? Gandalf? See what?',
-          createdAt: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
           author: {
-            name: 'Gandalf'
+            name: 'Gandalf',
           },
           body: "End? No, the journey doesn't end here. Death is just another path, one that we all must take. The grey rain-curtain of this world rolls back, and all turns to silver glass, and then you see it.",
-          createdAt: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
           author: {
-            name: 'Pippin'
+            name: 'Pippin',
           },
           body: "I didn't think it would end this way.",
-          createdAt: 'TA 3019'
-        }
-      ]
+          createdAt: 'TA 3019',
+        },
+      ],
     }
 
     const {getAllByText, getByText} = render(<PastMessages {...props} />)

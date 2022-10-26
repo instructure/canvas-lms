@@ -210,7 +210,7 @@ const closedCaptionLanguages = {
   },
   get 'zh-Hant'() {
     return I18n.t('Chinese Traditional')
-  }
+  },
 }
 
 export default closedCaptionLanguages

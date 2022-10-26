@@ -59,12 +59,12 @@ class OutcomeGroup extends React.Component {
     expandedOutcomes: ImmutablePropTypes.set.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
     outcomeProficiency: null,
-    breakpoints: {}
+    breakpoints: {},
   }
 
   handleToggle = (_event, expanded) => {
@@ -79,7 +79,7 @@ class OutcomeGroup extends React.Component {
       expandedOutcomes,
       onExpansionChange,
       outcomeProficiency,
-      breakpoints
+      breakpoints,
     } = this.props
     const numMastered = outcomes.filter(o => o.mastered).length
     const numGroup = outcomes.length

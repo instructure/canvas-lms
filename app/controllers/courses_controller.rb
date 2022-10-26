@@ -508,11 +508,14 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
+          create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
+          create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
+
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
-                     PERMISSION: ccr = @current_user.create_courses_right(@current_user.sub_account_for_course_creation(@domain_root_account)),
-                     RESTRICT_TO_MCC_ACCOUNT: ccr && !@domain_root_account.grants_any_right?(@current_user, session, :manage_courses, :create_courses)
-                   },
+                     PERMISSION: create_permission_root_account || create_permission_mcc_account,
+                     RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+                   }
                  })
 
           set_k5_mode(require_k5_theme: true)
@@ -822,7 +825,8 @@ class CoursesController < ApplicationController
   #
   # @returns Course
   def create
-    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @current_user.sub_account_for_course_creation(@domain_root_account)
+    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
+
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
       params_for_create = course_params
@@ -2137,7 +2141,7 @@ class CoursesController < ApplicationController
       end
 
       if @context && @current_user
-        if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+        if Setting.get("assignments_2_observer_view", "false") == "true"
           observed_users(@current_user, session, @context.id) # sets @selected_observed_user
           context_enrollment_scope = @context.enrollments.where(user_id: @current_user)
           if observee_selected?
@@ -3130,7 +3134,11 @@ class CoursesController < ApplicationController
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
+      # Saving master course setting for statsd logging later
+      @old_save_master_course = false
+      @new_save_master_course = false
       if params[:course].key?(:blueprint)
+        @old_save_master_course = MasterCourses::MasterTemplate.is_master_course?(@course)
         master_course = value_to_boolean(params[:course].delete(:blueprint))
         if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
           return unless authorized_action(@course.account, @current_user, :manage_master_courses)
@@ -3141,6 +3149,7 @@ class CoursesController < ApplicationController
           else
             action = master_course ? "set" : "remove"
             MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+            @new_save_master_course = master_course
           end
         end
       end
@@ -3210,6 +3219,18 @@ class CoursesController < ApplicationController
           # force the user to refresh the page after the job finishes to see the changes
           @course.sync_homeroom_participation
         end
+
+        # Increment a log if both master course and course pacing are on
+        if @old_save_master_course == @new_save_master_course
+          if !changes[:enable_course_paces].nil? && (changes[:enable_course_paces][1] && MasterCourses::MasterTemplate.is_master_course?(@course))
+            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+          end
+        elsif @old_save_master_course == false && @new_save_master_course == true
+          if @course.enable_course_paces == true
+            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+          end
+        end
+
         render_update_success
       else
         render_update_failure

@@ -21,7 +21,7 @@ const path = require('path')
 const t = require('./util')
 
 module.exports = error => {
-  const { rule, ruleIndex, request } = error
+  const {rule, ruleIndex, request} = error
 
   let message = ''
 
@@ -30,27 +30,23 @@ module.exports = error => {
   message += `    ${request}`
   message += `\n \n`
   message += t.wordWrap(
-    `According to rule #${ruleIndex+1}: "${rule.rule.trim().replace(/\s+/g, ' ')}"`
-    , 72
+    `According to rule #${ruleIndex + 1}: "${rule.rule.trim().replace(/\s+/g, ' ')}"`,
+    72
   )
   message += `\n \n`
 
   if (rule.specifier === 'relative') {
     message += expectedRelativeSpecifier(error)
-  }
-  else if (rule.specifier === 'package') {
+  } else if (rule.specifier === 'package') {
     message += expectedPackageSpecifier(error)
   }
 
   return t.alignWithWebpackStackTrace(t.bracketize(message))
 }
 
-const expectedRelativeSpecifier = ({ source, target, request }) => {
+const expectedRelativeSpecifier = ({source, target, request}) => {
   const suggestion = t.withLeadingDotSlash(
-    path.relative(
-      path.dirname(source),
-      t.withOrWithoutExtension(request, target)
-    )
+    path.relative(path.dirname(source), t.withOrWithoutExtension(request, target))
   )
 
   let message = ''
@@ -65,42 +61,41 @@ const expectedRelativeSpecifier = ({ source, target, request }) => {
   return t.bracketize(message)
 }
 
-const expectedPackageSpecifier = (error) => {
-  const { target } = error
+const expectedPackageSpecifier = error => {
+  const {target} = error
 
   if (target.startsWith('ui/shared')) {
     return useOrAddCanvasPackage(error)
-  }
-  else if (target.startsWith('packages/')) {
+  } else if (target.startsWith('packages/')) {
     return useOrAddGenericPackage(error)
   }
 }
 
-const useOrAddGenericPackage = (error) => {
-  const { target } = error
+const useOrAddGenericPackage = error => {
+  const {target} = error
   const [packageName] = micromatch.capture('packages/*/**', target)
-  const [pjsonFile, pjson] = t.findPackageJSON(target, [
-    packageName,
-    `@instructure/${packageName}`
-  ]) || []
+  const [pjsonFile, pjson] =
+    t.findPackageJSON(target, [packageName, `@instructure/${packageName}`]) || []
 
   if (pjsonFile) {
-    return useExistingPackage(error, { pjsonFile, pjson })
-  }
-  else {
-    return addGenericPackage(error, { packageName })
+    return useExistingPackage(error, {pjsonFile, pjson})
+  } else {
+    return addGenericPackage(error, {packageName})
   }
 }
 
-const addGenericPackage = (error, { packageName }) => {
+const addGenericPackage = (error, {packageName}) => {
   let message = ''
 
   message += `<Hint>`
   message += `\n`
-  message += t.wordWrap(`
+  message += t.wordWrap(
+    `
     Package is missing a package.json, you should add one at
     packages/${packageName}/package.json with contents similar to:
-  `, 72)
+  `,
+    72
+  )
   message += `\n`
   message += `
     {
@@ -113,28 +108,30 @@ const addGenericPackage = (error, { packageName }) => {
   return message
 }
 
-const useOrAddCanvasPackage = (error) => {
-  const { target } = error
+const useOrAddCanvasPackage = error => {
+  const {target} = error
   const [packageName] = micromatch.capture('ui/shared/*/**', target) || []
   const [pjsonFile, pjson] = t.findPackageJSON(target, [`@canvas/${packageName}`]) || []
 
   if (pjsonFile) {
-    return useExistingPackage(error, { pjsonFile, pjson })
-  }
-  else {
-    return addCanvasPackage(error, { packageName })
+    return useExistingPackage(error, {pjsonFile, pjson})
+  } else {
+    return addCanvasPackage(error, {packageName})
   }
 }
 
-const addCanvasPackage = (error, { packageName }) => {
+const addCanvasPackage = (error, {packageName}) => {
   let message = ''
 
   message += '<Hint>'
   message += `\n`
-  message += t.wordWrap(`
+  message += t.wordWrap(
+    `
     Canvas package is missing a package.json, you must add one at
     ui/shared/${packageName}/package.json with contents similar to:
-  `.trim(), 72)
+  `.trim(),
+    72
+  )
   message += `\n`
   message += `
     {
@@ -147,13 +144,14 @@ const addCanvasPackage = (error, { packageName }) => {
   return t.bracketize(message)
 }
 
-const useExistingPackage = ({ request, target }, { pjsonFile, pjson }) => {
+const useExistingPackage = ({request, target}, {pjsonFile, pjson}) => {
   const suggestion = [
-    pjson.name,    // e.g. @canvas/foo
-    path.relative( // e.g. lib/index.js
+    pjson.name, // e.g. @canvas/foo
+    path.relative(
+      // e.g. lib/index.js
       path.dirname(pjsonFile),
       t.withOrWithoutExtension(request, target) // or lib/index, w/o extension
-    )
+    ),
   ].join('/')
 
   let message = ''

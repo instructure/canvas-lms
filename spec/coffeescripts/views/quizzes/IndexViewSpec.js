@@ -41,33 +41,33 @@ const indexView = function (assignments, open, surveys) {
     collection: assignments,
     title: 'Assignment Quizzes',
     listId: 'assignment-quizzes',
-    isSurvey: false
+    isSurvey: false,
   })
   const openView = new QuizItemGroupView({
     collection: open,
     title: 'Practice Quizzes',
     listId: 'open-quizzes',
-    isSurvey: false
+    isSurvey: false,
   })
   const surveyView = new QuizItemGroupView({
     collection: surveys,
     title: 'Surveys',
     listId: 'surveys-quizzes',
-    isSurvey: true
+    isSurvey: true,
   })
   const noQuizzesView = new NoQuizzesView()
   const permissions = {
     create: true,
-    manage: true
+    manage: true,
   }
   const flags = {
     question_banks: true,
-    quiz_lti_enabled: false || ENV.flags.quiz_lti_enabled
+    quiz_lti_enabled: false || ENV.flags.quiz_lti_enabled,
   }
   const urls = {
     new_quiz_url: '/courses/1/quizzes/new?fresh=1',
     new_assignment_url: '/courses/1/assignments/new',
-    question_banks_url: '/courses/1/question_banks'
+    question_banks_url: '/courses/1/question_banks',
   }
   const view = new IndexView({
     assignmentView,
@@ -76,7 +76,7 @@ const indexView = function (assignments, open, surveys) {
     noQuizzesView,
     permissions,
     flags,
-    urls
+    urls,
   })
   view.$el.appendTo(fixtures)
   return view.render()
@@ -87,22 +87,22 @@ QUnit.module('IndexView', {
     fakeENV.setup({
       permissions: {
         create: true,
-        manage: true
+        manage: true,
       },
       flags: {
-        question_banks: true
+        question_banks: true,
       },
       urls: {
         new_quiz_url: '/courses/1/quizzes/new?fresh=1',
         new_assignment_url: '/courses/1/assignments/new',
-        question_banks_url: '/courses/1/question_banks'
-      }
+        question_banks_url: '/courses/1/question_banks',
+      },
     })
   },
   teardown() {
     fakeENV.teardown()
     fixtures.empty()
-  }
+  },
 })
 test('#hasNoQuizzes if assignment and open quizzes are empty', () => {
   const assignments = new QuizCollection([])
@@ -162,25 +162,25 @@ test('should render the view', () => {
     {
       id: 1,
       title: 'Foo Title',
-      permissions: {delete: true}
+      permissions: {delete: true},
     },
     {
       id: 2,
       title: 'Bar Title',
-      permissions: {delete: true}
-    }
+      permissions: {delete: true},
+    },
   ])
   const open = new QuizCollection([
     {
       id: 3,
       title: 'Foo Title',
-      permissions: {delete: true}
+      permissions: {delete: true},
     },
     {
       id: 4,
       title: 'Bar Title',
-      permissions: {delete: true}
-    }
+      permissions: {delete: true},
+    },
   ])
   const view = indexView(assignments, open)
   equal(view.$el.find('.collectionViewItems li.quiz').length, 4)
@@ -190,25 +190,25 @@ test('should filter by search term', () => {
     {
       id: 1,
       title: 'Foo Name',
-      permissions: {delete: true}
+      permissions: {delete: true},
     },
     {
       id: 2,
       title: 'Bar Title',
-      permissions: {delete: true}
-    }
+      permissions: {delete: true},
+    },
   ])
   const open = new QuizCollection([
     {
       id: 3,
       title: 'Baz Title',
-      permissions: {delete: true}
+      permissions: {delete: true},
     },
     {
       id: 4,
       title: 'Qux Name',
-      permissions: {delete: true}
-    }
+      permissions: {delete: true},
+    },
   ])
   let view = indexView(assignments, open)
   $('#searchTerm').val('foo')

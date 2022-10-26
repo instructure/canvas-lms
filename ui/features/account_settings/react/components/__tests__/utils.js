@@ -27,9 +27,9 @@ const fakeAxios = {
   post: jest.fn(() => ({
     then() {
       return {then() {}}
-    }
+    },
   })),
-  put: jest.fn(() => ({then() {}}))
+  put: jest.fn(() => ({then() {}})),
 }
 
 // This is modified from a version by Kent C. Dodds described here:
@@ -39,12 +39,12 @@ export function renderWithRedux(
   {
     initialState,
     store = configStore(initialState, fakeAxios, {
-      disableLogger: true
-    })
+      disableLogger: true,
+    }),
   } = {}
 ) {
   return {
     ...render(<Provider store={store}>{ui}</Provider>),
-    store
+    store,
   }
 }

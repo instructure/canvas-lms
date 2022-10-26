@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPicker'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('moderated_grading')
 
@@ -215,14 +216,12 @@ class AssignmentConfigurationTools extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
+        <ToolLaunchIframe
           src={this.state.toolLaunchUrl}
-          className="tool_launch"
           style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

@@ -35,7 +35,7 @@ ready(() => {
     DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
     COURSE_ID: ENV.COURSE_ID,
     contextType,
-    contextId
+    contextId,
   })
   app.render()
 })

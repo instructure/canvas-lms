@@ -22,7 +22,7 @@ const isSavingSettingsReducer = handleActions(
   {
     [actionTypes.SAVING_SETTINGS_START]: () => true,
     [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
-    [actionTypes.SAVING_SETTINGS_FAIL]: () => false
+    [actionTypes.SAVING_SETTINGS_FAIL]: () => false,
   },
   false
 )

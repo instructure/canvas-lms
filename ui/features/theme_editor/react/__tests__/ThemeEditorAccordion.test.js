@@ -37,20 +37,20 @@ function generateProps(type, overrides = {}) {
             human_name: 'Friendly Foo',
             variable_name: 'foo',
             type,
-            ...conditionalVariableThings
-          }
-        ]
-      }
+            ...conditionalVariableThings,
+          },
+        ],
+      },
     ],
     brandConfigVariables: {
-      foo: 'bar'
+      foo: 'bar',
     },
     changedValues: {
-      foo: {val: 'baz'}
+      foo: {val: 'baz'},
     },
     changeSomething() {},
     getDisplayValue: () => 'display_name',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -71,12 +71,12 @@ describe('ThemeEditorAccordion', () => {
     props.variableSchema = [
       {
         group_name: 'Foo',
-        variables: []
+        variables: [],
       },
       {
         group_name: 'Bar',
-        variables: []
-      }
+        variables: [],
+      },
     ]
     const wrapper = shallow(<ThemeEditorAccordion {...props} />)
     expect(wrapper.find('ThemeEditorVariableGroup')).toHaveLength(2)
@@ -92,17 +92,17 @@ describe('ThemeEditorAccordion', () => {
             default: '#047',
             human_name: 'Color',
             variable_name: 'color',
-            type: 'color'
+            type: 'color',
           },
           {
             default: 'image.png',
             human_name: 'Image',
             variable_name: 'image',
             type: 'image',
-            accept: 'image/*'
-          }
-        ]
-      }
+            accept: 'image/*',
+          },
+        ],
+      },
     ]
     const wrapper = shallow(<ThemeEditorAccordion {...props} />)
     expect(wrapper.find('ThemeEditorVariableGroup').children()).toHaveLength(2)

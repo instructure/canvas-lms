@@ -31,11 +31,11 @@ function makeProps() {
       create: true,
       manage_course_content_edit: true,
       manage_course_content_delete: true,
-      moderate: true
+      moderate: true,
     },
     searchAnnouncements: () => {},
     selectedCount: 0,
-    toggleSelectedAnnouncementsLock: () => {}
+    toggleSelectedAnnouncementsLock: () => {},
   }
 }
 

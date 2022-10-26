@@ -23,7 +23,7 @@ import {
   IconUnpublishedLine,
   IconMoreLine,
   IconEditLine,
-  IconTrashLine
+  IconTrashLine,
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'

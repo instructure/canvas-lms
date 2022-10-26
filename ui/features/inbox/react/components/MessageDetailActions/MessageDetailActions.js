@@ -83,5 +83,5 @@ MessageDetailActions.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
-  onForward: PropTypes.func
+  onForward: PropTypes.func,
 }

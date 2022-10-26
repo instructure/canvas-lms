@@ -31,8 +31,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
         _id: `${idx + 100}`,
         linkId: `${startId + idx}`,
         title: title || `Learning Outcome ${startId + idx}`,
-        canUnlink
-      }
+        canUnlink,
+      },
     }),
     {}
   )
@@ -42,12 +42,12 @@ export default {
   component: OutcomeMoveModal,
   args: {
     isOpen: true,
-    outcomes: outcomesGenerator(1, 2)
+    outcomes: outcomesGenerator(1, 2),
   },
   argTypes: {
     onCloseHandler: {action: 'closed'},
-    onCleanupHandler: {action: 'cleanup'}
-  }
+    onCleanupHandler: {action: 'cleanup'},
+  },
 }
 
 const Template = args => (
@@ -63,5 +63,5 @@ export const Default = Template.bind({})
 
 export const withOneOutcome = Template.bind({})
 withOneOutcome.args = {
-  outcomes: outcomesGenerator(1, 1)
+  outcomes: outcomesGenerator(1, 1),
 }

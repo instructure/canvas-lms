@@ -46,8 +46,8 @@ QUnit.module('Turnitin', {
           similarity_score: 0.8,
           state: 'acceptable',
           report_url: 'http://www.instructure.com',
-          status: 'pending'
-        }
+          status: 'pending',
+        },
       },
       has_originality_report: true,
       attachments: [
@@ -57,8 +57,7 @@ QUnit.module('Turnitin', {
           display_name: 'Untitled-2.rtf',
           filename: '1480456390_119__Untitled.rtf',
           'content-type': 'text/rtf',
-          url:
-            'http://canvas.docker/files/103/download?download_frd=1&verifier=kRS6CMQUNlpF1sobUbALPa0AxE2J70vxPAX7GQqo',
+          url: 'http://canvas.docker/files/103/download?download_frd=1&verifier=kRS6CMQUNlpF1sobUbALPa0AxE2J70vxPAX7GQqo',
           size: null,
           created_at: '2016-11-29T22:29:43Z',
           updated_at: '2016-11-29T22:29:43Z',
@@ -72,12 +71,12 @@ QUnit.module('Turnitin', {
           mime_class: 'doc',
           media_entry_id: null,
           locked_for_user: false,
-          preview_url: null
-        }
+          preview_url: null,
+        },
       ],
-      turnitin: {}
+      turnitin: {},
     })
-  }
+  },
 })
 
 test('uses the score when the score is 0', () => {
@@ -98,8 +97,8 @@ test('correctly finds text entry plagiarism data', () => {
       similarity_score: 0.8,
       state: 'acceptable',
       report_url: 'http://www.instructure.com',
-      status: 'pending'
-    }
+      status: 'pending',
+    },
   }
   submissionWithReport.submission_type = 'online_text_entry'
 

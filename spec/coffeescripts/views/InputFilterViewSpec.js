@@ -32,7 +32,7 @@ QUnit.module('InputFilterView', {
   teardown() {
     clock.restore()
     view.remove()
-  }
+  },
 })
 
 function createAndRenderView(options = {}) {
@@ -100,7 +100,7 @@ test('gets modelAttribute from input name', () => {
   createAndRenderView()
   const input = $('<input name="couch">').appendTo($('#fixtures'))
   view = new InputFilterView({
-    el: input[0]
+    el: input[0],
   })
   equal(view.modelAttribute, 'couch')
 })

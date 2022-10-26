@@ -22,8 +22,8 @@ import timezone from 'timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import newYork from 'timezone/America/New_York'
 
-import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary.js'
-import {overallAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers.js'
+import AssessmentSummary from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentSummary'
+import {overallAnonymityStates} from 'ui/features/speed_grader/react/AssessmentAuditTray/AuditTrailHelpers'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const {FULL, NA, PARTIAL} = overallAnonymityStates
@@ -39,7 +39,7 @@ QUnit.module('AssessmentSummary', suiteHooks => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(newYork, 'America/New_York'),
       tzData: {
-        'America/New_York': newYork
+        'America/New_York': newYork,
       },
       formats: getI18nFormats(),
     })
@@ -48,13 +48,13 @@ QUnit.module('AssessmentSummary', suiteHooks => {
       anonymityDate: new Date('2015-04-04T19:00:00.000Z'),
       assignment: {
         gradesPublishedAt: '2015-05-04T16:00:00.000Z',
-        pointsPossible: 10
+        pointsPossible: 10,
       },
       finalGradeDate: new Date('2015-04-18T17:00:00.000Z'),
       overallAnonymity: FULL,
       submission: {
-        score: 9.5
-      }
+        score: 9.5,
+      },
     }
   })
 

@@ -24,6 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
+import {ConditionalTooltip} from '../../../shared/ConditionalTooltip'
 
 export const Footer = ({
   disabled,
@@ -32,7 +33,8 @@ export const Footer = ({
   replaceAll,
   onReplaceAllChanged,
   editing,
-  applyRef
+  isModified,
+  applyRef,
 }) => {
   return (
     <>
@@ -57,21 +59,27 @@ export const Footer = ({
         padding="small small x-small none"
       >
         <Flex>
-          <Flex.Item shouldGrow shouldShrink />
+          <Flex.Item shouldGrow={true} shouldShrink={true} />
           <Flex.Item>
             <Button disabled={disabled} onClick={onCancel}>
               {formatMessage('Cancel')}
             </Button>
             {editing ? (
-              <Button
-                disabled={disabled}
-                color="primary"
-                onClick={onSubmit}
-                margin="0 0 0 x-small"
-                data-testid="icon-maker-save"
+              <ConditionalTooltip
+                condition={!isModified && !disabled}
+                renderTip={formatMessage('No changes to save.')}
+                on={['hover', 'focus']}
               >
-                {formatMessage('Save')}
-              </Button>
+                <Button
+                  disabled={!isModified || disabled}
+                  color="primary"
+                  onClick={onSubmit}
+                  margin="0 0 0 x-small"
+                  data-testid="icon-maker-save"
+                >
+                  {formatMessage('Save')}
+                </Button>
+              </ConditionalTooltip>
             ) : (
               <Button
                 disabled={disabled}

@@ -26,7 +26,7 @@ const openModerateStudentDialog = ($dialog, dialogWidth) => {
   const dialog = $dialog
     .dialog({
       title: I18n.t('Student Extensions'),
-      width: dialogWidth
+      width: dialogWidth,
     })
     .fixDialogButtons()
 

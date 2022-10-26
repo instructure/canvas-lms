@@ -32,8 +32,8 @@ export const MediaTrack = {
     _id: string,
     locale: string,
     content: string,
-    kind: string
-  })
+    kind: string,
+  }),
 }
 
 export const DefaultMocks = {
@@ -41,6 +41,6 @@ export const DefaultMocks = {
     _id: '1',
     locale: 'en',
     content: 'en',
-    kind: 'subtitle'
-  })
+    kind: 'subtitle',
+  }),
 }

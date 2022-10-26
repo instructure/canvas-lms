@@ -386,7 +386,7 @@ export default class TokenSelector {
         value: id,
         text: (left = $node.data('text')) != null ? left : $node.text(),
         noClear: true,
-        data: $node.data('user_data')
+        data: $node.data('user_data'),
       })
     } else {
       if (!toggleOnly) {
@@ -450,11 +450,7 @@ export default class TokenSelector {
         ? this.selection.next().length
           ? this.selection.next()
           : this.selection.parent('ul').next().length
-          ? this.selection
-              .parent('ul')
-              .next()
-              .find('li')
-              .first()
+          ? this.selection.parent('ul').next().find('li').first()
           : null
         : this.list != null
         ? this.list.first()
@@ -469,16 +465,10 @@ export default class TokenSelector {
   selectPrev() {
     this.select(
       this.selection
-        ? (this.selection != null
-          ? this.selection.prev().length
-          : undefined)
+        ? (this.selection != null ? this.selection.prev().length : undefined)
           ? this.selection.prev()
           : this.selection.parent('ul').prev().length
-          ? this.selection
-              .parent('ul')
-              .prev()
-              .find('li')
-              .last()
+          ? this.selection.parent('ul').prev().find('li').last()
           : null
         : this.list != null
         ? this.list.last()
@@ -563,7 +553,7 @@ export default class TokenSelector {
       parent: this.parent(),
       ancestors: Array.from(this.stack).map(ancestor => ancestor[0].data('id')),
       collection,
-      query
+      query,
     })
     list.render()
 

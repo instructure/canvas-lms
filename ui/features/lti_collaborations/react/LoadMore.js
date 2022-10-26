@@ -27,7 +27,7 @@ class LoadMore extends React.Component {
     hasMore: PropTypes.bool.isRequired,
     loadMore: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
-    children: PropTypes.any
+    children: PropTypes.any,
   }
 
   componentDidUpdate(oldProps) {
@@ -44,7 +44,6 @@ class LoadMore extends React.Component {
 
   render() {
     const hasChildren = React.Children.count(this.props.children) > 0
-    const opacity = this.props.isLoading ? 1 : 0
 
     return (
       <div className="LoadMore" ref="parent">
@@ -70,7 +69,7 @@ LoadMore.propTypes = {
   hasMore: PropTypes.bool.isRequired,
   loadMore: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
-  children: PropTypes.any
+  children: PropTypes.any,
 }
 
 export default LoadMore

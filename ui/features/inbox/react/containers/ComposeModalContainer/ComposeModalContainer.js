@@ -35,7 +35,7 @@ import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
-  SelectStrings
+  SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
 
@@ -159,7 +159,7 @@ const ComposeModalContainer = props => {
     if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
         setAddressBookMessages([
-          {text: I18n.t('No matches found. Please insert a valid recipient.'), type: 'error'}
+          {text: I18n.t('No matches found. Please insert a valid recipient.'), type: 'error'},
         ])
         isValid = false
       } else if (props.selectedIds.length === 0) {
@@ -193,8 +193,8 @@ const ComposeModalContainer = props => {
     if (isSubmissionCommentsType) {
       await props.createSubmissionComment({
         variables: {
-          body
-        }
+          body,
+        },
       })
     } else if (props.isReply) {
       await props.addConversationMessage({
@@ -206,8 +206,8 @@ const ComposeModalContainer = props => {
             c => c._id
           ),
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
-          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
-        }
+          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
+        },
       })
     } else if (props.isForward) {
       await props.addConversationMessage({
@@ -220,8 +220,8 @@ const ComposeModalContainer = props => {
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
           mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
-          contextCode: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
-        }
+          contextCode: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE,
+        },
       })
     } else {
       await props.createConversation({
@@ -235,8 +235,8 @@ const ComposeModalContainer = props => {
           subject,
           groupConversation: true,
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
-          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
-        }
+          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
+        },
       })
     }
   }
@@ -264,12 +264,12 @@ const ComposeModalContainer = props => {
         props={{
           mobile: {
             modalSize: 'fullscreen',
-            dataTestId: 'compose-modal-mobile'
+            dataTestId: 'compose-modal-mobile',
           },
           desktop: {
             modalSize: 'medium',
-            dataTestId: 'compose-modal-desktop'
-          }
+            dataTestId: 'compose-modal-desktop',
+          },
         }}
         render={responsiveProps => (
           <Modal
@@ -358,7 +358,7 @@ const ComposeModalContainer = props => {
         })}
         rcsConfig={{
           contextId: ENV.current_user_id,
-          contextType: 'user'
+          contextType: 'user',
         }}
       />
       <ModalSpinner
@@ -394,5 +394,5 @@ ComposeModalContainer.propTypes = {
   selectedIds: PropTypes.array,
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,
-  isPrivateConversation: PropTypes.bool
+  isPrivateConversation: PropTypes.bool,
 }

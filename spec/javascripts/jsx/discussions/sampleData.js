@@ -25,15 +25,15 @@ const data = {
       title: 'hello world',
       posted_at: new Date().toString(),
       author: {
-        display_name: 'John Doe'
+        display_name: 'John Doe',
       },
       read_state: 'read',
       unread_count: 0,
       permissions: {
-        delete: true
-      }
-    }
-  ]
+        delete: true,
+      },
+    },
+  ],
 }
 
 export default data

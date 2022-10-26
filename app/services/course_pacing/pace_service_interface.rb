@@ -22,7 +22,18 @@ class CoursePacing::PaceServiceInterface
     raise NotImplementedError
   end
 
+  def self.pace_for(context, should_duplicate: false)
+    pace_in_context(context)
+  rescue ActiveRecord::RecordNotFound
+    template = template_pace_for(context) || raise(ActiveRecord::RecordNotFound)
+    should_duplicate ? template.duplicate(create_params(context)) : template
+  end
+
   def self.pace_in_context(context)
+    raise NotImplementedError
+  end
+
+  def self.template_pace_for(context)
     raise NotImplementedError
   end
 
@@ -39,7 +50,9 @@ class CoursePacing::PaceServiceInterface
           pace.course_pace_module_items.create(module_item: module_item, duration: 0)
         end
       end
-      pace.save
+      if pace.save
+        pace.create_publish_progress(run_at: Time.now)
+      end
     end
 
     pace
@@ -47,6 +60,7 @@ class CoursePacing::PaceServiceInterface
 
   def self.update_pace(pace, update_params)
     if pace.update(update_params)
+      pace.create_publish_progress(run_at: Time.now)
       # Force the updated_at to be updated, because if the update just changed the items the course pace's
       # updated_at doesn't get modified
       pace.touch
@@ -54,6 +68,18 @@ class CoursePacing::PaceServiceInterface
     else
       false
     end
+  end
+
+  def self.progress(pace, publish: true)
+    progress = Progress.order(created_at: :desc).find_by(context: pace, tag: "course_pace_publish")
+
+    if (publish && !progress) || (progress.queued? && progress.delayed_job.blank?)
+      progress = pace.create_publish_progress(run_at: Time.now)
+    elsif progress.queued? && progress.delayed_job.present?
+      progress.delayed_job.update(run_at: Time.now)
+    end
+
+    progress
   end
 
   def self.delete_in_context(context)

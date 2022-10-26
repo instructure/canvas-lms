@@ -33,5 +33,5 @@ data._monthsShort = [
   'Sep',
   'Oct',
   'Nov',
-  'Déc'
+  'Déc',
 ]

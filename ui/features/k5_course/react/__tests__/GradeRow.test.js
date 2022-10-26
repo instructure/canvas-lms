@@ -28,7 +28,7 @@ const dtf = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
-  timeZone: ENV.TIMEZONE
+  timeZone: ENV.TIMEZONE,
 })
 
 const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
@@ -53,7 +53,7 @@ describe('GradeRow', () => {
     hasComments: false,
     currentUserId: '1',
     dateFormatter,
-    ...overrides
+    ...overrides,
   })
 
   it('renders assignment title as a link', () => {
@@ -106,8 +106,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 grade: null,
-                score: null
-              })
+                score: null,
+              }),
             })}
           </tbody>
         </table>
@@ -125,8 +125,8 @@ describe('GradeRow', () => {
                 gradingType: 'not_graded',
                 grade: null,
                 score: null,
-                pointsPossible: null
-              })
+                pointsPossible: null,
+              }),
             })}
           </tbody>
         </table>
@@ -145,8 +145,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 gradingType: 'gpa_scale',
-                grade: 'A'
-              })
+                grade: 'A',
+              }),
             })}
           </tbody>
         </table>
@@ -161,8 +161,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 gradingType: 'letter_grade',
-                grade: 'A'
-              })
+                grade: 'A',
+              }),
             })}
           </tbody>
         </table>
@@ -179,8 +179,8 @@ describe('GradeRow', () => {
                 gradingType: 'percent',
                 grade: '75%',
                 score: 7.5,
-                pointsPossible: 10
-              })
+                pointsPossible: 10,
+              }),
             })}
           </tbody>
         </table>
@@ -195,8 +195,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 gradingType: 'pass_fail',
-                grade: 'complete'
-              })
+                grade: 'complete',
+              }),
             })}
           </tbody>
         </table>
@@ -212,8 +212,8 @@ describe('GradeRow', () => {
               ...getProps({
                 gradingType: 'pass_fail',
                 grade: 'incomplete',
-                score: 0
-              })
+                score: 0,
+              }),
             })}
           </tbody>
         </table>
@@ -229,8 +229,8 @@ describe('GradeRow', () => {
               ...getProps({
                 gradingType: 'pass_fail',
                 grade: null,
-                score: null
-              })
+                score: null,
+              }),
             })}
           </tbody>
         </table>
@@ -247,8 +247,8 @@ describe('GradeRow', () => {
               ...getProps({
                 excused: true,
                 grade: null,
-                score: null
-              })
+                score: null,
+              }),
             })}
           </tbody>
         </table>
@@ -287,8 +287,8 @@ describe('GradeRow', () => {
                 missing: true,
                 grade: null,
                 points: null,
-                submissionDate: null
-              })
+                submissionDate: null,
+              }),
             })}
           </tbody>
         </table>
@@ -312,8 +312,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 late: true,
-                submissionDate: null
-              })
+                submissionDate: null,
+              }),
             })}
           </tbody>
         </table>
@@ -328,8 +328,8 @@ describe('GradeRow', () => {
             {GradeRow({
               ...getProps({
                 late: true,
-                submissionDate: '2020-05-18T05:59:59Z'
-              })
+                submissionDate: '2020-05-18T05:59:59Z',
+              }),
             })}
           </tbody>
         </table>

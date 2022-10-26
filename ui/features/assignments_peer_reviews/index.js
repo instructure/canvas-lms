@@ -30,19 +30,19 @@ const I18n = useI18nScope('assignments.peer_reviews')
 
 $(document).ready(() => {
   $('.peer_review').hover(
-    function() {
+    function () {
       $('.peer_review.submission-hover').removeClass('submission-hover')
       $(this).addClass('submission-hover')
     },
-    function() {
+    function () {
       $(this).removeClass('submission-hover')
     }
   )
 
-  $('.peer_review').focusin(function() {
+  $('.peer_review').focusin(function () {
     $(this).addClass('focusWithin')
   })
-  $('.peer_review').focusout(function(event) {
+  $('.peer_review').focusout(function (event) {
     const $parent = $(this).closest('.peer_review')
     const $newFocus = $(event.related).closest('.peer_review')
     if (!$newFocus.is($parent)) {
@@ -50,17 +50,13 @@ $(document).ready(() => {
     }
   })
 
-  $('.peer_review .delete_review_link').click(function(event) {
+  $('.peer_review .delete_review_link').click(function (event) {
     event.preventDefault()
     const next = $(this)
       .parents('.peer_review')
       .next()
       .find('a')
-      .add(
-        $(this)
-          .parents('.student_reviews')
-          .find('.assign_peer_review_link')
-      )
+      .add($(this).parents('.student_reviews').find('.assign_peer_review_link'))
       .first()
     $(this)
       .parents('.peer_review')
@@ -68,7 +64,7 @@ $(document).ready(() => {
         url: $(this).attr('href'),
         message: I18n.t('messages.cancel_peer_review', 'Cancel this peer review?'),
         success() {
-          $(this).fadeOut('slow', function() {
+          $(this).fadeOut('slow', function () {
             const $parent = $(this).parents('.peer_reviews')
             $(this).remove()
             if ($parent.find('.assigned').length === 0) {
@@ -76,27 +72,18 @@ $(document).ready(() => {
             }
             next.focus()
           })
-        }
+        },
       })
   })
 
-  $('.assign_peer_review_link').click(function(event) {
+  $('.assign_peer_review_link').click(function (event) {
     event.preventDefault()
     // if the form is there and is being shown, then slide it up.
-    if (
-      $(this)
-        .parents('.student_reviews')
-        .find('.form_content form:visible').length
-    ) {
-      $(this)
-        .parents('.student_reviews')
-        .find('.form_content form:visible')
-        .slideUp()
+    if ($(this).parents('.student_reviews').find('.form_content form:visible').length) {
+      $(this).parents('.student_reviews').find('.form_content form:visible').slideUp()
     } else {
       // otherwise make it and inject it then slide it down
-      const $form = $('#assign_peer_review_form')
-        .clone(true)
-        .removeAttr('id')
+      const $form = $('#assign_peer_review_form').clone(true).removeAttr('id')
       let url = $('.assign_peer_review_url').attr('href')
       let user_id = $(this)
         .parents('.student_reviews')
@@ -106,16 +93,12 @@ $(document).ready(() => {
       $(this)
         .parents('.student_reviews')
         .find('.peer_review')
-        .each(function() {
+        .each(function () {
           ;({user_id} = $(this).getTemplateData({textValues: ['user_id']}))
           $form.find(`select option.student_${user_id}`).attr('disabled', true)
         })
       $form.attr('action', url)
-      $(this)
-        .parents('.student_reviews')
-        .find('.form_content')
-        .empty()
-        .append($form)
+      $(this).parents('.student_reviews').find('.form_content').empty().append($form)
       $form.slideDown()
     }
   })
@@ -127,15 +110,13 @@ $(document).ready(() => {
     },
     success(data) {
       $(this).loadingImage('remove')
-      $(this).slideUp(function() {
+      $(this).slideUp(function () {
         $(this).remove()
       })
-      const $review = $('#review_request_blank')
-        .clone(true)
-        .removeAttr('id')
+      const $review = $('#review_request_blank').clone(true).removeAttr('id')
       $review.fillTemplateData({
         data: data.assessment_request,
-        hrefValues: ['id', 'user_id']
+        hrefValues: ['id', 'user_id'],
       })
       $(this)
         .parents('.student_reviews')
@@ -145,48 +126,39 @@ $(document).ready(() => {
         .find('.peer_reviews')
         .append($review)
       $review.slideDown()
-      $review
-        .find('a')
-        .first()
-        .focus()
-      const assessor_name = $(this)
-        .parents('.student_reviews')
-        .find('.assessor_name')
-        .text()
+      $review.find('a').first().focus()
+      const assessor_name = $(this).parents('.student_reviews').find('.assessor_name').text()
       const time = $.datetimeString(data.assessment_request.updated_at)
       $review.find('.reminder_peer_review_link').attr(
         'title',
         I18n.t('titles.reminder', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
-          time
+          time,
         })
       )
-      $(this).slideUp(function() {
+      $(this).slideUp(function () {
         $(this).remove()
       })
     },
     error(data) {
       $(this).loadingImage('remove')
       $(this).formErrors(data)
-    }
+    },
   })
 
-  $('.remind_peer_review_link').click(function(event) {
+  $('.remind_peer_review_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $link.parents('.peer_review').loadingImage({image_size: 'small'})
     return $.ajaxJSON($link.attr('href'), 'POST', {}, data => {
       $link.parents('.peer_review').loadingImage('remove')
-      const assessor_name = $link
-        .parents('.student_reviews')
-        .find('.assessor_name')
-        .text()
+      const assessor_name = $link.parents('.student_reviews').find('.assessor_name').text()
       const time = $.datetimeString(data.assessment_request.updated_at)
       $link.attr(
         'title',
         I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
-          time
+          time,
         })
       )
     })

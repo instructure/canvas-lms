@@ -34,7 +34,7 @@ const CalendarConferenceWidget = ({
   conference,
   conferenceTypes,
   setConference,
-  disabled
+  disabled,
 }) => {
   const addConferenceRef = useRef(null)
   const removeConferenceRef = useRef(null)
@@ -45,7 +45,7 @@ const CalendarConferenceWidget = ({
     setConference(c)
     showFlashAlert({
       message: I18n.t('Conference has been updated: %{title}', {title: c.title}),
-      srOnly: true
+      srOnly: true,
     })
     setTimeout(() => removeConferenceRef.current?.focus(), 250)
   }
@@ -96,13 +96,13 @@ CalendarConferenceWidget.propTypes = {
   conference: webConference,
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   setConference: PropTypes.func,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 }
 
 CalendarConferenceWidget.defaultProps = {
   conference: null,
   setConference: null,
-  disabled: false
+  disabled: false,
 }
 
 export default CalendarConferenceWidget

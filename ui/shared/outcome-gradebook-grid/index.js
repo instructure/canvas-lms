@@ -49,7 +49,7 @@ const Grid = {
     showHeaderRow: true,
     explicitInitialization: true,
     fullWidthRows: true,
-    numberOfColumnsToFreeze: 1
+    numberOfColumnsToFreeze: 1,
   },
   Events: {
     // Public: Draw header cell contents.
@@ -74,13 +74,13 @@ const Grid = {
       return _.each(_.zip(headers, headerRows), function ([header, headerRow]) {
         return $(headerRow).insertBefore($(header))
       })
-    }
+    },
   },
   Util: {
     COLUMN_OPTIONS: {
       width: 121,
       minWidth: 50,
-      sortable: true
+      sortable: true,
     },
     // Public: Translate an API response to columns and rows that can be used by SlickGrid.
 
@@ -90,13 +90,13 @@ const Grid = {
     toGrid(
       response,
       options = {
-        column: {}
+        column: {},
       }
     ) {
       Grid.dataSource = response
       return [
         Grid.Util.toColumns(response.linked.outcomes, response.rollups, options.column),
-        Grid.Util.toRows(response.rollups)
+        Grid.Util.toRows(response.rollups),
       ]
     },
     // Public: Translate an array of outcomes to columns that can be used by SlickGrid.
@@ -110,7 +110,7 @@ const Grid = {
       const columns = _.map(outcomes, function (outcome) {
         return _.extend(
           {
-            id: `outcome_${outcome.id}`
+            id: `outcome_${outcome.id}`,
           },
           {
             name: _.escape(outcome.title),
@@ -121,7 +121,7 @@ const Grid = {
                 return s.links.outcome === outcome.id
               })
             }),
-            outcome
+            outcome,
           },
           options
         )
@@ -134,7 +134,7 @@ const Grid = {
     _studentColumn() {
       // var studentOptions
       const studentOptions = {
-        width: 231
+        width: 231,
       }
       return _.extend(
         {
@@ -143,7 +143,7 @@ const Grid = {
           field: 'student',
           cssClass: 'outcome-student-cell',
           headerCssClass: 'outcome-student-header-cell',
-          formatter: Grid.View.studentCell
+          formatter: Grid.View.studentCell,
         },
         _.extend({}, Grid.Util.COLUMN_OPTIONS, studentOptions)
       )
@@ -193,10 +193,10 @@ const Grid = {
         student: _.extend(
           {
             grades_html_url: `/courses/${courseID}/grades/${user}#tab-outcomes`,
-            section_name: _.keys(Grid.sections).length > 1 ? section_name : null
+            section_name: _.keys(Grid.sections).length > 1 ? section_name : null,
           },
           student
-        )
+        ),
       }
       _.each(rollup[0].scores, function (score) {
         return (row[`outcome_${score.links.outcome}`] = _.pick(score, 'score', 'hide_points'))
@@ -280,7 +280,7 @@ const Grid = {
     // Returns a section or null.
     lookupSection(id_or_ids) {
       return _.pick(Grid.sections, id_or_ids)
-    }
+    },
   },
   Math: {
     mean(values, round = false) {
@@ -305,7 +305,7 @@ const Grid = {
     },
     cnt(values) {
       return values.length
-    }
+    },
   },
   View: {
     // Public: Render a SlickGrid cell.
@@ -344,14 +344,14 @@ const Grid = {
         return cellTemplate({
           color: cssColor,
           className,
-          description
+          description,
         })
       } else {
         return cellTemplate({
           color: cssColor,
           score: Math.round(score * 100.0) / 100.0,
           className,
-          masteryScore: outcome.mastery_points
+          masteryScore: outcome.mastery_points,
         })
       }
     },
@@ -359,7 +359,7 @@ const Grid = {
     studentCell(_row, _cell, value, _columnDef, _dataContext) {
       return studentCellTemplate(
         _.extend(value, {
-          course_id: ENV.GRADEBOOK_OPTIONS.context_id
+          course_id: ENV.GRADEBOOK_OPTIONS.context_id,
         })
       )
     },
@@ -439,7 +439,7 @@ const Grid = {
             {
               node: header,
               column: col,
-              grid
+              grid,
             },
             score
           )
@@ -456,7 +456,7 @@ const Grid = {
           showUnassessedStudents: !existingExclusions.includes('missing_user_rollups'),
           toggleInactiveEnrollments: Grid.gridRef._toggleStudentsWithInactiveEnrollments,
           toggleConcludedEnrollments: Grid.gridRef._toggleStudentsWithConcludedEnrollments,
-          toggleUnassessedStudents: Grid.gridRef._toggleStudentsWithNoResults
+          toggleUnassessedStudents: Grid.gridRef._toggleStudentsWithNoResults,
         },
         null
       )
@@ -466,7 +466,7 @@ const Grid = {
       $(node).addClass('average-filter')
       const view = new HeaderFilterView({
         grid,
-        redrawFn: Grid.View.redrawHeader
+        redrawFn: Grid.View.redrawHeader,
       })
       view.render()
       return $(node).append(view.$el)
@@ -481,7 +481,7 @@ const Grid = {
       const view = new OutcomeColumnView({
         el: node,
         attributes: column.outcome,
-        totalsFn
+        totalsFn,
       })
       return view.render()
     },
@@ -489,8 +489,8 @@ const Grid = {
       const results = Grid.View.getColumnResults(grid.getData(), column)
       const ratings = column.outcome.ratings || []
       return (ratings.result_count = results.length)
-    }
-  }
+    },
+  },
 }
 
 export default Grid

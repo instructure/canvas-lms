@@ -28,23 +28,23 @@ const fancyNote = {
     en: {
       title: 'A super great note title',
       description: 'An even better note description',
-      url: 'https://example.com/amazing_url'
+      url: 'https://example.com/amazing_url',
     },
     es: {
       title: 'A super great note title (spanish)',
       description: 'An even better note description (spanish)',
-      url: 'https://es.example.com/amazing_url'
-    }
+      url: 'https://es.example.com/amazing_url',
+    },
   },
   show_ats: {},
-  published: true
+  published: true,
 }
 
 describe('create modal', () => {
   it('It renders reasonable defaults', () => {
     const {getByText} = render(
       <CreateEditModal
-        open
+        open={true}
         onClose={() => {}}
         onSubmit={() => {}}
         currentNote={undefined}
@@ -60,7 +60,7 @@ describe('create modal', () => {
     const onSubmit = jest.fn()
     const {getByLabelText, getByText} = render(
       <CreateEditModal
-        open
+        open={true}
         onClose={() => {}}
         onSubmit={onSubmit}
         currentNote={undefined}
@@ -81,7 +81,7 @@ describe('create modal', () => {
     const onSubmit = jest.fn()
     const {getByLabelText, getByText} = render(
       <CreateEditModal
-        open
+        open={true}
         onClose={() => {}}
         onSubmit={onSubmit}
         currentNote={undefined}

@@ -22,6 +22,7 @@ import '../tinymce/hy'
 const locale = {
   "add_8523c19b": { "message": "Ավելացնել" },
   "all_4321c3a1": { "message": "Բոլորը" },
+  "alpha_15d59033": { "message": "Alpha" },
   "announcement_list_da155734": { "message": "Հայտարարությունների ցուցակ" },
   "announcements_a4b8ed4a": { "message": "Հայտարարություններ" },
   "apply_781a2546": { "message": "Կիրառել" },
@@ -63,7 +64,7 @@ const locale = {
     "message": "\"Creative Commons\" լիցենզիա"
   },
   "cyan_c1d5f68a": { "message": "Cyan" },
-  "decrease_indent_de6343ab": { "message": "Նվազեցնել ներսի տողագլուխը" },
+  "decrease_indent_d9cf469d": { "message": "Փոքրացնել Ներսի Տողագլուխը" },
   "deep_purple_bb3e2907": { "message": "Մուգ մանուշակագույն" },
   "delimiters_4db4840d": { "message": "Բաժանիչներ" },
   "details_98a31b68": { "message": "Մանրամասներ" },
@@ -72,7 +73,6 @@ const locale = {
   "discussions_index_6c36ced": { "message": "Քննարկումների ցուցիչ" },
   "done_54e3d4b6": { "message": "Պատրաստ է" },
   "due_multiple_dates_cc0ee3f5": { "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ" },
-  "edit_c5fbea07": { "message": "Խմբագրել" },
   "embed_image_1080badc": { "message": "Տեղադրել պատկերը" },
   "external_tools_6e77821": { "message": "Արտաքին գործիքներ" },
   "files_c300e900": { "message": "Ֆայլեր" },
@@ -92,9 +92,10 @@ const locale = {
   "i_hold_the_copyright_71ee91b1": {
     "message": "Ես հեղինակային իրավունք ունեմ"
   },
+  "icon_215a1dc6": { "message": "Նշան" },
   "image_8ad06": { "message": "Պատկեր" },
   "images_7ce26570": { "message": "Պատկերներ" },
-  "increase_indent_6d550a4a": { "message": "Ավելացնել ներսի տողագլուխը" },
+  "increase_indent_6af90f7c": { "message": "Մեծացնել ներսի տողագլուխը" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Տեղադրել" },
   "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
@@ -108,7 +109,6 @@ const locale = {
   "light_blue_5374f600": { "message": "Բաց կապույտ" },
   "link_7262adec": { "message": "Հղում" },
   "links_14b70841": { "message": "Հղումներ" },
-  "load_more_results_460f49a9": { "message": "Load more results" },
   "loading_25990131": { "message": "Բեռնում է..." },
   "loading_bde52856": { "message": "Բեռնում է" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
@@ -137,6 +137,8 @@ const locale = {
   "record_7c9448b": { "message": "Գրառում" },
   "red_8258edf3": { "message": "Կարմիր" },
   "relationships_6602af70": { "message": "Հարաբերություններ" },
+  "replace_e61834a7": { "message": "Փոխարինել" },
+  "reset_95a81614": { "message": "Սկզբնական Վիճակին Բերել" },
   "rich_content_editor_2708ef21": { "message": "Ֆորմատավորված տեքստի խմբագիր" },
   "save_11a80ec3": { "message": "Պահպանել" },
   "search_280d00bd": { "message": "Որոնել" },

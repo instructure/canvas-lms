@@ -24,31 +24,31 @@ import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
 const I18n = useI18nScope('react_files')
 
-FilesUsage.render = function() {
+FilesUsage.render = function () {
   if (this.state) {
     const percentUsed = Math.round((this.state.quota_used / this.state.quota) * 100)
     const label = I18n.t('%{percentUsed} of %{bytesAvailable} used', {
       percentUsed: I18n.n(percentUsed, {percentage: true}),
-      bytesAvailable: friendlyBytes(this.state.quota)
+      bytesAvailable: friendlyBytes(this.state.quota),
     })
     const srLabel = I18n.t('Files Quota: %{percentUsed} of %{bytesAvailable} used', {
       percentUsed: I18n.n(percentUsed, {percentage: true}),
-      bytesAvailable: friendlyBytes(this.state.quota)
+      bytesAvailable: friendlyBytes(this.state.quota),
     })
     return (
       <div className="grid-row ef-quota-usage">
         <div className="col-xs-3">
-          <div ref="container" className="progress-bar__bar-container" aria-hidden>
+          <div ref="container" className="progress-bar__bar-container" aria-hidden={true}>
             <div
               ref="bar"
               className="progress-bar__bar"
               style={{
-                width: Math.min(percentUsed, 100) + '%'
+                width: Math.min(percentUsed, 100) + '%',
               }}
             />
           </div>
         </div>
-        <div className="col-xs-9" style={{paddingLeft: '0px'}} aria-hidden>
+        <div className="col-xs-9" style={{paddingLeft: '0px'}} aria-hidden={true}>
           {label}
         </div>
         <div className="screenreader-only">{srLabel}</div>

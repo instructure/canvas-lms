@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails.js'
+import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import tz from '@canvas/timezone'
 import detroit from 'timezone/America/Detroit'
@@ -37,8 +37,8 @@ QUnit.module('EditAppointmentGroupDetails', {
         return [
           {
             asset_string: 'course_1',
-            course_sections: [{asset_string: 'section_1'}]
-          }
+            course_sections: [{asset_string: 'section_1'}],
+          },
         ]
       },
       context_code: 'course_1',
@@ -47,18 +47,18 @@ QUnit.module('EditAppointmentGroupDetails', {
       startDate() {
         return fcUtil.wrap('2015-08-07T17:00:00Z')
       },
-      allDay: false
+      allDay: false,
     }
     this.existing_event = {
       id: 1,
-      ...this.new_event
+      ...this.new_event,
     }
     this.contexts = [
       {
         asset_string: 'course_1',
         course_sections: [{asset_string: 'section_1'}],
-        can_create_appointment_groups: {all_sections: true}
-      }
+        can_create_appointment_groups: {all_sections: true},
+      },
     ]
   },
   teardown() {
@@ -66,10 +66,10 @@ QUnit.module('EditAppointmentGroupDetails', {
     this.$holder.detach()
     document.getElementById('fixtures').innerHTML = ''
     tz.restore(this.snapshot)
-  }
+  },
 })
 
-test('disable context and group controls when editing an existing appointment', function() {
+test('disable context and group controls when editing an existing appointment', function () {
   const instance = new EditAppointmentGroupDetails(
     '#fixtures',
     this.existing_event,

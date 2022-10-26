@@ -18,11 +18,11 @@
 
 import $ from 'jquery'
 
-const Adapter = function(inputConfig) {
+const Adapter = function (inputConfig) {
   this.config = inputConfig
 }
 
-Adapter.prototype.request = function(options) {
+Adapter.prototype.request = function (options) {
   const ajax = this.config.ajax || $.ajax
 
   options.headers = options.headers || {}

@@ -34,7 +34,7 @@ const GradingPeriodSelect = ({
   gradingPeriods,
   onGradingPeriodSelected,
   currentGradingPeriodId,
-  courseName
+  courseName,
 }) => {
   const ALL_PERIODS_VALUE = 'all'
   const [selectedValue, setSelectedValue] = useState(ALL_PERIODS_VALUE)
@@ -65,7 +65,7 @@ const GradingPeriodSelect = ({
               <ScreenReaderContent>{I18n.t('Select Grading Period')}</ScreenReaderContent>
             }
             assistiveText={I18n.t('Use arrow keys to navigate options.')}
-            isInline
+            isInline={true}
             onChange={(_e, data) => setSelectedValue(data.value)}
             width="20rem"
             value={selectedValue}
@@ -102,7 +102,7 @@ GradingPeriodSelect.propTypes = {
   gradingPeriods: PropTypes.arrayOf(PropTypes.shape(GradingPeriodShape)),
   onGradingPeriodSelected: PropTypes.func.isRequired,
   currentGradingPeriodId: PropTypes.string,
-  courseName: PropTypes.string.isRequired
+  courseName: PropTypes.string.isRequired,
 }
 
 export default GradingPeriodSelect

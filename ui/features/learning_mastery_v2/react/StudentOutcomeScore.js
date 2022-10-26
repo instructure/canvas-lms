@@ -57,7 +57,7 @@ const StudentOutcomeScore = ({outcome, rollup, visibleRatings}) => {
 StudentOutcomeScore.propTypes = {
   outcome: PropTypes.shape(outcomeShape).isRequired,
   rollup: PropTypes.shape(outcomeRollupShape),
-  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
 }
 
 export default StudentOutcomeScore

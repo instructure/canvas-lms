@@ -27,7 +27,7 @@ apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 it('renders readOnly', () => {
   const text = 'Hello world'
   const {getByText, getByTestId} = render(
-    <AssignmentDescription text={text} onChange={() => {}} readOnly />
+    <AssignmentDescription text={text} onChange={() => {}} readOnly={true} />
   )
   expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
   expect(getByText(`converted ${text}`)).toBeInTheDocument()

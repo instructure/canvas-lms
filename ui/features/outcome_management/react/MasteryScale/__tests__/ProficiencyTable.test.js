@@ -24,7 +24,7 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 const defaultProps = (props = {}) => ({
   update: () => Promise.resolve(),
   contextType: 'Account',
-  ...props
+  ...props,
 })
 
 describe('default proficiency', () => {
@@ -66,7 +66,7 @@ describe('default proficiency', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'Added mastery level',
       type: 'success',
-      srOnly: true
+      srOnly: true,
     })
   })
 
@@ -77,7 +77,7 @@ describe('default proficiency', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'Mastery level deleted',
       type: 'success',
-      srOnly: true
+      srOnly: true,
     })
   })
 
@@ -156,7 +156,7 @@ describe('default proficiency', () => {
       expect(updateSpy).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Mastery scale saved',
-        type: 'success'
+        type: 'success',
       })
     })
   })
@@ -283,17 +283,17 @@ describe('custom proficiency', () => {
               description: 'Great',
               points: 10,
               color: '0000ff',
-              mastery: true
+              mastery: true,
             },
             {
               description: 'Poor',
               points: 0,
               color: 'ff0000',
-              mastery: false
-            }
-          ]
-        }
-      }
+              mastery: false,
+            },
+          ],
+        },
+      },
     }
     const {getAllByText} = render(<ProficiencyTable {...customProficiencyProps} />)
     const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
@@ -308,27 +308,27 @@ describe('custom proficiency', () => {
       description: 'Great',
       points: 10,
       color: '0000ff',
-      mastery: false
+      mastery: false,
     }
     const defaultRating2 = {
       description: 'Average',
       points: 5,
       color: '00ff00',
-      mastery: true
+      mastery: true,
     }
     const defaultRating3 = {
       description: 'Poor',
       points: 3,
       color: 'ff0000',
-      mastery: false
+      mastery: false,
     }
     const customProficiencyProps = {
       ...defaultProps(),
       proficiency: {
         proficiencyRatingsConnection: {
-          nodes: [defaultRating1, defaultRating2, defaultRating3]
-        }
-      }
+          nodes: [defaultRating1, defaultRating2, defaultRating3],
+        },
+      },
     }
 
     it('by point value when a new rating is added', () => {
@@ -359,7 +359,7 @@ describe('custom proficiency', () => {
         description: 'Almost Perfect',
         points: 9,
         color: defaultColor,
-        mastery: false
+        mastery: false,
       }
       const expectedRatings = [defaultRating1, addedRating, defaultRating2, defaultRating3]
       expect(updateSpy).toHaveBeenCalledWith({ratings: expectedRatings})
@@ -411,7 +411,7 @@ describe('custom proficiency', () => {
         description: 'Pretty Poor',
         points: 2,
         color: defaultColor,
-        mastery: false
+        mastery: false,
       }
       const expectedRatings = [defaultRating1, defaultRating2, defaultRating3, addedRating]
       expect(updateSpy).toHaveBeenCalledWith({ratings: expectedRatings})
@@ -455,11 +455,11 @@ describe('custom proficiency', () => {
               description: 'Uno',
               points: 1,
               color: '0000ff',
-              mastery: true
-            }
-          ]
-        }
-      }
+              mastery: true,
+            },
+          ],
+        },
+      },
     }
     const {getAllByText} = render(<ProficiencyTable {...props} />)
     const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
@@ -478,17 +478,17 @@ describe('custom proficiency', () => {
               description: 'Great',
               points: 10,
               color: '0000ff',
-              mastery: true
+              mastery: true,
             },
             {
               description: 'Poor',
               points: 0,
               color: 'ff0000',
-              mastery: false
-            }
-          ]
-        }
-      }
+              mastery: false,
+            },
+          ],
+        },
+      },
     }
 
     it('does not render Save button', () => {

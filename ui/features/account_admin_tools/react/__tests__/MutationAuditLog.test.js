@@ -55,8 +55,8 @@ describe('AuditLogResults', () => {
           assetString: 'user_123',
           startDate: undefined,
           endDate: undefined,
-          first: 1
-        }
+          first: 1,
+        },
       },
       result: {
         data: {
@@ -71,26 +71,26 @@ describe('AuditLogResults', () => {
                   user: {
                     _id: '1',
                     name: 'Professor',
-                    __typename: 'User'
+                    __typename: 'User',
                   },
                   realUser: null,
                   params: {
-                    test: 'I AM A PARAMETER'
+                    test: 'I AM A PARAMETER',
                   },
-                  __typename: 'MutationLog'
-                }
+                  __typename: 'MutationLog',
+                },
               ],
               pageInfo: {
                 hasNextPage: true,
                 endCursor: 'cursor1',
-                __typename: 'PageInfo'
+                __typename: 'PageInfo',
               },
-              __typename: 'MutationLogConnection'
+              __typename: 'MutationLogConnection',
             },
-            __typename: 'AuditLogs'
-          }
-        }
-      }
+            __typename: 'AuditLogs',
+          },
+        },
+      },
     },
     {
       request: {
@@ -100,8 +100,8 @@ describe('AuditLogResults', () => {
           startDate: undefined,
           endDate: undefined,
           first: 1,
-          after: 'cursor1'
-        }
+          after: 'cursor1',
+        },
       },
       result: {
         data: {
@@ -116,24 +116,24 @@ describe('AuditLogResults', () => {
                   user: {
                     _id: '2',
                     name: 'Doctor',
-                    __typename: 'User'
+                    __typename: 'User',
                   },
                   realUser: null,
                   params: {},
-                  __typename: 'MutationLog'
-                }
+                  __typename: 'MutationLog',
+                },
               ],
               pageInfo: {
                 hasNextPage: false,
                 endCursor: 'cursor2',
-                __typename: 'PageInfo'
+                __typename: 'PageInfo',
               },
-              __typename: 'MutationLogConnection'
+              __typename: 'MutationLogConnection',
             },
-            __typename: 'AuditLogs'
-          }
-        }
-      }
+            __typename: 'AuditLogs',
+          },
+        },
+      },
     },
     {
       request: {
@@ -142,8 +142,8 @@ describe('AuditLogResults', () => {
           assetString: 'user_456',
           startDate: undefined,
           endDate: undefined,
-          first: 100
-        }
+          first: 100,
+        },
       },
       result: {
         data: {
@@ -153,14 +153,14 @@ describe('AuditLogResults', () => {
               pageInfo: {
                 hasNextPage: false,
                 endCursor: 'endCursor',
-                __typename: 'PageInfo'
+                __typename: 'PageInfo',
               },
-              __typename: 'MutationLogConnection'
+              __typename: 'MutationLogConnection',
             },
-            __typename: 'AuditLogs'
-          }
-        }
-      }
+            __typename: 'AuditLogs',
+          },
+        },
+      },
     },
     {
       request: {
@@ -169,11 +169,11 @@ describe('AuditLogResults', () => {
           assetString: 'error_1',
           startDate: undefined,
           endDate: undefined,
-          first: 100
-        }
+          first: 100,
+        },
       },
-      error: new Error('uh oh')
-    }
+      error: new Error('uh oh'),
+    },
   ]
 
   it('renders', async () => {

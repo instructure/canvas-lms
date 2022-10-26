@@ -29,13 +29,13 @@ export default {
     onNameConflictResolved: PropTypes.func.isRequired,
     allowSkip: PropTypes.bool,
     onRenameFileMessage: PropTypes.func,
-    onLockFileMessage: PropTypes.func
+    onLockFileMessage: PropTypes.func,
   },
 
   getInitialState() {
     return {
       isEditing: false,
-      fileOptions: this.props.fileOptions
+      fileOptions: this.props.fileOptions,
     }
   },
 
@@ -57,7 +57,7 @@ export default {
       file: this.state.fileOptions.file,
       dup: 'skip',
       name: this.state.fileOptions.name,
-      expandZip: this.state.fileOptions.expandZip
+      expandZip: this.state.fileOptions.expandZip,
     })
   },
 
@@ -69,7 +69,7 @@ export default {
       file: this.state.fileOptions.file,
       dup: 'overwrite',
       name: this.state.fileOptions.name,
-      expandZip: this.state.fileOptions.expandZip
+      expandZip: this.state.fileOptions.expandZip,
     })
   },
 
@@ -81,12 +81,12 @@ export default {
       file: this.state.fileOptions.file,
       dup: 'rename',
       name: ReactDOM.findDOMNode(this.refs.newName).value,
-      expandZip: this.state.fileOptions.expandZip
+      expandZip: this.state.fileOptions.expandZip,
     })
   },
 
   handleFormSubmit(e) {
     e.preventDefault()
     return this.handleChangeClick()
-  }
+  },
 }

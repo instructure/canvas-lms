@@ -92,7 +92,7 @@ function PermissionDetailToggles({tab, permissionName}) {
 
 PermissionDetailToggles.propTypes = {
   tab: string.isRequired,
-  permissionName: string.isRequired
+  permissionName: string.isRequired,
 }
 
 // TODO don't pass in label if we are passing in permission
@@ -167,7 +167,7 @@ PermissionTray.propTypes = {
   open: bool.isRequired,
   unassignedRoles: arrayOf(permissionPropTypes.role).isRequired,
   permissionName: string,
-  tab: string.isRequired
+  tab: string.isRequired,
 }
 
 function mapStateToProps(state, ownProps) {
@@ -194,7 +194,7 @@ function mapStateToProps(state, ownProps) {
       label: '',
       open: false,
       unassignedRoles: [],
-      tab: ownProps.tab || COURSE
+      tab: ownProps.tab || COURSE,
     }
     return {...stateProps, ...ownProps}
   }
@@ -209,13 +209,13 @@ function mapStateToProps(state, ownProps) {
     label: permission.label,
     open: true,
     unassignedRoles: displayedRoles.filter(r => !r.permissions[permissionName].enabled),
-    tab: ownProps.tab || COURSE
+    tab: ownProps.tab || COURSE,
   }
   return {...ownProps, ...stateProps}
 }
 
 const mapDispatchToProps = {
-  hideTray: actions.hideAllTrays
+  hideTray: actions.hideAllTrays,
 }
 
 export const ConnectedPermissionTray = connect(mapStateToProps, mapDispatchToProps)(PermissionTray)

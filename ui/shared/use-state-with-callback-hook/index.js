@@ -68,7 +68,7 @@ export default function useStateWithCallback(initialValue, makeMultipleCallbacks
     }
   }
 
-  useEffect(function() {
+  useEffect(function () {
     callbackList.current.forEach(fn => fn())
     callbackList.current = []
   })

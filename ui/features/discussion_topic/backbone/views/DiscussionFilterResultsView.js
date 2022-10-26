@@ -29,7 +29,7 @@ export default class DiscussionFilterResultsView extends EntryCollectionView {
       ...EntryCollectionView.prototype.defaults,
       descendants: 0,
       displayShowMore: true,
-      threaded: true
+      threaded: true,
     }
   }
 

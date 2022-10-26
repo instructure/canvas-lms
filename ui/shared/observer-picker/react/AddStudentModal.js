@@ -57,11 +57,11 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
       const {response} = await doFetchApi({
         method: 'POST',
         path: `/api/v1/users/${currentUserId}/observees`,
-        body: {pairing_code: studentCode}
+        body: {pairing_code: studentCode},
       })
       showFlashAlert({
         message: I18n.t('Student paired successfully'),
-        type: 'success'
+        type: 'success',
       })
       if (response.ok) {
         onStudentPaired()
@@ -71,7 +71,7 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
       showError([{text: I18n.t('Invalid pairing code.'), type: 'error'}])
       showFlashAlert({
         message: I18n.t('Failed pairing student.'),
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -82,7 +82,7 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
       onDismiss={handleClose}
       size="small"
       label={I18n.t('Pair with student')}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
       theme={{smallMaxWidth: '27em'}}
     >
       <Modal.Header>
@@ -115,8 +115,8 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
           display="inline-block"
           dangerouslySetInnerHTML={{
             __html: I18n.t('Visit *Canvas Guides* to learn more.', {
-              wrappers: [canvasGuideLinkHtml]
-            })
+              wrappers: [canvasGuideLinkHtml],
+            }),
           }}
         />
       </Modal.Body>
@@ -136,7 +136,7 @@ AddStudentModal.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   currentUserId: PropTypes.string.isRequired,
-  onStudentPaired: PropTypes.func.isRequired
+  onStudentPaired: PropTypes.func.isRequired,
 }
 
 export default AddStudentModal

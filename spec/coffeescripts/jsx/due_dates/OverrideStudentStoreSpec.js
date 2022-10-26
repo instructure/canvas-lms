@@ -40,9 +40,9 @@ QUnit.module('OverrideStudentStore', {
           {
             id: '7',
             course_section_id: '2',
-            type: 'StudentEnrollment'
-          }
-        ]
+            type: 'StudentEnrollment',
+          },
+        ],
       },
       {
         id: '5',
@@ -57,9 +57,9 @@ QUnit.module('OverrideStudentStore', {
           {
             id: '8',
             course_section_id: '4',
-            type: 'StudentEnrollment'
-          }
-        ]
+            type: 'StudentEnrollment',
+          },
+        ],
       },
       {
         id: '8',
@@ -74,10 +74,10 @@ QUnit.module('OverrideStudentStore', {
           {
             id: '10',
             course_section_id: '4',
-            type: 'StudentEnrollment'
-          }
-        ]
-      }
+            type: 'StudentEnrollment',
+          },
+        ],
+      },
     ]
     this.response2 = [
       {
@@ -87,7 +87,7 @@ QUnit.module('OverrideStudentStore', {
         sis_user_id: null,
         name: 'Publius Varus',
         sortable_name: 'Varus, Publius',
-        short_name: 'Publius'
+        short_name: 'Publius',
       },
       {
         id: '2',
@@ -102,9 +102,9 @@ QUnit.module('OverrideStudentStore', {
           {
             id: '7',
             course_section_id: '2',
-            type: 'StudentEnrollment'
-          }
-        ]
+            type: 'StudentEnrollment',
+          },
+        ],
       },
       {
         id: '9',
@@ -119,10 +119,10 @@ QUnit.module('OverrideStudentStore', {
           {
             id: '9',
             course_section_id: '4',
-            type: 'StudentEnrollment'
-          }
-        ]
-      }
+            type: 'StudentEnrollment',
+          },
+        ],
+      },
     ]
   },
   teardown() {
@@ -143,20 +143,20 @@ QUnit.module('OverrideStudentStore', {
         200,
         {
           'Content-Type': 'application/json',
-          Link: '<http://page2>; rel="next"'
+          Link: '<http://page2>; rel="next"',
         },
-        JSON.stringify(this.response)
+        JSON.stringify(this.response),
       ]
     )
     this.server.respondWith('GET', 'http://page2', [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.response2)
+      JSON.stringify(this.response2),
     ])
     this.server.respondWith('GET', '/api/v1/courses/1/search_users', [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.response)
+      JSON.stringify(this.response),
     ])
     this.server.respondWith(
       'GET',
@@ -166,7 +166,7 @@ QUnit.module('OverrideStudentStore', {
     this.server.respondWith('GET', '/api/v1/courses/1/search_users?search_term=publiu', [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.response)
+      JSON.stringify(this.response),
     ])
     this.server.respondWith(
       'GET',
@@ -175,12 +175,12 @@ QUnit.module('OverrideStudentStore', {
         200,
         {
           'Content-Type': 'application/json',
-          Link: '<http://coursepage2>; rel="next"'
+          Link: '<http://coursepage2>; rel="next"',
         },
-        JSON.stringify(this.response)
+        JSON.stringify(this.response),
       ]
     )
-  }
+  },
 })
 
 test('returns students', function () {
@@ -298,9 +298,9 @@ test('fetching by course: follows pagination up to the limit', function () {
       200,
       {
         'Content-Type': 'application/json',
-        Link: `<http://coursepage${i + 1}>; rel=\"next\"`
+        Link: `<http://coursepage${i + 1}>; rel=\"next\"`,
       },
-      '[]'
+      '[]',
     ])
     this.server.respond()
   }
@@ -313,7 +313,7 @@ test('fetching by course: saves results from all pages', function () {
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -327,7 +327,7 @@ test('fetching by course: if all users returned, sets allStudentsFetched to true
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    '[]'
+    '[]',
   ])
   equal(OverrideStudentStore.allStudentsFetched(), false)
   OverrideStudentStore.fetchStudentsForCourse()
@@ -357,7 +357,7 @@ test('fetching by course: shows secondary info for students with matching names 
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -369,7 +369,7 @@ test('fetching by course: shows secondary info for students with matching names 
   propEqual(matching, [
     'Publius Scipio (scippy)',
     'Publius Scipio (scipio@example.com)',
-    'publius Scipio (pscips08)'
+    'publius Scipio (pscips08)',
   ])
 })
 
@@ -379,7 +379,7 @@ test('fetching by course: does not show secondary info if there is no secondary 
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -396,7 +396,7 @@ test('fetching by course: does not show secondary info if the same student is re
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -416,7 +416,7 @@ test('ignores punctuation, case, and leading/trailing spaces when comparing stud
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -428,7 +428,7 @@ test('ignores punctuation, case, and leading/trailing spaces when comparing stud
   propEqual(matching, [
     'pu@bliüß!%&*) (Scîpiœ  (scippy)',
     'Publiüß Scîpiœ (scipio@example.com)',
-    ' !Pu%bliüß *scîpiœ& (pscips08)'
+    ' !Pu%bliüß *scîpiœ& (pscips08)',
   ])
 })
 
@@ -438,7 +438,7 @@ test('does not rename students more than once', function () {
   this.server.respondWith('GET', 'http://coursepage2', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.response2)
+    JSON.stringify(this.response2),
   ])
   OverrideStudentStore.fetchStudentsForCourse()
   this.server.respond()
@@ -450,6 +450,6 @@ test('does not rename students more than once', function () {
   propEqual(matching, [
     'Publius Scipio (@!)',
     'Publius Scipio (scipio@example.com)',
-    'publius Scipio (pscips08)'
+    'publius Scipio (pscips08)',
   ])
 })

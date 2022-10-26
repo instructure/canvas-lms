@@ -49,7 +49,12 @@ export const AnonymousPostSelector = () => {
           )}
           {selectedOptionId === 'hide' && <AnonymousAvatar seedString={CURRENT_USER} />}
         </Flex.Item>
-        <Flex.Item direction="column" margin="0 0 0 small" padding="0 small 0 0" shouldShrink>
+        <Flex.Item
+          direction="column"
+          margin="0 0 0 small"
+          padding="0 small 0 0"
+          shouldShrink={true}
+        >
           <Text weight="bold" size="medium" lineHeight="condensed">
             {selectedOptionId === 'hide' ? I18n.t('Anonymous') : ENV.current_user.display_name}
           </Text>

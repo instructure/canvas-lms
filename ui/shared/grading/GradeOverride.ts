@@ -26,7 +26,7 @@ export default class GradeOverride {
     this._attr = {
       percentage: null,
       schemeKey: null,
-      ...attr
+      ...attr,
     }
   }
 

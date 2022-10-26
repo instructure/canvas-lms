@@ -419,7 +419,7 @@ QUnit.module('Gradebook#renderStudentSearchFilter', {
 })
 
 test('does not render old set up/search field', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, false, 'input is not disabled')
@@ -427,35 +427,35 @@ test('does not render old set up/search field', function () {
 })
 
 test('renders Student Names label', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderStudentSearchFilter([])
   const studentSearch = document.querySelector('#gradebook-student-search')
   ok(studentSearch.textContent.includes('Student Names'))
 })
 
 test('enables the input if there is at least one student to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   notOk(studentSearchInput.disabled)
 })
 
 test('disables the input if the grid has not yet rendered', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'pending')
   this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   ok(studentSearchInput.disabled)
 })
 
 test('disables the input if there are no students to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderStudentSearchFilter([])
   const studentSearchInput = document.getElementById('student-names-filter')
   ok(studentSearchInput.disabled)
 })
 
 test('displays a select menu option for each student', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   const student = {id: '1', displayName: 'Joe Dirt', loaded: true, isPlaceholder: false}
   this.gradebook.renderStudentSearchFilter([student])
   const studentSearchInput = document.getElementById('student-names-filter')

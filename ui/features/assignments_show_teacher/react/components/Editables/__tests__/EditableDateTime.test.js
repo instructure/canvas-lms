@@ -51,7 +51,6 @@ function renderEditableDateTime(props = {}) {
  *  2, we are just going to short out those components and skip the tests.
  */
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('EditableDateTime', () => {
   it('renders in view mode', () => {
     const value = '2019-04-11T13:00:00-05:00'

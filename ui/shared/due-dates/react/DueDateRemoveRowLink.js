@@ -24,7 +24,7 @@ const I18n = useI18nScope('DueDateRemoveRowLink')
 
 class DueDateRemoveRowLink extends React.Component {
   static propTypes = {
-    handleClick: PropTypes.func.isRequired
+    handleClick: PropTypes.func.isRequired,
   }
 
   render() {

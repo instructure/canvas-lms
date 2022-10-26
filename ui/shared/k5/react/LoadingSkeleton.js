@@ -32,7 +32,7 @@ export default function LoadingSkeleton({screenReaderLabel, width, height, margi
           borderRadius: '0.25rem',
           background: 'linear-gradient(-90deg, #F5F5F5 5%, #E6E6E6 25%, #F5F5F5 40%)',
           backgroundSize: '500% 100%',
-          animation: 'shimmer 2s ease-in infinite' // shimmer defined in k5_dashboard.scss
+          animation: 'shimmer 2s ease-in infinite', // shimmer defined in k5_dashboard.scss
         }}
         data-testid="skeletonShimmerBox"
       />
@@ -45,5 +45,5 @@ LoadingSkeleton.propTypes = {
   screenReaderLabel: string.isRequired,
   width: string.isRequired,
   height: string.isRequired,
-  margin: string
+  margin: string,
 }

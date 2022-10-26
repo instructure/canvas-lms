@@ -44,14 +44,14 @@ export default class AssociationsTable extends React.Component {
     onRemoveAssociations: func.isRequired,
     onRestoreAssociations: func.isRequired,
     isLoadingAssociations: bool.isRequired,
-    focusManager: instanceOf(FocusManager).isRequired
+    focusManager: instanceOf(FocusManager).isRequired,
   }
 
   constructor(props) {
     super(props)
     this.wrapper = React.createRef()
     this.state = {
-      visibleExisting: props.existingAssociations
+      visibleExisting: props.existingAssociations,
     }
   }
 
@@ -64,7 +64,7 @@ export default class AssociationsTable extends React.Component {
     this.setState({
       visibleExisting: nextProps.existingAssociations.filter(
         assoc => !removedIds.includes(assoc.id)
-      )
+      ),
     })
 
     if (!this.props.isLoadingAssociations && nextProps.isLoadingAssociations) {
@@ -257,7 +257,7 @@ export default class AssociationsTable extends React.Component {
               {I18n.t('Current')}
             </Text>
           </Table.ColHeader>
-        </Table.Row>
+        </Table.Row>,
       ].concat(this.renderRows(this.state.visibleExisting))
     }
 
@@ -273,7 +273,7 @@ export default class AssociationsTable extends React.Component {
               {I18n.t('To be Added')}
             </Text>
           </Table.ColHeader>
-        </Table.Row>
+        </Table.Row>,
       ].concat(this.renderRows(this.props.addedAssociations))
     }
 
@@ -289,7 +289,7 @@ export default class AssociationsTable extends React.Component {
               {I18n.t('To be Removed')}
             </Text>
           </Table.ColHeader>
-        </Table.Row>
+        </Table.Row>,
       ].concat(this.renderToBeRemovedRows(this.props.removedAssociations))
     }
 

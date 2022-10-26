@@ -33,7 +33,7 @@ export const ImportantInfoShape = {
   courseId: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired,
   canEdit: PropTypes.bool.isRequired,
-  content: PropTypes.string.isRequired
+  content: PropTypes.string.isRequired,
 }
 
 export const ImportantInfoEditHeader = ({children, canEdit, courseName, courseId, margin}) => (
@@ -44,7 +44,7 @@ export const ImportantInfoEditHeader = ({children, canEdit, courseName, courseId
         <IconButton
           data-testid="important-info-edit"
           screenReaderLabel={I18n.t('Edit important info for %{courseName}', {
-            courseName
+            courseName,
           })}
           withBackground={false}
           withBorder={false}
@@ -62,7 +62,7 @@ ImportantInfoEditHeader.propTypes = {
   canEdit: PropTypes.bool.isRequired,
   courseName: PropTypes.string.isRequired,
   courseId: PropTypes.string.isRequired,
-  margin: PropTypes.string
+  margin: PropTypes.string,
 }
 
 const ImportantInfo = ({showTitle = false, titleMargin, infoDetails}) => {
@@ -95,7 +95,7 @@ const ImportantInfo = ({showTitle = false, titleMargin, infoDetails}) => {
 ImportantInfo.propTypes = {
   showTitle: PropTypes.bool,
   titleMargin: PropTypes.string,
-  infoDetails: PropTypes.shape(ImportantInfoShape)
+  infoDetails: PropTypes.shape(ImportantInfoShape),
 }
 
 export default ImportantInfo

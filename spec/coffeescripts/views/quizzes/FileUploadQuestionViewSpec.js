@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import FileUploadQuestion from 'ui/features/take_quiz/backbone/views/FileUploadQuestionView.js'
+import FileUploadQuestion from 'ui/features/take_quiz/backbone/views/FileUploadQuestionView'
 import File from '@canvas/files/backbone/models/File.coffee'
 import $ from 'jquery'
 
@@ -27,7 +27,7 @@ QUnit.module('FileUploadQuestionView', {
     this.model = new File(
       {
         display_name: 'foobar.jpg',
-        id: 1
+        id: 1,
       },
       {preflightUrl: 'url.com'}
     )
@@ -43,10 +43,10 @@ QUnit.module('FileUploadQuestionView', {
     window.ENV = this.oldEnv
     this.view.remove()
     this.server && this.server.restore()
-  }
+  },
 })
 
-test('#checkForFileChange set file upload status to in_progress', function() {
+test('#checkForFileChange set file upload status to in_progress', function () {
   $('#fileupload_in_progress').val(false)
   const spy = sinon.stub(this.model, 'save')
   ok($('#fileupload_in_progress').val(), 'false')
@@ -57,7 +57,7 @@ test('#checkForFileChange set file upload status to in_progress', function() {
   spy.restore()
 })
 
-test('#processAttachment fires "attachmentManipulationComplete" event', function() {
+test('#processAttachment fires "attachmentManipulationComplete" event', function () {
   $('#fileupload_in_progress').val(true)
   const spy = sinon.spy(this.view, 'trigger')
   notOk(spy.called, 'precondition')
@@ -68,7 +68,7 @@ test('#processAttachment fires "attachmentManipulationComplete" event', function
   this.view.trigger.restore()
 })
 
-test('#deleteAttachment fires "attachmentManipulationComplete" event', function() {
+test('#deleteAttachment fires "attachmentManipulationComplete" event', function () {
   const spy = sinon.spy(this.view, 'trigger')
   notOk(spy.called, 'precondition')
   this.view.deleteAttachment($.Event('keydown', {keyCode: 64}))
@@ -76,7 +76,7 @@ test('#deleteAttachment fires "attachmentManipulationComplete" event', function(
   this.view.trigger.restore()
 })
 
-test('#deleteAttachment clears file input', function() {
+test('#deleteAttachment clears file input', function () {
   equal(this.view.$fileUpload.val(), 'C:\\fakepath\\file.upload.zip')
   this.view.deleteAttachment($.Event('keydown', {keyCode: 64}))
   equal(this.view.$fileUpload.val(), '')

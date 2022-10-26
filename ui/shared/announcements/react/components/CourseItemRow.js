@@ -45,7 +45,7 @@ export default class CourseItemRow extends Component {
     metaContent: node,
     masterCourse: shape({
       courseData: masterCourseDataShape,
-      getLockOptions: func.isRequired
+      getLockOptions: func.isRequired,
     }),
     author: authorShape,
     title: string.isRequired,
@@ -71,7 +71,7 @@ export default class CourseItemRow extends Component {
     replyButton: node,
     focusOn: oneOf(['title', 'manageMenu', 'toggleButton']),
     clearFocusDirectives: func, // Required if focusOn is provided
-    hasReadBadge: bool
+    hasReadBadge: bool,
   }
 
   static defaultProps = {
@@ -83,7 +83,7 @@ export default class CourseItemRow extends Component {
       id: null,
       display_name: '',
       html_url: '',
-      avatar_image_url: null
+      avatar_image_url: null,
     },
     id: null,
     className: '',
@@ -106,12 +106,12 @@ export default class CourseItemRow extends Component {
     replyButton: null,
     focusOn: null,
     clearFocusDirectives: () => {},
-    hasReadBadge: false
+    hasReadBadge: false,
   }
 
   state = {
     isSelected: this.props.defaultSelected,
-    manageMenuShown: false
+    manageMenuShown: false,
   }
 
   componentDidMount() {
@@ -216,7 +216,7 @@ export default class CourseItemRow extends Component {
           )}
           {!this.props.isRead ? (
             <View display="block" margin="0 medium 0 0">
-              <Badge margin="0 0 0 0" standalone type="notification" />
+              <Badge margin="0 0 0 0" standalone={true} type="notification" />
             </View>
           ) : this.props.hasReadBadge ? (
             <View display="block" margin="0 small 0 0">
@@ -240,7 +240,7 @@ export default class CourseItemRow extends Component {
                 alt={this.props.author?.display_name || I18n.t('Unknown')}
                 name={this.props.author?.display_name || I18n.t('Unknown')}
                 src={this.props.author?.avatar_image_url}
-                data-fs-exclude
+                data-fs-exclude={true}
               />
             </div>
           )}
@@ -284,7 +284,7 @@ export default class CourseItemRow extends Component {
                         withBackground={false}
                         size="small"
                         screenReaderLabel={I18n.t('Manage options for %{name}', {
-                          name: this.props.title
+                          name: this.props.title,
                         })}
                       >
                         <IconMoreLine />

@@ -96,15 +96,6 @@ describe ApplicationHelper do
       account_admin_user
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
-
-    it "works for a sub-account admin" do
-      @sub_account = Account.create!(parent_account: @domain_root_account)
-      @sub_sub_account = Account.create!(parent_account: @sub_account)
-      @sub_admin = account_admin_user(account: @sub_account)
-      @sub_sub_admin = account_admin_user(account: @sub_sub_account)
-      expect(show_user_create_course_button(@sub_admin)).to be_truthy
-      expect(show_user_create_course_button(@sub_sub_admin)).to be_truthy
-    end
   end
 
   describe "tomorrow_at_midnight" do
@@ -830,7 +821,6 @@ describe ApplicationHelper do
     end
 
     it "returns false with no user" do
-      Account.site_admin.enable_feature!(:observer_picker)
       expect(planner_enabled?).to be false
     end
 
@@ -848,13 +838,6 @@ describe ApplicationHelper do
         expect(planner_enabled?).to be true
       end
 
-      it "returns false for the observer if not k5_user and observer_picker flag is disabled" do
-        Account.site_admin.disable_feature!(:observer_picker)
-        allow(helper).to receive(:k5_user?).and_return(false)
-        @current_user = @observer
-        expect(helper.planner_enabled?).to be false
-      end
-
       it "returns true for the observer if k5_user" do
         allow(helper).to receive(:k5_user?).and_return(true)
         @current_user = @observer
@@ -868,9 +851,8 @@ describe ApplicationHelper do
         expect(planner_enabled?).to be false
       end
 
-      it "returns true as an observer with observer_picker flag enabled" do
+      it "returns true for a normal observer" do
         allow(helper).to receive(:k5_user?).and_return(false)
-        Account.site_admin.enable_feature! :observer_picker
         @current_user = @observer
         expect(helper.planner_enabled?).to be true
       end

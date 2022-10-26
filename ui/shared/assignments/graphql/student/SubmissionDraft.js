@@ -68,8 +68,8 @@ export const SubmissionDraft = {
     meetsUrlCriteria: bool.isRequired,
     meetsStudentAnnotationCriteria: bool.isRequired,
     resourceLinkLookupUuid: string,
-    url: string
-  })
+    url: string,
+  }),
 }
 
 export const DefaultMocks = {
@@ -88,6 +88,6 @@ export const DefaultMocks = {
     meetsUrlCriteria: false,
     meetsStudentAnnotationCriteria: false,
     resourceLinkLookupUuid: null,
-    url: null
-  })
+    url: null,
+  }),
 }

@@ -48,7 +48,7 @@ const createRating = (description, points, color, mastery = false, focusField = 
   key: uuid(),
   color,
   mastery,
-  focusField
+  focusField,
 })
 
 const configToState = data => {
@@ -60,7 +60,7 @@ const configToState = data => {
   return {
     rows,
     savedRows: rows,
-    showConfirmation: false
+    showConfirmation: false,
   }
 }
 class ProficiencyTable extends React.Component {
@@ -71,7 +71,7 @@ class ProficiencyTable extends React.Component {
     focusTab: PropTypes.func,
     breakpoints: breakpointsShape,
     contextType: PropTypes.string.isRequired,
-    onNotifyPendingChanges: PropTypes.func
+    onNotifyPendingChanges: PropTypes.func,
   }
 
   static defaultProps = {
@@ -82,13 +82,13 @@ class ProficiencyTable extends React.Component {
           createRating(I18n.t('Mastery'), 3, '0B874B', true),
           createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
           createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
-          createRating(I18n.t('Well Below Mastery'), 0, 'E0061F')
-        ]
-      }
+          createRating(I18n.t('Well Below Mastery'), 0, 'E0061F'),
+        ],
+      },
     },
     canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     focusTab: null,
-    breakpoints: {}
+    breakpoints: {},
   }
 
   constructor(props) {
@@ -141,7 +141,7 @@ class ProficiencyTable extends React.Component {
         showFlashAlert({
           message: I18n.t('Added mastery level'),
           type: 'success',
-          srOnly: true
+          srOnly: true,
         })
       }
     )
@@ -162,7 +162,7 @@ class ProficiencyTable extends React.Component {
         return {
           showConfirmation: false,
           rows: sortedRows,
-          savedRows: sortedRows
+          savedRows: sortedRows,
         }
       },
       () => {
@@ -172,15 +172,15 @@ class ProficiencyTable extends React.Component {
           .then(() =>
             showFlashAlert({
               message: I18n.t('Mastery scale saved'),
-              type: 'success'
+              type: 'success',
             })
           )
           .catch(e => {
             showFlashAlert({
               message: I18n.t('An error occurred while saving the mastery scale: %{message}', {
-                message: e.message
+                message: e.message,
               }),
-              type: 'error'
+              type: 'error',
             })
             this.setState({savedRows: oldRows}, this.notifyPendingChanges)
           })
@@ -222,7 +222,7 @@ class ProficiencyTable extends React.Component {
   handleColorChange = _.memoize(index => value => {
     this.setState(
       ({rows}) => ({
-        rows: rows.update(index, row => row.set('color', unformatColor(value)))
+        rows: rows.update(index, row => row.set('color', unformatColor(value))),
       }),
       this.notifyPendingChanges
     )
@@ -248,7 +248,7 @@ class ProficiencyTable extends React.Component {
     } else {
       this.setState(
         {
-          rows: rows.setIn([index - 1, 'focusField'], 'trash')
+          rows: rows.setIn([index - 1, 'focusField'], 'trash'),
         },
         this.notifyPendingChanges
       )
@@ -256,7 +256,7 @@ class ProficiencyTable extends React.Component {
     showFlashAlert({
       message: I18n.t('Mastery level deleted'),
       type: 'success',
-      srOnly: true
+      srOnly: true,
     })
   })
 
@@ -274,9 +274,9 @@ class ProficiencyTable extends React.Component {
         description: row.get('description'),
         points: row.get('points'),
         mastery: row.get('mastery'),
-        color: row.get('color')
+        color: row.get('color'),
       }))
-      .toJS()
+      .toJS(),
   })
 
   sortRows = () => this.state.rows.sortBy(row => -row.get('points'))

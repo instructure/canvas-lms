@@ -30,8 +30,8 @@ describe('useRollups', () => {
       id: '1',
       name: 'Student 1',
       display_name: 'Student 1',
-      avatar_url: 'url'
-    }
+      avatar_url: 'url',
+    },
   ]
 
   const mockedRatings = [
@@ -39,38 +39,38 @@ describe('useRollups', () => {
       color: 'green',
       description: 'mastery!',
       mastery: true,
-      points: 3
+      points: 3,
     },
     {
       color: 'red',
       description: 'not great',
       mastery: false,
-      points: 0
-    }
+      points: 0,
+    },
   ]
 
   const mockedOutcomes = [
     {
       id: '1',
       title: 'outcome 1',
-      ratings: mockedRatings
-    }
+      ratings: mockedRatings,
+    },
   ]
 
   const mockedRollups = [
     {
       links: {
-        user: '1'
+        user: '1',
       },
       scores: [
         {
           score: 4,
           links: {
-            outcome: '1'
-          }
-        }
-      ]
-    }
+            outcome: '1',
+          },
+        },
+      ],
+    },
   ]
 
   beforeEach(() => {
@@ -79,10 +79,10 @@ describe('useRollups', () => {
       data: {
         linked: {
           users: mockedUsers,
-          outcomes: mockedOutcomes
+          outcomes: mockedOutcomes,
         },
-        rollups: mockedRollups
-      }
+        rollups: mockedRollups,
+      },
     })
     fetchMock = jest.spyOn(axios, 'get').mockResolvedValue(promise)
   })
@@ -110,9 +110,9 @@ describe('useRollups', () => {
         {
           studentId: '1',
           outcomeRollups: [
-            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}}
-          ]
-        }
+            {outcomeId: '1', rating: {...mockedRatings[0], color: `#${mockedRatings[0].color}`}},
+          ],
+        },
       ])
     })
 
@@ -126,8 +126,8 @@ describe('useRollups', () => {
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
           sort_by: 'student',
           add_defaults: true,
-          page: 1
-        }
+          page: 1,
+        },
       }
       expect(fetchMock).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
     })
@@ -140,7 +140,7 @@ describe('useRollups', () => {
       expect(fetchMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error loading rollups',
-        type: 'error'
+        type: 'error',
       })
     })
   })

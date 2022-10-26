@@ -35,12 +35,12 @@ export function AttachmentDisplay(props) {
       props={{
         mobile: {
           itemSpacing: '0 small 0 0',
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
           itemSpacing: 'none',
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={(_responsiveProps, _matches) =>
         props.attachment?._id && (
@@ -60,7 +60,7 @@ AttachmentDisplay.propTypes = {
   /**
    * Used to set the attachments prop, if no attachment is set
    */
-  setAttachment: PropTypes.func.isRequired
+  setAttachment: PropTypes.func.isRequired,
 }
 
 export default AttachmentDisplay

@@ -24,7 +24,7 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 const pluginConference = {
   conference_type: 'SecretConference',
   title: 'Secret Conference Conference',
-  description: ''
+  description: '',
 }
 
 function getProps(props = {}) {
@@ -33,7 +33,7 @@ function getProps(props = {}) {
     currentConferenceType: null,
     conferenceTypes: [],
     setConference: Function.prototype,
-    ...props
+    ...props,
   }
 }
 
@@ -93,7 +93,7 @@ describe('AddConference', () => {
 
     describe('LTI conferences', () => {
       const ltiConferenceTypes = [
-        {name: 'LTI Tool', type: 'LtiConference', lti_settings: {tool_id: '1'}}
+        {name: 'LTI Tool', type: 'LtiConference', lti_settings: {tool_id: '1'}},
       ]
 
       function postMessage(content_items) {
@@ -104,8 +104,8 @@ describe('AddConference', () => {
               origin: 'invalid://test',
               data: {
                 subject: 'LtiDeepLinkingResponse',
-                content_items
-              }
+                content_items,
+              },
             })
           )
         })
@@ -146,7 +146,7 @@ describe('AddConference', () => {
           title: 'MyLink',
           description: 'My description',
           conference_type: 'LtiConference',
-          lti_settings: {type: 'link', tool_id: '1'}
+          lti_settings: {type: 'link', tool_id: '1'},
         }
         expect(queryByTitle('Creating conference')).toBeNull()
         expect(setConference).toHaveBeenCalledWith(conference)
@@ -161,7 +161,7 @@ describe('AddConference', () => {
           title: 'LTI Tool Conference',
           description: '',
           conference_type: 'LtiConference',
-          lti_settings: {type: 'link', tool_id: '1'}
+          lti_settings: {type: 'link', tool_id: '1'},
         }
         expect(setConference).toHaveBeenCalledWith(conference)
       })
@@ -204,8 +204,8 @@ describe('AddConference', () => {
           iframe: {
             src: 'https://foo.bar',
             width: '111',
-            length: '222'
-          }
+            length: '222',
+          },
         }
         postMessage([content_item])
 
@@ -216,8 +216,8 @@ describe('AddConference', () => {
           lti_settings: {
             type: 'link',
             tool_id: '1',
-            url: 'https://foo.bar'
-          }
+            url: 'https://foo.bar',
+          },
         }
         expect(setConference).toHaveBeenCalledWith(conference)
       })
@@ -227,7 +227,7 @@ describe('AddConference', () => {
   describe('with muliple conference types', () => {
     const conferenceTypes = [
       {type: 'SecretConference', name: 'Secret Conference'},
-      {type: 'FooConference', name: 'Foo Conference'}
+      {type: 'FooConference', name: 'Foo Conference'},
     ]
 
     it('renders a select if multiple conference types are available', () => {

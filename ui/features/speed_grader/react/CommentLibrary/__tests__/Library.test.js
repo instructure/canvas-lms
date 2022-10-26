@@ -29,12 +29,12 @@ describe('Library', () => {
   const comments = [
     {
       _id: '1',
-      comment: 'great comment'
+      comment: 'great comment',
     },
     {
       _id: '2',
-      comment: 'great comment 2'
-    }
+      comment: 'great comment 2',
+    },
   ]
 
   const defaultProps = (props = {}) => {
@@ -51,7 +51,7 @@ describe('Library', () => {
       updateComment: () => {},
       suggestionsRef: document.body,
       setRemovedItemIndex: () => {},
-      ...props
+      ...props,
     }
   }
 
@@ -123,7 +123,7 @@ describe('Library', () => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         srOnly: true,
         message:
-          'There are new comment suggestions available. Press Tab to access the suggestions menu.'
+          'There are new comment suggestions available. Press Tab to access the suggestions menu.',
       })
     })
 
@@ -163,7 +163,7 @@ describe('Library', () => {
         <Library
           {...defaultProps({
             searchResults: comments,
-            suggestionsRef: document.getElementById('library-suggestions')
+            suggestionsRef: document.getElementById('library-suggestions'),
           })}
         />
       )
@@ -177,7 +177,7 @@ describe('Library', () => {
         <Library
           {...defaultProps({
             searchResults: comments,
-            suggestionsRef: document.getElementById('library-suggestions')
+            suggestionsRef: document.getElementById('library-suggestions'),
           })}
         />
       )

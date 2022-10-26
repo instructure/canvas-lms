@@ -22,7 +22,7 @@ QUnit.module('Date')
 
 test('Date.parse', () => {
   // create the same date the "new Date" would if the browser were in UTC
-  const utc = function() {
+  const utc = function () {
     return new Date(Date.UTC(...arguments))
   }
   const examples = {
@@ -51,7 +51,7 @@ test('Date.parse', () => {
     '2012-05-02T00:00:00-00:01': utc(2012, 4, 2, 0, 1, 0),
 
     // DST-ends edge case
-    '2012-11-04T01:00:00-06:00': utc(2012, 10, 4, 7, 0, 0)
+    '2012-11-04T01:00:00-06:00': utc(2012, 10, 4, 7, 0, 0),
   }
   return (() => {
     const result = []
@@ -80,7 +80,7 @@ test('date.getUTCOffset', () => {
     '-119': '+0159',
     ' 119': '-0159',
     '  -1': '+0001',
-    '   1': '-0001'
+    '   1': '-0001',
   }
   return (() => {
     const result = []

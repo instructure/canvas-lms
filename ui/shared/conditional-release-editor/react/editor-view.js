@@ -46,7 +46,7 @@ class EditorView extends React.Component {
       openAssignmentPicker: func.isRequired,
       closeAssignmentPicker: func.isRequired,
       addAssignmentsToRangeSet: func.isRequired,
-      clearGlobalWarning: func.isRequired
+      clearGlobalWarning: func.isRequired,
     }
   }
 
@@ -67,7 +67,7 @@ class EditorView extends React.Component {
         List()
       ),
       lower_bound: targetRange.get('lower_bound'),
-      upper_bound: targetRange.get('upper_bound')
+      upper_bound: targetRange.get('upper_bound'),
     })
 
     this.props.setAssignmentPickerTarget(target)
@@ -87,7 +87,7 @@ class EditorView extends React.Component {
     this.props.addAssignmentsToRangeSet({
       index: target.get('rangeIndex'),
       assignmentSetIndex: target.get('setIndex'),
-      assignment_set_associations: selectedAssignments
+      assignment_set_associations: selectedAssignments,
     })
 
     this.closeAssignmentPicker()
@@ -173,7 +173,7 @@ class EditorView extends React.Component {
     if (warning) {
       return (
         <div className="ic-flash-warning cr-global-warning">
-          <div className="ic-flash__icon" aria-hidden>
+          <div className="ic-flash__icon" aria-hidden={true}>
             <i className="icon-warning" />
           </div>
           {warning}
@@ -182,7 +182,7 @@ class EditorView extends React.Component {
             className="Button Button--icon-action close_link"
             onClick={this.props.clearGlobalWarning}
           >
-            <i className="icon-x" aria-hidden />
+            <i className="icon-x" aria-hidden={true} />
             <ScreenReaderContent>{I18n.t('Close')}</ScreenReaderContent>
           </button>
         </div>

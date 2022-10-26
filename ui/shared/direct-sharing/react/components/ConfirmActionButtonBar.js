@@ -29,7 +29,7 @@ ConfirmActionButtonBar.propTypes = {
   onPrimaryClick: func,
   onSecondaryClick: func,
 
-  padding: string
+  padding: string,
 }
 
 export default function ConfirmActionButtonBar({
@@ -38,7 +38,7 @@ export default function ConfirmActionButtonBar({
   secondaryLabel,
   onPrimaryClick,
   onSecondaryClick,
-  padding
+  padding,
 }) {
   const primaryButton = !primaryLabel ? null : (
     <Button

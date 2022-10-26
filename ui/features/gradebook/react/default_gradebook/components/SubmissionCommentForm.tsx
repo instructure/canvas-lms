@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {bool, func, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
@@ -26,19 +25,21 @@ import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
 const I18n = useI18nScope('gradebook')
 
-export default class SubmissionCommentForm extends React.Component {
-  static propTypes = {
-    cancelCommenting: func.isRequired,
-    comment: string,
-    processing: bool.isRequired,
-    setProcessing: func.isRequired,
-  }
+type Props = {
+  cancelCommenting: () => void
+  comment?: string
+  processing: boolean
+  setProcessing: (processing: boolean) => void
+}
 
-  static defaultProps = {
-    comment: '',
-  }
+type State = {
+  comment: string
+}
 
-  constructor(props) {
+export default class SubmissionCommentForm extends React.Component<Props, State> {
+  textarea: HTMLTextAreaElement | null = null
+
+  constructor(props: Props) {
     super(props)
     const methodsToBind = [
       'bindTextarea',
@@ -51,17 +52,17 @@ export default class SubmissionCommentForm extends React.Component {
     methodsToBind.forEach(method => {
       this[method] = this[method].bind(this)
     })
-    this.state = {comment: props.comment}
+    this.state = {comment: props.comment || ''}
   }
 
   focusTextarea() {
-    this.textarea.focus()
+    this.textarea?.focus()
   }
 
-  handleCancel(event, callback) {
+  handleCancel(event: Event, callback) {
     event.preventDefault()
 
-    this.setState({comment: this.props.comment}, () => {
+    this.setState({comment: this.props.comment || ''}, () => {
       this.props.cancelCommenting()
       if (callback) {
         callback()

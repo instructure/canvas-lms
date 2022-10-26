@@ -47,7 +47,7 @@ import I18n, {useTranslations} from '@canvas/i18n'
 import path from 'path'
 import timezone from 'timezone'
 import YAML from 'yaml'
-import { parse, format, hasMeridiem } from 'datetime'
+import {parse, format, hasMeridiem} from 'datetime'
 
 import defaultTZLocaleData from 'timezone/locales'
 import ar_SA from '../../../ext/custom_timezone_locales/ar_SA'
@@ -110,7 +110,7 @@ for (const locale of locales) {
       window.ENV.BIGEASY_LOCALE = locale.bigeasy
       window.ENV.MOMENT_LOCALE = locale.moment
       window.__PRELOADED_TIMEZONE_DATA__ = {
-        [locale.bigeasy]: tzLocaleData[locale.bigeasy]
+        [locale.bigeasy]: tzLocaleData[locale.bigeasy],
       }
 
       configureDateTimeMomentParser.up()
@@ -128,11 +128,7 @@ for (const locale of locales) {
         const formattedTime = format(date, 'time.formats.tiny')
         const formatted = `${formattedDate} ${formattedTime}`
 
-        expect(
-          parse(formatted).getTime()
-        ).toEqual(
-          date.getTime()
-        )
+        expect(parse(formatted).getTime()).toEqual(date.getTime())
       }
     })
 
@@ -146,7 +142,7 @@ for (const locale of locales) {
         'date.formats.full',
         'date.formats.full_with_weekday',
         'time.formats.tiny',
-        'time.formats.tiny_on_the_hour'
+        'time.formats.tiny_on_the_hour',
       ]
 
       for (const format of formats) {
@@ -158,7 +154,7 @@ for (const locale of locales) {
 
 function createDateSamples() {
   const dates = []
-  const currentYear = (new Date()).getFullYear()
+  const currentYear = new Date().getFullYear()
   const otherYear = currentYear + 4
 
   for (let i = 0; i < 12; ++i) {
@@ -172,23 +168,20 @@ function createDateSamples() {
 }
 
 function loadAvailableLocales() {
-  const manifest = (
-    YAML.parse(
-      fs.readFileSync(
-        path.resolve(__dirname, '../../../../config/locales/locales.yml'),
-        'utf8'
-      )
-    )
+  const manifest = YAML.parse(
+    fs.readFileSync(path.resolve(__dirname, '../../../../config/locales/locales.yml'), 'utf8')
   )
 
-  return Object.keys(manifest).map(key => {
-    const locale = manifest[key]
-    const base = key.split('-')[0]
+  return Object.keys(manifest)
+    .map(key => {
+      const locale = manifest[key]
+      const base = key.split('-')[0]
 
-    return {
-      key,
-      moment: locale.moment_locale || key.toLowerCase(),
-      bigeasy: locale.bigeasy_locale || manifest[base].bigeasy_locale
-    }
-  }).filter(x => x.key)
+      return {
+        key,
+        moment: locale.moment_locale || key.toLowerCase(),
+        bigeasy: locale.bigeasy_locale || manifest[base].bigeasy_locale,
+      }
+    })
+    .filter(x => x.key)
 }

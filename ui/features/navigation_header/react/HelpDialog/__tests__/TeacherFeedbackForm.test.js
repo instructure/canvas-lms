@@ -26,17 +26,17 @@ describe('TeacherFeedbackForm', () => {
   const courses = [
     {
       id: '1',
-      name: 'Engineering 101'
+      name: 'Engineering 101',
     },
     {
       id: '2',
-      name: 'Security 202'
-    }
+      name: 'Security 202',
+    },
   ]
 
   const props = {
     onCancel,
-    onSubmit
+    onSubmit,
   }
 
   beforeEach(() => {

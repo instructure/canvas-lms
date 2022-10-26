@@ -34,7 +34,7 @@ export const User = {
     id: string,
     avatarUrl: string,
     pronouns: string,
-    name: string
+    name: string,
   }),
 
   mock: ({
@@ -42,13 +42,13 @@ export const User = {
     name = 'Hank Mccoy',
     pronouns = 'They/Them',
     _id = '9',
-    id = 'DVSDF'
+    id = 'DVSDF',
   } = {}) => ({
     avatarUrl,
     name,
     pronouns,
     __typename: 'User',
     _id,
-    id
-  })
+    id,
+  }),
 }

@@ -34,7 +34,7 @@ test('registerRoutes registers route onEnter and onExit handlers for each route'
   const router = new Router(pageSpy)
   router.registerRoutes([
     {onEnter: () => {}, onExit: () => {}},
-    {onEnter: () => {}, onExit: () => {}}
+    {onEnter: () => {}, onExit: () => {}},
   ])
   equal(pageSpy.callCount, 2)
   equal(pageSpy.exit.callCount, 2)
@@ -74,7 +74,7 @@ test('handleEnter returns a function that calls enter handler and next', () => {
   const ctx = {params: {id: '5'}}
   const nextSpy = sinon.spy()
   const route = {
-    onEnter: sinon.spy()
+    onEnter: sinon.spy(),
   }
 
   const handler = Router.handleEnter(route)
@@ -89,7 +89,7 @@ test('handleExit returns a function that calls exit handler and next', () => {
   const ctx = {params: {id: '5'}}
   const nextSpy = sinon.spy()
   const route = {
-    onExit: sinon.spy()
+    onExit: sinon.spy(),
   }
 
   const handler = Router.handleExit(route)

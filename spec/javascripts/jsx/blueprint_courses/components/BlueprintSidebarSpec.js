@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintSidebar from 'ui/features/blueprint_course_master/react/components/BlueprintSidebar.js'
+import BlueprintSidebar from 'ui/features/blueprint_course_master/react/components/BlueprintSidebar'
 
 QUnit.module('BlueprintSidebar', hooks => {
   let clock
@@ -44,10 +44,7 @@ QUnit.module('BlueprintSidebar', hooks => {
 
   test('clicking open button sets isOpen to true', () => {
     wrapper = enzyme.mount(<BlueprintSidebar />)
-    wrapper
-      .find('.bcs__trigger button')
-      .at(0)
-      .simulate('click')
+    wrapper.find('.bcs__trigger button').at(0).simulate('click')
     clock.tick(500)
     strictEqual(wrapper.instance().state.isOpen, true)
   })

@@ -36,22 +36,22 @@ export default function GradeChangeLoggingContentView(options) {
   this.collection = new GradeChangeLoggingCollection()
   Backbone.View.apply(this, arguments)
   this.dateRangeSearch = new DateRangeSearchView({
-    name: 'gradeChangeLogging'
+    name: 'gradeChangeLogging',
   })
   this.graderSearch = new AutocompleteView({
     collection: this.options.users,
     fieldName: 'grader_id',
-    placeholder: 'Grader'
+    placeholder: 'Grader',
   })
   this.studentSearch = new AutocompleteView({
     collection: this.options.users,
     fieldName: 'student_id',
-    placeholder: 'Student'
+    placeholder: 'Student',
   })
   this.resultsView = new PaginatedCollectionView({
     template: gradeChangeLoggingResultsTemplate,
     itemView: GradeChangeLoggingItemView,
-    collection: this.collection
+    collection: this.collection,
   })
 }
 
@@ -65,7 +65,7 @@ GradeChangeLoggingContentView.child('studentSearch', '#gradeChangeStudentSearch'
 Object.assign(GradeChangeLoggingContentView.prototype, {
   els: {
     '#gradeChangeLoggingSearch': '$gradeChangeLogginSearch',
-    '#gradeChangeLoggingForm': '$form'
+    '#gradeChangeLoggingForm': '$form',
   },
 
   template,
@@ -92,7 +92,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
         id: null,
         type: null,
         start_time: '',
-        end_time: ''
+        end_time: '',
       }
 
       if (json.start_time) params.start_time = json.start_time
@@ -133,8 +133,8 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
         {
           type: 'required',
           message:
-            'A valid Grader, Student, Course Id, or Assignment Id is required to search events.'
-        }
+            'A valid Grader, Student, Course Id, or Assignment Id is required to search events.',
+        },
       ]
     }
     this.showErrors(errors)
@@ -165,8 +165,8 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
         errors.course_id = [
           {
             type: 'required',
-            message: 'A course with that ID could not be found for this account.'
-          }
+            message: 'A course with that ID could not be found for this account.',
+          },
         ]
       }
 
@@ -174,12 +174,12 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
         errors.assignment_id = [
           {
             type: 'required',
-            message: 'An assignment with that ID could not be found for this account.'
-          }
+            message: 'An assignment with that ID could not be found for this account.',
+          },
         ]
       }
 
       if (!$.isEmptyObject(errors)) return this.showErrors(errors)
     }
-  }
+  },
 })

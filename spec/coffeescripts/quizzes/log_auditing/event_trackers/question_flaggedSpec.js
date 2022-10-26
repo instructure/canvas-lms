@@ -24,13 +24,13 @@ QUnit.module('Quizzes::LogAuditing::EventTrackers::QuestionFlagged', {
   setup() {},
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 const DEFAULTS = Subject.prototype.options
-const createQuestion = function(id) {
+const createQuestion = function (id) {
   const $question = $('<div />', {
     class: 'question',
-    id: `question_${id}`
+    id: `question_${id}`,
   }).appendTo(document.getElementById('fixtures'))
   $('<a />', {class: 'flag_question'})
     .appendTo($question)
@@ -49,7 +49,7 @@ test('capturing: it works', () => {
   const tracker = new Subject({
     questionSelector: '.question',
     questionMarkedClass: 'marked',
-    buttonSelector: '.flag_question'
+    buttonSelector: '.flag_question',
   })
   tracker.install(capture)
   const $fakeQuestion = createQuestion('123')
@@ -57,14 +57,14 @@ test('capturing: it works', () => {
   ok(
     capture.calledWith({
       questionId: '123',
-      flagged: true
+      flagged: true,
     })
   )
   $fakeQuestion.find('a.flag_question').click()
   ok(
     capture.calledWith({
       questionId: '123',
-      flagged: false
+      flagged: false,
     })
   )
 })

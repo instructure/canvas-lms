@@ -30,7 +30,7 @@ const I18n = useI18nScope('direct_share_course_import_panel')
 CourseImportPanel.propTypes = {
   contentShare: contentShareShape.isRequired,
   onClose: func,
-  onImport: func
+  onImport: func,
 }
 
 export default function CourseImportPanel({contentShare, onClose, onImport}) {
@@ -51,9 +51,9 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
             insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentShare.content_type,
             insert_into_module_position: selectedPosition,
-            importer_skips: ['all_course_settings']
-          }
-        }
+            importer_skips: ['all_course_settings'],
+          },
+        },
       })
     )
     onImport(contentShare)

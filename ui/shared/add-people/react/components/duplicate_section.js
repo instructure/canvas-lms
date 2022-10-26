@@ -25,7 +25,7 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('add_people_duplicate_section')
 
@@ -44,11 +44,11 @@ class DuplicateSection extends React.Component {
     onSelectDuplicate: PropTypes.func.isRequired,
     onNewForDuplicate: PropTypes.func.isRequired,
     onSkipDuplicate: PropTypes.func.isRequired,
-    inviteUsersURL: PropTypes.string
+    inviteUsersURL: PropTypes.string,
   }
 
   static defaultProps = {
-    inviteUsersURL: undefined
+    inviteUsersURL: undefined,
   }
 
   // event handlers ----------------------------------------
@@ -82,7 +82,7 @@ class DuplicateSection extends React.Component {
     const newUserInfo = this.props.duplicates.newUserInfo
     const newUser = {
       name: (newUserInfo && newUserInfo.name) || '',
-      email: (newUserInfo && newUserInfo.email) || ''
+      email: (newUserInfo && newUserInfo.email) || '',
     }
     newUser[field] = event.target.value
     this.props.onNewForDuplicate(this.props.duplicates.address, newUser, false)
@@ -152,11 +152,11 @@ class DuplicateSection extends React.Component {
                 value={CREATE_NEW}
                 name={duplicateSet.address}
                 onChange={eatEvent}
-                checked
+                checked={true}
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Click to create a new user for %{address}', {
-                      address: duplicateSet.address
+                      address: duplicateSet.address,
                     })}
                   </ScreenReaderContent>
                 }
@@ -164,7 +164,7 @@ class DuplicateSection extends React.Component {
             </Table.RowHeader>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}
@@ -175,7 +175,7 @@ class DuplicateSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="email"
                 type="email"
                 placeholder={emailLabel}
@@ -200,19 +200,23 @@ class DuplicateSection extends React.Component {
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Click to create a new user for %{login}', {
-                      login: duplicateSet.address
+                      login: duplicateSet.address,
                     })}
                   </ScreenReaderContent>
                 }
               />
             </Table.RowHeader>
             <Table.Cell colSpan="5">
-              <CondensedButton
+              <Link
+                isWithinText={false}
+                as="button"
                 onClick={this.onSelectNewForDuplicate}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
-                {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
-              </CondensedButton>
+                <Text>
+                  {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
+                </Text>
+              </Link>
             </Table.Cell>
           </Table.Row>
         )
@@ -235,12 +239,14 @@ class DuplicateSection extends React.Component {
           />
         </Table.RowHeader>
         <Table.Cell colSpan="5">
-          <CondensedButton
+          <Link
+            isWithinText={false}
+            as="button"
             onClick={this.onSkipDuplicate}
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
-            {I18n.t('Don’t add this user for now.')}
-          </CondensedButton>
+            <Text>{I18n.t('Don’t add this user for now.')}</Text>
+          </Link>
         </Table.Cell>
       </Table.Row>
     )

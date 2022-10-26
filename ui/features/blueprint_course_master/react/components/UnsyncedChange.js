@@ -60,7 +60,7 @@ const UnsyncedChange = props => {
 }
 
 UnsyncedChange.propTypes = {
-  change: propTypes.unsyncedChange.isRequired
+  change: propTypes.unsyncedChange.isRequired,
 }
 
 UnsyncedChange.displayName = 'Row'

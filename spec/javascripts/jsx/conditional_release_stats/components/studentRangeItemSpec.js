@@ -27,9 +27,9 @@ const defaultProps = () => ({
   studentIndex: 0,
   student: {
     user: {name: 'Foo Bar'},
-    trend: 0
+    trend: 0,
   },
-  selectStudent: () => {}
+  selectStudent: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<StudentRangeItem {...props} />)

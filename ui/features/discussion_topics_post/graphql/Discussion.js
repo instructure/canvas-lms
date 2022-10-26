@@ -119,7 +119,7 @@ export const Discussion = {
     userCount: number,
     entryCounts: shape({
       unreadCount: number,
-      repliesCount: number
+      repliesCount: number,
     }),
     author: User.shape,
     anonymousAuthor: AnonymousUser.shape,
@@ -132,7 +132,7 @@ export const Discussion = {
     groupSet: GroupSet.shape,
     rootTopic: RootTopic.shape,
     rootEntriesTotalPages: number,
-    entriesTotalPages: number
+    entriesTotalPages: number,
   }),
 
   mock: ({
@@ -163,7 +163,7 @@ export const Discussion = {
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
-      __typename: 'DiscussionEntryCounts'
+      __typename: 'DiscussionEntryCounts',
     },
     author = User.mock({_id: '1', displayName: 'Charles Xavier'}),
     anonymousAuthor = null,
@@ -179,13 +179,13 @@ export const Discussion = {
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
       pageInfo: PageInfo.mock(),
-      __typename: 'DiscussionEntriesConnection'
+      __typename: 'DiscussionEntriesConnection',
     },
     discussionEntryDraftsConnection = {
       nodes: [DiscussionEntryDraft.mock()],
       pageInfo: PageInfo.mock(),
-      __typename: 'DiscussionEntryDraftsConnection'
-    }
+      __typename: 'DiscussionEntryDraftsConnection',
+    },
   } = {}) => ({
     id,
     _id,
@@ -225,13 +225,13 @@ export const Discussion = {
     entriesTotalPages,
     discussionEntriesConnection,
     discussionEntryDraftsConnection,
-    __typename: 'Discussion'
-  })
+    __typename: 'Discussion',
+  }),
 }
 
 export const DefaultMocks = {
   Discussion: () => ({
     _id: '1',
-    title: 'This is a Title'
-  })
+    title: 'This is a Title',
+  }),
 }

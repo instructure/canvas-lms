@@ -23,7 +23,7 @@ QUnit.module('unflatten')
 test('simple object', () => {
   const input = {
     foo: 1,
-    bar: 'baz'
+    bar: 'baz',
   }
   deepEqual(unflatten(input), input)
 })
@@ -39,7 +39,7 @@ test('nested params', () => {
     'c[f]': true,
     'c[g]': false,
     'c[h]': '',
-    i: 7
+    i: 7,
   }
   const expected = {
     a: [1, 2, 3],
@@ -49,16 +49,16 @@ test('nested params', () => {
       e: {ea: 'asdf'},
       f: true,
       g: false,
-      h: ''
+      h: '',
     },
-    i: 7
+    i: 7,
   }
   deepEqual(unflatten(input), expected)
 })
 
 test('prototype pollution protection', () => {
   const dangerous_input = {
-    '__proto__[admin]': true
+    '__proto__[admin]': true,
   }
 
   const safe_result = Object.create(null)

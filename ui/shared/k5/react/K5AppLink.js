@@ -113,7 +113,7 @@ export default function K5AppLink({app}) {
                   isWithinText={false}
                   theme={{
                     color: k5Theme.variables.colors.textDarkest,
-                    hoverColor: k5Theme.variables.colors.textDarkest
+                    hoverColor: k5Theme.variables.colors.textDarkest,
                   }}
                   target={app.windowTarget}
                 >
@@ -138,9 +138,9 @@ export const AppShape = {
   ).isRequired,
   title: PropTypes.string.isRequired,
   icon: PropTypes.string,
-  windowTarget: PropTypes.string
+  windowTarget: PropTypes.string,
 }
 
 K5AppLink.propTypes = {
-  app: PropTypes.shape(AppShape).isRequired
+  app: PropTypes.shape(AppShape).isRequired,
 }

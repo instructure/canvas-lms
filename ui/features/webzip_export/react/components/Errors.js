@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('webzip_exports')
 
-const Errors = props => {
+const Errors = _props => {
   return (
     <p className="webzipexport__errors">{I18n.t('An error occurred. Please try again later.')}</p>
   )

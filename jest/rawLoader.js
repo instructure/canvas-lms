@@ -17,9 +17,9 @@
  */
 
 module.exports = {
-  process: (data) => {
+  process: data => {
     return {
-      code: `module.exports = ${JSON.stringify(data)}`
+      code: `module.exports = ${JSON.stringify(data)}`,
     }
-  }
+  },
 }

@@ -44,18 +44,18 @@ export default class SyncHistory extends Component {
     associations: propTypes.courseList,
     loadAssociations: func.isRequired,
     isLoadingAssociations: bool.isRequired,
-    hasLoadedAssociations: bool.isRequired
+    hasLoadedAssociations: bool.isRequired,
   }
 
   static defaultProps = {
     migrations: [],
-    associations: []
+    associations: [],
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      associations: this.mapAssociations(props.associations)
+      associations: this.mapAssociations(props.associations),
     }
   }
 
@@ -70,7 +70,7 @@ export default class SyncHistory extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      associations: this.mapAssociations(nextProps.associations)
+      associations: this.mapAssociations(nextProps.associations),
     })
   }
 
@@ -117,7 +117,7 @@ const connectState = state => {
     ? {
         hasLoadedHistory: LoadStates.hasLoaded(selectedChange.status),
         isLoadingHistory: LoadStates.isLoading(selectedChange.status),
-        migrations: selectedChange.data ? [selectedChange.data] : []
+        migrations: selectedChange.data ? [selectedChange.data] : [],
       }
     : select(state, ['hasLoadedHistory', 'isLoadingHistory', 'migrations'])
 
@@ -125,7 +125,7 @@ const connectState = state => {
     select(state, [
       'hasLoadedAssociations',
       'isLoadingAssociations',
-      ['existingAssociations', 'associations']
+      ['existingAssociations', 'associations'],
     ]),
     historyState
   )

@@ -45,14 +45,14 @@ describe('Should load <AddressBookContainer> normally', () => {
 
   beforeEach(() => {
     window.ENV = {
-      current_user_id: 1
+      current_user_id: 1,
     }
   })
 
   const setup = props => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AddressBookContainer open {...props} />
+        <AddressBookContainer open={true} {...props} />
       </ApolloProvider>
     )
   }
@@ -120,7 +120,7 @@ describe('Should load <AddressBookContainer> normally', () => {
 
     it('should filter menu by initial context', async () => {
       setup({
-        activeCourseFilter: {contextID: 'course_123', contextName: 'course name'}
+        activeCourseFilter: {contextID: 'course_123', contextName: 'course name'},
       })
       const items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
@@ -232,7 +232,7 @@ describe('Should load <AddressBookContainer> normally', () => {
     it('Should call onSelectedIdsChange when id changes', async () => {
       const onSelectedIdsChangeMock = jest.fn()
       setup({
-        onSelectedIdsChange: onSelectedIdsChangeMock
+        onSelectedIdsChange: onSelectedIdsChangeMock,
       })
       let items = await screen.findAllByTestId('address-book-item')
       fireEvent.mouseDown(items[1])

@@ -17,8 +17,8 @@
  */
 
 import {unmountComponentAtNode} from 'react-dom'
-import PostPolicies from 'ui/features/speed_grader/react/PostPolicies/index.js'
-import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
+import PostPolicies from 'ui/features/speed_grader/react/PostPolicies/index'
+import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
 
 QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
   let $hideTrayMountPoint
@@ -32,7 +32,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       anonymousGrading: false,
       gradesPublished: true,
       id: '2301',
-      name: 'Math 1.1'
+      name: 'Math 1.1',
     }
   }
 
@@ -45,14 +45,17 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     document.body.appendChild($hideTrayMountPoint)
     document.body.appendChild($postTrayMountPoint)
 
-    const sections = [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}]
+    const sections = [
+      {id: '2001', name: 'Hogwarts'},
+      {id: '2002', name: 'Freshmen'},
+    ]
     afterUpdateSubmission = sinon.stub()
     updateSubmission = sinon.stub()
     postPolicies = new PostPolicies({
       afterUpdateSubmission,
       assignment: expectedAssignment(),
       sections,
-      updateSubmission
+      updateSubmission,
     })
   })
 
@@ -113,14 +116,17 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('passes the sections to "show"', () => {
       postPolicies.showHideAssignmentGradesTray({})
       const {sections} = hideGradesShowArgs()
-      deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
+      deepEqual(sections, [
+        {id: '2001', name: 'Hogwarts'},
+        {id: '2002', name: 'Freshmen'},
+      ])
     })
 
     test('passes updateSubmission to "show"', () => {
       postPolicies.showHideAssignmentGradesTray({
         submissionsMap: {
-          '1': {posted_at: new Date().toISOString()}
-        }
+          1: {posted_at: new Date().toISOString()},
+        },
       })
       const {onHidden} = hideGradesShowArgs()
       onHidden({userIds: ['1']})
@@ -129,7 +135,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
     test('passes afterUpdateSubmission to "show"', () => {
       postPolicies.showHideAssignmentGradesTray({
-        submissionsMap: {'1': {posted_at: new Date().toISOString()}}
+        submissionsMap: {1: {posted_at: new Date().toISOString()}},
       })
       const {onHidden} = hideGradesShowArgs()
       onHidden({userIds: ['1']})
@@ -138,7 +144,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
     test('onHidden updates posted_at when assignment anonymousGrading is false', () => {
       const submissionsMap = {
-        '1': {posted_at: new Date().toISOString()}
+        1: {posted_at: new Date().toISOString()},
       }
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
       const {onHidden} = hideGradesShowArgs()
@@ -149,7 +155,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('onHidden does not reload the page when assignment anonymousGrading is false', () => {
       const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
       const submissionsMap = {
-        '1': {posted_at: new Date().toISOString()}
+        1: {posted_at: new Date().toISOString()},
       }
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
       const {onHidden} = hideGradesShowArgs()
@@ -161,7 +167,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('onHidden reloads the page when assignment anonymousGrading is true', () => {
       const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
       const submissionsMap = {
-        '1': {posted_at: new Date().toISOString()}
+        1: {posted_at: new Date().toISOString()},
       }
       postPolicies._assignment.anonymousGrading = true
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
@@ -173,7 +179,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
     test('onHidden ignores user IDs that do not match known students', () => {
       const submissionsMap = {
-        '1': {posted_at: new Date().toISOString()}
+        1: {posted_at: new Date().toISOString()},
       }
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
       const {onHidden} = hideGradesShowArgs()
@@ -205,7 +211,10 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('passes sections to "show"', () => {
       postPolicies.showPostAssignmentGradesTray({})
       const {sections} = postGradesShowArgs()
-      deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
+      deepEqual(sections, [
+        {id: '2001', name: 'Hogwarts'},
+        {id: '2002', name: 'Freshmen'},
+      ])
     })
 
     test('passes submissions to "show"', () => {
@@ -216,7 +225,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
         posted_at: new Date().toISOString(),
         score: 1.0,
         user_id: '441',
-        workflow_state: 'graded'
+        workflow_state: 'graded',
       }
       postPolicies.showPostAssignmentGradesTray({submissions: [submission]})
       const {submissions} = postGradesShowArgs()
@@ -225,20 +234,20 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
           hasPostableComments: true,
           postedAt: submission.posted_at,
           score: 1.0,
-          workflowState: submission.workflow_state
-        }
+          workflowState: submission.workflow_state,
+        },
       ])
     })
 
     test('passes updateSubmission to "show"', () => {
-      postPolicies.showPostAssignmentGradesTray({submissionsMap: {'1': {posted_at: null}}})
+      postPolicies.showPostAssignmentGradesTray({submissionsMap: {1: {posted_at: null}}})
       const {onPosted} = postGradesShowArgs()
       onPosted({userIds: ['1']})
       strictEqual(updateSubmission.callCount, 1)
     })
 
     test('passes afterUpdateSubmission to "show"', () => {
-      postPolicies.showPostAssignmentGradesTray({submissionsMap: {'1': {posted_at: null}}})
+      postPolicies.showPostAssignmentGradesTray({submissionsMap: {1: {posted_at: null}}})
       const {onPosted} = postGradesShowArgs()
       onPosted({userIds: ['1']})
       strictEqual(afterUpdateSubmission.callCount, 1)
@@ -246,7 +255,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
     test('onPosted updates posted_at when assignment anonymousGrading is false', () => {
       const submissionsMap = {
-        '1': {posted_at: null}
+        1: {posted_at: null},
       }
       postPolicies.showPostAssignmentGradesTray({submissionsMap})
       const postedAt = new Date().toISOString()
@@ -258,7 +267,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('onPosted does not reload the page when assignment anonymousGrading is false', () => {
       const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
       const submissionsMap = {
-        '1': {posted_at: null}
+        1: {posted_at: null},
       }
       postPolicies.showPostAssignmentGradesTray({submissionsMap})
       const postedAt = new Date().toISOString()
@@ -271,7 +280,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
     test('onPosted reloads the page when assignment anonymousGrading is true', () => {
       const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
       const submissionsMap = {
-        '1': {posted_at: null}
+        1: {posted_at: null},
       }
       postPolicies._assignment.anonymousGrading = true
       postPolicies.showPostAssignmentGradesTray({submissionsMap})
@@ -283,7 +292,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
 
     test('onPosted ignores user IDs that do not match known students', () => {
       const submissionsMap = {
-        '1': {posted_at: null}
+        1: {posted_at: null},
       }
       postPolicies.showPostAssignmentGradesTray({submissionsMap})
       const postedAt = new Date().toISOString()

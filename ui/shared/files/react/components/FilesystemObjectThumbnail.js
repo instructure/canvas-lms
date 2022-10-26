@@ -22,7 +22,7 @@ import Folder from '../../backbone/models/Folder'
 import mimeClass from '@canvas/mime/mimeClass'
 import FilesystemObjectThumbnail from './LegacyFilesystemObjectThumbnail'
 
-FilesystemObjectThumbnail.render = function() {
+FilesystemObjectThumbnail.render = function () {
   const additionalClassName = this.props.className ? this.props.className : ''
 
   if (this.state.thumbnail_url) {

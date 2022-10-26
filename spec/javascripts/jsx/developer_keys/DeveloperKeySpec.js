@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import {Link} from '@instructure/ui-link'
 import {Img} from '@instructure/ui-img'
 
-import DeveloperKey from 'ui/features/developer_keys_v2/react/DeveloperKey.js'
+import DeveloperKey from 'ui/features/developer_keys_v2/react/DeveloperKey'
 
 class TestTable extends React.Component {
   render() {
@@ -80,7 +80,7 @@ const defaultProps = {
     user_name: 'billy bob',
     vendor_code: 'b3w9w9bf',
     workflow_state: 'active',
-    visible: false
+    visible: false,
   },
   store: {dispatch: () => {}},
   actions: {
@@ -91,9 +91,9 @@ const defaultProps = {
     deactivateDeveloperKey: () => {},
     deleteDeveloperKey: () => {},
     editDeveloperKey: () => {},
-    developerKeysModalOpen: () => {}
+    developerKeysModalOpen: () => {},
   },
-  ctx: {params: {contextId: 'context'}}
+  ctx: {params: {contextId: 'context'}},
 }
 
 function updateDefaultProps(updates = {}) {
@@ -111,7 +111,7 @@ function updateDefaultProps(updates = {}) {
 QUnit.module('DeveloperKey', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 test('includes developerName', () => {
   testWrapperOk(defaultProps, 'Atomic fireball')

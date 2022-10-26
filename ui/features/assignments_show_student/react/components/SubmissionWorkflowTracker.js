@@ -44,7 +44,7 @@ const possibleStates = {
           dateTime={submission.submittedAt}
           format={I18n.t('#date.formats.full')}
           prefix={I18n.t('SUBMITTED on')}
-          showTime
+          showTime={true}
         />
       )
     },
@@ -69,7 +69,7 @@ const possibleStates = {
           dateTime={submittedAt}
           format={I18n.t('#date.formats.full')}
           prefix={I18n.t('Submitted on')}
-          showTime
+          showTime={true}
         />
       )
     },
@@ -107,7 +107,7 @@ export default function SubmissionWorkflowTracker({submission}) {
       data-testid="submission-workflow-tracker"
     >
       <Flex>
-        <Flex.Item shouldShrink>
+        <Flex.Item shouldShrink={true}>
           <ProgressCircle
             meterColor="success"
             screenReaderLabel={I18n.t('Submission Progress')}
@@ -116,7 +116,7 @@ export default function SubmissionWorkflowTracker({submission}) {
             valueNow={state.value}
           />
         </Flex.Item>
-        <Flex.Item shouldGrow>
+        <Flex.Item shouldGrow={true}>
           <Text
             as="div"
             color="success"

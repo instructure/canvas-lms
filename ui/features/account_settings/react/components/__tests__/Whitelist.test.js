@@ -26,13 +26,13 @@ const defaultProps = {
   accountId: '1',
   contextId: '1',
   maxDomains: 50,
-  liveRegion: []
+  liveRegion: [],
 }
 
 describe('ConnectedWhitelist', () => {
   beforeEach(() => {
     window.ENV = {
-      ACCOUNT: {id: '1234'}
+      ACCOUNT: {id: '1234'},
     }
   })
 
@@ -78,12 +78,12 @@ describe('ConnectedWhitelist', () => {
               {
                 id: '1',
                 name: 'Cool Tool 1',
-                account_id: '1'
-              }
-            ]
-          }
-        }
-      }
+                account_id: '1',
+              },
+            ],
+          },
+        },
+      },
     })
 
     const toolDomain = getByText('eduappcenter.com')
@@ -132,9 +132,9 @@ describe('ConnectedWhitelist', () => {
     const {getByText, queryByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
-        }
-      }
+          account: ['instructure.com', 'canvaslms.com'],
+        },
+      },
     })
 
     const TEXT = 'Remove instructure.com as an allowed domain'
@@ -148,9 +148,9 @@ describe('ConnectedWhitelist', () => {
     const {getByText, getByTestId} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
-        }
-      }
+          account: ['instructure.com', 'canvaslms.com'],
+        },
+      },
     })
 
     const button = getByText('Remove canvaslms.com as an allowed domain')
@@ -164,9 +164,9 @@ describe('ConnectedWhitelist', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
-        }
-      }
+          account: ['instructure.com', 'canvaslms.com'],
+        },
+      },
     })
 
     const deleteButton = getByText('Remove instructure.com as an allowed domain')
@@ -179,9 +179,9 @@ describe('ConnectedWhitelist', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: ['instructure.com']
-        }
-      }
+          account: ['instructure.com'],
+        },
+      },
     })
 
     const deleteButton = getByText('Remove instructure.com as an allowed domain')
@@ -199,9 +199,9 @@ describe('ConnectedWhitelist', () => {
     const {getByLabelText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: exampleDomains
-        }
-      }
+          account: exampleDomains,
+        },
+      },
     })
 
     const addDomainButton = getByLabelText('Add Domain')
@@ -216,9 +216,9 @@ describe('ConnectedWhitelist', () => {
     const {getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
       initialState: {
         whitelistedDomains: {
-          account: exampleDomains
-        }
-      }
+          account: exampleDomains,
+        },
+      },
     })
 
     const domainMessage = getByText(/You have reached the domain limit/)
@@ -231,14 +231,17 @@ describe('ConnectedWhitelist', () => {
       for (let i = 0; i < 50; i++) {
         exampleDomains.push(`domain-${i}.com`)
       }
-      const {queryByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} inherited />, {
-        initialState: {
-          whitelistedDomains: {
-            account: [],
-            inherited: exampleDomains
-          }
+      const {queryByText} = renderWithRedux(
+        <ConnectedWhitelist {...defaultProps} inherited={true} />,
+        {
+          initialState: {
+            whitelistedDomains: {
+              account: [],
+              inherited: exampleDomains,
+            },
+          },
         }
-      })
+      )
 
       const domainMessage = queryByText(/You have reached the domain limit/)
       expect(domainMessage).toBeNull()
@@ -246,14 +249,14 @@ describe('ConnectedWhitelist', () => {
 
     it('shows an information message indicating that switching to custom will allow changes', () => {
       const {getByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist {...defaultProps} inherited={true} isSubAccount={true} />,
         {
           initialState: {
             whitelistedDomains: {
               account: [],
-              inherited: ['instructure.com', 'canvaslms.com']
-            }
-          }
+              inherited: ['instructure.com', 'canvaslms.com'],
+            },
+          },
         }
       )
 
@@ -265,14 +268,14 @@ describe('ConnectedWhitelist', () => {
 
     it('shows the allowed domain list from the inherited account', () => {
       const {getByText, queryByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited />,
+        <ConnectedWhitelist {...defaultProps} inherited={true} />,
         {
           initialState: {
             whitelistedDomains: {
               account: ['canvaslms.com'],
-              inherited: ['instructure.com']
-            }
-          }
+              inherited: ['instructure.com'],
+            },
+          },
         }
       )
 
@@ -285,7 +288,7 @@ describe('ConnectedWhitelist', () => {
 
     it('does not show the count for the allowed domain list', () => {
       const {queryByText, getByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited />
+        <ConnectedWhitelist {...defaultProps} inherited={true} />
       )
 
       const wrongString = queryByText('Domains (0/50)')
@@ -297,14 +300,14 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow adding items to the list', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist {...defaultProps} inherited={true} isSubAccount={true} />,
         {
           initialState: {
             whitelistedDomains: {
               inherited: ['instructure.com'],
-              account: []
-            }
-          }
+              account: [],
+            },
+          },
         }
       )
 
@@ -314,14 +317,14 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow removing items from the list', () => {
       const {getByRole} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist {...defaultProps} inherited={true} isSubAccount={true} />,
         {
           initialState: {
             whitelistedDomains: {
               inherited: ['instructure.com'],
-              account: []
-            }
-          }
+              account: [],
+            },
+          },
         }
       )
 

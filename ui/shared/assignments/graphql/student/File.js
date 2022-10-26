@@ -35,8 +35,8 @@ export const SubmissionDraftFile = {
     _id: string,
     displayName: string,
     mimeClass: string,
-    thumbnailUrl: string
-  })
+    thumbnailUrl: string,
+  }),
 }
 
 export const SubmissionFile = {
@@ -61,8 +61,8 @@ export const SubmissionFile = {
     submissionPreviewUrl: string,
     size: string,
     thumbnailUrl: string,
-    url: string
-  })
+    url: string,
+  }),
 }
 
 export const SubmissionCommentFile = {
@@ -81,12 +81,12 @@ export const SubmissionCommentFile = {
     displayName: string,
     id: string,
     mimeClass: string,
-    url: string
-  })
+    url: string,
+  }),
 }
 
 export const DefaultMocks = {
   File: () => ({
-    mimeClass: 'image'
-  })
+    mimeClass: 'image',
+  }),
 }

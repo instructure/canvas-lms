@@ -18,10 +18,10 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData, errorBox */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, fragmentChange, showIf */
-import '@canvas/util/templateData'/* getTemplateData */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/util/templateData' /* getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
 import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
@@ -55,7 +55,7 @@ CollaborationsPage.Util = {
         $collaboration.remove()
       })
     }
-  }
+  },
 }
 
 CollaborationsPage.Events = {
@@ -66,26 +66,26 @@ CollaborationsPage.Events = {
     $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
     $('#collaboration_selection_row').css('display: block;')
     $('#collaboration_selection_label').css([
-      'white-space: nowrap; text-align: left; display: block;'
+      'white-space: nowrap; text-align: left; display: block;',
     ])
     addDeepLinkingListener()
     $(window).on('externalContentReady', onExternalContentReady.bind(this))
     $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', function (e) {
+      .on('focus', function (_e) {
         $(this).removeClass('screenreader-only')
         $('#lti_new_collaboration_iframe').addClass('info_alert_outline')
       })
-      .on('blur', function (e) {
+      .on('blur', function (_e) {
         $(this).addClass('screenreader-only')
         $('#lti_new_collaboration_iframe').removeClass('info_alert_outline')
       })
   },
 
-  onClose(e) {
+  onClose(_e) {
     $('#delete_collaboration_dialog').dialog('close')
   },
 
-  onDelete(e) {
+  onDelete(_e) {
     const deleteDocument = $(this).hasClass('delete_document_button'),
       data = {delete_doc: deleteDocument},
       $collaboration = $('#delete_collaboration_dialog').data('collaboration'),
@@ -98,7 +98,7 @@ CollaborationsPage.Events = {
       url,
       'DELETE',
       data,
-      data => {
+      _data => {
         CollaborationsPage.Util.removeCollaboration($collaboration)
         $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'))
       },
@@ -109,12 +109,12 @@ CollaborationsPage.Events = {
   onFragmentChange(e, hash) {
     if (hash !== '#add_collaboration') return
 
-    if ($('#collaborations .collaboration').length == 0) {
+    if ($('#collaborations .collaboration').length === 0) {
       $('.add_collaboration_link').click()
     }
   },
 
-  onTypeChange(e) {
+  onTypeChange(_e) {
     let name = $(this).val(),
       type = name,
       launch_url = $(this).find('option:selected').data('launch-url'),
@@ -148,7 +148,7 @@ CollaborationsPage.Events = {
       $('.collaboration_authorization').hide()
       $('#collaborate_authorize_' + type).showIf($description.hasClass('unauthorized'))
     }
-  }
+  },
 }
 
 $(document).ready(CollaborationsPage.Events.init.bind(CollaborationsPage.Events))

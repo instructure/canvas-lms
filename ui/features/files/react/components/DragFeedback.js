@@ -29,7 +29,7 @@ export default function DragFeedback(props) {
       className="DragFeedback"
       style={{
         WebkitTransform: `translate3d(${props.pageX + 6}px, ${props.pageY + 6}px, 0)`,
-        transform: `translate3d(${props.pageX + 6}px, ${props.pageY + 6}px, 0)`
+        transform: `translate3d(${props.pageX + 6}px, ${props.pageY + 6}px, 0)`,
       }}
     >
       {props.itemsToDrag.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => (
@@ -38,7 +38,7 @@ export default function DragFeedback(props) {
           key={model.id}
           style={{
             left: 10 + index * 5 - index,
-            top: 10 + index * 5 - index
+            top: 10 + index * 5 - index,
           }}
         />
       ))}
@@ -50,5 +50,5 @@ export default function DragFeedback(props) {
 DragFeedback.propTypes = {
   itemsToDrag: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
   pageX: PropTypes.number.isRequired,
-  pageY: PropTypes.number.isRequired
+  pageY: PropTypes.number.isRequired,
 }

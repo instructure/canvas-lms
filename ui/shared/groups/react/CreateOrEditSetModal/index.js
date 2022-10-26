@@ -48,7 +48,7 @@ const INITIAL_STATE = Object.freeze({
   enableAutoLeader: false,
   autoLeaderType: 'FIRST',
   apiState: API_STATE.inactive,
-  errors: {}
+  errors: {},
 })
 
 function reducer(prevState, action) {
@@ -80,7 +80,7 @@ function reducer(prevState, action) {
         createGroupMemberCount,
         groupLimit,
         splitGroups,
-        bySection
+        bySection,
       }
     }
     case 'selfsignup-change': {
@@ -92,7 +92,7 @@ function reducer(prevState, action) {
       return {
         ...prevState,
         enableAutoLeader,
-        autoLeaderType: enableAutoLeader ? autoLeaderType : 'FIRST'
+        autoLeaderType: enableAutoLeader ? autoLeaderType : 'FIRST',
       }
     }
     default:
@@ -117,7 +117,7 @@ export const CreateOrEditSetModal = ({
   context,
   contextId,
   allowSelfSignup,
-  mockApi // used for Storybook only
+  mockApi, // used for Storybook only
 }) => {
   const [st, dispatch] = useReducer(reducer, INITIAL_STATE)
   const topElement = useRef(null)
@@ -135,7 +135,7 @@ export const CreateOrEditSetModal = ({
       group_limit: st.groupLimit,
       enable_self_signup: st.selfSignup ? '1' : '0',
       enable_auto_leader: st.enableAutoLeader ? '1' : '0',
-      create_group_count: st.createGroupCount
+      create_group_count: st.createGroupCount,
     }
     parms[st.selfSignup ? 'restrict_self_signup' : 'group_by_section'] = st.bySection ? '1' : '0'
     if (st.splitGroups !== SPLIT.off) parms.assign_async = true
@@ -204,7 +204,7 @@ export const CreateOrEditSetModal = ({
           )
             structureError(
               I18n.t('Must be at least one group per section; there are %{count} sections', {
-                count: studentSectionCount
+                count: studentSectionCount,
               })
             )
           break
@@ -246,7 +246,7 @@ export const CreateOrEditSetModal = ({
         const {json: assignJson} = await apiCall({
           path: assignPath,
           body: assignBody,
-          method: 'POST'
+          method: 'POST',
         })
         if (ASYNC_ACTIVE_STATES.includes(assignJson.workflow_state)) {
           creationJSON.current = assignJson
@@ -260,7 +260,7 @@ export const CreateOrEditSetModal = ({
       showFlashError(
         I18n.t('An error occurred while %{performingSomeTask}: %{errorMessage}', {
           performingSomeTask: step,
-          errorMessage: e.message
+          errorMessage: e.message,
         })
       )()
       dispatch({ev: 'api-change', to: 'inactive'})
@@ -353,12 +353,12 @@ CreateOrEditSetModal.propTypes = {
   context: string,
   contextId: string,
   allowSelfSignup: bool.isRequired,
-  mockApi: func
+  mockApi: func,
 }
 
 CreateOrEditSetModal.defaultProps = {
   closed: false,
-  onDismiss: Function.prototype
+  onDismiss: Function.prototype,
 }
 
 // Brings up the create groupset modal and returns a Promise that resolves when it is dismissed.
@@ -371,7 +371,11 @@ export function renderCreateDialog(div, mockApi) {
   return new Promise(resolve => {
     function onDismiss(result) {
       ReactDOM.render(
-        <CreateOrEditSetModal allowSelfSignup={ENV.allow_self_signup} mockApi={mockApi} closed />,
+        <CreateOrEditSetModal
+          allowSelfSignup={ENV.allow_self_signup}
+          mockApi={mockApi}
+          closed={true}
+        />,
         div
       )
       resolve(result)

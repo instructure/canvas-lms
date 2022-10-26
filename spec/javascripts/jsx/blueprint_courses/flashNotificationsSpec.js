@@ -29,20 +29,23 @@ const createMockStore = state => ({
   dispatch: () => {},
   mockStateChange() {
     this.subs.forEach(sub => sub())
-  }
+  },
 })
 
 QUnit.module('Blueprint Course FlashNotifications', {
   teardown() {
     FlashAlert.destroyContainer()
-  }
+  },
 })
 
 test('subscribes to a store and calls showFlashAlert for each notification in state', assert => {
   const done = assert.async()
   const flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
   const mockStore = createMockStore({
-    notifications: [{id: '1', message: 'hello'}, {id: '2', message: 'world'}]
+    notifications: [
+      {id: '1', message: 'hello'},
+      {id: '2', message: 'world'},
+    ],
   })
 
   FlashNotifications.subscribe(mockStore)
@@ -60,7 +63,10 @@ test('subscribes to a store and calls showFlashAlert for each notification in st
 test('subscribes to a store and dispatches clearNotifications for each notification in state', assert => {
   const done = assert.async()
   const mockStore = createMockStore({
-    notifications: [{id: '1', message: 'hello'}, {id: '2', message: 'world'}]
+    notifications: [
+      {id: '1', message: 'hello'},
+      {id: '2', message: 'world'},
+    ],
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
 

@@ -21,7 +21,7 @@ import ACTION_NAMES from '../actions/developerKeysActions'
 const initialState = {
   activateDeveloperKeyPending: false,
   activateDeveloperKeySuccessful: false,
-  activateDeveloperKeyError: null
+  activateDeveloperKeyError: null,
 }
 
 const developerKeysHandlers = {
@@ -29,18 +29,18 @@ const developerKeysHandlers = {
     ...state,
     activateDeveloperKeyPending: true,
     activateDeveloperKeySuccessful: false,
-    activateDeveloperKeyError: null
+    activateDeveloperKeyError: null,
   }),
   [ACTION_NAMES.ACTIVATE_DEVELOPER_KEY_SUCCESSFUL]: (state, _action) => ({
     ...state,
     activateDeveloperKeyPending: false,
-    activateDeveloperKeySuccessful: true
+    activateDeveloperKeySuccessful: true,
   }),
   [ACTION_NAMES.ACTIVATE_DEVELOPER_KEY_FAILED]: (state, action) => ({
     ...state,
     activateDeveloperKeyPending: false,
-    activateDeveloperKeyError: action.payload
-  })
+    activateDeveloperKeyError: action.payload,
+  }),
 }
 
 export default (state = initialState, action) => {

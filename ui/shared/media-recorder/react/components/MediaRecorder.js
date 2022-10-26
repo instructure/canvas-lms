@@ -41,16 +41,16 @@ const translations = {
   SAVE: I18n.t('Save'),
   SR_FILE_INPUT: I18n.t('File name'),
   START: I18n.t('Start Recording'),
-  START_OVER: I18n.t('Start Over')
+  START_OVER: I18n.t('Start Over'),
 }
 
 export default class CanvasMediaRecorder extends React.Component {
   static propTypes = {
-    onSaveFile: func
+    onSaveFile: func,
   }
 
   static defaultProps = {
-    onSaveFile: () => {}
+    onSaveFile: () => {},
   }
 
   saveFile = file => {

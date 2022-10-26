@@ -23,6 +23,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import {gradeEntry, gradeInfo, messages} from './PropTypes'
 
 export default class TextGradeInput extends PureComponent {
+  textInput?: HTMLInputElement
+
   static propTypes = {
     disabled: bool,
     gradeEntry: gradeEntry.isRequired,
@@ -43,12 +45,11 @@ export default class TextGradeInput extends PureComponent {
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
 
-    const {gradeEntry, gradeInfo, pendingGradeInfo} = props
-    const effectiveGradeInfo = pendingGradeInfo || gradeInfo
+    const effectiveGradeInfo = props.pendingGradeInfo || props.gradeInfo
 
     this.state = {
       gradeInfo: effectiveGradeInfo,
-      inputValue: gradeEntry.formatGradeInfoForInput(effectiveGradeInfo),
+      inputValue: props.gradeEntry.formatGradeInfoForInput(effectiveGradeInfo),
     }
   }
 
@@ -68,8 +69,8 @@ export default class TextGradeInput extends PureComponent {
   }
 
   focus() {
-    this.textInput.focus()
-    this.textInput.setSelectionRange(0, this.textInput.value.length)
+    this.textInput?.focus()
+    this.textInput?.setSelectionRange(0, this.textInput.value.length)
   }
 
   handleKeyDown(/* event */) {

@@ -23,7 +23,7 @@ const Question = props => (
   <div
     className={classSet({
       'question-statistics': true,
-      'content-box': true
+      'content-box': true,
     })}
   >
     {props.children}

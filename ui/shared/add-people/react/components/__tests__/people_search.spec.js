@@ -24,12 +24,12 @@ describe('PeopleSearch', () => {
   const props = {
     roles: [
       {id: '0', a: 'teacher'},
-      {id: '1', b: 'student'}
+      {id: '1', b: 'student'},
     ],
     sections: [
       {id: '0', a: 'secA'},
-      {id: '1', b: 'secB'}
-    ]
+      {id: '1', b: 'secB'},
+    ],
   }
 
   test('displays Email Address as default label', () => {

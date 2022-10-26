@@ -33,7 +33,7 @@ describe('SpeedGraderStatusMenu', () => {
       locale: 'en',
       secondsLate: 0,
       selection: 'none',
-      updateSubmission: jest.fn()
+      updateSubmission: jest.fn(),
     }
   })
 
@@ -81,7 +81,7 @@ describe('SpeedGraderStatusMenu', () => {
     selectMenuItem('Late')
     expect(props.updateSubmission).toHaveBeenLastCalledWith({
       latePolicyStatus: 'late',
-      secondsLateOverride: props.secondsLate
+      secondsLateOverride: props.secondsLate,
     })
   })
 

@@ -25,8 +25,8 @@ test('uploadFile posts form data instead of json if necessary', () => {
     setTimeout(() =>
       resolve({
         data: {
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -37,13 +37,13 @@ test('uploadFile posts form data instead of json if necessary', () => {
   postStub.onCall(1).resolves({data: {}})
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const url = `/api/v1/courses/1/files`
   const data = {
     name: 'fake',
-    'attachment[context_code]': 'course_1'
+    'attachment[context_code]': 'course_1',
   }
   const file = new File(['fake'], 'fake.txt')
 
@@ -60,8 +60,8 @@ test('uploadFile requests no_redirect in preflight even if not specified', () =>
     setTimeout(() =>
       resolve({
         data: {
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -72,7 +72,7 @@ test('uploadFile requests no_redirect in preflight even if not specified', () =>
   postStub.onCall(1).resolves({data: {}})
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const url = `/api/v1/courses/1/files`
@@ -91,8 +91,8 @@ test('uploadFile threads through in direct to S3 case', () => {
       resolve({
         data: {
           upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -105,7 +105,7 @@ test('uploadFile threads through in direct to S3 case', () => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const url = `/api/v1/courses/1/files`
@@ -124,8 +124,8 @@ test('uploadFile threads through in inst-fs case', () => {
       resolve({
         data: {
           upload_params: {fakeKey: 'fakeValue'},
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -134,7 +134,7 @@ test('uploadFile threads through in inst-fs case', () => {
     setTimeout(() =>
       resolve({
         status: 201,
-        data: {location: successUrl}
+        data: {location: successUrl},
       })
     )
   })
@@ -147,7 +147,7 @@ test('uploadFile threads through in inst-fs case', () => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const url = `/api/v1/courses/1/files`
@@ -165,8 +165,8 @@ test('uploadFile threads through in local-storage case', () => {
       resolve({
         data: {
           upload_params: {fakeKey: 'fakeValue'},
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -174,7 +174,7 @@ test('uploadFile threads through in local-storage case', () => {
   const postResponse = new Promise(resolve => {
     setTimeout(() =>
       resolve({
-        data: {id: 1}
+        data: {id: 1},
       })
     )
   })
@@ -187,7 +187,7 @@ test('uploadFile threads through in local-storage case', () => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const url = `/api/v1/courses/1/files`
@@ -202,7 +202,7 @@ test('uploadFile threads through in local-storage case', () => {
 test('completeUpload upacks embedded "attachments" wrapper if any', () => {
   const upload_url = 'http://uploadUrl'
   const preflightResponse = {
-    attachments: [{upload_url}]
+    attachments: [{upload_url}],
   }
 
   const postStub = sinon.stub()
@@ -228,7 +228,7 @@ test('completeUpload wires up progress callback if any', () => {
   const file = new File(['fake'], 'fake.txt')
   const options = {
     ajaxLib: fakeAjaxLib,
-    onProgress: sinon.spy()
+    onProgress: sinon.spy(),
   }
 
   return completeUpload(preflightResponse, file, options).then(() => {
@@ -237,7 +237,7 @@ test('completeUpload wires up progress callback if any', () => {
         sinon.match.any,
         sinon.match.any,
         sinon.match({
-          onUploadProgress: options.onProgress
+          onUploadProgress: options.onProgress,
         })
       ),
       'posted correct config'
@@ -252,7 +252,7 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', ()
     setTimeout(() =>
       resolve({
         status: 201,
-        data: {location: successUrl}
+        data: {location: successUrl},
       })
     )
   })
@@ -264,14 +264,14 @@ test('completeUpload skips GET after inst-fs upload if options.ignoreResult', ()
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {upload_url: 'http://uploadUrl'}
   const file = new File(['fake'], 'fake.txt')
   const options = {
     ajaxLib: fakeAjaxLib,
-    ignoreResult: true
+    ignoreResult: true,
   }
 
   return completeUpload(preflightResponse, file, options).then(() => {
@@ -286,7 +286,7 @@ test('completeUpload appends avatar include in GET after upload if options.inclu
     setTimeout(() =>
       resolve({
         status: 201,
-        data: {location: successUrl}
+        data: {location: successUrl},
       })
     )
   })
@@ -298,14 +298,14 @@ test('completeUpload appends avatar include in GET after upload if options.inclu
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {upload_url: 'http://uploadUrl'}
   const file = new File(['fake'], 'fake.txt')
   const options = {
     ajaxLib: fakeAjaxLib,
-    includeAvatar: true
+    includeAvatar: true,
   }
 
   return completeUpload(preflightResponse, file, options).then(() => {
@@ -323,12 +323,12 @@ test('completeUpload to S3 posts withCredentials false', () => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {
     upload_url: 'http://uploadUrl',
-    success_url: successUrl
+    success_url: successUrl,
   }
   const file = new File(['fake'], 'fake.txt')
   const options = {ajaxLib: fakeAjaxLib}
@@ -339,7 +339,7 @@ test('completeUpload to S3 posts withCredentials false', () => {
         sinon.match.any,
         sinon.match.any,
         sinon.match({
-          withCredentials: false
+          withCredentials: false,
         })
       ),
       'withCredentials is false'
@@ -355,7 +355,7 @@ test('completeUpload to non-S3 posts withCredentials true', () => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {upload_url: 'http://uploadUrl'}
@@ -368,7 +368,7 @@ test('completeUpload to non-S3 posts withCredentials true', () => {
         sinon.match.any,
         sinon.match.any,
         sinon.match({
-          withCredentials: true
+          withCredentials: true,
         })
       ),
       'withCredentials is true'
@@ -381,12 +381,12 @@ test('completeUpload does not add a null file to the upload POST', () => {
   postStub.resolves({data: {}})
 
   const fakeAjaxLib = {
-    post: postStub
+    post: postStub,
   }
 
   const preflightResponse = {
     upload_url: 'http://uploadUrl',
-    progress: {workflow_state: 'completed', results: {}}
+    progress: {workflow_state: 'completed', results: {}},
   }
   const file = null
   const options = {ajaxLib: fakeAjaxLib}
@@ -412,7 +412,7 @@ test('completeUpload immediately waits on progress if given a progress and no up
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {progress: {workflow_state: 'queued', url: 'http://progressUrl'}}
@@ -434,12 +434,12 @@ test('completeUpload waits on progress after upload POST if given both a progres
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const preflightResponse = {
     progress: {workflow_state: 'queued', url: 'http://progressUrl'},
-    upload_url: 'http://uploadUrl'
+    upload_url: 'http://uploadUrl',
   }
   const file = null
   const options = {ajaxLib: fakeAjaxLib}
@@ -476,8 +476,8 @@ test('uploadFile differentiates network failures after upload', () => {
   fakeAjaxLib.post.onCall(0).resolves({
     data: {
       upload_url: 'http://uploadUrl',
-      success_url: 'http://successUrl'
-    }
+      success_url: 'http://successUrl',
+    },
   }) // preflight
   fakeAjaxLib.post.onCall(1).resolves({data: {}}) // upload
   fakeAjaxLib.get.rejects({message: 'Network Error'}) // success url attempt

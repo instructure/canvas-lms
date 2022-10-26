@@ -37,7 +37,7 @@ const duplicates = {
         account_id: 1,
         account_name: 'School of Rock',
         email: 'addr1@foo.com',
-        login_id: 'addr1'
+        login_id: 'addr1',
       },
       {
         address: 'addr1',
@@ -46,9 +46,9 @@ const duplicates = {
         account_id: 1,
         account_name: 'School of Rock',
         email: 'addr1@foo.com',
-        login_id: 'addr1'
-      }
-    ]
+        login_id: 'addr1',
+      },
+    ],
   },
   addr2: {
     address: 'addr2',
@@ -64,7 +64,7 @@ const duplicates = {
         account_id: 1,
         account_name: 'School of Rock',
         email: 'addr2@foo.com',
-        login_id: 'addr2'
+        login_id: 'addr2',
       },
       {
         address: 'addr2',
@@ -73,10 +73,10 @@ const duplicates = {
         account_id: 1,
         account_name: 'School of Rock',
         email: 'addr2@foo.com',
-        login_id: 'addr1'
-      }
-    ]
-  }
+        login_id: 'addr1',
+      },
+    ],
+  },
 }
 const missing = {
   addr3: {address: 'addr3', type: 'unique_id', createNew: false, newUserInfo: undefined},
@@ -84,10 +84,10 @@ const missing = {
     address: 'addr4',
     type: 'unique_id',
     createNew: true,
-    newUserInfo: {name: 'the name2', email: 'email2'}
-  }
+    newUserInfo: {name: 'the name2', email: 'email2'},
+  },
 }
-const noop = function() {}
+const noop = function () {}
 const inviteUsersURL = '/courses/#/invite_users'
 
 test('renders the component', () => {

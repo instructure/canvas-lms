@@ -29,38 +29,38 @@ describe('fetchOutcomes', () => {
     groupsResponse: [
       {
         id: 1,
-        title: 'Group 1'
+        title: 'Group 1',
       },
       {
         id: 2,
-        title: 'Group 2'
-      }
+        title: 'Group 2',
+      },
     ],
     linksResponse: [
       {
         outcome_group: {id: 1},
         outcome: {
           id: 1,
-          title: 'Outcome 1'
-        }
+          title: 'Outcome 1',
+        },
       },
       {
         outcome_group: {id: 2},
         outcome: {
           id: 2,
-          title: 'Outcome 2'
-        }
-      }
+          title: 'Outcome 2',
+        },
+      },
     ],
     rollupsResponse: {
       rollups: [
         {
           scores: [
             {score: 3.0, links: {outcome: 1}},
-            {score: 1.0, links: {outcome: 2}}
-          ]
-        }
-      ]
+            {score: 1.0, links: {outcome: 2}},
+          ],
+        },
+      ],
     },
     resultsResponses: {
       1: {
@@ -70,33 +70,33 @@ describe('fetchOutcomes', () => {
           {
             id: 3,
             score: 2.0,
-            links: {alignment: 'live_assessments/assessment_1', learning_outcome: '1'}
-          }
+            links: {alignment: 'live_assessments/assessment_1', learning_outcome: '1'},
+          },
         ],
         linked: {
           assignments: [
             {id: 'assignment_1', name: 'Assignment 1'},
             {id: 'assignment_2', name: 'Assignment 2'},
-            {id: 'live_assessments/assessment_1', name: 'Test'}
-          ]
-        }
+            {id: 'live_assessments/assessment_1', name: 'Test'},
+          ],
+        },
       },
       2: {
         outcome_results: [
-          {id: 3, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '2'}}
+          {id: 3, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '2'}},
         ],
         linked: {
-          assignments: [{id: 'assignment_1', name: 'Assignment 1'}]
-        }
+          assignments: [{id: 'assignment_1', name: 'Assignment 1'}],
+        },
       },
       12: {
         outcome_results: [
-          {id: 12, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '12'}}
+          {id: 12, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '12'}},
         ],
         linked: {
-          assignments: [{id: 'assignment_1', name: 'Assignment 1'}]
-        }
-      }
+          assignments: [{id: 'assignment_1', name: 'Assignment 1'}],
+        },
+      },
     },
     alignmentsResponse: {
       1: [
@@ -105,15 +105,15 @@ describe('fetchOutcomes', () => {
           learning_outcome_id: 1,
           submission_types: 'online_text_entry',
           title: 'Assignment 1',
-          url: 'http://example.com'
+          url: 'http://example.com',
         },
         {
           assignment_id: 2,
           learning_outcome_id: 1,
           submission_types: 'online_text_entry',
           title: 'Assignment 2',
-          url: 'http://example2.com'
-        }
+          url: 'http://example2.com',
+        },
       ],
       2: [
         {
@@ -121,10 +121,10 @@ describe('fetchOutcomes', () => {
           learning_outcome_id: 2,
           submission_types: 'online_text_entry',
           title: 'Assignment 1',
-          url: 'http://example.com'
-        }
-      ]
-    }
+          url: 'http://example.com',
+        },
+      ],
+    },
   })
 
   const expectedOutcomes = [
@@ -137,17 +137,17 @@ describe('fetchOutcomes', () => {
       results: [
         {
           assignment: {id: 'assignment_1', name: 'Assignment 1'},
-          score: 3
+          score: 3,
         },
         {
           assignment: {id: 'assignment_2', name: 'Assignment 2'},
-          score: 2
+          score: 2,
         },
         {
           assignment: {id: 'live_assessments/assessment_1', name: 'Test'},
-          score: 2
-        }
-      ]
+          score: 2,
+        },
+      ],
     },
     {
       groupId: 2,
@@ -158,10 +158,10 @@ describe('fetchOutcomes', () => {
       results: [
         {
           assignment: {id: 'assignment_1', name: 'Assignment 1'},
-          score: 3
-        }
-      ]
-    }
+          score: 3,
+        },
+      ],
+    },
   ]
 
   const mockAll = ({
@@ -169,7 +169,7 @@ describe('fetchOutcomes', () => {
     linksResponse,
     rollupsResponse,
     resultsResponses,
-    alignmentsResponse
+    alignmentsResponse,
   }) => {
     fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
     fetchMock.mock(
@@ -236,8 +236,8 @@ describe('fetchOutcomes', () => {
         outcome_group: {id: i},
         outcome: {
           id: i,
-          title: `Outcome ${i}`
-        }
+          title: `Outcome ${i}`,
+        },
       })
     }
     mockAll(responses)
@@ -258,25 +258,23 @@ describe('fetchOutcomes', () => {
       fetchMock.mock('/first', {
         body: first,
         headers: {
-          link:
-            '</current>; rel="current",</second>; rel="next",</first>; rel="first",</last>; rel="last"'
-        }
+          link: '</current>; rel="current",</second>; rel="next",</first>; rel="first",</last>; rel="last"',
+        },
       })
       fetchMock.mock('/second', {
         body: second,
         headers: !third
           ? null
           : {
-              link:
-                '</current>; rel="current",</third>; rel="next",</first>; rel="first",</last>; rel="last"'
-            }
+              link: '</current>; rel="current",</third>; rel="next",</first>; rel="first",</last>; rel="last"',
+            },
       })
       if (third) {
         fetchMock.mock('/third', {
           body: third,
           headers: {
-            link: '</current>; rel="current",</first>; rel="first",</last>; rel="last"'
-          }
+            link: '</current>; rel="current",</first>; rel="first",</last>; rel="last"',
+          },
         })
       }
     }
@@ -309,7 +307,7 @@ describe('fetchOutcomes', () => {
       )
       return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual({
-          a: {b: {c: {d: ['e', 'f', 'e2', 'f2'], g: ['h', 'i', 'h2', 'i2'], j: 'k2'}}}
+          a: {b: {c: {d: ['e', 'f', 'e2', 'f2'], g: ['h', 'i', 'h2', 'i2'], j: 'k2'}}},
         })
       })
     })

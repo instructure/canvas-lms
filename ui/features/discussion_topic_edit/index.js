@@ -115,8 +115,8 @@ ready(() => {
         availabilityDatesReadonly: !!lockedItems.availability_dates,
         inPacedCourse: model.get('in_paced_course'),
         isModuleItem: ENV.IS_MODULE_ITEM,
-        courseId: assignment.courseID()
-      })
+        courseId: assignment.courseID(),
+      }),
     },
     lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
     announcementsLocked,
@@ -126,7 +126,7 @@ ready(() => {
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
     context_is_not_group: ENV.context_is_not_group,
-    is_student: ENV.current_user_is_student
+    is_student: ENV.current_user_is_student,
   })
   view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 

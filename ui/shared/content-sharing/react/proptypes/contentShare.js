@@ -27,7 +27,7 @@ export const CONTENT_SHARE_TYPES = [
   'page',
   'quiz',
   'module',
-  'module_item'
+  'module_item',
 ]
 
 const contentShareShape = shape({
@@ -38,7 +38,7 @@ const contentShareShape = shape({
   updated_at: string.isRequired,
   read_state: string.isRequired,
   sender: displayUser.isRequired,
-  content_export: contentExport
+  content_export: contentExport,
 })
 
 export default contentShareShape

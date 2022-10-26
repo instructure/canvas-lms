@@ -20,20 +20,20 @@ import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import CourseListItem from 'ui/features/epub_exports/react/CourseListItem.js'
+import CourseListItem from 'ui/features/epub_exports/react/CourseListItem'
 
 QUnit.module('CourseListItemSpec', {
   setup() {
     this.props = {
       course: {
         name: 'Maths 101',
-        id: 1
-      }
+        id: 1,
+      },
     }
-  }
+  },
 })
 
-test('getDisplayState', function() {
+test('getDisplayState', function () {
   let CourseListItemElement = <CourseListItem {...this.props} />
   let component = TestUtils.renderIntoDocument(CourseListItemElement)
   ok(isNull(component.getDisplayState()), 'display state should be null without epub_export')
@@ -41,8 +41,8 @@ test('getDisplayState', function() {
   this.props.course = {
     epub_export: {
       permissions: {},
-      workflow_state: 'generating'
-    }
+      workflow_state: 'generating',
+    },
   }
   CourseListItemElement = <CourseListItem {...this.props} />
   component = TestUtils.renderIntoDocument(CourseListItemElement)
@@ -51,7 +51,7 @@ test('getDisplayState', function() {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
-test('render', function() {
+test('render', function () {
   const CourseListItemElement = <CourseListItem {...this.props} />
   const component = TestUtils.renderIntoDocument(CourseListItemElement)
   ok(!isNull(ReactDOM.findDOMNode(component)), 'should render with course')

@@ -28,7 +28,7 @@ import {
   NAVIGATION_MESSAGE,
   INPUT_CHANGE_MESSAGE,
   KEY_NAMES,
-  KEY_CODES
+  KEY_CODES,
 } from '../../constants'
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
 import {useQuery} from '@apollo/react-hooks'
@@ -64,8 +64,8 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   const {data} = useQuery(MENTIONABLE_USERS_QUERY, {
     variables: {
       discussionTopicId: ENV.discussion_topic_id,
-      searchTerm: debouncedInputText
-    }
+      searchTerm: debouncedInputText,
+    },
   })
 
   const mentionData = data?.legacyNode?.mentionableUsersConnection?.nodes || []
@@ -198,7 +198,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
     if (focusedUser) {
       onFocusedUserChange({
         ...focusedUser,
-        ariaActiveDescendantId: ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id)
+        ariaActiveDescendantId: ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id),
       })
     } else {
       onFocusedUserChange(null)
@@ -267,10 +267,10 @@ MentionUIManager.propTypes = {
   rceRef: PropTypes.oneOfType([PropTypes.node, PropTypes.object]),
   onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
-  editor: PropTypes.object
+  editor: PropTypes.object,
 }
 
 MentionUIManager.defaultProps = {
   onFocusedUserChange: () => {},
-  onExited: () => {}
+  onExited: () => {},
 }

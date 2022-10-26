@@ -34,7 +34,7 @@ export function getPermissionsWithLabels(allPermissions, rolePermissions) {
         label,
         permissionName,
         displayed: false,
-        permission_name: 'whatever'
+        permission_name: 'whatever',
       }
       acc.push(permWithLabel)
     }
@@ -150,7 +150,7 @@ export function groupGranularPermissionsInRole(role) {
           explicit: [],
           locked: [],
           readonly: [],
-          granular_permissions: []
+          granular_permissions: [],
         }
       }
       // We need to get all of the permissions in a group, to determine
@@ -176,7 +176,7 @@ export function groupGranularPermissionsInRole(role) {
       enabled: groupPermissionEnabled(group.enabled),
       explicit: group.explicit.some(bool => bool),
       locked: group.locked.every(bool => bool),
-      readonly: group.readonly.some(bool => bool)
+      readonly: group.readonly.some(bool => bool),
     }
   })
 }

@@ -29,18 +29,18 @@ export default {
     onOpen: {action: 'onOpen'},
     onRecordingSave: {action: 'onRecordingSave'},
     onVideoUpload: {action: 'onVideoUpload'},
-    open: {control: 'boolean'}
-  }
+    open: {control: 'boolean'},
+  },
 }
 
 const Template = args => <MediaUploadModal {...args} />
 
 export const OpenExample = Template.bind({})
 OpenExample.args = {
-  open: true
+  open: true,
 }
 
 export const ClosedExample = Template.bind({})
 ClosedExample.args = {
-  open: false
+  open: false,
 }

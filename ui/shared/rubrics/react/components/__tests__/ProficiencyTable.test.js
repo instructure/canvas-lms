@@ -30,7 +30,7 @@ import {waitFor} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
-  accountId: '1'
+  accountId: '1',
 }
 
 // Because we had to override the displayName of the <ProficiencyRating> component in
@@ -227,16 +227,16 @@ describe('custom proficiency', () => {
             description: 'Great',
             points: 10,
             color: '0000ff',
-            mastery: true
+            mastery: true,
           },
           {
             description: 'Poor',
             points: 0,
             color: 'ff0000',
-            mastery: false
-          }
-        ]
-      }
+            mastery: false,
+          },
+        ],
+      },
     })
     const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
@@ -259,10 +259,10 @@ describe('custom proficiency', () => {
             description: 'Uno',
             points: 1,
             color: '0000ff',
-            mastery: true
-          }
-        ]
-      }
+            mastery: true,
+          },
+        ],
+      },
     })
     const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)

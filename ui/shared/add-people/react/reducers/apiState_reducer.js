@@ -20,6 +20,7 @@ import {handleActions} from 'redux-actions'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {actionTypes} from '../actions'
 import {defaultState} from '../store'
+
 const I18n = useI18nScope('add_peopleapiState_reducer')
 // helpers -----------------------
 //
@@ -54,7 +55,7 @@ function endApi(state) {
 function handleApiError(state, action) {
   return {
     pendingCount: state.pendingCount - 1,
-    error: payloadToErrorMessage(action.payload)
+    error: payloadToErrorMessage(action.payload),
   }
 }
 
@@ -74,10 +75,10 @@ export default handleActions(
       if (erroredUsers && erroredUsers.length) {
         newstate.error = erroredUsers.map(
           errUsr =>
-            `${errUsr.email}: ${(errUsr.errors &&
-              errUsr.errors.length &&
-              errUsr.errors[0].message) ||
-              I18n.t('Failed creating user')}`
+            `${errUsr.email}: ${
+              (errUsr.errors && errUsr.errors.length && errUsr.errors[0].message) ||
+              I18n.t('Failed creating user')
+            }`
         )
       }
       return newstate
@@ -91,7 +92,7 @@ export default handleActions(
 
     [actionTypes.RESET]: function resetReducer(/* state, action */) {
       return {pendingCount: 0, error: undefined}
-    }
+    },
   },
   defaultState.apiState
 )

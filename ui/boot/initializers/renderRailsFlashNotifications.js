@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initFlashContainer, renderServerNotifications } from '@canvas/rails-flash-notifications'
+import {initFlashContainer, renderServerNotifications} from '@canvas/rails-flash-notifications'
 import ready from '@instructure/ready'
 
 export function up() {
@@ -24,17 +24,15 @@ export function up() {
     ready(() => {
       try {
         initFlashContainer()
-      }
-      catch (e) {
+      } catch (e) {
         return reject(e)
       }
 
-      setTimeout(function() {
+      setTimeout(function () {
         try {
           renderServerNotifications()
           resolve()
-        }
-        catch (e) {
+        } catch (e) {
           reject(e)
         }
       }, 100)

@@ -28,10 +28,10 @@ export default {
     hasUpdateableRubrics: false,
     modifiedFields: {
       masteryPoints: true,
-      scoringMethod: true
+      scoringMethod: true,
     },
-    onConfirm: () => {}
-  }
+    onConfirm: () => {},
+  },
 }
 
 // Similar to showConfirmOutcomeEdit but without ReactDOM.render so we don't have to

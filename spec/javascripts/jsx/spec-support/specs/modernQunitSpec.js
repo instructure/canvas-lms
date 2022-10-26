@@ -42,10 +42,7 @@ QUnit.module('Functional Module', suiteHooks => {
   })
 
   test('auto-verifies mock expectations', () => {
-    sandbox
-      .mock(stubbable)
-      .expects('getOtherValue')
-      .once()
+    sandbox.mock(stubbable).expects('getOtherValue').once()
     // When the method call below is removed, this and only this spec will fail.
     stubbable.getOtherValue()
   })

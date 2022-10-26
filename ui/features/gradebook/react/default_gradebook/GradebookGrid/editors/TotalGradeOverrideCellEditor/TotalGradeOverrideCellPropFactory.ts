@@ -17,9 +17,12 @@
  */
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
+import type Gradebook from '../../../Gradebook'
 
 export default class TotalGradeOverrideCellPropFactory {
-  constructor(gradebook) {
+  _gradebook: Gradebook
+
+  constructor(gradebook: Gradebook) {
     this._gradebook = gradebook
   }
 
@@ -27,8 +30,8 @@ export default class TotalGradeOverrideCellPropFactory {
     const {finalGradeOverrides} = this._gradebook
     const userId = editorOptions.item.id
 
-    const grade = finalGradeOverrides.getGradeForUser(userId)
-    const pendingGradeInfo = finalGradeOverrides.getPendingGradeInfoForUser(userId)
+    const grade = finalGradeOverrides?.getGradeForUser(userId)
+    const pendingGradeInfo = finalGradeOverrides?.getPendingGradeInfoForUser(userId)
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
@@ -40,7 +43,7 @@ export default class TotalGradeOverrideCellPropFactory {
       gradeIsUpdating: pendingGradeInfo != null && pendingGradeInfo.valid,
 
       onGradeUpdate: gradeInfo => {
-        finalGradeOverrides.updateGrade(userId, gradeInfo)
+        finalGradeOverrides?.updateGrade(userId, gradeInfo)
       },
 
       pendingGradeInfo,

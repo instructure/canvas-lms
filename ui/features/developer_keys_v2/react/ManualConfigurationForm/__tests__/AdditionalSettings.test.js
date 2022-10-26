@@ -32,12 +32,12 @@ const props = (overrides = {}, additionalSettingsOverrides = {}, settingsOverrid
         text: 'Text',
         selection_height: 10,
         selection_width: 10,
-        ...settingsOverrides
+        ...settingsOverrides,
       },
-      ...additionalSettingsOverrides
+      ...additionalSettingsOverrides,
     },
     custom_fields: {},
-    ...overrides
+    ...overrides,
   }
 }
 

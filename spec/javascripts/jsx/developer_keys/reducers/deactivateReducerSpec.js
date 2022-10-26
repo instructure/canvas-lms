@@ -33,7 +33,7 @@ test('responds to deactivateDeveloperKeyStart', () => {
   const state = {
     deactivateDeveloperKeyPending: false,
     deactivateDeveloperKeySuccessful: true,
-    deactivateDeveloperKeyError: {}
+    deactivateDeveloperKeyError: {},
   }
 
   const action = actions.deactivateDeveloperKeyStart()
@@ -46,7 +46,7 @@ test('responds to deactivateDeveloperKeyStart', () => {
 test('responds to deactivateDeveloperKeySuccessful', () => {
   const state = {
     deactivateDeveloperKeyPending: true,
-    deactivateDeveloperKeySuccessful: false
+    deactivateDeveloperKeySuccessful: false,
   }
   const payload = {}
   const action = actions.deactivateDeveloperKeySuccessful(payload)
@@ -58,7 +58,7 @@ test('responds to deactivateDeveloperKeySuccessful', () => {
 test('responds to deactivateDeveloperKeyFailed', () => {
   const state = {
     deactivateDeveloperKeyPending: true,
-    deactivateDeveloperKeyError: null
+    deactivateDeveloperKeyError: null,
   }
   const error = {}
 

@@ -32,7 +32,7 @@ export default moment.defineLocale('ht-ht', {
     L: 'DD/MM/YYYY',
     LL: 'D MMMM YYYY',
     LLL: 'D MMMM YYYY HH:mm',
-    LLLL: 'dddd, D MMMM YYYY HH:mm'
+    LLLL: 'dddd, D MMMM YYYY HH:mm',
   },
   calendar: {
     sameDay: '[Today at] LT',
@@ -40,7 +40,7 @@ export default moment.defineLocale('ht-ht', {
     nextWeek: 'dddd [at] LT',
     lastDay: '[Yesterday at] LT',
     lastWeek: '[Last] dddd [at] LT',
-    sameElse: 'L'
+    sameElse: 'L',
   },
   relativeTime: {
     future: 'in %s',
@@ -55,11 +55,11 @@ export default moment.defineLocale('ht-ht', {
     M: 'a month',
     MM: '%d months',
     y: 'a year',
-    yy: '%d years'
+    yy: '%d years',
   },
   ordinalParse: /\d{1,2}º/,
   ordinal: '%dº',
   week: {
-    dow: 1 // Monday is the first day of the week.
-  }
+    dow: 1, // Monday is the first day of the week.
+  },
 })

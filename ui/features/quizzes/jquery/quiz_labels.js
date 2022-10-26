@@ -28,7 +28,7 @@ export default function addAriaDescription($answer, id) {
   const $label = $('<label/>', {
     id: labelId,
     class: 'screenreader-only',
-    text
+    text,
   })
 
   $answer.find('input:text').attr('aria-describedby', labelId)

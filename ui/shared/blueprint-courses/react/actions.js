@@ -63,12 +63,12 @@ const types = [
   'NOTIFY_ERROR',
   'CLEAR_NOTIFICATION',
   'INCLUDE_COURSE_SETTINGS',
-  'ENABLE_PUBLISH_COURSES'
+  'ENABLE_PUBLISH_COURSES',
 ]
 const actions = createActions(...types)
 
 actions.constants = {
-  MIGRATION_POLL_TIME: 3000
+  MIGRATION_POLL_TIME: 3000,
 }
 
 const {notifyInfo, notifyError} = actions
@@ -111,35 +111,37 @@ actions.loadHistory = () => (dispatch, getState) => {
       dispatch(
         actions.loadHistoryFail({
           err,
-          message: I18n.t('An error ocurred while loading sync history')
+          message: I18n.t('An error ocurred while loading sync history'),
         })
       )
     )
 }
 
-actions.checkMigration = (startInterval = false) => (dispatch, getState) => {
-  const state = getState()
-  // no need to check if another check is in progress
-  if (state.isCheckingMigration) return
-  dispatch(actions.checkMigrationStart())
-  api
-    .checkMigration(getState())
-    .then(res => {
-      dispatch(actions.checkMigrationSuccess(res.data))
-      if (startInterval && MigrationStates.isLoadingState(res.data)) {
-        actions.startMigrationStatusPoll()(dispatch, getState)
-      }
-    })
+actions.checkMigration =
+  (startInterval = false) =>
+  (dispatch, getState) => {
+    const state = getState()
+    // no need to check if another check is in progress
+    if (state.isCheckingMigration) return
+    dispatch(actions.checkMigrationStart())
+    api
+      .checkMigration(getState())
+      .then(res => {
+        dispatch(actions.checkMigrationSuccess(res.data))
+        if (startInterval && MigrationStates.isLoadingState(res.data)) {
+          actions.startMigrationStatusPoll()(dispatch, getState)
+        }
+      })
 
-    .catch(err =>
-      dispatch(
-        actions.checkMigrationFail({
-          err,
-          message: I18n.t('An error occurred while checking the migration status')
-        })
+      .catch(err =>
+        dispatch(
+          actions.checkMigrationFail({
+            err,
+            message: I18n.t('An error occurred while checking the migration status'),
+          })
+        )
       )
-    )
-}
+  }
 
 // we use a closure to scope migInterval to those two actions only
 ;(() => {
@@ -185,25 +187,27 @@ actions.checkMigration = (startInterval = false) => (dispatch, getState) => {
   }
 })()
 
-actions.beginMigration = (startInterval = true) => (dispatch, getState) => {
-  dispatch(actions.beginMigrationStart())
-  api
-    .beginMigration(getState())
-    .then(res => {
-      dispatch(actions.beginMigrationSuccess(res.data))
-      if (startInterval && MigrationStates.isLoadingState(res.data.workflow_state)) {
-        actions.startMigrationStatusPoll()(dispatch, getState)
-      }
-    })
-    .catch(err =>
-      dispatch(
-        actions.beginMigrationFail({
-          err,
-          message: I18n.t('An error occurred while starting migration')
-        })
+actions.beginMigration =
+  (startInterval = true) =>
+  (dispatch, getState) => {
+    dispatch(actions.beginMigrationStart())
+    api
+      .beginMigration(getState())
+      .then(res => {
+        dispatch(actions.beginMigrationSuccess(res.data))
+        if (startInterval && MigrationStates.isLoadingState(res.data.workflow_state)) {
+          actions.startMigrationStatusPoll()(dispatch, getState)
+        }
+      })
+      .catch(err =>
+        dispatch(
+          actions.beginMigrationFail({
+            err,
+            message: I18n.t('An error occurred while starting migration'),
+          })
+        )
       )
-    )
-}
+  }
 
 actions.addAssociations = associations => (dispatch, getState) => {
   const state = getState()
@@ -282,8 +286,8 @@ actions.loadAssociations = () => (dispatch, getState) => {
         const parsedCourse = Object.assign(course, {
           term: {
             id: '0',
-            name: course.term_name
-          }
+            name: course.term_name,
+          },
         })
         delete parsedCourse.term_name
         return parsedCourse
@@ -294,7 +298,7 @@ actions.loadAssociations = () => (dispatch, getState) => {
       dispatch(
         actions.loadAssociationsFail({
           err,
-          message: I18n.t('An error occurred while loading associations')
+          message: I18n.t('An error occurred while loading associations'),
         })
       )
     )
@@ -309,7 +313,7 @@ actions.saveAssociations = () => (dispatch, getState) => {
       dispatch(
         actions.saveAssociationsSuccess({
           added: state.addedAssociations,
-          removed: state.removedAssociations
+          removed: state.removedAssociations,
         })
       )
       dispatch(actions.notifyInfo({message: I18n.t('Associations saved successfully')}))
@@ -321,7 +325,7 @@ actions.saveAssociations = () => (dispatch, getState) => {
       dispatch(
         actions.saveAssociationsFail({
           err,
-          message: I18n.t('An error occurred while saving associations')
+          message: I18n.t('An error occurred while saving associations'),
         })
       )
     )
@@ -336,7 +340,7 @@ actions.loadUnsyncedChanges = () => (dispatch, getState) => {
       dispatch(
         actions.loadUnsyncedChangesFail({
           err,
-          message: I18n.t('An error ocurred while loading unsynced changes')
+          message: I18n.t('An error ocurred while loading unsynced changes'),
         })
       )
     )

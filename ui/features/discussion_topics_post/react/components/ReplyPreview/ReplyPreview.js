@@ -45,11 +45,11 @@ export const ReplyPreview = ({...props}) => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'x-small'
+          textSize: 'x-small',
         },
         desktop: {
-          textSize: 'small'
-        }
+          textSize: 'small',
+        },
       }}
       render={responsiveProps => {
         const showTruncatedText = () => {
@@ -135,5 +135,5 @@ ReplyPreview.propTypes = {
   /**
    * True if the quoted message has been deleted
    */
-  deleted: PropTypes.bool
+  deleted: PropTypes.bool,
 }

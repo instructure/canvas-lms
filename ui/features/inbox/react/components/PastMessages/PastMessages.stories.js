@@ -24,7 +24,7 @@ export default {
   component: PastMessages,
 }
 
-const Template = (args) => <PastMessages {...args} />
+const Template = args => <PastMessages {...args} />
 
 export const Component = Template.bind({})
 Component.args = {
@@ -33,8 +33,7 @@ Component.args = {
       author: {
         name: 'Rick Sanchez',
       },
-      body:
-        "I don't do magic Morty, I do science. One takes brains, the other takes dark eye liner",
+      body: "I don't do magic Morty, I do science. One takes brains, the other takes dark eye liner",
       createdAt: 'November 5, 2020 at 11:03am',
     },
     {

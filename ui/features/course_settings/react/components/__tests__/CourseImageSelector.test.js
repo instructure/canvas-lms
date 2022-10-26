@@ -33,13 +33,13 @@ describe('CourseImageSelector', () => {
   const defaultProps = {
     courseId: '1',
     name: 'course[image]',
-    setting: 'image'
+    setting: 'image',
   }
 
   const fakeStore = () => ({
     subscribe: jest.fn(),
     dispatch: jest.fn(),
-    getState: () => initialState
+    getState: () => initialState,
   })
 
   it('renders', () => {
@@ -69,7 +69,7 @@ describe('CourseImageSelector', () => {
   it('adds the wide classname if the wide prop is true', () => {
     const store = fakeStore()
     store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
-    const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} wide />)
+    const wrapper = shallow(<CourseImageSelector {...defaultProps} store={store} wide={true} />)
 
     expect(wrapper.find('.CourseImageSelectorWrapper').hasClass('wide')).toBe(true)
   })

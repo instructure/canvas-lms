@@ -61,7 +61,7 @@ const NEW_PACE_ALERT_MESSAGES = {
   ),
   Enrollment: I18n.t(
     'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
-  )
+  ),
 }
 
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
           <FlexItem margin="0 0 small">
             <PacePicker />
           </FlexItem>
-          <FlexItem margin="0 0 small" shouldGrow>
+          <FlexItem margin="0 0 small" shouldGrow={true}>
             <Settings
               isBlueprintLocked={props.isBlueprintLocked && props.context_type === 'Course'}
               margin="0 0 0 small"
@@ -117,7 +117,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     context_type: getSelectedContextType(state),
     context_id: getSelectedContextId(state),
-    newPace: isNewPace(state)
+    newPace: isNewPace(state),
   }
 }
 export default connect(mapStateToProps)(Header)

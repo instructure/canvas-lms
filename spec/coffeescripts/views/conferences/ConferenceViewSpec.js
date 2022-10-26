@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import Conference from 'ui/features/conferences/backbone/models/Conference'
 import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView.coffee'
 import $ from 'jquery'
 import I18nStubber from 'helpers/I18nStubber'
@@ -26,7 +26,7 @@ import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
 
 const fixtures = $('#fixtures')
-const conferenceView = function(conferenceOpts = {}) {
+const conferenceView = function (conferenceOpts = {}) {
   if (!('id' in conferenceOpts)) conferenceOpts.id = null
   if (!('recordings' in conferenceOpts)) conferenceOpts.recordings = []
   if (!('user_settings' in conferenceOpts)) conferenceOpts.user_settings = {}
@@ -49,8 +49,8 @@ const conferenceView = function(conferenceOpts = {}) {
       resume: false,
       update: true,
       edit: true,
-      manage_recordings: true
-    }
+      manage_recordings: true,
+    },
   })
   const app = new ConferenceView({model: conference})
   app.$el.appendTo($('#fixtures'))
@@ -63,7 +63,7 @@ QUnit.module('ConferenceView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('it should be accessible', assert => {
@@ -88,8 +88,8 @@ test('delete calls screenreader', () => {
       context_code: 'course_1',
       context_id: 1,
       context_type: 'Course',
-      join_url: 'www.blah.com'
-    })
+      join_url: 'www.blah.com',
+    }),
   ])
   sandbox.spy($, 'screenReaderFlashMessage')
   const view = conferenceView()
@@ -107,8 +107,8 @@ test('deleteRecordings calls screenreader', () => {
     200,
     {'Content-Type': 'application/json'},
     JSON.stringify({
-      deleted: true
-    })
+      deleted: true,
+    }),
   ])
   const big_blue_button_conference = {
     id: 1,
@@ -122,27 +122,25 @@ test('deleteRecordings calls screenreader', () => {
           {
             type: 'statistics',
             url: 'www.blah.com',
-            length: null
+            length: null,
           },
           {
             type: 'presentation',
             url: 'www.blah.com',
             length: 0,
-            show_to_students: true
-          }
+            show_to_students: true,
+          },
         ],
-        created_at: 1518554650000
-      }
+        created_at: 1518554650000,
+      },
     ],
     user_settings: {
-      record: true
-    }
+      record: true,
+    },
   }
   sandbox.spy($, 'screenReaderFlashMessage')
   const view = conferenceView(big_blue_button_conference)
-  $('div.ig-button[data-id="954cc3"]')
-    .children('a')
-    .trigger($.Event('click'))
+  $('div.ig-button[data-id="954cc3"]').children('a').trigger($.Event('click'))
   server.respond()
   equal($.screenReaderFlashMessage.callCount, 1)
   server.restore()
@@ -155,8 +153,8 @@ test('renders adobe connect link', () => {
     {
       name: 'Adobe Connect',
       type: 'AdobeConnect',
-      settings: []
-    }
+      settings: [],
+    },
   ]
   const adobe_connect_conference = {
     id: 1,
@@ -176,20 +174,20 @@ test('renders adobe connect link', () => {
           {
             type: 'statistics',
             url: 'www.blah.com',
-            length: null
+            length: null,
           },
           {
             type: 'presentation',
             url: 'www.blah.com',
-            length: 0
-          }
+            length: 0,
+          },
         ],
-        created_at: 1518554650000
-      }
+        created_at: 1518554650000,
+      },
     ],
     user_settings: {
-      record: true
-    }
+      record: true,
+    },
   }
   conferenceView(adobe_connect_conference)
   equal($('#adobe-connect-playback-link').attr('href'), 'www.blah.com')

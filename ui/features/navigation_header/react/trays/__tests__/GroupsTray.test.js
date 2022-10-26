@@ -24,17 +24,17 @@ describe('GroupsTray', () => {
   const groups = [
     {
       id: '1',
-      name: 'Group1'
+      name: 'Group1',
     },
     {
       id: '2',
-      name: 'Group2'
-    }
+      name: 'Group2',
+    },
   ]
 
   const props = {
     groups,
-    hasLoaded: true
+    hasLoaded: true,
   }
 
   it('renders loading spinner', () => {

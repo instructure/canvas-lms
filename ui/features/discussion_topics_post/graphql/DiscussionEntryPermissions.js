@@ -41,7 +41,7 @@ export const DiscussionEntryPermissions = {
     read: bool,
     reply: bool,
     update: bool,
-    viewRating: bool
+    viewRating: bool,
   }),
 
   mock: ({
@@ -52,7 +52,7 @@ export const DiscussionEntryPermissions = {
     read = true,
     reply = true,
     update = true,
-    viewRating = true
+    viewRating = true,
   } = {}) => ({
     attach,
     create,
@@ -62,6 +62,6 @@ export const DiscussionEntryPermissions = {
     reply,
     update,
     viewRating,
-    __typename: 'DiscussionEntryPermissions'
-  })
+    __typename: 'DiscussionEntryPermissions',
+  }),
 }

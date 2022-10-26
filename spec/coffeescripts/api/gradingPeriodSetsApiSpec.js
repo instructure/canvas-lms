@@ -37,7 +37,7 @@ const deserializedSets = [
         closeDate: new Date('2015-11-07T12:00:00Z'),
         isClosed: true,
         isLast: false,
-        weight: 43.5
+        weight: 43.5,
       },
       {
         id: '2',
@@ -47,17 +47,17 @@ const deserializedSets = [
         closeDate: new Date('2016-01-07T12:00:00Z'),
         isClosed: false,
         isLast: true,
-        weight: null
-      }
+        weight: null,
+      },
     ],
     permissions: {
       read: true,
       create: true,
       update: true,
-      delete: true
+      delete: true,
     },
     createdAt: new Date('2015-12-29T12:00:00Z'),
-    enrollmentTermIDs: undefined
+    enrollmentTermIDs: undefined,
   },
   {
     id: '2',
@@ -69,11 +69,11 @@ const deserializedSets = [
       read: true,
       create: true,
       update: true,
-      delete: true
+      delete: true,
     },
     createdAt: new Date('2015-11-29T12:00:00Z'),
-    enrollmentTermIDs: undefined
-  }
+    enrollmentTermIDs: undefined,
+  },
 ]
 const serializedSets = {
   grading_period_sets: [
@@ -91,7 +91,7 @@ const serializedSets = {
           close_date: new Date('2015-11-07T12:00:00Z'),
           is_closed: true,
           is_last: false,
-          weight: 43.5
+          weight: 43.5,
         },
         {
           id: '2',
@@ -101,16 +101,16 @@ const serializedSets = {
           close_date: new Date('2016-01-07T12:00:00Z'),
           is_closed: false,
           is_last: true,
-          weight: null
-        }
+          weight: null,
+        },
       ],
       permissions: {
         read: true,
         create: true,
         update: true,
-        delete: true
+        delete: true,
       },
-      created_at: '2015-12-29T12:00:00Z'
+      created_at: '2015-12-29T12:00:00Z',
     },
     {
       id: '2',
@@ -122,11 +122,11 @@ const serializedSets = {
         read: true,
         create: true,
         update: true,
-        delete: true
+        delete: true,
       },
-      created_at: '2015-11-29T12:00:00Z'
-    }
-  ]
+      created_at: '2015-11-29T12:00:00Z',
+    },
+  ],
 }
 
 QUnit.module('gradingPeriodSetsApi.list', {
@@ -139,7 +139,7 @@ QUnit.module('gradingPeriodSetsApi.list', {
   teardown() {
     fakeENV.teardown()
     this.server.restore()
-  }
+  },
 })
 
 test('calls the resolved endpoint', () => {
@@ -153,9 +153,9 @@ test('deserializes returned grading period sets', function () {
     200,
     {
       'Content-Type': 'application/json',
-      Link: this.fakeHeaders
+      Link: this.fakeHeaders,
     },
-    JSON.stringify(serializedSets)
+    JSON.stringify(serializedSets),
   ])
   this.server.autoRespond = true
   return api.list().then(sets => deepEqual(sets, deserializedSets))
@@ -172,20 +172,20 @@ test('creates a title from the creation date when the set has no title', functio
           read: true,
           create: true,
           update: true,
-          delete: true
+          delete: true,
         },
-        created_at: '2015-11-29T12:00:00Z'
-      }
-    ]
+        created_at: '2015-11-29T12:00:00Z',
+      },
+    ],
   }
   const jsonString = JSON.stringify(untitledSets)
   this.server.respondWith('GET', /grading_period_sets/, [
     200,
     {
       'Content-Type': 'application/json',
-      Link: this.fakeHeaders
+      Link: this.fakeHeaders,
     },
-    jsonString
+    jsonString,
   ])
   this.server.autoRespond = true
   return api.list().then(sets => equal(sets[0].title, 'Set created Nov 29, 2015'))
@@ -194,7 +194,7 @@ const deserializedSetCreating = {
   title: 'Fall 2015',
   weighted: null,
   displayTotalsForAllGradingPeriods: false,
-  enrollmentTermIDs: ['1', '2']
+  enrollmentTermIDs: ['1', '2'],
 }
 const deserializedSetCreated = {
   id: '1',
@@ -207,17 +207,17 @@ const deserializedSetCreated = {
     read: true,
     create: true,
     update: true,
-    delete: true
+    delete: true,
   },
-  createdAt: new Date('2015-12-31T12:00:00Z')
+  createdAt: new Date('2015-12-31T12:00:00Z'),
 }
 const serializedSetCreating = {
   grading_period_set: {
     title: 'Fall 2015',
     weighted: null,
-    display_totals_for_all_grading_periods: false
+    display_totals_for_all_grading_periods: false,
   },
-  enrollment_term_ids: ['1', '2']
+  enrollment_term_ids: ['1', '2'],
 }
 const serializedSetCreated = {
   grading_period_set: {
@@ -231,10 +231,10 @@ const serializedSetCreated = {
       read: true,
       create: true,
       update: true,
-      delete: true
+      delete: true,
     },
-    created_at: '2015-12-31T12:00:00Z'
-  }
+    created_at: '2015-12-31T12:00:00Z',
+  },
 }
 
 QUnit.module('gradingPeriodSetsApi.create', {
@@ -244,7 +244,7 @@ QUnit.module('gradingPeriodSetsApi.create', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls the resolved endpoint with the serialized grading period set', () => {
@@ -274,16 +274,16 @@ const deserializedSetUpdating = {
     read: true,
     create: true,
     update: true,
-    delete: true
-  }
+    delete: true,
+  },
 }
 const serializedSetUpdating = {
   grading_period_set: {
     title: 'Fall 2015',
     weighted: true,
-    display_totals_for_all_grading_periods: true
+    display_totals_for_all_grading_periods: true,
   },
-  enrollment_term_ids: ['1', '2']
+  enrollment_term_ids: ['1', '2'],
 }
 const serializedSetUpdated = {
   grading_period_set: {
@@ -299,7 +299,7 @@ const serializedSetUpdated = {
         start_date: new Date('2015-09-01T12:00:00Z'),
         end_date: new Date('2015-10-31T12:00:00Z'),
         close_date: new Date('2015-11-07T12:00:00Z'),
-        weight: 40
+        weight: 40,
       },
       {
         id: '2',
@@ -307,16 +307,16 @@ const serializedSetUpdated = {
         start_date: new Date('2015-11-01T12:00:00Z'),
         end_date: new Date('2015-12-31T12:00:00Z'),
         close_date: null,
-        weight: 60
-      }
+        weight: 60,
+      },
     ],
     permissions: {
       read: true,
       create: true,
       update: true,
-      delete: true
-    }
-  }
+      delete: true,
+    },
+  },
 }
 
 QUnit.module('gradingPeriodSetsApi.update', {
@@ -326,7 +326,7 @@ QUnit.module('gradingPeriodSetsApi.update', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls the resolved endpoint with the serialized grading period set', () => {

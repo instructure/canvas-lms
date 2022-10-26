@@ -37,6 +37,15 @@ module Factories
     @section_pace
   end
 
+  def student_enrollment_pace_model(opts = {})
+    student_enrollment = opts.delete(:student_enrollment) || opts[:context] || add_section(course_model(reusable: true))
+    @student_enrollment_pace = factory_with_protected_attributes(student_enrollment.course.course_paces, valid_student_enrollment_pace_attributes(student_enrollment).merge(opts))
+    student_enrollment.course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+      @student_enrollment_pace.course_pace_module_items.create(module_item: module_item, duration: 0)
+    end
+    @student_enrollment_pace
+  end
+
   def valid_course_pace_attributes
     {
       workflow_state: "active",
@@ -58,6 +67,18 @@ module Factories
       published_at: Time.current,
       course_section: section,
       user: nil
+    }
+  end
+
+  def valid_student_enrollment_pace_attributes(student_enrollment)
+    {
+      workflow_state: "active",
+      end_date: "2021-09-30",
+      exclude_weekends: true,
+      hard_end_dates: true,
+      published_at: Time.current,
+      course_section: nil,
+      user: student_enrollment.user
     }
   end
 end

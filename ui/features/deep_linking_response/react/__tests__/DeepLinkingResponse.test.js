@@ -33,8 +33,8 @@ describe('RetrievingContent', () => {
       errormsg: 'error message',
       errorlog: 'error log',
       ltiEndpoint: 'https://www.test.com/retrieve',
-      reloadpage: false
-    }
+      reloadpage: false,
+    },
   })
 
   const renderComponent = () =>
@@ -70,8 +70,8 @@ describe('RetrievingContent', () => {
         {
           type: 'LtiResourceLink',
           title: 'not happy',
-          errors: {fieldOne: 'error one', fieldTwo: 'error two'}
-        }
+          errors: {fieldOne: 'error one', fieldTwo: 'error two'},
+        },
       ]
       component = renderComponent()
     })

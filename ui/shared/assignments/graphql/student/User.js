@@ -28,12 +28,12 @@ export const SubmissionCommentAuthor = {
 
   shape: shape({
     avatarUrl: string,
-    shortName: string
-  })
+    shortName: string,
+  }),
 }
 
 export const DefaultMocks = {
   User: () => ({
-    shortName: 'Bob Dobbs'
-  })
+    shortName: 'Bob Dobbs',
+  }),
 }

@@ -31,7 +31,7 @@ export default {
 
   propTypes: {
     contextType: customPropTypes.contextType,
-    contextId: customPropTypes.contextId
+    contextId: customPropTypes.contextId,
   },
 
   name: 'search',
@@ -39,11 +39,11 @@ export default {
   getInitialState() {
     return {
       collection: new FilesCollection(),
-      errors: null
+      errors: null,
     }
   },
 
-  onFetchError(jqXHR, textStatus, errorThrown) {
+  onFetchError(jqXHR, textStatus, _errorThrown) {
     let responseText
     const message = I18n.t('An unknown server error occurred.  Please try again.')
 
@@ -95,7 +95,7 @@ export default {
         }
         $.screenReaderFlashMessageExclusive(
           I18n.t('results_count', 'Showing %{num_results} search results', {
-            num_results: this.state.collection.length
+            num_results: this.state.collection.length,
           })
         )
       }
@@ -122,8 +122,8 @@ export default {
         currentFolder: null,
         rootTillCurrentFolder: null,
         showingSearchResults: true,
-        searchResultCollection: this.state.collection
+        searchResultCollection: this.state.collection,
       })
     })
-  }
+  },
 }

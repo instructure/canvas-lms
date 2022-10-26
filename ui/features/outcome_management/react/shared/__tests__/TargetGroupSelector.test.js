@@ -23,7 +23,7 @@ import {
   accountMocks,
   smallOutcomeTree,
   groupMocks,
-  createOutcomeGroupMocks
+  createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
@@ -43,7 +43,7 @@ describe('TargetGroupSelector', () => {
     setTargetGroup: setTargetGroupMock,
     targetGroupId: '1',
     notifyGroupCreated: () => {},
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -62,7 +62,7 @@ describe('TargetGroupSelector', () => {
       contextType = 'Account',
       contextId = '1',
       mocks = accountMocks({childGroupsCount: 0}),
-      treeBrowserRootGroupId = '1'
+      treeBrowserRootGroupId = '1',
     } = {}
   ) => {
     return realRender(
@@ -76,7 +76,7 @@ describe('TargetGroupSelector', () => {
 
   it('loads nested groups', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [...smallOutcomeTree()],
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -86,7 +86,7 @@ describe('TargetGroupSelector', () => {
 
   it('calls setTargetGroup with the selected group object and ancestors ids', async () => {
     const {getByText} = render(<TargetGroupSelector {...defaultProps({groupId: undefined})} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [...smallOutcomeTree()],
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Root account folder'))
@@ -99,20 +99,20 @@ describe('TargetGroupSelector', () => {
         id: '100',
         name: 'Account folder 0',
         parentGroupId: '1',
-        isRootGroup: false
-      }
+        isRootGroup: false,
+      },
     })
   })
 
   it('displays a screen reader error and text error on failed request for account outcome groups', async () => {
     render(<TargetGroupSelector {...defaultProps()} />, {
-      mocks: []
+      mocks: [],
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       srOnly: true,
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -120,20 +120,20 @@ describe('TargetGroupSelector', () => {
     render(<TargetGroupSelector {...defaultProps()} />, {
       contextId: '2',
       contextType: 'Course',
-      mocks: []
+      mocks: [],
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading course learning outcome groups.',
       srOnly: true,
-      type: 'error'
+      type: 'error',
     })
   })
 
   it('displays a flash alert when a child group fails to load', async () => {
     const mocks = [
       ...accountMocks({childGroupsCount: 2}),
-      ...groupMocks({groupId: '100', childGroupOffset: 400})
+      ...groupMocks({groupId: '100', childGroupOffset: 400}),
     ]
     const {getByText} = render(<TargetGroupSelector {...defaultProps()} />, {mocks})
     await act(async () => jest.runAllTimers())
@@ -144,7 +144,7 @@ describe('TargetGroupSelector', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       type: 'error',
-      srOnly: false
+      srOnly: false,
     })
   })
 
@@ -163,12 +163,12 @@ describe('TargetGroupSelector', () => {
             ...groupMocks({
               groupId: '123',
               parentOutcomeGroupId: '12',
-              parentOutcomeGroupTitle: 'Group 12'
+              parentOutcomeGroupTitle: 'Group 12',
             }),
             ...groupMocks({
-              groupId: '12'
-            })
-          ]
+              groupId: '12',
+            }),
+          ],
         }
       )
       await act(async () => jest.runAllTimers())
@@ -197,9 +197,9 @@ describe('TargetGroupSelector', () => {
           ...accountMocks({childGroupsCount: 0}),
           ...createOutcomeGroupMocks({
             parentOutcomeGroupId: '1',
-            title: 'new group name'
-          })
-        ]
+            title: 'new group name',
+          }),
+        ],
       })
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
@@ -218,9 +218,9 @@ describe('TargetGroupSelector', () => {
             ...accountMocks({childGroupsCount: 0}),
             ...createOutcomeGroupMocks({
               parentOutcomeGroupId: '1',
-              title: 'new group name'
-            })
-          ]
+              title: 'new group name',
+            }),
+          ],
         }
       )
       await act(async () => jest.runAllTimers())
@@ -237,9 +237,9 @@ describe('TargetGroupSelector', () => {
           ...accountMocks({childGroupsCount: 0}),
           ...createOutcomeGroupMocks({
             parentOutcomeGroupId: '1',
-            title: 'new group name'
-          })
-        ]
+            title: 'new group name',
+          }),
+        ],
       })
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
@@ -248,7 +248,7 @@ describe('TargetGroupSelector', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'success',
-        message: '"new group name" was successfully created.'
+        message: '"new group name" was successfully created.',
       })
     })
 
@@ -259,9 +259,9 @@ describe('TargetGroupSelector', () => {
           ...createOutcomeGroupMocks({
             parentOutcomeGroupId: '1',
             title: 'new group name',
-            failResponse: true
-          })
-        ]
+            failResponse: true,
+          }),
+        ],
       })
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
@@ -270,7 +270,7 @@ describe('TargetGroupSelector', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         type: 'error',
-        message: 'An error occurred while creating this group. Please try again.'
+        message: 'An error occurred while creating this group. Please try again.',
       })
     })
   })

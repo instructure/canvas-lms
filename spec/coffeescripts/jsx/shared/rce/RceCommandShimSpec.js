@@ -28,45 +28,45 @@ QUnit.module('RceCommandShim - send', {
     remoteEditor = {
       hidden: false,
       isHidden: () => remoteEditor.hidden,
-      call: sinon.stub().returns('methodResult')
+      call: sinon.stub().returns('methodResult'),
     }
   },
   teardown() {
     fixtures.teardown()
-  }
+  },
 })
 
-test("just forwards through target's remoteEditor if set", function() {
+test("just forwards through target's remoteEditor if set", function () {
   this.$target.data('remoteEditor', remoteEditor)
   equal(RceCommandShim.send(this.$target, 'methodName', 'methodArgument'), 'methodResult')
   ok(remoteEditor.call.calledWith('methodName', 'methodArgument'))
 })
 
-test('returns false for exists? if neither remoteEditor nor rich_text are set (e.g. load failed)', function() {
+test('returns false for exists? if neither remoteEditor nor rich_text are set (e.g. load failed)', function () {
   this.$target.data('remoteEditor', null)
   equal(RceCommandShim.send(this.$target, 'exists?'), false)
 })
 
-test("returns target's val() for get_code if neither remoteEditor nor rich_text are set (e.g. load failed)", function() {
+test("returns target's val() for get_code if neither remoteEditor nor rich_text are set (e.g. load failed)", function () {
   this.$target.data('remoteEditor', null)
   this.$target.val('current raw value')
   equal(RceCommandShim.send(this.$target, 'get_code'), 'current raw value')
 })
 
-test('returns target val for get_code if editor is hidden', function() {
+test('returns target val for get_code if editor is hidden', function () {
   remoteEditor.hidden = true
   this.$target.data('remoteEditor', remoteEditor)
   this.$target.val('current HTML value')
   equal(RceCommandShim.send(this.$target, 'get_code'), 'current HTML value')
 })
 
-test('uses the editors get_code if visible', function() {
+test('uses the editors get_code if visible', function () {
   remoteEditor.hidden = false
   this.$target.data('remoteEditor', remoteEditor)
   equal(RceCommandShim.send(this.$target, 'get_code'), 'methodResult')
 })
 
-test('transforms create_link call for remote editor', function() {
+test('transforms create_link call for remote editor', function () {
   const url = 'http://someurl'
   const classes = 'one two'
   const previewAlt = 'alt text for preview'
@@ -74,13 +74,13 @@ test('transforms create_link call for remote editor', function() {
   RceCommandShim.send(this.$target, 'create_link', {
     url,
     classes,
-    dataAttributes: {'preview-alt': previewAlt}
+    dataAttributes: {'preview-alt': previewAlt},
   })
   ok(
     remoteEditor.call.calledWithMatch('insertLink', {
       href: url,
       class: classes,
-      'data-preview-alt': previewAlt
+      'data-preview-alt': previewAlt,
     })
   )
 })
@@ -92,19 +92,19 @@ QUnit.module('RceCommandShim - focus', {
     const editor = {
       focus() {
         return {}
-      }
+      },
     }
     const tinymce = {
-      get: () => editor
+      get: () => editor,
     }
     RceCommandShim.setTinymce(tinymce)
   },
   teardown() {
     fixtures.teardown()
-  }
+  },
 })
 
-test("just forwards through target's remoteEditor if set", function() {
+test("just forwards through target's remoteEditor if set", function () {
   remoteEditor = {focus: sinon.spy()}
   this.$target.data('remoteEditor', remoteEditor)
   RceCommandShim.focus(this.$target)
@@ -118,24 +118,24 @@ QUnit.module('RceCommandShim - destroy', {
   },
   teardown() {
     fixtures.teardown()
-  }
+  },
 })
 
-test("forwards through target's remoteEditor if set", function() {
+test("forwards through target's remoteEditor if set", function () {
   remoteEditor = {destroy: sinon.spy()}
   this.$target.data('remoteEditor', remoteEditor)
   RceCommandShim.destroy(this.$target)
   ok(remoteEditor.destroy.called)
 })
 
-test("clears target's remoteEditor afterwards if set", function() {
+test("clears target's remoteEditor afterwards if set", function () {
   remoteEditor = {destroy: sinon.spy()}
   this.$target.data('remoteEditor', remoteEditor)
   RceCommandShim.destroy(this.$target)
   equal(this.$target.data('remoteEditor'), undefined)
 })
 
-test('does not except if remoteEditor is not set', function() {
+test('does not except if remoteEditor is not set', function () {
   this.$target.data('remoteEditor', null)
   RceCommandShim.destroy(this.$target)
   ok(true, 'function did not throw an exception')

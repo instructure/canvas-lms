@@ -28,18 +28,18 @@ const I18n = useI18nScope('quiz_reports')
 class ReportStatus extends React.Component {
   static propTypes = {
     file: PropTypes.shape({
-      createdAt: PropTypes.string
+      createdAt: PropTypes.string,
     }),
 
     progress: PropTypes.shape({
       workflowState: PropTypes.string,
-      completion: PropTypes.number
-    })
+      completion: PropTypes.number,
+    }),
   }
 
   static defaultProps = {
     file: {},
-    progress: {}
+    progress: {},
   }
 
   render() {

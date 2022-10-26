@@ -60,7 +60,7 @@ function quizzesNextSpeedGrading(
     originalSubmission: Submission,
     numRequests: number
   ) {
-    const maxRequests = 5
+    const maxRequests = speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts || 20
     if (numRequests >= maxRequests) return false
     if (!originalSubmission.graded_at) return !submission.graded_at
     if (!submission.graded_at) return true
@@ -76,7 +76,7 @@ function quizzesNextSpeedGrading(
       frame.contentWindow.postMessage(
         {
           submission,
-          subject: 'canvas.speedGraderSubmissionChange'
+          subject: 'canvas.speedGraderSubmissionChange',
         },
         '*'
       )
@@ -102,7 +102,7 @@ function quizzesNextSpeedGrading(
   return {
     onMessage,
     postChangeSubmissionMessage,
-    quizzesNextChange
+    quizzesNextChange,
   }
 }
 

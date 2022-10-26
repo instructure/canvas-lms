@@ -26,12 +26,12 @@ export const LockInfo = {
   `,
 
   shape: shape({
-    isLocked: bool.isRequired
-  })
+    isLocked: bool.isRequired,
+  }),
 }
 
 export const DefaultMocks = {
   LockInfo: () => ({
-    isLocked: false
-  })
+    isLocked: false,
+  }),
 }

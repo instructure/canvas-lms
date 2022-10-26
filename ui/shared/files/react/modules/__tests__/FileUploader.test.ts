@@ -24,7 +24,7 @@ let fileOptions: object, folder: object
 beforeEach(() => {
   folder = {}
   fileOptions = {
-    file: {}
+    file: {},
   }
 })
 

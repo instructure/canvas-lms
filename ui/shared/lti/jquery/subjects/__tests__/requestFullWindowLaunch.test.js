@@ -99,9 +99,9 @@ describe('requestFullWindowLaunch', () => {
           data: {
             url: 'http://localhost/test',
             launchType: 'popup',
-            launchOptions: {width: 420, height: 400}
-          }
-        }
+            launchOptions: {width: 420, height: 400},
+          },
+        },
       })
       expect(window.open).toHaveBeenCalledWith(
         expect.any(String),

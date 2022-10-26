@@ -59,11 +59,11 @@ MentionsUI.propTypes = {
   onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
   onSelect: PropTypes.func,
-  editor: PropTypes.object
+  editor: PropTypes.object,
 }
 
 MentionsUI.defaultProps = {
   onFocusedUserChange: () => {},
   onExited: () => {},
-  onSelect: () => {}
+  onSelect: () => {},
 }

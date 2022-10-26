@@ -39,14 +39,14 @@ export default class UsageRightsIndicator extends React.Component {
     contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hidePreview: PropTypes.bool,
     deferSave: PropTypes.func,
-    suppressWarning: PropTypes.bool
+    suppressWarning: PropTypes.bool,
   }
 
   handleClick = event => {
     event.preventDefault()
     const contents = (
       <UsageRightsDialog
-        isOpen
+        isOpen={true}
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={[this.props.model]}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}

@@ -38,13 +38,13 @@ class FileUpload extends React.Component {
     currentFolder: PropTypes.instanceOf(Folder),
     filesDirectoryRef: PropTypes.oneOfType([
       PropTypes.func,
-      PropTypes.shape({current: PropTypes.elementType})
-    ])
+      PropTypes.shape({current: PropTypes.elementType}),
+    ]),
   }
 
   state = {
     isUploading: false,
-    isDragging: false
+    isDragging: false,
   }
 
   componentDidMount() {
@@ -123,7 +123,7 @@ class FileUpload extends React.Component {
     const isEmpty = this.props.currentFolder.isEmpty()
     return (
       <FileDrop
-        shouldAllowMultiple
+        shouldAllowMultiple={true}
         // Called when dropping files or when clicking,
         // after the file dialog window exits successfully
         onDrop={this.handleDrop}
@@ -152,7 +152,7 @@ class FileUpload extends React.Component {
     const classes = classnames({
       FileUpload: true,
       FileUpload__full: isEmptyFolder && !isDragging,
-      FileUpload__dragging: isDragging
+      FileUpload__dragging: isDragging,
     })
     return (
       <>

@@ -40,6 +40,7 @@ export default class PostGradesFrameDialog {
     this.$dialog = $(
       postGradesFrameDialog({
         allowances: iframeAllowances(),
+        shouldRenderForwardingIframe: ENV?.FEATURES?.lti_platform_storage,
       })
     )
 

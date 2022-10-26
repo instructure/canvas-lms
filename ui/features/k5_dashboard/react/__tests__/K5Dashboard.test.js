@@ -25,7 +25,7 @@ import {
   MOCK_TODOS,
   createPlannerMocks,
   defaultEnv,
-  defaultK5DashboardProps as defaultProps
+  defaultK5DashboardProps as defaultProps,
 } from './mocks'
 import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
 
@@ -41,23 +41,23 @@ const announcements = [
     message: '<p>This is the announcement</p>',
     html_url: 'http://google.com/announcement',
     permissions: {
-      update: true
+      update: true,
     },
     attachments: [
       {
         display_name: 'exam1.pdf',
         url: 'http://google.com/download',
-        filename: '1608134586_366__exam1.pdf'
-      }
-    ]
+        filename: '1608134586_366__exam1.pdf',
+      },
+    ],
   },
   {
     id: '21',
     context_code: 'course_1',
     title: "This sure isn't a homeroom",
     message: '<p>Definitely not!</p>',
-    html_url: '/courses/1/announcements/21'
-  }
+    html_url: '/courses/1/announcements/21',
+  },
 ]
 const gradeCourses = [
   {
@@ -68,10 +68,10 @@ const gradeCourses = [
       {
         computed_current_score: 82,
         computed_current_grade: 'B-',
-        type: 'student'
-      }
+        type: 'student',
+      },
     ],
-    homeroom_course: false
+    homeroom_course: false,
   },
   {
     id: '2',
@@ -81,26 +81,26 @@ const gradeCourses = [
       {
         computed_current_score: null,
         computed_current_grade: null,
-        type: 'student'
-      }
+        type: 'student',
+      },
     ],
-    homeroom_course: true
-  }
+    homeroom_course: true,
+  },
 ]
 const syllabus = {
   id: '2',
-  syllabus_body: "<p>Here's the grading scheme for this class.</p>"
+  syllabus_body: "<p>Here's the grading scheme for this class.</p>",
 }
 const apps = [
   {
     id: '17',
     course_navigation: {
       text: 'Google Apps',
-      icon_url: 'google.png'
+      icon_url: 'google.png',
     },
     context_id: '1',
-    context_name: 'Economics 101'
-  }
+    context_name: 'Economics 101',
+  },
 ]
 const staff = [
   {
@@ -110,9 +110,9 @@ const staff = [
     avatar_url: '/images/avatar1.png',
     enrollments: [
       {
-        role: 'TeacherEnrollment'
-      }
-    ]
+        role: 'TeacherEnrollment',
+      },
+    ],
   },
   {
     id: '2',
@@ -121,10 +121,10 @@ const staff = [
     avatar_url: '/images/avatar2.png',
     enrollments: [
       {
-        role: 'TaEnrollment'
-      }
-    ]
-  }
+        role: 'TaEnrollment',
+      },
+    ],
+  },
 ]
 
 beforeEach(() => {
@@ -165,19 +165,21 @@ describe('K-5 Dashboard', () => {
   })
 
   it('allows admins and teachers to turn off the elementary dashboard', async () => {
-    const {getByRole} = render(<K5Dashboard {...defaultProps} canDisableElementaryDashboard />)
+    const {getByRole} = render(
+      <K5Dashboard {...defaultProps} canDisableElementaryDashboard={true} />
+    )
     const optionsButton = getByRole('button', {name: 'Dashboard Options'})
     act(() => optionsButton.click())
     // There should be an Homeroom View menu option already checked
     const elementaryViewOption = screen.getByRole('menuitemradio', {
       name: 'Homeroom View',
-      checked: true
+      checked: true,
     })
     expect(elementaryViewOption).toBeInTheDocument()
     // There should be a Classic View menu option initially un-checked
     const classicViewOption = screen.getByRole('menuitemradio', {
       name: 'Classic View',
-      checked: false
+      checked: false,
     })
     expect(classicViewOption).toBeInTheDocument()
     // Clicking the Classic View option should update the user's dashboard setting
@@ -186,7 +188,7 @@ describe('K-5 Dashboard', () => {
       expect(fetchMock.called('/api/v1/users/self/settings', 'PUT')).toBe(true)
       expect(fetchMock.lastOptions('/api/v1/users/self/settings').body).toEqual(
         JSON.stringify({
-          elementary_dashboard_disabled: true
+          elementary_dashboard_disabled: true,
         })
       )
     })
@@ -221,7 +223,7 @@ describe('K-5 Dashboard', () => {
     })
 
     it('shows due today and missing items links pointing to the schedule tab of the course', async () => {
-      const {findByTestId} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      const {findByTestId} = render(<K5Dashboard {...defaultProps} plannerEnabled={true} />)
       const dueTodayLink = await findByTestId('number-due-today')
       expect(dueTodayLink).toBeInTheDocument()
       expect(dueTodayLink).toHaveTextContent('View 1 items due today for course Economics 101')
@@ -251,10 +253,10 @@ describe('K-5 Dashboard', () => {
       moxios.stubs.reset()
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
         status: 200,
-        response: []
+        response: [],
       })
       const {getByTestId, getByText} = render(
-        <K5Dashboard {...defaultProps} plannerEnabled />
+        <K5Dashboard {...defaultProps} plannerEnabled={true} />
       )
       await waitFor(() =>
         expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
@@ -276,7 +278,7 @@ describe('K-5 Dashboard', () => {
             .mostRecent()
             .respondWith({
               status: 200,
-              response: MOCK_CARDS
+              response: MOCK_CARDS,
             })
             .then(() => {
               // Expect just one announcement request for all cards
@@ -296,7 +298,7 @@ describe('K-5 Dashboard', () => {
             .mostRecent()
             .respondWith({
               status: 200,
-              response: []
+              response: [],
             })
             .then(() => {
               expect(fetchMock.calls(/\/api\/v1\/announcements.*/).length).toBe(0)
@@ -313,7 +315,11 @@ describe('K-5 Dashboard', () => {
   describe('Grades Section', () => {
     it('does not show the grades tab to students if hideGradesTabForStudents is set', async () => {
       const {findByRole, queryByRole} = render(
-        <K5Dashboard {...defaultProps} currentUserRoles={['student']} hideGradesTabForStudents />
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['student']}
+          hideGradesTabForStudents={true}
+        />
       )
       await findByRole('tab', {name: 'Homeroom'})
       expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
@@ -324,7 +330,7 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           currentUserRoles={['student', 'teacher']}
-          hideGradesTabForStudents
+          hideGradesTabForStudents={true}
         />
       )
       expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
@@ -405,7 +411,7 @@ describe('K-5 Dashboard', () => {
       // Overriding mocked cards to make all cards active so we have 2 subjects to choose from
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
         status: 200,
-        response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))
+        response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'})),
       })
       // Only return assignments associated with course_1 on next call
       fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
@@ -425,14 +431,12 @@ describe('K-5 Dashboard', () => {
       expect(fetchMock.lastUrl(ASSIGNMENTS_URL)).not.toMatch('context_codes%5B%5D=course_3')
       // Only return assignments associated with course_3 on next call
       fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(1, 3), {overwriteRoutes: true})
-      act(() =>
-        getByTestId('filter-important-dates-button').click()
-      )
+      act(() => getByTestId('filter-important-dates-button').click())
 
-      const subjectCalendarEconomics = getByLabelText('Economics 101', { selector: 'input' })
+      const subjectCalendarEconomics = getByLabelText('Economics 101', {selector: 'input'})
       expect(subjectCalendarEconomics).toBeChecked()
 
-      const subjectCalendarMaths = getByLabelText('The Maths', { selector: 'input' })
+      const subjectCalendarMaths = getByLabelText('The Maths', {selector: 'input'})
       expect(subjectCalendarMaths).not.toBeChecked()
 
       act(() => subjectCalendarEconomics.click())

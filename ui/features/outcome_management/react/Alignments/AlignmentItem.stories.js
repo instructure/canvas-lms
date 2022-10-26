@@ -28,8 +28,8 @@ export default {
     title: 'Assignment 1',
     url: '/courses/1/outcomes/1/alignments/3',
     moduleTitle: 'Module 1',
-    moduleUrl: '/courses/1/modules/1'
-  }
+    moduleUrl: '/courses/1/modules/1',
+  },
 }
 
 const Template = args => <AlignmentItem {...args} />
@@ -39,25 +39,25 @@ export const Default = Template.bind({})
 export const withRubric = Template.bind({})
 withRubric.args = {
   type: 'Rubric',
-  title: 'Rubric 1'
+  title: 'Rubric 1',
 }
 
 export const withLongAlignmentTitle = Template.bind({})
 withLongAlignmentTitle.args = {
-  title: 'Long Alignment Title '.repeat(10)
+  title: 'Long Alignment Title '.repeat(10),
 }
 
 export const withLongModuleTitle = Template.bind({})
 withLongModuleTitle.args = {
-  moduleTitle: 'Long Module Title '.repeat(10)
+  moduleTitle: 'Long Module Title '.repeat(10),
 }
 
 export const withoutModuleTitle = Template.bind({})
 withoutModuleTitle.args = {
-  moduleTitle: null
+  moduleTitle: null,
 }
 
 export const withoutModuleUrl = Template.bind({})
 withoutModuleUrl.args = {
-  moduleUrl: null
+  moduleUrl: null,
 }

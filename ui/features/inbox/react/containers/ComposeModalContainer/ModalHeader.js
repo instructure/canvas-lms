@@ -40,7 +40,7 @@ const ModalHeader = props => (
 
 ModalHeader.propTypes = {
   onDismiss: PropTypes.func,
-  headerTitle: PropTypes.string
+  headerTitle: PropTypes.string,
 }
 
 export default ModalHeader

@@ -24,7 +24,7 @@ import AddExternalFeed from '../AddExternalFeed'
 const defaultProps = () => ({
   defaultOpen: false,
   isSaving: false,
-  addExternalFeed: () => {}
+  addExternalFeed: () => {},
 })
 
 test('renders the AddExternalFeed component', () => {
@@ -61,25 +61,25 @@ test('submits the AddExternalFeed with correct arguments', () => {
   const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
-      checked: true
-    }
+      checked: true,
+    },
   })
   tree.instance().handleTextInputSetPhrase({
     target: {
-      value: 'phrase'
-    }
+      value: 'phrase',
+    },
   })
   tree.instance().handleTextInputSetFeedURL({
     target: {
-      value: 'url'
-    }
+      value: 'url',
+    },
   })
   tree.instance().handleRadioSelectionSetVerbosity('full')
   tree.instance().addRssSelection()
   expect(addFeedSpy.mock.calls[0][0]).toMatchObject({
     header_match: 'phrase',
     url: 'url',
-    verbosity: 'full'
+    verbosity: 'full',
   })
 })
 
@@ -90,18 +90,18 @@ test('isDoneSelecting correctly returns true when all arguments are set', () => 
   const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
-      checked: true
-    }
+      checked: true,
+    },
   })
   tree.instance().handleTextInputSetPhrase({
     target: {
-      value: 'phrase'
-    }
+      value: 'phrase',
+    },
   })
   tree.instance().handleTextInputSetFeedURL({
     target: {
-      value: 'url'
-    }
+      value: 'url',
+    },
   })
   tree.instance().handleRadioSelectionSetVerbosity('full')
   expect(tree.instance().isDoneSelecting()).toBe(true)
@@ -115,8 +115,8 @@ test('isDoneSelecting correctly returns false when all url is missing', () => {
   tree.instance().handleRadioSelectionSetVerbosity('full')
   tree.instance().handleTextInputSetFeedURL({
     target: {
-      value: null
-    }
+      value: null,
+    },
   })
   expect(tree.instance().isDoneSelecting()).toBe(false)
 })
@@ -128,8 +128,8 @@ test('isDoneSelecting correctly returns false when all phrase is missing', () =>
   const tree = shallow(<AddExternalFeed {...props} />)
   tree.instance().handleCheckboxPhraseChecked({
     target: {
-      checked: true
-    }
+      checked: true,
+    },
   })
   tree.instance().handleRadioSelectionSetVerbosity('full')
   expect(tree.instance().isDoneSelecting()).toBe(false)

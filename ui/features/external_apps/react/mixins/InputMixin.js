@@ -22,7 +22,7 @@ import classMunger from '../lib/classMunger'
 export default {
   getInitialState() {
     return {
-      value: this.props.defaultValue
+      value: this.props.defaultValue,
     }
   },
 
@@ -53,5 +53,5 @@ export default {
 
   getErrorMessage() {
     return this.props.errors[this.props.id]
-  }
+  },
 }

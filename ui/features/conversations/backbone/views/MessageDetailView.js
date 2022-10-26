@@ -19,7 +19,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import {View} from '@canvas/backbone'
-import Message from '../models/Message.coffee'
 import MessageItemView from './MessageItemView'
 import template from '../../jst/messageDetail.handlebars'
 import noMessage from '../../jst/noMessage.handlebars'
@@ -46,7 +45,7 @@ export default class MessageDetailView extends View {
       'click .message-detail-actions .star-toggle-btn': 'onStarToggle',
       'keydown .message-detail-actions .star-toggle-btn': 'onStarToggle',
       modelChange: 'onModelChange',
-      'changed:starred': 'render'
+      'changed:starred': 'render',
     }
 
     this.prototype.tagName = 'div'
@@ -55,7 +54,7 @@ export default class MessageDetailView extends View {
       star: I18n.t('star', 'Star'),
       unstar: I18n.t('unstar', 'Unstar'),
       archive: I18n.t('archive', 'Archive'),
-      unarchive: I18n.t('unarchive', 'Unarchive')
+      unarchive: I18n.t('unarchive', 'Unarchive'),
     }
   }
 

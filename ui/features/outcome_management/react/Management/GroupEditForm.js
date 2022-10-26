@@ -29,7 +29,7 @@ import {Mask} from '@instructure/ui-overlays'
 import {
   composeValidators,
   maxLengthValidator,
-  requiredValidator
+  requiredValidator,
 } from '@canvas/outcomes/react/validators/finalFormValidators'
 import LabeledTextField from '../shared/LabeledTextField'
 import LabeledRceField from '../shared/LabeledRceField'
@@ -53,7 +53,7 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
               open={isOpen}
               onDismiss={onCloseHandler}
               size="medium"
-              shouldReturnFocus
+              shouldReturnFocus={true}
               shouldCloseOnDocumentClick={false}
               data-testid="outcome-management-edit-modal"
             >
@@ -104,11 +104,11 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
 GroupEditForm.propTypes = {
   initialValues: PropTypes.shape({
     title: PropTypes.string,
-    description: PropTypes.string
+    description: PropTypes.string,
   }),
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
 }
 
 export default GroupEditForm

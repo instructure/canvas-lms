@@ -33,14 +33,14 @@ const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 export default class MobileNavigation extends React.Component {
   state = {
     globalNavIsOpen: false,
-    contextNavIsOpen: false
+    contextNavIsOpen: false,
   }
 
   static propTypes = {
     DesktopNavComponent: shape({
       ensureLoaded: func.isRequired,
-      state: object.isRequired
-    }).isRequired
+      state: object.isRequired,
+    }).isRequired,
   }
 
   componentDidMount() {
@@ -82,7 +82,7 @@ export default class MobileNavigation extends React.Component {
             label={I18n.t('Global Navigation')}
             open={this.state.globalNavIsOpen}
             onDismiss={closeGlobalNav}
-            shouldCloseOnDocumentClick
+            shouldCloseOnDocumentClick={true}
           >
             {this.state.globalNavIsOpen && (
               <React.Suspense fallback={spinner}>

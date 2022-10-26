@@ -40,7 +40,7 @@ export default function deprecated(message, obj, method, fn) {
   const originalFn = isBareFn ? obj : typeof fn === 'function' ? fn : obj[method]
   if (process.env.NODE_ENV !== 'production') {
     let warned = false
-    const newFn = Object.assign(function() {
+    const newFn = Object.assign(function () {
       if (!warned && console) {
         const warningArgs = isBareFn
           ? [originalFn]

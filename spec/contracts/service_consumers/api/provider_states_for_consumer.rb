@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Dir[File.dirname(__FILE__) + "/provider_states_for_consumer/*.rb"].sort.each { |f| require f }
-require "spec/factories/course_factory"
-require "spec/factories/user_factory"
+require_relative "../../../factories/course_factory"
+require_relative "../../../factories/user_factory"
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do

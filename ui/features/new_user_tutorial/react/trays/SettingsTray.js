@@ -29,25 +29,25 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/Panda_Map.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use course settings?'),
-        href: I18n.t('#community.instructor_use_course_settings')
+        href: I18n.t('#community.instructor_use_course_settings'),
       },
       {
         label: I18n.t('How do I set details for a course?'),
-        href: I18n.t('#community.instructor_set_course_details')
+        href: I18n.t('#community.instructor_set_course_details'),
       },
       {
         label: I18n.t('How do I change a course name and course code?'),
-        href: I18n.t('#community.instructor_change_name_code')
+        href: I18n.t('#community.instructor_change_name_code'),
       },
       {
         label: I18n.t('How do I add an image to a course card in the Dashboard?'),
-        href: I18n.t('#community.instructor_add_dashboard_image')
-      }
+        href: I18n.t('#community.instructor_add_dashboard_image'),
+      },
     ]}
   >
     {I18n.t(`Make your course your own! Upload an image to represent your

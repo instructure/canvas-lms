@@ -84,7 +84,7 @@ class AdminTable extends React.Component {
       srMsg: I18n.t(
         'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
       ),
-      handleRef: ref => ref && ref.focusDeleteLink()
+      handleRef: ref => ref && ref.focusDeleteLink(),
     })
 
   developerKeyRef = key => {
@@ -141,16 +141,16 @@ class AdminTable extends React.Component {
 
 AdminTable.propTypes = {
   store: shape({
-    dispatch: func.isRequired
+    dispatch: func.isRequired,
   }).isRequired,
   actions: shape({}).isRequired,
   developerKeysList: arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
   ctx: shape({
     params: shape({
-      contextId: string.isRequired
-    })
+      contextId: string.isRequired,
+    }),
   }).isRequired,
-  setFocus: func
+  setFocus: func,
 }
 
 AdminTable.defaultProps = {setFocus: () => {}}

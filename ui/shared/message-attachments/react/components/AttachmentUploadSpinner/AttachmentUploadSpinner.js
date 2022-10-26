@@ -53,7 +53,7 @@ export default AttachmentUploadSpinner
 
 AttachmentUploadSpinner.defaultProps = {
   label: I18n.t('Uploading Files'),
-  message: I18n.t('Please wait while we upload attachments.')
+  message: I18n.t('Please wait while we upload attachments.'),
 }
 
 AttachmentUploadSpinner.propTypes = {
@@ -61,5 +61,5 @@ AttachmentUploadSpinner.propTypes = {
   message: PropTypes.string,
   sendMessage: PropTypes.func.isRequired,
   isMessageSending: PropTypes.bool.isRequired,
-  pendingUploads: PropTypes.array.isRequired
+  pendingUploads: PropTypes.array.isRequired,
 }

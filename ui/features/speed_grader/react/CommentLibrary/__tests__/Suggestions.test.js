@@ -29,7 +29,7 @@ describe('Suggestions', () => {
       setComment: setCommentMock,
       closeSuggestions: closeSuggestionsMock,
       suggestionsRef: document.getElementById('suggestions'),
-      ...props
+      ...props,
     }
   }
 

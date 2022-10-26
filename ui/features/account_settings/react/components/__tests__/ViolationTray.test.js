@@ -28,7 +28,7 @@ describe('Violation Tray', () => {
   const getProps = overrides => ({
     violations: [],
     whitelistedDomains: {account: []},
-    ...overrides
+    ...overrides,
   })
 
   it('displays a spinner when loading data', async () => {
@@ -56,13 +56,13 @@ describe('Violation Tray', () => {
         {
           uri: 'http://example.com',
           latest_hit: '2019-11-11T00:00:00.000Z',
-          count: 7
+          count: 7,
         },
         {
           uri: 'http://clayd.dev',
           latest_hit: '2019-11-11T00:00:00.000Z',
-          count: 2
-        }
+          count: 2,
+        },
       ])
     )
     const {findByText} = render(<ViolationTray {...getProps()} />)

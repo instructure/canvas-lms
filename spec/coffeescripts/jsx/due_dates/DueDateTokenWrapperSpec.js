@@ -30,7 +30,7 @@ QUnit.module('DueDateTokenWrapper', {
       tokens: [
         {id: '1', name: 'Atilla', student_id: '3', type: 'student'},
         {id: '2', name: 'Huns', course_section_id: '4', type: 'section'},
-        {id: '3', name: 'Reading Group 3', group_id: '3', type: 'group'}
+        {id: '3', name: 'Reading Group 3', group_id: '3', type: 'group'},
       ],
       potentialOptions: [
         {course_section_id: '1', name: 'Patricians'},
@@ -47,7 +47,7 @@ QUnit.module('DueDateTokenWrapper', {
         {course_section_id: '6', name: 'Qux'},
         {group_id: '1', name: 'Reading Group One'},
         {group_id: '2', name: 'Reading Group Two'},
-        {noop_id: '1', name: 'Mastery Paths'}
+        {noop_id: '1', name: 'Mastery Paths'},
       ],
       handleTokenAdd() {},
       handleTokenRemove() {},
@@ -55,7 +55,7 @@ QUnit.module('DueDateTokenWrapper', {
       allStudentsFetched: false,
       currentlySearching: false,
       rowKey: 'nullnullnull',
-      disabled: false
+      disabled: false,
     }
     this.mountPoint = $('<div>').appendTo('body')[0]
     const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
@@ -66,14 +66,14 @@ QUnit.module('DueDateTokenWrapper', {
     this.clock.restore()
     ReactDOM.unmountComponentAtNode(this.mountPoint)
     fakeENV.teardown()
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   ok(this.DueDateTokenWrapper)
 })
 
-test('renders a TokenInput', function() {
+test('renders a TokenInput', function () {
   ok(this.TokenInput)
 })
 
@@ -85,7 +85,7 @@ test('displays the student displayName', function () {
   )
 })
 
-test('call to fetchStudents on input changes', function() {
+test('call to fetchStudents on input changes', function () {
   const fetch = sandbox.stub(this.DueDateTokenWrapper, 'safeFetchStudents')
   this.DueDateTokenWrapper.handleInput('to')
   equal(fetch.callCount, 1)
@@ -93,7 +93,7 @@ test('call to fetchStudents on input changes', function() {
   equal(fetch.callCount, 2)
 })
 
-test('if a user types handleInput filters the options', function() {
+test('if a user types handleInput filters the options', function () {
   // having debouncing enabled for fetching makes tests hard to contend with.
   this.DueDateTokenWrapper.removeTimingSafeties()
 
@@ -105,7 +105,7 @@ test('if a user types handleInput filters the options', function() {
   equal(this.DueDateTokenWrapper.optionsForMenu().length, 2)
 })
 
-test('menu options are grouped by type', function() {
+test('menu options are grouped by type', function () {
   equal(this.DueDateTokenWrapper.optionsForMenu()[1].props.value, 'course_section')
   equal(this.DueDateTokenWrapper.optionsForMenu()[2].props.value, 'Patricians')
   equal(this.DueDateTokenWrapper.optionsForMenu()[5].props.value, 'group')
@@ -114,7 +114,7 @@ test('menu options are grouped by type', function() {
   equal(this.DueDateTokenWrapper.optionsForMenu()[9].props.value, 'Seneca The Elder')
 })
 
-test('handleTokenAdd is called when a token is added', function() {
+test('handleTokenAdd is called when a token is added', function () {
   const addProp = sandbox.stub(this.props, 'handleTokenAdd')
   const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
   this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
@@ -123,7 +123,7 @@ test('handleTokenAdd is called when a token is added', function() {
   addProp.restore()
 })
 
-test('handleTokenRemove is called when a token is removed', function() {
+test('handleTokenRemove is called when a token is removed', function () {
   const removeProp = sandbox.stub(this.props, 'handleTokenRemove')
   const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
   this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
@@ -132,43 +132,43 @@ test('handleTokenRemove is called when a token is removed', function() {
   removeProp.restore()
 })
 
-test('findMatchingOption can match a string with a token', function() {
+test('findMatchingOption can match a string with a token', function () {
   let foundToken = this.DueDateTokenWrapper.findMatchingOption('sci')
   equal(foundToken.name, 'Scipio')
   foundToken = this.DueDateTokenWrapper.findMatchingOption('pub')
   equal(foundToken.name, 'Publius')
 })
 
-test('findMatchingOption can handle strings with weird characters', function() {
+test('findMatchingOption can handle strings with weird characters', function () {
   const foundToken = this.DueDateTokenWrapper.findMatchingOption('Plebs | [')
   equal(foundToken.name, 'Plebs | [ $')
 })
 
-test('findMatchingOption can match characters in the middle of a string', function() {
+test('findMatchingOption can match characters in the middle of a string', function () {
   const foundToken = this.DueDateTokenWrapper.findMatchingOption('The Elder')
   equal(foundToken.name, 'Seneca The Elder')
 })
 
-test('findMatchingOption can match tokens by properties', function() {
+test('findMatchingOption can match tokens by properties', function () {
   const fakeOption = {
     props: {
       set_props: {
         name: 'Baz',
-        course_section_id: '5'
-      }
-    }
+        course_section_id: '5',
+      },
+    },
   }
   const foundToken = this.DueDateTokenWrapper.findMatchingOption('Baz', fakeOption)
   equal(foundToken.course_section_id, '5')
 })
 
-test('hidingValidMatches updates as matching tag number changes', function() {
+test('hidingValidMatches updates as matching tag number changes', function () {
   ok(this.DueDateTokenWrapper.hidingValidMatches())
   this.DueDateTokenWrapper.handleInput('scipio')
   ok(!this.DueDateTokenWrapper.hidingValidMatches())
 })
 
-test('overrideTokenAriaLabel method', function() {
+test('overrideTokenAriaLabel method', function () {
   equal(
     this.DueDateTokenWrapper.overrideTokenAriaLabel('group X'),
     'Currently assigned to group X, click to remove'
@@ -188,7 +188,7 @@ QUnit.module('disabled DueDateTokenWrapper', {
       allStudentsFetched: false,
       currentlySearching: false,
       rowKey: 'wat',
-      disabled: true
+      disabled: true,
     }
     this.mountPoint = $('<div>').appendTo('body')[0]
     const DueDateTokenWrapperElement = <DueDateTokenWrapper {...props} />
@@ -197,9 +197,9 @@ QUnit.module('disabled DueDateTokenWrapper', {
   teardown() {
     ReactDOM.unmountComponentAtNode(this.mountPoint)
     fakeENV.teardown()
-  }
+  },
 })
 
-test('renders a readonly token input', function() {
+test('renders a readonly token input', function () {
   ok(this.DueDateTokenWrapper.refs.DisabledTokenInput)
 })

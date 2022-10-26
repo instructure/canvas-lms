@@ -24,7 +24,7 @@ import {
   ALL_ROLES_VALUE,
   ENABLED_FOR_NONE,
   ENABLED_FOR_PARTIAL,
-  ENABLED_FOR_ALL
+  ENABLED_FOR_ALL,
 } from '@canvas/permissions/react/propTypes'
 import {PERMISSIONS, ROLES} from './examples'
 import reducer from '../reducer'
@@ -45,33 +45,33 @@ describe('permissions::reducer', () => {
       {
         group_name: 'Account Permissions',
         group_permissions: [{permission_name: 'manage_courses_add'}],
-        context_type: 'Account'
-      }
+        context_type: 'Account',
+      },
     ],
     ACCOUNT_ROLES: [
       {
         role: 'AccountAdmin',
         label: 'Account Admin',
-        base_role_type: 'AccountMembership'
+        base_role_type: 'AccountMembership',
       },
       {
         role: 'CustomAccountAdmin',
         label: 'Custom Account Admin',
-        base_role_type: 'AccountMembership'
-      }
+        base_role_type: 'AccountMembership',
+      },
     ],
     COURSE_ROLES: [
       {
         role: 'TeacherEnrollment',
         label: 'Teacher',
-        base_role_type: 'TeacherEnrollment'
+        base_role_type: 'TeacherEnrollment',
       },
       {
         role: 'Custom Teacher Role',
         label: 'Custom Teacher Role',
-        base_role_type: 'TeacherEnrollment'
-      }
-    ]
+        base_role_type: 'TeacherEnrollment',
+      },
+    ],
   })
 
   function verifyPermissionsDidntChange(oldPermissions, newPermissions) {
@@ -109,7 +109,7 @@ describe('permissions::reducer', () => {
     const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
     const payload = {
       permissionSearchString: 'add',
-      contextType: COURSE
+      contextType: COURSE,
     }
     const newState = reduce(actions.updatePermissionsSearch(payload), originalState)
     verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
@@ -131,7 +131,7 @@ describe('permissions::reducer', () => {
     const originalState = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
     const payload = {
       selectedRoles: [],
-      contextType: ACCOUNT
+      contextType: ACCOUNT,
     }
     const newState = reduce(actions.updateRoleFilters(payload), originalState)
     verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
@@ -148,10 +148,10 @@ describe('permissions::reducer', () => {
           label: 'Course Sub-Admin',
           base_role_type: 'Course Admin',
           contextType: COURSE,
-          displayed: true
-        }
+          displayed: true,
+        },
       ],
-      contextType: COURSE
+      contextType: COURSE,
     }
     const newState = reduce(actions.updateRoleFilters(payload), originalState)
     verifyPermissionsDidntChange(originalState.permissions, newState.permissions)
@@ -161,7 +161,7 @@ describe('permissions::reducer', () => {
 
   it('UPDATE_SELECTED_ROLES changes the filters in the filter bar', () => {
     const originalState = {
-      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}]
+      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}],
     }
     const payload = {id: '108', label: 'meow', children: 'meow', value: '108'}
     const newState = reduce(actions.updateSelectedRoles(payload), originalState)
@@ -172,7 +172,7 @@ describe('permissions::reducer', () => {
 
   it('UPDATE_SELECTED_ROLES changes filters if all roles are selected', () => {
     const originalState = {
-      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}]
+      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}],
     }
     const payload = {id: '108', label: 'meow', children: 'meow', value: '108'}
     const newState = reduce(actions.updateSelectedRoles(payload), originalState)
@@ -183,21 +183,21 @@ describe('permissions::reducer', () => {
 
   it('FILTER_NEW_ROLE adds the new role to the filter bar and keeps the old', () => {
     const originalState = {
-      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}]
+      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}],
     }
     const payload = {id: '108', label: 'meow', children: 'meow', value: '108'}
     const newState = reduce(actions.filterNewRole(payload), originalState)
 
     const expectedState = [
       {id: '104', label: 'kitty', children: 'kitty', value: '104'},
-      {id: '108', label: 'meow', children: 'meow', value: '108'}
+      {id: '108', label: 'meow', children: 'meow', value: '108'},
     ]
     expect(newState.selectedRoles).toEqual(expectedState)
   })
 
   it('FILTER_NEW_ROLE does not change filters if all roles are selected', () => {
     const originalState = {
-      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}]
+      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}],
     }
     const payload = {id: '108', label: 'meow', children: 'meow', value: '108'}
     const newState = reduce(actions.filterNewRole(payload), originalState)
@@ -210,12 +210,12 @@ describe('permissions::reducer', () => {
     const originalState = {
       selectedRoles: [
         {id: '104', label: 'kitty', children: 'kitty', value: '104'},
-        {id: '108', label: 'meow', children: 'meow', value: '108'}
-      ]
+        {id: '108', label: 'meow', children: 'meow', value: '108'},
+      ],
     }
     const payload = {
       role: {id: '108', label: 'meow', children: 'meow', value: '108'},
-      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}]
+      selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}],
     }
     const newState = reduce(actions.filterDeletedRole(payload), originalState)
 
@@ -225,11 +225,11 @@ describe('permissions::reducer', () => {
 
   it('FILTER_DELETED_ROLE does not change the filters if all roles are selected', () => {
     const originalState = {
-      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}]
+      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}],
     }
     const payload = {
       role: {id: '108', label: 'meow', children: 'meow', value: '108'},
-      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}]
+      selectedRoles: [{label: ALL_ROLES_LABEL, value: ALL_ROLES_VALUE}],
     }
     const newState = reduce(actions.filterDeletedRole(payload), originalState)
 
@@ -239,11 +239,11 @@ describe('permissions::reducer', () => {
 
   it('FILTER_DELETED_ROLE resets to all roles displayed if the last displated role is deleted', () => {
     const originalState = {
-      selectedRoles: [{id: '108', label: 'meow', children: 'meow', value: '108'}]
+      selectedRoles: [{id: '108', label: 'meow', children: 'meow', value: '108'}],
     }
     const payload = {
       role: {id: '108', label: 'meow', children: 'meow', value: '108'},
-      selectedRoles: [{id: '108', label: 'meow', children: 'meow', value: '108'}]
+      selectedRoles: [{id: '108', label: 'meow', children: 'meow', value: '108'}],
     }
     const newState = reduce(actions.filterDeletedRole(payload), originalState)
 
@@ -268,13 +268,13 @@ describe('permissions::reducer', () => {
     const originalState = {
       activeAddTray: {
         show: false,
-        loading: false
-      }
+        loading: false,
+      },
     }
     const newState = reduce(actions.displayAddTray(), originalState)
     expect(newState.activeAddTray).toEqual({
       show: true,
-      loading: false
+      loading: false,
     })
   })
 
@@ -282,13 +282,13 @@ describe('permissions::reducer', () => {
     const originalState = {
       activeAddTray: {
         show: true,
-        loading: false
-      }
+        loading: false,
+      },
     }
     const newState = reduce(actions.hideAllTrays(), originalState)
     expect(newState.activeAddTray).toEqual({
       show: false,
-      loading: false
+      loading: false,
     })
   })
 
@@ -296,13 +296,13 @@ describe('permissions::reducer', () => {
     const originalState = {
       activeAddTray: {
         show: false,
-        loading: true
-      }
+        loading: true,
+      },
     }
     const newState = reduce(actions.addTraySavingStart(), originalState)
     expect(newState.activeAddTray).toEqual({
       show: false,
-      loading: true
+      loading: true,
     })
   })
 
@@ -310,13 +310,13 @@ describe('permissions::reducer', () => {
     const originalState = {
       activeAddTray: {
         show: true,
-        loading: true
-      }
+        loading: true,
+      },
     }
     const newState = reduce(actions.addTraySavingSuccess(), originalState)
     expect(newState.activeAddTray).toEqual({
       show: true,
-      loading: false
+      loading: false,
     })
   })
 
@@ -324,19 +324,19 @@ describe('permissions::reducer', () => {
     const originalState = {
       activeAddTray: {
         show: true,
-        loading: true
-      }
+        loading: true,
+      },
     }
     const newState = reduce(actions.addTraySavingFail(), originalState)
     expect(newState.activeAddTray).toEqual({
       show: true,
-      loading: false
+      loading: false,
     })
   })
 
   it('UPDATE_PERMISSIONS sets enabled in the store', () => {
     const originalState = {
-      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
+      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}],
     }
     const payload = {
       role: {
@@ -345,24 +345,24 @@ describe('permissions::reducer', () => {
           become_user: {
             enabled: false,
             locked: true,
-            explicit: true
-          }
-        }
-      }
+            explicit: true,
+          },
+        },
+      },
     }
     const newState = reduce(actions.updatePermissions(payload), originalState)
     const expectedState = [
       {
         id: '1',
-        permissions: {become_user: {enabled: ENABLED_FOR_NONE, locked: true, explicit: true}}
-      }
+        permissions: {become_user: {enabled: ENABLED_FOR_NONE, locked: true, explicit: true}},
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })
 
   it('UPDATE_PERMISSIONS sets locked in the store', () => {
     const originalState = {
-      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
+      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}],
     }
     const payload = {
       role: {
@@ -371,24 +371,24 @@ describe('permissions::reducer', () => {
           become_user: {
             enabled: true,
             locked: false,
-            explicit: true
-          }
-        }
-      }
+            explicit: true,
+          },
+        },
+      },
     }
     const newState = reduce(actions.updatePermissions(payload), originalState)
     const expectedState = [
       {
         id: '1',
-        permissions: {become_user: {enabled: ENABLED_FOR_ALL, locked: false, explicit: true}}
-      }
+        permissions: {become_user: {enabled: ENABLED_FOR_ALL, locked: false, explicit: true}},
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })
 
   it('UPDATE_PERMISSIONS sets explicit in the store', () => {
     const originalState = {
-      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}]
+      roles: [{id: '1', permissions: {become_user: {enabled: true, locked: true, explicit: true}}}],
     }
     const payload = {
       role: {
@@ -397,17 +397,17 @@ describe('permissions::reducer', () => {
           become_user: {
             enabled: true,
             locked: true,
-            explicit: false
-          }
-        }
-      }
+            explicit: false,
+          },
+        },
+      },
     }
     const newState = reduce(actions.updatePermissions(payload), originalState)
     const expectedState = [
       {
         id: '1',
-        permissions: {become_user: {enabled: ENABLED_FOR_ALL, locked: true, explicit: false}}
-      }
+        permissions: {become_user: {enabled: ENABLED_FOR_ALL, locked: true, explicit: false}},
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })
@@ -426,17 +426,17 @@ describe('permissions::reducer', () => {
             enabled: false,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
+            locked: false,
           },
           granular_2: {
             enabled: true,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
-          }
+            locked: false,
+          },
         },
-        contextType: ACCOUNT
-      }
+        contextType: ACCOUNT,
+      },
     }
 
     const expectedState = [
@@ -450,24 +450,24 @@ describe('permissions::reducer', () => {
             enabled: ENABLED_FOR_NONE,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
+            locked: false,
           },
           granular_2: {
             enabled: ENABLED_FOR_ALL,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
+            locked: false,
           },
           granular_permission_group: {
             built_from_granular_permissions: true,
             enabled: ENABLED_FOR_PARTIAL,
             explicit: true,
             locked: false,
-            readonly: false
-          }
+            readonly: false,
+          },
         },
-        contextType: ACCOUNT
-      }
+        contextType: ACCOUNT,
+      },
     ]
 
     const newState = reduce(actions.updatePermissions(payload), originalState)
@@ -482,16 +482,16 @@ describe('permissions::reducer', () => {
           id: '9',
           label: 'steven',
           role: 'steven',
-          workflow_state: 'active'
-        }
-      ]
+          workflow_state: 'active',
+        },
+      ],
     }
     const payload = {
       base_role_type: 'StudentEnrollment',
       id: '9',
       label: 'steven awesome',
       role: 'steven awesome',
-      workflow_state: 'active'
+      workflow_state: 'active',
     }
     const newState = reduce(actions.updateRole(payload), originalState)
     const expectedState = [
@@ -500,8 +500,8 @@ describe('permissions::reducer', () => {
         id: '9',
         label: 'steven awesome',
         role: 'steven awesome',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })
@@ -517,7 +517,7 @@ describe('permissions::reducer', () => {
           workflow_state: 'active',
           displayed: true,
           permissions: {},
-          contextType: COURSE
+          contextType: COURSE,
         },
         {
           base_role_type: 'AccountMembership',
@@ -527,9 +527,9 @@ describe('permissions::reducer', () => {
           workflow_state: 'active',
           displayed: false,
           permissions: {},
-          contextType: ACCOUNT
-        }
-      ]
+          contextType: ACCOUNT,
+        },
+      ],
     }
     const payload = {
       base_role_type: 'StudentEnrollment',
@@ -539,7 +539,7 @@ describe('permissions::reducer', () => {
       workflow_state: 'active',
       displayed: false,
       permissions: {},
-      contextType: COURSE
+      contextType: COURSE,
     }
     const newState = reduce(actions.addNewRole(payload), originalState)
     const expectedState = [
@@ -551,7 +551,7 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: true,
         permissions: {},
-        contextType: COURSE
+        contextType: COURSE,
       },
       {
         base_role_type: 'StudentEnrollment',
@@ -561,7 +561,7 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: true,
         permissions: {},
-        contextType: COURSE
+        contextType: COURSE,
       },
       {
         base_role_type: 'AccountMembership',
@@ -571,15 +571,15 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: false,
         permissions: {},
-        contextType: ACCOUNT
-      }
+        contextType: ACCOUNT,
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })
 
   it('ADD_NEW_ROLE groups granular role permissions', () => {
     const originalState = {
-      roles: [{id: '1', permissions: {}, contextType: COURSE, displayed: true}]
+      roles: [{id: '1', permissions: {}, contextType: COURSE, displayed: true}],
     }
 
     const payload = {
@@ -592,16 +592,16 @@ describe('permissions::reducer', () => {
           enabled: true,
           explicit: true,
           group: 'granular_permission_group',
-          locked: false
+          locked: false,
         },
         granular_2: {
           enabled: false,
           explicit: true,
           group: 'granular_permission_group',
-          locked: false
-        }
+          locked: false,
+        },
       },
-      contextType: COURSE
+      contextType: COURSE,
     }
 
     const expectedState = [
@@ -617,29 +617,29 @@ describe('permissions::reducer', () => {
             enabled: ENABLED_FOR_ALL,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
+            locked: false,
           },
           granular_2: {
             enabled: ENABLED_FOR_NONE,
             explicit: true,
             group: 'granular_permission_group',
-            locked: false
+            locked: false,
           },
           granular_permission_group: {
             built_from_granular_permissions: true,
             enabled: ENABLED_FOR_PARTIAL,
             explicit: true,
             locked: false,
-            readonly: false
-          }
-        }
+            readonly: false,
+          },
+        },
       },
       {
         id: '1',
         permissions: {},
         contextType: COURSE,
-        displayed: true
-      }
+        displayed: true,
+      },
     ]
 
     const newState = reduce(actions.addNewRole(payload), originalState)
@@ -657,7 +657,7 @@ describe('permissions::reducer', () => {
           workflow_state: 'active',
           displayed: false,
           permissions: {},
-          contextType: COURSE
+          contextType: COURSE,
         },
         {
           base_role_type: 'AccountMembership',
@@ -667,9 +667,9 @@ describe('permissions::reducer', () => {
           workflow_state: 'active',
           displayed: true,
           permissions: {},
-          contextType: ACCOUNT
-        }
-      ]
+          contextType: ACCOUNT,
+        },
+      ],
     }
     const payload = {
       base_role_type: 'AccountMembership',
@@ -679,7 +679,7 @@ describe('permissions::reducer', () => {
       workflow_state: 'active',
       displayed: false,
       permissions: {},
-      contextType: ACCOUNT
+      contextType: ACCOUNT,
     }
     const newState = reduce(actions.addNewRole(payload), originalState)
     const expectedState = [
@@ -691,7 +691,7 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: false,
         permissions: {},
-        contextType: COURSE
+        contextType: COURSE,
       },
       {
         base_role_type: 'AccountMembership',
@@ -701,7 +701,7 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: true,
         permissions: {},
-        contextType: ACCOUNT
+        contextType: ACCOUNT,
       },
       {
         base_role_type: 'AccountMembership',
@@ -711,8 +711,8 @@ describe('permissions::reducer', () => {
         workflow_state: 'active',
         displayed: true,
         permissions: {},
-        contextType: ACCOUNT
-      }
+        contextType: ACCOUNT,
+      },
     ]
     expect(newState.roles).toEqual(expectedState)
   })

@@ -45,7 +45,7 @@ export default class GroupCategoryView extends View {
       '.filterable': '$filter',
       '.filterable-unassigned-users': '$filterUnassignedUsers',
       '.unassigned-users-heading': '$unassignedUsersHeading',
-      '.groups-with-count': '$groupsHeading'
+      '.groups-with-count': '$groupsHeading',
     }
   }
 
@@ -57,7 +57,7 @@ export default class GroupCategoryView extends View {
       options.groupCategoryDetailView = new GroupCategoryDetailView({
         parentView: this,
         model: this.model,
-        collection: this.groups
+        collection: this.groups,
       })
     }
     if (options.groupsView == null) options.groupsView = this.groupsView(options)
@@ -77,7 +77,7 @@ export default class GroupCategoryView extends View {
     }
     return new GroupsView({
       collection: this.groups,
-      addUnassignedMenu
+      addUnassignedMenu,
     })
   }
 
@@ -86,7 +86,7 @@ export default class GroupCategoryView extends View {
     return new UnassignedUsersView({
       category: this.model,
       collection: this.model.unassignedUsers(),
-      groupsCollection: this.groups
+      groupsCollection: this.groups,
     })
   }
 
@@ -119,7 +119,7 @@ export default class GroupCategoryView extends View {
           this.model.groups().fetch()
           this.model.unassignedUsers().fetch()
           return this.render()
-        }
+        },
       })
     })
   }

@@ -71,6 +71,11 @@ class Setting < Switchman::UnshardedRecord
     cache.delete(name)
     @all_settings = nil
     MultiCache.delete("all_settings")
+
+    if Rails.const_defined? "Console"
+      message = Setting.get("setting_set_sighup_required_message", "** NOTE: After calling `Setting.set`, SIGHUP must be sent to all Canvas processes **")
+      Rails.logger.info(message)
+    end
   end
 
   # this cache doesn't get invalidated by other rails processes, obviously, so

@@ -23,13 +23,13 @@ export default {
   title: 'Examples/Canvas Inbox/Media Attachment',
   component: MediaAttachment,
   argTypes: {
-    onRemoveMedia: {action: 'remove media'}
-  }
+    onRemoveMedia: {action: 'remove media'},
+  },
 }
 
 const Template = args => <MediaAttachment {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  mediaTitle: 'This is a super awesome media file'
+  mediaTitle: 'This is a super awesome media file',
 }

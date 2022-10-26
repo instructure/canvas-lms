@@ -27,7 +27,7 @@ const easy_student_view = {
 
   hide() {
     $(selector).hide()
-  }
+  },
 }
 
 export {easy_student_view as default}

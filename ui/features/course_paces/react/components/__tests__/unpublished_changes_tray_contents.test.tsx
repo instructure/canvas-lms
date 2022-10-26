@@ -24,7 +24,7 @@ import userEvent from '@testing-library/user-event'
 const onTrayDismiss = jest.fn()
 const CHANGES = [
   {id: 'theme', summary: 'You changed the theme from Light Mode to Dark Mode.'},
-  {id: 'volume', summary: 'You changed the volume level from Palatable to Insanely High.'}
+  {id: 'volume', summary: 'You changed the volume level from Palatable to Insanely High.'},
 ]
 
 afterEach(() => {

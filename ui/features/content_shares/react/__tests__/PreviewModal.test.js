@@ -25,7 +25,7 @@ describe('content_shares/PreviewModal', () => {
   it('renders an iframe with the appropriate src', () => {
     window.ENV = {COMMON_CARTRIDGE_VIEWER_URL: 'http://example.com'}
     const share = mockShare()
-    render(<PreviewModal open share={share} />)
+    render(<PreviewModal open={true} share={share} />)
     const iframe = document.querySelector('iframe')
     expect(iframe).toBeInTheDocument()
     expect(iframe.getAttribute('src')).toBe(
@@ -35,7 +35,7 @@ describe('content_shares/PreviewModal', () => {
 
   it('dismisses the modal', () => {
     const handleDismiss = jest.fn()
-    const {getAllByText} = render(<PreviewModal open onDismiss={handleDismiss} />)
+    const {getAllByText} = render(<PreviewModal open={true} onDismiss={handleDismiss} />)
     const closeButtons = getAllByText(/close/i)
     closeButtons.forEach(button => fireEvent.click(button))
     expect(handleDismiss).toHaveBeenCalledTimes(closeButtons.length)

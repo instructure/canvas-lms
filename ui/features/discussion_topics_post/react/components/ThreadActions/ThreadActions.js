@@ -31,7 +31,7 @@ import {
   IconMarkAsReadSolid,
   IconMarkAsReadLine,
   IconWarningBorderlessSolid,
-  IconReplyAll2Line
+  IconReplyAll2Line,
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -57,7 +57,7 @@ export const ThreadActions = props => {
       onOpenInSpeedGrader: props.onOpenInSpeedGrader,
       onMarkThreadAsRead: props.onMarkThreadAsRead,
       onReport: props.onReport,
-      isReported: props.isReported
+      isReported: props.isReported,
     }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
@@ -73,7 +73,7 @@ export const ThreadActions = props => {
                 <IconButton
                   size="small"
                   screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
-                    author: props.authorName
+                    author: props.authorName,
                   })}
                   renderIcon={IconMoreLine}
                   withBackground={false}
@@ -98,7 +98,7 @@ const getMenuConfigs = props => {
       key: 'markAllAsRead',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark All as Read'),
-      selectionCallback: props.onMarkAllAsRead
+      selectionCallback: props.onMarkAllAsRead,
     })
   }
   if (props.onMarkAllAsUnread) {
@@ -106,7 +106,7 @@ const getMenuConfigs = props => {
       key: 'markAllAsUnRead',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark All as Unread'),
-      selectionCallback: props.onMarkAllAsUnread
+      selectionCallback: props.onMarkAllAsUnread,
     })
   }
   if (props.isUnread) {
@@ -114,14 +114,14 @@ const getMenuConfigs = props => {
       key: 'markAsRead',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark as Read'),
-      selectionCallback: props.onToggleUnread
+      selectionCallback: props.onToggleUnread,
     })
   } else {
     options.push({
       key: 'markAsUnread',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark as Unread'),
-      selectionCallback: props.onToggleUnread
+      selectionCallback: props.onToggleUnread,
     })
   }
   if (props.onMarkThreadAsRead) {
@@ -131,7 +131,7 @@ const getMenuConfigs = props => {
       label: I18n.t('Mark Thread as Read'),
       selectionCallback: () => {
         props.onMarkThreadAsRead(true)
-      }
+      },
     })
   }
   if (props.onMarkThreadAsRead) {
@@ -141,7 +141,7 @@ const getMenuConfigs = props => {
       label: I18n.t('Mark Thread as Unread'),
       selectionCallback: () => {
         props.onMarkThreadAsRead(false)
-      }
+      },
     })
   }
   if (props.goToTopic) {
@@ -149,7 +149,7 @@ const getMenuConfigs = props => {
       key: 'toTopic',
       icon: <IconDiscussionLine />,
       label: I18n.t('Go To Topic'),
-      selectionCallback: props.goToTopic
+      selectionCallback: props.goToTopic,
     })
   }
   if (props.goToParent) {
@@ -157,7 +157,7 @@ const getMenuConfigs = props => {
       key: 'toParent',
       icon: <IconDiscussionLine />,
       label: I18n.t('Go To Parent'),
-      selectionCallback: props.goToParent
+      selectionCallback: props.goToParent,
     })
   }
   if (props.goToQuotedReply) {
@@ -165,7 +165,7 @@ const getMenuConfigs = props => {
       key: 'toQuotedReply',
       icon: <IconReplyAll2Line />,
       label: I18n.t('Go To Quoted Reply'),
-      selectionCallback: props.goToQuotedReply
+      selectionCallback: props.goToQuotedReply,
     })
   }
   if (props.onEdit) {
@@ -173,7 +173,7 @@ const getMenuConfigs = props => {
       key: 'edit',
       icon: <IconEditLine />,
       label: I18n.t('Edit'),
-      selectionCallback: props.onEdit
+      selectionCallback: props.onEdit,
     })
   }
   if (props.onDelete) {
@@ -181,7 +181,7 @@ const getMenuConfigs = props => {
       key: 'delete',
       icon: <IconTrashLine />,
       label: I18n.t('Delete'),
-      selectionCallback: props.onDelete
+      selectionCallback: props.onDelete,
     })
   }
   if (props.onOpenInSpeedGrader) {
@@ -189,20 +189,20 @@ const getMenuConfigs = props => {
       key: 'inSpeedGrader',
       icon: <IconSpeedGraderLine />,
       label: I18n.t('Open in SpeedGrader'),
-      selectionCallback: props.onOpenInSpeedGrader
+      selectionCallback: props.onOpenInSpeedGrader,
     })
   }
   if (props.onReport) {
     options.push({
       key: 'separator',
-      separator: true
+      separator: true,
     })
     options.push({
       key: 'report',
       icon: <IconWarningBorderlessSolid />,
       label: props.isReported ? I18n.t('Reported') : I18n.t('Report'),
       selectionCallback: props.onReport,
-      disabled: props.isReported
+      disabled: props.isReported,
     })
   }
   return options
@@ -253,13 +253,13 @@ ThreadActions.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   onReport: PropTypes.func,
   isReported: PropTypes.bool,
-  isSearch: PropTypes.bool
+  isSearch: PropTypes.bool,
 }
 
 ThreadActions.defaultProps = {
   isUnread: false,
   isSearch: false,
-  isReported: false
+  isReported: false,
 }
 
 export default ThreadActions

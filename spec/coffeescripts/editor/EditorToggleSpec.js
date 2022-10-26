@@ -31,7 +31,7 @@ QUnit.module('EditorToggle', {
   teardown() {
     containerDiv.remove()
     fixtures.empty()
-  }
+  },
 })
 
 test('constructor initializes textarea container', () => {
@@ -57,11 +57,11 @@ test('it defaults tinyOptions to an empty object if none are given', () => {
 test('@options.rceOptions argument is not modified after initialization', () => {
   const rceOptions = {
     focus: false,
-    otherStuff: ''
+    otherStuff: '',
   }
   const initialOpts = {
     someStuff: null,
-    rceOptions
+    rceOptions,
   }
   const editorToggle = new EditorToggle(containerDiv, initialOpts)
   editorToggle.getRceOptions()
@@ -72,11 +72,11 @@ test('@options.rceOptions argument is not modified after initialization', () => 
 test('@options.rceOptions can extend the default RichContentEditor opts', () => {
   const rceOptions = {
     focus: false,
-    otherStuff: ''
+    otherStuff: '',
   }
   const initialOpts = {
     someStuff: null,
-    rceOptions
+    rceOptions,
   }
   const editorToggle = new EditorToggle(containerDiv, initialOpts)
   const opts = editorToggle.getRceOptions()
@@ -89,7 +89,7 @@ test("createDone does not throw error when editButton doesn't exist", () => {
   sandbox.stub($.fn, 'click').callsArg(0)
   EditorToggle.prototype.createDone.call({
     options: {doneText: ''},
-    display() {}
+    display() {},
   })
   ok($.fn.click.called)
 })
@@ -113,7 +113,7 @@ test('replaceTextArea', () => {
     el: $('<div/>'),
     textAreaContainer: $('<div/>'),
     textArea,
-    createTextArea: () => ({})
+    createTextArea: () => ({}),
   }
   EditorToggle.prototype.replaceTextArea.call(et)
 

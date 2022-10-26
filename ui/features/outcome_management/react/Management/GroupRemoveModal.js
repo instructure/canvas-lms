@@ -41,7 +41,7 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
         onSuccess()
         showFlashAlert({
           message: I18n.t('This group was successfully removed.'),
-          type: 'success'
+          type: 'success',
         })
       } else {
         throw Error()
@@ -54,14 +54,14 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
             'An error occurred while removing this group: "%{groupTitle}" contains one or ' +
               'more Outcomes that are currently aligned to content.',
             {
-              groupTitle
+              groupTitle,
             }
           )
         : I18n.t('An error occurred while removing this group. Please try again.')
 
       showFlashAlert({
         message,
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -72,7 +72,7 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
       label={I18n.t('Remove Group?')}
       open={isOpen}
       onDismiss={onCloseHandler}
-      shouldReturnFocus
+      shouldReturnFocus={true}
     >
       <Modal.Body>
         <View as="div" padding="small 0">
@@ -104,7 +104,7 @@ GroupRemoveModal.propTypes = {
   groupTitle: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired
+  onSuccess: PropTypes.func.isRequired,
 }
 
 export default GroupRemoveModal

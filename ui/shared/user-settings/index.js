@@ -37,11 +37,11 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
 const userSettings = {
-  globalEnv: window.ENV
+  globalEnv: window.ENV,
 }
 
 function addTokens(method, ...tokens) {
-  return function(key, value) {
+  return function (key, value) {
     const stringifiedValue = JSON.stringify(value)
     const joinedTokens = tokens.map(token => userSettings.globalEnv[token]).join('_')
     try {

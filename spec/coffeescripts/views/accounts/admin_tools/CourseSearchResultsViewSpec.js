@@ -18,14 +18,14 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView.js'
-import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
+import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView'
+import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
 import assertions from 'helpers/assertions'
-import { initFlashContainer } from '@canvas/rails-flash-notifications'
+import {initFlashContainer} from '@canvas/rails-flash-notifications'
 
 const errorMessageJSON = {
   status: 'not_found',
-  message: 'There was no foo bar in the baz'
+  message: 'There was no foo bar in the baz',
 }
 const courseJSON = {
   account_id: 6,
@@ -38,7 +38,7 @@ const courseJSON = {
   name: 'Super Fun Deleted Course',
   sis_course_id: null,
   start_at: null,
-  workflow_state: 'deleted'
+  workflow_state: 'deleted',
 }
 
 QUnit.module('CourseSearchResultsView', {
@@ -50,44 +50,37 @@ QUnit.module('CourseSearchResultsView', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.courseSearchResultsView, done, {a11yReport: true})
 })
 
-test('restored is set to false when initialized', function() {
+test('restored is set to false when initialized', function () {
   ok(!this.courseRestore.get('restored'))
 })
 
-test('render is called whenever the model has a change event triggered', function() {
-  sandbox
-    .mock(this.courseSearchResultsView)
-    .expects('render')
-    .once()
+test('render is called whenever the model has a change event triggered', function () {
+  sandbox.mock(this.courseSearchResultsView).expects('render').once()
   this.courseSearchResultsView.applyBindings()
   return this.courseRestore.trigger('change')
 })
 
-test('pressing the restore button calls restore on the model and view', function() {
+test('pressing the restore button calls restore on the model and view', function () {
   this.courseRestore.set(courseJSON)
-  sandbox
-    .mock(this.courseRestore)
-    .expects('restore')
-    .once()
-    .returns($.Deferred().resolve())
+  sandbox.mock(this.courseRestore).expects('restore').once().returns($.Deferred().resolve())
   return this.courseSearchResultsView.$restoreCourseBtn.click()
 })
 
-test('not found message is displayed when model has no id and a status', function() {
+test('not found message is displayed when model has no id and a status', function () {
   this.courseRestore.clear({silent: true})
   this.courseRestore.set(errorMessageJSON)
   ok(this.courseSearchResultsView.$el.find('.alert-error').length > 0, 'Error message is displayed')
 })
 
-test('options to restore a course and its details should be displayed when a deleted course is found', function() {
+test('options to restore a course and its details should be displayed when a deleted course is found', function () {
   this.courseRestore.set(courseJSON)
   ok(
     this.courseSearchResultsView.$el.find('#restoreCourseBtn').length > 0,
@@ -95,34 +88,26 @@ test('options to restore a course and its details should be displayed when a del
   )
 })
 
-test('show screenreader text when course not found', function() {
+test('show screenreader text when course not found', function () {
   initFlashContainer()
   this.courseRestore.clear({silent: true})
   this.courseRestore.set(errorMessageJSON)
   this.courseSearchResultsView.resultsFound()
-  ok(
-    $('#flash_screenreader_holder')
-      .text()
-      .match('Course not found')
-  )
+  ok($('#flash_screenreader_holder').text().match('Course not found'))
 })
 
-test('show screenreader text on finding deleted course', function() {
+test('show screenreader text on finding deleted course', function () {
   initFlashContainer()
   this.courseRestore.set(courseJSON)
   this.courseSearchResultsView.resultsFound()
-  ok(
-    $('#flash_screenreader_holder')
-      .text()
-      .match('Course found')
-  )
+  ok($('#flash_screenreader_holder').text().match('Course found'))
 })
 
-test('show screenreader text on finding non-deleted course', function() {
+test('show screenreader text on finding non-deleted course', function () {
   initFlashContainer()
   this.courseRestore.set({
     ...courseJSON,
-    workflow_state: 'active'
+    workflow_state: 'active',
   })
   this.courseSearchResultsView.resultsFound()
   ok(
@@ -132,7 +117,7 @@ test('show screenreader text on finding non-deleted course', function() {
   )
 })
 
-test('shows options to view a course or add enrollments if a course was restored', function() {
+test('shows options to view a course or add enrollments if a course was restored', function () {
   this.courseRestore.set(courseJSON, {silent: true})
   this.courseRestore.set('restored', true, {silent: true})
   this.courseRestore.set('workflow_state', 'active')
@@ -144,7 +129,7 @@ test('shows options to view a course or add enrollments if a course was restored
   )
 })
 
-test('shows options to view a course or add enrollments if non deleted course was found', function() {
+test('shows options to view a course or add enrollments if non deleted course was found', function () {
   this.courseRestore.set(courseJSON, {silent: true})
   this.courseRestore.set('workflow_state', 'active')
   ok(this.courseSearchResultsView.$el.find('#viewCourse').length > 0, 'Viewing a course displayed')

@@ -285,7 +285,7 @@ module Api::V1::Assignment
     if opts[:include_assessment_requests]
       if user.assigned_assessments.any?
         submission = assignment.submission_for_student(user)
-        assessment_requests = user.assigned_assessments.where(assessor_asset: submission).preload(:asset, :assessor_asset)
+        assessment_requests = user.assigned_assessments.where(assessor_asset: submission).preload(:asset, assessor_asset: :assignment)
         hash["assessment_requests"] = assessment_requests.map { |assessment_request| assessment_request_json(assessment_request, anonymous_peer_reviews: assignment.anonymous_peer_reviews?) }
       else
         hash["assessment_requests"] = []

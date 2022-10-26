@@ -27,32 +27,32 @@ export const template = generateActionTemplates(
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
         'Allows user to filter for Blueprint courses as the account level. Allows user to add associated courses.'
-      )
+      ),
     },
     {
       title: I18n.t('Courses'),
-      description: I18n.t('Allows user to see the list of courses in the account.')
-    }
+      description: I18n.t('Allows user to see the list of courses in the account.'),
+    },
   ],
   [
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
         'If this permission is disabled and Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings.'
-      )
+      ),
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
         'To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Statistics'),
       description: I18n.t(
         'Allows user to see the list of recently started and ended courses in account statistics.'
-      )
-    }
+      ),
+    },
   ],
   [],
   []

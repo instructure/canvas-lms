@@ -38,7 +38,7 @@ QUnit.module('SpeedGraderLink', suiteHooks => {
     context = {
       disabled: false,
       href: 'https://example.com',
-      disabledTip: ''
+      disabledTip: '',
     }
   })
 

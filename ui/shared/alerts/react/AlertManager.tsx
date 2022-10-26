@@ -26,7 +26,7 @@ export type AlertManagerContextType = {
 
 export const AlertManagerContext = createContext<AlertManagerContextType>({
   setOnFailure: () => {},
-  setOnSuccess: () => {}
+  setOnSuccess: () => {},
 })
 
 type AlertManagerState = {
@@ -42,14 +42,14 @@ export default class AlertManager extends React.Component<
 > {
   state: AlertManagerState = {
     key: 0,
-    successScreenReaderOnly: true
+    successScreenReaderOnly: true,
   }
 
   closeAlert = () => {
     this.setState({
       alertMessage: undefined,
       alertStatus: undefined,
-      successScreenReaderOnly: true
+      successScreenReaderOnly: true,
     })
   }
 
@@ -57,7 +57,7 @@ export default class AlertManager extends React.Component<
     this.setState(prevState => ({
       alertMessage,
       alertStatus: 'error',
-      key: prevState.key + 1
+      key: prevState.key + 1,
     }))
   }
 
@@ -66,7 +66,7 @@ export default class AlertManager extends React.Component<
       alertMessage,
       alertStatus: 'success',
       key: prevState.key + 1,
-      successScreenReaderOnly: screenReaderOnly
+      successScreenReaderOnly: screenReaderOnly,
     }))
   }
 
@@ -104,7 +104,7 @@ export default class AlertManager extends React.Component<
       <AlertManagerContext.Provider
         value={{
           setOnFailure: this.setOnFailure,
-          setOnSuccess: this.setOnSuccess
+          setOnSuccess: this.setOnSuccess,
         }}
       >
         {this.state.alertStatus && (
@@ -116,7 +116,7 @@ export default class AlertManager extends React.Component<
               position: 'fixed',
               right: '120px',
               top: '80px',
-              zIndex: 101
+              zIndex: 101,
             }}
           >
             {this.renderAlert()}

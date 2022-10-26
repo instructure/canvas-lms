@@ -33,7 +33,7 @@ export default class OutcomeDetailView extends DialogBaseView {
       containerId: 'outcome_detail',
       close: this.onClose,
       buttons: [],
-      width: 640
+      width: 640,
     }
   }
 
@@ -41,7 +41,7 @@ export default class OutcomeDetailView extends DialogBaseView {
     this.alignmentsForView = new Backbone.Collection([])
     this.alignmentsView = new CollectionView({
       collection: this.alignmentsForView,
-      itemView: AlignmentView
+      itemView: AlignmentView,
     })
     return super.initialize(...arguments)
   }
@@ -54,7 +54,7 @@ export default class OutcomeDetailView extends DialogBaseView {
     super.render(...arguments)
     this.alignmentsView.setElement(this.$('.alignments'))
     this.allAlignments = new OutcomeResultCollection([], {
-      outcome: this.model
+      outcome: this.model,
     })
 
     this.allAlignments.on('fetched:last', () =>

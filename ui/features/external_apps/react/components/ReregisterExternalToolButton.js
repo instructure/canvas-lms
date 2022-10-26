@@ -30,7 +30,7 @@ export default class ReregisterExternalToolButton extends React.Component {
   state = {
     tool: this.props.tool,
     modalIsOpen: false,
-    registrationUpdateModalIsOpen: false
+    registrationUpdateModalIsOpen: false,
   }
 
   componentDidUpdate() {
@@ -47,7 +47,7 @@ export default class ReregisterExternalToolButton extends React.Component {
     e.preventDefault()
     this.setState({
       tool: this.props.tool,
-      modalIsOpen: true
+      modalIsOpen: true,
     })
   }
 
@@ -79,7 +79,7 @@ export default class ReregisterExternalToolButton extends React.Component {
           ref="lti2Iframe"
           handleInstall={this.handleReregistration}
           registrationUrl={this.props.tool.reregistration_url}
-          reregistration
+          reregistration={true}
           toolName={this.props.tool.name || I18n.t('Tool Content')}
         />
       </Modal.Body>

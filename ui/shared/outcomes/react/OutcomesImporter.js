@@ -65,14 +65,14 @@ export default class OutcomesImporter extends Component {
     importId: PropTypes.string,
     contextUrlRoot: PropTypes.string.isRequired,
     invokedImport: PropTypes.bool.isRequired,
-    onSuccessfulOutcomesImport: PropTypes.func
+    onSuccessfulOutcomesImport: PropTypes.func,
   }
 
   static defaultProps = {
     file: null,
     importId: null,
     learningOutcomeGroupAncestorIds: [],
-    onSuccessfulOutcomesImport: () => {}
+    onSuccessfulOutcomesImport: () => {},
   }
 
   componentDidMount() {
@@ -106,7 +106,7 @@ export default class OutcomesImporter extends Component {
       contextUrlRoot,
       learningOutcomeGroupId,
       file,
-      importId
+      importId,
     } = this.props
     disableOutcomeViews()
     if (file !== null) {
@@ -116,7 +116,7 @@ export default class OutcomesImporter extends Component {
         .catch(() => {
           showFlashAlert({
             type: 'error',
-            message: I18n.t('There was an error uploading your file. Please try again.')
+            message: I18n.t('There was an error uploading your file. Please try again.'),
           })
           resetOutcomeViews()
         })
@@ -137,14 +137,14 @@ export default class OutcomesImporter extends Component {
         type: 'error',
         message: I18n.t(
           'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.'
-        )
+        ),
       })
     } else if (count > 0) {
       showFlashAlert({
         type: 'warning',
         message: I18n.t(
           'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
-        )
+        ),
       })
     } else {
       apiClient
@@ -160,12 +160,12 @@ export default class OutcomesImporter extends Component {
 
   successfulUpload(createdGroupIds) {
     this.props.onSuccessfulOutcomesImport({
-      selectedGroupAncestorIds: [...this.props.learningOutcomeGroupAncestorIds, ...createdGroupIds]
+      selectedGroupAncestorIds: [...this.props.learningOutcomeGroupAncestorIds, ...createdGroupIds],
     })
 
     showFlashAlert({
       type: 'success',
-      message: I18n.t('Your outcomes were successfully imported.')
+      message: I18n.t('Your outcomes were successfully imported.'),
     })
   }
 
@@ -173,7 +173,7 @@ export default class OutcomesImporter extends Component {
     const {invokedImport} = this.props
     const styles = {
       textAlign: 'center',
-      marginTop: '3rem'
+      marginTop: '3rem',
     }
     return (
       <div style={styles}>

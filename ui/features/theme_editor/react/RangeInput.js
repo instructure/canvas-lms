@@ -32,7 +32,7 @@ export default class RangeInput extends Component {
     onChange: PropTypes.func,
     themeState: PropTypes.object,
     handleThemeStateChange: PropTypes.func,
-    variableKey: PropTypes.string.isRequired
+    variableKey: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -40,11 +40,11 @@ export default class RangeInput extends Component {
     onChange() {},
     formatValue: val => val,
     themeState: {},
-    handleThemeStateChange() {}
+    handleThemeStateChange() {},
   }
 
   state = {
-    value: this.props.defaultValue
+    value: this.props.defaultValue,
   }
 
   /* TODO: Remove this workaround when we upgrade to 15.6.x or later */

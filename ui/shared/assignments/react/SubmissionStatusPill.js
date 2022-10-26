@@ -51,5 +51,5 @@ export default function SubmissionStatusPill(props) {
 
 SubmissionStatusPill.propTypes = {
   excused: bool,
-  submissionStatus: string
+  submissionStatus: string,
 }

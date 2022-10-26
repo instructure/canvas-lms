@@ -22,11 +22,11 @@ const {transform} = require('@babel/core')
 exports.process = (source, path) => {
   const amd = compile(source, path, {
     // brandable_css assets are not available in test
-    injectBrandableStylesheet: false
+    injectBrandableStylesheet: false,
   })
 
   return transform(amd, {
     filename: path,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
+    plugins: ['@babel/plugin-transform-modules-commonjs'],
   })
 }

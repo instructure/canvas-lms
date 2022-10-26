@@ -28,7 +28,7 @@ const numberFormat = {
 
   outcomeScore(n) {
     return numberFormat._format(n, {precision: 2, strip_insignificant_zeros: true})
-  }
+  },
 }
 
 export default numberFormat

@@ -27,7 +27,7 @@ import {
   InternalSetting,
   InternalSettingMutationVariables,
   UpdateInternalSettingData,
-  UpdateInternalSettingVariables
+  UpdateInternalSettingVariables,
 } from './types'
 import {InternalSettingsTable} from './table/InternalSettingsTable'
 import {Portal} from '@instructure/ui-portal'
@@ -39,7 +39,7 @@ import {Heading} from '@instructure/ui-heading'
 import {
   DELETE_INTERNAL_SETTING_MUTATION,
   UPDATE_INTERNAL_SETTING_MUTATION,
-  CREATE_INTERNAL_SETTING_MUTATION
+  CREATE_INTERNAL_SETTING_MUTATION,
 } from './graphql/Mutations'
 
 const I18n = useI18nScope('internal-settings')
@@ -175,9 +175,9 @@ export const InternalSettingsManager = (props: {internalSettings: InternalSettin
         <Mask>
           <Dialog
             open={!!pendingDeleteId}
-            shouldContainFocus
+            shouldContainFocus={true}
             defaultFocusElement={() => {}}
-            shouldReturnFocus
+            shouldReturnFocus={true}
             onDismiss={cancelDeleteInternalSetting}
           >
             <View

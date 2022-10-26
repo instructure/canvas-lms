@@ -31,8 +31,8 @@ test('extractInfoFromEvent', () => {
   const changeEvent = {
     type: 'change',
     target: {
-      files: [{type: 'image/jpeg'}]
-    }
+      files: [{type: 'image/jpeg'}],
+    },
   }
 
   const dragEvent = {
@@ -41,27 +41,27 @@ test('extractInfoFromEvent', () => {
       files: [
         {
           name: 'test',
-          type: 'image/jpeg'
-        }
-      ]
-    }
+          type: 'image/jpeg',
+        },
+      ],
+    },
   }
 
   const changeResults = Helpers.extractInfoFromEvent(changeEvent)
   const expectedChangeResults = {
     file: {
-      type: 'image/jpeg'
+      type: 'image/jpeg',
     },
-    type: 'image/jpeg'
+    type: 'image/jpeg',
   }
 
   const dragResults = Helpers.extractInfoFromEvent(dragEvent)
   const expectedDragResults = {
     file: {
       name: 'test',
-      type: 'image/jpeg'
+      type: 'image/jpeg',
     },
-    type: 'image/jpeg'
+    type: 'image/jpeg',
   }
 
   deepEqual(changeResults, expectedChangeResults, 'creates the proper info from change events')

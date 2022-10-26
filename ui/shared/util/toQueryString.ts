@@ -48,7 +48,7 @@ export default function toQueryString(params: QueryParameterMap): string {
         .replace(/\[\d+\]$/, '[]')
         .replace(/{/g, '[')
         .replace(/}/g, ']'),
-      elt[1]
+      elt[1],
     ]
   }
 

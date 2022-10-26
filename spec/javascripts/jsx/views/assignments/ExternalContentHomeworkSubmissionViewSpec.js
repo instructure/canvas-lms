@@ -29,7 +29,7 @@ function newView() {
 QUnit.module('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('Does submit the assignment if the EULA checkbox is not checked', () => {

@@ -36,15 +36,15 @@ const I18n = useI18nScope('announcements_v2')
 export default class ExternalFeedsTray extends Component {
   static propTypes = {
     atomFeedUrl: string,
-    permissions: propTypes.permissions.isRequired
+    permissions: propTypes.permissions.isRequired,
   }
 
   static defaultProps = {
-    atomFeedUrl: null
+    atomFeedUrl: null,
   }
 
   state = {
-    open: false
+    open: false,
   }
 
   renderTrayContent() {

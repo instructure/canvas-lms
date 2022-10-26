@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
-  include GranularPermissionEnforcement
-
   private
 
   def pacing_service
@@ -34,14 +32,6 @@ class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
 
   def context
     @section
-  end
-
-  def authorize_action
-    enforce_granular_permissions(action_name.to_sym == :index ? course : @section,
-                                 overrides: [],
-                                 actions: {
-                                   index: [:manage_content], show: [:read], create: [:create], update: [:update], delete: [:delete]
-                                 })
   end
 
   def load_contexts

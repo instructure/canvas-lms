@@ -37,7 +37,7 @@ export function DiscussionDetails({...props}) {
   const formattedPoints = pointsPossible
     ? numberFormat._format(pointsPossible, {
         precision: 2,
-        strip_insignificant_zeros: true
+        strip_insignificant_zeros: true,
       })
     : 0
 
@@ -50,34 +50,34 @@ export function DiscussionDetails({...props}) {
           text: I18n.t(
             {
               one: '1 point',
-              other: '%{formattedPoints} points'
+              other: '%{formattedPoints} points',
             },
             {
               count: pointsPossible,
-              formattedPoints
+              formattedPoints,
             }
           ),
-          textSize: 'x-small'
+          textSize: 'x-small',
         },
         desktop: {
           text: I18n.t(
             {
               one: '1 point possible',
-              other: '%{formattedPoints} points possible'
+              other: '%{formattedPoints} points possible',
             },
             {
               count: pointsPossible,
-              formattedPoints
+              formattedPoints,
             }
           ),
-          textSize: 'small'
-        }
+          textSize: 'small',
+        },
       }}
       render={responsiveProps => (
         <>
           {props.discussionTopic.assignment ? (
             <Flex data-testid="graded-discussion-info">
-              <Flex.Item padding="xx-small" shouldGrow shouldShrink align="start">
+              <Flex.Item padding="xx-small" shouldGrow={true} shouldShrink={true} align="start">
                 <AssignmentAvailabilityContainer
                   assignment={props.discussionTopic?.assignment}
                   isAdmin={props.discussionTopic.permissions.readAsAdmin}
@@ -85,7 +85,7 @@ export function DiscussionDetails({...props}) {
                   courseId={props.courseId}
                 />
               </Flex.Item>
-              <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
+              <Flex.Item padding="xx-small" shouldShrink={true} align="end" overflowY="hidden">
                 <Text weight="normal" size={responsiveProps.textSize}>
                   {responsiveProps.text}
                 </Text>
@@ -93,7 +93,7 @@ export function DiscussionDetails({...props}) {
             </Flex>
           ) : (
             <Flex data-testid="non-graded-discussion-info">
-              <Flex.Item padding="xx-small" shouldGrow shouldShrink align="start">
+              <Flex.Item padding="xx-small" shouldGrow={true} shouldShrink={true} align="start">
                 <DiscussionAvailabilityContainer
                   courseSections={props.discussionTopic.courseSections}
                   totalUserCount={props.discussionTopic.userCount}
@@ -114,7 +114,7 @@ export function DiscussionDetails({...props}) {
 DiscussionDetails.propTypes = {
   discussionTopic: PropTypes.object,
   inPacedCourse: PropTypes.bool,
-  courseId: PropTypes.string
+  courseId: PropTypes.string,
 }
 
 export default DiscussionDetails

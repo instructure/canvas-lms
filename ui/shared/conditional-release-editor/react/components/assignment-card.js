@@ -37,9 +37,9 @@ const assignmentSource = {
   beginDrag(props) {
     return {
       path: props.path,
-      id: props.assignment.get('id').toString()
+      id: props.assignment.get('id').toString(),
     }
-  }
+  },
 }
 
 class AssignmentCard extends React.Component {
@@ -54,7 +54,7 @@ class AssignmentCard extends React.Component {
       // injected by React DnD
       isDragging: bool.isRequired,
       connectDragSource: func.isRequired,
-      connectDragPreview: func.isRequired
+      connectDragPreview: func.isRequired,
     }
   }
 
@@ -99,7 +99,7 @@ class AssignmentCard extends React.Component {
       const points =
         this.props.assignment.get('category') !== 'page'
           ? I18n.t('%{points} pts', {
-              points: I18n.n(this.props.assignment.get('points_possible') || 0)
+              points: I18n.n(this.props.assignment.get('points_possible') || 0),
             })
           : ''
 
@@ -125,7 +125,7 @@ class AssignmentCard extends React.Component {
     const classes = classNames({
       'cr-assignment-card': true,
       'cr-assignment-card__loading': !this.props.assignment,
-      'cr-assignment-card__dragging': this.props.isDragging
+      'cr-assignment-card__dragging': this.props.isDragging,
     })
 
     return this.props.connectDragPreview(
@@ -148,5 +148,5 @@ class AssignmentCard extends React.Component {
 export default DragSource('AssignmentCard', assignmentSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   connectDragPreview: connect.dragPreview(),
-  isDragging: monitor.isDragging()
+  isDragging: monitor.isDragging(),
 }))(AssignmentCard)

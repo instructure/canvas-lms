@@ -23,7 +23,7 @@ export default class ModalContent extends React.Component {
 
   static defaultProps = {
     className: 'ReactModal__Body',
-    style: {}
+    style: {},
   }
 
   render() {

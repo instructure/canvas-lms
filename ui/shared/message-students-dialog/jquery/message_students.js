@@ -20,9 +20,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import natcompare from '@canvas/util/natcompare'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
 const I18n = useI18nScope('public_message_students')
 /* showIf */
 
@@ -37,7 +38,7 @@ function checkSendable() {
 }
 
 /* global messageStudents */
-window.messageStudents = function(settings) {
+window.messageStudents = function (settings) {
   const $message_students_dialog = messageStudentsDialog()
   currentSettings = settings
   $message_students_dialog.find('.message_types').empty()
@@ -65,13 +66,13 @@ window.messageStudents = function(settings) {
     $student.find('.name').text(student.name)
     $student.find('.score').text(student.score)
     const remove_text = I18n.t('Remove %{student} from recipients', {
-      student: student.name
+      student: student.name,
     })
     const $remove_button = $student.find('.remove-button')
     $remove_button
       .attr('title', remove_text)
       .append($("<span class='screenreader-only'></span>").text(remove_text))
-    $remove_button.click(function(event) {
+    $remove_button.click(function (event) {
       event.preventDefault()
       // hide the selected student
       const $s = $(this).closest('li')
@@ -95,7 +96,7 @@ window.messageStudents = function(settings) {
   $ul.show()
 
   const dialogTitle = I18n.t('Message Students for %{course_name}', {
-    course_name: title
+    course_name: title,
   })
 
   $message_students_dialog.data('students_hash', students_hash),
@@ -119,11 +120,8 @@ window.messageStudents = function(settings) {
           .attr('aria-label', dialogTitle)
       },
       close: (_event, _ui) => {
-        $message_students_dialog
-          .closest('.ui-dialog')
-          .removeAttr('role')
-          .removeAttr('aria-label')
-      }
+        $message_students_dialog.closest('.ui-dialog').removeAttr('role').removeAttr('aria-label')
+      },
     })
     .dialog('open')
     .dialog('option', 'title', dialogTitle)
@@ -144,7 +142,7 @@ $(document).ready(() => {
       const ids = []
       $(this)
         .find('.student:visible')
-        .each(function() {
+        .each(function () {
           ids.push($(this).data('id'))
         })
       if (ids.length == 0) {
@@ -155,27 +153,21 @@ $(document).ready(() => {
     },
     beforeSubmit(data) {
       disableButtons(true)
-      $(this)
-        .find('.send_button')
-        .text(I18n.t('Sending Message...'))
+      $(this).find('.send_button').text(I18n.t('Sending Message...'))
     },
     success(data) {
       $.flashMessage(I18n.t('Message sent!'))
       disableButtons(false)
-      $(this)
-        .find('.send_button')
-        .text(I18n.t('Send Message'))
+      $(this).find('.send_button').text(I18n.t('Send Message'))
       $('#message_students_dialog').dialog('close')
     },
     error(data) {
       disableButtons(false)
-      $(this)
-        .find('.send_button')
-        .text(I18n.t('Sending Message Failed, please try again'))
-    }
+      $(this).find('.send_button').text(I18n.t('Sending Message Failed, please try again'))
+    },
   })
 
-  const showStudentsMessageSentTo = function() {
+  const showStudentsMessageSentTo = function () {
     const optionIdx = parseInt($message_students_dialog.find('select').val(), 10) || 0
     const option = currentSettings.options[optionIdx]
     const studentsHash = $message_students_dialog.data('students_hash')
@@ -217,15 +209,12 @@ $(document).ready(() => {
     })
   }
 
-  const closeDialog = function() {
+  const closeDialog = function () {
     $message_students_dialog.dialog('close')
   }
 
   $message_students_dialog.find('.cancel_button').click(closeDialog)
-  $message_students_dialog
-    .find('select')
-    .change(showStudentsMessageSentTo)
-    .change(checkSendable)
+  $message_students_dialog.find('select').change(showStudentsMessageSentTo).change(checkSendable)
   $message_students_dialog
     .find('.cutoff_score')
     .bind('change blur keyup', showStudentsMessageSentTo)

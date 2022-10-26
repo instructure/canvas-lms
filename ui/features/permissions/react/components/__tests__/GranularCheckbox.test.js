@@ -35,13 +35,13 @@ function buildProps({enabled = ENABLED_FOR_ALL, readonly = false}) {
     roleId: '1',
     handleScroll: noop,
     handleClick: noop,
-    apiBusy: false
+    apiBusy: false,
   }
 }
 
 describe('permissions::GranularCheckbox', () => {
   it('displays a spinner whilst the API is in flight', () => {
-    const {getByText} = render(<GranularCheckbox {...buildProps({})} apiBusy />)
+    const {getByText} = render(<GranularCheckbox {...buildProps({})} apiBusy={true} />)
 
     expect(getByText('Waiting for request to complete')).toBeInTheDocument()
   })

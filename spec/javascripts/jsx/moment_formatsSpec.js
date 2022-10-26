@@ -17,9 +17,7 @@
  */
 
 import I18nStubber from 'helpers/I18nStubber'
-import {
-  prepareFormats
-} from '../../../ui/boot/initializers/configureDateTimeMomentParser'
+import {prepareFormats} from '../../../ui/boot/initializers/configureDateTimeMomentParser'
 
 QUnit.module('Moment formats', {
   setup() {
@@ -30,12 +28,12 @@ QUnit.module('Moment formats', {
       'date.formats.short': '%b %-d',
       'time.formats.tiny': '%l:%M%P',
       'time.formats.tiny_on_the_hour': '%l%P',
-      'time.event': '%{date} event %{time}'
+      'time.event': '%{date} event %{time}',
     })
   },
   teardown() {
     I18nStubber.clear()
-  }
+  },
 })
 
 test('formatsForLocale include formats matching datepicker', () => {

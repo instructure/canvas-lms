@@ -38,16 +38,16 @@ export function RolePillContainer({...props}) {
       props={{
         tablet: {
           display: 'inline',
-          delimiter: 'pipe'
+          delimiter: 'pipe',
         },
         desktop: {
           display: 'inline-block',
-          delimiter: 'none'
+          delimiter: 'none',
         },
         mobile: {
           display: 'inline',
-          delimiter: 'pipe'
-        }
+          delimiter: 'pipe',
+        },
       }}
       render={(responsiveProps, matches) => (
         <>
@@ -85,7 +85,7 @@ function roleName(baseRole) {
     },
     get Author() {
       return I18n.t('Author')
-    }
+    },
   }
 
   return types[baseRole] || baseRole
@@ -110,7 +110,7 @@ RolePillContainer.propTypes = {
   /**
    * String Array of user roles
    */
-  discussionRoles: PropTypes.array
+  discussionRoles: PropTypes.array,
 }
 
 export default RolePillContainer

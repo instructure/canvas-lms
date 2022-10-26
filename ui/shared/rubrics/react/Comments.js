@@ -63,7 +63,7 @@ const FreeFormComments = props => {
     >
       {[first, ...options]}
     </SimpleSelect>,
-    <br key="br" />
+    <br key="br" />,
   ]
 
   const saveBox = () => {
@@ -108,11 +108,11 @@ FreeFormComments.propTypes = {
   large: PropTypes.bool.isRequired,
   saveLater: PropTypes.bool,
   setComments: PropTypes.func.isRequired,
-  setSaveLater: PropTypes.func.isRequired
+  setSaveLater: PropTypes.func.isRequired,
 }
 FreeFormComments.defaultProps = {
   comments: '',
-  saveLater: false
+  saveLater: false,
 }
 
 const commentElement = assessment => {
@@ -144,11 +144,11 @@ export const CommentText = ({assessment, placeholder, weight}) => (
 CommentText.propTypes = {
   assessment: PropTypes.shape(assessmentShape),
   placeholder: PropTypes.string,
-  weight: PropTypes.string.isRequired
+  weight: PropTypes.string.isRequired,
 }
 CommentText.defaultProps = {
   assessment: null,
-  placeholder: ''
+  placeholder: '',
 }
 
 const Comments = props => {
@@ -184,12 +184,12 @@ Comments.propTypes = {
   large: PropTypes.bool,
   savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
   setComments: PropTypes.func.isRequired,
-  setSaveLater: PropTypes.func.isRequired
+  setSaveLater: PropTypes.func.isRequired,
 }
 Comments.defaultProps = {
   allowSaving: true,
   footer: null,
-  large: true
+  large: true,
 }
 
 export default Comments

@@ -23,7 +23,7 @@ import {shouldPolyfill as spfRTF} from '@formatjs/intl-relativetimeformat/should
 import {oncePerPage} from '@instructure/updown';
 
 declare const ENV: {
-  readonly LOCALES: string[];
+  readonly LOCALES: string[]
 };
 
 const FORMAT_JS_DIR = '/dist/@formatjs';
@@ -33,22 +33,21 @@ function localeDataFor(sys: string, locale: string): string {
 }
 
 type PolyfillerUpValue = {
-  subsys: string,
-  locale: string,
-  loaded?: string,
-  source?: string,
+  subsys: string
+  locale: string
+  loaded?: string
+  source?: string
   error?: string
 };
 
 type PolyfillerArgs = {
-  subsys: Function,
-  should: (locale: string) => string | undefined,
-  polyfill: () => Promise<unknown>,
+  subsys: Function
+  should: (locale: string) => string | undefined
+  polyfill: () => Promise<unknown>
   localeLoader: (locale: string) => Promise<void>
 };
 
 function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerArgs): Capability {
-
   const subsysName = subsys.name;
   const native = subsys;
   const nativeName = 'Native' + subsysName;
@@ -66,7 +65,8 @@ function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerA
       /* eslint-disable no-await-in-loop */ // it's actually fine in for-loops
       for (const locale of locales) {
         const nativeSupport = Intl[subsysName].supportedLocalesOf([locale]);
-        if (nativeSupport.length > 0) return {subsys: subsysName, locale: native[0], source: 'native'};
+        if (nativeSupport.length > 0)
+          return {subsys: subsysName, locale: native[0], source: 'native'};
 
         const doable = should(locale);
         if (!doable || doable === 'en') continue;
@@ -93,7 +93,7 @@ function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerA
       const value = await up(ENV.LOCALES);
       return {value, down};
     }),
-    requires: []  // TODO  railsparameters?
+    requires: [], // TODO  railsparameters?
   };
 }
 
@@ -105,23 +105,24 @@ const intlSubsystemsInUse: Capability[] = [
       await import('@formatjs/intl-datetimeformat/polyfill-force');
       await import(/* webpackIgnore: true */ `${FORMAT_JS_DIR}/intl-datetimeformat/add-all-tz.js`);
     },
-    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('datetimeformat', l))
+    localeLoader: (l: string) =>
+      import(/* webpackIgnore: true */ localeDataFor('datetimeformat', l)),
   }),
 
   polyfillerFactory({
     subsys: Intl.NumberFormat,
     should: spfNF,
     polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
-    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('numberformat', l))
+    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('numberformat', l)),
   }),
 
   polyfillerFactory({
     subsys: Intl.RelativeTimeFormat,
     should: spfRTF,
     polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
-    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l))
-
-  })
+    localeLoader: (l: string) =>
+      import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l)),
+  }),
 ];
 
 const IntlPolyfills: Capability = {
@@ -136,7 +137,7 @@ const IntlPolyfills: Capability = {
         console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`);
     });
   },
-  requires: intlSubsystemsInUse
+  requires: intlSubsystemsInUse,
 };
 
 export default IntlPolyfills;

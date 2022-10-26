@@ -32,14 +32,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -53,7 +53,7 @@ describe('AssignmentContext', () => {
   describe('Desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
 
@@ -71,7 +71,7 @@ describe('AssignmentContext', () => {
   describe('Tablet', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'},
       }))
     })
 

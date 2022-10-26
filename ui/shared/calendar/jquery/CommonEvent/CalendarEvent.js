@@ -137,7 +137,7 @@ Object.assign(CalendarEvent.prototype, {
       {
         'calendar_event[start_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : '',
         'calendar_event[end_at]': this.end ? fcUtil.unwrap(this.end).toISOString() : '',
-        'calendar_event[all_day]': this.allDay
+        'calendar_event[all_day]': this.allDay,
       },
       success,
       error
@@ -160,7 +160,7 @@ Object.assign(CalendarEvent.prototype, {
     let status = I18n.t('Available')
     if (this.calendarEvent.available_slots > 0) {
       status = I18n.t('%{availableSlots} Available', {
-        availableSlots: I18n.n(this.calendarEvent.available_slots)
+        availableSlots: I18n.n(this.calendarEvent.available_slots),
       })
     }
     if (
@@ -169,7 +169,7 @@ Object.assign(CalendarEvent.prototype, {
       this.calendarEvent.child_events.length
     ) {
       status = I18n.t('%{availableSlots} more available', {
-        availableSlots: I18n.n(this.calendarEvent.available_slots)
+        availableSlots: I18n.n(this.calendarEvent.available_slots),
       })
     }
     if (this.calendarEvent.available_slots === 0) {
@@ -228,5 +228,5 @@ Object.assign(CalendarEvent.prototype, {
       this.calendarEvent.reserved === true ||
       (this.calendarEvent.appointment_group_url && this.calendarEvent.parent_event_id)
     )
-  }
+  },
 })

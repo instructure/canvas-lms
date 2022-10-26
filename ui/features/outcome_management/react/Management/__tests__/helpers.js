@@ -32,15 +32,15 @@ export const defaultRatingsAndCalculationMethod = {
   ratings: [
     {
       description: 'Exceeds mastery',
-      points: 4
+      points: 4,
     },
     {
       description: 'Mastery',
-      points: 3
+      points: 3,
     },
     {
       description: 'Below mastery',
-      points: 1
-    }
-  ]
+      points: 1,
+    },
+  ],
 }

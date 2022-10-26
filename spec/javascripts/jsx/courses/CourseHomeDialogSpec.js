@@ -32,12 +32,12 @@ QUnit.module('CourseHomeDialog', {
 
   teardown: () => {
     fakeXhr.restore()
-  }
+  },
 })
 
 const store = createStore({
   selectedDefaultView: 'modules',
-  savedDefaultView: 'modules'
+  savedDefaultView: 'modules',
 })
 
 const getDefaultProps = () => ({
@@ -46,7 +46,7 @@ const getDefaultProps = () => ({
   wikiUrl: 'example.com',
   courseId: '1',
   open: true,
-  isPublishing: false
+  isPublishing: false,
 })
 
 test('Renders', () => {

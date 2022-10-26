@@ -27,17 +27,17 @@ import {
   createPlannerMocks,
   opportunities,
   defaultK5DashboardProps as defaultProps,
-  defaultEnv
+  defaultEnv,
 } from './mocks'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
-  fetchShowK5Dashboard: jest.fn()
+  fetchShowK5Dashboard: jest.fn(),
 }))
 
 const currentUserId = defaultProps.currentUser.id
-const moxiosWait = () => new Promise((r) => moxios.wait(r));
+const moxiosWait = () => new Promise(r => moxios.wait(r))
 
 describe('K5Dashboard Schedule Section', () => {
   beforeEach(() => {
@@ -55,14 +55,14 @@ describe('K5Dashboard Schedule Section', () => {
 
   it('displays the planner with a planned item', async () => {
     const {findByText} = render(
-      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
   })
 
   it('displays a list of missing assignments if there are any', async () => {
     const {findByTestId, findByText} = render(
-      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     const missingAssignments = await findByTestId('missing-item-info')
     expect(missingAssignments).toHaveTextContent('Show 2 missing items')
@@ -76,7 +76,7 @@ describe('K5Dashboard Schedule Section', () => {
 
   it('renders the weekly planner header', async () => {
     const {findByTestId} = render(
-      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     const planner = await findByTestId('PlannerApp', {timeout: 4000}) // give it some more time
     expect(planner).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('K5Dashboard Schedule Section', () => {
 
   it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
     const {findByTestId} = render(
-      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     const jumpToNavButton = await findByTestId('jump-to-weekly-nav-button')
     expect(jumpToNavButton).not.toBeVisible()
@@ -99,7 +99,7 @@ describe('K5Dashboard Schedule Section', () => {
 
   it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
     const {findByTestId, getByTestId} = render(
-      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
+      <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
     const todayButton = await findByTestId('jump-to-today-button')
     expect(todayButton).toBeEnabled()
@@ -126,7 +126,7 @@ describe('K5Dashboard Schedule Section', () => {
 
   it('preloads surrounding weeks only once schedule tab is visible', async () => {
     const {findByText, getByText} = render(
-      <K5Dashboard {...defaultProps} currentUserRoles={['user', 'student']} plannerEnabled />
+      <K5Dashboard {...defaultProps} currentUserRoles={['user', 'student']} plannerEnabled={true} />
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
     expect(moxios.requests.count()).toBe(6)
@@ -138,26 +138,26 @@ describe('K5Dashboard Schedule Section', () => {
   it('reloads the planner with correct data when the selected observee is updated', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
       status: 200,
-      response: MOCK_CARDS
+      response: MOCK_CARDS,
     })
     const observerPlannerItem = cloneDeep(MOCK_PLANNER_ITEM)
     observerPlannerItem[0].plannable.title = 'Assignment for Observee'
     const observedUsersList = [
       {
         id: currentUserId,
-        name: 'Self'
+        name: 'Self',
       },
       {
         id: '2',
-        name: 'Student 2'
-      }
+        name: 'Student 2',
+      },
     ]
     const {findByText, findByTestId, getByTestId, getByText} = render(
       <K5Dashboard
         {...defaultProps}
         defaultTab="tab-schedule"
-        plannerEnabled
-        canAddObservee
+        plannerEnabled={true}
+        canAddObservee={true}
         currentUserRoles={['user', 'observer']}
         observedUsersList={observedUsersList}
       />
@@ -167,17 +167,17 @@ describe('K5Dashboard Schedule Section', () => {
     moxios.stubs.reset()
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
       status: 200,
-      response: MOCK_CARDS_2
+      response: MOCK_CARDS_2,
     })
     moxios.stubRequest(/api\/v1\/planner\/items\?.*observed_user_id=2.*/, {
       status: 200,
       headers: {link: 'url; rel="current"'},
-      response: observerPlannerItem
+      response: observerPlannerItem,
     })
     moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
       status: 200,
       headers: {link: 'url; rel="current"'},
-      response: [opportunities[0]]
+      response: [opportunities[0]],
     })
     const observerSelect = getByTestId('observed-student-dropdown')
     act(() => observerSelect.click())

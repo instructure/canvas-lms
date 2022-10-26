@@ -32,7 +32,8 @@
 // [1]: https://webpack.js.org/guides/public-path/#on-the-fly
 // [2]: https://webpack.js.org/plugins/define-plugin/
 if (typeof __webpack_public_path__ !== 'undefined') {
-  __webpack_public_path__ = ((window.ENV && window.ENV.ASSET_HOST) || '') + CANVAS_WEBPACK_PUBLIC_PATH
+  __webpack_public_path__ =
+    ((window.ENV && window.ENV.ASSET_HOST) || '') + CANVAS_WEBPACK_PUBLIC_PATH
 }
 
 /* eslint-enable no-undef */

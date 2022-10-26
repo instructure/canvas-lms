@@ -71,7 +71,7 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
     canvas.toBlob(blob => {
       setTakenImage({
         dataURL,
-        blob
+        blob,
       })
     })
   }
@@ -97,7 +97,7 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
         {/* eslint-disable jsx-a11y/media-has-caption */}
         <video
           className="webcam-request-video"
-          autoPlay
+          autoPlay={true}
           ref={videoRef}
           style={{display: showVideo ? 'block' : 'none'}}
         />
@@ -150,7 +150,7 @@ const WebcamModal = ({onSelectImage, open, onDismiss}) => {
 WebcamModal.propTypes = {
   onSelectImage: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
-  onDismiss: PropTypes.func.isRequired
+  onDismiss: PropTypes.func.isRequired,
 }
 
 export default WebcamModal

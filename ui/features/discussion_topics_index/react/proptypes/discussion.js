@@ -28,7 +28,7 @@ const discussion = shape({
   author: author.isRequired,
   read_state: oneOf(['read', 'unread']).isRequired,
   unread_count: number.isRequired,
-  subscribed: bool.isRequired
+  subscribed: bool.isRequired,
 })
 
 export const discussionList = arrayOf(discussion)

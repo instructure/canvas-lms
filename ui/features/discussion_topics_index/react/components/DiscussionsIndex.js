@@ -35,12 +35,12 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 
 import {
   ConnectedDiscussionsContainer,
-  DroppableConnectedDiscussionsContainer
+  DroppableConnectedDiscussionsContainer,
 } from './DiscussionContainer'
 import {
   pinnedDiscussionBackground,
   unpinnedDiscussionsBackground,
-  closedDiscussionBackground
+  closedDiscussionBackground,
 } from './DiscussionBackgrounds'
 import {ConnectedIndexHeader} from './IndexHeader'
 import DiscussionsDeleteModal from './DiscussionsDeleteModal'
@@ -76,15 +76,15 @@ export default class DiscussionsIndex extends Component {
     sendToOpen: bool.isRequired,
     sendToSelection: shape({
       content_id: string,
-      content_type: oneOf(CONTENT_SHARE_TYPES)
+      content_type: oneOf(CONTENT_SHARE_TYPES),
     }),
     DIRECT_SHARE_ENABLED: bool.isRequired,
-    COURSE_ID: string
+    COURSE_ID: string,
   }
 
   state = {
     showDelete: false,
-    deleteFunction: () => {}
+    deleteFunction: () => {},
   }
 
   componentDidMount() {
@@ -133,7 +133,7 @@ export default class DiscussionsIndex extends Component {
       title: I18n.t('Move Discussion'),
       items: [item],
       moveOptions: {
-        siblings: moveSibilings
+        siblings: moveSibilings,
       },
       focusOnExit: () => {},
       onMoveSuccess: res => {
@@ -142,8 +142,8 @@ export default class DiscussionsIndex extends Component {
       formatSaveUrl: () =>
         reorderDiscussionsURL({
           contextType: this.props.contextType,
-          contextId: this.props.contextId
-        })
+          contextId: this.props.contextId,
+        }),
     }
     renderTray(moveProps)
   }
@@ -157,10 +157,10 @@ export default class DiscussionsIndex extends Component {
               title={I18n.t('Pinned Discussions')}
               discussions={this.props.pinnedDiscussions}
               deleteDiscussion={this.openDeleteDiscussionsModal}
-              pinned
+              pinned={true}
               renderContainerBackground={() =>
                 pinnedDiscussionBackground({
-                  permissions: this.props.permissions
+                  permissions: this.props.permissions,
                 })
               }
             />
@@ -175,7 +175,7 @@ export default class DiscussionsIndex extends Component {
               unpinnedDiscussionsBackground({
                 permissions: this.props.permissions,
                 contextID: this.props.contextId,
-                contextType: this.props.contextType
+                contextType: this.props.contextType,
               })
             }
           />
@@ -187,7 +187,7 @@ export default class DiscussionsIndex extends Component {
             deleteDiscussion={this.openDeleteDiscussionsModal}
             renderContainerBackground={() =>
               closedDiscussionBackground({
-                permissions: this.props.permissions
+                permissions: this.props.permissions,
               })
             }
           />
@@ -195,7 +195,7 @@ export default class DiscussionsIndex extends Component {
         {this.state.showDelete && (
           <DiscussionsDeleteModal
             onSubmit={this.state.deleteFunction}
-            defaultOpen
+            defaultOpen={true}
             selectedCount={1}
           />
         )}
@@ -212,10 +212,10 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.pinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             onMoveDiscussion={this.renderMoveDiscussionTray}
-            pinned
+            pinned={true}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
-                permissions: this.props.permissions
+                permissions: this.props.permissions,
               })
             }
           />
@@ -230,7 +230,7 @@ export default class DiscussionsIndex extends Component {
               unpinnedDiscussionsBackground({
                 permissions: this.props.permissions,
                 contextID: this.props.contextId,
-                contextType: this.props.contextType
+                contextType: this.props.contextType,
               })
             }
           />
@@ -240,10 +240,10 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
-            closedState
+            closedState={true}
             renderContainerBackground={() =>
               closedDiscussionBackground({
-                permissions: this.props.permissions
+                permissions: this.props.permissions,
               })
             }
           />
@@ -251,7 +251,7 @@ export default class DiscussionsIndex extends Component {
         {this.state.showDelete && (
           <DiscussionsDeleteModal
             onSubmit={this.state.deleteFunction}
-            defaultOpen
+            defaultOpen={true}
             selectedCount={1}
           />
         )}
@@ -298,7 +298,7 @@ const connectState = (state, ownProps) => {
     allDiscussions,
     closedForCommentsDiscussionIds,
     pinnedDiscussionIds,
-    unpinnedDiscussionIds
+    unpinnedDiscussionIds,
   } = state
 
   const fromState = {
@@ -313,7 +313,7 @@ const connectState = (state, ownProps) => {
     sendToOpen: state.sendTo.open,
     sendToSelection: state.sendTo.selection,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
-    COURSE_ID: state.COURSE_ID
+    COURSE_ID: state.COURSE_ID,
   }
   return {...ownProps, ...fromPagination, ...fromState}
 }
@@ -325,7 +325,7 @@ const connectActions = dispatch =>
       'deleteFocusDone',
       'getDiscussions',
       'setCopyToOpen',
-      'setSendToOpen'
+      'setSendToOpen',
     ]),
     dispatch
   )

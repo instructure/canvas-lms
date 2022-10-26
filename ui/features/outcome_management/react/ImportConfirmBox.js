@@ -57,7 +57,7 @@ const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
     const focusRegion = FocusRegionManager.activateRegion(container, {
       shouldContainFocus: true,
       shouldReturnFocus: true,
-      onBlur: onCloseHandler
+      onBlur: onCloseHandler,
     })
     return () => FocusRegionManager.blurRegion(container, focusRegion.id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,10 +75,10 @@ const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
           {I18n.t(
             {
               one: 'You are about to add 1 outcome to this course.',
-              other: 'You are about to add %{count} outcomes to this course.'
+              other: 'You are about to add %{count} outcomes to this course.',
             },
             {
-              count
+              count,
             }
           )}
         </Text>
@@ -116,7 +116,7 @@ const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
 ImportConfirmBox.propTypes = {
   count: PropTypes.number.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
-  onImportHandler: PropTypes.func.isRequired
+  onImportHandler: PropTypes.func.isRequired,
 }
 
 export default ImportConfirmBox

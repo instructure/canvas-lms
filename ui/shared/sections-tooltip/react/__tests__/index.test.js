@@ -22,7 +22,7 @@ import SectionTooltip from '../index'
 
 const defaultProps = () => ({
   sections: [{id: 2, name: 'sections name', user_count: 4}],
-  totalUserCount: 5
+  totalUserCount: 5,
 })
 
 test('renders the SectionTooltip component', () => {

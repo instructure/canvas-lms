@@ -454,7 +454,7 @@ class Submission < ActiveRecord::Base
         user.id == user_id &&
         assignment.published?
     end
-    can :read and can :comment and can :make_group_comment and can :submit
+    can :read and can :comment and can :make_group_comment and can :submit and can :mark_item_read and can :read_comments
 
     # see user_can_read_grade? before editing :read_grade permissions
     given do |user|
@@ -511,7 +511,7 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given { |user| peer_reviewer?(user) }
+    given { |user| peer_reviewer?(user) && !!assignment&.submitted?(user: user) }
     can :read and can :comment and can :make_group_comment
 
     given { |user, session| can_view_plagiarism_report("turnitin", user, session) }
@@ -2420,7 +2420,7 @@ class Submission < ActiveRecord::Base
       return false if submitted_at.present?
       return false unless past_due?
 
-      cached_quiz_lti? || assignment.expects_submission?
+      cached_quiz_lti? || assignment.expects_submission? || assignment.quiz_lti?
     end
     alias_method :missing, :missing?
 
@@ -2576,7 +2576,7 @@ class Submission < ActiveRecord::Base
     return unless context.grants_right?(user, :participate_as_student)
 
     if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      ContentParticipation.participate(content: self, user: user)
+      mark_item_unread("grade")
     else
       ContentParticipation.create_or_update({ content: self, user: user, workflow_state: "unread" })
     end
@@ -2628,7 +2628,8 @@ class Submission < ActiveRecord::Base
     end
 
     return state if state.present?
-    return "read" if assignment.deleted? || assignment.muted? || !user_id
+
+    return "read" if assignment.deleted? || !posted? || !user_id
     return "unread" if grade || score
 
     has_comments = if visible_submission_comments.loaded?
@@ -2669,22 +2670,30 @@ class Submission < ActiveRecord::Base
     change_read_state("unread", current_user)
   end
 
-  def mark_item_read(current_user, content_item)
-    ContentParticipation.participate(
-      content: self,
-      user: current_user,
-      content_item: content_item,
-      workflow_state: "read"
-    )
+  def mark_item_read(content_item)
+    change_item_read_state("read", content_item)
   end
 
-  def mark_item_unread(current_user, content_item)
-    ContentParticipation.participate(
+  def mark_item_unread(content_item)
+    change_item_read_state("unread", content_item)
+  end
+
+  def change_item_read_state(new_state, content_item)
+    return nil unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+
+    participant = ContentParticipation.participate(
       content: self,
-      user: current_user,
+      user: user,
       content_item: content_item,
-      workflow_state: "unread"
+      workflow_state: new_state
     )
+
+    new_state = read_state(user)
+
+    StreamItem.update_read_state_for_asset(self, new_state, user.id)
+    PlannerHelper.clear_planner_cache(user)
+
+    participant
   end
 
   def change_read_state(new_state, current_user)

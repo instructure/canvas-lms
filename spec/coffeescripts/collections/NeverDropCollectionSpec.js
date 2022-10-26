@@ -26,7 +26,7 @@ class AssignmentStub extends Backbone.Model {
 
   toView = () => ({
     name: this.get('name'),
-    id: this.id
+    id: this.id,
   })
 }
 class Assignments extends Backbone.Collection {
@@ -42,22 +42,22 @@ QUnit.module('NeverDropCollection', {
       list.map((val, i) => ({
         id: val,
         position: list.length - i,
-        name: `Assignment ${val}`
+        name: `Assignment ${val}`,
       }))
     )
     this.never_drops = new NeverDropCollection([], {
       assignments: this.assignments,
-      ag_id: 1
+      ag_id: 1,
     })
-  }
+  },
 })
 
-test('#initialize', function() {
+test('#initialize', function () {
   deepEqual(this.never_drops.assignments, this.assignments)
   strictEqual(this.never_drops.ag_id, 1)
 })
 
-test('#toAssignments', function() {
+test('#toAssignments', function () {
   this.never_drops.add({})
   this.never_drops.add({})
   this.never_drops.add({})
@@ -67,7 +67,7 @@ test('#toAssignments', function() {
   deepEqual(output, expected)
 })
 
-test('#findNextAvailable', function() {
+test('#findNextAvailable', function () {
   this.never_drops.add({})
   deepEqual(
     this.never_drops.findNextAvailable(),

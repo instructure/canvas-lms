@@ -43,7 +43,7 @@ export const GradesPage = ({
   userIsCourseAdmin,
   showLearningMasteryGradebook,
   outcomeProficiency,
-  observedUserId
+  observedUserId,
 }) => {
   const [loadingGradingPeriods, setLoadingGradingPeriods] = useState(true)
   const [error, setError] = useState(null)
@@ -69,8 +69,8 @@ export const GradesPage = ({
     }, []),
     error: setError,
     params: {
-      include
-    }
+      include,
+    },
   })
 
   useEffect(() => {
@@ -182,7 +182,7 @@ GradesPage.propTypes = {
   userIsCourseAdmin: PropTypes.bool.isRequired,
   showLearningMasteryGradebook: PropTypes.bool.isRequired,
   outcomeProficiency: outcomeProficiencyShape,
-  observedUserId: PropTypes.string
+  observedUserId: PropTypes.string,
 }
 
 export default GradesPage

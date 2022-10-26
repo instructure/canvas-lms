@@ -37,12 +37,12 @@ export function Like({...props}) {
       props={{
         mobile: {
           textSize: 'small',
-          itemSpacing: '0 small 0 0'
+          itemSpacing: '0 small 0 0',
         },
         desktop: {
           textSize: 'medium',
-          itemSpacing: 'none'
-        }
+          itemSpacing: 'none',
+        },
       }}
       render={responsiveProps => (
         <span className="discussion-like-btn">
@@ -118,5 +118,5 @@ Like.propTypes = {
   /**
    * Name of the author of the post being liked
    */
-  authorName: PropTypes.string.isRequired
+  authorName: PropTypes.string.isRequired,
 }

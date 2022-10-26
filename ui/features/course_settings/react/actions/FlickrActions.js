@@ -80,7 +80,7 @@ const FlickrActions = {
     const imageSize = 'url_m'
 
     return `https://api.flickr.com/services/rest/?method=flickr.photos.search&format=json&nojsoncallback=true&api_key=${apiKey}&sort=${sort}&license=${licenses}&text=${term}&per_page=${per_page}&content_type=6&safe_search=1&page=${page}&privacy_filter=1&extras=license,owner_name,${imageSize},needs_interstitial`
-  }
+  },
 }
 
 export default FlickrActions

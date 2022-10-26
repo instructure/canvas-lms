@@ -76,5 +76,5 @@ PostTypes.propTypes = {
   anonymousGrading: bool.isRequired,
   defaultValue: oneOf([EVERYONE, GRADED]).isRequired,
   disabled: bool.isRequired,
-  postTypeChanged: func.isRequired
+  postTypeChanged: func.isRequired,
 }

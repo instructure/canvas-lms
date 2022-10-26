@@ -41,7 +41,7 @@ class InheritedTable extends React.Component {
       srMsg: I18n.t(
         'Loaded more developer keys. Focus moved to the last enabled developer key in the list.'
       ),
-      handleRef: ref => (ref ? ref.focusToggleGroup() : this.props.setFocus())
+      handleRef: ref => (ref ? ref.focusToggleGroup() : this.props.setFocus()),
     })
 
   developerKeyRef = key => {
@@ -84,7 +84,7 @@ class InheritedTable extends React.Component {
                 store={this.props.store}
                 actions={this.props.actions}
                 ctx={this.props.ctx}
-                inherited
+                inherited={true}
                 // inherited keys can't be deleted
                 onDelete={() => {}}
               />
@@ -103,7 +103,7 @@ class InheritedTable extends React.Component {
 
 InheritedTable.propTypes = {
   store: shape({
-    dispatch: func.isRequired
+    dispatch: func.isRequired,
   }).isRequired,
   actions: shape({}).isRequired,
   developerKeysList: arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
@@ -111,10 +111,10 @@ InheritedTable.propTypes = {
   prefix: string.isRequired,
   ctx: shape({
     params: shape({
-      contextId: string.isRequired
-    })
+      contextId: string.isRequired,
+    }),
   }).isRequired,
-  setFocus: func
+  setFocus: func,
 }
 
 InheritedTable.defaultProps = {setFocus: () => {}}

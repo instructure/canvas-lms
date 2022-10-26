@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/index.js'
-import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
-import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail.js'
+import AuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/index'
+import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
+import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail'
 
 QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
   let $container
@@ -38,19 +38,19 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
       buildEvent(
         {id: '4905', eventType: 'submission_updated', userId: '1101'},
         {grade: [null, 'A']}
-      )
+      ),
     ]
     const users = [
       {id: '1101', name: 'A sedulous pupil', role: 'student'},
       {id: '1102', name: 'A quizzical administrator', role: 'administrator'},
-      {id: '1103', name: 'A querulous final-grader', role: 'final_grader'}
+      {id: '1103', name: 'A querulous final-grader', role: 'final_grader'},
     ]
 
     const externalTools = []
     const quizzes = []
 
     props = {
-      auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes})
+      auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes}),
     }
   })
 

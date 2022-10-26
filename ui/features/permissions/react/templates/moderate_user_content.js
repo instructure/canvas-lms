@@ -27,8 +27,8 @@ export const template = generateActionTemplates(
       title: I18n.t('ePortfolios'),
       description: I18n.t(
         'Allows user to view the ePortfolio Moderation page and manage ePortfolio spam content.'
-      )
-    }
+      ),
+    },
   ],
   [],
   [],

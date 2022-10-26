@@ -25,8 +25,8 @@ export const loadRollups = (courseId, needDefaults = false, page = 1) => {
       include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
       sort_by: 'student',
       page,
-      ...(needDefaults && {add_defaults: true})
-    }
+      ...(needDefaults && {add_defaults: true}),
+    },
   }
   return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)
 }

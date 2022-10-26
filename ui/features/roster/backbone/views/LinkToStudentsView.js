@@ -31,7 +31,7 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     this.prototype.dialogOptions = {
       id: 'link_students',
-      title: I18n.t('titles.link_to_students', 'Link to Students')
+      title: I18n.t('titles.link_to_students', 'Link to Students'),
     }
   }
 
@@ -51,16 +51,16 @@ export default class LinkToStudentsView extends DialogBaseView {
           type: 'user',
           context: `course_${ENV.course.id}_students`,
           exclude: [this.model.get('id')],
-          skip_visibility_checks: true
+          skip_visibility_checks: true,
         },
         noExpand: true,
         browser: {
           data: {
             per_page: 100,
-            types: ['user']
-          }
-        }
-      }
+            types: ['user'],
+          },
+        },
+      },
     })
     const input = this.$('#student_input').data('token_input')
     input.$fakeInput.css('width', '100%')
@@ -70,7 +70,7 @@ export default class LinkToStudentsView extends DialogBaseView {
         input.addToken({
           value: e.observed_user.id,
           text: e.observed_user.name,
-          data: e.observed_user
+          data: e.observed_user,
         })
       }
     }
@@ -126,8 +126,8 @@ export default class LinkToStudentsView extends DialogBaseView {
               user_id: this.model.get('id'),
               associated_user_id: user.id,
               type: enrollment.type,
-              limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
-            }
+              limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section,
+            },
           }
           if (enrollment.role !== enrollment.type) {
             data.enrollment.role_id = enrollment.role_id

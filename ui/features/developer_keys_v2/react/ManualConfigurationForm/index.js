@@ -33,16 +33,17 @@ const I18n = useI18nScope('react_developer_keys')
 
 export default class ManualConfigurationForm extends React.Component {
   state = {
-    showMessages: false
+    showMessages: false,
   }
 
   generateToolConfiguration = () => {
     const toolConfig = {
       ...this.requiredRef.generateToolConfigurationPart(),
       scopes: this.servicesRef.generateToolConfigurationPart(),
-      ...this.additionalRef.generateToolConfigurationPart()
+      ...this.additionalRef.generateToolConfigurationPart(),
     }
-    toolConfig.extensions[0].settings.placements = this.placementsRef.generateToolConfigurationPart()
+    toolConfig.extensions[0].settings.placements =
+      this.placementsRef.generateToolConfigurationPart()
     return toolConfig
   }
 
@@ -117,9 +118,9 @@ export default class ManualConfigurationForm extends React.Component {
 ManualConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object,
   validScopes: PropTypes.object.isRequired,
-  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
+  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 ManualConfigurationForm.defaultProps = {
-  toolConfiguration: {}
+  toolConfiguration: {},
 }

@@ -17,5 +17,5 @@
  */
 
 export default interface Formatter {
-  (content: string, parser: DOMParser): string;
+  (content: string, parser: DOMParser): string
 }

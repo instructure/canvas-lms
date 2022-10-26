@@ -75,6 +75,6 @@ const InfiniteScroll = {
 
   componentWillUnmount() {
     this.detachScroll()
-  }
+  },
 }
 export default InfiniteScroll

@@ -81,8 +81,8 @@ export default {
             if (value && value.length > 255) {
               return I18n.t('Title is too long')
             }
-          }
-        }
+          },
+        },
       }
       if (
         $this[0].id === 'add_notification_form' &&
@@ -115,7 +115,7 @@ export default {
           $(this).slideUp(function () {
             $(this).remove()
           })
-        }
+        },
       })
     })
   },
@@ -124,5 +124,5 @@ export default {
     $('textarea.edit_notification_form, #add_notification_form textarea').each(function (_i) {
       RichContentEditor.loadNewEditor($(this))
     })
-  }
+  },
 }

@@ -26,8 +26,8 @@ export default {
   argTypes: {
     handleOptionSelect: {action: 'onSelect'},
     handleStar: {action: 'onStar'},
-    handleOpen: {action: 'onOpen'}
-  }
+    handleOpen: {action: 'onOpen'},
+  },
 }
 
 const Template = args => <ConversationListHolder {...args} />
@@ -44,8 +44,8 @@ WithUnreadConversations.args = {
           nodes: [
             {user: {name: 'Bob Barker'}},
             {user: {name: 'Sally Ford'}},
-            {user: {name: 'Russel Franks'}}
-          ]
+            {user: {name: 'Russel Franks'}},
+          ],
         },
         conversationMessagesConnection: {
           nodes: [
@@ -56,12 +56,12 @@ WithUnreadConversations.args = {
                   [
                     {user: {name: 'Bob Barker'}},
                     {user: {name: 'Sally Ford'}},
-                    {user: {name: 'Russel Franks'}}
-                  ]
-                ]
+                    {user: {name: 'Russel Franks'}},
+                  ],
+                ],
               },
               createdAt: 'November 5, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
+              body: 'This is the body text for the message.',
             },
             {
               author: {name: 'Sally Ford'},
@@ -69,15 +69,15 @@ WithUnreadConversations.args = {
                 nodes: [
                   {user: {name: 'Sally Ford'}},
                   {user: {name: 'Bob Barker'}},
-                  {user: {name: 'Russel Franks'}}
-                ]
+                  {user: {name: 'Russel Franks'}},
+                ],
               },
               createdAt: 'November 4, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
-            }
-          ]
-        }
-      }
+              body: 'This is the body text for the message.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 2,
@@ -85,22 +85,21 @@ WithUnreadConversations.args = {
       conversation: {
         subject: 'This is a different subject line',
         conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
         },
         conversationMessagesConnection: {
           nodes: [
             {
               author: {name: 'Todd Martin'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 3,
@@ -108,7 +107,7 @@ WithUnreadConversations.args = {
       conversation: {
         subject: 'This is a different subject line',
         conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
         },
         starred: true,
         conversationMessagesConnection: {
@@ -116,15 +115,14 @@ WithUnreadConversations.args = {
             {
               author: {name: 'Todd Martin'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 4,
@@ -132,24 +130,23 @@ WithUnreadConversations.args = {
       conversation: {
         subject: 'This is a different subject line',
         conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
         },
         conversationMessagesConnection: {
           nodes: [
             {
               author: {name: 'Todd Martin'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
-    }
-  ]
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
+    },
+  ],
 }
 
 export const WithConversations = Template.bind({})
@@ -164,8 +161,8 @@ WithConversations.args = {
           nodes: [
             {user: {name: 'Bob Barker'}},
             {user: {name: 'Sally Ford'}},
-            {user: {name: 'Russel Franks'}}
-          ]
+            {user: {name: 'Russel Franks'}},
+          ],
         },
         conversationMessagesConnection: {
           nodes: [
@@ -175,11 +172,11 @@ WithConversations.args = {
                 nodes: [
                   {user: {name: 'Bob Barker'}},
                   {user: {name: 'Sally Ford'}},
-                  {user: {name: 'Russel Franks'}}
-                ]
+                  {user: {name: 'Russel Franks'}},
+                ],
               },
               createdAt: 'November 5, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
+              body: 'This is the body text for the message.',
             },
             {
               author: {name: 'Sally Ford'},
@@ -187,15 +184,15 @@ WithConversations.args = {
                 nodes: [
                   {user: {name: 'Sally Ford'}},
                   {user: {name: 'Bob Barker'}},
-                  {user: {name: 'Russel Franks'}}
-                ]
+                  {user: {name: 'Russel Franks'}},
+                ],
               },
               createdAt: 'November 4, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
-            }
-          ]
-        }
-      }
+              body: 'This is the body text for the message.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 2,
@@ -203,22 +200,21 @@ WithConversations.args = {
       conversation: {
         subject: 'This is a different subject line',
         conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
         },
         conversationMessagesConnection: {
           nodes: [
             {
               author: {name: 'Todd Martin'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 3,
@@ -231,23 +227,22 @@ WithConversations.args = {
             {user: {name: 'Barbara Ellis'}},
             {user: {name: 'Bob Barker'}},
             {user: {name: 'Sally Ford'}},
-            {user: {name: 'Russel Franks'}}
-          ]
+            {user: {name: 'Russel Franks'}},
+          ],
         },
         conversationMessagesConnection: {
           nodes: [
             {
               author: {name: 'Jim Clarkson'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Jim Clarkson'}}, {user: {name: 'Barbara Ellis'}}]
+                nodes: [{user: {name: 'Jim Clarkson'}}, {user: {name: 'Barbara Ellis'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
     },
     {
       _id: 4,
@@ -255,22 +250,21 @@ WithConversations.args = {
       conversation: {
         subject: 'This is a different subject line',
         conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
         },
         conversationMessagesConnection: {
           nodes: [
             {
               author: {name: 'Todd Martin'},
               conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
               },
               createdAt: 'November 3, 2020 at 8:58am',
-              body:
-                'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
-        }
-      }
-    }
-  ]
+              body: 'This conversation has a much longer body which should be too long to completely display.',
+            },
+          ],
+        },
+      },
+    },
+  ],
 }

@@ -48,5 +48,5 @@ PodcastFeed.propTypes = {
    * Link to discussions RSS feed
    */
   linkUrl: PropTypes.string.isRequired,
-  responsiveProps: PropTypes.object
+  responsiveProps: PropTypes.object,
 }

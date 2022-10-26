@@ -49,7 +49,7 @@ const HtmlConference = ({conference, html, removeConference, removeButtonRef}) =
           />
         </Flex.Item>
       )}
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         <div dangerouslySetInnerHTML={{__html: sanitizeHtml(html)}} />
       </Flex.Item>
     </Flex>
@@ -64,7 +64,7 @@ const LinkConference = ({conference, conferenceType, removeConference, removeBut
     url = `${conference.url}/join`
   }
   let title = I18n.t('%{name} Conference', {
-    name: (conferenceType && conferenceType.name) || ''
+    name: (conferenceType && conferenceType.name) || '',
   })
 
   if (conference.conference_type === 'LtiConference') {
@@ -77,7 +77,7 @@ const LinkConference = ({conference, conferenceType, removeConference, removeBut
 
   return (
     <Flex direction="row">
-      <Flex.Item shouldShrink shouldGrow>
+      <Flex.Item shouldShrink={true} shouldGrow={true}>
         <Text as="div" size="small">
           {url ? (
             <Link
@@ -135,12 +135,12 @@ Conference.propTypes = {
   conference: webConference.isRequired,
   conferenceType: webConferenceType,
   removeConference: PropTypes.func,
-  removeButtonRef: PropTypes.func
+  removeButtonRef: PropTypes.func,
 }
 
 Conference.defaultProps = {
   removeConference: null,
-  removeButtonRef: undefined
+  removeButtonRef: undefined,
 }
 
 export default Conference

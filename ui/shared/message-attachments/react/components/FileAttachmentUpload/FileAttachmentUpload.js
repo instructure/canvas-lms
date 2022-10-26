@@ -47,16 +47,16 @@ export const FileAttachmentUpload = props => {
         ref={attachmentInput}
         type="file"
         style={{display: 'none'}}
-        aria-hidden
+        aria-hidden={true}
         onChange={props.onAddItem}
-        multiple
+        multiple={true}
       />
     </>
   )
 }
 
 FileAttachmentUpload.propTypes = {
-  onAddItem: PropTypes.func.isRequired
+  onAddItem: PropTypes.func.isRequired,
 }
 
 export default FileAttachmentUpload

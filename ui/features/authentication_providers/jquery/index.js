@@ -22,7 +22,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 var authenticationProviders = {
   hideAllNewAuthTypeForms() {
     const newForms = document.querySelectorAll('.auth-form-container--new')
-    Array.prototype.forEach.call(newForms, (el, id) => {
+    Array.prototype.forEach.call(newForms, (el, _id) => {
       el.style.display = 'none'
     })
   },
@@ -33,9 +33,7 @@ var authenticationProviders = {
     if (form !== null) {
       form.style.display = ''
       setTimeout(() => {
-        $(form)
-          .find(':focusable:first')
-          .focus()
+        $(form).find(':focusable:first').focus()
         form.scrollIntoView()
       }, 100)
     }
@@ -52,7 +50,7 @@ var authenticationProviders = {
     authenticationProviders.hideNoAuthMessage()
     authenticationProviders.hideAllNewAuthTypeForms()
     authenticationProviders.showFormFor(authType)
-  }
+  },
 }
 
 export default authenticationProviders

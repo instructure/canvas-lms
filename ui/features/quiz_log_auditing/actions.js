@@ -21,15 +21,15 @@ import EventStore from './stores/events'
 
 const Actions = {}
 
-Actions.dismissNotification = function(key) {
+Actions.dismissNotification = function (key) {
   return Dispatcher.dispatch('notifications:dismiss', key)
 }
 
-Actions.reloadEvents = function() {
+Actions.reloadEvents = function () {
   EventStore.load()
 }
 
-Actions.setActiveAttempt = function(attempt) {
+Actions.setActiveAttempt = function (attempt) {
   EventStore.setActiveAttempt(attempt)
 }
 

@@ -27,7 +27,7 @@ import 'jquery-pageless'
 
 const I18n = useI18nScope('user_notes')
 
-ready(function() {
+ready(function () {
   if (ENV.user_note_list_pageless_options) {
     $('#user_note_list').pageless(ENV.user_note_list_pageless_options)
   }
@@ -45,27 +45,20 @@ ready(function() {
   $('#new_user_note_button').click(event => {
     event.preventDefault()
     $('#create_entry').slideDown()
-    $('#add_entry_form')
-      .find(':text:first')
-      .focus()
-      .select()
+    $('#add_entry_form').find(':text:first').focus().select()
   })
 
   $('#add_entry_form').formSubmit({
     resetForm: true,
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $('#create_entry').slideUp()
       $('#proccessing').loadingImage()
       return true
     },
     success(data) {
       $('#no_user_notes_message').hide()
-      $(this)
-        .find('.title')
-        .val('')
-      $(this)
-        .find('.note')
-        .val('')
+      $(this).find('.title').val('')
+      $(this).find('.note').val('')
       const user_note = data.user_note
       user_note.created_at = $.datetimeString(user_note.updated_at)
       const action = $('#add_entry_form').attr('action') + '/' + user_note.id
@@ -87,13 +80,13 @@ ready(function() {
         .end()
         .slideDown()
     },
-    error(data) {
+    error(_data) {
       $('#proccessing').loadingImage('remove')
       $('#create_entry').slideDown()
-    }
+    },
   })
 
-  $('.delete_user_note_link').click(function(event) {
+  $('.delete_user_note_link').click(function (event) {
     event.preventDefault()
     const token = $('form:first').getFormData().authenticity_token
     const $user_note = $(this).parents('.user_note')
@@ -105,7 +98,7 @@ ready(function() {
       token,
       url: $(this).attr('href'),
       success() {
-        $(this).fadeOut('slow', function() {
+        $(this).fadeOut('slow', function () {
           $(this).remove()
           if (!$('#user_note_list > .user_note').length) {
             $('#no_user_notes_message').show()
@@ -114,7 +107,7 @@ ready(function() {
       },
       error(data) {
         $(this).formErrors(data)
-      }
+      },
     })
   })
 })

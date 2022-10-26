@@ -77,6 +77,7 @@ async function ltiMessageHandler(e) {
     origin: e.origin,
     subject,
     message_id: message.message_id,
+    toolOrigin: message.toolOrigin,
   })
 
   if (

@@ -46,12 +46,12 @@ const getButtonProps = props => {
     ? {
         renderIcon: props.enabledIcon,
         color: 'success',
-        screenReaderLabel: props.enabledScreenReaderLabel
+        screenReaderLabel: props.enabledScreenReaderLabel,
       }
     : {
         renderIcon: props.disabledIcon,
         color: 'secondary',
-        screenReaderLabel: props.disabledScreenReaderLabel
+        screenReaderLabel: props.disabledScreenReaderLabel,
       }
 }
 
@@ -64,7 +64,7 @@ ToggleButton.propTypes = {
   disabledTooltipText: PropTypes.string.isRequired,
   enabledScreenReaderLabel: PropTypes.string.isRequired,
   disabledScreenReaderLabel: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default ToggleButton

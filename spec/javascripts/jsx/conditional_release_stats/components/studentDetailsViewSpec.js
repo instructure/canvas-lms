@@ -33,19 +33,19 @@ const defaultProps = () => ({
     name: 'foo',
     sortable_name: 'student@instructure.com',
     short_name: 'student@instructure.com',
-    login_id: 'student'
+    login_id: 'student',
   },
   triggerAssignment: {
     assignment: {
       id: '1',
       name: 'hello world',
       points_possible: 100,
-      grading_type: 'percent'
+      grading_type: 'percent',
     },
     submission: {
       submitted_at: '2016-08-22T14:52:43Z',
-      grade: '100'
-    }
+      grade: '100',
+    },
   },
   followOnAssignments: [
     {
@@ -56,14 +56,14 @@ const defaultProps = () => ({
         name: 'hello world',
         grading_type: 'percent',
         points_possible: 100,
-        submission_types: ['online_text_entry']
-      }
-    }
+        submission_types: ['online_text_entry'],
+      },
+    },
   ],
 
   selectNextStudent: () => {},
   selectPrevStudent: () => {},
-  unselectStudent: () => {}
+  unselectStudent: () => {},
 })
 
 test('renders full view component correctly', () => {

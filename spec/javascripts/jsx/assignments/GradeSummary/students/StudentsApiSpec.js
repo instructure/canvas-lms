@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as StudentsApi from 'ui/features/assignment_grade_summary/react/students/StudentsApi.js'
+import * as StudentsApi from 'ui/features/assignment_grade_summary/react/students/StudentsApi'
 import FakeServer, {
   paramsFromRequest,
   pathFromRequest,

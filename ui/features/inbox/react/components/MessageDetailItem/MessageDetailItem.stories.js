@@ -26,8 +26,8 @@ export default {
   argTypes: {
     onReply: {action: 'reply'},
     onReplyAll: {action: 'replyAll'},
-    onDelete: {action: 'delete'}
-  }
+    onDelete: {action: 'delete'},
+  },
 }
 
 const Template = args => <MessageDetailItem {...args} />
@@ -53,12 +53,12 @@ WithMultipleRecipients.args = {
       {name: 'Cristoforo Gülnarə'},
       {name: 'Katka Lauge'},
       {name: 'Sofia Fernanda'},
-      {name: 'Orestes Etheldreda'}
+      {name: 'Orestes Etheldreda'},
     ],
     createdAt: 'November 5, 2020 at 2:25pm',
-    body: 'This is the body text for the message.'
+    body: 'This is the body text for the message.',
   },
-  contextName: 'Fake Course 1'
+  contextName: 'Fake Course 1',
 }
 
 export const WithOneRecipient = Template.bind({})
@@ -67,7 +67,7 @@ WithOneRecipient.args = {
     author: {name: 'Bob Barker'},
     recipients: [{name: 'Bob Barker'}, {name: 'Sally Ford'}],
     createdAt: 'November 5, 2020 at 2:25pm',
-    body: 'This is the body text for the message.'
+    body: 'This is the body text for the message.',
   },
-  contextName: 'Fake Course 1'
+  contextName: 'Fake Course 1',
 }

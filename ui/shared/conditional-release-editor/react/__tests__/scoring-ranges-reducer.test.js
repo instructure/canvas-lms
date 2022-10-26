@@ -25,8 +25,8 @@ import * as actions from '../actions'
 const saveData = data => {
   return {
     data: {
-      scoring_ranges: data
-    }
+      scoring_ranges: data,
+    },
   }
 }
 
@@ -39,18 +39,18 @@ function initialState() {
     {
       lower_bound: '0.8484',
       upper_bound: '1.00',
-      assignment_sets: [{assignment_set_associations: []}]
+      assignment_sets: [{assignment_set_associations: []}],
     },
     {
       lower_bound: '0.4242',
       upper_bound: '0.8484',
-      assignment_sets: [{assignment_set_associations: []}]
+      assignment_sets: [{assignment_set_associations: []}],
     },
     {
       lower_bound: '0',
       upper_bound: '0.4242',
-      assignment_sets: [{assignment_set_associations: []}]
-    }
+      assignment_sets: [{assignment_set_associations: []}],
+    },
   ]
 }
 
@@ -77,14 +77,14 @@ describe('scoringRangeReducer', () => {
       saveData([
         {lower_bound: '0.05', upper_bound: '0.10'},
         {lower_bound: '0.25', upper_bound: '0.30'},
-        {lower_bound: '0.15', upper_bound: '0.20'}
+        {lower_bound: '0.15', upper_bound: '0.20'},
       ])
     )
     expect(newState).toEqual(
       Immutable.fromJS([
         {lower_bound: '0.25', upper_bound: '0.30'},
         {lower_bound: '0.15', upper_bound: '0.20'},
-        {lower_bound: '0.05', upper_bound: '0.10'}
+        {lower_bound: '0.05', upper_bound: '0.10'},
       ])
     )
   })
@@ -98,7 +98,7 @@ describe('scoringRangeReducer', () => {
       Immutable.fromJS([
         {lower_bound: '0.60', upper_bound: '1.00'},
         {lower_bound: '0.4242', upper_bound: '0.60'},
-        {lower_bound: '0', upper_bound: '0.4242'}
+        {lower_bound: '0', upper_bound: '0.4242'},
       ])
     )
   })
@@ -112,7 +112,7 @@ describe('scoringRangeReducer', () => {
       Immutable.fromJS([
         {lower_bound: '0.8484', upper_bound: '1.00'},
         {lower_bound: '0.4242', upper_bound: '0.8484'},
-        {lower_bound: '0', upper_bound: '0.4242'}
+        {lower_bound: '0', upper_bound: '0.4242'},
       ])
     )
   })
@@ -126,7 +126,7 @@ describe('scoringRangeReducer', () => {
       Immutable.fromJS([
         {lower_bound: '0.8484', upper_bound: '1.00'},
         {lower_bound: '0', upper_bound: '0.8484'},
-        {lower_bound: '0', upper_bound: '0'}
+        {lower_bound: '0', upper_bound: '0'},
       ])
     )
   })
@@ -134,7 +134,7 @@ describe('scoringRangeReducer', () => {
   it('sets errors if present', () => {
     const newState = reduce(initialState(), actions.SET_ERROR_AT_SCORE_INDEX, {
       index: 0,
-      error: 'rats'
+      error: 'rats',
     })
     expect(newState.getIn([0, 'error'])).toBe('rats')
   })
@@ -143,7 +143,7 @@ describe('scoringRangeReducer', () => {
     const newState = reduce(initialState(), actions.ADD_ASSIGNMENTS_TO_RANGE_SET, {
       index: 0,
       assignmentSetIndex: 0,
-      assignment_set_associations: [{assignment_id: 1}, {assignment_id: 2}]
+      assignment_set_associations: [{assignment_id: 1}, {assignment_id: 2}],
     })
     expect(
       newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id'])
@@ -157,7 +157,7 @@ describe('scoringRangeReducer', () => {
     const state = initialState()
     state[0].assignment_sets = [
       {assignment_set_associations: [{assignment_id: '1'}]},
-      {assignment_set_associations: [{assignment_id: '2'}]}
+      {assignment_set_associations: [{assignment_id: '2'}]},
     ]
 
     const newState = reduce(state, actions.MERGE_ASSIGNMENT_SETS, {index: 0, leftSetIndex: 0})
@@ -172,7 +172,7 @@ describe('scoringRangeReducer', () => {
     const state = initialState()
     state[0].assignment_sets = [
       {assignment_set_associations: [{assignment_id: '2'}, {assignment_id: '1'}]},
-      {assignment_set_associations: [{assignment_id: '2'}]}
+      {assignment_set_associations: [{assignment_id: '2'}]},
     ]
 
     const newState = reduce(state, actions.MERGE_ASSIGNMENT_SETS, {index: 0, leftSetIndex: 0})
@@ -188,7 +188,7 @@ describe('scoringRangeReducer', () => {
     const state = initialState()
     state[0].assignment_sets = [
       {assignment_set_associations: [{assignment_id: '1', id: 5}]},
-      {assignment_set_associations: [{assignment_id: '2', id: 3}]}
+      {assignment_set_associations: [{assignment_id: '2', id: 3}]},
     ]
 
     const newState = reduce(state, actions.MERGE_ASSIGNMENT_SETS, {index: 0, leftSetIndex: 0})
@@ -202,13 +202,13 @@ describe('scoringRangeReducer', () => {
   it('splits assignment sets apart', () => {
     const state = initialState()
     state[0].assignment_sets = [
-      {assignment_set_associations: [{assignment_id: '1'}, {assignment_id: '2'}]}
+      {assignment_set_associations: [{assignment_id: '1'}, {assignment_id: '2'}]},
     ]
 
     const newState = reduce(state, actions.SPLIT_ASSIGNMENT_SET, {
       index: 0,
       assignmentSetIndex: 0,
-      splitIndex: 1
+      splitIndex: 1,
     })
     const newSets = newState.getIn([0, 'assignment_sets'])
 
@@ -223,15 +223,15 @@ describe('scoringRangeReducer', () => {
       {
         assignment_set_associations: [
           {assignment_id: '1', id: 4},
-          {assignment_id: '2', id: 3}
-        ]
-      }
+          {assignment_id: '2', id: 3},
+        ],
+      },
     ]
 
     const newState = reduce(state, actions.SPLIT_ASSIGNMENT_SET, {
       index: 0,
       assignmentSetIndex: 0,
-      splitIndex: 1
+      splitIndex: 1,
     })
     const newSets = newState.getIn([0, 'assignment_sets'])
 
@@ -259,7 +259,7 @@ describe('scoringRangeReducer', () => {
 
     const newState = reduce(state, actions.UPDATE_ASSIGNMENT_INDEX, {
       path: new Path(0, 0, 2),
-      assignmentIndex: 0
+      assignmentIndex: 0,
     })
 
     expect(newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations']).size).toBe(3)
@@ -281,7 +281,7 @@ describe('scoringRangeReducer', () => {
 
     const newState = reduce(state, actions.INSERT_ASSIGNMENT, {
       path: new Path(0, 0, 0),
-      assignment: '3'
+      assignment: '3',
     })
 
     expect(newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations']).size).toBe(3)

@@ -30,25 +30,25 @@ const RubricsTray = () => (
     image="/images/tutorial-tray-images/Panda_Teacher.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I add a rubric in a course?'),
-        href: I18n.t('#community.instructor_add_rubric_course')
+        href: I18n.t('#community.instructor_add_rubric_course'),
       },
       {
         label: I18n.t('How do I manage rubrics in a course?'),
-        href: I18n.t('#community.instructor_manage_rubrics')
+        href: I18n.t('#community.instructor_manage_rubrics'),
       },
       {
         label: I18n.t('How do I align an outcome with a rubric in a course?'),
-        href: I18n.t('#community.instructor_align_outcome_rubric')
+        href: I18n.t('#community.instructor_align_outcome_rubric'),
       },
       {
         label: I18n.t('How do I add a rubric to an assignment?'),
-        href: I18n.t('#community.instructor_add_rubric_assignment')
-      }
+        href: I18n.t('#community.instructor_add_rubric_assignment'),
+      },
     ]}
   >
     {I18n.t(`Rubrics can show students your expectations for assignment quality

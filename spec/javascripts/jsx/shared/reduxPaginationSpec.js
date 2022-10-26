@@ -20,7 +20,7 @@ import {
   createPaginatedReducer,
   createPaginationActions,
   selectPaginationState,
-  LoadStates
+  LoadStates,
 } from '@canvas/pagination/redux/actions'
 
 const createMockStore = state => ({
@@ -32,7 +32,7 @@ const createMockStore = state => ({
   dispatch: () => {},
   mockStateChange() {
     this.subs.forEach(sub => sub())
-  }
+  },
 })
 
 QUnit.module('Redux Pagination')
@@ -46,7 +46,7 @@ test('creates proper actionTypes', () => {
     'GET_THINGS_START',
     'GET_THINGS_SUCCESS',
     'GET_THINGS_FAIL',
-    'CLEAR_THINGS_PAGE'
+    'CLEAR_THINGS_PAGE',
   ])
 })
 
@@ -60,8 +60,8 @@ test('creates get action creator from thunk that calls start with current page',
   const mockStore = createMockStore({
     things: {
       currentPage: 3,
-      pages: {3: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {3: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: []})
@@ -80,8 +80,8 @@ test('creates get action creator from thunk that calls start with a payload page
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: []})
@@ -100,8 +100,8 @@ test('creates get action creator from thunk that calls success', assert => {
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: ['item1']})
@@ -110,7 +110,7 @@ test('creates get action creator from thunk that calls success', assert => {
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'GET_THINGS_SUCCESS', payload: {page: 5, data: ['item1']}}
+      {type: 'GET_THINGS_SUCCESS', payload: {page: 5, data: ['item1']}},
     ])
     dispatchSpy.restore()
     done()
@@ -122,23 +122,23 @@ test('creates get action creator from thunk that calls success with lastPage is 
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) =>
     resolve({
       data: ['item1'],
       headers: {
-        link: '<http://canvas.example.com/api/v1/someendpoint&page=5&per_page=50>; rel="last"'
-      }
+        link: '<http://canvas.example.com/api/v1/someendpoint&page=5&per_page=50>; rel="last"',
+      },
     })
   const {actionCreators} = createPaginationActions('things', thunk)
   actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: ['item1'], lastPage: 5}}
+      {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: ['item1'], lastPage: 5}},
     ])
     dispatchSpy.restore()
     done()
@@ -150,8 +150,8 @@ test('creates get action creator from thunk that calls fail', assert => {
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, reject) => reject({message: 'oops error'})
@@ -160,7 +160,7 @@ test('creates get action creator from thunk that calls fail', assert => {
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'GET_THINGS_FAIL', payload: {page: 5, message: 'oops error'}}
+      {type: 'GET_THINGS_FAIL', payload: {page: 5, message: 'oops error'}},
     ])
     dispatchSpy.restore()
     done()
@@ -172,8 +172,8 @@ test('creates get action creator from thunk that does not call thunk if page is 
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: ['item1']})
@@ -191,8 +191,8 @@ test('creates get action creator from thunk that calls thunk if page is already 
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: ['item1']})
@@ -201,7 +201,7 @@ test('creates get action creator from thunk that calls thunk if page is already 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
     deepEqual(dispatchSpy.secondCall.args, [
-      {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: ['item1']}}
+      {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: ['item1']}},
     ])
     dispatchSpy.restore()
     done()
@@ -213,8 +213,8 @@ test('creates get action creator from thunk that selects the page if select is t
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
   const thunk = () => (resolve, _reject) => resolve({data: ['item1']})
@@ -233,21 +233,21 @@ test('can get all pagination results under a single set of dispatches', assert =
   const mockStore = createMockStore({
     things: {
       currentPage: 1,
-      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}}
-    }
+      pages: {1: {item: [], loadState: LoadStates.NOT_LOADED}},
+    },
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
 
   const mockResult = {
     data: ['item1'],
     headers: {
-      link: '<http://canvas.example.com/api/v1/someendpoint&page=5&per_page=50>; rel="last"'
-    }
+      link: '<http://canvas.example.com/api/v1/someendpoint&page=5&per_page=50>; rel="last"',
+    },
   }
   const thunk = () => new Promise((resolve, _reject) => resolve(mockResult))
   const {actionCreators} = createPaginationActions('things', thunk, {
     totalCount: 250,
-    fetchAll: true
+    fetchAll: true,
   })
   actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
   setTimeout(() => {
@@ -261,8 +261,8 @@ test('can get all pagination results under a single set of dispatches', assert =
       payload: {
         data: ['item1', 'item1', 'item1', 'item1', 'item1'],
         lastPage: 1,
-        page: 1
-      }
+        page: 1,
+      },
     }
     deepEqual(dispatchSpy.secondCall.args, [expectedResults])
     dispatchSpy.restore()
@@ -278,9 +278,9 @@ test('sets current page on SELECT_PAGE', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.NOT_LOADED
-      }
-    }
+        loadState: LoadStates.NOT_LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'SELECT_THINGS_PAGE', payload: {page: 5}}
@@ -294,9 +294,9 @@ test('sets last page on GET_SUCCESS', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.NOT_LOADED
-      }
-    }
+        loadState: LoadStates.NOT_LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'GET_THINGS_SUCCESS', payload: {lastPage: 5, page: 1, data: ['item1']}}
@@ -310,9 +310,9 @@ test('sets items for page on GET_SUCCESS', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.NOT_LOADED
-      }
-    }
+        loadState: LoadStates.NOT_LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: ['item1']}}
@@ -326,9 +326,9 @@ test('resets items for page on CLEAR_PAGE', () => {
     pages: {
       1: {
         items: [{id: 1, title: 'some title'}],
-        loadState: LoadStates.LOADED
-      }
-    }
+        loadState: LoadStates.LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'CLEAR_THINGS_PAGE', payload: {page: 1}}
@@ -342,17 +342,17 @@ test('resets items for multiple pages on CLEAR_PAGE', () => {
     pages: {
       1: {
         items: [{id: 1, title: 'some title'}],
-        loadState: LoadStates.LOADED
+        loadState: LoadStates.LOADED,
       },
       2: {
         items: [{id: 1, title: 'some title'}],
-        loadState: LoadStates.LOADED
+        loadState: LoadStates.LOADED,
       },
       3: {
         items: [{id: 1, title: 'some title'}],
-        loadState: LoadStates.LOADED
-      }
-    }
+        loadState: LoadStates.LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'CLEAR_THINGS_PAGE', payload: {pages: [2, 3]}}
@@ -368,9 +368,9 @@ test('sets loadState for page to LOADING on GET_START', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.NOT_LOADED
-      }
-    }
+        loadState: LoadStates.NOT_LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'GET_THINGS_START', payload: {page: 1}}
@@ -384,9 +384,9 @@ test('sets loadState for page to LOADED on GET_SUCCESS', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.LOADING
-      }
-    }
+        loadState: LoadStates.LOADING,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'GET_THINGS_SUCCESS', payload: {page: 1, data: []}}
@@ -400,9 +400,9 @@ test('sets loadState for page to ERRORED on GET_FAIL', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.LOADING
-      }
-    }
+        loadState: LoadStates.LOADING,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'GET_THINGS_FAIL', payload: {page: 1, message: 'oops error'}}
@@ -416,9 +416,9 @@ test('sets loadState for page to NOT_LOADED on CLEAR_PAGE', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.LOADED
-      }
-    }
+        loadState: LoadStates.LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'CLEAR_THINGS_PAGE', payload: {page: 1}}
@@ -432,17 +432,17 @@ test('sets loadState for multiple pages to NOT_LOADED on CLEAR_PAGE', () => {
     pages: {
       1: {
         items: [],
-        loadState: LoadStates.LOADED
+        loadState: LoadStates.LOADED,
       },
       2: {
         items: [],
-        loadState: LoadStates.LOADED
+        loadState: LoadStates.LOADED,
       },
       3: {
         items: [],
-        loadState: LoadStates.LOADED
-      }
-    }
+        loadState: LoadStates.LOADED,
+      },
+    },
   }
   const reduce = createPaginatedReducer('things')
   const action = {type: 'CLEAR_THINGS_PAGE', payload: {pages: [2, 3]}}
@@ -461,10 +461,10 @@ test('derives state for existing page', () => {
       pages: {
         1: {
           items: ['item1'],
-          loadState: LoadStates.LOADING
-        }
-      }
-    }
+          loadState: LoadStates.LOADING,
+        },
+      },
+    },
   }
   const derivedState = selectPaginationState(state, 'things')
   deepEqual(derivedState.things, ['item1'])
@@ -480,10 +480,10 @@ test('derives state for not yet existing page', () => {
       pages: {
         1: {
           items: ['item1'],
-          loadState: LoadStates.LOADING
-        }
-      }
-    }
+          loadState: LoadStates.LOADING,
+        },
+      },
+    },
   }
   const derivedState = selectPaginationState(state, 'things')
   deepEqual(derivedState.things, [])

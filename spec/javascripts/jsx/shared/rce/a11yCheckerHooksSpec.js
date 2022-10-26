@@ -25,7 +25,7 @@ QUnit.module('beforeCheck', {
     window.ENV = {} || window.ENV
     window.ENV.url_for_high_contrast_tinymce_editor_css = [
       '/base/spec/javascripts/fixtures/a11yCheckerTest1.css',
-      '/base/spec/javascripts/fixtures/a11yCheckerTest2.css'
+      '/base/spec/javascripts/fixtures/a11yCheckerTest2.css',
     ]
 
     fakeEditor = {
@@ -38,23 +38,23 @@ QUnit.module('beforeCheck', {
             link.rel = 'stylesheet'
             link.onload = callback
             document.querySelector('#fixtures').appendChild(link)
-          }
+          },
         },
         doc: {
           styleSheets: {
             0: {disabled: false},
             1: {disabled: false},
             2: {disabled: false},
-            length: 3
-          }
-        }
-      }
+            length: 3,
+          },
+        },
+      },
     }
   },
   teardown() {
     window.ENV.url_for_high_contrast_tinymce_editor_css = undefined
     document.querySelector('#fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('disables the last two stylesheets in the editor', () => {
@@ -95,55 +95,55 @@ QUnit.module('afterCheck', {
               disabled: false,
               ownerNode: {
                 parentElement: {
-                  removeChild: sinon.spy()
-                }
-              }
+                  removeChild: sinon.spy(),
+                },
+              },
             },
             1: {
               disabled: true,
               href: 'nonHC.css',
               ownerNode: {
                 parentElement: {
-                  removeChild: sinon.spy()
-                }
-              }
+                  removeChild: sinon.spy(),
+                },
+              },
             },
             2: {
               disabled: true,
               href: 'nonHC2.css',
               ownerNode: {
                 parentElement: {
-                  removeChild: sinon.spy()
-                }
-              }
+                  removeChild: sinon.spy(),
+                },
+              },
             },
             3: {
               disabled: false,
               href: 'HC.css',
               ownerNode: {
                 parentElement: {
-                  removeChild: sinon.spy()
-                }
-              }
+                  removeChild: sinon.spy(),
+                },
+              },
             },
             4: {
               disabled: false,
               href: 'HC2.css',
               ownerNode: {
                 parentElement: {
-                  removeChild: sinon.spy()
-                }
-              }
+                  removeChild: sinon.spy(),
+                },
+              },
             },
-            length: 5
-          }
-        }
-      }
+            length: 5,
+          },
+        },
+      },
     }
   },
   teardown() {
     document.querySelector('#fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('removes anything added by the a11yChecker', () => {

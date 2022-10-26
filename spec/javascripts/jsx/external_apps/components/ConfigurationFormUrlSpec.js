@@ -18,15 +18,15 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormUrl from 'ui/features/external_apps/react/components/ConfigurationFormUrl.js'
+import ConfigurationFormUrl from 'ui/features/external_apps/react/components/ConfigurationFormUrl'
 
 const fakeStore = {
   findAppByShortName() {
     return {
       short_name: 'someApp',
-      config_options: []
+      config_options: [],
     }
-  }
+  },
 }
 
 const component = TestUtils.renderIntoDocument(

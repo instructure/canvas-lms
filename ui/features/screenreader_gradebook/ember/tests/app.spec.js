@@ -32,25 +32,25 @@ QUnit.module('screenreader_gradebook', {
 
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
-test('fetches enrollments', function() {
+test('fetches enrollments', function () {
   equal(this.controller.get('enrollments').objectAt(0).user.name, 'Bob Barnes')
   equal(this.controller.get('enrollments').objectAt(1).user.name, 'Fred Flint')
 })
 
-test('fetches sections', function() {
+test('fetches sections', function () {
   equal(this.controller.get('sections').objectAt(0).name, 'Vampires and Demons')
   equal(this.controller.get('sections').objectAt(1).name, 'Slayers and Scoobies')
 })
 
-test('fetches custom_columns', function() {
+test('fetches custom_columns', function () {
   equal(this.controller.get('custom_columns.length'), 1)
   equal(this.controller.get('custom_columns.firstObject').title, fixtures.custom_columns[0].title)
 })
 
-test('fetches outcomes', function() {
+test('fetches outcomes', function () {
   equal(this.controller.get('outcomes').objectAt(0).title, 'Eating')
   equal(this.controller.get('outcomes').objectAt(1).title, 'Drinking')
 })

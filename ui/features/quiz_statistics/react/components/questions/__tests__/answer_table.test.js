@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import AnswerTable from '../answer_table'
-import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/questions/answer_table', () => {
   it('renders', () => {
     render(
       <AnswerTable
         answers={[
-          { id: 1, correct: true, responses: 3 },
-          { id: 2, correct: false, responses: 4 }
+          {id: 1, correct: true, responses: 3},
+          {id: 2, correct: false, responses: 4},
         ]}
       />
     )
@@ -37,8 +36,8 @@ describe('canvas_quizzes/statistics/views/questions/answer_table', () => {
     render(
       <AnswerTable
         answers={[
-          { id: 1, correct: true, responses: 3, user_names: ['a', 'b'] },
-          { id: 2, correct: false, responses: 4 }
+          {id: 1, correct: true, responses: 3, user_names: ['a', 'b']},
+          {id: 2, correct: false, responses: 4},
         ]}
       />
     )

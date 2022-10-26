@@ -55,7 +55,7 @@ K5IconTab.propTypes = {
   icon: PropTypes.elementType.isRequired,
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
-  courseContext: PropTypes.string
+  courseContext: PropTypes.string,
 }
 
 const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext}) => {
@@ -121,11 +121,11 @@ K5Tabs.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
-      label: PropTypes.string.isRequired
+      label: PropTypes.string.isRequired,
     })
   ).isRequired,
   tabsRef: PropTypes.func,
-  courseContext: PropTypes.string
+  courseContext: PropTypes.string,
 }
 
 export {K5IconTab}

@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash-underscore'
-import { camelize } from './convert_case'
+import {camelize} from './convert_case'
 
 const pick = _.pick
 

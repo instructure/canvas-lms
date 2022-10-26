@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/announcements/react/actions.js'
-import * as apiClient from 'ui/features/announcements/react/apiClient.js'
+import actions from 'ui/features/announcements/react/actions'
+import * as apiClient from 'ui/features/announcements/react/apiClient'
 
 let sandbox = null
 
@@ -34,7 +34,7 @@ QUnit.module('Announcements redux actions', {
   teardown() {
     if (sandbox) sandbox.restore()
     sandbox = null
-  }
+  },
 })
 
 test('searchAnnouncements dispatches UPDATE_ANNOUNCEMENTS_SEARCH with search term', () => {
@@ -42,22 +42,22 @@ test('searchAnnouncements dispatches UPDATE_ANNOUNCEMENTS_SEARCH with search ter
   const dispatchSpy = sinon.spy()
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, () => state)
   deepEqual(dispatchSpy.firstCall.args, [
-    {type: 'UPDATE_ANNOUNCEMENTS_SEARCH', payload: {term: 'test'}}
+    {type: 'UPDATE_ANNOUNCEMENTS_SEARCH', payload: {term: 'test'}},
   ])
 })
 
 test('searchAnnouncements calls actions.clearAnnouncementsPage when search term updates', () => {
   const getState = () => ({
     announcementsSearch: {term: Math.random().toString()},
-    announcements: {lastPage: 5}
+    announcements: {lastPage: 5},
   })
   const dispatchSpy = sinon.spy()
   const clearAnnouncementsSpy = sinon.spy(actions, 'clearAnnouncementsPage')
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, getState)
   deepEqual(clearAnnouncementsSpy.firstCall.args, [
     {
-      pages: [1, 2, 3, 4, 5]
-    }
+      pages: [1, 2, 3, 4, 5],
+    },
   ])
   clearAnnouncementsSpy.restore()
 })
@@ -65,7 +65,7 @@ test('searchAnnouncements calls actions.clearAnnouncementsPage when search term 
 test('searchAnnouncements calls actions.clearAnnouncements when search term updates', () => {
   const getState = () => ({
     announcementsSearch: {term: Math.random().toString()},
-    announcements: {lastPage: 1}
+    announcements: {lastPage: 1},
   })
   const dispatchSpy = sinon.spy()
   const getAnnouncementsSpy = sinon.spy(actions, 'getAnnouncements')
@@ -73,8 +73,8 @@ test('searchAnnouncements calls actions.clearAnnouncements when search term upda
   deepEqual(getAnnouncementsSpy.firstCall.args, [
     {
       page: 1,
-      select: true
-    }
+      select: true,
+    },
   ])
   getAnnouncementsSpy.restore()
 })
@@ -100,7 +100,7 @@ test('searchAnnouncements does not call actions.getAnnouncements when filter sta
 test('searchAnnouncements calls actions.getAnnouncements when filter updates', () => {
   const getState = () => ({
     announcementsSearch: {filter: Math.random().toString()},
-    announcements: {lastPage: 1}
+    announcements: {lastPage: 1},
   })
   const dispatchSpy = sinon.spy()
   const getAnnouncementsSpy = sinon.spy(actions, 'getAnnouncements')
@@ -108,8 +108,8 @@ test('searchAnnouncements calls actions.getAnnouncements when filter updates', (
   deepEqual(getAnnouncementsSpy.firstCall.args, [
     {
       page: 1,
-      select: true
-    }
+      select: true,
+    },
   ])
   getAnnouncementsSpy.restore()
 })
@@ -132,20 +132,20 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
           items: [
             {
               id: 1,
-              locked: true
+              locked: true,
             },
             {
               id: 2,
-              locked: true
+              locked: true,
             },
             {
               id: 3,
-              locked: false
-            }
-          ]
-        }
-      }
-    }
+              locked: false,
+            },
+          ],
+        },
+      },
+    },
   }
   const dispatchSpy = sinon.spy()
   mockSuccess('lockAnnouncements', {successes: [], failures: []})
@@ -163,20 +163,20 @@ test('toggleAnnouncementsLock calls apiClient.lockAnnouncements with passed in a
           items: [
             {
               id: 1,
-              locked: true
+              locked: true,
             },
             {
               id: 2,
-              locked: true
+              locked: true,
             },
             {
               id: 3,
-              locked: false
-            }
-          ]
-        }
-      }
-    }
+              locked: false,
+            },
+          ],
+        },
+      },
+    },
   }
   const dispatchSpy = sinon.spy()
   mockSuccess('lockAnnouncements', {successes: [], failures: []})
@@ -195,20 +195,20 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
           items: [
             {
               id: 1,
-              locked: true
+              locked: true,
             },
             {
               id: 2,
-              locked: true
+              locked: true,
             },
             {
               id: 3,
-              locked: false
-            }
-          ]
-        }
-      }
-    }
+              locked: false,
+            },
+          ],
+        },
+      },
+    },
   }
   const dispatchSpy = sinon.spy()
   mockSuccess('lockAnnouncements', {successes: [], failures: []})
@@ -234,7 +234,7 @@ test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise s
   const done = assert.async()
   const state = {
     announcements: {pages: {1: {items: [{id: 1}]}}, currentPage: 1},
-    selectedAnnouncements: []
+    selectedAnnouncements: [],
   }
   const dispatchSpy = sinon.spy()
 
@@ -251,13 +251,13 @@ test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise succ
   const done = assert.async()
   const state = {
     announcements: {pages: {1: {items: [{id: 1}]}}, currentPage: 1},
-    selectedAnnouncements: []
+    selectedAnnouncements: [],
   }
   const dispatchSpy = sinon.spy()
 
   mockSuccess('lockAnnouncements', {
     successes: [],
-    failures: [{data: 1, err: 'something bad happened'}]
+    failures: [{data: 1, err: 'something bad happened'}],
   })
   actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
 
@@ -343,7 +343,7 @@ test('deleteAnnouncements clears page cache from current page to last page if re
   setTimeout(() => {
     deepEqual(dispatchSpy.thirdCall.args[0], {
       type: 'CLEAR_ANNOUNCEMENTS_PAGE',
-      payload: {pages: [3, 4, 5, 6, 7]}
+      payload: {pages: [3, 4, 5, 6, 7]},
     })
     done()
   })
@@ -360,7 +360,7 @@ test('deleteAnnouncements re-selects the current page if request succeeds', asse
   setTimeout(() => {
     ok(dispatchSpy.lastCall.args[0], {
       type: 'GET_ANNOUNCEMENTS_PAGE',
-      payload: {page: 3, select: true}
+      payload: {page: 3, select: true},
     })
     done()
   })

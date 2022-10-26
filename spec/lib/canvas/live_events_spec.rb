@@ -2048,21 +2048,52 @@ describe Canvas::LiveEvents do
       @course = course_model
       @child_course = course_model
       @master_template = MasterCourses::MasterTemplate.create!(course: @course)
-      @child_subscription =
-        MasterCourses::ChildSubscription.create!(master_template: @master_template, child_course: @child_course)
     end
 
-    context "created" do
-      it "triggers an blueprint_subscription_created live event" do
-        expect_event("blueprint_subscription_created", {
-                       master_template_account_uuid: @master_template.course.account.uuid,
-                       master_template_id: @master_template.id.to_s,
-                       master_course_uuid: @course.uuid,
-                       child_subscription_id: @child_subscription.id.to_s,
-                       child_course_uuid: @child_course.uuid,
-                       child_course_account_uuid: @child_course.account.uuid
-                     }).once
-        Canvas::LiveEvents.blueprint_subscription_created(@child_subscription)
+    let(:child_subscription) do
+      expect_event("course_updated", {
+                     account_id: @master_template.course.account.global_id.to_s,
+                     course_id: @course.global_id.to_s,
+                     created_at: anything,
+                     name: @course.name,
+                     updated_at: anything,
+                     uuid: @course.uuid,
+                     workflow_state: "claimed"
+                   }).at_least(1).times
+      expect_event("blueprint_subscription_created", event_data)
+
+      @child_subscription = @master_template.add_child_course!(@child_course)
+    end
+
+    let(:event_data) do
+      {
+        master_template_account_uuid: @master_template.course.account.uuid,
+        master_template_id: @master_template.id.to_s,
+        master_course_uuid: @course.uuid,
+        child_subscription_id: anything,
+        child_course_uuid: @child_course.uuid,
+        child_course_account_uuid: @child_course.account.uuid
+      }
+    end
+
+    it "triggers a blueprint_subscription_created live event" do
+      child_subscription
+    end
+
+    it "triggers a blueprint_subscription_deleted live event" do
+      expect_event("blueprint_subscription_deleted", event_data)
+      child_subscription.destroy
+    end
+
+    context "when previously associated" do
+      before do
+        expect_event("blueprint_subscription_deleted", event_data)
+        child_subscription.destroy
+      end
+
+      it "triggers a blueprint_subscription_created live event" do
+        expect_event("blueprint_subscription_created", event_data)
+        @master_template.add_child_course!(@child_course)
       end
     end
   end

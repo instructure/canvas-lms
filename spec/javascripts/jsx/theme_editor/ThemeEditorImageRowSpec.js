@@ -19,7 +19,7 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom'
-import ThemeEditorImageRow from 'ui/features/theme_editor/react/ThemeEditorImageRow.js'
+import ThemeEditorImageRow from 'ui/features/theme_editor/react/ThemeEditorImageRow'
 
 let elem, props
 
@@ -28,9 +28,9 @@ QUnit.module('ThemeEditorImageRow Component', {
     elem = document.createElement('div')
     props = {
       varDef: {},
-      onChange: sinon.spy()
+      onChange: sinon.spy(),
     }
-  }
+  },
 })
 
 test('renders with human name heading', () => {

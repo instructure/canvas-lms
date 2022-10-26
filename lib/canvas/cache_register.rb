@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# modules included into ActiveRecord can't be reloaded, so use a vanilla require,
-# and not a child of a reloadable constant
-require "active_record/cache_register"
-
 module Canvas
   module CacheRegister
     # this is an attempt to separate out more granular timestamps that we can use in cache keys

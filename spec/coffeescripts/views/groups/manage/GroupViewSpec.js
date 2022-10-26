@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import GroupView from 'ui/features/manage_groups/backbone/views/GroupView.js'
-import GroupUsersView from 'ui/features/manage_groups/backbone/views/GroupUsersView.js'
-import GroupDetailView from 'ui/features/manage_groups/backbone/views/GroupDetailView.js'
+import GroupView from 'ui/features/manage_groups/backbone/views/GroupView'
+import GroupUsersView from 'ui/features/manage_groups/backbone/views/GroupUsersView'
+import GroupDetailView from 'ui/features/manage_groups/backbone/views/GroupDetailView'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection.coffee'
 import Group from '@canvas/groups/backbone/models/Group.coffee'
@@ -37,20 +37,20 @@ QUnit.module('GroupView', {
     group = new Group({
       id: 42,
       name: 'Foo Group',
-      members_count: 7
+      members_count: 7,
     })
     users = new GroupUserCollection(
       [
         {
           id: 1,
           name: 'bob',
-          sortable_name: 'bob'
+          sortable_name: 'bob',
         },
         {
           id: 2,
           name: 'joe',
-          sortable_name: 'joe'
-        }
+          sortable_name: 'joe',
+        },
       ],
       {group}
     )
@@ -60,16 +60,16 @@ QUnit.module('GroupView', {
     group.set('leader', {id: 1})
     const groupUsersView = new GroupUsersView({
       model: group,
-      collection: users
+      collection: users,
     })
     const groupDetailView = new GroupDetailView({
       model: group,
-      users
+      users,
     })
     view = new GroupView({
       groupUsersView,
       groupDetailView,
-      model: group
+      model: group,
     })
     view.render()
     view.$el.appendTo($('#fixtures'))
@@ -78,7 +78,7 @@ QUnit.module('GroupView', {
     fakeENV.teardown()
     view.remove()
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('it should be accessible', assert => {

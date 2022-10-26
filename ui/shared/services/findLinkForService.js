@@ -54,12 +54,12 @@ export function findLinkForService(service_type, callback) {
   if (!$dialog.length) {
     $dialog = $("<div id='instructure_bookmark_search'/>")
     $dialog.append(
-      `${"<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
+      `${
+        "<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
         "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
         "<input type='text' class='query' style='width: 230px;'/>" +
-        "<button class='btn search_button' type='submit'>"}${htmlEscape(
-        I18n.t('buttons.search', 'Search')
-      )}</button></form>`
+        "<button class='btn search_button' type='submit'>"
+      }${htmlEscape(I18n.t('buttons.search', 'Search'))}</button></form>`
     )
     $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>")
     $dialog.find('form').submit(event => {
@@ -113,7 +113,7 @@ export function findLinkForService(service_type, callback) {
                 $('<a class="bookmark_link" style="font-weight: bold;"/>')
                   .attr({
                     href: data[idx].url,
-                    title: data[idx].title
+                    title: data[idx].title,
                   })
                   .text(data[idx].short_title)
               )
@@ -132,14 +132,14 @@ export function findLinkForService(service_type, callback) {
         }
       )
     })
-    $dialog.delegate('.bookmark_link', 'click', function(event) {
+    $dialog.delegate('.bookmark_link', 'click', function (event) {
       event.preventDefault()
       const url = $(this).attr('href')
       const title = $(this).attr('title') || $(this).text()
       $dialog.dialog('close')
       callback({
         url,
-        title
+        title,
       })
     })
   }
@@ -154,22 +154,14 @@ export function findLinkForService(service_type, callback) {
   let url = '/search/bookmarks?q=%7B%7B+query+%7D%7D&service_type=%7B%7B+service_type+%7D%7D'
   url = $.replaceTags(url, 'service_type', service_type)
   $dialog.data('reference_url', url)
-  $dialog
-    .find('.results')
-    .empty()
-    .end()
-    .find('.query')
-    .val('')
+  $dialog.find('.results').empty().end().find('.query').val('')
   $dialog.dialog({
     title: I18n.t('titles.bookmark_search', 'Bookmark Search: %{service_name}', {
-      service_name: $.titleize(service_type)
+      service_name: $.titleize(service_type),
     }),
     open() {
-      $dialog
-        .find('input:visible:first')
-        .focus()
-        .select()
+      $dialog.find('input:visible:first').focus().select()
     },
-    width: 400
+    width: 400,
   })
 }

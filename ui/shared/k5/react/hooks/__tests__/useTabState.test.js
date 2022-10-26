@@ -25,7 +25,7 @@ const TABS = [
   {id: TAB_IDS.GRADES},
   {id: TAB_IDS.MODULES},
   {id: TAB_IDS.SCHEDULE},
-  {id: TAB_IDS.RESOURCES}
+  {id: TAB_IDS.RESOURCES},
 ]
 
 beforeAll(() => {

@@ -45,7 +45,7 @@ describe('CanvasInbox App Container', () => {
 
   beforeEach(() => {
     window.ENV = {
-      current_user_id: 1
+      current_user_id: 1,
     }
   })
 

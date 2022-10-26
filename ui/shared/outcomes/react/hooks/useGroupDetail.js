@@ -64,7 +64,7 @@ const useGroupDetail = ({
   searchString = '',
   id,
   rhsGroupIdsToRefetch = [],
-  targetGroupId
+  targetGroupId,
 }) => {
   const {contextType, contextId, rootIds} = useCanvasContext()
   searchString = useSearchString(searchString)
@@ -72,7 +72,7 @@ const useGroupDetail = ({
   const queryVars = {
     outcomesContextType: contextType,
     outcomesContextId: contextId,
-    targetGroupId
+    targetGroupId,
   }
   const client = useApolloClient()
   const allVariables = useRef([])
@@ -88,7 +88,7 @@ const useGroupDetail = ({
   const variables = {
     id,
     outcomeIsImported: loadOutcomesIsImported,
-    ...queryVars
+    ...queryVars,
   }
 
   const {loading, error, data, fetchMore, refetch} = useQuery(query, {
@@ -96,12 +96,12 @@ const useGroupDetail = ({
     skip,
     context: {
       fetchOptions: {
-        signal: abortController.signal
-      }
+        signal: abortController.signal,
+      },
     },
     onCompleted: () => {
       allVariables.current = uniqWith([...allVariables.current, variables], isEqual)
-    }
+    },
   })
 
   // To handle refetching of groups when an outcome is created. This will ensure that
@@ -129,7 +129,7 @@ const useGroupDetail = ({
     if (error) {
       showFlashAlert({
         message: I18n.t('An error occurred while loading selected group.'),
-        type: 'error'
+        type: 'error',
       })
     }
   }, [error])
@@ -138,7 +138,7 @@ const useGroupDetail = ({
     if (!loading) {
       fetchMore({
         variables: {
-          outcomesCursor: group?.outcomes?.pageInfo?.endCursor
+          outcomesCursor: group?.outcomes?.pageInfo?.endCursor,
         },
         updateQuery: (prevData, {fetchMoreResult}) => {
           // Reverse to uniq so it'll remove previous result if they appear
@@ -156,11 +156,11 @@ const useGroupDetail = ({
               outcomes: {
                 ...prevData.group.outcomes,
                 edges,
-                pageInfo: fetchMoreResult.group.outcomes.pageInfo
-              }
-            }
+                pageInfo: fetchMoreResult.group.outcomes.pageInfo,
+              },
+            },
           }
-        }
+        },
       })
     }
   }
@@ -183,7 +183,7 @@ const useGroupDetail = ({
     vars.forEach(v => {
       const {group: g} = client.readQuery({
         query,
-        variables: v
+        variables: v,
       })
 
       let removedCount = 0
@@ -198,8 +198,8 @@ const useGroupDetail = ({
               return false
             }
             return true
-          })
-        }
+          }),
+        },
       }
 
       newGroup.outcomesCount -= removedCount
@@ -208,8 +208,8 @@ const useGroupDetail = ({
         query,
         variables: v,
         data: {
-          group: newGroup
-        }
+          group: newGroup,
+        },
       })
     })
   }
@@ -235,7 +235,7 @@ const useGroupDetail = ({
                 title
               }
             }
-          `
+          `,
         })
         return {
           linkId: link._id,
@@ -243,7 +243,7 @@ const useGroupDetail = ({
           title: link.node.title,
           canUnlink: link.canUnlink,
           parentGroupId: link.group._id,
-          parentGroupTitle: link.group.title
+          parentGroupTitle: link.group.title,
         }
       })
       .reduce((dict, link) => {
@@ -261,14 +261,14 @@ const useGroupDetail = ({
         message: I18n.t(
           {
             one: `Showing %{count} outcome for %{groupTitle}.`,
-            other: `Showing %{count} outcomes for %{groupTitle}.`
+            other: `Showing %{count} outcomes for %{groupTitle}.`,
           },
           {
             count: group.outcomesCount,
-            groupTitle: group.title
+            groupTitle: group.title,
           }
         ),
-        srOnly: true
+        srOnly: true,
       })
     }
   }, [loading, group])
@@ -281,7 +281,7 @@ const useGroupDetail = ({
     removeLearningOutcomes,
     readLearningOutcomes,
     refetchLearningOutcome,
-    refetch
+    refetch,
   }
 }
 

@@ -28,7 +28,7 @@ import {responsiveQuerySizes} from '../../../util/utils'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('ConversationListContainer', () => {
@@ -38,8 +38,8 @@ describe('ConversationListContainer', () => {
       {
         variables: {
           scope,
-          course
-        }
+          course,
+        },
       },
       res => {
         return {...res}
@@ -47,7 +47,7 @@ describe('ConversationListContainer', () => {
       {
         data: data => {
           return {data}
-        }
+        },
       }
     )
   }
@@ -64,13 +64,13 @@ describe('ConversationListContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -86,7 +86,7 @@ describe('ConversationListContainer', () => {
 
   beforeEach(() => {
     window.ENV = {
-      current_user_id: 1
+      current_user_id: 1,
     }
   })
 
@@ -180,7 +180,7 @@ describe('ConversationListContainer', () => {
     beforeEach(() => {
       window.document.getSelection = () => {
         return {
-          removeAllRanges: () => {}
+          removeAllRanges: () => {},
         }
       }
     })
@@ -188,12 +188,12 @@ describe('ConversationListContainer', () => {
       const mock = jest.fn()
       const conversationsQuery = {
         data: getConversationsQuery('multipleConversations').data,
-        loading: false
+        loading: false,
       }
 
       const conversationList = setup({
         onSelectConversation: mock,
-        conversationsQuery
+        conversationsQuery,
       })
 
       await waitForApolloLoading()
@@ -204,7 +204,7 @@ describe('ConversationListContainer', () => {
           checkbox,
           new MouseEvent('click', {
             bubbles: true,
-            cancelable: true
+            cancelable: true,
           })
         )
       })
@@ -215,7 +215,7 @@ describe('ConversationListContainer', () => {
     it('should be able to select range of conversations ASC', async () => {
       const conversationsQuery = {
         data: getConversationsQuery('multipleConversations').data,
-        loading: false
+        loading: false,
       }
 
       const conversationList = setup({conversationsQuery})
@@ -224,7 +224,7 @@ describe('ConversationListContainer', () => {
       const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
       fireEvent.click(conversations[0])
       fireEvent.click(conversations[2], {
-        shiftKey: true
+        shiftKey: true,
       })
       const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
       expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
@@ -233,7 +233,7 @@ describe('ConversationListContainer', () => {
     it('should be able to select range of conversations DESC', async () => {
       const conversationsQuery = {
         data: getConversationsQuery('multipleConversations').data,
-        loading: false
+        loading: false,
       }
 
       const conversationList = setup({conversationsQuery})
@@ -242,7 +242,7 @@ describe('ConversationListContainer', () => {
       const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
       fireEvent.click(conversations[2])
       fireEvent.click(conversations[0], {
-        shiftKey: true
+        shiftKey: true,
       })
       const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
       expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
@@ -253,7 +253,7 @@ describe('ConversationListContainer', () => {
     describe('tablet', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          tablet: {maxWidth: '67'}
+          tablet: {maxWidth: '67'},
         }))
       })
 
@@ -268,7 +268,7 @@ describe('ConversationListContainer', () => {
     describe('desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {minWidth: '768'}
+          desktop: {minWidth: '768'},
         }))
       })
 

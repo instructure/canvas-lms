@@ -70,15 +70,15 @@ export type GradebookSettings = {
 }
 
 export type PerformanceControlValues = {
-  active_request_limit?: number
-  api_max_per_page?: number
-  assignment_groups_per_page?: number
-  context_modules_per_page?: number
-  custom_column_data_per_page?: number
-  custom_columns_per_page?: number
-  students_chunk_size?: number
-  submissions_chunk_size?: number
-  submissions_per_page?: number
+  activeRequestLimit?: number
+  apiMaxPerPage?: number
+  assignmentGroupsPerPage?: number
+  contextModulesPerPage?: number
+  customColumnDataPerPage?: number
+  customColumnsPerPage?: number
+  studentsCchunkSize?: number
+  submissionsChunkSize?: number
+  submissionsPerPage?: number
 }
 
 export type GradebookOptions = {
@@ -415,4 +415,17 @@ export type SerializedComment = {
   author?: string
   authorAvatarUrl?: string
   authorUrl?: string
+}
+
+export type AssignmentWithOverride = {
+  id: string
+  name: string
+  due_at: string
+  please_ignore: boolean
+  hadOriginalErrors: boolean
+  overrideForThisSection: {
+    id: string
+    course_section_id: string
+    due_at: null | Date
+  }
 }

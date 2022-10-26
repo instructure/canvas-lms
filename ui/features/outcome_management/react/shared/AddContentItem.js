@@ -32,7 +32,7 @@ const AddContentItem = ({
   labelInstructions,
   textInputInstructions,
   onSaveHandler,
-  onHideHandler
+  onHideHandler,
 }) => {
   const [title, setTitle] = useState('')
 
@@ -86,7 +86,7 @@ AddContentItem.propTypes = {
   labelInstructions: PropTypes.string.isRequired,
   textInputInstructions: PropTypes.string.isRequired,
   onSaveHandler: PropTypes.func.isRequired,
-  onHideHandler: PropTypes.func.isRequired
+  onHideHandler: PropTypes.func.isRequired,
 }
 
 export default AddContentItem

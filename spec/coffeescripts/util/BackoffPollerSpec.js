@@ -29,14 +29,14 @@ QUnit.module('BackoffPoller', {
   teardown() {
     this.clock.restore()
     this.server.restore()
-  }
+  },
 })
 
-test('should keep polling when it gets a "continue"', function() {
+test('should keep polling when it gets a "continue"', function () {
   const poller = new BackoffPoller('fixtures/ok.json', () => 'continue', {
     backoffFactor: 1,
     baseInterval: 10,
-    maxAttempts: 100
+    maxAttempts: 100,
   })
   poller.start().then(this.callback)
 
@@ -47,11 +47,11 @@ test('should keep polling when it gets a "continue"', function() {
   poller.stop(false)
 })
 
-test('should reset polling when it gets a "reset"', function() {
+test('should reset polling when it gets a "reset"', function () {
   const poller = new BackoffPoller('fixtures/ok.json', () => 'reset', {
     backoffFactor: 1,
     baseInterval: 10,
-    maxAttempts: 100
+    maxAttempts: 100,
   })
   poller.start().then(this.callback)
 
@@ -63,11 +63,11 @@ test('should reset polling when it gets a "reset"', function() {
   poller.stop(false)
 })
 
-test('should stop polling when it gets a "stop"', function() {
+test('should stop polling when it gets a "stop"', function () {
   let count = 0
   const poller = new BackoffPoller('fixtures/ok.json', () => (count++ > 3 ? 'stop' : 'continue'), {
     backoffFactor: 1,
-    baseInterval: 10
+    baseInterval: 10,
   })
   poller.start().then(this.callback)
   // let the four 'continue' intervals expire, responding after each
@@ -82,11 +82,11 @@ test('should stop polling when it gets a "stop"', function() {
   ok(this.ran_callback, 'poller should have run callbacks')
 })
 
-test('should abort polling when it hits maxAttempts', function() {
+test('should abort polling when it hits maxAttempts', function () {
   const poller = new BackoffPoller('fixtures/ok.json', () => 'continue', {
     backoffFactor: 1,
     baseInterval: 10,
-    maxAttempts: 3
+    maxAttempts: 3,
   })
   poller.start().then(this.callback)
 
@@ -104,7 +104,7 @@ test('should abort polling when it hits maxAttempts', function() {
   ok(!this.ran_callback, 'poller should not have run callbacks')
 })
 
-test('should abort polling when it gets anything else', function() {
+test('should abort polling when it gets anything else', function () {
   const poller = new BackoffPoller('fixtures/ok.json', () => 'omgwtfbbq', {baseInterval: 10})
   poller.start().then(this.callback)
 

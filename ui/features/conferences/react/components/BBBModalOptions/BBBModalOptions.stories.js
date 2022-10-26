@@ -23,7 +23,7 @@ import BBBModalOptions from './BBBModalOptions'
 export default {
   title: 'Examples/Conferences/BBBModalOptions',
   component: BBBModalOptions,
-  argTypes: {}
+  argTypes: {},
 }
 
 const defaultProps = {
@@ -42,9 +42,9 @@ const defaultProps = {
     'share_other_webcams',
     'share_microphone',
     'send_public_chat',
-    'send_private_chat'
+    'send_private_chat',
   ],
-  setAttendeesOptions: () => {}
+  setAttendeesOptions: () => {},
 }
 
 const Template = props => (

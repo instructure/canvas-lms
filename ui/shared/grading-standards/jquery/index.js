@@ -55,7 +55,7 @@ $(document).ready(() => {
       },
       close() {
         $(event.target).focus()
-      }
+      },
     })
   })
   $('.grading_standard .delete_grading_standard_link').click(function (event) {
@@ -80,7 +80,7 @@ $(document).ready(() => {
             'There was a problem deleting this grading scheme'
           )
         )
-      }
+      },
     })
   })
   $('.grading_standard .done_button').click(event => {
@@ -102,12 +102,12 @@ $(document).ready(() => {
     $standard.dim()
     let put_data = {
       'assignment[grading_standard_id]': '',
-      'assignment[grading_type]': 'points'
+      'assignment[grading_type]': 'points',
     }
     let url = $('#edit_assignment_form').attr('action')
     if ($('#update_course_url').length) {
       put_data = {
-        'course[grading_standard_id]': ''
+        'course[grading_standard_id]': '',
       }
       url = $('#update_course_url').attr('href')
     } else if (url && url.match(/assignments$/)) {
@@ -129,7 +129,7 @@ $(document).ready(() => {
           data: standard,
           id: 'grading_standard_blank',
           avoid: '.find_grading_standard',
-          hrefValues: ['id']
+          hrefValues: ['id'],
         })
         .find('.edit_grading_standard_link')
         .removeClass('read_only')
@@ -223,7 +223,7 @@ $(document).ready(() => {
                   .clone(true)
                 $standard_select
                   .fillTemplateData({
-                    data: standard
+                    data: standard,
                   })
                   .data('context_code', standard.context_code)
                   .removeClass('blank')
@@ -232,7 +232,7 @@ $(document).ready(() => {
                 $standard
                   .fillTemplateData({
                     data: standard,
-                    id: `grading_standard_brief_${standard.id}`
+                    id: `grading_standard_brief_${standard.id}`,
                   })
                   .data('context_code', standard.context_code)
                 $standard.removeClass('blank')
@@ -243,7 +243,7 @@ $(document).ready(() => {
                       jdx === 0
                         ? roundedNumber(100)
                         : `< ${roundedNumber(standard.data[jdx - 1][1] * 100)}`,
-                    next_value: roundedNumber(standard.data[jdx][1] * 100)
+                    next_value: roundedNumber(standard.data[jdx][1] * 100),
                   }
                   const $row = $standard.find('.details_row.blank:first').clone(true)
                   $row.removeClass('blank')
@@ -279,7 +279,7 @@ $(document).ready(() => {
     const $brief = $(this).parents('.grading_standard_brief')
     const brief = $brief.getTemplateData({
       textValues: ['id', 'title'],
-      dataValues: ['context_code']
+      dataValues: ['context_code'],
     })
     const id = brief.id
     const title = brief.title
@@ -298,7 +298,7 @@ $(document).ready(() => {
     $(this).parents('.grading_standard').triggerHandler('grading_standard_updated', {
       id,
       data,
-      title
+      title,
     })
     const current_context_code = $('#edit_letter_grades_form').data().context_code
     $(this)
@@ -332,7 +332,7 @@ $(document).ready(() => {
         data: standard,
         id: `grading_standard_${standard.id || 'blank'}`,
         avoid: '.find_grading_standard',
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
       .fillFormData(standard, {object_name: 'grading_standard'})
     const $link = $standard.find('.insert_grading_standard:first').clone(true)
@@ -376,13 +376,13 @@ $(document).ready(() => {
       $standard.find('.remove_grading_standard_link').removeClass('read_only')
       let put_data = {
         'assignment[grading_standard_id]': standard.id,
-        'assignment[grading_type]': 'letter_grade'
+        'assignment[grading_type]': 'letter_grade',
       }
       let url = $('#edit_assignment_form').attr('action')
       $('input.grading_standard_id, ').val(standard.id)
       if ($('#update_course_url').length) {
         put_data = {
-          'course[grading_standard_id]': standard.id
+          'course[grading_standard_id]': standard.id,
         }
         url = $('#update_course_url').attr('href')
       } else if (url && url.match(/assignments$/)) {

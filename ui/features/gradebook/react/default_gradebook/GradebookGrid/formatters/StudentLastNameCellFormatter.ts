@@ -17,6 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type Gradebook from '../../Gradebook'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
 import {
   getSecondaryDisplayInfo,
@@ -28,7 +29,9 @@ import {
 const I18n = useI18nScope('gradebook')
 
 export default class StudentLastNameCellFormatter {
-  constructor(gradebook) {
+  options: ReturnType<typeof getOptions>
+
+  constructor(gradebook: Gradebook) {
     this.options = getOptions(gradebook)
   }
 

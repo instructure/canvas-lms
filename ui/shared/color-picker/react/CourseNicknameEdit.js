@@ -33,7 +33,7 @@ class CourseNicknameEdit extends React.Component {
 
   static propTypes = {
     nicknameInfo: PropTypes.object.isRequired,
-    onEnter: PropTypes.func
+    onEnter: PropTypes.func,
   }
 
   constructor(props) {
@@ -71,12 +71,12 @@ class CourseNicknameEdit extends React.Component {
         url: `/api/v1/users/self/course_nicknames/${this.props.nicknameInfo.courseId}`,
         type: this.state.nickname.length > 0 ? 'PUT' : 'DELETE',
         data: {
-          nickname: this.state.nickname
+          nickname: this.state.nickname,
         },
         success: data => {
           this.props.nicknameInfo.onNicknameChange(data.nickname || data.name)
         },
-        error: () => {}
+        error: () => {},
       })
     }
   }

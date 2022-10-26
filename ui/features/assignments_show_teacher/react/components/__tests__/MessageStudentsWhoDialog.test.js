@@ -45,7 +45,6 @@ function renderMessageStudentsWhoDialog(assignment = mockAssignment(), propsOver
   return render(<MessageStudentsWhoDialog {...props} />)
 }
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('MessageStudentsWhoDialog', () => {
   afterEach(cleanup)
 

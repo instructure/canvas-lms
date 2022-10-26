@@ -59,7 +59,7 @@ const OutcomeManagementPanel = ({
   targetGroupIdsToRefetch,
   setTargetGroupIdsToRefetch,
   importsTargetGroup,
-  setImportsTargetGroup
+  setImportsTargetGroup,
 }) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
@@ -73,7 +73,7 @@ const OutcomeManagementPanel = ({
     selectedOutcomesCount,
     toggleSelectedOutcomes,
     removeSelectedOutcome,
-    clearSelectedOutcomes
+    clearSelectedOutcomes,
   } = useSelectedOutcomes()
   const {
     error,
@@ -90,13 +90,13 @@ const OutcomeManagementPanel = ({
     debouncedSearchString,
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
-    clearCache
+    clearCache,
   } = useManageOutcomes({
     collection: 'OutcomeManagementPanel',
     importNumber,
     lhsGroupIdsToRefetch,
     lhsGroupId,
-    parentsToUnload
+    parentsToUnload,
   })
 
   useEffect(() => {
@@ -146,11 +146,11 @@ const OutcomeManagementPanel = ({
     loadMore,
     removeLearningOutcomes,
     readLearningOutcomes,
-    refetchLearningOutcome
+    refetchLearningOutcome,
   } = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString,
-    rhsGroupIdsToRefetch
+    rhsGroupIdsToRefetch,
   })
 
   const {removeOutcomes, removeOutcomesStatus} = useOutcomesRemove()
@@ -208,7 +208,7 @@ const OutcomeManagementPanel = ({
     selectedParentGroupId,
     selectedGroupId,
     collections,
-    queryCollections
+    queryCollections,
   })
 
   const onSuccessGroupRemove = () => {
@@ -226,7 +226,7 @@ const OutcomeManagementPanel = ({
     showImportOutcomesModal({
       learningOutcomeGroup: group,
       learningOutcomeGroupAncestorIds: Object.keys(collections),
-      onFileDrop: handleFileDrop
+      onFileDrop: handleFileDrop,
     })
   }, [group, collections, handleFileDrop])
 
@@ -238,7 +238,7 @@ const OutcomeManagementPanel = ({
         edit: openGroupEditModal,
         description: openGroupDescriptionModal,
         add_outcomes: openFindOutcomesModal,
-        import_outcomes: openImportOutcomesModal
+        import_outcomes: openImportOutcomesModal,
       }
 
       const callback = actions[action] || function () {}
@@ -250,7 +250,7 @@ const OutcomeManagementPanel = ({
       openGroupEditModal,
       openGroupMoveModal,
       openGroupRemoveModal,
-      openImportOutcomesModal
+      openImportOutcomesModal,
     ]
   )
 
@@ -263,7 +263,7 @@ const OutcomeManagementPanel = ({
         canUnlink: edge.canUnlink,
         parentGroupId: parentGroup._id,
         parentGroupTitle: parentGroup.title,
-        ...edge.node
+        ...edge.node,
       })
       if (action === 'remove') {
         openOutcomeRemoveModal()
@@ -288,7 +288,7 @@ const OutcomeManagementPanel = ({
     // set the initial target group as the outcome parent group
     outcomeMoveInitialTargetGroup = {
       name: singleOutcomeSelected.parentGroupTitle,
-      id: singleOutcomeSelected.parentGroupId
+      id: singleOutcomeSelected.parentGroupId,
     }
   }
 
@@ -436,7 +436,7 @@ const OutcomeManagementPanel = ({
                 minHeight: 'calc(720px - 10.5rem)',
                 height: 'calc(100vh - 16.35rem)',
                 background:
-                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+                  '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%',
               }}
             />
           </Flex.Item>
@@ -585,7 +585,7 @@ const OutcomeManagementPanel = ({
 }
 
 OutcomeManagementPanel.defaultProps = {
-  createdOutcomeGroupIds: []
+  createdOutcomeGroupIds: [],
 }
 
 OutcomeManagementPanel.propTypes = {
@@ -597,7 +597,7 @@ OutcomeManagementPanel.propTypes = {
   targetGroupIdsToRefetch: PropTypes.arrayOf(PropTypes.string).isRequired,
   setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
   importsTargetGroup: PropTypes.object.isRequired,
-  setImportsTargetGroup: PropTypes.func.isRequired
+  setImportsTargetGroup: PropTypes.func.isRequired,
 }
 
 export default OutcomeManagementPanel

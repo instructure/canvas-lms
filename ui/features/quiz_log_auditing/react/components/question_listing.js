@@ -27,7 +27,7 @@ class QuestionListing extends React.Component {
   static defaultProps = {
     questions: [],
     activeQuestionId: undefined,
-    activeEventId: undefined
+    activeEventId: undefined,
   }
 
   render() {
@@ -37,7 +37,7 @@ class QuestionListing extends React.Component {
 
         <ol id="ic-QuizInspector__QuestionListing">
           {this.props.questions
-            .sort(function(a, b) {
+            .sort(function (a, b) {
               return a.position > b.position
             })
             .map(this.renderQuestion.bind(this))}
@@ -47,7 +47,7 @@ class QuestionListing extends React.Component {
           className="no-hover"
           to={{
             pathname: '/',
-            search: window.location.search
+            search: window.location.search,
           }}
         >
           <IconArrowStartLine /> {I18n.t('links.back_to_session_information', 'Back to Log')}
@@ -63,11 +63,11 @@ class QuestionListing extends React.Component {
           className={this.props.activeQuestionId === question.id ? 'active' : undefined}
           to={{
             pathname: `/questions/${question.id}`,
-            search: window.location.search
+            search: window.location.search,
           }}
         >
           {I18n.t('links.question', 'Question %{position}', {
-            position: question.position
+            position: question.position,
           })}
         </Link>
       </li>

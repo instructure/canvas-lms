@@ -33,7 +33,7 @@ test('responds to deleteDeveloperKeyStart', () => {
   const state = {
     deleteDeveloperKeyPending: false,
     deleteDeveloperKeySuccessful: true,
-    deleteDeveloperKeyError: {}
+    deleteDeveloperKeyError: {},
   }
 
   const action = actions.deleteDeveloperKeyStart()
@@ -46,7 +46,7 @@ test('responds to deleteDeveloperKeyStart', () => {
 test('responds to deleteDeveloperKeySuccessful', () => {
   const state = {
     deleteDeveloperKeyPending: true,
-    deleteDeveloperKeySuccessful: false
+    deleteDeveloperKeySuccessful: false,
   }
   const payload = {}
   const action = actions.deleteDeveloperKeySuccessful(payload)
@@ -58,7 +58,7 @@ test('responds to deleteDeveloperKeySuccessful', () => {
 test('responds to deleteDeveloperKeyFailed', () => {
   const state = {
     deleteDeveloperKeyPending: true,
-    deleteDeveloperKeyError: null
+    deleteDeveloperKeyError: null,
   }
   const error = {}
 

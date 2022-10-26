@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 
 const I18n = useI18nScope('quiz_statistics.discrimination_index_help')
 
-const Help = ({ style }) => (
+const Help = ({style}) => (
   <div style={style}>
     <p>
       {I18n.t(`
@@ -41,13 +41,17 @@ const Help = ({ style }) => (
     </p>
 
     <p>
-      <a href={I18n.t('#community.instructor_quiz_statistics')} target="_blank" rel="noopener noreferrer">
+      <a
+        href={I18n.t('#community.instructor_quiz_statistics')}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {I18n.t('Learn more about quiz statistics.')}
       </a>
     </p>
   </div>
 )
 
-Help.propTypes = { style: PropTypes.object }
+Help.propTypes = {style: PropTypes.object}
 
 export default Help

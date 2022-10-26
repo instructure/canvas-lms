@@ -28,7 +28,7 @@ function defaultProps(overrides) {
     updatePreference: jest.fn(),
     userId: '1',
     notificationPreferences: {channels: []},
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -51,9 +51,9 @@ describe('Notification Preferences', () => {
         weekly_notification_range: {
           weekday: 'Saturday',
           start_time: '7pm',
-          end_time: '9pm'
-        }
-      }
+          end_time: '9pm',
+        },
+      },
     }
     const props = defaultProps()
     const {getByTestId} = render(<NotificationPreferences {...props} />)
@@ -70,8 +70,8 @@ describe('Notification Preferences', () => {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: null,
         allowed_push_categories: [],
-        daily_notification_time: '6pm'
-      }
+        daily_notification_time: '6pm',
+      },
     }
 
     const props = defaultProps()
@@ -89,9 +89,9 @@ describe('Notification Preferences', () => {
         weekly_notification_range: {
           weekday: 'Saturday',
           start_time: '7pm',
-          end_time: '9pm'
-        }
-      }
+          end_time: '9pm',
+        },
+      },
     }
 
     const props = defaultProps()
@@ -115,7 +115,7 @@ describe('Notification Preferences', () => {
   it('renders the appropriate alert text for account context', () => {
     const props = defaultProps({
       contextType: 'account',
-      contextName: 'Dope Account'
+      contextName: 'Dope Account',
     })
     const {getByText} = render(<NotificationPreferences {...props} />)
 
@@ -129,13 +129,13 @@ describe('Notification Preferences', () => {
   it('renders the Privacy Notice alert when enabled by domain account', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        account_privacy_notice: true
-      }
+        account_privacy_notice: true,
+      },
     }
 
     const props = defaultProps({
       contextType: 'account',
-      contextName: 'Dope Account'
+      contextName: 'Dope Account',
     })
     const {getByText} = render(<NotificationPreferences {...props} />)
 
@@ -145,13 +145,13 @@ describe('Notification Preferences', () => {
   it('does not render the Privacy Notice alert when context is course', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        account_privacy_notice: true
-      }
+        account_privacy_notice: true,
+      },
     }
 
     const props = defaultProps({
       contextType: 'course',
-      contextName: 'Dope Course'
+      contextName: 'Dope Course',
     })
     const {queryByText} = render(<NotificationPreferences {...props} />)
 
@@ -162,13 +162,13 @@ describe('Notification Preferences', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         account_privacy_notice: true,
-        read_privacy_info: 'some date string'
-      }
+        read_privacy_info: 'some date string',
+      },
     }
 
     const props = defaultProps({
       contextType: 'account',
-      contextName: 'Dope Account'
+      contextName: 'Dope Account',
     })
     const {queryByText} = render(<NotificationPreferences {...props} />)
 
@@ -181,8 +181,8 @@ describe('Notification Preferences', () => {
       contextName: 'Cool Account',
       notificationPreferences: {
         channels: [],
-        sendObservedNamesInNotifications: true
-      }
+        sendObservedNamesInNotifications: true,
+      },
     })
     const {getByTestId} = render(<NotificationPreferences {...props} />)
 
@@ -195,8 +195,8 @@ describe('Notification Preferences', () => {
       contextName: 'Cool Account',
       notificationPreferences: {
         channels: [],
-        sendObservedNamesInNotifications: null
-      }
+        sendObservedNamesInNotifications: null,
+      },
     })
     const {queryByTestId} = render(<NotificationPreferences {...props} />)
 

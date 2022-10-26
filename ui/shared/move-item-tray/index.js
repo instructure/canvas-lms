@@ -39,7 +39,7 @@ export const backbone = {
   collectionToItems(collection, getItems = col => col.models) {
     return getItems(collection).map(item => ({
       id: item.attributes.id,
-      title: item.attributes.name || item.attributes.title
+      title: item.attributes.name || item.attributes.title,
     }))
   },
 
@@ -47,7 +47,7 @@ export const backbone = {
     return collection.models.filter(filter).map(item => ({
       id: item.attributes.id,
       title: item.attributes.name || item.attributes.title,
-      items: this.collectionToItems(getItems(item))
+      items: this.collectionToItems(getItems(item)),
     }))
   },
 
@@ -99,7 +99,7 @@ export const backbone = {
     }
 
     this.reorderInCollection(order, model, newColl)
-  }
+  },
 }
 
 export function reorderElements(order, container, idToItemSelector = id => `#${id}`) {

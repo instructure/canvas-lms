@@ -22,14 +22,14 @@ import {
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
   isTopicAuthor,
-  getDisplayName
+  getDisplayName,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
-  UPDATE_DISCUSSION_ENTRY
+  UPDATE_DISCUSSION_ENTRY,
 } from '../../../graphql/Mutations'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
@@ -72,7 +72,7 @@ export const DiscussionThreadContainer = props => {
       discussionEntryID: newDiscussionEntry.parentId,
       first: ENV.per_page,
       sort,
-      courseID: window.ENV?.course_id
+      courseID: window.ENV?.course_id,
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
@@ -87,7 +87,7 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
-    }
+    },
   })
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
@@ -100,7 +100,7 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
-    }
+    },
   })
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
@@ -114,7 +114,7 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
-    }
+    },
   })
 
   const updateDiscussionEntryParticipantCache = (cache, result) => {
@@ -127,7 +127,7 @@ export const DiscussionThreadContainer = props => {
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountchange
+        unreadCountChange: discussionUnreadCountchange,
       })
     }
   }
@@ -142,7 +142,7 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the reply.'))
-    }
+    },
   })
 
   const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
@@ -160,15 +160,15 @@ export const DiscussionThreadContainer = props => {
       setTimeout(() => {
         setReportingError(false)
       }, 3000)
-    }
+    },
   })
 
   const toggleRating = () => {
     updateDiscussionEntryParticipant({
       variables: {
         discussionEntryId: props.discussionEntry._id,
-        rating: props.discussionEntry.entryParticipant?.rating ? 'not_liked' : 'liked'
-      }
+        rating: props.discussionEntry.entryParticipant?.rating ? 'not_liked' : 'liked',
+      },
     })
   }
 
@@ -177,8 +177,8 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         read: !props.discussionEntry.entryParticipant?.read,
-        forcedReadState: true
-      }
+        forcedReadState: true,
+      },
     })
   }
 
@@ -270,8 +270,8 @@ export const DiscussionThreadContainer = props => {
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
-          id: props.discussionEntry._id
-        }
+          id: props.discussionEntry._id,
+        },
       })
     }
   }
@@ -281,8 +281,8 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
-        removeAttachment: !fileId
-      }
+        removeAttachment: !fileId,
+      },
     })
   }
 
@@ -306,7 +306,7 @@ export const DiscussionThreadContainer = props => {
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.4,
         }
       )
 
@@ -325,8 +325,8 @@ export const DiscussionThreadContainer = props => {
         replyFromEntryId: props.discussionEntry._id,
         isAnonymousAuthor,
         message,
-        courseID: ENV.course_id
-      }
+        courseID: ENV.course_id,
+      },
     })
     setEditorExpanded(false)
   }
@@ -337,18 +337,18 @@ export const DiscussionThreadContainer = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          padding: 'medium xx-small small'
+          padding: 'medium xx-small small',
         },
         desktop: {
-          padding: 'medium medium small'
-        }
+          padding: 'medium medium small',
+        },
       }}
       render={responsiveProps => (
         <>
           <Highlight isHighlighted={props.discussionEntry._id === props.highlightEntryId}>
             <div style={{marginLeft: marginDepth}} ref={onThreadRefCurrentSet}>
               <Flex padding={responsiveProps.padding}>
-                <Flex.Item shouldShrink shouldGrow>
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
@@ -445,8 +445,8 @@ export const DiscussionThreadContainer = props => {
                       updateDiscussionEntryReported({
                         variables: {
                           discussionEntryId: props.discussionEntry._id,
-                          reportType
-                        }
+                          reportType,
+                        },
                       })
                       setReportModalIsLoading(true)
                     }}
@@ -502,11 +502,11 @@ DiscussionThreadContainer.propTypes = {
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }
 
 DiscussionThreadContainer.defaultProps = {
-  depth: 0
+  depth: 0,
 }
 
 export default DiscussionThreadContainer
@@ -518,10 +518,10 @@ const DiscussionSubentries = props => {
     discussionEntryID: props.discussionEntryId,
     first: ENV.per_page,
     sort,
-    courseID: window.ENV?.course_id
+    courseID: window.ENV?.course_id,
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    variables
+    variables,
   })
 
   if (subentries.error) {
@@ -554,5 +554,5 @@ DiscussionSubentries.propTypes = {
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
   removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }

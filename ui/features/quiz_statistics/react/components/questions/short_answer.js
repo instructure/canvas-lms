@@ -36,7 +36,7 @@ const ShortAnswer = props => (
 
         <div
           className="question-text"
-          aria-hidden
+          aria-hidden={true}
           dangerouslySetInnerHTML={{__html: props.questionText}}
         />
       </div>
@@ -50,7 +50,7 @@ const ShortAnswer = props => (
         <CorrectAnswerDonut
           correctResponseRatio={calculateResponseRatio(props.answers, props.participantCount, {
             correctResponseCount: props.correct,
-            questionType: props.questionType
+            questionType: props.questionType,
           })}
         />
       </div>

@@ -33,13 +33,13 @@ QUnit.module('DashboardCard', {
       {
         type: 'DiscussionTopic',
         unread_count: 2,
-        count: 7
+        count: 7,
       },
       {
         type: 'Announcement',
         unread_count: 0,
-        count: 3
-      }
+        count: 3,
+      },
     ]
     this.props = {
       shortName: 'Bio 101',
@@ -54,14 +54,14 @@ QUnit.module('DashboardCard', {
           hidden: false,
           icon: 'icon-discussion',
           label: 'Discussions',
-          path: '/courses/1/discussion_topics'
-        }
+          path: '/courses/1/discussion_topics',
+        },
       ],
       backgroundColor: '#EF4437',
       image: null,
       isFavorited: true,
       connectDragSource: c => c,
-      connectDropTarget: c => c
+      connectDropTarget: c => c,
     }
     moxios.install()
     return (this.getStateForCourseStub = sandbox
@@ -75,7 +75,7 @@ QUnit.module('DashboardCard', {
     if (this.wrapper) {
       return this.wrapper.remove()
     }
-  }
+  },
 })
 
 function errorRendered() {
@@ -142,7 +142,7 @@ test('handles success removing course from favorites', async function (assert) {
     const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 200,
-      response: []
+      response: [],
     })
   })
 
@@ -173,7 +173,7 @@ test('handles failure removing course from favorites', async function (assert) {
     const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 403,
-      response: []
+      response: [],
     })
   })
 

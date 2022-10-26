@@ -35,7 +35,7 @@ export default class GeneratePairingCode extends Component {
     pairingCode: '',
     showModal: false,
     gettingPairingCode: false,
-    pairingCodeError: false
+    pairingCodeError: false,
   }
 
   openModal = () => {
@@ -54,13 +54,13 @@ export default class GeneratePairingCode extends Component {
       .then(({data}) => {
         this.setState({
           gettingPairingCode: false,
-          pairingCode: data.code
+          pairingCode: data.code,
         })
       })
       .catch(() => {
         this.setState({
           gettingPairingCode: false,
-          pairingCodeError: true
+          pairingCodeError: true,
         })
       })
   }
@@ -101,7 +101,7 @@ export default class GeneratePairingCode extends Component {
         <Modal
           open={this.state.showModal}
           onDismiss={this.closeModal}
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={true}
           label={I18n.t('Pair with Observer')}
           size="small"
         >
@@ -139,5 +139,5 @@ export default class GeneratePairingCode extends Component {
 
 GeneratePairingCode.propTypes = {
   userId: string.isRequired,
-  name: string
+  name: string,
 }

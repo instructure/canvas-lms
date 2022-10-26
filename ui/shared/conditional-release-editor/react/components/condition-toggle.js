@@ -32,7 +32,7 @@ export default class ConditionToggle extends React.Component {
       isFake: bool,
       isDisabled: bool,
       path: object,
-      handleToggle: func
+      handleToggle: func,
     }
   }
 
@@ -66,7 +66,7 @@ export default class ConditionToggle extends React.Component {
       'cr-condition-toggle__and': this.props.isAnd,
       'cr-condition-toggle__or': !this.props.isAnd,
       'cr-condition-toggle__fake': this.props.isFake,
-      'cr-condition-toggle__disabled': this.props.isDisabled
+      'cr-condition-toggle__disabled': this.props.isDisabled,
     })
 
     return (

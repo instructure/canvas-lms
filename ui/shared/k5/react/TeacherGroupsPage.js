@@ -52,7 +52,7 @@ const TeacherGroupsPage = props => (
 
 TeacherGroupsPage.propTypes = {
   groupsPath: string.isRequired,
-  canManageGroups: bool
+  canManageGroups: bool,
 }
 
 export default TeacherGroupsPage

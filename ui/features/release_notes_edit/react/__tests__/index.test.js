@@ -30,10 +30,10 @@ const exampleNote = {
     en: {
       title: 'A great note title',
       description: 'A really great note description',
-      url: 'https://example.com/great_url'
-    }
+      url: 'https://example.com/great_url',
+    },
   },
-  show_ats: {}
+  show_ats: {},
 }
 
 describe('release notes editing parent', () => {

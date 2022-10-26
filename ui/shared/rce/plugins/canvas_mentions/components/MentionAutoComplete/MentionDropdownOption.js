@@ -127,5 +127,5 @@ MentionDropdownOption.props = {
   /**
    * Menu Ref is needed to scroll menu correctly
    */
-  menuRef: PropTypes.node
+  menuRef: PropTypes.node,
 }

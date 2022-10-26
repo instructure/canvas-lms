@@ -30,7 +30,7 @@ const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
 class TermsOfServiceCustomContents extends React.Component {
   state = {
-    TERMS_OF_SERVICE_CUSTOM_CONTENT: undefined
+    TERMS_OF_SERVICE_CUSTOM_CONTENT: undefined,
   }
 
   async componentDidMount() {
@@ -51,15 +51,15 @@ class TermsOfServiceCustomContents extends React.Component {
 
 export default class TermsOfServiceModal extends React.Component {
   static propTypes = {
-    preview: bool
+    preview: bool,
   }
 
   static defaultProps = {
-    preview: false
+    preview: false,
   }
 
   state = {
-    open: false
+    open: false,
   }
 
   handleCloseModal = () => {
@@ -78,7 +78,7 @@ export default class TermsOfServiceModal extends React.Component {
 
       return {
         open: !state.open,
-        TERMS_OF_SERVICE_CUSTOM_CONTENT
+        TERMS_OF_SERVICE_CUSTOM_CONTENT,
       }
     })
   }

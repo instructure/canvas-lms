@@ -45,7 +45,7 @@ describe('loadCardDashboard', () => {
           .mostRecent()
           .respondWith({
             status: 200,
-            response: ['card']
+            response: ['card'],
           })
           .then(() => {
             expect(callback).toHaveBeenCalledWith(['card'], true)
@@ -65,7 +65,7 @@ describe('loadCardDashboard', () => {
           .mostRecent()
           .respondWith({
             status: 200,
-            response: ['card']
+            response: ['card'],
           })
           .then(() => {
             resetCardCache()
@@ -90,7 +90,7 @@ describe('loadCardDashboard', () => {
         moxios.requests
           .mostRecent()
           .respondWith({
-            status: 500
+            status: 500,
           })
           .then(() => {
             expect(showFlashAlert).toHaveBeenCalledTimes(1)

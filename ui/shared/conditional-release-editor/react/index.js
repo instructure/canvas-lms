@@ -32,11 +32,11 @@ class Editor extends React.Component {
 
   static propTypes = {
     env: PropTypes.object.isRequired,
-    type: PropTypes.string.isRequired
+    type: PropTypes.string.isRequired,
   }
 
   state = {
-    editor: null
+    editor: null,
   }
 
   validateBeforeSave = () => {
@@ -47,7 +47,7 @@ class Editor extends React.Component {
         $.screenReaderFlashError(
           I18n.t('%{error} in mastery paths range %{index}', {
             error: errorRecord.error,
-            index: errorRecord.index + 1
+            index: errorRecord.index + 1,
           })
         )
         errors.push({message: errorRecord.error})
@@ -76,7 +76,7 @@ class Editor extends React.Component {
       grading_type: newAttributes.grading_type,
       id: newAttributes.id,
       points_possible: newAttributes.points_possible,
-      submission_types: newAttributes.submission_types
+      submission_types: newAttributes.submission_types,
     })
   }
 
@@ -117,7 +117,7 @@ class Editor extends React.Component {
     return this.loadEditor().then(({default: ConditionalReleaseEditor}) => {
       const editor = new ConditionalReleaseEditor({
         assignment: env.assignment,
-        courseId: env.course_id
+        courseId: env.course_id,
       })
       editor.attach(
         document.getElementById('canvas-conditional-release-editor'),
@@ -136,14 +136,14 @@ class Editor extends React.Component {
   }
 }
 
-const attach = function(element, type, env) {
+const attach = function (element, type, env) {
   const editor = <Editor env={env} type={type} />
   return ReactDOM.render(editor, element)
 }
 
 const ConditionalRelease = {
   Editor,
-  attach
+  attach,
 }
 
 export default ConditionalRelease

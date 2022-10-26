@@ -26,7 +26,7 @@ ready(() => {
     loadOnStartup: true,
     quizStatisticsUrl: ENV.quiz_statistics_url,
     quizReportsUrl: ENV.quiz_reports_url,
-    courseSectionsUrl: ENV.course_sections_url
+    courseSectionsUrl: ENV.course_sections_url,
   })
 
   mount(document.body.querySelector('#content')).then(() => {

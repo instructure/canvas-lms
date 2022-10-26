@@ -30,11 +30,11 @@ describe('AccountNotificationSettings', () => {
     const fakeEnv = {
       API_GATEWAY_URI: 'http://some-gateway.api/graphql',
       DOMAIN_ROOT_ACCOUNT_ID: '12345',
-      current_user_id: '54321'
+      current_user_id: '54321',
     }
     NotificationSettings({envDict: fakeEnv})
     expect(CanvasApollo.createClient).toHaveBeenCalledWith({
-      apiGatewayUri: 'http://some-gateway.api/graphql'
+      apiGatewayUri: 'http://some-gateway.api/graphql',
     })
   })
 })

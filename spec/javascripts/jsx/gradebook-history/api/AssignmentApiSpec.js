@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import AssignmentApi from 'ui/features/gradebook_history/react/api/AssignmentApi.js'
+import AssignmentApi from 'ui/features/gradebook_history/react/api/AssignmentApi'
 
 QUnit.module('AssignmentApi', {
   setup() {

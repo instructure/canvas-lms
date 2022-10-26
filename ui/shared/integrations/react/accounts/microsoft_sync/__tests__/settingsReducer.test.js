@@ -19,7 +19,7 @@
 import {
   getTenantErrorMessages,
   doUpdateSettings,
-  getSuffixErrorMessages
+  getSuffixErrorMessages,
 } from '../lib/settingsHelper'
 import {defaultState, settingsReducer, reducerActions} from '../lib/settingsReducer'
 
@@ -29,7 +29,7 @@ jest.mock('../lib/settingsHelper', () => {
     tenantErrorMessages: jest.fn(),
     doUpdateSettings: jest.fn(),
     getSuffixErrorMessages: jest.fn(),
-    getTenantErrorMessages: jest.fn()
+    getTenantErrorMessages: jest.fn(),
   }
 })
 
@@ -44,7 +44,7 @@ const expectedState = {
   last_saved_microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
   microsoft_sync_login_attribute: 'email',
   microsoft_sync_login_attribute_suffix: '@example.com',
-  microsoft_sync_remote_attribute: 'mailNickname'
+  microsoft_sync_remote_attribute: 'mailNickname',
 }
 
 const cloneDefaultState = () => {
@@ -68,7 +68,7 @@ describe('settingsReducer', () => {
     it('updates the tenant', () => {
       const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateTenant,
-        payload: {microsoft_sync_tenant: expectedState.microsoft_sync_tenant}
+        payload: {microsoft_sync_tenant: expectedState.microsoft_sync_tenant},
       })
 
       expect(result.microsoft_sync_tenant).toBe(expectedState.microsoft_sync_tenant)
@@ -78,8 +78,8 @@ describe('settingsReducer', () => {
       const result = settingsReducer(cloneDefaultState, {
         type: reducerActions.updateAttribute,
         payload: {
-          microsoft_sync_login_attribute: expectedState.microsoft_sync_login_attribute
-        }
+          microsoft_sync_login_attribute: expectedState.microsoft_sync_login_attribute,
+        },
       })
 
       expect(result.microsoft_sync_login_attribute).toBe(
@@ -89,7 +89,7 @@ describe('settingsReducer', () => {
 
     it('clears errorMessages', () => {
       const state = settingsReducer(cloneDefaultState(), {
-        type: reducerActions.removeAlerts
+        type: reducerActions.removeAlerts,
       })
 
       expect(state.errorMessage).toEqual('')
@@ -100,8 +100,9 @@ describe('settingsReducer', () => {
       const actualState = settingsReducer(cloneDefaultState, {
         type: reducerActions.updateSuffix,
         payload: {
-          microsoft_sync_login_attribute_suffix: expectedState.microsoft_sync_login_attribute_suffix
-        }
+          microsoft_sync_login_attribute_suffix:
+            expectedState.microsoft_sync_login_attribute_suffix,
+        },
       })
 
       expect(actualState.microsoft_sync_login_attribute_suffix).toEqual(
@@ -113,8 +114,8 @@ describe('settingsReducer', () => {
       const actualState = settingsReducer(cloneDefaultState, {
         type: reducerActions.updateRemoteAttribute,
         payload: {
-          microsoft_sync_remote_attribute: expectedState.microsoft_sync_remote_attribute
-        }
+          microsoft_sync_remote_attribute: expectedState.microsoft_sync_remote_attribute,
+        },
       })
 
       expect(actualState.microsoft_sync_remote_attribute).toEqual(
@@ -126,13 +127,13 @@ describe('settingsReducer', () => {
       const state = {
         ...cloneDefaultState(),
         microsoft_sync_tenant: 'saved_value',
-        last_saved_microsoft_sync_tenant: 'saved_value'
+        last_saved_microsoft_sync_tenant: 'saved_value',
       }
 
       it('does not set info message if the tenant is unchanged', () => {
         const result = settingsReducer(state, {
           type: reducerActions.updateTenant,
-          payload: {microsoft_sync_tenant: 'saved_value'}
+          payload: {microsoft_sync_tenant: 'saved_value'},
         })
 
         expect(result.tenantInfoMessages.length).toBe(0)
@@ -141,7 +142,7 @@ describe('settingsReducer', () => {
       it('sets an info message if the tenant is changed', () => {
         const result = settingsReducer(state, {
           type: reducerActions.updateTenant,
-          payload: {microsoft_sync_tenant: 'new_value'}
+          payload: {microsoft_sync_tenant: 'new_value'},
         })
 
         expect(result.tenantInfoMessages.length).toBe(1)
@@ -151,10 +152,10 @@ describe('settingsReducer', () => {
         const result = settingsReducer(
           {
             ...cloneDefaultState(),
-            microsoft_sync_tenant: 'new_value'
+            microsoft_sync_tenant: 'new_value',
           },
           {
-            type: reducerActions.updateSuccess
+            type: reducerActions.updateSuccess,
           }
         )
 
@@ -165,10 +166,10 @@ describe('settingsReducer', () => {
         const result = settingsReducer(
           {
             ...cloneDefaultState(),
-            microsoft_sync_tenant: 'new_value'
+            microsoft_sync_tenant: 'new_value',
           },
           {
-            type: reducerActions.updateError
+            type: reducerActions.updateError,
           }
         )
 
@@ -182,19 +183,19 @@ describe('settingsReducer', () => {
       const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchSuccess,
         payload: {
-          ...expectedState
-        }
+          ...expectedState,
+        },
       })
       expect(result).toStrictEqual({
         ...cloneDefaultState(),
-        ...expectedState
+        ...expectedState,
       })
     })
 
     it('still works even if no sync settings are returned', () => {
       const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchSuccess,
-        payload: {}
+        payload: {},
       })
 
       expect(result).toStrictEqual(cloneDefaultState())
@@ -202,7 +203,7 @@ describe('settingsReducer', () => {
 
     it('adds an error message on fetch failure', () => {
       const result = settingsReducer(cloneDefaultState(), {
-        type: reducerActions.fetchError
+        type: reducerActions.fetchError,
       })
 
       expect(result.errorMessage).toBeTruthy()
@@ -212,8 +213,8 @@ describe('settingsReducer', () => {
       const result = settingsReducer(cloneDefaultState(), {
         type: reducerActions.fetchLoading,
         payload: {
-          loading: false
-        }
+          loading: false,
+        },
       })
 
       expect(result.loading).toBeFalsy()
@@ -236,7 +237,7 @@ describe('settingsReducer', () => {
       })
       const state = settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateSettings,
-        dispatch: dispatchMock
+        dispatch: dispatchMock,
       })
 
       await flushPromises()
@@ -252,11 +253,11 @@ describe('settingsReducer', () => {
       settingsReducer(
         {
           ...cloneDefaultState(),
-          ...expectedState
+          ...expectedState,
         },
         {
           type: reducerActions.updateSettings,
-          dispatch: dispatchMock
+          dispatch: dispatchMock,
         }
       )
       await flushPromises()
@@ -276,7 +277,7 @@ describe('settingsReducer', () => {
       })
       settingsReducer(cloneDefaultState(), {
         type: reducerActions.updateSettings,
-        dispatch: dispatchMock
+        dispatch: dispatchMock,
       })
 
       await flushPromises()
@@ -296,7 +297,7 @@ describe('settingsReducer', () => {
         })
         const newState = settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
-          dispatch: dispatchMock
+          dispatch: dispatchMock,
         })
 
         expect(getTenantErrorMessages).toHaveBeenCalledTimes(1)
@@ -309,7 +310,7 @@ describe('settingsReducer', () => {
       it('tries to toggle sync and indicate success', async () => {
         settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
-          dispatch: dispatchMock
+          dispatch: dispatchMock,
         })
 
         await flushPromises()
@@ -325,7 +326,7 @@ describe('settingsReducer', () => {
         })
         settingsReducer(cloneDefaultState(), {
           type: reducerActions.toggleSync,
-          dispatch: dispatchMock
+          dispatch: dispatchMock,
         })
 
         await flushPromises()
@@ -339,7 +340,7 @@ describe('settingsReducer', () => {
         for (const type of [reducerActions.updateSettings, reducerActions.toggleSync]) {
           const {uiEnabled} = settingsReducer(cloneDefaultState(), {
             type,
-            dispatch: dispatchMock
+            dispatch: dispatchMock,
           })
 
           expect(uiEnabled).toBeFalsy()
@@ -353,10 +354,10 @@ describe('settingsReducer', () => {
       for (const type of [
         reducerActions.updateSuccess,
         reducerActions.updateError,
-        reducerActions.toggleError
+        reducerActions.toggleError,
       ]) {
         const {uiEnabled} = settingsReducer(cloneDefaultState(), {
-          type
+          type,
         })
         expect(uiEnabled).toBeTruthy()
       }
@@ -364,7 +365,7 @@ describe('settingsReducer', () => {
 
     it('adds a success message on success', () => {
       const result = settingsReducer(cloneDefaultState(), {
-        type: reducerActions.updateSuccess
+        type: reducerActions.updateSuccess,
       })
 
       expect(result.successMessage).toBeTruthy()
@@ -372,7 +373,7 @@ describe('settingsReducer', () => {
 
     it('adds an error message on failure to update', () => {
       const result = settingsReducer(cloneDefaultState(), {
-        type: reducerActions.updateError
+        type: reducerActions.updateError,
       })
 
       expect(result.errorMessage).toBeTruthy()
@@ -380,7 +381,7 @@ describe('settingsReducer', () => {
 
     it('adds an error message on failure to toggle and inverts enabled', () => {
       const result = settingsReducer(cloneDefaultState(), {
-        type: reducerActions.toggleError
+        type: reducerActions.toggleError,
       })
 
       expect(result.errorMessage).toBeTruthy()

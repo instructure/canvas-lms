@@ -22,7 +22,7 @@ import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
 import type GridSupport from '../GridSupport/index'
 import type Gradebook from '../../Gradebook'
 
-function getProps(column, gradebook, options) {
+function getProps(column, gradebook: Gradebook, options) {
   const columnId = column.id
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
   const assignmentGroup = gradebook.getAssignmentGroup(column.assignmentGroupId)
@@ -40,7 +40,7 @@ function getProps(column, gradebook, options) {
   }
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
 
     assignmentGroup: {
       groupWeight: assignmentGroup.group_weight,
@@ -54,7 +54,7 @@ function getProps(column, gradebook, options) {
     onMenuDismiss() {
       setTimeout(gradebook.handleColumnHeaderMenuClose)
     },
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
 
     sortBySetting: {
       direction: sortRowsBySetting.direction,
@@ -78,7 +78,7 @@ function getProps(column, gradebook, options) {
 export default class AssignmentGroupColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 

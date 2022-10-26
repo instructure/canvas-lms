@@ -29,7 +29,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       grading_type: 'points',
       id: '2',
       name: 'an Assignment',
-      points_possible: 10
+      points_possible: 10,
     }
   })
 
@@ -96,7 +96,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       sandbox.server.respondWith('POST', `/courses/${context_id}/gradebook/update_submission`, [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(payload)
+        JSON.stringify(payload),
       ])
     }
 
@@ -109,7 +109,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
     test('submit reports number of students', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
-        {submission: {id: '22', assignment_id: '2', user_id: '4'}}
+        {submission: {id: '22', assignment_id: '2', user_id: '4'}},
       ]
       respondWithPayload(payload)
       const students = [{id: '3'}, {id: '4'}]
@@ -118,8 +118,8 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       clickSetDefaultGrade()
       const {
         firstCall: {
-          args: [message]
-        }
+          args: [message],
+        },
       } = alert
       strictEqual(message, '2 Student scores updated')
     })
@@ -129,7 +129,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
         {submission: {id: '33', assignment_id: '2', user_id: '5'}},
-        {submission: {id: '44', assignment_id: '2', user_id: '6'}}
+        {submission: {id: '44', assignment_id: '2', user_id: '6'}},
       ]
       respondWithPayload(payload)
       const students = [{id: '3'}, {id: '4'}, {id: '5'}, {id: '6'}]
@@ -139,8 +139,8 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       clickSetDefaultGrade()
       const {
         firstCall: {
-          args: [message]
-        }
+          args: [message],
+        },
       } = alert
       strictEqual(message, '4 Student scores updated')
     })

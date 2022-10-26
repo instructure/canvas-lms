@@ -21,14 +21,12 @@ import type {SubmissionComment} from '@canvas/grading.grading.d'
 import type {StatusColors} from './constants/colors'
 import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 
-export type GridColumn = {id: string} & Partial<{
+export type GridColumn = {id: string; cssClass: string; headerCssClass: string} & Partial<{
   assignmentGroupId: string
   autoEdit: boolean
-  cssClass: string
   customColumnId: string
   editor: LongTextEditor
   field: string
-  headerCssClass: string
   hidden: boolean
   maxLength: number
   maxWidth: number

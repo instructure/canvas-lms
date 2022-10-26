@@ -28,7 +28,7 @@ const I18n = useI18nScope('submissions')
 
 const MAX_RETRIES = 3
 
-INST.downloadSubmissions = function(url, onClose) {
+INST.downloadSubmissions = function (url, onClose) {
   let retryCount = 0
   let cancelled = false
   const title = ENV.SUBMISSION_DOWNLOAD_DIALOG_TITLE || I18n.t('Download Assignment Submissions')
@@ -38,11 +38,11 @@ INST.downloadSubmissions = function(url, onClose) {
       title,
       close() {
         cancelled = true
-      }
+      },
     })
     .on('dialogclose', onClose)
   $('#download_submissions_dialog .progress').progressbar({value: 0})
-  const checkForChange = function() {
+  const checkForChange = function () {
     if (cancelled || $('#download_submissions_dialog:visible').length === 0) {
       return
     }
@@ -62,7 +62,7 @@ INST.downloadSubmissions = function(url, onClose) {
               'Finished!  Redirecting to File...'
             )
             const linkText = I18n.t('Click here to download %{size_of_file}', {
-              size_of_file: attachment.readable_size
+              size_of_file: attachment.readable_size,
             })
             const link = `<a href="${htmlEscape(url)}"><b>${htmlEscape(linkText)}</b></a>`
 
@@ -100,7 +100,13 @@ INST.downloadSubmissions = function(url, onClose) {
             }
             $('#download_submissions_dialog .status').text(message)
             if (progress <= 5 || progress === lastProgress) {
-              $.ajaxJSON(`${url}&compile=1`, 'GET', {}, () => {}, () => {})
+              $.ajaxJSON(
+                `${url}&compile=1`,
+                'GET',
+                {},
+                () => {},
+                () => {}
+              )
             }
             lastProgress = progress
           }

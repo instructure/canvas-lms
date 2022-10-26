@@ -20,7 +20,7 @@ import $ from 'jquery'
 let blurActiveInput = false
 let initialized = false
 
-export default function(enable = true) {
+export default function (enable = true) {
   blurActiveInput = enable
   if (initialized) return
   initialized = true
@@ -36,18 +36,13 @@ export default function(enable = true) {
   $(window).bind({
     blur(e) {
       if (blurActiveInput && document.activeElement && window === e.target) {
-        $(document.activeElement)
-          .filter(':input')
-          .change()
-          .triggerHandler('blur')
+        $(document.activeElement).filter(':input').change().triggerHandler('blur')
       }
     },
     focus(e) {
       if (blurActiveInput && document.activeElement && window === e.target) {
-        $(document.activeElement)
-          .filter(':input')
-          .triggerHandler('focus')
+        $(document.activeElement).filter(':input').triggerHandler('focus')
       }
-    }
+    },
   })
 }

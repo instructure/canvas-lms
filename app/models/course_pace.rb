@@ -40,6 +40,8 @@ class CoursePace < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   after_create :log_pace_counts
+  after_create :log_course_blackout_dates
+  after_destroy :log_pace_deletes
   after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
   after_save :log_average_item_duration
 
@@ -53,6 +55,7 @@ class CoursePace < ActiveRecord::Base
   scope :unpublished, -> { where(workflow_state: "unpublished") }
   scope :published, -> { where(workflow_state: "active").where.not(published_at: nil) }
   scope :section_paces, -> { where.not(course_section_id: nil) }
+  scope :student_enrollment_paces, -> { where.not(user_id: nil) }
 
   workflow do
     state :unpublished
@@ -69,6 +72,30 @@ class CoursePace < ActiveRecord::Base
 
   def asset_name
     I18n.t("Course Pace")
+  end
+
+  def effective_name
+    if user_id.present?
+      user.name
+    elsif course_section_id.present?
+      course_section.name
+    else
+      course.name
+    end
+  end
+
+  def type
+    if user_id.present?
+      "StudentEnrollment"
+    elsif course_section_id.present?
+      "Section"
+    else
+      "Course"
+    end
+  end
+
+  def duration
+    course_pace_module_items.sum(:duration)
   end
 
   def valid_secondary_context
@@ -346,5 +373,21 @@ class CoursePace < ActiveRecord::Base
     paced_course_module_items = all_active_course_module_items.where(id: course_pace_module_items.pluck(:module_item_id))
     InstStatsd::Statsd.count("course.paced.paced_module_item_count", paced_course_module_items.size)
     InstStatsd::Statsd.count("course.paced.all_module_item_count", all_active_course_module_items.size)
+  end
+
+  def log_pace_deletes
+    if course_section_id.present?
+      InstStatsd::Statsd.increment("course_pacing.deleted_section_pace")
+    elsif user_id.present?
+      InstStatsd::Statsd.increment("course_pacing.deleted_user_pace")
+    else
+      InstStatsd::Statsd.increment("course_pacing.deleted_course_pace")
+    end
+  end
+
+  def log_course_blackout_dates
+    InstStatsd::Statsd.count("course_pacing.course_blackout_dates.count", CalendarEvent.with_blackout_date.active.where(context: course).size)
+    account_blackout_dates = Account.multi_account_chain_ids([course.account.id]).sum { |id| CalendarEvent.with_blackout_date.active.where(context: Account.find(id)).size }
+    InstStatsd::Statsd.count("course_pacing.account_blackout_dates.count", account_blackout_dates)
   end
 end

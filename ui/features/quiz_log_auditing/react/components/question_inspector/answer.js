@@ -27,9 +27,8 @@ import React from 'react'
 const GenericRenderer = props => <div>{'' + props.answer}</div>
 const Renderers = [Essay, FIMB, Matching, MultipleAnswers, MultipleChoice, MultipleDropdowns]
 
-const getRenderer = questionType => (
+const getRenderer = questionType =>
   Renderers.find(entry => entry.questionTypes.includes(questionType)) || GenericRenderer
-)
 
 const Answer = props => {
   const Renderer = getRenderer(props.question.questionType)

@@ -25,7 +25,7 @@ const outcome = (id, title) => ({
   id,
   title,
   assignments: [
-    {html_url: 'http://foo', id: 'assignment_2', name: 'My alignment', submission_types: 'none'}
+    {html_url: 'http://foo', id: 'assignment_2', name: 'My alignment', submission_types: 'none'},
   ],
   mastered: false,
   mastery_points: 3,
@@ -40,22 +40,22 @@ const outcome = (id, title) => ({
         id: 'assignment_2',
         name: 'My alignment',
         html_url: 'http://foo',
-        submission_types: ''
-      }
-    }
-  ]
+        submission_types: '',
+      },
+    },
+  ],
 })
 
 const defaultProps = (props = {}) => ({
   outcomeGroup: {
     id: 10,
-    title: 'My group'
+    title: 'My group',
   },
   outcomes: [outcome(1, 'My outcome')],
   expanded: false,
   expandedOutcomes: Set(),
   onExpansionChange: () => {},
-  ...props
+  ...props,
 })
 
 it('renders the OutcomeGroup component', () => {
@@ -64,7 +64,7 @@ it('renders the OutcomeGroup component', () => {
 })
 
 it('includes the individual outcomes', () => {
-  const {getByText} = render(<OutcomeGroup {...defaultProps()} expanded />)
+  const {getByText} = render(<OutcomeGroup {...defaultProps()} expanded={true} />)
   expect(getByText('My outcome')).not.toBeNull()
 })
 
@@ -74,10 +74,10 @@ it('renders outcomes in alphabetical order by title', () => {
       outcome(1, 'ZZ Top'),
       outcome(2, 'Aardvark'),
       outcome(3, 'abba'),
-      outcome(4, 'Aerosmith')
-    ]
+      outcome(4, 'Aerosmith'),
+    ],
   })
-  const {getAllByRole} = render(<OutcomeGroup {...props} expanded />)
+  const {getAllByRole} = render(<OutcomeGroup {...props} expanded={true} />)
   const outcomes = getAllByRole('listitem')
   expect(outcomes).toHaveLength(4)
   expect(within(outcomes[0]).getByText('Aardvark')).not.toBeNull()

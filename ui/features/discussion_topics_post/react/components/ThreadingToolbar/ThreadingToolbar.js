@@ -40,12 +40,12 @@ export function ThreadingToolbar({...props}) {
       props={{
         mobile: {
           itemSpacing: '0 small 0 0',
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
           itemSpacing: 'none',
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={(responsiveProps, matches) =>
         (props.searchTerm || props.filter !== 'all') &&
@@ -122,7 +122,7 @@ ThreadingToolbar.propTypes = {
   filter: PropTypes.string,
   onOpenIsolatedView: PropTypes.func,
   discussionEntry: PropTypes.object,
-  isIsolatedView: PropTypes.bool
+  isIsolatedView: PropTypes.bool,
 }
 
 ThreadingToolbar.Reply = Reply

@@ -26,7 +26,7 @@ const ELEMENT_NODE = 1
 class SVGWrapper extends React.Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
-    fillColor: PropTypes.string
+    fillColor: PropTypes.string,
   }
 
   componentDidMount() {
@@ -61,7 +61,7 @@ class SVGWrapper extends React.Component {
 
         this.svg.setAttribute('focusable', false)
         this.rootSpan.appendChild(this.svg)
-      }
+      },
     })
   }
 

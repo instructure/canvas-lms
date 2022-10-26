@@ -40,13 +40,13 @@ const Legend = () => (
 
     <dt>{I18n.t('legend.dotted_circle', 'Dotted Circle')}</dt>
     <dd>
-      <Emblem answered />
+      <Emblem answered={true} />
       {I18n.t('legend.dotted_circle_desc', 'An answer, regardless of correctness.')}
     </dd>
 
     <dt>{I18n.t('legend.filled_circle', 'Filled Circle')}</dt>
     <dd>
-      <Emblem answered last />
+      <Emblem answered={true} last={true} />
       {I18n.t(
         'legend.filled_circle_desc',
         'The final answer for the question, the one that counts.'

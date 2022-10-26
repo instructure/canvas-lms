@@ -43,11 +43,11 @@ const RosterTableLastActivity = ({enrollments}) => {
 }
 
 RosterTableLastActivity.propTypes = {
-  enrollments: arrayOf(object)
+  enrollments: arrayOf(object),
 }
 
 RosterTableLastActivity.defaultProps = {
-  enrollments: []
+  enrollments: [],
 }
 
 export default RosterTableLastActivity

@@ -58,12 +58,12 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
       if (isGroup) {
         setImportGroupsStatus(prevStatus => ({
           ...prevStatus,
-          [outcomeOrGroupId]: status
+          [outcomeOrGroupId]: status,
         }))
       } else {
         setImportOutcomesStatus(prevStatus => ({
           ...prevStatus,
-          [outcomeOrGroupId]: status
+          [outcomeOrGroupId]: status,
         }))
       }
     },
@@ -75,15 +75,15 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
       message: err.message
         ? isGroup
           ? I18n.t('An error occurred while importing these outcomes: %{message}.', {
-              message: err.message
+              message: err.message,
             })
           : I18n.t('An error occurred while importing this outcome: %{message}.', {
-              message: err.message
+              message: err.message,
             })
         : isGroup
         ? I18n.t('An error occurred while importing these outcomes.')
         : I18n.t('An error occurred while importing this outcome.'),
-      type: 'error'
+      type: 'error',
     })
 
   const trackProgress = useCallback(
@@ -93,31 +93,31 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
             'All outcomes from %{groupTitle} have been successfully added to %{targetGroupTitle}.',
             {
               groupTitle,
-              targetGroupTitle
+              targetGroupTitle,
             }
           )
         : isCourse
         ? I18n.t('All outcomes from %{groupTitle} have been successfully added to this course.', {
-            groupTitle
+            groupTitle,
           })
         : I18n.t('All outcomes from %{groupTitle} have been successfully added to this account.', {
-            groupTitle
+            groupTitle,
           })
 
       try {
         await resolveProgress(
           {
             url: `/api/v1/progress/${progress._id}`,
-            workflow_state: progress.state
+            workflow_state: progress.state,
           },
           {
-            interval: isGroup ? groupPollingInterval : outcomePollingInterval
+            interval: isGroup ? groupPollingInterval : outcomePollingInterval,
           }
         )
         if (isGroup) {
           showFlashAlert({
             message,
-            type: 'success'
+            type: 'success',
           })
         }
         setStatus(outcomeOrGroupId, IMPORT_COMPLETED, isGroup)
@@ -154,14 +154,14 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
       targetGroupId,
       targetGroupTitle,
       groupTitle = null,
-      isGroup = true
+      isGroup = true,
     }) => {
       try {
         const input = targetGroupId
           ? {targetGroupId}
           : {
               targetContextId,
-              targetContextType
+              targetContextType,
             }
         if (isGroup) {
           input.groupId = outcomeOrGroupId
@@ -184,7 +184,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
           isGroup,
           groupTitle,
           targetGroupTitle,
-          progress
+          progress,
         }
 
         const activeImports = getLocalStorageActiveImports()
@@ -212,7 +212,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     clearGroupsStatus,
     clearOutcomesStatus,
     hasAddedOutcomes,
-    setHasAddedOutcomes
+    setHasAddedOutcomes,
   }
 }
 

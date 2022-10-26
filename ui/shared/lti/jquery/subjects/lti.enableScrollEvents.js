@@ -29,7 +29,7 @@ export default function enableScrollEvents({responseMessages}) {
       timeout = window.requestAnimationFrame(() => {
         responseMessages.sendResponse({
           subject: 'lti.scroll',
-          scrollY: window.scrollY
+          scrollY: window.scrollY,
         })
       })
     },

@@ -31,6 +31,6 @@ const searchFilter = {
   sort: '',
   setSort: () => {},
   pageNumber: 0,
-  setPageNumber: () => {}
+  setPageNumber: () => {},
 }
 export const SearchContext = React.createContext(searchFilter)

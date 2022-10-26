@@ -47,7 +47,7 @@ export class AssignmentCardMenu extends React.Component {
 
       // action props
       moveAssignment: func.isRequired,
-      setAriaAlert: func.isRequired
+      setAriaAlert: func.isRequired,
     }
   }
 
@@ -59,7 +59,7 @@ export class AssignmentCardMenu extends React.Component {
       I18n.t('Moved assignment %{name} to scoring range %{lower} - %{upper}', {
         name: this.props.assignment.get('name'),
         lower: transformScore(range.get('lower_bound'), this.props.triggerAssignment, false),
-        upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true)
+        upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true),
       })
     )
   }
@@ -81,7 +81,7 @@ export class AssignmentCardMenu extends React.Component {
                   this.props.triggerAssignment,
                   false
                 ),
-                upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true)
+                upper: transformScore(range.get('upper_bound'), this.props.triggerAssignment, true),
               })}
             </View>
           </Menu.Item>
@@ -119,13 +119,13 @@ export class AssignmentCardMenu extends React.Component {
 const ConnectedAssignmentCardMenu = connect(
   state => ({
     ranges: state.getIn(['rule', 'scoring_ranges'], List()),
-    triggerAssignment: state.get('trigger_assignment', Map())
+    triggerAssignment: state.get('trigger_assignment', Map()),
   }),
   dispatch =>
     bindActionCreators(
       {
         moveAssignment: actions.moveAssignment,
-        setAriaAlert: actions.setAriaAlert
+        setAriaAlert: actions.setAriaAlert,
       },
       dispatch
     )

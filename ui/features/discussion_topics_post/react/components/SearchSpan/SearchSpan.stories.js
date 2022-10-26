@@ -23,7 +23,7 @@ import {SearchSpan} from './SearchSpan'
 export default {
   title: 'Examples/Discussion Posts/Components/SearchSpan',
   component: SearchSpan,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = props => (
@@ -35,10 +35,10 @@ Default.args = {}
 
 export const MultipleInstances = Template.bind({})
 MultipleInstances.args = {
-  text: 'A posty message for Posty Postersen'
+  text: 'A posty message for Posty Postersen',
 }
 
 export const NoMatches = Template.bind({})
 NoMatches.args = {
-  text: 'This is the post that never ends. It goes on and on my friends. '
+  text: 'This is the post that never ends. It goes on and on my friends. ',
 }

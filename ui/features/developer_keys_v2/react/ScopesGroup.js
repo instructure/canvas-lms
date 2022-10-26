@@ -34,7 +34,7 @@ export default class ScopesGroup extends React.Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
-      groupChecked: this.allScopesAreSelected(nextProps)
+      groupChecked: this.allScopesAreSelected(nextProps),
     })
   }
 
@@ -106,7 +106,7 @@ export default class ScopesGroup extends React.Component {
 
     this.props.setSelectedScopes(newScopes)
     this.setState({
-      groupChecked: event.currentTarget.checked
+      groupChecked: event.currentTarget.checked,
     })
   }
 
@@ -122,7 +122,7 @@ export default class ScopesGroup extends React.Component {
 
     this.props.setSelectedScopes(newScopes)
     this.setState({
-      groupChecked: false
+      groupChecked: false,
     })
   }
 
@@ -167,9 +167,9 @@ ScopesGroup.propTypes = {
   scopes: PropTypes.arrayOf(
     PropTypes.shape({
       scope: PropTypes.string,
-      verb: PropTypes.string.isRequired
+      verb: PropTypes.string.isRequired,
     })
   ).isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 }

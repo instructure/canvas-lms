@@ -47,7 +47,7 @@ export default function DirectShareOperationStatus({promise, startingMsg, succes
   let alert
   const alertProps = {
     liveAlert: true,
-    margin: 'small 0'
+    margin: 'small 0',
   }
 
   if (operationStatus === 'error') {

@@ -28,7 +28,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
     const mergedData = {
       ...options.data,
       context_codes: this.context_codes,
-      filter: 'all_ungraded_todo_items'
+      filter: 'all_ungraded_todo_items',
     }
     const mergedOptions = {...options, data: mergedData}
     return super.fetch(mergedOptions)
@@ -43,7 +43,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
       title: note.plannable.title,
       todo_at: note.plannable.todo_date,
       start_at: note.plannable.todo_date,
-      html_url: note.html_url
+      html_url: note.html_url,
     }))
   }
 }

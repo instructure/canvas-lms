@@ -26,7 +26,7 @@ import {extend} from 'underscore'
 
 const JSON_HEADERS = {
   Accept: 'application/json; charset=UTF-8',
-  'Content-Type': 'application/json; charset=UTF-8'
+  'Content-Type': 'application/json; charset=UTF-8',
 }
 
 export default class EventManager {
@@ -117,9 +117,9 @@ export default class EventManager {
       global: false, // don't whine to the user if this fails
       headers: JSON_HEADERS,
       data: JSON.stringify({
-        quiz_submission_events: eventSet.toJSON()
+        quiz_submission_events: eventSet.toJSON(),
       }),
-      error: options.errorHandler
+      error: options.errorHandler,
     })
 
     delivery.then(
@@ -208,5 +208,5 @@ export default class EventManager {
 EventManager.options = {
   autoDeliver: true,
   autoDeliveryFrequency: 15000, // milliseconds
-  deliveryUrl: '/quiz_submission_events'
+  deliveryUrl: '/quiz_submission_events',
 }

@@ -37,11 +37,11 @@ export default class ModuleFileDrop extends React.Component {
   static propTypes = {
     courseId: string.isRequired,
     moduleId: string.isRequired,
-    contextModules: instanceOf(Element)
+    contextModules: instanceOf(Element),
   }
 
   static defaultProps = {
-    contextModules: null
+    contextModules: null,
   }
 
   static folderState = {}
@@ -56,7 +56,7 @@ export default class ModuleFileDrop extends React.Component {
       folder: null,
       contextType: null,
       contextId: null,
-      interaction: true
+      interaction: true,
     }
   }
 
@@ -79,7 +79,7 @@ export default class ModuleFileDrop extends React.Component {
             ModuleFileDrop.folderState = {
               contextId: rootFolder.context_id,
               contextType: rootFolder.context_type,
-              folder: rootFolder
+              folder: rootFolder,
             }
             ModuleFileDrop.activeDrops.forEach(drop => {
               drop.setFolderState(ModuleFileDrop.folderState)
@@ -93,14 +93,14 @@ export default class ModuleFileDrop extends React.Component {
   showAlert = () => {
     showFlashAlert({
       type: 'error',
-      message: I18n.t('Unable to set up drag and drop for modules')
+      message: I18n.t('Unable to set up drag and drop for modules'),
     })
   }
 
   addFile(file) {
     ModuleFileDrop.folderState.folder.files = [
       ...ModuleFileDrop.folderState.folder.files,
-      new FilesystemObject(file)
+      new FilesystemObject(file),
     ]
     ModuleFileDrop.activeDrops.forEach(drop => {
       drop.setFolderState(ModuleFileDrop.folderState)
@@ -142,7 +142,7 @@ export default class ModuleFileDrop extends React.Component {
     }
     FileOptionsCollection.setUploadOptions({
       alwaysRename: false,
-      alwaysUploadZips: true
+      alwaysUploadZips: true,
     })
     this.setState({hightlightUpload: false, isUploading: true}, () => {
       FileOptionsCollection.setFolder(folder)
@@ -183,7 +183,7 @@ export default class ModuleFileDrop extends React.Component {
     const {interaction, folder} = this.state
     return (
       <FileDrop
-        shouldAllowMultiple
+        shouldAllowMultiple={true}
         renderLabel={this.renderBillboard()}
         onDragEnter={this.handleDragEnter}
         onDragLeave={this.handleDragLeave}
@@ -207,7 +207,7 @@ export default class ModuleFileDrop extends React.Component {
 
   lockFileMessage = nameToUse => {
     return I18n.t('A locked file named "%{name}" already exists. Please enter a new name.', {
-      name: nameToUse
+      name: nameToUse,
     })
   }
 
@@ -220,8 +220,8 @@ export default class ModuleFileDrop extends React.Component {
           currentFolder={folder}
           contextId={contextId}
           contextType={contextType}
-          allowSkip
-          alwaysUploadZips
+          allowSkip={true}
+          alwaysUploadZips={true}
           onEmptyOrClose={this.handleEmptyUpload}
           onRenameFileMessage={this.renameFileMessage}
           onLockFileMessage={this.lockFileMessage}

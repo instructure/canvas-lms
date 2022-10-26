@@ -21,7 +21,7 @@ import React from 'react'
 
 export default {
   title: 'Examples/Canvas Inbox/No Selected Conversation',
-  component: NoSelectedConversation
+  component: NoSelectedConversation,
 }
 
 const Template = () => <NoSelectedConversation />

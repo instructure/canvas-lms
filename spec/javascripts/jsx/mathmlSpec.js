@@ -35,7 +35,7 @@ QUnit.module('MathML and MathJax test', {
   },
   after: () => {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('loadMathJax loads mathJax', () => {
@@ -48,8 +48,8 @@ test('loadMathJax does not load mathJax', () => {
   stub = sinon.stub($, 'ajax')
   window.MathJax = {
     Hub: {
-      Queue: () => {}
-    }
+      Queue: () => {},
+    },
   }
   mathml.loadMathJax('bogus')
   ok(!$.ajax.called)
@@ -70,8 +70,8 @@ test('isMathJaxLoaded return true', () => {
 test('reloadElement reloads the element', () => {
   window.MathJax = {
     Hub: {
-      Queue: () => {}
-    }
+      Queue: () => {},
+    },
   }
   stub = sinon.stub(window.MathJax.Hub, 'Queue')
   mathml.reloadElement('content')
@@ -81,9 +81,9 @@ test('reloadElement reloads the element', () => {
 QUnit.module('isMathInElement', {
   beforeEach: () => {
     window.ENV = {
-      FEATURES: {}
+      FEATURES: {},
     }
-  }
+  },
 })
 
 test('returns true if there is mathml', () => {
@@ -106,10 +106,10 @@ QUnit.module('isMathInElement, with new_math_equation_handling on', {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true
-      }
+        inline_math_everywhere: true,
+      },
     }
-  }
+  },
 })
 
 test('returns true if there is mathml', () => {
@@ -146,10 +146,10 @@ QUnit.module('isMathInElement, including inline LaTex', {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true
-      }
+        inline_math_everywhere: true,
+      },
     }
-  }
+  },
 })
 
 test('returns true if there is mathml', () => {
@@ -192,14 +192,14 @@ QUnit.module('mathEquationHelper', {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true
-      }
+        inline_math_everywhere: true,
+      },
     }
     document.getElementById('fixtures').innerHTML = ''
   },
   afterEach: () => {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('getImageEquationText does not use data-equation-content', () => {
@@ -266,14 +266,14 @@ QUnit.module('isMathJaxIgnored', {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true
-      }
+        inline_math_everywhere: true,
+      },
     }
     document.getElementById('fixtures').innerHTML = ''
   },
   afterEach: () => {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('ignores elements in the ignore list', () => {

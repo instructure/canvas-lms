@@ -72,7 +72,7 @@ const MessageStudentsWhoHelper = {
       students,
       context_code: `course_${getCourseId(assignment)}`,
       callback: this.callbackFn.bind(this),
-      subjectCallback: this.generateSubjectCallbackFn(assignment)
+      subjectCallback: this.generateSubjectCallbackFn(assignment),
     }
   },
 
@@ -93,7 +93,7 @@ const MessageStudentsWhoHelper = {
       group_conversation: true,
       bulk_message: true,
       media_comment_id: undefined,
-      media_comment_type: undefined
+      media_comment_type: undefined,
     }
 
     if (mediaFile) {
@@ -121,13 +121,13 @@ const MessageStudentsWhoHelper = {
         text: I18n.t("Haven't submitted yet"),
         subjectFn: assignment =>
           I18n.t('No submission for %{assignment}', {assignment: assignment.name}),
-        criteriaFn: student => !hasSubmitted(student)
+        criteriaFn: student => !hasSubmitted(student),
       },
       {
         text: I18n.t("Haven't been graded"),
         subjectFn: assignment =>
           I18n.t('No grade for %{assignment}', {assignment: assignment.name}),
-        criteriaFn: student => !this.exists(student.score)
+        criteriaFn: student => !this.exists(student.score),
       },
       {
         text: I18n.t('Scored less than'),
@@ -135,10 +135,10 @@ const MessageStudentsWhoHelper = {
         subjectFn: (assignment, cutoff) =>
           I18n.t('Scored less than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
-            cutoff: I18n.n(cutoff)
+            cutoff: I18n.n(cutoff),
           }),
         criteriaFn: (student, cutoff) =>
-          this.scoreWithCutoff(student, cutoff) && student.score < cutoff
+          this.scoreWithCutoff(student, cutoff) && student.score < cutoff,
       },
       {
         text: I18n.t('Scored more than'),
@@ -146,11 +146,11 @@ const MessageStudentsWhoHelper = {
         subjectFn: (assignment, cutoff) =>
           I18n.t('Scored more than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
-            cutoff: I18n.n(cutoff)
+            cutoff: I18n.n(cutoff),
           }),
         criteriaFn: (student, cutoff) =>
-          this.scoreWithCutoff(student, cutoff) && student.score > cutoff
-      }
+          this.scoreWithCutoff(student, cutoff) && student.score > cutoff,
+      },
     ]
   },
 
@@ -185,6 +185,6 @@ const MessageStudentsWhoHelper = {
       const subjectFn = this.findOptionByText(selected).subjectFn
       return subjectFn(assignment, cutoffString)
     }
-  }
+  },
 }
 export default MessageStudentsWhoHelper

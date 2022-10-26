@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('ExternalApps.ExternalAppsStore', {
@@ -34,7 +34,7 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
         installed_locally: true,
         name: 'Talent',
         context: 'Course',
-        context_id: 1
+        context_id: 1,
       },
       {
         app_id: 2,
@@ -44,7 +44,7 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
         installed_locally: true,
         name: 'Twitter',
         context: 'Course',
-        context_id: 1
+        context_id: 1,
       },
       {
         app_id: 3,
@@ -54,8 +54,8 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
         installed_locally: true,
         name: 'LinkedIn',
         context: 'Course',
-        context_id: 1
-      }
+        context_id: 1,
+      },
     ]
     this.accountResponse = {
       id: 1,
@@ -66,20 +66,20 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
       default_storage_quota_mb: 500,
       default_user_storage_quota_mb: 50,
       default_group_storage_quota_mb: 50,
-      default_time_zone: 'America/Denver'
+      default_time_zone: 'America/Denver',
     }
   },
   teardown() {
     this.server.restore()
     return store.reset()
-  }
+  },
 })
 
 test('fetch', function () {
   this.server.respondWith('GET', /\/lti_apps/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.tools)
+    JSON.stringify(this.tools),
   ])
   store.fetch()
   this.server.respond()
@@ -90,12 +90,12 @@ test('resets and fetch responses interwoven', function () {
   this.server.respondWith('GET', /\/lti_apps/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.tools)
+    JSON.stringify(this.tools),
   ])
   this.server.respondWith('GET', /\/lti_apps/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.tools)
+    JSON.stringify(this.tools),
   ])
   store.fetch()
   store.reset()
@@ -109,7 +109,7 @@ test('updateAccessToken', function () {
   this.server.respondWith('PUT', /\/accounts/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.accountResponse)
+    JSON.stringify(this.accountResponse),
   ])
   const success = (data, statusText, xhr) => equal(statusText, 'success')
   const error = () => ok(false, 'Unable to update app center access token')
@@ -123,7 +123,7 @@ test('fetchWithDetails with ContextExternalTool', function () {
   this.server.respondWith('GET', /\/external_tools/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.fetchWithDetails(tool).done(data => equal(data.status, 'ok'))
   return this.server.respond()
@@ -135,7 +135,7 @@ test('fetchWithDetails with Lti::ToolProxy', function () {
   this.server.respondWith('GET', /\/tool_proxies/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.fetchWithDetails(tool).done(data => equal(data.status, 'ok'))
   return this.server.respond()
@@ -155,7 +155,7 @@ test('save', function () {
   this.server.respondWith('POST', /\/external_tools/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.save('manual', data, success.bind(this), error.bind(this))
   this.server.respond()
@@ -170,7 +170,7 @@ test('save stringifys JSON payload', function () {
   const ajaxSpy = sinon.spy()
   store._generateParams = () => ({
     foo: 'bar',
-    url: null
+    url: null,
   })
   const data = {some: 'data'}
   const success = function (data, statusText, xhr) {
@@ -182,7 +182,7 @@ test('save stringifys JSON payload', function () {
   this.server.respondWith('POST', /\/external_tools/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.save('manual', data, success.bind(this), error.bind(this))
   this.server.respond()
@@ -197,7 +197,7 @@ test('save sets the content type to application/json', function () {
   const ajaxSpy = sinon.spy()
   store._generateParams = () => ({
     foo: 'bar',
-    url: null
+    url: null,
   })
   const data = {some: 'data'}
   const success = function (data, statusText, xhr) {
@@ -209,7 +209,7 @@ test('save sets the content type to application/json', function () {
   this.server.respondWith('POST', /\/external_tools/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.save('manual', data, success.bind(this), error.bind(this))
   this.server.respond()
@@ -227,7 +227,7 @@ test('_generateParams manual', () => {
     customFields: 'a=1\nb=2\nc=3',
     url: 'http://google.com',
     description: 'This is a description',
-    verifyUniqueness: 'true'
+    verifyUniqueness: 'true',
   }
   const params = store._generateParams('manual', data)
   deepEqual(params, {
@@ -235,7 +235,7 @@ test('_generateParams manual', () => {
     custom_fields: {
       a: '1',
       b: '2',
-      c: '3'
+      c: '3',
     },
     description: 'This is a description',
     domain: undefined,
@@ -243,7 +243,7 @@ test('_generateParams manual', () => {
     privacy_level: 'email_only',
     shared_secret: 'SECRET',
     url: 'http://google.com',
-    verify_uniqueness: 'true'
+    verify_uniqueness: 'true',
   })
 })
 
@@ -251,7 +251,7 @@ test('_generateParams url', () => {
   const data = {
     name: 'My App',
     configUrl: 'http://example.com/config.xml',
-    verifyUniqueness: 'true'
+    verifyUniqueness: 'true',
   }
   const params = store._generateParams('url', data)
   deepEqual(params, {
@@ -261,7 +261,7 @@ test('_generateParams url', () => {
     name: 'My App',
     privacy_level: 'anonymous',
     shared_secret: 'N/A',
-    verify_uniqueness: 'true'
+    verify_uniqueness: 'true',
   })
 })
 
@@ -269,7 +269,7 @@ test('_generateParams xml', () => {
   const data = {
     name: 'My App',
     xml: '<foo>bar</foo>',
-    verifyUniqueness: 'true'
+    verifyUniqueness: 'true',
   }
   const params = store._generateParams('xml', data)
   deepEqual(params, {
@@ -279,7 +279,7 @@ test('_generateParams xml', () => {
     name: 'My App',
     privacy_level: 'anonymous',
     shared_secret: 'N/A',
-    verify_uniqueness: 'true'
+    verify_uniqueness: 'true',
   })
 })
 
@@ -300,7 +300,7 @@ test('delete ContextExternalTool', function () {
   this.server.respondWith('DELETE', /\/external_tools/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.delete(tool)
   this.server.respond()
@@ -326,7 +326,7 @@ test('delete Lti::ToolProxy', function () {
   this.server.respondWith('DELETE', /\/tool_proxies/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.delete(tool)
   this.server.respond()
@@ -348,7 +348,7 @@ test('deactivate', function () {
   this.server.respondWith('PUT', /\/tool_proxies/, [
     200,
     {'Content-Type': 'application/json'},
-    '{ "status": "ok" }'
+    '{ "status": "ok" }',
   ])
   store.deactivate(tool, success, error)
   this.server.respond()

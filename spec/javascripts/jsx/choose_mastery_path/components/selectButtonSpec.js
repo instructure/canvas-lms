@@ -18,14 +18,14 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import SelectButton from 'ui/features/choose_mastery_path/react/components/select-button.js'
+import SelectButton from 'ui/features/choose_mastery_path/react/components/select-button'
 
 QUnit.module('Select Button')
 
 const defaultProps = () => ({
   isSelected: false,
   isDisabled: false,
-  onSelect: () => {}
+  onSelect: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<SelectButton {...props} />)

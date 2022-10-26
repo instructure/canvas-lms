@@ -46,7 +46,7 @@ const Todo = ({
   ignore,
   needs_grading_count,
   timeZone,
-  openInNewTab
+  openInNewTab,
 }) => {
   const [ignored, setIgnored] = useState(false)
 
@@ -71,7 +71,7 @@ const Todo = ({
   return (
     <Flex id={`todo-${id}`} data-testid="todo" as="div" alignItems="start" margin="medium 0 0">
       <Badge
-        standalone
+        standalone={true}
         count={needs_grading_count}
         countUntil={100}
         margin="0 small 0 0"
@@ -80,7 +80,7 @@ const Todo = ({
             alt={I18n.t(
               {
                 one: '1 submission needs grading',
-                other: '%{count} submissions need grading'
+                other: '%{count} submissions need grading',
               },
               {count: needs_grading_count}
             )}
@@ -91,7 +91,7 @@ const Todo = ({
         theme={{
           fontSize: '1rem',
           fontWeight: '700',
-          size: '1.5rem'
+          size: '1.5rem',
         }}
       />
       <Flex as="div" direction="column" margin="0 small 0 0" width="27rem">
@@ -100,7 +100,7 @@ const Todo = ({
           target={openInNewTab ? '_blank' : undefined}
           isWithinText={false}
           theme={{
-            fontWeight: '700'
+            fontWeight: '700',
           }}
         >
           <Text>{I18n.t('Grade %{assignment}', {assignment: name})}</Text>
@@ -126,7 +126,7 @@ const Todo = ({
       </Flex>
       <IconButton
         screenReaderLabel={I18n.t('Ignore %{assignment} until new submission', {
-          assignment: name
+          assignment: name,
         })}
         withBackground={false}
         withBorder={false}
@@ -145,19 +145,19 @@ Todo.propTypes = {
     all_dates: PropTypes.arrayOf(
       PropTypes.shape({
         base: PropTypes.bool,
-        due_at: PropTypes.string
+        due_at: PropTypes.string,
       })
     ).isRequired,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,
-    points_possible: PropTypes.number.isRequired
+    points_possible: PropTypes.number.isRequired,
   }),
   context_name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,
   ignore: PropTypes.string.isRequired,
   needs_grading_count: PropTypes.number,
   timeZone: PropTypes.string.isRequired,
-  openInNewTab: PropTypes.bool.isRequired
+  openInNewTab: PropTypes.bool.isRequired,
 }
 
 export default Todo

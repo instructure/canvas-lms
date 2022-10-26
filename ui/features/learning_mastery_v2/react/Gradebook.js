@@ -29,7 +29,7 @@ import {
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
-  CELL_HEIGHT
+  CELL_HEIGHT,
 } from './constants'
 
 const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings}) => {
@@ -106,7 +106,7 @@ Gradebook.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
   rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
 }
 
 export default Gradebook

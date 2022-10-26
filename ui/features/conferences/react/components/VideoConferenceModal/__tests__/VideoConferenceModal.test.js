@@ -30,7 +30,7 @@ const userList = [
   {displayName: 'Jeffrey Johnson', id: '0'},
   {displayName: 'Jewel Pearson', id: '8'},
   {displayName: 'Nic Nolan', id: '6'},
-  {displayName: 'Omar Soto Fortuno', id: '4'}
+  {displayName: 'Omar Soto Fortuno', id: '4'},
 ]
 
 const startCalendarDate = new Date().toISOString()
@@ -64,8 +64,8 @@ describe('VideoConferenceModal', () => {
         settings: [],
         free_trial: false,
         lti_settings: null,
-        contexts: null
-      }
+        contexts: null,
+      },
     ]
     window.ENV.bbb_recording_enabled = true
     window.ENV.context_name = 'Amazing Course'
@@ -112,11 +112,11 @@ describe('VideoConferenceModal', () => {
         'share_other_webcams',
         'share_microphone',
         'send_public_chat',
-        'send_private_chat'
+        'send_private_chat',
       ],
       selectedAttendees: [],
       startCalendarDate,
-      endCalendarDate
+      endCalendarDate,
     })
   })
 
@@ -173,7 +173,7 @@ describe('VideoConferenceModal', () => {
       description: 'An introduction to PHP.',
       invitationOptions: [],
       attendeesOptions: ['share_webcam'],
-      type: 'BigBlueButton'
+      type: 'BigBlueButton',
     })
 
     expect(container.getByText('Save')).toBeInTheDocument()
@@ -196,7 +196,7 @@ describe('VideoConferenceModal', () => {
       description: '',
       invitationOptions: [],
       attendeesOptions: ['share_webcam'],
-      type: 'BigBlueButton'
+      type: 'BigBlueButton',
     })
 
     fireEvent.click(container.getByText('Attendees'))

@@ -28,7 +28,7 @@ class ApiProgressBar extends React.Component {
   static propTypes = {
     progress_id: PropTypes.string,
     onComplete: PropTypes.func,
-    delay: PropTypes.number
+    delay: PropTypes.number,
   }
 
   //
@@ -36,12 +36,12 @@ class ApiProgressBar extends React.Component {
   //
 
   static defaultProps = {
-    delay: 1000
+    delay: 1000,
   }
 
   state = {
     completion: 0,
-    workflow_state: null
+    workflow_state: null,
   }
 
   intervalID = null
@@ -94,7 +94,7 @@ class ApiProgressBar extends React.Component {
     if (_.isObject(progress)) {
       this.setState({
         completion: progress.completion,
-        workflow_state: progress.workflow_state
+        workflow_state: progress.workflow_state,
       })
     }
   }

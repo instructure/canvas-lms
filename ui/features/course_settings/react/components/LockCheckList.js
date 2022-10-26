@@ -27,17 +27,17 @@ export default class LockCheckList extends React.Component {
     locks: propTypes.itemLocks.isRequired,
     lockableAttributes: propTypes.lockableAttributeList.isRequired,
     onChange: PropTypes.func,
-    formName: PropTypes.string.isRequired
+    formName: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
-    onChange: () => {}
+    onChange: () => {},
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      locks: props.locks
+      locks: props.locks,
     }
     this.onChangeFunctions = this.props.lockableAttributes.reduce((object, item) => {
       object[item] = e => this.onChange(e, item) //eslint-disable-line
@@ -50,7 +50,7 @@ export default class LockCheckList extends React.Component {
     locks[value] = e.target.checked
     this.setState(
       {
-        locks
+        locks,
       },
       () => this.props.onChange(locks)
     )

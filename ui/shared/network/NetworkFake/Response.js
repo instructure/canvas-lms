@@ -23,7 +23,7 @@ export default class Response {
     this.responseData = {
       body: null,
       headers: {},
-      status: 200
+      status: 200,
     }
 
     this.sent = false

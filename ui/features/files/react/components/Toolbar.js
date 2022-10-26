@@ -49,7 +49,7 @@ export default class Toolbar extends React.Component {
     userCanAddFilesForContext: PropTypes.bool,
     userCanEditFilesForContext: PropTypes.bool,
     userCanDeleteFilesForContext: PropTypes.bool,
-    userCanRestrictFilesForContext: PropTypes.bool
+    userCanRestrictFilesForContext: PropTypes.bool,
   }
 
   componentWillMount() {
@@ -70,7 +70,7 @@ export default class Toolbar extends React.Component {
 
     return downloadStuffAsAZip(this.getItemsToDownload(), {
       contextType: this.props.contextType,
-      contextId: this.props.contextId
+      contextId: this.props.contextId,
     })
   }
 
@@ -87,11 +87,11 @@ export default class Toolbar extends React.Component {
       title: I18n.t(
         {
           one: 'Edit permissions for: %{itemName}',
-          other: 'Edit permissions for %{count} items'
+          other: 'Edit permissions for %{count} items',
         },
         {
           count: this.props.selectedItems.length,
-          itemName: this.props.selectedItems[0].displayName()
+          itemName: this.props.selectedItems[0].displayName(),
         }
       ),
 
@@ -100,7 +100,7 @@ export default class Toolbar extends React.Component {
       close() {
         ReactDOM.unmountComponentAtNode(this)
         $(this).remove()
-      }
+      },
     })
 
     ReactDOM.render(
@@ -116,7 +116,7 @@ export default class Toolbar extends React.Component {
   openUsageRightsDialog() {
     const contents = (
       <UsageRightsDialog
-        isOpen
+        isOpen={true}
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={this.props.selectedItems}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
@@ -211,7 +211,7 @@ export default class Toolbar extends React.Component {
       return null
     }
     const phoneHiddenSet = classnames({
-      'hidden-phone': this.showingButtons
+      'hidden-phone': this.showingButtons,
     })
     if (canManage) {
       return (
@@ -292,7 +292,7 @@ export default class Toolbar extends React.Component {
               contextId: this.props.contextId,
               returnFocusTo: event.target,
               clearSelectedItems: this.props.clearSelectedItems,
-              onMove: this.props.onMove
+              onMove: this.props.onMove,
             })
           }}
           title={I18n.t('Move')}
@@ -312,7 +312,7 @@ export default class Toolbar extends React.Component {
           <a
             className="ui-button btn-download"
             href={this.props.selectedItems[0].get('url')}
-            download
+            download={true}
             title={this.downloadTitle}
             aria-label={this.downloadTitle}
             data-tooltip=""
@@ -381,7 +381,7 @@ export default class Toolbar extends React.Component {
       userCanRestrictFilesForContext,
       userCanAddFilesForContext,
       userCanEditFilesForContext,
-      userCanDeleteFilesForContext
+      userCanDeleteFilesForContext,
     } = this.props
 
     const canManage = permission => {
@@ -395,18 +395,18 @@ export default class Toolbar extends React.Component {
     const formClassName = classnames({
       'ic-Input-group': true,
       'ef-search-form': true,
-      'ef-search-form--showing-buttons': this.showingButtons
+      'ef-search-form--showing-buttons': this.showingButtons,
     })
 
     const buttonSetClasses = classnames({
       'ui-buttonset': true,
-      'screenreader-only': !this.showingButtons
+      'screenreader-only': !this.showingButtons,
     })
 
     const viewBtnClasses = classnames({
       'ui-button': true,
       'btn-view': true,
-      'Toolbar__ViewBtn--onlyfolders': selectedItemIsFolder
+      'Toolbar__ViewBtn--onlyfolders': selectedItemIsFolder,
     })
     const label = selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')
 
