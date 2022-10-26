@@ -113,7 +113,7 @@ export default function UserSuspendLink() {
 
   function renderModal(action) {
     const name = ENV.CONTEXT_USER_DISPLAY_NAME
-    let modalLabel, actionColor, actionFunc, actionName, actionText
+    let modalLabel, actionColor, actionFunc, actionName, actionText, infoText
     if (action === SUSPEND) {
       modalLabel = I18n.t('Confirm suspension')
       actionColor = 'danger'
@@ -123,6 +123,9 @@ export default function UserSuspendLink() {
         'Suspending %{name} from this account will remove all access to all authorized systems from all their logins.',
         {name}
       )
+      infoText = I18n.t(
+        'You must be authorized to manage SIS in order to suspend logins with an associated SIS ID.'
+      )
     } else {
       modalLabel = I18n.t('Confirm reactivation')
       actionColor = 'primary'
@@ -131,6 +134,9 @@ export default function UserSuspendLink() {
       actionText = I18n.t(
         'Reactivation will allow all logins for %{name} to log in to Canvas and regain access to previously authorized API integrations.',
         {name}
+      )
+      infoText = I18n.t(
+        'You must be authorized to manage SIS in order to reactivate logins with an associated SIS ID.'
       )
     }
     return (
@@ -148,6 +154,8 @@ export default function UserSuspendLink() {
         <Modal.Body>
           <View as="div" margin="medium">
             <Text as="div">{actionText}</Text>
+            <br />
+            <Text as="div">{infoText}</Text>
           </View>
         </Modal.Body>
 

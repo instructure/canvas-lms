@@ -72,9 +72,9 @@
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
 <% js_env user_suspend_status: {
-  pseudonyms: @user.all_active_pseudonyms.map do |p|
-    {id: p.id, workflow_state: p.workflow_state, unique_id: p.unique_id}
-  end
+  pseudonyms: @user.all_active_pseudonyms.reject do |p|
+      p.sis_user_id.present? && !can_do(p, @current_user, :manage_sis)
+  end.map { |p| { id: p.id, workflow_state: p.workflow_state, unique_id: p.unique_id } }
 } %>
 
 <div id="user-info-fieldsets">
