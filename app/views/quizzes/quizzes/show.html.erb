@@ -35,7 +35,7 @@
   admin_show_rubric_title = t('links.show_assignment_rubric', "Show Rubric")
   is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
               !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
-  can_direct_share = can_do(@context, @current_user, :manage_content) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))
+  can_direct_share = can_do(@context, @current_user, :direct_share)
 %>
 
 <% if @headers %>

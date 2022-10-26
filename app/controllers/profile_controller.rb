@@ -492,7 +492,7 @@ class ProfileController < ApplicationController
   end
 
   def content_shares
-    raise not_found unless @current_user.can_content_share?
+    raise not_found unless @current_user.can_view_content_shares?
 
     @user ||= @current_user
     set_active_tab "content_shares"

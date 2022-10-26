@@ -2111,7 +2111,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def can_content_share?
+  def can_view_content_shares?
     non_student_enrollment? || account_membership?
   end
 
