@@ -370,12 +370,13 @@ module AuthenticationMethods
     return unless fix_ms_office_redirects
 
     respond_to do |format|
-      format.json { render_json_unauthorized }
-      format.all do
+      format.any(:html, :pdf) do
         store_location
         flash[:warning] = I18n.t("lib.auth.errors.not_authenticated", "You must be logged in to access this page") unless request.path == "/"
         redirect_to login_url(params.permit(:canvas_login, :authentication_provider))
       end
+      format.json { render_json_unauthorized }
+      format.all { render plain: "Unauthenticated", status: :unauthorized }
     end
   end
 
