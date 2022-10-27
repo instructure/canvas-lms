@@ -303,28 +303,70 @@ class OutcomesApiController < ApplicationController
     end
   end
 
-  def find_outcomes_service_assignment_alignments(course)
-    outcomes = ContentTag.active.where(context: context).learning_outcome_links.pluck(:content_id)
-    assignments = Assignment.active.where(context: context).type_quiz_lti
-    os_results = get_outcome_alignments(context, outcomes.join(","), { includes: "alignments", list_groups: false })
+  def add_alignment(course, assignment, outcome_id, associated_asset_id)
+    {
+      learning_outcome_id: outcome_id,
+      title: assignment.title,
+      assignment_id: associated_asset_id,
+      submission_types: assignment.submission_types,
+      url: "#{polymorphic_url([course, :assignments])}/#{associated_asset_id}"
+    }
+  end
 
-    os_assignment_alignments = []
+  def find_outcomes_service_assignment_alignments(course, student_id)
+    outcomes = ContentTag.active.where(context: context).learning_outcome_links
+    student_uuid = User.find(student_id).uuid
+    assignments = Assignment.active.where(context: context).quiz_lti
+    return if assignments.nil? || outcomes.nil?
+
+    os_alignments = get_outcome_alignments(context, outcomes.pluck(:content_id).join(","), { includes: "alignments", list_groups: false })
+    os_results = get_lmgb_results(context, assignments.pluck(:id).join(","), "canvas.assignment.quizzes", outcomes.pluck(:content_id).join(","), student_uuid)
+
+    # collecting known alignments from results to fill in if asset information
+    # is missing from get_outcome_alignments using a composite key of
+    # outcomeId_artifactId_artifactType
+    os_alignments_from_results = {}
     os_results&.each do |r|
-      next if r[:alignments].nil?
+      next if r[:associated_asset_id].nil?
 
-      r[:alignments].each do |a|
-        next if a[:associated_asset_id].nil?
+      # using latest attempt to find the aligning question & quiz metadata
+      attempt = r[:attempts]&.max_by { |a| a[:submitted_at] || a[:created_at] }
+      next if attempt.nil? || attempt[:metadata].blank?
 
-        os_assignment_alignments.push({
-                                        learning_outcome_id: r[:external_id],
-                                        title: assignments.find(a[:associated_asset_id]).title,
-                                        assignment_id: a[:associated_asset_id],
-                                        submission_types: assignments.find(a[:associated_asset_id]).submission_types,
-                                        url: "#{polymorphic_url([course, :assignments])}/#{a[:associated_asset_id]}"
-                                      })
+      # capturing artifact alignment
+      os_alignments_from_results["#{r[:external_outcome_id]}_#{r[:artifact_id]}_#{r[:artifact_type]}"] = r
+
+      # capturing question alignment(s)
+      question_metadata = attempt[:metadata][:question_metadata]
+      unless question_metadata.blank?
+        question_metadata&.each do |question|
+          os_alignments_from_results["#{r[:external_outcome_id]}_#{question[:quiz_item_id]}_quizzes.item"] = r
+        end
       end
     end
-    os_assignment_alignments
+
+    outcome_assignment_alignments = []
+    os_alignments&.each do |o|
+      next if o[:alignments].nil?
+
+      o[:alignments].each do |a|
+        # for those artifacts that do not have associated_asset_id (aka Canvas assignment id)
+        # populated, try looking for in the lmgb results from outcome service
+        if a[:associated_asset_id].nil? && os_alignments_from_results.present?
+          alignment_from_results = os_alignments_from_results["#{o[:external_id]}_#{a[:artifact_id]}_#{a[:artifact_type]}"]
+          next if alignment_from_results.nil?
+
+          assignment = assignments.find_by(id: alignment_from_results[:associated_asset_id])
+          outcome_assignment_alignments.push(add_alignment(course, assignment, o[:external_id], alignment_from_results[:associated_asset_id]))
+        else
+          assignment = assignments.find_by(id: a[:associated_asset_id])
+          next if assignment.nil?
+
+          outcome_assignment_alignments.push(add_alignment(course, assignment, o[:external_id], a[:associated_asset_id]))
+        end
+      end
+    end
+    outcome_assignment_alignments.uniq
   end
 
   # @API Get aligned assignments for an outcome in a course for a particular student
@@ -394,7 +436,8 @@ class OutcomesApiController < ApplicationController
       # find_outcomes_service_assignment_alignments
       # Returns outcome service aligned assignments for a given course
       # if the outcome_service_results_to_canvas FF is enabled
-      alignments.concat(quiz_alignments, magic_marker_alignments, find_outcomes_service_assignment_alignments(course))
+      os_alignments = find_outcomes_service_assignment_alignments(course, student_id)
+      alignments.concat(quiz_alignments, magic_marker_alignments, os_alignments)
 
       render json: alignments
     else
