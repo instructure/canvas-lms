@@ -68,6 +68,17 @@ if Qti.migration_executable
       expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.pluck(:weight)).to eq [100, 0, 100, 100]
     end
 
+    it "imports BB Ultra multiple choice questions" do
+      hash = get_quiz_data(bbultra_question_dir, "multiple_choice")[0][0]
+      expect(hash[:question_type]).to eq "multiple_choice_question"
+      expect(hash[:answers].map { |a| [a[:migration_id], a[:weight]] }).to match_array(
+        [["new_737b553c-d6a6-44a5-b35f-9db46dee58df", 0],
+         ["new_abe0e40b-beb3-4429-b6cb-57724daec7b9", 0],
+         ["new_dc28d500-df92-4572-afc5-bcb3caee7448", 100],
+         ["new_458c2d9d-0b9a-4bb9-9689-6051771cf7f7", 0]]
+      )
+    end
+
     it "converts matching questions where the answers are given out of order" do
       hash = get_question_hash(bb9_question_dir, "matching2", delete_answer_ids: false)
       matches = {}
