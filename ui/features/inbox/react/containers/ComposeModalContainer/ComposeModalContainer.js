@@ -320,6 +320,7 @@ const ComposeModalContainer = props => {
                   courseMessages={courseMessages}
                   data-testid="compose-modal-inputs"
                   isPrivateConversation={props.isPrivateConversation}
+                  selectedContext={selectedContext}
                 />
               )}
             </ModalBody>
