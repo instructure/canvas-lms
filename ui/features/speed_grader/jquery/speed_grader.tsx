@@ -2809,7 +2809,13 @@ EG = {
   },
 
   renderLtiLaunch($div, urlBase, submission) {
-    const externalToolUrl = submission.external_tool_url || submission.url
+    let externalToolUrl = submission.external_tool_url || submission.url
+
+    if (ENV.NQ_GRADE_BY_QUESTION_ENABLED && window.jsonData.quiz_lti && externalToolUrl) {
+      const quizToolUrl = new URL(externalToolUrl)
+      quizToolUrl.searchParams.set('grade_by_question_enabled', String(ENV.GRADE_BY_QUESTION))
+      externalToolUrl = quizToolUrl.href
+    }
 
     urlBase += SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)
 

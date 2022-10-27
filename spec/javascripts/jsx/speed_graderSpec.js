@@ -1385,7 +1385,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
   test('contains iframe with the escaped student submission url', () => {
     let retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       external_tool_url: url,
@@ -1399,10 +1399,30 @@ QUnit.module('SpeedGrader', rootHooks => {
     buildIframeStub.restore()
   })
 
+  test('includes the grade_by_question query param when a new quiz and flag + setting are enabled', () => {
+    ENV.NQ_GRADE_BY_QUESTION_ENABLED = true
+    ENV.GRADE_BY_QUESTION = true
+    const originalJsonData = window.jsonData
+    window.jsonData = {quiz_lti: true}
+    const retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
+    const url = 'http://www.example.com/lti/launch/user/4'
+    const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
+    const submission = {
+      external_tool_url: url,
+      resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
+    }
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, submission)
+    const [srcUrl] = buildIframeStub.firstCall.args
+    const {searchParams} = new URL(decodeURIComponent(unescape(srcUrl).match(/http.*/)[0]))
+    strictEqual(searchParams.get('grade_by_question_enabled'), 'true')
+    buildIframeStub.restore()
+    window.jsonData = originalJsonData
+  })
+
   test('can be fullscreened', () => {
     const retrieveUrl =
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       url,
@@ -1417,7 +1437,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   test('allows options defined in iframeAllowances()', () => {
     const retrieveUrl =
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       url,
