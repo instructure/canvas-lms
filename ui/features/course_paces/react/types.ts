@@ -159,6 +159,8 @@ export interface PaceContextsState {
   readonly pageCount: number
   readonly entriesPerRequest: number
   readonly isLoading: boolean
+  readonly defaultPaceContext: PaceContext | null
+  readonly isLoadingDefault: false
 }
 
 export interface StoreState {

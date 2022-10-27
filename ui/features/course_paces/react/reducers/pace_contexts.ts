@@ -26,6 +26,8 @@ export const paceContextsInitialState: PaceContextsState = {
   page: 1,
   entriesPerRequest: 10,
   isLoading: true,
+  defaultPaceContext: null,
+  isLoadingDefault: false,
 }
 
 export const paceContextsReducer = (
@@ -57,6 +59,17 @@ export const paceContextsReducer = (
       return {
         ...state,
         selectedContextType: action.payload,
+      }
+    case PaceContextsConstants.SET_DEFAULT_PACE_LOADING:
+      return {
+        ...state,
+        isLoadingDefault: action.payload,
+      }
+    case PaceContextsConstants.SET_DEFAULT_PACE_CONTEXT:
+      return {
+        ...state,
+        defaultPaceContext: action.payload.result,
+        isLoadingDefault: false,
       }
     default:
       return state

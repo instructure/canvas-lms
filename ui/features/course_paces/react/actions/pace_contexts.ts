@@ -30,6 +30,8 @@ export enum Constants {
   SET_SELECTED_PACE_CONTEXT_TYPE = 'PACE_CONTEXTS/SET_SELECTED_PACE_CONTEXT_TYPE',
   SET_PAGE = 'PACE_CONTEXTS/SET_PAGE',
   SET_LOADING = 'PACE_CONTEXTS/SET_LOADING',
+  SET_DEFAULT_PACE_LOADING = 'PACE_CONTEXTS/DEFAULT/SET_LOADING',
+  SET_DEFAULT_PACE_CONTEXT = 'PACE_CONTEXTS/DEFAULT/SET_PACE_CONTEXT',
 }
 
 const regularActions = {
@@ -54,6 +56,14 @@ const thunkActions = {
       )
       if (!response?.pace_contexts) throw new Error(I18n.t('Response body was empty'))
       dispatch(createAction(Constants.SET_PACE_CONTEXTS, {result: response, page}))
+    }
+  },
+  fetchDefaultPaceContext: (): ThunkAction<void, StoreState, void, Action> => {
+    return async (dispatch, getState) => {
+      dispatch(createAction(Constants.SET_DEFAULT_PACE_LOADING, true))
+      const {coursePace} = getState()
+      const response = await Api.getDefaultPaceContext(coursePace.course_id)
+      dispatch(createAction(Constants.SET_DEFAULT_PACE_CONTEXT, {result: response}))
     }
   },
 }

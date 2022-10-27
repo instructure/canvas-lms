@@ -22,6 +22,7 @@ import fetchMock from 'fetch-mock'
 import {renderConnected} from '../../../__tests__/utils'
 import {PRIMARY_PACE, HEADING_STATS_API_RESPONSE} from '../../../__tests__/fixtures'
 import {Header} from '../header'
+import {paceContextsActions} from '../../../actions/pace_contexts'
 
 const defaultProps = {
   context_type: 'Course',
@@ -29,6 +30,7 @@ const defaultProps = {
   newPace: false,
   isBlueprintLocked: false,
   setIsBlueprintLocked: () => {},
+  fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 }
 
 describe('Course paces header', () => {

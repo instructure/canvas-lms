@@ -35,27 +35,29 @@ import Settings from './settings/settings'
 import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
-import {isNewPace} from '../../reducers/course_paces'
-import {CoursePace, StoreState, ResponsiveSizes} from '../../types'
+import {getCoursePace, isNewPace} from '../../reducers/course_paces'
+import {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {paceContextsActions} from '../../actions/pace_contexts'
 
 const I18n = useI18nScope('course_paces_header')
 
 const {Item: FlexItem} = Flex as any
 
 interface DispatchProps {
+  readonly fetchDefaultPaceContext: () => void
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
 }
 
 type StoreProps = {
+  readonly coursePace: CoursePace
+  readonly defaultPaceContext: PaceContext
   readonly context_type: string
   readonly context_id: string
   readonly newPace: boolean
 }
 
 type PassedProps = {
-  coursePace: CoursePace
   handleDrawerToggle?: () => void
   setIsBlueprintLocked: (arg) => void
   readonly responsiveSize: ResponsiveSizes
@@ -78,25 +80,16 @@ const NEW_PACE_ALERT_MESSAGES = {
 
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const [newPaceAlertDismissed, setNewPaceAlertDismissed] = useState(false)
-  const [paceContext, setPaceContext] = useState({})
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
 
+  const fetchDefaultPaceContext = props.fetchDefaultPaceContext
+  useEffect(() => {
+    if (window.ENV.FEATURES.course_paces_redesign) {
+      fetchDefaultPaceContext()
+    }
+  }, [fetchDefaultPaceContext, props.coursePace?.updated_at])
+
   if (window.ENV.FEATURES.course_paces_redesign) {
-    // Get the info for the heading, which pertains
-    // to the default pace / course context
-
-    // TODO: alter hook usage when contexts have their own actions and reducers
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      doFetchApi({
-        path: `/api/v1/courses/${window.ENV?.COURSE_ID}/pace_contexts?type=course`,
-      })
-        .then(({json}) => {
-          setPaceContext(json?.pace_contexts?.[0])
-        })
-        .catch(console.log)
-    }, [props.coursePace.updated_at])
-
     const metricTheme = {
       valueFontSize: '1.125rem',
       labelFontSize: '0.875rem',
@@ -109,23 +102,23 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
       const durations = []
       if (planDays > 7) {
         weeks = Math.floor(planDays / 7)
-        durations.push(I18n.t({one: '1 Week', other: '%{count} Weeks'}, {count: weeks}))
+        durations.push(I18n.t({one: '1 week', other: '%{count} weeks'}, {count: weeks}))
         planDays -= weeks * 7
       }
       if (planDays > 0)
-        durations.push(I18n.t({one: '1 Day', other: '%{count} Days', zero: ''}, {count: planDays}))
+        durations.push(I18n.t({one: '1 day', other: '%{count} days', zero: ''}, {count: planDays}))
       return durations.join(', ')
     }
 
     return (
       <View as="div" margin="0 0 small 0">
-        {paceContext?.name ? (
+        {props.defaultPaceContext?.name ? (
           <Heading
             level="h1"
             theme={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
             margin="0 0 small 0"
           >
-            {paceContext?.name}
+            {props.defaultPaceContext?.name}
           </Heading>
         ) : null}
         <Text>
@@ -156,7 +149,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Students')}
-                        renderValue={paceContext?.associated_student_count}
+                        renderValue={props.defaultPaceContext?.associated_student_count}
                         isGroupChild={true}
                       />
                       <Metric
@@ -164,7 +157,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Sections')}
-                        renderValue={paceContext?.associated_section_count}
+                        renderValue={props.defaultPaceContext?.associated_section_count}
                         isGroupChild={true}
                       />
                       <Metric
@@ -172,7 +165,9 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Duration')}
-                        renderValue={getDurationLabel(paceContext?.applied_pace?.duration) || '--'}
+                        renderValue={
+                          getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) || '--'
+                        }
                         isGroupChild={true}
                       />
                     </MetricGroup>
@@ -252,6 +247,8 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 
 const mapStateToProps = (state: StoreState) => {
   return {
+    coursePace: getCoursePace(state),
+    defaultPaceContext: state.paceContexts.defaultPaceContext,
     context_type: getSelectedContextType(state),
     context_id: getSelectedContextId(state),
     newPace: isNewPace(state),
@@ -260,4 +257,5 @@ const mapStateToProps = (state: StoreState) => {
 
 export default connect(mapStateToProps, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
+  fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 })(Header)
