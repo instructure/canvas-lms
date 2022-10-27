@@ -174,6 +174,7 @@ const HeaderInputs = props => {
                 hasSelectAllFilterOption={true}
                 selectedRecipients={props.selectedRecipients}
                 addressBookMessages={props.addressBookMessages}
+                courseContextCode={props.selectedContext?.contextID || ''}
               />
             }
             shouldGrow={true}
@@ -230,6 +231,7 @@ HeaderInputs.propTypes = {
   addressBookMessages: PropTypes.array,
   courseMessages: PropTypes.array,
   isPrivateConversation: PropTypes.bool,
+  selectedContext: PropTypes.object,
 }
 
 export default HeaderInputs

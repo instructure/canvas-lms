@@ -33,6 +33,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
     $search: String
     $afterUser: String
     $afterContext: String
+    $courseContextCode: String!
   ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
@@ -63,6 +64,14 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
                     name
                     id
                     _id
+                  }
+                }
+              }
+              observerEnrollmentsConnection(contextCode: $courseContextCode) {
+                nodes {
+                  associatedUser {
+                    _id
+                    name
                   }
                 }
               }

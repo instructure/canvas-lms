@@ -37,7 +37,7 @@ describe "conversations new" do
   end
 
   describe "message sending" do
-    context "when react_inbox feature flag is off" do
+    context "when react_inbox feature flag is off", ignore_js_errors: true do
       before do
         Account.default.set_feature_flag! :react_inbox, "off"
       end
@@ -348,17 +348,21 @@ describe "conversations new" do
         context "for teacher" do
           before do
             user_session(@teacher)
-            get "/conversations"
-            open_react_compose_modal_addressbook
           end
 
           it "correctly shows course options", priority: "1" do
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
             # back, all in course, Teachers, Students, Student Groups
             expect(ff("div[data-testid='address-book-item']").count).to eq(5)
             expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
           end
 
           it "correctly shows Teachers option", priority: "1" do
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
             fj("div[data-testid='address-book-item']:contains('Teachers')").click
             wait_for_ajaximations
             # back, all in Teachers, @Teacher name, @t2 name
@@ -366,7 +370,32 @@ describe "conversations new" do
             expect(fj("div[data-testid='address-book-item']:contains('All in Teachers')")).to be_present
           end
 
+          it "correctly shows Observers option" do
+            observer_in_course(name: "Scott Summers", active_all: true, associated_user_id: @s1).user
+            o2 = observer_in_course(name: "Collins Ryan", active_all: true, associated_user_id: @s2).user
+
+            enrollment = @course.enroll_user(o2, "ObserverEnrollment")
+            enrollment.associated_user = @s3
+            enrollment.workflow_state = "active"
+            enrollment.save
+
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
+            fj("div[data-testid='address-book-item']:contains('Observers')").click
+            wait_for_ajaximations
+            # back, all in Observers, @Observer1 Name, @Observer2 Name
+            expect(ff("div[data-testid='address-book-item']").count).to eq(4)
+            expect(fj("div[data-testid='address-book-item']:contains('Scott Summers')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('Observing: first student')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('Collins Ryan')")).to be_present
+            expect(fj("div[data-testid='address-book-item']:contains('Observing: second student, third student')")).to be_present
+          end
+
           it "correctly shows students option", priority: "1" do
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
             fj("div[data-testid='address-book-item']:contains('Students')").click
             wait_for_ajaximations
             # back, all in Students, @s1 name, @s2 name, @s3 name
@@ -376,6 +405,9 @@ describe "conversations new" do
 
           # There is no option to send a message to all groups
           it "correctly shows student groups option", priority: "1" do
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
             fj("div[data-testid='address-book-item']:contains('Student Groups')").click
             wait_for_ajaximations
 
@@ -384,6 +416,9 @@ describe "conversations new" do
           end
 
           it "correctly shows student group option", priority: "1" do
+            get "/conversations"
+            open_react_compose_modal_addressbook
+
             fj("div[data-testid='address-book-item']:contains('Student Groups')").click
             wait_for_ajaximations
             fj("div[data-testid='address-book-item']:contains('#{@group.name}')").click
