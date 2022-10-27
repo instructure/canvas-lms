@@ -68,7 +68,7 @@ export default class GravatarView extends AvatarUploadBaseView {
   }
 
   getImage() {
-    throw 'GravatarView does not support getImage()'
+    throw new Error('GravatarView does not support getImage()')
   }
 
   _updatePreviewFromInput() {

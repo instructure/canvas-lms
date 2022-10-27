@@ -42,34 +42,14 @@ import styles from './styles'
 import '../mathlive'
 
 export default class EquationEditorModal extends Component {
-  static propTypes = {
-    editor: PropTypes.object.isRequired,
-    label: PropTypes.string.isRequired,
-    onModalDismiss: PropTypes.func.isRequired,
-    onModalClose: PropTypes.func.isRequired,
-    onEquationSubmit: PropTypes.func.isRequired,
-    title: PropTypes.node,
-    mountNode: PropTypes.string,
-  }
-
-  // used for inline latex delimited like: \( ... \) OR $$ ... $$
-  static boundaryRegex = /\\\((.+?)\\\)|\$\$(.+?)\$\$/g
-
   static debounceRate = 1000
 
-  static defaultProps = {
-    title: null,
-    mountNode: null,
-  }
-
   state = {
-    advanced: false,
-    workingFormula: '',
+    advanced: this.props.openAdvanced || !!this.props.originalLatex.advancedOnly,
+    workingFormula: this.props.originalLatex.latex || '',
   }
 
   hostPageDisablesShortcuts = null
-
-  originalFormula = null
 
   previewElement = React.createRef()
 
@@ -77,96 +57,21 @@ export default class EquationEditorModal extends Component {
   // Helper functions //
   // **************** //
 
-  currentFormula(nodeValue, cursor) {
-    let leftIndex, rightIndex
-    // The range could still contain more than one formulae, so we need to
-    // isolate them and figure out which one the cursor is within.
-    const formulae = nodeValue.match(EquationEditorModal.boundaryRegex)
-    if (!formulae) {
-      return [undefined, 0, 0]
-    }
+  insertNewRange() {
+    const {editor, originalLatex} = this.props
+    const {startContainer, leftIndex, rightIndex} = originalLatex
 
-    const foundFormula = formulae.find(formula => {
-      leftIndex = nodeValue.indexOf(formula)
-      rightIndex = leftIndex + formula.length
-      return leftIndex < cursor && cursor < rightIndex && this.selectionIsLatex(formula)
-    })
-    return [foundFormula, leftIndex, rightIndex]
-  }
+    if (!startContainer) return
 
-  insertNewRange(currentFormula, startContainer, leftIndex, rightIndex) {
-    const {editor} = this.props
     const range = document.createRange()
     range.setStart(startContainer, leftIndex)
     range.setEnd(startContainer, rightIndex)
-
     editor.selection.setRng(range)
-    this.originalFormula = this.selectionToLatex(currentFormula)
-    this.forceAdvancedModeIfNecessary(this.originalFormula)
-    this.mathField.setValue(this.originalFormula || ' ')
-  }
-
-  loadExistingFormula() {
-    const {editor} = this.props
-    const selection = editor.selection.getContent()
-
-    // check if highlighted text is inline latex
-    if (selection && this.selectionIsLatex(selection)) {
-      this.originalFormula = this.selectionToLatex(selection)
-      this.forceAdvancedModeIfNecessary(this.originalFormula)
-      this.mathField.setValue(this.originalFormula || ' ')
-    } else {
-      // check if we launched modal from an equation image
-      const selnode = editor.selection.getNode()
-      if (selnode.tagName === 'IMG' && selnode.classList.contains('equation_image')) {
-        try {
-          const src = new URL(selnode.src)
-          const encoded_eq = src.pathname.replace(/^\/equation_images\//, '')
-          this.originalFormula = decodeURIComponent(decodeURIComponent(encoded_eq))
-          this.forceAdvancedModeIfNecessary(this.originalFormula)
-          this.mathField.setValue(this.originalFormula || ' ')
-        } catch (ex) {
-          // probably failed to create the new URL
-          // eslint-disable-next-line no-console
-          console.error(ex)
-        }
-      } else {
-        // check if the cursor was within inline latex when launched
-        const editorRange = editor.selection.getRng()
-        const startContainer = editorRange.startContainer
-        const wholeText = startContainer.wholeText
-
-        if (wholeText) {
-          const cursor = editorRange.startOffset
-          // The `wholeText` value is not sufficient, since we could be dealing with
-          // a number of nested ranges. The `nodeValue` is the text in the range in
-          // which we have found the cursor.
-          const nodeValue = startContainer.nodeValue
-          const [currentFormula, leftIndex, rightIndex] = this.currentFormula(nodeValue, cursor)
-
-          if (currentFormula !== undefined) {
-            this.insertNewRange(currentFormula, startContainer, leftIndex, rightIndex)
-          }
-        }
-      }
-    }
   }
 
   advancedModeOnly(latex) {
     const normalizedLatex = latex.replace(/\s+/, '')
     return containsAdvancedSyntax(normalizedLatex)
-  }
-
-  selectionIsLatex(selection) {
-    return (
-      (selection.startsWith('\\(') && selection.endsWith('\\)')) ||
-      (selection.startsWith('$$') && selection.endsWith('$$'))
-    )
-  }
-
-  selectionToLatex(selection) {
-    const sansDelimiters = selection.substr(2, selection.length - 4)
-    return sansDelimiters.replace(/&nbsp;/g, '').trim()
   }
 
   usedInCanvas() {
@@ -186,30 +91,12 @@ export default class EquationEditorModal extends Component {
     }
   }
 
-  handleEntered = () => {
-    if (advancedPreference.isSet()) {
-      this.toggleAdvanced()
-    }
-    this.loadExistingFormula()
-  }
-
-  handleModalCancel = e => {
-    const element = e.srcElement || e.targetElement
-    // MathJax Menu clicks closes modal. MathJax doesn't let us to get the menu click event
-    // to use stopPropagation().
-    const isMathJaxEvent =
-      element &&
-      (element.id === 'MathJax_MenuFrame' ||
-        element.classList.contains('MathJax_Menu') ||
-        element.classList.contains('MathJax_MenuItem'))
-    if (isMathJaxEvent) {
-      return
-    }
+  handleModalCancel = () => {
     if (this.usedInCanvas()) {
       // restore the original value
       ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
     }
-    this.props.onModalDismiss?.()
+    this.props.onModalDismiss()
   }
 
   handleModalDone = () => {
@@ -230,7 +117,7 @@ export default class EquationEditorModal extends Component {
   renderMathInAdvancedPreview = debounce(
     () => {
       if (this.previewElement.current) {
-        this.previewElement.current.innerHTML = `\\\(${this.state.workingFormula}\\\)`
+        this.previewElement.current.innerHTML = String.raw`\(${this.state.workingFormula}\)`
         mathml.processNewMathInElem(this.previewElement.current)
       }
     },
@@ -242,9 +129,6 @@ export default class EquationEditorModal extends Component {
   )
 
   setPreviewElementContent() {
-    if (!this.state.advanced) {
-      return
-    }
     if (this.state.workingFormula) {
       this.renderMathInAdvancedPreview()
     } else {
@@ -279,14 +163,7 @@ export default class EquationEditorModal extends Component {
     })
   }
 
-  forceAdvancedModeIfNecessary(latex) {
-    if (this.advancedModeOnly(latex)) {
-      this.toggleAdvanced()
-    }
-  }
-
   handleOpen = () => {
-    this.originalFormula = null
     if (this.usedInCanvas()) {
       // store the original value (so it can be restored later)
       this.hostPageDisablesShortcuts = ENV.disable_keyboard_shortcuts
@@ -306,28 +183,20 @@ export default class EquationEditorModal extends Component {
   // ******************* //
 
   renderFooter = () => {
-    const cancelButton = (
-      <Button data-testid="equation-editor-modal-cancel" onClick={this.handleModalCancel}>
-        {formatMessage('Cancel')}
-      </Button>
-    )
-
-    const doneButton = (
-      <Button
-        data-testid="equation-editor-modal-done"
-        margin="none none none xx-small"
-        onClick={this.handleModalDone}
-        color="primary"
-      >
-        {formatMessage('Done')}
-      </Button>
-    )
-
     return (
-      <div>
-        {cancelButton}
-        {doneButton}
-      </div>
+      <>
+        <Button data-testid="equation-editor-modal-cancel" onClick={this.handleModalCancel}>
+          {formatMessage('Cancel')}
+        </Button>
+        <Button
+          data-testid="equation-editor-modal-done"
+          margin="none none none xx-small"
+          onClick={this.handleModalDone}
+          color="primary"
+        >
+          {formatMessage('Done')}
+        </Button>
+      </>
     )
   }
 
@@ -352,14 +221,12 @@ export default class EquationEditorModal extends Component {
     )
   }
 
-  handleRef = node => {
-    this.modalFooter = node
-  }
-
   componentDidMount() {
     this.registerBasicEditorListener()
     this.setPreviewElementContent()
     this.stubMacros()
+    if (!this.state.advanced) this.mathField.setValue(this.state.workingFormula)
+    this.insertNewRange()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -377,15 +244,14 @@ export default class EquationEditorModal extends Component {
   }
 
   render = () => {
-    const {label, onModalClose, title, mountNode} = this.props
+    const {onModalClose, mountNode} = this.props
 
     return (
       <Modal
         data-mce-component={true}
-        label={label}
+        label={formatMessage('Equation Editor')}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}
-        onEntered={this.handleEntered}
         onOpen={this.handleOpen}
         open={true}
         mountNode={mountNode}
@@ -401,23 +267,12 @@ export default class EquationEditorModal extends Component {
             onClick={this.handleModalCancel}
             screenReaderLabel={formatMessage('Close')}
           />
-          <Heading>{title || label}</Heading>
+          <Heading>{formatMessage('Equation Editor')}</Heading>
         </Modal.Header>
         <Modal.Body>
-          <div
-            ref={node => {
-              this.modalContent = node
-            }}
-            className={css(styles.mathfieldContainer)}
-          >
-            <div>
-              <MemoizedEquationEditorToolbar executeCommand={this.executeCommand} />
-            </div>
-
-            <div
-              className={css(styles.mathFieldContainer)}
-              style={{display: this.state.advanced ? 'none' : null}}
-            >
+          <div className={css(styles.mathfieldContainer)}>
+            <MemoizedEquationEditorToolbar executeCommand={this.executeCommand} />
+            <div style={{display: this.state.advanced ? 'none' : null}}>
               <math-field
                 style={{
                   padding: '0.5em',
@@ -433,11 +288,7 @@ export default class EquationEditorModal extends Component {
                 math-mode-space=" "
               />
             </div>
-
-            <div
-              className={css(styles.mathFieldContainer)}
-              style={{display: this.state.advanced ? null : 'none'}}
-            >
+            <div style={{display: this.state.advanced ? null : 'none'}}>
               <TextArea
                 style={{
                   height: '5.1rem',
@@ -449,20 +300,38 @@ export default class EquationEditorModal extends Component {
                 onChange={e => this.setState({workingFormula: e.target.value})}
               />
             </div>
-
             <div className={css(styles.latexToggle)}>
               <Flex>
                 <Flex.Item>{this.renderToggle()}</Flex.Item>
               </Flex>
             </div>
-
             <div style={{display: this.state.advanced ? null : 'none', marginTop: '1em'}}>
               <span data-testid="mathml-preview-element" ref={this.previewElement} />
             </div>
           </div>
         </Modal.Body>
-        <Modal.Footer ref={this.handleRef}>{this.renderFooter()}</Modal.Footer>
+        <Modal.Footer>{this.renderFooter()}</Modal.Footer>
       </Modal>
     )
   }
+}
+
+EquationEditorModal.propTypes = {
+  editor: PropTypes.object.isRequired,
+  onModalDismiss: PropTypes.func.isRequired,
+  onModalClose: PropTypes.func.isRequired,
+  onEquationSubmit: PropTypes.func.isRequired,
+  mountNode: PropTypes.string,
+  originalLatex: PropTypes.shape({
+    latex: PropTypes.string,
+    advancedOnly: PropTypes.bool,
+    startContainer: PropTypes.element,
+    leftIndex: PropTypes.number,
+    rightIndex: PropTypes.number,
+  }).isRequired,
+  openAdvanced: PropTypes.bool.isRequired,
+}
+
+EquationEditorModal.defaultProps = {
+  mountNode: null,
 }

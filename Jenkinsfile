@@ -279,6 +279,8 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
+    FORCE_CRYSTALBALL = "${configuration.getBoolean('force-crystalball', '0') ? 1 : 0}"
+
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
@@ -457,6 +459,7 @@ pipeline {
                                         -e CRYSTALBALL_DIFF_FROM=$diffFrom \
                                         -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
                                         -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
+                                        -e FORCE_CRYSTALBALL=$FORCE_CRYSTALBALL \
                                         general-build-container bundle exec crystalball --dry-run
                       '''
 

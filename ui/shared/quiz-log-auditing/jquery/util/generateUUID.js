@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+/* eslint-disable no-bitwise */
+
 export default function generateUUID() {
   let now = Date.now()
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {

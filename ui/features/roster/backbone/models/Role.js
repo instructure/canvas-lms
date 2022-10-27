@@ -42,7 +42,7 @@ export default class Role extends Model {
   //   in the error object to any validation function you make. It's
   //   passed by reference dawg.
   // @api override backbone
-  validate(attrs) {
+  validate(_attrs) {
     const errors = {}
     if (!_.isEmpty(errors)) return errors
   }

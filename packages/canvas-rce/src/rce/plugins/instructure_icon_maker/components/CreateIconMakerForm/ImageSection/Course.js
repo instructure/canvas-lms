@@ -38,7 +38,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
       payload: formatMessage(
         'GIF/PNG format images larger than {size} KB are not currently supported.',
         {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
-      )
+      ),
     })
   }
 
@@ -100,12 +100,12 @@ const Course = ({dispatch, onChange, onLoading, onLoaded}) => {
             files,
             bookmark,
             hasMore,
-            isLoading
-          }
+            isLoading,
+          },
         }}
         sortBy={{
           sort: 'date_added',
-          order: 'desc'
+          order: 'desc',
         }}
         onImageEmbed={file => {
           setUrl(file.download_url)
@@ -120,14 +120,14 @@ Course.propTypes = {
   dispatch: PropTypes.func,
   onChange: PropTypes.func,
   onLoading: PropTypes.func,
-  onLoaded: PropTypes.func
+  onLoaded: PropTypes.func,
 }
 
 Course.defaultProps = {
   dispatch: () => {},
   onChange: () => {},
   onLoading: () => {},
-  onLoaded: () => {}
+  onLoaded: () => {},
 }
 
 export default Course

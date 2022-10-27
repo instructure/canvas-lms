@@ -30,23 +30,23 @@ function getMenuItems(ed) {
   const items = [
     {
       text: formatMessage('Upload Document'),
-      value: 'instructure_upload_document'
-    }
+      value: 'instructure_upload_document',
+    },
   ]
   if (contextType === 'course') {
     items.push({
       text: formatMessage('Course Documents'),
-      value: 'instructure_course_document'
+      value: 'instructure_course_document',
     })
   } else if (contextType === 'group') {
     items.push({
       text: formatMessage('Group Documents'),
-      value: 'instructure_group_document'
+      value: 'instructure_group_document',
     })
   }
   items.push({
     text: formatMessage('User Documents'),
-    value: 'instructure_user_document'
+    value: 'instructure_user_document',
   })
   return items
 }
@@ -92,9 +92,9 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
             onSetup: api => {
               api.setDisabled(!isOKToLink(ed.selection.getContent()))
               return () => {}
-            }
+            },
           }
-        })
+        }),
     })
 
     // Register button
@@ -106,7 +106,7 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
           return {
             type: 'choiceitem',
             text: item.text,
-            value: item.value
+            value: item.value,
           }
         })
         callback(items)
@@ -126,9 +126,9 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
         return () => {
           ed.off('NodeChange', handleNodeChange)
         }
-      }
+      },
     })
-  }
+  },
 })
 
 // Register plugin

@@ -24,20 +24,20 @@ export default function (editor) {
       name: 'alignleft',
       text: formatMessage('Left Align'),
       cmd: 'JustifyLeft',
-      icon: 'align-left'
+      icon: 'align-left',
     },
     {
       name: 'aligncenter',
       text: formatMessage('Center Align'),
       cmd: 'JustifyCenter',
-      icon: 'align-center'
+      icon: 'align-center',
     },
     {
       name: 'alignright',
       text: formatMessage('Right Align'),
       cmd: 'JustifyRight',
-      icon: 'align-right'
-    }
+      icon: 'align-right',
+    },
   ]
 
   const alignButtonLabel = formatMessage('Align')
@@ -51,7 +51,7 @@ export default function (editor) {
           type: 'choiceitem',
           value: button.cmd,
           icon: button.icon,
-          text: button.text
+          text: button.text,
         }
       })
       callback(items)
@@ -88,6 +88,6 @@ export default function (editor) {
       nodeChangeHandler()
       editor.on('NodeChange', nodeChangeHandler)
       return () => editor.off('NodeChange', nodeChangeHandler)
-    }
+    },
   })
 }

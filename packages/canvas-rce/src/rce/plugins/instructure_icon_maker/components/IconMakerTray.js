@@ -30,11 +30,10 @@ import {Footer} from './CreateIconMakerForm/Footer'
 import {buildStylesheet, buildSvg} from '../svg'
 import {statuses, useSvgSettings} from '../svg/settings'
 import {defaultState, actions} from '../reducers/svgSettings'
-import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../svg/constants'
 import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
-import buildDownloadUrl from '../../shared/buildDownloadUrl'
+import addIconMakerAttributes from '../utils/addIconMakerAttributes'
 import {validIcon} from '../utils/iconValidation'
 import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
@@ -140,7 +139,7 @@ function renderFooter(
   )
 }
 
-export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
+export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrigin}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
@@ -149,7 +148,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
   const title = editing ? formatMessage('Edit Icon') : formatMessage('Create Icon')
 
-  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
+  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, canvasOrigin)
   const [status, setStatus] = useState(statuses.IDLE)
 
   const [initialSettings, setInitialSettings] = useState({...defaultState})
@@ -240,7 +239,6 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
   const writeIconToRCE = ({url, display_name}) => {
     const {alt, isDecorative, externalStyle, externalWidth, externalHeight} = settings
-
     const imageAttributes = {
       alt_text: alt,
       display_name,
@@ -255,12 +253,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     }
 
     // Mark the image as an icon maker icon.
-    imageAttributes[ICON_MAKER_ATTRIBUTE] = true
-
-    // URL to fetch the SVG from when loading the Edit tray.
-    // We can't use the 'src' because Canvas will re-write the
-    // source attribute to a URL that is not cross-origin friendly.
-    imageAttributes[ICON_MAKER_DOWNLOAD_URL_ATTR] = buildDownloadUrl(url)
+    addIconMakerAttributes(imageAttributes)
 
     bridge.embedImage(imageAttributes)
   }
@@ -343,6 +336,7 @@ IconMakerTray.propTypes = {
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
   rcsConfig: PropTypes.object.isRequired,
+  canvasOrigin: PropTypes.string.isRequired,
 }
 
 IconMakerTray.defaultProps = {

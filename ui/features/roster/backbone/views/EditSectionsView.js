@@ -57,7 +57,7 @@ export default class EditSectionsView extends DialogBaseView {
       placeholder: I18n.t('edit_sections_placeholder', 'Enter a section name'),
       title: I18n.t('edit_sections_title', 'Section name'),
       onNewToken: this.onNewToken.bind(this),
-      added: (data, $token, newToken) => {
+      added: (data, $token, _newToken) => {
         return this.$('#user_sections').append($token)
       },
       selector: {
@@ -89,7 +89,7 @@ export default class EditSectionsView extends DialogBaseView {
     return (() => {
       const result = []
       for (const e of Array.from(this.model.sectionEditableEnrollments())) {
-        var section
+        let section
         if ((section = ENV.CONTEXTS.sections[e.course_section_id])) {
           result.push(
             $sections.append(

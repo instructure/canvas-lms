@@ -37,7 +37,7 @@ QUnit.module('DueDateAddRowButton with true display prop', {
 
 test('renders a button', function () {
   ok(this.DueDateAddRowButton)
-  ok(this.DueDateAddRowButton.refs.addButton)
+  ok(this.DueDateAddRowButton.addButtonRef)
 })
 
 QUnit.module('DueDateAddRowButton with false display prop', {
@@ -58,5 +58,5 @@ QUnit.module('DueDateAddRowButton with false display prop', {
 
 test('does not render a button', function () {
   ok(this.DueDateAddRowButton)
-  ok(!this.DueDateAddRowButton.refs.addButton)
+  ok(!this.DueDateAddRowButton.addButtonRef)
 })

@@ -492,6 +492,9 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Geschachtelt größer als" },
   "nested_less_than_27d17e58": { "message": "Geschachtelt kleiner als" },
   "next_page_d2a39853": { "message": "Nächste Seite" },
+  "no_changes_to_save_d29f6e91": {
+    "message": "Keine Änderungen zu speichern."
+  },
   "no_e16d9132": { "message": "Nein" },
   "no_file_chosen_9a880793": { "message": "Keine Datei ausgewählt" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -573,7 +576,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Vorrangig" },
   "precedes_equal_20701e84": { "message": "Vorrangig oder gleich" },
   "preformatted_d0670862": { "message": "Vorformatiert" },
-  "pretty_html_editor_28748756": { "message": "Pretty HTML-Editor" },
   "preview_53003fd2": { "message": "Vorschau" },
   "preview_in_overlay_ed772c46": { "message": "Vorschau in Overlay" },
   "preview_inline_9787330": { "message": "Inlne-Vorschau" },
@@ -593,7 +595,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Quaternionen" },
   "quizzes_7e598f57": { "message": "Quizze" },
   "rational_numbers_80ddaa4a": { "message": "Rationale Zahlen" },
-  "raw_html_editor_e3993e41": { "message": "Raw-HTML-Editor" },
   "real_numbers_7c99df94": { "message": "Reelle Zahlen" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reeller Teil (einer komplexen Zahl)"
@@ -881,9 +882,6 @@ const locale = {
   "view_description_30446afc": { "message": "Beschreibung anzeigen" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Tastenkombinationen anzeigen"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "Vordefinierte Farben anzeigen"
   },
   "view_title_description_67940918": {
     "message": "Beschreibung { title } anzeigen"

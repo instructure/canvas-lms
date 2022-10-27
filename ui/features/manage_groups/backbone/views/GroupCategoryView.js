@@ -69,7 +69,7 @@ export default class GroupCategoryView extends View {
     return super.initialize(...arguments)
   }
 
-  groupsView(options) {
+  groupsView(_options) {
     let addUnassignedMenu = null
     if (ENV.IS_LARGE_ROSTER) {
       const users = this.model.unassignedUsers()
@@ -81,7 +81,7 @@ export default class GroupCategoryView extends View {
     })
   }
 
-  unassignedUsersView(options) {
+  unassignedUsersView(_options) {
     if (ENV.IS_LARGE_ROSTER) return false
     return new UnassignedUsersView({
       category: this.model,

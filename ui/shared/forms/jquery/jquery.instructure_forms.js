@@ -97,11 +97,11 @@ $.fn.formSubmit = function (options) {
         formData = newData
       }
     }
-    let method =
-        $form.data('method') || $form.find("input[name='_method']").val() || $form.attr('method'),
-      formId = $form.attr('id'),
-      action = $form.attr('action'),
-      submitParam = null
+    const method =
+      $form.data('method') || $form.find("input[name='_method']").val() || $form.attr('method')
+    const formId = $form.attr('id')
+    let action = $form.attr('action')
+    let submitParam = null
     if ($.isFunction(options.beforeSubmit)) {
       submitParam = null
       try {
@@ -115,32 +115,33 @@ $.fn.formSubmit = function (options) {
       }
     }
 
+    let loadingPromise
+
     if (options.disableWhileLoading) {
       const oldOnSubmit = onSubmit
-      onSubmit = function (loadingPromise) {
+      onSubmit = function (loadingPromise_) {
         if (options.disableWhileLoading === 'spin_on_success') {
           // turn it into a false promise, i.e. never resolve
-          const origPromise = loadingPromise
-          loadingPromise = $.Deferred()
+          const origPromise = loadingPromise_
+          loadingPromise_ = $.Deferred()
           origPromise.fail(() => {
-            loadingPromise.reject()
+            loadingPromise_.reject()
           })
         }
-        $form.disableWhileLoading(loadingPromise)
+        $form.disableWhileLoading(loadingPromise_)
         if (oldOnSubmit) oldOnSubmit.apply(this, arguments)
       }
     }
 
     if (onSubmit) {
-      var loadingPromise = $.Deferred(),
-        oldHandlers = {}
+      loadingPromise = $.Deferred()
+      const oldHandlers = {}
       onSubmit.call(this, loadingPromise, formData)
       $.each(['success', 'error'], function (i, successOrError) {
         oldHandlers[successOrError] = options[successOrError]
         options[successOrError] = function () {
-          loadingPromise[successOrError === 'success' ? 'resolve' : 'reject'].apply(
-            loadingPromise,
-            arguments
+          loadingPromise[successOrError === 'success' ? 'resolve' : 'reject'].bind(loadingPromise)(
+            ...arguments
           )
           if ($.isFunction(oldHandlers[successOrError])) {
             return oldHandlers[successOrError].apply(this, arguments)
@@ -183,7 +184,7 @@ $.fn.formSubmit = function (options) {
         if ($obj) $formObj = $obj
         needValidForm = false
       }
-      if ($formObj.parents('html').get(0) == $('html').get(0) && options.formErrors !== false) {
+      if ($formObj.parents('html').get(0) === $('html').get(0) && options.formErrors !== false) {
         if ($.isFunction(options.errorFormatter)) data = options.errorFormatter(data.errors || data)
         $formObj.formErrors(data, options)
       } else if (needValidForm) {
@@ -251,7 +252,6 @@ $.fn.formSubmit = function (options) {
         )
           .appendTo('body')
           .find('#frame_' + id),
-        formMethod = method,
         priorTarget = $form.attr('target'),
         priorEnctype = $form.attr('ENCTYPE'),
         request = new FakeXHR()
@@ -273,7 +273,7 @@ $.fn.formSubmit = function (options) {
       $frame.bind('form_response_loaded', function () {
         const i = $frame[0],
           doc = i.contentDocument || i.contentWindow.document
-        if (doc.location.href == 'about:blank') return
+        if (doc.location.href === 'about:blank') return
 
         request.setResponse($(doc).text())
         if ($.httpSuccess(request)) {
@@ -313,7 +313,7 @@ $.ajaxJSONPreparedFiles = function (options) {
   }
   const attachments = []
   const ready = function () {
-    let data = options.formDataTarget == 'url' ? options.formData : {}
+    let data = options.formDataTarget === 'url' ? options.formData : {}
     if (options.handle_files) {
       let result = attachments
       if (options.single_file) {
@@ -332,8 +332,8 @@ $.ajaxJSONPreparedFiles = function (options) {
     parameters.no_redirect = true
     file = file.files[0]
     import('@canvas/upload-file')
-      .then(({uploadFile}) =>
-        uploadFile(uploadUrl, parameters, file, undefined, options.onProgress)
+      .then(({uploadFile: uploadFile_}) =>
+        uploadFile_(uploadUrl, parameters, file, undefined, options.onProgress)
       )
       .then(data => {
         attachments.push(data)
@@ -343,7 +343,7 @@ $.ajaxJSONPreparedFiles = function (options) {
         ;(options.upload_error || options.error).call($this, error)
       })
   }
-  var next = function () {
+  const next = function () {
     const item = list.shift()
     if (item) {
       const attrs = $.extend(
@@ -359,7 +359,7 @@ $.ajaxJSONPreparedFiles = function (options) {
           'attachment[context_code]': options.context_code,
           'attachment[on_duplicate]': 'rename',
         },
-        options.formDataTarget == 'uploadDataUrl' ? options.formData : {}
+        options.formDataTarget === 'uploadDataUrl' ? options.formData : {}
       )
       if (item.files.length === 1) {
         attrs['attachment[content_type]'] = item.files[0].type
@@ -406,7 +406,7 @@ $.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, o
 
 $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest)
 if ($.handlesHTML5Files) {
-  $("input[type='file']").live('change', function (event) {
+  $("input[type='file']").live('change', function (_event) {
     const file_list = this.files
     if (file_list) {
       $(this).data('file_list', file_list)
@@ -439,7 +439,7 @@ $.ajaxFileUpload = function (options) {
           // error function
           if (options.error && $.isFunction(options.error)) {
             data = data || {}
-            const $obj = options.error.call(this, data.errors || data)
+            options.error.call(this, data.errors || data)
           } else {
             $.ajaxJSON.unhandledXHRs.push(request)
           }
@@ -453,12 +453,15 @@ $.ajaxFileUpload = function (options) {
 $.httpSuccess = function (r) {
   try {
     return (
-      (!r.status && location.protocol == 'file:') ||
+      (!r.status && window.location.protocol === 'file:') ||
       (r.status >= 200 && r.status < 300) ||
-      r.status == 304 ||
-      (jQuery.browser.safari && r.status == undefined)
+      r.status === 304 ||
+      // eslint-disable-next-line eqeqeq
+      ($.browser.safari && r.status == undefined)
     )
-  } catch (e) {}
+  } catch (e) {
+    // no-op
+  }
 
   return false
 }
@@ -498,11 +501,13 @@ $.sendFormAsBinary = function (options, not_binary) {
     )
   }
   xhr.onreadystatechange = function (event) {
-    if (xhr.readyState == 4) {
+    if (xhr.readyState === 4) {
       let json = null
       try {
         json = $.parseJSON(xhr.responseText)
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
       if ($.httpSuccess(xhr)) {
         if (json && !json.errors) {
           if (options.success && $.isFunction(options.success)) {
@@ -529,6 +534,7 @@ $.sendFormAsBinary = function (options, not_binary) {
     if (not_binary) {
       xhr.send(body)
     } else if (!xhr.sendAsBinary) {
+      // eslint-disable-next-line no-console
       console.log('xhr.sendAsBinary not supported')
     } else {
       xhr.sendAsBinary(body)
@@ -546,13 +552,13 @@ $.fileData = function (file_object) {
 }
 
 $.toMultipartForm = function (params, callback) {
-  let boundary = '-----AaB03x' + _.uniqueId(),
-    result = {content_type: 'multipart/form-data; boundary=' + boundary},
-    body = '--' + boundary + '\r\n',
-    paramsList = [],
-    hasFakeFile = false
+  let body = '--' + boundary + '\r\n'
+  let hasFakeFile = false
+  const boundary = '-----AaB03x' + _.uniqueId()
+  const paramsList = []
+  const result = {content_type: 'multipart/form-data; boundary=' + boundary}
 
-  for (var idx in params) {
+  for (const idx in params) {
     paramsList.push([idx, params[idx]])
     if (params[idx] && params[idx].fake_file) {
       hasFakeFile = true
@@ -561,7 +567,7 @@ $.toMultipartForm = function (params, callback) {
   if (window.FormData && !hasFakeFile) {
     const fd = new FormData()
     // xsslint xssable.receiver.whitelist fd
-    for (var idx in params) {
+    for (const idx in params) {
       let param = params[idx]
       if (window.FileList && param instanceof FileList) {
         param = param[0]
@@ -590,9 +596,9 @@ $.toMultipartForm = function (params, callback) {
       finished()
       return
     }
-    let param = paramsList.shift(),
-      name = param[0],
-      value = param[1]
+    const param = paramsList.shift()
+    const name = param[0]
+    let value = param[1]
 
     if (window.FileList && value instanceof FileList) {
       value = value[0]
@@ -607,14 +613,15 @@ $.toMultipartForm = function (params, callback) {
         'Content-Type: multipart/mixed; boundary=' +
         innerBoundary +
         '\r\n\r\n'
-      for (const jdx in value) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const _jdx in value) {
         fileList.push(value)
       }
       const finishedFiles = function () {
-        body += '--' + innerBoundary + '--\r\n' + '--' + boundary + '\r\n'
+        body += '--' + innerBoundary + '--\r\n--' + boundary + '\r\n'
         nextParam()
       }
-      var nextFile = function () {
+      const nextFile = function () {
         if (fileList.length === 0) {
           finishedFiles()
           return
@@ -721,14 +728,15 @@ $.fn.fillFormData = function (data, opts) {
       const inputType = $obj.attr('type')
       if (name in data) {
         if (name) {
-          if (inputType == 'hidden' && $obj.next('input:checkbox').attr('name') == name) {
+          if (inputType === 'hidden' && $obj.next('input:checkbox').attr('name') === name) {
             // do nothing
-          } else if (inputType != 'checkbox' && inputType != 'radio') {
+          } else if (inputType !== 'checkbox' && inputType !== 'radio') {
             let val = data[name]
             if (typeof val === 'undefined' || val === null) {
               val = ''
             }
             $obj.val(val.toString())
+            // eslint-disable-next-line eqeqeq
           } else if ($obj.val() == data[name]) {
             $obj.attr('checked', true)
           } else {
@@ -751,16 +759,16 @@ $.fn.fillFormData.defaults = {object_name: null, call_change: true}
 //    values: specify the set of values to retrieve (if they exist)
 //      by default retrieves all it can find.
 $.fn.getFormData = function (options) {
-  var options = $.extend({}, $.fn.getFormData.defaults, options),
-    result = {},
-    $form = this
+  options = $.extend({}, $.fn.getFormData.defaults, options)
+  let result = {}
+  const $form = this
   $form
     .find(':input')
     .not(':button')
     .each(function () {
       const $input = $(this),
         inputType = $input.attr('type')
-      if ((inputType == 'radio' || inputType == 'checkbox') && !$input.attr('checked')) return
+      if ((inputType === 'radio' || inputType === 'checkbox') && !$input.attr('checked')) return
       let val = $input.val()
       if ($input.hasClass('datetime_field_enabled')) {
         val = $input.data('iso8601')
@@ -769,16 +777,17 @@ $.fn.getFormData = function (options) {
         if ($input.data('rich_text')) {
           val = send($input, 'get_code', false)
         }
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
       const attr = $input.prop('name') || ''
       const multiValue = attr.match(/\[\]$/)
-      if (inputType == 'hidden' && !multiValue) {
+      if (inputType === 'hidden' && !multiValue) {
         if (
-          $form
-            .find("[name='" + attr + "']")
-            .filter(
-              'textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden'
-            )[0] != $input[0]
+          $form.find("[name='" + attr + "']").filter(
+            'textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden'
+            // eslint-disable-next-line eqeqeq
+          )[0] != $input[0]
         ) {
           return
         }
@@ -786,9 +795,9 @@ $.fn.getFormData = function (options) {
       if (
         attr &&
         attr !== '' &&
-        (inputType == 'checkbox' || typeof result[attr] === 'undefined' || multiValue)
+        (inputType === 'checkbox' || typeof result[attr] === 'undefined' || multiValue)
       ) {
-        if (!options.values || $.inArray(attr, options.values) != -1) {
+        if (!options.values || $.inArray(attr, options.values) !== -1) {
           if (multiValue) {
             result[attr] = result[attr] || []
             result[attr].push(val)
@@ -797,7 +806,6 @@ $.fn.getFormData = function (options) {
           }
         }
       }
-      const lastAttr = attr
     })
   if (options.object_name) {
     result = $._stripObjectName(result, options.object_name, true)
@@ -865,8 +873,9 @@ $._stripObjectName = function (data, object_name, include_original) {
   if (data instanceof Array) {
     new_result = []
   }
+  let original_name
+  let found
   for (const i in data) {
-    var original_name, found
     if (data instanceof Array) {
       original_name = data[i]
     } else {
@@ -914,10 +923,10 @@ $.fn.validateForm = function (options) {
   if (this.length === 0) {
     return false
   }
-  var options = $.extend({}, $.fn.validateForm.defaults, options),
-    $form = this,
-    errors = {},
-    data = options.data || $form.getFormData(options)
+  options = $.extend({}, $.fn.validateForm.defaults, options)
+  const $form = this
+  const errors = {}
+  const data = options.data || $form.getFormData(options)
 
   if (options.object_name) {
     options.required = $._addObjectName(options.required, options.object_name)
@@ -960,7 +969,7 @@ $.fn.validateForm = function (options) {
   if (options.numbers) {
     $.each(options.numbers, (i, name) => {
       const val = parseFloat(data[name])
-      if (isNaN(val)) {
+      if (Number.isNaN(Number(val))) {
         if (!errors[name]) {
           errors[name] = []
         }
@@ -987,7 +996,8 @@ $.fn.validateForm = function (options) {
     })
   }
   let hasErrors = false
-  for (const err in errors) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for (const _err in errors) {
     hasErrors = true
     break
   }
@@ -1014,20 +1024,21 @@ $.fn.formErrors = function (data_errors, options) {
   if (typeof data_errors === 'string') {
     data_errors = {base: data_errors}
   }
+  let newval
   $.each(data_errors, (i, val) => {
     if (typeof val === 'string') {
-      var newval = []
+      newval = []
       newval.push(val)
       val = newval
     } else if (
       typeof i === 'number' &&
-      val.length == 2 &&
-      val[0] instanceof jQuery &&
+      val.length === 2 &&
+      val[0] instanceof $ &&
       typeof val[1] === 'string'
     ) {
       elementErrors.push(val)
       return
-    } else if (typeof i === 'number' && val.length == 2 && typeof val[1] === 'string') {
+    } else if (typeof i === 'number' && val.length === 2 && typeof val[1] === 'string') {
       newval = []
       newval.push(val[1])
       i = val[0]
@@ -1068,7 +1079,6 @@ $.fn.formErrors = function (data_errors, options) {
   let hasErrors = false
   let highestTop = 0
   let lastField = null
-  const currentTop = $(document).scrollTop()
   const errorDetails = {}
   $('#aria_alerts').empty()
   $.each(errors, (name, msg) => {
@@ -1090,10 +1100,10 @@ $.fn.formErrors = function (data_errors, options) {
         }
       }
     }
-    if (!$obj || $obj.length === 0 || name == 'general') {
+    if (!$obj || $obj.length === 0 || name === 'general') {
       $obj = $form
     }
-    if ($obj[0].tagName == 'TEXTAREA' && $obj.next('.mceEditor').length) {
+    if ($obj[0].tagName === 'TEXTAREA' && $obj.next('.mceEditor').length) {
       $obj = $obj.next().find('.mceIframeContainer')
     }
     errorDetails[name] = {object: $obj, message: msg}
@@ -1159,7 +1169,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
     const offset = $obj.offset()
     const height = $box.outerHeight()
     let objLeftIndent = Math.round($obj.outerWidth() / 5)
-    if ($obj[0].tagName == 'FORM') {
+    if ($obj[0].tagName === 'FORM') {
       objLeftIndent = Math.min(objLeftIndent, 50)
     }
     $box
@@ -1172,7 +1182,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
 
     const cleanup = function () {
       const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
-      const srError = _.find($screenReaderErrors, node => $(node).text() == $box.text())
+      const srError = _.find($screenReaderErrors, node => $(node).text() === $box.text())
       $box.remove()
       if (srError) {
         $(srError).remove()
@@ -1225,7 +1235,7 @@ $.moveErrorBoxes = function () {
         const offset = $obj.offset()
         const height = $box.outerHeight()
         let objLeftIndent = Math.round($obj.outerWidth() / 5)
-        if ($obj[0].tagName == 'FORM') {
+        if ($obj[0].tagName === 'FORM') {
           objLeftIndent = Math.min(objLeftIndent, 50)
         }
         $box
@@ -1247,7 +1257,7 @@ $.moveErrorBoxes = function () {
   }
 }
 // Hides all error boxes for the given form element and its input elements.
-$.fn.hideErrors = function (options) {
+$.fn.hideErrors = function (_options) {
   if (this.length) {
     const $oldBox = this.data('associated_error_box')
     const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
@@ -1256,12 +1266,12 @@ $.fn.hideErrors = function (options) {
       this.data('associated_error_box', null)
     }
     this.find(':input').each(function () {
-      const $obj = $(this),
-        $oldBox = $obj.data('associated_error_box')
-      if ($oldBox) {
-        $oldBox.remove()
+      const $obj = $(this)
+      const $oldBox_ = $obj.data('associated_error_box')
+      if ($oldBox_) {
+        $oldBox_.remove()
         $obj.data('associated_error_box', null)
-        const srError = _.find($screenReaderErrors, node => $(node).text() == $oldBox.text())
+        const srError = _.find($screenReaderErrors, node => $(node).text() === $oldBox_.text())
         if (srError) {
           $(srError).remove()
         }
@@ -1295,7 +1305,7 @@ $.fn.markRequired = function (options) {
         return
       }
       // Added the if statement to prevent the JS from adding the asterisk to the forgot password placeholder.
-      if (this.id != 'pseudonym_session_unique_id_forgot') {
+      if (this.id !== 'pseudonym_session_unique_id_forgot') {
         label.append(
           $('<span aria-hidden="true" />')
             .text('*')

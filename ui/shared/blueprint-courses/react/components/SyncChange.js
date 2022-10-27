@@ -104,6 +104,7 @@ class SyncChange extends Component {
     })
 
     return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
       <div className={classes} onClick={this.toggleExpanded}>
         <div className="bcs__history-item__content">
           {hasExceptions && (

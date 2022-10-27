@@ -40,6 +40,8 @@ describe('canvas_quizzes/statistics/views/questions/essay', () => {
     try {
       getByText('View in SpeedGrader')
       expect(false).toBe(true)
-    } catch (e) {}
+    } catch (e) {
+      // no-op
+    }
   })
 })

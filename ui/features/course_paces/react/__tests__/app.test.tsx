@@ -19,6 +19,8 @@
 import React from 'react'
 
 import {renderConnected} from './utils'
+import {PRIMARY_PACE} from './fixtures'
+
 import {App} from '../app'
 
 const pollForPublishStatus = jest.fn()
@@ -38,8 +40,6 @@ beforeAll(() => {
     end_at: {date: '2021-09-30', date_context: 'course'},
     start_at: {date: '2021-09-01', date_context: 'course'},
   }
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_for_sections = true
 })
 
 afterEach(() => {
@@ -48,15 +48,30 @@ afterEach(() => {
 
 describe('App', () => {
   it('starts polling for published status updates on mount', () => {
-    renderConnected(<App {...defaultProps} />)
+    renderConnected(<App {...defaultProps} coursePace={PRIMARY_PACE} />)
     expect(pollForPublishStatus).toHaveBeenCalled()
   })
 
   it('renders one screenreader-only h1', () => {
-    const {getByRole} = renderConnected(<App {...defaultProps} />)
+    const {getByRole} = renderConnected(<App {...defaultProps} coursePace={PRIMARY_PACE} />)
     // should only be one h1 in the whole app
     const heading = getByRole('heading', {level: 1})
     expect(heading).toBeInTheDocument()
     expect(heading).toHaveTextContent('Course Pacing')
+  })
+
+  describe('with course paces redesign ON', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_redesign = true
+    })
+
+    it('renders empty state if supplied shell course pace', () => {
+      const {getByRole} = renderConnected(
+        <App {...defaultProps} coursePace={{id: undefined, context_type: 'Course'}} />
+      )
+      const getStartedButton = getByRole('button', {name: 'Get Started'})
+      expect(getStartedButton).toBeInTheDocument()
+    })
   })
 })

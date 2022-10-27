@@ -423,6 +423,91 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    context "recipient user deleted" do
+      def delete_recipient
+        # The short issue is CP and CMP are not fk attached to the user, but our code expects an associated user.
+        # As a result the below specs give us options to handle when a user is hard deleted without cleanup.
+        # The CMP requires that the cmp.workflow_state == deleted;
+        # there is no way around this because the loader takes an array of cmps and it would defeat the purpose to check user beforehand.
+        # Thus for now we handle this and return null which can be processed.
+
+        conversation(@student, sender: @teacher)
+
+        # delete student
+        student_id = @student.id
+
+        # delete enrollments can run in a loop if multiple
+        enrollment = @student.enrollments.first
+        enrollment_state = enrollment.enrollment_state
+        enrollment_state.delete
+        enrollment.delete
+
+        # delete stream_item_instances can run in a loop if multiple
+        stream_item_instance = @student.stream_item_instances.first
+        stream_item_instance.delete
+
+        # delete user_account_associations can run in a loop if multiple
+        user_account_association = @student.user_account_associations.first
+        user_account_association.delete
+
+        @student.delete
+
+        # deleting the cmp
+        # the problem cp:  cp_without_associated_user = ConversationParticipant.where(user_id: student_id).first
+        cmp_without_associated_user = ConversationMessageParticipant.where(user_id: student_id).first
+        cmp_without_associated_user.workflow_state = "deleted"
+        cmp_without_associated_user.save
+
+        student_id
+      end
+
+      it "returns empty recipients" do
+        delete_recipient
+        type = GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
+
+        recipients_ids = type.resolve("
+        conversationsConnection(scope: \"sent\") {
+          nodes {
+            conversation {
+              conversationMessagesConnection {
+                nodes {
+                  recipients {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+        ")
+        expect(recipients_ids[0][0].empty?).to be true
+      end
+
+      context "ConversationMessageParticipant.workflow_state deleted" do
+        it "returns nil for user" do
+          student_id = delete_recipient
+          type = GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
+          cmps_ids = type.resolve("
+            conversationsConnection(scope: \"sent\") {
+              nodes {
+                conversation {
+                  conversationParticipantsConnection {
+                    nodes {
+                      user {
+                        _id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ")
+          expect(cmps_ids[0].include?(@teacher.id.to_s)).to be true
+          expect(cmps_ids[0].include?(student_id.to_s)).to be false
+        end
+      end
+    end
+
     it "has createdAt field for conversationMessagesConnection" do
       Timecop.freeze do
         c = conversation(@student, @teacher)
@@ -613,6 +698,54 @@ describe Types::UserType do
     end
   end
 
+  context "observerEnrollmentsConnection" do
+    let(:teacher_type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    let(:student_type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    before do
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+
+      @student1_observer = observer_in_course(active_all: true, associated_user_id: @student1).user
+      @student2_observer = observer_in_course(active_all: true, associated_user_id: @student2).user
+    end
+
+    it "returns associatedUser ids" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"course_#{@course.id}\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([[@student1.id.to_s], [@student2.id.to_s]])
+    end
+
+    it "returns empty associatedUser ids" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"course_#{@course.id}\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([[], [], [], []])
+    end
+
+    it "returns nil when context is empty" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([nil, nil])
+    end
+
+    it "returns nil when not teacher" do
+      result = student_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([nil])
+    end
+  end
+
   context "total_recipients" do
     let(:type) do
       GraphQLTypeTester.new(
@@ -626,6 +759,90 @@ describe Types::UserType do
     it "returns total_recipients for given context (excluding current_user)" do
       result = type.resolve("totalRecipients(context: \"course_#{@course.id}\")")
       expect(result).to eq(@course.enrollments.count - 1)
+    end
+  end
+
+  context "recipients_observers" do
+    let(:student_type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    let(:teacher_type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    before do
+      student = @student
+      @third_student = student_in_course(active_all: true).user
+      @fourth_student = student_in_course(active_all: true).user
+      @student = student
+
+      observer = observer_in_course(active_all: true, associated_user_id: @student).user
+      observer_enrollment_2 = @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+      observer_enrollment_2.update_attribute(:associated_user_id, @other_student.id)
+
+      observer_enrollment_3 = @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+      observer_enrollment_3.update_attribute(:associated_user_id, @third_student.id)
+
+      second_observer = observer_in_course(active_all: true, associated_user_id: @fourth_student).user
+
+      @observer = observer
+      @second_observer = second_observer
+    end
+
+    it "returns nil if the user is not the current user" do
+      result = teacher_type.resolve('recipientsObservers(contextCode: "course_1", recipientIds: ["1"]) { nodes { _id } } ')
+      expect(result).to be nil
+    end
+
+    it "returns nil if invalid course is given" do
+      result = teacher_type.resolve('recipientsObservers(contextCode: "fake_2", recipientIds: ["1"]) { nodes { _id } } ')
+      expect(result).to be nil
+    end
+
+    it "returns a users observers as messageable user" do
+      recipients = [@student.id.to_s]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).to eq [@observer.id.to_s]
+    end
+
+    it "does not return observers that are not active" do
+      inactive_observer = User.create
+      inactive_observer_enrollment = @course.enroll_user(inactive_observer, "ObserverEnrollment", enrollment_state: "completed")
+      inactive_observer_enrollment.update_attribute(:associated_user_id, @student.id)
+      recipients = [@student.id.to_s]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).not_to include(inactive_observer.id.to_s)
+    end
+
+    it "does not return duplicate observers if an observer is observing multiple students in the course" do
+      recipients = [@student, @other_student, @third_student].map(&:id).map(&:to_s)
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).to eq [@observer.id.to_s]
+    end
+
+    it "returns observers for all students in a course if the entire course is a recipient and current user can send observers messages" do
+      recipients = ["course_#{@course.id}"]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result.length).to eq 2
+      expect(result).to include(@observer.id.to_s, @second_observer.id.to_s)
+    end
+
+    it "does not return observers that the current user is unable to message" do
+      recipients = ["course_#{@course.id}"]
+      result = student_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @student)
+      expect(result.length).to eq 1
+      expect(result).to include(@student.observee_enrollments.first.user.id.to_s)
     end
   end
 

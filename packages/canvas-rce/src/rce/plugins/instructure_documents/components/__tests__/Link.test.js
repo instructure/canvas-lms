@@ -33,7 +33,7 @@ function renderComponent(props) {
       id={469}
       lock_at={null}
       locked_for_user={false}
-      published
+      published={true}
       unlock_at={null}
       onClick={() => {}}
       {...props}
@@ -179,7 +179,7 @@ describe('RCE "Documents" Plugin > Document', () => {
         onClick,
         media_entry_id: 'media-entry-id',
         title: 'title',
-        type: 'type'
+        type: 'type',
       })
 
       const btn = getByText('click me')
@@ -195,7 +195,7 @@ describe('RCE "Documents" Plugin > Document', () => {
         target: '_blank',
         text: 'click me',
         title: 'title',
-        type: 'type'
+        type: 'type',
       })
     })
 

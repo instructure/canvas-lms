@@ -28,14 +28,14 @@ export const CustomNumberInput = ({
   processValueCallback,
   formatValueCallback,
   placeholder,
-  onChange
+  onChange,
 }) => {
   const [inputValue, digestCurrentValue, digestNewValue, hasError] = useDebouncedNumericValue({
     value,
     parseValueCallback,
     processValueCallback,
     formatValueCallback,
-    onChange
+    onChange,
   })
   const handleChange = (event, newValue) => digestNewValue(newValue.trim())
   const handleBlur = () => digestCurrentValue()
@@ -69,12 +69,12 @@ CustomNumberInput.propTypes = {
   processValueCallback: PropTypes.func,
   // Formats a number and returns a formatted string number. Ex. 90 -> "90º"
   formatValueCallback: PropTypes.func,
-  placeholder: PropTypes.string
+  placeholder: PropTypes.string,
 }
 
 CustomNumberInput.defaultProps = {
   parseValueCallback: value => value,
   processValueCallback: value => value,
   formatValueCallback: value => value,
-  placeholder: ''
+  placeholder: '',
 }

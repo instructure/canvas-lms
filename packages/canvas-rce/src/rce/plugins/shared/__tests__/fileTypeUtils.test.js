@@ -22,7 +22,7 @@ import {
   isVideo,
   isAudio,
   isText,
-  mediaPlayerURLFromFile
+  mediaPlayerURLFromFile,
 } from '../fileTypeUtils'
 
 describe('fileTypeUtils', () => {
@@ -70,7 +70,7 @@ describe('fileTypeUtils', () => {
     it("creates url from input file's embedded_iframe_url", () => {
       const file = {
         embedded_iframe_url: '/media_objects_iframe/m-media_object_id',
-        type: 'video/mov'
+        type: 'video/mov',
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe('/media_objects_iframe/m-media_object_id?type=video')
@@ -79,7 +79,7 @@ describe('fileTypeUtils', () => {
     it("creates url from file's media_entry_id", () => {
       const file = {
         media_entry_id: 'm-media_id',
-        content_type: 'audio/mp3'
+        content_type: 'audio/mp3',
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe('/media_objects_iframe/m-media_id?type=audio')
@@ -88,7 +88,7 @@ describe('fileTypeUtils', () => {
     it("creates url from file's url", () => {
       const file = {
         'content-type': 'video/mov',
-        url: 'http://origin/path/to/file'
+        url: 'http://origin/path/to/file',
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&type=video')
@@ -97,7 +97,7 @@ describe('fileTypeUtils', () => {
     it("returns undefined if the file isn't media", () => {
       const file = {
         'content-type': 'text/palin',
-        url: 'http://origin/path/to/file'
+        url: 'http://origin/path/to/file',
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe(undefined)
@@ -106,7 +106,7 @@ describe('fileTypeUtils', () => {
     it("includes the file verifier if it's part of the file's url", () => {
       const file = {
         'content-type': 'video/mov',
-        url: 'http://origin/path/to/file?verifier=xyzzy'
+        url: 'http://origin/path/to/file?verifier=xyzzy',
       }
       const url = mediaPlayerURLFromFile(file)
       expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&verifier=xyzzy&type=video')

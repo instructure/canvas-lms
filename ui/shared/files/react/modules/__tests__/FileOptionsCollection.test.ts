@@ -21,7 +21,7 @@ import {
   TYPE,
   ICON_MAKER_ICONS,
   SVG_TYPE,
-} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants.js'
+} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
 
 describe('applyCategory()', () => {
   let fileText, fileType

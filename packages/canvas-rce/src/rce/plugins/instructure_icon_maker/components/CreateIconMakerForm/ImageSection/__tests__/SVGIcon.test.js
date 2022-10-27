@@ -27,8 +27,8 @@ describe('SVGThumbnail', () => {
   const source = {
     foo: {
       source: () => '<svg />',
-      label: 'Foo'
-    }
+      label: 'Foo',
+    },
   }
 
   const subject = () => render(<SVGThumbnail name={name} source={source} />)

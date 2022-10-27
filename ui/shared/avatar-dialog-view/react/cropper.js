@@ -78,6 +78,7 @@ class CanvasCropper extends React.Component {
         ref={el => {
           this.wrapper = el
         }}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex="0"
       >
         {this.props.imgFile && (

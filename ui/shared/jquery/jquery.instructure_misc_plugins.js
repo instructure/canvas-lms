@@ -90,7 +90,7 @@ $.fn.undim = function (speed) {
 //  dialog: If present, do a jquery.ui.dialog instead of a confirm(). If an
 //    object, it will be merged into the dialog options.
 $.fn.confirmDelete = function (options) {
-  var options = $.extend({}, $.fn.confirmDelete.defaults, options)
+  options = $.extend({}, $.fn.confirmDelete.defaults, options)
   const $object = this
   let $dialog = null
   let result = true
@@ -110,7 +110,7 @@ $.fn.confirmDelete = function (options) {
     options.confirmed.call($object)
     if (options.url) {
       if (!options.success) {
-        options.success = function (data) {
+        options.success = function (_data) {
           $object.fadeOut('slow', () => {
             $object.remove()
           })
@@ -122,12 +122,12 @@ $.fn.confirmDelete = function (options) {
         options.url,
         'DELETE',
         data,
-        data => {
-          options.success.call($object, data)
+        data_ => {
+          options.success.call($object, data_)
         },
-        (data, request, status, error) => {
+        (data_, request, status, error) => {
           if (options.error && $.isFunction(options.error)) {
-            options.error.call($object, data, request, status, error)
+            options.error.call($object, data_, request, status, error)
           } else {
             $.ajaxJSON.unhandledXHRs.push(request)
           }
@@ -177,7 +177,8 @@ $.fn.confirmDelete = function (options) {
       )
       return
     } else {
-      result = confirm(options.message)
+      // eslint-disable-next-line no-alert
+      result = window.confirm(options.message)
     }
   }
   onContinue()
@@ -199,7 +200,7 @@ $.fn.fragmentChange = function (fn) {
     // actually shown in the hash by specifying a query
     // parameter, hash=some_hash
     let query_hash = null
-    for (var i = 0; i < query.length; i++) {
+    for (let i = 0; i < query.length; i++) {
       const item = query[i]
       if (item && item.indexOf('hash=') === 0) {
         query_hash = '#' + item.substring(5)
@@ -210,9 +211,9 @@ $.fn.fragmentChange = function (fn) {
     let found = false
     // Can only be used on the root document,
     // will not work on an iframe, for example.
-    for (var i = 0; i < $._checkFragments.fragmentList.length; i++) {
+    for (let i = 0; i < $._checkFragments.fragmentList.length; i++) {
       const obj = $._checkFragments.fragmentList[i]
-      if (obj.doc[0] == $doc[0]) {
+      if (obj.doc[0] === $doc[0]) {
         found = true
       }
     }
@@ -240,7 +241,7 @@ $._checkFragments = function () {
   for (let idx = 0; idx < list.length; idx++) {
     const obj = list[idx]
     const $doc = obj.doc
-    if ($doc[0].location.hash != obj.fragment) {
+    if ($doc[0].location.hash !== obj.fragment) {
       $doc.triggerHandler('document_fragment_change', $doc[0].location.hash)
       obj.fragment = $doc[0].location.hash
       $._checkFragments.fragmentList[idx] = obj
@@ -260,7 +261,7 @@ $.fn.clickLink = function () {
 // had much success with it.
 $.fn.showIf = function (bool) {
   if ($.isFunction(bool)) {
-    return this.each(function (index) {
+    return this.each(function (_index) {
       $(this).showIf(bool.call(this))
     })
   }
@@ -283,7 +284,7 @@ $.fn.disableIf = function (bool) {
 $.fn.indicate = function (options) {
   options = options || {}
   let $indicator
-  if (options == 'remove') {
+  if (options === 'remove') {
     $indicator = this.data('indicator')
     if ($indicator) {
       $indicator.remove()
@@ -355,6 +356,7 @@ $.fn.hasScrollbar = function () {
 }
 
 $.fn.log = function (msg) {
+  // eslint-disable-next-line no-console
   console.log('%s: %o', msg, this)
   return this
 }
@@ -400,44 +402,44 @@ $.fn.autoGrowInput = function (o) {
   )
 
   this.filter('input:text').each(function () {
-    let minWidth = o.minWidth || $(this).width(),
-      val = '',
-      input = $(this),
-      testSubject = $('<tester/>').css({
-        position: 'absolute',
-        top: -9999,
-        left: -9999,
-        width: 'auto',
-        fontSize: input.css('fontSize'),
-        fontFamily: input.css('fontFamily'),
-        fontWeight: input.css('fontWeight'),
-        letterSpacing: input.css('letterSpacing'),
-        whiteSpace: 'nowrap',
-      }),
-      check = function () {
-        setTimeout(() => {
-          if (val === (val = input.val())) {
-            return
-          }
+    let val = ''
+    const minWidth = o.minWidth || $(this).width()
+    const input = $(this)
+    const testSubject = $('<tester/>').css({
+      position: 'absolute',
+      top: -9999,
+      left: -9999,
+      width: 'auto',
+      fontSize: input.css('fontSize'),
+      fontFamily: input.css('fontFamily'),
+      fontWeight: input.css('fontWeight'),
+      letterSpacing: input.css('letterSpacing'),
+      whiteSpace: 'nowrap',
+    })
+    const check = function () {
+      setTimeout(() => {
+        if (val === (val = input.val())) {
+          return
+        }
 
-          // Enter new content into testSubject
-          testSubject.text(val)
+        // Enter new content into testSubject
+        testSubject.text(val)
 
-          // Calculate new width + whether to change
-          const testerWidth = testSubject.width(),
-            newWidth =
-              testerWidth + o.comfortZone >= minWidth ? testerWidth + o.comfortZone : minWidth,
-            currentWidth = input.width(),
-            isValidWidthChange =
-              (newWidth < currentWidth && newWidth >= minWidth) ||
-              (newWidth > minWidth && newWidth < o.maxWidth)
+        // Calculate new width + whether to change
+        const testerWidth = testSubject.width(),
+          newWidth =
+            testerWidth + o.comfortZone >= minWidth ? testerWidth + o.comfortZone : minWidth,
+          currentWidth = input.width(),
+          isValidWidthChange =
+            (newWidth < currentWidth && newWidth >= minWidth) ||
+            (newWidth > minWidth && newWidth < o.maxWidth)
 
-          // Animate width
-          if (isValidWidthChange) {
-            input.width(newWidth)
-          }
-        })
-      }
+        // Animate width
+        if (isValidWidthChange) {
+          input.width(newWidth)
+        }
+      })
+    }
 
     testSubject.insertAfter(input)
 

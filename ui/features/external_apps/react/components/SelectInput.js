@@ -22,6 +22,7 @@ import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import InputMixin from '../mixins/InputMixin'
 
+// eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
   displayName: 'SelectInput',
 
@@ -45,6 +46,7 @@ export default createReactClass({
       </option>
     ))
     if (this.props.allowBlank) {
+      // eslint-disable-next-line jsx-a11y/control-has-associated-label
       options.unshift(<option key="NO_VALUE" value={null} />)
     }
     return options
@@ -52,12 +54,14 @@ export default createReactClass({
 
   handleSelectChange(e) {
     e.preventDefault()
+    // eslint-disable-next-line react/no-unused-state
     this.setState({value: e.target.value})
   },
 
   render() {
     return (
       <div className={this.getClassNames()}>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
           {this.props.label}
           <select

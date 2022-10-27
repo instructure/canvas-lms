@@ -79,10 +79,10 @@ export const RotationControls = ({rotation, onChange}) => {
 
 RotationControls.propTypes = {
   rotation: PropTypes.number,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
 RotationControls.defaultProps = {
   rotation: 0,
-  onChange: () => {}
+  onChange: () => {},
 }

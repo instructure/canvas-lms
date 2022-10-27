@@ -317,10 +317,9 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links
-    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
+    featured_help_links lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
     calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign
+    course_paces_redesign course_paces_for_students
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -1052,8 +1051,9 @@ class ApplicationController < ActionController::Base
   def get_context(include_deleted: false)
     GuardRail.activate(:secondary) do
       unless @context
-        if params[:course_id]
-          @context = api_find(Course.active, params[:course_id])
+        if params[:course_id] || (request.url.include?("/graphql") && params[:operationName] == "CreateSubmission")
+
+          @context = params[:course_id] ? api_find(Course.active, params[:course_id]) : pull_context_course
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
           params[:context_id] = params[:course_id]
           params[:context_type] = "Course"
@@ -3097,6 +3097,11 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :k5_user?
+
+  def pull_context_course
+    assignment_id = params[:variables][:assignmentLid]
+    ::Assignment.active.find(assignment_id).course
+  end
 
   def react_discussions_post_enabled_for_preferences_use?
     if @context.instance_of?(UserProfile) && Account.default.feature_enabled?(:react_discussions_post)

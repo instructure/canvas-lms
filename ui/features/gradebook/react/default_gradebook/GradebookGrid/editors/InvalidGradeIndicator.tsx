@@ -18,9 +18,8 @@
 
 import React from 'react'
 import {func} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -30,11 +29,15 @@ export default function InvalidGradeIndicator(props) {
   return (
     <div className="Grid__GradeCell__InvalidGrade">
       <Tooltip placement="bottom" renderTip={I18n.t('This is not a valid grade')} color="primary">
-        <Button elementRef={props.elementRef} size="small" variant="icon">
-          <Text color="danger">
-            <IconWarningLine />
-          </Text>
-        </Button>
+        <IconButton
+          elementRef={props.elementRef}
+          size="small"
+          color="danger"
+          withBorder={false}
+          withBackground={false}
+          renderIcon={IconWarningLine}
+          screenReaderLabel={I18n.t('This is not a valid grade')}
+        />
       </Tooltip>
     </div>
   )

@@ -23,7 +23,7 @@ import {
   TEXT_SIZE,
   MAX_CHAR_COUNT,
   Size,
-  TEXT_SIZE_FONT_DIFF
+  TEXT_SIZE_FONT_DIFF,
 } from './constants'
 import {Shape} from './shape'
 
@@ -37,7 +37,7 @@ export function buildText({text, textPosition, textSize, textColor, shape, size}
     fill: textColor || '',
     'font-family': 'Lato Extended',
     'font-size': TEXT_SIZE[textSize],
-    'font-weight': 'bold'
+    'font-weight': 'bold',
   })
 
   const containerWidth = getContainerWidth({text, textSize, size})
@@ -45,7 +45,7 @@ export function buildText({text, textPosition, textSize, textColor, shape, size}
     const subtextWidth = getTextWidth(line, textSize)
     const subtext = createSvgElement('tspan', {
       x: Math.max(TEXT_BACKGROUND_PADDING, Math.floor((containerWidth - subtextWidth) * 0.5)),
-      dy: index === 0 ? 0 : TEXT_SIZE[textSize]
+      dy: index === 0 ? 0 : TEXT_SIZE[textSize],
     })
     subtext.textContent = line
     textElement.appendChild(subtext)
@@ -60,7 +60,7 @@ export function buildTextBackground({
   textSize,
   textBackgroundColor,
   shape,
-  size
+  size,
 }) {
   if (!text.trim()) return null
 

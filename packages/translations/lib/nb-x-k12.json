@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Neste side"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Ingen endringer å lagre."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen forfallsdatoer tildelt"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Forhåndsformattert"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Elegante HTML-redigering"
-    },
     "preview_53003fd2": {
         "message": "Forhåndsvisning"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Rasjonelle tall"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Rå HTML-redigerer"
     },
     "real_numbers_7c99df94": {
         "message": "Reelle tall"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Vis neste uke"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Vis forhåndsdefinerte farger"
     },
     "view_previous_week_6f83849f": {
         "message": "Vis tidligere uke"

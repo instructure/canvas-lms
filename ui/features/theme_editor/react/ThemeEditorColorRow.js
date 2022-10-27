@@ -49,6 +49,7 @@ export default class ThemeEditorColorRow extends Component {
     if (this.showWarning()) {
       return (
         <span role="alert">
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
           <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
             <div className="ic-Form-message__Layout">
               <i className="icon-warning" role="presentation" />
@@ -142,6 +143,7 @@ export default class ThemeEditorColorRow extends Component {
           <div className="Theme__editor-color-block">
             {this.textColorInput()}
             {this.warningLabel()}
+            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label
               className="Theme__editor-color-label Theme__editor-color-block_label-sample"
               style={{backgroundColor: this.props.placeholder}}
@@ -152,7 +154,8 @@ export default class ThemeEditorColorRow extends Component {
                 className="Theme__editor-color-block_input-sample Theme__editor-color-block_input"
                 type="color"
                 value={colorInputValue}
-                role="presentation-only"
+                // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+                role="presentation"
                 onChange={event => this.inputChange(event.target.value)}
               />
             </label>

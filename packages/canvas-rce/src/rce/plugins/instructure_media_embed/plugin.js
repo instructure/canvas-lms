@@ -27,16 +27,16 @@ tinymce.create('tinymce.plugins.InstructureMediaEmbed', {
     ed.ui.registry.addMenuItem('instructure_media_embed', {
       text: formatMessage('Embed'),
       icon: 'embed',
-      onAction: () => ed.execCommand('instructureMediaEmbed')
+      onAction: () => ed.execCommand('instructureMediaEmbed'),
     })
 
     // Register toolbar button
     ed.ui.registry.addButton('instructure_media_embed', {
       tooltip: formatMessage('Embed'),
       icon: 'embed',
-      onAction: () => ed.execCommand('instructureMediaEmbed')
+      onAction: () => ed.execCommand('instructureMediaEmbed'),
     })
-  }
+  },
 })
 
 // Register plugin

@@ -38,7 +38,7 @@ const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
         backgroundImage: `url(${image})`,
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
       }
     }
 
@@ -53,7 +53,7 @@ const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
           rgba(255,255,255,1) ${variantSettings.gradientOne}, rgba(255,0,0,1) ${variantSettings.gradientOne},
           rgba(255,0,0,1) ${variantSettings.gradientTwo}, rgba(255,255,255,1) ${variantSettings.gradientTwo}
         )
-      `
+      `,
     }
   }
 
@@ -65,7 +65,7 @@ const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
           display: 'block',
           height: variantSettings.width,
           width: variantSettings.width,
-          ...background()
+          ...background(),
         }}
       >
         {loading && (
@@ -84,13 +84,13 @@ PreviewIcon.variants = {
   small: {
     width: '25px',
     gradientOne: '43%',
-    gradientTwo: '57%'
+    gradientTwo: '57%',
   },
   large: {
     width: '50px',
     gradientOne: '49%',
-    gradientTwo: '51%'
-  }
+    gradientTwo: '51%',
+  },
 }
 
 PreviewIcon.propTypes = {
@@ -99,7 +99,7 @@ PreviewIcon.propTypes = {
   variant: PropTypes.string,
   image: PropTypes.string,
   loading: PropTypes.bool,
-  checkered: PropTypes.bool
+  checkered: PropTypes.bool,
 }
 
 PreviewIcon.defaultProps = {
@@ -108,7 +108,7 @@ PreviewIcon.defaultProps = {
   testId: null,
   image: '',
   loading: false,
-  checkered: false
+  checkered: false,
 }
 
 export default PreviewIcon

@@ -68,7 +68,7 @@ $(document).ready(() => {
         'confirm.delete_grading_scheme',
         'Are you sure you want to delete this grading scheme?'
       ),
-      success(data) {
+      success(_data) {
         $(this).slideUp(function () {
           $(this).remove()
         })
@@ -89,7 +89,8 @@ $(document).ready(() => {
   })
   $('.grading_standard .remove_grading_standard_link').click(function (event) {
     event.preventDefault()
-    const result = confirm(
+    // eslint-disable-next-line no-alert
+    const result = window.confirm(
       I18n.t(
         'confirm.unlink_grading_scheme',
         'Are you sure you want to unlink this grading scheme?'
@@ -259,7 +260,7 @@ $(document).ready(() => {
             $find.addClass('loaded')
             $find.find('.grading_standards_holder').slideDown()
           },
-          data => {
+          _data => {
             $find
               .find('.loading_message')
               .text(
@@ -290,7 +291,7 @@ $(document).ready(() => {
       .each(function () {
         const name = $(this).find('.name').text()
         let val = numberHelper.parse($(this).find('.next_value').text()) / 100.0
-        if (isNaN(val)) {
+        if (Number.isNaN(Number(val))) {
           val = ''
         }
         data.push([name, val])
@@ -304,10 +305,10 @@ $(document).ready(() => {
     $(this)
       .parents('.grading_standard')
       .find('.edit_grading_standard_link')
-      .toggleClass('read_only', current_context_code != brief.context_code)
+      .toggleClass('read_only', current_context_code !== brief.context_code)
     $(this).parents('.find_grading_standard').find('.cancel_find_grading_standard_link').click()
   })
-  $('.grading_standard .cancel_button').click(function (event) {
+  $('.grading_standard .cancel_button').click(function (_event) {
     $(this)
       .parents('.grading_standard')
       .removeClass('editing')
@@ -317,7 +318,7 @@ $(document).ready(() => {
     $standard.find('.max_score_cell').removeAttr('tabindex')
     $standard.find('.to_add').remove()
     $standard.find('.to_delete').removeClass('to_delete').show()
-    if ($standard.attr('id') == 'grading_standard_new') {
+    if ($standard.attr('id') === 'grading_standard_new') {
       $standard.remove()
     }
   })
@@ -406,15 +407,15 @@ $(document).ready(() => {
       $standard.find('.remove_grading_standard_link').addClass('read_only')
     }
   })
-  $('.grading_standard .save_button').click(function (event) {
+  $('.grading_standard .save_button').click(function (_event) {
     const $standard = $(this).parents('.grading_standard')
     let url = $(
       '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url'
     ).attr('href')
     let method = 'POST'
     if (
-      $standard.attr('id') != 'grading_standard_blank' &&
-      $standard.attr('id') != 'grading_standard_new'
+      $standard.attr('id') !== 'grading_standard_blank' &&
+      $standard.attr('id') !== 'grading_standard_new'
     ) {
       url = $(this).parents('.grading_standard').find('.update_grading_standard_url').attr('href')
       method = 'PUT'
@@ -427,7 +428,7 @@ $(document).ready(() => {
 
       if (/^grading_standard\[.*\]\[value\]$/.test(key)) {
         parsedValue = numberHelper.parse(data[key])
-        if (!isNaN(parsedValue)) {
+        if (!Number.isNaN(Number(parsedValue))) {
           data[key] = parsedValue
         }
       }
@@ -441,8 +442,8 @@ $(document).ready(() => {
       url,
       method,
       data,
-      data => {
-        const standard = data.grading_standard
+      data_ => {
+        const standard = data_.grading_standard
         $standard
           .find('button')
           .attr('disabled', false)
@@ -459,7 +460,7 @@ $(document).ready(() => {
       }
     )
   })
-  $('.grading_standard thead').mouseover(function (event) {
+  $('.grading_standard thead').mouseover(function (_event) {
     if (!$(this).parents('.grading_standard').hasClass('editing')) {
       return
     }
@@ -480,7 +481,7 @@ $(document).ready(() => {
       $(this).prev('.insert_grading_standard').show()
     }
   })
-  $('.grading_standard *').focus(function (event) {
+  $('.grading_standard *').focus(function (_event) {
     $(this).trigger('mouseover')
     if ($(this).hasClass('delete_row_link')) {
       $(this)
@@ -544,7 +545,7 @@ $(document).ready(() => {
     val = round(val, 2)
     $(this).parents('.grading_standard_row').find('.standard_value').val(I18n.n(val))
 
-    if (isNaN(val)) {
+    if (Number.isNaN(Number(val))) {
       val = null
     }
 
@@ -559,20 +560,20 @@ $(document).ready(() => {
      * point value.
      */
     for (
-      var idx = $list.index($(this).parents('.grading_standard_row')) + 1;
+      let idx = $list.index($(this).parents('.grading_standard_row')) + 1;
       idx < $list.length;
       idx++
     ) {
-      var $row = $list.eq(idx)
+      const $row = $list.eq(idx)
 
       // Parse the given point value from the input of the current row.
-      var points = numberHelper.parse($row.find('.standard_value').val())
+      let points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
-      if (idx == $list.length - 1) {
+      if (idx === $list.length - 1) {
         // When the current row is the last row, the minimum point value must be 0.
         points = 0
       } else if (!points || points > lastVal - MINIMUM_SCHEME_VALUE_DIFFERENCE) {
@@ -582,7 +583,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(lastVal) - 1
+        points = parseInt(lastVal, 10) - 1
       }
 
       $row.find('.standard_value').val(I18n.n(points))
@@ -595,17 +596,17 @@ $(document).ready(() => {
      * subsequent row is able to reference it while calculating its own minimum
      * point value.
      */
-    for (var idx = $list.index($(this).parents('.grading_standard_row')) - 1; idx >= 0; idx--) {
-      var $row = $list.eq(idx)
+    for (let idx = $list.index($(this).parents('.grading_standard_row')) - 1; idx >= 0; idx--) {
+      const $row = $list.eq(idx)
 
       // Parse the given point value from the input of the current row.
-      var points = numberHelper.parse($row.find('.standard_value').val())
+      let points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
-      if (idx == $list.length - 1) {
+      if (idx === $list.length - 1) {
         // When the current row is the last row, the minimum point value must be 0.
         points = 0
       } else if (!points || points < prevVal + MINIMUM_SCHEME_VALUE_DIFFERENCE) {
@@ -615,7 +616,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(prevVal) + 1
+        points = parseInt(prevVal, 10) + 1
       }
 
       prevVal = points
@@ -633,12 +634,12 @@ $(document).ready(() => {
       // Parse the given point value from the input of the current row.
       let points = numberHelper.parse($(this).find('.standard_value').val())
 
-      var idx = $list.index(this)
-      if (isNaN(points)) {
+      idx = $list.index(this)
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
-      if (idx == $list.length - 1) {
+      if (idx === $list.length - 1) {
         // When the current row is the last row, the minimum point value must be 0.
         points = 0
       } else if (!points || points > lastVal - MINIMUM_SCHEME_VALUE_DIFFERENCE) {
@@ -648,7 +649,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(lastVal) - 1
+        points = parseInt(lastVal, 10) - 1
       }
 
       $(this).find('.standard_value').val(I18n.n(points))
@@ -662,27 +663,27 @@ $(document).ready(() => {
      * point value.
      */
     prevVal = 0
-    for (var idx = $list.length - 1; idx >= 0; idx--) {
-      var $row = $list.eq(idx)
+    for (let idx = $list.length - 1; idx >= 0; idx--) {
+      const $row = $list.eq(idx)
 
       // Parse the given point value from the input of the current row.
-      var points = numberHelper.parse($row.find('.standard_value').val())
+      let points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
-      if (idx == $list.length - 1) {
+      if (idx === $list.length - 1) {
         // When the current row is the last row, the minimum point value must be 0.
         points = 0
-      } else if ((!points || points < prevVal + MINIMUM_SCHEME_VALUE_DIFFERENCE) && points != 0) {
+      } else if ((!points || points < prevVal + MINIMUM_SCHEME_VALUE_DIFFERENCE) && points !== 0) {
         /*
          * When the current row is NOT the last row, and the minimum point value is
          * either absent or is too close (higher value than 0.01 less than the
          * previous value), change the minimum point value to be one point more
          * than the minimum point value of the next-lower row.
          */
-        points = parseInt(prevVal) + 1
+        points = parseInt(prevVal, 10) + 1
       }
 
       prevVal = points
@@ -694,7 +695,7 @@ $(document).ready(() => {
       let min_score = 0
       if ($prev && $prev.length > 0) {
         min_score = numberHelper.parse($prev.find('.standard_value').val())
-        if (isNaN(min_score)) {
+        if (Number.isNaN(Number(min_score))) {
           min_score = 0
         }
         $(this)

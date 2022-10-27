@@ -95,29 +95,29 @@ function getMenuItems(ed) {
     items = [
       {
         text: formatMessage('Edit Link'),
-        value: getCommandName(ed.selection.getNode())
+        value: getCommandName(ed.selection.getNode()),
       },
       {
         text: formatMessage('Remove Link'),
-        value: 'instructureUnlink'
-      }
+        value: 'instructureUnlink',
+      },
     ]
   } else {
     items = [
       {
         text: formatMessage('External Link'),
-        value: 'instructureLinkCreate'
-      }
+        value: 'instructureLinkCreate',
+      },
     ]
     if (contextType === 'course') {
       items.push({
         text: formatMessage('Course Link'),
-        value: 'instructure_course_links'
+        value: 'instructure_course_links',
       })
     } else if (contextType === 'group') {
       items.push({
         text: formatMessage('Group Link'),
-        value: 'instructure_group_links'
+        value: 'instructure_group_links',
       })
     }
     if (sel_anchors > 0) {
@@ -125,9 +125,9 @@ function getMenuItems(ed) {
       items.push({
         text: formatMessage.plural(sel_anchors, {
           one: 'Remove Link',
-          other: 'Remove Links'
+          other: 'Remove Links',
         }),
-        value: 'instructureUnlinkAll'
+        value: 'instructureUnlinkAll',
       })
     }
   }
@@ -199,9 +199,9 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
             onSetup: api => {
               api.setDisabled(!isOKToLink(ed.selection.getContent()))
               return () => {}
-            }
+            },
           }
-        })
+        }),
     })
 
     // Register toolbar button
@@ -213,7 +213,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
           return {
             type: 'choiceitem',
             text: item.text,
-            value: item.value
+            value: item.value,
           }
         })
         callback(items)
@@ -273,7 +273,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
           ed.off('NodeChange', handleNodeChange)
           ed.off('Change', deleteEmptyLink)
         }
-      }
+      },
     })
 
     // the context toolbar buttons
@@ -283,7 +283,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
       },
 
       text: formatMessage('Link Options'),
-      tooltip: formatMessage('Show link options')
+      tooltip: formatMessage('Show link options'),
     })
     const remButtonLabel = formatMessage('Remove Link')
     ed.ui.registry.addButton('instructureUnlink', {
@@ -291,16 +291,16 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
         removeAnchorFromSelectedElement(ed)
       },
 
-      text: remButtonLabel
+      text: remButtonLabel,
     })
 
     ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
       items: 'instructure-link-options instructureUnlink',
       position: 'node',
       predicate: elem => !!getAnchorElement(ed, elem),
-      scope: 'node'
+      scope: 'node',
     })
-  }
+  },
 })
 
 // Register plugin

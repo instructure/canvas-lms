@@ -29,7 +29,7 @@ import {IconButton} from '@instructure/ui-buttons'
 
 const hideStyle = {
   position: 'absolute',
-  left: '-9999px'
+  left: '-9999px',
 }
 
 export default class ShowOnFocusButton extends Component {
@@ -37,11 +37,11 @@ export default class ShowOnFocusButton extends Component {
     children: oneOfType([node, func]).isRequired, // func === functional component
     onClick: func,
     screenReaderLabel: string.isRequired,
-    margin: string
+    margin: string,
   }
 
   state = {
-    visible: false
+    visible: false,
   }
 
   handleFocus = () => {

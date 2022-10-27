@@ -29,7 +29,7 @@ const isNumeric = n => {
   } catch (e) {
     return false
   }
-  return !isNaN(n) && isFinite(n) // eslint-disable-line no-restricted-globals
+  return !Number.isNaN(Number(n)) && Number.isFinite(Number(n))
 }
 
 const checkBlank = s => {

@@ -54,13 +54,13 @@ export default function ImageList({images, lastItemRef, onImageClick, isIconMake
 ImageList.propTypes = {
   images: arrayOf(Image.propTypes.image),
   lastItemRef: shape({
-    current: instanceOf(Element)
+    current: instanceOf(Element),
   }).isRequired,
   onImageClick: func.isRequired,
-  isIconMaker: bool
+  isIconMaker: bool,
 }
 
 ImageList.defaultProps = {
   images: [],
-  isIconMaker: false
+  isIconMaker: false,
 }

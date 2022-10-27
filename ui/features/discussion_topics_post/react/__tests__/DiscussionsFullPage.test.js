@@ -98,23 +98,37 @@ describe('DiscussionFullPage', () => {
     expect(container).toBeTruthy()
   })
 
+  it('should render split screen view if enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
+  it('should render isolated view if enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
+  it('should render isolated view if both isolated view and split screen view are enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
   describe('discussion entries', () => {
     it('should render', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
         ...getDiscussionSubentriesQueryMock({
           first: 20,
-          sort: 'desc',
         }),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
-      expect(container.queryByText('This is the child reply')).toBeNull()
+      expect(container.queryByText('This is the child reply asc')).toBeNull()
 
       const expandButton = container.getByTestId('expand-button')
       fireEvent.click(expandButton)
 
-      expect(await container.findByText('This is the child reply')).toBeInTheDocument()
+      expect(await container.findByText('This is the child reply asc')).toBeInTheDocument()
     })
 
     it('should allow deleting entries', async () => {
@@ -454,6 +468,14 @@ describe('DiscussionFullPage', () => {
     await waitFor(() =>
       expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
     )
+
+    // expect the highlight to exist for a while
+    jest.advanceTimersByTime(3000)
+    expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+    // expect the highlight to disappear
+    jest.advanceTimersByTime(3000)
+    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')

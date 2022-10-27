@@ -37,14 +37,9 @@ const defaultProps = {
   selectedContextId: COURSE.id,
   selectedContextType: 'Course' as const,
   setSelectedPaceContext: selectPaceContextFn,
-  changeCount: 0,
   responsiveSize: 'large' as const,
+  unappliedChangesExist: false,
 }
-
-beforeAll(() => {
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_for_sections = true
-})
 
 afterEach(() => {
   jest.clearAllMocks()
@@ -137,7 +132,9 @@ describe('PacePicker', () => {
 
   describe('warning modal', () => {
     it('is displayed if context changes with unpublished changes', () => {
-      const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
+      const {getByText, getByLabelText} = render(
+        <PacePicker {...defaultProps} unappliedChangesExist={true} />
+      )
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
@@ -148,7 +145,7 @@ describe('PacePicker', () => {
 
     it('shows a message for changes in section paces', () => {
       const {getByText, getByLabelText} = render(
-        <PacePicker {...defaultProps} selectedContextType="Section" changeCount={1} />
+        <PacePicker {...defaultProps} selectedContextType="Section" unappliedChangesExist={true} />
       )
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
@@ -160,7 +157,7 @@ describe('PacePicker', () => {
 
     it('aborts context change on cancel', () => {
       const {getByDisplayValue, getByText, getByLabelText} = render(
-        <PacePicker {...defaultProps} changeCount={1} />
+        <PacePicker {...defaultProps} unappliedChangesExist={true} />
       )
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
@@ -173,7 +170,9 @@ describe('PacePicker', () => {
     })
 
     it('cancels context change on "Keep Editing"', () => {
-      const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
+      const {getByText, getByLabelText} = render(
+        <PacePicker {...defaultProps} unappliedChangesExist={true} />
+      )
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
@@ -185,7 +184,9 @@ describe('PacePicker', () => {
     })
 
     it('changes context change on "Discard Changes"', () => {
-      const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
+      const {getByText, getByLabelText} = render(
+        <PacePicker {...defaultProps} unappliedChangesExist={true} />
+      )
       const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())

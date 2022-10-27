@@ -37,9 +37,9 @@ function exportPropsToSelf(properties, keyMethod) {
     }
   }
 
-  let keys = keyMethod(properties),
-    keyLength = keys.length,
-    prop
+  const keys = keyMethod(properties)
+  let keyLength = keys.length
+  let prop
 
   while (keyLength--) {
     prop = keys[keyLength]
@@ -152,6 +152,7 @@ function TinyMCEContentItem(contentItem) {
   exportPropsToSelf.call(this, contentItem, Object.getOwnPropertyNames)
 
   decorate('isLTI', function () {
+    // eslint-disable-next-line no-bitwise
     return !!~LTI_MIME_TYPES.indexOf(this.mediaType)
   })
 
@@ -181,13 +182,13 @@ function TinyMCEContentItem(contentItem) {
       return JSON.stringify(this.placementAdvice)
     }
 
-    return this.placementAdvice.presentationDocumentTarget.toLowerCase() == 'window'
+    return this.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window'
       ? '_blank'
       : null
   })
 
   decorate('docTarget', function () {
-    if (this.placementAdvice.presentationDocumentTarget == 'embed' && !this.isImage) {
+    if (this.placementAdvice.presentationDocumentTarget === 'embed' && !this.isImage) {
       return 'text'
     } else if (this.isOverriddenForThumbnail) {
       return 'link'

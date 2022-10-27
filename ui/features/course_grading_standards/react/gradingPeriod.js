@@ -53,7 +53,7 @@ class GradingPeriod extends React.Component {
     weight: this.props.weight,
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       title: nextProps.title,
       startDate: nextProps.startDate,
@@ -94,7 +94,7 @@ class GradingPeriod extends React.Component {
     return (
       <GradingPeriodTemplate
         key={this.props.id}
-        ref="template"
+        ref={c => (this.templateRef = c)}
         id={this.props.id}
         title={this.props.title}
         weight={this.props.weight}

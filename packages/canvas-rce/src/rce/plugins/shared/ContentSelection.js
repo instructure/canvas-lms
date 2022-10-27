@@ -43,7 +43,7 @@ export function asImageEmbed($element) {
   return {
     ...fromImageEmbed($element),
     $element,
-    type: IMAGE_EMBED_TYPE
+    type: IMAGE_EMBED_TYPE,
   }
 }
 
@@ -86,7 +86,7 @@ export function asLink($element, editor) {
     url: $link.href,
     contentType,
     fileName,
-    published
+    published,
   }
 }
 
@@ -111,7 +111,7 @@ export function asVideoElement($element) {
     type: VIDEO_EMBED_TYPE,
     id:
       $videoElem.parentElement?.getAttribute('data-mce-p-data-media-id') ||
-      $videoElem.getAttribute('data-mce-p-data-media-id')
+      $videoElem.getAttribute('data-mce-p-data-media-id'),
   }
 }
 
@@ -131,7 +131,7 @@ export function asAudioElement($element) {
     titleText: title,
     id:
       $element.parentElement?.getAttribute('data-mce-p-data-media-id') ||
-      $element.getAttribute('data-mce-p-data-media-id')
+      $element.getAttribute('data-mce-p-data-media-id'),
   }
 
   if ($audioIframe.tagName === 'IFRAME') {
@@ -156,14 +156,14 @@ function asText($element, editor) {
   return {
     $element,
     text,
-    type: TEXT_TYPE
+    type: TEXT_TYPE,
   }
 }
 
 function asNone($element) {
   return {
     $element: $element || null,
-    type: NONE_TYPE
+    type: NONE_TYPE,
   }
 }
 

@@ -22,18 +22,14 @@ import {useSvgSettings, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 
 describe('useSvgSettings()', () => {
-  let editing, ed, rcs
+  let editing, ed
+  const canvasOrigin = 'https://domain.from.env'
 
   beforeEach(() => {
     ed = new Editor()
-    rcs = {
-      contextType: 'course',
-      contextId: 1,
-      canvasUrl: 'https://domain.from.env'
-    }
   })
 
-  const subject = () => renderHook(() => useSvgSettings(ed, editing, rcs)).result
+  const subject = () => renderHook(() => useSvgSettings(ed, editing, canvasOrigin)).result
 
   describe('when a new icon is being created (not editing)', () => {
     beforeEach(() => {
@@ -180,7 +176,7 @@ describe('useSvgSettings()', () => {
       mock = fetchMock.mock({
         name: 'icon_metadata',
         matcher: '*',
-        response: () => ({body})
+        response: () => ({body}),
       })
     })
 
@@ -247,7 +243,9 @@ describe('useSvgSettings()', () => {
     })
 
     it('parses the SVG settings from the icon metadata', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+      const {result, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, canvasOrigin)
+      )
 
       await waitForValueToChange(() => {
         return result.current[0]
@@ -308,14 +306,14 @@ describe('useSvgSettings()', () => {
             imageSettings: {
               cropperSettings: null,
               icon: {
-                label: 'Art Icon'
+                label: 'Art Icon',
               },
               iconFillColor: '#FFFFFF',
               image: 'Art Icon',
-              mode: 'SingleColor'
-            }
+              mode: 'SingleColor',
+            },
           },
-          ...overrideParams
+          ...overrideParams,
         })}`
 
       const overwriteUrl = () =>
@@ -323,7 +321,7 @@ describe('useSvgSettings()', () => {
           name: 'icon_metadata',
           matcher: '*',
           response: () => ({body}),
-          overwriteRoutes: true
+          overwriteRoutes: true,
         }))
 
       beforeEach(() => {
@@ -333,7 +331,9 @@ describe('useSvgSettings()', () => {
       })
 
       it('replaces icon type from object to string for single-color images', async () => {
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -387,16 +387,18 @@ describe('useSvgSettings()', () => {
             cropperSettings: null,
             icon: {
               // Spanish label
-              label: 'Ícono de arte'
+              label: 'Ícono de arte',
             },
             iconFillColor: '#FFFFFF',
             image: 'Art Icon',
-            mode: 'SingleColor'
-          }
+            mode: 'SingleColor',
+          },
         })
         overwriteUrl()
 
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -450,16 +452,18 @@ describe('useSvgSettings()', () => {
             cropperSettings: null,
             icon: {
               // Invalid label
-              label: 'Banana'
+              label: 'Banana',
             },
             iconFillColor: '#FFFFFF',
             image: 'Art Icon',
-            mode: 'SingleColor'
-          }
+            mode: 'SingleColor',
+          },
         })
         overwriteUrl()
 
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -508,7 +512,9 @@ describe('useSvgSettings()', () => {
     })
 
     it('returns the status to "idle"', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+      const {result, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, canvasOrigin)
+      )
 
       await waitForValueToChange(() => {
         return result.current[1]
@@ -631,7 +637,7 @@ describe('useSvgSettings()', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
             "textPosition":"below"
-          }`
+          }`,
       })
 
       fetchMock.mock('begin:https://domain.from.env/api/v1/files/2/icon_metadata', {
@@ -649,7 +655,7 @@ describe('useSvgSettings()', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
             "textPosition":"below"
-          }`
+          }`,
       })
     })
 
@@ -657,7 +663,7 @@ describe('useSvgSettings()', () => {
 
     it('loads the correct metadata', async () => {
       const {result, rerender, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, rcs)
+        useSvgSettings(ed, editing, canvasOrigin)
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image-1')[0])

@@ -21,7 +21,11 @@ import FileSelectBox from '@canvas/select-content-dialog/react/components/FileSe
 
 let wrapper
 
-const renderComponent = () => ReactDOM.render(<FileSelectBox contextString="test_3" />, wrapper)
+const renderComponent = () => {
+  const ref = React.createRef()
+  ReactDOM.render(<FileSelectBox ref={ref} contextString="test_3" />, wrapper)
+  return ref.current
+}
 
 const folders = [
   {
@@ -108,7 +112,7 @@ test('it renders', function () {
 test('it should alphabetize the folder list', function () {
   this.server.respond()
   // This also tests that folders without files are not shown.
-  const childrenLabels = $(this.component.refs.selectBox)
+  const childrenLabels = $(this.component.selectBoxRef)
     .children('optgroup')
     .toArray()
     .map(x => x.label)
@@ -118,12 +122,12 @@ test('it should alphabetize the folder list', function () {
 
 test('it should show the loading state while files are loading', function () {
   // Has aria-busy attr set to true for a11y
-  equal($(this.component.refs.selectBox).attr('aria-busy'), 'true')
-  equal($(this.component.refs.selectBox).children()[1].text, 'Loading...')
+  equal($(this.component.selectBoxRef).attr('aria-busy'), 'true')
+  equal($(this.component.selectBoxRef).children()[1].text, 'Loading...')
   this.server.respond()
   // Make sure those things disappear when the content actually loads
-  equal($(this.component.refs.selectBox).attr('aria-busy'), 'false')
-  const loading = $(this.component.refs.selectBox)
+  equal($(this.component.selectBoxRef).attr('aria-busy'), 'false')
+  const loading = $(this.component.selectBoxRef)
     .children()
     .toArray()
     .filter(x => x.text === 'Loading...')

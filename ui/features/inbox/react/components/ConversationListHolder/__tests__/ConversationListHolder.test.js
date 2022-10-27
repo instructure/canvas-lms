@@ -148,7 +148,7 @@ const props = {
   isLoadingMoreMenuData: false,
   hasMoreMenuData: false,
   fetchMoreMenuData: jest.fn(),
-  isError: false,
+  isError: {},
 }
 
 jest.mock('../../../../util/utils', () => ({

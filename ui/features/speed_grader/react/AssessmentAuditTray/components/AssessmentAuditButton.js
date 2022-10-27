@@ -19,14 +19,14 @@
 import React from 'react'
 import {func} from 'prop-types'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {IconClockLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('speed_grader')
 
 const theme = {
-  [Button.theme]: {
+  [Link.theme]: {
     smallPadding: '0',
   },
 }
@@ -34,9 +34,9 @@ const theme = {
 export default function AssessmentAuditButton(props) {
   return (
     <ApplyTheme theme={theme}>
-      <Button renderIcon={IconClockLine} onClick={props.onClick} size="small" variant="link">
+      <Link renderIcon={IconClockLine} onClick={props.onClick} size="small" as="button">
         {I18n.t('Assessment audit')}
-      </Button>
+      </Link>
     </ApplyTheme>
   )
 }

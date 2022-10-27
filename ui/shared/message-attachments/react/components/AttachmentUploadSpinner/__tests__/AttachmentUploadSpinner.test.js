@@ -25,7 +25,7 @@ const setup = props => {
   return render(
     <AttachmentUploadSpinner
       sendMessage={Function.prototype}
-      isMessageSending
+      isMessageSending={true}
       pendingUploads={['fake upload']}
       {...props}
     />

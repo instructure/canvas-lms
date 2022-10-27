@@ -22,11 +22,13 @@ import {PastMessages} from '../../components/PastMessages/PastMessages'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {AttachmentDisplay} from '@canvas/message-attachments'
+import {AttachmentDisplay, MediaAttachment} from '@canvas/message-attachments'
 import {Flex} from '@instructure/ui-flex'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
+
+const {Item} = Flex
 
 const ModalBody = props => (
   <Modal.Body padding="none">
@@ -41,15 +43,30 @@ const ModalBody = props => (
         <MessageBody onBodyChange={props.onBodyChange} messages={props.bodyMessages} />
       </View>
       {props.pastMessages?.length > 0 && <PastMessages messages={props.pastMessages} />}
-      {props.attachments?.length > 0 && (
-        <View borderWidth="small none none none" padding="small">
+      <Flex alignItems="start" borderWidth="small none none none" padding="small">
+        {props.mediaUploadFile && props.mediaUploadFile.uploadedFile && (
+          <Item data-testid="media-attachment">
+            <MediaAttachment
+              file={{
+                mediaID: props.mediaUploadFile.mediaObject.media_object.media_id,
+                src: URL.createObjectURL(props.mediaUploadFile.uploadedFile),
+                title: props.mediaUploadFile.mediaObject.media_object.title,
+                type: props.mediaUploadFile.mediaObject.media_object.media_type,
+                mediaTracks: props.mediaUploadFile.mediaObject.media_object.media_tracks,
+              }}
+              onRemoveMediaComment={props.onRemoveMediaComment}
+            />
+          </Item>
+        )}
+
+        <Item shouldShrink={true}>
           <AttachmentDisplay
             attachments={props.attachments}
             onReplaceItem={props.replaceAttachment}
             onDeleteItem={props.removeAttachment}
           />
-        </View>
-      )}
+        </Item>
+      </Flex>
     </Flex>
   </Modal.Body>
 )
@@ -68,6 +85,8 @@ ModalBody.propTypes = {
   removeAttachment: PropTypes.func,
   replaceAttachment: PropTypes.func,
   modalError: PropTypes.string,
+  mediaUploadFile: PropTypes.object,
+  onRemoveMediaComment: PropTypes.func,
 }
 
 export default ModalBody

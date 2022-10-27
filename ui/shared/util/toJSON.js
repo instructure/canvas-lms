@@ -33,8 +33,8 @@ const build = function (base, key, value) {
 }
 
 $.fn.toJSON = function () {
-  let json = {},
-    push_counters = {}
+  let json = {}
+  const push_counters = {}
 
   const push_counter = function (key, i) {
     if (push_counters[key] === undefined) {
@@ -54,9 +54,9 @@ $.fn.toJSON = function () {
     }
 
     let k,
-      keys = this.name.match(patterns.key),
       merge = this.value,
       reverse_key = this.name
+    const keys = this.name.match(patterns.key)
 
     while ((k = keys.pop()) !== undefined) {
       // adjust reverse_key

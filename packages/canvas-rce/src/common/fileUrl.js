@@ -21,25 +21,41 @@
 // in mocha tests.
 import {parse, format} from 'url'
 
+function parseCanvasUrl(url) {
+  if (!url) {
+    return null
+  }
+  const parsed = parse(url, true)
+  if (parsed.host && window.location.host !== parsed.host) {
+    return null
+  }
+  return parsed
+}
+function changeDownloadToWrapParams(parsedUrl) {
+  delete parsedUrl.search
+  delete parsedUrl.query.download_frd
+  parsedUrl.query.wrap = '1'
+  parsedUrl.pathname = parsedUrl.pathname.replace(/\/(?:download|preview)\/?$/, '')
+  return parsedUrl
+}
+function addContext(parsedUrl, contextType, contextId) {
+  // if this is a http://canvas/files... url. change it to be contextual
+  if (/^\/files/.test(parsedUrl.pathname)) {
+    const context = contextType.replace(/([^s])$/, '$1s') // canvas contexts are plural
+    parsedUrl.pathname = `/${context}/${contextId}${parsedUrl.pathname}`
+  }
+  return parsedUrl
+}
 // simply replaces the download_frd url param with wrap
 // wrap=1 will (often) cause the resource to be loaded
 // in an iframe on canvas' files page
 export function downloadToWrap(url) {
-  if (!url) {
+  const parsed = parseCanvasUrl(url)
+  if (!parsed) {
     return url
   }
-  const parsed = parse(url, true)
-  if (parsed.host && window.location.host !== parsed.host) {
-    return url
-  }
-  delete parsed.search
-  delete parsed.query.download_frd
-  parsed.query.wrap = '1'
-  parsed.pathname = parsed.pathname.replace(/\/(?:download|preview)\/?$/, '')
-
-  return format(parsed)
+  return format(changeDownloadToWrapParams(parsed))
 }
-
 // take a url to a file (e.g. /files/17), and convert it to
 // it's in-context url (e.g. /courses/2/files/17).
 // Add wrap=1 to the url so it previews, not downloads
@@ -51,43 +67,29 @@ export function fixupFileUrl(contextType, contextId, fileInfo) {
   // the file may have an href or a url
   const key = fileInfo.href ? 'href' : 'url'
   if (fileInfo[key]) {
-    const parsed = parse(fileInfo[key], true)
-    if (!parsed.host || window.location.host === parsed.host) {
-      // only fixup our urls
-
-      delete parsed.search
-      delete parsed.query.download_frd
-      parsed.query.wrap = '1'
-      parsed.pathname = parsed.pathname.replace(/\/download\/?$/, '')
-
-      // if this is a http://canvas/files... url. change it to be contextual
-      if (/^\/files/.test(parsed.pathname)) {
-        const context = contextType.replace(/([^s])$/, '$1s') // canvas contexts are plural
-        parsed.pathname = `/${context}/${contextId}${parsed.pathname}`
-      }
-
-      // if this is a user file, add the verifier
-      if (fileInfo.uuid && contextType.includes('user')) {
-        delete parsed.search
-        parsed.query.verifier = fileInfo.uuid
-      }
-      fileInfo[key] = format(parsed)
+    let parsed = parseCanvasUrl(fileInfo[key])
+    if (!parsed) {
+      return fileInfo
     }
+    parsed = changeDownloadToWrapParams(parsed)
+    parsed = addContext(parsed, contextType, contextId)
+    // if this is a user file, add the verifier
+    if (fileInfo.uuid && contextType.includes('user')) {
+      delete parsed.search
+      parsed.query.verifier = fileInfo.uuid
+    }
+    fileInfo[key] = format(parsed)
   }
   return fileInfo
 }
-
 // embedded resources, like an <img src=url> with /preview
 // in the url will not be logged as a view in canvas.
 // This is appropriate for images in some rce content.
 // Remove wrap=1 to indicate we want the file downloaded
 // (which is necessary to show in an <img> tag), not viewed
 export function prepEmbedSrc(url) {
-  if (!url) {
-    return url
-  }
-  const parsed = parse(url, true)
-  if (parsed.host && window.location.host !== parsed.host) {
+  const parsed = parseCanvasUrl(url)
+  if (!parsed) {
     return url
   }
   if (!/\/preview(?:\?|$)/.test(parsed.pathname)) {
@@ -97,17 +99,13 @@ export function prepEmbedSrc(url) {
   delete parsed.query.wrap
   return format(parsed)
 }
-
 // when the user opens a link to a resource, we want its view
-// logged, so replace /preview with /download
+// logged, so remove /preview
 // Add wrap=1 to indicate clicking on the link should open a preview
-// and not download the file
+// and not download the file (this doesn't work if the original link is a download link)
 export function prepLinkedSrc(url) {
-  if (!url) {
-    return url
-  }
-  const parsed = parse(url, true)
-  if (parsed.host && window.location.host !== parsed.host) {
+  const parsed = parseCanvasUrl(url)
+  if (!parsed) {
     return url
   }
   delete parsed.search

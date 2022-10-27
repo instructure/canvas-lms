@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Næsta síða"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Engar breytingar til að vista."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Engum skiladagsetningum úthlutað"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Forsniðnir"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Pretty HTML ritlill"
-    },
     "preview_53003fd2": {
         "message": "Forskoðun"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Rökréttar tölur"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Óunninn HTML-ritill"
     },
     "real_numbers_7c99df94": {
         "message": "Raunverulegar tölur"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Skoða næstu viku"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Skoða fyrirfram skilgreinda liti"
     },
     "view_previous_week_6f83849f": {
         "message": "Skoða síðustu viku"

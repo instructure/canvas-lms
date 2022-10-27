@@ -72,14 +72,12 @@ export default class NaiveFetchDispatch {
        */
       request.active = true
 
-      /* eslint-disable promise/catch-or-return */
       fetch(...args)
         .then(request.resolve)
         .catch(request.reject)
         .finally(() => {
           this.clearRequest(request)
         })
-      /* eslint-enable promise/catch-or-return */
     }
 
     this.addRequest(request)

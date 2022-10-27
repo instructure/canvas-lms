@@ -122,7 +122,7 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
     name: results.display_name,
     url: results.preview_url,
     type: fileMetaProps.contentType,
-    embed: fileEmbed(results)
+    embed: fileEmbed(results),
   }
 
   actions.push(files.createAddFile(fileProps))
@@ -148,7 +148,7 @@ export function embedUploadResult(results, selectedTabType) {
       content_type: results['content-type'],
       contextType: results.contextType,
       contextId: results.contextId,
-      uuid: results.uuid
+      uuid: results.uuid,
     }
     bridge.insertImage(file_props)
   } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
@@ -166,7 +166,7 @@ export function embedUploadResult(results, selectedTabType) {
       type: embedData.type,
       contextType: results.contextType,
       contextId: results.contextId,
-      uuid: results.uuid
+      uuid: results.uuid,
     })
   } else {
     bridge.insertLink(
@@ -184,7 +184,7 @@ export function embedUploadResult(results, selectedTabType) {
         target: '_blank',
         contextType: results.contextType,
         contextId: results.contextId,
-        uuid: results.uuid
+        uuid: results.uuid,
       },
       false
     )
@@ -229,7 +229,7 @@ export function mediaUploadComplete(error, uploadData) {
         embedded_iframe_url: mediaObject.embedded_iframe_url,
         media_id: mediaObject.media_object.media_id,
         type: uploadedFile.type,
-        title: uploadedFile.title || uploadedFile.name
+        title: uploadedFile.title || uploadedFile.name,
       }
       dispatch(removePlaceholdersFor(uploadedFile.name))
       embedUploadResult(embedData, 'media')
@@ -258,9 +258,9 @@ export function uploadToIconMakerFolder(svg, uploadSettings = {}) {
     const fileMetaProps = {
       file: {
         name: svg.name,
-        type: 'image/svg+xml'
+        type: 'image/svg+xml',
       },
-      name: svg.name
+      name: svg.name,
     }
 
     return source.fetchIconMakerFolder({jwt, host, contextId, contextType}).then(({folders}) => {
@@ -271,7 +271,7 @@ export function uploadToIconMakerFolder(svg, uploadSettings = {}) {
           contextId,
           contextType,
           onDuplicate,
-          category: ICON_MAKER_ICONS
+          category: ICON_MAKER_ICONS,
         })
         .then(results => {
           return source.uploadFRD(svgAsFile, results)
@@ -295,7 +295,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
           contextId,
           contextType,
           origin: originFromHost(host),
-          headers: headerFor(jwt)
+          headers: headerFor(jwt),
         },
         (err, uploadData) => {
           dispatch(mediaUploadComplete(err, uploadData))

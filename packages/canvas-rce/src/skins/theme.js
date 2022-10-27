@@ -89,7 +89,7 @@ export default function generator({borders, colors, forms, shadows, spacing, typ
     canvasFormElementLabelFontWeight: typography.fontWeightBold,
 
     // a11y button badge
-    canvasBadgeBackgroundColor: colors.textInfo
+    canvasBadgeBackgroundColor: colors.textInfo,
   }
   vars.tinySplitButtonChevronHoverBackground = darken(vars.toolbarButtonHoverBackground, 10)
   return vars
@@ -112,7 +112,7 @@ generator.canvas = function (variables) {
 
     activeMenuItemBackground: variables['ic-brand-button--primary-bgd'],
     activeMenuItemLabelColor: variables['ic-brand-button--primary-text'],
-    tableSelectorHighlightColor: alpha(lighten(variables['ic-brand-primary'], 10), 50)
+    tableSelectorHighlightColor: alpha(lighten(variables['ic-brand-primary'], 10), 50),
   }
 }
 
@@ -123,6 +123,6 @@ generator['canvas-a11y'] = generator['canvas-high-contrast'] = function ({colors
     canvasLinkDecoration: 'underline',
     canvasFocusBorderColor: colors.borderBrand,
     canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
-    canvasBrandColor: colors.brand
+    canvasBrandColor: colors.brand,
   }
 }

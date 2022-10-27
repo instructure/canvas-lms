@@ -31,6 +31,8 @@ describe('canvas_quizzes/statistics/views/questions/calculated', () => {
     try {
       getByText('View in SpeedGrader')
       expect(false).toBe(true)
-    } catch (e) {}
+    } catch (e) {
+      // no-op
+    }
   })
 })

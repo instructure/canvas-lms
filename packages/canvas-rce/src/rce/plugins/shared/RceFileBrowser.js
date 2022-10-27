@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
 import RceApiSource from '../../../rcs/api'
+import addIconMakerAttributes from '../instructure_icon_maker/utils/addIconMakerAttributes'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -31,7 +32,7 @@ import {isPreviewable} from './Previewable'
 RceFileBrowser.propTypes = {
   onFileSelect: func.isRequired,
   onAllFilesLoading: func.isRequired,
-  searchString: string.isRequired
+  searchString: string.isRequired,
 }
 
 export default function RceFileBrowser(props) {
@@ -42,7 +43,7 @@ export default function RceFileBrowser(props) {
       new RceApiSource({
         jwt,
         refreshToken,
-        host
+        host,
       })
     )
   }, [host, jwt, refreshToken, source])
@@ -51,24 +52,31 @@ export default function RceFileBrowser(props) {
     const content_type = fileInfo.api.type
     const canPreview = isPreviewable(content_type)
 
-    const clazz = classnames('instructure_file_link', {
-      instructure_scribd_file: canPreview,
-      inline_disabled: true
-    })
-
     const url = downloadToWrap(fileInfo.src)
     const embedded_iframe_url = mediaPlayerURLFromFile(fileInfo.api)
 
-    onFileSelect({
+    let onFileSelectParams = {
       name: fileInfo.name,
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
       media_id: fileInfo.api.embed?.id,
       target: '_blank',
-      class: clazz,
-      content_type
-    })
+      content_type,
+    }
+    if (fileInfo.api?.category === 'icon_maker_icons') {
+      onFileSelectParams.src = fileInfo.api.url
+      addIconMakerAttributes(onFileSelectParams)
+    } else {
+      // do not add this to icon maker icons
+      const clazz = classnames('instructure_file_link', {
+        instructure_scribd_file: canPreview,
+        inline_disabled: true,
+      })
+      onFileSelectParams = {...onFileSelectParams, class: clazz}
+    }
+
+    onFileSelect(onFileSelectParams)
   }
 
   return (

@@ -127,7 +127,7 @@ class FileOptionsCollection {
     return ReactDOM.findDOMNode(this.refs.addFileInput).click()
   }
 
-  handleFilesInputChange(e) {
+  handleFilesInputChange(_e) {
     const selectedFiles = this.toFilesOptionArray(
       ReactDOM.findDOMNode(this.refs.addFileInput).files
     )
@@ -147,6 +147,7 @@ class FileOptionsCollection {
 
     // redo conflict resolution, new name from user could still conflict
     const allOptions = resolvedNames.concat(nameCollisions).concat(zips)
+    // eslint-disable-next-line prefer-const
     ;({resolved, collisions, zips} = this.segregateOptionBuckets(allOptions))
     this.setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})
   }
@@ -163,6 +164,7 @@ class FileOptionsCollection {
 
     // redo conflict resolution, new name from user could still conflict
     const allOptions = resolvedNames.concat(nameCollisions).concat(zips)
+    // eslint-disable-next-line prefer-const
     ;({resolved, collisions, zips} = this.segregateOptionBuckets(allOptions))
     this.setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})
   }

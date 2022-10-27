@@ -81,7 +81,7 @@ jQuery(function ($) {
         .getTemplateData({textValues: ['id']}).id
       return data
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this).loadingImage({image_size: 'small'}).addClass('saving')
     },
     success(data) {
@@ -154,7 +154,7 @@ jQuery(function ($) {
               $focusTo.focus()
             })
           },
-          error(data, request, status, error) {
+          error(data) {
             this.undim()
             if (data.hasOwnProperty('message')) {
               alert(data.message)
@@ -191,10 +191,10 @@ jQuery(function ($) {
           $header.find('.collapse_sub_accounts_link, .add_sub_account_link').show()
           $header.parent('.account').children('ul').empty().hide()
           let account = null
-          for (var idx in data) {
+          for (const idx in data) {
             account = data[idx]
           }
-          for (var idx in account.sub_accounts) {
+          for (const idx in account.sub_accounts) {
             let sub_account = null
             for (const jdx in account.sub_accounts[idx]) {
               if (typeof account.sub_accounts[idx][jdx] === 'object') {
@@ -261,7 +261,7 @@ jQuery(function ($) {
           $header.parent('.account').children('ul').slideDown()
           $header.find('.collapse_sub_accounts_link').focus()
         },
-        data => {}
+        _data => {}
       )
     }
     return false

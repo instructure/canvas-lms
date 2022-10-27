@@ -17,7 +17,7 @@
  */
 import React, {Component} from 'react'
 import {bool, func, string} from 'prop-types'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -29,14 +29,14 @@ export default class LoadingFutureIndicator extends Component {
     loadingFuture: bool,
     allFutureItemsLoaded: bool,
     onLoadMore: func,
-    loadingError: string
+    loadingError: string,
   }
 
   static defaultProps = {
     loadingFuture: false,
     allFutureItemsLoaded: false,
     onLoadMore: () => {},
-    loadingError: undefined
+    loadingError: undefined,
   }
 
   handleLoadMoreButton = () => {
@@ -46,9 +46,9 @@ export default class LoadingFutureIndicator extends Component {
   renderLoadMore() {
     if (!this.props.loadingFuture && !this.props.allFutureItemsLoaded) {
       return (
-        <CondensedButton onClick={this.handleLoadMoreButton}>
+        <Link isWithinText={false} as="button" onClick={this.handleLoadMoreButton}>
           {formatMessage('Load more')}
-        </CondensedButton>
+        </Link>
       )
     }
   }

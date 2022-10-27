@@ -73,7 +73,7 @@ const FastSelectComponent = Component.extend({
     .observes('items')
     .on('didInsertElement'),
 
-  arrayWillChange(items, start, removeCount, addCount) {
+  arrayWillChange(items, start, removeCount, _addCount) {
     const select = get(this, 'element')
     const options = select.childNodes
     let i = start + removeCount - 1

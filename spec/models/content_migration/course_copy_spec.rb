@@ -567,6 +567,21 @@ describe ContentMigration do
       expect(@copy_to.reload.overridden_course_visibility).to be_blank
     end
 
+    it "does not overwrite visibility when skipped" do
+      @copy_from.is_public = true
+      @copy_from.is_public_to_auth_users = true
+      @copy_from.save!
+
+      @cm.copy_options = { everything: true }
+      @cm.migration_settings = { importer_skips: ["visibility_settings"] }
+      @cm.save!
+
+      run_course_copy
+
+      expect(@copy_to.is_public).to be false
+      expect(@copy_to.is_public_to_auth_users).to be false
+    end
+
     it "copies dashboard images" do
       att = attachment_model(context: @copy_from, uploaded_data: stub_png_data, filename: "homework.png")
       @copy_from.image_id = att.id

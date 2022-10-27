@@ -71,6 +71,8 @@ export default class DeleteExternalToolButton extends React.Component {
     if (this.props.canDelete || this.props.canAddEdit) {
       return (
         <li role="presentation" className="DeleteExternalToolButton">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
             tabIndex="-1"

@@ -65,7 +65,9 @@ class BreakdownGraph extends React.Component {
               lowerBound: this.props.lowerBound,
             })}
           </span>
+          {/* TODO: use InstUI button */}
           <button
+            type="button"
             className="crs-link-button"
             onClick={this.selectRange}
             title={I18n.t('View range student details')}

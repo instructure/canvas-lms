@@ -44,7 +44,7 @@ describe('splitTextIntoLines()', () => {
       'amet, consectetur adipiscing',
       'elit, sed eiusmod tempor',
       'incidunt ut labore et',
-      'dolore magna aliqua.'
+      'dolore magna aliqua.',
     ])
   })
 
@@ -53,7 +53,7 @@ describe('splitTextIntoLines()', () => {
       'Incompreh-',
       'ensibility',
       'is a long',
-      'word!'
+      'word!',
     ])
   })
 

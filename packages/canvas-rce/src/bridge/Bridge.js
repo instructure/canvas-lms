@@ -33,6 +33,7 @@ export default class Bridge {
     this._languages = []
     this._controller = {}
     this._uploadMediaTranslations = null
+    this._canvasOrigin = ''
   }
 
   get editorRendered() {
@@ -88,6 +89,14 @@ export default class Bridge {
 
   set languages(langs) {
     this._languages = langs
+  }
+
+  get canvasOrigin() {
+    return this._canvasOrigin
+  }
+
+  set canvasOrigin(origin) {
+    this._canvasOrigin = origin
   }
 
   // we have to defer importing mediaTranslations until they are asked for
@@ -155,7 +164,7 @@ export default class Bridge {
       const {selection} = this.focusedEditor.props.tinymce.get(this.focusedEditor.props.textareaId)
       link.selectionDetails = {
         node: selection.getNode(),
-        range: selection.getRng()
+        range: selection.getRng(),
       }
       if (!link.text) {
         link.text = link.title || link.href
@@ -211,7 +220,7 @@ export default class Bridge {
     if (this.focusedEditor) {
       this.focusedEditor.addAlert({
         text: err.toString(),
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -221,7 +230,7 @@ export default class Bridge {
       this.insertLink({
         title: image.display_name,
         href: image.href,
-        embed: {type: 'image'}
+        embed: {type: 'image'},
       })
     } else {
       this.insertImage(image)

@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {getAutoTrack} from '@canvas/canvas-media-player'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {bool, func} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
@@ -64,11 +64,12 @@ class MediaAttempt extends React.Component {
     submission: Submission.shape.isRequired,
     updateUploadingFiles: func.isRequired,
     uploadingFiles: bool.isRequired,
+    setIframeURL: func.isRequired,
+    iframeURL: string,
   }
 
   state = {
     mediaModalOpen: false,
-    iframeURL: '',
     mediaModalTabs: {record: false, upload: false},
   }
 
@@ -89,7 +90,7 @@ class MediaAttempt extends React.Component {
     } else {
       this.props.updateUploadingFiles(true)
       if (data.mediaObject.embedded_iframe_url) {
-        this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
+        this.props.setIframeURL(data.mediaObject.embedded_iframe_url)
       }
       this.props.createSubmissionDraft({
         variables: {
@@ -115,7 +116,7 @@ class MediaAttempt extends React.Component {
         attempt: this.props.submission.attempt || 1,
       },
     })
-    this.setState({iframeURL: ''})
+    this.props.setIframeURL('')
   }
 
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
@@ -131,7 +132,7 @@ class MediaAttempt extends React.Component {
       type: track.kind,
       language: track.locale,
     }))
-    const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.state.iframeURL
+    const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.props.iframeURL
     const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
     return (
       <Flex direction="column" alignItems="center">
@@ -146,7 +147,7 @@ class MediaAttempt extends React.Component {
               }}
             >
               <iframe
-                src={this.state.iframeURL}
+                src={this.props.iframeURL}
                 title="preview"
                 style={{
                   position: 'absolute',

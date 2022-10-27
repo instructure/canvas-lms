@@ -453,7 +453,7 @@ When set, all columns except term_id, status, start_date, and end_date will be i
 <td></td>
 <td>✓</td>
 <td>The date the term starts. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ</td>
+YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 <tr>
 <td>end_date</td>
@@ -461,7 +461,7 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td></td>
 <td>✓</td>
 <td>The date the term ends. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ</td>
+YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 </table>
 
@@ -545,7 +545,8 @@ specified the default term for the account will be used</td>
 <td></td>
 <td>✓</td>
 <td>The course start date. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ. To remove the start date pass "&lt;delete>"</td>
+YYYY-MM-DDTHH:MM:SSZ. To remove the start date pass "&lt;delete&gt;".
+Will keep any existing value if empty.</td>
 </tr>
 <tr>
 <td>end_date</td>
@@ -553,7 +554,8 @@ YYYY-MM-DDTHH:MM:SSZ. To remove the start date pass "&lt;delete>"</td>
 <td></td>
 <td>✓</td>
 <td>The course end date. The format should be in ISO 8601:
-YYYY-MM-DDTHH:MM:SSZ. To remove the end date pass "&lt;delete>"</td>
+YYYY-MM-DDTHH:MM:SSZ. To remove the end date pass "&lt;delete&gt;"
+Will keep any existing value if empty.</td>
 </tr>
 <tr>
 <td>course_format</td>
@@ -660,14 +662,14 @@ interface, this is called the SIS ID.</td>
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The section start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The section start date. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The section end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The section end date The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 </table>
 
@@ -712,14 +714,14 @@ enrollments.csv
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The enrollment start date. For start_date to take effect the end_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The enrollment start date. For start_date to take effect the end_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 <tr>
 <td>end_date</td>
 <td>date</td>
 <td></td>
 <td>✓</td>
-<td>The enrollment end date. For end_date to take effect the start_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ</td>
+<td>The enrollment end date. For end_date to take effect the start_date also needs to be populated. The format should be in ISO 8601: YYYY-MM-DDTHH:MM:SSZ. Will be cleared if empty.</td>
 </tr>
 <tr>
 <td>user_id</td>

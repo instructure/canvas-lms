@@ -2645,8 +2645,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "rubric_association_id", limit: 8
       t.float    "score"
       t.text     "data"
-      # TODO: we have previously attempted to drop the comments field, but the
-      # migration to do so was malformed.
       t.text     "comments"
       t.datetime "created_at"
       t.datetime "updated_at"

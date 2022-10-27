@@ -43,6 +43,6 @@ describe('ShowMoreRepliesButton', () => {
   it('should render with disabled prop', () => {
     const {getByTestId} = setup({onClick, buttonText: 'Click Me', fetchingMoreReplies: true})
 
-    expect(getByTestId('show-more-replies-button').getAttribute('disabled')).toBe('')
+    expect(getByTestId('show-more-replies-button').getAttribute('aria-disabled')).toBe('true')
   })
 })

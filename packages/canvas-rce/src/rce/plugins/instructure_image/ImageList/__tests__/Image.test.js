@@ -34,9 +34,9 @@ describe('RCE "Images" Plugin > Image', () => {
         href: 'http://canvas.rce/images/example.png',
         id: 123,
         preview_url: 'http://canvas.rce/images/preview/example.png',
-        thumbnail_url: 'http://canvas.rce/images/thumbnail/example.png'
+        thumbnail_url: 'http://canvas.rce/images/thumbnail/example.png',
       },
-      onClick: jest.fn()
+      onClick: jest.fn(),
     }
   })
 
@@ -123,7 +123,7 @@ describe('RCE "Images" Plugin > Image', () => {
     function dragStart($element) {
       const event = new Event('dragstart', {bubbles: true})
       Object.assign(event, {
-        dataTransfer: buildDataTransfer()
+        dataTransfer: buildDataTransfer(),
       })
       $element.dispatchEvent(event)
     }
@@ -135,7 +135,7 @@ describe('RCE "Images" Plugin > Image', () => {
         },
         setData(type, data) {
           imageData = {type, data}
-        }
+        },
       }
     }
 

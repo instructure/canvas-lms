@@ -35,7 +35,7 @@ export function propsFromState(state) {
     all_files,
     jwt,
     host,
-    source
+    source,
   } = state
 
   const collections = {}
@@ -63,6 +63,6 @@ export function propsFromState(state) {
     all_files,
     jwt,
     host,
-    source
+    source,
   }
 }

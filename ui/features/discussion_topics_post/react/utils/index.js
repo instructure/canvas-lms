@@ -92,7 +92,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // Creates an object containing the data that needs to be updated
     // Writes that new data to the cache using the id of the object
     const discussionEntryOptions = {
-      id: btoa('DiscussionEntry-' + variables.discussionEntryID),
+      id: btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId),
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }
@@ -113,25 +113,38 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
         data,
       })
     }
+
     // The writeQuery creates a subentry query shape using the data from the new discussion entry
     // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
-    const subEntriesOptions = {
-      query: DISCUSSION_SUBENTRIES_QUERY,
-      variables,
+    const parentEntryOptions = {
+      id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
+      fragment: DiscussionEntry.fragment,
+      fragmentName: 'DiscussionEntry',
     }
+    const parentEntryData = JSON.parse(JSON.stringify(cache.readFragment(parentEntryOptions)))
 
-    const currentSubentriesQueryData = JSON.parse(
-      JSON.stringify(cache.readQuery(subEntriesOptions))
-    )
-    if (currentSubentriesQueryData) {
-      const subentriesLegacyNode = currentSubentriesQueryData.legacyNode
-      if (variables.sort === 'desc') {
-        subentriesLegacyNode.discussionSubentriesConnection.nodes.unshift(newDiscussionEntry)
-      } else {
-        subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
+    if (parentEntryData.subentriesCount) {
+      const subEntriesOptions = {
+        query: DISCUSSION_SUBENTRIES_QUERY,
+        variables,
       }
 
-      cache.writeQuery({...subEntriesOptions, data: currentSubentriesQueryData})
+      const currentSubentriesQueryData = JSON.parse(
+        JSON.stringify(cache.readQuery(subEntriesOptions))
+      )
+      if (currentSubentriesQueryData) {
+        const subentriesLegacyNode = currentSubentriesQueryData.legacyNode
+        if (variables.sort === 'desc') {
+          subentriesLegacyNode.discussionSubentriesConnection.nodes.unshift(newDiscussionEntry)
+        } else {
+          subentriesLegacyNode.discussionSubentriesConnection.nodes.push(newDiscussionEntry)
+        }
+
+        cache.writeQuery({...subEntriesOptions, data: currentSubentriesQueryData})
+      }
+      return true
+    } else {
+      return false
     }
   } catch (e) {
     // If a subentry query has never been called for the entry being replied to, an exception will be thrown

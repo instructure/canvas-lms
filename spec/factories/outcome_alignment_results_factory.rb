@@ -96,24 +96,21 @@ module Factories
   # Mocks calls to the OS endpoints:
   #
   #   - retrieving data from the Canvas' LearningOutcomeResult table
-  #   - transforming this data into a collection of JSON AuthoritativeResult objects
+  #   - transforming this data into a collection of AuthoritativeResult hash objects
   def authoritative_results_from_db
-    {
-      results:
-        LearningOutcomeResult.all.map do |lor|
-          {
-            user_uuid: lor.user.uuid,
-            points: lor.score,
-            points_possible: lor.possible,
-            external_outcome_id: lor.learning_outcome.id,
-            attempts: nil,
-            associated_asset_type: nil,
-            associated_asset_id: lor.alignment.content_id,
-            artifact_type: nil,
-            artifact_id: nil,
-            submitted_at: lor.submitted_at
-          }
-        end
-    }.to_json
+    LearningOutcomeResult.all.map do |lor|
+      {
+        user_uuid: lor.user.uuid,
+        points: lor.score,
+        points_possible: lor.possible,
+        external_outcome_id: lor.learning_outcome.id,
+        attempts: nil,
+        associated_asset_type: nil,
+        associated_asset_id: lor.alignment.content_id,
+        artifact_type: nil,
+        artifact_id: nil,
+        submitted_at: lor.submitted_at
+      }
+    end
   end
 end

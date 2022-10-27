@@ -246,7 +246,7 @@ class InfoController < ApplicationController
     }
 
     if InstFS.enabled?
-      ret[:insf_fs] = lambda do
+      ret[:inst_fs] = lambda do
         CanvasHttp
           .get(URI.join(InstFS.app_host, "/readiness").to_s)
           .is_a?(Net::HTTPSuccess)

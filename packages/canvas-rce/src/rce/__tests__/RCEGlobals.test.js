@@ -22,7 +22,7 @@ describe('RCEGlobals', () => {
   describe('features', () => {
     const initialFeatures = {
       new_equation_editor: true,
-      new_math_equation_handling: true
+      new_math_equation_handling: true,
     }
 
     const otherFeatures = {some_other_feature: true}
@@ -50,7 +50,7 @@ describe('RCEGlobals', () => {
   describe('config', () => {
     const initialConfig = {
       locale: 'en',
-      timezone: 'America/Denver'
+      timezone: 'America/Denver',
     }
 
     const otherConfig = {somethingElse: true}

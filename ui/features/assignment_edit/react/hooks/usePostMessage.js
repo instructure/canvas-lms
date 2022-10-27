@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react'
 
 export default function usePostMessage(expectedMessageType) {
   const [messageData, setMessageData] = useState(null)

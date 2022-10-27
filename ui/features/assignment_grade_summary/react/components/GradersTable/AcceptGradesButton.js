@@ -65,7 +65,6 @@ function successButton(props) {
       {I18n.t('Accepted')}
     </Button>
   )
-  /* eslint-enable react/prop-types */
 }
 
 export default function AcceptGradesButton(props) {

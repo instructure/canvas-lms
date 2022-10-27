@@ -67,7 +67,7 @@ function CanvasModal({
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
         <Flex>
-          <FlexItem grow>
+          <FlexItem grow={true}>
             <Heading>{title}</Heading>
           </FlexItem>
           <FlexItem>

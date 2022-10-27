@@ -34,7 +34,7 @@ export default function DraggingBlocker(props) {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: '1000000000000'
+          zIndex: '1000000000000',
         }}
       />
     )
@@ -44,5 +44,5 @@ export default function DraggingBlocker(props) {
 }
 
 DraggingBlocker.propTypes = {
-  dragging: bool.isRequired
+  dragging: bool.isRequired,
 }

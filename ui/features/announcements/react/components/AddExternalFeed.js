@@ -48,7 +48,6 @@ const verbosityTypes = [
 export default class AddExternalFeed extends React.Component {
   static propTypes = {
     defaultOpen: bool,
-    isSaving: bool.isRequired,
     addExternalFeed: func.isRequired,
   }
 

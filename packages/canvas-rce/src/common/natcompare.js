@@ -29,7 +29,7 @@ export default {
     return x.localeCompare(y, activeLocale, {
       sensitivity: 'variant',
       ignorePunctuation: false,
-      numeric: true
+      numeric: true,
     })
   },
 
@@ -43,5 +43,5 @@ export default {
 
   byGet(key) {
     return this.by(x => x.get(key))
-  }
+  },
 }

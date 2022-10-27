@@ -48,7 +48,7 @@ describe "threaded discussions" do
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
       editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
-      if editor_switch_button.text == "Raw HTML Editor"
+      if editor_switch_button.text == "Switch to raw HTML Editor"
         editor_switch_button.click
       end
       wait_for_ajaximations
@@ -299,7 +299,7 @@ describe "threaded discussions" do
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
       editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
-      if editor_switch_button.text == "Raw HTML Editor"
+      if editor_switch_button.text == "Switch to raw HTML Editor"
         editor_switch_button.click
       end
       wait_for_ajaximations
@@ -382,6 +382,42 @@ describe "threaded discussions" do
       wait_for_ajax_requests
       entry.reload
       expect(entry.workflow_state).to eq "deleted"
+    end
+
+    it "replies to 3rd level stay 3rd level" do
+      topic = create_discussion("flatten 3rd level replies", "threaded")
+      first_reply = topic.discussion_entries.create!(
+        user: @student,
+        message: "1st level reply"
+      )
+      second_reply = DiscussionEntry.create!(
+        message: "2nd level reply",
+        discussion_topic_id: first_reply.discussion_topic_id,
+        user_id: first_reply.user_id,
+        root_entry_id: first_reply.id,
+        parent_id: first_reply.id
+      )
+      third_entry = DiscussionEntry.create!(
+        message: "3rd level reply",
+        discussion_topic_id: second_reply.discussion_topic_id,
+        user_id: second_reply.user_id,
+        root_entry_id: second_reply.id,
+        parent_id: second_reply.id
+      )
+      user_session(@student)
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      expect(fj("div:contains('flatten 3rd level replies')")).to be_present
+      expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
+      f("button[data-testid='expand-button']").click
+      wait_for_ajaximations
+      ff("button[data-testid='threading-toolbar-reply']")[2].click
+      wait_for_ajaximations
+      type_in_tiny("textarea", "replying to 3rd level reply")
+      f("button[data-testid='DiscussionEdit-submit'").click
+      wait_for_ajaximations
+      flattened_reply = DiscussionEntry.last
+      expect(flattened_reply.parent_id).to eq third_entry.parent_id
+      expect(flattened_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@student</span>replying to 3rd level reply</p>"
     end
 
     context "replies reporting" do

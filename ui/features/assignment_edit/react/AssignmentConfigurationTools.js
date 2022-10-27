@@ -50,7 +50,7 @@ class AssignmentConfigurationTools extends React.Component {
     visibilityEnabled: !!this.props.selectedTool,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getTools()
   }
 
@@ -86,14 +86,13 @@ class AssignmentConfigurationTools extends React.Component {
             }
           }
         }
-        const currentToolType = this.state.toolType
         this.setState({
           tools: data,
           toolType: this.props.selectedToolType || '',
           toolLaunchUrl: prevToolLaunch || 'about:blank',
         })
       }, self),
-      error(xhr) {
+      error(_xhr) {
         $.flashError(I18n.t('Error retrieving similarity detection tools'))
       },
     })
@@ -207,6 +206,7 @@ class AssignmentConfigurationTools extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={beforeAlertStyles}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
         >
           <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
@@ -227,6 +227,7 @@ class AssignmentConfigurationTools extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={afterAlertStyles}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
         >
           <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>

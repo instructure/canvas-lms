@@ -76,13 +76,13 @@ export default class FakeEditor {
         return {
           anchorNode: {
             ...this._selectedNode,
-            wholeText: this._selectedNode?.textContent
+            wholeText: this._selectedNode?.textContent,
           },
-          anchorOffset: this._anchorOffset
+          anchorOffset: this._anchorOffset,
         }
       },
       getBookmark: () => {},
-      moveToBookmark: () => {}
+      moveToBookmark: () => {},
     }
 
     this.dom = {
@@ -119,7 +119,7 @@ export default class FakeEditor {
         return oldelem.parentNode.replaceChild(newelem, oldelem)
       },
       select: selector => this._$container.querySelectorAll(selector),
-      remove: elem => elem.remove()
+      remove: elem => elem.remove(),
     }
     this.initialize()
   }

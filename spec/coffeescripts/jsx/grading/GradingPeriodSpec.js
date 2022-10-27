@@ -146,32 +146,32 @@ test('replaceInputWithDate calls formatDatetimeForDisplay', function () {
 
 test("assigns the 'readOnly' property on the template when false", function () {
   const gradingPeriod = this.renderComponent()
-  equal(gradingPeriod.refs.template.props.readOnly, false)
+  equal(gradingPeriod.templateRef.props.readOnly, false)
 })
 
 test("assigns the 'readOnly' property on the template when true", function () {
   const gradingPeriod = this.renderComponent({readOnly: true})
-  equal(gradingPeriod.refs.template.props.readOnly, true)
+  equal(gradingPeriod.templateRef.props.readOnly, true)
 })
 
 test("assigns the 'weight' and 'weighted' properties", function () {
   const gradingPeriod = this.renderComponent()
-  equal(gradingPeriod.refs.template.props.weight, 50)
-  equal(gradingPeriod.refs.template.props.weighted, true)
+  equal(gradingPeriod.templateRef.props.weight, 50)
+  equal(gradingPeriod.templateRef.props.weighted, true)
 })
 
 test("assigns the 'weight' and 'weighted' properties when weighted is false", function () {
   const gradingPeriod = this.renderComponent({weighted: false})
-  equal(gradingPeriod.refs.template.props.weight, 50)
-  equal(gradingPeriod.refs.template.props.weighted, false)
+  equal(gradingPeriod.templateRef.props.weight, 50)
+  equal(gradingPeriod.templateRef.props.weighted, false)
 })
 
 test("assigns the 'closeDate' property", function () {
   const gradingPeriod = this.renderComponent()
-  deepEqual(gradingPeriod.refs.template.props.closeDate, new Date('2015-06-07T00:00:00Z'))
+  deepEqual(gradingPeriod.templateRef.props.closeDate, new Date('2015-06-07T00:00:00Z'))
 })
 
 test("assigns 'endDate' as 'closeDate' when 'closeDate' is not defined", function () {
   const gradingPeriod = this.renderComponent({closeDate: null})
-  deepEqual(gradingPeriod.refs.template.props.closeDate, new Date('2015-05-31T00:00:00Z'))
+  deepEqual(gradingPeriod.templateRef.props.closeDate, new Date('2015-05-31T00:00:00Z'))
 })

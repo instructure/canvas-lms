@@ -34,8 +34,8 @@ import {
 import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
-import {CondensedButton} from '@instructure/ui-buttons'
 
+import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
@@ -656,15 +656,17 @@ const CanvasInbox = () => {
                                 border={true}
                                 padding="medium none medium none"
                               >
-                                <CondensedButton
+                                <Link
                                   data-testid="message-detail-back-button"
+                                  isWithinText={false}
+                                  as="button"
                                   renderIcon={<IconArrowOpenStartLine size="x-small" />}
                                   onClick={() => {
                                     setSelectedConversations([])
                                   }}
                                 >
                                   <Text>{I18n.t('Back')}</Text>
-                                </CondensedButton>
+                                </Link>
                               </Flex.Item>
                             </Flex>
                           </View>

@@ -42,14 +42,14 @@ describe('DirectShareCourseTray', () => {
   })
 
   it('displays interface for selecting a course', async () => {
-    const {getByText} = render(<DirectShareCourseTray open />)
+    const {getByText} = render(<DirectShareCourseTray open={true} />)
     // loads the panel asynchronously, so we have to wait for it
     expect(await waitFor(() => getByText(/select a course/i))).toBeInTheDocument()
   })
 
   it('calls onDismiss when cancel is clicked', async () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<DirectShareCourseTray open onDismiss={handleDismiss} />)
+    const {getByText} = render(<DirectShareCourseTray open={true} onDismiss={handleDismiss} />)
     fireEvent.click(await waitFor(() => getByText(/cancel/i)))
     expect(handleDismiss).toHaveBeenCalled()
   })

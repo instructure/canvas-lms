@@ -41,5 +41,5 @@ export default {
     setTimeout(() => {
       scrollIntoView.scrollIntoView(target, config)
     }, this.INTERIM_DELAY)
-  }
+  },
 }

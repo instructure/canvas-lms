@@ -112,9 +112,9 @@ ShowFolder.render = function () {
   if (currentState.errorMessages) {
     return (
       <div>
-        {currentState.errorMessages.map(error => {
-          ;<div className="muted">{error.message}</div>
-        })}
+        {currentState.errorMessages.map(error => (
+          <div className="muted">{error.message}</div>
+        ))}
       </div>
     )
   }
@@ -159,6 +159,7 @@ ShowFolder.render = function () {
           <div
             ref="accessibilityMessage"
             className="ShowFolder__accessbilityMessage col-xs"
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             tabIndex={0}
           >
             {I18n.t(

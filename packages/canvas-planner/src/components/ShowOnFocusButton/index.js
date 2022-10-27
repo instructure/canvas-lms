@@ -20,7 +20,7 @@ import {findDOMNode} from 'react-dom'
 import {node, object, func} from 'prop-types'
 
 import {themeable} from '@instructure/ui-themeable'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import styles from './styles.css'
@@ -31,41 +31,44 @@ class ShowOnFocusButton extends Component {
     buttonProps: object,
     srProps: object,
     children: node.isRequired,
-    elementRef: func
+    elementRef: func,
   }
 
   static defaultProps = {
-    elementRef: () => {}
+    elementRef: () => {},
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      visible: false
+      visible: false,
     }
   }
 
-  handleFocus = e => {
+  handleFocus = _ => {
     this.setState(
       {
-        visible: true
+        visible: true,
       },
       () => {
+        // eslint-disable-next-line react/no-find-dom-node
         findDOMNode(this.btnRef).focus()
       }
     )
   }
 
-  handleBlur = e => {
+  handleBlur = _ => {
     this.setState({
-      visible: false
+      visible: false,
     })
   }
 
   renderButton() {
     const {buttonProps, children} = this.props
     return (
-      <CondensedButton
+      <Link
+        isWithinText={false}
+        as="button"
         elementRef={btn => {
           this.btnRef = btn
           this.props.elementRef(btn)
@@ -75,7 +78,7 @@ class ShowOnFocusButton extends Component {
         {...buttonProps}
       >
         {children}
-      </CondensedButton>
+      </Link>
     )
   }
 

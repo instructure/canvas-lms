@@ -63,7 +63,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController for Icon Maker
 
   function setAltTextInTray(newAltText) {
     fireEvent.change(screen.getByPlaceholderText(/(describe the icon)/i), {
-      target: {value: `${newAltText}`}
+      target: {value: `${newAltText}`},
     })
   }
 

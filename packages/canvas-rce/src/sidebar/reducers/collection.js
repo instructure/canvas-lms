@@ -30,13 +30,13 @@ export default function (state = {}, action) {
         isLoading: true,
         cancel: action.cancel,
         hasMore: true,
-        searchString: action.searchString
+        searchString: action.searchString,
       }
     case REQUEST_PAGE:
       return {
         ...state,
         isLoading: true,
-        cancel: action.cancel
+        cancel: action.cancel,
       }
 
     case RECEIVE_PAGE:
@@ -47,14 +47,14 @@ export default function (state = {}, action) {
         bookmark: action.bookmark,
         isLoading: false,
         cancel: null,
-        hasMore: !!action.bookmark
+        hasMore: !!action.bookmark,
       }
 
     case FAIL_PAGE: {
       const overrides = {
         isLoading: false,
         cancel: null,
-        error: action.error
+        error: action.error,
       }
       if (state.links.length === 0) {
         overrides.bookmark = null

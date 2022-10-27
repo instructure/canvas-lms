@@ -42,7 +42,7 @@ describe('transformShape()', () => {
           width: 40,
           height: 40,
           translateX: -20,
-          translateY: -20
+          translateY: -20,
         })
       })
 
@@ -57,7 +57,7 @@ describe('transformShape()', () => {
           width: 80,
           height: 80,
           translateX: -40,
-          translateY: -40
+          translateY: -40,
         })
       })
 
@@ -72,7 +72,7 @@ describe('transformShape()', () => {
           width: 110,
           height: 110,
           translateX: -55,
-          translateY: -55
+          translateY: -55,
         })
       })
 
@@ -87,7 +87,7 @@ describe('transformShape()', () => {
           width: 140,
           height: 140,
           translateX: -70,
-          translateY: -70
+          translateY: -70,
         })
       })
 
@@ -112,7 +112,7 @@ describe('transformShape()', () => {
           width: 24,
           height: 24,
           translateX: -12,
-          translateY: -12
+          translateY: -12,
         })
       })
 
@@ -127,7 +127,7 @@ describe('transformShape()', () => {
           width: 50,
           height: 50,
           translateX: -25,
-          translateY: -25
+          translateY: -25,
         })
       })
 
@@ -142,7 +142,7 @@ describe('transformShape()', () => {
           width: 80,
           height: 80,
           translateX: -40,
-          translateY: -40
+          translateY: -40,
         })
       })
 
@@ -157,7 +157,7 @@ describe('transformShape()', () => {
           width: 112,
           height: 112,
           translateX: -56,
-          translateY: -56
+          translateY: -56,
         })
       })
 
@@ -182,7 +182,7 @@ describe('transformShape()', () => {
           width: 8,
           height: 8,
           translateX: -4,
-          translateY: -4
+          translateY: -4,
         })
       })
 
@@ -197,7 +197,7 @@ describe('transformShape()', () => {
           width: 24,
           height: 24,
           translateX: -12,
-          translateY: -12
+          translateY: -12,
         })
       })
 
@@ -212,7 +212,7 @@ describe('transformShape()', () => {
           width: 44,
           height: 44,
           translateX: -22,
-          translateY: -22
+          translateY: -22,
         })
       })
 
@@ -227,7 +227,7 @@ describe('transformShape()', () => {
           width: 72,
           height: 72,
           translateX: -36,
-          translateY: -36
+          translateY: -36,
         })
       })
 
@@ -246,7 +246,7 @@ describe('transformShape()', () => {
           width: 60,
           height: 60,
           translateX: -30,
-          translateY: -30
+          translateY: -30,
         })
       })
     })
@@ -259,7 +259,7 @@ describe('transformShape()', () => {
           width: 108,
           height: 108,
           translateX: -54,
-          translateY: -54
+          translateY: -54,
         })
       })
     })
@@ -272,7 +272,7 @@ describe('transformShape()', () => {
           width: 142,
           height: 142,
           translateX: -71,
-          translateY: -71
+          translateY: -71,
         })
       })
     })
@@ -285,7 +285,7 @@ describe('transformShape()', () => {
           width: 200,
           height: 200,
           translateX: -100,
-          translateY: -100
+          translateY: -100,
         })
       })
     })
@@ -302,7 +302,7 @@ describe('transformShape()', () => {
           width: 54,
           height: 54,
           translateX: -27,
-          translateY: -27
+          translateY: -27,
         })
       })
     })
@@ -315,7 +315,7 @@ describe('transformShape()', () => {
           width: 100,
           height: 100,
           translateX: -50,
-          translateY: -50
+          translateY: -50,
         })
       })
     })
@@ -328,7 +328,7 @@ describe('transformShape()', () => {
           width: 132,
           height: 132,
           translateX: -66,
-          translateY: -66
+          translateY: -66,
         })
       })
     })
@@ -341,7 +341,7 @@ describe('transformShape()', () => {
           width: 180,
           height: 180,
           translateX: -90,
-          translateY: -90
+          translateY: -90,
         })
       })
     })
@@ -358,7 +358,7 @@ describe('transformShape()', () => {
           width: 28,
           height: 28,
           translateX: -14,
-          translateY: -14
+          translateY: -14,
         })
       })
     })
@@ -371,7 +371,7 @@ describe('transformShape()', () => {
           width: 68,
           height: 68,
           translateX: -34,
-          translateY: -34
+          translateY: -34,
         })
       })
     })
@@ -384,7 +384,7 @@ describe('transformShape()', () => {
           width: 100,
           height: 100,
           translateX: -50,
-          translateY: -50
+          translateY: -50,
         })
       })
     })
@@ -397,7 +397,7 @@ describe('transformShape()', () => {
           width: 160,
           height: 160,
           translateX: -80,
-          translateY: -80
+          translateY: -80,
         })
       })
     })
@@ -414,7 +414,7 @@ describe('transformShape()', () => {
           width: 36,
           height: 36,
           translateX: -18,
-          translateY: -18
+          translateY: -18,
         })
       })
     })
@@ -427,7 +427,7 @@ describe('transformShape()', () => {
           width: 80,
           height: 80,
           translateX: -40,
-          translateY: -40
+          translateY: -40,
         })
       })
     })
@@ -440,7 +440,7 @@ describe('transformShape()', () => {
           width: 110,
           height: 110,
           translateX: -55,
-          translateY: -55
+          translateY: -55,
         })
       })
     })
@@ -453,7 +453,7 @@ describe('transformShape()', () => {
           width: 180,
           height: 180,
           translateX: -90,
-          translateY: -90
+          translateY: -90,
         })
       })
     })
@@ -470,7 +470,7 @@ describe('transformShape()', () => {
           width: 30,
           height: 30,
           translateX: -15,
-          translateY: -15
+          translateY: -15,
         })
       })
     })
@@ -483,7 +483,7 @@ describe('transformShape()', () => {
           width: 60,
           height: 60,
           translateX: -30,
-          translateY: -30
+          translateY: -30,
         })
       })
     })
@@ -496,7 +496,7 @@ describe('transformShape()', () => {
           width: 80,
           height: 80,
           translateX: -40,
-          translateY: -40
+          translateY: -40,
         })
       })
     })
@@ -509,7 +509,7 @@ describe('transformShape()', () => {
           width: 120,
           height: 120,
           translateX: -60,
-          translateY: -60
+          translateY: -60,
         })
       })
     })
@@ -648,7 +648,7 @@ describe('buildImage', () => {
       height: 2,
       x: 3,
       y: 4,
-      transform: 'translate(5, 6)'
+      transform: 'translate(5, 6)',
     }
 
     describe('when the encoded image type is a stock image', () => {
@@ -656,7 +656,7 @@ describe('buildImage', () => {
         const settings = {
           ...baseSettings,
           encodedImage: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
-          encodedImageType: 'SingleColor'
+          encodedImageType: 'SingleColor',
         }
         expect(buildImage(settings)).toMatchInlineSnapshot(`
           <g
@@ -680,7 +680,7 @@ describe('buildImage', () => {
         const settings = {
           ...baseSettings,
           encodedImage: 'data:image/svg+xml;base64,PHN2Zbbbbbbbbb',
-          encodedImageType: 'Course'
+          encodedImageType: 'Course',
         }
         expect(buildImage(settings)).toMatchInlineSnapshot(`
           <g

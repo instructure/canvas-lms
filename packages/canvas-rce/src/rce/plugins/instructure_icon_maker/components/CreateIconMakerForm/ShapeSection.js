@@ -43,7 +43,7 @@ export const ShapeSection = ({settings, onChange}) => {
         .then(base64Image => {
           onChange({
             type: actions.SET_ENCODED_IMAGE,
-            payload: base64Image
+            payload: base64Image,
           })
         })
         // eslint-disable-next-line no-console
@@ -97,12 +97,12 @@ const SHAPE_DESCRIPTION = {
   [Shape.Pentagon]: formatMessage('Pentagon'),
   [Shape.Hexagon]: formatMessage('Hexagon'),
   [Shape.Octagon]: formatMessage('Octagon'),
-  [Shape.Star]: formatMessage('Star')
+  [Shape.Star]: formatMessage('Star'),
 }
 
 const SIZE_DESCRIPTION = {
   [Size.ExtraSmall]: formatMessage('Extra Small'),
   [Size.Small]: formatMessage('Small'),
   [Size.Medium]: formatMessage('Medium'),
-  [Size.Large]: formatMessage('Large')
+  [Size.Large]: formatMessage('Large'),
 }

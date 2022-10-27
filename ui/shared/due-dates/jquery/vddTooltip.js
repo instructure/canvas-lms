@@ -27,7 +27,9 @@ export default function vddTooltip() {
       try {
         const el = document.querySelector(selector)
         return $(el).html()
-      } catch (err) {}
+      } catch (err) {
+        // no-op
+      }
     },
   })
 }

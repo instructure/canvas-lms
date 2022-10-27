@@ -43,6 +43,7 @@ import {SearchContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
+import * as ReactDOMServer from 'react-dom/server'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
 
@@ -56,7 +57,7 @@ import {ReportReply} from '../../components/ReportReply/ReportReply'
 const I18n = useI18nScope('discussion_topics_post')
 
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, sort, filter} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -71,19 +72,23 @@ export const DiscussionThreadContainer = props => {
     const variables = {
       discussionEntryID: newDiscussionEntry.parentId,
       first: ENV.per_page,
-      sort,
+      sort: 'asc',
       courseID: window.ENV?.course_id,
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    props.removeDraftFromDiscussionCache(cache, result)
-    addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+    if (props.removeDraftFromDiscussionCache) props.removeDraftFromDiscussionCache(cache, result)
+    const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+    if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
+    props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => {
+    onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      setExpandReplies(true)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -209,7 +214,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view) {
+          if (ENV.isolated_view || ENV.split_screen_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -250,7 +255,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view) {
+          if (ENV.isolated_view || ENV.split_screen_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -322,7 +327,11 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        replyFromEntryId: props.discussionEntry._id,
+        replyFromEntryId:
+          props.discussionEntry.rootEntryId &&
+          props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+            ? props.discussionEntry.parentId
+            : props.discussionEntry._id,
         isAnonymousAuthor,
         message,
         courseID: ENV.course_id,
@@ -459,7 +468,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: replyMarginDepth}}>
-            {editorExpanded && !ENV.isolated_view && (
+            {editorExpanded && !(ENV.isolated_view || ENV.split_screen_view) && (
               <View
                 display="block"
                 background="primary"
@@ -473,6 +482,16 @@ export const DiscussionThreadContainer = props => {
                     onReplySubmit(message, anonymousAuthorState)
                   }}
                   onCancel={() => setEditorExpanded(false)}
+                  value={
+                    props.discussionEntry.rootEntryId &&
+                    props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+                      ? ReactDOMServer.renderToString(
+                          <span className="mceNonEditable mention" data-mention="1">
+                            @{getDisplayName(props.discussionEntry)}
+                          </span>
+                        )
+                      : ''
+                  }
                 />
               </View>
             )}
@@ -484,6 +503,8 @@ export const DiscussionThreadContainer = props => {
               depth={props.depth + 1}
               markAsRead={props.markAsRead}
               parentRefCurrent={threadRefCurrent}
+              highlightEntryId={props.highlightEntryId}
+              setHighlightEntryId={props.setHighlightEntryId}
             />
           )}
         </>
@@ -495,6 +516,7 @@ export const DiscussionThreadContainer = props => {
 DiscussionThreadContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionEntry: PropTypes.object.isRequired,
+  refetchDiscussionEntries: PropTypes.func,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
@@ -503,6 +525,7 @@ DiscussionThreadContainer.propTypes = {
   highlightEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  setHighlightEntryId: PropTypes.func,
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -513,11 +536,10 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
-  const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
     first: ENV.per_page,
-    sort,
+    sort: 'asc',
     courseID: window.ENV?.course_id,
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
@@ -537,12 +559,15 @@ const DiscussionSubentries = props => {
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
+      refetchDiscussionEntries={subentries.refetch || null}
       discussionEntry={entry}
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
       parentRefCurrent={props.parentRefCurrent}
       removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
       updateDraftCache={props.updateDraftCache}
+      highlightEntryId={props.highlightEntryId}
+      setHighlightEntryId={props.setHighlightEntryId}
     />
   ))
 }
@@ -555,4 +580,6 @@ DiscussionSubentries.propTypes = {
   parentRefCurrent: PropTypes.object,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  setHighlightEntryId: PropTypes.func,
 }

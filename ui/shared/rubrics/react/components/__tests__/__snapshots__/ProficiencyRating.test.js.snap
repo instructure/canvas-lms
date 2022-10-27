@@ -118,14 +118,12 @@ exports[`renders the ProficiencyRating component 1`] = `
         onShowContent={[Function]}
         placement="bottom center"
         renderTrigger={
-          <CondensedButton
+          <Link
             as="button"
-            color="primary"
-            cursor="pointer"
+            color="link"
             elementRef={[Function]}
-            margin="0"
-            size="medium"
-            type="button"
+            iconPlacement="start"
+            isWithinText={false}
           >
             <div>
               <span
@@ -138,7 +136,7 @@ exports[`renders the ProficiencyRating component 1`] = `
               />
               Change
             </div>
-          </CondensedButton>
+          </Link>
         }
         shadow="resting"
         shouldAlignArrow={false}

@@ -243,10 +243,8 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
 }
 
 export const GroupStructure = ({onChange, errormsg}) => {
-  /* eslint-disable prettier/prettier */
   const {selfSignup, createGroupCount, createGroupMemberCount, bySection, splitGroups, groupLimit} =
     useContext(GroupContext)
-  /* eslint-enable prettier/prettier */
 
   function handleChange(key, val) {
     let result = {createGroupCount, createGroupMemberCount, bySection, splitGroups, groupLimit}

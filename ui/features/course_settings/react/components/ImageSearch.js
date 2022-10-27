@@ -53,7 +53,7 @@ export default class ImageSearch extends React.Component {
 
   state = ImageSearchStore.getState()
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.unsubscribe = ImageSearchStore.subscribe(() => this.handleChange())
   }
 

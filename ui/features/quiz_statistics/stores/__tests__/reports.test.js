@@ -360,7 +360,7 @@ describe('quizReports:generate', function () {
       by: 1,
     })
 
-    assertChange({
+    return assertChange({
       fn: () => Dispatcher.dispatch('quizReports:generate', 'student_analysis'),
       of: () => fakeServer.requests.length,
       by: 0,
@@ -387,7 +387,7 @@ describe('quizReports:generate', function () {
       ],
     })
 
-    assertChange({
+    return assertChange({
       fn: () => Dispatcher.dispatch('quizReports:generate', 'student_analysis'),
       of: () => fakeServer.requests.length,
       by: 0,

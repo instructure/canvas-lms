@@ -18,8 +18,8 @@
 
 @use "sass:math";
 
-@import "pages/turnitin.scss";
-@import "base/environment";
+@import 'pages/turnitin.scss';
+@import 'base/environment';
 
 // DO NOT ADD ANYTHING TO THIS FILE
 // there is certainly a better place to put whatever it is that you were thinking
@@ -43,7 +43,8 @@
   overflow: auto;
 }
 
-#fixed_bottom, #flash_message_holder {
+#fixed_bottom,
+#flash_message_holder {
   position: fixed;
   z-index: 100000;
   #{direction(left)}: 0;
@@ -59,7 +60,8 @@
   height: 0;
 }
 
-#flash_message_holder, #flash_message_buffer {
+#flash_message_holder,
+#flash_message_buffer {
   top: 0;
   list-style: none;
   margin: 0;
@@ -118,7 +120,8 @@
       background-image: url(/images/check_16.png);
       background-repeat: no-repeat;
     }
-    &.ui-state-error, &.ui-state-warning {
+    &.ui-state-error,
+    &.ui-state-warning {
       i {
         background-image: url(/images/warning_16.png);
       }
@@ -131,7 +134,8 @@
   }
 }
 
-.user_content, .mceContentBody {
+.user_content,
+.mceContentBody {
   position: relative;
   min-height: 5px;
   max-width: 100%;
@@ -139,8 +143,11 @@
   a:not(.btn):not(.Button):not([role='button']) {
     text-decoration: underline;
   }
-  a.btn, a.Button, a[role='button'] {
-    &:hover, &:focus {
+  a.btn,
+  a.Button,
+  a[role='button'] {
+    &:hover,
+    &:focus {
       text-decoration: none;
     }
   }
@@ -152,10 +159,8 @@
   }
 }
 
-
 .user_content iframe,
-.user_content video
- {
+.user_content video {
   border: 0;
   padding: 0;
   margin: 0;
@@ -166,13 +171,23 @@
   background-color: #eee;
 }
 
-.reminder, .reminder-content {
+// copied from the instui Link focus ring style
+.user_content a:focus {
+  outline-offset: 0.0625rem;
+  outline-color: var(--ic-link-color);
+  outline-width: 2px;
+  outline-style: solid;
+}
+
+.reminder,
+.reminder-content {
   border: 1px solid #aaa;
   border-radius: 5px;
   margin: 5px;
   clear: both;
   font-size: 0.9em;
-  h2, .h2 {
+  h2,
+  .h2 {
     margin-top: 0;
     background-color: #eee;
     text-transform: uppercase;
@@ -189,8 +204,6 @@
   }
 }
 
-
-
 #floating_reminders {
   cursor: move;
   padding: 5px 10px;
@@ -198,7 +211,7 @@
   top: 5px;
   #{direction(left)}: 0px;
   background-color: #fe8;
-  border: 2px solid #FBAD00;
+  border: 2px solid #fbad00;
   border-radius: 5px;
   width: 300px;
   z-index: 2;
@@ -209,13 +222,15 @@
 }
 
 #right-side {
-  h2, .h2 {
+  h2,
+  .h2 {
     .small_link {
       font-size: 0.6em;
       font-family: arial, sans-serif;
     }
   }
-  h4.item_list_header, .h4.item_list_header {
+  h4.item_list_header,
+  .h4.item_list_header {
     font-size: 1.3em;
     font-weight: bold;
     border-bottom: 1px solid #888;
@@ -275,9 +290,10 @@
       }
     }
   }
-  .events_list, .to-do-list {
-
-    li.event, li.todo {
+  .events_list,
+  .to-do-list {
+    li.event,
+    li.todo {
       i.icon-check {
         color: $ic-color-success;
       }
@@ -297,15 +313,17 @@
       position: relative;
 
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         #{direction(right)}: 0;
         height: 100%;
         width: $ic-sp;
         background: linear-gradient(
-          to direction(right), rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 1) 80%);
+          to direction(right),
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 1) 80%
+        );
       }
     }
 
@@ -315,8 +333,10 @@
       &:after {
         width: $ic-sp * 2.5;
         background: linear-gradient(
-          to direction(right), rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 1) 50%);
+          to direction(right),
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 1) 50%
+        );
       }
     }
 
@@ -338,7 +358,8 @@
       float: direction(right);
       @include fontSize(12px);
       font-weight: normal;
-      &[class*=icon-]:before, &[class^=icon-]:before {
+      &[class*='icon-']:before,
+      &[class^='icon-']:before {
         @include fontSize(16px);
         vertical-align: middle;
       }
@@ -349,7 +370,9 @@
       }
     }
   }
-  * + .events_list { margin-top: $ic-sp * 1.5; }
+  * + .events_list {
+    margin-top: $ic-sp * 1.5;
+  }
   .details {
     margin: 5px;
     padding: 5px 10px;
@@ -374,22 +397,28 @@
 
 table.summary {
   width: auto;
-  th, caption {
+  th,
+  caption {
     text-align: direction(left);
   }
-  th, td, caption {
-    padding: $ic-sp*0.5;
+  th,
+  td,
+  caption {
+    padding: $ic-sp * 0.5;
   }
-  thead th, caption {
+  thead th,
+  caption {
     font-weight: bold;
     border-bottom: 1px solid $ic-border-dark;
   }
-  td, tbody th {
+  td,
+  tbody th {
     border-bottom: 1px solid $ic-border-light;
     background-color: $ic-color-light;
   }
   table.subtable {
-    th, td {
+    th,
+    td {
       border-top: 0;
       padding: direction-sides(1px 5px 1px 0);
       font-size: 0.8em;
@@ -408,7 +437,9 @@ table.formtable td {
   padding: 2px 3px;
 }
 
-.courses, .groups, .accounts {
+.courses,
+.groups,
+.accounts {
   .name {
     font-size: 1.1em;
     font-weight: bold;
@@ -444,7 +475,9 @@ table.formtable td {
 .course:hover,
 .group:hover,
 .account:hover {
-  .course, .group, .account {
+  .course,
+  .group,
+  .account {
     .info {
       .links {
         color: $ic-hint-text;
@@ -587,7 +620,8 @@ $wizard-bg-color: $ic-color-dark;
   #{direction(left)}: 0;
   width: 100%;
   display: none;
-  h3, .h3 {
+  h3,
+  .h3 {
     border-bottom: 1px solid #aaa;
     margin: 0 0 10px;
     padding-bottom: 5px;
@@ -595,8 +629,7 @@ $wizard-bg-color: $ic-color-dark;
   .wizard_content {
     @if $use_high_contrast {
       background-color: #fff;
-    }
-    @else {
+    } @else {
       background-color: #eee;
     }
     border-top: 1px solid #888;
@@ -658,12 +691,12 @@ $wizard-bg-color: $ic-color-dark;
               color: $ic-font-color-dark;
               text-decoration: none;
             }
-          }
-          @else {
+          } @else {
             background-color: $ic-color-light;
           }
         }
-        a[class*=icon-], a[class^=icon-] {
+        a[class*='icon-'],
+        a[class^='icon-'] {
           &:before {
             @include fontSize($ic-font-size--medium);
             line-height: 16px;
@@ -681,9 +714,8 @@ $wizard-bg-color: $ic-color-dark;
     background-size: cover;
     @if $use_high_contrast {
       background: rgba(darken($wizard-bg-color, 22%), 0.95);
-    }
-    @else {
-      background: url("/images/wizard-bg.jpg") no-repeat center center $wizard-bg-color;
+    } @else {
+      background: url('/images/wizard-bg.jpg') no-repeat center center $wizard-bg-color;
     }
     * {
       box-sizing: border-box;
@@ -709,7 +741,7 @@ $wizard-bg-color: $ic-color-dark;
         animation-fill-mode: forwards;
       }
 
-      i[class^=icon-] {
+      i[class^='icon-'] {
         width: ($wizard-icon-size + $ic-sp * 4) * 0.5;
         height: ($wizard-icon-size + $ic-sp * 4) * 0.5;
         background: $wizard-bg-color;
@@ -736,7 +768,11 @@ $wizard-bg-color: $ic-color-dark;
       display: flex;
       flex-direction: column;
       @if $use_high_contrast == false {
-        background: linear-gradient(to bottom, rgba($wizard-bg-color, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+        background: linear-gradient(
+          to bottom,
+          rgba($wizard-bg-color, 0.75) 0%,
+          rgba(0, 0, 0, 0) 100%
+        );
       }
     }
     .wizard-box__columns {
@@ -787,8 +823,7 @@ $wizard-bg-color: $ic-color-dark;
         display: flex;
         @if $use_high_contrast {
           background: rgba(black, 0.2);
-        }
-        @else {
+        } @else {
           background: rgba(desaturate(darken($wizard-bg-color, 11), 2), 0.9);
         }
         @include breakpoint(desktop) {
@@ -825,7 +860,7 @@ $wizard-bg-color: $ic-color-dark;
           }
           &.completed {
             a.header {
-              background-image: url("/images/wizard-todo-checked.svg");
+              background-image: url('/images/wizard-todo-checked.svg');
             }
           }
           a.header {
@@ -836,7 +871,7 @@ $wizard-bg-color: $ic-color-dark;
             padding: direction-sides(8px ($ic-sp * 3) 8px ($ic-sp * 3));
             color: $ic-color-light;
             text-decoration: none;
-            background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
+            background: url('/images/wizard-todo-unchecked.svg') no-repeat $ic-sp 50%;
             background-size: 16px 16px;
             line-height: 1.2;
             border-#{direction(left)}: math.div($ic-sp, 3) solid transparent;
@@ -904,8 +939,7 @@ $wizard-bg-color: $ic-color-dark;
         @if $use_high_contrast {
           background: $ic-color-light;
           color: desaturate(darken($wizard-bg-color, 25), 2);
-        }
-        @else {
+        } @else {
           background: rgba($ic-color-light, 0.85);
           color: desaturate(darken($wizard-bg-color, 20), 2);
         }
@@ -935,7 +969,8 @@ $wizard-bg-color: $ic-color-dark;
 }
 
 #content_tags_dialog {
-  h3, .h3 {
+  h3,
+  .h3 {
     margin: 0;
     padding: 0;
     font-size: 0.8em;
@@ -977,7 +1012,8 @@ $wizard-bg-color: $ic-color-dark;
   display: none;
 }
 
-#keyboard_navigation, .keyboard_navigation {
+#keyboard_navigation,
+.keyboard_navigation {
   ul.navigation_list {
     padding: 0;
     margin: 0;
@@ -999,13 +1035,15 @@ $wizard-bg-color: $ic-color-dark;
 }
 
 .communication_messages_list {
-  .communication_message, .communication_sub_message {
+  .communication_message,
+  .communication_sub_message {
     .context_code {
       display: none;
     }
   }
   &.communication_messages_show_context {
-    .communication_message, .communication_sub_message {
+    .communication_message,
+    .communication_sub_message {
       .context_code {
         display: inline;
       }
@@ -1043,7 +1081,6 @@ $wizard-bg-color: $ic-color-dark;
         font-size: 1em;
         font-weight: bold;
         // :color #444
-
       }
       .sub_title {
         margin-#{direction(left)}: 30px;
@@ -1098,7 +1135,8 @@ $wizard-bg-color: $ic-color-dark;
         margin-#{direction(right)}: 5px;
         a {
           opacity: 0;
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             opacity: 1;
           }
         }
@@ -1163,7 +1201,7 @@ $wizard-bg-color: $ic-color-dark;
               }
               &.correct_answer {
                 .answer_bar {
-                  background: #8EC778;
+                  background: #8ec778;
                 }
               }
             }
@@ -1302,7 +1340,8 @@ $wizard-bg-color: $ic-color-dark;
   font-size: 0.85em;
   background-color: #f2f2f2;
   div {
-    &.header, li {
+    &.header,
+    li {
       padding: 0 5px;
       border-width: 0px;
       color: #999;
@@ -1466,11 +1505,13 @@ html > body .communication_message:hover div.header .under_links {
     .title {
       display: none;
     }
-    .locked_title, .locked_message {
+    .locked_title,
+    .locked_message {
       display: inline;
     }
   }
-  .locked_title, .locked_message {
+  .locked_title,
+  .locked_message {
     display: none;
   }
   .header {
@@ -1539,7 +1580,7 @@ body > #ui-datepicker-div {
     &.ui-state-default {
       &.minimal {
         background: #fff;
-        border-color: #DDE8F0;
+        border-color: #dde8f0;
       }
     }
     .ui-icon {
@@ -1566,7 +1607,8 @@ body > #ui-datepicker-div {
     li {
       padding-#{direction(left)}: 20px;
       background: url(/images/ball.png) no-repeat center left;
-      &.prev, &.next {
+      &.prev,
+      &.next {
         font-size: 0.9em;
       }
       &.prev {
@@ -1594,8 +1636,9 @@ body.padless-content .ic-Layout-contentMain,
 }
 
 #sequence_footer {
-  padding-top: $ic-sp*2;
-  .next, .prev {
+  padding-top: $ic-sp * 2;
+  .next,
+  .prev {
     width: 150px;
     overflow: hidden;
     .title {
@@ -1642,7 +1685,7 @@ body.padless-content .ic-Layout-contentMain,
       }
       &.locked_requirement {
         .description {
-          padding-#{direction(left)}: $ic-sp*2;
+          padding-#{direction(left)}: $ic-sp * 2;
         }
         a {
           color: $ic-color-medium;
@@ -1662,7 +1705,10 @@ body.padless-content .ic-Layout-contentMain,
   }
 }
 
-h2.h-margin-top, h3.h-margin-top, .h2.h-margin-top, .h3.h-margin-top {
+h2.h-margin-top,
+h3.h-margin-top,
+.h2.h-margin-top,
+.h3.h-margin-top {
   margin-top: 20px;
 }
 
@@ -1675,14 +1721,15 @@ form.user_content_post_form {
   background: none !important;
 }
 
-#change_calendar_version_link_holder a, .dashboard-toggle a {
+#change_calendar_version_link_holder a,
+.dashboard-toggle a {
   margin-#{direction(right)}: 10px;
   padding: 1px 10px;
   border-radius: 3px;
   @include vertical-gradient(#0abdff, #008fd6);
   text-decoration: none !important;
   &:hover {
-    border-color: #165A92;
+    border-color: #165a92;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   }
   @include fontSize($ic-font-size--xsmall);
@@ -1717,12 +1764,13 @@ form.user_content_post_form {
   bottom: 0;
   // The styles below are no longer needed for the masquerading or student view;
   // however, we need to keep them for other fixed warnings
-  >*:not(.ic-alert-masquerade-student-view) {
+  > *:not(.ic-alert-masquerade-student-view) {
     i {
       vertical-align: middle;
       margin-#{direction(right)}: 10px;
     }
-    b, div {
+    b,
+    div {
       line-height: 28px;
       vertical-align: middle;
     }
@@ -1732,7 +1780,7 @@ form.user_content_post_form {
     }
   }
   .fixed_warning {
-    background-color: #FDD;
+    background-color: #fdd;
     border-width: 2px 0 0;
     border-style: solid;
     border-color: black;
@@ -1794,8 +1842,7 @@ form.user_content_post_form {
   h1 {
     margin-top: 3rem;
   }
-  .ic-Error-img
-  {
+  .ic-Error-img {
     margin-top: 2rem;
     max-width: 350px;
   }

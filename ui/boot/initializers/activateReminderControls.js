@@ -55,7 +55,6 @@ $(document).ready(function () {
         $('#reminders_icon').hide()
       }
     )
-    const url = $floater.find('.update_session_url').attr('href')
   })
   $('.hide_reminders_link').click(function (event) {
     event.preventDefault()
@@ -78,7 +77,6 @@ $(document).ready(function () {
         $(this).remove()
       }
     )
-    const url = $floater.find('.update_session_url').attr('href')
   })
   $('.drop_held_context_link').click(function (event) {
     event.preventDefault()
@@ -86,7 +84,7 @@ $(document).ready(function () {
     $reminder.confirmDelete({
       url: $(this).attr('href'),
       message: 'Are you sure you want to drop this ' + $reminder.find('.item_type').text() + '?',
-      success(data) {
+      success(_data) {
         $(this).fadeOut('fast', function () {
           $(this).remove()
           if ($('#floating_reminders .reminder').length === 0) {

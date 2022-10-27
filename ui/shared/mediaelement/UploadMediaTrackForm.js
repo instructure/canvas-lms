@@ -18,6 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import template from './jst/UploadMediaTrackForm.handlebars'
+// eslint-disable-next-line import/no-cycle
 import mejs from './index'
 import $ from 'jquery'
 

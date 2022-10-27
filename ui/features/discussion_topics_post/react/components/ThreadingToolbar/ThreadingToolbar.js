@@ -49,7 +49,7 @@ export function ThreadingToolbar({...props}) {
       }}
       render={(responsiveProps, matches) =>
         (props.searchTerm || props.filter !== 'all') &&
-        ENV.isolated_view &&
+        (ENV.isolated_view || ENV.split_screen_view) &&
         !props.isIsolatedView ? (
           <Link
             as="button"

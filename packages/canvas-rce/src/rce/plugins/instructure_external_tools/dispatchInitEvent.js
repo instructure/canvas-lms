@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function(ed, document, url) {
+export default function (ed, document, url) {
   const ev = document.createEvent('CustomEvent')
   ev.initCustomEvent('tinyRCE/initExternalTools', true, true, {
     ed,
-    url
+    url,
   })
   document.dispatchEvent(ev)
 }

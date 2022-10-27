@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'tr_TR',
   day: {
     abbrev: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],

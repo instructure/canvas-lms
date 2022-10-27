@@ -31,7 +31,7 @@ describe('Preview', () => {
       scaleRatio: 1,
       rotation: 0,
       translateX: 0,
-      translateY: 0
+      translateY: 0,
     }
     dispatch = jest.fn()
   })

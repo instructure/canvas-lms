@@ -371,6 +371,7 @@ class OutcomeResultsController < ApplicationController
 
   def find_outcomes_service_results(opts = {})
     find_outcomes_service_outcome_results(
+      @current_user,
       users: opts[:all_users] ? @all_users : @users,
       context: @context,
       outcomes: @outcomes,

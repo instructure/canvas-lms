@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -32,7 +32,7 @@ import SimilarityIndicator from '../SimilarityIndicator'
 const I18n = useI18nScope('gradebook')
 
 const themeOverrides = {
-  [Button.theme]: {
+  [IconButton.theme]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
@@ -218,14 +218,14 @@ export default class AssignmentRowCell extends Component {
             )}
 
             <div className="Grid__GradeCell__Options">
-              <Button
+              <IconButton
                 elementRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}
                 size="small"
-                variant="icon"
-              >
-                <IconExpandStartLine title={I18n.t('Open submission tray')} />
-              </Button>
+                renderIcon={IconExpandStartLine}
+                color="secondary"
+                screenReaderLabel={I18n.t('Open submission tray')}
+              />
             </div>
           </div>
         </div>

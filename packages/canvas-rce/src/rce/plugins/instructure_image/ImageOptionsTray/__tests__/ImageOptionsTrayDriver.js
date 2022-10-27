@@ -21,7 +21,7 @@ import {
   getByLabelText,
   getAllByText,
   queryByLabelText,
-  waitFor
+  waitFor,
 } from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {

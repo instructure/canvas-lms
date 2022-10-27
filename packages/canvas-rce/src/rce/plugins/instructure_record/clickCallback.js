@@ -86,7 +86,7 @@ export default function (ed, document) {
               contextType: ed.settings.canvas_rce_user_context.type,
               contextId: ed.settings.canvas_rce_user_context.id,
               origin: originFromHost(contentProps.host),
-              headers: headerFor(contentProps.jwt)
+              headers: headerFor(contentProps.jwt),
             }}
             languages={Bridge.languages}
             open={true}

@@ -29,9 +29,9 @@ class Group extends React.Component {
   toggleOpen = () => {
     this.setState({open: !this.state.open}, () => {
       if (this.state.open) {
-        this.refs.memberList.focus()
+        this.memberListRef.focus()
       } else {
-        this.refs.groupTitle.focus()
+        this.groupTitleRef.focus()
       }
     })
   }
@@ -115,6 +115,8 @@ class Group extends React.Component {
       ) : null
 
     const manageLink = isLeader ? (
+      // TODO: use InstUI button
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
       <a
         href="#"
         className="manage-link"
@@ -147,10 +149,12 @@ class Group extends React.Component {
 
     const body = (
       <div id={studentGroupId} className={`student-group-body${showBody ? '' : ' hidden'}`}>
+        {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
         <ul
-          ref="memberList"
+          ref={c => (this.memberListRef = c)}
           className="student-group-list clearfix"
           aria-label={I18n.t('group members')}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
           role="list"
         >
@@ -159,6 +163,7 @@ class Group extends React.Component {
             const name = u.name || u.display_name
             const leaderBadge = isLeader ? <i className="icon-user" aria-hidden="true" /> : null
             return (
+              // eslint-disable-next-line jsx-a11y/no-redundant-roles, jsx-a11y/no-noninteractive-tabindex
               <li tabIndex="0" role="listitem" key={u.id}>
                 <span className="screenreader-only">
                   {isLeader ? I18n.t('group leader %{user_name}', {user_name: name}) : name}
@@ -215,6 +220,7 @@ class Group extends React.Component {
       membershipAction = (
         <span
           id="membership-action"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
           title={toolTip}
           data-tooltip="left"
@@ -226,13 +232,14 @@ class Group extends React.Component {
     }
 
     return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
       <div
         role="listitem"
         className={`accordion student-groups content-box${showBody ? ' show-body' : ''}`}
         onClick={this.toggleOpen}
       >
         <div className="student-group-header align-items-center clearfix">
-          <div ref="groupTitle" className="student-group-title">
+          <div ref={c => (this.groupTitleRef = c)} className="student-group-title">
             <h2 aria-label={groupName}>
               {this.props.group.name}
               <small>&nbsp;{this.props.group.group_category.name}</small>

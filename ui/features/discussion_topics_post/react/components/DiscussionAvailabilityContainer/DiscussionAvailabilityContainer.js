@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 
@@ -84,7 +84,9 @@ export function DiscussionAvailabilityContainer({...props}) {
               ) : (
                 <>
                   {prefixText && <Text size={responsiveProps.textSize}>{' | '}</Text>}
-                  <CondensedButton
+                  <Link
+                    isWithinText={false}
+                    as="button"
                     onClick={() => {
                       setAvailabilityTrayOpen(true)
                     }}
@@ -94,7 +96,7 @@ export function DiscussionAvailabilityContainer({...props}) {
                     <Text weight="bold" size={responsiveProps.textSize}>
                       {I18n.t('View Availability')}
                     </Text>
-                  </CondensedButton>
+                  </Link>
                   <TrayDisplayer
                     setTrayOpen={setAvailabilityTrayOpen}
                     trayTitle="Availability"

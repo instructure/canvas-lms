@@ -200,6 +200,7 @@ export default class AttemptTab extends Component {
 
   state = {
     filesToUpload: [],
+    mediaRecordingIframURL: '',
   }
 
   renderFileUpload = () => {
@@ -302,7 +303,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: true,
+            submit_assignment: false,
           },
           null,
           axios,
@@ -397,9 +398,15 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           updateUploadingFiles={this.props.updateUploadingFiles}
           uploadingFiles={this.props.uploadingFiles}
+          iframeURL={this.state.mediaRecordingIframURL}
+          setIframeURL={this.setMediaRecordingIframeURL}
         />
       </LazyLoad>
     )
+  }
+
+  setMediaRecordingIframeURL = url => {
+    this.setState({mediaRecordingIframURL: url})
   }
 
   renderStudentAnnotationAttempt = () => {

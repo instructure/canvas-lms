@@ -93,10 +93,12 @@ QUnit.module('SpeedGrader', rootHooks => {
     sandbox.stub(SpeedGraderHelpers, 'reloadPage')
 
     setupFixtures()
+    fakeENV.setup({SINGLE_NQ_SESSION_ENABLED: true})
   })
 
   rootHooks.afterEach(() => {
     teardownFixtures()
+    fakeENV.teardown()
   })
 
   QUnit.module('SpeedGrader#showDiscussion', {
@@ -3272,6 +3274,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com/foo',
         settings_url: 'example.com/settings',
         show_help_menu_item: false,
+        SINGLE_NQ_SESSION_ENABLED: true,
       })
       sinon.stub($, 'getJSON')
       sinon.stub($, 'ajaxJSON')
@@ -6417,10 +6420,21 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
     })
 
-    QUnit.module('#loadSubmissionPreview', hooks => {
+    QUnit.module('#loadSubmissionPreview', contextHooks => {
       const EG = SpeedGrader.EG
+      async function postMessage(message, targetOrigin) {
+        await new Promise(resolve => {
+          const listen = () => {
+            window.removeEventListener('message', listen, false)
+            resolve()
+          }
 
-      hooks.beforeEach(() => {
+          window.addEventListener('message', listen, false)
+          window.postMessage(message, targetOrigin)
+        })
+      }
+
+      contextHooks.beforeEach(() => {
         setupFixtures(`
         <div id='this_student_does_not_have_a_submission'></div>
         <div id='iframe_holder'>
@@ -6433,11 +6447,53 @@ QUnit.module('SpeedGrader', rootHooks => {
         }
       })
 
-      hooks.afterEach(() => {
+      contextHooks.afterEach(() => {
         SpeedGrader.teardown()
       })
 
-      QUnit.module('when a submission is unsubmitted', () => {
+      QUnit.module('when the student has submitted for a quizzesNext quiz', hooks => {
+        let submission
+        hooks.beforeEach(() => {
+          EG.currentStudent.submission = {
+            submission_type: 'basic_lti_launch',
+            workflow_state: 'pending_review',
+          }
+          submission = {submission_type: 'basic_lti_launch'}
+        })
+
+        test('launches a quizzesNext session if it has not yet been launched', async () => {
+          await postMessage({subject: 'quizzesNext.register'}, '*')
+          const ltiLaunchStub = sandbox.stub(EG, 'renderLtiLaunch')
+          EG.loadSubmissionPreview(null, submission)
+          ok(ltiLaunchStub.calledOnce)
+        })
+
+        QUnit.module('when a quizzesNext session has already been launched', () => {
+          test('does not launch a new quizzesNext session when in "single session" mode', async () => {
+            await postMessage({subject: 'quizzesNext.register'}, '*')
+            EG.loadSubmissionPreview(null, submission)
+            const ltiLaunchStub = sandbox.stub(EG, 'renderLtiLaunch')
+            EG.loadSubmissionPreview(null, submission)
+            ok(ltiLaunchStub.notCalled)
+          })
+
+          test('launches a new quizzesNext session when in "session per student" mode', async () => {
+            await postMessage(
+              {
+                subject: 'quizzesNext.register',
+                payload: {singleLtiLaunch: false},
+              },
+              '*'
+            )
+            EG.loadSubmissionPreview(null, submission)
+            const ltiLaunchStub = sandbox.stub(EG, 'renderLtiLaunch')
+            EG.loadSubmissionPreview(null, submission)
+            ok(ltiLaunchStub.calledOnce)
+          })
+        })
+      })
+
+      QUnit.module('when the student has not submitted', () => {
         test('shows the "this student does not have a submission" div', () => {
           const $noSubmission = $('#this_student_does_not_have_a_submission')
           $noSubmission.hide()
@@ -6450,6 +6506,32 @@ QUnit.module('SpeedGrader', rootHooks => {
           EG.loadSubmissionPreview()
 
           strictEqual($('#iframe_holder').html(), '')
+        })
+
+        QUnit.module('when quizzesNext is loaded', () => {
+          test('does not empty the iframe when operating in "single session" mode', async () => {
+            await postMessage(
+              {subject: 'quizzesNext.register', payload: {singleLtiLaunch: true}},
+              '*'
+            )
+            EG.loadSubmissionPreview()
+            ok($('#iframe_holder').text().includes('I am an iframe holder!'))
+          })
+
+          test('operates in "single session" mode by default for quizzesNext', async () => {
+            await postMessage({subject: 'quizzesNext.register'}, '*')
+            EG.loadSubmissionPreview()
+            ok($('#iframe_holder').text().includes('I am an iframe holder!'))
+          })
+
+          test('empties the iframe when operating in "session per student" mode', async () => {
+            await postMessage(
+              {subject: 'quizzesNext.register', payload: {singleLtiLaunch: false}},
+              '*'
+            )
+            EG.loadSubmissionPreview()
+            notOk($('#iframe_holder').text().includes('I am an iframe holder!'))
+          })
         })
       })
     })

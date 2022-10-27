@@ -71,7 +71,7 @@ INST.downloadSubmissions = function (url, onClose) {
             )
             $('#download_submissions_dialog .status_loader').css('visibility', 'hidden')
 
-            location.href = url
+            window.location.href = url
             return
           } else if (attachment.workflow_state === 'errored') {
             // The only way the backend gets to an "errored" state is if there are no files to add
@@ -83,7 +83,7 @@ INST.downloadSubmissions = function (url, onClose) {
             cancelled = true
           } else {
             let progress = parseInt(attachment.file_state, 10)
-            if (isNaN(progress)) {
+            if (Number.isNaN(Number(progress))) {
               progress = 0
             }
             progress += 5

@@ -331,7 +331,7 @@ module CustomSeleniumActions
 
   def switch_to_raw_html_editor
     button = f('button[data-btn-id="rce-editormessage-btn"]')
-    if button.text == "Raw HTML Editor"
+    if button.text == "Switch to raw HTML Editor"
       button.click
     end
   end

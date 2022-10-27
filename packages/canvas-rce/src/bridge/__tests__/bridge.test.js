@@ -152,12 +152,12 @@ describe('Editor/Sidebar bridge', () => {
               return {
                 selection: {
                   getRng: jest.fn(() => 'some-range'),
-                  getNode: jest.fn(() => 'some-node')
-                }
+                  getNode: jest.fn(() => 'some-node'),
+                },
               }
-            }
-          }
-        }
+            },
+          },
+        },
       }
     })
 
@@ -180,8 +180,8 @@ describe('Editor/Sidebar bridge', () => {
         expect(editor.insertLink).toHaveBeenCalledWith({
           selectionDetails: {
             node: 'some-node',
-            range: 'some-range'
-          }
+            range: 'some-range',
+          },
         })
       })
 
@@ -238,7 +238,7 @@ describe('Editor/Sidebar bridge', () => {
         expect(embedMediaSpy).toHaveBeenCalledWith({
           content_type: 'video/mp4',
           href: 'here/i/am',
-          embedded_iframe_url: 'here/i/am'
+          embedded_iframe_url: 'here/i/am',
         })
       })
     })
@@ -291,7 +291,7 @@ describe('Editor/Sidebar bridge', () => {
         Bridge.showError('whoops')
         expect(editor.addAlert).toHaveBeenCalledWith({
           text: 'whoops',
-          type: 'error'
+          type: 'error',
         })
       })
     })

@@ -87,7 +87,7 @@ export default class CourseSidebar extends Component {
     this.props.realRef(this)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // if migration is going from a loading state to a non-loading state
     // aka a migration probably just ended and we should refresh the list
     // of unsynced changes

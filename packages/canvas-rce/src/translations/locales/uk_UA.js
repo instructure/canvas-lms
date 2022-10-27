@@ -132,11 +132,18 @@ const locale = {
   "light_blue_5374f600": { "message": "Світло-блакитний" },
   "link_7262adec": { "message": "Посилання" },
   "links_14b70841": { "message": "Посилання" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Посилання на зовнішній сайт."
+  },
   "loading_25990131": { "message": "Завантаження..." },
   "loading_bde52856": { "message": "Завантаження" },
   "loading_failed_b3524381": { "message": "Невдале завантаження..." },
   "locked_762f138b": { "message": "Заблоковано" },
   "media_af190855": { "message": "Носій інформації" },
+  "minimize_file_preview_da911944": {
+    "message": "Згорнути попередній перегляд файлу"
+  },
+  "minimize_video_20aa554b": { "message": "Зменшити відео" },
   "misc_3b692ea7": { "message": "Різне" },
   "modules_c4325335": { "message": "Розділи" },
   "my_files_2f621040": { "message": "Мої файли" },
@@ -179,11 +186,17 @@ const locale = {
   "submit_a3cc6859": { "message": "Підтвердити" },
   "syllabus_f191f65b": { "message": "Навчальний план" },
   "teal_f729a294": { "message": "Бірюзовий" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Попередній перегляд документа в даний момент обробляється. Будь-ласка спробуйте пізніше."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Матеріал в публічному домені"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Матеріал опубліковано під ліцензією Creative Commons"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Цей документ не може бути показаний в Canvas."
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Це рівняння не можна перетворити у базовому режимі перегляду"

@@ -44,6 +44,7 @@ const filesEnv = {
       folder.fetch()
       return folder
     }
+    return undefined
   }),
 }
 

@@ -38,7 +38,14 @@ const I18n = useI18nScope('file_preview')
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {
-    currentFolder: customPropTypes.folder,
+    currentFolder: PropTypes.oneOfType([
+      customPropTypes.folder,
+      PropTypes.shape({
+        files: PropTypes.shape({
+          models: PropTypes.arrayOf(PropTypes.instanceOf(File)),
+        }),
+      }),
+    ]),
     query: PropTypes.object,
     collection: PropTypes.object,
     params: PropTypes.object,
@@ -53,7 +60,7 @@ export default class FilePreview extends React.PureComponent {
     displayedItem: null,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.isOpen) {
       this.getItemsToView(this.props, items => this.setState(this.stateProperties(items)))
     }
@@ -63,7 +70,7 @@ export default class FilePreview extends React.PureComponent {
     return codeToRemoveLater.hideFileTreeFromPreviewInJaws()
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.isOpen) {
       this.getItemsToView(newProps, items => this.setState(this.stateProperties(items)))
     }

@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Pàgina següent"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "No hi ha cap canvi per desar."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No hi ha cap data de lliurament assignada"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Amb format previ"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Editor de dades HTML processades"
-    },
     "preview_53003fd2": {
         "message": "Visualització prèvia"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Números racionals"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Editor de dades HTML sense processar"
     },
     "real_numbers_7c99df94": {
         "message": "Números reals"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Mostra la setmana que ve"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Mostra els colors predefinits"
     },
     "view_previous_week_6f83849f": {
         "message": "Mostra la setmana passada"

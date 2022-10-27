@@ -45,10 +45,11 @@ module Outcomes
         learning_outcome_id: outcomes.map(&:id)
       )
       # muted associations is applied to remove assignments that students
-      # are not yet allowed to see:
+      # are not yet allowed to view:
       # Assignment Grades have not be posted yet (i.e. Submission.posted_at = nil)
-      # PostPolicy.post_manually is false or null
+      # PostPolicy.post_manually is false & the submission is not posted
       # Assignment grading_type is not_graded
+      # see result_analytics_spec.rb for more details around what is excluded/included
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
         results = results.exclude_muted_associations
       end
@@ -72,12 +73,25 @@ module Outcomes
     #        :outcomes - The outcomes to lookup results for (required)
     #
     # Returns a relation of the results
-    def find_outcomes_service_outcome_results(opts)
+    def find_outcomes_service_outcome_results(user, opts)
       required_opts = %i[users context outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
       user_uuids = users.pluck(:uuid).join(",")
-      assignment_ids = Assignment.where(context: context).type_quiz_lti.pluck(:id).join(",")
+
+      # check if the logged in user has manage_grades & view_all_grades permissions
+      # if not, apply exclude_muted_associations to the assignment query
+      assignment_ids =
+        if context.grants_any_right?(user, :manage_grades, :view_all_grades)
+          Assignment.active.where(context: context).quiz_lti.pluck(:id).join(",")
+        else
+          # return if there is more than one user in users as this would indicate
+          # user with insufficient permissions accessing the LMGB
+          return if users.length > 1
+
+          Assignment.active.where(context: context).quiz_lti.exclude_muted_associations_for_user(users[0]).pluck(:id).join(",")
+        end
+
       outcome_ids = outcomes.pluck(:id).join(",")
       handle_outcome_service_results(
         get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids),

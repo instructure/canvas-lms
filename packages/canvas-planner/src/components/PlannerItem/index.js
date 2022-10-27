@@ -23,13 +23,13 @@ import {themeable, ApplyTheme} from '@instructure/ui-themeable'
 import {
   AccessibleContent,
   ScreenReaderContent,
-  PresentationContent
+  PresentationContent,
 } from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {Avatar} from '@instructure/ui-avatar'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
-import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {
   IconAssignmentLine,
@@ -42,7 +42,7 @@ import {
   IconPeerReviewLine,
   IconWarningLine,
   IconVideoCameraSolid,
-  IconVideoCameraLine
+  IconVideoCameraLine,
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
@@ -62,7 +62,6 @@ import {animatable} from '../../dynamic-ui'
 export class PlannerItem_raw extends Component {
   static propTypes = {
     color: string,
-    id: string.isRequired,
     uniqueId: string.isRequired,
     animatableIndex: number,
     title: string.isRequired,
@@ -73,7 +72,6 @@ export class PlannerItem_raw extends Component {
     details: string,
     courseName: string,
     completed: bool,
-    overrideId: string,
     associated_item: string,
     context: object,
     html_url: string,
@@ -97,7 +95,7 @@ export class PlannerItem_raw extends Component {
     isMissingItem: bool,
     readOnly: bool,
     onlineMeetingURL: string,
-    isObserving: bool
+    isObserving: bool,
   }
 
   static defaultProps = {
@@ -106,14 +104,14 @@ export class PlannerItem_raw extends Component {
     allDay: false,
     simplifiedControls: false,
     isMissingItem: false,
-    isObserving: false
+    isObserving: false,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       calendarEventModalOpen: false,
-      completed: props.completed
+      completed: props.completed,
     }
   }
 
@@ -125,7 +123,7 @@ export class PlannerItem_raw extends Component {
     this.props.deregisterAnimatable('item', this, [this.props.uniqueId])
     this.props.registerAnimatable('item', this, nextProps.animatableIndex, [nextProps.uniqueId])
     this.setState({
-      completed: nextProps.completed
+      completed: nextProps.completed,
     })
   }
 
@@ -201,7 +199,7 @@ export class PlannerItem_raw extends Component {
         if (this.showEndTime()) {
           return formatMessage('{startTime} to {endTime}', {
             startTime: this.formatDate(this.props.date),
-            endTime: this.formatDate(this.props.endTime)
+            endTime: this.formatDate(this.props.endTime),
           })
         } else {
           return this.formatDate(this.props.date)
@@ -229,7 +227,7 @@ export class PlannerItem_raw extends Component {
     const params = {
       assignmentType,
       title: this.props.title,
-      datetime: this.props.date ? this.props.date.format(datetimeformat) : null
+      datetime: this.props.date ? this.props.date.format(datetimeformat) : null,
     }
 
     if (this.props.date) {
@@ -295,7 +293,7 @@ export class PlannerItem_raw extends Component {
             name={currentUser.displayName || '?'}
             src={currentUser.avatarUrl}
             size="small"
-            data-fs-exclude
+            data-fs-exclude={true}
           />
         )
     }
@@ -326,11 +324,12 @@ export class PlannerItem_raw extends Component {
     if (['To Do', 'Calendar Event'].includes(this.props.associated_item)) {
       return (
         <div className={styles.title} style={{position: 'relative'}}>
-          <CondensedButton
+          <Link
+            isWithinText={false}
             theme={{
               mediumPaddingHorizontal: '0',
               linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
-              linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined
+              linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
             }}
             elementRef={link => {
               this.itemLink = link
@@ -344,7 +343,7 @@ export class PlannerItem_raw extends Component {
           >
             <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
             <PresentationContent>{this.props.title}</PresentationContent>
-          </CondensedButton>
+          </Link>
           {this.renderCalendarEventModal()}
         </div>
       )
@@ -356,7 +355,7 @@ export class PlannerItem_raw extends Component {
         isWithinText={false}
         theme={{
           linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
-          linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined
+          linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined,
         }}
         elementRef={link => {
           this.itemLink = link
@@ -402,8 +401,8 @@ export class PlannerItem_raw extends Component {
           <ApplyTheme
             theme={{
               [IconButton.theme]: {
-                iconColor: this.props.simplifiedControls ? undefined : this.props.color
-              }
+                iconColor: this.props.simplifiedControls ? undefined : this.props.color,
+              },
             }}
           >
             <IconButton
@@ -546,7 +545,7 @@ export class PlannerItem_raw extends Component {
           checkedBackground: this.props.color,
           checkedBorderColor: this.props.color,
           borderColor: this.props.color,
-          hoverBorderColor: this.props.color
+          hoverBorderColor: this.props.color,
         }
   }
 
@@ -563,7 +562,7 @@ export class PlannerItem_raw extends Component {
               name={feedback.author_name || '?'}
               src={feedback.author_avatar_url}
               size="small"
-              data-fs-exclude
+              data-fs-exclude={true}
             />
           </span>
           <span className={styles.feedbackComment}>
@@ -596,18 +595,18 @@ export class PlannerItem_raw extends Component {
     const checkboxLabel = this.state.completed
       ? formatMessage('{assignmentType} {title} is marked as done.', {
           assignmentType,
-          title: this.props.title
+          title: this.props.title,
         })
       : formatMessage('{assignmentType} {title} is not marked as done.', {
           assignmentType,
-          title: this.props.title
+          title: this.props.title,
         })
 
     return (
       <div className={styles.completed}>
         <ApplyTheme
           theme={{
-            [CheckboxFacade.theme]: this.getCheckboxTheme()
+            [CheckboxFacade.theme]: this.getCheckboxTheme(),
           }}
         >
           <Checkbox
@@ -660,7 +659,7 @@ export class PlannerItem_raw extends Component {
           styles[this.getLayout()],
           'planner-item',
           {
-            [styles.missingItem]: this.props.isMissingItem
+            [styles.missingItem]: this.props.isMissingItem,
           },
           this.props.simplifiedControls ? styles.k5Layout : ''
         )}

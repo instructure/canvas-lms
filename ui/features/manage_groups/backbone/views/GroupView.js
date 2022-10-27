@@ -101,7 +101,7 @@ export default class GroupView extends View {
     return this.addUnassignedMenu.showBy($target, e.type === 'click')
   }
 
-  hideAddUser(e) {
+  hideAddUser(_e) {
     return this.addUnassignedMenu.hide()
   }
 

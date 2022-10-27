@@ -31,7 +31,7 @@ export const CreateIconMakerForm = ({
   editing,
   allowNameChange,
   nameRef,
-  rcsConfig
+  rcsConfig,
 }) => {
   return (
     <>

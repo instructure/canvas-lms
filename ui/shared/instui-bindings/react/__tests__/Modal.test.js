@@ -25,7 +25,7 @@ describe('CanvasModal', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(
       <CanvasModal
-        open
+        open={true}
         label="Do the thing"
         onDismiss={handleDismiss}
         footer={<span>The Footer</span>}
@@ -58,7 +58,7 @@ describe('CanvasModal', () => {
       }
 
       const {getByText} = render(
-        <CanvasModal open label="Do the thing">
+        <CanvasModal open={true} label="Do the thing">
           <ThrowError />
         </CanvasModal>
       )

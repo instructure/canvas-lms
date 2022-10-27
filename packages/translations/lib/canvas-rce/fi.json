@@ -489,6 +489,7 @@
   "nested_greater_than_d852e60d": { "message": "on suurempi kuin" },
   "nested_less_than_27d17e58": { "message": "on pienempi kuin" },
   "next_page_d2a39853": { "message": "Seuraava sivu" },
+  "no_changes_to_save_d29f6e91": { "message": "Ei tallennettavia muutoksia." },
   "no_e16d9132": { "message": "Ei" },
   "no_file_chosen_9a880793": { "message": "Ei valittua tiedostoa" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -566,7 +567,6 @@
   "precedes_196b9aef": { "message": "Edeltää" },
   "precedes_equal_20701e84": { "message": "Edeltää yhtä suurta" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
-  "pretty_html_editor_28748756": { "message": "Pretty-tekstieditori" },
   "preview_53003fd2": { "message": "Esikatsele" },
   "preview_in_overlay_ed772c46": { "message": "Esikatselu asettelussa" },
   "preview_inline_9787330": { "message": "Esikatselu inline-tilassa" },
@@ -586,7 +586,6 @@
   "quaternions_877024e0": { "message": "Kvaterniot" },
   "quizzes_7e598f57": { "message": "Tietovisat" },
   "rational_numbers_80ddaa4a": { "message": "Rationaaliset luvut" },
-  "raw_html_editor_e3993e41": { "message": "Raaka HTML-muokkausohjelma" },
   "real_numbers_7c99df94": { "message": "Oikeat numerot" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Todellinen osa (kompleksinumerosta)"
@@ -868,9 +867,6 @@
   "view_description_30446afc": { "message": "Näytä kuvaus" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Näytä näppäimistön pikakuvakkeet"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "Näytä ennalta määritetyt värit"
   },
   "view_title_description_67940918": {
     "message": "Näytä kohteen { title } kuvaus"

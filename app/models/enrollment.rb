@@ -1117,6 +1117,10 @@ class Enrollment < ActiveRecord::Base
     find_score(id_opts)&.current_points
   end
 
+  def computed_final_points(id_opts = nil)
+    find_score(id_opts)&.final_points
+  end
+
   def unposted_current_points(id_opts = nil)
     find_score(id_opts)&.unposted_current_points
   end

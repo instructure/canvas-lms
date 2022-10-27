@@ -32,6 +32,7 @@ import {
   IconPauseSolid,
   IconCalendarClockLine,
   IconCalendarClockSolid,
+  IconAnalyticsSolid,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
@@ -115,7 +116,7 @@ export default function JobsHeader({
           })}
         </SimpleSelect>
       </Flex.Item>
-      <Flex.Item margin="0 xx-small">
+      <Flex.Item margin="0 0 0 xx-small">
         <Tooltip
           renderTip={
             startDate || endDate ? I18n.t('Date filter is in effect') : I18n.t('Date/Time options')
@@ -143,6 +144,18 @@ export default function JobsHeader({
           onSave={onChangeDateOptions}
           onClose={() => setDateModalOpen(false)}
         />
+      </Flex.Item>
+      <Flex.Item>
+        <Tooltip renderTip={I18n.t('Job Stats')}>
+          <IconButton
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Job Stats')}
+            href="/job_stats"
+          >
+            <IconAnalyticsSolid />
+          </IconButton>
+        </Tooltip>
       </Flex.Item>
       <Flex.Item>
         <ToggleButton

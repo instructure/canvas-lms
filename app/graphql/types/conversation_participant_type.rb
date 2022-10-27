@@ -30,13 +30,18 @@ module Types
     field :subscribed, Boolean, null: false
     field :updated_at, Types::DateTimeType, null: true
 
-    field :user, UserType, null: false
+    field :user, UserType, null: true
     def user
       load_association(:user).then do |u|
         # This is necessary because the user association doesn't contain all the attributes
         # we might want after creating a conversation. Doing the following load off of the
         # ID will get us the full user object and all attributes we might need.
-        Loaders::IDLoader.for(User).load(u.id)
+
+        if u&.id
+          Loaders::IDLoader.for(User).load(u.id)
+        else
+          nil
+        end
       end
     end
 

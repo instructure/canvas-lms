@@ -31,7 +31,7 @@ const inlineMediaComment = {
     </a>`
     ),
 
-  buildCommentHolder: $link =>
+  buildCommentHolder: _$link =>
     $('<div><div class="innerholder" tabindex="-1" style="margin-bottom: 15px;"></div></div>'),
 
   getMediaCommentId($link) {

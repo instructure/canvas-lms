@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'pl_PL',
   day: {
     abbrev: ['nie', 'pon', 'wto', 'śro', 'czw', 'pią', 'sob'],

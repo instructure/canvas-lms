@@ -78,21 +78,21 @@ export default function ExpandoText(props) {
 
 ExpandoText.propTypes = {
   text: string.isRequired,
-  title: string.isRequired
+  title: string.isRequired,
 }
 
 export const styles = StyleSheet.create({
   descriptionText: {
     lineHeight: '1.2rem',
     p: {
-      margin: '1rem 0'
+      margin: '1rem 0',
     },
     ':nth-child(1n)> :first-child': {
       marginTop: '0',
-      display: 'inline-block'
+      display: 'inline-block',
     },
     ':nth-child(1n)> :last-child': {
-      marginBottom: '0'
-    }
-  }
+      marginBottom: '0',
+    },
+  },
 })

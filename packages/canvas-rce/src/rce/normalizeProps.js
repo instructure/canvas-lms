@@ -29,6 +29,6 @@ export default function (props, tinymce) {
     // enforced values, in addition to props and cannot be overridden by
     // props
     editorOptions,
-    tinymce
+    tinymce,
   }
 }

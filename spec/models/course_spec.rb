@@ -2792,6 +2792,32 @@ describe Course do
         end
       end
 
+      describe "TAB_COURSE_PACES" do
+        it "is included when course paces is enabled" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).to include(Course::TAB_COURSE_PACES)
+        end
+
+        it "is not included if the flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
+
+        it "is not included if the course has it disabled" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = false
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
+      end
+
       it "returns the defaults if nothing specified" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).to eql(default_tab_ids)
@@ -2831,21 +2857,37 @@ describe Course do
         expect(course.tab_configuration).to eq [{ "id" => 1 }]
       end
 
-      it "does not omit the target attribute for an external tool tab that is part of the tab configuration list" do
-        @tool = @course.context_external_tools.create!(name: "a", domain: "example.com", consumer_key: "key", shared_secret: "secret")
-        @tool.course_navigation = {
-          "canvas_icon_class" => "test-icon",
-          "icon_url" => "https://example.com/a.png",
-          "text" => "Test Tool",
-          "windowTarget" => "_blank",
-          "url" => "https://example.com/launch"
-        }
-        @tool.save!
-        tab_id = "context_external_tool_#{@tool.id}"
+      context "when a tool tab is part of the tab configuration list" do
+        before do
+          @tool = @course.context_external_tools.create!(name: "a", domain: "example.com", consumer_key: "key", shared_secret: "secret")
+          @tool.course_navigation = {
+            "canvas_icon_class" => "test-icon",
+            "icon_url" => "https://example.com/a.png",
+            "text" => "Test Tool",
+            "windowTarget" => "_blank",
+            "url" => "https://example.com/launch"
+          }
+          @tool.save!
+          @tab_id = "context_external_tool_#{@tool.id}"
 
-        @course.tab_configuration = [{ "id" => tab_id }]
-        tab = @course.tabs_available(@user).find { |t| t[:id] == tab_id }
-        expect(tab[:target]).to eq("_blank")
+          @course.tab_configuration = [{ "id" => @tab_id }]
+        end
+
+        it "does not omit the target attribute for an external tool tab that is part of the tab configuration list" do
+          tab = @course.tabs_available(@user).find { |t| t[:id] == @tab_id }
+          expect(tab[:target]).to eq("_blank")
+        end
+
+        context "when the course is on a different shard than the currently activated shard" do
+          specs_require_sharding
+
+          it "matches the tool tab with the tab in the tab configuration list" do
+            @shard2.activate do
+              tab = @course.tabs_available(@user).find { |t| t[:id] == @tab_id }
+              expect(tab[:target]).to eq("_blank")
+            end
+          end
+        end
       end
 
       it "removes ids for tabs not in the default list" do
@@ -3146,6 +3188,16 @@ describe Course do
     context "students" do
       before do
         course_with_student(active_all: true)
+      end
+
+      describe "TAB_COURSE_PACES" do
+        it "is not included" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
       end
 
       it "returns K-6 tabs if feature flag is enabled for students" do
@@ -4931,7 +4983,7 @@ describe Course do
 
       it "returns tools from course's account chain" do
         @shard1.activate do
-          expect(subject).to include(account_tool.asset_string)
+          expect(subject).to include(@course.shard.activate { account_tool.asset_string })
         end
       end
     end

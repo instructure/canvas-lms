@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import '@canvas/jquery/jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
 
 const I18n = useI18nScope('gradebook_uploads')

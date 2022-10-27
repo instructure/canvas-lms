@@ -143,7 +143,7 @@ const ApplyScoreToUngradedModal: React.FC<Props> = ({assignmentGroup, onApply, o
         <Button
           interaction={isCurrentInputValid ? 'enabled' : 'disabled'}
           onClick={handleApply}
-          variant="primary"
+          color="primary"
         >
           {I18n.t('Apply Score')}
         </Button>

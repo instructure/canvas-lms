@@ -69,8 +69,7 @@ $.fn.loadingImg = function (options) {
       paddingTop = $obj.outerHeight() / 2 - image.height / 2
     } else {
       paddingTop = parseInt(options.vertical, 10)
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(paddingTop)) {
+      if (Number.isNaN(Number(paddingTop))) {
         paddingTop = 0
       }
     }
@@ -88,8 +87,7 @@ $.fn.loadingImg = function (options) {
       paddingLeft = $obj.outerWidth() / 2 - image.width / 2
     } else {
       paddingLeft = parseInt(options.horizontal, 10)
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(paddingLeft)) {
+      if (Number.isNaN(Number(paddingLeft))) {
         paddingLeft = 0
       }
     }

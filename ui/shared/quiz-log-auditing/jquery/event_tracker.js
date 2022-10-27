@@ -56,7 +56,7 @@ export default class EventTracker {
   //
   // @param {Function} deliveryCallback
   // A callback to invoke when the tracker has an event ready for delivery.
-  install(deliveryCallback) {
+  install(_deliveryCallback) {
     throw new Error('Not implemented!')
   }
 

@@ -29,7 +29,7 @@ const MultiColor = ({dispatch, onLoaded}) => {
 
     convertFileToBase64(
       new Blob([svg.source()], {
-        type: 'image/svg+xml'
+        type: 'image/svg+xml',
       })
     ).then(base64Image => {
       dispatch({...actions.SET_IMAGE, payload: base64Image})
@@ -43,12 +43,12 @@ const MultiColor = ({dispatch, onLoaded}) => {
 
 MultiColor.propTypes = {
   dispatch: PropTypes.func,
-  onLoaded: PropTypes.func
+  onLoaded: PropTypes.func,
 }
 
 MultiColor.defaultProps = {
   dispatch: () => {},
-  onLoaded: () => {}
+  onLoaded: () => {},
 }
 
 export default MultiColor

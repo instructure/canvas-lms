@@ -50,7 +50,7 @@ export default function Link(props) {
     const canPreview = isPreviewable(props.content_type)
     const clazz = classnames('instructure_file_link', {
       instructure_scribd_file: canPreview,
-      inline_disabled: true
+      inline_disabled: true,
     })
 
     const attrs = {
@@ -64,7 +64,7 @@ export default function Link(props) {
       title: props.title,
       type: props.type,
       embedded_iframe_url: props.embedded_iframe_url,
-      media_entry_id: props.media_entry_id
+      media_entry_id: props.media_entry_id,
     }
     if (canPreview) {
       attrs['data-canvas-previewable'] = true
@@ -202,12 +202,12 @@ export default function Link(props) {
 
 Link.propTypes = {
   focusRef: shape({
-    current: instanceOf(Element)
+    current: instanceOf(Element),
   }),
   ...fileOrMediaObjectShape,
-  onClick: func.isRequired
+  onClick: func.isRequired,
 }
 
 Link.defaultProps = {
-  focusRef: null
+  focusRef: null,
 }

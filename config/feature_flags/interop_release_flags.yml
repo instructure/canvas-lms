@@ -106,3 +106,13 @@ lti_tools_from_federated_parents:
     If enabled, LTI tools installed in federated parent accounts will be
     available / visible in child accounts.
   applies_to: SiteAdmin
+ags_improved_course_concluded_response_codes:
+  state: hidden
+  display_name: Better LTI AGS Response Codes for Concluded Courses
+  description: |-
+    If enabled, the AGS API will return a more helpful response code whenever an LTI
+    tool attempts to access or modify data in a course that has already concluded.
+    Rather than returning a generic 404 Not Found, the API will instead return a 422
+    along with a helpful message indicating that the tool cannot access concluded
+    courses.
+  applies_to: RootAccount

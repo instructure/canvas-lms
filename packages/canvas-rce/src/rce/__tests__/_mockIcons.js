@@ -48,7 +48,7 @@ const icons = {
   IconTextSuperscriptLine: '',
   IconTextDirectionLtrLine: '',
   IconTextDirectionRtlLine: '',
-  IconUnderlineLine: ''
+  IconUnderlineLine: '',
 }
 
 export default icons

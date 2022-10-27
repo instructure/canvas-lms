@@ -19,7 +19,7 @@
 import {
   ICON_MAKER_ICONS,
   ICON_MAKER_ATTRIBUTE,
-  ICON_MAKER_DOWNLOAD_URL_ATTR
+  ICON_MAKER_DOWNLOAD_URL_ATTR,
 } from '../../rce/plugins/instructure_icon_maker/svg/constants'
 
 import buildDownloadUrl from '../../rce/plugins/shared/buildDownloadUrl'
@@ -39,10 +39,10 @@ export function createAddImage({id, filename, display_name, url, thumbnail_url},
         filename,
         display_name,
         preview_url: url,
-        thumbnail_url
+        thumbnail_url,
       },
-      contextType
-    }
+      contextType,
+    },
   }
 }
 
@@ -59,7 +59,7 @@ export function receiveImages({response, contextType, opts = {}}) {
 
   return {
     type: RECEIVE_IMAGES,
-    payload: {files: files.map(f => applyAttributes(f, opts)), bookmark, contextType, searchString}
+    payload: {files: files.map(f => applyAttributes(f, opts)), bookmark, contextType, searchString},
   }
 }
 

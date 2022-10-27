@@ -76,14 +76,14 @@ LtiTool.propTypes = {
   title: string.isRequired,
   image: string.isRequired,
   onAction: func.isRequired,
-  description: string
+  description: string,
 }
 
 export const styles = StyleSheet.create({
   appTitle: {
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
   },
   appButton: {
-    cursor: 'pointer'
-  }
+    cursor: 'pointer',
+  },
 })

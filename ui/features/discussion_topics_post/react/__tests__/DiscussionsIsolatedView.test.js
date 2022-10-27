@@ -84,6 +84,23 @@ describe('DiscussionsIsolatedView', () => {
     )
   }
 
+  it('should render isolated view container', async () => {
+    const mocks = [...getDiscussionQueryMock()]
+    const container = setup(mocks)
+    const replyButton = await container.findByTestId('threading-toolbar-reply')
+    fireEvent.click(replyButton)
+    expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
+  })
+
+  it('should render isolated view container if split screen view is also enabled', async () => {
+    window.ENV.split_screen_view = true
+    const mocks = [...getDiscussionQueryMock()]
+    const container = setup(mocks)
+    const replyButton = await container.findByTestId('threading-toolbar-reply')
+    fireEvent.click(replyButton)
+    expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
+  })
+
   it.skip('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),

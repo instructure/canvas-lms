@@ -35,6 +35,8 @@ class RubricAssessment < ActiveRecord::Base
   has_many :learning_outcome_results, as: :artifact, dependent: :destroy
   serialize :data
 
+  self.ignored_columns = [:comments]
+
   simply_versioned
 
   validates :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id, presence: true

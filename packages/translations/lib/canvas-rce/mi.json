@@ -481,6 +481,7 @@
   "nested_greater_than_d852e60d": { "message": "Nested Nui atu i" },
   "nested_less_than_27d17e58": { "message": "Kohanga Iti I Te" },
   "next_page_d2a39853": { "message": "Whārangi haere ake nei" },
+  "no_changes_to_save_d29f6e91": { "message": "Kaore he huringa hei tiaki." },
   "no_e16d9132": { "message": "Kahore" },
   "no_file_chosen_9a880793": { "message": "Kaore he kōnae i tīpakotia" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -560,7 +561,6 @@
   "precedes_196b9aef": { "message": "Kei mua" },
   "precedes_equal_20701e84": { "message": "Tuhinga o mua Ōrite" },
   "preformatted_d0670862": { "message": "Tuhinga o mua" },
-  "pretty_html_editor_28748756": { "message": "Ataahua HTML Etita" },
   "preview_53003fd2": { "message": "Arokite" },
   "preview_in_overlay_ed772c46": { "message": "Arokite i roto i paparua" },
   "preview_inline_9787330": { "message": "Arokite i roto i te raina" },
@@ -580,7 +580,6 @@
   "quaternions_877024e0": { "message": "Nga hauwha" },
   "quizzes_7e598f57": { "message": "Ngā Quizzes" },
   "rational_numbers_80ddaa4a": { "message": "Tau Tikanga" },
-  "raw_html_editor_e3993e41": { "message": "Mata HTML Editor" },
   "real_numbers_7c99df94": { "message": "Nga Tau Tuturu" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Wahi Tuturu (o te Tau Matatini)"
@@ -875,7 +874,6 @@
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Titiro npapa patopato tapahi poto"
   },
-  "view_predefined_colors_92f5db39": { "message": "Tirohia ngā tae kua tohua" },
   "view_title_description_67940918": {
     "message": "Tirohia { title } te whakāturanga"
   },

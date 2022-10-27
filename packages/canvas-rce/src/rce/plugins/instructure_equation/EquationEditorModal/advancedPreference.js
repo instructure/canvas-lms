@@ -35,7 +35,7 @@ const advancedPreference = {
 
   clear() {
     STORE.removeItem(KEY)
-  }
+  },
 }
 
 export {advancedPreference as default, STORE, KEY}

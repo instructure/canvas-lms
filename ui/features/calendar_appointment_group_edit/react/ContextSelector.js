@@ -48,7 +48,7 @@ class ContextSelector extends React.Component {
     this.setIndeterminates()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       selectedContexts: new Set(nextProps.appointmentGroup.context_codes),
       selectedSubContexts: new Set(nextProps.appointmentGroup.sub_context_codes),

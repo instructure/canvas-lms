@@ -474,7 +474,7 @@ QUnit.module('Gradebook#updateCurrentSection', {
     this.gradebook.postGradesStore = {
       setSelectedSection: sinon.stub(),
     }
-    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForSectionFilterChange')
+    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentData')
     sinon.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     sandbox.stub(this.gradebook, 'updateSectionFilterVisibility')
   },
@@ -543,7 +543,7 @@ test('has no effect when the section has not changed', function () {
 
 test('reloads student data after saving settings', async function () {
   await this.gradebook.updateCurrentSection('2001')
-  strictEqual(this.gradebook.dataLoader.reloadStudentDataForSectionFilterChange.callCount, 1)
+  strictEqual(this.gradebook.dataLoader.reloadStudentData.callCount, 1)
 })
 
 QUnit.module('Gradebook#isFilteringColumnsByGradingPeriod', {
@@ -828,7 +828,7 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
         updateColumnHeaders: sinon.stub(),
       },
     }
-    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
+    sandbox.stub(this.gradebook.dataLoader, 'reloadStudentData')
     sandbox.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
   },
 })
@@ -861,7 +861,7 @@ test('includes the "student" column id when updating column headers', async func
 
 test('reloads student data after saving settings', async function () {
   await this.gradebook.toggleEnrollmentFilter('inactive')
-  strictEqual(this.gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
+  strictEqual(this.gradebook.dataLoader.reloadStudentData.callCount, 1)
 })
 
 QUnit.module('Gradebook#updateCurrentModule', {

@@ -78,8 +78,14 @@ describe Outcomes::ResultAnalytics do
       outcome_ids = @outcomes.pluck(:id).join(",")
       uuids = "#{@students[0].uuid},#{@students[1].uuid},#{@students[2].uuid}"
       expect(ra).to receive(:get_lmgb_results).with(@course, quiz.id.to_s, "canvas.assignment.quizzes", outcome_ids, uuids).and_return(nil)
+      opts = { context: @course, users: @students, outcomes: @outcomes }
+      ra.send(:find_outcomes_service_outcome_results, @teacher, opts)
+    end
 
-      ra.send(:find_outcomes_service_outcome_results, { context: @course, users: @students, outcomes: @outcomes })
+    it "returns nil if session user is a student and there are more than 1 users sent in the opts" do
+      opts = { context: @course, users: @students, outcomes: @outcomes }
+      results = ra.find_outcomes_service_outcome_results(@student, opts)
+      expect(results).to eq nil
     end
 
     describe "#handle_outcome_service_results" do

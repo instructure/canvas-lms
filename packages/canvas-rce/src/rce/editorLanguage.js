@@ -68,7 +68,7 @@ const mapping = {
   zh: 'zh_CN',
   'zh-HK': 'zh_TW',
   'zh-Hans': 'zh_CN',
-  'zh-Hant': 'zh_TW'
+  'zh-Hant': 'zh_TW',
 }
 
 // still expose it as a method for consistent usage and in case we ever have to

@@ -27,7 +27,6 @@ import {reduceDuplicateCourses} from '../../../util/courses_helper'
 import {SubjectInput} from '../../components/SubjectInput/SubjectInput'
 
 import {Flex} from '@instructure/ui-flex'
-import {MediaAttachment} from '../../components/MediaAttachment/MediaAttachment'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer'
@@ -203,19 +202,6 @@ const HeaderInputs = props => {
       ) : (
         <SubjectInput onChange={props.onSubjectChange} value={props.subject} />
       )}
-      {props.mediaAttachmentTitle && (
-        <Flex.Item data-testid="media-attachment">
-          <ComposeInputWrapper
-            shouldGrow={true}
-            input={
-              <MediaAttachment
-                mediaTitle={props.mediaAttachmentTitle}
-                onRemoveMedia={props.onRemoveMediaComment}
-              />
-            }
-          />
-        </Flex.Item>
-      )}
     </Flex>
   )
 }
@@ -234,9 +220,7 @@ HeaderInputs.propTypes = {
   userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
-  mediaAttachmentTitle: PropTypes.string,
   activeCourseFilter: PropTypes.object,
-  onRemoveMediaComment: PropTypes.func,
   selectedRecipients: PropTypes.array,
   setUserNote: PropTypes.func,
   /**

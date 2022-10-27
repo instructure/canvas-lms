@@ -639,5 +639,76 @@ describe "Jobs V2 API", type: :request do
         expect(progress.reload).to be_completed
       end
     end
+
+    context "global admin" do
+      specs_require_sharding
+
+      before :once do
+        Shard.default.update delayed_jobs_shard_id: Shard.default.id
+
+        @shard1.update delayed_jobs_shard_id: @shard2.id
+        @shard1.activate do
+          2.times do
+            Kernel.delay(next_in_strand: false, strand: "sadness").p
+          end
+          Kernel.delay(locked_by: "fake", locked_at: 1.hour.ago).p
+          @shard1.update jobs_held: true
+        end
+
+        @shard2.update delayed_jobs_shard_id: @shard2.id
+        @shard2.activate do
+          a = Account.create! name: "jobs2"
+          a.account_domains.create! host: "jobs2.127.0.0.1.xip.io"
+
+          Kernel.delay(next_in_strand: false, singleton: "misery").p
+          Kernel.delay(run_at: 1.day.ago).p
+          Kernel.delay(run_at: 1.day.from_now).p
+          @shard2.update block_stranded: true
+        end
+      end
+
+      before do
+        if ::Switchman::Shard.instance_variable_defined?(:@jobs_scope_empty)
+          ::Switchman::Shard.remove_instance_variable(:@jobs_scope_empty)
+        end
+        allow(HostUrl).to receive(:default_host).and_return("www.example.com")
+      end
+
+      it "enumerates job clusters" do
+        json = api_call(:get, "/api/v1/jobs2/clusters?per_page=2",
+                        { controller: "jobs_v2", action: "clusters", format: "json", per_page: 2 })
+        expect(json.map { |row| row["id"] }).to match_array([Shard.default.id, @shard2.id])
+      end
+
+      it "retrieves stats from a job cluster" do
+        json = api_call(:get, "/api/v1/jobs2/clusters?job_shards[]=#{@shard2.id}",
+                        { controller: "jobs_v2", action: "clusters", format: "json", job_shards: [@shard2.to_param] })
+        expect(json).to eq [{
+          "id" => @shard2.id,
+          "database_server_id" => "1",
+          "block_stranded_shard_ids" => [@shard2.id],
+          "jobs_held_shard_ids" => [@shard1.id],
+          "domain" => "jobs2.127.0.0.1.xip.io",
+          "counts" => {
+            "queued" => 1,
+            "running" => 1,
+            "future" => 1,
+            "blocked" => 3
+          }
+        }]
+      end
+
+      it "lists stuck strands in a cluster" do
+        json = api_call(:get, "/api/v1/jobs2/stuck/strands?job_shard=#{@shard2.id}",
+                        { controller: "jobs_v2", action: "stuck_strands", format: "json", job_shard: @shard2.to_param })
+        expect(json).to eq([{ "name" => "sadness", "count" => 2 }])
+      end
+
+      it "lists stuck singletons in a cluster" do
+        json = api_call(:get, "/api/v1/jobs2/stuck/singletons?job_shard=#{@shard2.id}",
+                        { controller: "jobs_v2", action: "stuck_singletons", format: "json", job_shard: @shard2.to_param })
+        expect(json).to eq([{ "name" => "misery", "count" => 1 }])
+      end
+    end
   end
 end

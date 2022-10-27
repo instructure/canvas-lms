@@ -49,17 +49,17 @@ describe('SingleColor', () => {
 
       expect(dispatch).toHaveBeenNthCalledWith(1, {
         ...actions.SET_IMAGE_NAME,
-        payload: 'Art Icon'
+        payload: 'Art Icon',
       })
 
       expect(dispatch).toHaveBeenNthCalledWith(2, {
         ...actions.SET_ICON,
-        payload: 'art'
+        payload: 'art',
       })
 
       expect(dispatch).toHaveBeenNthCalledWith(3, {
         ...actions.SET_IMAGE_COLLECTION_OPEN,
-        payload: false
+        payload: false,
       })
     })
   })

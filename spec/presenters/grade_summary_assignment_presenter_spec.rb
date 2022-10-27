@@ -340,7 +340,7 @@ describe GradeSummaryAssignmentPresenter do
 
     it "is false if participation item is read" do
       @assignment.grade_student(@student, grader: @teacher, score: 5)
-      @submission.mark_item_read("grade")
+      @submission.reload.mark_item_read("grade")
 
       expect(@test_presenter.item_unread?("grade")).to be_falsey
     end

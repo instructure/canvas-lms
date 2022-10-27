@@ -130,12 +130,12 @@ $(function () {
   const restoreAlert = function ($alert, data) {
     const $criteria = $alert.find('.criteria')
     $criteria.empty()
-    for (var idx in data.criteria) {
+    for (const idx in data.criteria) {
       $criteria.append(createCriterion(data.criteria[idx], 'li'))
     }
     const $recipients = $alert.find('.recipients')
     $recipients.empty()
-    for (var idx in data.recipients) {
+    for (const idx in data.recipients) {
       if (ENV.ALERTS.POSSIBLE_RECIPIENTS[data.recipients[idx]]) {
         $recipients.append(createRecipient(data.recipients[idx], 'li'))
       }
@@ -188,7 +188,7 @@ $(function () {
       const $criteria_select = $alert.find('.add_criterion_link').prev()
       $criteria_select.empty()
       let count = 0
-      for (var idx in ENV.ALERTS.POSSIBLE_CRITERIA_ORDER) {
+      for (const idx in ENV.ALERTS.POSSIBLE_CRITERIA_ORDER) {
         const criterion = ENV.ALERTS.POSSIBLE_CRITERIA_ORDER[idx]
         let found = -1
         for (const jdx in data.criteria) {
@@ -209,8 +209,8 @@ $(function () {
       const $recipients_select = $alert.find('.add_recipient_link').prev()
       $recipients_select.empty()
       count = 0
-      for (var idx in ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER) {
-        const recipient = ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER[idx]
+      for (const idx_ in ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER) {
+        const recipient = ENV.ALERTS.POSSIBLE_RECIPIENTS_ORDER[idx_]
         if ($.inArray(recipient, data.recipients) == -1) {
           $recipients_select.append(createRecipient(recipient, 'option'))
           count += 1
@@ -280,7 +280,7 @@ $(function () {
       }
       $alert.find('.criteria input.editing').each(function () {
         const val = $(this).attr('value')
-        if (!val || isNaN(val) || parseFloat(val) < 0) {
+        if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $(this),
             I18n.t('errors.threshold_should_be_numeric', 'This should be a positive number'),
@@ -298,7 +298,7 @@ $(function () {
       } else {
         const $repetition = $alert.find('input[name="alert[repetition]"]')
         const val = $repetition.attr('value')
-        if (!val || isNaN(val) || parseFloat(val) < 0) {
+        if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $repetition,
             I18n.t('errors.threshold_should_be_numeric', 'This should be a positive number'),

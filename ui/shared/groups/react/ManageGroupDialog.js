@@ -28,6 +28,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('student_groups')
 
+// eslint-disable-next-line react/prefer-es6-class
 const ManageGroupDialog = createReactClass({
   displayName: 'ManageGroupDialog',
   mixins: [BackboneState, InfiniteScroll],
@@ -48,11 +49,11 @@ const ManageGroupDialog = createReactClass({
     e.preventDefault()
     let errors = false
     if (this.state.name.length == 0) {
-      $(this.refs.nameInput).errorBox(I18n.t('Group name is required'))
+      $(this.nameInputRef).errorBox(I18n.t('Group name is required'))
       errors = true
     }
     if (this.props.maxMembership && this.state.checked.length > this.props.maxMembership) {
-      $(this.refs.userList).errorBox(I18n.t('Too many members'))
+      $(this.userListRef).errorBox(I18n.t('Too many members'))
       errors = true
     }
     if (!errors) {
@@ -92,7 +93,7 @@ const ManageGroupDialog = createReactClass({
     return (
       <div id="manage_group_form">
         <form className="form-dialog" onSubmit={this.handleFormSubmit}>
-          <div ref="scrollElement" className="form-dialog-content">
+          <div ref={c => (this.scrollElementRef = c)} className="form-dialog-content">
             <table className="formtable">
               <tr>
                 <td>
@@ -100,7 +101,7 @@ const ManageGroupDialog = createReactClass({
                 </td>
                 <td>
                   <input
-                    ref="nameInput"
+                    ref={c => (this.nameInputRef = c)}
                     id="group_name"
                     type="text"
                     name="name"
@@ -112,13 +113,14 @@ const ManageGroupDialog = createReactClass({
               </tr>
               <tr>
                 <td>
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                   <label aria-live="polite" aria-atomic="true">
                     {I18n.t('Members')} {inviteLimit}
                   </label>
                 </td>
                 <td>
                   <PaginatedUserCheckList
-                    ref="userList"
+                    ref={c => (this.userListRef = c)}
                     checked={this.state.checked}
                     permanentUsers={[ENV.current_user]}
                     users={users}
@@ -129,7 +131,11 @@ const ManageGroupDialog = createReactClass({
             </table>
           </div>
           <div className="form-controls">
-            <button className="btn confirm-dialog-cancel-btn" onClick={this.props.closeDialog}>
+            <button
+              type="button"
+              className="btn confirm-dialog-cancel-btn"
+              onClick={this.props.closeDialog}
+            >
               {I18n.t('Cancel')}
             </button>
             <button className="btn btn-primary confirm-dialog-confirm-btn" type="submit">

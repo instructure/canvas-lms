@@ -29,6 +29,8 @@ class FlickrImage extends React.Component {
     }
 
     return (
+      // TODO: use InstUI button
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid, no-script-url
       <a className="FlickrImage" onClick={this.handleClick} href="javascript:;" ref="flickrImage">
         <img
           className="FlickrImage__screenreader"

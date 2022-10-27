@@ -74,7 +74,7 @@ export default class CreateAssignmentView extends DialogFormView
     unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
     data.due_at = @_getDueAt(unfudged) if unfudged?
     data.published = true if @shouldPublish
-    data.points_possible = numberHelper.parse(data.points_possible)
+    data.points_possible = numberHelper.parse(data.points_possible) if data.points_possible
     return data
 
   saveAndPublish: (event) ->

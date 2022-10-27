@@ -91,7 +91,7 @@ export default class TrayController {
     return audioOptions
       .updateMediaObject({
         media_object_id: audioOptions.media_object_id,
-        subtitles: audioOptions.subtitles
+        subtitles: audioOptions.subtitles,
       })
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {

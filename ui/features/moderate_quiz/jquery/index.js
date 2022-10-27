@@ -152,7 +152,7 @@ window.moderation = {
   studentsCurrentlyTakingQuiz: false,
 }
 
-$(document).ready(function (event) {
+$(document).ready(function (_event) {
   timing.initTimes()
   setInterval(moderation.updateTimes, 500)
   let updateErrors = 0
@@ -202,7 +202,7 @@ $(document).ready(function (event) {
           moderation.updateSubmission(data[idx], true)
         }
       },
-      data => {
+      _data => {
         updating(false)
         updateErrors++
         if (updateErrors > 5) {
@@ -311,17 +311,17 @@ $(document).ready(function (event) {
   })
 
   $('#extension_extra_time')
-    .on('invalid:not_a_number', function (e) {
+    .on('invalid:not_a_number', function (_e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_not_a_number', 'Extra time must be a number.')
       )
     })
-    .on('invalid:greater_than', function (e) {
+    .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_too_short', 'Extra time must be greater than 0.')
       )
     })
-    .on('invalid:less_than', function (e) {
+    .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_time_too_long',
@@ -331,7 +331,7 @@ $(document).ready(function (event) {
     })
 
   $('#extension_extra_attempts')
-    .on('invalid:not_a_number', function (e) {
+    .on('invalid:not_a_number', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_not_a_number',
@@ -339,7 +339,7 @@ $(document).ready(function (event) {
         )
       )
     })
-    .on('invalid:greater_than', function (e) {
+    .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_short',
@@ -347,7 +347,7 @@ $(document).ready(function (event) {
         )
       )
     })
-    .on('invalid:less_than', function (e) {
+    .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_long',
@@ -374,11 +374,11 @@ $(document).ready(function (event) {
     const formData = $(this).getFormData()
 
     function valid(data) {
-      let extraAttempts = parseInt(data.extra_attempts, 10),
-        extraTime = parseInt(data.extra_time, 10),
-        valid = true
+      const extraAttempts = parseInt(data.extra_attempts, 10)
+      const extraTime = parseInt(data.extra_time, 10)
+      let valid = true
 
-      if (data.extra_attempts && isNaN(extraAttempts)) {
+      if (data.extra_attempts && Number.isNaN(Number(extraAttempts))) {
         $('#extension_extra_attempts').trigger('invalid:not_a_number')
         valid = false
       } else if (extraAttempts > 1000) {
@@ -389,7 +389,7 @@ $(document).ready(function (event) {
         valid = false
       }
 
-      if (data.extra_time && isNaN(extraTime)) {
+      if (data.extra_time && Number.isNaN(Number(extraTime))) {
         $('#extension_extra_time').trigger('invalid:not_a_number')
         valid = false
       } else if (extraTime > 10080) {
@@ -450,12 +450,14 @@ $(document).ready(function (event) {
         url,
         'POST',
         formData,
+        // eslint-disable-next-line no-loop-func
         data => {
           finished++
           moderation.updateSubmission(data)
           checkIfFinished()
         },
-        data => {
+        // eslint-disable-next-line no-loop-func
+        _data => {
           finished++
           errors++
           checkIfFinished()
@@ -508,7 +510,7 @@ $(document).ready(function (event) {
         data.time_type === 'extend_from_now' &&
         data.time < $dialog.data('row').data('minutes_left')
       ) {
-        const result = confirm(
+        const result = window.confirm(
           I18n.t(
             'confirms.taking_time_away',
             'That would be less time than the student currently has.  Continue anyway?'
@@ -542,7 +544,7 @@ $(document).ready(function (event) {
           moderation.updateSubmission(data)
           $dialog.dialog('close')
         },
-        data => {
+        _data => {
           $dialog
             .find('button')
             .attr('disabled', false)
@@ -643,7 +645,7 @@ $(document).ready(function (event) {
       this.cleanUpEventListeners()
       this.dialog.dialog('close')
     },
-    setFocusOnLoad(event, ui) {
+    setFocusOnLoad(_event, _ui) {
       $('#autosubmit_form').focus()
     },
     showDialog() {

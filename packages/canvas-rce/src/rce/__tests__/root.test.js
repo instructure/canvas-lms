@@ -37,7 +37,7 @@ describe('RceModule', () => {
       editorOptions: () => {
         return {}
       },
-      textareaId: 'textarea_id'
+      textareaId: 'textarea_id',
     }
   })
 

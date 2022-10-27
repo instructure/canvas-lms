@@ -17,7 +17,10 @@
  */
 
 import React from 'react'
+import {waitFor} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 import {renderConnected} from '../../../__tests__/utils'
+import {PRIMARY_PACE, HEADING_STATS_API_RESPONSE} from '../../../__tests__/fixtures'
 import {Header} from '../header'
 
 const defaultProps = {
@@ -27,11 +30,6 @@ const defaultProps = {
   isBlueprintLocked: false,
   setIsBlueprintLocked: () => {},
 }
-
-beforeAll(() => {
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_for_sections = true
-})
 
 describe('Course paces header', () => {
   it('renders', () => {
@@ -84,4 +82,54 @@ describe('Course paces header', () => {
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })
   // the other messsages are tested with UnpublishedChangesIndicator
+
+  describe('with course paces for students', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_for_students = true
+    })
+
+    it('does render publishing changes for student paces', () => {
+      const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
+      expect(queryByText('All changes published')).toBeInTheDocument()
+    })
+  })
+
+  describe('with course paces redesign ON', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_redesign = true
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('renders the data pulled from the context api', () => {
+      window.ENV.COURSE_ID = 30
+      fetchMock.mock('/api/v1/courses/30/pace_contexts?type=course', HEADING_STATS_API_RESPONSE)
+      const {findByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+
+      waitFor(() => {
+        expect(findByRole('heading', {name: 'Defense Against the Dark Arts'})).toBeTruthy()
+        expect(findByRole('row', {name: 'Students 30'})).toBeTruthy()
+        expect(findByRole('row', {name: 'Sections 3'})).toBeTruthy()
+        expect(findByRole('row', {name: 'Duration 9 Weeks, 2 Days'})).toBeTruthy()
+      })
+    })
+
+    it('renders the proper button for preexisting pace', () => {
+      const {getByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      const getStartedButton = getByRole('button', {name: 'Edit Default Pace'})
+      expect(getStartedButton).toBeInTheDocument()
+    })
+
+    it('renders the proper button for empty state', () => {
+      const {getByRole} = renderConnected(
+        <Header {...defaultProps} coursePace={{id: undefined, context_type: 'Course'}} />
+      )
+      const getStartedButton = getByRole('button', {name: 'Create Default Pace'})
+      expect(getStartedButton).toBeInTheDocument()
+    })
+  })
 })

@@ -59,7 +59,7 @@ class InfoFrame extends React.Component {
     itemShown: courseNotSetUpItem,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (window.ENV.COURSE_WIZARD.checklist_states.publish_step) {
       this.setState({
         itemShown: checklistComplete,
@@ -67,7 +67,7 @@ class InfoFrame extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.getWizardItem(newProps.itemToShow)
   }
 
@@ -117,7 +117,10 @@ class InfoFrame extends React.Component {
   renderButton = () => {
     if (this.state.itemShown.key === 'home_page') {
       return (
+        // TODO: use InstUI button
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
         <a
+          role="button"
           ref={e => (this.callToAction = e)}
           onClick={this.chooseHomePage}
           className="Button Button--primary"

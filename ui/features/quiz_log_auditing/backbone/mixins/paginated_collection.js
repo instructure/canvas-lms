@@ -179,7 +179,7 @@ const Mixin = {
     } else if (options.hasOwnProperty('page')) {
       if (process.env.NODE_ENV === 'development') {
         console.error(
-          'You should not specify a page when fetching all pages since it ' + 'will be reset to 1!'
+          'You should not specify a page when fetching all pages since it will be reset to 1!'
         )
       }
 

@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../format-message'
-import {showFlashAlert} from '../../../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../../../common/FlashAlert'
 
 const EDIT_MESSAGE = formatMessage('If left empty link, text will display as course link name')
 
@@ -32,13 +32,13 @@ export const LinkDisplay = ({
   placeholderText,
   linkFileName,
   published,
-  handleTextChange
+  handleTextChange,
 }) => {
   useEffect(() => {
     showFlashAlert({
       message: formatMessage('Selected {linkFileName}', {linkFileName}),
       type: 'info',
-      srOnly: true
+      srOnly: true,
     })
   }, [linkFileName])
 

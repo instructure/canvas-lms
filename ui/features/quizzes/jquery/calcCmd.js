@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Ignored rules can be removed incrementally
+// Resolving all these up-front is untenable and unlikely
+/* eslint-disable eqeqeq,@typescript-eslint/no-redeclare */
+/* eslint-disable block-scoped-var,no-var,vars-on-top */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('calculator.command')
@@ -62,7 +68,7 @@ const calcCmd = {}
     while (index < command.length) {
       const item = parseToken(command, index)
       if (!item) {
-        throw 'unrecognized token at ' + index
+        throw new Error('unrecognized token at ' + index)
       }
       index = item.newIndex
       result.push(item)
@@ -86,7 +92,7 @@ const calcCmd = {}
           syntaxIndex++
           result = syntax[syntaxIndex]
         } else {
-          throw 'expecting a number at ' + syntax[syntaxIndex].newIndex
+          throw new Error('expecting a number at ' + syntax[syntaxIndex].newIndex)
         }
         break
       case 'variable':
@@ -107,7 +113,7 @@ const calcCmd = {}
           }
           syntaxIndex--
           if (ender !== 'close_paren') {
-            throw 'expecting close parenthesis at ' + syntax[syntaxIndex].newIndex
+            throw new Error('expecting close parenthesis at ' + syntax[syntaxIndex].newIndex)
           }
         } else {
           result = syntax[syntaxIndex]
@@ -123,7 +129,7 @@ const calcCmd = {}
     if (!result) {
       const index = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].newIndex) || 0
       const type = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].token) || 'nothing'
-      throw 'expecting a value at ' + index + ', got a ' + type
+      throw new Error('expecting a value at ' + index + ', got a ' + type)
     }
     syntaxIndex++
     return result
@@ -132,23 +138,18 @@ const calcCmd = {}
     switch (syntax[syntaxIndex].token) {
       case 'add':
         return syntax[syntaxIndex++]
-        break
       case 'subtract':
         return syntax[syntaxIndex++]
-        break
       case 'multiply':
         return syntax[syntaxIndex++]
-        break
       case 'divide':
         return syntax[syntaxIndex++]
-        break
       case 'power':
         return syntax[syntaxIndex++]
-        break
     }
     const value = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].token) || 'value'
     const index = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].newIndex) || 0
-    throw 'unexpected ' + value + ' at ' + index
+    throw new Error('unexpected ' + value + ' at ' + index)
   }
 
   var parseExpression = function (syntax, enders) {
@@ -199,7 +200,7 @@ const calcCmd = {}
         syntaxIndex = 2
         result.assignmentExpression = parseExpression(syntax)
       } else {
-        throw 'Expecting value at ' + syntax[syntaxIndex + 1].newIndex
+        throw new Error('Expecting value at ' + syntax[syntaxIndex + 1].newIndex)
       }
     } else {
       result = parseExpression(syntax)
@@ -253,9 +254,9 @@ const calcCmd = {}
       }
     }
     if (round3.length === 0) {
-      throw 'expressions should have at least one value'
+      throw new Error('expressions should have at least one value')
     } else if (round3.length > 1) {
-      throw 'unexpected modifier: ' + round3[1].token
+      throw new Error('unexpected modifier: ' + round3[1].token)
     } else {
       return compute(round3[0])
     }
@@ -271,20 +272,16 @@ const calcCmd = {}
     switch (tree.token) {
       case 'number':
         return parseFloat(tree.value)
-        break
       case 'expression':
         return computeExpression(tree)
-        break
       case 'parenthesized_expression':
         return compute(tree.expression)
-        break
       case 'variable_assignment':
         if (tree.variable.value === '_') {
-          throw "the variable '_' is reserved"
+          throw new Error("the variable '_' is reserved")
         }
         variables[tree.variable.value] = compute(tree.assignmentExpression)
         return variables[tree.variable.value]
-        break
       case 'variable':
         if (tree.value === '_') {
           return lastComputedResult || 0
@@ -300,10 +297,9 @@ const calcCmd = {}
           value = value || (variables && variables[tree.value])
         }
         if (value == undefined) {
-          throw 'undefined variable ' + tree.value
+          throw new Error('undefined variable ' + tree.value)
         }
         return value
-        break
       case 'method':
         var args = []
         for (const idx in tree.arguments) {
@@ -314,11 +310,10 @@ const calcCmd = {}
         if (methods[tree.value]) {
           return methods[tree.value].apply(null, args)
         } else {
-          throw 'unrecognized method ' + tree.value
+          throw new Error('unrecognized method ' + tree.value)
         }
-        break
     }
-    throw 'Unexpected token type: ' + tree.token
+    throw new Error('Unexpected token type: ' + tree.token)
   }
   calcCmd.clearMemory = function () {
     variables = {}

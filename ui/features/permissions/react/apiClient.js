@@ -45,6 +45,6 @@ export function deleteRole(contextId, role) {
 //      the same as the base role. This will need to be fixed on endpoint
 //      before we can do anything with it here.
 
-export function updateBaseRole({contextId}, role, baseRole) {
+export function updateBaseRole({contextId: _contextId}, _role, _baseRole) {
   throw new Error('API does not currently support updating the base role')
 }

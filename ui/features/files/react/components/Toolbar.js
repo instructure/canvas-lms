@@ -52,7 +52,7 @@ export default class Toolbar extends React.Component {
     userCanRestrictFilesForContext: PropTypes.bool,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.downloadTitle = I18n.t('Download as Zip')
     this.tabIndex = null
   }
@@ -74,7 +74,7 @@ export default class Toolbar extends React.Component {
     })
   }
 
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     this.showingButtons = nextProps.selectedItems.length
   }
 
@@ -141,6 +141,8 @@ export default class Toolbar extends React.Component {
     if (this.props.indexExternalToolsForContext?.length > 0) {
       return (
         <div className="inline-block">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             className="al-trigger btn"
             id="file_menu_link"
@@ -155,6 +157,8 @@ export default class Toolbar extends React.Component {
           <ul className="al-options" role="menu">
             {this.props.indexExternalToolsForContext.map(tool => (
               <li key={tool.id} role="menuitem">
+                {/* TODO: use InstUI button */}
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
                   {this.iconForTrayTool(tool)}
                   {tool.title}
@@ -418,7 +422,6 @@ export default class Toolbar extends React.Component {
             aria-label={I18n.t('Search for files')}
             type="search"
             ref="searchTerm"
-            role="textbox"
             className="ic-Input"
             defaultValue={this.props.query.search_term}
           />
@@ -430,6 +433,8 @@ export default class Toolbar extends React.Component {
 
         <div className="ef-header__secondary">
           <div className={buttonSetClasses}>
+            {/* TODO: use InstUI button */}
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
               ref="previewLink"
               href="#"

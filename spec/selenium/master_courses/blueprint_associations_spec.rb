@@ -60,7 +60,7 @@ describe "Blueprint association settings" do
       row.find_element(xpath: "td//label").click
       expect(fj("span:contains('To be Added')")).to be
       element = f(".bca-associations-table")
-      element = element.find_element(css: "form[data-course-id=\"#{@minion3.id}\"]")
+      element = element.find_element(css: "button[data-course-id=\"#{@minion3.id}\"]")
       expect(element).to be
     end
 

@@ -85,6 +85,7 @@ class CreateTicketForm extends React.Component {
             }}
           />
 
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Subject')}</span>
             <input
@@ -98,6 +99,7 @@ class CreateTicketForm extends React.Component {
             />
           </label>
 
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Description')}</span>
             <textarea
@@ -121,6 +123,7 @@ class CreateTicketForm extends React.Component {
             />
           </label>
 
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('How is this affecting you?')}</span>
             <select
@@ -147,6 +150,7 @@ class CreateTicketForm extends React.Component {
           </label>
 
           {!window.ENV.current_user_id ? (
+            // eslint-disable-next-line jsx-a11y/label-has-associated-control
             <label className="ic-Form-control">
               <span className="ic-Label">{I18n.t('Your email address')}</span>
               <input className="ic-Input" type="email" name="error[email]" />

@@ -47,6 +47,9 @@ The quiz taking police has arrived.
        });
      }
 */
+
+/* eslint-disable no-restricted-globals, import/no-amd */
+
 define([], function () {
   if (!window.Worker) {
     // if this browser doesn't support web workers, this module does nothing

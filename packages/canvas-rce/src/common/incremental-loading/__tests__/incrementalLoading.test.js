@@ -43,9 +43,9 @@ describe('RCE > Common > Incremental Loading', () => {
       contextType: 'course',
       sortBy: {
         sort: 'alphabetical',
-        order: 'asc'
+        order: 'asc',
       },
-      searchString: ''
+      searchString: '',
     }
   })
 

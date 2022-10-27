@@ -133,24 +133,21 @@ describe OutcomesServiceAuthoritativeResultsHelper do
   # Mocks calls to the OS endpoints:
   #
   #   - retrieving data from the Canvas' LearningOutcomeResult table
-  #   - transforming this data into a collection of JSON AuthoritativeResult objects
+  #   - transforming this data into a collection of AuthoritativeResult objects
   def authoritative_results_from_db
-    {
-      results:
-        LearningOutcomeResult.all.map do |lor|
-          {
-            user_uuid: lor.user.uuid,
-            points: lor.score,
-            points_possible: lor.possible,
-            external_outcome_id: lor.learning_outcome.id,
-            attempts: nil,
-            associated_asset_type: nil,
-            associated_asset_id: lor.alignment.content_id,
-            artifact: lor.artifact,
-            submitted_at: lor.submitted_at
-          }
-        end
-    }.to_json
+    LearningOutcomeResult.all.map do |lor|
+      {
+        user_uuid: lor.user.uuid,
+        points: lor.score,
+        points_possible: lor.possible,
+        external_outcome_id: lor.learning_outcome.id,
+        attempts: nil,
+        associated_asset_type: nil,
+        associated_asset_id: lor.alignment.content_id,
+        artifact: lor.artifact,
+        submitted_at: lor.submitted_at
+      }
+    end
   end
 
   describe "percentage and mastery calculation" do
@@ -163,7 +160,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
         create_learning_outcome_result @students[0], points, { points_possible: 19.0 }
       end
 
-      results = json_to_outcome_results(authoritative_results_from_db)
+      results = convert_to_learning_outcome_results(authoritative_results_from_db)
 
       expect(results.size).to eq 20
       results.each do |r|
@@ -175,7 +172,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
     end
   end
 
-  describe "#json_to_outcome_result" do
+  describe "#convert_to_learning_outcome_result" do
     it "sets artifact to submission" do
       create_outcome
       create_alignment
@@ -188,7 +185,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
         user_uuid: @students[0].uuid,
         associated_asset_type: "canvas.assignment.quizzes"
       }
-      learning_outcome_result = json_to_outcome_result(ar_hash)
+      learning_outcome_result = convert_to_learning_outcome_result(ar_hash)
 
       expect(learning_outcome_result.artifact_id).to eq submission.id
       expect(learning_outcome_result.artifact_type).to eq "Submission"
@@ -206,7 +203,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_learning_outcome_result @students[0], 3.0
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.size).to eq 2
       from_lor.each_with_index do |ru, i|
@@ -233,7 +230,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       end
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.size).to eq 0
 
@@ -251,7 +248,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       end
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.size).to eq 1
       expect(from_lor[0].count).to eq 2
@@ -270,7 +267,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       end
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor[0].score).to eq 3.0
 
@@ -295,7 +292,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_from_scores [1.0, 2.0, 3.0, 4.0], 1
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.size).to eq 6
       # without sorting the arrays this spec may fail at Flakey Spec Catcher
@@ -313,7 +310,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       end
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.map(&:score)).to eq [3.75]
 
@@ -332,7 +329,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       end
 
       from_lor = rollup_user_results LearningOutcomeResult.all.to_a
-      from_ar = json_to_rollup_scores(authoritative_results_from_db)
+      from_ar = rollup_scores(authoritative_results_from_db)
 
       expect(from_lor.size).to eq 2
       # without sorting the arrays this spec may fail at Flakey Spec Catcher
@@ -355,7 +352,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_outcome
       create_alignment
       create_learning_outcome_result @students[2], 2.0
-      results = json_to_outcome_results(authoritative_results_from_db)
+      results = convert_to_learning_outcome_results(authoritative_results_from_db)
 
       rollups = outcome_results_rollups(results: results, users: @students)
       os_rollups = outcome_service_results_rollups(results)
@@ -379,7 +376,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_outcome
       create_alignment
       create_learning_outcome_result @students[1], 3.0
-      results = json_to_outcome_results(authoritative_results_from_db)
+      results = convert_to_learning_outcome_results(authoritative_results_from_db)
 
       rollups = outcome_service_results_rollups(results)
       expect(rollups.count).to eq 2
@@ -393,7 +390,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_outcome
       create_alignment
       create_learning_outcome_result @students[0], 3.0
-      results = json_to_outcome_results(authoritative_results_from_db)
+      results = convert_to_learning_outcome_results(authoritative_results_from_db)
 
       rollups = outcome_service_results_rollups(results)
       expect(rollups.count).to eq 1

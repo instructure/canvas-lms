@@ -22,7 +22,7 @@ import {
   getByLabelText,
   queryByLabelText,
   queryByTestId,
-  waitFor
+  waitFor,
 } from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {

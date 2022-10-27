@@ -32,7 +32,7 @@ const SHAPE_OPTIONS = [
   {id: Shape.Pentagon, label: formatMessage('Pentagon')},
   {id: Shape.Hexagon, label: formatMessage('Hexagon')},
   {id: Shape.Octagon, label: formatMessage('Octagon')},
-  {id: Shape.Star, label: formatMessage('Star')}
+  {id: Shape.Star, label: formatMessage('Star')},
 ]
 
 export const ShapeControls = ({shape, onChange}) => {
@@ -58,10 +58,10 @@ export const ShapeControls = ({shape, onChange}) => {
 
 ShapeControls.propTypes = {
   shape: PropTypes.string,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
 ZoomControls.defaultProps = {
   shape: 'square',
-  onChange: () => {}
+  onChange: () => {},
 }

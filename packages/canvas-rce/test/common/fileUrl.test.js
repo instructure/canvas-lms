@@ -68,7 +68,7 @@ describe('Common file url utils', () => {
       beforeEach(() => {
         fileInfo = {
           href: '/files/17/download?download_frd=1',
-          uuid: 'xyzzy'
+          uuid: 'xyzzy',
         }
       })
 
@@ -95,7 +95,7 @@ describe('Common file url utils', () => {
       beforeEach(() => {
         fileInfo = {
           url: '/files/17/download?download_frd=1',
-          uuid: 'xyzzy'
+          uuid: 'xyzzy',
         }
       })
 
@@ -141,7 +141,7 @@ describe('Common file url utils', () => {
       strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
     })
 
-    it('does not indescriminetly replace /preview in a url', () => {
+    it('does not indiscriminately replace /preview in a url', () => {
       const url = '/please/preview/me'
       strictEqual(prepEmbedSrc(url), '/please/preview/me/preview')
     })
@@ -159,7 +159,7 @@ describe('Common file url utils', () => {
       strictEqual(prepLinkedSrc(url), '/users/2/files/17?verifier=xyzzy&wrap=1')
     })
 
-    it('does not indescriminetly replace /download in a url', () => {
+    it('does not indiscriminately replace /download in a url', () => {
       const url = '/please/download/me'
       strictEqual(prepLinkedSrc(url), `${url}?wrap=1`)
     })

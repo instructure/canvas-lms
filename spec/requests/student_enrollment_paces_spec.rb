@@ -38,31 +38,6 @@ describe "Student Enrollment Paces API" do
     expect(response.status).to eq 401
   end
 
-  describe "index" do
-    let!(:student_pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
-
-    before do
-      course_pace_model(course: course)
-    end
-
-    it "returns relevant paces" do
-      get api_v1_student_enrollment_paces_path(course.id), params: { format: :json }
-      expect(response.status).to eq 200
-      json = JSON.parse(response.body)
-      expect(
-        json["paces"].map { |p| p["id"] }
-      ).to match_array(
-        [student_pace.id]
-      )
-      pace_json = json["paces"].first
-      expect(pace_json["student"]["name"]).to eq student.name
-    end
-
-    it "returns a 401 if the user lacks permissions" do
-      assert_grant_check { get api_v1_student_enrollment_paces_path(course.id), params: { format: :json } }
-    end
-  end
-
   describe "show" do
     it "returns the pace for the requested student enrollment" do
       student_pace = student_enrollment_pace_model(student_enrollment: student_enrollment)
@@ -239,17 +214,6 @@ describe "Student Enrollment Paces API" do
   context "course_paces_redesign flag is disabled" do
     before do
       Account.site_admin.disable_feature!(:course_paces_redesign)
-    end
-
-    describe "index" do
-      before do
-        student_enrollment_pace_model(student_enrollment: student_enrollment)
-      end
-
-      it "returns 404" do
-        get api_v1_student_enrollment_paces_path(course), params: { format: :json }
-        expect(response.status).to eq 404
-      end
     end
 
     describe "show" do

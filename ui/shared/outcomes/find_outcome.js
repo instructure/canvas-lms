@@ -26,7 +26,7 @@ import '@canvas/util/templateData'
 const I18n = useI18nScope('find_outcome')
 /* fillTemplateData, getTemplateData */
 
-var find_outcome = (function () {
+const find_outcome = (function () {
   return {
     find(callback, options) {
       options = options || {}
@@ -42,8 +42,8 @@ var find_outcome = (function () {
           {},
           data => {
             const valids = []
-            for (var idx in data) {
-              var outcome = data[idx].learning_outcome
+            for (const idx in data) {
+              const outcome = data[idx].learning_outcome
               if (!options.for_rubric || (outcome.data && outcome.data.rubric_criterion)) {
                 valids.push(outcome)
               }
@@ -62,8 +62,8 @@ var find_outcome = (function () {
             } else {
               $dialog.find('.loading_message').hide()
               $dialog.addClass('loaded')
-              for (var idx in valids) {
-                var outcome = valids[idx]
+              for (const idx in valids) {
+                const outcome = valids[idx]
                 outcome.name = outcome.short_description
                 outcome.mastery_points =
                   outcome.data.rubric_criterion.mastery_points ||
@@ -113,7 +113,7 @@ var find_outcome = (function () {
               $dialog.find('.outcomes_select:not(.blank):first').click()
             }
           },
-          data => {
+          _data => {
             $dialog
               .find('.loading_message')
               .text(

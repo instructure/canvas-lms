@@ -52,5 +52,5 @@ AccordionSection.propTypes = {
   children: node.isRequired,
   onToggle: func.isRequired,
   expanded: bool.isRequired,
-  label: string.isRequired
+  label: string.isRequired,
 }

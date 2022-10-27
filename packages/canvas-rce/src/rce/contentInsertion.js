@@ -23,7 +23,7 @@ import {
   cleanUrl,
   getAnchorElement,
   isOnlyTextSelected,
-  isImageFigure
+  isImageFigure,
 } from './contentInsertionUtils'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 
@@ -101,14 +101,27 @@ export function insertImage(editor, image) {
     content = renderLinkedImage(editor.selection.getRng().startContainer, image)
   } else {
     // render the image, constraining its size on insertion
+    const imgNode = editor.selection.getNode()
+    // apply selected styles only in course/user images
+    if (isElemImg(imgNode) && !image['data-inst-icon-maker-icon']) {
+      const customStyles = imgNode.style
+      const customWidth = imgNode.getAttribute('width')
+      const parseStyles = {}
+      for (let i = 0; i < customStyles.length; ++i) {
+        const cssAttribute = customStyles.item(i)
+        parseStyles[cssAttribute] = customStyles[cssAttribute]
+      }
+      image.width = customWidth
+      image.style = parseStyles
+    }
     content = renderImage({
-      ...image
+      ...image,
     })
   }
   return insertContent(editor, content)
 }
 
-export function insertEquation(editor, latex, canvasUrl) {
+export function insertEquation(editor, latex) {
   const docSz =
     parseFloat(
       editor.dom.doc.defaultView.getComputedStyle(editor.dom.doc.body).getPropertyValue('font-size')
@@ -121,10 +134,7 @@ export function insertEquation(editor, latex, canvasUrl) {
     : docSz
   const scale = imgSz / docSz
 
-  let url = `/equation_images/${encodeURIComponent(encodeURIComponent(latex))}?scale=${scale}`
-  if (canvasUrl) {
-    url = canvasUrl + url
-  }
+  const url = `/equation_images/${encodeURIComponent(encodeURIComponent(latex))}?scale=${scale}`
 
   // if I simply create the html string, xsslint fails jenkins
   const img = document.createElement('img')
@@ -188,7 +198,7 @@ function decorateLinkWithEmbed(link) {
     instructure_audio_link: type === 'audio',
     auto_open: link.embed && link.embed.autoOpenPreview,
     inline_disabled: link.embed && link.embed.disableInlinePreview,
-    no_preview: link.embed && link.embed.noPreview
+    no_preview: link.embed && link.embed.noPreview,
   })
 
   if (link.embed.type == 'video' || link.embed.type == 'audio') {
@@ -234,7 +244,7 @@ function insertUndecoratedLink(editor, linkProps) {
     title: linkProps.title,
     'data-canvas-previewable': linkProps['data-canvas-previewable'],
     'data-course-type': linkProps['data-course-type'],
-    'data-published': linkProps['data-published']
+    'data-published': linkProps['data-published'],
   }
 
   if (linkAttrs.target === '_blank') {

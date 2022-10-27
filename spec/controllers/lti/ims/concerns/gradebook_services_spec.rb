@@ -97,6 +97,47 @@ module Lti
           end
         end
 
+        context "the ags_improved_course_concluded_response_codes flag is enabled" do
+          before(:once) do
+            Account.site_admin.enable_feature!(:ags_improved_course_concluded_response_codes)
+          end
+
+          it "responds with 422 if course is hard concluded" do
+            context.update!(workflow_state: "completed")
+            get :index, params: valid_params
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it "responds with 422 if course end date has passed" do
+            context.update!(start_at: Time.now - 2.days, conclude_at: Time.now - 1.day, restrict_enrollments_to_course_dates: true)
+            get :index, params: valid_params
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it "still responds with a 404 if an invalid course_id is passed" do
+            get :index, params: valid_params.merge({ course_id: Course.last.id + 1 })
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+
+        context "the ags_improved_course_concluded_response_codes flag is disabled" do
+          before(:once) do
+            Account.site_admin.disable_feature!(:ags_improved_course_concluded_response_codes)
+          end
+
+          it "responds with a 404 if the course is hard concluded" do
+            context.update!(workflow_state: :completed)
+            get :index, params: valid_params
+            expect(response).to have_http_status(:not_found)
+          end
+
+          it "responds with a 404 if the course end has passed" do
+            context.update!(start_at: Time.now - 2.days, conclude_at: Time.now - 1.day, restrict_enrollments_to_course_dates: true)
+            get :index, params: valid_params
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+
         context "with user not in context" do
           before { user.enrollments.destroy_all }
 

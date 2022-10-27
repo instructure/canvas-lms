@@ -19,7 +19,7 @@
 import axios from '@canvas/axios'
 import React from 'react'
 import {mount} from 'enzyme'
-import DefaultToolForm, {toolSubmissionType} from '../DefaultToolForm'
+import DefaultToolForm from '../DefaultToolForm'
 import SelectContentDialog from '@canvas/select-content-dialog'
 
 const newProps = (overrides = {}) => ({

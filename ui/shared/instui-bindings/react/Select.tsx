@@ -83,11 +83,11 @@ type GroupProps = {
 // CanvasSelectOption and CanvasSelectGroup are components our client can create thru CanvasSelect
 // to pass us our options. They are never rendered themselves, but get transformed into INSTUI's
 // Select.Option and Select.Group on rendering CanvasSelect. See renderChildren below.
-function CanvasSelectOption({id, value}: OptionProps): ReactElement {
+function CanvasSelectOption(_props: OptionProps): ReactElement {
   return <div />
 }
 
-function CanvasSelectGroup({label}: GroupProps): ReactElement {
+function CanvasSelectGroup(_props: GroupProps): ReactElement {
   return <div />
 }
 
@@ -122,6 +122,7 @@ class CanvasSelect extends React.Component<Props, State> {
   }
 
   render(): ReactElement {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {id, label, value, onChange, children, noOptionsLabel = '---', ...otherProps} = this.props
 
     return (

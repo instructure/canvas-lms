@@ -22,7 +22,7 @@ import {
   SHAPE_CONTAINER_LENGTH,
   GLUE_WIDTH,
   PREVIEW_WIDTH,
-  PREVIEW_BACKGROUND_COLOR
+  PREVIEW_BACKGROUND_COLOR,
 } from '../constants'
 import {buildShapeMask} from './shape'
 
@@ -35,7 +35,7 @@ export function buildSvg(shape) {
     width: GLUE_WIDTH,
     height: PREVIEW_HEIGHT,
     fill: PREVIEW_BACKGROUND_COLOR,
-    'fill-opacity': '0.5'
+    'fill-opacity': '0.5',
   })
   const rightGlue = createSvgElement('rect', {
     x: GLUE_WIDTH + SHAPE_CONTAINER_LENGTH,
@@ -43,7 +43,7 @@ export function buildSvg(shape) {
     width: GLUE_WIDTH,
     height: PREVIEW_HEIGHT,
     fill: PREVIEW_BACKGROUND_COLOR,
-    'fill-opacity': '0.5'
+    'fill-opacity': '0.5',
   })
   const defsElement = createSvgElement('defs')
   const maskElement = createMask(settings)
@@ -55,7 +55,7 @@ export function buildSvg(shape) {
     height: SHAPE_CONTAINER_LENGTH,
     mask: 'url(#imageCropperMask)',
     fill: PREVIEW_BACKGROUND_COLOR,
-    'fill-opacity': '0.5'
+    'fill-opacity': '0.5',
   })
   defsElement.appendChild(maskElement)
   mainContainer.appendChild(leftGlue)
@@ -69,24 +69,24 @@ function createSvgContainer() {
   return createSvgElement('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
     width: PREVIEW_WIDTH,
-    height: PREVIEW_HEIGHT
+    height: PREVIEW_HEIGHT,
   })
 }
 
 function createMask(settings) {
   const maskElement = createSvgElement('mask', {
-    id: 'imageCropperMask'
+    id: 'imageCropperMask',
   })
   const shapeContainer = createSvgElement('svg', {
     x: `${PREVIEW_WIDTH / 2 - SHAPE_CONTAINER_LENGTH / 2}`,
     y: 0,
     width: SHAPE_CONTAINER_LENGTH,
-    height: SHAPE_CONTAINER_LENGTH
+    height: SHAPE_CONTAINER_LENGTH,
   })
   const bgElement = createSvgElement('rect', {
     width: '100%',
     height: `${PREVIEW_HEIGHT}px`,
-    fill: 'white'
+    fill: 'white',
   })
   const shapeElement = buildShapeMask(settings)
   shapeContainer.appendChild(bgElement)

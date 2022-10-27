@@ -71,7 +71,7 @@ test('isNewGradingPeriod returns true if the id contains "new"', function () {
 
 test('does not render a delete button', function () {
   const gradingPeriod = this.renderComponent()
-  notOk(gradingPeriod.refs.deleteButton)
+  notOk(gradingPeriod.deleteButtonRef)
 })
 
 test('renders attributes as read-only', function () {
@@ -128,7 +128,7 @@ test('isNewGradingPeriod returns true if the id contains "new"', function () {
 
 test('does not render a delete button', function () {
   const gradingPeriod = this.renderComponent()
-  notOk(gradingPeriod.refs.deleteButton)
+  notOk(gradingPeriod.deleteButtonRef)
 })
 
 test('renders attributes as read-only', function () {
@@ -170,7 +170,7 @@ QUnit.module('editable GradingPeriod', {
 
 test('renders a delete button', function () {
   const gradingPeriod = this.renderComponent()
-  ok(gradingPeriod.refs.deleteButton)
+  ok(gradingPeriod.deleteButtonRef)
 })
 
 test('renders with input fields', function () {
@@ -197,7 +197,7 @@ test('uses the end date for close date', function () {
 test("calls onClick handler for clicks on 'delete grading period'", function () {
   const deleteSpy = sinon.spy()
   const gradingPeriod = this.renderComponent({onDeleteGradingPeriod: deleteSpy})
-  Simulate.click(gradingPeriod.refs.deleteButton)
+  Simulate.click(gradingPeriod.deleteButtonRef)
   ok(deleteSpy.calledOnce)
 })
 
@@ -207,7 +207,7 @@ test("ignores clicks on 'delete grading period' when disabled", function () {
     onDeleteGradingPeriod: deleteSpy,
     disabled: true,
   })
-  Simulate.click(gradingPeriod.refs.deleteButton)
+  Simulate.click(gradingPeriod.deleteButtonRef)
   notOk(deleteSpy.called)
 })
 
@@ -232,7 +232,7 @@ test('does not warn of invalid props if all required props are present and of th
 
 test('warns if required props are missing', function () {
   this.renderComponent({disabled: null})
-  ok(this.consoleError.calledOnce)
+  ok(this.consoleError.calledTwice)
 })
 
 test('warns if required props are of the wrong type', function () {

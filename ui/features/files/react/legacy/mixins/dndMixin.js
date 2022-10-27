@@ -64,7 +64,9 @@ export default {
       const img = new Image()
       img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
       event.dataTransfer.setDragImage(img, 150, 150)
-    } catch (error) {}
+    } catch (error) {
+      // no-op
+    }
 
     this.renderDragFeedback(event)
     event.dataTransfer.effectAllowed = 'move'

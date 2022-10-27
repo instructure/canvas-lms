@@ -65,7 +65,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
-    this.on('success', args => (window.location.href = this.model.get('html_url')))
+    this.on('success', _args => (window.location.href = this.model.get('html_url')))
     this.lockedItems = options.lockedItems || {}
     const todoDate = this.model.get('todo_date')
     return (this.studentTodoAtDateValue = todoDate ? new Date(todoDate) : '')
@@ -132,7 +132,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   // handles the toggling of the student todo date picker
-  toggleStudentTodo(e) {
+  toggleStudentTodo(_e) {
     return this.$studentTodoAtContainer.toggle()
   }
 
@@ -278,7 +278,8 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
-        !confirm(
+        // eslint-disable-next-line no-alert
+        !window.confirm(
           I18n.t(
             'warnings.overwrite_changes',
             'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?'
@@ -340,7 +341,8 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (event != null) {
       event.preventDefault()
     }
-    if (!this.hasUnsavedChanges() || confirm(this.unsavedWarning())) {
+    // eslint-disable-next-line no-alert
+    if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
       RichContentEditor.closeRCE(this.$wikiPageBody)
       return this.trigger('cancel')

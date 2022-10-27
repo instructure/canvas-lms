@@ -38,7 +38,9 @@ export default class TruncateWithTooltip extends React.Component {
 
   render() {
     const {children: text, ...remainingProps} = this.props
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const tooltipProps = pickProps(remainingProps, Tooltip.propTypes)
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const truncateProps = pickProps(remainingProps, TruncateText.propTypes)
 
     const truncatedText = (

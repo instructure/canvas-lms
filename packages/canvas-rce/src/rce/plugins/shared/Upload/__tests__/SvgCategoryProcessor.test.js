@@ -24,8 +24,8 @@ describe('process()', () => {
 
   const file = () => ({
     slice: () => ({
-      text: async () => fileText
-    })
+      text: async () => fileText,
+    }),
   })
 
   beforeEach(() => {
@@ -42,7 +42,7 @@ describe('process()', () => {
     it('returns the icon maker category', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: ICON_MAKER_ICONS
+        category: ICON_MAKER_ICONS,
       })
     })
   })
@@ -63,8 +63,8 @@ describe('process()', () => {
       slice: () => ({
         text: async () => {
           throw 'an error'
-        }
-      })
+        },
+      }),
     }
 
     it('returns undefined', async () => {

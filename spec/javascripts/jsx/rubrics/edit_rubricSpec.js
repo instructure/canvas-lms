@@ -119,3 +119,56 @@ test('clicking hidden grading_rubric checkbox does not hide totalling_rubric che
   $('.grading_rubric_checkbox').triggerHandler('change')
   notStrictEqual($('.totalling_rubric').css('visibility'), 'hidden')
 })
+
+const criterionHtml =
+  '<tr id="criterion_blank" class="criterion">' +
+  '  <td style="padding: 0;">' +
+  '    <table class="ratings">' +
+  '      <tbody>' +
+  '        <tr>' +
+  '          <td class="rating">' +
+  '            <div class="container">' +
+  '              <div class="rating-main">' +
+  '                <span class="points">4</span>' +
+  '                <div class="description rating_description_value">Full Marks</div>' +
+  '                <span class="rating_id" style="display: none;">58_3952</span>' +
+  '              </div>' +
+  '            </div>' +
+  '          </td>' +
+  '          <td class="rating">' +
+  '            <div class="container">' +
+  '              <div class="rating-main">' +
+  '                <span class="points">2</span>' +
+  '                <div class="description rating_description_value">Partial Marks</div>' +
+  '                <span class="rating_id" style="display: none;">58_4365</span>' +
+  '              </div>' +
+  '            </div>' +
+  '          </td>' +
+  '          <td class="rating">' +
+  '            <div class="container">' +
+  '              <div class="rating-main">' +
+  '                <span class="points">0</span>' +
+  '                <div class="description rating_description_value">No Marks</div>' +
+  '                <span class="rating_id" style="display: none;">58_4372</span>' +
+  '              </div>' +
+  '            </div>' +
+  '          </td>' +
+  '        </tr>' +
+  '      </tbody>' +
+  '    </table>' +
+  '  </td>' +
+  '  <td class="nobr points_form toggle_for_hide_points">' +
+  '    <div class="editing" style="white-space: normal">' +
+  '      <input type="text" aria-label="Points" value="4" class="criterion_points span1 no-margin-bottom">' +
+  '      pts' +
+  '      </span><br>' +
+  '    </div>' +
+  '  </td>' +
+  '</tr>'
+
+test('sets the first rating value to the points input initially when a criterion id is "blank"', () => {
+  $(document.body).append($(rubricHtml))
+  $(document.body).append($(criterionHtml))
+  rubricEditing.init()
+  equal($('.criterion_points').val(), '4')
+})

@@ -270,44 +270,50 @@ body:not(.responsive_student_grades_page) {
   }
 }
 
-#grades_summary .visibility_feedback_ff {
+#grades_summary .feedback_visibility_ff {
   a.toggle_comments_link,
   a.toggle_rubric_assessments_link {
     background-color: $ic-color-medium-light;
     padding: 4px 6px;
     border: 1px solid $ic-border-color;
     border-radius: 4px;
-  }
-
-  a.toggle_rubric_assessments_link {
-    padding-right: 2px;
+    position: relative;
+    display: inline-block;
+    width: fit-content;
   }
 
   a.tooltip {
-    margin-left: 12px;
+    margin-#{direction(left)}: 8px;
+  }
+
+  .score_holder span.tooltip {
+    display: inline-block;
   }
 
   span.comment_count {
     font-size: 14px;
   }
 
-  div.unread_comment_dot {
-    background-color: $electric;
-    width: 12px;
-    line-height: 12px;
-    border-radius: 6px;
+  .unread_dot {
     position: absolute;
-    right: -6px;
+    width: 12px;
+    height: 12px;
+    background-color: $electric;
+    border-radius: 6px;
+  }
+
+  .grade_dot {
+    #{direction(right)}: -10px;
+    top: -11px;
+  }
+
+  .rubric_dot {
+    #{direction(left)}: 23px;
     top: -7px;
   }
 
-  div.unread_rubric_dot {
-    background-color: $electric;
-    width: 12px;
-    line-height: 12px;
-    border-radius: 6px;
-    position: absolute;
-    left: 23px;
+  .comment_dot {
+    #{direction(right)}: -6px;
     top: -7px;
   }
 }

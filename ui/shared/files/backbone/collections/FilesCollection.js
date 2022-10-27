@@ -16,8 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
+import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 import _ from 'underscore'
+import deparam from 'deparam'
 import File from '../models/File.coffee'
 
 export default class FilesCollection extends PaginatedCollection {
@@ -27,7 +29,6 @@ export default class FilesCollection extends PaginatedCollection {
   }
 
   fetch(options = {}) {
-    let res
     options.data = _.extend(
       {content_types: this.parentFolder != null ? this.parentFolder.contentTypes : undefined},
       options.data || {}
@@ -35,7 +36,7 @@ export default class FilesCollection extends PaginatedCollection {
     if (this.parentFolder != null ? this.parentFolder.useVerifiers : undefined) {
       options.data.use_verifiers = 1
     }
-    return (res = super.fetch(options))
+    return super.fetch(options)
   }
 
   parse(response) {

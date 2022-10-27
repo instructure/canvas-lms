@@ -27,7 +27,7 @@ import {MAX_SCALE_RATIO, MIN_SCALE_RATIO, BUTTON_SCALE_STEP} from '../constants'
 import formatMessage from '../../../../../../../format-message'
 import PropTypes from 'prop-types'
 import {CustomNumberInput} from './CustomNumberInput'
-import {showFlashAlert} from '../../../../../../../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../../../../../../../common/FlashAlert'
 import {debounce} from '@instructure/debounce'
 
 const parseZoomText = value => {
@@ -52,7 +52,7 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
     const message = {
       message: `${round(value * 100)}% Zoom`,
       type: 'info',
-      srOnly: true
+      srOnly: true,
     }
     debouncedAlert(message)
     onChange(value)
@@ -102,10 +102,10 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
 
 ZoomControls.propTypes = {
   scaleRatio: PropTypes.number,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
 ZoomControls.defaultProps = {
   scaleRatio: MIN_SCALE_RATIO,
-  onChange: () => {}
+  onChange: () => {},
 }

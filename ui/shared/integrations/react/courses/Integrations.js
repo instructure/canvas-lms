@@ -32,6 +32,7 @@ const I18n = useI18nScope('course_settings')
 
 const Integrations = () => {
   const anyIntegrationsAvailable = ENV.MSFT_SYNC_ENABLED
+
   if (!anyIntegrationsAvailable) {
     return (
       <Flex justifyItems="space-around">
@@ -45,9 +46,12 @@ const Integrations = () => {
   }
 
   const [msGroup, msEnabled, msLoading, msError, msToggleEnabled, setMSError, setMSGroup] =
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useMicrosoftSettings(ENV.COURSE_ID)
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [msExpanded, setMSExpanded] = useState(!!msError)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [msInfo, setMSInfo] = useState()
 
   return (

@@ -20,6 +20,7 @@ import React, {useRef, useEffect} from 'react'
 import shallow from 'zustand/shallow'
 import {camelize} from 'convert-case'
 import Gradebook from './Gradebook'
+import {findFilterValuesOfType} from './Gradebook.utils'
 import type {GradebookOptions} from './gradebook.d'
 import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
@@ -76,9 +77,13 @@ export default function GradebookData(props: Props) {
     state => state.isGradingPeriodAssignmentsLoading
   )
   const fetchGradingPeriodAssignments = useStore(state => state.fetchGradingPeriodAssignments)
+  const loadAssignmentGroups = useStore(state => state.loadAssignmentGroups)
+  const recentlyLoadedAssignmentGroups = useStore(state => state.recentlyLoadedAssignmentGroups)
+
+  const currentGradingPeriodId = findFilterValuesOfType('grading-period', appliedFilters)[0]
+  const gradingPeriodSet = props.gradebookEnv.grading_period_set
 
   // Initial state
-  // We might be able to do this in gradebook/index.tsx instead
   useEffect(() => {
     useStore.setState({
       courseId,
@@ -119,6 +124,29 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.settings.filter_columns_by,
   ])
 
+  useEffect(() => {
+    if (gradingPeriodSet) {
+      fetchGradingPeriodAssignments()
+        .then(() => {
+          if (currentGradingPeriodId !== '0') {
+            loadAssignmentGroups(currentGradingPeriodId)
+          }
+        })
+        .catch(error => {
+          throw new Error('Failed to load grading period assignments', error)
+        })
+    } else {
+      loadAssignmentGroups().catch(error => {
+        throw new Error('Failed to load assignment groups', error)
+      })
+    }
+  }, [
+    gradingPeriodSet,
+    currentGradingPeriodId,
+    fetchGradingPeriodAssignments,
+    loadAssignmentGroups,
+  ])
+
   return (
     <Gradebook
       {...props}
@@ -135,6 +163,7 @@ export default function GradebookData(props: Props) {
       isModulesLoading={isModulesLoading}
       isStudentIdsLoading={isStudentIdsLoading}
       modules={modules}
+      recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
       studentIds={studentIds}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}

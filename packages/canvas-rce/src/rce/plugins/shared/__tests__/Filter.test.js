@@ -32,7 +32,7 @@ describe('RCE Plugins > Filter', () => {
       contentType: 'course_files',
       contentSubtype: 'documents',
       sortValue: 'date_added',
-      searchString: ''
+      searchString: '',
     }
   })
 
@@ -343,7 +343,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'documents'
+        contentSubtype: 'documents',
       })
       expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
     })
@@ -352,7 +352,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'images'
+        contentSubtype: 'images',
       })
       expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
     })
@@ -361,7 +361,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'media'
+        contentSubtype: 'media',
       })
       expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
@@ -369,7 +369,7 @@ describe('RCE Plugins > Filter', () => {
     it('is visible when the contentType is links', () => {
       renderComponent({
         userContextType: 'course',
-        contentType: 'links'
+        contentType: 'links',
       })
       expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
@@ -378,7 +378,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'all'
+        contentSubtype: 'all',
       })
       expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
@@ -387,7 +387,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'documents'
+        contentSubtype: 'documents',
       })
       const searchInput = component.getByPlaceholderText('Search')
       expect(currentFilterSettings.searchString).toBe('')
@@ -401,7 +401,7 @@ describe('RCE Plugins > Filter', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
-        contentSubtype: 'documents'
+        contentSubtype: 'documents',
       })
       const searchInput = component.getByPlaceholderText('Search')
       expect(currentFilterSettings.searchString).toBe('')
@@ -421,7 +421,7 @@ describe('RCE Plugins > Filter', () => {
         contentType: 'course_files',
         contentSubtype: 'documents',
         isContentLoading: true,
-        searchString: 'abc'
+        searchString: 'abc',
       })
       const searchInput = component.getByPlaceholderText('Search')
       expect(searchInput.hasAttribute('readonly')).toBe(false)

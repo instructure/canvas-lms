@@ -932,6 +932,16 @@ describe GradebookExporter do
         exporter.to_csv
       end
 
+      it "includes the computed current points for the grading period" do
+        expect(enrollment).to receive(:computed_current_points).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
+      it "includes the computed final points for the grading period" do
+        expect(enrollment).to receive(:computed_final_points).with({ grading_period_id: grading_period.id })
+        exporter.to_csv
+      end
+
       context "when final grade override is enabled for the course" do
         before { enable_final_grade_override! }
 

@@ -23,7 +23,7 @@ import categoryHelper from '@canvas/assignments/assignment-categories'
 import {transformScore} from '@canvas/conditional-release-score'
 import assignmentShape from '../shapes/assignment'
 
-const {object, number} = PropTypes
+const {number} = PropTypes
 
 export default class StudentAssignmentItem extends React.Component {
   static propTypes = {

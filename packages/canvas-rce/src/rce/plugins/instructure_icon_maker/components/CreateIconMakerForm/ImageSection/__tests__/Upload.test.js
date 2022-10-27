@@ -27,19 +27,19 @@ import {isAnUnsupportedGifPngImage} from '../utils'
 jest.mock('../../../../../../../bridge', () => {
   return {
     trayProps: {
-      get: () => ({foo: 'bar'})
-    }
+      get: () => ({foo: 'bar'}),
+    },
   }
 })
 
 jest.mock('../compressionUtils', () => ({
   ...jest.requireActual('../compressionUtils'),
-  compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk=='))
+  compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk==')),
 }))
 
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
-  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false)
+  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false),
 }))
 
 let props
@@ -83,7 +83,7 @@ describe('Upload()', () => {
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
       name: 'Test Image.png',
       type: 'image/png',
-      size: 100000
+      size: 100000,
     }
 
     const onSubmitCall = () =>
@@ -92,7 +92,7 @@ describe('Upload()', () => {
         {},
         {},
         {
-          theFile
+          theFile,
         }
       )
 
@@ -131,7 +131,7 @@ describe('Upload()', () => {
         onSubmitCall()
         expect(dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
-          payload: false
+          payload: false,
         })
       })
 
@@ -139,7 +139,7 @@ describe('Upload()', () => {
         onSubmitCall()
         expect(onChange).toHaveBeenCalledWith({
           type: 'SetError',
-          payload: 'GIF/PNG format images larger than 250 KB are not currently supported.'
+          payload: 'GIF/PNG format images larger than 250 KB are not currently supported.',
         })
       })
     })
@@ -152,7 +152,7 @@ describe('Upload()', () => {
         'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
       name: 'Test Image.jpeg',
       type: 'image/jpeg',
-      size: 600000
+      size: 600000,
     }
 
     const onSubmitCall = () =>
@@ -161,7 +161,7 @@ describe('Upload()', () => {
         {},
         {},
         {
-          theFile
+          theFile,
         }
       )
 
@@ -180,7 +180,7 @@ describe('Upload()', () => {
       await flushPromises()
       expect(dispatch).toHaveBeenCalledWith({
         ...actions.SET_IMAGE,
-        payload: 'data:image/jpeg;base64,abcdefghijk=='
+        payload: 'data:image/jpeg;base64,abcdefghijk==',
       })
     })
 

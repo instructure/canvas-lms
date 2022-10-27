@@ -54,10 +54,9 @@ export default class OverrideAttempts extends React.Component {
     this.props.onChange('allowedAttempts', limit)
   }
 
-  /* eslint-disable no-restricted-globals */
   onChangeAttemptLimit = (_event, numValue) => {
     const value = NumberHelper.parse(numValue)
-    if (isNaN(value)) {
+    if (Number.isNaN(Number(value))) {
       return
     }
     this.props.onChange('allowedAttempts', Math.trunc(value))
@@ -65,7 +64,7 @@ export default class OverrideAttempts extends React.Component {
 
   onIncrementAttemptLimit = _event => {
     const value = NumberHelper.parse(this.props.allowedAttempts)
-    if (isNaN(value)) {
+    if (Number.isNaN(Number(value))) {
       return
     }
     this.props.onChange('allowedAttempts', value + 1)
@@ -73,14 +72,13 @@ export default class OverrideAttempts extends React.Component {
 
   onDecrementAttemptLimit = _event => {
     const value = NumberHelper.parse(this.props.allowedAttempts)
-    if (isNaN(value)) {
+    if (Number.isNaN(Number(value))) {
       return
     }
     if (value > 1) {
       this.props.onChange('allowedAttempts', value - 1)
     }
   }
-  /* eslint-enable no-restricted-globals */
 
   renderLimit() {
     const attempts = this.props.allowedAttempts === null ? 'unlimited' : 'limited'

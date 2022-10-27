@@ -20,7 +20,7 @@ import {
   CHANGE_CONTEXT_TYPE,
   CHANGE_CONTEXT_ID,
   CHANGE_SEARCH_STRING,
-  CHANGE_SORT_BY
+  CHANGE_SORT_BY,
 } from '../actions/filter'
 
 export function changeContextType(state = '', action) {

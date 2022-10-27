@@ -22,7 +22,7 @@ import formatMessage from '../../../format-message'
 // TODO: a placeholder. Design a better one. See CORE-2826
 export default class ErrorBoundary extends React.Component {
   static propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node,
   }
 
   constructor(props) {
@@ -34,7 +34,7 @@ export default class ErrorBoundary extends React.Component {
     // Update state so the next render will show the fallback UI.
     return {
       hasError: true,
-      error
+      error,
     }
   }
 

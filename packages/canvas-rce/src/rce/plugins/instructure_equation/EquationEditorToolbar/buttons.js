@@ -27,35 +27,35 @@ export default [
         command: '_{\\placeholder{}}',
         advancedCommand: '_',
         svgCommand: 'x_{\\square}',
-        label: formatMessage('Subscript')
+        label: formatMessage('Subscript'),
       },
       {
         displayName: 'x^{\u2B1A}_{\\ }',
         command: '^{\\placeholder{}}',
         advancedCommand: '^',
         svgCommand: 'x^{\\square}',
-        label: formatMessage('Superscript')
+        label: formatMessage('Superscript'),
       },
       {
         displayName: '\\frac{\u2B1A}{\u2B1A}',
         command: '\\frac{\\placeholder{}}{\\placeholder{}}',
         advancedCommand: '\\frac{ }{ }',
         svgCommand: '\\frac{n}{m}',
-        label: formatMessage('Fraction')
+        label: formatMessage('Fraction'),
       },
       {
         displayName: '\\sqrt{\\ }',
         command: '\\sqrt{\\placeholder{}}',
         advancedCommand: '\\sqrt{ }',
         svgCommand: '\\sqrt{ }',
-        label: formatMessage('Square Root')
+        label: formatMessage('Square Root'),
       },
       {
         displayName: '\\sqrt[n]{\\ }',
         command: '\\sqrt[\\placeholder{}]{\\placeholder{}}',
         advancedCommand: '\\sqrt[ ]{ }',
         svgCommand: '\\sqrt[n]{ }',
-        label: formatMessage('N-th Root')
+        label: formatMessage('N-th Root'),
       },
       {command: '\\langle', label: formatMessage('Left Angle Bracket')},
       {command: '\\rangle', label: formatMessage('Right Angle Bracket')},
@@ -64,7 +64,7 @@ export default [
         command: '\\binom{\\placeholder{}}{\\placeholder{}}',
         advancedCommand: '\\binom{ }{ }',
         svgCommand: '\\binom{n}{m}',
-        label: formatMessage('Binomial Coefficient')
+        label: formatMessage('Binomial Coefficient'),
       },
       // TODO maybe re-add vector, after figuring out if it even works
       {command: 'f', label: formatMessage('F (function)')},
@@ -85,32 +85,32 @@ export default [
         command: '\\sum_{\\placeholder{}}^{\\placeholder{}}',
         advancedCommand: '\\sum_{ }^{ }',
         svgCommand: '\\sum',
-        label: formatMessage('Sum')
+        label: formatMessage('Sum'),
       },
       {
         displayName: '\\prod_{\\ }^{\\ }',
         command: '\\prod_{\\placeholder{}}^{\\placeholder{}}',
         advancedCommand: '\\prod_{ }^{ }',
         svgCommand: '\\prod',
-        label: formatMessage('Product')
+        label: formatMessage('Product'),
       },
       {
         displayName: '\\coprod_{\\ }^{\\ }',
         command: '\\coprod_{\\placeholder{}}^{\\placeholder{}}',
         advancedCommand: '\\coprod_{ }^{ }',
         svgCommand: '\\coprod',
-        label: formatMessage('Coproduct')
+        label: formatMessage('Coproduct'),
       },
       {
         displayName: '\\int_{\\ }^{\\ }',
         command: '\\int_{\\placeholder{}}^{\\placeholder{}}',
         advancedCommand: '\\int_{ }^{ }',
         svgCommand: '\\int_a^b',
-        label: formatMessage('Definite Integral')
+        label: formatMessage('Definite Integral'),
       },
       {
         command: '\\int',
-        label: formatMessage('Indefinite Integral')
+        label: formatMessage('Indefinite Integral'),
       },
       {command: '\\mathbb{N}', label: formatMessage('Natural Numbers')},
       {command: '\\mathbb{P}', label: formatMessage('Prime Numbers')},
@@ -124,23 +124,23 @@ export default [
         command: '\\overline{\\placeholder{}}',
         advancedCommand: '\\overline{ }',
         svgCommand: '\\overline{x}',
-        label: formatMessage('Bar')
+        label: formatMessage('Bar'),
       },
       {
         displayName: '\\hat{\u2B1A}',
         command: '\\hat{\\placeholder{}}',
         advancedCommand: '\\hat{ }',
         svgCommand: '\\hat{x}',
-        label: formatMessage('Hat')
+        label: formatMessage('Hat'),
       },
       {
         displayName: '\\vec{\u2B1A}',
         command: '\\vec{\\placeholder{}}',
         advancedCommand: '\\vec{ }',
         svgCommand: '\\vec{v}',
-        label: formatMessage('Vector (Notation)')
-      }
-    ]
+        label: formatMessage('Vector (Notation)'),
+      },
+    ],
   },
 
   {
@@ -187,8 +187,8 @@ export default [
       {command: '\\Upsilon', label: formatMessage('Uppercase Upsilon')},
       {command: '\\Phi', label: formatMessage('Uppercase Phi')},
       {command: '\\Psi', label: formatMessage('Uppercase Psi')},
-      {command: '\\Omega', label: formatMessage('Uppercase Omega')}
-    ]
+      {command: '\\Omega', label: formatMessage('Uppercase Omega')},
+    ],
   },
 
   {
@@ -214,8 +214,8 @@ export default [
       {command: '\\dagger', label: formatMessage('Dagger')},
       {command: '\\ddagger', label: formatMessage('Double Dagger')},
       {command: '\\wr', label: formatMessage('Wreath Product')},
-      {command: '\\amalg', label: formatMessage('Amalg (Coproduct)')}
-    ]
+      {command: '\\amalg', label: formatMessage('Amalg (Coproduct)')},
+    ],
   },
 
   {
@@ -265,8 +265,8 @@ export default [
       {command: '\\vdash', label: formatMessage('Turnstile (Yields)')},
       {command: '\\dashv', label: formatMessage('Reverse Turnstile (Does Not Yield)')},
       {command: '\\exists', label: formatMessage('Exists')},
-      {command: '\\varnothing', label: formatMessage('Empty Set')}
-    ]
+      {command: '\\varnothing', label: formatMessage('Empty Set')},
+    ],
   },
 
   {
@@ -281,7 +281,7 @@ export default [
       {command: '\\Longleftrightarrow', label: formatMessage('Logical Equivalence (Thick)')},
       {
         command: '\\Updownarrow',
-        label: formatMessage('Upward And Downward Pointing Arrow (Thick)')
+        label: formatMessage('Upward And Downward Pointing Arrow (Thick)'),
       },
       {command: '\\mapsto', label: formatMessage('Maps To')},
       {command: '\\nearrow', label: formatMessage('Up And Right Diagonal Arrow')},
@@ -303,8 +303,8 @@ export default [
       {command: '\\leftarrow', label: formatMessage('Leftward Arrow')},
       {command: '\\Leftarrow', label: formatMessage('Thick Leftward Arrow')},
       {command: '\\leftrightarrow', label: formatMessage('Logical Equivalence (Short)')},
-      {command: '\\Leftrightarrow', label: formatMessage('Logical Equivalence (Short And Thick)')}
-    ]
+      {command: '\\Leftrightarrow', label: formatMessage('Logical Equivalence (Short And Thick)')},
+    ],
   },
 
   {
@@ -316,8 +316,8 @@ export default [
       {command: '\\rceil', label: formatMessage('Right Ceiling')},
       {command: '/', label: formatMessage('Forward Slash')},
       {command: '\\lbrace', label: formatMessage('Left Curly Brace')},
-      {command: '\\rbrace', label: formatMessage('Right Curly Brace')}
-    ]
+      {command: '\\rbrace', label: formatMessage('Right Curly Brace')},
+    ],
   },
 
   {
@@ -361,7 +361,7 @@ export default [
       {command: '\\infty', label: formatMessage('Infinity')},
       {command: '\\aleph', label: formatMessage('Aleph')},
       {command: '^\\circ', label: formatMessage('Degree Symbol')}, // \\deg requires the gensymb package added to LaTex
-      {command: '\\angle', label: formatMessage('Angle')}
-    ]
-  }
+      {command: '\\angle', label: formatMessage('Angle')},
+    ],
+  },
 ]

@@ -25,12 +25,12 @@ import {ColorSection} from '../ColorSection'
 function selectOption(button, option) {
   userEvent.click(
     screen.getByRole('button', {
-      name: button
+      name: button,
     })
   )
   userEvent.click(
     screen.getByRole('option', {
-      name: option
+      name: option,
     })
   )
 }

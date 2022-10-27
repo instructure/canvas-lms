@@ -36,13 +36,13 @@ describe('RCE "Images" Plugin > Images', () => {
         course: {
           hasMore: false,
           isLoading: false,
-          files: []
-        }
+          files: [],
+        },
       },
       contextType: 'course',
       sortBy: {sort: 'alphabetical', order: 'desc'},
       searchString: 'whereami?',
-      onImageEmbed() {}
+      onImageEmbed() {},
     }
   })
 
@@ -114,7 +114,7 @@ describe('RCE "Images" Plugin > Images', () => {
       props.images[props.contextType].files = [
         buildImage(0, 'example_1.png', 100, 200),
         buildImage(1, 'example_2.png', 101, 201),
-        buildImage(2, 'example_3.png', 102, 202)
+        buildImage(2, 'example_3.png', 102, 202),
       ]
     })
 
@@ -178,8 +178,8 @@ describe('RCE "Images" Plugin > Images', () => {
         files: [
           buildImage(0, 'example_1.png', 100, 200),
           buildImage(1, 'example_2.png', 101, 201),
-          buildImage(2, 'example_3.png', 102, 202)
-        ]
+          buildImage(2, 'example_3.png', 102, 202),
+        ],
       }
       renderComponent()
       fireEvent.focus(getLoadMoreButton())
@@ -221,8 +221,8 @@ describe('RCE "Images" Plugin > Images', () => {
         files: [
           buildImage(0, 'example_1.png', 100, 200),
           buildImage(1, 'example_2.png', 101, 201),
-          buildImage(2, 'example_3.png', 102, 202)
-        ]
+          buildImage(2, 'example_3.png', 102, 202),
+        ],
       }
       renderComponent()
 
@@ -234,7 +234,7 @@ describe('RCE "Images" Plugin > Images', () => {
       props.images[props.contextType] = {
         hasMore: true,
         isLoading: false,
-        files: [...props.images[props.contextType].files, buildImage(3, 'example_4.png', 103, 203)]
+        files: [...props.images[props.contextType].files, buildImage(3, 'example_4.png', 103, 203)],
       }
     })
 

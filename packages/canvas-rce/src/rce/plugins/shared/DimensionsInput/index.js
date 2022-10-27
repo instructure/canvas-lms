@@ -37,9 +37,9 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
     } else if (!dimensionsState.isAtLeastMinimums) {
       result = {
         text: formatMessage('Must be at least {percentage}%', {
-          percentage: minPercentage
+          percentage: minPercentage,
         }),
-        type: 'error'
+        type: 'error',
       }
     }
   } else if (!dimensionsState.isNumeric) {
@@ -48,9 +48,9 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
     result = {
       text: formatMessage('Must be at least {width} x {height}px', {
         width: minWidth,
-        height: minHeight
+        height: minHeight,
       }),
-      type: 'error'
+      type: 'error',
     }
   }
   return result
@@ -131,7 +131,7 @@ DimensionsInput.propTypes = {
     heightState: shape({
       addOffset: func.isRequired,
       inputValue: string.isRequired,
-      setInputValue: func.isRequired
+      setInputValue: func.isRequired,
     }).isRequired,
     isNumeric: bool.isRequired,
     usePercentageUnits: bool.isRequired,
@@ -139,15 +139,15 @@ DimensionsInput.propTypes = {
     widthState: shape({
       addOffset: func.isRequired,
       inputValue: string.isRequired,
-      setInputValue: func.isRequired
+      setInputValue: func.isRequired,
     }).isRequired,
     percentageState: shape({
       addOffset: func.isRequired,
       inputValue: string.isRequired,
-      setInputValue: func.isRequired
-    }).isRequired
+      setInputValue: func.isRequired,
+    }).isRequired,
   }),
   minHeight: number.isRequired,
   minWidth: number.isRequired,
-  minPercentage: number.isRequired
+  minPercentage: number.isRequired,
 }

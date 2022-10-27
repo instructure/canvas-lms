@@ -103,6 +103,7 @@ export default class ThemeEditorImageRow extends Component {
                 value={this.props.userInput.val === '' ? '' : this.props.currentValue}
               />
 
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="Theme__editor-image_upload-label">
                 <span className="screenreader-only">{this.props.varDef.human_name}</span>
                 <input

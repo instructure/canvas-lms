@@ -19,7 +19,7 @@
 import moment from 'moment'
 import getFormats from './formats'
 
-const config = { customI18nFormats: [] }
+const config = {customI18nFormats: []}
 
 // Parse a DateTime string according to any of the pre-defined formats. The
 // formats may come from Moment itself, or from the locale dictionary for
@@ -45,7 +45,7 @@ export default function parseDateTime(input, locale) {
   return momentInstance.isValid() ? momentInstance : null
 }
 
-export function useI18nFormats(customI18nFormats) {
+export function loadI18nFormats(customI18nFormats) {
   config.customI18nFormats = customI18nFormats
 }
 
@@ -72,15 +72,14 @@ export function createDateTimeMoment(input, format, locale) {
     )
   }
 
-  let m = moment.apply(null, [input, format, locale])
+  const m = moment.apply(null, [input, format, locale])
 
   if (m._pf.unusedTokens.length > 0) {
     // we didn't use strict at first, because we want to accept when
     // there's unused input as long as we're using all tokens. but if the
     // best non-strict match has unused tokens, reparse with strict
     return moment.apply(null, [input, format, locale, true])
-  }
-  else {
+  } else {
     return m
   }
 }

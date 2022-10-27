@@ -493,6 +493,9 @@
   "nested_greater_than_d852e60d": { "message": "Supérieur à (groupé)" },
   "nested_less_than_27d17e58": { "message": "Inférieur à (groupé)" },
   "next_page_d2a39853": { "message": "Page suivante" },
+  "no_changes_to_save_d29f6e91": {
+    "message": "Aucun changement à enregister."
+  },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Aucun fichier choisi" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -570,7 +573,6 @@
   "precedes_196b9aef": { "message": "Précédant" },
   "precedes_equal_20701e84": { "message": "Précède l''égalité" },
   "preformatted_d0670862": { "message": "Préformaté" },
-  "pretty_html_editor_28748756": { "message": "Éditeur Pretty HTML" },
   "preview_53003fd2": { "message": "Aperçu" },
   "preview_in_overlay_ed772c46": { "message": "Aperçu en superposition" },
   "preview_inline_9787330": { "message": "Aperçu « inline »" },
@@ -590,7 +592,6 @@
   "quaternions_877024e0": { "message": "Quaternions" },
   "quizzes_7e598f57": { "message": "Questionnaires" },
   "rational_numbers_80ddaa4a": { "message": "Nombres rationnels" },
-  "raw_html_editor_e3993e41": { "message": "Éditeur HTML brut" },
   "real_numbers_7c99df94": { "message": "Nombres réels" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Portion réelle (d''un nombre complexe)"
@@ -892,9 +893,6 @@
   "view_description_30446afc": { "message": "Visualiser la description" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Voir les raccourcis clavier"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "Voir les couleurs prédéfinies"
   },
   "view_title_description_67940918": {
     "message": "Visualiser la description de { title }"

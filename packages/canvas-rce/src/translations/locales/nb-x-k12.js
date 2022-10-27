@@ -490,6 +490,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Nested større enn" },
   "nested_less_than_27d17e58": { "message": "Nested mindre enn" },
   "next_page_d2a39853": { "message": "Neste side" },
+  "no_changes_to_save_d29f6e91": { "message": "Ingen endringer å lagre." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -567,7 +568,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Forutgående" },
   "precedes_equal_20701e84": { "message": "Går foran lik" },
   "preformatted_d0670862": { "message": "Forhåndsformattert" },
-  "pretty_html_editor_28748756": { "message": "Elegante HTML-redigering" },
   "preview_53003fd2": { "message": "Forhåndsvisning" },
   "preview_in_overlay_ed772c46": { "message": "Forhåndsvis i utvidet vindu" },
   "preview_inline_9787330": { "message": "Forhåndsvis i vindu" },
@@ -587,7 +587,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Kvaternioner" },
   "quizzes_7e598f57": { "message": "Quizer" },
   "rational_numbers_80ddaa4a": { "message": "Rasjonelle tall" },
-  "raw_html_editor_e3993e41": { "message": "Rå HTML-redigerer" },
   "real_numbers_7c99df94": { "message": "Reelle tall" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reell del (av komplekst tall)"
@@ -860,9 +859,6 @@ const locale = {
   "view_ba339f93": { "message": "Vis" },
   "view_description_30446afc": { "message": "Vis beskrivelse" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Vis tastatur-snarveier" },
-  "view_predefined_colors_92f5db39": {
-    "message": "Vis forhåndsdefinerte farger"
-  },
   "view_title_description_67940918": { "message": "Vis { title }-beskrivelse" },
   "white_87fa64fd": { "message": "Hvit" },
   "width_492fec76": { "message": "Bredd" },

@@ -42,32 +42,6 @@ describe "Section Paces API" do
     expect(response.status).to eq 401
   end
 
-  describe "index" do
-    let!(:section_pace) { section_pace_model(section: section) }
-    let!(:section_pace_with_enrollments) { section_pace_model(section: section_two) }
-
-    before do
-      course_pace_model(course: course)
-      section_pace_model(section: section_three, workflow_state: "deleted")
-    end
-
-    it "returns relevant paces" do
-      get api_v1_section_paces_path(course.id), params: { format: :json }
-      expect(response.status).to eq 200
-      json = JSON.parse(response.body)
-      expect(
-        json["paces"].map { |p| p["id"] }
-      ).to match_array(
-        [section_pace.id, section_pace_with_enrollments.id]
-      )
-      [section_pace, section_pace_with_enrollments].each do |pace|
-        pace_json = json["paces"].detect { |p| p["id"] == pace.id }
-        expect(pace_json["section"]["name"]).to eq pace.course_section.name
-        expect(pace_json["section"]["size"]).to eq pace.course_section.enrollments.count
-      end
-    end
-  end
-
   describe "show" do
     it "returns the pace for the requested section" do
       section_pace = section_pace_model(section: section)
@@ -219,20 +193,6 @@ describe "Section Paces API" do
   context "course_paces_redesign flag is disabled" do
     before do
       Account.site_admin.disable_feature!(:course_paces_redesign)
-    end
-
-    describe "index" do
-      before do
-        section_pace_model(section: section)
-        section_pace_model(section: section_two)
-        course_pace_model(course: course)
-        section_pace_model(section: section_three, workflow_state: "deleted")
-      end
-
-      it "returns 404" do
-        get api_v1_section_paces_path(course.id), params: { format: :json }
-        expect(response.status).to eq 404
-      end
     end
 
     describe "show" do
