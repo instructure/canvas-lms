@@ -319,6 +319,7 @@ module SpeedGrader
       end
 
       res[:GROUP_GRADING_MODE] = assignment.grade_as_group?
+      res[:quiz_lti] = assignment.quiz_lti?
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
