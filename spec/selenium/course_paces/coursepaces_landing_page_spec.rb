@@ -76,7 +76,7 @@ describe "course pace landing page" do
 
       expect(number_of_students.text).to include("1")
       expect(number_of_sections.text).to include("2")
-      expect(default_duration.text).to include("2 Days")
+      expect(default_duration.text).to include("2 days")
     end
   end
 end
