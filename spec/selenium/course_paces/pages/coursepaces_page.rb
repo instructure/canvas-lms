@@ -90,7 +90,7 @@ module CoursePacesPageObject
   end
 
   def edit_tray_close_button_selector
-    "button:contains('Close')"
+    "[data-testid='tray-close-button'] button"
   end
 
   def hypothetical_end_date_selector
@@ -290,6 +290,22 @@ module CoursePacesPageObject
     end
   end
 
+  def reset_all_button_selector
+    "[data-testid='reset-all-button']"
+  end
+
+  def reset_all_cancel_button_selector
+    "[data-testid='reset-all-cancel-button']"
+  end
+
+  def reset_all_reset_button_selector
+    "[data-testid='reset-all-reset-button']"
+  end
+
+  def reset_all_x_button_selector
+    "[data-testid='reset-changes-modal'] [data-testid='instui-modal-close'] button"
+  end
+
   #------------------------- Elements --------------------------------
 
   def assignment_due_date
@@ -377,7 +393,7 @@ module CoursePacesPageObject
   end
 
   def edit_tray_close_button
-    fj(edit_tray_close_button_selector)
+    f(edit_tray_close_button_selector)
   end
 
   def hypothetical_end_date
@@ -537,6 +553,22 @@ module CoursePacesPageObject
     f(remove_pace_modal_x_selector)
   end
 
+  def reset_all_button
+    f(reset_all_button_selector)
+  end
+
+  def reset_all_cancel_button
+    f(reset_all_cancel_button_selector)
+  end
+
+  def reset_all_reset_button
+    f(reset_all_reset_button_selector)
+  end
+
+  def reset_all_x_button
+    f(reset_all_x_button_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   #----------------------- Click Items -------------------------------
 
@@ -654,6 +686,22 @@ module CoursePacesPageObject
 
   def click_remove_pace_modal_x
     remove_pace_modal_x.click
+  end
+
+  def click_reset_all_button
+    reset_all_button.click
+  end
+
+  def click_reset_all_cancel_button
+    reset_all_cancel_button.click
+  end
+
+  def click_reset_all_reset_button
+    reset_all_reset_button.click
+  end
+
+  def click_reset_all_x_button
+    reset_all_x_button.click
   end
 
   #------------------------------Retrieve Text------------------------

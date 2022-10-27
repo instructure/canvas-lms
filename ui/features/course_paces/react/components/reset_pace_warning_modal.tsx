@@ -37,6 +37,7 @@ export type ComponentProps = {
 
 export const ResetPaceWarningModal: React.FC<ComponentProps> = ({open, onCancel, onConfirm}) => (
   <Modal
+    data-testid="reset-changes-modal"
     size="small"
     open={open}
     onDismiss={onCancel}
@@ -51,8 +52,15 @@ export const ResetPaceWarningModal: React.FC<ComponentProps> = ({open, onCancel,
     </ModalBody>
     <ModalFooter>
       <View>
-        <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
-        <Button margin="0 x-small" onClick={onConfirm} color="danger">
+        <Button data-testid="reset-all-cancel-button" onClick={onCancel}>
+          {I18n.t('Cancel')}
+        </Button>
+        <Button
+          data-testid="reset-all-reset-button"
+          margin="0 x-small"
+          onClick={onConfirm}
+          color="danger"
+        >
           {I18n.t('Reset')}
         </Button>
       </View>
