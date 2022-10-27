@@ -812,6 +812,9 @@ describe ContentMigration do
     expect(cm).to be_failed
     expect(cm.migration_issues).not_to be_empty
     expect(cm.migration_issues.last.error_report.message).to include "job expired"
+
+    cm.queue_migration
+    expect(cm.migration_issues).to be_empty
   end
 
   it "expires import jobs after 48 hours" do
