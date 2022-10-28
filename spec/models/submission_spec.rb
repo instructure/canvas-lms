@@ -1448,6 +1448,33 @@ describe Submission do
         end
       end
     end
+
+    context "when submitting to a New Quiz LTI assignment" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does grade missing new quiz submissions" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq 200
+        end
+      end
+    end
   end
 
   describe "#apply_late_policy_before_save" do
