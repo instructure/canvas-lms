@@ -633,10 +633,10 @@
           <td colspan="6">
             <% assignment_presenter.rubric_assessments.each do |assessment| %>
               <div class="assessor" style="text-align: <%= direction('right') %>; margin-bottom: 5px">
-                <% if assignment.anonymous_peer_reviews %>
-                  <%= t("Anonymous User") %>
-                <% else %>
+                <% if can_do(assessment, @current_user, :read_assessor) %>
                   <%= t("Assessment by %{name}", :name => assessment.assessor_name) %>
+                <% else %>
+                  <%= t("Anonymous User") %>
                 <% end %>
               </div>
               <div class="rubric-toggle"><a href="#" data-aria="rubric_<%= assignment.id %>" class="screenreader-toggle pull-left"><%= t(:close_rubric, 'Close Rubric') %></a></div>
