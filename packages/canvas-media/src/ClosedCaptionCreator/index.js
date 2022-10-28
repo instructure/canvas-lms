@@ -25,6 +25,7 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
 import ClosedCaptionCreatorRow from './ClosedCaptionCreatorRow'
+import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 
 // TODO:
 //   - Limit file creation
@@ -35,20 +36,19 @@ export default class ClosedCaptionPanel extends Component {
     subtitles: arrayOf(
       shape({
         locale: string.isRequired,
-        file: shape({name: string.isRequired}).isRequired
+        file: shape({name: string.isRequired}).isRequired,
       })
     ),
     updateSubtitles: func.isRequired,
     uploadMediaTranslations: shape({
       UploadMediaStrings: objectOf(string),
-      SelectStrings: objectOf(string)
+      SelectStrings: objectOf(string),
     }).isRequired,
-    languages: arrayOf(
-      shape({
-        id: string,
-        language: string
-      })
-    ).isRequired
+    userLocale: string,
+  }
+
+  static defaultProps = {
+    userLocale: 'en',
   }
 
   constructor(props) {
@@ -60,8 +60,9 @@ export default class ClosedCaptionPanel extends Component {
       newSelectedLanguage: null,
       lastDeletedCCIndex: -1,
       subtitles: props.subtitles || [],
-      announcement: null
+      announcement: null,
     }
+    this.closedCaptionLanguages = sortedClosedCaptionLanguageList(this.props.userLocale)
     this._addButtonRef = React.createRef()
     this._newCreatorRef = React.createRef()
     this._nextCCRef = React.createRef()
@@ -95,7 +96,7 @@ export default class ClosedCaptionPanel extends Component {
       addingNewClosedCaption: true,
       newSelectedFile: null,
       newSelectedLanguage: null,
-      announcement: null
+      announcement: null,
     })
   }
 
@@ -106,8 +107,8 @@ export default class ClosedCaptionPanel extends Component {
           {
             locale: prevState.newSelectedLanguage.id,
             file: newFile,
-            isNew: true
-          }
+            isNew: true,
+          },
         ])
         this.props.updateSubtitles(subtitles)
         return {
@@ -118,7 +119,7 @@ export default class ClosedCaptionPanel extends Component {
           announcement: formatMessage(
             this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
             {lang: prevState.newSelectedLanguage.label}
-          )
+          ),
         }
       })
     } else {
@@ -130,7 +131,7 @@ export default class ClosedCaptionPanel extends Component {
     if (this.state.newSelectedFile) {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
-          {locale: lang.id, file: prevState.newSelectedFile, isNew: true}
+          {locale: lang.id, file: prevState.newSelectedFile, isNew: true},
         ])
         this.props.updateSubtitles(subtitles)
         return {
@@ -141,7 +142,7 @@ export default class ClosedCaptionPanel extends Component {
           announcement: formatMessage(
             this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
             {lang: lang.label}
-          )
+          ),
         }
       })
     } else {
@@ -151,7 +152,7 @@ export default class ClosedCaptionPanel extends Component {
 
   onRowDelete = locale => {
     this.setState(prevState => {
-      const deletedLang = this.props.languages.findIndex(l => l.id === locale)
+      const deletedLang = this.closedCaptionLanguages.findIndex(l => l.id === locale)
       const deletedCCIndex = prevState.subtitles.findIndex(s => s.locale === locale)
       const subtitles = prevState.subtitles.filter(s => s.locale !== locale)
       this.props.updateSubtitles(subtitles)
@@ -162,7 +163,7 @@ export default class ClosedCaptionPanel extends Component {
           this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
           {lang: deletedLang?.label}
         ),
-        lastDeletedCCIndex: deletedCCIndex
+        lastDeletedCCIndex: deletedCCIndex,
       }
     })
   }
@@ -174,8 +175,8 @@ export default class ClosedCaptionPanel extends Component {
         {this.state.announcement && (
           <Alert
             liveRegion={this.props.liveRegion}
-            screenReaderOnly
-            isLiveRegionAtomic
+            screenReaderOnly={true}
+            isLiveRegionAtomic={true}
             liveRegionPoliteness="assertive"
           >
             {this.state.announcement}
@@ -191,8 +192,8 @@ export default class ClosedCaptionPanel extends Component {
               onDeleteRow={this.onRowDelete}
               onLanguageSelected={this.onLanguageSelected}
               onFileSelected={this.onFileSelected}
-              languages={this.props.languages}
-              selectedLanguage={this.props.languages.find(l => l.id === cc.locale)}
+              languages={this.closedCaptionLanguages}
+              selectedLanguage={this.closedCaptionLanguages.find(l => l.id === cc.locale)}
               selectedFile={cc.file}
             />
           ))}
@@ -206,7 +207,7 @@ export default class ClosedCaptionPanel extends Component {
               onDeleteRow={this.onRowDelete}
               onLanguageSelected={this.onLanguageSelected}
               onFileSelected={this.onFileSelected}
-              languages={this.props.languages.filter(candidate_lang => {
+              languages={this.closedCaptionLanguages.filter(candidate_lang => {
                 // remove already selected languages form the list
                 return !this.state.subtitles.find(st => st.locale === candidate_lang.id)
               })}

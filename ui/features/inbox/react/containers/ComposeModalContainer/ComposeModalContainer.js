@@ -17,7 +17,6 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
@@ -426,13 +425,11 @@ const ComposeModalContainer = props => {
         tabs={{embed: false, record: true, upload: true}}
         uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
-        languages={Object.keys(closedCaptionLanguages).map(key => {
-          return {id: key, label: closedCaptionLanguages[key]}
-        })}
         rcsConfig={{
           contextId: ENV.current_user_id,
           contextType: 'user',
         }}
+        userLocale={ENV.LOCALE}
       />
       <ModalSpinner
         label={I18n.t('Sending Message')}
