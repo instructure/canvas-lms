@@ -33,7 +33,7 @@ import * as Alerts from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
-import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
+import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import StatusPill from '@canvas/grading-status-pill'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -697,7 +697,12 @@ function setupHeader() {
         this.elements.settings.form.dialog('close')
       }
 
-      const gradeByQuestion = $('#enable_speedgrader_grade_by_question').prop('checked')
+      const gradeByQuestion = !!$('#enable_speedgrader_grade_by_question').prop('checked')
+      if (gradeByQuestion !== ENV.GRADE_BY_QUESTION) {
+        ENV.GRADE_BY_QUESTION = gradeByQuestion
+        QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage($iframe_holder, gradeByQuestion)
+      }
+
       // eslint-disable-next-line promise/catch-or-return
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion,
@@ -4303,7 +4308,7 @@ export default {
         externalToolLaunchOptions = launchOptions
       }
     }
-    quizzesNextSpeedGrading(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
+    QuizzesNextSpeedGrading.setup(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
 
     // fire off the request to get the jsonData
     window.jsonData = {}
