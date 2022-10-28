@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('assignments_2')
 
+// eslint-disable-next-line react/prefer-stateless-function
 export default class OperatorType extends React.Component {
   static propTypes = {
     value: string.isRequired,

@@ -32,6 +32,7 @@ const I18n = useI18nScope('assignments_2_submission_histories_query')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
+// eslint-disable-next-line react/prefer-stateless-function
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
     initialQueryData: shape({

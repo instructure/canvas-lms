@@ -136,7 +136,7 @@ for (const locale of locales) {
 
     test(`hour format matches timezone locale`, () => {
       if (locale.key === 'ca') {
-        pending("it's broken for ca, needs investigation")
+        this.pending("it's broken for ca, needs investigation")
       }
 
       const formats = [

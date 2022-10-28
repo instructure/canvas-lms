@@ -23,6 +23,7 @@ import CollaborationsNavigation from './CollaborationsNavigation'
 import CollaborationsList from './CollaborationsList'
 import LoadingSpinner from './LoadingSpinner'
 
+// eslint-disable-next-line react/prefer-stateless-function
 class CollaborationsApp extends React.Component {
   static propTypes = {
     applicationState: PropTypes.object,
