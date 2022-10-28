@@ -23,13 +23,13 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::CreateSubmission do
   before(:once) do
     course_with_student(active_all: true)
-    @assignment = @course.assignments.create!(
-      title: "Example Assignment",
-      submission_types: "online_upload"
-    )
+    @assignment =
+      @course.assignments.create!(title: "Example Assignment", submission_types: "online_upload")
     @attachment1 = attachment_with_context(@student)
     @attachment2 = attachment_with_context(@student)
-    @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "neato-vid")
+    @media_object =
+      factory_with_protected_attributes(MediaObject, media_id: "m-123456", title: "neato-vid")
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
   end
 
   def mutation_str(
@@ -40,7 +40,8 @@ RSpec.describe Mutations::CreateSubmission do
     file_ids: [],
     media_id: nil,
     resource_link_lookup_uuid: nil,
-    url: nil
+    url: nil,
+    student_id: nil
   )
     <<~GQL
       mutation {
@@ -53,6 +54,7 @@ RSpec.describe Mutations::CreateSubmission do
           #{"mediaId: \"#{media_id}\"" if media_id}
           #{"resourceLinkLookupUuid: \"#{resource_link_lookup_uuid}\"" if resource_link_lookup_uuid}
           #{"url: \"#{url}\"" if url}
+          #{"studentId: \"#{student_id}\"" if student_id}
         }) {
           submission {
             _id
@@ -91,9 +93,7 @@ RSpec.describe Mutations::CreateSubmission do
 
   it "creates a new submission" do
     result = run_mutation(file_ids: [@attachment1.id, @attachment2.id])
-    expect(
-      result.dig(:data, :createSubmission, :submission, :_id)
-    ).to eq Submission.last.id.to_s
+    expect(result.dig(:data, :createSubmission, :submission, :_id)).to eq Submission.last.id.to_s
   end
 
   context "read permissions check" do
@@ -115,16 +115,24 @@ RSpec.describe Mutations::CreateSubmission do
   context "when the submission_type is student_annotation" do
     it "requires annotatable_attachment_id to be present" do
       result = run_mutation(submission_type: "student_annotation")
-      error_message = "Student Annotation submissions require an annotatable_attachment_id to submit"
+      error_message =
+        "Student Annotation submissions require an annotatable_attachment_id to submit"
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq error_message
     end
 
     it "changes a CanvadocsAnnotationContext from draft attempt to the current attempt" do
-      @assignment.update!(annotatable_attachment: @attachment, submission_types: "student_annotation")
+      @assignment.update!(
+        annotatable_attachment: @attachment,
+        submission_types: "student_annotation"
+      )
       submission = @assignment.submissions.find_by(user: @student)
       submission.update!(attempt: 7)
       annotation_context = submission.annotation_context(draft: true)
-      result = run_mutation(annotatable_attachment_id: @attachment.id, submission_type: "student_annotation")
+      result =
+        run_mutation(
+          annotatable_attachment_id: @attachment.id,
+          submission_type: "student_annotation"
+        )
 
       aggregate_failures do
         expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to be_nil
@@ -137,13 +145,17 @@ RSpec.describe Mutations::CreateSubmission do
     it "returns an error if there is no media_id" do
       @assignment.update(submission_types: "media_recording")
       result = run_mutation(submission_type: "media_recording")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "media_recording submissions require a media_id to submit"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "media_recording submissions require a media_id to submit"
     end
 
     it "returns an error if the media_id does not match a media object" do
       @assignment.update(submission_types: "media_recording")
       result = run_mutation(submission_type: "media_recording", media_id: "not_a_media_id")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "The media_id does not correspond to an existing media object"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "The media_id does not correspond to an existing media object"
     end
 
     it "saves the media_object on the submission" do
@@ -162,7 +174,9 @@ RSpec.describe Mutations::CreateSubmission do
     it "returns an error if there are no attachments" do
       @assignment.update!(submission_types: "online_upload")
       result = run_mutation(submission_type: "online_upload")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "You must attach at least one file to this assignment"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "You must attach at least one file to this assignment"
     end
 
     it "returns an error if any of the file_ids are not found" do
@@ -170,26 +184,82 @@ RSpec.describe Mutations::CreateSubmission do
       id_offset = [@attachment1.id, @attachment2.id].max
       unaffiliated_ids = [id_offset + 1, id_offset + 2, id_offset + 3]
       result = run_mutation(submission_type: "online_upload", file_ids: unaffiliated_ids)
-      expected_message = "No attachments found for the following ids: [#{unaffiliated_ids.map { |i| "\"#{i}\"" }.join(", ")}]"
+      expected_message =
+        "No attachments found for the following ids: [#{unaffiliated_ids.map { |i| "\"#{i}\"" }.join(", ")}]"
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq expected_message
     end
 
     it "returns an error if the returned attachment does not have an allowed file extension" do
       @assignment.update!(submission_types: "online_upload", allowed_extensions: "allowed")
-      result = run_mutation(submission_type: "online_upload", file_ids: [@attachment1.id, @attachment2.id])
+      result =
+        run_mutation(submission_type: "online_upload", file_ids: [@attachment1.id, @attachment2.id])
       expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "Invalid file type"
     end
 
     it "stores the correct attachments on the submission" do
       @assignment.update!(submission_types: "online_upload")
-      result = run_mutation(submission_type: "online_upload", file_ids: [@attachment1.id, @attachment2.id])
+      result =
+        run_mutation(submission_type: "online_upload", file_ids: [@attachment1.id, @attachment2.id])
       submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
 
       expect(submission.workflow_state).to eq "submitted"
 
       ids = submission.attachment_ids.split(",")
-      expect(ids.include?(result.dig(:data, :createSubmission, :submission, :attachments, 0, :_id))).to be true
-      expect(ids.include?(result.dig(:data, :createSubmission, :submission, :attachments, 1, :_id))).to be true
+      expect(
+        ids.include?(result.dig(:data, :createSubmission, :submission, :attachments, 0, :_id))
+      ).to be true
+      expect(
+        ids.include?(result.dig(:data, :createSubmission, :submission, :attachments, 1, :_id))
+      ).to be true
+    end
+
+    it "logs as a proxy submission if student_id if provided" do
+      teacher_role =
+        Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      @assignment.update!(submission_types: "online_upload")
+      result =
+        run_mutation(
+          {
+            submission_type: "online_upload",
+            student_id: @student.id,
+            file_ids: [@attachment1.id]
+          },
+          @teacher
+        )
+
+      submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
+
+      expect(submission.proxy_submitter).to eq @teacher
+    end
+
+    it "requires proxy_assignment_submission to log a proxy submission" do
+      # RoleOverride.create!(
+      #   permission: 'proxy_assignment_submission',
+      #   enabled: true,
+      #   role: teacher_role,
+      #   account: @course.root_account
+      # )
+      RoleOverride.where(permission: "proxy_assignment_submission").destroy_all
+      @assignment.update!(submission_types: "online_upload")
+      result =
+        run_mutation(
+          {
+            submission_type: "online_upload",
+            student_id: @student.id,
+            file_ids: [@attachment1.id]
+          },
+          @teacher
+        )
+
+      submission = Submission.find_by(id: result.dig(:data, :createSubmission, :submission, :_id))
+
+      expect(submission).to be_nil
     end
   end
 
@@ -197,13 +267,17 @@ RSpec.describe Mutations::CreateSubmission do
     it "returns an error if the body is not provided" do
       @assignment.update!(submission_types: "online_text_entry")
       result = run_mutation(submission_type: "online_text_entry")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "Text entry submission cannot be empty"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "Text entry submission cannot be empty"
     end
 
     it "returns an error if the body is empty" do
       @assignment.update!(submission_types: "online_text_entry")
       result = run_mutation(submission_type: "online_text_entry", body: "")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "Text entry submission cannot be empty"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "Text entry submission cannot be empty"
     end
 
     it "saves the body to the submission" do
@@ -212,7 +286,9 @@ RSpec.describe Mutations::CreateSubmission do
       submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
 
       expect(submission.workflow_state).to eq "submitted"
-      expect(result.dig(:data, :createSubmission, :submission, :body)).to eq("thundercougarfalconbird")
+      expect(result.dig(:data, :createSubmission, :submission, :body)).to eq(
+        "thundercougarfalconbird"
+      )
     end
   end
 
@@ -220,7 +296,9 @@ RSpec.describe Mutations::CreateSubmission do
     it "returns an error if the url is not provided" do
       @assignment.update!(submission_types: "online_url")
       result = run_mutation(submission_type: "online_url")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "URL entry submission cannot be empty"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "URL entry submission cannot be empty"
     end
 
     it "returns an error if the url is not valid" do
@@ -256,18 +334,21 @@ RSpec.describe Mutations::CreateSubmission do
 
     it "saves the resource_link_lookup_uuid to the submission" do
       uuid = SecureRandom.uuid
-      result = run_mutation(
-        resource_link_lookup_uuid: uuid,
-        submission_type: "basic_lti_launch",
-        url: "http://localhost/some-url"
-      )
+      result =
+        run_mutation(
+          resource_link_lookup_uuid: uuid,
+          submission_type: "basic_lti_launch",
+          url: "http://localhost/some-url"
+        )
       submission = Submission.find(result.dig(:data, :createSubmission, :submission, :_id))
       expect(submission.resource_link_lookup_uuid).to eq uuid
     end
 
     it "returns an error if no URL is provided" do
       result = run_mutation(submission_type: "basic_lti_launch")
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq "LTI submissions require a URL to submit"
+      expect(
+        result.dig(:data, :createSubmission, :errors, 0, :message)
+      ).to eq "LTI submissions require a URL to submit"
     end
 
     it "returns an error if an invalid URL is provided" do
@@ -280,17 +361,13 @@ RSpec.describe Mutations::CreateSubmission do
     @assignment.update!(lock_at: 1.day.ago)
     create_adhoc_override_for_assignment(@assignment, @student, { lock_at: 1.day.from_now })
     result = run_mutation(file_ids: [@attachment1.id, @attachment2.id])
-    expect(
-      result.dig(:data, :createSubmission, :submission, :_id)
-    ).to eq Submission.last.id.to_s
+    expect(result.dig(:data, :createSubmission, :submission, :_id)).to eq Submission.last.id.to_s
   end
 
   it "can do resubmissions" do
     (1..3).each do |i|
       result = run_mutation(file_ids: [@attachment1.id, @attachment2.id])
-      expect(
-        result.dig(:data, :createSubmission, :submission, :attempt)
-      ).to eq i
+      expect(result.dig(:data, :createSubmission, :submission, :attempt)).to eq i
     end
   end
 
