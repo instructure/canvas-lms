@@ -1,0 +1,286 @@
+/*
+ * Copyright (C) 2022 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React, {ReactNode, useEffect, useState} from 'react'
+import moment from 'moment-timezone'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {
+  IconArrowEndLine,
+  IconCalendarClockLine,
+  IconClockLine,
+  IconAssignmentLine,
+} from '@instructure/ui-icons'
+
+import {
+  coursePaceTimezone,
+  coursePaceDateFormatter,
+  coursePaceDateShortFormatter,
+} from '../../shared/api/backend_serializer'
+import {CoursePace, OptionalDate, PaceDuration, ResponsiveSizes} from '../../types'
+import {coursePaceActions} from '../../actions/course_paces'
+
+const {Item: FlexItem} = Flex as any
+const I18n = useI18nScope('course_paces_projected_dates')
+
+const DASH = String.fromCharCode(0x2013)
+
+const START_DATE_CAPTIONS = {
+  user: I18n.t('Student enrollment date'),
+  course: I18n.t('Determined by course start date'),
+  // always refer to the start and end dates as "course"
+  // because the course does whether it's bounded
+  // by the term or course dates
+  term: I18n.t('Determined by course start date'),
+  section: I18n.t('Determined by section start date'),
+  hypothetical: I18n.t("Determined by today's date"),
+}
+
+const END_DATE_CAPTIONS = {
+  hard: I18n.t('Required end date'),
+  user: I18n.t('Determined by course pace'),
+  course: I18n.t('Determined by course end date'),
+  term: I18n.t('Determined by course end date'),
+  section: I18n.t('Determined by section end date'),
+  hypothetical: I18n.t('Determined by course pace'),
+}
+
+interface PassedProps {
+  readonly coursePace: CoursePace
+  readonly assignments: number
+  readonly paceDuration: PaceDuration
+  readonly plannedEndDate: OptionalDate
+  readonly compressDates: typeof coursePaceActions.compressDates
+  readonly uncompressDates: typeof coursePaceActions.uncompressDates
+  readonly compression: number
+  readonly responsiveSize: ResponsiveSizes
+}
+
+export const PaceModalStats: React.FC<PassedProps> = ({
+  coursePace,
+  assignments,
+  paceDuration,
+  plannedEndDate,
+  compressDates,
+  uncompressDates,
+  compression,
+  responsiveSize,
+}) => {
+  const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
+  const [shrink, setShrink] = useState(responsiveSize === 'small')
+  const enrollmentType = coursePace.context_type === 'Enrollment'
+  const startDateValue = coursePace.start_date
+  const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
+  let endDateValue, endHelpText
+  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
+    endDateValue = plannedEndDate
+    endHelpText = END_DATE_CAPTIONS.user
+  } else {
+    endDateValue =
+      coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
+    endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
+  }
+
+  useEffect(() => {
+    const isSmallScreen = responsiveSize === 'small'
+    const dateFormat = isSmallScreen ? coursePaceDateShortFormatter : coursePaceDateFormatter
+    setDateFormat(dateFormat)
+    setShrink(isSmallScreen)
+  }, [responsiveSize])
+
+  useEffect(() => {
+    if (compression > 0) {
+      compressDates()
+    } else {
+      uncompressDates()
+    }
+  }, [compressDates, compression, uncompressDates])
+
+  const hasAtLeastOneDate = () => !!(startDateValue || endDateValue)
+
+  const getColoredText = (color: string, child: ReactNode, props: any = {}) => (
+    <Text color="alert" theme={{alertColor: color}} {...props}>
+      {child}
+    </Text>
+  )
+
+  const renderColoredDate = (label, dateValue, helpText, testid) => {
+    return (
+      <View data-testid={testid} display="inline-block">
+        <View as="div" margin="0">
+          {getColoredText('#30203A', label)}
+        </View>
+        <View data-testid="coursepace-date-text" as="div" margin="xxx-small 0 0 0">
+          {dateValue
+            ? getColoredText(
+                '#66189D',
+                dateFormatter(moment.tz(dateValue, coursePaceTimezone).toDate()),
+                {weight: 'bold'}
+              )
+            : getColoredText('#66189D', `${DASH} ${I18n.t('Not Specified')} ${DASH}`, {
+                weight: 'bold',
+              })}
+        </View>
+        {!shrink && (
+          <div style={{whiteSpace: 'nowrap'}}>
+            {getColoredText('#66189D', <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>, {
+              fontStyle: 'italic',
+              size: 'small',
+            })}
+          </div>
+        )}
+      </View>
+    )
+  }
+
+  const renderDates = () => {
+    return (
+      <View
+        as="div"
+        background="alert"
+        theme={{backgroundAlert: '#F9F0FF'}}
+        padding="small medium"
+        borderRadius="medium"
+        height="100%"
+      >
+        <FlexItem margin="0 medium medium 0">
+          <View
+            display="inline-block"
+            background="alert"
+            theme={{backgroundAlert: '#EAD7F8'}}
+            padding="small"
+            width="3.3rem"
+            height="3.3rem"
+            margin="none small none none"
+            borderRadius="circle"
+          >
+            <IconCalendarClockLine color="alert" size="small" theme={{alertColor: '#66189D'}} />
+          </View>
+          {renderColoredDate(
+            I18n.t('Start Date'),
+            startDateValue,
+            startHelpText,
+            'coursepace-start-date'
+          )}
+        </FlexItem>
+        <FlexItem margin="0 medium medium 0" shouldGrow={true}>
+          <View margin="none small none none">
+            <IconArrowEndLine color="alert" size="x-small" theme={{alertColor: '#66189D'}} />
+          </View>
+          {renderColoredDate(I18n.t('End Date'), endDateValue, endHelpText, 'coursepace-end-date')}
+        </FlexItem>
+      </View>
+    )
+  }
+
+  const renderAssignmentsSection = () => {
+    return (
+      <View
+        data-testid="colored-assignments-section"
+        display="block"
+        background="alert"
+        theme={{backgroundAlert: '#E7F4FC'}}
+        height="100%"
+        padding="small medium"
+        borderRadius="medium"
+        margin={shrink ? 'x-small none' : 'none x-small'}
+      >
+        <View
+          display="inline-block"
+          background="alert"
+          theme={{backgroundAlert: '#C8E0EF', paddingXSmall: '0.65rem'}}
+          padding="x-small small none small"
+          width="3.3rem"
+          height="3.3rem"
+          margin="small small none none"
+          borderRadius="circle"
+        >
+          <IconAssignmentLine color="alert" size="small" theme={{alertColor: '#0374B5'}} />
+        </View>
+        <View display="inline-block" margin="small none none none">
+          {getColoredText('#30203A', I18n.t('Assignments'))}
+          {getColoredText('#0374B5', assignments, {as: 'div', weight: 'bold'})}
+        </View>
+      </View>
+    )
+  }
+
+  const renderDurationSection = () => {
+    const weeks = I18n.t(
+      {
+        one: '1 week',
+        other: '%{count} weeks',
+      },
+      {count: paceDuration.weeks}
+    )
+    const days = I18n.t(
+      {
+        one: '1 day',
+        other: '%{count} days',
+      },
+      {count: paceDuration.days}
+    )
+
+    const duration = `${weeks}, ${days}`
+    return (
+      <View
+        data-testid="colored-duration-section"
+        display="block"
+        background="alert"
+        theme={{backgroundAlert: '#E3FFF2'}}
+        height="100%"
+        padding="small medium"
+        borderRadius="medium"
+      >
+        <View
+          display="inline-block"
+          background="alert"
+          theme={{backgroundAlert: '#B4F3D6', paddingSmall: '0.67rem'}}
+          padding="small"
+          width="3.3rem"
+          height="3.3rem"
+          margin="small small none none"
+          borderRadius="circle"
+        >
+          <IconClockLine color="alert" size="small" theme={{alertColor: '#068447'}} />
+        </View>
+        <View display="inline-block" margin="small none none none">
+          {getColoredText('#30203A', I18n.t('Duration'))}
+          {getColoredText('#068447', duration, {as: 'div', weight: 'bold'})}
+        </View>
+      </View>
+    )
+  }
+
+  return (
+    <Flex
+      data-testid="projected-dates-redesing"
+      direction={shrink ? 'column' : 'row'}
+      margin="none none small none"
+      alignItems="stretch"
+    >
+      {hasAtLeastOneDate() && <FlexItem>{renderDates()}</FlexItem>}
+      <FlexItem>{renderAssignmentsSection()}</FlexItem>
+      <FlexItem>{renderDurationSection()}</FlexItem>
+    </Flex>
+  )
+}
+
+export default PaceModalStats

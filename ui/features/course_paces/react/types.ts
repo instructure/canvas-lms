@@ -30,6 +30,7 @@ export interface Enrollment {
   readonly start_at?: string
   readonly completed_course_pace_at?: string
   readonly avatar_url?: string
+  readonly section_id?: string
 }
 
 export interface Enrollments {
@@ -154,6 +155,7 @@ export interface UIState {
 
 export interface PaceContextsState {
   readonly selectedContextType: APIPaceContextTypes
+  readonly selectedContext: PaceContext | null
   readonly entries: PaceContext[]
   readonly page: number
   readonly pageCount: number

@@ -18,10 +18,16 @@
 
 import React from 'react'
 import {act} from '@testing-library/react'
-import {renderConnected} from '../../__tests__/utils'
-import {PRIMARY_PACE, SECTION_PACE, STUDENT_PACE} from '../../__tests__/fixtures'
+import {renderConnected} from '../../../__tests__/utils'
+import {
+  PACE_CONTEXTS_SECTIONS_RESPONSE,
+  PRIMARY_PACE,
+  SECTION_1,
+  SECTION_PACE,
+  STUDENT_PACE,
+} from '../../../__tests__/fixtures'
 
-import {PaceModal} from '../pace_modal'
+import {PaceModal} from '..'
 
 const onClose = jest.fn()
 
@@ -32,6 +38,16 @@ const defaultProps = {
   onClose,
   onResetPace: jest.fn(),
   responsiveSize: 'large' as const,
+  unappliedChangesExist: false,
+  paceName: 'Custom Pace',
+  selectedPaceContext: PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0],
+  enrolledSection: SECTION_1,
+  assignmentsCount: 5,
+  paceDuration: {weeks: 2, days: 3},
+  plannedEndDate: '2022-12-01',
+  compression: 0,
+  compressDates: jest.fn(),
+  uncompressDates: jest.fn(),
 }
 
 afterEach(() => {
@@ -50,14 +66,14 @@ describe('PaceModal', () => {
 
   it('renders the course title', () => {
     const {getByText} = renderConnected(<PaceModal {...defaultProps} />)
-    expect(getByText('Course Pace')).toBeInTheDocument()
+    expect(getByText('Course Pace: Custom Pace')).toBeInTheDocument()
   })
   it('renders the section title', () => {
     const {getByText} = renderConnected(<PaceModal {...defaultProps} coursePace={SECTION_PACE} />)
-    expect(getByText('Section Pace')).toBeInTheDocument()
+    expect(getByText('Section Pace: Custom Pace')).toBeInTheDocument()
   })
   it('renders the student enrollment title', () => {
     const {getByText} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
-    expect(getByText('Student Pace')).toBeInTheDocument()
+    expect(getByText('Student Pace: Custom Pace')).toBeInTheDocument()
   })
 })
