@@ -21,6 +21,7 @@ import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
+import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
 import React, {useMemo, useEffect} from 'react'
 import {reduceDuplicateCourses} from '../../../util/courses_helper'
@@ -30,6 +31,8 @@ import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer'
+import {Spinner} from '@instructure/ui-spinner'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -66,6 +69,23 @@ const HeaderInputs = props => {
     }
     return true
   }
+
+  const canIncludeObservers = useMemo(() => {
+    if (ENV?.CONVERSATIONS?.CAN_MESSAGE_ACCOUNT_CONTEXT) {
+      return true
+    }
+    const currentCourseAssetId = props?.activeCourseFilter?.contextID
+    if (!currentCourseAssetId) {
+      return false
+    }
+
+    const enrollmentsThatCanIncludeObservers = ['TeacherEnrollment', 'TaEnrollment']
+    return props?.courses?.enrollments.some(
+      enrollment =>
+        enrollment?.course.assetString === currentCourseAssetId &&
+        enrollmentsThatCanIncludeObservers.includes(enrollment.type)
+    )
+  }, [props.activeCourseFilter, props.courses])
 
   const canAddUserNote = useMemo(() => {
     let canAddFacultyNote = false
@@ -191,6 +211,45 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
+      {canIncludeObservers && props?.activeCourseFilter?.contextID && (
+        <Flex.Item>
+          <Button
+            disabled={props.areObserversLoading}
+            color="secondary"
+            margin="xx-small"
+            onClick={() => {
+              props.getRecipientsObserver()
+            }}
+            data-testid="include-observer-button"
+          >
+            {I18n.t('Include Observers')}
+            {props.areObserversLoading && (
+              <div style={{display: 'inline-block', margin: '-0.5rem none'}}>
+                <Spinner
+                  renderTitle={I18n.t('Getting recipients observers')}
+                  size="x-small"
+                  margin="none none none x-small"
+                />
+              </div>
+            )}
+          </Button>
+        </Flex.Item>
+      )}
+      {props.includeObserversMessages && (
+        <Flex.Item>
+          <Alert
+            margin="x-small x-small small x-small"
+            variant={props.includeObserversMessages?.type}
+            onDismiss={() => {
+              props.setIncludeObserversMessages(null)
+            }}
+            renderCloseButtonLabel="Close"
+            hasShadow={false}
+          >
+            {props.includeObserversMessages?.text}
+          </Alert>
+        </Flex.Item>
+      )}
       {props.isReply || props.isForward ? (
         <ComposeInputWrapper
           title={
@@ -232,6 +291,10 @@ HeaderInputs.propTypes = {
   courseMessages: PropTypes.array,
   isPrivateConversation: PropTypes.bool,
   selectedContext: PropTypes.object,
+  getRecipientsObserver: PropTypes.func,
+  areObserversLoading: PropTypes.bool,
+  includeObserversMessages: PropTypes.object,
+  setIncludeObserversMessages: PropTypes.func,
 }
 
 export default HeaderInputs

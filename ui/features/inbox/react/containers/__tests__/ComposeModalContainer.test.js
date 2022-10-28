@@ -123,6 +123,29 @@ describe('ComposeModalContainer', () => {
     })
   })
 
+  describe('Include Observers Button', () => {
+    beforeEach(() => {
+      window.ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT = true
+    })
+
+    it('should not render if context is not selected', () => {
+      const component = setup()
+      expect(component.container).toBeTruthy()
+      expect(component.queryByTestId('include-observer-button')).toBeFalsy()
+    })
+
+    it('should render if context is selected', async () => {
+      const component = setup()
+
+      const select = await component.findByTestId('course-select')
+      fireEvent.click(select)
+      const selectOptions = await component.findAllByText('Fighting Magneto 101')
+      fireEvent.click(selectOptions[0])
+
+      expect(await component.findByTestId('include-observer-button')).toBeTruthy()
+    })
+  })
+
   describe('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])

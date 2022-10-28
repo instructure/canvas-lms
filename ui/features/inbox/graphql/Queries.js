@@ -277,3 +277,20 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
   ${SubmissionComment.fragment}
   ${PageInfo.fragment}
 `
+
+export const RECIPIENTS_OBSERVERS_QUERY = gql`
+  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds) {
+          nodes {
+            id
+            name
+            _id
+          }
+        }
+      }
+    }
+  }
+`
