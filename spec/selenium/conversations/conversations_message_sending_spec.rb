@@ -575,6 +575,56 @@ describe "conversations new" do
         expect(@s2.conversations.last.conversation.conversation_messages.last.body).to eq "sent to everyone in the account level group"
       end
 
+      describe "include observers button" do
+        before do
+          @observer = user_factory(active_all: true, active_state: "active", name: "an observer")
+          observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+          observer_enrollment.update_attribute(:associated_user_id, @s1.id)
+
+          @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active")
+          user_session(@teacher)
+          get "/conversations"
+          open_react_compose_modal_addressbook
+        end
+
+        it "includes correct observers when clicked" do
+          ff("input[aria-label='Address Book']")[1].click
+          fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')").click
+          f("button[data-testid='include-observer-button']").click
+          wait_for_ajaximations
+
+          expect(fj("span[data-testid='address-book-tag'] button:contains(#{@observer.name})")).to be_present
+          expect(ff("[data-testid='address-book-tag']").count).to eq 2
+        end
+
+        it "does not include duplicate observers when clicked" do
+          ff("input[aria-label='Address Book']")[1].click
+          fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')").click
+          f("button[data-testid='include-observer-button']").click
+          wait_for_ajaximations
+
+          expect(fj("span[data-testid='address-book-tag'] button:contains(#{@observer.name})")).to be_present
+          expect(ff("[data-testid='address-book-tag']").count).to eq 2
+
+          f("button[data-testid='include-observer-button']").click
+          wait_for_ajaximations
+
+          expect(ff("[data-testid='address-book-tag']").count).to eq 2
+        end
+
+        it "renders an alert when no observers are added" do
+          ff("input[aria-label='Address Book']")[1].click
+          fj("div[data-testid='address-book-item']:contains('Students')").click
+          wait_for_ajaximations
+          fj("div[data-testid='address-book-item']:contains('#{@s2.name}')").click
+          f("button[data-testid='include-observer-button']").click
+          wait_for_ajaximations
+          fj("div:contains('Selected recipient(s) do not have assigned Observers')").click
+
+          expect(ff("[data-testid='address-book-tag']").count).to eq 1
+        end
+      end
+
       context "sent scope" do
         it "defaults to reply to recipients", ignore_js_errors: true do
           conversation(@teacher, @s1, @s2, body: "hi there", workflow_state: "unread")
