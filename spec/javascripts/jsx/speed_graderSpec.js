@@ -24,6 +24,7 @@ import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader'
 import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
 import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
 import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
+import QuizzesNextSpeedGrading from 'ui/features/speed_grader/QuizzesNextSpeedGrading'
 import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -124,6 +125,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com',
         show_help_menu_item: false,
         force_anonymous_grading: false,
+        GRADE_BY_QUESTION: false,
       }
       sandbox.stub(userSettings, 'get')
       userSettings.get.withArgs('eg_hide_student_names').returns(false)
@@ -181,6 +183,28 @@ QUnit.module('SpeedGrader', rootHooks => {
       return saveUserSettings.then(() => {
         ok(SpeedGraderHelpers.reloadPage.notCalled)
       })
+    })
+
+    test('sends a postMessage only when "grade_by_question" changes', () => {
+      const postMessageStub = sandbox.stub(
+        QuizzesNextSpeedGrading,
+        'postGradeByQuestionChangeMessage'
+      )
+      const checkbox = document.getElementById('enable_speedgrader_grade_by_question')
+      const form = $('#settings_form')
+
+      checkbox.checked = true
+      form.submit()
+      ok(postMessageStub.calledOnceWithExactly(sinon.match.any, true))
+
+      postMessageStub.resetHistory()
+      checkbox.checked = false
+      form.submit()
+      ok(postMessageStub.calledOnceWithExactly(sinon.match.any, false))
+
+      postMessageStub.resetHistory()
+      form.submit()
+      ok(postMessageStub.notCalled)
     })
   })
 

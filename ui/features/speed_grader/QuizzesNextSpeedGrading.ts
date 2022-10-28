@@ -33,13 +33,14 @@
 import type {Submission} from './jquery/speed_grader.d'
 import $ from 'jquery'
 
-function quizzesNextSpeedGrading(
-  EG,
-  $iframe_holder,
-  registerCb,
-  refreshGradesCb,
-  speedGraderWindow = window
-) {
+function sendPostMessage($iframe_holder, message) {
+  const contentWindow = $iframe_holder.children()[0]?.contentWindow
+  if (contentWindow) {
+    contentWindow.postMessage(message, '*')
+  }
+}
+
+function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindow = window) {
   function quizzesNextChange(submission) {
     EG.refreshSubmissionsToView()
     if (submission && submission.submission_history) {
@@ -71,16 +72,8 @@ function quizzesNextSpeedGrading(
   // gets the submission from the speed_grader.js
   // function that will call this
   function postChangeSubmissionMessage(submission) {
-    const frame = $iframe_holder.children()[0]
-    if (frame && frame.contentWindow) {
-      frame.contentWindow.postMessage(
-        {
-          submission,
-          subject: 'canvas.speedGraderSubmissionChange',
-        },
-        '*'
-      )
-    }
+    const message = {subject: 'canvas.speedGraderSubmissionChange', submission}
+    sendPostMessage($iframe_holder, message)
     EG.showSubmissionDetails()
     quizzesNextChange(submission)
   }
@@ -106,4 +99,12 @@ function quizzesNextSpeedGrading(
   }
 }
 
-export default quizzesNextSpeedGrading
+export function postGradeByQuestionChangeMessage($iframe_holder, enabled) {
+  const message = {subject: 'canvas.speedGraderGradeByQuestionChange', enabled}
+  sendPostMessage($iframe_holder, message)
+}
+
+export default {
+  setup,
+  postGradeByQuestionChangeMessage,
+}
