@@ -363,6 +363,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Icon Maker Icons" },
   "icon_options_7e32746e": { "message": "Icon Options" },
   "icon_options_tray_2b407977": { "message": "Icon Options Tray" },
+  "icon_preview_1782a1d9": { "message": "Icon Preview" },
   "icon_shape_30b61e7": { "message": "Icon Shape" },
   "icon_size_9353edea": { "message": "Icon Size" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
