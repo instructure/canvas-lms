@@ -22,10 +22,8 @@ import Popup from '../popup'
 
 describe('canvas_quizzes/components/popup', () => {
   it('renders', () => {
-    class Content extends React.Component {
-      render() {
-        return <span>yea!</span>
-      }
+    function Content() {
+      return <span>yea!</span>
     }
 
     render(<Popup content={Content} />)
@@ -34,16 +32,12 @@ describe('canvas_quizzes/components/popup', () => {
   })
 
   it('changes content', () => {
-    class One extends React.Component {
-      render() {
-        return <span>one</span>
-      }
+    function One() {
+      return <span>one</span>
     }
 
-    class Two extends React.Component {
-      render() {
-        return <span>two</span>
-      }
+    function Two() {
+      return <span>two</span>
     }
 
     render(<Popup content={One} />)
@@ -56,10 +50,8 @@ describe('canvas_quizzes/components/popup', () => {
   })
 
   it('updates content props', () => {
-    class Content extends React.Component {
-      render() {
-        return <span>{this.props.someContentProp}</span>
-      }
+    function Content({someContentProp}) {
+      return <span>{someContentProp}</span>
     }
 
     render(<Popup content={Content} someContentProp="one" />)

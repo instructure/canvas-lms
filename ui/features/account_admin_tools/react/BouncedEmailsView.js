@@ -54,6 +54,7 @@ export default function BouncedEmailsView({accountId}) {
 
   // so, uh, the report localizes column names, and we're just identifying them by position
   // that's maybe a little brittle :(
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const renderTableHeader = header => {
     return (
       <Table.Head>

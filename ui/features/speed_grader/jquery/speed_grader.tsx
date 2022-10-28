@@ -2743,7 +2743,11 @@ EG = {
     } else if (attachment) {
       this.renderAttachment(attachment)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
-      if (!ENV.SINGLE_NQ_SESSION_ENABLED || !externalToolLoaded || !externalToolLaunchOptions.singleLtiLaunch) {
+      if (
+        !ENV.SINGLE_NQ_SESSION_ENABLED ||
+        !externalToolLoaded ||
+        !externalToolLaunchOptions.singleLtiLaunch
+      ) {
         this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
         externalToolLoaded = true
       } else {

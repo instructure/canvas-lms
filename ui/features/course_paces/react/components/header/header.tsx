@@ -83,11 +83,13 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
 
   const fetchDefaultPaceContext = props.fetchDefaultPaceContext
+  const updated_at = props.coursePace?.updated_at
+
   useEffect(() => {
     if (window.ENV.FEATURES.course_paces_redesign) {
       fetchDefaultPaceContext()
     }
-  }, [fetchDefaultPaceContext, props.coursePace?.updated_at])
+  }, [fetchDefaultPaceContext, updated_at])
 
   if (window.ENV.FEATURES.course_paces_redesign) {
     const metricTheme = {
