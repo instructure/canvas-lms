@@ -1,9 +1,10 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
  * Canvas is free software: you can redistribute it and/or modify it under
+ *
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
@@ -16,13 +17,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-describe('closedCaptionLanguages', () => {
-  it('has extended CC languages', () => {
-    return import('../closedCaptionLanguages').then(cclanguages => {
-      // spot check some expected changes
-      expect(cclanguages.default.he).toEqual('Hebrew')
-      expect(cclanguages.default['zh-Hant']).toEqual('Chinese Traditional')
-      expect(cclanguages.default['en-GB']).toEqual('English (United Kingdom)')
-    })
+import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
+
+describe('sortedClosedCaptionLanguageList', () => {
+  it("sorts the user's language to the top", () => {
+    expect(sortedClosedCaptionLanguageList('en')[0].id).toEqual('en')
+    expect(sortedClosedCaptionLanguageList('zh-Hant')[0].id).toEqual('zh-Hant')
+  })
+
+  it('handles locales with underscores', () => {
+    expect(sortedClosedCaptionLanguageList('en_GB')[0].id).toEqual('en-GB')
   })
 })

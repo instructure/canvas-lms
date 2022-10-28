@@ -22,11 +22,6 @@ import ClosedCaptionCreator from '../ClosedCaptionCreator'
 
 function makeProps(options = {}) {
   return {
-    languages: [
-      {id: 'en', label: 'English'},
-      {id: 'fr', label: 'French'},
-      {id: 'es', label: 'Spanish'}
-    ],
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     uploadMediaTranslations: {
       UploadMediaStrings: {
@@ -37,17 +32,18 @@ function makeProps(options = {}) {
         SUPPORTED_FILE_TYPES: 'supported file types',
         CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose File',
         CLOSED_CAPTIONS_SELECT_LANGUAGE: 'select language',
-        DELETED_CAPTION: 'deleted caption'
+        DELETED_CAPTION: 'deleted caption',
       },
       SelectStrings: {
         USE_ARROWS: 'Use arrows',
         LIST_COLLAPSED: 'List collapsed.',
         LIST_EXPANDED: 'List expanded.',
-        OPTION_SELECTED: '{option} selected.'
-      }
+        OPTION_SELECTED: '{option} selected.',
+      },
     },
     updateSubtitles: () => {},
-    ...options
+    userLocale: 'en',
+    ...options,
   }
 }
 
@@ -55,8 +51,8 @@ describe('ClosedCaptionPanel', () => {
   const selectFile = (element, file) => {
     fireEvent.change(element, {
       target: {
-        files: file
-      }
+        files: file,
+      },
     })
   }
 
@@ -173,8 +169,8 @@ describe('ClosedCaptionPanel', () => {
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
               {locale: 'es', file: {name: 'es.srt'}},
-              {locale: 'fr', file: {name: 'fr.srt'}}
-            ]
+              {locale: 'fr', file: {name: 'fr.srt'}},
+            ],
           })}
         />
       )
@@ -199,8 +195,8 @@ describe('ClosedCaptionPanel', () => {
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
               {locale: 'es', file: {name: 'es.srt'}},
-              {locale: 'fr', file: {name: 'fr.srt'}}
-            ]
+              {locale: 'fr', file: {name: 'fr.srt'}},
+            ],
           })}
         />
       )
@@ -225,8 +221,8 @@ describe('ClosedCaptionPanel', () => {
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
-              {locale: 'es', file: {name: 'es.srt'}}
-            ]
+              {locale: 'es', file: {name: 'es.srt'}},
+            ],
           })}
         />
       )
@@ -248,8 +244,8 @@ describe('ClosedCaptionPanel', () => {
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
-              {locale: 'es', file: {name: 'es.srt'}}
-            ]
+              {locale: 'es', file: {name: 'es.srt'}},
+            ],
           })}
         />
       )

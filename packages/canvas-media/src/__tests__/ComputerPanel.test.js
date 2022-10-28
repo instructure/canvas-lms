@@ -27,10 +27,10 @@ if (window.URL) {
     createObjectURL: file => {
       return {
         label: file.name,
-        src: 'blob://junk'
+        src: 'blob://junk',
       }
     },
-    revokeObjectURL: _url => undefined
+    revokeObjectURL: _url => undefined,
   }
 }
 
@@ -49,14 +49,14 @@ const uploadMediaTranslations = {
     RECORD_PANEL_TITLE: 'Record',
     SUBMIT_TEXT: 'Submit',
     UPLOADING_ERROR: 'Upload Error',
-    UPLOAD_MEDIA_LABEL: 'Upload Media'
+    UPLOAD_MEDIA_LABEL: 'Upload Media',
   },
   SelectStrings: {
     USE_ARROWS: 'Use arrow keys to navigate options.',
     LIST_COLLAPSED: 'List collapsed.',
     LIST_EXPANDED: 'List expanded.',
-    OPTION_SELECTED: '{option} selected.'
-  }
+    OPTION_SELECTED: '{option} selected.',
+  },
 }
 
 function createPanel(overrideProps) {
@@ -69,7 +69,7 @@ function createPanel(overrideProps) {
       label="Upload File"
       uploadMediaTranslations={uploadMediaTranslations}
       accept={ACCEPTED_FILE_TYPES}
-      languages={[{id: 'en', label: 'english'}]}
+      userLocale="en"
       liveRegion={() => null}
       updateSubtitles={() => false}
       {...overrideProps}
@@ -88,30 +88,30 @@ describe('UploadMedia: ComputerPanel', () => {
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
-        files: [notAMediaFile]
-      }
+        files: [notAMediaFile],
+      },
     })
     expect(getByText('Invalid File')).toBeVisible()
   })
 
   it('shows an editable text input for title if a valid file is added', async () => {
     const aFile = new File(['foo'], 'foo.mov', {
-      type: 'video/quicktime'
+      type: 'video/quicktime',
     })
     const setFile = file =>
       rerender(
         createPanel({
           setFile,
           theFile: file,
-          hasUploadedFile: true
+          hasUploadedFile: true,
         })
       )
     const {rerender, getByLabelText, getByPlaceholderText} = renderPanel({setFile})
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
-        files: [aFile]
-      }
+        files: [aFile],
+      },
     })
     const titleInput = getByPlaceholderText('File name')
     expect(titleInput.value).toEqual('foo.mov')
@@ -127,7 +127,7 @@ describe('UploadMedia: ComputerPanel', () => {
     // see also packages/canvas-rce/src/rce/plugins/shared/Upload/__tests__/ComputerPanel.test.js
     it.skip('Renders a video player preview if afile type is a video', async () => {
       const aFile = new File(['foo'], 'foo.mp4', {
-        type: 'video/mp4'
+        type: 'video/mp4',
       })
       const {getAllByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
       const playButton = await waitFor(() => getAllByText('Play'))
@@ -137,7 +137,7 @@ describe('UploadMedia: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/avi', async () => {
       // because avi videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.avi', {
-        type: 'video/avi'
+        type: 'video/avi',
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
       const icon = await waitFor(() => getByTestId('preview-video-icon'))
@@ -148,7 +148,7 @@ describe('UploadMedia: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/x-ms-wma', async () => {
       // because avi videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.wma', {
-        type: 'video/x-ms-wma'
+        type: 'video/x-ms-wma',
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
       const icon = await waitFor(() => getByTestId('preview-video-icon'))
@@ -159,7 +159,7 @@ describe('UploadMedia: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/x-ms-wmv', async () => {
       // because avi videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.wmv', {
-        type: 'video/x-ms-wmv'
+        type: 'video/x-ms-wmv',
       })
       const {getByTestId, getByText} = renderPanel({theFile: aFile, hasUploadedFile: true})
       const icon = await waitFor(() => getByTestId('preview-video-icon'))
@@ -169,7 +169,7 @@ describe('UploadMedia: ComputerPanel', () => {
 
     it('clicking the trash button removes the file preview', async () => {
       const aFile = new File(['foo'], 'foo.mov', {
-        type: 'video/quicktime'
+        type: 'video/quicktime',
       })
       const setFile = jest.fn()
       const setHasUploadedFile = jest.fn()
@@ -177,7 +177,7 @@ describe('UploadMedia: ComputerPanel', () => {
         theFile: aFile,
         setFile,
         setHasUploadedFile,
-        hasUploadedFile: true
+        hasUploadedFile: true,
       })
       const clearButton = await waitFor(() => getByText('Clear selected file'))
       expect(clearButton).toBeInTheDocument()
@@ -192,22 +192,22 @@ describe('UploadMedia: ComputerPanel', () => {
     it('when uploading videos', async () => {
       HTMLElement.prototype.scrollIntoView = jest.fn()
       const aFile = new File(['foo'], 'foo.mov', {
-        type: 'video/quicktime'
+        type: 'video/quicktime',
       })
       const setFile = file =>
         rerender(
           createPanel({
             setFile,
             theFile: file,
-            hasUploadedFile: true
+            hasUploadedFile: true,
           })
         )
       const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
       const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
       fireEvent.change(dropZone, {
         target: {
-          files: [aFile]
-        }
+          files: [aFile],
+        },
       })
       const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
       expect(ccCheckbox).not.toBeNull()
@@ -221,22 +221,22 @@ describe('UploadMedia: ComputerPanel', () => {
     it('when uploading audios', async () => {
       HTMLElement.prototype.scrollIntoView = jest.fn()
       const aFile = new File(['foo'], 'foo.mp3', {
-        type: 'audio/mp3'
+        type: 'audio/mp3',
       })
       const setFile = file =>
         rerender(
           createPanel({
             setFile,
             theFile: file,
-            hasUploadedFile: true
+            hasUploadedFile: true,
           })
         )
       const {rerender, getByLabelText, getByTestId, getByRole} = renderPanel({setFile})
       const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
       fireEvent.change(dropZone, {
         target: {
-          files: [aFile]
-        }
+          files: [aFile],
+        },
       })
       const ccCheckbox = getByRole('checkbox', {name: /Add CC\/Subtitles/})
       expect(ccCheckbox).not.toBeNull()
