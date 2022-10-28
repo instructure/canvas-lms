@@ -103,7 +103,7 @@ describe('PaceContextsContent', () => {
     headers.forEach(header => {
       expect(getAllByText(header)[0]).toBeInTheDocument()
     })
-    expect(getByText(studentPaceContext.applied_pace.name)).toBeInTheDocument()
+    expect(getByText('J-M')).toBeInTheDocument()
     expect(getAllByText('Individual')[0]).toBeInTheDocument()
   })
 

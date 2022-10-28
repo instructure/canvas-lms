@@ -28,7 +28,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
-import {StoreState, CoursePace} from '../../../types'
+import {StoreState, CoursePace, ResponsiveSizes} from '../../../types'
 import {Course, BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getCoursePace} from '../../../reducers/course_paces'
@@ -36,7 +36,7 @@ import {coursePaceActions} from '../../../actions/course_paces'
 import {actions as uiActions} from '../../../actions/ui'
 import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
-import {getSyncing} from '../../../reducers/ui'
+import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
 
 const I18n = useI18nScope('course_paces_settings')
 
@@ -49,6 +49,7 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly coursePace: CoursePace
   readonly isSyncing: boolean
+  readonly responsiveSize: ResponsiveSizes
 }
 
 interface DispatchProps {
@@ -116,7 +117,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   }
 
   menuButton = () => {
-    if (window.ENV.FEATURES.course_paces_redesign) {
+    if (window.ENV.FEATURES.course_paces_redesign && this.props.responsiveSize !== 'small') {
       return (
         <Button
           data-testid="course-pace-settings"
@@ -217,6 +218,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
+    responsiveSize: getResponsiveSize(state),
     blackoutDates: getBlackoutDates(state),
     course: getCourse(state),
     courseId: getCourse(state).id,

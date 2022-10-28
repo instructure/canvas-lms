@@ -39,7 +39,7 @@ export interface PaceContextsTableProps {
   isLoading: boolean
   responsiveSize: ResponsiveSizes
   setPage: (page: number) => void
-  handleContextSelect: (contextType: PaceContextTypes, contextId: string) => void
+  handleContextSelect: (paceContext: PaceContext) => void
 }
 
 interface Header {
@@ -51,12 +51,6 @@ const PACE_TYPES = {
   StudentEnrollment: I18n.t('Individual'),
   CourseSection: I18n.t('Section'),
   Course: I18n.t('Default'),
-}
-
-export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = {
-  course: 'Course',
-  section: 'Section',
-  student_enrollment: 'Enrollment',
 }
 
 const {Item: FlexItem} = Flex as any
@@ -119,7 +113,7 @@ const PaceContextsTable = ({
   const renderContextLink = (paceContext: PaceContext) => (
     <Link
       isWithinText={false}
-      onClick={() => handleContextSelect(CONTEXT_TYPE_MAP[contextType], paceContext.item_id)}
+      onClick={() => handleContextSelect(paceContext)}
     >
       <TruncateText>{paceContext.name}</TruncateText>
     </Link>

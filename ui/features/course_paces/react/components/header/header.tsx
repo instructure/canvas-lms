@@ -46,6 +46,7 @@ const {Item: FlexItem} = Flex as any
 
 interface DispatchProps {
   readonly fetchDefaultPaceContext: () => void
+  readonly setDefaultPaceContextAsSelected: () => void
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
 }
 
@@ -187,6 +188,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                 data-testid="go-to-default-pace"
                 onClick={() => {
                   props.setSelectedPaceContext('Course', window.ENV.COURSE_ID)
+                  props.setDefaultPaceContextAsSelected()
                 }}
               >
                 {!props.coursePace.id && props.coursePace.context_type === 'Course'
@@ -259,5 +261,6 @@ const mapStateToProps = (state: StoreState) => {
 
 export default connect(mapStateToProps, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
+  setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected,
   fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 })(Header)

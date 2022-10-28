@@ -18,7 +18,7 @@
 
 import {createAction, ActionsUnion} from '../shared/types'
 import * as Api from '../api/pace_contexts_api'
-import {APIPaceContextTypes, StoreState} from '../types'
+import {APIPaceContextTypes, PaceContext, StoreState} from '../types'
 import {ThunkAction} from 'redux-thunk'
 import {Action} from 'redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -28,16 +28,22 @@ const I18n = useI18nScope('pace_contexts_actions')
 export enum Constants {
   SET_PACE_CONTEXTS = 'PACE_CONTEXTS/SET_PACE_CONTEXTS',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'PACE_CONTEXTS/SET_SELECTED_PACE_CONTEXT_TYPE',
+  SET_SELECTED_PACE_CONTEXT = 'PACE_CONTEXTS/SET_SELECTED_PACE_CONTEXT',
   SET_PAGE = 'PACE_CONTEXTS/SET_PAGE',
   SET_LOADING = 'PACE_CONTEXTS/SET_LOADING',
   SET_DEFAULT_PACE_LOADING = 'PACE_CONTEXTS/DEFAULT/SET_LOADING',
   SET_DEFAULT_PACE_CONTEXT = 'PACE_CONTEXTS/DEFAULT/SET_PACE_CONTEXT',
+  SET_DEFAULT_PACE_CONTEXT_AS_SELECTED = 'PACE_CONTEXTS/DEFAULT/SET_PACE_CONTEXT_AS_SELECTED',
 }
 
 const regularActions = {
   setPage: (page: number) => createAction(Constants.SET_PAGE, page),
-  setSelectedContextType: (paceContext: APIPaceContextTypes) =>
-    createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, paceContext),
+  setSelectedContextType: (paceContextType: APIPaceContextTypes) =>
+    createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, paceContextType),
+  setSelectedContext: (paceContext: PaceContext) =>
+    createAction(Constants.SET_SELECTED_PACE_CONTEXT, paceContext),
+  setDefaultPaceContextAsSelected: () =>
+    createAction(Constants.SET_DEFAULT_PACE_CONTEXT_AS_SELECTED),
 }
 
 const thunkActions = {

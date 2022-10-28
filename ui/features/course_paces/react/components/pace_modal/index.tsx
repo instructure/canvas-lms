@@ -29,26 +29,52 @@ import {Tray} from '@instructure/ui-tray'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 
-import BlueprintLock from './header/blueprint_lock'
-import Body from './body'
-import Errors from './errors'
-import Footer from './footer'
-import ProjectedDates from './header/projected_dates/projected_dates'
-import Settings from './header/settings/settings'
-import UnpublishedChangesTrayContents from './unpublished_changes_tray_contents'
-import UnpublishedWarningModal from './header/unpublished_warning_modal'
+import Body from '../body'
+import Errors from '../errors'
+import Footer from '../footer'
+import UnpublishedChangesTrayContents from '../unpublished_changes_tray_contents'
+import UnpublishedWarningModal from '../header/unpublished_warning_modal'
 
-import {coursePaceActions} from '../actions/course_paces'
-import {CoursePace, ResponsiveSizes, StoreState} from '../types'
-import {getCoursePace, getUnappliedChangesExist} from '../reducers/course_paces'
-import {getResponsiveSize} from '../reducers/ui'
-import {SummarizedChange} from '../utils/change_tracking'
+import {coursePaceActions} from '../../actions/course_paces'
+import {
+  CoursePace,
+  OptionalDate,
+  PaceContext,
+  PaceDuration,
+  ResponsiveSizes,
+  Section,
+  StoreState,
+} from '../../types'
+import {
+  getCompression,
+  getCoursePace,
+  getCoursePaceItems,
+  getPaceDuration,
+  getPaceName,
+  getPlannedEndDate,
+  getUnappliedChangesExist,
+} from '../../reducers/course_paces'
+import {getResponsiveSize} from '../../reducers/ui'
+import {SummarizedChange} from '../../utils/change_tracking'
+import PaceModalHeading from './heading'
+import {getSelectedPaceContext} from '../../reducers/pace_contexts'
+import {getEnrolledSection} from '../../reducers/enrollments'
+import PaceModalStats from './stats'
 
 const I18n = useI18nScope('course_paces_modal')
 
 interface StoreProps {
   readonly coursePace: CoursePace
   readonly unappliedChangesExist: boolean
+  readonly paceName: string
+  readonly selectedPaceContext: PaceContext
+  readonly enrolledSection: Section
+  readonly assignmentsCount: number
+  readonly paceDuration: PaceDuration
+  readonly plannedEndDate: OptionalDate
+  readonly compression: number
+  readonly compressDates: any
+  readonly uncompressDates: any
 }
 
 interface DispatchProps {
@@ -72,17 +98,19 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
   const closeButtonRef = useRef<HTMLElement | null>(null)
 
   const modalTitle = () => {
+    let title
     if (!props.coursePace) {
       return I18n.t('Loading...')
     }
 
     if (props.coursePace.context_type === 'Course') {
-      return I18n.t('Course Pace')
+      title = I18n.t('Course Pace')
     } else if (props.coursePace.context_type === 'Section') {
-      return I18n.t('Section Pace')
+      title = I18n.t('Section Pace')
     } else if (props.coursePace.context_type === 'Enrollment') {
-      return I18n.t('Student Pace')
+      title = I18n.t('Student Pace')
     }
+    return `${title}: ${props.paceName}`
   }
 
   const handleClose = () => {
@@ -135,41 +163,51 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
           </FlexItem>
         </Flex>
       </Modal.Header>
-      <Modal.Body padding="large">
-        <Flex as="div" direction="column" margin="small">
-          <View>
-            <Errors />
-          </View>
-          <Flex as="section" justifyItems="end">
-            <Settings
-              isBlueprintLocked={
-                props.isBlueprintLocked && props.coursePace.context_type === 'Course'
-              }
-              margin="0 0 0 small"
-            />
-            <BlueprintLock
-              newPace={!props.coursePace.id}
-              contextIsCoursePace={props.coursePace.context_type === 'Course'}
+      <Modal.Body padding={props.responsiveSize === 'small' ? 'none small' : 'none large'}>
+        <View
+          as="div"
+          maxWidth={props.responsiveSize === 'small' ? '100%' : '80%'}
+          margin="none auto"
+        >
+          <Flex as="div" direction="column" margin="small">
+            <View>
+              <Errors />
+            </View>
+            <PaceModalHeading
+              enrolledSection={props.enrolledSection}
+              isBlueprintLocked={props.isBlueprintLocked}
+              coursePace={props.coursePace}
+              paceContext={props.selectedPaceContext}
+              contextName={props.paceName}
               setIsBlueprintLocked={setIsBlueprintLocked}
             />
-          </Flex>
-          <ProjectedDates key={`${props.coursePace.context_type}-${props.coursePace.context_id}`} />
-          <Body blueprintLocked={isBlueprintLocked} />
-          <Tray
-            label={I18n.t('Unpublished Changes tray')}
-            open={trayOpen}
-            onDismiss={handleTrayDismiss}
-            placement={props.responsiveSize === 'small' ? 'bottom' : 'end'}
-            shouldContainFocus={true}
-            shouldReturnFocus={true}
-            shouldCloseOnDocumentClick={true}
-          >
-            <UnpublishedChangesTrayContents
-              handleTrayDismiss={handleTrayDismiss}
-              changes={props.changes}
+            <PaceModalStats
+              coursePace={props.coursePace}
+              assignments={props.assignmentsCount}
+              paceDuration={props.paceDuration}
+              plannedEndDate={props.plannedEndDate}
+              compressDates={props.compressDates}
+              uncompressDates={props.uncompressDates}
+              compression={props.compression}
+              responsiveSize={props.responsiveSize}
             />
-          </Tray>
-        </Flex>
+            <Body blueprintLocked={isBlueprintLocked} />
+            <Tray
+              label={I18n.t('Unpublished Changes tray')}
+              open={trayOpen}
+              onDismiss={handleTrayDismiss}
+              placement={props.responsiveSize === 'small' ? 'bottom' : 'end'}
+              shouldContainFocus={true}
+              shouldReturnFocus={true}
+              shouldCloseOnDocumentClick={true}
+            >
+              <UnpublishedChangesTrayContents
+                handleTrayDismiss={handleTrayDismiss}
+                changes={props.changes}
+              />
+            </Tray>
+          </Flex>
+        </View>
         <UnpublishedWarningModal
           open={!!pendingContext}
           onCancel={() => {
@@ -201,9 +239,21 @@ const mapStateToProps = (state: StoreState) => {
     coursePace: getCoursePace(state),
     responsiveSize: getResponsiveSize(state),
     unappliedChangesExist: getUnappliedChangesExist(state),
+    paceName: getPaceName(state),
+    selectedPaceContext: getSelectedPaceContext(state),
+    assignmentsCount: getCoursePaceItems(state).length,
+    paceDuration: getPaceDuration(state),
+    plannedEndDate: getPlannedEndDate(state),
+    compression: getCompression(state),
+    enrolledSection:
+      state.paceContexts.selectedContextType === 'student_enrollment'
+        ? getEnrolledSection(state, parseInt(state.paceContexts.selectedContext?.item_id || '', 10))
+        : null,
   }
 }
 
 export default connect(mapStateToProps, {
   onResetPace: coursePaceActions.onResetPace,
+  compressDates: coursePaceActions.compressDates,
+  uncompressDates: coursePaceActions.uncompressDates,
 })(PaceModal)
