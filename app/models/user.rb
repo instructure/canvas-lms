@@ -491,6 +491,11 @@ class User < ActiveRecord::Base
       end
     end
 
+    if fake_student?
+      # We don't need to worry about relative ids here because test students are never cross-shard
+      refreshed_root_account_ids << enrollments.where(type: "StudentViewEnrollment").pick(:root_account_id)
+    end
+
     # Update the user
     self.root_account_ids = refreshed_root_account_ids.to_a.sort
     if root_account_ids_changed?

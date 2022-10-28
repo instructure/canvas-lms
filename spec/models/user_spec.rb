@@ -489,6 +489,14 @@ describe User do
         )
       end
     end
+
+    context "student_view user" do
+      it "does create root_account_ids for student view student" do
+        course_with_teacher(active_all: true)
+        @fake_student = @course.student_view_student
+        expect(@fake_student.reload.root_account_ids).to eq([root_account.global_id])
+      end
+    end
   end
 
   describe "update_account_associations" do

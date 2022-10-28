@@ -3726,6 +3726,7 @@ class Course < ActiveRecord::Base
       end
     end
     DueDateCacher.recompute_users_for_course(fake_student.id, self)
+    fake_student.update_root_account_ids
     fake_student
   end
   private :sync_enrollments
