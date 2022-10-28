@@ -79,6 +79,12 @@ if Qti.migration_executable
       )
     end
 
+    it "imports BB Ultra Presentation Only questions" do
+      hash = get_quiz_data(bbultra_question_dir, "text_only_question")[0][0]
+      expect(hash[:question_type]).to eq "text_only_question"
+      expect(hash[:question_text]).to eq "oi"
+    end
+
     it "converts matching questions where the answers are given out of order" do
       hash = get_question_hash(bb9_question_dir, "matching2", delete_answer_ids: false)
       matches = {}
