@@ -60,9 +60,9 @@
   <div class="web_conference_member_user_settings"></div>
     <div id="filter_div">
     <h4 style="font-weight: bold;">Filter by Role:</h4>
-    <ul style="list-style-type: none;" id="role_select_filter" multiple="multiple">
+    <ul style="list-style-type: none; display: inline;" id="role_select_filter" multiple="multiple">
       {{# each roles}}
-        <li>
+        <li class="filter-checkboxes">
           <label class="checkbox">
             <input id="role_id_{{id}}" name="role[{{id}}]" type="checkbox" value="{{id}}" class="role_checkbox">
             {{name}}            
