@@ -21,6 +21,7 @@ puts "Linting sub-packages"
 linter_options[:command] = "yarn lint"
 linter_options[:base_dir] = "../../"
 linter_options[:append_files_to_command] = true
+linter_options[:severe_anywhere] = false
 
 package_dirs = `ls -1 packages/*/package.json 2> /dev/null`.split("\n").map { |d| d.sub("/package.json", "") }
 cwd = Dir.pwd
