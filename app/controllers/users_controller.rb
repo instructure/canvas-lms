@@ -2511,15 +2511,6 @@ class UsersController < ApplicationController
         # when we send a 400.
         puts ("User create attempted: @user.id: #{@user.inspect}")
         return render :json => errors, :status => :bad_request
-      rescue ActiveRecord::RecordNotUnique => e
-        errors = {
-          :errors => {
-            :user => @user.errors.as_json[:errors],
-            :pseudonym => @pseudonym.errors.as_json[:errors],
-          }
-        }
-        puts ("User already exists")
-        return render :json => errors, :status => :conflict
       end
 
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
