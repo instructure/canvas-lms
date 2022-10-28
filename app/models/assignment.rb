@@ -2265,13 +2265,20 @@ class Assignment < ActiveRecord::Base
     body url submission_type media_comment_id media_comment_type submitted_at
   ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid]).to_set
+                                    %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid student_id]).to_set
 
   def submit_homework(original_student, opts = {})
     raise "Student Required" unless original_student
 
     eula_timestamp = opts[:eula_agreement_timestamp]
     webhook_info = assignment_configuration_tool_lookups.take&.webhook_info
+    should_add_proxy = false
+
+    if opts[:proxied_student]
+      current_user = original_student
+      original_student = opts[:proxied_student]
+      should_add_proxy = true
+    end
 
     if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
@@ -2314,6 +2321,7 @@ class Assignment < ActiveRecord::Base
           homework.attachment_ids = nil
           homework.late_policy_status = nil
           homework.seconds_late_override = nil
+          homework.proxy_submitter_id = nil
         end
 
         student_id = homework.user.global_id
@@ -2324,6 +2332,7 @@ class Assignment < ActiveRecord::Base
         homework.lti_user_id = homework_lti_user_id_hash[student_id]
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
+        homework.proxy_submitter = current_user if should_add_proxy
 
         if webhook_info
           homework.turnitin_data[:webhook_info] = webhook_info

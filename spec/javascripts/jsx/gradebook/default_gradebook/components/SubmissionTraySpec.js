@@ -109,6 +109,7 @@ QUnit.module('SubmissionTray', hooks => {
         pointsPossible: 10,
         postManually: false,
         published: true,
+        submissionTypes: ['online_text_entry', 'online_upload'],
       },
       isFirstAssignment: false,
       isLastAssignment: false,
@@ -154,6 +155,10 @@ QUnit.module('SubmissionTray', hooks => {
   function carouselButton(label) {
     const $buttons = [...content.querySelectorAll('button')]
     return $buttons.find($button => $button.textContent.trim() === label)
+  }
+
+  function submitForStudentButton() {
+    return carouselButton('Submit for Student')
   }
 
   function radioInputGroupDiv() {
@@ -252,6 +257,45 @@ QUnit.module('SubmissionTray', hooks => {
       mountComponent({submissionUpdating: false})
       assertAssignmentButtonsDisabled(false)
     })
+  })
+
+  QUnit.module('Submit for Student', () => {
+    test('is not displayed when proxySubmissionsAllowed is false', () => {
+      mountComponent({proxySubmissionsAllowed: false})
+      notOk(submitForStudentButton())
+    })
+
+    test('is displayed when proxySubmissionsAllowed is true', () => {
+      mountComponent({proxySubmissionsAllowed: true})
+      ok(submitForStudentButton())
+    })
+  })
+
+  test('shows proxy submitter indicator if most recent submission is a proxy', () => {
+    const props = {
+      submission: {
+        assignmentId: '30',
+        enteredGrade: '10',
+        enteredScore: 10,
+        excused: false,
+        grade: '7',
+        gradedAt: new Date().toISOString(),
+        hasPostableComments: false,
+        id: '2501',
+        late: false,
+        missing: false,
+        pointsDeducted: 3,
+        postedAt: null,
+        proxySubmitter: 'Captain America',
+        score: 7,
+        secondsLate: 0,
+        submissionType: 'online_text_entry',
+        userId: '27',
+        workflowState: 'graded',
+      },
+    }
+    mountComponent(props)
+    ok(content.textContent.includes('Submitted by Captain America'))
   })
 
   test('shows SpeedGrader link if enabled', () => {

@@ -3441,6 +3441,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       submissionComments: this.getSubmissionComments(),
       submissionCommentsLoaded: this.getSubmissionCommentsLoaded(),
       editedCommentId,
+      proxySubmissionsAllowed: ENV.GRADEBOOK_OPTIONS.proxy_submissions_allowed,
+      reloadSubmission: proxyDetails => this.reloadSubmission(submission, student, proxyDetails),
+    }
+  }
+
+  reloadSubmission = (submission, student, proxyDetails) => {
+    for (const val in proxyDetails) {
+      submission[val] = proxyDetails[val]
+    }
+    this.updateSubmissionsFromExternal([submission])
+    if (this.getSubmissionTrayState().open) {
+      this.renderSubmissionTray(student)
     }
   }
 
