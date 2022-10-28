@@ -1576,7 +1576,7 @@ class Submission < ActiveRecord::Base
     return if points_deducted_changed? || grading_period&.closed?
 
     incoming_assignment ||= assignment
-    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission? || submitted_to_lti_assignment?(incoming_assignment)
+    return unless late_policy_status_manually_applied? || incoming_assignment.expects_submission? || for_new_quiz?(incoming_assignment) || submitted_to_lti_assignment?(incoming_assignment)
 
     late_policy ||= incoming_assignment.course.late_policy
     return score_missing(late_policy, incoming_assignment.points_possible, incoming_assignment.grading_type) if missing?
@@ -2420,9 +2420,13 @@ class Submission < ActiveRecord::Base
       return false if submitted_at.present?
       return false unless past_due?
 
-      cached_quiz_lti? || assignment.expects_submission? || assignment.quiz_lti?
+      for_new_quiz? || assignment.expects_submission?
     end
     alias_method :missing, :missing?
+
+    def for_new_quiz?(quiz_assignment = assignment)
+      cached_quiz_lti? || !!quiz_assignment&.quiz_lti?
+    end
 
     def extended?
       return false if excused?
