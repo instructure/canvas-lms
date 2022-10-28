@@ -82,8 +82,9 @@ const MentionDropdownOption = props => {
             margin="0 small 0 0"
             size="x-small"
             elementRef={ref => {
-              const img = ref?.querySelector('img')
-              img?.setAttribute('data-ignore-a11y-check', '')
+              ref?.childNodes.forEach(node => {
+                node.setAttribute('data-ignore-a11y-check', '')
+              })
             }}
           />
           <Text
@@ -92,6 +93,7 @@ const MentionDropdownOption = props => {
                 ? 'primary-inverse'
                 : null
             }
+            data-ignore-a11y-check=""
           >
             {props.name}
           </Text>
