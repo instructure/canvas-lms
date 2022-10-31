@@ -24,7 +24,7 @@ import CustomHelpLinkSettings from './react/custom_help_link_settings/CustomHelp
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import './jquery/index'
-import './backbone/account_quota_settings.coffee'
+import './backbone/account_quota_settings'
 import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
 import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
