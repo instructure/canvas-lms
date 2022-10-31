@@ -40,7 +40,8 @@ define [
       'click .all_users_checkbox': 'toggleAllUsers'
       'change #web_conference_long_running': 'changeLongRunning'
       'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
-      'change .role_checkbox': 'filterUsersByRole'
+      'change .role_checkbox': 'filterUsersByRoleAndSearch'
+      'input #user-search': 'filterUsersByRoleAndSearch'
 
     render: ->
       super
@@ -199,7 +200,7 @@ define [
           $(this).attr('checked', false)
         )
 
-    filterUsersByRole: ->
+    filterUsersByRoleAndSearch: ->
       @resetSelectAllCheckboxOnFilter()
       role_checkboxes = Array.from($('.role_checkbox:checked'))
       ids = role_checkboxes.map((checkbox) -> checkbox.value)
@@ -211,15 +212,28 @@ define [
           else 
             $(el).show()
         )
-        if !($("#members_list li.member:not(:hidden)").length > 0)
-          $('#no_users_error_message').show()
-        else
-          $('#no_users_error_message').hide()
       else
         $('#no_users_error_message').hide()
         user_list_items.forEach((el) ->
           $(el).show()
         )
+      EditConferenceView.prototype.searchVisibleUsers()
+      if !($("#members_list li.member:not(:hidden)").length > 0)
+        $('#no_users_error_message').show()
+      else
+        $('#no_users_error_message').hide()
+
+    searchVisibleUsers: ->
+      search_query = $("#user-search")[0].value.toLowerCase()
+      visible_users = Array.from($("#members_list li.member:not(:hidden)"))
+      visible_users.forEach((el) ->
+        name = el.innerText.toLowerCase()
+        if !(name.includes(search_query))
+          $(el).hide()
+      )
+
+    addInputEventListener: ->
+      $('#user-search').addEventListener('input', filterUsersByRoleAndSearch)
 
     resetSelectAllCheckboxOnFilter: ->
       if($('.all_users_checkbox').is(':checked'))
