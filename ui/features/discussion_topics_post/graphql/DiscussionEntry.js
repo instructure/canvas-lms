@@ -131,8 +131,8 @@ export const DiscussionEntry = {
   }),
 
   mock: ({
-    id = 'RGlzY3Vzc2lvbkVudHJ5LTE=',
-    _id = '1',
+    id = 'DiscussionEntry-default-mock',
+    _id = 'DiscussionEntry-default-mock',
     createdAt = '2021-02-08T13:35:56-07:00',
     updatedAt = '2021-04-13T10:00:20-06:00',
     deleted = false,

@@ -49,7 +49,7 @@ describe('DiscussionFullPage', () => {
       per_page: 20,
       isolated_view_initial_page_size: 5,
       current_page: 0,
-      discussion_topic_id: '1',
+      discussion_topic_id: 'Discussion-default-mock',
       manual_mark_as_read: false,
       current_user: {
         id: 'PLACEHOLDER',
@@ -87,7 +87,7 @@ describe('DiscussionFullPage', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicManager discussionTopicId="1" />
+          <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
         </AlertManagerContext.Provider>
       </MockedProvider>
     )
@@ -471,7 +471,10 @@ describe('DiscussionFullPage', () => {
   it('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock({replyFromEntryId: '1', includeReplyPreview: false}),
+      ...createDiscussionEntryMock({
+        replyFromEntryId: 'DiscussionEntry-default-mock',
+        includeReplyPreview: false,
+      }),
     ]
     const container = setup(mocks)
 
@@ -508,7 +511,10 @@ describe('DiscussionFullPage', () => {
   it('should show reply preview when replying to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock({replyFromEntryId: '1', includeReplyPreview: true}),
+      ...createDiscussionEntryMock({
+        replyFromEntryId: 'DiscussionEntry-default-mock',
+        includeReplyPreview: true,
+      }),
     ]
     const container = setup(mocks)
 
@@ -623,7 +629,7 @@ describe('DiscussionFullPage', () => {
 
     it('should highlight the deep linked discussion entry', async () => {
       window.ENV.discussions_deep_link = {
-        entry_id: '1',
+        entry_id: 'DiscussionEntry-default-mock',
         root_entry_id: null,
       }
       const container = setup(getDiscussionQueryMock())

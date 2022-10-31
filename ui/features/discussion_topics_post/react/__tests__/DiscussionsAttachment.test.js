@@ -88,7 +88,7 @@ describe('DiscussionThreadAttachment', () => {
       const container = setup(
         defaultProps(),
         updateDiscussionEntryMock({
-          discussionEntryId: '1',
+          discussionEntryId: 'DiscussionEntry-default-mock',
           message: '<p>This is the parent reply</p>',
           removeAttachment: true,
         })
