@@ -244,16 +244,30 @@ RSpec.describe Lti::Result, type: :model do
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 
-      context "with result_score less than 0" do
-        let(:result_score) { -1 }
+      context "when non-numeric" do
+        let(:result_score) { "uh oh" }
 
         it "raises an error" do
-          expect do
-            result
-          end.to raise_error(
+          expect { result }.to raise_error(
             ActiveRecord::RecordInvalid,
-            "Validation failed: Result score must be greater than or equal to 0"
+            "Validation failed: Result score is not a number"
           )
+        end
+      end
+
+      context "when positive" do
+        it "saves score" do
+          expect { result }.not_to raise_error
+          expect(result.result_score).to eq result_score
+        end
+      end
+
+      context "when negative" do
+        let(:result_score) { -1 }
+
+        it "saves score" do
+          expect { result }.not_to raise_error
+          expect(result.result_score).to eq result_score
         end
       end
     end

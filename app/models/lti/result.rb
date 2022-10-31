@@ -31,7 +31,7 @@ class Lti::Result < ApplicationRecord
 
   validates :line_item, :user, presence: true
   validates :result_maximum, presence: true, unless: proc { |r| r.read_attribute(:result_score).blank? }
-  validates :result_score, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :result_score, numericality: true, allow_nil: true
   validates :result_maximum, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validate do |result|
     if result.result_maximum == 0 && line_item&.score_maximum != 0

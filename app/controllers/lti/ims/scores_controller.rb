@@ -73,6 +73,7 @@ module Lti::IMS
       :verify_required_params,
       :verify_valid_timestamp,
       :verify_valid_score_maximum,
+      :verify_valid_score_given,
       :verify_valid_submitted_at,
       :verify_valid_content_item_submission_type,
       :verify_attempts_for_online_upload
@@ -329,6 +330,16 @@ module Lti::IMS
         render_error("ScoreMaximum must be greater than or equal to 0", :unprocessable_entity)
       else
         render_error("ScoreMaximum not supplied when ScoreGiven present.", :unprocessable_entity)
+      end
+    end
+
+    def verify_valid_score_given
+      return if ignore_score?
+
+      if params.key?(:scoreGiven)
+        return if params[:scoreGiven].to_f >= 0
+
+        render_error("ScoreGiven must be greater than or equal to 0", :unprocessable_entity)
       end
     end
 
