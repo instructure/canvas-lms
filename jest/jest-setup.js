@@ -87,7 +87,6 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /The prop `courseId` is marked as required in `(LatestAnnouncementLink|PublishButton)`/,
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,
-  /The prop `dateTime` is marked as required in `FriendlyDatetime`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
   /The prop `id` is marked as required in `(ColHeader|DashboardCard|FormField|Option)`/,

@@ -110,7 +110,9 @@ describe('SearchResults', () => {
     beforeEach(() => {
       document.body.appendChild(document.createElement('div'))
       const props = {...defaultProps()}
-      const collection = new FilesCollection([{id: '1'}])
+      const collection = new FilesCollection([
+        {id: '1', created_at: '2022-01-01T00:00:00', modified_at: '2022-01-01T00:00:00'},
+      ])
       wrapper = mount(<SearchResults {...props} />, {attachTo: document.body.firstChild})
       wrapper.instance().setState({collection})
       menuItems = Array.from(document.body.querySelectorAll('.al-options [role="menuitem"]'))
