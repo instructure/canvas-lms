@@ -192,6 +192,27 @@ describe Role do
     end
   end
 
+  describe "#display_sort_index" do
+    before :once do
+      account_model
+    end
+
+    it "sorts course roles by name within base role type" do
+      @account.roles.create name: "Auditor", base_role_type: "StudentEnrollment"
+      @account.roles.create name: "1337 Student", base_role_type: "StudentEnrollment"
+      roles = @account.available_course_roles.sort_by(&:display_sort_index)
+      expect(roles.map(&:label)).to eq ["Student", "1337 Student", "Auditor", "Teacher", "TA", "Designer", "Observer"]
+    end
+
+    it "sorts account roles with built-in first, then case-insensitive name" do
+      @account.roles.create! name: "button pusher", base_role_type: "AccountMembership"
+      @account.roles.create! name: "MCSE", base_role_type: "AccountMembership"
+      @account.roles.create! name: "Apple Evangelist", base_role_type: "AccountMembership"
+      roles = @account.available_account_roles.sort_by(&:display_sort_index)
+      expect(roles.map(&:label)).to eq ["Account Admin", "Apple Evangelist", "button pusher", "MCSE"]
+    end
+  end
+
   describe "custom role helpers" do
     before :once do
       account_model
