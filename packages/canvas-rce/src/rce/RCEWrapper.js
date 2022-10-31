@@ -58,6 +58,7 @@ import {
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
+import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -1317,9 +1318,11 @@ class RCEWrapper extends React.Component {
   /* *********** end autosave support *************** */
 
   onWordCountUpdate = e => {
+    const shouldIgnore = countShouldIgnore(this.editor, 'body', 'words')
+    const updatedCount = e.wordCount.words - shouldIgnore
     this.setState(state => {
-      if (e.wordCount.words !== state.wordCount) {
-        return {wordCount: e.wordCount.words}
+      if (updatedCount !== state.wordCount) {
+        return {wordCount: updatedCount}
       } else return null
     })
   }
@@ -1437,6 +1440,7 @@ class RCEWrapper extends React.Component {
           'instructure_documents',
           'instructure_equation',
           'instructure_external_tools',
+          'instructure_wordcount',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
@@ -1518,7 +1522,7 @@ class RCEWrapper extends React.Component {
             items:
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
-          tools: {title: formatMessage('Tools'), items: 'wordcount lti_tools_menuitem'},
+          tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'},
         },
         options.menu

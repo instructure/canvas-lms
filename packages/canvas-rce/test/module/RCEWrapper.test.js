@@ -1083,7 +1083,7 @@ describe('RCEWrapper', () => {
             title: 'Insert',
           },
           tools: {
-            items: 'wordcount',
+            items: 'instructure_wordcount',
             title: 'Tools',
           },
         }
@@ -1101,7 +1101,7 @@ describe('RCEWrapper', () => {
           },
         }
         const result = sleazyDeepCopy(standardMenu)
-        result.tools.items = 'wordcount | foo bar'
+        result.tools.items = 'instructure_wordcount | foo bar'
         assert.deepStrictEqual(mergeMenu(a, b), result)
       })
 
@@ -1133,7 +1133,7 @@ describe('RCEWrapper', () => {
           },
         }
         const result = sleazyDeepCopy(standardMenu)
-        result.tools.items = 'wordcount | foo bar'
+        result.tools.items = 'instructure_wordcount | foo bar'
         result.new_menu = {
           items: 'foo bar',
           title: 'New Menu',
