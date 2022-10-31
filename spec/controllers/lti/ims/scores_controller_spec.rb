@@ -1163,6 +1163,14 @@ module Lti::IMS
           it_behaves_like "an unprocessable entity"
         end
 
+        context "when negative scoreGiven is supplied" do
+          let(:params_overrides) do
+            super().merge(scoreGiven: -1, scoreMaximum: line_item.score_maximum)
+          end
+
+          it_behaves_like "an unprocessable entity"
+        end
+
         context "when model validation fails (score_maximum is not a number)" do
           let(:params_overrides) do
             super().merge(scoreGiven: 12.3456, scoreMaximum: 45.678)
