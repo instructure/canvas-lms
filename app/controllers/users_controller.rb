@@ -181,8 +181,7 @@ class UsersController < ApplicationController
     }
   end
   def check_darkly_flag
-    binding.pry
-    ld_user = launch_darkly_user(ENV['SETTINGS_TABLE_PREFIX'], @current_user.id, @current_user.name)
+    ld_user = launch_darkly_user(ENV['SETTINGS_TABLE_PREFIX'], @user_id, @user_name)
     @show_feature = Rails.configuration.launch_darkly_client.variation("qwerty-test-flag", ld_user, false)
   end
 
