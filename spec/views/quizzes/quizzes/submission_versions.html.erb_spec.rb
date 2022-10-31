@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/submission_versions" do
+describe "quizzes/quizzes/submission_versions" do
   it "renders" do
     course_with_teacher(active_all: true)
     course_quiz

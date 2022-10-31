@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "accounts/_sis_batch_counts.html.erb" do
+describe "accounts/_sis_batch_counts" do
   it "renders sis count data" do
     data = { counts: { xlists: 2, enrollments: 3, courses: 5, users: 6, terms: 6,
                        group_memberships: 7, group_categories: 2, groups: 8,

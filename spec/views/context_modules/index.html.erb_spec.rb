@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/context_modules/index" do
+describe "context_modules/index" do
   before do
     assign(:body_classes, [])
     assign(:menu_tools, Hash.new([]))

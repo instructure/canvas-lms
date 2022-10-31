@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "sections/show.html.erb" do
+describe "sections/show" do
   describe "sis_source_id edit box" do
     before do
       course_with_teacher(active_all: true)

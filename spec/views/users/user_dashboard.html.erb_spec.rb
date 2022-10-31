@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/users/user_dashboard" do
+describe "users/user_dashboard" do
   it "renders" do
     course_with_student
     view_context

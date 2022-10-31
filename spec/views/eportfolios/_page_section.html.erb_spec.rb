@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/eportfolios/_page_section" do
+describe "eportfolios/_page_section" do
   it "renders" do
     eportfolio_with_user
     view_portfolio

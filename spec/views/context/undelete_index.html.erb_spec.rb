@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "context/undelete_index.html.erb" do
+describe "context/undelete_index" do
   before do
     course_with_teacher(active_all: true)
     assign(:context, @course)

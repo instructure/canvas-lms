@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/users/show" do
+describe "users/show" do
   before do
     enroll = course_with_student
     account_admin_user
