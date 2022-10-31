@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/calendars/_event" do
+describe "calendars/_event" do
   it "renders" do
     course_with_student
     view_context(@course, @user)

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/files/_nested_content" do
+describe "files/_nested_content" do
   it "renders" do
     course_with_student
     view_context

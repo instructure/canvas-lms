@@ -19,7 +19,7 @@
 
 require_relative "../views_helper"
 
-describe "/courses/_recent_feedback" do
+describe "courses/_recent_feedback" do
   before do
     course_with_student(active_all: true)
     assign(:current_user, @user)

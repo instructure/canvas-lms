@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/terms/index" do
+describe "terms/index" do
   it "allows deletion of terms with only deleted courses" do
     assign(:context, assign(:root_account, Account.default))
     term = Account.default.enrollment_terms.create!

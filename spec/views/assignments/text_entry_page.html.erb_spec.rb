@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/assignments/text_entry_page" do
+describe "assignments/text_entry_page" do
   it "renders" do
     course_with_student
     view_context(@course, @user)

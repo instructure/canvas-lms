@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/assignments/edit" do
+describe "assignments/edit" do
   before do
     course_with_teacher(active_all: true)
     view_context(@course, @user)

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/collaborations/index" do
+describe "collaborations/index" do
   before do
     course_with_student
     view_context(@course, @user)

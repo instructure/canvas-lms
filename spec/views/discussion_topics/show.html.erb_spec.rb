@@ -20,7 +20,7 @@
 require_relative "../../spec_helper"
 require_relative "../views_helper"
 
-describe "/discussion_topics/show" do
+describe "discussion_topics/show" do
   it "renders" do
     course_with_teacher
     view_context(@course, @user)

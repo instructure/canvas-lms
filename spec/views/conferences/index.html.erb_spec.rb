@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/conferences/index" do
+describe "conferences/index" do
   before do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: "wimba")

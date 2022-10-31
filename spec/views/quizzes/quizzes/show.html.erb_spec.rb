@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/show" do
+describe "quizzes/quizzes/show" do
   it "renders" do
     course_with_student
     view_context
@@ -110,8 +110,8 @@ describe "/quizzes/quizzes/show" do
     view_context
     assign(:quiz, @course.quizzes.create!)
     render "quizzes/quizzes/show"
-    expect(view).to have_rendered "/quizzes/quizzes/_quiz_show_teacher"
-    expect(view).not_to have_rendered "/quizzes/quizzes/_quiz_show_student"
+    expect(view).to have_rendered "quizzes/quizzes/_quiz_show_teacher"
+    expect(view).not_to have_rendered "quizzes/quizzes/_quiz_show_student"
   end
 
   it "does not render direct share menu options for students" do
@@ -151,8 +151,8 @@ describe "/quizzes/quizzes/show" do
     assign(:quiz, quiz)
     view_context
     render "quizzes/quizzes/show"
-    expect(view).to have_rendered "/quizzes/quizzes/_quiz_show_student"
-    expect(view).not_to have_rendered "/quizzes/quizzes/_quiz_show_teacher"
+    expect(view).to have_rendered "quizzes/quizzes/_quiz_show_student"
+    expect(view).not_to have_rendered "quizzes/quizzes/_quiz_show_teacher"
   end
 
   it "renders draft version warning" do

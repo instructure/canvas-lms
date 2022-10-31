@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/groups/show" do
+describe "groups/show" do
   it "renders" do
     course_with_student
     @group = @course.groups.create!(name: "some group")
