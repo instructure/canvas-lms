@@ -41,10 +41,12 @@
 <% end %>
 <div>
   <% if show_user_create_course_button(@current_user) %>
+    <% if @show_feature %>
     <button type="button"
             id="start_new_course"
             class="element_toggler btn button-sidebar-wide"
             aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
+    <% end %>
     <%= render :partial => 'shared/new_course_form' %>
   <% end %>
 
