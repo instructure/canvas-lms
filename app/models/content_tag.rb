@@ -740,4 +740,31 @@ class ContentTag < ActiveRecord::Base
       course_pace.create_publish_progress if deleted? || cpmi.destroyed? || cpmi.saved_change_to_id? || saved_change_to_position?
     end
   end
+
+  def trigger_publish!
+    enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
+    if unpublished?
+      if content_type == "Attachment"
+        content.set_publish_state_for_usage_rights
+        content.save!
+        publish if content.published?
+      else
+        publish unless enable_publish_at && content.respond_to?(:publish_at) && content.publish_at
+      end
+    end
+
+    update_asset_workflow_state!
+  end
+
+  def trigger_unpublish!
+    if published?
+      if content_type == "Attachment"
+        content.locked = true
+        content.save!
+      end
+      unpublish
+    end
+
+    update_asset_workflow_state!
+  end
 end

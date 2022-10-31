@@ -4155,6 +4155,34 @@ class Course < ActiveRecord::Base
     !templated_accounts.exists?
   end
 
+  def batch_update_context_modules(progress = nil, event:, module_ids:, skip_content_tags: false)
+    completed_ids = []
+    modules = context_modules.not_deleted.where(id: module_ids)
+    progress&.calculate_completion!(0, modules.size)
+    modules.each do |context_module|
+      # Break out of the loop if the progress has been canceled
+      break if progress&.reload&.failed?
+
+      case event.to_s
+      when "publish"
+        context_module.publish unless context_module.active?
+        unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
+          context_module.publish_items!(progress: progress)
+        end
+      when "unpublish"
+        context_module.unpublish unless context_module.unpublished?
+        if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
+          context_module.unpublish_items!(progress: progress)
+        end
+      when "delete"
+        context_module.destroy
+      end
+      progress&.increment_completion!(1) if progress&.total
+      completed_ids << context_module.id
+    end
+    completed_ids
+  end
+
   private
 
   def effective_due_dates
