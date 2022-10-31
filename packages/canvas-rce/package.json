@@ -101,6 +101,7 @@
     "@instructure/ui-spinner": "7",
     "@instructure/ui-svg-images": "7",
     "@instructure/ui-tabs": "7",
+    "@instructure/ui-table": "7",
     "@instructure/ui-text": "7",
     "@instructure/ui-text-area": "7",
     "@instructure/ui-text-input": "7",

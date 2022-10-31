@@ -248,7 +248,10 @@ module.exports = {
       {
         test: /\.js$/,
         type: 'javascript/auto',
-        include: [path.resolve(canvasDir, 'node_modules/@instructure')],
+        include: [
+          path.resolve(canvasDir, 'node_modules/@instructure'),
+          ...globPlugins('/node_modules/@instructure'),
+        ],
       },
       {
         test: /\.(js|ts|tsx)$/,

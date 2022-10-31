@@ -45,6 +45,14 @@ describe('MentionDropdownOption tests', () => {
     expect(nameText).toHaveAttribute('data-ignore-a11y-check')
   })
 
+  it('should add a data-ignore-wordcount to the non img content nodes within the mention option', () => {
+    const {getByText} = setup()
+    const initialText = getByText(/dh/i)
+    const nameText = getByText(/davis hyer/i)
+    expect(initialText).toHaveAttribute('data-ignore-wordcount', 'chars-only')
+    expect(nameText).toHaveAttribute('data-ignore-wordcount')
+  })
+
   it('should call onSelect when selected', () => {
     const selectSpy = jest.fn()
     const {container} = setup({onSelect: selectSpy})
