@@ -12,7 +12,7 @@
 # these gems to prevent regression, and the indentation serves to alert us to the relationship between the gem and canvas-lms
 source 'https://rubygems.org/'
 
-RUBY_VERSION = "2.5"
+RUBY_VERSION = "2.6.10"
 
 require File.expand_path("../config/canvas_rails5", __FILE__)
 
