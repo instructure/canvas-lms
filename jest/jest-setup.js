@@ -92,7 +92,7 @@ const ignoredErrors = [
   /The prop `id` is marked as required in `(ColHeader|DashboardCard|FormField|Option)`/,
   /The prop `label` is marked as required in `(FormField|FormFieldLayout|Modal)`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
-  /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
+  /The prop `renderLabel` is marked as required in `(NumberInput|Select)`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
   /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
   /WARNING: heuristic fragment matching going on!/,
