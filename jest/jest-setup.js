@@ -76,7 +76,6 @@ const ignoredErrors = [
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
-  /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
   /Prop `children` should be supplied unless/,
