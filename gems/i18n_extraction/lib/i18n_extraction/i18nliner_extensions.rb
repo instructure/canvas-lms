@@ -168,7 +168,7 @@ module I18nExtraction::Extensions
 
   module RubyProcessor
     STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`
-      .split("\n") - ["OpenStruct", "Tableless"])
+      .split("\n") - ["OpenStruct"])
                        .map(&:underscore).freeze
 
     def scope_for(filename)
