@@ -80,7 +80,6 @@ const ignoredErrors = [
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
   /Prop `children` should be supplied unless/,
-  /props.setRCEOpen is not a function/,
   /React does not recognize the `%s` prop on a DOM element/,
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
