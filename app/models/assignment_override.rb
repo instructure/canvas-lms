@@ -253,10 +253,10 @@ class AssignmentOverride < ActiveRecord::Base
     case self.set_type
     when "ADHOC"
       assignment_override_students.preload(:user).map(&:user)
-    when SET_TYPE_NOOP
-      nil
-    else
+    when "CourseSection", "Group"
       super
+    else
+      nil
     end
   end
 
