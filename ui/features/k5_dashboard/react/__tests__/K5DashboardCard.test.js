@@ -164,7 +164,9 @@ describe('K-5 Dashboard Card', () => {
 
 describe('LatestAnnouncementLink', () => {
   it('renders loading skeleton while loading', () => {
-    const {getByText, queryByText} = render(<LatestAnnouncementLink loading={true} color="red" />)
+    const {getByText, queryByText} = render(
+      <LatestAnnouncementLink courseId="1" loading={true} color="red" />
+    )
     expect(getByText('Loading latest announcement link')).toBeInTheDocument()
     expect(queryByText('New announcement', {exact: false})).not.toBeInTheDocument()
   })
