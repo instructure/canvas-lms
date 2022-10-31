@@ -146,4 +146,40 @@ describe "Canvadoc" do
       expect(@doc).to have_annotations
     end
   end
+
+  describe "mime types" do
+    before do
+      Account.current_domain_root_account = Account.default
+    end
+
+    after do
+      Account.current_domain_root_account = nil
+    end
+
+    it "returns default mime types" do
+      expect(Canvadoc.mime_types).to eq(Canvadoc::DEFAULT_MIME_TYPES)
+    end
+
+    it "returns iWork files in mime_types when feature is enabled" do
+      acct = Account.default.root_account
+      acct.enable_feature! :docviewer_enable_iwork_files
+
+      full_set = Canvadoc::DEFAULT_MIME_TYPES.dup.concat(Canvadoc::IWORK_MIME_TYPES)
+
+      expect(Canvadoc.mime_types).to eq(full_set)
+    end
+
+    it "returns default submission mime types" do
+      expect(Canvadoc.submission_mime_types).to eq(Canvadoc::DEFAULT_SUBMISSION_MIME_TYPES)
+    end
+
+    it "returns iWork files in submission_mime_types when feature is enabled" do
+      acct = Account.default.root_account
+      acct.enable_feature! :docviewer_enable_iwork_files
+
+      full_set = Canvadoc::DEFAULT_SUBMISSION_MIME_TYPES.dup.concat(Canvadoc::IWORK_MIME_TYPES)
+
+      expect(Canvadoc.submission_mime_types).to eq(full_set)
+    end
+  end
 end
