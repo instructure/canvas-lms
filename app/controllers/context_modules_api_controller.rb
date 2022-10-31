@@ -254,6 +254,9 @@ class ContextModulesApiController < ApplicationController
   # @argument event [Required, String]
   #   The action to take on each module. Must be 'delete'.
   #
+  # @argument async [Boolean]
+  # . If true, the request will be processed asynchronously and a Progress will be returned.
+  #
   # @response_field completed A list of IDs for modules that were updated.
   #
   # @example_request
@@ -266,7 +269,8 @@ class ContextModulesApiController < ApplicationController
   #
   # @example_response
   #    {
-  #      "completed": [1, 2]
+  #      "completed": [1, 2],
+  #      "progress": null,
   #    }
   def batch_update
     if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_edit])
@@ -279,23 +283,23 @@ class ContextModulesApiController < ApplicationController
       modules = @context.context_modules.not_deleted.where(id: module_ids)
       return render(json: { message: "no modules found" }, status: :not_found) if modules.empty?
 
-      completed_ids = []
-      modules.each do |mod|
-        case event
-        when "publish"
-          unless mod.active?
-            mod.publish
-            mod.publish_items!
-          end
-        when "unpublish"
-          mod.unpublish unless mod.unpublished?
-        when "delete"
-          mod.destroy
-        end
-        completed_ids << mod.id
+      batch_update_params = {
+        event: event,
+        module_ids: modules.pluck(:id),
+        skip_content_tags: value_to_boolean(params[:skip_content_tags])
+      }
+      if value_to_boolean(params[:async]) && Account.site_admin.feature_enabled?(:module_publish_menu)
+        progress = Progress.create!(context: @context, tag: "context_module_batch_update", user: @current_user)
+        progress.process_job(
+          @context,
+          :batch_update_context_modules,
+          { run_at: Time.now },
+          batch_update_params
+        )
+      else
+        completed_ids = @context.batch_update_context_modules(batch_update_params)
       end
-
-      render json: { completed: completed_ids }
+      render json: { completed: completed_ids, progress: progress }
     end
   end
 
@@ -414,10 +418,15 @@ class ContextModulesApiController < ApplicationController
       if params[:module].key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
-          @module.publish_items!
-          publish_warning = @module.content_tags.any?(&:unpublished?)
+          unless Account.site_admin.feature_enabled?(:module_publish_menu) && value_to_boolean(params[:module][:skip_content_tags])
+            @module.publish_items!
+            publish_warning = @module.content_tags.any?(&:unpublished?)
+          end
         else
           @module.unpublish
+          if Account.site_admin.feature_enabled?(:module_publish_menu) && !value_to_boolean(params[:module][:skip_content_tags])
+            @module.unpublish_items!
+          end
         end
       end
       relock_warning = @module.relock_warning?

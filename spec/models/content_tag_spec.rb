@@ -958,4 +958,44 @@ describe ContentTag do
       expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(false)
     end
   end
+
+  describe "#trigger_publish!" do
+    it "publishes the tag if it is unpublished" do
+      course_factory
+      tag = ContentTag.create!(context: @course, workflow_state: "unpublished")
+      expect(tag.published?).to eq(false)
+      tag.trigger_publish!
+      expect(tag.reload.published?).to eq(true)
+    end
+
+    it "publishes the tag and the attachment content if possible" do
+      course_factory
+      tag = ContentTag.create!(context: @course, content: attachment_model(locked: true), workflow_state: "unpublished")
+      expect(tag.published?).to eq(false)
+      expect(@attachment.published?).to eq(false)
+      tag.trigger_publish!
+      expect(tag.reload.published?).to eq(true)
+      expect(@attachment.reload.published?).to eq(true)
+    end
+  end
+
+  describe "#trigger_unpublish!" do
+    it "unpublishes the tag if it is published" do
+      course_factory
+      tag = ContentTag.create!(context: @course, workflow_state: "published")
+      expect(tag.published?).to eq(true)
+      tag.trigger_unpublish!
+      expect(tag.reload.published?).to eq(false)
+    end
+
+    it "unpublishes the tag and locks the attachment content" do
+      course_factory
+      tag = ContentTag.create!(context: @course, content: attachment_model, workflow_state: "published")
+      expect(tag.published?).to eq(true)
+      expect(@attachment.published?).to eq(true)
+      tag.trigger_unpublish!
+      expect(tag.reload.published?).to eq(false)
+      expect(@attachment.reload.published?).to eq(false)
+    end
+  end
 end
