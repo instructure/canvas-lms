@@ -73,7 +73,7 @@ const ignoredErrors = [
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
-  /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
+  /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `HomePagePromptContainer`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
