@@ -61,7 +61,6 @@ const ignoredErrors = [
   /ColorPicker: isMounted is deprecated/,
   /contextType was defined as an instance property on %s/,
   /Each child in a list should have a unique "key" prop/,
-  /Encountered two children with the same key/,
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
   /Expected one of ListItem in List but found 'ProfileTab/,

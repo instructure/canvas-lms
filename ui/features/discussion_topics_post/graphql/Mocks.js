@@ -37,7 +37,7 @@ import {AnonymousUser} from './AnonymousUser'
 /* Query Mocks */
 export const getDiscussionQueryMock = ({
   courseID = '1',
-  discussionID = '1',
+  discussionID = 'Discussion-default-mock',
   filter = 'all',
   page = 'MA==',
   perPage = 20,
@@ -73,8 +73,8 @@ export const getDiscussionQueryMock = ({
               discussionEntriesConnection: {
                 nodes: [
                   DiscussionEntry.mock({
-                    _id: '101',
-                    id: 'RGlzY3Vzc2lvbkVudHJ5LTEwMQo=',
+                    _id: 'DiscussionEntry-unread-mock',
+                    id: 'DiscussionEntry-unread-mock',
                     message: '<p>This is an Unread Reply</p>',
                   }),
                 ],
@@ -88,8 +88,8 @@ export const getDiscussionQueryMock = ({
               discussionEntriesConnection: {
                 nodes: [
                   DiscussionEntry.mock({
-                    _id: '102',
-                    id: 'RGlzY3Vzc2lvbkVudHJ5LTEwMgo=',
+                    _id: 'DiscussionEntry-asc-mock',
+                    id: 'DiscussionEntry-asc-mock',
                     message: '<p>This is a Reply asc</p>',
                   }),
                 ],
@@ -112,6 +112,16 @@ export const getDiscussionQueryMock = ({
               courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
               id: 'role-user',
             }),
+            discussionEntriesConnection: {
+              nodes: [
+                DiscussionEntry.mock({
+                  _id: 'DiscussionEntry-default-mock',
+                  id: 'DiscussionEntry-default-mock',
+                }),
+              ],
+              pageInfo: PageInfo.mock(),
+              __typename: 'DiscussionSubentriesConnection',
+            },
           })
         })(),
       },
@@ -122,7 +132,7 @@ export const getDiscussionQueryMock = ({
 
 export const getAnonymousDiscussionQueryMock = ({
   courseID = '1',
-  discussionID = '1',
+  discussionID = 'Discussion-default-mock',
   filter = 'all',
   page = 'MA==',
   perPage = 20,
@@ -162,6 +172,7 @@ export const getAnonymousDiscussionQueryMock = ({
             discussionEntriesConnection: {
               nodes: [
                 DiscussionEntry.mock({
+                  id: 'DiscussionEntry-anonymous-mock',
                   author: null,
                   anonymousAuthor: AnonymousUser.mock({shortName: 'current_user'}),
                 }),
@@ -182,7 +193,7 @@ export const getDiscussionSubentriesQueryMock = ({
   before = null,
   beforeRelativeEntry = null,
   courseID = '1',
-  discussionEntryID = '1',
+  discussionEntryID = 'DiscussionEntry-default-mock',
   first = null,
   includeRelativeEntry = null,
   last = null,
@@ -213,7 +224,7 @@ export const getDiscussionSubentriesQueryMock = ({
         legacyNode: (() => {
           if (includeRelativeEntry) {
             return DiscussionEntry.mock({
-              id: btoa(`DiscussionEntry-${discussionEntryID}`),
+              id: discussionEntryID,
               _id: discussionEntryID,
               discussionSubentriesConnection: {
                 nodes: [
@@ -230,13 +241,13 @@ export const getDiscussionSubentriesQueryMock = ({
           }
           if (first !== null && first === 0) {
             return DiscussionEntry.mock({
-              id: btoa(`DiscussionEntry-${discussionEntryID}`),
+              id: discussionEntryID,
               _id: discussionEntryID,
             })
           }
           if (sort === 'asc') {
             return DiscussionEntry.mock({
-              id: btoa(`DiscussionEntry-${discussionEntryID}`),
+              id: discussionEntryID,
               _id: discussionEntryID,
               discussionSubentriesConnection: {
                 nodes: [
@@ -253,7 +264,7 @@ export const getDiscussionSubentriesQueryMock = ({
             })
           }
           return DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-${discussionEntryID}`),
+            id: discussionEntryID,
             _id: discussionEntryID,
             discussionSubentriesConnection: {
               nodes: [
@@ -275,7 +286,7 @@ export const getDiscussionSubentriesQueryMock = ({
 ]
 
 /* Mutation Mocks */
-export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
+export const deleteDiscussionEntryMock = ({id = 'DiscussionEntry-default-mock'} = {}) => [
   {
     request: {
       query: DELETE_DISCUSSION_ENTRY,
@@ -285,7 +296,7 @@ export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
       data: {
         deleteDiscussionEntry: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-${id}`),
+            id,
             _id: id,
             deleted: true,
           }),
@@ -298,7 +309,7 @@ export const deleteDiscussionEntryMock = ({id = '1'} = {}) => [
 ]
 
 export const updateDiscussionEntryParticipantMock = ({
-  discussionEntryId = '1',
+  discussionEntryId = 'DiscussionEntry-default-mock',
   read = null,
   rating = null,
   forcedReadState = null,
@@ -320,7 +331,7 @@ export const updateDiscussionEntryParticipantMock = ({
       data: {
         updateDiscussionEntryParticipant: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-${discussionEntryId}`),
+            id: discussionEntryId,
             _id: discussionEntryId,
             ratingSum: rating !== null && rating === 'liked' ? 1 : 0,
             entryParticipant: {
@@ -340,7 +351,7 @@ export const updateDiscussionEntryParticipantMock = ({
 ]
 
 export const updateDiscussionEntryMock = ({
-  discussionEntryId = '1',
+  discussionEntryId = 'DiscussionEntry-default-mock',
   message = '<p>This is the parent reply</p>',
   removeAttachment = !'7',
 } = {}) => [
@@ -357,7 +368,7 @@ export const updateDiscussionEntryMock = ({
       data: {
         updateDiscussionEntry: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-${discussionEntryId}`),
+            id: discussionEntryId,
             _id: discussionEntryId,
             message,
             attachment: removeAttachment ? null : Attachment.mock(),
@@ -371,7 +382,7 @@ export const updateDiscussionEntryMock = ({
 ]
 
 export const subscribeToDiscussionTopicMock = ({
-  discussionTopicId = '1',
+  discussionTopicId = 'Discussion-default-mock',
   subscribed = true,
 } = {}) => [
   {
@@ -386,7 +397,7 @@ export const subscribeToDiscussionTopicMock = ({
       data: {
         subscribeToDiscussionTopic: {
           discussionTopic: Discussion.mock({
-            id: btoa(`Discussion-${discussionTopicId}`),
+            id: discussionTopicId,
             _id: discussionTopicId,
             subscribed,
             groupSet: null,
@@ -399,7 +410,7 @@ export const subscribeToDiscussionTopicMock = ({
 ]
 
 export const createDiscussionEntryMock = ({
-  discussionTopicId = '1',
+  discussionTopicId = 'Discussion-default-mock',
   message = '',
   replyFromEntryId = null,
   includeReplyPreview = null,
@@ -422,8 +433,8 @@ export const createDiscussionEntryMock = ({
       data: {
         createDiscussionEntry: {
           discussionEntry: DiscussionEntry.mock({
-            id: btoa(`DiscussionEntry-1`),
-            _id: '1',
+            id: 'DiscussionEntry-created-mock',
+            _id: 'DiscussionEntry-created-mock',
             message,
           }),
           errors: null,
@@ -434,7 +445,7 @@ export const createDiscussionEntryMock = ({
   },
 ]
 
-export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
+export const deleteDiscussionTopicMock = ({id = 'Discussion-default-mock'} = {}) => [
   {
     request: {
       query: DELETE_DISCUSSION_TOPIC,
@@ -452,7 +463,10 @@ export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
   },
 ]
 
-export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = true} = {}) => [
+export const updateDiscussionReadStateMock = ({
+  discussionTopicId = 'Discussion-default-mock',
+  read = true,
+} = {}) => [
   {
     request: {
       query: UPDATE_DISCUSSION_READ_STATE,
@@ -476,7 +490,7 @@ export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = t
 ]
 
 export const updateDiscussionTopicMock = ({
-  discussionTopicId = '1',
+  discussionTopicId = 'Discussion-default-mock',
   published = null,
   locked = null,
 } = {}) => [

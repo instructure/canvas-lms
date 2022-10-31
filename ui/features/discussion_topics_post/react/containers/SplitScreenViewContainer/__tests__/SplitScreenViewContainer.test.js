@@ -45,7 +45,7 @@ describe('SplitScreenViewContainer', () => {
     window.ENV = {
       per_page,
       isolated_view_initial_page_size,
-      discussion_topic_id: '1',
+      discussion_topic_id: 'Discussion-default-mock',
       manual_mark_as_read: false,
       current_user: {
         id: 'PLACEHOLDER',
@@ -82,7 +82,7 @@ describe('SplitScreenViewContainer', () => {
 
   const defaultProps = overrides => ({
     discussionTopic: Discussion.mock(),
-    discussionEntryId: '1',
+    discussionEntryId: 'DiscussionEntry-default-mock',
     open: true,
     onClose,
     onOpenSplitScreenView,
@@ -130,7 +130,11 @@ describe('SplitScreenViewContainer', () => {
     expect(goToParentButton).toBeInTheDocument()
     fireEvent.click(goToParentButton)
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith('1', '1', false)
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith(
+      'DiscussionEntry-default-mock',
+      'DiscussionEntry-default-mock',
+      false
+    )
   })
 
   it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {

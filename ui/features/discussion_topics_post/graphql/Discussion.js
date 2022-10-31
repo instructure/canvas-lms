@@ -136,8 +136,8 @@ export const Discussion = {
   }),
 
   mock: ({
-    id = 'RGlzY3Vzc2lvbi0x',
-    _id = '1',
+    id = 'Discussion-default-mock',
+    _id = 'Discussion-default-mock',
     title = 'X-Men Powers Discussion',
     message = 'This is a Discussion Topic Message',
     createdAt = '2020-11-23T11:40:44-07:00',
