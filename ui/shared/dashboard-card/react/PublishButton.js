@@ -84,7 +84,11 @@ export default class PublishButton extends React.Component {
 
     return (
       <div className="ic-DashboardCard__header-publish">
-        <Button onClick={this.handleClick} ref={b => (this.publishButton = b)} color="secondary">
+        <Button
+          onClick={this.handleClick}
+          elementRef={b => (this.publishButton = b)}
+          color="secondary"
+        >
           {I18n.t('Publish')}
           <ScreenReaderContent>{courseNickname}</ScreenReaderContent>
         </Button>
