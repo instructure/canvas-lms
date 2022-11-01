@@ -60,16 +60,21 @@
   <div class="web_conference_member_user_settings"></div>
     <div id="filter_div">
     <h4 style="font-weight: bold;">Filter by Role:</h4>
-    <ul style="list-style-type: none;" id="role_select_filter" multiple="multiple">
-      {{# each roles}}
-        <li>
-          <label class="checkbox">
-            <input id="role_id_{{id}}" name="role[{{id}}]" type="checkbox" value="{{id}}" class="role_checkbox">
-            {{name}}            
-          </label>
-        </li>
-      {{/each}}
+    <ul style="list-style-type: none; margin-left: 10px;" id="role_select_filter" multiple="multiple">
+        <div style="display: flex; flex-direction: row">
+            {{# each roles}}
+                <li style="margin-right: 1rem;">
+                    <label class="checkbox">
+                        <input id="role_id_{{id}}" name="role[{{id}}]" type="checkbox" value="{{id}}" class="role_checkbox">
+                        {{name}}
+                    </label>
+                </li>
+            {{/each}}
+        </div>
     </ul>
+    <div>
+        <input style="height: 1rem; width: 30rem;" id="user-search" type="text" placeholder="Search"/>
+    </div>
     <hr>
     <label class="checkbox" for="user_all" style="margin-left: 10px; padding-bottom: 10px;">
       {{checkbox "user.all" class="all_users_checkbox"}}
@@ -89,7 +94,7 @@
       {{/each}}
       <li id="no_users_error_message" style="display: none;">
         <label>
-          No users match the selected roles.
+          No matching users.
         </label>
       </li>
     </ul>
