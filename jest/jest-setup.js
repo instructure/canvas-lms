@@ -63,7 +63,6 @@ const ignoredErrors = [
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
   /Expected one of ListItem in List but found 'ProfileTab/,
-  /Expected one of PaginationButton in Pagination but found .*/,
   /Failed loading the language file for/,
   /Function components cannot be given refs/,
   /Functions are not valid as a React child/,
