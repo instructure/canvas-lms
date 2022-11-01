@@ -63,7 +63,7 @@ group :test do
   gem "parallel_tests"
   gem "rspecq", github: "kyler-instructure/rspecq", ref: "8cea6a3225cf0856a26c6c6b93a5ea5605082aa0"
   gem "flakey_spec_catcher", "~> 0.11.2", require: false
-  gem "factory_bot", "6.1.0", require: false
+  gem "factory_bot", "6.2.1", require: false
   gem "rspec_junit_formatter", require: false
   # axe-core* versions at or above 4.2 have difficulties with iframes. Keep these at 4.1.0 until fixes are investigated
   gem "axe-core-selenium", "~> 4.1.0", require: false
