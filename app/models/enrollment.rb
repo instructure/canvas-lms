@@ -156,6 +156,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def touch_assignments
+    return if self.fake_student?
     Assignment.
       where(context_id: course_id, context_type: 'Course').
       where("EXISTS (?) AND NOT EXISTS (?)",

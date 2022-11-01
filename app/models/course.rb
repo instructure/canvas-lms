@@ -2838,7 +2838,8 @@ class Course < ActiveRecord::Base
         # hash the unique_id so that it's hard to accidently enroll the user in
         # a course by entering something in a user list. :(
         fake_student.pseudonyms.create!(:account => self.root_account,
-                                        :unique_id => Canvas::Security.hmac_sha1("Test Student_#{fake_student.id}"))
+                                        :unique_id => Canvas::Security.hmac_sha1("Test Student_#{fake_student.id}"),
+                                        :integration_id => SecureRandom.uuid)
       end
       fake_student
     else
