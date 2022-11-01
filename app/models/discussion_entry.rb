@@ -54,6 +54,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_create :set_root_account_id
   after_save :update_discussion
   after_save :context_module_action_later
+  after_save :create_discussion_entry_versions
   after_create :create_participants
   after_create :log_discussion_entry_metrics
   after_create :clear_planner_cache_for_participants
@@ -234,6 +235,23 @@ class DiscussionEntry < ActiveRecord::Base
         break if dt.blank?
       end
       self.class.connection.after_transaction_commit { discussion_topic.update_materialized_view }
+    end
+  end
+
+  def create_discussion_entry_versions
+    if saved_changes.key?("message")
+      user = current_user || self.user
+
+      message_old, message_new = saved_changes["message"]
+      updated_at_old = saved_changes.key?("updated_at") ? saved_changes["updated_at"][0] : 1.minute.ago
+      updated_at_new = saved_changes.key?("updated_at") ? saved_changes["updated_at"][1] : Time.now
+
+      if discussion_entry_versions.count == 0 && !message_old.nil?
+        discussion_entry_versions.create!(root_account: root_account, user: user, version: 1, message: message_old, created_at: updated_at_old, updated_at: updated_at_old)
+      end
+
+      new_version = (discussion_entry_versions.maximum(:version) || 0) + 1
+      discussion_entry_versions.create!(root_account: root_account, user: user, version: new_version, message: message_new, created_at: updated_at_new, updated_at: updated_at_new)
     end
   end
 
