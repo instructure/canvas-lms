@@ -2264,7 +2264,7 @@ class ApplicationController < ActionController::Base
   end
 
   def launch_darkly_user
-    domain = ENV['SETTINGS_TABLE_PREFIX'] || 'localhost'
+    domain = ENV['SETTINGS_TABLE_PREFIX']
     {
       key: "#{domain.split('.')[0]}-#{user_id}",
       name: @current_user.name,
