@@ -79,6 +79,9 @@ export function constructJSXImageElement(image, canvasOrigin, opts = {}) {
     otherAttributes.role = 'presentation'
   }
 
+  delete otherAttributes.contextType // react doesn't like these
+  delete otherAttributes.contextId
+
   const ret = (
     <img
       alt={altText}

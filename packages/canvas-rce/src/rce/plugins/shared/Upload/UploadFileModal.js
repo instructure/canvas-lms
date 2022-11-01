@@ -58,6 +58,7 @@ function shouldBeDisabled(
 const UploadFileModal = React.forwardRef(
   (
     {
+      preselectedFile,
       editor,
       contentProps,
       trayProps,
@@ -73,7 +74,7 @@ const UploadFileModal = React.forwardRef(
     },
     ref
   ) => {
-    const [theFile, setFile] = useState(null)
+    const [theFile, setFile] = useState(preselectedFile)
     const [error, setError] = useState(null)
     const [fileUrl, setFileUrl] = useState('')
     const [selectedPanel, setSelectedPanel] = useState(panels[0])
@@ -320,6 +321,7 @@ UploadFileModal.propTypes = {
   modalBodyWidth: number,
   modalBodyHeight: number,
   requireA11yAttributes: bool,
+  preselectedFile: object, // JS File
 }
 
 export default UploadFileModal

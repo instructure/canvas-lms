@@ -1296,6 +1296,17 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(lti_favorite_modal).to be_displayed
       end
 
+      describe "Edit menubar menu", ignore_js_errors: true do
+        it "shows tinymce flash alert on selecting 'Paste'" do
+          rce_wysiwyg_state_setup(@course)
+          menubar_open_menu("Edit")
+          menubar_menu_item("Paste").click
+          alert = f('.tox-notification--error[role="alert"]')
+          expect(alert).to be_displayed
+          expect(alert.text).to include "Your browser doesn't support direct access to the clipboard."
+        end
+      end
+
       describe "Tools menubar menu", ignore_js_errors: true do
         it "includes Apps menu item in" do
           rce_wysiwyg_state_setup(@course)
