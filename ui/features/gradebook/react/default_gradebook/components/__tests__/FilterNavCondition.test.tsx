@@ -258,7 +258,7 @@ describe('FilterNavFilter', () => {
             ],
           },
           '2': {
-            id: '1',
+            id: '2',
             name: 'Student Group Category 2',
             groups: [
               {id: '3', name: 'Student Group 3'},
