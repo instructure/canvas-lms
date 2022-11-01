@@ -2262,4 +2262,16 @@ class ApplicationController < ActionController::Base
   def teardown_live_events_context
     LiveEvents.clear_context!
   end
+
+  def launch_darkly_user
+    domain = ENV['SETTINGS_TABLE_PREFIX']
+    {
+      key: "#{domain.split('.')[0]}-#{user_id}",
+      name: @current_user.name,
+      custom: {
+        canvas_id: @current_user.id,
+        canvas_domain: domain,
+      }
+    }
+  end
 end
