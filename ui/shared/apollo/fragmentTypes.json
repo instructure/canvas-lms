@@ -102,6 +102,9 @@
             "name": "DiscussionEntryDraft"
           },
           {
+            "name": "DiscussionEntryVersion"
+          },
+          {
             "name": "Enrollment"
           },
           {
@@ -463,6 +466,9 @@
           },
           {
             "name": "DiscussionEntryDraft"
+          },
+          {
+            "name": "DiscussionEntryVersion"
           },
           {
             "name": "Enrollment"

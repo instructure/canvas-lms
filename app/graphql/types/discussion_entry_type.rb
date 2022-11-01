@@ -220,5 +220,14 @@ module Types
     def root_entry
       load_association(:root_entry)
     end
+
+    field :discussion_entry_versions_connection, Types::DiscussionEntryVersionType.connection_type, null: true
+    def discussion_entry_versions_connection
+      if object.deleted?
+        nil
+      else
+        load_association(:discussion_entry_versions)
+      end
+    end
   end
 end
