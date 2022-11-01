@@ -77,7 +77,7 @@ describe('CanvasMultiSelect', () => {
   })
 
   it('accepts a prop to customize content in the input', () => {
-    props.customRenderBeforeInput = () => [<div>Customized Content</div>]
+    props.customRenderBeforeInput = () => [<div key="foo">Customized Content</div>]
     const {getByText} = renderComponent()
     expect(getByText('Customized Content')).toBeInTheDocument()
   })

@@ -310,7 +310,7 @@ export const AddressBook = ({
   // Render header menu item
   const renderHeaderItem = text => {
     return (
-      <View as="div" padding="xx-small">
+      <View as="div" padding="xx-small" key="address-book-item-header">
         <Flex
           width="100%"
           margin="xxx-small none xxx-small xxx-small"

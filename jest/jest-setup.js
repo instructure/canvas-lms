@@ -60,7 +60,6 @@ const ignoredErrors = [
   /Cannot update during an existing state transition/,
   /ColorPicker: isMounted is deprecated/,
   /contextType was defined as an instance property on %s/,
-  /Each child in a list should have a unique "key" prop/,
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
   /Expected one of ListItem in List but found 'ProfileTab/,
