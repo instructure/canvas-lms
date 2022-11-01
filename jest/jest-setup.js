@@ -85,7 +85,7 @@ const ignoredErrors = [
   /The prop `courseId` is marked as required in `PublishButton`/,
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
-  /The prop `groupTitle` is marked as required in `(GroupRemoveModal|SearchBreadcrumb)`/,
+  /The prop `groupTitle` is marked as required in `SearchBreadcrumb`/,
   /The prop `id` is marked as required in `(ColHeader|DashboardCard|FormField|Option)`/,
   /The prop `label` is marked as required in `(FormField|FormFieldLayout|Modal)`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
