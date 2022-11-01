@@ -168,23 +168,6 @@ class UsersController < ApplicationController
   skip_before_action :load_user, :only => [:create_self_registered_user]
   before_action :require_self_registration, :only => [:new, :create, :create_self_registered_user]
 
-  before_action :check_darkly_flag
-
-  def launch_darkly_user(domain, user_id, user_name)
-    {
-      key: "#{domain.split('.')[0]}-#{user_id}",
-      name: user_name,
-      custom: {
-        canvas_id: user_id,
-        canvas_domain: domain,
-      }
-    }
-  end
-  def check_darkly_flag
-    ld_user = launch_darkly_user(ENV['SETTINGS_TABLE_PREFIX'], @user_id, @user_name)
-    @show_feature = Rails.configuration.launch_darkly_client.variation("qwerty-test-flag", ld_user, false)
-  end
-
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
