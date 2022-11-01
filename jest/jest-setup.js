@@ -82,7 +82,6 @@ const ignoredErrors = [
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
-  /The prop `courseId` is marked as required in `PublishButton`/,
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `SearchBreadcrumb`/,
