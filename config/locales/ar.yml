@@ -7924,7 +7924,7 @@ ar:
     one: "يوم واحد"
     other: "%{count} أيام"
     two: "%{count} أيام"
-    zero: "%{count} أيام"
+    zero: "0 أيام"
   count_discussions_found_fc326362: "%{count} تم العثور على نقاشات."
   count_errors_5cde7fdc: 
     few: "%{count} أخطاء:"
