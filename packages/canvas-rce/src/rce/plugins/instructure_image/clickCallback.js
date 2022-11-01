@@ -16,37 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import bridge from '../../../bridge'
-import formatMessage from '../../../format-message'
+import doFileUpload from '../shared/Upload/doFileUpload'
 
-export default function (ed, document, trayProps) {
-  return import('../shared/Upload/UploadFile').then(({UploadFile}) => {
-    let container = document.querySelector('.canvas-rce-upload-container')
-    if (!container) {
-      container = document.createElement('div')
-      container.className = 'canvas-rce-upload-container'
-      document.body.appendChild(container)
-    }
+export default function (ed, document) {
+  const unsplashEnabled = ed.getParam('unsplash_enabled')
+  const panels = unsplashEnabled ? ['COMPUTER', 'UNSPLASH', 'URL'] : ['COMPUTER', 'URL']
 
-    const handleDismiss = () => {
-      ReactDOM.unmountComponentAtNode(container)
-      ed.focus(false)
-    }
-    const unsplashEnabled = ed.getParam('unsplash_enabled')
-    const panels = unsplashEnabled ? ['COMPUTER', 'UNSPLASH', 'URL'] : ['COMPUTER', 'URL']
-    ReactDOM.render(
-      <UploadFile
-        accept="image/*"
-        editor={ed}
-        label={formatMessage('Upload Image')}
-        panels={panels}
-        onDismiss={handleDismiss}
-        trayProps={trayProps}
-        canvasOrigin={bridge.canvasOrigin}
-      />,
-      container
-    )
+  return doFileUpload(ed, document, {
+    accept: 'image/*',
+    panels,
   })
 }
