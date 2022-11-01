@@ -967,4 +967,36 @@ describe DiscussionEntry do
       end
     end
   end
+
+  describe "discussion_entry_versions" do
+    let(:user) { user_model(name: "John Doe") }
+
+    it "creates version 1 on new entry" do
+      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+
+      expect(entry.discussion_entry_versions.count).to eq(1)
+      expect(entry.discussion_entry_versions.take.message).to eq(entry.message)
+    end
+
+    it "creates various versions on entry updates" do
+      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+
+      expect(entry.discussion_entry_versions.count).to eq(1)
+      expect(entry.discussion_entry_versions.take.message).to eq(entry.message)
+
+      entry.message = "Test 2"
+      entry.save!
+
+      expect(entry.discussion_entry_versions.count).to eq(2)
+      expect(entry.discussion_entry_versions.first.message).to eq(entry.message)
+
+      entry.message = "Test 3"
+      entry.save!
+
+      expect(entry.discussion_entry_versions.count).to eq(3)
+      expect(entry.discussion_entry_versions.first.message).to eq(entry.message)
+
+      expect(entry.discussion_entry_versions.pluck(:message)).to eq(["Test 3", "Test 2", "Test 1"])
+    end
+  end
 end
