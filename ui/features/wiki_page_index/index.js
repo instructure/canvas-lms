@@ -44,6 +44,7 @@ const view = new WikiPageIndexView({
   default_editing_roles: ENV.DEFAULT_EDITING_ROLES,
   wikiIndexPlacements: ENV.wiki_index_menu_tools,
   WIKI_RIGHTS: ENV.WIKI_RIGHTS,
+  autoFetch: true,
 })
 
 view.collection.setParams({sort: 'title', per_page: 30})
