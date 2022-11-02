@@ -89,7 +89,7 @@ const ignoredErrors = [
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /\[View|Button|Text\] .* in version 8.0.0/i,
+  /\[View|Text\] .* in version 8.0.0/i,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
