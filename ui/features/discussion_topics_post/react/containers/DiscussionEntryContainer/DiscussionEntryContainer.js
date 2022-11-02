@@ -155,6 +155,9 @@ export const DiscussionEntryContainer = props => {
                     lastReplyAtDisplay={props.lastReplyAtDisplay}
                     showCreatedAsTooltip={!props.isTopic}
                     isTopicAuthor={props.isTopicAuthor}
+                    discussionEntryVersions={
+                      props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
+                    }
                   />
                 </Flex.Item>
               )}
