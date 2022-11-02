@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
-import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
+import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 
 const revisionOptions = ['parentModel']
 
