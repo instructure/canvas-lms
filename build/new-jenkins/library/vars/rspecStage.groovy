@@ -137,16 +137,18 @@ def tearDownNode() {
   archiveArtifacts allowEmptyArchive: true, artifacts: "$destDir/**/*"
 
   findFiles(glob: "$destDir/spec_failures/**/index.html").each { file ->
-    // tmp/node_18/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+    // tmp/node_18/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/TestFailure::ErrorClass/index
     // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+    def splitPath = file.getPath().split('/')
+    def pathCategory = splitPath[3]
+    def specTitle = splitPath.toList().subList(4, splitPath.size() - 2).join('/')
+    def errorClass = splitPath[splitPath.size() - 2]
 
-    def pathCategory = file.getPath().split('/')[3]
     def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
-    def splitPath = file.getPath().split('/').toList()
-    def specTitle = splitPath.subList(4, splitPath.size() - 1).join('/')
     def artifactsPath = "${currentBuild.getAbsoluteUrl()}artifact/${file.getPath()}"
 
     buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
+    buildSummaryReport.setFailureDetails(specTitle, errorClass)
 
     if (pathCategory == finalCategory) {
       buildSummaryReport.setFailureCategory(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_NEVER_PASSED)
