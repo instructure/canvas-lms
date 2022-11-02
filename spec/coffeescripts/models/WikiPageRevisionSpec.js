@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 import '@canvas/jquery/jquery.ajaxJSON'
 
