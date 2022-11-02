@@ -28,7 +28,7 @@ describe Notifier do
       dispatch = :test_dispatch
       message = double("message")
 
-      expect(DelayedNotification).to receive(:delay_if_production).and_return(DelayedNotification)
+      expect(DelayedNotification).to receive(:delay_if_production).and_call_original
       expect(DelayedNotification).to receive(:process).with(
         kind_of(ActiveRecord::Base),
         kind_of(Notification),

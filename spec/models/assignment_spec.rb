@@ -3520,13 +3520,13 @@ describe Assignment do
 
         context "when trying to grade and excuse simultaneously" do
           it "raises an error" do
-            expect(lambda do
+            expect do
               @assignment.grade_student(
                 @student1,
                 grade: 0,
                 excuse: true
               )
-            end).to raise_error("Cannot simultaneously grade and excuse an assignment")
+            end.to raise_error("Cannot simultaneously grade and excuse an assignment")
           end
         end
       end

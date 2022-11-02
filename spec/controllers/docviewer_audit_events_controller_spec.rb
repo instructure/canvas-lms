@@ -265,13 +265,13 @@ describe DocviewerAuditEventsController do
 
     it "can annotate even if there are no slots available" do
       @assignment.update!(grader_count: 1)
-      expect(subject).to change {
+      expect(&subject).to change {
         AnonymousOrModerationEvent.where(assignment: @assignment, submission: @submission).count
       }.by(1)
     end
 
     it "does not occupy a slot when annotating" do
-      expect(subject).not_to change { @assignment.provisional_moderation_graders.count }
+      expect(&subject).not_to change { @assignment.provisional_moderation_graders.count }
     end
   end
 

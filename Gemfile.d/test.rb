@@ -29,13 +29,13 @@ group :test do
   gem "puma", "5.2.2", require: false
 
   gem "db-query-matchers", "0.11.0"
-  gem "rspec", "3.10.0"
+  gem "rspec", "3.12.0"
   gem "rspec_around_all", "0.2.0"
-  gem "rspec-rails", "4.0.1"
+  gem "rspec-rails", "6.0.1"
   gem "rspec-collection_matchers", "1.2.0"
-  gem "rspec-support", "3.10.2"
-  gem "rspec-expectations", "3.10.1"
-  gem "rspec-mocks", "3.10.2"
+  gem "rspec-support", "3.12.0"
+  gem "rspec-expectations", "3.12.0"
+  gem "rspec-mocks", "3.12.0"
   gem "shoulda-matchers", "4.3.0"
 
   gem "once-ler", "2.0.1"

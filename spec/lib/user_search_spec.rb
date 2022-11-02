@@ -487,7 +487,7 @@ describe UserSearch do
       course = Course.create!
       student = User.create!
       bad_scope = -> { UserSearch.scope_for(course, student, enrollment_type: "all") }
-      expect(bad_scope).to raise_error(RequestError, "Invalid enrollment type: all")
+      expect(&bad_scope).to raise_error(RequestError, "Invalid enrollment type: all")
     end
 
     it "doesn't explode with group context" do
