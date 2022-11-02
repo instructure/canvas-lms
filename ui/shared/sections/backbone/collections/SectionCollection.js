@@ -17,7 +17,7 @@
 //
 
 import {Collection} from '@canvas/backbone'
-import Section from '../models/Section.coffee'
+import Section from '../models/Section'
 
 // A collection for working with course sections returned from
 // CoursesController#sections.

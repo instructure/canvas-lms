@@ -19,7 +19,7 @@ import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import $ from 'jquery'
 import AssignmentOverride from '../models/AssignmentOverride.coffee'
-import Section from '@canvas/sections/backbone/models/Section.coffee'
+import Section from '@canvas/sections/backbone/models/Section'
 
 # Class Summary
 #   Assignments can have overrides ie DueDates.

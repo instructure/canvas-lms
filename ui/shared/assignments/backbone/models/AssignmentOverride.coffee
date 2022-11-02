@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import Section from '@canvas/sections/backbone/models/Section.coffee'
+import Section from '@canvas/sections/backbone/models/Section'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
