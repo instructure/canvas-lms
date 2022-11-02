@@ -169,7 +169,7 @@ export default function PermissionsIndex(props) {
               <Grid.Col width={8}>
                 <CanvasMultiSelect
                   id="permissions-role-filter"
-                  label=""
+                  label={I18n.t('Permission role filter')}
                   assistiveText={I18n.t(
                     'Filter Roles. Type or use arrow keys to navigate. Multiple selections are allowed.'
                   )}

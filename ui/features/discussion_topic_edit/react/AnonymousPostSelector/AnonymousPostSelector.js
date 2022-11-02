@@ -88,6 +88,7 @@ export const AnonymousPostSelector = () => {
           }}
           data-testid="anonymous_post_selector"
           data-component="anonymous_post_selector"
+          renderLabel={I18n.t('Visibility selector')}
         >
           <Select.Option
             id="show"
