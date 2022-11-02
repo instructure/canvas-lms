@@ -103,10 +103,6 @@ const DEFAULT_PROPS = () => ({
   contextId: 1,
   permissions: PERMISSIONS,
   roles: ROLES,
-  searchPermissions: () => {},
-  filterRoles: () => {},
-  tabChanged: () => {},
-  setAndOpenAddTray: () => {},
   selectedRoles: [{value: '0', label: 'All Roles'}],
 })
 
