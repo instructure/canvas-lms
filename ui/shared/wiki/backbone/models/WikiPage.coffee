@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import WikiPageRevision from './WikiPageRevision.coffee'
+import WikiPageRevision from './WikiPageRevision'
 import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import splitAssetString from '@canvas/util/splitAssetString'

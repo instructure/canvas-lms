@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
+import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 QUnit.module('WikiPageRevision::urls')
