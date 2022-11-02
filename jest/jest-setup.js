@@ -58,7 +58,6 @@ const ignoredErrors = [
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
-  /ColorPicker: isMounted is deprecated/,
   /contextType was defined as an instance property on %s/,
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
