@@ -19,6 +19,7 @@
 import {AnonymousUser} from './AnonymousUser'
 import {bool, number, shape, string} from 'prop-types'
 import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
+import {DiscussionEntryVersion} from './DiscussionEntryVersion'
 import gql from 'graphql-tag'
 import {Attachment} from './Attachment'
 import {PageInfo} from './PageInfo'
@@ -76,9 +77,15 @@ export const DiscussionEntry = {
         }
         deleted
       }
+      discussionEntryVersionsConnection {
+        nodes {
+          ...DiscussionEntryVersion
+        }
+      }
     }
     ${Attachment.fragment}
     ${DiscussionEntryPermissions.fragment}
+    ${DiscussionEntryVersion.fragment}
   `,
 
   shape: shape({
@@ -128,6 +135,7 @@ export const DiscussionEntry = {
       }),
       deleted: bool,
     }),
+    discussionEntryVersionsConnection: DiscussionEntryVersion.shape,
   }),
 
   mock: ({
@@ -170,6 +178,14 @@ export const DiscussionEntry = {
     isolatedEntryId = null,
     parentId = null,
     quotedEntry = null,
+    discussionEntryVersionsConnection = {
+      nodes: [
+        DiscussionEntryVersion.mock({
+          message: '<p>This is the parent reply</p>',
+        }),
+      ],
+      __typename: 'DiscussionEntryVersionConnection',
+    },
   } = {}) => ({
     id,
     _id,
@@ -193,6 +209,7 @@ export const DiscussionEntry = {
     isolatedEntryId,
     parentId,
     quotedEntry,
+    discussionEntryVersionsConnection,
     __typename: 'DiscussionEntry',
   }),
 }

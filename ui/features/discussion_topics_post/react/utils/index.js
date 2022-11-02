@@ -267,6 +267,10 @@ export const getOptimisticResponse = ({
         isolatedEntryId,
         quotedEntry,
         attachment: null,
+        discussionEntryVersionsConnection: {
+          nodes: [],
+          __typename: 'DiscussionEntryVersionConnection',
+        },
         __typename: 'DiscussionEntry',
       },
       errors: null,
