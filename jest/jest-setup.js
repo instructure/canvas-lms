@@ -62,7 +62,6 @@ const ignoredErrors = [
   /contextType was defined as an instance property on %s/,
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
-  /Expected one of ListItem in List but found 'ProfileTab/,
   /Failed loading the language file for/,
   /Function components cannot be given refs/,
   /invalid messageType: (notSupported|undefined)/,
