@@ -65,7 +65,6 @@ const ignoredErrors = [
   /Expected one of ListItem in List but found 'ProfileTab/,
   /Failed loading the language file for/,
   /Function components cannot be given refs/,
-  /Functions are not valid as a React child/,
   /invalid messageType: (notSupported|undefined)/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
