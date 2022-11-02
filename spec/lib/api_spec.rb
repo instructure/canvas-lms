@@ -52,7 +52,7 @@ describe Api do
     end
 
     it "does not find a missing record" do
-      expect(-> { @api.api_find(User, (User.all.map(&:id).max + 1)) }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { @api.api_find(User, (User.all.map(&:id).max + 1)) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "finds an existing sis_id record" do
@@ -74,7 +74,7 @@ describe Api do
     it "does not find record from other account" do
       account = Account.create(name: "new")
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(-> { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "finds record from other root account explicitly" do
@@ -93,7 +93,7 @@ describe Api do
 
     it "does not find a missing sis_id record" do
       @user = user_with_pseudonym username: "sis_user_1@example.com"
-      expect(-> { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'finds user id "self" when a current user is provided' do
@@ -101,7 +101,7 @@ describe Api do
     end
 
     it 'does not find user id "self" when a current user is not provided' do
-      expect(-> { TestApiInstance.new(Account.default, nil).api_find(User, "self") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { TestApiInstance.new(Account.default, nil).api_find(User, "self") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it 'finds account id "self"' do
@@ -150,7 +150,7 @@ describe Api do
     end
 
     it "does not find a user with an invalid AR id" do
-      expect(-> { @api.api_find(User, "a1") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { @api.api_find(User, "a1") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "does not find sis ids in other accounts" do
@@ -163,8 +163,8 @@ describe Api do
       user3 = user_with_pseudonym username: "sis_user_3@example.com", account: account1
       user4 = user_with_pseudonym username: "sis_user_3@example.com", account: account2
       expect(api1.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq user1
-      expect(-> { api2.api_find(User, "sis_login_id:sis_user_1@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
-      expect(-> { api1.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
+      expect { api2.api_find(User, "sis_login_id:sis_user_1@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { api1.api_find(User, "sis_login_id:sis_user_2@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
       expect(api2.api_find(User, "sis_login_id:sis_user_2@example.com")).to eq user2
       expect(api1.api_find(User, "sis_login_id:sis_user_3@example.com")).to eq user3
       expect(api2.api_find(User, "sis_login_id:sis_user_3@example.com")).to eq user4
@@ -580,7 +580,7 @@ describe Api do
 
     it "raises an error otherwise" do
       [StreamItem, PluginSetting].each do |collection|
-        expect(-> { Api.sis_find_sis_mapping_for_collection(collection) }).to raise_error("need to add support for table name: #{collection.table_name}")
+        expect { Api.sis_find_sis_mapping_for_collection(collection) }.to raise_error("need to add support for table name: #{collection.table_name}")
       end
     end
   end
@@ -606,7 +606,7 @@ describe Api do
   context "relation_for_sis_mapping_and_columns" do
     it "fails when not given a root account" do
       expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
-      expect(-> { Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory) }).to raise_error("sis_root_account required for lookups")
+      expect { Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory) }.to raise_error("sis_root_account required for lookups")
     end
 
     it "properly generates an escaped arg string" do
@@ -626,7 +626,7 @@ describe Api do
     end
 
     it "fails if we're scoping to an account and the scope isn't provided" do
-      expect(-> { Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, {}, Account.default) }).to raise_error("missing scope for collection")
+      expect { Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, {}, Account.default) }.to raise_error("missing scope for collection")
     end
   end
 

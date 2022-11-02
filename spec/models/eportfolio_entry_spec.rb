@@ -32,17 +32,17 @@ describe EportfolioEntry do
     it "validates the length of attributes" do
       @eportfolio_entry.name = @long_string
       @eportfolio_entry.slug = @long_string
-      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
+      expect { @eportfolio_entry.save! }.to raise_error("Validation failed: Name is too long (maximum is 255 characters), Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of slug" do
       @eportfolio_entry.slug = @long_string
-      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
+      expect { @eportfolio_entry.save! }.to raise_error("Validation failed: Slug is too long (maximum is 255 characters)")
     end
 
     it "validates the length of name" do
       @eportfolio_entry.name = @long_string
-      expect(-> { @eportfolio_entry.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect { @eportfolio_entry.save! }.to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 

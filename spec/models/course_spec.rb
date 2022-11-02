@@ -883,7 +883,7 @@ describe Course do
       # should throw rails validation error instead of db invalid statement error
       @course = Course.create_unique
       @course.sis_source_id = "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm"
-      expect(-> { @course.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+      expect { @course.save! }.to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
     end
 
     it "always has a uuid, if it was created" do
@@ -3695,7 +3695,7 @@ describe Course do
         it "checks whether or not grade export is enabled - failure" do
           allow(@plugin).to receive(:enabled?).and_return(false)
           @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-          expect(-> { @course.publish_final_grades(@user) }).to raise_error("final grade publishing disabled")
+          expect { @course.publish_final_grades(@user) }.to raise_error("final grade publishing disabled")
         end
 
         it "updates all student enrollments with pending and a last update status" do
@@ -3935,7 +3935,7 @@ describe Course do
 
         it "makes sure grade publishing is enabled" do
           allow(@plugin).to receive(:enabled?).and_return(false)
-          expect(-> { @course.send_final_grades_to_endpoint nil }).to raise_error("final grade publishing disabled")
+          expect { @course.send_final_grades_to_endpoint nil }.to raise_error("final grade publishing disabled")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["final grade publishing disabled"] * 6) + [nil] + (["final grade publishing disabled"] * 2)
         end
@@ -3943,7 +3943,7 @@ describe Course do
         it "makes sure an endpoint is defined" do
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings[:publish_endpoint] = ""
-          expect(-> { @course.send_final_grades_to_endpoint nil }).to raise_error("endpoint undefined")
+          expect { @course.send_final_grades_to_endpoint nil }.to raise_error("endpoint undefined")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["endpoint undefined"] * 6) + [nil] + (["endpoint undefined"] * 2)
         end
@@ -3956,7 +3956,7 @@ describe Course do
           @user = user_factory
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-          expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("publishing disallowed for this publishing user")
+          expect { @course.send_final_grades_to_endpoint @user }.to raise_error("publishing disallowed for this publishing user")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["publishing disallowed for this publishing user"] * 6) + [nil] + (["publishing disallowed for this publishing user"] * 2)
         end
@@ -3969,7 +3969,7 @@ describe Course do
           @user = user_factory
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
-          expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("grade publishing requires a grading standard")
+          expect { @course.send_final_grades_to_endpoint @user }.to raise_error("grade publishing requires a grading standard")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["grade publishing requires a grading standard"] * 6) + [nil] + (["grade publishing requires a grading standard"] * 2)
         end
@@ -3978,7 +3978,7 @@ describe Course do
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
           @plugin_settings[:format_type] = "invalid_Format"
-          expect(-> { @course.send_final_grades_to_endpoint @user }).to raise_error("unknown format type: invalid_Format")
+          expect { @course.send_final_grades_to_endpoint @user }.to raise_error("unknown format type: invalid_Format")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["unknown format type: invalid_Format"] * 6) + [nil] + (["unknown format type: invalid_Format"] * 2)
         end
@@ -4075,7 +4075,7 @@ describe Course do
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).and_raise("waaah fail")
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-          expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+          expect { @course.send_final_grades_to_endpoint(@user) }.to raise_error("waaah fail")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[published published published published error unpublishable unpublished unpublishable error]
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq ([nil] * 4) + ["waaah fail"] + ([nil] * 3) + ["waaah fail"]
         end
@@ -4109,7 +4109,7 @@ describe Course do
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {}).and_raise("waaah fail")
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).and_raise("waaah fail")
           expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
-          expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+          expect { @course.send_final_grades_to_endpoint(@user) }.to raise_error("waaah fail")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[published error published error error unpublishable unpublished unpublishable error]
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
         end
@@ -4126,7 +4126,7 @@ describe Course do
                                                                              end
                                                                            }
                                                                          })
-          expect(-> { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
+          expect { @course.send_final_grades_to_endpoint(@user) }.to raise_error("waaah fail")
           expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq %w[error error error error error error unpublished error error]
           expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["waaah fail"] * 6) + [nil] + (["waaah fail"] * 2)
         end
@@ -4542,7 +4542,7 @@ describe Course do
 
       it "does not allow grade publishing for a user that is disallowed" do
         @user = User.new
-        expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym in the wrong account" do
@@ -4550,7 +4550,7 @@ describe Course do
         @pseudonym.account = account_model
         @pseudonym.sis_user_id = "U1"
         @pseudonym.save!
-        expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not allow grade publishing for a user with a pseudonym without a sis id" do
@@ -4558,7 +4558,7 @@ describe Course do
         @pseudonym.account_id = @course.root_account_id
         @pseudonym.sis_user_id = nil
         @pseudonym.save!
-        expect(-> { quick_sanity_check(@user, false) }).to raise_error("publishing disallowed for this publishing user")
+        expect { quick_sanity_check(@user, false) }.to raise_error("publishing disallowed for this publishing user")
       end
 
       it "does not publish empty csv" do

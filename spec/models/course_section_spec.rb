@@ -344,17 +344,17 @@ describe CourseSection, "moving to new course" do
     it "validates the length of attributes" do
       @section.name = @long_string
       @section.sis_source_id = @long_string
-      expect(-> { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
+      expect { @section.save! }.to raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
     end
 
     it "validates the length of sis_source_id" do
       @section.sis_source_id = @long_string
-      expect(-> { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+      expect { @section.save! }.to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
     end
 
     it "validates the length of section name" do
       @section.name = @long_string
-      expect(-> { @section.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect { @section.save! }.to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 
