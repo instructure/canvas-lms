@@ -58,14 +58,12 @@ function ProfileTab({id, html_url, label, counts}) {
   }
 
   return (
-    <List.Item key={id}>
-      <View className={`profile-tab-${id}`} as="div" margin="small 0">
-        <Link isWithinText={false} href={html_url}>
-          {label}
-          {renderCountBadge()}
-        </Link>
-      </View>
-    </List.Item>
+    <View className={`profile-tab-${id}`} as="div" margin="small 0">
+      <Link isWithinText={false} href={html_url}>
+        {label}
+        {renderCountBadge()}
+      </Link>
+    </View>
   )
 }
 
@@ -106,7 +104,11 @@ export default function ProfileTray(props) {
       <hr role="presentation" />
       <List isUnstyled={true} margin="none" itemSpacing="small">
         {loaded ? (
-          tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
+          tabs.map(tab => (
+            <List.Item key={tab.id}>
+              <ProfileTab {...tab} counts={counts} />
+            </List.Item>
+          ))
         ) : (
           <List.Item key="loading">
             <div style={{textAlign: 'center'}}>
