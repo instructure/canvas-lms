@@ -235,7 +235,7 @@ ObserverOptions.propTypes = {
   handleChangeObservedUser: PropTypes.func.isRequired,
   margin: PropTypes.string,
   canAddObservee: PropTypes.bool.isRequired,
-  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string),
   autoFocus: PropTypes.bool,
   renderLabel: PropTypes.string,
 }
