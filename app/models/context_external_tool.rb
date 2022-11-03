@@ -1309,7 +1309,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def prepare_for_ags(matching_1_1_tool_id)
     related_assignments(matching_1_1_tool_id).each do |a|
-      a.prepare_for_ags_if_needed!(self)
+      a.prepare_for_ags_if_needed!(self, use_tool: true)
     end
   end
 
