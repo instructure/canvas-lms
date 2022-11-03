@@ -39,6 +39,7 @@ import FolderPickerView from './backbone/views/subviews/FolderPickerView.coffee'
 import SelectContentCheckboxView from '@canvas/content-migrations/backbone/views/subviews/SelectContentCheckboxView.coffee'
 import QuestionBankView from '@canvas/content-migrations/backbone/views/subviews/QuestionBankView.coffee'
 import CourseFindSelectView from './backbone/views/subviews/CourseFindSelectView.coffee'
+import ImportBlueprintSettingsView from './backbone/views/subviews/ImportBlueprintSettingsView.coffee'
 import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
 import DaySubView from '@canvas/day-substitution/backbone/views/DaySubstitutionView.coffee'
 import ExternalToolContentView from './backbone/views/ExternalToolContentView.coffee'
@@ -140,8 +141,12 @@ ConverterViewControl.register
                                 migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT
                                 questionBank: null
 
+          importBlueprintSettings: new ImportBlueprintSettingsView
+                                   model: ConverterViewControl.getModel()
+
           quizzes_next_enabled: ENV.QUIZZES_NEXT_ENABLED
           new_quizzes_migration: ENV.NEW_QUIZZES_MIGRATION
+          blueprint_eligible: ENV.BLUEPRINT_ELIGIBLE_IMPORT
 
 
 ConverterViewControl.register
