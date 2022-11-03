@@ -112,6 +112,12 @@ describe('Common file url utils', () => {
         strictEqual(result.href, fileInfo.href)
       })
 
+      it('transforms urls if from the specified canvas origin', () => {
+        fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
+        const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
+        strictEqual(result.href, 'http://instructure.com/courses/2/files/17?wrap=1')
+      })
+
       it('transforms course file urls', () => {
         // removes download_frd and adds wrap
         const result = fixupFileUrl('course', 2, fileInfo)
@@ -157,7 +163,13 @@ describe('Common file url utils', () => {
     it('skips transforming the url if from a different host', () => {
       const url = 'http://instructure.com/some/path'
       const result = prepEmbedSrc(url)
-      strictEqual(url, result)
+      strictEqual(result, url)
+    })
+
+    it('transforms the url if from the current canvas host', () => {
+      const url = 'http://instructure.com/some/path'
+      const result = prepEmbedSrc(url, 'http://instructure.com')
+      strictEqual(result, 'http://instructure.com/some/path/preview')
     })
 
     it('replaces /download?some_params with /preview?some_params', () => {

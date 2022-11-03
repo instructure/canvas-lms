@@ -85,6 +85,7 @@ class RceApiSource {
     this.refreshToken = options.refreshToken || defaultRefreshTokenHandler
     this.hasSession = false
     this.alertFunc = options.alertFunc || alertHandler.handleAlert
+    this.canvasOrigin = options.canvasOrigin || window.origin
   }
 
   getSession() {
@@ -170,7 +171,9 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f)),
+        files: files.map(f =>
+          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+        ),
       }
     })
   }
@@ -319,7 +322,9 @@ class RceApiSource {
     return this.apiFetch(uri, headers).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f)),
+        files: files.map(f =>
+          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+        ),
         searchString: props.searchString,
       }
     })
