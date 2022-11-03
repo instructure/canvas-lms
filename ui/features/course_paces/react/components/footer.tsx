@@ -269,6 +269,7 @@ export const Footer: React.FC<ComponentProps> = ({
             on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}
           >
             <Button
+              data-testid="apply-or-create-pace-button"
               color="primary"
               onClick={() => pubDisabled || handlePublishClicked()}
               interaction={

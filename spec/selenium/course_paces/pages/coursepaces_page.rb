@@ -261,6 +261,14 @@ module CoursePacesPageObject
 
   #------------------------- Redesign Selectors ----------------------
 
+  def apply_or_create_pace_button_selector
+    "[data-testid='apply-or-create-pace-button']"
+  end
+
+  def blueprint_label_selector
+    ".blueprint-label"
+  end
+
   def course_pace_settings_button_selector
     "[data-testid='course-pace-settings']"
   end
@@ -529,6 +537,15 @@ module CoursePacesPageObject
   end
 
   #------------------------- Redesign Elements -----------------------
+
+  def apply_or_create_pace_button
+    f(apply_or_create_pace_button_selector)
+  end
+
+  def blueprint_label
+    f(blueprint_label_selector)
+  end
+
   def course_pace_settings_button
     f(course_pace_settings_button_selector)
   end
@@ -672,6 +689,14 @@ module CoursePacesPageObject
   end
 
   #------------------------- Redesign Elements -----------------------
+  def click_apply_or_create_pace_button
+    apply_or_create_pace_button.click
+  end
+
+  def click_course_pace_settings_button
+    course_pace_settings_button.click
+  end
+
   def click_remove_pace_button
     remove_pace_button.click
   end
