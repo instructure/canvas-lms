@@ -18,9 +18,9 @@
 
 import Backbone from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
-import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
-import Group from 'ui/features/grade_summary/backbone/models/Group.coffee'
+import Group from 'ui/features/grade_summary/backbone/models/Group'
 import OutcomeDetailView from 'ui/features/grade_summary/backbone/views/OutcomeDetailView'
 import fakeENV from 'helpers/fakeENV'
 

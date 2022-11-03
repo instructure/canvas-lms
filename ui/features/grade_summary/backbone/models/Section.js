@@ -15,25 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import Backbone from '@canvas/backbone'
-import ProgressBarView from './ProgressBarView'
-import template from '../../jst/alignment.handlebars'
+import {Model, Collection} from '@canvas/backbone'
+import natcompare from '@canvas/util/natcompare'
 
-export default class AlignmentView extends Backbone.View {
-  static initClass() {
-    this.prototype.tagName = 'li'
-    this.prototype.className = 'alignment'
-    this.prototype.template = template
-  }
-
+export default class Section extends Model {
   initialize() {
-    super.initialize(...arguments)
-    return (this.progress = new ProgressBarView({model: this.model}))
-  }
-
-  toJSON() {
-    const json = super.toJSON(...arguments)
-    return {...json, progress: this.progress}
+    return this.set('groups', new Collection([], {comparator: natcompare.byGet('title')}))
   }
 }
-AlignmentView.initClass()

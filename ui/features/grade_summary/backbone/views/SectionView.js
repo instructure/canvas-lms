@@ -17,7 +17,7 @@
 
 import {View} from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
-import GroupView from './GroupView.coffee'
+import GroupView from './GroupView'
 import template from '../../jst/section.handlebars'
 
 export default class SectionView extends View {

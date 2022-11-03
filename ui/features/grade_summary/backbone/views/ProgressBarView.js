@@ -16,24 +16,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ProgressBarView from './ProgressBarView'
-import template from '../../jst/alignment.handlebars'
+import template from '../../jst/progress_bar.handlebars'
 
-export default class AlignmentView extends Backbone.View {
-  static initClass() {
-    this.prototype.tagName = 'li'
-    this.prototype.className = 'alignment'
-    this.prototype.template = template
-  }
+class ProgressBarView extends Backbone.View {}
 
-  initialize() {
-    super.initialize(...arguments)
-    return (this.progress = new ProgressBarView({model: this.model}))
-  }
+ProgressBarView.prototype.className = 'bar'
+ProgressBarView.prototype.template = template
 
-  toJSON() {
-    const json = super.toJSON(...arguments)
-    return {...json, progress: this.progress}
-  }
-}
-AlignmentView.initClass()
+export default ProgressBarView

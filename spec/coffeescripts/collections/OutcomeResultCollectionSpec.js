@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
-import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
 import fakeENV from 'helpers/fakeENV'
 import tz from '@canvas/timezone'
 
@@ -96,6 +96,7 @@ QUnit.module('OutcomeResultCollectionSpec', {
 })
 
 test('default params reflect aligned outcome', function () {
+  // eslint-disable-next-line new-cap
   const collectionModel = new this.outcomeResultCollection.model()
   deepEqual(collectionModel.get('mastery_points'), 8)
   deepEqual(collectionModel.get('points_possible'), 10)
