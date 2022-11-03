@@ -124,6 +124,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
           </FlexItem>
           <FlexItem>
             <IconButton
+              data-testid="course-pace-edit-close-x"
               withBackground={false}
               withBorder={false}
               renderIcon={IconXSolid}
