@@ -9719,6 +9719,7 @@ nn:
   enter_score_cutoff_3ff8ad22: "Skriv inn avskjeringsverdi"
   enter_specific_phrase_9b686755: "Legg inn spesifikk frase"
   enter_the_access_token_for_your_organization_from__38b84fd1: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
+  enter_the_access_token_for_your_organization_from__7b67e135: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_access_token_for_your_organization_from__cc77493d: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Oppgi e-postadressene til brukarane du vil legge til, berre delt av komma"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Oppgi e-postadressene til brukarane du vil legge til, skilde med komma eller linjeskift"
@@ -12100,6 +12101,7 @@ nn:
       for fillagring. Gruppene kan samarbeide om dokument eller planlegge webkonferansar.
       Det er som eit miniemne der du kan jobbe med færre studentar
       på eit meir fokusert prosjekt.
+  groups_are_a_good_place_to_collaborate_on_projects_92bb0c02: "Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper og liknande.  Kvar gruppe har kalender, wiki, diskusjonar og fillagringsplass. Gruppene kan samarbeide om dokument eller planlegge webkonferansar. Det er som eit miniemne der du kan jobbe med færre studentar og på eit meir fokusert prosjekt."
   groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
       Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper
       og liknande. Kvar gruppe har kalender, wiki, diskusjonar og litt plass
@@ -12139,7 +12141,7 @@ nn:
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
       
-      Utfallet av di importering feila på grunn av en feil ved sjølve importeringa. Undersøk fila di og prøv opplastinga på nytt på %{url}
+      Import av læringsmål feila på grunn av en feil ved sjølve importeringa. Undersøk fila di og prøv opplastinga på nytt på %{url}
       
       Følgande feil oppsto:
       %{row}
@@ -24299,12 +24301,27 @@ nn:
       For å endre blueprint-låseinnstillingar i ein individuell quiz eller på quizoversikta, må 'Emne - legg til / endre / slett' òg vere slått på. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "For å endre låseinnstillingar i diskusjonsoversikta for blueprintemne, må 'Emne - legg til / endre / slett' og 'Diskusjonar - vis' òg vere slått på. Dersom løyvet ikkje er slått på og 'Emne - legg til / endre / slett' og 'Diskusjonar - vis' er slått på, kan låseinnstillingane for blueprintemne endrast i enkeltståande diskusjonar."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "For å endre vurderingsskjema for emne, må 'Emne - legg til / endre / slett' òg vere slått på."
+  to_edit_course_grading_schemes_courses_manage_must_b6de9dbc: "For å endre vurderingsskjema for emne, må 'Emne - administrer' òg vere slått på."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "For å endre emneinnstillingar, må 'Emne - legg til / endre / slett' vere slått på. "
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "For å endre emneinnstillingar, må 'Emne - legg til / endre / slett' vere slått på. "
+  to_edit_course_settings_courses_manage_must_be_ena_813e1588: "For å endre emneinnstillingar, må 'Emne - administrer' vere slått på. "
+  to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "For å redigere på grupper må \"Grupper - administrer\" vere slått på"
+  to_edit_lock_settings_for_course_files_course_file_92273739: "For å endre på låseinnstillingar for emnefilar må \"Emnefilar - rediger\", \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
+  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "For å endre på låseinnstillingar frå Oppgåveoversikta må \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
+  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "For å endre på låseinnstillingar frå Diskusjonsoversikta må \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "For å endre på låseinnstillingar på ein enkelt quiz eller på quizoversikta må \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
+  to_edit_lock_settings_on_files_courses_manage_and__f4718695: "For å endre på låseinnstillingar på filer må \"emner - administrer\" og \"Emnefiler - rediger\" vere slått på"
+  to_edit_lock_settings_on_quizzes_courses_manage_an_eb629aa9: "For å endre på låseinnstillingar på quizar må \"emner - administrer\" og \"Oppgåver og quizar - administrer\" vere slått på"
+  to_edit_lock_settings_on_the_discussions_index_pag_9488110a: "For å endre på låseinnstillingar frå Diskusjonsoversikta må  \"Emner - administrer\" og \"Diskusjonar - sjå\" vere slått på."
+  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "For å endre på låseinnstillingar på personoversikta må \"Personar - oppdater\",  \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
+  to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "For å redigere ein quiz må \"Oppgåver og quizar - administrer / rediger\" også vere slått på"
+  to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "For å endre SIS id på eit emne må \"Emner - administrer\" og \"SIS data - administrer\" vere slått på."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       For å endre brukardetaljar, modifisere innloggingsdetaljar eller endre brukarpassord, må 'Brukarar - administrere innloggingsdeltajar' òg vere slått på.
       For å sjå sidevisingar for ein brukar, må 'Statistikk - vis' òg vere slått på.
       For å opptre som andre brukarar, må 'Brukarar - opptre som' òg vere slått på.
+  to_edit_user_details_modify_login_details_or_chang_63aa95a5: "For å redigere på brukardetaljar, innloggingsdetaljar eller passord må \"Brukarar - administrer innlogginsdetaljar\" vere slått på"
+  to_enable_microsoft_teams_sync_please_provide_a_te_44c6d180: "For kunne synkronisere med Microsoft Teams må du oppgi ein tenant, innloggingsattributt og fjernattributt"
   to_end_a_long_running_conference_the_course_conten_63e3f993: "For å avslutte ein langvarig konferanse må løyve for Emne Innhald vere slått på  "
   to_f0e90538: "Til: "
   to_fully_manage_course_level_question_banks_assign_3e5eb580: "For å administrere spørsmålsbankar på emnenivå må løyve for Oppgåver og Quizar - administrere/endre også vere slått på"
@@ -24330,21 +24347,29 @@ nn:
   to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "For å kunne knytte ein observatør til ein student må \"Brukarar - administrer innloggingsdetaljar\" og \"Meldingar - send til enkeltmedlemmar\" vere slått på."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "For å logge på Canvas brukaren din medan du er på farten, skann denne QR-koden frå ein Canvas mobilapp."
+  to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "For å gjere justering av læringsmål enklare, legg bare til læringsmål som er viktige for det enkelte emne"
   to_manage_associated_courses_courses_view_list_and_26f4c15c: "For å kunne administrere tilknytta emner må dei to løyva \"Emner - sjå liste\" og \"Emner - legg til\" vere slått på "
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "For å administrere innstillingar for blueprint-emne i emneinnstillingar må 'Emne - legg til / endre / slett' òg vere slått på."
   to_manage_course_announcements_discussions_moderat_5f02f46e: "For å kunne administrere kunngjeringar på emne så må løyve \"Diskusjonar - moderer\" vere slått på"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "For å redigere emneinnhald, må 'Emneinnhald - legg til / rediger / slett' være slått på."
+  to_manage_course_content_courses_manage_and_course_c7a49f42: "For å redigere emneinnhald, må 'Emne - administrer' og \"Emneinnhald - legg til/rediger/slett\"  vere slått på."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       For å administrere diskusjonar, må 'Diskusjonar - moderer' òg vere slått på.
       
       For å svare på ein diskusjon, må 'Diskusjonar - post' òg vere slått på.
+  to_manage_discussions_discussions_moderate_must_al_834a8b9: "For å kunne administrere diskusjonar må \"Diskusjonar - moderer\" vere slått på"
   to_manage_discussions_discussions_moderate_must_al_d6d665be: "For å administrere diskusjonar, må 'Diskusjonar - moderer' òg vere slått på. For å svare på ein diskusjon, må 'Diskusjonar - post' òg vere slått på. "
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "For å administrere diskusjonar, må 'Diskusjonar - post' og 'Diskusjonar - moderer' òg vere slått på. For å svare på ein diskusjon må 'Diskusjon - post' òg vere slått på."
+  to_manage_feature_options_for_an_account_feature_o_6327c2da: "For å administrere funksjonsval for ein konto må 'Funksjonsval - slå på / av' òg vere slått på."
+  to_manage_lock_settings_for_object_types_courses_m_c3373154: "For å administrere låseinnstillingar for ulike element må \"Emner - administrer\" vere slått på "
+  to_manage_moderated_grading_grades_select_final_gr_d701c298: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
   to_manage_sis_data_sis_data_manage_must_also_be_en_748806e8: "For å administrere SIS-data må «SIS-data - administrer» også vere aktivert."
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "For å administrere SIS-data, må 'SIS-data - administrer' óg vere slått på."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "For å administrere SIS-data må 'SIS-data - administrer' vere slått på. Dersom 'SIS-data - administrer' er slått på og 'SIS-data - les' er slått av, vil kontoløyvet overstyre emneløyvet. Dersom 'SIS-data - administrer' er slått av og 'SIS-data - les' er slått på, kan ein brukar kun sjå SIS-ID-ar for emne, brukarar og underkontoar. For å hindre ein brukar frå å sjå SIS-ID-ar  på emnenivå, må både 'SIS-data - administrer' og 'SIS-data - les' vere slått av. "
+  to_manage_sis_data_sis_data_manage_must_be_enabled_cb33e77d: "For å administrere SIS-data må «SIS-data - administrer» også vere aktivert."
   to_manage_the_feature_options_tab_feature_options__c478f81: "For å administrere fana for funksjonsval, må 'Funksjonsval - slå på / av' òg vere slått på."
   to_manage_the_feature_options_tab_feature_options__fc32fca3: "For å administrere fana for funksjonsval, må 'Funksjonsval - slå på slå av òg vere slått på."
+  to_merge_users_the_self_service_user_merge_feature_d07a9276: "For å slå saman brukerkontoer må funksjonsvalet \" Sjølvbetjent samanslåing\" vere slått på"
   to_minscore_43e5452e: "to %{minScore}%"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_2c7f4c18: |-
       For å moderere ein quiz, må 'Oppgåver og Quizar - legg til / endre / slett' òg vere slått på..
@@ -24374,6 +24399,7 @@ nn:
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
   to_publish_and_unpublish_module_content_courses_ma_4a203bea: "For å publisere og avpublisere modulinnhald, Emner - administrer og Emneinnhald - Sjå må også være skrudd på. Modulelement kan ikkje verte avpublisert dersom det finnst studentinnleveringar."
+  to_publish_final_grades_for_a_moderated_assignment_713090cf: "For å publisere vurderingar for ei moderert oppgåve må \"Vurderingar - rediger\" og vere skrudd på."
   to_publish_unpublish_module_content_course_content_efc294d4: "For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på"
   to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "For å fjerne ein brukar med SIS ID, SIS Data - administrer må være skrudd på."
   to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "For å svare i ein diskusjon må \"Diskusjonar - kommenter\" òg vere slått på."
@@ -24386,6 +24412,7 @@ nn:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "For å hindre brukartilgong til spesifikke Google Apps-domene, list domena her."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "Skriv inn domenet her med komma (,) for å separere lista, for å begrense brukarar frå spesifikke Google Apps domene. For å begrense brukarar frå Google Apps generelt, kan du legge inn '*'."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "For å avgrense tilgangen til berre Azure Active Directory-brukarar, registrer tenaren her. "
+  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "For å vurdere ei moderert oppgåve i SpeedGrader må \"Vurderingar - endre\" òg vere slått på."
   to_search_and_view_notifications_for_a_user_users__becfb733: "For å søke og sjå varsel for ein brukar må 'Brukarar - vis liste' òg vere slått på."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "For å søke gjennom og vise varslingar for ein brukar må «Brukarar - vis liste» også være aktivert."
   to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "For å kunne søke etter kun oppgåveID så må \"Vurdering - sjå alle vurderingar\" òg vere slått på."
