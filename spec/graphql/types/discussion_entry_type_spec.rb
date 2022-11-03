@@ -501,4 +501,62 @@ describe Types::DiscussionEntryType do
     discussion_entry_versions = discussion_entry_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
+
+  it "returns nil discussion entry versions when is other student" do
+    student_in_course(course: @course, active_all: true)
+    discussion_entry_student_type = GraphQLTypeTester.new(discussion_entry, current_user: @student)
+
+    discussion_entry.message = "Hello! 2"
+    discussion_entry.save!
+
+    discussion_entry.message = "Hello! 3"
+    discussion_entry.save!
+
+    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    expect(discussion_entry_versions).to eq(nil)
+  end
+
+  it "return the discussion entry versions when they belong to the student" do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    entry = @topic.discussion_entries.create!(message: "Hello!", user: @student, editor: @student)
+
+    discussion_entry_student_type = GraphQLTypeTester.new(entry, current_user: @student)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_student_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  it "return the discussion entry versions when a group discussion is retrieved by a teacher" do
+    course_factory(active_all: true)
+
+    teacher = User.create!
+    student = User.create!
+    @course.enroll_teacher(teacher, enrollment_state: "active")
+    @course.enroll_student(student)
+
+    group_category = @course.group_categories.create(name: "Project Group")
+    group = group_model(name: "Project Group 1", group_category: group_category, context: @course)
+    group.add_user(student)
+
+    group_topic = group.discussion_topics.create!(title: "Title", user: teacher)
+    entry = group_topic.discussion_entries.create!(message: "Hello!", user: student, editor: student)
+    discussion_entry_teacher_type = GraphQLTypeTester.new(entry, current_user: teacher)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
 end
