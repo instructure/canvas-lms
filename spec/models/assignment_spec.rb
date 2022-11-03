@@ -9993,20 +9993,26 @@ describe Assignment do
           describe "#prepare_for_ags_if_needed!" do
             subject { assignment }
 
+            let(:use_tool) { false }
+
             context "when the assignment is not AGS ready" do
               before do
+                assignment.update!(lti_context_id: SecureRandom.uuid)
+
                 # assignments configured with LTI 1.1 will not have
                 # LineItem or ResouceLink records prior to the LTI 1.3
                 # launch.
+                # (note: this needs to happen _after_ any other calls to
+                # assignment.save! since that calls update_line_items)
+                # (note: this setup and test hierarchy is not great)
                 assignment.line_items.destroy_all
 
                 Lti::ResourceLink.where(
                   resource_link_uuid: assignment.lti_context_id
                 ).destroy_all
 
-                assignment.update!(lti_context_id: SecureRandom.uuid)
-
-                assignment.prepare_for_ags_if_needed!(tool)
+                allow(assignment).to receive(:tool_from_external_tool_tag).and_call_original
+                assignment.prepare_for_ags_if_needed!(tool, use_tool: use_tool)
               end
 
               it "creates the default line item" do
@@ -10019,6 +10025,18 @@ describe Assignment do
                     resource_link_uuid: subject.lti_context_id
                   )
                 ).to be_present
+              end
+
+              it "queries to find correct tool" do
+                expect(assignment).to have_received(:tool_from_external_tool_tag).at_least(:once)
+              end
+
+              context "when told to use the given tool" do
+                let(:use_tool) { true }
+
+                it "does not query for the tool again" do
+                  expect(subject).not_to have_received(:tool_from_external_tool_tag)
+                end
               end
             end
 
