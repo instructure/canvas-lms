@@ -321,6 +321,34 @@ export default function CanvasContentTray(props) {
     }
   }, [hasOpened])
 
+  useEffect(() => {
+    if (!hasOpened) return
+
+    let c = document.querySelector('[role="main"]')
+    let target_w = 0
+    if (!c) return
+
+    const margin =
+      window.getComputedStyle(c).direction === 'ltr'
+        ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
+        : c.getBoundingClientRect().left
+
+    target_w = c.offsetWidth - trayRef.current?.offsetWidth + margin
+
+    if (target_w >= 320 && target_w < c.offsetWidth) {
+      c.style.boxSizing = 'border-box'
+      c.style.width = `${target_w}px`
+    }
+
+    setHidingTrayOnAction(target_w < 320)
+
+    return () => {
+      c = document.querySelector('[role="main"]')
+      if (!c) return
+      c.style.width = ''
+    }
+  }, [hasOpened])
+
   function handleOpenTray() {
     bridge.focusEditor(editor)
     setHasOpened(true)
@@ -434,28 +462,6 @@ export default function CanvasContentTray(props) {
           onClose={handleCloseTray}
           onExit={handleExitTray}
           onOpen={handleOpenTray}
-          onEntered={() => {
-            const c = document.querySelector('[role="main"]')
-            let target_w = 0
-            if (c) {
-              const margin =
-                window.getComputedStyle(c).direction === 'ltr'
-                  ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
-                  : c.getBoundingClientRect().left
-
-              target_w = c.offsetWidth - trayRef.current?.offsetWidth + margin
-
-              if (target_w >= 320 && target_w < c.offsetWidth) {
-                c.style.boxSizing = 'border-box'
-                c.style.width = `${target_w}px`
-              }
-            }
-            setHidingTrayOnAction(target_w < 320)
-          }}
-          onExiting={() => {
-            const c = document.querySelector('[role="main"]')
-            if (c) c.style.width = ''
-          }}
           contentRef={el => (trayRef.current = el)}
         >
           {isOpen && hasOpened ? (
