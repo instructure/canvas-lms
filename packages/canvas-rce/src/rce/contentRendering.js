@@ -51,7 +51,7 @@ export function renderLink(data, contents, canvasOrigin) {
 
 export function renderLinkedImage(linkElem, image, canvasOrigin) {
   const linkHref = linkElem.getAttribute('href')
-  image.href = prepEmbedSrc(image.href)
+  image.href = prepEmbedSrc(image.href, canvasOrigin)
 
   return renderToStaticMarkup(
     <a href={absoluteToRelativeUrl(linkHref, canvasOrigin)} data-mce-href={linkHref}>
@@ -99,7 +99,7 @@ export function constructJSXImageElement(image, canvasOrigin, opts = {}) {
 }
 
 export function renderImage(image, canvasOrigin, opts) {
-  image.href = prepEmbedSrc(image.href)
+  image.href = prepEmbedSrc(image.href, canvasOrigin)
   return renderToStaticMarkup(constructJSXImageElement(image, canvasOrigin, opts))
 }
 

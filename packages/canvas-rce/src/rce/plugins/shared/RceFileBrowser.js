@@ -17,7 +17,7 @@
  */
 
 import React, {useMemo} from 'react'
-import {func, string} from 'prop-types'
+import {func, object, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
@@ -33,10 +33,26 @@ RceFileBrowser.propTypes = {
   onFileSelect: func.isRequired,
   onAllFilesLoading: func.isRequired,
   searchString: string.isRequired,
+  canvasOrigin: string,
+  jwt: string.isRequired,
+  refreshToken: string.isRequired,
+  host: string.isRequired,
+  source: string.isRequired,
+  context: object.isRequired,
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect, searchString, onAllFilesLoading, jwt, refreshToken, host, source} = props
+  const {
+    onFileSelect,
+    searchString,
+    onAllFilesLoading,
+    jwt,
+    refreshToken,
+    host,
+    source,
+    canvasOrigin,
+  } = props
+
   const apiSource = useMemo(() => {
     return (
       source ||
@@ -44,9 +60,10 @@ export default function RceFileBrowser(props) {
         jwt,
         refreshToken,
         host,
+        canvasOrigin,
       })
     )
-  }, [host, jwt, refreshToken, source])
+  }, [host, jwt, refreshToken, source, canvasOrigin])
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api.type
