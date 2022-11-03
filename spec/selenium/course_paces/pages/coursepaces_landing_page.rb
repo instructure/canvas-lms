@@ -114,6 +114,10 @@ module CoursePacesLandingPageObject
     create_default_pace_button.click
   end
 
+  def click_edit_default_pace_button
+    create_default_pace_button.click
+  end
+
   def click_section_tab
     section_tab.click
   end
