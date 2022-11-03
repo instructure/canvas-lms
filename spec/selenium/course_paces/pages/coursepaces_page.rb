@@ -269,6 +269,10 @@ module CoursePacesPageObject
     ".blueprint-label"
   end
 
+  def course_pace_modal_x_selector
+    "[data-testid='course-pace-edit-close-x']"
+  end
+
   def course_pace_settings_button_selector
     "[data-testid='course-pace-settings']"
   end
@@ -546,6 +550,10 @@ module CoursePacesPageObject
     f(blueprint_label_selector)
   end
 
+  def course_pace_modal_x
+    f(course_pace_modal_x_selector)
+  end
+
   def course_pace_settings_button
     f(course_pace_settings_button_selector)
   end
@@ -695,6 +703,10 @@ module CoursePacesPageObject
 
   def click_course_pace_settings_button
     course_pace_settings_button.click
+  end
+
+  def click_course_pace_modal_x
+    course_pace_modal_x.click
   end
 
   def click_remove_pace_button

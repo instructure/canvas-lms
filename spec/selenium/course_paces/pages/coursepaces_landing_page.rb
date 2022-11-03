@@ -21,12 +21,24 @@ require_relative "../../common"
 
 module CoursePacesLandingPageObject
   #------------------------- Selectors -------------------------------
+  def community_info_text_selector
+    "[data-testid='course-pacing-more-info-link'] a"
+  end
+
   def context_link_selector(context_name)
     "//td[@data-testid = 'course-pace-item']/button//*[text() = '#{context_name}']"
   end
 
+  def course_pace_context_table_selector
+    "[data-testid='course-pace-context-table']"
+  end
+
   def course_paces_navigation_selector
     ".course_paces"
+  end
+
+  def course_paces_panda_selector
+    ".course-paces-panda"
   end
 
   def create_default_pace_button_selector
@@ -59,12 +71,24 @@ module CoursePacesLandingPageObject
 
   #------------------------- Elements --------------------------------
 
+  def community_info_text
+    f(community_info_text_selector)
+  end
+
   def context_link(context_name)
     fxpath(context_link_selector(context_name))
   end
 
+  def course_pace_context_table
+    f(course_pace_context_table_selector)
+  end
+
   def course_paces_navigation
     f(course_paces_navigation_selector)
+  end
+
+  def course_paces_panda
+    f(course_paces_panda_selector)
   end
 
   def create_default_pace_button
