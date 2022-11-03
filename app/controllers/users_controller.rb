@@ -881,6 +881,7 @@ class UsersController < ApplicationController
       @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end
 
+    MasterCourses::MasterTemplate.preload_is_master_course(@courses)
     render json: @courses.map { |c|
       { label: c.nickname_for(@current_user),
         id: c.id,
@@ -891,7 +892,8 @@ class UsersController < ApplicationController
         account_name: c.enrollment_term.root_account.name,
         account_id: c.enrollment_term.root_account.id,
         start_at: datetime_string(c.start_at, :verbose, nil, true),
-        end_at: datetime_string(c.conclude_at, :verbose, nil, true) }
+        end_at: datetime_string(c.conclude_at, :verbose, nil, true),
+        blueprint: MasterCourses::MasterTemplate.is_master_course?(c) }
     }
   end
 
