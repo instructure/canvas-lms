@@ -1110,21 +1110,34 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def prepare_for_ags_if_needed!(tool)
+  def prepare_for_ags_if_needed!(tool, use_tool: false)
     # Don't do anything unless the tool is AGS ready
     return unless tool&.use_1_3? && tool.developer_key.present?
 
     # The assignment is already AGS ready
     return if line_items.active.present?
 
-    update_line_items
+    if use_tool
+      # the 1.3 tool has already been loaded by
+      # ContextExternalTool#prepare_for_ags, and this
+      # method is about to get called for a large number
+      # of assignments, so querying for the correct tool
+      # each time is not a good idea.
+      update_line_items(tool)
+    else
+      # the default usage of this method is "just-in-time"
+      # which will be called with the currently-asssociated
+      # tool for the assignment. but it's good to explicitly
+      # find the tool again to confirm they match
+      update_line_items
+    end
   end
 
   def create_assignment_line_item!
     update_line_items
   end
 
-  def update_line_items
+  def update_line_items(lti_1_3_tool = nil)
     # TODO: Edits to existing Assignment<->Tool associations are (mostly) ignored
     #
     # A few key points as a result:
@@ -1149,15 +1162,12 @@ class Assignment < ActiveRecord::Base
     # ContentTag on the currently bound tool. Presumably you always want correct data in the LineItem, regardless of
     # which Tool it's bound to.
     GuardRail.activate(:primary) do
-      if lti_1_3_external_tool_tag? && line_items.empty?
+      if lti_1_3_external_tool_tag?(lti_1_3_tool) && line_items.empty?
         rl = Lti::ResourceLink.create!(
           context: self,
           custom: validate_resource_link_custom_params,
           resource_link_uuid: lti_context_id,
-          context_external_tool: ContextExternalTool.from_content_tag(
-            external_tool_tag,
-            context
-          ),
+          context_external_tool: lti_1_3_tool || tool_from_external_tool_tag,
           url: lti_resource_link_url
         )
 
@@ -1169,7 +1179,7 @@ class Assignment < ActiveRecord::Base
           &.update!(label: title, score_maximum: points_possible || 0)
       end
 
-      if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
+      if lti_1_3_external_tool_tag?(lti_1_3_tool) && !lti_resource_links.empty?
         options = {}
         validated_params = validate_resource_link_custom_params
         # Check if they actually passed something that isn't just our default value of nil, such as an
@@ -1222,17 +1232,22 @@ class Assignment < ActiveRecord::Base
     )
   end
 
-  def lti_1_3_external_tool_tag?
+  def lti_1_3_external_tool_tag?(lti_1_3_tool)
     return false unless external_tool?
     return false unless external_tool_tag&.content_type == "ContextExternalTool"
+    return lti_1_3_tool.use_1_3? if lti_1_3_tool
 
     # Lookup the tool and check if the LTI version is 1.3
-    ContextExternalTool.from_content_tag(
-      external_tool_tag,
-      context
-    )&.use_1_3?
+    tool_from_external_tool_tag&.use_1_3?
   end
   private :lti_1_3_external_tool_tag?
+
+  def tool_from_external_tool_tag
+    @tool_from_external_tool_tag = ContextExternalTool.from_content_tag(
+      external_tool_tag,
+      context
+    )
+  end
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
