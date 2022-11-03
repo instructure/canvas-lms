@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2015 - present Instructure, Inc.
+// Copyright (C) 2014 - present Instructure, Inc.
 //
 // This file is part of Canvas.
 //
@@ -15,19 +15,15 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-// Adds _.sum method.
-//
-// Use like:
-//
-// _.sum([2,3,4]) #=> 9
-//
-// or with a custom accessor:
-//
-// _.sum([[2,3], [3,4]], (a) -> a[0]) #=> 5
-import _ from 'underscore'
+import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 
-export default _.mixin({
-  sum(array, accessor = null, start = 0) {
-    return _.reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
-  },
-})
+class WrappedCollection extends PaginatedCollection {
+  parse(response) {
+    this.linked = response.linked
+    return response[this.key]
+  }
+}
+
+WrappedCollection.optionProperty('key')
+
+export default WrappedCollection

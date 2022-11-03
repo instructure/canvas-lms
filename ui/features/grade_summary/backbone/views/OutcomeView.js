@@ -17,23 +17,44 @@
 
 import Backbone from '@canvas/backbone'
 import ProgressBarView from './ProgressBarView'
-import template from '../../jst/alignment.handlebars'
+import OutcomePopoverView from './OutcomePopoverView'
+import OutcomeDialogView from './OutcomeDialogView'
+import template from '../../jst/outcome.handlebars'
 
-export default class AlignmentView extends Backbone.View {
-  static initClass() {
-    this.prototype.tagName = 'li'
-    this.prototype.className = 'alignment'
-    this.prototype.template = template
-  }
-
+class OutcomeView extends Backbone.View {
   initialize() {
     super.initialize(...arguments)
     return (this.progress = new ProgressBarView({model: this.model}))
   }
 
+  afterRender() {
+    this.popover = new OutcomePopoverView({
+      el: this.$('.more-details'),
+      model: this.model,
+    })
+    return (this.dialog = new OutcomeDialogView({
+      model: this.model,
+    }))
+  }
+
+  show(e) {
+    return this.dialog.show(e)
+  }
+
   toJSON() {
-    const json = super.toJSON(...arguments)
-    return {...json, progress: this.progress}
+    return {
+      ...super.toJSON(...arguments),
+      progress: this.progress,
+    }
   }
 }
-AlignmentView.initClass()
+
+OutcomeView.prototype.className = 'outcome'
+OutcomeView.prototype.tagName = 'li'
+OutcomeView.prototype.template = template
+OutcomeView.prototype.events = {
+  'click .more-details': 'show',
+  'keydown .more-details': 'show',
+}
+
+export default OutcomeView
