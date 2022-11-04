@@ -85,7 +85,9 @@ export const DiscussionTopicAlertManager = props => {
           applicableAlerts.push(
             <Alert key="post-required" renderCloseButtonLabel="Close" margin="0 0 x-small">
               <Text data-testid="post-required" size={responsiveProps?.alert?.textSize}>
-                {I18n.t('You must post before seeing replies.')}
+                {I18n.t(
+                  'You must post before seeing replies. Edit history will be available to instructors.'
+                )}
               </Text>
             </Alert>
           )
