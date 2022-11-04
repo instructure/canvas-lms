@@ -20,6 +20,12 @@
     "address_3159962f": {
         "message": "Cím:"
     },
+    "afrikaans_da0fe6ee": {
+        "message": "Afrikaans"
+    },
+    "albanian_21ed929e": {
+        "message": "Albán"
+    },
     "align_11050992": {
         "message": "Igazítás"
     },
@@ -74,8 +80,14 @@
     "apps_54d24a47": {
         "message": "Alkalmazások"
     },
+    "arabic_c5c87acd": {
+        "message": "Arab"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Biztosan törölni szeretné ezt a tervezőbeli elemet?"
+    },
+    "armenian_12da6118": {
+        "message": "Örmény"
     },
     "arrows_464a3e54": {
         "message": "Nyilak"
@@ -137,6 +149,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "A Tennivaló Listád Elkezdése"
     },
+    "belarusian_b2f19c76": {
+        "message": "Fehérorosz"
+    },
     "beta_cb5f307e": {
         "message": "Béta"
     },
@@ -145,6 +160,9 @@
     },
     "brick_f2656265": {
         "message": "Tégla"
+    },
+    "bulgarian_feccab7e": {
+        "message": "Bolgár"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -160,6 +178,12 @@
     },
     "canvas_planner_98ed106": {
         "message": "Canvas Tervező"
+    },
+    "catalan_16f6b78f": {
+        "message": "Katalán"
+    },
+    "chinese_111d37f6": {
+        "message": "Kínai"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
@@ -275,11 +299,20 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons licenc:"
     },
+    "croatian_d713d655": {
+        "message": "Horvát"
+    },
     "custom_6979cd81": {
         "message": "Egyéni"
     },
     "cyan_c1d5f68a": {
         "message": "Cián"
+    },
+    "czech_9aa2cbe4": {
+        "message": "Cseh"
+    },
+    "danish_c18cdac8": {
+        "message": "Dán"
     },
     "date_added_ed5ad465": {
         "message": "Dátum hozzáadva"
@@ -389,6 +422,9 @@
     "due_when_7eed10c6": {
         "message": "Határidő: { when }"
     },
+    "dutch_6d05cee5": {
+        "message": "Holland"
+    },
     "edit_c5fbea07": {
         "message": "Szerkesztés"
     },
@@ -419,6 +455,18 @@
     "embedded_content_aaeb4d3d": {
         "message": "beágyazott tartalom"
     },
+    "english_australia_dc405d82": {
+        "message": "English (Australia)"
+    },
+    "english_c60612e2": {
+        "message": "Angol"
+    },
+    "english_canada_12688ee4": {
+        "message": "English (Canada)"
+    },
+    "english_united_kingdom_a613f831": {
+        "message": "English (United Kingdom)"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Legalább 3 karaktert be kell írni a kereséshez"
     },
@@ -433,6 +481,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Hiba történt a korábbi elemek betöltése közben."
+    },
+    "estonian_5e8e2fa4": {
+        "message": "Észt"
     },
     "excused_cf8792eb": {
         "message": "Felmentve"
@@ -482,6 +533,9 @@
     "files_index_af7c662b": {
         "message": "Fájlok indexe"
     },
+    "finnish_4df2923d": {
+        "message": "Finn"
+    },
     "focus_element_options_toolbar_18d993e": {
         "message": "Az elem opciók eszköztár fókuszba helyezése"
     },
@@ -500,11 +554,23 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "{ count, plural,\n     =0 {# eredmény}\n    one {# eredmény}\n  other {# eredmény}\n} található"
     },
+    "french_33881544": {
+        "message": "Francia"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "French (Canada)"
+    },
     "fullscreen_873bf53f": {
         "message": "Teljes képernyő"
     },
+    "galician_7e4508b5": {
+        "message": "Galíciai"
+    },
     "generating_preview_45b53be0": {
         "message": "Előnézet generálása... "
+    },
+    "german_3ec99bbb": {
+        "message": "Német"
     },
     "go_to_card_view_dashboard_9d03970e": {
         "message": "Ugrás a vezérlőpult kártya nézetére"
@@ -554,6 +620,9 @@
     "group_navigation_99f191a": {
         "message": "Csoportnavigáció"
     },
+    "haitian_creole_7eb4195b": {
+        "message": "Haiti"
+    },
     "heading_2_5b84eed2": {
         "message": "Címsor 2"
     },
@@ -563,8 +632,14 @@
     "heading_4_b2e74be7": {
         "message": "Címsor 4"
     },
+    "hebrew_88fbf778": {
+        "message": "Héber"
+    },
     "height_69b03e15": {
         "message": "Magasság"
+    },
+    "hindi_9bcd4b34": {
+        "message": "Hindi"
     },
     "home_351838cd": {
         "message": "Kezdőlap"
@@ -572,11 +647,17 @@
     "html_editor_fb2ab713": {
         "message": "HTML szerkesztő"
     },
+    "hungarian_fc7d30c9": {
+        "message": "Magyar"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Szereztem jogosultságot ennek a fájlnak a használatához."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Megtartom a szerzői jogot"
+    },
+    "icelandic_9d6d35de": {
+        "message": "Izlandi"
     },
     "icon_215a1dc6": {
         "message": "Ikon"
@@ -605,6 +686,9 @@
     "indigo_2035fc55": {
         "message": "Indigókék"
     },
+    "indonesian_5f6accd6": {
+        "message": "Indonéz"
+    },
     "insert_593145ef": {
         "message": "Beszúrás"
     },
@@ -626,8 +710,17 @@
     "invalid_url_cbde79f": {
         "message": "Helytelen webcím"
     },
+    "irish_567e109f": {
+        "message": "Ír"
+    },
+    "italian_bd3c792d": {
+        "message": "Olasz"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
+    },
+    "japanese_b5721ca7": {
+        "message": "Japán"
     },
     "join_6cafecca": {
         "message": "Csatlakozás"
@@ -638,11 +731,17 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Billentyűparancsok"
     },
+    "korean_da812d9": {
+        "message": "Koreai"
+    },
     "large_9c5e80e7": {
         "message": "Nagy"
     },
     "late_2be42b88": {
         "message": "Késve"
+    },
+    "latvian_2bbb6aab": {
+        "message": "Lett"
     },
     "left_to_right_e9b4fd06": {
         "message": "Balról jobbra"
@@ -661,6 +760,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Linkek egy külső oldalra"
+    },
+    "lithuanian_5adcbe24": {
+        "message": "Litván"
     },
     "load_more_35d33c7": {
         "message": "Továbbiak betöltése"
@@ -713,8 +815,20 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Úgy tűnik, itt nincsen semmi."
     },
+    "macedonian_6ed541af": {
+        "message": "Macedón"
+    },
     "magenta_4a65993c": {
         "message": "Magenta"
+    },
+    "malay_f5dddce4": {
+        "message": "Maláj"
+    },
+    "maltese_916925e8": {
+        "message": "Máltai"
+    },
+    "maori_new_zealand_5380a95f": {
+        "message": "Māori (New Zealand)"
     },
     "media_af190855": {
         "message": "Média"
@@ -803,6 +917,12 @@
     "none_3b5e34d2": {
         "message": "Nincs"
     },
+    "norwegian_53f391ec": {
+        "message": "Norvég"
+    },
+    "norwegian_bokmal_ad5843fa": {
+        "message": "Norwegian Bokmål"
+    },
     "nothing_for_now_e3e3ce2a": {
         "message": "Egyelőre semmi"
     },
@@ -887,6 +1007,12 @@
     "points_points_63e59cce": {
         "message": "{ points } pont"
     },
+    "polish_4cf2ecaf": {
+        "message": "Lengyel"
+    },
+    "portuguese_9c212cf4": {
+        "message": "Portugál"
+    },
     "posted_when_a578f5ab": {
         "message": "Közzétéve: { when }"
     },
@@ -962,6 +1088,12 @@
     "right_to_left_9cfb092a": {
         "message": "Jobbról balra"
     },
+    "romanian_13670c1e": {
+        "message": "Román"
+    },
+    "russian_1e3e197": {
+        "message": "Orosz"
+    },
     "save_11a80ec3": {
         "message": "Mentés"
     },
@@ -983,6 +1115,9 @@
     "selected_274ce24f": {
         "message": "Kiválasztva"
     },
+    "serbian_7187f1f2": {
+        "message": "Szerb"
+    },
     "show_all_ae37d610": {
         "message": "Összes megjelenítése"
     },
@@ -1001,6 +1136,12 @@
     "size_b30e1077": {
         "message": "Méret"
     },
+    "slovak_69f48e1b": {
+        "message": "Szlovák"
+    },
+    "slovenian_30ae5208": {
+        "message": "Szlovén"
+    },
     "small_b070434a": {
         "message": "Kicsi"
     },
@@ -1015,6 +1156,9 @@
     },
     "sort_by_e75f9e3e": {
         "message": "Rendezés alapja"
+    },
+    "spanish_de9de5d6": {
+        "message": "Spanyol"
     },
     "square_unordered_list_b15ce93b": {
         "message": "rendezetlen lista négyzetekkel"
@@ -1055,11 +1199,20 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Támogatott fájltípusok: SRT vagy WebVTT"
     },
+    "swahili_5caeb4ba": {
+        "message": "Szuahéli"
+    },
+    "swedish_59a593ca": {
+        "message": "Svéd"
+    },
     "syllabus_f191f65b": {
         "message": "Tematika"
     },
     "tab_arrows_4cf5abfc": {
         "message": "Tab/Nyilak"
+    },
+    "tagalog_74906db7": {
+        "message": "Tagalog"
     },
     "task_16b0ef38": {
         "message": "Feladat"
@@ -1069,6 +1222,9 @@
     },
     "text_7f4593da": {
         "message": "Szöveg"
+    },
+    "thai_8f9bc548": {
+        "message": "Thai"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Ekkorra kell megcsinálni ezt"
@@ -1142,6 +1298,9 @@
     "tray_839df38a": {
         "message": "Tálca"
     },
+    "turkish_5b69578b": {
+        "message": "Török"
+    },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "Nyomjon Control F9-et a kép opciók eléréséhez { text }"
     },
@@ -1150,6 +1309,9 @@
     },
     "type_control_f9_to_access_table_options_text_92141329": {
         "message": "Nyomjon Control F9-et a táblázat opciók eléréséhez { text }"
+    },
+    "ukrainian_945b00b7": {
+        "message": "Ukrán"
     },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Nem lehet készként megjelölni."
@@ -1223,11 +1385,17 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Videólejátszó ehhez: { title }"
     },
+    "vietnamese_e7a76583": {
+        "message": "Vietnami"
+    },
     "view_ba339f93": {
         "message": "Megtekintés"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "A gyors elérés billentyűkombinációk megtekintése"
+    },
+    "welsh_42ab94b1": {
+        "message": "Walesi"
     },
     "width_492fec76": {
         "message": "Szélesség"
@@ -1249,6 +1417,9 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Tegnap"
+    },
+    "yiddish_f96986df": {
+        "message": "Jiddis"
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Önnek média visszajelzése van."
