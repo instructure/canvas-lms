@@ -505,7 +505,7 @@ describe "threaded discussions" do
         )
         user_session(@student)
         get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-        expect(fj("div:contains('You must post before seeing replies.')")).to be_present
+        expect(fj("div:contains('You must post before seeing replies. Edit history will be available to instructors.')")).to be_present
         expect(f("body")).not_to contain_jqcss("div:contains('students can only see this if they reply')")
         f("button[data-testid='discussion-topic-reply']").click
         type_in_tiny("textarea", "student here")
