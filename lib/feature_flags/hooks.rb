@@ -66,6 +66,13 @@ module FeatureFlags
       root_account.settings&.dig(:provision, "lti").present?
     end
 
+    def self.docviewer_enable_iwork_visible_on_hook(context)
+      root_account = context.root_account
+
+      # Right now Apple only has a server in the US, to comply with GDPR, we'll only turn this on for folks in the US.
+      root_account.external_integration_keys.find_by(key_type: "salesforce_billing_country_code")&.key_value == "US"
+    end
+
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)
