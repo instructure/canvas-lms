@@ -552,11 +552,11 @@ $.fileData = function (file_object) {
 }
 
 $.toMultipartForm = function (params, callback) {
-  let body = '--' + boundary + '\r\n'
-  let hasFakeFile = false
   const boundary = '-----AaB03x' + _.uniqueId()
   const paramsList = []
   const result = {content_type: 'multipart/form-data; boundary=' + boundary}
+  let body = '--' + boundary + '\r\n'
+  let hasFakeFile = false
 
   for (const idx in params) {
     paramsList.push([idx, params[idx]])
