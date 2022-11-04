@@ -432,6 +432,24 @@ describe SubmissionsController do
       end
     end
 
+    it "rewrites canvas content links" do
+      course_with_student_logged_in(active_all: true)
+      @course.account.enable_service(:avatars)
+      assignment = @course.assignments.create!(
+        title: "some assignment",
+        submission_types: "online_text_entry"
+      )
+      sub_params = { submission_type: "online_text_entry", body: "<p><img src=\"http://test.host/courses/1/files/1?preview\"></p>" }
+      post "create", params: {
+        course_id: @course.id,
+        assignment_id: assignment.id,
+        submission: sub_params
+      }
+
+      submission = assigns[:submission]
+      expect(submission.body).to eq "<p><img src=\"/courses/1/files/1?preview\"></p>"
+    end
+
     it "rejects an empty text response" do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
