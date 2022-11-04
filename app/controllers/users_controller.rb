@@ -1732,21 +1732,7 @@ class UsersController < ApplicationController
     end
 
     if @user.grants_right?(@current_user, :update_avatar)
-      avatar = user_params.delete(:avatar)
-
-      # delete any avatar_image passed, because we only allow updating avatars
-      # based on [:avatar][:token].
-      user_params.delete(:avatar_image)
-
-      managed_attributes << :avatar_image
-      if token = avatar.try(:[], :token)
-        if av_json = avatar_for_token(@user, token)
-          user_params[:avatar_image] = { :type => av_json['type'],
-            :url => av_json['url'] }
-        end
-      elsif url = avatar.try(:[], :url)
-        user_params[:avatar_image] = { :type => 'external', :url => url }
-      end
+      update_avatar(managed_attributes, user_params)
     end
 
     if managed_attributes.any? && user_params.except(*managed_attributes).empty?
@@ -2221,6 +2207,24 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def update_avatar(managed_attributes, user_params)
+    avatar = user_params.delete(:avatar)
+
+    # delete any avatar_image passed, because we only allow updating avatars
+    # based on [:avatar][:token].
+    user_params.delete(:avatar_image)
+
+    managed_attributes << :avatar_image
+    if token = avatar.try(:[], :token)
+      if av_json = avatar_for_token(@user, token)
+        user_params[:avatar_image] = { :type => av_json['type'],
+                                       :url => av_json['url'] }
+      end
+    elsif url = avatar.try(:[], :url)
+      user_params[:avatar_image] = { :type => 'external', :url => url }
+    end
+  end
 
   def generate_grading_period_id(period_id)
     # nil and '' will get converted to 0 in the .to_i call
