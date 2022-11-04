@@ -65,7 +65,7 @@ module CC::Importer::Canvas
          group_weighting_scheme storage_quota grading_standard_identifier_ref
          overridden_course_visibility root_account_uuid
          image_url image_identifier_ref banner_image_url banner_image_identifier_ref
-         course_color alt_name].each do |string_type|
+         course_color alt_name time_zone].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end

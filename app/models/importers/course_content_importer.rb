@@ -527,6 +527,10 @@ module Importers
         Announcement.lock_from_course(course)
       end
 
+      if settings.key?(:time_zone)
+        course.time_zone = settings[:time_zone]
+      end
+
       if settings.key?(:default_post_policy)
         post_manually = Canvas::Plugin.value_to_boolean(settings.dig(:default_post_policy, :post_manually))
         course.default_post_policy.update!(post_manually: post_manually)
