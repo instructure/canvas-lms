@@ -287,6 +287,11 @@ class SubmissionsController < SubmissionsBaseController
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
+
+    if submission_params.key?(:body)
+      submission_params[:body] = process_incoming_html_content(params[:submission][:body])
+    end
+
     begin
       @submission = @assignment.submit_homework(@submission_user, submission_params)
     rescue ActiveRecord::RecordInvalid => e
