@@ -150,6 +150,7 @@ describe "Canvadoc" do
   describe "mime types" do
     before do
       Account.current_domain_root_account = Account.default
+      Account.default.external_integration_keys.create!(key_type: "salesforce_billing_country_code", key_value: "US")
     end
 
     after do
