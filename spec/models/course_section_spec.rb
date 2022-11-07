@@ -664,7 +664,7 @@ describe CourseSection, "moving to new course" do
 
     it "does nothing if course paces aren't turned on" do
       @section.update(start_at: 1.day.from_now)
-      expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.id}")).not_to exist
+      expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.global_id}")).not_to exist
     end
 
     context "with course paces enabled" do
@@ -676,7 +676,7 @@ describe CourseSection, "moving to new course" do
       it "doesn't queue an update if the course pace isn't published" do
         @section_course_pace.update workflow_state: "unpublished"
         @section.update(start_at: 1.day.from_now)
-        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.id}")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.global_id}")).not_to exist
       end
 
       it "publishes a section course pace (alone) if it exists" do
@@ -684,14 +684,14 @@ describe CourseSection, "moving to new course" do
         course_pace.publish
         @section.start_at = 2.days.from_now
         @section.save!
-        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.id}")).to exist
-        expect(Delayed::Job.where(singleton: "course_pace_publish:#{course_pace.id}")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.global_id}")).to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{course_pace.global_id}")).not_to exist
       end
 
       it "doesn't queue an update for irrelevant changes" do
         @section.name = "Test Name"
         @section.save!
-        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.id}")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@section_course_pace.global_id}")).not_to exist
       end
     end
   end
