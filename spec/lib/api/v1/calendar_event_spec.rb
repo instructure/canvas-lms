@@ -68,4 +68,14 @@ describe Api::V1::CalendarEvent do
     json = event_json(event, @user, @session, { include: ["web_conference"] })
     expect(json["web_conference"]).not_to be_present
   end
+
+  it "does not include the CourseSection name if already present on the event" do
+    section = course.course_sections.create!(name: "Section 1")
+    event = section.calendar_events.create!(title: "Test")
+    json = event_json(event, @user, @session, {})
+    expect(json["title"]).to eq("Test (#{section.name})")
+    event.update(title: "Test (#{section.name})")
+    json = event_json(event, @user, @session, {})
+    expect(json["title"]).to eq("Test (#{section.name})")
+  end
 end
