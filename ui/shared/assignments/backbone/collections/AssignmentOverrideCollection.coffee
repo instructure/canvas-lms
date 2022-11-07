@@ -18,7 +18,7 @@
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
 import $ from 'jquery'
-import AssignmentOverride from '../models/AssignmentOverride.coffee'
+import AssignmentOverride from '../models/AssignmentOverride'
 import Section from '@canvas/sections/backbone/models/Section'
 
 # Class Summary

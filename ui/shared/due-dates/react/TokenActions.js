@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import Section from '@canvas/sections/backbone/models/Section'
 
 const TokenActions = {
