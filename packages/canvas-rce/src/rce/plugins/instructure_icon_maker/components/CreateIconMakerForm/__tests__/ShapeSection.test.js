@@ -73,13 +73,17 @@ describe('<ShapeSection />', () => {
       ...DEFAULT_SETTINGS,
       shape: 'triangle',
       imageSettings: {
+        image: 'data:image/svg+xml;base64,AAABBBCCC',
         cropperSettings: {},
       },
     }
 
     it('recrops the embedded image', () => {
       render(<ShapeSection settings={settings} onChange={() => {}} />)
-      expect(createCroppedImageSvg).toHaveBeenCalledWith({shape: 'triangle'})
+      expect(createCroppedImageSvg).toHaveBeenCalledWith(
+        {shape: 'triangle'},
+        'data:image/svg+xml;base64,AAABBBCCC'
+      )
     })
 
     it('sets the encoded image to the newly cropped base64 encoded image', async () => {
@@ -89,7 +93,22 @@ describe('<ShapeSection />', () => {
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith({
           payload: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
-          type: 'SetEncodedImage',
+          type: 'SetEmbedImage',
+        })
+      )
+    })
+
+    it('sets the new cropper settings with the new shape', async () => {
+      const onChange = jest.fn()
+      render(<ShapeSection settings={settings} onChange={onChange} />)
+      expect(convertFileToBase64).toHaveBeenCalled()
+      await waitFor(() =>
+        expect(onChange).toHaveBeenCalledWith({
+          payload: {
+            image: 'data:image/svg+xml;base64,AAABBBCCC',
+            cropperSettings: {shape: 'triangle'},
+          },
+          type: 'SetImageSettings',
         })
       )
     })

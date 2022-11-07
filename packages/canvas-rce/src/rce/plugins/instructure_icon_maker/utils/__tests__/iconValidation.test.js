@@ -24,7 +24,9 @@ describe('icon validation', () => {
   beforeEach(() => {
     settings = {
       color: null,
-      encodedImage: '',
+      imageSettings: {
+        image: '',
+      },
       outlineSize: 'none',
       text: '',
     }
@@ -58,7 +60,7 @@ describe('icon validation', () => {
     })
 
     it('is true if the icon has an image', () => {
-      settings.encodedImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR...'
+      settings.imageSettings.image = 'data:image/svg+xml;base64,PHN2ZyB3aWR...'
       expect(hasImage(settings)).toBe(true)
     })
   })
@@ -90,7 +92,7 @@ describe('icon validation', () => {
     })
 
     it('is true if the icon has an image', () => {
-      settings.encodedImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR...'
+      settings.imageSettings.image = 'data:image/svg+xml;base64,PHN2ZyB3aWR...'
       expect(validIcon(settings)).toBe(true)
     })
 

@@ -211,7 +211,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
     settings.color,
     settings.textColor,
     settings.text,
-    settings.encodedImage,
+    settings.imageSettings,
     settings.outlineColor,
     settings.outlineSize,
   ])

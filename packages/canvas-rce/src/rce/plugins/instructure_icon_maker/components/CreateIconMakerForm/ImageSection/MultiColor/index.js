@@ -21,8 +21,9 @@ import PropTypes from 'prop-types'
 import SVGList, {TYPE} from '../SVGList'
 import {actions} from '../../../../reducers/imageSection'
 import {convertFileToBase64} from '../../../../svg/utils'
+import {actions as svgActions} from '../../../../reducers/svgSettings'
 
-const MultiColor = ({dispatch, onLoaded}) => {
+const MultiColor = ({dispatch, onChange, onLoaded}) => {
   const onSelect = (id, svg) => {
     dispatch({...actions.START_LOADING})
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
@@ -35,6 +36,7 @@ const MultiColor = ({dispatch, onLoaded}) => {
       dispatch({...actions.SET_IMAGE, payload: base64Image})
       dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
       dispatch({...actions.STOP_LOADING})
+      onChange({type: svgActions.SET_EMBED_IMAGE, payload: base64Image})
     })
   }
 
@@ -43,11 +45,13 @@ const MultiColor = ({dispatch, onLoaded}) => {
 
 MultiColor.propTypes = {
   dispatch: PropTypes.func,
+  onChange: PropTypes.func,
   onLoaded: PropTypes.func,
 }
 
 MultiColor.defaultProps = {
   dispatch: () => {},
+  onChange: PropTypes.func,
   onLoaded: () => {},
 }
 

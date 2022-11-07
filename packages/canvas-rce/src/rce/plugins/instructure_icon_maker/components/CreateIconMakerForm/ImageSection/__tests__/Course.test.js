@@ -193,6 +193,15 @@ describe('Course()', () => {
       })
     })
 
+    it('dispatches a "set embed image" action', async () => {
+      await waitFor(() => {
+        expect(props.onChange).toHaveBeenCalledWith({
+          type: 'SetEmbedImage',
+          payload: 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ==',
+        })
+      })
+    })
+
     it('dispatches a "set image collection open" action', async () => {
       await waitFor(() =>
         expect(props.dispatch).toHaveBeenCalledWith({
@@ -316,6 +325,15 @@ describe('Course()', () => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetCropperOpen',
           payload: true,
+        })
+      })
+    })
+
+    it('dispatches a "set embed image" action', async () => {
+      await waitFor(() => {
+        expect(props.onChange).toHaveBeenCalledWith({
+          type: 'SetEmbedImage',
+          payload: 'data:image/jpeg;base64,abcdefghijk==',
         })
       })
     })

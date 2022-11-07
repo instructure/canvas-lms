@@ -52,7 +52,6 @@ export function buildSvg(settings, options = {}) {
   clipPath.appendChild(shape)
 
   // These are required to make the group have the right shape
-  fillGroup.appendChild(clipPath)
   fillGroup.appendChild(shape.cloneNode(true))
 
   // These are required to make the group have the right shape

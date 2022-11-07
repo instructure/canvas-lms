@@ -22,11 +22,10 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {Preview} from '../Preview'
 
 describe('Preview', () => {
-  let settings, dispatch
+  let settings, dispatch, image
 
   beforeEach(() => {
     settings = {
-      image: 'https://www.fillmurray.com/640/480',
       shape: 'square',
       scaleRatio: 1,
       rotation: 0,
@@ -34,16 +33,20 @@ describe('Preview', () => {
       translateY: 0,
     }
     dispatch = jest.fn()
+    image = 'https://www.fillmurray.com/640/480'
   })
+
+  const subject = (otherProps = {}) =>
+    render(<Preview settings={settings} dispatch={dispatch} image={image} {...otherProps} />)
 
   describe('renders', () => {
     it('the image', () => {
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('img')).toBeInTheDocument()
     })
 
     it('the image with src', () => {
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('img')).toMatchInlineSnapshot(`
       <img
         alt="Image to crop"
@@ -54,26 +57,26 @@ describe('Preview', () => {
     })
 
     it('the crop shape container', () => {
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('#cropShapeContainer')).toBeInTheDocument()
     })
 
     it('with rotate transform', () => {
       settings.rotation = 90
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('img').style).toHaveProperty('transform', 'rotate(90deg)')
     })
 
     it('with scale transform', () => {
       settings.scaleRatio = 1.6
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('img').style).toHaveProperty('transform', 'scale(1.6)')
     })
 
     it('with rotate and scale transform', () => {
       settings.rotation = 90
       settings.scaleRatio = 1.6
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       expect(container.querySelector('img').style).toHaveProperty(
         'transform',
         'rotate(90deg) scale(1.6)'
@@ -82,18 +85,18 @@ describe('Preview', () => {
   })
 
   it('changes the crop shape', () => {
-    const {container, rerender} = render(<Preview settings={settings} dispatch={dispatch} />)
+    const {container, rerender} = subject()
     const svgContainer = container.querySelector('#cropShapeContainer')
     const squareContent = svgContainer.innerHTML
     settings.shape = 'octagon'
-    rerender(<Preview settings={settings} dispatch={dispatch} />)
+    rerender(<Preview settings={settings} dispatch={dispatch} image={image} />)
     const octagonContent = svgContainer.innerHTML
     expect(squareContent).not.toEqual(octagonContent)
   })
 
   describe('calls dispatch using wheel', () => {
     it('when zoom in', async () => {
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       const event = {deltaY: -25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
@@ -103,7 +106,7 @@ describe('Preview', () => {
 
     it('when zoom out', async () => {
       settings.scaleRatio = 2
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       const event = {deltaY: 25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
@@ -114,7 +117,7 @@ describe('Preview', () => {
 
   describe('sets scale style using wheel', () => {
     it('when zoom in', async () => {
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       const event = {deltaY: -25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
@@ -125,7 +128,7 @@ describe('Preview', () => {
 
     it('when zoom out', async () => {
       settings.scaleRatio = 2
-      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      const {container} = subject()
       const event = {deltaY: 25}
       fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
@@ -139,7 +142,7 @@ describe('Preview', () => {
     let container, event
 
     beforeEach(() => {
-      const component = render(<Preview settings={settings} dispatch={dispatch} />)
+      const component = subject()
       document.querySelector('#cropper-preview').focus()
       container = component.container
       event = {preventDefault: jest.fn()}
@@ -228,7 +231,7 @@ describe('Preview', () => {
     })
 
     beforeEach(() => {
-      const component = render(<Preview settings={settings} dispatch={dispatch} />)
+      const component = subject()
       container = component.container
       target = container.querySelector('img')
 

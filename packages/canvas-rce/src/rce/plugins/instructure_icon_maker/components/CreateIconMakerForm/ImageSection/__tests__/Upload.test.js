@@ -20,6 +20,7 @@ import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import Upload, {onSubmit} from '../Upload'
 import {actions} from '../../../../reducers/imageSection'
+import {actions as svgActions} from '../../../../reducers/svgSettings'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import fetchMock from 'fetch-mock'
 import {isAnUnsupportedGifPngImage} from '../utils'
@@ -98,9 +99,17 @@ describe('Upload()', () => {
 
     afterEach(() => jest.clearAllMocks())
 
-    it('sets the selected image', () => {
+    it('sets the selected image to preview', () => {
       onSubmitCall()
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE, payload: theFile.preview})
+    })
+
+    it('sets the selected image as embed image', () => {
+      onSubmitCall()
+      expect(onChange).toHaveBeenCalledWith({
+        type: svgActions.SET_EMBED_IMAGE,
+        payload: theFile.preview,
+      })
     })
 
     it('sets the selected image name', () => {
@@ -147,6 +156,7 @@ describe('Upload()', () => {
 
   describe('onSubmit() with an image to be compressed', () => {
     const dispatch = jest.fn()
+    const onChange = jest.fn()
     const theFile = {
       preview:
         'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
@@ -156,7 +166,7 @@ describe('Upload()', () => {
     }
 
     const onSubmitCall = () =>
-      onSubmit(dispatch)(
+      onSubmit(dispatch, onChange)(
         {},
         {},
         {},
@@ -175,11 +185,20 @@ describe('Upload()', () => {
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_COMPRESSION_STATUS, payload: true})
     })
 
-    it('sets the selected image', async () => {
+    it('sets the selected image to preview', async () => {
       onSubmitCall()
       await flushPromises()
       expect(dispatch).toHaveBeenCalledWith({
         ...actions.SET_IMAGE,
+        payload: 'data:image/jpeg;base64,abcdefghijk==',
+      })
+    })
+
+    it('sets the selected image as embed image', async () => {
+      onSubmitCall()
+      await flushPromises()
+      expect(onChange).toHaveBeenCalledWith({
+        type: svgActions.SET_EMBED_IMAGE,
         payload: 'data:image/jpeg;base64,abcdefghijk==',
       })
     })

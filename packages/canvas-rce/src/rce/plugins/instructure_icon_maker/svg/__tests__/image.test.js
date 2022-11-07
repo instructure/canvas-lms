@@ -655,8 +655,11 @@ describe('buildImage', () => {
       it('uses the icon settings to set the image attributes', () => {
         const settings = {
           ...baseSettings,
-          encodedImage: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
-          encodedImageType: 'SingleColor',
+          embedImage: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
+          imageSettings: {
+            image: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
+            mode: 'SingleColor',
+          },
         }
         expect(buildImage(settings)).toMatchInlineSnapshot(`
           <g
@@ -679,8 +682,11 @@ describe('buildImage', () => {
       it('uses image attributes computed from the square size', () => {
         const settings = {
           ...baseSettings,
-          encodedImage: 'data:image/svg+xml;base64,PHN2Zbbbbbbbbb',
-          encodedImageType: 'Course',
+          embedImage: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
+          imageSettings: {
+            image: 'data:image/svg+xml;base64,PHN2Zbbbbbbbbb',
+            mode: 'Course',
+          },
         }
         expect(buildImage(settings)).toMatchInlineSnapshot(`
           <g
@@ -688,7 +694,7 @@ describe('buildImage', () => {
           >
             <image
               height="114"
-              href="data:image/svg+xml;base64,PHN2Zbbbbbbbbb"
+              href="data:image/svg+xml;base64,PHN2Zaaaaaaaaa"
               transform="translate(-57, -57)"
               width="114"
               x="50%"
