@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
+import {
+  AUTO_MARK_AS_READ_DELAY,
+  SearchContext,
+  DiscussionManagerUtilityContext,
+} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
@@ -194,6 +198,7 @@ const SplitScreenThreadContainer = props => {
   const [reportingError, setReportingError] = useState(false)
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const {filter} = useContext(SearchContext)
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
@@ -380,6 +385,14 @@ const SplitScreenThreadContainer = props => {
                               }
                             : null
                         }
+                        onQuoteReply={() => {
+                          setReplyFromId(props.discussionEntry._id)
+                          props.onOpenSplitScreenView(
+                            props.discussionEntry._id,
+                            props.discussionEntry.isolatedEntryId,
+                            true
+                          )
+                        }}
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {
