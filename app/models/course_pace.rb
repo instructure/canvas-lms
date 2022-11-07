@@ -129,7 +129,7 @@ class CoursePace < ActiveRecord::Base
     progress = Progress.create!(context: self, tag: "course_pace_publish")
     progress.process_job(self, :publish, {
                            run_at: run_at,
-                           singleton: "course_pace_publish:#{id}",
+                           singleton: "course_pace_publish:#{global_id}",
                            on_conflict: :overwrite
                          }, { enrollment_ids: enrollment_ids })
     progress
