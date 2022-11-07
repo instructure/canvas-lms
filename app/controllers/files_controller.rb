@@ -1503,7 +1503,7 @@ class FilesController < ApplicationController
   end
 
   def open_cors
-    headers["Access-Control-Allow-Origin"] = "*"
+    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
     headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "POST, PUT, DELETE, GET, OPTIONS"
     headers["Access-Control-Request-Method"] = "*"
@@ -1511,7 +1511,7 @@ class FilesController < ApplicationController
   end
 
   def open_limited_cors
-    headers["Access-Control-Allow-Origin"] = "*"
+    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
     headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
   end

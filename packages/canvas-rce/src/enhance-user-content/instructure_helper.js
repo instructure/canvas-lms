@@ -123,6 +123,7 @@ export function showFilePreviewInline(event, disableGooglePreviews) {
     {
       method: 'GET',
       headers: {Accept: 'application/json'},
+      credentials: 'include',
     }
   )
     .then(response => {
