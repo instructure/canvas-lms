@@ -940,7 +940,7 @@ class ApplicationController < ActionController::Base
         return redirect_to login_url(params.permit(:authentication_provider)) if !@files_domain && !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
-          if @context_enrollment.inactive?
+          if @context_enrollment.enrollment_state&.pending?
             start_date = @context_enrollment.available_at
           end
           if @context.claimed?

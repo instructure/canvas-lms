@@ -1451,7 +1451,6 @@ describe CoursesController do
         expect(assigns[:current_user]).to eq @student1
         expect(session[:enrollment_uuid]).to eq @enrollment.uuid
         expect(session[:permissions_key]).not_to be_nil
-        permissions_key = session[:permissions_key]
         @enrollment.reload
         expect(@enrollment).to be_invited
 
@@ -1461,7 +1460,7 @@ describe CoursesController do
         expect(assigns[:pending_enrollment]).to eq @enrollment
         expect(assigns[:current_user]).to eq @student1
         expect(session[:enrollment_uuid]).to eq @enrollment.uuid
-        expect(session[:permissions_key]).to eq permissions_key
+        expect(session[:permissions_key]).not_to be_nil
         @enrollment.reload
         expect(@enrollment).to be_invited
       end

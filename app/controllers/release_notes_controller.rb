@@ -167,8 +167,11 @@ class ReleaseNotesController < ApplicationController
 
   # For specs only
   def clear_ivars
-    instance_variables.each do |ivar|
-      instance_variable_set(ivar, nil)
+    # modern rails does this for us, which is much better
+    if Rails.version < "7.0"
+      instance_variables.each do |ivar|
+        instance_variable_set(ivar, nil)
+      end
     end
   end
 end

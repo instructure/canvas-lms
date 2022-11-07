@@ -211,9 +211,10 @@ module CanvasRails
         if options&.[](:unprefixed_key)
           super
         else
-          SUPPORTED_VERSIONS.any? do |version|
+          # Any is eager, so we must map first or we won't run on all keys
+          SUPPORTED_VERSIONS.map do |version|
             super(key, (options || {}).merge(explicit_version: version.delete(".")))
-          end
+          end.any?
         end
       end
 

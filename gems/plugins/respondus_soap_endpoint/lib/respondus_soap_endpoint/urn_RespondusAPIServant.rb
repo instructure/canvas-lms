@@ -597,7 +597,7 @@ Implemented for: Canvas LMS)]
       if Setting.get("respondus_endpoint.polling_api", "true") == "false"
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.
-        timeout(5.minutes.to_i) do
+        Timeout.timeout(5.minutes.to_i) do
           loop do
             ret = poll_for_completion
             if ret == ["pending"]

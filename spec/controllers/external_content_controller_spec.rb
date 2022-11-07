@@ -364,6 +364,7 @@ describe ExternalContentController do
         end
 
         context "when the JTI has been seen already" do
+          specs_require_cache(:redis_cache_store)
           let(:static_uuid) { "d219444f-a608-45c3-b81b-74bf6ac7da25" }
 
           before do

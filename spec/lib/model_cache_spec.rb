@@ -46,8 +46,6 @@ describe ModelCache do
   after do
     ModelCache.keys.delete("TestModelCacheUser")
     ModelCache.keys.delete("TestModelCachePseudonym")
-    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete("TestModelCacheUser")
-    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete("TestModelCachePseudonym")
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end
