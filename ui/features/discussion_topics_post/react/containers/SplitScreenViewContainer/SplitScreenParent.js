@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -60,6 +61,7 @@ export const SplitScreenParent = props => {
   })
 
   const {setOnSuccess} = useContext(AlertManagerContext)
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
@@ -223,6 +225,10 @@ export const SplitScreenParent = props => {
                             },
                           })
                         }
+                        onQuoteReply={() => {
+                          setReplyFromId(props.discussionEntry._id)
+                          props.setRCEOpen(true)
+                        }}
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

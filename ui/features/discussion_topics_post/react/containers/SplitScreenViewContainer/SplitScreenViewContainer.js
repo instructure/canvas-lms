@@ -24,6 +24,7 @@ import {
   getOptimisticResponse,
   buildQuotedReply,
 } from '../../utils'
+import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
@@ -53,6 +54,7 @@ const I18n = useI18nScope('discussion_topics_post')
 
 export const SplitScreenViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
   const [draftSaved, setDraftSaved] = useState(true)
@@ -202,7 +204,7 @@ export const SplitScreenViewContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        parentEntryId: props.discussionEntryId,
+        parentEntryId: replyFromId || props.discussionEntryId,
         isAnonymousAuthor,
         message,
         fileId,
@@ -215,7 +217,7 @@ export const SplitScreenViewContainer = props => {
         rootEntryId: props.discussionEntryId,
         quotedEntry: buildQuotedReply(
           splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
-          props.replyFromId
+          replyFromId
         ),
         isAnonymous:
           !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
@@ -392,6 +394,10 @@ export const SplitScreenViewContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.highlightEntryId, props.discussionEntryId])
 
+  useEffect(() => {
+    if (!props.RCEOpen) setReplyFromId(null)
+  }, [props.RCEOpen, setReplyFromId])
+
   const renderSplitScreenView = () => {
     return (
       <>
@@ -427,16 +433,19 @@ export const SplitScreenViewContainer = props => {
                     message,
                     fileId,
                     includeReplyPreview,
-                    props.replyFromId,
+                    replyFromId,
                     anonymousAuthorState
                   )
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}
                 quotedEntry={buildQuotedReply(
-                  splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                    .nodes,
-                  props.replyFromId
+                  [
+                    splitScreenEntryOlderDirection.data.legacyNode,
+                    ...splitScreenEntryOlderDirection.data?.legacyNode
+                      ?.discussionSubentriesConnection.nodes,
+                  ],
+                  replyFromId
                 )}
                 value={findDraftMessage(
                   splitScreenEntryOlderDirection.data.legacyNode.root_entry_id ||
@@ -449,7 +458,7 @@ export const SplitScreenViewContainer = props => {
                     variables: {
                       discussionTopicId: props.discussionTopic._id,
                       message: newDraftMessage,
-                      parentId: props.replyFromId,
+                      parentId: replyFromId,
                     },
                   })
                 }}
@@ -547,7 +556,6 @@ SplitScreenViewContainer.propTypes = {
   onOpenSplitScreenView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,

@@ -124,7 +124,7 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    ENV.isolated_view ? setReplyFromId(discussionEntryId) : setReplyFromId(null)
+    if (ENV.isolated_view) setReplyFromId(discussionEntryId)
     setIsolatedEntryId(isolatedId || discussionEntryId)
     if (ENV.isolated_view) {
       setIsolatedViewOpen(true)
@@ -396,7 +396,6 @@ const DiscussionTopicManager = props => {
                   updateDraftCache={updateDraftCache}
                   discussionTopic={discussionTopicQuery.data.legacyNode}
                   discussionEntryId={isolatedEntryId}
-                  replyFromId={replyFromId}
                   open={isSplitScreenViewOpen}
                   RCEOpen={editorExpanded}
                   setRCEOpen={setEditorExpanded}

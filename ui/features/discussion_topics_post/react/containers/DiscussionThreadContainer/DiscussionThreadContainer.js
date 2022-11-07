@@ -420,10 +420,18 @@ export const DiscussionThreadContainer = props => {
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
                           onQuoteReply={
-                            !(ENV.isolated_view || ENV.split_screen_view)
+                            !ENV.isolated_view
                               ? () => {
                                   setReplyFromId(props.discussionEntry._id)
-                                  setEditorExpanded(true)
+                                  if (ENV.split_screen_view) {
+                                    props.onOpenIsolatedView(
+                                      props.discussionEntry._id,
+                                      props.discussionEntry.isolatedEntryId,
+                                      true
+                                    )
+                                  } else {
+                                    setEditorExpanded(true)
+                                  }
                                 }
                               : null
                           }

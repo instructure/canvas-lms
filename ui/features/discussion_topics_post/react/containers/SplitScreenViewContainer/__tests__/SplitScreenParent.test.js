@@ -182,6 +182,16 @@ describe('SplitScreenParent', () => {
     ).toBeFalsy()
   })
 
+  describe('Quote Reply', () => {
+    it('appears in kebab menu', () => {
+      const {getByTestId, queryByText} = setup(defaultProps())
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryByText('Quote Reply')).toBeTruthy()
+    })
+  })
+
   describe('Report Reply', () => {
     it('show Report', () => {
       const {getByTestId, queryByText} = setup(defaultProps())
