@@ -39,7 +39,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     if input[:parent_entry_id]
       parent_entry = topic.discussion_entries.find(input[:parent_entry_id])
       entry.parent_entry = parent_entry
-      entry.include_reply_preview = input[:include_reply_preview].present? if parent_entry.root_entry_id.present?
+      entry.include_reply_preview = input[:include_reply_preview].present?
     end
 
     if input[:file_id]

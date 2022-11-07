@@ -158,7 +158,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
       expect(entry.include_reply_preview?).to be false
     end
 
-    it "cannot be a reply to a root entry" do
+    it "can be a reply to a root entry" do
       root_entry = @topic.discussion_entries.create!(message: "parent entry", user: @teacher, discussion_topic: @topic)
       result = run_mutation(discussion_topic_id: @topic.id, message: "Howdy Hey", include_reply_preview: true, parent_entry_id: root_entry.id)
 
@@ -166,7 +166,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
       expect(result.dig("data", "createDiscussionEntry", "errors")).to be nil
 
       entry = @topic.discussion_entries.last
-      expect(entry.include_reply_preview?).to be false
+      expect(entry.include_reply_preview?).to be true
     end
 
     it "does set on reply to a child reply" do
