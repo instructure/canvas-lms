@@ -59,7 +59,11 @@ describe "RequestThrottle" do
     end
 
     it "uses session id" do
-      expect(throttler.client_identifier(req(request_logged_out))).to eq "session:sess1"
+      request = req(request_logged_out)
+      # The actual session object will have no id because we don't have a session store in this spec context
+      expect(request.env).to receive(:[]).with("rack.session.options").and_return({ id: "sess1" })
+      allow(request.env).to receive(:[]).and_call_original
+      expect(throttler.client_identifier(request)).to eq "session:sess1"
     end
 
     it "falls back to ip" do

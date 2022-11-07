@@ -65,7 +65,7 @@ describe "Modules API", type: :request do
   end
 
   before do
-    @attachment = attachment_model(context: @course, usage_rights: @course.usage_rights.create!(legal_copyright: "(C) 2012 Initrode", use_justification: "creative_commons", license: "cc_by_sa"), uploaded_data: stub_file_data("test_image.jpg", Rails.root.join("spec/fixtures/test_image.jpg").read, "image/jpeg"))
+    @attachment = attachment_model(context: @course, usage_rights: @course.usage_rights.create!(legal_copyright: "(C) 2012 Initrode", use_justification: "creative_commons", license: "cc_by_sa"), uploaded_data: stub_file_data("test_image.jpg", Rails.root.join("spec/fixtures/files/test_image.jpg").read, "image/jpeg"))
 
     @attachment_tag = @module2.add_item(id: @attachment.id, type: "attachment")
     @module2.save!

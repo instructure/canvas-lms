@@ -15,8 +15,8 @@ module DumpHelper
       if val.is_a?(Proc)
         raise TypeError, "#{key}: #{$!}"
       end
-      if $!.message == "singleton can't be dumped" && !val.singleton_methods.empty?
-        raise TypeError, "#{key}: singleton can't be dumped (#<#{val.class}>): #{val.singleton_methods.inspect}"
+      if $!.message == "singleton can't be dumped" && !val.singleton_methods(false).empty?
+        raise TypeError, "#{key}: singleton can't be dumped (#<#{val.class}>): #{val.singleton_methods(false).inspect}"
       end
       if val.is_a?(Hash) && val.default_proc
         raise TypeError, "#{key}: can't dump hash with default proc: #{val.default_proc.inspect}"

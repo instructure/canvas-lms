@@ -45,7 +45,7 @@ module Canvas
   end
 
   def self.reconnect_redis
-    Canvas::Redis.reconnect_redis
+    CanvasCache::Redis.reconnect_redis
   end
 
   def self.cache_store_config_for(cluster)
@@ -66,7 +66,7 @@ module Canvas
 
     case config.delete("cache_store")
     when "redis_cache_store"
-      Canvas::Redis.patch
+      CanvasCache::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
       if config.except("expires_in") == {} && cluster == Rails.env && Canvas.redis_enabled?
         ActiveSupport::Cache.lookup_store(:redis_cache_store, redis: Canvas.redis)

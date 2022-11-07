@@ -1095,15 +1095,19 @@ describe Quizzes::QuizzesController do
         expect(assigns[:accessed_asset]).not_to be_nil
         expect(assigns[:accessed_asset][:level]).to eq "participate"
         expect(assigns[:access].participate_score).to eq 1
+        aua = assigns[:access]
 
-        # Since the second request we will make is handled by the same controller
-        # instance, @accessed_asset must be reset otherwise
-        # ApplicationController#log_page_view will use it to log another entry.
-        controller.instance_variable_set("@accessed_asset", nil)
-        controller.js_env.clear
+        # Rails does this for us on newer rails
+        if Rails.version < "7.0"
+          # Since the second request we will make is handled by the same controller
+          # instance, @accessed_asset must be reset otherwise
+          # ApplicationController#log_page_view will use it to log another entry.
+          controller.instance_variable_set("@accessed_asset", nil)
+          controller.js_env.clear
+        end
 
         post "show", params: { course_id: @course, quiz_id: @quiz.id, take: "1" }
-        expect(assigns[:access].participate_score).to eq 1
+        expect(aua.reload.participate_score).to eq 1
       end
     end
 

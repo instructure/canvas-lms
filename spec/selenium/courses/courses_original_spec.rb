@@ -29,8 +29,7 @@ describe "courses" do
       account = Account.default
       account.settings = { open_registration: true, no_enrollments_can_create_courses: true, teachers_can_create_courses: true }
       account.save!
-      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
+      account.disable_feature!(:new_user_tutorial)
     end
 
     context "draft state" do

@@ -114,7 +114,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def test_ldap_connection
     begin
-      timeout(Setting.get("test_ldap_connection_timeout", "5").to_i) do
+      Timeout.timeout(Setting.get("test_ldap_connection_timeout", "5").to_i) do
         TCPSocket.open(auth_host, auth_port)
       end
       return true
@@ -129,7 +129,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def test_ldap_bind
-    timeout(Setting.get("test_ldap_bind_timeout", "60").to_i) do
+    Timeout.timeout(Setting.get("test_ldap_bind_timeout", "60").to_i) do
       conn = ldap_connection
       unless (res = conn.bind)
         error = conn.get_operation_result

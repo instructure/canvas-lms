@@ -191,7 +191,7 @@ module Api
 
             value = value.dup.force_encoding(Encoding::BINARY)
             value = absolute_controller(value) if key == :controller
-            params[key] = URI.parser.unescape(value)
+            params[key] = URI::DEFAULT_PARSER.unescape(value)
           end
           req.path_parameters = params
           app = route.app
