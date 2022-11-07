@@ -61,7 +61,7 @@ module Api::V1::CalendarEvent
 
     hash["type"] = "event"
     if event.context_type == "CourseSection"
-      hash["title"] += " (#{context.name})"
+      hash["title"] += " (#{context.name})" unless hash["title"].end_with?(" (#{context.name})")
       hash["description"] = api_user_content(event.description, event.context.course) unless excludes.include?("description")
     else
       hash["description"] = api_user_content(event.description, context) unless excludes.include?("description")
