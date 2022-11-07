@@ -17,7 +17,7 @@
  */
 
 import TokenActions from '@canvas/due-dates/react/TokenActions'
-import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import {map} from 'lodash'
 
 QUnit.module('TokenActions is a thing', {
