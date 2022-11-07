@@ -625,9 +625,6 @@ function showFilePreviewInOverlayHandler({file_id, verifier}) {
 
 function wireUpFilePreview() {
   window.addEventListener('message', event => {
-    if (event.origin !== window.location.origin) {
-      return
-    }
     if (event.data.subject === 'preview_file') {
       showFilePreviewInOverlayHandler(event.data)
     }
