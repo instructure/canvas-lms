@@ -89,6 +89,7 @@ export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) 
           <Flex.Item padding="small">
             {getAltTextLabel()}
             <TextArea
+              label=""
               aria-label={formatMessage('Alt Text')}
               id="icon-alt-text"
               height="4rem"
