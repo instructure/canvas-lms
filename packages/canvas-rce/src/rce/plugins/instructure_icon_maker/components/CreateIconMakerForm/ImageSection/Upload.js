@@ -25,20 +25,23 @@ import {UploadFile} from '../../../../shared/Upload/UploadFile'
 import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
 import {isAnUnsupportedGifPngImage, MAX_GIF_PNG_SIZE_BYTES} from './utils'
 
-function dispatchCompressedImage(theFile, dispatch) {
+function dispatchCompressedImage(theFile, dispatch, onChange) {
   dispatch({...actions.SET_IMAGE, payload: ''})
+  onChange({type: svgActions.SET_EMBED_IMAGE, payload: ''})
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
   dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
   return compressImage(theFile.preview)
     .then(blob => {
       dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
       dispatch({...actions.SET_IMAGE, payload: blob})
+      onChange({type: svgActions.SET_EMBED_IMAGE, payload: blob})
       dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
     })
     .catch(() => {
       // If compression fails, use the original one
       // TODO: We can show the user that compression failed in some way
       dispatch({...actions.SET_IMAGE, payload: theFile.preview})
+      onChange({type: svgActions.SET_EMBED_IMAGE, payload: theFile.preview})
       dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
     })
 }
@@ -58,10 +61,11 @@ export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPane
   }
 
   if (canCompressImage() && shouldCompressImage(theFile)) {
-    return dispatchCompressedImage(theFile, dispatch)
+    return dispatchCompressedImage(theFile, dispatch, onChange)
   }
 
   dispatch({...actions.SET_IMAGE, payload: theFile.preview})
+  onChange({type: svgActions.SET_EMBED_IMAGE, payload: theFile.preview})
   dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
   dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})

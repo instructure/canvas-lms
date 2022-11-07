@@ -18,21 +18,23 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
-
 import MultiColor from '../index'
 import {actions} from '../../../../../reducers/imageSection'
+import {actions as svgActions} from '../../../../../reducers/svgSettings'
 
 describe('MultiColor', () => {
-  let dispatch, onLoaded
+  let dispatch, onChange, onLoaded
 
   beforeEach(() => {
     dispatch = jest.fn()
+    onChange = jest.fn()
     onLoaded = jest.fn()
   })
 
   afterEach(() => jest.clearAllMocks())
 
-  const subject = () => render(<MultiColor dispatch={dispatch} onLoaded={onLoaded} />)
+  const subject = () =>
+    render(<MultiColor dispatch={dispatch} onChange={onChange} onLoaded={onLoaded} />)
 
   it('renders the multi-color SVG list', () => {
     const {getByTestId} = subject()
@@ -68,6 +70,11 @@ describe('MultiColor', () => {
 
         expect(dispatch).toHaveBeenNthCalledWith(5, {
           ...actions.STOP_LOADING,
+        })
+
+        expect(onChange).toHaveBeenCalledWith({
+          type: svgActions.SET_EMBED_IMAGE,
+          payload: expect.any(String),
         })
       })
     })

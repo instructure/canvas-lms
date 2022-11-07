@@ -33,11 +33,13 @@ describe('createCroppedImageSvg()', () => {
   })
 
   const subject = (otherSettings = {}) =>
-    createCroppedImageSvg({
-      image: 'data:image/png;base64,asdfasdfjksdf==',
-      shape: Shape.Square,
-      ...otherSettings,
-    })
+    createCroppedImageSvg(
+      {
+        shape: Shape.Square,
+        ...otherSettings,
+      },
+      'data:image/png;base64,asdfasdfjksdf=='
+    )
 
   it('builds a <svg />', async () => {
     const svg = await subject()

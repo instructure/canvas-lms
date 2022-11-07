@@ -21,7 +21,6 @@ import {DEFAULT_CROPPER_SETTINGS} from '../components/CreateIconMakerForm/ImageC
 export const defaultState = DEFAULT_CROPPER_SETTINGS
 
 export const actions = {
-  SET_IMAGE: 'SetImage',
   SET_SHAPE: 'SetShape',
   SET_ROTATION: 'SetRotation',
   SET_SCALE_RATIO: 'SetScaleRatio',
@@ -33,8 +32,6 @@ export const actions = {
 
 export const cropperSettingsReducer = (state, action) => {
   switch (action.type) {
-    case actions.SET_IMAGE:
-      return {...state, image: action.payload}
     case actions.SET_SHAPE:
       return {...state, shape: action.payload}
     case actions.SET_ROTATION:

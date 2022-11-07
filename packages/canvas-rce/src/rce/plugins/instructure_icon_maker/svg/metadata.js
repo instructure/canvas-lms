@@ -28,6 +28,14 @@ export function buildMetadata(settings) {
     externalStyle,
     externalWidth,
     externalHeight,
+    x,
+    y,
+    translateX,
+    translateY,
+    width,
+    height,
+    transform,
+    embedImage,
     error,
     ...embedSettings
   } = settings

@@ -48,11 +48,11 @@ function getTransformValue({translateX, translateY, rotation, scaleRatio}) {
   return values.join(' ')
 }
 
-export const Preview = ({settings, dispatch}) => {
+export const Preview = ({image, settings, dispatch}) => {
   const previewRef = createRef()
   const shapeRef = createRef()
   const imgRef = createRef()
-  const {image, shape, rotation, scaleRatio, translateX, translateY} = settings
+  const {shape, rotation, scaleRatio, translateX, translateY} = settings
   const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
   const [tempTranslateX, tempTranslateY, onMouseDownCallback, onTouchStartCallback] =
     useKeyMouseTouchEvents(translateX, translateY, dispatch, imgRef)
@@ -135,6 +135,7 @@ export const Preview = ({settings, dispatch}) => {
 }
 
 Preview.propTypes = {
+  image: PropTypes.string.isRequired,
   settings: ImageCropperSettingsPropTypes.isRequired,
   dispatch: PropTypes.func.isRequired,
 }

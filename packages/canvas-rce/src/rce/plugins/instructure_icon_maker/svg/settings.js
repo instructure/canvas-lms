@@ -21,6 +21,8 @@ import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSe
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from './constants'
 import {modes} from '../reducers/imageSection'
 import iconsLabels from '../utils/iconsLabels'
+import {createCroppedImageSvg} from '../components/CreateIconMakerForm/ImageCropper/imageCropUtils'
+import {convertFileToBase64} from './utils'
 
 export const statuses = {
   ERROR: 'error',
@@ -114,6 +116,19 @@ export function useSvgSettings(editor, editing, canvasOrigin) {
 
         processMetadataForBackwardCompatibility(metadataJson)
 
+        const {imageSettings} = metadataJson
+        if (imageSettings?.cropperSettings) {
+          const generatedSvg = await createCroppedImageSvg(
+            imageSettings.cropperSettings,
+            imageSettings.image
+          )
+          metadataJson.embedImage = await convertFileToBase64(
+            new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'})
+          )
+        } else {
+          metadataJson.embedImage = imageSettings?.image || defaultState.embedImage
+        }
+
         // settings found, return parsed results
         dispatch(metadataJson)
         setStatus(statuses.IDLE)
@@ -140,4 +155,20 @@ function processMetadataForBackwardCompatibility(metadataJson) {
       metadataJson.imageSettings = null
     }
   }
+
+  // On old icons we stored the original image inside cropper settings
+  // If that's the case we are copying it to the correct place
+  const cropperSettingsImage = metadataJson?.imageSettings?.cropperSettings?.image
+  const imageSettingsImage = metadataJson?.imageSettings?.image
+  const encodedImage = metadataJson?.encodedImage
+  if (imageSettingsImage && cropperSettingsImage && imageSettingsImage !== cropperSettingsImage) {
+    metadataJson.imageSettings.image =
+      cropperSettingsImage || imageSettingsImage || encodedImage || ''
+    delete metadataJson.imageSettings.cropperSettings.image
+  }
+
+  // Removes old and unused encoded image fields from metadata
+  delete metadataJson.encodedImage
+  delete metadataJson.encodedImageType
+  delete metadataJson.encodedImageName
 }

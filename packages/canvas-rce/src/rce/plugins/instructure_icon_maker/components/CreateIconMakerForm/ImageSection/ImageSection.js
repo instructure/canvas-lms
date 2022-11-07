@@ -50,7 +50,7 @@ const filterSectionStateMetadata = state => {
   return {mode, image, imageName, icon, iconFillColor, cropperSettings}
 }
 
-export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, canvasOrigin}) => {
+export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigin}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const Upload = React.lazy(() => import('./Upload'))
   const SingleColor = React.lazy(() => import('./SingleColor'))
@@ -117,49 +117,6 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
   }, [onChange, settings.shape, settings.size])
 
   useEffect(() => {
-    if (
-      (editing && !!settings.encodedImage) ||
-      (!!settings.encodedImage && settings.encodedImage !== state.image)
-    ) {
-      dispatch({
-        type: actions.SET_IMAGE.type,
-        payload: settings.encodedImage,
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing, settings.encodedImage])
-
-  useEffect(() => {
-    if (editing && !!settings.encodedImageName) {
-      dispatch({
-        type: actions.SET_IMAGE_NAME.type,
-        payload: settings.encodedImageName,
-      })
-    }
-  }, [editing, settings.encodedImageName])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE,
-      payload: state.image,
-    })
-  }, [onChange, state.image])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE_TYPE,
-      payload: state.mode,
-    })
-  }, [onChange, state.mode])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE_NAME,
-      payload: state.imageName,
-    })
-  }, [onChange, state.imageName])
-
-  useEffect(() => {
     if (state.icon && state.icon in SingleColorSVG) {
       dispatch({...actions.START_LOADING})
       // eslint-disable-next-line promise/catch-or-return
@@ -170,9 +127,10 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
       ).then(base64Image => {
         dispatch({...actions.SET_IMAGE, payload: base64Image})
         dispatch({...actions.STOP_LOADING})
+        onChange({type: svgActions.SET_EMBED_IMAGE, payload: base64Image})
       })
     }
-  }, [state.icon, state.iconFillColor])
+  }, [onChange, state.icon, state.iconFillColor])
 
   useEffect(() => {
     if (
@@ -212,6 +170,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
             </Flex.Item>
             <Flex.Item>
               <ImageOptions
+                embedImage={settings.embedImage}
                 state={state}
                 dispatch={dispatch}
                 rcsConfig={rcsConfig}
