@@ -240,6 +240,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Fletxa descendent dreta en diagonal"
   },
+  "download_filename_2baae924": { "message": "Baixa { filename }" },
   "downward_arrow_cca52012": { "message": "Fletxa descendent" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Triangle d’orientació descendent"
@@ -300,6 +301,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Molt petit" },
   "extracurricular_icon_67c8ca42": { "message": "Icona extracurricular" },
   "f_function_fe422d65": { "message": "F (funció)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "No s''ha pogut obtenir el contingut del fitxer"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "S''ha superat la quota d''emmagatzematge de fitxers"
   },
@@ -456,6 +460,9 @@ const locale = {
   "link_7262adec": { "message": "Enllaç" },
   "link_options_a16b758b": { "message": "Opcions d''enllaç" },
   "links_14b70841": { "message": "Enllaços" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Enllaça a un lloc extern."
+  },
   "load_more_35d33c7": { "message": "Carrega''n més" },
   "loading_25990131": { "message": "S''està carregant…" },
   "loading_bde52856": { "message": "S''està carregant" },
@@ -490,6 +497,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Mitjà" },
   "middle_27dc1d5": { "message": "Centre" },
+  "minimize_file_preview_da911944": {
+    "message": "Minimitza la visualització prèvia del fitxer"
+  },
+  "minimize_video_20aa554b": { "message": "Minimitza el vídeo" },
   "minus_fd961e2e": { "message": "Menys" },
   "minus_plus_3461f637": { "message": "Menys/més" },
   "misc_3b692ea7": { "message": "Miscel·lània" },
@@ -595,6 +606,12 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Píxels" },
+  "play_media_comment_35257210": {
+    "message": "Reprodueix el comentari multimèdia."
+  },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Reprodueix el comentari multimèdia de { name } enviat el { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Més" },
   "plus_minus_f8be2e83": { "message": "Més/menys" },
   "posted_when_a578f5ab": { "message": "Publicat: { when }" },
@@ -753,6 +770,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipus de fitxer admesos: SRT o WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Canvieu a l’editor de dades HTML processades"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Canvieu a l’editor de dades HTML sense processar"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Canvia a l’editor d’HTML"
   },
@@ -769,6 +792,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Text (opcional)" },
   "text_position_8df8c162": { "message": "Posició del text" },
   "text_size_887c2f6": { "message": "Mida del text" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "La visualització prèvia del document s''està processant actualment. Torneu a provar-ho més endavant."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "El material és de domini públic"
   },
@@ -790,8 +816,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Fletxa dreta gruixuda" },
   "thick_rightward_arrow_a2e1839e": { "message": "Fletxa dreta gruixuda" },
   "thick_upward_arrow_acd20328": { "message": "Fletxa ascendent gruixuda" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Aquest document no es pot visualitzar al Canvas"
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Aquesta equació no es pot renderitzar a la Vista bàsica."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "En aquest moment, aquesta imatge no està disponible."
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Tot i que el títol del vídeo que es mostra al explorador és el correcte, no hem pogut actualitzar-lo a la base de dades."
