@@ -1356,8 +1356,13 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.html do
           @body_classes << "full-width"
-          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
-                 USER_ID: @user.id)
+          js_env(
+            CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+            USER_ID: @user.id,
+            PERMISSIONS: {
+              can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis)
+            }
+          )
           render status: status
         end
         format.json do

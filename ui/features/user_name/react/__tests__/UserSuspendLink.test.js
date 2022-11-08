@@ -44,6 +44,7 @@ const mixedStates = {
 
 const USER_ID = '31337'
 const route = `/api/v1/users/${USER_ID}`
+const PERMISSIONS = {can_manage_sis_pseudonyms: true}
 
 describe('UserSuspendLink::', () => {
   let savedUserId
@@ -51,10 +52,12 @@ describe('UserSuspendLink::', () => {
   beforeAll(() => {
     savedUserId = ENV.USER_ID
     ENV.USER_ID = USER_ID
+    ENV.PERMISSIONS = PERMISSIONS
   })
 
   afterAll(() => {
     delete ENV.user_suspend_status
+    delete ENV.PERMISSIONS
     ENV.USER_ID = savedUserId
   })
 
@@ -93,11 +96,27 @@ describe('UserSuspendLink::', () => {
       expect(await findByText(/Confirm reactivation/)).toBeInTheDocument()
     })
 
+    it('brings up a Reactivate modal with info text if user is unauthorized', async () => {
+      ENV.PERMISSIONS.can_manage_sis_pseudonyms = false
+      const {getByText, findByText} = render(<UserSuspendLink />)
+      const button = getByText(/reactivate user/i)
+      fireEvent.click(button)
+      expect(await findByText(/You must be authorized/)).toBeInTheDocument()
+    })
+
     it('brings up a Suspend modal if reactivate is clicked', async () => {
       const {getByText, findByText} = render(<UserSuspendLink />)
       const button = getByText(/suspend user/i)
       fireEvent.click(button)
       expect(await findByText(/Confirm suspension/)).toBeInTheDocument()
+    })
+
+    it('brings up a Suspend modal with info text if user is unauthorized', async () => {
+      ENV.PERMISSIONS.can_manage_sis_pseudonyms = false
+      const {getByText, findByText} = render(<UserSuspendLink />)
+      const button = getByText(/suspend user/i)
+      fireEvent.click(button)
+      expect(await findByText(/You must be authorized/)).toBeInTheDocument()
     })
   })
 

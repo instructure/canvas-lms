@@ -107,6 +107,15 @@ export default function UserSuspendLink() {
     )
   }
 
+  function renderInfoText(infoText) {
+    return (
+      <>
+        <br />
+        <Text as="div">{infoText}</Text>
+      </>
+    )
+  }
+
   function onModalCancel() {
     setModalIsOpen(false)
   }
@@ -154,8 +163,7 @@ export default function UserSuspendLink() {
         <Modal.Body>
           <View as="div" margin="medium">
             <Text as="div">{actionText}</Text>
-            <br />
-            <Text as="div">{infoText}</Text>
+            {ENV.PERMISSIONS.can_manage_sis_pseudonyms ? null : renderInfoText(infoText)}
           </View>
         </Modal.Body>
 
