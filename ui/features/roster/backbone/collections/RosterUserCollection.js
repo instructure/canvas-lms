@@ -17,7 +17,7 @@
 
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 
-import RosterUser from '../models/RosterUser.coffee'
+import RosterUser from '../models/RosterUser'
 
 export default class RosterUserCollection extends PaginatedCollection {
   url() {
