@@ -38,6 +38,64 @@ describe('enhanceUserContent()', () => {
     document.body.removeChild(elem)
   })
 
+  describe('when an img has a src that matches a canvas file path', () => {
+    it('makes relative src absolute', () => {
+      subject('<img id="relative_img" src="/files/1?download_frd=1" />')
+
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+
+      expect(document.getElementById('relative_img').getAttribute('src')).toEqual(
+        'https://canvas.is.here:2000/files/1?download_frd=1'
+      )
+    })
+
+    it('does not change absolute src', () => {
+      subject(
+        '<img id="relative_img" src="https://canvas.is.not.here:3000/files/1?download_frd=1" />'
+      )
+
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+
+      expect(document.getElementById('relative_img').getAttribute('src')).toEqual(
+        'https://canvas.is.not.here:3000/files/1?download_frd=1'
+      )
+    })
+
+    it('sets the alt text on hidden images', () => {
+      subject('<img id="relative_img" src="/files/1?download_frd=1&hidden=1" />')
+
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+
+      expect(document.getElementById('relative_img').getAttribute('alt')).toEqual(
+        'This image is currently unavailable'
+      )
+    })
+  })
+
+  describe('when an iframe has a src that matches a canvas file path', () => {
+    it('makes relative src absolute', () => {
+      subject('<iframe id="relative_iframe" src="/media_object_iframe" />')
+
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+
+      expect(document.getElementById('relative_iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.here:2000/media_object_iframe'
+      )
+    })
+
+    it('does not change absolute src', () => {
+      subject(
+        '<img id="relative_iframe" src="https://canvas.is.not.here:3000/files/1?download_frd=1" />'
+      )
+
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+
+      expect(document.getElementById('relative_iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.not.here:3000/files/1?download_frd=1'
+      )
+    })
+  })
+
   describe('when a link has an href that matches a canvas file path', () => {
     it('makes relative links absolute', () => {
       subject(
