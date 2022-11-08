@@ -33,7 +33,7 @@ jest.mock('../utils', () => ({
   responsiveQuerySizes: jest.fn(),
 }))
 
-describe('DiscussionThreadAttachment', () => {
+describe('DiscussionsAttachment', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
   const openMock = jest.fn()
@@ -90,6 +90,7 @@ describe('DiscussionThreadAttachment', () => {
         updateDiscussionEntryMock({
           discussionEntryId: 'DiscussionEntry-default-mock',
           message: '<p>This is the parent reply</p>',
+          fileId: null,
           removeAttachment: true,
         })
       )

@@ -306,11 +306,12 @@ const DiscussionTopicManager = props => {
             <DiscussionTopicContainer
               updateDraftCache={updateDraftCache}
               discussionTopic={discussionTopicQuery.data.legacyNode}
-              createDiscussionEntry={(message, isAnonymousAuthor) => {
+              createDiscussionEntry={(message, fileId, isAnonymousAuthor) => {
                 createDiscussionEntry({
                   variables: {
                     discussionTopicId: ENV.discussion_topic_id,
                     message,
+                    fileId,
                     courseID: ENV.course_id,
                     isAnonymousAuthor,
                   },
