@@ -42,11 +42,14 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   #   When included, orders the results in the given order. "asc" is the default order and to reverse the order pass
   #   "desc". Works in conjunction with the "sort" argument.
   #
+  # @argument search_term [Optional, String]
+  #   When included, filters the results by the course pace name for the given search term.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/1/pace_contexts?type=course \
   #     -H 'Authorization: Bearer <token>'
   def index
-    contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type, sort: params[:sort], order: params[:order])
+    contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type, params: filter_params)
     paginated_contexts = Api.paginate(contexts, self, api_v1_pace_contexts_url, total_entries: contexts.count)
     render json: {
       pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c) },
@@ -71,5 +74,9 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   def load_type
     @type = params["type"]
     head :bad_request unless PERMITTED_CONTEXT_TYPES.include?(@type)
+  end
+
+  def filter_params
+    params.permit(:sort, :order, :search_term)
   end
 end

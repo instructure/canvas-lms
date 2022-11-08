@@ -370,5 +370,38 @@ describe "Pace Contexts API" do
         end
       end
     end
+
+    context "when a search_term is specified" do
+      context "sections" do
+        before do
+          add_section("Section A", course: course)
+          add_section("Section B", course: course)
+          add_section("Section C", course: course)
+        end
+
+        it "filters by the section name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", search_term: "a", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Unnamed Course", "Section A"]
+        end
+      end
+
+      context "student enrollments" do
+        before do
+          student = user_model(name: "Student Foo", sortable_name: "A, Foo")
+          student_two = user_model(name: "Student Bar", sortable_name: "B, Foo")
+          course.enroll_student(student, enrollment_state: "active")
+          course.enroll_student(student_two, enrollment_state: "active")
+        end
+
+        it "filters by the user name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", search_term: "bAr", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Student Bar"]
+        end
+      end
+    end
   end
 end
