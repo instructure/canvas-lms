@@ -120,15 +120,17 @@ namespace :db do
           # picky. the admin should know what they're doing, and we'd rather not
           # fail here.
           pseudonym = user.pseudonyms.create!(:unique_id => email,
-              :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin)
+              :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin, :integration_id => SecureRandom.uuid)
           user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
+
+          # set the password later.
+          pseudonym.password = pseudonym.password_confirmation = password
+          unless pseudonym.save
+            raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
+            raise "unknown error saving password"
+          end
         end
-        # set the password later.
-        pseudonym.password = pseudonym.password_confirmation = password
-        unless pseudonym.save
-          raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
-          raise "unknown error saving password"
-        end
+        pseudonym.update(integration_id: SecureRandom.uuid) unless pseudonym.integration_id
         Role.clear_built_in_roles!
         Account.site_admin.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
         Account.default.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
