@@ -288,6 +288,7 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
+        fileId,
         removeAttachment: !fileId,
       },
     })
@@ -325,7 +326,7 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
-  const onReplySubmit = (message, isAnonymousAuthor, includeReplyPreview) => {
+  const onReplySubmit = (message, fileId, isAnonymousAuthor, includeReplyPreview) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
@@ -334,6 +335,7 @@ export const DiscussionThreadContainer = props => {
           props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
             ? props.discussionEntry.parentId
             : props.discussionEntry._id,
+        fileId,
         isAnonymousAuthor,
         includeReplyPreview,
         message,
@@ -490,8 +492,8 @@ export const DiscussionThreadContainer = props => {
                 <DiscussionEdit
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                  onSubmit={(message, includeReplyPreview, _fileId, anonymousAuthorState) => {
-                    onReplySubmit(message, anonymousAuthorState, includeReplyPreview)
+                  onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
+                    onReplySubmit(message, fileId, anonymousAuthorState, includeReplyPreview)
                   }}
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}

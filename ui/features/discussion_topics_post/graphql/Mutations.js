@@ -132,6 +132,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $discussionTopicId: ID!
     $message: String!
     $replyFromEntryId: ID
+    $fileId: ID
     $includeReplyPreview: Boolean
     $isAnonymousAuthor: Boolean
     $courseID: String
@@ -141,6 +142,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         discussionTopicId: $discussionTopicId
         message: $message
         parentEntryId: $replyFromEntryId
+        fileId: $fileId
         includeReplyPreview: $includeReplyPreview
         isAnonymousAuthor: $isAnonymousAuthor
       }
@@ -172,12 +174,14 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
   mutation UpdateDiscussionEntry(
     $discussionEntryId: ID!
     $message: String
+    $fileId: ID
     $removeAttachment: Boolean
   ) {
     updateDiscussionEntry(
       input: {
         discussionEntryId: $discussionEntryId
         message: $message
+        fileId: $fileId
         removeAttachment: $removeAttachment
       }
     ) {

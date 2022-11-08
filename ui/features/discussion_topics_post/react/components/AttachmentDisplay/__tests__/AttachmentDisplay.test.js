@@ -21,10 +21,23 @@ import {render} from '@testing-library/react'
 import {AttachmentDisplay} from '../AttachmentDisplay'
 
 const setup = props => {
-  return render(<AttachmentDisplay setAttachment={() => {}} {...props} />)
+  return render(
+    <AttachmentDisplay setAttachment={() => {}} setAttachmentToUpload={() => {}} {...props} />
+  )
 }
 
 describe('AttachmentDisplay', () => {
+  it('displays AttachButton when there is no attachment', () => {
+    const {queryByText} = setup()
+    expect(queryByText('Attach')).toBeTruthy()
+  })
+
+  it('only allows one attachment at a time', () => {
+    const {queryByTestId} = setup()
+    expect(queryByTestId('attachment-input')).toHaveAttribute('type', 'file')
+    expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')
+  })
+
   it('displays AttachmentButton when there is an attachment', () => {
     const {queryByText} = setup({
       attachment: {
@@ -34,6 +47,7 @@ describe('AttachmentDisplay', () => {
       },
     })
 
+    expect(queryByText('Attach')).toBeFalsy()
     expect(queryByText('file_name.file')).toBeTruthy()
   })
 
@@ -46,6 +60,7 @@ describe('AttachmentDisplay', () => {
       },
     })
 
+    expect(queryByText('Attach')).toBeFalsy()
     expect(queryByText('Fundamentals of Differential E...')).toBeTruthy()
   })
 })
