@@ -154,10 +154,16 @@ export function enhanceUserContent(container = document, opts = {}) {
 
   content.querySelectorAll('.unenhanced').forEach(unenhanced_elem => {
     unenhanced_elem.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src')
+
+      if (!/^\/[^/]/.test(src)) {
+        return
+      }
+
       // if the image file is unpublished it's replaced with the lock image
       // and canvas adds hidden=1 to the URL.
       // we also need to strip the alt text
-      if (/hidden=1$/.test(img.getAttribute('src'))) {
+      if (/hidden=1$/.test(src)) {
         img.setAttribute('alt', formatMessage('This image is currently unavailable'))
       }
     })
@@ -165,12 +171,19 @@ export function enhanceUserContent(container = document, opts = {}) {
 
     // guarantee relative links point to canvas
     if (canvasOrigin) {
-      unenhanced_elem.querySelectorAll('a').forEach(link => {
+      const attributes = ['href', 'src']
+      const selector = '[href], [src]'
+
+      unenhanced_elem.querySelectorAll(selector).forEach(element => {
         try {
-          const href = link.getAttribute('href')
-          if (href[0] !== '#') {
-            const url = new URL(href, canvasOrigin)
-            link.setAttribute('href', url.href)
+          for (const a of attributes) {
+            const potentialUrl = element.getAttribute(a)
+            if (!/^\/[^/]/.test(potentialUrl)) {
+              continue
+            }
+
+            const absoluteUrl = new URL(potentialUrl, canvasOrigin)
+            element.setAttribute(a, absoluteUrl.href)
           }
         } catch (_ignore) {
           // canvasOrigin probably isn't a valid base url
