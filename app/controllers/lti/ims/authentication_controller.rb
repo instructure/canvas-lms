@@ -78,6 +78,7 @@ module Lti
 
         render(
           "lti/ims/authentication/authorize",
+          formats: :html,
           layout: "borderless_lti",
           locals: {
             redirect_uri: redirect_uri,
