@@ -24,19 +24,21 @@ class CoursePacing::PaceContextsService
     @course = course
   end
 
-  def contexts_of_type(type, sort: nil, order: nil)
+  def contexts_of_type(type, params: {})
     case type
     when "course"
       [course]
     when "section"
       sections = course.active_course_sections
-      sections = sections.order(sort) if sort == "name"
-      sections = sections.reverse_order if order == "desc"
+      sections = sections.where("name ILIKE ?", "%#{params[:search_term]}%") if params[:search_term].present?
+      sections = sections.order(params[:sort]) if params[:sort] == "name"
+      sections = sections.reverse_order if params[:order] == "desc"
       sections
     when "student_enrollment"
       student_enrollments = course.student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*")
-      student_enrollments = student_enrollments.joins(:user).order("users.sortable_name") if sort == "name"
-      student_enrollments = student_enrollments.reverse_order if order == "desc"
+      student_enrollments = student_enrollments.joins(:user).where("users.name ILIKE ?", "%#{params[:search_term]}%") if params[:search_term].present?
+      student_enrollments = student_enrollments.joins(:user).order("users.sortable_name") if params[:sort] == "name"
+      student_enrollments = student_enrollments.reverse_order if params[:order] == "desc"
       student_enrollments.to_a
     else
       Canvas::Errors.capture_exception(
