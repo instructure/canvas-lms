@@ -15,27 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import SelectView from './SelectView'
+import InputView from 'backbone-input-view'
 
-import template from '../../jst/roleSelect.handlebars'
+class SelectView extends InputView {}
 
-export default class RoleSelectView extends SelectView {
-  static initClass() {
-    this.optionProperty('rolesCollection')
-    this.prototype.template = template
-  }
+SelectView.prototype.tagName = 'select'
+SelectView.prototype.className = 'select-view'
+SelectView.prototype.events = {change: 'updateModel'}
 
-  attach() {
-    return this.rolesCollection.on('add reset remove change', this.render, this)
-  }
-
-  toJSON() {
-    return {
-      roles: this.rolesCollection.toJSON(),
-      selectedRole: (this.el.selectedOptions != null ? this.el.selectedOptions.length : undefined)
-        ? this.el.selectedOptions[0].value
-        : '',
-    }
-  }
-}
-RoleSelectView.initClass()
+export default SelectView
