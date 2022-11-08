@@ -177,7 +177,7 @@ const PaceContextsTable = ({
   const renderRow = (paceContext: PaceContext) => {
     const rowCells = getValuesByContextType(paceContext)
     return (
-      <TableRow key={paceContext.item_id}>
+      <TableRow data-testid="course-pace-row" key={paceContext.item_id}>
         {rowCells.map((cell, index) => (
           <TableCell
             data-testid="course-pace-item"
@@ -244,7 +244,14 @@ const PaceContextsTable = ({
           </Table>
         </View>
       )}
-      {pageCount > 1 && <Paginator loadPage={setPage} page={currentPage} pageCount={pageCount} />}
+      {pageCount > 1 && (
+        <Paginator
+          data-testid="context-table-paginator"
+          loadPage={setPage}
+          page={currentPage}
+          pageCount={pageCount}
+        />
+      )}
     </>
   )
 }

@@ -29,8 +29,24 @@ module CoursePacesLandingPageObject
     "//td[@data-testid = 'course-pace-item']/button//*[text() = '#{context_name}']"
   end
 
+  def context_row_selector(context_name)
+    "//tr[@data-testid = 'course-pace-row' and .//*[contains(text(), '#{context_name}')]]"
+  end
+
+  def context_table_page_selector(page_number)
+    "//*[@data-testid = 'context-table-paginator']//button[.//*[contains(text(), '#{page_number}')]]"
+  end
+
+  def context_table_pagination_selector
+    "[data-testid='context-table-paginator']"
+  end
+
   def course_pace_context_table_selector
     "[data-testid='course-pace-context-table']"
+  end
+
+  def course_pace_table_rows_selector
+    "[data-testid='course-pace-row']"
   end
 
   def course_paces_navigation_selector
@@ -91,6 +107,22 @@ module CoursePacesLandingPageObject
     f(course_paces_panda_selector)
   end
 
+  def course_pace_table_rows
+    ff(course_pace_table_rows_selector)
+  end
+
+  def context_row(context_name)
+    fxpath(context_row_selector(context_name))
+  end
+
+  def context_table_page(page_number)
+    fxpath(context_table_page_selector(page_number))
+  end
+
+  def context_table_pagination
+    f(context_table_pagination_selector)
+  end
+
   def create_default_pace_button
     f(create_default_pace_button_selector)
   end
@@ -128,6 +160,10 @@ module CoursePacesLandingPageObject
 
   def click_get_started_button
     get_started_button.click
+  end
+
+  def click_context_table_page(page_number)
+    context_table_page(page_number).click
   end
 
   def click_course_paces_navigation
