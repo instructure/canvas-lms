@@ -396,11 +396,11 @@ module AccountReports::ReportHelper
 
   class ExtendedCSV < CsvWithI18n
     def <<(row)
-      if @lineno % 1000 == 0
+      if lineno % 1000 == 0
         Shackles.activate(:master) do
           report = self.instance_variable_get(:@account_report).reload
-          report.update_attribute(:current_line, @lineno)
-          report.update_attribute(:progress, (@lineno.to_f/report.total_lines)*100) if report.total_lines
+          report.update_attribute(:current_line, lineno)
+          report.update_attribute(:progress, lineno.to_f / (report.total_lines + 1 ) * 100) if report.total_lines
           if report.workflow_state == 'deleted'
             report.workflow_state = 'aborted'
             report.save!

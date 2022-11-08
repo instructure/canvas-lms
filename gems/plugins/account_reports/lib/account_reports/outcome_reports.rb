@@ -18,7 +18,6 @@
 
 require 'account_reports/report_helper'
 
-
 module AccountReports
 
   class OutcomeReports
@@ -101,7 +100,7 @@ module AccountReports
               AND r.content_tag_id = ct.id)
             LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id AND sub.workflow_state <> 'deleted'", parameters])).
-              where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
+        where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
                 AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
@@ -149,7 +148,7 @@ module AccountReports
           row['assignment url'] = "https://#{host}"
           row['assignment url'] << "/courses/#{row['course id']}"
           row['assignment url'] << "/assignments/#{row['assignment id']}"
-          row['submission date']=default_timezone_format(row['submission date'])
+          row['submission date'] = default_timezone_format(row['submission date'])
           csv << headers.map { |h| row[h] }
         end
         csv << ['No outcomes found'] if total == 0
@@ -162,9 +161,9 @@ module AccountReports
       order_options = %w(users courses outcomes)
       select = order_options & [param]
 
-      order_sql = {'users' => 'u.id, learning_outcomes.id, c.id',
-                   'courses' => 'c.id, u.id, learning_outcomes.id',
-                   'outcomes' => 'learning_outcomes.id, u.id, c.id'}
+      order_sql = { 'users' => 'u.id, learning_outcomes.id, c.id',
+                    'courses' => 'c.id, u.id, learning_outcomes.id',
+                    'outcomes' => 'learning_outcomes.id, u.id, c.id' }
       if select.length == 1
         order = order_sql[select.first]
         add_extra_text(I18n.t('account_reports.outcomes.order',
@@ -221,59 +220,62 @@ module AccountReports
         students = students.where("p.workflow_state<>'deleted' AND c.workflow_state='available'")
       end
 
-    def write_outcomes_report(headers, scope)
-      header_keys = headers.keys
-      header_names = headers.values
-      host = root_account.domain
-      enable_i18n_features = @account_report.account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
+      def write_outcomes_report(headers, scope)
+        header_keys = headers.keys
+        header_names = headers.values
+        host = root_account.domain
+        enable_i18n_features = @account_report.account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
 
-      write_report header_names, enable_i18n_features do |csv|
-        total = scope.length
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-        scope.each do |row|
-          row = row.attributes.dup
+        write_report header_names, enable_i18n_features do |csv|
+          total = scope.length
+          Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+          scope.each do |row|
+            row = row.attributes.dup
 
-      headers = ['student name', 'student id', 'student sis id',
-                 'assessment title', 'assessment id', 'assessment type',
-                 'submission date', 'submission score', 'learning outcome name',
-                 'learning outcome id', 'attempt', 'outcome score',
-                 'assessment question', 'assessment question id',
-                 'course name', 'course id', 'course sis id']
+            headers = ['student name', 'student id', 'student sis id',
+                       'assessment title', 'assessment id', 'assessment type',
+                       'submission date', 'submission score', 'learning outcome name',
+                       'learning outcome id', 'attempt', 'outcome score',
+                       'assessment question', 'assessment question id',
+                       'course name', 'course id', 'course sis id']
 
-      t_headers = []
-      t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
-      t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
-      t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
-      t_headers << I18n.t('#account_reports.report_header_assessment_title', 'assessment title')
-      t_headers << I18n.t('#account_reports.report_header_assessment_id', 'assessment id')
-      t_headers << I18n.t('#account_reports.report_header_assessment_type', 'assessment type')
-      t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
-      t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
-      t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
-      t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
-      t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
-      t_headers << I18n.t('#account_reports.report_header_assessment_question', 'assessment question')
-      t_headers << I18n.t('#account_reports.report_header_assessment_question_id', 'assessment question id')
-      t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
-      t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+            t_headers = []
+            t_headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+            t_headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+            t_headers << I18n.t('#account_reports.report_header_student_sis_id', 'student sis id')
+            t_headers << I18n.t('#account_reports.report_header_assessment_title', 'assessment title')
+            t_headers << I18n.t('#account_reports.report_header_assessment_id', 'assessment id')
+            t_headers << I18n.t('#account_reports.report_header_assessment_type', 'assessment type')
+            t_headers << I18n.t('#account_reports.report_header_submission_date', 'submission date')
+            t_headers << I18n.t('#account_reports.report_header_submission_score', 'submission score')
+            t_headers << I18n.t('#account_reports.report_header_learning_outcome_name', 'learning outcome name')
+            t_headers << I18n.t('#account_reports.report_header_learning_outcome_id', 'learning outcome id')
+            t_headers << I18n.t('#account_reports.report_header_attempt', 'attempt')
+            t_headers << I18n.t('#account_reports.report_header_outcome_score', 'outcome score')
+            t_headers << I18n.t('#account_reports.report_header_assessment_question', 'assessment question')
+            t_headers << I18n.t('#account_reports.report_header_assessment_question_id', 'assessment question id')
+            t_headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+            t_headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+            t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
 
-      # Generate the CSV report
-      write_report t_headers do |csv|
+            # Generate the CSV report
+            write_report t_headers do |csv|
 
-        total = students.count(:all)
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-        students.find_each do |row|
-          row = row.attributes.dup
-          row['submission date']=default_timezone_format(row['submission date'])
+              total = students.count(:all)
+              Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+              students.find_each do |row|
+                row = row.attributes.dup
+                row['submission date'] = default_timezone_format(row['submission date'])
 
-          csv << headers.map { |h| row[h] }
+                csv << headers.map { |h| row[h] }
 
+              end
+              csv << ['No outcomes found'] if total == 0
+            end
+          end
         end
-        csv << ['No outcomes found'] if total == 0
       end
+
     end
   end
-
 end
