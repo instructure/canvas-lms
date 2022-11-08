@@ -34,7 +34,8 @@ export default class AssignToGroupMenu extends PopoverMenuView {
 
     this.prototype.tagName = 'div'
 
-    this.prototype.className = 'assign-to-group-menu ui-tooltip popover content-top horizontal'
+    this.prototype.className =
+      'assign-to-group-menu ui-tooltip popover right content-top horizontal'
 
     this.prototype.template = template
   }

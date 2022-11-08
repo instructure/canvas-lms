@@ -59,7 +59,7 @@ export default class PopoverMenuView extends View {
         this.setWidth()
       }
       this.$el.position({
-        my: this.my || 'left+6 top-47',
+        my: this.my || 'right-22 top-47',
         at: this.at || 'right center',
         of: $target,
         collision: 'none',
