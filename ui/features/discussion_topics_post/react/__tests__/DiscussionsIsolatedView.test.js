@@ -115,7 +115,7 @@ describe('DiscussionsIsolatedView', () => {
       }),
       ...createDiscussionEntryMock({
         includeReplyPreview: false,
-        replyFromEntryId: '1',
+        parentEntryId: '1',
       }),
     ]
     const {findByText, findByTestId, queryByTestId} = setup(mocks)

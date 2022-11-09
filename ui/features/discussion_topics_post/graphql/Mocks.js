@@ -414,7 +414,7 @@ export const subscribeToDiscussionTopicMock = ({
 export const createDiscussionEntryMock = ({
   discussionTopicId = 'Discussion-default-mock',
   message = '',
-  replyFromEntryId = null,
+  parentEntryId = null,
   fileId = null,
   includeReplyPreview = null,
   isAnonymousAuthor = false,
@@ -427,7 +427,7 @@ export const createDiscussionEntryMock = ({
         discussionTopicId,
         message,
         isAnonymousAuthor,
-        ...(replyFromEntryId !== null && {replyFromEntryId}),
+        ...(parentEntryId !== null && {parentEntryId}),
         ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
         ...(courseID !== null && {courseID}),
