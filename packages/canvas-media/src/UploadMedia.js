@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {bool, func, instanceOf, shape, string} from 'prop-types'
-import React, {Suspense} from 'react'
+import React, {Suspense, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {isEqual} from 'lodash'
 
@@ -28,11 +28,40 @@ import {px} from '@instructure/ui-utils'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 
+import formatMessage from './format-message'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 import translationShape from './translationShape'
+import getTranslations from './getTranslations'
 import {CC_FILE_MAX_BYTES} from './shared/constants'
+
+// This component will guarantee formatMessage is initialized with the user
+// locale's translations before rendering the actual UploadMedia component.
+// This lets clients simply import UploadMedia and render it w/o having to
+// remember to call something else to initalize canvas-media's i18n
+// TODO: convert UploadMedia to a function component and the getTranslations
+//       bit into a hook
+export default function UploadMedia(props) {
+  const [translationsLoaded, setTranslationsLoaded] = useState(false)
+
+  useEffect(() => {
+    getTranslations(props.userLocale)
+      .catch(() => {
+        // ignore and fallback to english
+      })
+      .finally(() => {
+        setTranslationsLoaded(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (translationsLoaded) {
+    return <UploadMediaModal {...props} />
+  } else {
+    return <div>{formatMessage('Loading...')}</div>
+  }
+}
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
@@ -42,7 +71,7 @@ export const PANELS = {
   RECORD: 1,
 }
 
-export default class UploadMedia extends React.Component {
+export class UploadMediaModal extends React.Component {
   static propTypes = {
     disableSubmitWhileUploading: bool,
     liveRegion: func,

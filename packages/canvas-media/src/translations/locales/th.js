@@ -18,11 +18,7 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {
-  "no_preview_is_available_for_this_file_f940114a": {
-    "message": "ไม่มีตัวอย่างแสดงสำหรับไฟล์นี้"
-  }
-}
+const locale = {}
 
 
 formatMessage.addLocale({th: locale})

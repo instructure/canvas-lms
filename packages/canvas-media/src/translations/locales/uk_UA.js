@@ -19,6 +19,7 @@
 import formatMessage from '../../format-message'
 
 const locale = {
+  "greek_65c5b3f7": { "message": "Грецький" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Попередній перегляд  для цього файлу недоступний."
   }
