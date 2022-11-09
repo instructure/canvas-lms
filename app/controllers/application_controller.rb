@@ -2266,7 +2266,7 @@ class ApplicationController < ActionController::Base
   def launch_darkly_user
     domain = ENV['SETTINGS_TABLE_PREFIX']
     {
-      key: "#{domain.split('.')[0]}-#{user_id}",
+      key: "#{domain.split('.')[0]}-#{@current_user.id}",
       name: @current_user.name,
       custom: {
         canvas_id: @current_user.id,
