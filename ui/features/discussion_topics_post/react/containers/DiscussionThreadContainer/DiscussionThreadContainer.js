@@ -330,7 +330,7 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        replyFromEntryId:
+        parentEntryId:
           props.discussionEntry.rootEntryId &&
           props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
             ? props.discussionEntry.parentId

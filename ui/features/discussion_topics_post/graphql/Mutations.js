@@ -131,7 +131,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
   mutation CreateDiscussionEntry(
     $discussionTopicId: ID!
     $message: String!
-    $replyFromEntryId: ID
+    $parentEntryId: ID
     $fileId: ID
     $includeReplyPreview: Boolean
     $isAnonymousAuthor: Boolean
@@ -141,7 +141,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
       input: {
         discussionTopicId: $discussionTopicId
         message: $message
-        parentEntryId: $replyFromEntryId
+        parentEntryId: $parentEntryId
         fileId: $fileId
         includeReplyPreview: $includeReplyPreview
         isAnonymousAuthor: $isAnonymousAuthor

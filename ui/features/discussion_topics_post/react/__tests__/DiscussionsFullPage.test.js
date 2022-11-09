@@ -472,7 +472,7 @@ describe('DiscussionFullPage', () => {
     const mocks = [
       ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock({
-        replyFromEntryId: 'DiscussionEntry-default-mock',
+        parentEntryId: 'DiscussionEntry-default-mock',
         includeReplyPreview: false,
       }),
     ]
@@ -512,7 +512,7 @@ describe('DiscussionFullPage', () => {
     const mocks = [
       ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock({
-        replyFromEntryId: 'DiscussionEntry-default-mock',
+        parentEntryId: 'DiscussionEntry-default-mock',
         includeReplyPreview: true,
       }),
     ]
