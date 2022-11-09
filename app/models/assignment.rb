@@ -359,7 +359,7 @@ class Assignment < ActiveRecord::Base
 
     # If this assignment uses an external tool, duplicate that too, and mark
     # the assignment as "duplicating"
-    if external_tool_tag.present?
+    if external_tool? && external_tool_tag.present?
       result.external_tool_tag = external_tool_tag.dup
       result.workflow_state = "duplicating"
       result.duplication_started_at = Time.zone.now

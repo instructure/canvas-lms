@@ -1580,6 +1580,13 @@ describe Assignment do
         expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
       end
 
+      it "do not duplicates the assignment's external_tool_tag if the submission type was updated" do
+        assignment.update(submission_types: "online_text_entry")
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.external_tool_tag).not_to be_present
+      end
+
       it "sets the assignment's state to 'duplicating'" do
         expect(assignment.duplicate.workflow_state).to eq("duplicating")
       end
