@@ -392,8 +392,8 @@ describe('SplitScreenViewContainer', () => {
       })
     )
 
-    const replyButton = await findAllByText('Quote')
-    fireEvent.click(replyButton[0])
+    const replyButton = await findAllByText('Reply')
+    fireEvent.click(replyButton[1])
 
     expect(onOpenSplitScreenView).toHaveBeenCalledWith('104', null, true)
   })

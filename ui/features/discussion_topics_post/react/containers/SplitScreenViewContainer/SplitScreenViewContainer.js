@@ -56,6 +56,7 @@ export const SplitScreenViewContainer = props => {
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
   const [draftSaved, setDraftSaved] = useState(true)
+  const [isQuotedReply, setIsQuotedReply] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -433,11 +434,15 @@ export const SplitScreenViewContainer = props => {
                   props.setRCEOpen(false)
                 }}
                 onCancel={() => props.setRCEOpen(false)}
-                quotedEntry={buildQuotedReply(
-                  splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection
-                    .nodes,
-                  props.replyFromId
-                )}
+                quotedEntry={
+                  isQuotedReply
+                    ? buildQuotedReply(
+                        splitScreenEntryOlderDirection.data?.legacyNode
+                          ?.discussionSubentriesConnection.nodes,
+                        props.replyFromId
+                      )
+                    : null
+                }
                 value={findDraftMessage(
                   splitScreenEntryOlderDirection.data.legacyNode.root_entry_id ||
                     splitScreenEntryOlderDirection.data.legacyNode._id
