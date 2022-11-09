@@ -31,7 +31,7 @@ export async function createCroppedImageSvg(settings) {
   const rootElement = createSvgElement('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
     width: squareDimension,
-    height: squareDimension
+    height: squareDimension,
   })
 
   const defs = createDefsElement({shape, squareDimension})
@@ -39,7 +39,7 @@ export async function createCroppedImageSvg(settings) {
     imageWidth,
     imageHeight,
     squareDimension,
-    settings
+    settings,
   })
 
   rootElement.appendChild(defs)
@@ -61,7 +61,7 @@ const createDefsElement = ({shape, squareDimension}) => {
   const defs = createSvgElement('defs')
   const shapeMask = buildShapeMask({shape, size: squareDimension})
   const clipPath = createSvgElement('clipPath', {
-    id: CLIP_PATH_ID
+    id: CLIP_PATH_ID,
   })
   clipPath.appendChild(shapeMask)
   defs.appendChild(clipPath)
@@ -74,19 +74,19 @@ const convertTranslationUnits = (translationPixels, imageHeight) => {
 
 const createMainSvgGroup = ({imageWidth, imageHeight, squareDimension, settings}) => {
   const mainGroup = createSvgElement('g', {
-    'clip-path': `url(#${CLIP_PATH_ID})`
+    'clip-path': `url(#${CLIP_PATH_ID})`,
   })
   const imageElement = createSvgElement('image', {
     width: imageWidth,
     height: imageHeight,
-    href: settings.image
+    href: settings.image,
   })
   setTransformAttribute({
     imageElement,
     imageWidth,
     imageHeight,
     squareDimension,
-    settings
+    settings,
   })
   mainGroup.appendChild(imageElement)
   return mainGroup
@@ -97,7 +97,7 @@ export const setTransformAttribute = ({
   imageWidth,
   imageHeight,
   squareDimension,
-  settings
+  settings,
 }) => {
   const {rotation = 0, scaleRatio = 1.0, translateX = 0, translateY = 0} = settings
   const horizontalCenter = (scaleRatio * imageWidth) / 2

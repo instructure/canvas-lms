@@ -56,7 +56,10 @@ describe('feature_flags::FeatureFlagButton', () => {
 
   it('Hides the lock and menu item for allowed with disableDefaults', () => {
     const {container, queryByText} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} disableDefaults />
+      <FeatureFlagButton
+        featureFlag={sampleData.allowedFeature.feature_flag}
+        disableDefaults={true}
+      />
     )
     expect(container.querySelector('svg[name="IconUnlock"]')).not.toBeInTheDocument()
     userEvent.click(container.querySelector('button'))

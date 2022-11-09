@@ -72,7 +72,12 @@ class GettingStartedCollaborations extends React.Component {
     return (
       <div className="GettingStartedCollaborations">
         <div className="image-collaborations-container">
-          <img className="image-collaborations" src="/images/svg-icons/icon-collaborations.svg" />
+          <img
+            aria-hidden={true}
+            alt=""
+            className="image-collaborations"
+            src="/images/svg-icons/icon-collaborations.svg"
+          />
         </div>
         <div className="Collaborations--GettingStarted">{this.renderContent()}</div>
       </div>

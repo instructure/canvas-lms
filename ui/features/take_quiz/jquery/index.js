@@ -63,7 +63,7 @@ const quizSubmission = (function () {
   // $('.time_running,.time_remaining') is probably not yet loaded at the time
   const $timeRunningFunc = function () {
     if ($timeRunningTimeRemaining.length > 0) return $timeRunningTimeRemaining
-    return ($timeRunningTimeRemaining = $('.time_running,.time_remaining'))
+    return $('.time_running,.time_remaining')
   }
 
   return {
@@ -216,9 +216,9 @@ const quizSubmission = (function () {
               // Connectivity lost?
               const current_user_id = window.ENV.current_user_id || 'none'
               $.ajaxJSON(
-                location.protocol +
+                window.location.protocol +
                   '//' +
-                  location.host +
+                  window.location.host +
                   '/simple_response.json?user_id=' +
                   current_user_id +
                   '&rnd=' +
@@ -231,7 +231,7 @@ const quizSubmission = (function () {
                     I18n.t(
                       'errors.connection_lost',
                       "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.",
-                      {host: location.host}
+                      {host: window.location.host}
                     )
                   )
                 }
@@ -258,12 +258,8 @@ const quizSubmission = (function () {
         currentTimeToDueDate = quizSubmission.timeToDueDate -= quizSubmission.clockInterval
       }
       const now = new Date()
-      const endAt = quizSubmission.endAt.text()
 
       timeMod = (timeMod + 1) % 120
-      if (timeMod == 0 && !endAt && !quizSubmission.twelveHourDeadline) {
-        const end = quizSubmission.endAtParsed
-      }
 
       currentTimeLeft = quizSubmission.floorTimeLeft(currentTimeLeft)
 
@@ -531,11 +527,11 @@ const quizSubmission = (function () {
   }
 })()
 
-$(window).focus(evt => {
+$(window).focus(_evt => {
   quizSubmission.updateSubmission()
 })
 
-$(window).blur(evt => {
+$(window).blur(_evt => {
   quizSubmission.inBackground = true
 })
 
@@ -582,7 +578,7 @@ $(function () {
     })
     window.addEventListener(
       'unload',
-      e => {
+      _e => {
         const data = $('#submit_quiz_form').getFormData()
         const url = $('.backup_quiz_submission_url').attr('href')
 
@@ -619,14 +615,14 @@ $(function () {
 
       if (!event.isDefaultPrevented()) {
         const url = $(this).attr('href') || ''
-        let hashStripped = location.href
+        let hashStripped = window.location.href
         if (hashStripped.indexOf('#')) {
           hashStripped = hashStripped.substring(0, hashStripped.indexOf('#'))
         }
         if (url.indexOf('#') == 0 || url.indexOf(hashStripped + '#') == 0) {
           return
         }
-        const result = confirm(
+        const result = window.confirm(
           I18n.t(
             'confirms.navigate_away',
             "You're about to navigate away from this page.  Continue anyway?"
@@ -704,14 +700,16 @@ $(function () {
         quizSubmission.updateSubmission()
       }
     })
-    .delegate('label.upload-label', 'mouseup', event => {
+    .delegate('label.upload-label', 'mouseup', _event => {
       quizSubmission.updateSubmission()
     })
     .delegate(':text,textarea,select', 'change', function (event, update) {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
-        $this.val(isNaN(val) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
+        $this.val(
+          Number.isNaN(Number(val)) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true})
+        )
       }
       if ($this.hasClass('precision_question_input')) {
         const precisionQuestionInputVal = numberHelper.parse($this.val())
@@ -770,10 +768,10 @@ $(function () {
       quizSubmission.updateSubmission()
     })
     .delegate('.question_input', 'change', function (event, update, changedMap) {
-      let $this = $(this),
-        tagName = this.tagName.toUpperCase(),
-        id = $this.parents('.question').attr('id'),
-        val = ''
+      const $this = $(this)
+      const tagName = this.tagName.toUpperCase()
+      const id = $this.parents('.question').attr('id')
+      let val = ''
       if (tagName === 'A') return
       if (changedMap) {
         // reduce redundant jquery lookups and other calls
@@ -851,7 +849,7 @@ $(function () {
     if (e.keyCode === 13) return false
   })
 
-  $('.quiz_submit').click(event => {
+  $('.quiz_submit').click(_event => {
     quizSubmission.finalSubmitButtonClicked = true
   })
 
@@ -911,7 +909,7 @@ $(function () {
     }
 
     if (warningMessage != undefined && !quizSubmission.submitting) {
-      const result = confirm(warningMessage)
+      const result = window.confirm(warningMessage)
       if (!result) {
         event.preventDefault()
         event.stopPropagation()
@@ -960,7 +958,7 @@ $(function () {
   const $submit_buttons = $('#submit_quiz_form button[type=submit]')
 
   // set the form action depending on the button clicked
-  $submit_buttons.click(function (event) {
+  $submit_buttons.click(function (_event) {
     quizSubmission.clearAccessCode = false
     const action = $(this).data('action')
     if (action != undefined) {
@@ -996,9 +994,7 @@ showDeauthorizedDialog = function () {
 }
 
 if (ENV.LOCKDOWN_BROWSER) {
-  let ldbLoginPopup
-
-  ldbLoginPopup = new LDBLoginPopup()
+  const ldbLoginPopup = new LDBLoginPopup()
   ldbLoginPopup
     .on('login_success.take_quiz', () => {
       $.flashMessage(I18n.t('login_successful', 'Login successful.'))

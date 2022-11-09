@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import Ember from 'ember'
 import App from './config/app'
 import routes from './config/routes'
 import AssignmentSubtotalGradesComponent from './components/assignment_subtotal_grades_component'

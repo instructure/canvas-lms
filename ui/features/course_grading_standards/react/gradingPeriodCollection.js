@@ -41,7 +41,7 @@ class GradingPeriodCollection extends React.Component {
     saveDisabled: true,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getPeriods()
   }
 
@@ -134,7 +134,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   areDatesValid = period => {
-    if (!isNaN(period.startDate) && !isNaN(period.endDate)) {
+    if (!Number.isNaN(Number(period.startDate)) && !Number.isNaN(Number(period.endDate))) {
       return true
     } else {
       $.flashError(I18n.t('All dates fields must be present and formatted correctly'))
@@ -218,6 +218,7 @@ class GradingPeriodCollection extends React.Component {
         <div className="form-actions">
           <button
             className="Button btn-primary btn save_button"
+            type="button"
             id="update-button"
             disabled={this.state.disabled || this.state.saveDisabled}
             onClick={this.batchUpdatePeriods}

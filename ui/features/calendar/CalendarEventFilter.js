@@ -53,26 +53,24 @@ export default function calendarEventFilter(viewingGroup, events, schedulerState
             // new scheduler is not enabled: show only if someone is signed up
             keep = event.calendarEvent.child_events_count > 0
           }
-        } else {
+        } else if (
           // appointment slot
+          schedulerState.inFindAppointmentMode &&
+          event.isOnCalendar(schedulerState.selectedCourse.asset_string)
+        ) {
+          // show it (non-grayed) if it is reservable; filter it out otherwise
           if (
-            schedulerState.inFindAppointmentMode &&
-            event.isOnCalendar(schedulerState.selectedCourse.asset_string)
+            event.calendarEvent.reserved ||
+            event.calendarEvent.available_slots === 0 ||
+            event.endDate() < fcUtil.now()
           ) {
-            // show it (non-grayed) if it is reservable; filter it out otherwise
-            if (
-              event.calendarEvent.reserved ||
-              event.calendarEvent.available_slots === 0 ||
-              event.endDate() < fcUtil.now()
-            ) {
-              keep = false
-            } else {
-              gray = false
-            }
-          } else {
-            // normal calendar mode: hide reservable slots
             keep = false
+          } else {
+            gray = false
           }
+        } else {
+          // normal calendar mode: hide reservable slots
+          keep = false
         }
       } else if (
         viewingGroup.id === (event.calendarEvent && event.calendarEvent.appointment_group_id)

@@ -46,19 +46,16 @@ exports[`renders desert when completely empty 1`] = `
         size="medium"
         spacing="none"
       >
-        <CondensedButton
+        <Link
           as="button"
-          color="primary"
-          cursor="pointer"
-          elementRef={[Function]}
+          color="link"
+          iconPlacement="start"
           id="PlannerEmptyState_CardView"
-          margin="0"
+          isWithinText={false}
           onClick={[Function]}
-          size="medium"
-          type="button"
         >
           Go to Card View Dashboard
-        </CondensedButton>
+        </Link>
       </InlineListItem>
       <InlineListItem
         delimiter="none"
@@ -67,19 +64,16 @@ exports[`renders desert when completely empty 1`] = `
         size="medium"
         spacing="none"
       >
-        <CondensedButton
+        <Link
           as="button"
-          color="primary"
-          cursor="pointer"
-          elementRef={[Function]}
+          color="link"
+          iconPlacement="start"
           id="PlannerEmptyState_AddToDo"
-          margin="0"
+          isWithinText={false}
           onClick={[Function]}
-          size="medium"
-          type="button"
         >
           Add To-Do
-        </CondensedButton>
+        </Link>
       </InlineListItem>
     </InlineList>
   </div>

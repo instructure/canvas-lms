@@ -33,11 +33,11 @@ export default function KeyboardShortcutModal(props) {
   return (
     <Modal
       data-testid="RCE_KeyboardShortcutModal"
-      data-mce-component
+      data-mce-component={true}
       label={formatMessage('Keyboard Shortcuts')}
       open={props.open}
-      shouldCloseOnDocumentClick
-      shouldReturnFocus
+      shouldCloseOnDocumentClick={true}
+      shouldReturnFocus={true}
       size="auto"
       onClose={props.onClose}
       onExited={props.onExited}
@@ -55,7 +55,7 @@ export default function KeyboardShortcutModal(props) {
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="small">
-          <List isUnstyled>
+          <List isUnstyled={true}>
             <List.Item>
               <Text weight="bold">
                 {OSKey}+F8/{OSKey}+0
@@ -99,5 +99,5 @@ KeyboardShortcutModal.propTypes = {
   open: bool.isRequired,
   onClose: func,
   onDismiss: func.isRequired,
-  onExited: func
+  onExited: func,
 }

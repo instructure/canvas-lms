@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import setupCSP from '../setupCSP.js'
+import setupCSP from '../setupCSP'
 import {waitFor} from '@testing-library/react'
 
 const oldEnv = window.ENV

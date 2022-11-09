@@ -126,7 +126,6 @@ describe('DateTimeInput::', () => {
    * The DST behavior was however extensively tested manually.
    */
 
-  /* eslint-disable jest/no-disabled-tests */
   it.skip('works when a DST boundary is crossed DT -> ST', () => {
     const dstProps = {...props, timezone: 'America/New_York'}
     const {getByLabelText, getByDisplayValue, getAllByText} = renderInput(dstProps)
@@ -149,5 +148,4 @@ describe('DateTimeInput::', () => {
     expect(getByDisplayValue('Sat, May 1, 2021')).toBeInTheDocument()
     expect(getByDisplayValue('10:00 AM')).toBeInTheDocument()
   })
-  /* eslint-enable jest/no-disabled-tests */
 })

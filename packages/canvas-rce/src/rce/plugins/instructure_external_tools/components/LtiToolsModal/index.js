@@ -53,13 +53,13 @@ export function LtiToolsModal(props) {
 
   return (
     <Modal
-      data-mce-component
+      data-mce-component={true}
       liveRegion={getLiveRegion}
       size="medium"
       theme={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
-      open
+      open={true}
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Header theme={{padding: '0.5rem'}}>
@@ -82,7 +82,7 @@ export function LtiToolsModal(props) {
       </Modal.Header>
       <Modal.Body overflow="fit">
         <Flex as="div" direction="column">
-          <Flex.Item as="div" shouldShrink shouldGrow>
+          <Flex.Item as="div" shouldShrink={true} shouldGrow={true}>
             <Alert liveRegion={getLiveRegion} variant="info" screenReaderOnly={!filterEmpty}>
               {filterEmpty && formatMessage('No results found for {filterTerm}', {filterTerm})}
               {!filterEmpty &&
@@ -110,7 +110,7 @@ export function LtiToolsModal(props) {
 
   function renderTools(ltiButtons) {
     return (
-      <List isUnstyled>
+      <List isUnstyled={true}>
         {ltiButtons
           .sort((a, b) => a.title.localeCompare(b.title))
           .map(b => {
@@ -142,8 +142,8 @@ LtiToolsModal.propTypes = {
       id: oneOfType([string, number]).isRequired,
       image: string.isRequired,
       onAction: func.isRequired,
-      title: string.isRequired
+      title: string.isRequired,
     })
   ),
-  onDismiss: func.isRequired
+  onDismiss: func.isRequired,
 }

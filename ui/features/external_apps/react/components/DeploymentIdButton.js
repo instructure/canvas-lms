@@ -47,6 +47,8 @@ export default class DeploymentIdButton extends React.Component {
   render() {
     return (
       <li role="presentation" className="ui-menu-item">
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           tabIndex="-1"

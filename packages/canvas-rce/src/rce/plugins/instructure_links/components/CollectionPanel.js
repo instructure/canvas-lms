@@ -27,7 +27,7 @@ export default function CollectionPanel(props) {
     collection: props.collection,
     onToggle: props.onChangeAccordion,
     expanded: props.selectedAccordionIndex === props.collection,
-    label: props.label
+    label: props.label,
   }
 
   function fetchInitialPage() {
@@ -78,11 +78,11 @@ CollectionPanel.propTypes = {
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string,
   editing: bool,
-  onEditClick: func
+  onEditClick: func,
 }
 
 CollectionPanel.defaultProps = {
   renderNewPageLink: false,
   suppressRenderEmpty: false,
-  editing: false
+  editing: false,
 }

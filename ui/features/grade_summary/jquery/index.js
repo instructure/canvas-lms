@@ -681,7 +681,7 @@ function setup() {
     if (ENV.visibility_feedback_enabled) {
       $('.toggle_comments_link').on('click', function (event) {
         event.preventDefault()
-        const $unreadIcon = $(this).find('.unread_comment_dot')
+        const $unreadIcon = $(this).find('.comment_dot')
 
         if ($unreadIcon.length) {
           const mark_comments_read_url = $unreadIcon.data('href')
@@ -697,7 +697,7 @@ function setup() {
 
       $('.toggle_rubric_assessments_link').on('click', function (event) {
         event.preventDefault()
-        const $unreadIcon = $(this).find('.unread_rubric_dot')
+        const $unreadIcon = $(this).find('.rubric_dot')
 
         if ($unreadIcon.length) {
           const mark_rubric_comments_read_url = $unreadIcon.data('href')
@@ -705,6 +705,13 @@ function setup() {
           $unreadIcon.remove()
         }
       })
+
+      if ($('.unread_dot.grade_dot').length) {
+        const fiveSeconds = 5000
+        setTimeout(() => {
+          $('.unread_dot.grade_dot').remove()
+        }, fiveSeconds)
+      }
     }
 
     $('.screenreader-toggle').click(function (event) {

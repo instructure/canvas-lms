@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'nn_NO',
   day: {
     abbrev: ['sø.', 'må.', 'ty.', 'on.', 'to.', 'fr.', 'la.'],

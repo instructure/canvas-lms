@@ -24,9 +24,9 @@ describe('process()', () => {
 
   const file = () => ({
     slice: () => ({
-      text: async () => fileText
+      text: async () => fileText,
     }),
-    type: fileType
+    type: fileType,
   })
 
   const subject = (fileOverride = null) => CategoryProcessor.process(fileOverride || file())
@@ -44,7 +44,7 @@ describe('process()', () => {
     it('processes the file with the SVG processor', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: ICON_MAKER_ICONS
+        category: ICON_MAKER_ICONS,
       })
     })
   })

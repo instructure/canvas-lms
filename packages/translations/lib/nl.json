@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Volgende pagina"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Geen wijzigingen om op te slaan."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Geen inleverdatums toegewezen"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Voorgeformatteerd"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Pretty HTML-editor"
-    },
     "preview_53003fd2": {
         "message": "Voorbeeld"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Rationele getallen"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Editor voor onbewerkte HTML"
     },
     "real_numbers_7c99df94": {
         "message": "Reële getallen"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Volgende week bekijken"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Voorgedefinieerde kleuren bekijken"
     },
     "view_previous_week_6f83849f": {
         "message": "Vorige week bekijken"

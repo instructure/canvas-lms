@@ -49,7 +49,7 @@ const NAMED_COLORS = [
   {color: '#556572', name: formatMessage('Steel Blue')},
   {color: '#6B7780', name: formatMessage('Grey')},
   {color: '#FFFFFF', name: formatMessage('White')},
-  null
+  null,
 ]
 
 export const ColorInput = ({
@@ -60,7 +60,7 @@ export const ColorInput = ({
   popoverMountNode,
   width = '11rem',
   readonly = false,
-  requireColor = false
+  requireColor = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState(color)
@@ -103,18 +103,21 @@ export const ColorInput = ({
   ))
 
   function renderPopover() {
+    const pickerLabel = colorName
+      ? formatMessage('Color Picker ({colorName} selected)', {colorName})
+      : formatMessage('Color Picker')
     return (
       <Popover
         on="click"
         isShowingContent={isOpen}
         onShowContent={() => setIsOpen(true)}
         onHideContent={() => setIsOpen(false)}
-        shouldContainFocus
-        shouldReturnFocus
+        shouldContainFocus={true}
+        shouldReturnFocus={true}
         mountNode={popoverMountNode}
         renderTrigger={
           <IconButton
-            screenReaderLabel={formatMessage('View predefined colors')}
+            screenReaderLabel={pickerLabel}
             size="small"
             withBackground={false}
             withBorder={false}
@@ -145,10 +148,6 @@ export const ColorInput = ({
     )
   }
 
-  const pickerLabel = colorName
-    ? formatMessage('Color Picker ({colorName} selected)', {colorName})
-    : formatMessage('Color Picker')
-
   return (
     <View as="div">
       <TextInput
@@ -158,10 +157,10 @@ export const ColorInput = ({
         onBlur={handleInputBlur}
         onChange={(e, value) => handleColorChange(value)}
         placeholder={formatMessage('None')}
-        renderBeforeInput={<ColorPreview color={color} disabled margin="0" />}
-        renderAfterInput={<span aria-label={pickerLabel}>{renderPopover()}</span>}
+        renderBeforeInput={<ColorPreview color={color} disabled={true} margin="0" />}
+        renderAfterInput={renderPopover}
         renderLabel={label}
-        shouldNotWrap
+        shouldNotWrap={true}
         value={inputValue || ''}
         width={width}
         interaction={readonly ? 'readonly' : undefined}
@@ -174,7 +173,7 @@ function ColorPreview({color, name, disabled, margin = 'xxx-small', onSelect}) {
   return (
     <BaseButton
       interaction={disabled ? 'readonly' : undefined}
-      isCondensed
+      isCondensed={true}
       margin={margin}
       onClick={onSelect}
       size="small"

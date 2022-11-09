@@ -26,8 +26,21 @@ const locale = {
   "decrease_indent_d9cf469d": { "message": "Minska indraget" },
   "icon_215a1dc6": { "message": "Ikon" },
   "increase_indent_6af90f7c": { "message": "Öka indraget" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Länkar till en externa sida."
+  },
+  "minimize_file_preview_da911944": {
+    "message": "Minimera förhandsvisning av fil"
+  },
+  "minimize_video_20aa554b": { "message": "Minimera video" },
   "replace_e61834a7": { "message": "Ersätt" },
-  "reset_95a81614": { "message": "Återställ" }
+  "reset_95a81614": { "message": "Återställ" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Förhandsvisningen av dokumentet bearbetas. Vänligen försök igen senare."
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Det här dokumentet kan inte visas i Canvas."
+  }
 }
 
 

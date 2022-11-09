@@ -461,6 +461,8 @@ module Importers
         atts -= [:restrict_enrollments_to_course_dates]
       end
 
+      atts -= [:is_public_to_auth_users, :is_public] if migration.should_skip_import? "visibility_settings"
+
       course.settings_will_change! unless atts.empty?
 
       # superhax to force new wiki front page if home view changed (or is master course sync)

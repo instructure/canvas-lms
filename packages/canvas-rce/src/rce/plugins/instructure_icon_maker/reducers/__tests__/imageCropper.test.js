@@ -25,33 +25,33 @@ describe('cropperSettingsReducer()', () => {
   it('handles "SetImage" actions', () => {
     const nextState = subject({
       type: 'SetImage',
-      payload: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=='
+      payload: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==',
     })
 
     expect(nextState).toMatchObject({
-      image: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=='
+      image: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==',
     })
   })
 
   it('handles "SetShape" actions', () => {
     const nextState = subject({
       type: 'SetShape',
-      payload: 'circle'
+      payload: 'circle',
     })
 
     expect(nextState).toMatchObject({
-      shape: 'circle'
+      shape: 'circle',
     })
   })
 
   it('handles "SetScaleRatio" actions', () => {
     const nextState = subject({
       type: 'SetScaleRatio',
-      payload: 1.5
+      payload: 1.5,
     })
 
     expect(nextState).toMatchObject({
-      scaleRatio: 1.5
+      scaleRatio: 1.5,
     })
   })
 
@@ -60,7 +60,7 @@ describe('cropperSettingsReducer()', () => {
     const nextState = () =>
       subject({
         type: 'FooBar',
-        payload: 'banana'
+        payload: 'banana',
       })
     expect(nextState).toThrow(Error)
   })

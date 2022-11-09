@@ -1575,7 +1575,12 @@ rubricEditing.init = function () {
         })
     })
     .triggerHandler('change')
-  $('#criterion_blank').find('.criterion_points').val('5')
+
+  const firstRating = $('#criterion_blank').find('.ratings .points')[0]?.innerHTML
+  $('#criterion_blank')
+    .find('.criterion_points')
+    .val(firstRating || '5')
+
   if ($('#default_rubric').find('.criterion').length <= 1) {
     rubricEditing.addCriterion($('#default_rubric'))
     $('#default_rubric').find('.criterion').removeClass('new_criterion')

@@ -23,7 +23,10 @@ describe ContentParticipation do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     assignment_model(course: @course)
+
     @content = @assignment.submit_homework(@student)
+    @assignment.ensure_post_policy(post_manually: false)
+    @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
   end
 
   describe "create_or_update" do
@@ -59,7 +62,7 @@ describe ContentParticipation do
     end
 
     context "when feeback visibility ff is on" do
-      before do
+      before(:once) do
         Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       end
 
@@ -85,6 +88,24 @@ describe ContentParticipation do
           ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "comment")
           ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "rubric")
         end.to change(ContentParticipation, :count).by 3
+      end
+
+      it "creates a participation if submission is not posted" do
+        @content.update_columns(posted_at: nil)
+
+        expect do
+          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        end.to change(ContentParticipation, :count).by 1
+      end
+
+      it "doesn't change the read state if submission is not posted" do
+        @content.update_columns(posted_at: nil)
+
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+
+        cp = ContentParticipation.where(user_id: @student).first
+        expect(cp.workflow_state).to eq "unread"
       end
 
       it "doesn't allow invalid content_item" do
@@ -344,6 +365,14 @@ describe ContentParticipation do
 
         ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
         expect(cpc.reload.unread_count).to eq 0
+      end
+
+      it "participation count is not created when submission is not posted" do
+        @content.update_columns(posted_at: nil)
+
+        expect do
+          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        end.to change(ContentParticipationCount, :count).by 0
       end
 
       context "when multiple submissions exist" do

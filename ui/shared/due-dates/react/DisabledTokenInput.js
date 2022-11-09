@@ -48,6 +48,7 @@ class DisabledTokenInput extends React.Component {
   render() {
     return (
       <ul
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex="0"
         aria-labelledby="assign-to-label"
         className="ic-tokens flex"

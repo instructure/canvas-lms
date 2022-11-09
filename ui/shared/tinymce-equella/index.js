@@ -83,7 +83,6 @@ export default function (ed) {
         title: 'Embed content from Equella',
       })
       .bind('equella_ready', (event, data) => {
-        const clickedEditor = $box.data('editor') || ed
         const selectedContent = ed.selection.getContent()
         if (selectedContent) {
           // selected content

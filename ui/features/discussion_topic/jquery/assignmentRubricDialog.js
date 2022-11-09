@@ -35,7 +35,9 @@ const assignmentRubricDialog = {
       const selector = $trigger.data('focusReturnsTo')
       try {
         this.$focusReturnsTo = $(document.querySelector(selector))
-      } catch (err) {}
+      } catch (err) {
+        // no-op
+      }
 
       $trigger.click(event => {
         event.preventDefault()

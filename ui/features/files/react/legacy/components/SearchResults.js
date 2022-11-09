@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
@@ -89,6 +90,7 @@ export default {
       !_.isEqual(this.props.query.search_term, props.query && props.query.search_term)
     ) {
       const forceUpdate = () => {
+        // eslint-disable-next-line react/no-is-mounted
         if (this.isMounted()) {
           this.setState({errors: null})
           this.forceUpdate()

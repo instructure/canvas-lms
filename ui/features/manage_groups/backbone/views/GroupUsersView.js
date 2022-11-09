@@ -47,7 +47,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       refreshPositions: true,
       revert: 'invalid',
       revertDuration: 150,
-      start(event, ui) {
+      start(_event, _ui) {
         // hide AssignToGroupMenu (original and helper)
         $('.assign-to-group-menu').hide()
       },
@@ -165,7 +165,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
       ],
       moveOptions: {
         groupsLabel: I18n.t('Groups'),
-        groups: backbone.collectionToGroups(this.model.collection, col => ({models: []})),
+        groups: backbone.collectionToGroups(this.model.collection, _col => ({models: []})),
         excludeCurrent: true,
       },
       onMoveSuccess: res => {

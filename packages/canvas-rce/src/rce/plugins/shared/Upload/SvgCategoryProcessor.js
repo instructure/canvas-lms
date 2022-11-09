@@ -30,7 +30,7 @@ export async function process(file) {
 
     if (slice.includes(iconMakerType)) {
       return {
-        category: ICON_MAKER_ICONS
+        category: ICON_MAKER_ICONS,
       }
     }
   } catch {}

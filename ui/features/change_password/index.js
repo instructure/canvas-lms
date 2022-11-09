@@ -33,9 +33,9 @@ $form.formSubmit({
     )
   },
   success() {
-    location.href = '/login/canvas?password_changed=1'
+    window.location.href = '/login/canvas?password_changed=1'
   },
   error(errors) {
-    if (errors.nonce) location.href = '/login/canvas'
+    if (errors.nonce) window.location.href = '/login/canvas'
   },
 })

@@ -70,7 +70,7 @@ module Types
     def quoted_entry
       if object.deleted?
         nil
-      elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
+      elsif object.include_reply_preview && (Account.site_admin.feature_enabled?(:isolated_view) || Account.site_admin.feature_enabled?(:split_screen_view))
         load_association(:parent_entry)
       end
     end

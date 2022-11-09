@@ -31,6 +31,7 @@ import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('external_tools')
 
+// eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
   displayName: 'AddApp',
 
@@ -42,7 +43,6 @@ export default createReactClass({
   getInitialState() {
     return {
       modalIsOpen: false,
-      isValid: false,
       errorMessage: null,
       fields: {},
     }
@@ -73,7 +73,7 @@ export default createReactClass({
       }
     }
 
-    this.props.app.config_options.map(opt => {
+    this.props.app.config_options.forEach(opt => {
       fields[opt.name] = {
         type: opt.param_type,
         value: opt.default_value,
@@ -82,6 +82,7 @@ export default createReactClass({
       }
     })
 
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({fields}, this.validateConfig)
       this.refs.addTool.focus()
@@ -89,10 +90,10 @@ export default createReactClass({
   },
 
   handleChange(e) {
-    let target = e.target,
-      value = target.value,
-      name = $(target).data('rel'),
-      fields = this.state.fields
+    const target = e.target
+    let value = target.value
+    const name = $(target).data('rel')
+    const fields = this.state.fields
 
     if (target.type === 'checkbox') {
       value = target.checked
@@ -111,11 +112,11 @@ export default createReactClass({
       })
     )
     this.setState({invalidFields})
-    this.setState({isValid: _.isEmpty(invalidFields)})
   },
 
   openModal(e) {
     e.preventDefault()
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({modalIsOpen: true})
     }
@@ -178,14 +179,14 @@ export default createReactClass({
   },
 
   onSaveSuccess(tool) {
-    $(this.refs.addButton).removeAttr('disabled')
+    $(this.addButtonRef).removeAttr('disabled')
     tool.off('sync', this.onSaveSuccess)
     this.setState({errorMessage: null})
     this.closeModal(this.props.handleToolInstalled)
   },
 
   onSaveFail(_tool) {
-    $(this.refs.addButton).removeAttr('disabled')
+    $(this.addButtonRef).removeAttr('disabled')
     this.setState({
       errorMessage: I18n.t('There was an error in processing your request'),
     })
@@ -217,6 +218,8 @@ export default createReactClass({
   render() {
     return (
       <div className="AddApp">
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           ref="addTool"

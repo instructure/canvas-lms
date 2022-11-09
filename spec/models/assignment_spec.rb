@@ -5686,6 +5686,48 @@ describe Assignment do
     end
   end
 
+  describe "scope: exclude_muted_associations_for_user" do
+    before do
+      @assignment = assignment_model(course: @course)
+    end
+
+    context "includes assignment" do
+      it "posted submission" do
+        @assignment.submission_for_student(@student).update!(posted_at: Time.zone.now)
+        expect(Assignment.exclude_muted_associations_for_user(@student).count).to eq 1
+      end
+
+      it "unposted submissions with default posting policy" do
+        # By default, an automatic post policy (post_manually: false) is associated to
+        # an assignment.  Now that post policy is included in exclude_muted_associations
+        # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
+        # post policy assignment until the submission is posted.  See "manual posting
+        # policy" test cases below.
+        expect(Assignment.exclude_muted_associations_for_user(@student).count).to eq 1
+      end
+
+      it "not graded assignment with unposted submissions with default posting policy" do
+        @assignment.update!(grading_type: "not_graded")
+        expect(Assignment.exclude_muted_associations_for_user(@student).count).to eq 1
+      end
+
+      it "not graded assignment with unposted submissions with manual posting policy" do
+        @assignment.post_policy.update!(post_manually: true)
+        @assignment.update!(grading_type: "not_graded")
+        expect(Assignment.exclude_muted_associations_for_user(@student).count).to eq 1
+      end
+    end
+
+    context "excludes assignment" do
+      it "graded assignment with unposted submissions with manual posting policy" do
+        submission = Submission.find_by(user_id: @user.id, assignment_id: @assignment.id)
+        expect(submission.posted?).to eq false
+        @assignment.post_policy.update!(post_manually: true)
+        expect(Assignment.exclude_muted_associations_for_user(@student).count).to eq 0
+      end
+    end
+  end
+
   describe "linked submissions" do
     shared_examples_for "submittable" do
       before :once do

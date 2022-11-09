@@ -344,7 +344,7 @@ const Color = {
   White: '#FFFFFF',
   Yellow: '#FFFF00',
   Green: '#00FF00',
-  Red: '#FF0000'
+  Red: '#FF0000',
 }
 
 function initializeSettings() {
@@ -364,11 +364,11 @@ function initializeSettings() {
     imageSettings: {
       cropperSettings: null,
       icon: {
-        label: 'Art Icon'
+        label: 'Art Icon',
       },
       iconFillColor: Color.White,
       image: 'Art Icon',
-      mode: 'SingleColor'
-    }
+      mode: 'SingleColor',
+    },
   }
 }

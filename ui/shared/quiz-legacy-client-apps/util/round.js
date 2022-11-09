@@ -17,8 +17,6 @@
  */
 
 export default function round(n, digits) {
-  let scale
-
   if (digits === undefined) {
     digits = 0
   }
@@ -27,7 +25,7 @@ export default function round(n, digits) {
     n = parseFloat(n)
   }
 
-  scale = Math.pow(10, parseInt(digits, 10))
+  const scale = Math.pow(10, parseInt(digits, 10))
   n = Math.round(n * scale) / scale
 
   return n

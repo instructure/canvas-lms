@@ -24,7 +24,7 @@ class RCEGlobals {
       RCEGlobals.instance = this
       this._data = {
         features: {},
-        config: {}
+        config: {},
       }
     }
 

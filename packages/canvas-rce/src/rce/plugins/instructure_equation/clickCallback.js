@@ -18,8 +18,9 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import formatMessage from '../../../format-message'
 import Bridge from '../../../bridge'
+import {parseLatex} from './EquationEditorModal/parseLatex'
+import advancedPreference from './EquationEditorModal/advancedPreference'
 
 export default function (ed, document, _trayProps) {
   return import('./EquationEditorModal').then(module => {
@@ -44,10 +45,11 @@ export default function (ed, document, _trayProps) {
     ReactDOM.render(
       <EquationEditorModal
         editor={ed}
-        label={formatMessage('Equation Editor')}
         onModalDismiss={handleDismiss}
         onModalClose={handleDismiss}
         onEquationSubmit={handleSubmit}
+        originalLatex={parseLatex(ed)}
+        openAdvanced={advancedPreference.isSet()}
       />,
       container
     )

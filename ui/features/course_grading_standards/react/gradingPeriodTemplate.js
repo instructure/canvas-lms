@@ -40,30 +40,10 @@ const tabbableDate = (ref, date) => {
   )
 }
 
-const renderActions = ({props, onDeleteGradingPeriod}) => {
-  if (props.permissions.delete && !props.readOnly) {
-    let cssClasses = 'Button Button--icon-action icon-delete-grading-period'
-    if (props.disabled) cssClasses += ' disabled'
-    return (
-      <div className="GradingPeriod__Actions content-box">
-        <button
-          ref="deleteButton"
-          role="button"
-          className={cssClasses}
-          aria-disabled={props.disabled}
-          onClick={onDeleteGradingPeriod}
-        >
-          <i className="icon-x icon-delete-grading-period" />
-          <span className="screenreader-only">{I18n.t('Delete grading period')}</span>
-        </button>
-      </div>
-    )
-  }
-}
-
 class GradingPeriodTemplate extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
+    disabled: PropTypes.bool.isRequired,
     weight: PropTypes.number,
     weighted: PropTypes.bool.isRequired,
     startDate: PropTypes.instanceOf(Date).isRequired,
@@ -87,6 +67,7 @@ class GradingPeriodTemplate extends React.Component {
 
       const invalidProps = []
       _.each(requiredProps, (propType, propName) => {
+        // eslint-disable-next-line valid-typeof
         const invalidProp = _.isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })
@@ -216,6 +197,27 @@ class GradingPeriodTemplate extends React.Component {
     )
   }
 
+  renderActions = () => {
+    if (this.props.permissions.delete && !this.props.readOnly) {
+      let cssClasses = 'Button Button--icon-action icon-delete-grading-period'
+      if (this.props.disabled) cssClasses += ' disabled'
+      return (
+        <div className="GradingPeriod__Actions content-box">
+          <button
+            ref={c => (this.deleteButtonRef = c)}
+            type="button"
+            className={cssClasses}
+            aria-disabled={this.props.disabled}
+            onClick={this.onDeleteGradingPeriod}
+          >
+            <i className="icon-x icon-delete-grading-period" />
+            <span className="screenreader-only">{I18n.t('Delete grading period')}</span>
+          </button>
+        </div>
+      )
+    }
+  }
+
   render() {
     return (
       <div
@@ -243,6 +245,7 @@ class GradingPeriodTemplate extends React.Component {
               {this.renderEndDate()}
             </div>
             <div className="col-xs-12 col-md-8 col-lg-2">
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="ic-Label" id={postfixId('period_close_date_', this)}>
                 {I18n.t('Close Date')}
               </label>
@@ -252,7 +255,7 @@ class GradingPeriodTemplate extends React.Component {
           </div>
         </div>
 
-        {renderActions(this)}
+        {this.renderActions()}
       </div>
     )
   }

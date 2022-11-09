@@ -30,7 +30,7 @@ export const fileShape = {
   lock_at: string,
   unlock_at: string,
   locked_for_user: bool,
-  published: bool
+  published: bool,
 }
 
 export const mediaObjectShape = {
@@ -39,7 +39,7 @@ export const mediaObjectShape = {
   embedded_iframe_url: string.isRequired,
   id: oneOfType([number, string]).isRequired,
   title: string.isRequired,
-  published: bool
+  published: bool,
 }
 
 export const fileOrMediaObjectShape = {
@@ -56,5 +56,5 @@ export const fileOrMediaObjectShape = {
   lock_at: string,
   unlock_at: string,
   locked_for_user: bool,
-  published: bool
+  published: bool,
 }

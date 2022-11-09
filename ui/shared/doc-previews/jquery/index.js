@@ -19,7 +19,6 @@
 import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
@@ -79,7 +78,7 @@ $.fn.loadDocPreview = function (options) {
         options
       )
 
-    function tellAppIViewedThisInline(serviceUsed) {
+    function tellAppIViewedThisInline(_serviceUsed) {
       // if I have a url to ping back to the app that I viewed this file inline, ping it.
       if (opts.attachment_view_inline_ping_url) {
         $.ajaxJSON(
@@ -94,7 +93,7 @@ $.fn.loadDocPreview = function (options) {
 
     if (opts.crocodoc_session_url) {
       const sanitizedUrl = sanitizeUrl(opts.crocodoc_session_url)
-      var iframe = $('<iframe/>', {
+      const iframe = $('<iframe/>', {
         src: sanitizedUrl,
         width: opts.width,
         height: opts.height,
@@ -108,14 +107,13 @@ $.fn.loadDocPreview = function (options) {
       })
     } else if (opts.canvadoc_session_url) {
       const canvadocWrapper = $(
-        '<div style="overflow: auto; resize: vertical;\
-        border: 1px solid transparent; height: 100%;"/>'
+        `<div style="overflow: auto; resize: vertical; border: 1px solid transparent; height: 100%;"/>`
       )
       canvadocWrapper.appendTo($this)
 
       const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
       const sanitizedUrl = sanitizeUrl(opts.canvadoc_session_url)
-      var iframe = $('<iframe/>', {
+      const iframe = $('<iframe/>', {
         src: sanitizedUrl,
         width: opts.width,
         allowfullscreen: '1',
@@ -184,31 +182,29 @@ $.fn.loadDocPreview = function (options) {
           }
         })
       }
-    } else {
       // else fall back with a message that the document can't be viewed inline
-      if (opts.attachment_preview_processing) {
-        $this.html(
-          '<p>' +
-            htmlEscape(
-              I18n.t(
-                'errors.document_preview_processing',
-                'The document preview is currently being processed. Please try again later.'
-              )
-            ) +
-            '</p>'
-        )
-      } else {
-        $this.html(
-          '<p>' +
-            htmlEscape(
-              I18n.t(
-                'errors.cannot_view_document_in_canvas',
-                'This document cannot be displayed within Canvas.'
-              )
-            ) +
-            '</p>'
-        )
-      }
+    } else if (opts.attachment_preview_processing) {
+      $this.html(
+        '<p>' +
+          htmlEscape(
+            I18n.t(
+              'errors.document_preview_processing',
+              'The document preview is currently being processed. Please try again later.'
+            )
+          ) +
+          '</p>'
+      )
+    } else {
+      $this.html(
+        '<p>' +
+          htmlEscape(
+            I18n.t(
+              'errors.cannot_view_document_in_canvas',
+              'This document cannot be displayed within Canvas.'
+            )
+          ) +
+          '</p>'
+      )
     }
   })
 }

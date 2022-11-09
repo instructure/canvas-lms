@@ -49,8 +49,7 @@ const [show, hide] = ['block', 'none'].map(displayVal => id => {
   if (el) el.style.display = displayVal
 })
 
-const observerMode = () =>
-  ENV.current_user_roles?.includes('observer')
+const observerMode = () => ENV.current_user_roles?.includes('observer')
 
 /**
  * This component renders the header and the to do sidebar for the user

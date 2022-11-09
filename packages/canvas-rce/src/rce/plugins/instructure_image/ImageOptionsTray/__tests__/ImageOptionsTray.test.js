@@ -42,12 +42,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         naturalWidth: 100,
         appliedPercentage: 100,
         usePercentageUnits: false,
-        url: 'https://www.fillmurray.com/200/100'
+        url: 'https://www.fillmurray.com/200/100',
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
       open: true,
-      isIconMaker: false
+      isIconMaker: false,
     }
   })
 

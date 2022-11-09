@@ -29,7 +29,7 @@ export const initialState = {
   error: undefined,
   cropperOpen: false,
   cropperSettings: null,
-  compressed: false
+  compressed: false,
 }
 
 export const actions = {
@@ -46,14 +46,14 @@ export const actions = {
   CLEAR_MODE: {type: 'ClearMode'},
   UPDATE_SETTINGS: {type: 'UpdateSettings'},
   SET_CROPPER_OPEN: {type: 'SetCropperOpen'},
-  SET_CROPPER_SETTINGS: {type: 'SetCropperSettings'}
+  SET_CROPPER_SETTINGS: {type: 'SetCropperSettings'},
 }
 
 export const modes = {
   courseImages: {type: 'Course', label: formatMessage('Course Images')},
   uploadImages: {type: 'Upload', label: formatMessage('Upload Image')},
   singleColorImages: {type: 'SingleColor', label: formatMessage('Single Color Image')},
-  multiColorImages: {type: 'MultiColor', label: formatMessage('Multi Color Image')}
+  multiColorImages: {type: 'MultiColor', label: formatMessage('Multi Color Image')},
 }
 
 const imageSection = (state, action) => {

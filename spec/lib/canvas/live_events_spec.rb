@@ -2200,6 +2200,7 @@ describe Canvas::LiveEvents do
       }
       @master_content_tag =
         MasterCourses::MasterContentTag.create!(master_content_tag_params)
+      allow_any_instance_of(Assignment).to receive(:lti_resource_link_id).and_return("someltiresourcelinkid")
     end
 
     it "triggers a blueprint_restrictions_updated live event" do
@@ -2207,6 +2208,7 @@ describe Canvas::LiveEvents do
                      canvas_assignment_id: @master_content_tag.content_id.to_s,
                      canvas_course_id: @master_content_tag.master_template.course_id.to_s,
                      canvas_course_uuid: @master_content_tag.master_template.course.uuid,
+                     lti_resource_link_id: "someltiresourcelinkid",
                      restrictions: @master_content_tag.restrictions,
                      use_default_restrictions: @master_content_tag.use_default_restrictions
                    }).once

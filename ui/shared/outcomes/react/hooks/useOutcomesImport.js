@@ -103,7 +103,6 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         : I18n.t('All outcomes from %{groupTitle} have been successfully added to this account.', {
             groupTitle,
           })
-
       try {
         await resolveProgress(
           {
@@ -114,7 +113,10 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
             interval: isGroup ? groupPollingInterval : outcomePollingInterval,
           }
         )
-        if (isGroup) {
+        const shouldShowAlert = getLocalStorageActiveImports().some(
+          imp => imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId
+        )
+        if (isGroup && shouldShowAlert) {
           showFlashAlert({
             message,
             type: 'success',
@@ -124,16 +126,16 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
       } catch (err) {
         showFlashError(err, isGroup)
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
-      }
-
-      const activeImports = getLocalStorageActiveImports()
-      storeActiveImportsInLocalStorage(
-        activeImports.filter(
-          imp => !(imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId)
+      } finally {
+        const activeImports = getLocalStorageActiveImports()
+        storeActiveImportsInLocalStorage(
+          activeImports.filter(
+            imp => !(imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId)
+          )
         )
-      )
+      }
     },
-    [groupPollingInterval, outcomePollingInterval, isCourse, setStatus]
+    [isCourse, groupPollingInterval, outcomePollingInterval, setStatus]
   )
 
   useEffect(() => {
@@ -190,7 +192,6 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const activeImports = getLocalStorageActiveImports()
         activeImports.push(newTrackedImport)
         storeActiveImportsInLocalStorage(activeImports)
-        setStatus(outcomeOrGroupId, IMPORT_PENDING, isGroup)
         trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle)
         setHasAddedOutcomes(true)
       } catch (err) {

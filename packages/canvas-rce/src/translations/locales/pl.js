@@ -494,6 +494,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Zagnieżdżone większe niż" },
   "nested_less_than_27d17e58": { "message": "Zagnieżdżone mniejsze niż" },
   "next_page_d2a39853": { "message": "Następna strona" },
+  "no_changes_to_save_d29f6e91": { "message": "Brak zmian do zapisania" },
   "no_e16d9132": { "message": "Nie" },
   "no_file_chosen_9a880793": { "message": "Nie wybrano pliku" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -575,7 +576,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Poprzedza" },
   "precedes_equal_20701e84": { "message": "Poprzedza lub równa się" },
   "preformatted_d0670862": { "message": "Wstępnie formatowane" },
-  "pretty_html_editor_28748756": { "message": "Ulepszony edytor HTML" },
   "preview_53003fd2": { "message": "Podgląd" },
   "preview_in_overlay_ed772c46": { "message": "Podgląd w nakładce" },
   "preview_inline_9787330": { "message": "Wbudowany pogląd" },
@@ -595,7 +595,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Kwaterniony" },
   "quizzes_7e598f57": { "message": "Testy" },
   "rational_numbers_80ddaa4a": { "message": "Liczby wymierne" },
-  "raw_html_editor_e3993e41": { "message": "Edytor HTML bez formatowania" },
   "real_numbers_7c99df94": { "message": "Liczby rzeczywiste" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Część rzeczywista (liczby zespolonej)"
@@ -889,9 +888,6 @@ const locale = {
   "view_description_30446afc": { "message": "Wyświetl opis" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Wyświetl skróty klawiszowe"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "Wybierz uprzednio zdefiniowane kolory"
   },
   "view_title_description_67940918": { "message": "Wyświetl opis { title }" },
   "white_87fa64fd": { "message": "Biały" },

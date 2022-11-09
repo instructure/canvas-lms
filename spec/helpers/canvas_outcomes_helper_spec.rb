@@ -32,6 +32,17 @@ describe CanvasOutcomesHelper do
                                                                                  })
   end
 
+  def stub_get_alignments(params)
+    stub_request(:get, "http://domain/api/outcomes/list?#{params}").with({
+                                                                           headers: {
+                                                                             Authorization: /\+*/,
+                                                                             Accept: "*/*",
+                                                                             "Accept-Encoding": /\+*/,
+                                                                             "User-Agent": "Ruby"
+                                                                           }
+                                                                         })
+  end
+
   subject { Object.new.extend CanvasOutcomesHelper }
 
   around do |example|
@@ -162,6 +173,133 @@ describe CanvasOutcomesHelper do
         expect(subject.extract_domain_jwt(account, "")).to eq ["beta.domain", "encoded"]
         allow(ApplicationController).to receive(:test_cluster_name).and_return("invalid")
         expect(subject.extract_domain_jwt(account, "")).to eq [nil, nil]
+      end
+    end
+  end
+
+  describe "#get_outcome_alignments" do
+    before do
+      settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+      account.settings[:provision] = { "outcomes" => settings }
+      account.save!
+    end
+
+    context "without outcome ids" do
+      it "returns nil when outcome ids is nil" do
+        expect(subject.get_outcome_alignments(@course, nil)).to eq nil
+      end
+
+      it "returns nil when outcome ids is empty" do
+        expect(subject.get_outcome_alignments(@course, "")).to eq nil
+      end
+    end
+
+    context "without context" do
+      it "returns nil when context is nil" do
+        expect(subject.get_outcome_alignments(nil, "123")).to eq nil
+      end
+
+      it "returns nil when context is empty" do
+        expect(subject.get_outcome_alignments("", "123")).to eq nil
+      end
+    end
+
+    context "without outcome_service_results_to_canvas feature flag enabled" do
+      it "returns nil" do
+        expect(subject.get_outcome_alignments(@course, "123")).to eq nil
+      end
+    end
+
+    context "returns results" do
+      before do
+        @course.enable_feature!(:outcome_service_results_to_canvas)
+      end
+
+      def mock_alignment_response(external_ids, include_group, alignments)
+        response = external_ids.split(",").map do |e_id|
+          {
+            id: "1",
+            guid: nil,
+            group: include_group,
+            label: "",
+            title: "Outcome #{e_id}",
+            description: "",
+            external_id: e_id,
+            alignments: []
+          }
+        end
+        if alignments
+          response = response.map do |r|
+            r[:alignments] = [
+              {
+                id: 1,
+                artifact_type: "quizzes.quiz",
+                artifact_id: 1,
+                alignment_set_id: 1,
+                aligned_at: "2022-10-13T10:13:00.013Z",
+                created_at: "2022-10-13T10:13:00.013Z",
+                updated_at: "2022-10-13T10:13:00.013Z",
+                deleted_at: nil,
+                context_id: 1,
+                associated_asset_id: nil,
+                associated_asset_type: nil
+              }
+            ]
+          end
+        end
+        response
+      end
+
+      it "raises error on non 2xx response" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1").to_return(status: 401, body: '{"valid_jwt":false}')
+        expect { subject.get_outcome_alignments(@course, "1") }.to raise_error(RuntimeError, /Error retrieving aligned assets from Outcomes Service:/)
+      end
+
+      it "outcomes only" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1")
+          .to_return(status: 200, body: mock_alignment_response("1", false, false).to_json)
+        expect(subject.get_outcome_alignments(@course, "1")).to eq mock_alignment_response("1", false, false)
+      end
+
+      it "multiple outcomes" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1,2")
+          .to_return(status: 200, body: mock_alignment_response("1,2", false, false).to_json)
+        expect(subject.get_outcome_alignments(@course, "1,2")).to eq mock_alignment_response("1,2", false, false)
+      end
+
+      it "outcome with alignments" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1&includes=alignments")
+          .to_return(status: 200, body: mock_alignment_response("1", false, true).to_json)
+        expect(subject.get_outcome_alignments(@course, "1", { includes: "alignments" })).to eq mock_alignment_response("1", false, true)
+      end
+
+      it "outcome with alignments and groups" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1&includes=alignments&list_groups=true")
+          .to_return(status: 200, body: mock_alignment_response("1", true, true).to_json)
+        expect(subject.get_outcome_alignments(@course, "1", { includes: "alignments", list_groups: true })).to eq mock_alignment_response("1", true, true)
+      end
+
+      it "outcome with alignments and no groups" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=1&includes=alignments&list_groups=false")
+          .to_return(status: 200, body: mock_alignment_response("1", false, true).to_json)
+        expect(subject.get_outcome_alignments(@course, "1", { includes: "alignments", list_groups: false })).to eq mock_alignment_response("1", false, true)
+      end
+    end
+
+    context "no results found" do
+      before do
+        @course.enable_feature!(:outcome_service_results_to_canvas)
+      end
+
+      it "returns empty array when no outcome ids are matched" do
+        stub_get_alignments("context_uuid=#{@course.uuid}&external_outcome_id_list=123").to_return(status: 200, body: "[]")
+        expect(subject.get_outcome_alignments(@course, "123")).to eq []
+      end
+
+      it "returns empty array when context is not matched" do
+        @course.update!(uuid: "someguid")
+        stub_get_alignments("context_uuid=someguid&external_outcome_id_list=1").to_return(status: 200, body: "[]")
+        expect(subject.get_outcome_alignments(@course, "1")).to eq []
       end
     end
   end

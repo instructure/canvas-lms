@@ -21,7 +21,7 @@ import {themeable} from '@instructure/ui-themeable'
 import {func, bool, string} from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 import {InlineList} from '@instructure/ui-list'
 import formatMessage from '../../format-message'
@@ -37,11 +37,11 @@ class PlannerEmptyState extends Component {
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
     responsiveSize: string,
-    isWeekly: bool
+    isWeekly: bool,
   }
 
   static defaultProps = {
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
   handleDashboardCardLinkClick = () => {
@@ -52,9 +52,14 @@ class PlannerEmptyState extends Component {
 
   renderAddToDoButton() {
     return (
-      <CondensedButton id="PlannerEmptyState_AddToDo" onClick={this.props.onAddToDo}>
+      <Link
+        as="button"
+        isWithinText={false}
+        id="PlannerEmptyState_AddToDo"
+        onClick={this.props.onAddToDo}
+      >
         {formatMessage('Add To-Do')}
-      </CondensedButton>
+      </Link>
     )
   }
 
@@ -79,12 +84,14 @@ class PlannerEmptyState extends Component {
             <InlineList delimiter="pipe">
               {this.props.changeDashboardView && (
                 <InlineList.Item>
-                  <CondensedButton
+                  <Link
+                    as="button"
+                    isWithinText={false}
                     id="PlannerEmptyState_CardView"
                     onClick={this.handleDashboardCardLinkClick}
                   >
                     {formatMessage('Go to Card View Dashboard')}
-                  </CondensedButton>
+                  </Link>
                 </InlineList.Item>
               )}
               <InlineList.Item>{this.renderAddToDoButton()}</InlineList.Item>

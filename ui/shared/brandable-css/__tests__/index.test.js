@@ -19,7 +19,7 @@ import BrandableCSS from '..'
 import stubEnv from '@canvas/stub-env'
 
 describe('@canvas/brandable-css#loadStylesheet', () => {
-  const env = stubEnv({
+  stubEnv({
     ASSET_HOST: 'http://cdn.example.com',
   })
 

@@ -59,7 +59,6 @@ export const Module: React.FC<ComponentProps> = props => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
   const [datesVisible, setDatesVisible] = useState(props.showProjections)
   const wasExpanded = useRef(props.showProjections)
-  const isStudentPace = props.coursePace.context_type === 'Enrollment'
   const isTableStacked = props.responsiveSize === 'small'
 
   useEffect(() => {
@@ -125,11 +124,8 @@ export const Module: React.FC<ComponentProps> = props => {
   }
 
   const renderAssignmentRow = item => {
-    // Scoping the key this way guarantees a new AssignmentRow is rendered when date that impacts it changes
-    // This is necessary because the AssignmentRow maintains the duration in local state,
-    // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
-    // get reverted as you type).
-    const key = `${props.module.moduleKey}-${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`
+    // Scoping the key this way keeps a single reference on the table, regardless of whether the pace exists or not
+    const key = `assignment-row-${item.module_item_id}`
     return (
       <AssignmentRow
         key={key}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,18 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RceApiSource from '../rcs/api'
+import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../svg/constants'
+import buildDownloadUrl from '../../shared/buildDownloadUrl'
 
-export async function getCanvasUrl(props) {
-  if (!props || !props.jwt || !props.host) {
-    return null
-  }
-
-  const source = new RceApiSource(props)
-  try {
-    const session = await source.getSession()
-    return session.canvasUrl
-  } catch (e) {
-    return null
-  }
+const addIconMakerAttributes = (imageAttributes: {src: string}) => {
+  imageAttributes[ICON_MAKER_ATTRIBUTE] = true
+  imageAttributes[ICON_MAKER_DOWNLOAD_URL_ATTR] = buildDownloadUrl(imageAttributes.src)
 }
+export default addIconMakerAttributes

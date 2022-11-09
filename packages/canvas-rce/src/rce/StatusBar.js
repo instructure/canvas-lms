@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, number, oneOf, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
-import {CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Badge} from '@instructure/ui-badge'
@@ -33,7 +33,7 @@ import {
   IconA11yLine,
   IconKeyboardShortcutsLine,
   IconMiniArrowEndLine,
-  IconFullScreenLine
+  IconFullScreenLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
@@ -56,12 +56,12 @@ StatusBar.propTypes = {
   preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
   readOnly: bool,
   a11yBadgeColor: string,
-  a11yErrorsCount: number
+  a11yErrorsCount: number,
 }
 
 StatusBar.defaultProps = {
   a11yBadgeColor: '#0374B5',
-  a11yErrorsCount: 0
+  a11yErrorsCount: 0,
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -193,7 +193,7 @@ export default function StatusBar(props) {
     return (
       <ApplyTheme
         theme={{
-          [Badge.theme]: {colorPrimary: props.a11yBadgeColor}
+          [Badge.theme]: {colorPrimary: props.a11yBadgeColor},
         }}
       >
         <Badge count={props.a11yErrorsCount} countUntil={100}>
@@ -212,14 +212,16 @@ export default function StatusBar(props) {
         : formatMessage('Access the pretty HTML editor')
     const label =
       props.editorView === PRETTY_HTML_EDITOR_VIEW
-        ? formatMessage('Raw HTML Editor')
-        : formatMessage('Pretty HTML Editor')
+        ? formatMessage('Switch to raw HTML Editor')
+        : formatMessage('Switch to pretty HTML Editor')
     return (
       <View data-testid="html-editor-message">
-        <CondensedButton
+        <Button
           data-btn-id="rce-editormessage-btn"
           margin="0 small"
           title={message}
+          color="secondary"
+          size="small"
           tabIndex={tabIndexForBtn('rce-editormessage-btn')}
           onClick={event => {
             event.target.focus()
@@ -232,7 +234,7 @@ export default function StatusBar(props) {
           onFocus={() => setFocusedBtnId('rce-editormessage-btn')}
         >
           {label}
-        </CondensedButton>
+        </Button>
       </View>
     )
   }
@@ -383,7 +385,9 @@ export default function StatusBar(props) {
       ref={statusBarRef}
       onKeyDown={handleKey}
     >
-      <Flex.Item shouldGrow>{isHtmlView() ? renderHtmlEditorMessage() : renderPath()}</Flex.Item>
+      <Flex.Item shouldGrow={true}>
+        {isHtmlView() ? renderHtmlEditorMessage() : renderPath()}
+      </Flex.Item>
 
       <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}
@@ -406,6 +410,6 @@ const styles = StyleSheet.create({
     width: '1px',
     height: '1.5rem',
     position: 'relative',
-    top: '.5rem'
-  }
+    top: '.5rem',
+  },
 })

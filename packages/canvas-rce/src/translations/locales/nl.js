@@ -510,6 +510,9 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Genest groter dan" },
   "nested_less_than_27d17e58": { "message": "Genest kleiner dan" },
   "next_page_d2a39853": { "message": "Volgende pagina" },
+  "no_changes_to_save_d29f6e91": {
+    "message": "Geen wijzigingen om op te slaan."
+  },
   "no_e16d9132": { "message": "Nee" },
   "no_file_chosen_9a880793": { "message": "Geen bestand gekozen" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -591,7 +594,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Gaat vooraf aan" },
   "precedes_equal_20701e84": { "message": "Gaat vooraf aan gelijk" },
   "preformatted_d0670862": { "message": "Voorgeformatteerd" },
-  "pretty_html_editor_28748756": { "message": "Pretty HTML-editor" },
   "preview_53003fd2": { "message": "Voorbeeld" },
   "preview_in_overlay_ed772c46": { "message": "Voorbeeld in overlay" },
   "preview_inline_9787330": { "message": "Voorbeeld inline" },
@@ -611,7 +613,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Quaternionen" },
   "quizzes_7e598f57": { "message": "Toetsen" },
   "rational_numbers_80ddaa4a": { "message": "Rationele getallen" },
-  "raw_html_editor_e3993e41": { "message": "Editor voor onbewerkte HTML" },
   "real_numbers_7c99df94": { "message": "Reële getallen" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reëel deel (van complex getal)"
@@ -902,9 +903,6 @@ const locale = {
   "view_ba339f93": { "message": "Bekijken" },
   "view_description_30446afc": { "message": "Beschrijving bekijken" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Sneltoetsen bekijken" },
-  "view_predefined_colors_92f5db39": {
-    "message": "Voorgedefinieerde kleuren bekijken"
-  },
   "view_title_description_67940918": {
     "message": "{ title } beschrijving bekijken"
   },

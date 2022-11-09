@@ -105,6 +105,7 @@ describe('toHtmlString', () => {
   })
 
   describe('when the link needs to be sanitized', () => {
+    // eslint-disable-next-line no-script-url
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(

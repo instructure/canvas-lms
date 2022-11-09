@@ -23,15 +23,13 @@ const I18n = useI18nScope('assignments_2')
 export default class AssignmentFieldValidator {
   messages = {}
 
-  // beause isNan is not the same as Number.isNaN
-  /* eslint-disable no-restricted-globals */
   isPointsValid = value => {
     const strValue = `${value}`
     if (!strValue) {
       this.messages.pointsPossible = I18n.t('Points is required')
       return false // it's required
     }
-    if (isNaN(strValue)) {
+    if (Number.isNaN(Number(strValue))) {
       this.messages.pointsPossible = I18n.t('Points must be a number >= 0')
       return false // must be a number
     }
@@ -44,7 +42,6 @@ export default class AssignmentFieldValidator {
     return true
   }
 
-  /* eslint-enable no-restricted-globals */
   isNameValid = value => {
     if (!value || value.trim().length === 0) {
       this.messages.name = I18n.t('Assignment name is required')

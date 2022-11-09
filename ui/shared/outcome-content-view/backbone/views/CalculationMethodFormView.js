@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import $ from 'jquery'
 import _ from 'underscore'
 
 import Backbone from '@canvas/backbone'
@@ -57,7 +58,7 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   change(e) {
-    const val = parseInt(numberHelper.parse($(e.target).val()))
+    const val = parseInt(numberHelper.parse($(e.target).val()), 10)
     if (_.isNaN(val)) return
     this.model.set({
       calculation_int: val,

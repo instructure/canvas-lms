@@ -2678,6 +2678,19 @@ class Submission < ActiveRecord::Base
     change_item_read_state("unread", content_item)
   end
 
+  def mark_submission_comments_read(current_user)
+    timestamp = Time.now.utc
+    viewed_comments = visible_submission_comments.pluck(:id).map do |id|
+      {
+        user_id: current_user.id,
+        submission_comment_id: id,
+        viewed_at: timestamp
+      }
+    end
+
+    ViewedSubmissionComment.insert_all(viewed_comments)
+  end
+
   def change_item_read_state(new_state, content_item)
     return nil unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
 

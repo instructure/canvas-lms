@@ -46,28 +46,28 @@ describe('MultiColor', () => {
       fireEvent.click(getByTestId('icon-maker-art'))
 
       expect(dispatch).toHaveBeenNthCalledWith(1, {
-        ...actions.START_LOADING
+        ...actions.START_LOADING,
       })
 
       expect(dispatch).toHaveBeenNthCalledWith(2, {
         ...actions.SET_IMAGE_NAME,
-        payload: 'Art Icon'
+        payload: 'Art Icon',
       })
 
       // Wait for the async bits to resolve
       await waitFor(() => {
         expect(dispatch).toHaveBeenNthCalledWith(3, {
           ...actions.SET_IMAGE,
-          payload: expect.any(String)
+          payload: expect.any(String),
         })
 
         expect(dispatch).toHaveBeenNthCalledWith(4, {
           ...actions.SET_IMAGE_COLLECTION_OPEN,
-          payload: false
+          payload: false,
         })
 
         expect(dispatch).toHaveBeenNthCalledWith(5, {
-          ...actions.STOP_LOADING
+          ...actions.STOP_LOADING,
         })
       })
     })

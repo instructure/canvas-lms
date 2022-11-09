@@ -29,7 +29,7 @@ describe('RCE Plugins > LtiTool', () => {
       description: 'This is tool 1.',
       image: 'tool1/icon.png',
       onAction: () => {},
-      ...override
+      ...override,
     }
     return props
   }

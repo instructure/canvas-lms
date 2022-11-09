@@ -38,7 +38,7 @@ export default class FileSelectBox extends React.Component {
 
   isDirty = true
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.refresh()
   }
 
@@ -80,7 +80,8 @@ export default class FileSelectBox extends React.Component {
   isLoading = () => this.fileStore.getState().isLoading || this.folderStore.getState().isLoading
 
   createFolderFileTreeStructure = () => {
-    let {folders, files} = this.state
+    const {files} = this.state
+    let {folders} = this.state
 
     // Put files into the right folders.
     const groupedFiles = _.groupBy(files, 'folder_id')
@@ -122,6 +123,7 @@ export default class FileSelectBox extends React.Component {
           </optgroup>
         )
       }
+      return undefined
     })
   }
 
@@ -138,7 +140,9 @@ export default class FileSelectBox extends React.Component {
     return (
       <div>
         <select
-          ref="selectBox"
+          ref={c => {
+            this.selectBoxRef = c
+          }}
           aria-busy={this.isLoading()}
           className="module_item_select"
           aria-label={ariaLabel}

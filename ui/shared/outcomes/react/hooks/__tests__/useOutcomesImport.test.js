@@ -211,6 +211,24 @@ describe('useOutcomesImport', () => {
       })
     })
 
+    it('does not display flash confirmation after group import if group is not in localStorage', async () => {
+      resolveProgress.mockImplementation(() => {
+        delete localStorage.activeImports
+        return Promise.resolve()
+      })
+      const {result} = renderHook(() => useOutcomesImport(), {
+        wrapper,
+      })
+      act(() => {
+        result.current.importOutcomes({
+          outcomeOrGroupId: groupId,
+          groupTitle: 'New Group',
+        })
+      })
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledTimes(0)
+    })
+
     it('imports group in Course context and displays flash confirmation', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,

@@ -20,6 +20,6 @@ import LinkOptionsDialogController from './components/LinkOptionsDialog/LinkOpti
 
 const dialogController = new LinkOptionsDialogController()
 
-export default function(ed, op) {
+export default function (ed, op) {
   dialogController.showDialogForEditor(ed, op)
 }

@@ -26,12 +26,12 @@ function getMenuItems() {
   return [
     {
       text: formatMessage('Create Icon Maker Icon'),
-      value: 'instructure_create_icon_maker'
+      value: 'instructure_create_icon_maker',
     },
     {
       text: formatMessage('Saved Icon Maker Icons'),
-      value: 'instructure_list_icon_maker'
-    }
+      value: 'instructure_list_icon_maker',
+    },
   ]
 }
 
@@ -75,8 +75,8 @@ tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
           onSetup: api => {
             api.setDisabled(!isOKToLink(ed.selection.getContent()))
             return () => {}
-          }
-        }))
+          },
+        })),
     })
 
     // Register button
@@ -87,7 +87,7 @@ tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
         const items = getMenuItems().map(item => ({
           type: 'choiceitem',
           text: item.text,
-          value: item.value
+          value: item.value,
         }))
         callback(items)
       },
@@ -106,7 +106,7 @@ tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
         return () => {
           ed.off('NodeChange', handleNodeChange)
         }
-      }
+      },
     })
 
     // Register context toolbar for editing existing icon maker icons
@@ -115,7 +115,7 @@ tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
         handleOptionSelected(ed, 'instructure_edit_icon_maker')
       }
     })
-  }
+  },
 })
 
 // Register plugin

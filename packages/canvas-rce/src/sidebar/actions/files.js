@@ -29,7 +29,7 @@ export const SET_ROOT = 'action.files.set_root'
 export function createToggle(id) {
   return {
     type: TOGGLE,
-    id
+    id,
   }
 }
 
@@ -40,14 +40,14 @@ export function createAddFile({id, name, url, type, embed}) {
     name,
     url,
     embed,
-    fileType: type
+    fileType: type,
   }
 }
 
 export function createRequestFiles(id) {
   return {
     type: REQUEST_FILES,
-    id
+    id,
   }
 }
 
@@ -55,7 +55,7 @@ export function createReceiveFiles(id, files) {
   return {
     type: RECEIVE_FILES,
     id,
-    fileIds: files.map(file => file.id)
+    fileIds: files.map(file => file.id),
   }
 }
 
@@ -63,7 +63,7 @@ export function createInsertFile(id, fileId) {
   return {
     type: INSERT_FILE,
     id,
-    fileId
+    fileId,
   }
 }
 
@@ -89,14 +89,14 @@ export function createAddFolder(folder) {
     name: folder.name,
     parentId: folder.parentId,
     filesUrl: folder.filesUrl,
-    foldersUrl: folder.foldersUrl
+    foldersUrl: folder.foldersUrl,
   }
 }
 
 export function createRequestSubfolders(id) {
   return {
     type: REQUEST_SUBFOLDERS,
-    id
+    id,
   }
 }
 
@@ -104,7 +104,7 @@ export function createReceiveSubfolders(id, folders) {
   return {
     type: RECEIVE_SUBFOLDERS,
     id,
-    folderIds: folders.map(folder => folder.id)
+    folderIds: folders.map(folder => folder.id),
   }
 }
 
@@ -137,7 +137,7 @@ export function toggle(id) {
 export function createSetRoot(id) {
   return {
     type: SET_ROOT,
-    id
+    id,
   }
 }
 

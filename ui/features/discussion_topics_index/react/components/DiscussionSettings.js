@@ -59,7 +59,7 @@ export default class DiscussionSettings extends Component {
     studentSettings: [],
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     this.setState({
       markAsRead: props.userSettings.manual_mark_as_read,
       studentSettings: this.defaultStudentSettingsValues(props),

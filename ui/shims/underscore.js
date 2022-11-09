@@ -18,7 +18,9 @@
 
 // //
 // if you want underscore in your code. require 'underscore' (this file)
+// eslint-disable-next-line import/no-commonjs
 const _ = require('lodash-underscore')
 
 // grab the global '_' variable, make it not global and return it
+// eslint-disable-next-line import/no-commonjs
 module.exports = _.noConflict()

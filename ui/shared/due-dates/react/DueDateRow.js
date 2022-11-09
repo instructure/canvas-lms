@@ -45,6 +45,8 @@ class DueDateRow extends React.Component {
     allStudentsFetched: PropTypes.bool.isRequired,
     inputsDisabled: PropTypes.bool.isRequired,
     defaultDueTime: PropTypes.string,
+    dueDatesReadonly: PropTypes.bool.isRequired,
+    availabilityDatesReadonly: PropTypes.bool.isRequired,
   }
 
   // --------------------
@@ -81,7 +83,7 @@ class DueDateRow extends React.Component {
   }
 
   tokenizedSections = sectionOverrides => {
-    var sectionOverrides = sectionOverrides || []
+    sectionOverrides = sectionOverrides || []
     return _.map(sectionOverrides, (override, index) => ({
       id: `section-key-${index}`,
       type: 'section',
@@ -91,7 +93,7 @@ class DueDateRow extends React.Component {
   }
 
   tokenizedGroups = groupOverrides => {
-    var groupOverrides = groupOverrides || []
+    groupOverrides = groupOverrides || []
     return _.map(groupOverrides, (override, index) => ({
       id: `group-key-${index}`,
       type: 'group',
@@ -101,7 +103,7 @@ class DueDateRow extends React.Component {
   }
 
   tokenizedAdhoc = adhocOverrides => {
-    var adhocOverrides = adhocOverrides || []
+    adhocOverrides = adhocOverrides || []
     return _.reduce(
       adhocOverrides,
       (overrideTokens, ov) => {
@@ -113,7 +115,7 @@ class DueDateRow extends React.Component {
   }
 
   tokenizedNoop = noopOverrides => {
-    var noopOverrides = noopOverrides || []
+    noopOverrides = noopOverrides || []
     return _.map(noopOverrides, (override, index) => ({
       id: `noop-key-${index}`,
       noop_id: override.get('noop_id'),

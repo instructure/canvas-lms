@@ -36,22 +36,23 @@ QUnit.module('Modal', {
 
 test('has a default class of, "ReactModal__Content--canvas"', function () {
   const ModalElement = (
-    <Modal isOpen title="Hello">
+    <Modal isOpen={true} title="Hello">
       inner content
     </Modal>
   )
   this.component = TestUtils.renderIntoDocument(ModalElement)
-  ok($('.ReactModalPortal').find('.ReactModal__Content--canvas').length === 1)
+  strictEqual($('.ReactModalPortal').find('.ReactModal__Content--canvas').length, 1)
 })
 
 test('can create a custom content class', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen className="custom_class_name" title="Hello">
+    <Modal isOpen={true} className="custom_class_name" title="Hello">
       Inner content
     </Modal>
   )
-  ok(
-    $('.ReactModalPortal').find('.custom_class_name').length === 1,
+  strictEqual(
+    $('.ReactModalPortal').find('.custom_class_name').length,
+    1,
     'allows custom content class name'
   )
 })
@@ -62,8 +63,9 @@ test('can create a custom overlay class name', function () {
       Inner content
     </Modal>
   )
-  ok(
-    $('.ReactModalPortal').find('.custom_overlay_class_name').length === 1,
+  strictEqual(
+    $('.ReactModalPortal').find('.custom_overlay_class_name').length,
+    1,
     'allows custom overlay class name'
   )
 })
@@ -74,7 +76,11 @@ test('renders ModalContent inside of modal', function () {
       <ModalContent className="childContent">word</ModalContent>
     </Modal>
   )
-  ok($('.ReactModalPortal').find('.childContent').length === 1, 'puts child content in the modal')
+  strictEqual(
+    $('.ReactModalPortal').find('.childContent').length,
+    1,
+    'puts child content in the modal'
+  )
 })
 
 test('renders ModalButtons inside of modal', function () {
@@ -83,8 +89,9 @@ test('renders ModalButtons inside of modal', function () {
       <ModalButtons className="buttonContent">buttons here</ModalButtons>
     </Modal>
   )
-  ok(
-    $('.ReactModalPortal').find('.buttonContent').length === 1,
+  strictEqual(
+    $('.ReactModalPortal').find('.buttonContent').length,
+    1,
     'puts button component in the modal'
   )
 })
@@ -110,11 +117,12 @@ test('updates modalIsOpen when props change', function () {
     </Modal>
   )
   equal(this.component.state.modalIsOpen, false, 'props are false')
-  this.component.componentWillReceiveProps({isOpen: true})
+  this.component.UNSAFE_componentWillReceiveProps({isOpen: true})
   ok(this.component.state.modalIsOpen, 'props change to true')
 })
 
 test('Sets the iframe allowances', function () {
+  // eslint-disable-next-line qunit/no-global-expect, jest/valid-expect
   expect(1)
   const spy = sinon.spy()
   this.component = TestUtils.renderIntoDocument(

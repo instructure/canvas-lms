@@ -26,7 +26,9 @@ import {Text} from '@instructure/ui-text'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
+import {View} from '@instructure/ui-view'
 import {IconXSolid} from '@instructure/ui-icons'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
@@ -80,34 +82,19 @@ export default class AssociationsTable extends React.Component {
     this.fixIcons()
   }
 
-  onRemove = e => {
-    e.preventDefault()
-
-    const form = e.currentTarget
-    const courseId = form.getAttribute('data-course-id')
-    const courseName = form.getAttribute('data-course-name')
-    const focusIndex = form.getAttribute('data-focus-index')
-
+  onRemove = (courseId, courseName, focusIndex) => {
     setTimeout(() => this.props.focusManager.movePrev(focusIndex), 400)
 
     $.screenReaderFlashMessage(I18n.t('Removed course association %{course}', {course: courseName}))
     this.props.onRemoveAssociations([courseId])
   }
 
-  onRestore = e => {
-    e.preventDefault()
-
-    const form = e.currentTarget
-    const courseId = form.getAttribute('data-course-id')
-    const courseName = form.getAttribute('data-course-name')
-
+  onRestore = (courseId, courseName) => {
     // re-focus the restored association
     setTimeout(
       () =>
         document
-          .querySelector(
-            `.bca-associations-table form[data-course-id="${courseId}"] button[type="submit"]`
-          )
+          .querySelector(`.bca-associations-table button[data-course-id="${courseId}"]`)
           .focus(),
       400
     )
@@ -182,23 +169,17 @@ export default class AssociationsTable extends React.Component {
             )}
           </Table.Cell>
           <Table.Cell>
-            <form
-              style={{margin: 0}}
-              onSubmit={this.onRemove}
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              renderIcon={<IconXSolid />}
+              color="primary"
+              elementRef={focusNode.ref}
+              size="small"
+              screenReaderLabel={label}
+              onClick={this.onRemove.bind(this, course.id, course.name, focusNode.index)}
               data-course-id={course.id}
-              data-course-name={course.name}
-              data-focus-index={focusNode.index}
-            >
-              <CondensedButton
-                type="submit"
-                size="small"
-                renderIcon={<IconXSolid />}
-                ref={focusNode.ref}
-                aria-label={label}
-              >
-                <ScreenReaderContent>{label}</ScreenReaderContent>
-              </CondensedButton>
-            </form>
+            />
           </Table.Cell>
         </Table.Row>
       )
@@ -224,24 +205,19 @@ export default class AssociationsTable extends React.Component {
             )}
           </Table.Cell>
           <Table.Cell>
-            <form
-              style={{margin: 0}}
-              onSubmit={this.onRestore}
-              data-course-id={course.id}
-              data-course-name={course.name}
-              data-focus-index={focusNode.index}
-            >
-              <CondensedButton
-                type="submit"
-                size="small"
-                margin="x-small 0"
-                ref={focusNode.ref}
-                aria-label={label}
+            <View display="inline-block" margin="xx-small none">
+              <Link
+                isWithinText={false}
+                as="button"
+                elementRef={focusNode.ref}
+                onClick={this.onRestore.bind(this, course.id, course.name)}
               >
-                <PresentationContent>{I18n.t('Undo')}</PresentationContent>
+                <PresentationContent>
+                  <Text size="small">{I18n.t('Undo')}</Text>
+                </PresentationContent>
                 <ScreenReaderContent>{label}</ScreenReaderContent>
-              </CondensedButton>
-            </form>
+              </Link>
+            </View>
           </Table.Cell>
         </Table.Row>
       )
@@ -329,8 +305,8 @@ export default class AssociationsTable extends React.Component {
       <div className="bca-associations-table" ref={this.wrapper}>
         {this.renderLoadingOverlay()}
         {this.state.visibleExisting.length ||
-        addedAssociations.length ||
-        removedAssociations.length ? (
+        addedAssociations.length > 0 ||
+        removedAssociations.length > 0 ? (
           this.renderTable()
         ) : (
           <Text color="secondary" as="p">

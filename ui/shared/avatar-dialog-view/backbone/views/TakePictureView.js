@@ -86,7 +86,7 @@ export default class TakePictureView extends BaseView {
     )
   }
 
-  onMediaMetadata(e) {
+  onMediaMetadata(_e) {
     let wait
     return (wait = window.setInterval(() => {
       if (this.$video[0].videoHeight === 0) return
@@ -135,7 +135,7 @@ export default class TakePictureView extends BaseView {
     )
     const url = canvas.toDataURL()
 
-    img.onload = e => {
+    img.onload = _e => {
       const sX = (video.clientWidth - this.$clip.width()) / 2
       const sY = (video.clientHeight - this.$clip.height()) / 2
 
@@ -172,7 +172,7 @@ export default class TakePictureView extends BaseView {
     return (img.src = url)
   }
 
-  onRetry(e) {
+  onRetry(_e) {
     return this.resetSnapshot()
   }
 

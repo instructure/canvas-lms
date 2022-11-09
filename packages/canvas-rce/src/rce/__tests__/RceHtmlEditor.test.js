@@ -33,14 +33,14 @@ document.createRange = () => {
         left: 0,
         right: 0,
         width: 0,
-        height: 0
+        height: 0,
       }
     },
     getClientRects: () => {
       return {
-        length: 0
+        length: 0,
       }
-    }
+    },
   }
 }
 

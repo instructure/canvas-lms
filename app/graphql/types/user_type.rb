@@ -291,6 +291,26 @@ module Types
       nil
     end
 
+    field :recipients_observers, MessageableUserType.connection_type, null: true do
+      argument :recipient_ids, [String], required: true
+      argument :context_code, String, required: true
+    end
+    def recipients_observers(recipient_ids: nil, context_code: nil)
+      return nil unless object == context[:current_user]
+
+      # This field will only be used for conversations with a course context
+      course_context = Context.find_by_asset_string(context_code)
+      return nil unless course_context.is_a?(Course)
+
+      # Setting this global variable is required for helper functions to run correctly
+      @current_user = object
+      normalized_recipient_ids = normalize_recipients(recipients: recipient_ids, context_code: context_code).map(&:id)
+      course_observers_observing_recipients_ids = course_context.enrollments.not_fake.active_by_date.of_observer_type.where(associated_user_id: normalized_recipient_ids).distinct.pluck(:user_id)
+
+      # Normalize recipients should remove any observers that the current user is not able to message
+      normalize_recipients(recipients: course_observers_observing_recipients_ids, context_code: context_code)
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or

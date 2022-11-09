@@ -404,6 +404,9 @@
     "links_14b70841": {
         "message": "קישורים"
     },
+    "links_to_an_external_site_de74145d": {
+        "message": "קישורים לאתר חיצוני"
+    },
     "load_more_a36f9cf9": {
         "message": "טענו עוד"
     },
@@ -445,6 +448,12 @@
     },
     "media_af190855": {
         "message": "מדיה"
+    },
+    "minimize_file_preview_da911944": {
+        "message": "מיזעור חלון תצוגה מקדימה של קובץ"
+    },
+    "minimize_video_20aa554b": {
+        "message": "מיזעור וידאו"
     },
     "misc_3b692ea7": {
         "message": "אחר"
@@ -671,6 +680,9 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "התאריך והשעה של פריט משימה זו הגיע"
     },
+    "the_document_preview_is_currently_being_processed__7d9ea135": {
+        "message": "התצוגה המוקדמת של מסמך זה מעובדת כעת. יש לנסות מאוחר יותר"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "החומר הנו ברשות הציבור"
     },
@@ -679,6 +691,9 @@
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "אין נקודות המשויכות לפריט זה"
+    },
+    "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+        "message": "מסמך זה לא ניתן להצגה בתוך קנבס."
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "נוסחה זו לא ניתנת להצגה בתצוגה בסיסית"

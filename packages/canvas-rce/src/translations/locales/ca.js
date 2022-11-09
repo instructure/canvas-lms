@@ -520,6 +520,7 @@ const locale = {
   },
   "nested_less_than_27d17e58": { "message": "Estructura imbricada inferior a" },
   "next_page_d2a39853": { "message": "Pàgina següent" },
+  "no_changes_to_save_d29f6e91": { "message": "No hi ha cap canvi per desar." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No s''ha triat cap fitxer" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -601,9 +602,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Precedeix a" },
   "precedes_equal_20701e84": { "message": "El precedent és igual que" },
   "preformatted_d0670862": { "message": "Amb format previ" },
-  "pretty_html_editor_28748756": {
-    "message": "Editor de dades HTML processades"
-  },
   "preview_53003fd2": { "message": "Visualització prèvia" },
   "preview_in_overlay_ed772c46": {
     "message": "Visualització prèvia en superposició"
@@ -625,9 +623,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Quaternions" },
   "quizzes_7e598f57": { "message": "Proves" },
   "rational_numbers_80ddaa4a": { "message": "Números racionals" },
-  "raw_html_editor_e3993e41": {
-    "message": "Editor de dades HTML sense processar"
-  },
   "real_numbers_7c99df94": { "message": "Números reals" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Porció real (d’un número complex)"
@@ -917,9 +912,6 @@ const locale = {
   "view_description_30446afc": { "message": "Mostra la descripció" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Mostra les dreceres del teclat"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "Mostra els colors predefinits"
   },
   "view_title_description_67940918": {
     "message": "Mostra la descripció de { title }"

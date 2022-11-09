@@ -133,7 +133,7 @@ class FlavorGrid {
   }
 }
 
-window.Jobs = class Jobs extends FlavorGrid {
+class Jobs extends FlavorGrid {
   constructor(options, type_name = 'jobs', grid_name = '#jobs-grid') {
     if (options.max_attempts) {
       Jobs.max_attempts = options.max_attempts
@@ -157,6 +157,7 @@ window.Jobs = class Jobs extends FlavorGrid {
       case 'tag':
         $('#jobs-search').show()
         $('#jobs-search').attr('placeholder', flavor)
+        break
       default:
         $('#jobs-search').hide()
     }
@@ -295,7 +296,8 @@ window.Jobs = class Jobs extends FlavorGrid {
     }
 
     if (this.grid.getSelectedRows().length < 1) {
-      alert('No jobs are selected')
+      // eslint-disable-next-line no-alert
+      window.alert('No jobs are selected')
       return
     }
 
@@ -323,7 +325,8 @@ window.Jobs = class Jobs extends FlavorGrid {
             )
         }
       })()
-      if (!confirm(message)) return
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(message)) return
     }
 
     // special case -- if they've selected all, then don't send the ids so that
@@ -363,6 +366,7 @@ window.Jobs = class Jobs extends FlavorGrid {
     }
   }
 }
+window.Jobs = Jobs
 
 class Workers extends Jobs {
   constructor(options) {

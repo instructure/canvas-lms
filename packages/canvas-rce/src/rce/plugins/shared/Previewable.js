@@ -40,7 +40,7 @@ export const previewableMimeTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/postscript',
   'application/pdf',
-  'application/vnd.ms-powerpoint'
+  'application/vnd.ms-powerpoint',
 ]
 
 export function isPreviewable(type) {

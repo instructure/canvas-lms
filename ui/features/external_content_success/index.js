@@ -121,6 +121,7 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
             .map(([msg, isError], index) => {
               return (
                 <Alert
+                  // eslint-disable-next-line react/no-array-index-key
                   key={index}
                   variant={isError ? 'error' : 'info'}
                   renderCloseButtonLabel="Close"

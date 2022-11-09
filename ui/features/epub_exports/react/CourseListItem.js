@@ -63,12 +63,10 @@ class CourseListItem extends React.Component {
   }
 
   getDisplayTimestamp = () => {
-    let timestamp
-
     if (_.isEmpty(this.epubExport())) {
       return null
     }
-    timestamp = this.epubExport().updated_at
+    const timestamp = this.epubExport().updated_at
 
     return <FriendlyDatetime dateTime={timestamp} />
   }

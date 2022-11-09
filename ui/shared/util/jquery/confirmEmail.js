@@ -39,12 +39,12 @@ $(() => {
         $this.attr('href'),
         'POST',
         {},
-        data => {
+        _data => {
           resending = false
           $this.text(text)
           $.flashMessage(I18n.t('done_resending', 'Done! Message delivery may take a few minutes.'))
         },
-        data => {
+        _data => {
           resending = false
           $this.text(text)
           $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))

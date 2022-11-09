@@ -45,6 +45,7 @@ export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
 // begins publishing. use getSyncing to keep the ui consistent in the transition
 export const getSyncing = (state: StoreState): boolean =>
   state.ui.syncing > 0 || getBlackoutDatesSyncing(state) || getPacePublishing(state)
+export const getAnyActiveRequests = (state: StoreState): boolean => state.ui.syncing > 0
 export const getErrors = (state: StoreState) => state.ui.errors
 export const getCategoryError = (state: StoreState, category: string | string[]) => {
   if (Array.isArray(category)) {
@@ -65,6 +66,7 @@ export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
 export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
+export const getIsSyncing = (state: StoreState) => state.ui.syncing
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -111,6 +113,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, showPaceModal: false}
     case UIConstants.SHOW_PACE_MODAL:
       return {...state, showPaceModal: true}
+    case UIConstants.SET_SELECTED_PACE_CONTEXT_TYPE:
+      return {...state, selectedContextType: action.payload}
     default:
       return state
   }

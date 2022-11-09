@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Page suivante"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Aucune modification à enregistrer."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Pas de dates limites de rendu"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Préformaté"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Éditeur HTML embelli"
-    },
     "preview_53003fd2": {
         "message": "Aperçu"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Nombres rationnels"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Éditeur HTML brut"
     },
     "real_numbers_7c99df94": {
         "message": "Nombres réels"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Afficher la semaine suivante"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Afficher les couleurs prédéfinies"
     },
     "view_previous_week_6f83849f": {
         "message": "Afficher la semaine précédente"

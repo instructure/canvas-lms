@@ -32,11 +32,12 @@ const I18n = useI18nScope('profile')
 
 $(document).ready(function () {
   $('#communication_channels').tabs()
-  $('#communication_channels').bind('tabsshow', function (event) {
+  $('#communication_channels').bind('tabsshow', function (_event) {
     let channelInputField
     if ($(this).css('display') !== 'none') {
       // TODO: This is always undefined - where did this come from?
       const idx = $(this).data('selected.tabs')
+      // eslint-disable-next-line eqeqeq
       if (idx == 0) {
         channelInputField = $('#register_email_address').find(':text:first')
       } else {
@@ -69,7 +70,6 @@ $(document).ready(function () {
   )
   $('.add_email_link,.add_contact_link').click(function (event) {
     event.preventDefault()
-    let view = 'email'
     $('#communication_channels')
       .show()
       .dialog({
@@ -80,13 +80,12 @@ $(document).ready(function () {
       })
     if ($(this).hasClass('add_contact_link')) {
       $('#communication_channels').tabs('select', '#register_sms_number')
-      view = 'sms'
     } else {
       $('#communication_channels').tabs('select', '#register_email_address')
     }
   })
 
-  var formatTabs = function (tabs) {
+  const formatTabs = function (tabs) {
     const $form = $(tabs).parents('#register_sms_number')
     const sms_number = $form.find('.sms_number').val().replace(/[^\d]/g, '')
 
@@ -94,7 +93,7 @@ $(document).ready(function () {
       !ENV.INTERNATIONAL_SMS_ENABLED || $form.find('.country option:selected').data('useEmail')
 
     // Don't show the 10-digit warning if we're not expecting a U.S. number
-    $form.find('.should_be_10_digits').showIf(useEmail && sms_number && sms_number.length != 10)
+    $form.find('.should_be_10_digits').showIf(useEmail && sms_number && sms_number.length !== 10)
 
     // Show the "international text messaging rates may apply" warning if international SMS is enabled, the user has
     // selected a country, and that country is not the U.S.
@@ -164,12 +163,12 @@ $(document).ready(function () {
 
       if (type === 'email' || type === 'sms_email' || type === 'slack') {
         // Make sure it's a valid email address
-        var match = address.match(
+        const match = address.match(
           /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
         )
         if (!match) {
           // Not a valid email address. Show a message on the relevant field, then bail.
-          var errorMessage =
+          const errorMessage =
             address === '' ? I18n.t('Email is required') : I18n.t('Email is invalid!')
           if (type === 'email') {
             $(this).formErrors({communication_channel_email: errorMessage})
@@ -183,9 +182,9 @@ $(document).ready(function () {
         // the address will already have the country code prepended, and this will result in our regex failing always
         // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
         // we can't detect when they entered a blank phone number). libphonenumber plz
-        var match = data.communication_channel_sms_number.match(/^[0-9]+$/)
+        const match = data.communication_channel_sms_number.match(/^[0-9]+$/)
         if (!match) {
-          var errorMessage =
+          const errorMessage =
             address === '' ? I18n.t('Cell Number is required') : I18n.t('Cell Number is invalid!')
           $(this).formErrors({communication_channel_sms_number: errorMessage})
           return false
@@ -210,7 +209,7 @@ $(document).ready(function () {
       let path = data['communication_channel[address]']
       $(this).data('email', path)
       $list.find('.channel .path').each(function () {
-        if ($(this).text() == path) {
+        if ($(this).text() === path) {
           path = ''
         }
       })
@@ -299,7 +298,7 @@ $(document).ready(function () {
       .parents('.channel')
       .confirmDelete({
         url: $(this).attr('href'),
-        success(data) {
+        success(_data) {
           const $list = $(this).parents('.channel_list')
           manageAfterDeletingAnEmailFocus(this)
           $(this).remove()
@@ -309,13 +308,13 @@ $(document).ready(function () {
   })
   $('.channel_list .channel .reset_bounce_count_link').click(function (event) {
     event.preventDefault()
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, _data => {
       $(this).parents('.channel').find('.bouncing-channel').remove()
       $(this).remove()
       $.flashMessage(I18n.t('Bounce count reset!'))
     })
   })
-  $('#confirm_communication_channel .cancel_button').click(event => {
+  $('#confirm_communication_channel .cancel_button').click(_event => {
     $('#confirm_communication_channel').dialog('close')
   })
   $('.email_channels .channel .path,.other_channels .channel .path').click(function (event) {
@@ -325,7 +324,8 @@ $(document).ready(function () {
       let type = 'email address',
         confirm_title = I18n.t('titles.confirm_email_address', 'Confirm Email Address')
       if ($(this).parents('.channel_list').hasClass('other_channels')) {
-        ;(type = 'sms number'), (confirm_title = I18n.t('Confirm Communication Channel'))
+        type = 'sms number'
+        confirm_title = I18n.t('Confirm Communication Channel')
       }
       let $box = $('#confirm_communication_channel')
 
@@ -339,8 +339,8 @@ $(document).ready(function () {
         `/confirmations/${data.user_id}/limit_reached/${data.channel_id}`,
         'GET',
         {},
-        data => {
-          if (data.confirmation_limit_reached) {
+        data_ => {
+          if (data_.confirmation_limit_reached) {
             $box.find('.re_send_confirmation_link').css('visibility', 'hidden')
           } else {
             $box.find('.re_send_confirmation_link').css('visibility', 'visible')
@@ -390,7 +390,7 @@ $(document).ready(function () {
       url = $.replaceTags(url, 'code', data.code)
       $(this).attr('action', url)
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('.status_message')
         .text(I18n.t('confirming_contact', 'Confirming...'))
@@ -404,7 +404,7 @@ $(document).ready(function () {
       $('#confirm_communication_channel').dialog('close')
       $.flashMessage(I18n.t('notices.contact_confirmed', 'Contact successfully confirmed!'))
     },
-    error(data) {
+    error(_data) {
       $(this).find('.status_message').css('visibility', 'hidden')
       $.flashError(I18n.t('Confirmation failed.  Please try again.'))
     },
@@ -418,12 +418,12 @@ $(document).ready(function () {
       default_email_id: channel_id,
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, data => {
-      const channel_id = data.user.communication_channel.id
+      const channel_id_ = data.user.communication_channel.id
       $('.channel.default')
         .removeClass('default')
         .find('a.default_link span.screenreader-only.default_label')
         .remove()
-      $('.channel#channel_' + channel_id)
+      $('.channel#channel_' + channel_id_)
         .addClass('default')
         .find('a.default_link')
         .append(
@@ -440,15 +440,15 @@ $(document).ready(function () {
       $link.attr('href'),
       'POST',
       {},
-      data => {
+      _data => {
         $link.text(I18n.t('links.resent_confirmation', 'Done! Message may take a few minutes.'))
       },
-      data => {
+      _data => {
         $link.text(I18n.t('links.resend_confirmation_failed', 'Request failed. Try again.'))
       }
     )
   })
-  $('#communication_channels .cancel_button').click(event => {
+  $('#communication_channels .cancel_button').click(_event => {
     $('#communication_channels').dialog('close')
   })
   $('#confirm_email_channel .cancel_button').click(() => {

@@ -243,6 +243,9 @@ const locale = {
   "link_7262adec": { "message": "Hivatkozás" },
   "link_options_a16b758b": { "message": "Link beállításai" },
   "links_14b70841": { "message": "Linkek" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Linkek egy külső oldalra"
+  },
   "load_more_35d33c7": { "message": "Továbbiak betöltése" },
   "loading_25990131": { "message": "Betöltés..." },
   "loading_bde52856": { "message": "Töltődik" },
@@ -254,6 +257,10 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "media_af190855": { "message": "Média" },
   "medium_5a8e9ead": { "message": "Közepes" },
+  "minimize_file_preview_da911944": {
+    "message": "Fájl előnézet méretének csökkentése"
+  },
+  "minimize_video_20aa554b": { "message": "Videó méretének csökkentése" },
   "misc_3b692ea7": { "message": "Egyéb" },
   "miscellaneous_e9818229": { "message": "Egyéb" },
   "modules_c4325335": { "message": "Modulok" },
@@ -311,7 +318,6 @@ const locale = {
   "pumpkin_904428d5": { "message": "Sütőtök" },
   "purple_7678a9fc": { "message": "Lila" },
   "quizzes_7e598f57": { "message": "Kvízek" },
-  "raw_html_editor_e3993e41": { "message": "Egyszerű HTML szerkesztő" },
   "record_7c9448b": { "message": "Felvétel" },
   "record_upload_media_5fdce166": {
     "message": "Médiafájl rögzítése/feltöltése"
@@ -357,6 +363,9 @@ const locale = {
   "tab_arrows_4cf5abfc": { "message": "Tab/Nyilak" },
   "teal_f729a294": { "message": "Kékeszöld" },
   "text_7f4593da": { "message": "Szöveg" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "A dokumentum előnézete feldolgozás alatt. Kérjük, próbálja újra később."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Az anyag a közkincs kategóriába tartozik"
   },
@@ -365,6 +374,9 @@ const locale = {
   },
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "Az anyag kivételt képez- pl. tisztességes felhasználás, árajánlási jog vagy mások a vonatkozó szerzői jogi törvények alapján"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Ezt a dokumentumot nem lehet megtekinteni a Canvasban. "
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Ezt az egyenletet nem lehet megjeleníteni alapnézetben."

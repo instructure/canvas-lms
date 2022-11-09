@@ -145,6 +145,7 @@ export default class Scopes extends React.Component {
               />
               &nbsp;
               <Tooltip renderTip={includeTooltip} on={['hover', 'focus']} color="primary">
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                 <span tabIndex="0">
                   <IconInfoLine />
                   <ScreenReaderContent>{includeTooltip}</ScreenReaderContent>

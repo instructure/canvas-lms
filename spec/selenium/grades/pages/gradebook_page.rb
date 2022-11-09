@@ -41,7 +41,7 @@ module Gradebook
   MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'
 
   def self.gradebook_settings_cog
-    f("#gradebook-settings-button")
+    f('[data-test-id="gradebook-settings-button"]')
   end
 
   def self.notes_option
@@ -186,7 +186,7 @@ module Gradebook
   end
 
   def self.gradebook_settings_button
-    f("#gradebook-settings-button")
+    f('[data-test-id="gradebook-settings-button"]')
   end
 
   def self.filters_element

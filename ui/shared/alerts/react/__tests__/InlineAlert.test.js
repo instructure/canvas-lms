@@ -29,12 +29,12 @@ describe('CanvasInlineAlert', () => {
   })
 
   it('renders an alert with sr features', () => {
-    render(<CanvasInlineAlert liveAlert>alert message</CanvasInlineAlert>)
+    render(<CanvasInlineAlert liveAlert={true}>alert message</CanvasInlineAlert>)
     expect(document.querySelector('[role="alert"]')).toBeInTheDocument()
   })
 
   it('renders an sr-only alert', () => {
-    render(<CanvasInlineAlert screenReaderOnly>alert message</CanvasInlineAlert>)
+    render(<CanvasInlineAlert screenReaderOnly={true}>alert message</CanvasInlineAlert>)
     expect(document.querySelector('[role="alert"]')).toBeInTheDocument()
     // There's no great way to tell if instui has done its ScreenReaderContent thing
   })

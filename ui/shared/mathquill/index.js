@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 /**
  * Instructure tweaks/additions:
  *  * wysiwyg toolbar and misc fixes, i.e. https://github.com/jenseng/mathquill/tree/fancyeditor2
@@ -2718,7 +2721,7 @@ _.resolveNonItalicizedFunctions = function () {
     if (
       single_char ||
       (latex &&
-        raw[0] == '\\' &&
+        raw[0] === '\\' &&
         functions[raw.substring(1)] &&
         functions[(raw + latex).substring(1)])
     ) {

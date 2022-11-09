@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Avatar} from '@instructure/ui-avatar'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {truncateText} from '@canvas/util/TextHelper'
@@ -143,23 +143,27 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
 
           <div style={{minWidth: '60px'}}>
             {this.props.currentUserIsAuthor && (
-              <Button
+              <IconButton
                 size="small"
-                variant="icon"
+                color="secondary"
                 onClick={this.handleEditComment}
                 elementRef={this.bindEditButton}
-              >
-                <IconEditLine
-                  title={I18n.t('Edit Comment: %{comment}', {comment: this.props.comment})}
-                />
-              </Button>
+                screenReaderLabel={I18n.t('Edit Comment: %{comment}', {
+                  comment: this.props.comment,
+                })}
+                renderIcon={IconEditLine}
+              />
             )}
             <span style={{float: 'right'}}>
-              <Button size="small" variant="icon" onClick={this.handleDeleteComment}>
-                <IconTrashLine
-                  title={I18n.t('Delete Comment: %{comment}', {comment: this.props.comment})}
-                />
-              </Button>
+              <IconButton
+                size="small"
+                color="secondary"
+                onClick={this.handleDeleteComment}
+                screenReaderLabel={I18n.t('Delete Comment: %{comment}', {
+                  comment: this.props.comment,
+                })}
+                renderIcon={IconTrashLine}
+              />
             </span>
           </div>
         </div>

@@ -112,6 +112,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     <RCE
       ref={magicRef}
       autosave={autosave_}
+      canvasOrigin={ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || ''}
       defaultContent={defaultContent}
       editorOptions={tinymceConfig}
       highContrastCSS={window.ENV?.url_for_high_contrast_tinymce_editor_css}

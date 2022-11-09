@@ -35,7 +35,7 @@ class DataRow extends React.Component {
 
   state = {showBottomBorder: false}
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     this.setState({showBottomBorder: false})
   }
 
@@ -62,7 +62,7 @@ class DataRow extends React.Component {
 
     const inputVal = numberHelper.parse(this.state.minScoreInput)
 
-    if (!isNaN(inputVal) && inputVal >= 0 && inputVal <= 100) {
+    if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
       this.props.onRowMinScoreChange(this.props.uniqueId, String(inputVal))
     }
 
@@ -121,7 +121,7 @@ class DataRow extends React.Component {
     if (this.props.onlyDataRowRemaining) return null
     return (
       <button
-        ref="deleteButton"
+        ref={c => (this.deleteButtonRef = c)}
         className="Button Button--icon-action delete_row_button"
         onClick={this.triggerDeleteRow}
         type="button"

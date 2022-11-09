@@ -37,5 +37,5 @@ export default function UrlPanel({fileUrl, setFileUrl}) {
 
 UrlPanel.propTypes = {
   fileUrl: string.isRequired,
-  setFileUrl: func.isRequired
+  setFileUrl: func.isRequired,
 }

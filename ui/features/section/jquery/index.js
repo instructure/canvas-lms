@@ -38,18 +38,18 @@ const I18n = useI18nScope('section')
 $(document).ready(function () {
   const section_id = window.location.pathname.split('/')[4],
     $edit_section_form = $('#edit_section_form'),
-    $edit_section_link = $('.edit_section_link'),
-    currentEnrollmentList = new PaginatedList($('#current-enrollment-list'), {
-      presenter: sectionEnrollmentPresenter,
-      template: enrollmentTemplate,
-      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
-    }),
-    completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
-      presenter: sectionEnrollmentPresenter,
-      requestParams: {state: 'completed', page: 1, per_page: 25},
-      template: enrollmentTemplate,
-      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
-    })
+    $edit_section_link = $('.edit_section_link')
+  new PaginatedList($('#current-enrollment-list'), {
+    presenter: sectionEnrollmentPresenter,
+    template: enrollmentTemplate,
+    url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
+  })
+  new PaginatedList($('#completed-enrollment-list'), {
+    presenter: sectionEnrollmentPresenter,
+    requestParams: {state: 'completed', page: 1, per_page: 25},
+    template: enrollmentTemplate,
+    url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
+  })
 
   $edit_section_form
     .formSubmit({
@@ -64,7 +64,7 @@ $(document).ready(function () {
         $('#section_name').text(section.name)
         $('span.sis_source_id').text(section.sis_source_id || '')
       },
-      error(data) {
+      error(_data) {
         $edit_section_form.loadingImage('remove')
         $edit_section_form.show()
       },
@@ -115,7 +115,7 @@ $(document).ready(function () {
     })
   })
   $('#uncrosslist_form .cancel_button')
-    .click(event => {
+    .click(_event => {
       $('#uncrosslist_form').dialog('close')
     })
     .submit(function () {
@@ -210,7 +210,7 @@ $(document).ready(function () {
           $('#sis_id_holder,#account_name_holder').hide()
         }
       },
-      data => {
+      _data => {
         $('#course_autocomplete_name').text(
           I18n.t('errors.confirmation_failed', 'Confirmation Failed')
         )

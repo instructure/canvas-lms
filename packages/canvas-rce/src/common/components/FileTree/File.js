@@ -51,7 +51,7 @@ File.propTypes = {
   file: shape({
     id: number,
     name: string,
-    type: string
+    type: string,
   }).isRequired,
-  onSelect: func
+  onSelect: func,
 }

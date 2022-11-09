@@ -40,7 +40,7 @@ export default class LockCheckList extends React.Component {
       locks: props.locks,
     }
     this.onChangeFunctions = this.props.lockableAttributes.reduce((object, item) => {
-      object[item] = e => this.onChange(e, item) //eslint-disable-line
+      object[item] = e => this.onChange(e, item)
       return object
     }, {})
   }

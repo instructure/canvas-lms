@@ -95,9 +95,9 @@ RestoreAutoSaveModal.propTypes = {
   savedContent: string,
   open: bool.isRequired,
   onNo: func.isRequired,
-  onYes: func.isRequired
+  onYes: func.isRequired,
 }
 
 RestoreAutoSaveModal.defaultProps = {
-  savedContent: ''
+  savedContent: '',
 }

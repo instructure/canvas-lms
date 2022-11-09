@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
@@ -24,15 +24,16 @@ import {Text} from '@instructure/ui-text'
 export function ShowMoreRepliesButton({onClick, ...props}) {
   return (
     <span className="discussions-show-more-replies-button">
-      <CondensedButton
+      <Link
+        isWithinText={false}
+        as="button"
         onClick={onClick}
-        color="primary"
         data-testid="show-more-replies-button"
         interaction={props.fetchingMoreReplies ? 'disabled' : 'enabled'}
         {...props}
       >
         <Text weight="bold">{props.buttonText}</Text>
-      </CondensedButton>
+      </Link>
     </span>
   )
 }

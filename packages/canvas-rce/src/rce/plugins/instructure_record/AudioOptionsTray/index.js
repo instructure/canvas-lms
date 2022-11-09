@@ -38,7 +38,7 @@ export default function AudioOptionsTray({
   onDismiss,
   onSave,
   trayProps,
-  audioOptions
+  audioOptions,
 }) {
   const [subtitles, setSubtitles] = useState(audioOptions.tracks || [])
 
@@ -46,7 +46,7 @@ export default function AudioOptionsTray({
     onSave({
       media_object_id: audioOptions.id,
       subtitles,
-      updateMediaObject: contentProps.updateMediaObject
+      updateMediaObject: contentProps.updateMediaObject,
     })
   }
 
@@ -91,7 +91,7 @@ export default function AudioOptionsTray({
                         <ClosedCaptionPanel
                           subtitles={subtitles.map(st => ({
                             locale: st.locale,
-                            file: {name: st.language || st.locale}
+                            file: {name: st.language || st.locale},
                           }))}
                           uploadMediaTranslations={Bridge.uploadMediaTranslations}
                           languages={Bridge.languages}
@@ -129,22 +129,22 @@ AudioOptionsTray.propTypes = {
   open: bool.isRequired,
   trayProps: shape({
     host: string.isRequired,
-    jwt: string.isRequired
+    jwt: string.isRequired,
   }).isRequired,
   audioOptions: shape({
     id: string.isRequired,
     titleText: string.isRequired,
     tracks: arrayOf(
       shape({
-        locale: string.isRequired
+        locale: string.isRequired,
       })
-    )
-  }).isRequired
+    ),
+  }).isRequired,
 }
 
 AudioOptionsTray.defaultProps = {
   onEntered: null,
   onExited: null,
   onDismiss: null,
-  onSave: null
+  onSave: null,
 }

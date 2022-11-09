@@ -28,9 +28,9 @@ export default class SyllabusCollection extends Backbone.Collection {
     super()
 
     for (const collection of collections) {
-      collection.on('add', (model, collection, options) => this.add(model, options))
-      collection.on('remove', (model, collection, options) => this.remove(model, options))
-      collection.on('reset', (collection, options) => {
+      collection.on('add', (model, _collection, options) => this.add(model, options))
+      collection.on('remove', (model, _collection, options) => this.remove(model, options))
+      collection.on('reset', (_collection, _options) => {
         function find_collection_models(memo, model) {
           if (model.get('collection') === collection) {
             return memo.push(model)
@@ -39,13 +39,13 @@ export default class SyllabusCollection extends Backbone.Collection {
           }
         }
 
-        for (var model of this.reduce(find_collection_models, [])) {
+        for (const model of this.reduce(find_collection_models, [])) {
           this.remove(model)
         }
 
         return (() => {
           const result = []
-          for (model of collection.models) {
+          for (const model of collection.models) {
             result.push(this.add(model))
           }
           return result

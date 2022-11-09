@@ -114,6 +114,7 @@ export const DiscussionTopicRepliesContainer = props => {
             highlightEntryId={props.highlightEntryId}
             removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
             updateDraftCache={props.updateDraftCache}
+            setHighlightEntryId={props.setHighlightEntryId}
           />
         )
       })}
@@ -139,6 +140,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
   isSearchResults: PropTypes.bool,
+  setHighlightEntryId: PropTypes.func,
 }
 
 export default DiscussionTopicRepliesContainer

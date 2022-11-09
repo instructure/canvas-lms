@@ -36,7 +36,7 @@ import {
   MIN_PERCENTAGE,
   videoSizes,
   labelForImageSize,
-  scaleToSize
+  scaleToSize,
 } from '../../instructure_image/ImageEmbedOptions'
 import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
@@ -96,7 +96,7 @@ export default function VideoOptionsTray(props) {
       appliedWidth,
       displayAs,
       subtitles,
-      updateMediaObject
+      updateMediaObject,
     })
   }
   const tooltipText = formatMessage('Used by screen readers to describe the video')
@@ -128,7 +128,7 @@ export default function VideoOptionsTray(props) {
   if (videoSize !== CUSTOM) {
     messagesForSize.push({
       text: formatMessage('{width} x {height}px', {height: videoHeight, width: videoWidth}),
-      type: 'hint'
+      type: 'hint',
     })
   }
   const saveDisabled =
@@ -232,7 +232,7 @@ export default function VideoOptionsTray(props) {
                         <ClosedCaptionPanel
                           subtitles={subtitles.map(st => ({
                             locale: st.locale,
-                            file: {name: st.language || st.locale} // this is an artifact of ClosedCaptionCreatorRow's inards
+                            file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
                           }))}
                           uploadMediaTranslations={Bridge.uploadMediaTranslations}
                           languages={Bridge.languages}
@@ -272,7 +272,7 @@ VideoOptionsTray.propTypes = {
     appliedWidth: number,
     naturalHeight: number.isRequired,
     naturalWidth: number.isRequired,
-    tracks: arrayOf(shape({locale: string.isRequired}))
+    tracks: arrayOf(shape({locale: string.isRequired})),
   }).isRequired,
   onEntered: func,
   onExited: func,
@@ -281,12 +281,12 @@ VideoOptionsTray.propTypes = {
   open: bool.isRequired,
   trayProps: shape({
     host: string.isRequired,
-    jwt: string.isRequired
+    jwt: string.isRequired,
   }),
-  id: string
+  id: string,
 }
 VideoOptionsTray.defaultProps = {
   onEntered: null,
   onExited: null,
-  id: 'video-options-tray'
+  id: 'video-options-tray',
 }

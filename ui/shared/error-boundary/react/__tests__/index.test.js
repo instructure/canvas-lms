@@ -52,7 +52,6 @@ describe('ErrorBoundary', () => {
   })
 
   test('renders the component when error is thrown', () => {
-    // eslint-disable-next-line  no-undef
     jest.spyOn(console, 'error') // In tests that you expect errors
     const {getByText} = render(
       <ErrorBoundary errorComponent={<div>Making sure this does not work</div>}>

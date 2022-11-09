@@ -205,7 +205,7 @@ export default class OutcomeIconBase extends Backbone.View {
       helper: 'clone',
       revert: 'invalid',
       scroll: false,
-      drag(event, ui) {
+      drag(event, _ui) {
         const i = $(this).data('draggable')
         const o = i.options
         let scrolled = false

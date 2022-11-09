@@ -39,7 +39,7 @@ class GradingStandard extends React.Component {
     showAlert: false,
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       editingStandard: $.extend(true, {}, this.props.standard),
       saving: nextProps.saving,
@@ -51,14 +51,15 @@ class GradingStandard extends React.Component {
     if (this.props.justAdded) ReactDOM.findDOMNode(this.refs.title).focus()
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     if (this.props.editing !== prevProps.editing) {
       ReactDOM.findDOMNode(this.refs.title).focus()
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
     }
   }
 
-  triggerEditGradingStandard = event => {
+  triggerEditGradingStandard = _event => {
     this.props.onSetEditingStatus(this.props.uniqueId, true)
   }
 
@@ -110,7 +111,6 @@ class GradingStandard extends React.Component {
 
   changeRowMinScore = (index, inputVal) => {
     const newEditingStandard = $.extend(true, {}, this.state.editingStandard)
-    const lastChar = inputVal.substr(inputVal.length - 1)
     newEditingStandard.data[index][1] = inputVal
     this.setState({editingStandard: newEditingStandard})
   }
@@ -205,6 +205,7 @@ class GradingStandard extends React.Component {
     return data.map(function (item, idx, array) {
       return (
         <DataRow
+          // eslint-disable-next-line react/no-array-index-key
           key={idx}
           uniqueId={idx}
           row={item}
@@ -285,7 +286,7 @@ class GradingStandard extends React.Component {
             <i className="icon-edit" />
           </button>
           <button
-            ref="deleteButton"
+            ref={c => (this.deleteButtonRef = c)}
             className="Button Button--icon-action delete_grading_standard_button"
             onClick={this.triggerDeleteGradingStandard}
             type="button"
@@ -385,7 +386,12 @@ class GradingStandard extends React.Component {
     if (this.standardIsValid()) {
       return (
         <div id="valid_standard" className="alert alert-success">
-          <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>
+          <button
+            type="button"
+            aria-label="Close"
+            className="dismiss_alert close"
+            onClick={this.hideAlert}
+          >
             ×
           </button>
           <div className="alert-message">{I18n.t('Looks great!')}</div>
@@ -394,7 +400,12 @@ class GradingStandard extends React.Component {
     }
     return (
       <div id="invalid_standard" className="alert alert-error">
-        <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>
+        <button
+          type="button"
+          aria-label="Close"
+          className="dismiss_alert close"
+          onClick={this.hideAlert}
+        >
           ×
         </button>
         {this.renderInvalidStandardMessage()}

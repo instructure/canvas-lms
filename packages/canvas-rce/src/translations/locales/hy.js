@@ -109,11 +109,18 @@ const locale = {
   "light_blue_5374f600": { "message": "Բաց կապույտ" },
   "link_7262adec": { "message": "Հղում" },
   "links_14b70841": { "message": "Հղումներ" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Արտաքին կայքին հղումներ"
+  },
   "loading_25990131": { "message": "Բեռնում է..." },
   "loading_bde52856": { "message": "Բեռնում է" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "locked_762f138b": { "message": "Արգելափակված է" },
   "media_af190855": { "message": "Մուլտիմեդիա" },
+  "minimize_file_preview_da911944": {
+    "message": "Փոքրացնել ֆայլի նախնական դիտումը"
+  },
+  "minimize_video_20aa554b": { "message": "Փոքրացնել տեսահոլովակը" },
   "misc_3b692ea7": { "message": "Այլ" },
   "modules_c4325335": { "message": "Մոդուլներ" },
   "my_files_2f621040": { "message": "Իմ ֆայլերը" },
@@ -147,11 +154,17 @@ const locale = {
   "submit_a3cc6859": { "message": "Ուղարկել" },
   "syllabus_f191f65b": { "message": "Դասընթացի ծրագիր" },
   "teal_f729a294": { "message": "Փիրուզագույն" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Փաստաթղթի նախնական դիտումը այժմ մշակման փուլում է: Փորձեք կրկին ավելի ուշ:"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Նյութը գտնվում է հանրությանը հասանելի դոմենում"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Նյութը արտոնագրված է  Creative Commons կողմից"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Այս փաստաթուղթը չի կարող ցուցադրվել Canvas-ի ներսում:"
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Այս հավասարումը հնարավոր չէ ցուցադրել Հիմնական տեսքով:"

@@ -51,7 +51,7 @@ export default class Modal extends React.Component {
     modalIsOpen: this.props.isOpen,
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     let callback
     if (this.props.isOpen && !props.isOpen) callback = this.cleanupAfterClose
     this.setState({modalIsOpen: props.isOpen}, callback)
@@ -102,6 +102,7 @@ export default class Modal extends React.Component {
         buttons = child
       } else {
         // Warning if you don't include a component of the right type
+        // eslint-disable-next-line no-console
         console.warn(
           'Modal chilren must be wrapped in either a modal-content or modal-buttons component.'
         )

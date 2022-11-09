@@ -106,7 +106,6 @@ test('mounting sets fields onto state', function () {
       shared_secret: {description: 'Shared Secret', required: true, type: 'text', value: ''},
     },
     invalidFields: ['consumer_key', 'shared_secret'],
-    isValid: false,
     modalIsOpen: false,
   })
 })

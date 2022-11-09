@@ -52,7 +52,7 @@ let msfInstanceCounter = 0
 $.fn.moduleSequenceFooter = function (options = {}) {
   // You must pass in a assetType and assetId or we throw an error.
   if (!options.assetType || !options.assetID) {
-    throw 'Option must be set with assetType and assetID'
+    throw new Error('Option must be set with assetType and assetID')
   }
 
   this.msfAnimation = enabled =>

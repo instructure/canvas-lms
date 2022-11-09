@@ -22,7 +22,7 @@ import initialState from './initialState'
 import thunkMiddleware from 'redux-thunk'
 import {batch, batching} from 'redux-batch-middleware'
 
-export default function(props, state) {
+export default function (props, state) {
   const store = createStore(
     batching(rootReducer),
     state || initialState(props),

@@ -45,14 +45,14 @@ it('does not render with null status', () => {
 })
 
 it('renders excused when given excused only', () => {
-  ReactDOM.render(<SubmissionStatusPill excused />, document.getElementById('fixtures'))
+  ReactDOM.render(<SubmissionStatusPill excused={true} />, document.getElementById('fixtures'))
   const excusedPill = $('[data-test-id="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
 })
 
 it('renders only excused even when submission is also missing', () => {
   ReactDOM.render(
-    <SubmissionStatusPill excused submissionStatus="missing" />,
+    <SubmissionStatusPill excused={true} submissionStatus="missing" />,
     document.getElementById('fixtures')
   )
   const excusedPill = $('[data-test-id="excused-pill"]')
@@ -63,7 +63,7 @@ it('renders only excused even when submission is also missing', () => {
 
 it('renders only excused even when submission is also late', () => {
   ReactDOM.render(
-    <SubmissionStatusPill excused submissionStatus="late" />,
+    <SubmissionStatusPill excused={true} submissionStatus="late" />,
     document.getElementById('fixtures')
   )
   const excusedPill = $('[data-test-id="excused-pill"]')

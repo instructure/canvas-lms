@@ -108,7 +108,6 @@ export default class GradingPeriodSet extends React.Component {
     terms: array.isRequired,
     readOnly: bool.isRequired,
     expanded: bool,
-    actionsDisabled: bool,
     onEdit: func.isRequired,
     onDelete: func.isRequired,
     onPeriodsChange: func.isRequired,
@@ -460,6 +459,7 @@ export default class GradingPeriodSet extends React.Component {
     const arrow = this.props.expanded ? 'down' : 'right'
     return (
       <div className={`GradingPeriodSet--${setStateSuffix}`}>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <div
           className="ItemGroup__header"
           ref={ref => {
@@ -470,6 +470,7 @@ export default class GradingPeriodSet extends React.Component {
           <div>
             <div className="ItemGroup__header__title">
               <button
+                type="button"
                 className="Button Button--icon-action GradingPeriodSet__toggle"
                 aria-expanded={this.props.expanded}
                 aria-label={I18n.t('Toggle %{title} grading period visibility', {

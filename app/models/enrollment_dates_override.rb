@@ -19,10 +19,20 @@
 #
 
 class EnrollmentDatesOverride < ActiveRecord::Base
+  belongs_to :root_account, class_name: "Account"
   belongs_to :context, polymorphic: [:account]
   belongs_to :enrollment_term
 
+  before_save :infer_root_account
+
   after_save :update_courses_and_states_if_necessary
+
+  def infer_root_account
+    return if root_account_id.present?
+
+    self.root_account = context.root_account if context&.root_account?
+    self.root_account_id ||= context&.resolved_root_account_id || context&.root_account_id
+  end
 
   def update_courses_and_states_if_necessary
     if saved_changes?

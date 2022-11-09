@@ -20,7 +20,7 @@ import {
   fireEvent,
   queryByLabelText,
   queryByTestId,
-  queryHelpers
+  queryHelpers,
 } from '@testing-library/dom'
 
 export default class LinkOptionsTrayDriver {

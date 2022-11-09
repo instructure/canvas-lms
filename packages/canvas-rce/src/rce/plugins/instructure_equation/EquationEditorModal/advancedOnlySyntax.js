@@ -99,7 +99,7 @@ const advancedOnlyCommands = [
   'varlimsup',
   'varprojlim',
   'vcenter',
-  'vmatrix'
+  'vmatrix',
 ]
 
 const advancedOnlyRegex = new RegExp(advancedOnlyCommands.join('|'), 'm')

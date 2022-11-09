@@ -28,7 +28,7 @@ tinymce.create('tinymce.plugins.InstructureExternalTools', {
     ed.ui.registry.addIcon('lti', IconLtiLine.src)
     dispatchInitEvent(ed, document, url)
   },
-  icon: 'lti'
+  icon: 'lti',
 })
 
 // Register plugin

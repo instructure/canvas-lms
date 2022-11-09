@@ -41,5 +41,5 @@ export const getPayload = (state, action) => action.payload
 
 export const identity =
   (def = '') =>
-  (s, a) =>
+  (s, _a) =>
     s === undefined ? def : s

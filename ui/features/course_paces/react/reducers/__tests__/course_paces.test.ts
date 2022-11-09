@@ -19,7 +19,13 @@
 import moment from 'moment-timezone'
 import {CoursePace} from '../../types'
 import {BlackoutDate} from '../../shared/types'
-import {getBlackoutDateChanges, isNewPace, mergeAssignmentsAndBlackoutDates} from '../course_paces'
+import {
+  getBlackoutDateChanges,
+  getPaceName,
+  isNewPace,
+  mergeAssignmentsAndBlackoutDates,
+} from '../course_paces'
+import {DEFAULT_STORE_STATE, SECTION_PACE, STUDENT_PACE} from '../../__tests__/fixtures'
 
 const newbod1: BlackoutDate = {
   temp_id: 'tmp1',
@@ -82,6 +88,20 @@ describe('course_paces reducer', () => {
         // @ts-ignore
         isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
       ).toBe(false)
+    })
+
+    describe('with course paces for students', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_for_students = true
+      })
+
+      it('is new if it is a student pace', () => {
+        expect(
+          // @ts-ignore
+          isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
+        ).toBe(true)
+      })
     })
   })
 
@@ -297,6 +317,22 @@ describe('course_paces reducer', () => {
       expect(result[0].itemsWithDates[2].module_item_id).toEqual('2')
 
       expect(result[1].itemsWithDates.length).toBe(2)
+    })
+  })
+
+  describe('getPaceName', () => {
+    it('gets pace name for course pace', () => {
+      expect(getPaceName(DEFAULT_STORE_STATE)).toBe('Neuromancy 300')
+    })
+
+    it('gets pace name for section pace', () => {
+      expect(getPaceName({...DEFAULT_STORE_STATE, coursePace: SECTION_PACE})).toBe('Hackers')
+    })
+
+    it('gets pace name for student pace', () => {
+      expect(getPaceName({...DEFAULT_STORE_STATE, coursePace: STUDENT_PACE})).toBe(
+        'Henry Dorsett Case'
+      )
     })
   })
 })

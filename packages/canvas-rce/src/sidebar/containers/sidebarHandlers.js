@@ -27,7 +27,7 @@ import {
   mediaUploadComplete,
   uploadPreflight,
   uploadToIconMakerFolder,
-  uploadToMediaFolder
+  uploadToMediaFolder,
 } from '../actions/upload'
 import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
 import {toggle as toggleFolder} from '../actions/files'
@@ -38,7 +38,7 @@ import {changeContext, changeSearchString, changeSortBy} from '../actions/filter
 import {allFilesLoading} from '../actions/all_files'
 import {get as getSession} from '../actions/session'
 
-export const DEFAULT_FILE_CATEGORY = 'uncategorized'
+const DEFAULT_FILE_CATEGORY = 'uncategorized'
 
 export default function propsFromDispatch(dispatch) {
   return {
@@ -73,6 +73,6 @@ export default function propsFromDispatch(dispatch) {
     onChangeContext: newContext => dispatch(changeContext(newContext)),
     onChangeSearchString: searchString => dispatch(changeSearchString(searchString)),
     onChangeSortBy: sortBy => dispatch(changeSortBy(sortBy)),
-    onAllFilesLoading: isLoading => dispatch(allFilesLoading(isLoading))
+    onAllFilesLoading: isLoading => dispatch(allFilesLoading(isLoading)),
   }
 }

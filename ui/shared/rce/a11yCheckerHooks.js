@@ -19,7 +19,7 @@
 const noop = () => {}
 
 export function beforeCheck(editor = {}, done = noop) {
-  const [_skinStylesheet, ...ourCustomStylesheets] = Array.from(editor.dom.doc.styleSheets)
+  const [, ...ourCustomStylesheets] = Array.from(editor.dom.doc.styleSheets)
   const hcStyles = window.ENV.url_for_high_contrast_tinymce_editor_css
   ourCustomStylesheets.forEach(s => (s.disabled = true))
 

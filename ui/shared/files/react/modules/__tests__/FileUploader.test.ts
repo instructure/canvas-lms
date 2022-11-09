@@ -17,7 +17,7 @@
  */
 
 import FileUploader from '../FileUploader'
-import {ICON_MAKER_ICONS} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants.js'
+import {ICON_MAKER_ICONS} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
 
 let fileOptions: object, folder: object
 

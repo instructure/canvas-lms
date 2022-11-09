@@ -38,7 +38,7 @@ export default function updateModelsUsageRights(apiData, models) {
   })
   // We'll go ahead and update the files and remove the id from our list.
   if (files) {
-    files.map((file, index) => {
+    files.map(file => {
       const id = parseInt(file[file.idAttribute], 10)
       const idx = affectedIds.indexOf(id)
 
@@ -55,6 +55,8 @@ export default function updateModelsUsageRights(apiData, models) {
 
         return affectedIds.splice(idx, 1)
       }
+
+      return undefined
     })
   }
 

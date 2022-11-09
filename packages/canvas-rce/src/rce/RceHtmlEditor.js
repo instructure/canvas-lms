@@ -98,7 +98,7 @@ const RceHtmlEditor = React.forwardRef(({onFocus, ...props}, editorRef) => {
           extraKeys: {Tab: false, 'Shift-Tab': false},
           screenReaderLabel: label,
           direction: dir,
-          rtlMoveVisually: true
+          rtlMoveVisually: true,
         }}
         value={code}
         onChange={value => {
@@ -114,12 +114,12 @@ RceHtmlEditor.propTypes = {
   code: string.isRequired,
   height: string,
   onChange: func,
-  onFocus: func
+  onFocus: func,
 }
 RceHtmlEditor.defaultProps = {
   height: 'auto',
   onChange: _value => {},
-  onFocus: () => {}
+  onFocus: () => {},
 }
 
 export default RceHtmlEditor

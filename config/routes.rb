@@ -951,6 +951,7 @@ CanvasRails::Application.routes.draw do
   get "xsd/:version.xsd" => "content_exports#xml_schema"
 
   get "/jobs", to: "jobs_v2#redirect", as: "jobs"
+  get "/job_stats", to: "jobs_v2#job_stats", as: "job_stats"
 
   resources :jobs_v1, controller: :jobs, only: [:index, :show] do
     collection do
@@ -1542,6 +1543,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/logins", action: :create
       put "accounts/:account_id/logins/:id", action: :update
       delete "users/:user_id/logins/:id", action: :destroy
+      post "users/reset_password", action: :forgot_password
     end
 
     scope(controller: :accounts) do
@@ -2442,7 +2444,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "course_pacing/section_paces_api") do
-      get "courses/:course_id/section_paces", action: :index, as: :section_paces
       get "courses/:course_id/sections/:course_section_id/pace", action: :show, as: :section_pace
       post "courses/:course_id/sections/:course_section_id/paces", action: :create, as: :new_section_pace
       patch "courses/:course_id/sections/:course_section_id/pace", action: :update, as: :patch_section_pace
@@ -2450,7 +2451,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "course_pacing/student_enrollment_paces_api") do
-      get "courses/:course_id/student_enrollment_paces", action: :index, as: :student_enrollment_paces
       get "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :show, as: :student_enrollment_pace
       post "courses/:course_id/student_enrollments/:student_enrollment_id/paces", action: :create, as: :new_student_enrollment_pace
       patch "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :update, as: :patch_student_enrollment_pace
@@ -2479,10 +2479,13 @@ CanvasRails::Application.routes.draw do
       get "jobs2/:bucket/by_:group/search", action: :search
       get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
       get "jobs2/:bucket", action: :list, as: :jobs_list, constraints: { bucket: /running|queued|future|failed/ }
+      get "jobs2/clusters", action: :clusters, as: :job_clusters
       get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
       put "jobs2/unstuck", action: :unstuck
+      get "jobs2/stuck/strands", action: :stuck_strands, as: :jobs_stuck_strands
+      get "jobs2/stuck/singletons", action: :stuck_singletons, as: :jobs_stuck_singletons
     end
   end
 

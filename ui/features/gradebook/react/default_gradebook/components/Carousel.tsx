@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 
 type CarouselProps = {
@@ -60,31 +60,31 @@ export default class Carousel extends Component<CarouselProps> {
 
   render() {
     const leftArrow = (
-      <Button
+      <IconButton
         disabled={this.props.disabled}
         ref={button => {
           this.leftArrow = button
         }}
-        variant="icon"
+        color="secondary"
         onClick={this.handleLeftArrowClick}
         size="small"
-      >
-        <IconArrowOpenStartLine title={this.props.leftArrowDescription} />
-      </Button>
+        renderIcon={IconArrowOpenStartLine}
+        screenReaderLabel={this.props.leftArrowDescription}
+      />
     )
 
     const rightArrow = (
-      <Button
+      <IconButton
         disabled={this.props.disabled}
         ref={button => {
           this.rightArrow = button
         }}
-        variant="icon"
+        color="secondary"
         onClick={this.handleRightArrowClick}
         size="small"
-      >
-        <IconArrowOpenEndLine title={this.props.rightArrowDescription} />
-      </Button>
+        renderIcon={IconArrowOpenEndLine}
+        screenReaderLabel={this.props.rightArrowDescription}
+      />
     )
 
     return (

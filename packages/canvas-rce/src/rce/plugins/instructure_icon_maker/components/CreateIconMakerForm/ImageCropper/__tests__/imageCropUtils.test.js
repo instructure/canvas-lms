@@ -36,7 +36,7 @@ describe('createCroppedImageSvg()', () => {
     createCroppedImageSvg({
       image: 'data:image/png;base64,asdfasdfjksdf==',
       shape: Shape.Square,
-      ...otherSettings
+      ...otherSettings,
     })
 
   it('builds a <svg />', async () => {

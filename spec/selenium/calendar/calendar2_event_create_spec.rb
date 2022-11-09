@@ -255,6 +255,24 @@ describe "calendar2" do
         expect(@course.calendar_events.last.title).to eq("Event in course calendar")
       end
 
+      it "keeps the modal's context if the context is unable to be changed in the more options screen when editing" do
+        section1 = @course.course_sections.first
+        CalendarEvent.create!(
+          context: section1,
+          title: "Section Event",
+          start_at: Time.zone.now,
+          end_at: Time.zone.now + 1.hour,
+          effective_context_code: @course.asset_string
+        )
+        get "/calendar2"
+        wait_for_ajaximations
+        event_title_on_calendar.click
+        calendar_edit_event_link.click
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
+        expect_new_page_load { more_options_submit_button.click }
+        expect(driver.current_url).to match %r{/calendar2}
+      end
+
       it "creates an event with an important date in a k5 subject" do
         toggle_k5_setting(@course.account)
 

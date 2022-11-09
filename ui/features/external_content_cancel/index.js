@@ -23,12 +23,12 @@ const I18n = useI18nScope('external_content.cancel')
 let parentWindow
 window.parentWindow = window.parent
 window.callback = ENV.service
-while (parentWindow && !parentWindow[callback]) {
+while (parentWindow && !parentWindow[window.callback]) {
   parentWindow = parentWindow.parent
 }
 parentWindow.$(parentWindow).trigger('externalContentCancel')
-if (parentWindow[callback] && parentWindow[callback].cancel) {
-  parentWindow[callback].cancel()
+if (parentWindow[window.callback] && parentWindow[window.callback].cancel) {
+  parentWindow[window.callback].cancel()
   setTimeout(
     () =>
       $('#dialog_message').text(

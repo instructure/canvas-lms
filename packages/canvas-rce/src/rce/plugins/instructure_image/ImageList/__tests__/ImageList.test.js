@@ -31,9 +31,9 @@ describe('RCE "Images" Plugin > ImageList', () => {
       images: [
         buildImage(0, 'example_1.png', 100, 200),
         buildImage(1, 'example_2.png', 101, 201),
-        buildImage(2, 'example_3.png', 102, 202)
+        buildImage(2, 'example_3.png', 102, 202),
       ],
-      onImageClick: jest.fn()
+      onImageClick: jest.fn(),
     }
   })
 

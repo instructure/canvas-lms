@@ -54,7 +54,8 @@ describe('PreviewIcon()', () => {
     beforeEach(() => {
       props = {
         testId: 'preview-icon',
-        image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAtAAAAQ9CAYAAABwXXr6AAABdGlDQ1BpY2...'
+        image:
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAtAAAAQ9CAYAAABwXXr6AAABdGlDQ1BpY2...',
       }
     })
 
@@ -69,7 +70,7 @@ describe('PreviewIcon()', () => {
     beforeEach(() => {
       props = {
         color: '#06A3B7',
-        testId: 'preview-icon'
+        testId: 'preview-icon',
       }
     })
 
@@ -84,7 +85,7 @@ describe('PreviewIcon()', () => {
     beforeEach(() => {
       props = {
         variant: 'large',
-        testId: 'preview-icon'
+        testId: 'preview-icon',
       }
     })
 
@@ -112,7 +113,7 @@ describe('PreviewIcon()', () => {
   describe('when "loading" is true', () => {
     beforeEach(() => {
       props = {
-        loading: true
+        loading: true,
       }
     })
 
@@ -126,7 +127,7 @@ describe('PreviewIcon()', () => {
   describe('when "checkered" is true', () => {
     beforeEach(() => {
       props = {
-        checkered: true
+        checkered: true,
       }
     })
 

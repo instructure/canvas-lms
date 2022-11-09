@@ -40,8 +40,7 @@ export function fudgeDateForProfileTimezone(date) {
   // "Support for RFC 2822 format strings is by convention only."
   // So for those cases, we fall back on date.js's monkeypatched version of Date.parse,
   // which is what this method has always historically used before the speed optimization of using new Date()
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(fudgedDate)) {
+  if (Number.isNaN(Number(fudgedDate))) {
     // checking for isNaN(<date>) is how you check for `Invalid Date`
     fudgedDate = Date.parse(formatted)
   }

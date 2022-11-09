@@ -24,7 +24,7 @@ describe('CanvasTray', () => {
   it('renders header, close button, children', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(
-      <CanvasTray open label="Do the thing" onDismiss={handleDismiss}>
+      <CanvasTray open={true} label="Do the thing" onDismiss={handleDismiss}>
         Tray Content
       </CanvasTray>
     )
@@ -52,7 +52,7 @@ describe('CanvasTray', () => {
       }
 
       const {getByText} = render(
-        <CanvasTray open label="Do the thing">
+        <CanvasTray open={true} label="Do the thing">
           <ThrowError />
         </CanvasTray>
       )

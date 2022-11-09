@@ -19,6 +19,37 @@
 #
 
 module CanvasOutcomesHelper
+  def get_outcome_alignments(context, outcome_ids, additional_params = nil)
+    return if outcome_ids.blank? || context.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
+
+    params = {
+      context_uuid: context.uuid,
+      external_outcome_id_list: outcome_ids
+    }
+
+    domain, jwt = extract_domain_jwt(
+      context.root_account,
+      "lmgb_results.show",
+      params
+    )
+    return if domain.nil? || jwt.nil?
+
+    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
+    params = params.merge(additional_params) unless additional_params.nil?
+    response = CanvasHttp.get(
+      build_request_url(protocol, domain, "api/outcomes/list", params),
+      {
+        "Authorization" => jwt
+      }
+    )
+
+    if /^2/.match?(response.code.to_s)
+      JSON.parse(response.body, symbolize_names: true)
+    else
+      raise "Error retrieving aligned assets from Outcomes Service: #{response.body}"
+    end
+  end
+
   def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids)
     return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || user_uuids.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
 

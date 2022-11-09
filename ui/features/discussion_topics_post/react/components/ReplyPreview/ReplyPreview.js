@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -92,12 +92,14 @@ export const ReplyPreview = ({...props}) => {
                   {message.length > TRUNCATE_LENGTH && (
                     <Flex.Item>
                       <span className="discussions-show-more-text">
-                        <CondensedButton
+                        <Link
+                          isWithinText={false}
+                          as="button"
                           margin="small"
                           onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
                         >
                           <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
-                        </CondensedButton>
+                        </Link>
                       </span>
                     </Flex.Item>
                   )}

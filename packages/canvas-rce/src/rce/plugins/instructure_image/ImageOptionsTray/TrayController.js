@@ -88,20 +88,20 @@ export default class TrayController {
         src: imageOptions.url,
         role: imageOptions.isDecorativeImage ? 'presentation' : null,
         width: imageOptions.appliedWidth,
-        height: imageOptions.appliedHeight
+        height: imageOptions.appliedHeight,
       })
 
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
         target: $img,
         width: imageOptions.appliedWidth,
-        height: imageOptions.appliedHeight
+        height: imageOptions.appliedHeight,
       })
     } else {
       const link = renderLink({
         href: $img.src,
         text: imageOptions.altText || $img.src,
-        target: '_blank'
+        target: '_blank',
       })
       editor.selection.setContent(link)
     }
@@ -113,14 +113,14 @@ export default class TrayController {
     // Workaround: When passing empty string to editor.dom.setAttribs it removes the attribute
     $img.setAttribute('alt', imageOptions.altText)
     editor.dom.setAttribs($img, {
-      role: imageOptions.isDecorativeImage ? 'presentation' : null
+      role: imageOptions.isDecorativeImage ? 'presentation' : null,
     })
 
     // tell tinymce so the context toolbar resets
     editor.fire('ObjectResized', {
       target: $img,
       width: imageOptions.appliedWidth,
-      height: imageOptions.appliedHeight
+      height: imageOptions.appliedHeight,
     })
   }
 

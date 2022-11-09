@@ -31,7 +31,7 @@ export const actions = {
   SET_TRANSLATE_Y: 'SetTranslateY',
   SET_WIDTH: 'SetWidth',
   SET_HEIGHT: 'SetHeight',
-  SET_ERROR: 'SetError'
+  SET_ERROR: 'SetError',
 }
 
 const buildTransformString = state => {

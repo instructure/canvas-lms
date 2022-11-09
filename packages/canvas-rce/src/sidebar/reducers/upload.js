@@ -28,7 +28,7 @@ import {
   PROCESSED_FOLDER_BATCH,
   QUOTA_EXCEEDED_UPLOAD,
   START_LOADING,
-  STOP_LOADING
+  STOP_LOADING,
 } from '../actions/upload'
 import {combineReducers} from 'redux'
 
@@ -52,7 +52,7 @@ function error(state = {}, action) {
     case QUOTA_EXCEEDED_UPLOAD:
       return {
         ...state,
-        type: action.type
+        type: action.type,
       }
     default:
       return state
@@ -78,8 +78,8 @@ function folders(state = {}, action) {
         [action.id]: {
           id: action.id,
           name: action.name,
-          parentId: action.parentId
-        }
+          parentId: action.parentId,
+        },
       }
     case FAIL_FOLDERS_LOAD:
     default:
@@ -164,5 +164,5 @@ export default combineReducers({
   folderTree,
   error,
   loadingFolders,
-  uploadingMediaStatus
+  uploadingMediaStatus,
 })

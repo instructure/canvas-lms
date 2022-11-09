@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {
   IconMoreLine,
   IconEditLine,
@@ -30,7 +30,6 @@ import {
   IconSearchLine,
   IconImportLine,
 } from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 

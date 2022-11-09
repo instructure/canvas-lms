@@ -259,51 +259,8 @@ module CanvasSanitize # :nodoc:
       "embed" => { "src" => DEFAULT_PROTOCOLS }.freeze,
       "iframe" => { "src" => DEFAULT_PROTOCOLS }.freeze,
       "style" => { "any" => DEFAULT_PROTOCOLS }.freeze,
-      "annotation" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "annotation-xml" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "maction" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "maligngroup" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "malignmark" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "math" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "menclose" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "merror" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mfenced" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mfrac" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mglyph" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mi" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mlabeledtr" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mlongdiv" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mmultiscripts" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mn" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mo" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mover" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mpadded" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mphantom" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mprescripts" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mroot" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mrow" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "ms" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mscarries" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mscarry" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msgroup" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msline" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mspace" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msqrt" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msrow" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mstack" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mstyle" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msub" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msubsup" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "msup" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mtable" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mtd" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mtext" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "mtr" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "munder" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "munderover" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "none" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-      "semantics" => { "href" => DEFAULT_PROTOCOLS }.freeze,
-    }.freeze,
+    },
+
     css: {
       properties: (%w[
         align-content align-items align-self
@@ -340,6 +297,22 @@ module CanvasSanitize # :nodoc:
       protocols: DEFAULT_PROTOCOLS
     }
   }.freeze
+
+  # Any allowed elements for which we don't explicitly declare a
+  # protocol above will be populated with a sane default for
+  # href/src/cite/etc. so as to not allow arbitrary javascript or
+  # other protocols on any tag + attribute combos we may have missed
+  missing_protocol_elements = SANITIZE[:elements].to_set - SANITIZE[:protocols].keys.to_set
+  missing_protocol_elements.each do |element|
+    elements_allowed_attributes = SANITIZE[:attributes][element]
+    element_protocols = %w[href src cite].each_with_object({}) do |attribute, hash|
+      hash[attribute] = DEFAULT_PROTOCOLS if elements_allowed_attributes&.include?(attribute)
+    end
+    SANITIZE[:protocols][element] = element_protocols.freeze unless element_protocols.empty?
+  end
+
+  SANITIZE[:protocols].freeze
+  SANITIZE.freeze
 
   module ClassMethods
     def sanitize_field(*args)

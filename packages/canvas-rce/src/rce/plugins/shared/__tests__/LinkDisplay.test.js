@@ -20,9 +20,9 @@ import React from 'react'
 import {LinkDisplay} from '../LinkDisplay'
 import {render, fireEvent} from '@testing-library/react'
 import {IconBlank} from '../linkUtils'
-import {showFlashAlert} from '../../../../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../../../../common/FlashAlert'
 
-jest.mock('../../../../canvasFileBrowser/FlashAlert')
+jest.mock('../../../../common/FlashAlert')
 
 describe('LinkDisplay', () => {
   let props
@@ -34,7 +34,7 @@ describe('LinkDisplay', () => {
       Icon: IconBlank,
       placeholderText: 'default placeholder',
       published: true,
-      handleTextChange: jest.fn()
+      handleTextChange: jest.fn(),
     }
   })
 
@@ -100,7 +100,7 @@ describe('LinkDisplay', () => {
     expect(showFlashAlert).toHaveBeenLastCalledWith({
       message: 'Selected Course Link 2',
       srOnly: true,
-      type: 'info'
+      type: 'info',
     })
   })
 })

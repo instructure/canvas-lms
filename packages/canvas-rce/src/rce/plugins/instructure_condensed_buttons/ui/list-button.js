@@ -24,33 +24,33 @@ const listTypes = {
   'unordered-default': {
     listType: 'UL',
     icon: 'list-bull-default',
-    text: formatMessage('default bulleted unordered list')
+    text: formatMessage('default bulleted unordered list'),
   },
   circle: {
     listType: 'UL',
     icon: 'list-bull-circle',
-    text: formatMessage('circle unordered list')
+    text: formatMessage('circle unordered list'),
   },
   square: {
     listType: 'UL',
     icon: 'list-bull-square',
-    text: formatMessage('square unordered list')
+    text: formatMessage('square unordered list'),
   },
   'ordered-default': {
     listType: 'OL',
     icon: 'list-num-default',
-    text: formatMessage('default numerical ordered list')
+    text: formatMessage('default numerical ordered list'),
   },
   'upper-alpha': {
     listType: 'OL',
     icon: 'list-num-upper-alpha',
-    text: formatMessage('uppercase alphabetic ordered list')
+    text: formatMessage('uppercase alphabetic ordered list'),
   },
   'upper-roman': {
     listType: 'OL',
     icon: 'list-num-upper-roman',
-    text: formatMessage('uppercase Roman numeral ordered list')
-  }
+    text: formatMessage('uppercase Roman numeral ordered list'),
+  },
 }
 
 function selectedListType(listTypes, editor) {
@@ -89,7 +89,7 @@ export default function register(editor) {
           type: 'choiceitem',
           value: listType,
           icon,
-          text
+          text,
         }
       })
       callback(items)
@@ -98,7 +98,7 @@ export default function register(editor) {
     onAction: () => {
       const selected = listTypes[selectedListType(Object.keys(listTypes), editor)]
       const cmd =
-        selected && selected.listType == 'OL' ? 'InsertOrderedList' : 'InsertUnorderedList'
+        selected && selected.listType === 'OL' ? 'InsertOrderedList' : 'InsertUnorderedList'
       editor.execCommand(cmd)
     },
 
@@ -136,6 +136,6 @@ export default function register(editor) {
       nodeChangeHandler({parents: editor.dom.getParents(editor.selection.getNode(), 'ol,ul')})
       editor.on('NodeChange', nodeChangeHandler)
       return () => editor.off('NodeChange', nodeChangeHandler)
-    }
+    },
   })
 }

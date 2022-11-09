@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CondensedButton} from '@instructure/ui-buttons'
+import React, {useState} from 'react'
+import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {MediaComment} from '../../../graphql/MediaComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
-import React, {useState} from 'react'
 import {View} from '@instructure/ui-view'
 
 export const MessageDetailMediaAttachment = props => {
@@ -61,9 +61,9 @@ export const MessageDetailMediaAttachment = props => {
   return (
     <Flex direction="column">
       <Flex.Item>
-        <CondensedButton onClick={() => setOpen(!open)} margin="xx-small">
+        <Link isWithinText={false} as="button" onClick={() => setOpen(!open)} margin="xx-small">
           <IconAttachMediaLine /> {props.mediaComment.title}
-        </CondensedButton>
+        </Link>
       </Flex.Item>
       {open && (
         <Flex.Item>

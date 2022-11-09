@@ -23,13 +23,13 @@ export default function register(editor) {
     {
       name: 'superscript',
       text: formatMessage('Superscript'),
-      cmd: 'Superscript'
+      cmd: 'Superscript',
     },
     {
       name: 'subscript',
       text: formatMessage('Subscript'),
-      cmd: 'Subscript'
-    }
+      cmd: 'Subscript',
+    },
   ]
   const buttonLabel = formatMessage('Superscript and Subscript')
 
@@ -42,7 +42,7 @@ export default function register(editor) {
           type: 'choiceitem',
           value: button.cmd,
           icon: button.name,
-          text: button.text
+          text: button.text,
         }
       })
       callback(items)
@@ -79,6 +79,6 @@ export default function register(editor) {
       nodeChangeHandler()
       editor.on('NodeChange', nodeChangeHandler)
       return () => editor.off('NodeChange', nodeChangeHandler)
-    }
+    },
   })
 }

@@ -33,6 +33,7 @@ export default {
   displayName: 'ShowFolder',
 
   debouncedForceUpdate: _.debounce(function () {
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) this.forceUpdate()
   }, 0),
 
@@ -81,7 +82,9 @@ export default {
         let parsedResponse
         try {
           parsedResponse = $.parseJSON(jqXHR.responseText)
-        } catch (error) {}
+        } catch (error) {
+          // no-op
+        }
         if (parsedResponse) {
           this.setState({errorMessages: parsedResponse.errors})
           if (this.props.query.preview != null) {
@@ -92,7 +95,7 @@ export default {
     )
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.registerListeners(this.props)
     this.getCurrentFolder(this.props)
   },

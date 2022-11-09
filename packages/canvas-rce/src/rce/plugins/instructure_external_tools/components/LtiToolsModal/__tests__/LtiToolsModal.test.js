@@ -31,29 +31,29 @@ describe('RCE Plugins > LtiToolModal', () => {
           id: 1,
           description: 'This is tool 1.',
           image: 'tool1/icon.png',
-          onAction: () => {}
+          onAction: () => {},
         },
         {
           title: 'Tool 2',
           id: 2,
           description: 'This is tool 2',
           image: '/tool2/image.png',
-          onAction: () => {}
+          onAction: () => {},
         },
         {
           title: 'Tool 3',
           id: 3,
           image: 'https://www.edu-apps.org/assets/lti_public_resources/tool3.png',
-          onAction: () => {}
+          onAction: () => {},
         },
         {
           title: 'Diffrient Tool',
           id: 4,
           image: 'https://www.edu-apps.org/assets/lti_public_resources/tool3.png',
-          onAction: () => {}
-        }
+          onAction: () => {},
+        },
       ],
-      ...override
+      ...override,
     }
     return props
   }
@@ -123,9 +123,9 @@ describe('RCE Plugins > LtiToolModal', () => {
           id: 1,
           description: 'This is tool 1.',
           image: 'tool1/icon.png',
-          onAction: doAction
-        }
-      ]
+          onAction: doAction,
+        },
+      ],
     })
     const tool1 = getByText('Tool 1')
     tool1.click()

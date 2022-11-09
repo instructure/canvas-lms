@@ -293,6 +293,8 @@ const ComposeModalContainer = props => {
               removeAttachment={removeAttachment}
               replaceAttachment={replaceAttachment}
               modalError={props.modalError}
+              mediaUploadFile={mediaUploadFile}
+              onRemoveMediaComment={onRemoveMedia}
             >
               {isSubmissionCommentsType ? null : (
                 <HeaderInputs
@@ -314,8 +316,6 @@ const ComposeModalContainer = props => {
                   subject={
                     props.isReply || props.isForward ? props.pastConversation?.subject : subject
                   }
-                  mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
-                  onRemoveMediaComment={onRemoveMedia}
                   addressBookMessages={addressBookMessages}
                   courseMessages={courseMessages}
                   data-testid="compose-modal-inputs"

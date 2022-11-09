@@ -51,7 +51,7 @@ class LoadMore extends React.Component {
 
         {this.props.hasMore && !this.props.isLoading && (
           <div className="LoadMore-button">
-            <button className="Button--link" onClick={this.props.loadMore}>
+            <button type="button" className="Button--link" onClick={this.props.loadMore}>
               {I18n.t('Load more results')}
             </button>
           </div>

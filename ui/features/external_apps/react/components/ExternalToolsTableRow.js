@@ -194,6 +194,7 @@ export default class ExternalToolsTableRow extends React.Component {
               <i className="icon-mini-arrow-down" />
               <span className="screenreader-only">{`${tool.name} ${I18n.t('Settings')}`}</span>
             </button>
+            {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
             <ul
               className="al-options"
               role="menu"

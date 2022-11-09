@@ -34,7 +34,7 @@ import {
   MIN_WIDTH,
   MIN_PERCENTAGE,
   imageSizes,
-  labelForImageSize
+  labelForImageSize,
 } from '../instructure_image/ImageEmbedOptions'
 import formatMessage from '../../../format-message'
 import DimensionsInput from './DimensionsInput'
@@ -53,11 +53,11 @@ const ImageOptionsForm = ({
   messagesForSize,
   hideDimensions,
   id = 'image-options-form',
-  isIconMaker = false
+  isIconMaker = false,
 }) => {
   const TYPE = isIconMaker ? formatMessage('icon') : formatMessage('image')
   const tooltipText = formatMessage('Used by screen readers to describe the content of an {TYPE}', {
-    TYPE
+    TYPE,
   })
   const textAreaLabel = (
     <Flex alignItems="center">

@@ -485,7 +485,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('applies fancy midnight when reiterating a due date in bulk', async () => {
       const assignments = standardAssignmentResponse()
       assignments[0].all_dates[0].due_at = '2020-02-20T02:59:59Z'
-      const {getByText, getAllByLabelText} = await renderBulkEditAndWait({}, assignments)
+      const {getAllByLabelText} = await renderBulkEditAndWait({}, assignments)
       const dueAtInput = getAllByLabelText('Due At')[0]
       changeAndBlurInput(dueAtInput, '2020-02-20')
       expect(dueAtInput.value).toMatch('Thu, Feb 20, 2020, 11:59 PM')

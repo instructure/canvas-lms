@@ -198,7 +198,10 @@ module Crystalball
             change_map[change_type] << change_path
           end
           Crystalball.log :warn, "Crystalball changes: #{file_changes.slice("new", "modified")}"
-          if file_changes["new"].count.positive?
+          if ENV["FORCE_CRYSTALBALL"] == "1"
+            Crystalball.log :warn, "Crystalball force enabled despite config changes or new files"
+            []
+          elsif file_changes["new"].count.positive?
             Crystalball.log :warn, "Crystalball detected new .git files: #{file_changes["new"]}"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]

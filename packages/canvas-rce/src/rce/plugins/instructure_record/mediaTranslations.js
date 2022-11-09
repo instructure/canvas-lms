@@ -49,14 +49,14 @@ const uploadMediaTranslations = {
     ADD_NEW_CAPTION_OR_SUBTITLE: formatMessage('Add another'),
     ADDED_CAPTION: 'Captions for {lang} added',
     DELETED_CAPTION: 'Deleted captions for {lang}',
-    PROGRESS_LABEL: formatMessage('Uploading')
+    PROGRESS_LABEL: formatMessage('Uploading'),
   },
 
   SelectStrings: {
     USE_ARROWS: 'Use arrow keys to navigate options.',
     LIST_COLLAPSED: 'List collapsed.',
     LIST_EXPANDED: 'List expanded.',
-    OPTION_SELECTED: '{option} selected.'
-  }
+    OPTION_SELECTED: '{option} selected.',
+  },
 }
 export default uploadMediaTranslations

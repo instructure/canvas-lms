@@ -487,6 +487,7 @@
   "nested_greater_than_d852e60d": { "message": "Aninhado Maior do que" },
   "nested_less_than_27d17e58": { "message": "Aninhado Menos do que" },
   "next_page_d2a39853": { "message": "Próxima página" },
+  "no_changes_to_save_d29f6e91": { "message": "Nenhuma alteração a guardar." },
   "no_e16d9132": { "message": "Não" },
   "no_file_chosen_9a880793": { "message": "Nenhum ficheiro escolhido" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -564,7 +565,6 @@
   "precedes_196b9aef": { "message": "Precede" },
   "precedes_equal_20701e84": { "message": "Precede Igual" },
   "preformatted_d0670862": { "message": "Pré-formatado" },
-  "pretty_html_editor_28748756": { "message": "Editor HTML Bonito" },
   "preview_53003fd2": { "message": "Visualização" },
   "preview_in_overlay_ed772c46": {
     "message": "Pré-visualização em sobreposição"
@@ -586,7 +586,6 @@
   "quaternions_877024e0": { "message": "Quaternions" },
   "quizzes_7e598f57": { "message": "Testes" },
   "rational_numbers_80ddaa4a": { "message": "Números Racionais" },
-  "raw_html_editor_e3993e41": { "message": "Editor HTML em bruto" },
   "real_numbers_7c99df94": { "message": "Números reais" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Porção real (de número complexo)"
@@ -867,7 +866,6 @@
   "view_ba339f93": { "message": "Ver" },
   "view_description_30446afc": { "message": "Ver descrição" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Ver atalhos de teclado" },
-  "view_predefined_colors_92f5db39": { "message": "Ver cores pré-definidas" },
   "view_title_description_67940918": { "message": "Ver descrição { title }" },
   "white_87fa64fd": { "message": "Branco" },
   "width_492fec76": { "message": "Largura" },

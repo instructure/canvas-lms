@@ -46,8 +46,8 @@ const unsplashFetchReducer = (state, action) => {
         totalResults: action.payload.total_results,
         results: {
           ...state.results,
-          ...{[state.searchPage]: action.payload.results}
-        }
+          ...{[state.searchPage]: action.payload.results},
+        },
       }
     case 'FETCH_FAILURE':
       return {...state, loading: false, error: true, hasLoaded: true}
@@ -70,7 +70,7 @@ const useUnsplashSearch = source => {
     results: {},
     totalPages: 1,
     searchTerm: '',
-    searchPage: 1
+    searchPage: 1,
   })
 
   const effectFirstRun = useRef(true)
@@ -101,8 +101,8 @@ const useUnsplashSearch = source => {
       type: 'SET_SEARCH_DATA',
       payload: {
         searchTerm: term,
-        searchPage: page
-      }
+        searchPage: page,
+      },
     })
   }
 
@@ -143,7 +143,7 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
       >
         {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', {
           totalResults,
-          numDisplayed: results[page].length
+          numDisplayed: results[page].length,
         })}
       </Alert>
     )
@@ -209,14 +209,14 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                     as="button"
                     display="block"
                     theme={{
-                      mediumPaddingHorizontal: '0'
+                      mediumPaddingHorizontal: '0',
                     }}
                     onClick={() => {
                       setSelectedImage(resultImage.id)
                       setUnsplashData({
                         id: resultImage.id,
                         url: resultImage.urls.link,
-                        alt: resultImage.alt_text
+                        alt: resultImage.alt_text,
                       })
                     }}
                   >
@@ -226,7 +226,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                         resultImage.id === selectedImage
                           ? {
                               border: `5px solid ${brandColor}`,
-                              padding: '2px'
+                              padding: '2px',
                             }
                           : null
                       }
@@ -299,7 +299,7 @@ UnsplashPanel.propTypes = {
   setUnsplashData: func,
   source: object,
   brandColor: string,
-  liveRegion: func
+  liveRegion: func,
 }
 
 export const styles = StyleSheet.create({
@@ -311,12 +311,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     flexFlow: 'row wrap',
-    width: '100%'
+    width: '100%',
   },
   imageWrapper: {
     position: 'relative',
     margin: '12px',
-    'min-width': '200px'
+    'min-width': '200px',
   },
   imageAttribution: {
     position: 'absolute',
@@ -326,27 +326,27 @@ export const styles = StyleSheet.create({
     'min-height': '8px',
     opacity: 0,
     'background-color': '#2d3b45',
-    'z-index': 99
+    'z-index': 99,
   },
   imageContainer: {
-    'text-align': 'center'
+    'text-align': 'center',
   },
   positionedText: {
     position: 'absolute',
     height: '100%',
     width: '100%',
     top: '0',
-    left: '0'
-  }
+    left: '0',
+  },
 })
 
 export const hoverStyles = StyleSheet.create({
   imageWrapper: {
     [`#:hover ${css(styles.imageAttribution)}`]: {
-      opacity: 0.8
+      opacity: 0.8,
     },
     [`#:focus-within ${css(styles.imageAttribution)}`]: {
-      opacity: 0.8
-    }
-  }
+      opacity: 0.8,
+    },
+  },
 })

@@ -66,7 +66,7 @@ export function findLinkForService(service_type, callback) {
       event.preventDefault()
       event.stopPropagation()
       const now = new Date()
-      if (service_type == 'diigo' && lastLookup && now - lastLookup < 15000) {
+      if (service_type === 'diigo' && lastLookup && now - lastLookup < 15000) {
         // let the user know we have to take things slow because of Diigo
         setTimeout(() => {
           $dialog.find('form').submit()
@@ -146,7 +146,7 @@ export function findLinkForService(service_type, callback) {
   $dialog
     .find('.search_button')
     .text(
-      service_type == 'delicious'
+      service_type === 'delicious'
         ? I18n.t('buttons.search_by_tag', 'Search by Tag')
         : I18n.t('buttons.search', 'Search')
     )

@@ -1334,7 +1334,13 @@ class SubmissionsApiController < ApplicationController
   #
   def mark_submission_item_read
     if authorized_action(@submission, @current_user, :mark_item_read)
-      render_state_change_result @submission.mark_item_read(params[:item])
+      item = params[:item]
+
+      if item == "comment"
+        @submission.mark_submission_comments_read(@current_user)
+      end
+
+      render_state_change_result @submission.mark_item_read(item)
     end
   end
 

@@ -20,13 +20,22 @@
 class CoursePacing::PaceContextsPresenter
   def self.as_json(pace_context)
     {
-      name: pace_context.name,
+      name: display_name_for(pace_context),
       type: pace_context.class_name,
       item_id: pace_context.id,
       associated_section_count: pace_context.try(:course_sections).try(:count),
-      associated_student_count: pace_context.student_enrollments.count,
+      associated_student_count: pace_context.try(:student_enrollments).try(:count),
       applied_pace: applied_pace_for(pace_context)
     }
+  end
+
+  def self.display_name_for(pace_context)
+    case pace_context
+    when Course, CourseSection
+      pace_context.name
+    when StudentEnrollment
+      pace_context.user.name
+    end
   end
 
   def self.applied_pace_for(pace_context)

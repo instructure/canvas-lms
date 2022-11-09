@@ -35,7 +35,7 @@ class LinkValidator extends React.Component {
     showConfetti: false,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setLoadingState()
     this.getResults(true)
   }
@@ -127,7 +127,6 @@ class LinkValidator extends React.Component {
           disabled={this.state.buttonDisabled}
           style={this.state.buttonMessageStyle}
           type="button"
-          role="button"
           data-testid="validate-button"
         >
           {this.state.buttonMessage}

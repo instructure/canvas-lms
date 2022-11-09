@@ -294,7 +294,7 @@ class DiscussionEntry < ActiveRecord::Base
     #     change_column_default :discussion_entries, :legacy, false
     #   end
     # end
-    self.legacy = !(context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:isolated_view))
+    self.legacy = !(context.feature_enabled?(:react_discussions_post) && (Account.site_admin.feature_enabled?(:isolated_view) || Account.site_admin.feature_enabled?(:split_screen_view)))
   end
 
   def infer_root_entry_id

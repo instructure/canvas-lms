@@ -25,7 +25,7 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import formatMessage from '../../format-message'
@@ -47,7 +47,7 @@ export class ToDoSidebar extends Component {
     forCourse: string,
     isObserving: bool,
     loadingError: string,
-    additionalTitleContext: bool
+    additionalTitleContext: bool,
   }
 
   static defaultProps = {
@@ -55,7 +55,7 @@ export class ToDoSidebar extends Component {
     timeZone: moment.tz.guess(),
     locale: 'en',
     forCourse: undefined,
-    additionalTitleContext: false
+    additionalTitleContext: false,
   }
 
   constructor(props) {
@@ -64,7 +64,7 @@ export class ToDoSidebar extends Component {
     this.titleFocus = null
 
     this.state = {
-      visibleToDos: this.getVisibleItems(props.items)
+      visibleToDos: this.getVisibleItems(props.items),
     }
   }
 
@@ -77,9 +77,7 @@ export class ToDoSidebar extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const visibleToDos = this.getVisibleItems(nextProps.items)
-    this.setState({
-      visibleToDos
-    })
+    this.setState({visibleToDos})
   }
 
   componentDidUpdate() {
@@ -113,9 +111,13 @@ export class ToDoSidebar extends Component {
     if (this.props.changeDashboardView && this.state.visibleToDos.length > 0) {
       return (
         <View as="div" textAlign="center">
-          <CondensedButton onClick={() => this.props.changeDashboardView('planner')}>
+          <Link
+            isWithinText={false}
+            as="button"
+            onClick={() => this.props.changeDashboardView('planner')}
+          >
             {formatMessage('Show All')}
-          </CondensedButton>
+          </Link>
         </View>
       )
     }
@@ -130,7 +132,7 @@ export class ToDoSidebar extends Component {
     }
 
     return (
-      <List id="planner-todosidebar-item-list" isUnstyled>
+      <List id="planner-todosidebar-item-list" isUnstyled={true}>
         {this.state.visibleToDos.map((item, itemIndex) => (
           <List.Item key={item.uniqueId}>
             <ToDoItem
@@ -208,7 +210,7 @@ const mapStateToProps = state => ({
   items: state.sidebar.items,
   loaded: state.sidebar.loaded,
   isObserving: !!observedUserId(state),
-  loadingError: state.sidebar.loadingError
+  loadingError: state.sidebar.loadingError,
 })
 const mapDispatchToProps = {sidebarLoadInitialItems, sidebarCompleteItem}
 

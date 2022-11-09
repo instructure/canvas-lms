@@ -21,13 +21,13 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ZoomControls} from '../ZoomControls'
 import {BUTTON_SCALE_STEP} from '../../constants'
 import round from '../../../../../utils/round'
-import {showFlashAlert} from '../../../../../../../../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../../../../../../../../common/FlashAlert'
 
-jest.mock('../../../../../../../../canvasFileBrowser/FlashAlert')
+jest.mock('../../../../../../../../common/FlashAlert')
 jest.mock('@instructure/debounce', () => ({
   debounce: fn => {
     return fn
-  }
+  },
 }))
 
 describe('ZoomControls', () => {
@@ -378,7 +378,7 @@ describe('ZoomControls', () => {
       return {
         message: `${round(ratio) * 100}% Zoom`,
         type: 'info',
-        srOnly: true
+        srOnly: true,
       }
     }
 
@@ -387,7 +387,7 @@ describe('ZoomControls', () => {
 
       props = {
         scaleRatio,
-        onChange: () => {}
+        onChange: () => {},
       }
     })
 

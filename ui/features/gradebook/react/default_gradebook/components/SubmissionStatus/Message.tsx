@@ -24,7 +24,7 @@ import {IconInfoLine, IconWarningLine} from '@instructure/ui-icons'
 
 const VARIANT_MAP = {
   info: {color: 'primary', Icon: IconInfoLine},
-  warning: {color: 'warning', Icon: IconWarningLine},
+  warning: {color: 'danger', Icon: IconWarningLine},
 }
 
 const Message = ({message, variant}) => {

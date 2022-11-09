@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -99,9 +99,9 @@ const GradebookMenu: React.FC<Props> = ({courseUrl, learningMasteryEnabled, vari
   }
 
   const trigger = (
-    <CondensedButton color="primary">
+    <Link isWithinText={false} as="button">
       {selectedItem.activeLabel} <IconMiniArrowDownSolid />
-    </CondensedButton>
+    </Link>
   )
 
   const renderMenuOption = option => (

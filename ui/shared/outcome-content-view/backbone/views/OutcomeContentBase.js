@@ -67,7 +67,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
     this.errors = {}
     const data = this.getFormData()
     for (const fieldName in this.validations) {
-      var errorMessage
+      let errorMessage
       const validation = this.validations[fieldName]
       if ((errorMessage = validation(data))) {
         this.errors[fieldName] = [{message: errorMessage}]
@@ -201,7 +201,8 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   delete(e) {
     e.preventDefault()
-    if (!confirm(I18n.t('confirm.delete', 'Are you sure you want to delete?'))) return
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(I18n.t('confirm.delete', 'Are you sure you want to delete?'))) return
     this.state = 'delete'
     this.setModelUrl()
     return this.$el.disableWhileLoading(

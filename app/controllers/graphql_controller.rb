@@ -37,6 +37,7 @@ class GraphQLController < ApplicationController
 
   def execute
     result = execute_on(CanvasSchema)
+    prep_page_view_for_submit
     render json: result
   end
 
@@ -102,5 +103,13 @@ class GraphQLController < ApplicationController
         status: :unauthorized
       )
     end
+  end
+
+  def prep_page_view_for_submit
+    return unless params[:operationName] == "CreateSubmission"
+
+    assignment = ::Assignment.active.find(params[:variables][:assignmentLid])
+    get_context
+    log_asset_access(assignment, "assignments", nil, "participate")
   end
 end

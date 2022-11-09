@@ -30,7 +30,7 @@ import {renderImage as renderImageHtml} from '../../../contentRendering'
 
 export default function Image({focusRef, image, onClick, isIconMaker}) {
   const imgTitle = formatMessage('Click to embed {imageName}', {
-    imageName: image.display_name
+    imageName: image.display_name,
   })
 
   function handleDragStart(event) {
@@ -90,7 +90,7 @@ export default function Image({focusRef, image, onClick, isIconMaker}) {
 
 Image.propTypes = {
   focusRef: shape({
-    current: instanceOf(Element)
+    current: instanceOf(Element),
   }),
   image: shape({
     display_name: string.isRequired,
@@ -98,13 +98,13 @@ Image.propTypes = {
     href: string.isRequired,
     id: number,
     preview_url: string,
-    thumbnail_url: string.isRequired
+    thumbnail_url: string.isRequired,
   }).isRequired,
   onClick: func.isRequired,
-  isIconMaker: bool
+  isIconMaker: bool,
 }
 
 Image.defaultProps = {
   focusRef: null,
-  isIconMaker: false
+  isIconMaker: false,
 }

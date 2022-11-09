@@ -123,12 +123,6 @@ module Lti
             expect(Lti::LineItem.last.coupled).to eq(false)
           end
 
-          it "responds with 404 if course is concluded" do
-            course.update!(workflow_state: "completed")
-            send_request
-            expect(response).to be_not_found
-          end
-
           it "responds with the line item mime type" do
             send_request
             expect(response.headers["Content-Type"]).to include described_class::MIME_TYPE

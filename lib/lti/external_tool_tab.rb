@@ -31,10 +31,11 @@ module Lti
 
     def tabs
       tools.sort_by(&:id).map do |tool|
+        asset_string_relative_to_context = context.shard.activate { tool.asset_string }
         tab = {
-          id: tool.asset_string,
+          id: asset_string_relative_to_context,
           label: tool.label_for(placement, locale),
-          css_class: tool.asset_string,
+          css_class: asset_string_relative_to_context,
           visibility: tool.extension_setting(placement, :visibility),
           href: "#{context.class.to_s.downcase}_external_tool_path".to_sym,
           external: true,

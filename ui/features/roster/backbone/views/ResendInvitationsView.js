@@ -43,7 +43,7 @@ export default class ResendInvitationsView extends View {
     return this.model.on('change:pendingInvitationsCount', this.render, this)
   }
 
-  resendPendingInvitations(e) {
+  resendPendingInvitations(_e) {
     this.sending = true
     this.render()
     const xhr = $.ajaxJSON(

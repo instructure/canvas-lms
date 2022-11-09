@@ -60,7 +60,7 @@ export default class AddUnassignedMenu extends PopoverMenuView {
     return this.hide()
   }
 
-  showBy($target, focus = false) {
+  showBy(_$target, _focus = false) {
     this.collection.reset()
     this.collection.deleteParam('search_term')
     return super.showBy(...arguments)

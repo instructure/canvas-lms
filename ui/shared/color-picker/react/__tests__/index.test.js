@@ -28,8 +28,8 @@ describe('ColorPicker', () => {
 
     return render(
       <ColorPicker
-        isOpen
-        nonModal
+        isOpen={true}
+        nonModal={true}
         parentComponent="container"
         positions={{top: 0, left: 0}}
         {...props}

@@ -109,11 +109,18 @@ const locale = {
   "light_blue_5374f600": { "message": "Μπλε Ανοιχτό" },
   "link_7262adec": { "message": "Σύνδεσμος" },
   "links_14b70841": { "message": "Σύνδεσμοι" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Σύνδεσμοι σε εξωτερική ιστοσελίδα."
+  },
   "loading_25990131": { "message": "Φόρτωση..." },
   "loading_bde52856": { "message": "Φόρτωση" },
   "loading_failed_b3524381": { "message": "Η Φόρτωση Απέτυχε" },
   "locked_762f138b": { "message": "Κλειδωμένο" },
   "media_af190855": { "message": "Δεδομένα" },
+  "minimize_file_preview_da911944": {
+    "message": "Ελαχιστοποίηση Προεπισκόπησης Αρχείου"
+  },
+  "minimize_video_20aa554b": { "message": "Ελαχιστοποίηση Βίντεο" },
   "misc_3b692ea7": { "message": "Διάφορα" },
   "modules_c4325335": { "message": "Ενότητες" },
   "my_files_2f621040": { "message": "Τα αρχεία μου" },
@@ -149,11 +156,17 @@ const locale = {
   "submit_a3cc6859": { "message": "Υποβολή" },
   "syllabus_f191f65b": { "message": "Αναλυτικό Πρόγραμμα" },
   "teal_f729a294": { "message": "Γαλαζοπράσινο" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "<mrk mid=\"5994\" mtype=\"seg\">Η προεπισκόπηση του εγγράφου δημιουργείται αυτή τη στιγμή.</mrk> <mrk mid=\"5995\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Το υλικό βρίσκεται στο δημόσιο domain"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Το υλικό φέρει άδεια Creative Commons"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Αυτό το έγγραφο δεν μπορεί να εμφανιστεί μέσα στο Canvas."
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"

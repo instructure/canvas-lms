@@ -27,8 +27,10 @@
 //   ui/shared/mediaelement/mep-feature-tracks-instructure.js
 //
 
+/* eslint-disable no-undef, eqeqeq, prefer-const, promise/catch-or-return */
+/* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
+
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 
 const I18n = useI18nScope('mepfeaturetracksinstructure')
@@ -378,7 +380,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         .not(this)
         .attr('aria-selected', 'false')
         .removeAttr('checked')
-      if (lang == 'none') {
+      if (lang === 'none') {
         t.selectedTrack = null
         t.captionsButton.removeClass('mejs-captions-enabled')
       } else {
@@ -436,7 +438,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
 
             after()
 
-            if (track.kind == 'chapters') {
+            if (track.kind === 'chapters') {
               t.media.addEventListener(
                 'play',
                 () => {
@@ -448,7 +450,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
               )
             }
 
-            if (track.kind == 'slides') {
+            if (track.kind === 'slides') {
               t.setupSlides(track)
             }
           },
@@ -691,7 +693,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         i
 
       for (i = 0; i < t.tracks.length; i++) {
-        if (t.tracks[i].kind == 'chapters' && t.tracks[i].isLoaded) {
+        if (t.tracks[i].kind === 'chapters' && t.tracks[i].isLoaded) {
           t.drawChapters(t.tracks[i])
           t.hasChapters = true
           break

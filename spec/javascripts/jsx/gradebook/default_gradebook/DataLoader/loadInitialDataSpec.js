@@ -267,12 +267,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     }
 
-    test('loads assignment groups', async () => {
-      sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
-      await loadInitialData()
-      strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 1)
-    })
-
     test('loads student content', async () => {
       sinon.spy(dataLoader.studentContentDataLoader, 'load')
       await loadInitialData()

@@ -35,6 +35,6 @@ export default function LoadMoreButton({loader}) {
 
 LoadMoreButton.propTypes = {
   loader: shape({
-    onLoadMore: func.isRequired
-  }).isRequired
+    onLoadMore: func.isRequired,
+  }).isRequired,
 }

@@ -35,7 +35,7 @@ function addButton(editor, onAction) {
   editor.ui.registry.addButton(BUTTON_ID, {
     onAction,
     text: formatMessage('Edit Icon'),
-    tooltip: formatMessage('Edit Existing Icon Maker Icon')
+    tooltip: formatMessage('Edit Existing Icon Maker Icon'),
   })
 }
 
@@ -46,7 +46,7 @@ function addAltTextButton(editor) {
       trayController.showTrayForEditor(editor, true)
     },
     text: formatMessage('Icon Options'),
-    tooltip: formatMessage('Edit alt text for this icon instance')
+    tooltip: formatMessage('Edit alt text for this icon instance'),
   })
 }
 
@@ -55,6 +55,6 @@ function addContextToolbar(editor) {
     items: `${BUTTON_ID} ${EDIT_ALT_TEXT_BUTTON_ID}`,
     position: 'node',
     scope: 'node',
-    predicate: shouldShowEditButton
+    predicate: shouldShowEditButton,
   })
 }

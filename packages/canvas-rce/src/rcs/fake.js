@@ -26,17 +26,17 @@ const PAGES = {
         href: '/courses/1/announcements',
         title: 'Announcements List',
         date: '2018-04-22T13:00:00Z',
-        date_type: 'posted'
+        date_type: 'posted',
       },
       {
         href: '/courses/1/announcements/2',
         title: 'Announcement 2',
         date: '2018-04-22T13:00:00Z',
-        date_type: 'delayed_post'
+        date_type: 'delayed_post',
       },
-      {href: '/courses/1/announcements/1', title: 'Announcement 1'}
+      {href: '/courses/1/announcements/1', title: 'Announcement 1'},
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // first page of assignments
@@ -47,33 +47,33 @@ const PAGES = {
         title: 'Assignment List',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
+        date_type: 'due',
       },
       {
         href: '/courses/1/assignments/1',
         title: 'Assignment 1',
         published: false,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
+        date_type: 'due',
       },
       {
         href: '/courses/1/assignments/2',
         title: 'Assignment 2',
         published: false,
         date: null,
-        date_type: null
+        date_type: null,
       },
       {
         href: '/courses/1/assignments/3',
         title: 'Assignment 3',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
+        date_type: 'due',
       },
-      {href: '/courses/1/assignments/4', title: 'Quiz 1', published: true}
+      {href: '/courses/1/assignments/4', title: 'Quiz 1', published: true},
     ],
     // refers to second page of assignments
-    bookmark: 'assignments2'
+    bookmark: 'assignments2',
   },
 
   // second page of assignments
@@ -84,17 +84,17 @@ const PAGES = {
         title: 'Quiz 2',
         published: false,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
+        date_type: 'due',
       },
       {
         href: '/courses/1/assignments/6',
         title: 'Quiz 3',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
-      }
+        date_type: 'due',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // page of discussions
@@ -105,39 +105,39 @@ const PAGES = {
         title: 'Discussion Index',
         published: false,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
+        date_type: 'due',
       },
       {
         href: '/courses/1/discussion_topics/4',
         title: 'Discussion 2',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'todo'
+        date_type: 'todo',
       },
       {
         href: '/courses/1/discussion_topics/3',
         title: 'Discussion 1',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'todo'
+        date_type: 'todo',
       },
       {
         href: '/courses/1/discussion_topics/2',
         title: 'Announcement 2',
         published: false,
         date: null,
-        date_type: null
+        date_type: null,
       },
       {
         href: '/courses/1/discussion_topics/1',
         title: 'Announcement 1',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'due'
-      }
+        date_type: 'due',
+      },
     ],
     // intentionally referring to page that doesn't exist to test failure mode
-    bookmark: 'discussions2'
+    bookmark: 'discussions2',
   },
 
   // page of modules
@@ -148,30 +148,30 @@ const PAGES = {
         title: 'Modules List',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'published'
+        date_type: 'published',
       },
       {
         href: '/courses/1/modules/2',
         title: 'Module 2',
         published: false,
         date: null,
-        date_type: 'published'
+        date_type: 'published',
       },
       {
         href: '/courses/1/modules/1',
         title: 'Module 1',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'published'
-      }
+        date_type: 'published',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // page of quizzes
   quizzes: {
     links: [],
-    bookmark: null
+    bookmark: null,
   },
 
   // page of wiki pages
@@ -182,17 +182,17 @@ const PAGES = {
         title: 'Wiki Page 1',
         published: true,
         date: '2018-04-22T13:00:00Z',
-        date_type: 'todo'
+        date_type: 'todo',
       },
       {
         href: '/courses/1/pages/wiki-page-2',
         title: 'Wiki Page 2',
         published: false,
         date: null,
-        date_type: 'todo'
-      }
+        date_type: 'todo',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // root files
@@ -202,16 +202,16 @@ const PAGES = {
         id: 1,
         type: 'text/plain',
         name: 'File 1',
-        url: '/files/1'
+        url: '/files/1',
       },
       {
         id: 2,
         type: 'text/plain',
         name: 'File 2',
-        url: '/files/2'
-      }
+        url: '/files/2',
+      },
     ],
-    bookmark: 'files2'
+    bookmark: 'files2',
   },
 
   // root files page 2
@@ -221,10 +221,10 @@ const PAGES = {
         id: 3,
         type: 'text/plain',
         name: 'File 3',
-        url: '/files/3'
-      }
+        url: '/files/3',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // files in folder 1
@@ -234,22 +234,22 @@ const PAGES = {
         id: 4,
         type: 'text/plain',
         name: 'File 4',
-        url: '/files/4'
+        url: '/files/4',
       },
       {
         id: 5,
         type: 'text/plain',
         name: 'File 5',
-        url: '/files/5'
-      }
+        url: '/files/5',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // result for folder with no files
   emptyfiles: {
     files: [],
-    bookmark: null
+    bookmark: null,
   },
 
   // root folders
@@ -260,10 +260,10 @@ const PAGES = {
         name: 'Folder 1',
         parentId: 42,
         filesUrl: 'folder1files',
-        foldersUrl: 'folder1folders'
-      }
+        foldersUrl: 'folder1folders',
+      },
     ],
-    bookmark: 'folders2'
+    bookmark: 'folders2',
   },
 
   // root folders page 2
@@ -274,10 +274,10 @@ const PAGES = {
         name: 'Folder 2',
         parentId: 42,
         filesUrl: 'emptyfiles',
-        foldersUrl: 'emptyfolders'
-      }
+        foldersUrl: 'emptyfolders',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // sub folders for folder 1
@@ -288,23 +288,23 @@ const PAGES = {
         name: 'Folder 1 Sub',
         parentId: 1,
         filesUrl: 'emptyfiles',
-        foldersUrl: 'emptyfolders'
-      }
+        foldersUrl: 'emptyfolders',
+      },
     ],
-    bookmark: null
+    bookmark: null,
   },
 
   // folders result for a folder with no sub folders
   emptyfolders: {
     folders: [],
-    bookmark: null
-  }
+    bookmark: null,
+  },
 }
 
 const FOLDERS = [
   {id: 1, name: 'Folder 1', filesUrl: 'filesurl', foldersUrl: 'foldersurl'},
   {id: 2, name: 'Folder 2', filesUrl: 'filesurl', foldersUrl: 'foldersurl'},
-  {id: 3, name: 'Folder 3', filesUrl: 'filesurl', foldersUrl: 'foldersurl'}
+  {id: 3, name: 'Folder 3', filesUrl: 'filesurl', foldersUrl: 'foldersurl'},
 ]
 
 export function buildImage(index, name, height, width) {
@@ -316,7 +316,7 @@ export function buildImage(index, name, height, width) {
     href: url,
     id,
     preview_url: url,
-    thumbnail_url: url
+    thumbnail_url: url,
   }
 }
 
@@ -342,26 +342,26 @@ const brokenImage = {
   filename: 'broken_image.jpeg',
   href: 'http://canvas/files/123000000/download',
   preview_url: 'http://canvas/files/123000000/download',
-  thumbnail_url: 'http://does.not/exist.png'
+  thumbnail_url: 'http://does.not/exist.png',
 }
 
 const IMAGE_RESPONSES = [
   {
     bookmark: 'http://canvas/images/2',
-    files: [images[0], brokenImage, ...images.slice(1, 10)]
+    files: [images[0], brokenImage, ...images.slice(1, 10)],
   },
 
   {
     bookmark: 'http://canvas/images/3',
     bookmarkForThis: 'http://canvas/images/2',
-    files: images.slice(10, 20)
+    files: images.slice(10, 20),
   },
 
   {
     bookmark: null,
     bookmarkForThis: 'http://canvas/images/3',
-    files: images.slice(20)
-  }
+    files: images.slice(20),
+  },
 ]
 
 const FLICKR_RESULTS = {
@@ -369,36 +369,36 @@ const FLICKR_RESULTS = {
     {
       id: '1',
       href: 'https://farm9.static.flickr.com/8491/8297692520_4e7a43ffcf_s.jpg',
-      title: 'Game of Go in our club.'
+      title: 'Game of Go in our club.',
     },
     {
       id: '2',
       href: 'https://farm1.static.flickr.com/5/7270219_6d3f41bc71_s.jpg',
-      title: 'Another game of Go'
+      title: 'Another game of Go',
     },
     {
       id: '3',
       href: 'https://farm1.static.flickr.com/8/9686480_c726bf6c5d_s.jpg',
-      title: 'the fourth game'
-    }
+      title: 'the fourth game',
+    },
   ],
   chess: [
     {
       id: '4',
       href: 'https://farm5.static.flickr.com/4051/4627936161_39df5d616a_s.jpg',
-      title: 'Chess.'
+      title: 'Chess.',
     },
     {
       id: '5',
       href: 'https://farm8.static.flickr.com/7428/9646564428_0e359a1092_s.jpg',
-      title: 'chess'
+      title: 'chess',
     },
     {
       id: '6',
       href: 'https://farm9.static.flickr.com/8309/7961751980_66333f83cf_s.jpg',
-      title: 'champion chess'
-    }
-  ]
+      title: 'champion chess',
+    },
+  ],
 }
 
 function makeFiles(bookmark_base, extension, content_type) {
@@ -411,11 +411,11 @@ function makeFiles(bookmark_base, extension, content_type) {
           content_type,
           display_name: `file${i}`,
           href: `http://the.net/${i}`,
-          date: `2019-05-25T13:0${i}:00Z`
+          date: `2019-05-25T13:0${i}:00Z`,
         }
       }),
       bookmark: `${bookmark_base}2`,
-      hasMore: true
+      hasMore: true,
     },
     [`${bookmark_base}2`]: {
       files: [4, 5, 6].map(i => {
@@ -425,12 +425,12 @@ function makeFiles(bookmark_base, extension, content_type) {
           content_type,
           display_name: `file${i}`,
           href: `http://the.net/${i}`,
-          date: `2019-05-25T13:0${i}:00Z`
+          date: `2019-05-25T13:0${i}:00Z`,
         }
       }),
       bookmark: null,
-      hasMore: false
-    }
+      hasMore: false,
+    },
   }
 }
 const DOCUMENTS = makeFiles('documents', 'txt', 'text/plain')
@@ -445,31 +445,31 @@ const UNSPLASH_RESULTS = {
         urls: {
           link: 'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'Y_pLBbSAhHI',
         alt_text: 'four brown tabby kittens',
         user: {
           name: "Q'AILA",
           avatar:
-            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'gAPXLS1LRVE',
         alt_text: 'two short-fur orange cats lying on gray surface',
         user: {
           name: 'Olya Kuzovkina',
           avatar:
-            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
-      }
-    ]
+            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
+      },
+    ],
   },
   kittens2: {
     total_results: '3',
@@ -479,31 +479,31 @@ const UNSPLASH_RESULTS = {
         urls: {
           link: 'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'bhO_wSXegfI',
         alt_text: 'grey cat',
         user: {
           name: 'Sandy Millar',
           avatar:
-            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: '2qzT9qKvI9U',
         alt_text: 'brown tabby cat',
         user: {
           name: 'Sandy Millar',
           avatar:
-            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
-      }
-    ]
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
+      },
+    ],
   },
   kittens3: {
     total_results: 2009,
@@ -513,144 +513,144 @@ const UNSPLASH_RESULTS = {
         urls: {
           link: 'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1479065476818-424362c3a854?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'Y_pLBbSAhHI',
         alt_text: 'four brown tabby kittens',
         user: {
           name: "Q'AILA",
           avatar:
-            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-fb-1478804329-75cc0bd7b087.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1484733544471-3abf5846a4ff?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'gAPXLS1LRVE',
         alt_text: 'two short-fur orange cats lying on gray surface',
         user: {
           name: 'Olya Kuzovkina',
           avatar:
-            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1484733460542-9653d0439bd9?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1554530700-747e22bb4e56?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'bhO_wSXegfI',
         alt_text: 'grey cat',
         user: {
           name: 'Sandy Millar',
           avatar:
-            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1548878811-cddbc06f9d4c?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: '2qzT9qKvI9U',
         alt_text: 'brown tabby cat',
         user: {
           name: 'Sandy Millar',
           avatar:
-            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1530245392659-56d20d09dfba?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1554146445-58ae3448247d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1554146445-58ae3448247d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1554146445-58ae3448247d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'zgQXEtEnaxA',
         alt_text: 'long-fur brown cat sitting on white desk',
         user: {
           name: 'Rikki Austin',
           avatar:
-            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1547239246-d2f052bdccf8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1547239246-d2f052bdccf8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1547239246-d2f052bdccf8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'S10uzabOxr4',
         alt_text: 'selective focus photography of gray cat beside window',
         user: {
           name: 'Rikki Austin',
           avatar:
-            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1542043341496-520a51bf0ccb?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1520811607976-6d7812b0ecac?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1520811607976-6d7812b0ecac?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1520811607976-6d7812b0ecac?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: '2Cl0lX_4bag',
         alt_text: 'two gray and black cats eating food on white plastic pet bowl',
         user: {
           name: 'Bonnie Kittle',
           avatar:
-            'https://images.unsplash.com/profile-1520272805752-525f71e721ca?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1520272805752-525f71e721ca?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1532386236358-a33d8a9434e3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1532386236358-a33d8a9434e3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1532386236358-a33d8a9434e3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: '1l2waV8glIQ',
         alt_text: 'selective focus photography brown cat lying over black cat',
         user: {
           name: 'Raul Varzar',
           avatar:
-            'https://images.unsplash.com/profile-1538941834664-a6d8eb80866b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1538941834664-a6d8eb80866b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1554181192-3ebfd857cc40?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1554181192-3ebfd857cc40?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1554181192-3ebfd857cc40?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: '4mA9_5vbZ_s',
         alt_text: 'three cats beside road',
         user: {
           name: 'Yuliya Kosolapova',
           avatar:
-            'https://images.unsplash.com/profile-1542573282965-bd0ef4147e78?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
+            'https://images.unsplash.com/profile-1542573282965-bd0ef4147e78?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
       },
       {
         urls: {
           link: 'https://images.unsplash.com/photo-1557369560-a25f3fad22cf?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
           thumbnail:
-            'https://images.unsplash.com/photo-1557369560-a25f3fad22cf?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ'
+            'https://images.unsplash.com/photo-1557369560-a25f3fad22cf?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&ixid=eyJhcHBfaWQiOjY4MTA0fQ',
         },
         id: 'TszVNhi39a8',
         alt_text: null,
         user: {
           name: 'Karly Gomez',
           avatar:
-            'https://images.unsplash.com/profile-1556908132245-1b888ce7e85d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32'
-        }
-      }
-    ]
-  }
+            'https://images.unsplash.com/profile-1556908132245-1b888ce7e85d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&cs=tinysrgb&fit=crop&h=32&w=32',
+        },
+      },
+    ],
+  },
 }
 
 export function getSession() {
@@ -658,7 +658,7 @@ export function getSession() {
     contextType: 'course',
     contextId: 47,
     canUploadFiles: true,
-    usageRightsRequired: true
+    usageRightsRequired: true,
   })
 }
 
@@ -672,8 +672,8 @@ export function initializeImages(props) {
       files: [],
       bookmark: undefined,
       hasMore: true,
-      isLoading: false
-    }
+      isLoading: false,
+    },
   }
 }
 
@@ -681,7 +681,7 @@ export function initializeUpload() {
   return {
     uploading: false,
     folders: {},
-    formExpanded: false
+    formExpanded: false,
   }
 }
 
@@ -689,7 +689,7 @@ export function initializeFlickr() {
   return {
     searchResults: [],
     searching: false,
-    formExpanded: false
+    formExpanded: false,
   }
 }
 
@@ -697,7 +697,7 @@ export function initializeCollection(endpoint) {
   return {
     links: [],
     bookmark: endpoint,
-    loading: false
+    loading: false,
   }
 }
 
@@ -707,14 +707,14 @@ export function initializeDocuments(_props) {
       files: [],
       bookmark: 'documents1',
       isLoading: false,
-      hasMore: true
+      hasMore: true,
     },
     user: {
       files: [],
       bookmark: 'documents1',
       isLoading: false,
-      hasMore: true
-    }
+      hasMore: true,
+    },
   }
 }
 
@@ -724,14 +724,14 @@ export function initializeMedia(_props) {
       files: [],
       bookmark: 'media1',
       isLoading: false,
-      hasMore: true
+      hasMore: true,
     },
     user: {
       files: [],
       bookmark: 'media1',
       isLoading: false,
-      hasMore: true
-    }
+      hasMore: true,
+    },
   }
 }
 
@@ -794,9 +794,9 @@ export function fetchRootFolder(props) {
         id: 0,
         name: `${props.contextType} files`,
         filesUrl: 'files',
-        foldersUrl: 'folders'
-      }
-    ]
+        foldersUrl: 'folders',
+      },
+    ],
   })
 }
 
@@ -851,7 +851,7 @@ export function getFile(id) {
     type: 'text/plain',
     name: 'Test File',
     url: 'test.txt',
-    embed: {type: 'file'}
+    embed: {type: 'file'},
   })
 }
 
@@ -901,7 +901,7 @@ export function updateMediaObject(state, {media_object_id, title}) {
         title,
         media_type: 'video',
         date: '2019-10-29T13:08:36Z',
-        published: true
+        published: true,
       })
     }, FAKE_TIMEOUT)
   })

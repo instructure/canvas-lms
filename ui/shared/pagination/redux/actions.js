@@ -181,7 +181,9 @@ function wrapGetPageThunk(actions, name, thunk) {
             if (links.last) {
               try {
                 successPayload.lastPage = Number(/&page=([0-9]+)&/.exec(links.last)[1])
-              } catch (e) {} // eslint-disable-line
+              } catch (e) {
+                // no-op
+              }
             }
             dispatch({type: actions.success, payload: successPayload})
           })

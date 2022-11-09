@@ -42,10 +42,27 @@ describe CoursePacing::PaceContextsService do
     end
 
     context "for type 'student_enrollment'" do
-      it "requires implementation" do
-        expect do
-          subject.contexts_of_type("student_enrollment")
-        end.to raise_error(NotImplementedError)
+      let(:student) { user_model(name: "Foo Bar") }
+      let(:student_two) { user_model(name: "Bar Foo") }
+      let!(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
+      let!(:enrollment_two) { course.enroll_student(student_two, enrollment_state: "active") }
+
+      it "returns an array of the student enrollments" do
+        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+      end
+
+      context "when a user has multiple enrollment sources in a course" do
+        let(:section_one) { add_section("Section One", course: course) }
+
+        before do
+          Timecop.freeze(2.weeks.ago) do
+            course.enroll_student(student_two, allow_multiple_enrollments: true, section: section_one, enrollment_state: "active")
+          end
+        end
+
+        it "returns only the most recently created enrollment" do
+          expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+        end
       end
     end
 

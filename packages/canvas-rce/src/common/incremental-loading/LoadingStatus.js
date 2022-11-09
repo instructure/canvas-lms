@@ -45,6 +45,6 @@ export default function LoadingStatus({loader}) {
 
 LoadingStatus.propTypes = {
   loader: shape({
-    lastRecordsLoaded: number.isRequired
-  }).isRequired
+    lastRecordsLoaded: number.isRequired,
+  }).isRequired,
 }

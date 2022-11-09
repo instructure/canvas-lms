@@ -97,7 +97,6 @@ describe('getRCSProps', () => {
       canUploadFiles: true,
       filesTabDisabled: false,
       themeUrl: 'http://the.theme.here/',
-      canvasUrl: 'https://canvas.instructure.com',
       features: {
         // This feature name was renamed in getRCSProps() to "icon_maker_cropper"
         icon_maker_cropper: true,

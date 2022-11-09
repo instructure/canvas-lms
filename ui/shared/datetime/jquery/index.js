@@ -285,7 +285,7 @@ $.fn.timepicker = function () {
         const offset = $(this).offset()
         const height = $(this).outerHeight()
         const width = $(this).outerWidth()
-        const $picker = $('#time_picker')
+        $picker = $('#time_picker')
         $picker
           .css({
             left: -1000,
@@ -293,7 +293,6 @@ $.fn.timepicker = function () {
             width: 'auto',
           })
           .show()
-        const pickerOffset = $picker.offset()
         const pickerHeight = $picker.outerHeight()
         const pickerWidth = $picker.outerWidth()
         $picker
@@ -351,14 +350,15 @@ $.fn.timepicker = function () {
         }
         if ($current.length === 0) {
           idx = parseInt(time, 10) - 1
-          if (isNaN(idx)) {
+          if (Number.isNaN(Number(idx))) {
             idx = 0
           }
           $('#time_picker .time_slot').eq(idx).triggerHandler('mouseover')
           return
         }
-        if (event.keyString == 'ctrl+up') {
-          var $parent = $current.parent('.widget_group')
+        let $parent
+        if (event.keyString === 'ctrl+up') {
+          $parent = $current.parent('.widget_group')
           idx = $parent.children('.time_slot').index($current)
           if ($parent.hasClass('ampm_group')) {
             idx = min / 15
@@ -366,11 +366,11 @@ $.fn.timepicker = function () {
             idx = parseInt(hr, 10) - 1
           }
           $parent.prev('.widget_group').find('.time_slot').eq(idx).triggerHandler('mouseover')
-        } else if (event.keyString == 'ctrl+right') {
+        } else if (event.keyString === 'ctrl+right') {
           $current.next('.time_slot').triggerHandler('mouseover')
-        } else if (event.keyString == 'ctrl+left') {
+        } else if (event.keyString === 'ctrl+left') {
           $current.prev('.time_slot').triggerHandler('mouseover')
-        } else if (event.keyString == 'ctrl+down') {
+        } else if (event.keyString === 'ctrl+down') {
           $parent = $current.parent('.widget_group')
           idx = $parent.children('.time_slot').index($current)
           const $list = $parent.next('.widget_group').find('.time_slot')
@@ -378,7 +378,7 @@ $.fn.timepicker = function () {
           if ($parent.hasClass('hour_group')) {
             idx = min / 15
           } else if ($parent.hasClass('minute_group')) {
-            idx = ampm == 'am' ? 0 : 1
+            idx = ampm === 'am' ? 0 : 1
           }
           $list.eq(idx).triggerHandler('mouseover')
         }

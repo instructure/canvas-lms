@@ -21,7 +21,7 @@ export const CLIP_PATH_ID = 'clip-path-for-embed'
 
 export function buildClipPath() {
   const clipPath = createSvgElement('clipPath', {
-    id: CLIP_PATH_ID
+    id: CLIP_PATH_ID,
   })
 
   return clipPath

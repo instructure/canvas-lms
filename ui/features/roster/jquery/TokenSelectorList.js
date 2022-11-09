@@ -52,7 +52,7 @@ export default class TokenSelectorList extends PaginatedView {
 `
   }
 
-  initialize(options) {
+  initialize(_options) {
     this.paginationScrollContainer = $('<ul />', {role: 'menu'})
     super.initialize(...arguments)
     this.selector = this.options.selector
@@ -346,17 +346,17 @@ export default class TokenSelectorList extends PaginatedView {
     }
   }
 
-  onDownArrowKey(e, $target) {
+  onDownArrowKey(e) {
     e.preventDefault()
     return this.selector.selectNext()
   }
 
-  onRightArrowKey(e, $target) {
+  onRightArrowKey(e) {
     e.preventDefault()
     return this.selector.expandSelection()
   }
 
-  onLeftArrowKey(e, $target) {
+  onLeftArrowKey(_e) {
     if (this.selector.listExpanded()) {
       return this.selector.collapse()
     }
@@ -372,7 +372,7 @@ export default class TokenSelectorList extends PaginatedView {
     return this.selectResult($target)
   }
 
-  onEscapeKey(e, $target) {
+  onEscapeKey(_e) {
     this.selector.input.focus()
     return this.selector.close()
   }

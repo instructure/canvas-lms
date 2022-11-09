@@ -90,7 +90,7 @@ function quizzesNextSpeedGrading(
     switch (message.subject) {
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
-        return registerCb(postChangeSubmissionMessage)
+        return registerCb(postChangeSubmissionMessage, message.payload || {singleLtiLaunch: true})
       case 'quizzesNext.submissionUpdate':
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
     }

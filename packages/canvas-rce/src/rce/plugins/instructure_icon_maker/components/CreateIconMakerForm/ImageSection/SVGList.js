@@ -29,7 +29,7 @@ import SingleColorSVG from './SingleColor/svg'
 
 export const TYPE = {
   Singlecolor: 'singlecolor',
-  Multicolor: 'multicolor'
+  Multicolor: 'multicolor',
 }
 
 export function svgSourceFor(type) {
@@ -82,12 +82,12 @@ SVGList.propTypes = {
   fillColor: PropTypes.string,
   type: PropTypes.oneOf(Object.values(TYPE)).isRequired,
   onSelect: PropTypes.func.isRequired,
-  onMount: PropTypes.func
+  onMount: PropTypes.func,
 }
 
 SVGList.defaultProps = {
   fillColor: '#000000',
-  onMount: () => {}
+  onMount: () => {},
 }
 
 export default SVGList

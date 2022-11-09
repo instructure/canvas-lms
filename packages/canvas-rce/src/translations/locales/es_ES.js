@@ -516,6 +516,9 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Agrupado mayor que" },
   "nested_less_than_27d17e58": { "message": "Agrupado menor que" },
   "next_page_d2a39853": { "message": "Siguiente página" },
+  "no_changes_to_save_d29f6e91": {
+    "message": "No se han guardado los cambios."
+  },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": {
     "message": "No se ha seleccionado ningún archivo"
@@ -597,7 +600,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Precede" },
   "precedes_equal_20701e84": { "message": "Precede o es igual a" },
   "preformatted_d0670862": { "message": "Previamente formateado" },
-  "pretty_html_editor_28748756": { "message": "Editor HTML agradable" },
   "preview_53003fd2": { "message": "Vista previa" },
   "preview_in_overlay_ed772c46": { "message": "Vista previa en superposición" },
   "preview_inline_9787330": { "message": "Vista previa online" },
@@ -617,7 +619,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Cuaterniones" },
   "quizzes_7e598f57": { "message": "Pruebas" },
   "rational_numbers_80ddaa4a": { "message": "Números racionales" },
-  "raw_html_editor_e3993e41": { "message": "Editor HTML puro" },
   "real_numbers_7c99df94": { "message": "Números reales" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Porción real (de un número complejo)"
@@ -912,7 +913,6 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Ver los accesos directos de teclado"
   },
-  "view_predefined_colors_92f5db39": { "message": "Ver colores predefinidos" },
   "view_title_description_67940918": { "message": "Ver descripción { title }" },
   "white_87fa64fd": { "message": "Blanco" },
   "width_492fec76": { "message": "Ancho" },

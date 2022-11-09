@@ -440,6 +440,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "巢式大於" },
   "nested_less_than_27d17e58": { "message": "巢式小於" },
   "next_page_d2a39853": { "message": "下一頁" },
+  "no_changes_to_save_d29f6e91": { "message": "沒有要儲存的變更。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "未選擇檔案" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -509,7 +510,6 @@ const locale = {
   "precedes_196b9aef": { "message": "之前" },
   "precedes_equal_20701e84": { "message": "等於之前" },
   "preformatted_d0670862": { "message": "已預先格式化" },
-  "pretty_html_editor_28748756": { "message": "美觀 HTML 編輯器" },
   "preview_53003fd2": { "message": "預覽" },
   "preview_in_overlay_ed772c46": { "message": "覆蓋預覽" },
   "preview_inline_9787330": { "message": "預覽內嵌" },
@@ -529,7 +529,6 @@ const locale = {
   "quaternions_877024e0": { "message": "四合數" },
   "quizzes_7e598f57": { "message": "測驗" },
   "rational_numbers_80ddaa4a": { "message": "有理數" },
-  "raw_html_editor_e3993e41": { "message": "原始 HTML 編輯器" },
   "real_numbers_7c99df94": { "message": "實數" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "實數部份（複數的）"
@@ -782,7 +781,6 @@ const locale = {
   "view_ba339f93": { "message": "檢視" },
   "view_description_30446afc": { "message": "檢視描述" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "檢視鍵盤快速鍵" },
-  "view_predefined_colors_92f5db39": { "message": "檢視預定義的顏色" },
   "view_title_description_67940918": { "message": "檢視 { title } 描述" },
   "white_87fa64fd": { "message": "白色" },
   "width_492fec76": { "message": "寬度" },

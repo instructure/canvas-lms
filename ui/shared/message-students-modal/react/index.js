@@ -138,14 +138,15 @@ class MessageStudents extends React.Component {
 
   // Event & pseudo-event handlers
 
-  handleAlertClose = e => {
+  handleAlertClose = _e => {
     this.setState({
       hideAlert: true,
     })
   }
 
   handleChange(field, value) {
-    let {data, errors} = this.state
+    let {data} = this.state
+    const {errors} = this.state
     const newData = {}
     newData[field] = value
     data = {...data, ...newData}

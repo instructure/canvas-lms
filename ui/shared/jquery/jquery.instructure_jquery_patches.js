@@ -38,7 +38,7 @@ $.attrHooks.method = $.extend($.attrHooks.method, {
 
 $.fn.originalScrollTop = $.fn.scrollTop
 $.fn.scrollTop = function () {
-  if (this.selector == 'html,body' && arguments.length === 0) {
+  if (this.selector === 'html,body' && arguments.length === 0) {
     console.error(
       "$('html,body').scrollTop() is not cross-browser compatible... use $.windowScrollTop() instead"
     )
@@ -76,10 +76,12 @@ $.windowScrollTop = function () {
 }
 
 // indicate we want stringified IDs for JSON responses
-$.ajaxPrefilter('json', (options, originalOptions, jqXHR) => {
-  if (options.accepts.json)
-    options.accepts.json = options.accepts.json + ', application/json+canvas-string-ids'
-  else options.accepts.json = 'application/json+canvas-string-ids'
+$.ajaxPrefilter('json', (options, _originalOptions, _jqXHR) => {
+  if (options.accepts.json) {
+    options.accepts.json += ', application/json+canvas-string-ids'
+  } else {
+    options.accepts.json = 'application/json+canvas-string-ids'
+  }
 })
 
 // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80

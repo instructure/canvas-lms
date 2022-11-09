@@ -26,9 +26,7 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
-    active_account_calendars = @current_user.associated_accounts.active.where(account_calendar_visible: true)
-    account_calendar_events_enabled = Account.site_admin.feature_enabled?(:account_calendar_events)
-    @show_account_calendars = !active_account_calendars.empty? && account_calendar_events_enabled
+    @show_account_calendars = Account.site_admin.feature_enabled?(:account_calendar_events) && @current_user.account_calendars.any?
     get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)

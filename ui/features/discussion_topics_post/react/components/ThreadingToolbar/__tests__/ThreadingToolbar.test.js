@@ -42,32 +42,13 @@ beforeEach(() => {
   }))
 })
 
+afterEach(() => {
+  window.ENV.isolated_view = false
+  window.ENV.split_screen_view = false
+})
+
 describe('PostToolbar', () => {
-  it('renders provided children', () => {
-    const {getByText} = render(
-      <ThreadingToolbar>
-        <>First</>
-        <>Second</>
-      </ThreadingToolbar>
-    )
-
-    expect(getByText('First')).toBeTruthy()
-    expect(getByText('Second')).toBeTruthy()
-  })
-
-  it('renders "Go to Reply" button when search term is not ""', () => {
-    window.ENV.isolated_view = true
-    const {getByText} = render(
-      <ThreadingToolbar searchTerm="asdf">
-        <>First</>
-        <>Second</>
-      </ThreadingToolbar>
-    )
-
-    expect(getByText('Go to Reply')).toBeTruthy()
-  })
-
-  it('renders "Go to Reply" button when filter is set to unread', () => {
+  it('renders "Go to Reply" button when filter is set to unread in isolated view', () => {
     window.ENV.isolated_view = true
     const {getByText} = render(
       <ThreadingToolbar searchTerm="" filter="unread">
@@ -79,7 +60,19 @@ describe('PostToolbar', () => {
     expect(getByText('Go to Reply')).toBeTruthy()
   })
 
-  it('should not render go to reply button when isIsolatedView prop is true', () => {
+  it('renders "Go to Reply" button when filter is set to unread in split screen view', () => {
+    window.ENV.split_screen_view = true
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="" filter="unread">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
+  })
+
+  it('should not render go to reply button when isIsolatedView prop is true in isolated view', () => {
     window.ENV.isolated_view = true
     const {queryByText} = render(
       <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView={true}>
@@ -89,6 +82,42 @@ describe('PostToolbar', () => {
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
+  })
+
+  it('should not render go to reply button when isIsolatedView prop is true in split screen view', () => {
+    window.ENV.split_screen_view = true
+    const {queryByText} = render(
+      <ThreadingToolbar searchTerm="" filter="unread" isIsolatedView={true}>
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(queryByText('Go to Reply')).toBeNull()
+  })
+
+  it('renders "Go to Reply" button when search term is not "" in isolated view', () => {
+    window.ENV.isolated_view = true
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="asdf">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
+  })
+
+  it('renders "Go to Reply" button when search term is not "" in split screen view', () => {
+    window.ENV.split_screen_view = true
+    const {getByText} = render(
+      <ThreadingToolbar searchTerm="asdf">
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('Go to Reply')).toBeTruthy()
   })
 
   describe('when rootEntryId is present', () => {
@@ -112,6 +141,29 @@ describe('PostToolbar', () => {
       fireEvent.click(container.getByText('Go to Reply'))
       await waitFor(() =>
         expect(onOpenIsolatedView).toHaveBeenCalledWith('3', '3', false, '1', '1')
+      )
+    })
+
+    it('calls the onOpenSplitScreenView callback with the isolated entry id', async () => {
+      window.ENV.split_screen_view = true
+      const onOpenSplitScreenView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            id: '1',
+            _id: '1',
+            rootEntryId: '2',
+            isolatedEntryId: '3',
+            parentId: '3',
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenSplitScreenView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenSplitScreenView).toHaveBeenCalledWith('3', '3', false, '1', '1')
       )
     })
   })
@@ -138,6 +190,28 @@ describe('PostToolbar', () => {
         expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
       )
     })
+
+    it('calls the onOpenSplitScreenView callback with the entry id', async () => {
+      window.ENV.split_screen_view = true
+      const onOpenSplitScreenView = jest.fn()
+      const container = render(
+        <ThreadingToolbar
+          discussionEntry={DiscussionEntry.mock({
+            _id: '1',
+            rootEntryId: null,
+            isolatedEntryId: null,
+            parentId: null,
+          })}
+          searchTerm="neato"
+          onOpenIsolatedView={onOpenSplitScreenView}
+        />
+      )
+
+      fireEvent.click(container.getByText('Go to Reply'))
+      await waitFor(() =>
+        expect(onOpenSplitScreenView).toHaveBeenCalledWith('1', null, false, null, '1')
+      )
+    })
   })
 
   it('calls the onOpenIsolatedView callback with its own id if it is a root entry', async () => {
@@ -160,6 +234,40 @@ describe('PostToolbar', () => {
     await waitFor(() =>
       expect(onOpenIsolatedView).toHaveBeenCalledWith('1', null, false, null, '1')
     )
+  })
+
+  it('calls the onOpenSplitScreenView callback with its own id if it is a root entry', async () => {
+    window.ENV.split_screen_view = true
+    const onOpenSplitScreenView = jest.fn()
+    const container = render(
+      <ThreadingToolbar
+        discussionEntry={DiscussionEntry.mock({
+          id: '1',
+          _id: '1',
+          isolatedEntryId: null,
+          rootEntryId: null,
+        })}
+        searchTerm="neato"
+        onOpenIsolatedView={onOpenSplitScreenView}
+      />
+    )
+
+    fireEvent.click(container.getByText('Go to Reply'))
+    await waitFor(() =>
+      expect(onOpenSplitScreenView).toHaveBeenCalledWith('1', null, false, null, '1')
+    )
+  })
+
+  it('renders provided children', () => {
+    const {getByText} = render(
+      <ThreadingToolbar>
+        <>First</>
+        <>Second</>
+      </ThreadingToolbar>
+    )
+
+    expect(getByText('First')).toBeTruthy()
+    expect(getByText('Second')).toBeTruthy()
   })
 
   describe('Mobile', () => {

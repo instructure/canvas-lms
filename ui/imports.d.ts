@@ -87,6 +87,9 @@ declare module '@instructure/ui-menu' {
 declare module '@instructure/ui-link' {
   export interface Link {
     size?: string
+    margin?: string
+    isWithinText?: boolean
+    as?: string
   }
 }
 

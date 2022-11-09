@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Próxima página"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Nenhuma alteração a guardar."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nenhuma data limite atribuída"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Pré-formatado"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Editor HTML Bonito"
-    },
     "preview_53003fd2": {
         "message": "Visualização"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Números Racionais"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Editor HTML em bruto"
     },
     "real_numbers_7c99df94": {
         "message": "Números reais"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Ver próxima semana"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Ver cores pré-definidas"
     },
     "view_previous_week_6f83849f": {
         "message": "Ver semana anterior"

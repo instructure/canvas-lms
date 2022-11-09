@@ -188,7 +188,7 @@ export default class DashboardView extends View {
   closeConference(e) {
     e.preventDefault()
     if (
-      !confirm(
+      !window.confirm(
         I18n.t(
           'confirm.close',
           'Are you sure you want to end this conference?\n\nYou will not be able to reopen it.'

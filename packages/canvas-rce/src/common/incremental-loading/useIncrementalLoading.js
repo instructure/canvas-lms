@@ -28,7 +28,7 @@ export default function useIncrementalLoading(options) {
     searchString,
     onLoadInitial,
     onLoadMore,
-    records
+    records,
   } = options
   const recordCountRef = useRef(records.length)
 
@@ -51,7 +51,7 @@ export default function useIncrementalLoading(options) {
           lastItemRef.current.focus()
         }
         onLoadMore()
-      }
+      },
     }
 
     recordCountRef.current = records.length
@@ -66,6 +66,6 @@ export default function useIncrementalLoading(options) {
     records.length,
     lastItemRef,
     onLoadInitial,
-    onLoadMore
+    onLoadMore,
   ])
 }

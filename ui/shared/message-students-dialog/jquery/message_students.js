@@ -99,8 +99,8 @@ window.messageStudents = function (settings) {
     course_name: title,
   })
 
-  $message_students_dialog.data('students_hash', students_hash),
-    $message_students_dialog.find('.asset_title').text(title)
+  $message_students_dialog.data('students_hash', students_hash)
+  $message_students_dialog.find('.asset_title').text(title)
   $message_students_dialog.find('.out_of').showIf(settings.points_possible != null)
   $message_students_dialog.find('.send_button').text(I18n.t('send_message', 'Send Message'))
   $message_students_dialog.find('.points_possible').text(I18n.n(settings.points_possible))
@@ -151,17 +151,17 @@ $(document).ready(() => {
       data.recipients = ids.join(',')
       return data
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       disableButtons(true)
       $(this).find('.send_button').text(I18n.t('Sending Message...'))
     },
-    success(data) {
+    success(_data) {
       $.flashMessage(I18n.t('Message sent!'))
       disableButtons(false)
       $(this).find('.send_button').text(I18n.t('Send Message'))
       $('#message_students_dialog').dialog('close')
     },
-    error(data) {
+    error(_data) {
       disableButtons(false)
       $(this).find('.send_button').text(I18n.t('Sending Message Failed, please try again'))
     },
@@ -172,7 +172,7 @@ $(document).ready(() => {
     const option = currentSettings.options[optionIdx]
     const studentsHash = $message_students_dialog.data('students_hash')
     let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
-    if (isNaN(cutoff)) {
+    if (Number.isNaN(Number(cutoff))) {
       cutoff = null
     }
 

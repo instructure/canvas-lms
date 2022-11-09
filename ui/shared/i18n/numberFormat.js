@@ -20,7 +20,7 @@ import I18n from './i18nObj'
 
 const numberFormat = {
   _format(n, options) {
-    if (typeof n !== 'number' || isNaN(n)) {
+    if (typeof n !== 'number' || Number.isNaN(Number(n))) {
       return n
     }
     return I18n.n(n, options)

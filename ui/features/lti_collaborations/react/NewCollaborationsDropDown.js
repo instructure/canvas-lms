@@ -23,10 +23,6 @@ import splitAssetString from '@canvas/util/splitAssetString'
 const I18n = useI18nScope('react_collaborations')
 
 class NewCollaborationsDropDown extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)
     const hasOne = this.props.ltiCollaborators.length === 1
@@ -43,13 +39,14 @@ class NewCollaborationsDropDown extends React.Component {
         ) : (
           <div>
             <button
+              type="button"
               className="al-trigger Button Button--primary"
               aria-label={I18n.t('Add Collaboration')}
-              role="button"
               href="#"
             >
               {I18n.t('+ Collaboration')}
             </button>
+            {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
             <ul
               className="al-options"
               role="menu"

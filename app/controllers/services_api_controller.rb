@@ -117,7 +117,7 @@ class ServicesApiController < ApplicationController
 
     should_add_base_url = !Canvas::Cdn.config.host
     base_url = "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"
-    add_base_url_if_needed = ->(url) { "#{should_add_base_url && base_url}#{url}" }
+    add_base_url_if_needed = ->(url) { "#{should_add_base_url ? base_url : ""}#{url}" }
 
     high_contrast_css_urls = env[:url_for_high_contrast_tinymce_editor_css] || []
     editor_css_urls = env[:url_to_what_gets_loaded_inside_the_tinymce_editor_css] || []

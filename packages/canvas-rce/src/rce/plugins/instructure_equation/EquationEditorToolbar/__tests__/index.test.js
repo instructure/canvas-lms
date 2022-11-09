@@ -23,7 +23,7 @@ import buttons from '../buttons'
 
 function defaultProps() {
   return {
-    executeCommand: () => {}
+    executeCommand: () => {},
   }
 }
 

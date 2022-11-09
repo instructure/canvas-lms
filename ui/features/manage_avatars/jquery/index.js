@@ -29,14 +29,16 @@ $(document).ready(function () {
     event.preventDefault()
     const $link = $(this)
     if ($link.attr('data-state') === 'none') {
-      var result = confirm(
+      // eslint-disable-next-line no-alert
+      const result = window.confirm(
         I18n.t('prompts.delete_avatar', "Are you sure you want to delete this user's profile pic?")
       )
       if (!result) {
         return
       }
     } else if ($link.attr('data-state') === 'locked') {
-      var result = confirm(
+      // eslint-disable-next-line no-alert
+      const result = window.confirm(
         I18n.t(
           'prompts.lock_avatar',
           'Locking this picture will approve it and prevent the user from updating it.  Continue?'
@@ -75,7 +77,7 @@ $(document).ready(function () {
         $td.parents('tr').attr('class', data.avatar_state)
         $td.find('.progress').css('visibility', 'hidden')
       },
-      data => {
+      _data => {
         $td
           .find('.progress')
           .text(I18n.t('errors.update_failed', 'Update failed, please try again'))

@@ -17,6 +17,9 @@
  */
 
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('external_toolsModalLauncher')
 
 /**
  * Provide an iframe for launching an LTI tool directly from the frontend.
@@ -46,7 +49,13 @@ const ToolLaunchIframe = React.forwardRef((props, ref) => {
 
   return (
     <>
-      <iframe ref={ref} className="tool_launch" {...props} data-lti-launch="true" />
+      <iframe
+        title={I18n.t('External tool frame')}
+        ref={ref}
+        className="tool_launch"
+        {...props}
+        data-lti-launch="true"
+      />
       {postMessageForwardingFrame()}
     </>
   )

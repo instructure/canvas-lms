@@ -98,9 +98,9 @@ class ContentChunker {
         content: mathElement.getAttribute(this.mathMLAttr) || '',
         mimeType: MimeTypes.mathML,
       })
-    } else {
       // Recursive base case: no more chunks to process
-      if (!mathElement) return chunks
+    } else if (!mathElement) {
+      return chunks
     }
 
     // Recurse and concat results

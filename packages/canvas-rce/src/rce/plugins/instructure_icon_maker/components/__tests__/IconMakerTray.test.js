@@ -54,12 +54,13 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     onUnmount: jest.fn(),
     editing: false,
+    canvasOrigin: 'http://canvas.instructor.com',
   }
 
   let rcs
 
-  const renderComponent = componentProps => {
-    return render(<IconMakerTray {...componentProps} />)
+  const renderComponent = (componentProps = {}) => {
+    return render(<IconMakerTray {...defaults} {...componentProps} />)
   }
 
   const {confirm} = window.confirm
@@ -67,7 +68,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   beforeAll(() => {
     rcs = {
       getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
-      canvasUrl: 'https://domain.from.env',
     }
 
     RceApiSource.mockImplementation(() => rcs)
@@ -91,25 +91,25 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   })
 
   it('renders the create view', () => {
-    renderComponent(defaults)
+    renderComponent()
     screen.getByRole('heading', {name: /create icon/i})
   })
 
   it('closes the tray', async () => {
     const onUnmount = jest.fn()
-    renderComponent({...defaults, onUnmount})
+    renderComponent({onUnmount})
     userEvent.click(screen.getByText(/close/i))
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
   it('does not call confirm when there are no changes', () => {
-    renderComponent(defaults)
+    renderComponent()
     userEvent.click(screen.getByText(/close/i))
     expect(window.confirm).not.toHaveBeenCalled()
   })
 
   it('calls confirm when the user has unsaved changes', () => {
-    renderComponent(defaults)
+    renderComponent()
     // edit the icon before clicking on close
     setIconColor('#000000')
     userEvent.click(screen.getByText(/close/i))
@@ -117,7 +117,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   })
 
   it('inserts a placeholder when an icon is inserted', async () => {
-    const {getByTestId} = renderComponent(defaults)
+    const {getByTestId} = renderComponent()
     setIconColor('#000000')
     userEvent.click(getByTestId('create-icon-button'))
     await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
@@ -423,6 +423,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           onClose={jest.fn()}
           editor={ed}
           rceConfig={{contextType: 'course', contextId: 2}}
+          canvasOrigin="https://canvas.instructor.com"
         />
       )
 
@@ -460,8 +461,8 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           rcsConfig={{
             contextType: 'course',
             contextId: 2,
-            canvasUrl: 'https://canvas.instructure.com',
           }}
+          canvasOrigin="https://canvas.instructure.com"
         />
       )
 

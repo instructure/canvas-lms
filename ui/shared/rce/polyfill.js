@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+
 const editorExtensions = {
   call(methodName, ...args) {
     // since exists? has a ? and cant be a regular function (yet we want

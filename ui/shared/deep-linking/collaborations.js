@@ -67,14 +67,14 @@ export function collaborationUrl(id) {
 
 function updateCollaboration(contentItem, collab_id) {
   const url = document.querySelector('.collaboration_' + collab_id + ' a.title')?.href
-  $.ajaxJSON(url, 'PUT', contentItem, collaborationSuccess, msg => {
+  $.ajaxJSON(url, 'PUT', contentItem, collaborationSuccess, _msg => {
     $.screenReaderFlashMessage(I18n.t('Collaboration update failed'))
   })
 }
 
 function createCollaboration(contentItem) {
   const url = document.querySelector('#new_collaboration')?.getAttribute('action')
-  $.ajaxJSON(url, 'POST', contentItem, collaborationSuccess, msg => {
+  $.ajaxJSON(url, 'POST', contentItem, collaborationSuccess, _msg => {
     $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'))
   })
 }

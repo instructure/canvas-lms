@@ -32,7 +32,7 @@ const mockVideoPlayers = [
     naturalHeight: 600,
     source: '/path/to/video0.mp4',
     type: 'video-embed',
-    id: 'm-video-id0'
+    id: 'm-video-id0',
   },
   {
     titleText: 'video title 1',
@@ -42,7 +42,7 @@ const mockVideoPlayers = [
     naturalHeight: 600,
     source: '/path/to/video1.mp4',
     type: 'video-embed',
-    id: 'm-video-id1'
+    id: 'm-video-id1',
   },
   {
     titleText: 'video title2',
@@ -52,8 +52,8 @@ const mockVideoPlayers = [
     naturalHeight: 600,
     source: '/path/to/video2.mp4',
     type: 'video-embed',
-    id: 'm-video-id2'
-  }
+    id: 'm-video-id2',
+  },
 ]
 
 beforeAll(() => {
@@ -113,7 +113,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     return {
       titleText: driver.titleText,
       displayAs: driver.displayAs,
-      size: driver.size
+      size: driver.size,
     }
   }
 
@@ -191,7 +191,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         appliedWidth: '321',
         titleText: 'new title',
         media_object_id: 'm_somevideo',
-        updateMediaObject
+        updateMediaObject,
       })
       expect(getTray()).toBeNull() // the tray is closed
       const videoIframe = trayController.$videoContainer
@@ -212,7 +212,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         appliedWidth: '321',
         titleText: 'new title',
         media_object_id: undefined,
-        updateMediaObject
+        updateMediaObject,
       })
       expect(getTray()).toBeNull() // the tray is closed
       const videoIframe = trayController.$videoContainer
@@ -232,7 +232,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         displayAs: 'link',
         titleText: 'new <em>fancy</em> title',
         media_object_id: 'm_somevideo',
-        updateMediaObject
+        updateMediaObject,
       })
       expect(getTray()).toBeNull() // the tray is closed
       const videoContainer = trayController.$videoContainer

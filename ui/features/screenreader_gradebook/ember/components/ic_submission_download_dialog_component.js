@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import register from '../helpers/register'
@@ -76,7 +77,7 @@ export default register(
           new_val += 5
         }
         const state = parseInt(this.get('attachment.file_state'), 10)
-        if (isNaN(state)) {
+        if (Number.isNaN(Number(state))) {
           new_val = 0
         }
       }
@@ -113,7 +114,7 @@ export default register(
 
     downloadCompletedFile: function () {
       if (this.get('percentComplete') === 100) {
-        return (location.href = this.get('url'))
+        return (window.location.href = this.get('url'))
       }
     }.observes('percentComplete'),
 

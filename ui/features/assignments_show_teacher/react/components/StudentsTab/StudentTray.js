@@ -144,6 +144,8 @@ export default class StudentTray extends React.Component {
   }
 
   onChangeDueAt = (_event, newValue) => {
+    // Should we be using this.state.dueAt with <DateTimeInput> below?
+    // eslint-disable-next-line react/no-unused-state
     this.setState({dueAt: newValue})
   }
 

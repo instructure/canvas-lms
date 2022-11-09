@@ -35,23 +35,23 @@ function getMenuItems(ed) {
   const items = [
     {
       text: formatMessage('Upload Image'),
-      value: 'instructure_upload_image'
-    }
+      value: 'instructure_upload_image',
+    },
   ]
   if (contextType === 'course') {
     items.push({
       text: formatMessage('Course Images'),
-      value: 'instructure_course_image'
+      value: 'instructure_course_image',
     })
   } else if (contextType === 'group') {
     items.push({
       text: formatMessage('Group Images'),
-      value: 'instructure_group_image'
+      value: 'instructure_group_image',
     })
   }
   items.push({
     text: formatMessage('User Images'),
-    value: 'instructure_user_image'
+    value: 'instructure_user_image',
   })
   return items
 }
@@ -97,9 +97,9 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
             onSetup: api => {
               api.setDisabled(!isOKToLink(editor.selection.getContent()))
               return () => {}
-            }
+            },
           }
-        })
+        }),
     })
 
     // Register buttons
@@ -111,7 +111,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
           return {
             type: 'choiceitem',
             text: item.text,
-            value: item.value
+            value: item.value,
           }
         })
         callback(items)
@@ -131,7 +131,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
         return () => {
           editor.off('NodeChange', handleNodeChange)
         }
-      }
+      },
     })
 
     /*
@@ -155,20 +155,20 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
       },
 
       text: formatMessage('Image Options'),
-      tooltip: buttonAriaLabel
+      tooltip: buttonAriaLabel,
     })
 
     editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
       items: 'instructure-image-options',
       position: 'node',
       predicate: canUpdateImageProps,
-      scope: 'node'
+      scope: 'node',
     })
   },
 
   remove(editor) {
     trayController.hideTrayForEditor(editor)
-  }
+  },
 })
 
 // Register plugin

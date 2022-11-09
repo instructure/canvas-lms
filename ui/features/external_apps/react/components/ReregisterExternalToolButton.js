@@ -30,7 +30,6 @@ export default class ReregisterExternalToolButton extends React.Component {
   state = {
     tool: this.props.tool,
     modalIsOpen: false,
-    registrationUpdateModalIsOpen: false,
   }
 
   componentDidUpdate() {
@@ -63,10 +62,6 @@ export default class ReregisterExternalToolButton extends React.Component {
     this.refs.reregModal.openModal(e)
   }
 
-  reregistrationUpdateCloseHandler = () => {
-    this.setState({reregistrationUpdateModalIsOpen: false})
-  }
-
   getModal = () => (
     <Modal
       ref="reactModal"
@@ -89,6 +84,8 @@ export default class ReregisterExternalToolButton extends React.Component {
   getButton = () => {
     const editAriaLabel = I18n.t('Reregister %{toolName}', {toolName: this.state.tool.name})
     return (
+      // TODO: use InstUI button
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
       <a
         href="#"
         tabIndex="-1"

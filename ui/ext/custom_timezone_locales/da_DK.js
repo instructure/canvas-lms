@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'da_DK',
   day: {
     abbrev: ['søn', 'man', 'tir', 'ons', 'tor', 'fre', 'lør'],

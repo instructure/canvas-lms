@@ -23,9 +23,9 @@ const fauxEditor = {
   settings: {
     canvas_rce_user_context: {
       type: 'course',
-      id: '17'
-    }
-  }
+      id: '17',
+    },
+  },
 }
 
 describe('instructure_media_embed clickCallback', () => {
@@ -50,7 +50,7 @@ describe('instructure_media_embed clickCallback', () => {
     await clickCallback(fauxEditor, document)
     expect(
       getAllByLabelText(document, 'Embed', {
-        selector: '[role="dialog"]'
+        selector: '[role="dialog"]',
       })[0]
     ).toBeVisible()
   })

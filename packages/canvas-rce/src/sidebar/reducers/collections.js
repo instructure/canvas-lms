@@ -22,7 +22,7 @@ import {combineReducers} from 'redux'
 
 // binds a collection reducer to listen only to actions directed at it
 function boundCollectionReducer(key) {
-  return function(state = {}, action) {
+  return function (state = {}, action) {
     switch (action.type) {
       case REQUEST_INITIAL_PAGE:
       case REQUEST_PAGE:
@@ -47,5 +47,5 @@ export default combineReducers({
   discussions: boundCollectionReducer('discussions'),
   modules: boundCollectionReducer('modules'),
   quizzes: boundCollectionReducer('quizzes'),
-  wikiPages: boundCollectionReducer('wikiPages')
+  wikiPages: boundCollectionReducer('wikiPages'),
 })

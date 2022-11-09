@@ -32,9 +32,9 @@ describe('ContentTypeExternalToolTray', () => {
         onDismiss={onDismiss}
         acceptedResourceTypes={['page', 'module']}
         targetResourceType="page"
-        allowItemSelection
+        allowItemSelection={true}
         selectableItems={[{id: '1', name: 'module 1'}]}
-        open
+        open={true}
         {...props}
       />
     )

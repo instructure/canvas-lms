@@ -104,7 +104,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('has "Show Details" text if detailsVisible is false', () => {
     mountComponent({}, {detailsVisible: false})
-    strictEqual(wrapper.find('Button').text(), 'Show Details')
+    strictEqual(wrapper.find('Link').text(), 'Show Details')
   })
 
   test('hides the main container if detailsVisible is true', () => {
@@ -114,7 +114,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('has "Hide Details" text if detailsVisible is true', () => {
     mountComponent()
-    strictEqual(wrapper.find('Button').text(), 'Hide Details')
+    strictEqual(wrapper.find('Link').text(), 'Hide Details')
   })
 
   test('shows the main container if detailsVisible is true', () => {

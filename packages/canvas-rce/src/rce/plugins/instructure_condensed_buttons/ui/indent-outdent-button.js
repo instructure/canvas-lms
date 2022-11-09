@@ -22,20 +22,20 @@ export default function register(editor) {
   const baseIndentButton = {
     tooltip: formatMessage('Increase Indent'),
     icon: 'indent',
-    onAction: () => editor.execCommand('indent')
+    onAction: () => editor.execCommand('indent'),
   }
 
   const indentButtons = [
     {
       name: 'indent',
       text: formatMessage('Increase Indent'),
-      cmd: 'indent'
+      cmd: 'indent',
     },
     {
       name: 'outdent',
       text: formatMessage('Decrease Indent'),
-      cmd: 'outdent'
-    }
+      cmd: 'outdent',
+    },
   ]
   editor.ui.registry.addButton('inst_indent', baseIndentButton)
 
@@ -47,7 +47,7 @@ export default function register(editor) {
           type: 'choiceitem',
           value: button.cmd,
           icon: button.name,
-          text: button.text
+          text: button.text,
         }
       })
       callback(items)
@@ -75,6 +75,6 @@ export default function register(editor) {
 
       editor.on('NodeChange', onNodeChange)
       return () => editor.off('NodeChange', onNodeChange)
-    }
+    },
   })
 }

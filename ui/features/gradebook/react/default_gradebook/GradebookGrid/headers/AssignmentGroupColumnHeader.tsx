@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
@@ -91,9 +91,14 @@ AssignmentGroupDetail.propTypes = {
 
 function renderTrigger(assignmentGroup, ref) {
   return (
-    <Button elementRef={ref} margin="0" size="small" variant="icon">
-      <IconMoreSolid title={I18n.t('%{name} Options', {name: assignmentGroup.name})} />
-    </Button>
+    <IconButton
+      elementRef={ref}
+      margin="0"
+      size="small"
+      color="secondary"
+      renderIcon={IconMoreSolid}
+      screenReaderLabel={I18n.t('%{name} Options', {name: assignmentGroup.name})}
+    />
   )
 }
 

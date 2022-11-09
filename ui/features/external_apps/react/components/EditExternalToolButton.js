@@ -71,12 +71,10 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   saveChanges = (configurationType, data) => {
-    const success = res => {
-      const updatedTool = Object.assign(this.state.tool, res)
+    const success = _res => {
       // refresh app config index with latest tool state
       store.reset()
       store.fetch()
-      this.setState({updatedTool})
       this.closeModal()
       // Unsure why this is necessary, but the focus is lost if not wrapped in a timeout
       setTimeout(() => {
@@ -158,6 +156,8 @@ export default class EditExternalToolButton extends React.Component {
 
       return (
         <li role="presentation" className="EditExternalToolButton">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
             ref={this.editButton}

@@ -137,6 +137,7 @@ function shouldApplySelectedStyle(color) {
   return this.state.currentColor === color.hexcode
 }
 
+// eslint-disable-next-line react/prefer-es6-class
 const ColorPicker = createReactClass({
   // ===============
   //     CONFIG
@@ -238,7 +239,7 @@ const ColorPicker = createReactClass({
     $(window).off('scroll', this.handleScroll)
   },
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState(
       {
         isOpen: nextProps.isOpen,
@@ -266,6 +267,7 @@ const ColorPicker = createReactClass({
   // ===============
 
   closeModal() {
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({
         isOpen: false,
@@ -343,6 +345,7 @@ const ColorPicker = createReactClass({
 
   onApply(color, _event) {
     const doneSaving = () => {
+      // eslint-disable-next-line react/no-is-mounted
       if (this.isMounted()) {
         this.setState({saveInProgress: false})
       }
@@ -427,7 +430,9 @@ const ColorPicker = createReactClass({
         'with-dark-check': this.props.withDarkCheck,
       })
       return (
+        // TODO: use InstUI button
         <button
+          type="button"
           className={colorBlockStyles}
           ref={ref}
           role="radio"

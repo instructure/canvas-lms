@@ -29,27 +29,36 @@ import {actions} from './actions/ui'
 import Body from './components/body'
 import Footer from './components/footer'
 import Header from './components/header/header'
-import PaceModal from './components/pace_modal'
-import PacePicker from './components/header/pace_picker'
-import {ResponsiveSizes, StoreState} from './types'
-import {getLoadingMessage, getShowLoadingOverlay, getShowPaceModal} from './reducers/ui'
+import PaceContent from './components/content'
+import CoursePaceEmpty from './components/course_pace_table/course_pace_empty'
+import {ResponsiveSizes, StoreState, CoursePace} from './types'
+import {
+  getLoadingMessage,
+  getShowLoadingOverlay,
+  getShowPaceModal,
+  getIsSyncing,
+} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {getSummarizedChanges} from './reducers/course_paces'
+import {getSummarizedChanges, getCoursePace, getPacePublishing} from './reducers/course_paces'
 import {coursePaceActions} from './actions/course_paces'
 import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
 import Errors from './components/errors'
-
-const {Item: FlexItem} = Flex as any
+import PaceModal from './components/pace_modal'
 
 const I18n = useI18nScope('course_paces_app')
+
+const {Item: FlexItem} = Flex as any
 
 interface StoreProps {
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
   readonly modalOpen: boolean
   readonly unpublishedChanges: SummarizedChange[]
+  readonly coursePace: CoursePace
+  readonly isSyncing: boolean
+  readonly isPacePublishing: boolean
 }
 
 interface DispatchProps {
@@ -73,6 +82,9 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   responsiveSize,
   pollForPublishStatus,
   unpublishedChanges,
+  coursePace,
+  isSyncing,
+  isPacePublishing,
 }) => {
   const [trayOpen, setTrayOpen] = useState(false)
 
@@ -97,14 +109,25 @@ export const App: React.FC<ResponsiveComponentProps> = ({
         <>
           <Flex as="section" alignItems="end" wrap="wrap">
             <FlexItem margin="0 0 small">
-              <PacePicker />
+              <Header
+                coursePace={coursePace}
+                isBlueprintLocked={isBlueprintLocked}
+                setIsBlueprintLocked={setIsBlueprintLocked}
+                handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+                responsiveSize={responsiveSize}
+              />
+              {!coursePace.id && coursePace.context_type === 'Course' ? (
+                <CoursePaceEmpty responsiveSize={responsiveSize} />
+              ) : (
+                // Make sure changes have finished before updating contexts
+                !isPacePublishing && !isSyncing && <PaceContent />
+              )}
             </FlexItem>
           </Flex>
           <PaceModal
             isOpen={modalOpen}
             isBlueprintLocked={isBlueprintLocked}
             changes={unpublishedChanges}
-            responsiveSize={responsiveSize}
             onClose={() => handleModalClose()}
             handleDrawerToggle={() => setTrayOpen(!trayOpen)}
           />
@@ -149,7 +172,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
         </Mask>
       </Overlay>
-      <Flex as="div" direction="column" margin="small">
+      <Flex as="div" direction="column" margin="small none small small">
         {renderApp()}
       </Flex>
     </View>
@@ -177,6 +200,9 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     showLoadingOverlay: getShowLoadingOverlay(state),
     modalOpen: getShowPaceModal(state),
     unpublishedChanges: getSummarizedChanges(state),
+    coursePace: getCoursePace(state),
+    isSyncing: getIsSyncing(state) === 1,
+    isPacePublishing: getPacePublishing(state),
   }
 }
 
