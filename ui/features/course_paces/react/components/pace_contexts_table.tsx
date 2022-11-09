@@ -19,8 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import {PaceContext, APIPaceContextTypes, PaceContextTypes, ResponsiveSizes} from '../types'
-import {dateString} from '@canvas/datetime/date-functions'
+import {PaceContext, APIPaceContextTypes, ResponsiveSizes} from '../types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -28,6 +27,7 @@ import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Spinner} from '@instructure/ui-spinner'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -82,7 +82,7 @@ const PaceContextsTable = ({
   const formatDate = (date: string) => {
     if (!date) return '--'
 
-    return dateString(date, {format: 'full'})
+    return formatTimeAgoDate(date)
   }
 
   const getHeaderByContextType = () => {
@@ -111,10 +111,7 @@ const PaceContextsTable = ({
   }
 
   const renderContextLink = (paceContext: PaceContext) => (
-    <Link
-      isWithinText={false}
-      onClick={() => handleContextSelect(paceContext)}
-    >
+    <Link isWithinText={false} onClick={() => handleContextSelect(paceContext)}>
       <TruncateText>{paceContext.name}</TruncateText>
     </Link>
   )
