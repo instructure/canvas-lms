@@ -59,7 +59,7 @@ const usersProps = {
   },
   onUpdateFilters: sinon.spy(),
   onApplyFilters: sinon.spy(),
-  columnHeaderRef: sinon.spy(),
+  sortColumnHeaderRef: sinon.spy(),
   roles: {},
 }
 
