@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "canvas/plugins/ticketing_system/custom_error"
-
 module Canvas::Plugins::TicketingSystem
   describe CustomError do
     let(:report) { ErrorReport.new }

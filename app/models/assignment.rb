@@ -20,8 +20,6 @@
 
 require "atom"
 require "canvas/draft_state_validations"
-require_dependency "turnitin"
-require_dependency "vericite"
 
 class Assignment < ActiveRecord::Base
   include Workflow

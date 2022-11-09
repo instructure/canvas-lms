@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "lazy_presumptuous_i18n_backend"
-
 module CanvasI18nFallbacks
   # see BCP-47 "Tags for Identifying Languages" for the grammar
   # definition that led to this pattern match. It is not 100%

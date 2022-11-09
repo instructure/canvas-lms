@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../spec_helper"
-require_dependency "services/rich_content"
 
 module Services
   describe RichContent do

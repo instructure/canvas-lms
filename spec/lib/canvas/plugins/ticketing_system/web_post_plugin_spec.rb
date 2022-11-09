@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "canvas/plugins/ticketing_system/web_post_plugin"
-
 module Canvas::Plugins::TicketingSystem
   describe WebPostPlugin do
     describe "#export_error" do

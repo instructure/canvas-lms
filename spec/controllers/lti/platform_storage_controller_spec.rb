@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/platform_storage_controller"
-
 describe Lti::PlatformStorageController do
   describe "#post_message_forwarding" do
     subject { get :post_message_forwarding }

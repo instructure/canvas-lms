@@ -172,7 +172,6 @@ module Canvas::Plugins::DefaultPlugins
                               encrypted_settings: [:secret]
                             })
 
-    require_dependency "cc/importer/cc_worker"
     Canvas::Plugin.register "canvas_cartridge_importer", :export_system, {
       name: -> { I18n.t "canvas_cartridge_name", "Canvas Cartridge Importer" },
       display_name: -> { I18n.t "canvas_cartridge_display", "Canvas Common Cartridge" },
@@ -190,7 +189,6 @@ module Canvas::Plugins::DefaultPlugins
         valid_contexts: %w[Account Course]
       },
     }
-    require_dependency "canvas/migration/worker/course_copy_worker"
     Canvas::Plugin.register "course_copy_importer", :export_system, {
       name: -> { I18n.t :course_copy_name, "Copy Canvas Course" },
       display_name: -> { I18n.t :course_copy_display, "Course Copy" },
@@ -209,7 +207,6 @@ module Canvas::Plugins::DefaultPlugins
         valid_contexts: %w[Course]
       },
     }
-    require_dependency "canvas/migration/worker/zip_file_worker"
     Canvas::Plugin.register "zip_file_importer", :export_system, {
       name: -> { I18n.t :zip_file_name, ".zip file" },
       display_name: -> { I18n.t :zip_file_display, "File Import" },

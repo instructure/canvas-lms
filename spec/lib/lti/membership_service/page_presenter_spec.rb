@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/membership_service/page_presenter"
-
 module Lti::MembershipService
   describe PagePresenter do
     let(:base_url) { "https://localhost:3000" }

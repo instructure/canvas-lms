@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/launch"
-
 module Lti
   describe Launch do
     let(:launch) { Launch.new }

@@ -32,7 +32,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 
 require_relative "../../spec_helper"
-require_dependency "utils/time_presenter"
 
 module Utils
   describe TimePresenter do

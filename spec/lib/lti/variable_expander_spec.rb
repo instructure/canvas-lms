@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/variable_expander"
-
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.create!(lti_guid: "test-lti-guid") }

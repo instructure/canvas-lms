@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/membership_service/group_lis_person_collator"
-
 module Lti::MembershipService
   describe GroupLisPersonCollator do
     context "group with many students" do
