@@ -166,10 +166,7 @@ export function loadDocPreview($container, options) {
     iframe.setAttribute('src', sanitizedUrl)
     iframe.setAttribute('width', opts.width)
     iframe.setAttribute('allowfullscreen', '1')
-    iframe.setAttribute(
-      'style',
-      `border: 0; overflow: auto; height: 99%; min-height': ${minHeight}`
-    )
+    iframe.setAttribute('style', `border: 0; overflow: auto; height: 99%; min-height: ${minHeight}`)
     iframe.id = opts.id
     canvadocWrapper.appendChild(iframe)
   } else if (
