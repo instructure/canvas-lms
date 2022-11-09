@@ -19,6 +19,8 @@
 import formatMessage from '../../format-message'
 
 const locale = {
+  "file_name_8fd421ff": { "message": "檔案名稱" },
+  "greek_65c5b3f7": { "message": "希臘語" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "本檔案不支援預覽。"
   }

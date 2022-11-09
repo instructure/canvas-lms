@@ -19,6 +19,8 @@
 import formatMessage from '../../format-message'
 
 const locale = {
+  "file_name_8fd421ff": { "message": "Dateiname" },
+  "greek_65c5b3f7": { "message": "Griechisch" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Für diese Datei ist keine Vorschau verfügbar."
   }

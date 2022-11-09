@@ -64,7 +64,9 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     ...rest
   } = props
 
-  useState(() => formatMessage.setup({locale: normalizeLocale(props.language)}))
+  useState(() => {
+    formatMessage.setup({locale: normalizeLocale(props.language)})
+  })
   const [translations, setTranslations] = useState(() => {
     const locale = normalizeLocale(props.language)
     const p = getTranslations(locale)
@@ -77,7 +79,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
         setTranslations(false)
       })
     return p
-  }, [])
+  })
 
   // some properties are only used on initialization
   // Languages are a bit of a mess since Tinymce and Canvas

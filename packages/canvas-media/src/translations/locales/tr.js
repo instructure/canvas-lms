@@ -19,7 +19,9 @@
 import formatMessage from '../../format-message'
 
 const locale = {
+  "english_c60612e2": { "message": "İngilizce" },
   "file_name_8fd421ff": { "message": "Dosya adı" },
+  "greek_65c5b3f7": { "message": "Yunan" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
   }
