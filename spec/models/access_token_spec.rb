@@ -184,6 +184,13 @@ describe AccessToken do
       expect(@at.usable?).to eq false
     end
 
+    it "is usable if it needs refreshed but dev key doesn't require it" do
+      dk = DeveloperKey.create!
+      dk.update!(auto_expire_tokens: false)
+      @at.update!(developer_key: dk, expires_at: 2.hours.ago)
+      expect(@at.usable?).to eq true
+    end
+
     it "is usable if it needs refreshed, but requesting with a refresh_token" do
       @at.update!(expires_at: 2.hours.ago)
       expect(@at.usable?(:crypted_refresh_token)).to eq true
