@@ -19,6 +19,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {connect} from 'react-redux'
 import {Tabs} from '@instructure/ui-tabs'
+import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {actions as uiActions} from '../actions/ui'
@@ -31,6 +32,7 @@ import {
 } from '../types'
 import PaceContextsTable from './pace_contexts_table'
 import {getResponsiveSize} from '../reducers/ui'
+import Search from './search'
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -44,20 +46,23 @@ export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = 
 
 interface PaceContextsContentProps {
   currentPage: number
+  currentSearchTerm: string
   paceContexts: PaceContext[]
-  fetchPaceContexts: (contextType: APIPaceContextTypes, page?: number) => void
+  fetchPaceContexts: (contextType: APIPaceContextTypes, page?: number, searchTerm?: string) => void
   selectedContextType: APIPaceContextTypes
   setSelectedContextType: (selectedContextType: APIPaceContextTypes) => void
   setSelectedContext: (selectedPaceContext: PaceContext) => void
   setSelectedModalContext: (contextType: PaceContextTypes, contextId: string) => void
   pageCount: number
   setPage: (page: number) => void
+  setSearchTerm: typeof paceContextsActions.setSearchTerm
   isLoading: boolean
   responsiveSize: ResponsiveSizes
 }
 
 export const PaceContent = ({
   currentPage,
+  currentSearchTerm,
   paceContexts,
   fetchPaceContexts,
   selectedContextType,
@@ -66,6 +71,7 @@ export const PaceContent = ({
   setSelectedContext,
   pageCount,
   setPage,
+  setSearchTerm,
   isLoading,
   responsiveSize,
 }: PaceContextsContentProps) => {
@@ -74,12 +80,15 @@ export const PaceContent = ({
 
   useEffect(() => {
     let page = currentPage
-    // if switching tabs set page to 1
+    let searchTerm = currentSearchTerm
+    // if switching tabs set page to 1 and reset search term
     if (currentTypeRef.current !== selectedContextType) {
       page = 1
+      searchTerm = ''
       currentTypeRef.current = selectedContextType
+      setSearchTerm(searchTerm)
     }
-    fetchPaceContexts(selectedContextType, page)
+    fetchPaceContexts(selectedContextType, page, searchTerm)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedContextType, currentPage])
 
@@ -87,6 +96,7 @@ export const PaceContent = ({
     setTab(id)
     const type = id.split('-')
     setSelectedContextType(type[1])
+    setSearchTerm('')
   }
 
   const handleContextSelect = (paceContext: PaceContext) => {
@@ -103,6 +113,15 @@ export const PaceContent = ({
         isSelected={tab === 'tab-section'}
         padding="none"
       >
+        <View
+          as="div"
+          padding="small"
+          background="secondary"
+          margin="large none none none"
+          borderWidth="small small none small"
+        >
+          <Search contextType="section" />
+        </View>
         <PaceContextsTable
           contextType="section"
           handleContextSelect={handleContextSelect}
@@ -121,6 +140,15 @@ export const PaceContent = ({
         isSelected={tab === 'tab-student_enrollment'}
         padding="none"
       >
+        <View
+          as="div"
+          padding="small"
+          background="secondary"
+          margin="large none none none"
+          borderWidth="small small none small"
+        >
+          <Search contextType="student_enrollment" />
+        </View>
         <PaceContextsTable
           contextType="student_enrollment"
           handleContextSelect={handleContextSelect}
@@ -140,6 +168,7 @@ const mapStateToProps = (state: StoreState) => ({
   paceContexts: state.paceContexts.entries,
   pageCount: state.paceContexts.pageCount,
   currentPage: state.paceContexts.page,
+  currentSearchTerm: state.paceContexts.searchTerm,
   isLoading: state.paceContexts.isLoading,
   selectedContextType: state.paceContexts.selectedContextType,
   responsiveSize: getResponsiveSize(state),
@@ -147,6 +176,7 @@ const mapStateToProps = (state: StoreState) => ({
 
 export default connect(mapStateToProps, {
   setPage: paceContextsActions.setPage,
+  setSearchTerm: paceContextsActions.setSearchTerm,
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSelectedContextType: paceContextsActions.setSelectedContextType,
   setSelectedContext: paceContextsActions.setSelectedContext,

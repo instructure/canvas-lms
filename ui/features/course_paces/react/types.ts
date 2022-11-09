@@ -163,6 +163,7 @@ export interface PaceContextsState {
   readonly isLoading: boolean
   readonly defaultPaceContext: PaceContext | null
   readonly isLoadingDefault: false
+  readonly searchTerm: string
 }
 
 export interface StoreState {
@@ -192,7 +193,7 @@ export interface PaceContext {
   applied_pace: Pace | null
 }
 
-export interface PaceContextApiresponse {
+export interface PaceContextApiResponse {
   pace_contexts: PaceContext[]
   total_entries: number
 }

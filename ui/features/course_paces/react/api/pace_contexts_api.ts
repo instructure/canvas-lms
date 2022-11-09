@@ -23,9 +23,17 @@ export const getPaceContexts = (
   courseId: string,
   contextType: APIPaceContextTypes,
   page: number,
-  entriesPerRequest: number
+  entriesPerRequest: number,
+  searchTerm: string
 ) => {
-  const apiParams = {type: contextType.toLocaleLowerCase(), page, per_page: entriesPerRequest}
+  const apiParams: Record<string, string | number> = {
+    type: contextType.toLocaleLowerCase(),
+    page,
+    per_page: entriesPerRequest,
+  }
+  if (searchTerm && searchTerm.length) {
+    apiParams.search_term = searchTerm
+  }
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/pace_contexts`,
     params: apiParams,
