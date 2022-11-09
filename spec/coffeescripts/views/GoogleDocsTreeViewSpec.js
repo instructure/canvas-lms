@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import GoogleDocsTreeView from 'ui/features/submit_assignment/backbone/views/GoogleDocsTreeView.coffee'
+import GoogleDocsTreeView from 'ui/features/submit_assignment/backbone/views/GoogleDocsTreeView'
 
 const file1 = {
   name: 'File 1',
@@ -69,7 +68,6 @@ test('activateFile triggers an event', () => {
 })
 
 test('activateFolder delegates through to clicking the sign', () => {
-  expect(1)
   const tree = new GoogleDocsTreeView({model: folderData})
   tree.render()
   tree.$('.sign').on('click', () => ok('got clicked'))

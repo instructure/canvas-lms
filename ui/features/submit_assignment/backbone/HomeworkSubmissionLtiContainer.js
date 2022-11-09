@@ -21,9 +21,9 @@ import $ from 'jquery'
 import _ from 'underscore'
 import ExternalContentReturnView from '@canvas/external-tools/backbone/views/ExternalContentReturnView.coffee'
 import ExternalToolCollection from './collections/ExternalToolCollection'
-import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView.coffee'
-import ExternalContentUrlSubmissionView from './views/ExternalContentUrlSubmissionView.coffee'
-import ExternalContentLtiLinkSubmissionView from './views/ExternalContentLtiLinkSubmissionView.coffee'
+import ExternalContentFileSubmissionView from './views/ExternalContentFileSubmissionView'
+import ExternalContentUrlSubmissionView from './views/ExternalContentUrlSubmissionView'
+import ExternalContentLtiLinkSubmissionView from './views/ExternalContentLtiLinkSubmissionView'
 import {recordEulaAgreement} from '../jquery/helper'
 import {handleContentItem, handleDeepLinkingError} from '../deepLinking'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
@@ -153,12 +153,12 @@ export default class HomeworkSubmissionLtiContainer {
       model: new Backbone.Model(item),
     })
 
-    homeworkSubmissionView.on('relaunchTool', function (tool, _model) {
+    homeworkSubmissionView.on('relaunchTool', function (t) {
       this.remove()
-      return this.parentView.embedLtiLaunch(tool.get('id'))
+      return this.parentView.embedLtiLaunch(t.get('id'))
     })
 
-    homeworkSubmissionView.on('cancel', function (_tool, _model) {
+    homeworkSubmissionView.on('cancel', function () {
       return this.parentView.cancelSubmission()
     })
 
