@@ -19,7 +19,6 @@
 #
 
 require_relative "../../../spec_helper"
-require_dependency "api/html/content"
 
 module Api
   module Html

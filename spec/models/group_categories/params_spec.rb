@@ -19,7 +19,6 @@
 
 require_relative "../../spec_helper"
 require_relative "../../support/boolean_translator"
-require_dependency "group_categories/params"
 
 module GroupCategories
   describe Params do

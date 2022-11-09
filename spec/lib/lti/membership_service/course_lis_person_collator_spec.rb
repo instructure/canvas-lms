@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/membership_service/course_lis_person_collator"
-
 module Lti::MembershipService
   describe CourseLisPersonCollator do
     context "course with teacher" do

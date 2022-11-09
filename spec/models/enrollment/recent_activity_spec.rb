@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "enrollment/recent_activity"
-
 class Enrollment
   describe RecentActivity do
     describe "initialization" do

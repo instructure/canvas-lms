@@ -20,7 +20,6 @@
 
 require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
-require_dependency "lti/app_launch_collator"
 
 module Lti
   describe AppLaunchCollator do

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/ims/concerns/gradebook_services"
-
 module Lti
   module IMS::Concerns
     describe GradebookServices, type: :controller do

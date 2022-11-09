@@ -444,10 +444,3 @@ class AuthenticationProvider < ActiveRecord::Base
     Setting.get("auth_provider_debug_expire_minutes", 30).to_i.minutes
   end
 end
-
-# so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
-require_dependency "authentication_provider/canvas"
-require_dependency "authentication_provider/cas"
-require_dependency "authentication_provider/google"
-require_dependency "authentication_provider/linked_in"
-require_dependency "authentication_provider/twitter"

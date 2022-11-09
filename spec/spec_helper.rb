@@ -942,8 +942,6 @@ RSpec.configure do |config|
   end
 end
 
-require_dependency "lazy_presumptuous_i18n_backend"
-
 module I18nStubs
   def stub(translations)
     new_locales = translations.keys - I18n.config.available_locales

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "messages/name_helper"
-
 module Messages
   describe NameHelper do
     let(:course) { double(:course, account_membership_allows: false) }

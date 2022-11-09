@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "lti/ims/advantage_errors"
-
 describe "LTI Advantage Errors" do
   shared_examples "error check" do
     it "initializes with default api message and http status code" do

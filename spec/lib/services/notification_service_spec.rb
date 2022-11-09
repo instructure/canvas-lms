@@ -19,7 +19,6 @@
 #
 
 require_relative "../../messages/messages_helper"
-require_dependency "services/notification_service"
 
 module Services
   describe NotificationService do
