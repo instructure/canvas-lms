@@ -151,5 +151,42 @@ describe "course pace landing page" do
 
       expect(course_pace_table_rows.count).to eq(9)
     end
+
+    it "searches for a section by name" do
+      15.times do |x|
+        @course.course_sections.create!(name: "Sections to Paginate #{x}")
+      end
+
+      visit_course_paces_page
+
+      expect(course_pace_table_rows.count).to eq(10)
+      expect(context_table_pagination).to be_displayed
+
+      search_input.send_keys("Sections to Paginate 1")
+      click_search_button
+
+      expect(course_pace_table_rows.count).to eq(6)
+    end
+  end
+
+  context "course pace table for student enrollments" do
+    before :once do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+    end
+
+    it "searches for a student by name" do
+      n_students_in_course(15, course: @course)
+
+      visit_course_paces_page
+      click_student_tab
+
+      expect(course_pace_table_rows.count).to eq(10)
+      expect(context_table_pagination).to be_displayed
+
+      search_input.send_keys("user 1")
+      click_search_button
+
+      expect(course_pace_table_rows.count).to eq(7)
+    end
   end
 end

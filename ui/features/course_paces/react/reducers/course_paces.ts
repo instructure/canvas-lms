@@ -97,7 +97,7 @@ export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
 export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDates | undefined =>
   state.coursePace.compressed_due_dates
-
+export const getSearchTerm = (state: StoreState): string => state.paceContexts.searchTerm
 export const getCoursePaceItems = createSelector(getCoursePaceModules, getModuleItems)
 
 export const getPaceName = (state: StoreState): string => {

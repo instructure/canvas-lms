@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {act} from '@testing-library/react'
+import {act, fireEvent} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
 import {
   COURSE,
   PACE_CONTEXTS_SECTIONS_RESPONSE,
   PACE_CONTEXTS_STUDENTS_RESPONSE,
+  PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE,
 } from '../../__tests__/fixtures'
 import PaceContent from '../content'
 import fetchMock from 'fetch-mock'
@@ -44,6 +45,7 @@ const firstSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0]
 const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10`
 const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10`
 const SECTION_PACE_CREATION_API = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${firstSection.item_id}`
+const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&search_term=A`
 
 const MINUTE = 1000 * 60
 const HOUR = MINUTE * 60
@@ -69,6 +71,10 @@ describe('PaceContextsContent', () => {
   beforeEach(() => {
     fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_SECTIONS_RESPONSE))
     fetchMock.get(STUDENT_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_STUDENTS_RESPONSE))
+    fetchMock.get(
+      SEARCH_SECTION_CONTEXTS_API,
+      JSON.stringify(PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE)
+    )
     fetchMock.get(SECTION_PACE_CREATION_API, JSON.stringify({course_pace: {}, progress: null}))
     jest.clearAllMocks()
   })
@@ -126,6 +132,24 @@ describe('PaceContextsContent', () => {
       })
       expect(getByText('J-M')).toBeInTheDocument()
       expect(getAllByText('Individual')[0]).toBeInTheDocument()
+    })
+
+    it('filters results by search term', async () => {
+      const {findByText, queryByText, getByRole, getByPlaceholderText} = renderConnected(
+        <PaceContent />
+      )
+      const searchInput = getByPlaceholderText('Search for sections')
+      const searchButton = getByRole('button', {name: 'Search'})
+      act(() => {
+        fireEvent.change(searchInput, {target: {value: 'A'}})
+      })
+      act(() => {
+        searchButton.click()
+      })
+
+      expect(await findByText('A-C')).toBeInTheDocument()
+      expect(await queryByText('D-F')).not.toBeInTheDocument()
+      expect(await queryByText('G-K')).not.toBeInTheDocument()
     })
 
     it('provides contextType and contextId to Pace modal', async () => {

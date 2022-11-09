@@ -226,7 +226,7 @@ const PaceContextsTable = ({
           {paceContexts.map((paceContext: PaceContext) => renderMobileRow(paceContext))}
         </View>
       ) : (
-        <View as="div" margin="large none" borderWidth="small small none small">
+        <View as="div" margin="none none large none" borderWidth="small small none small">
           <Table
             data-testid="course-pace-context-table"
             caption={I18n.t('Course Paces Table')}

@@ -29,6 +29,7 @@ export const paceContextsInitialState: PaceContextsState = {
   isLoading: true,
   defaultPaceContext: null,
   isLoadingDefault: false,
+  searchTerm: '',
 }
 
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
@@ -84,6 +85,11 @@ export const paceContextsReducer = (
       return {
         ...state,
         selectedContext: state.defaultPaceContext,
+      }
+    case PaceContextsConstants.SET_SEARCH_TERM:
+      return {
+        ...state,
+        searchTerm: action.payload,
       }
     default:
       return state

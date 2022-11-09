@@ -30,7 +30,7 @@ import {
   Sections,
   UIState,
   PaceContextsState,
-  PaceContextApiresponse,
+  PaceContextApiResponse,
   StoreState,
   PaceContext,
 } from '../types'
@@ -190,8 +190,7 @@ export const HEADING_STATS_API_RESPONSE = {
   ],
 }
 
-
-export const COURSE_PACE_CONTEXT:PaceContext = {
+export const COURSE_PACE_CONTEXT: PaceContext = {
   name: 'Course 1',
   type: 'Course',
   item_id: '78',
@@ -205,7 +204,7 @@ export const COURSE_PACE_CONTEXT:PaceContext = {
   },
 }
 
-export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiresponse = {
+export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiResponse = {
   pace_contexts: [
     {
       name: 'A-C',
@@ -250,7 +249,26 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiresponse = {
   total_entries: 3,
 }
 
-export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextApiresponse = {
+export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextApiResponse = {
+  pace_contexts: [
+    {
+      name: 'A-C',
+      type: 'CourseSection',
+      item_id: '78',
+      associated_section_count: 1,
+      associated_student_count: 21,
+      applied_pace: {
+        name: 'Main',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+  ],
+  total_entries: 1,
+}
+
+export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextApiResponse = {
   pace_contexts: [
     {
       name: 'Jon',
@@ -356,6 +374,7 @@ export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
   page: 1,
   entriesPerRequest: 10,
   isLoading: true,
+  searchTerm: '',
 }
 
 export const PROGRESS_RUNNING = {
