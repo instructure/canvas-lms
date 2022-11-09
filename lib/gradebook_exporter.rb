@@ -18,6 +18,18 @@
 
 class GradebookExporter
   include GradebookSettingsHelpers
+  include LocaleSelection
+
+  # You may see a pattern in this file of things that look like `<< nil << nil`
+  # to create 'buffer' cells for columns. Let's try to stop using that pattern
+  # and instead define the 'buffer' columns here in the BUFFER_COLUMN_DEFINITIONS
+  # hash. Use the buffer_columns and buffer_column_headers methods to populate the
+  # relevant rows.
+  BUFFER_COLUMN_DEFINITIONS = {
+    grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
+    override_score: ['Override Score'].freeze,
+    override_grade: ['Override Grade'].freeze
+  }.freeze
 
   def initialize(course, user, options = {})
     @course  = course
@@ -28,6 +40,34 @@ class GradebookExporter
   def to_csv
     enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
                                                            include: gradebook_includes)
+    I18n.locale = @options[:locale] || infer_locale(
+      context:      @course,
+      user:         @user,
+      root_account: @course.root_account
+    )
+
+    @options = CsvWithI18n.csv_i18n_settings(@user, @options)
+    csv_data
+  end
+
+  private
+
+  def buffer_column_headers(column_name)
+    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).dup
+  end
+
+  def buffer_columns(column_name, buffer_value=nil)
+    column_count = BUFFER_COLUMN_DEFINITIONS.fetch(column_name).length
+    Array.new(column_count, buffer_value)
+  end
+
+  def csv_data
+    enrollment_scope = @course.apply_enrollment_visibility(
+      gradebook_enrollment_scope(user: @user, course: @course),
+      @user,
+      nil,
+      include: gradebook_includes(user: @user, course: @course)
+    ).preload(:root_account, :sis_pseudonym)
     student_enrollments = enrollments_for_csv(enrollment_scope)
 
     student_section_names = {}
@@ -66,7 +106,9 @@ class GradebookExporter
     include_root_account = @course.root_account.trust_exists?
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]
-    CSV.generate do |csv|
+
+    CsvWithI18n.generate(@options.slice(:encoding, :col_sep, :include_bom)) do |csv|
+
       # First row
       row = ["Student", "ID"]
       row << "SIS User ID" if include_sis_id

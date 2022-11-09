@@ -220,17 +220,22 @@ module AccountReports::ReportHelper
         'account_reports.default.message',
         "%{type} report successfully generated with the following settings. Account: %{account}; %{options}",
         :type => type, :account => account.name, :options => options),
-      file)
+      file
+    )
   end
 
-  def write_report(headers, &block)
-    file = generate_and_run_report(headers, &block)
+  def write_report(headers, enable_i18n_features = false, &block)
+    file = generate_and_run_report(headers, 'csv', enable_i18n_features, &block)
     Shackles.activate(:master) { send_report(file) }
   end
 
-  def generate_and_run_report(headers = nil, extention = 'csv')
-    file = AccountReports.generate_file(@account_report, extention)
-    ExtendedCSV.open(file, "w") do |csv|
+  def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false)
+    file = AccountReports.generate_file(@account_report, extension)
+    options = {}
+    if enable_i18n_features
+      options = CsvWithI18n.csv_i18n_settings(@account_report.user)
+    end
+    ExtendedCSV.open(file, "w", options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       Shackles.activate(:slave) { yield csv }
@@ -239,13 +244,163 @@ module AccountReports::ReportHelper
     file
   end
 
-  class ExtendedCSV < CSV
+  # to use write_report_in_batches you need the following
+  # 1. create account_report_runners with batch_items populated with the ids
+  #    that will run for the batch. Example would be doing something with
+  #    courses and you would pass 1_000 course_ids to the runner or you could
+  #    pass enrollment_term_ids to each runner
+  # 2. have a method named parallel_#{report_type}
+  # 3. the parallel_#{report_type} method will need to know what to do with the
+  #    strings or ids in the account_report_runner.batch_items.
+  #    batch_items is an array of strings.
+  #    in the example with courses it would run the report for the ids or for
+  #    the enrollment_term_id the query could use the id and get the results for
+  #    the term.
+  # 4. the parallel_#{report_type} will also need to add rows individually with
+  #    add_report_row.
+  def write_report_in_batches(headers)
+    # we use total_lines to track progress in the normal progress.
+    # just use it here to do the same thing here even though it is not really
+    # the number of lines.
+    total_runners = @account_report.account_report_runners.count
+
+    # If there are no runners, short-circuit and just send back an empty report with headers only.
+    # Otherwise, the report will get stuck in a "running" state and never exit.
+    if total_runners == 0
+      write_report(headers)
+      return
+    end
+
+    @account_report.update_attributes(total_lines: total_runners)
+
+    args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
+    @account_report.account_report_runners.find_each do |runner|
+      self.send_later_enqueue_args(:run_account_report_runner, args, runner, headers)
+    end
+  end
+
+  def add_report_row(row:, row_number: nil, report_runner:)
+    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner)
+    if report_runner.rows.length == 1_000
+      report_runner.write_rows
+    end
+  end
+
+  def build_report_row(row:, row_number: nil, report_runner:)
+    # force all fields to strings
+    report_runner.account_report_rows.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
+                                          row_number: row_number,
+                                          account_report_id: report_runner.account_report_id,
+                                          account_report_runner: report_runner,
+                                          created_at: Time.zone.now)
+  end
+
+  def number_of_items_per_runner(item_count, min: 25, max: 1000)
+    # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
+    [[item_count/99.to_f.round(0), min].max, max].min
+  end
+
+  def create_report_runners(ids, total, min: 25, max: 1000)
+    return if ids.empty?
+    ids_so_far = 0
+    ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
+      @account_report.add_report_runner(batch)
+      ids_so_far += batch.length
+      if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
+        @account_report.write_report_runners
+        ids_so_far = 0
+      end
+    end
+    @account_report.write_report_runners
+  end
+
+  def run_account_report_runner(report_runner, headers)
+    return if report_runner.reload.workflow_state == 'aborted'
+    @account_report = report_runner.account_report
+    begin
+      if @account_report.workflow_state == 'aborted'
+        report_runner.abort
+        return
+      end
+      report_runner.start
+      Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner)}
+    rescue => e
+      report_runner.fail
+      self.fail_with_error(e)
+    ensure
+      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
+      compile_parallel_report(headers) if last_account_report_runner?(@account_report)
+    end
+  end
+
+  def compile_parallel_report(headers)
+    @account_report.update_attributes(total_lines: @account_report.account_report_rows.count + 1)
+    write_report headers do |csv|
+      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each { |record| csv << record.row }
+    end
+    @account_report.delete_account_report_rows
+  end
+
+  def fail_with_error(error)
+    Shackles.activate(:master) do
+      @account_report.account_report_runners.incomplete.update_all(workflow_state: 'aborted')
+      @account_report.delete_account_report_rows
+      Canvas::Errors.capture_exception(:account_report, error)
+      @account_report.workflow_state = 'error'
+      @account_report.save!
+      raise error
+    end
+  end
+
+  def runner_aborted?(report_runner)
+    if report_runner.reload.workflow_state == 'aborted'
+      report_runner.delete_account_report_rows
+      true
+    else
+      false
+    end
+  end
+
+  def update_parallel_progress(account_report: @account_report, report_runner:)
+    return if runner_aborted?(report_runner)
+    report_runner.complete
+    # let the regular report process update progress to 100 percent, cap at 99.
+    progress = [(account_report.account_report_runners.completed.count.to_f/account_report.total_lines * 100).to_i, 99].min
+    current_line = account_report.account_report_rows.count
+    account_report.current_line ||= 0
+    account_report.progress ||= 0
+    updates = {}
+    updates[:current_line] = current_line if account_report.current_line < current_line
+    updates[:progress] = progress if account_report.progress < progress
+    unless updates.empty?
+      Shackles.activate(:master) do
+        AccountReport.where(id: account_report).where("progress <?", progress).update_all(updates)
+      end
+    end
+  end
+
+  def last_account_report_runner?(account_report)
+    return false if account_report.account_report_runners.incomplete.exists?
+    AccountReport.transaction do
+      @account_report.reload(lock: true)
+      return false if account_report.workflow_state == 'error'
+      if @account_report.workflow_state == 'running'
+        @account_report.workflow_state = 'compiling'
+        @account_report.save!
+        true
+      else
+        false
+      end
+    end
+  end
+
+  class ExtendedCSV < CsvWithI18n
     def <<(row)
-      if @lineno % 1000 == 0
+      if lineno % 1000 == 0
         Shackles.activate(:master) do
           report = self.instance_variable_get(:@account_report).reload
-          report.update_attribute(:current_line, @lineno)
-          report.update_attribute(:progress, (@lineno.to_f/report.total_lines)*100) if report.total_lines
+          report.update_attribute(:current_line, lineno)
+          report.update_attribute(:progress, lineno.to_f / (report.total_lines + 1 ) * 100) if report.total_lines
           if report.workflow_state == 'deleted'
             report.workflow_state = 'aborted'
             report.save!
