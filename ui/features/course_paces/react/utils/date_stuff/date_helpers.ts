@@ -20,6 +20,10 @@ import moment from 'moment-timezone'
 
 import {BlackoutDate} from '../../shared/types'
 import {weekendIntegers} from '../../shared/api/backend_serializer'
+import tz from '@canvas/timezone'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('course_paces_app')
 
 /*
  * Any date manipulation should be consolidated into helper functions in this file
@@ -132,4 +136,34 @@ const dayIsDisabled = (
     (excludeWeekends && weekendIntegers.includes(date.weekday())) ||
     inBlackoutDate(date, blackoutDates)
   )
+}
+
+export const formatTimeAgoDate = date => {
+  if (typeof date === 'string') {
+    date = Date.parse(date)
+  }
+  const MINUTE = 60 * 1000
+  const now = new Date()
+  const diff = Math.abs(now.valueOf() - date)
+  const minutes = Math.round(diff / MINUTE)
+  const hours = Math.round(minutes / 60)
+  const days = Math.round(hours / 24)
+  const weeks = Math.round(days / 7)
+
+  if (minutes < 5) {
+    return I18n.t('Just Now')
+  }
+  if (minutes < 60) {
+    return I18n.t('%{count} minutes ago', {count: minutes})
+  }
+  if (hours < 24) {
+    return I18n.t({one: '1 hour ago', other: '%{count} hours ago'}, {count: hours})
+  }
+  if (days < 7) {
+    return I18n.t({one: '1 day ago', other: '%{count} days ago'}, {count: days})
+  }
+  if (weeks < 4) {
+    return I18n.t({one: '1 week ago', other: '%{count} weeks ago'}, {count: weeks})
+  }
+  return tz.format(date, 'date.formats.long')
 }
