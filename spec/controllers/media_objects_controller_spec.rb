@@ -678,26 +678,6 @@ describe MediaObjectsController do
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
         [{ url: "whatever man", bitrate: 12_345 }]
       )
-      allow_any_instance_of(Attachment).to receive(:grants_right?).and_return(true)
-      attachment_with_context(@course, {
-                                filename: "test.mp4",
-                                content_type: "video/mp4",
-                                media_object: MediaObject.create!(media_id: "the-video")
-                              })
-    end
-
-    it "with an unauthorized attachment" do
-      course_with_student_logged_in
-      allow_any_instance_of(Attachment).to receive(:grants_right?).and_return(false)
-      get "iframe_media_player", params: { media_object_id: "the-video" }
-      expect(response).to be_unauthorized
-    end
-
-    it "with a locked attachment" do
-      course_with_student_logged_in
-      allow_any_instance_of(Attachment).to receive(:locked_for?).and_return(true)
-      get "iframe_media_player", params: { media_object_id: "the-video" }
-      expect(response).to redirect_to "/images/svg-icons/icon_lock.svg"
     end
 
     it "does not include content-security-policy headers" do
