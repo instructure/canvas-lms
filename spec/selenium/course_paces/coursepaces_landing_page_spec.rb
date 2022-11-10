@@ -189,4 +189,61 @@ describe "course pace landing page" do
       expect(course_pace_table_rows.count).to eq(7)
     end
   end
+
+  context "course pace table for users" do
+    before :once do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+      @new_section_1 = @course.course_sections.create!(name: "New Section 1")
+      @student2 = user_factory(name: "Mary Seim", active_all: true, active_state: "active", section: @new_section_1)
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+      # We need to run jobs because its progress gets stuck on the landing page otherwise!
+      run_jobs
+    end
+
+    it "includes all students enrolled in the course" do
+      visit_course_paces_page
+      click_student_tab
+
+      expect(course_pace_table_rows.count).to eq(2)
+    end
+
+    it "user includes assigned pace and pace type" do
+      create_section_pace(@new_section_1)
+      student_enrollment = Enrollment.find_by(user_id: @student2.id)
+      create_student_pace(student_enrollment)
+
+      visit_course_paces_page
+      click_student_tab
+
+      expect(context_row("Mary Seim").text).to include("Mary Seim Individual")
+    end
+
+    it "sections are paginated when there are many sections in the list" do
+      create_users_in_course(@course, 15, return_type: :record)
+      # We need to run jobs because its progress gets stuck on the landing page otherwise!
+      run_jobs
+
+      visit_course_paces_page
+      click_student_tab
+
+      expect(course_pace_table_rows.count).to eq(10)
+      expect(context_table_pagination).to be_displayed
+
+      click_context_table_page(2)
+
+      expect(course_pace_table_rows.count).to eq(7)
+    end
+
+    it "navigates to the student's individual pace for editing" do
+      student_enrollment = Enrollment.find_by(user_id: @student.id)
+      create_student_pace(student_enrollment)
+
+      visit_course_paces_page
+      click_student_tab
+      click_context_link(@student.name)
+
+      expect(apply_or_create_pace_button.text).to eq("Apply Changes")
+      expect(course_pace_title.text).to include("Student Pace: #{@student.name}")
+    end
+  end
 end
