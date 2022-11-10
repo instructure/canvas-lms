@@ -54,7 +54,7 @@ describe "Pace Contexts API" do
         applied_pace_json = course_json["applied_pace"]
         expect(applied_pace_json["name"]).to eq course.name
         expect(applied_pace_json["type"]).to eq "Course"
-        expect(applied_pace_json["duration"]).to eq 0
+        expect(applied_pace_json["duration"]).to eq 1
         expect(Time.parse(applied_pace_json["last_modified"])).to be_within(1.second).of(default_pace.published_at)
       end
 

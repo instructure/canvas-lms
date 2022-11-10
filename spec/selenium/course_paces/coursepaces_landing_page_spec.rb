@@ -105,7 +105,7 @@ describe "course pace landing page" do
       expect(course_pace_context_table).to be_displayed
       expect(number_of_students.text).to include("1")
       expect(number_of_sections.text).to include("2")
-      expect(default_duration.text).to include("2 days")
+      expect(default_duration.text).to include("3 days")
     end
   end
 
