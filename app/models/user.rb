@@ -1749,7 +1749,7 @@ class User < ActiveRecord::Base
   end
 
   def discussions_splitscreen_view?
-    !!preferences[:discussions_splitscreen_view?]
+    !!preferences[:discussions_splitscreen_view]
   end
 
   def close_announcement(announcement)

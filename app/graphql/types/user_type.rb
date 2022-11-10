@@ -49,6 +49,11 @@ module Types
 
     field :pronouns, String, null: true
 
+    field :discussions_splitscreen_view, Boolean, null: false
+    def discussions_splitscreen_view
+      object.discussions_splitscreen_view?
+    end
+
     field :avatar_url, UrlType, null: true
 
     def avatar_url
