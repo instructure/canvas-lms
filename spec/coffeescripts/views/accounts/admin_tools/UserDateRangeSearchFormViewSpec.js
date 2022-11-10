@@ -23,7 +23,7 @@ import AccountUserCollection from 'ui/features/account_admin_tools/backbone/coll
 import UserDateRangeSearchFormView from 'ui/features/account_admin_tools/backbone/views/UserDateRangeSearchFormView'
 import InputFilterView from 'backbone-input-filter-view'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
-import UserView from 'ui/features/account_admin_tools/backbone/views/UserView.coffee'
+import UserView from 'ui/features/account_admin_tools/backbone/views/UserView'
 
 QUnit.module('UserDateRangeSearchFormView', {
   setup() {
