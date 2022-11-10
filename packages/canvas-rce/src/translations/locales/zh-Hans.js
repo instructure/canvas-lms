@@ -206,6 +206,7 @@ const locale = {
   "double_dagger_faf78681": { "message": "双剑号" },
   "down_and_left_diagonal_arrow_40ef602c": { "message": "左下斜箭头" },
   "down_and_right_diagonal_arrow_6ea0f460": { "message": "右下斜箭头" },
+  "download_filename_2baae924": { "message": "下载 { filename }" },
   "downward_arrow_cca52012": { "message": "向下箭头" },
   "downward_pointing_triangle_2a12a601": { "message": "倒三角" },
   "drag_a_file_here_1bf656d5": { "message": "把文件拖动到此处" },
@@ -260,6 +261,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "特小" },
   "extracurricular_icon_67c8ca42": { "message": "课外图标" },
   "f_function_fe422d65": { "message": "F（函数）" },
+  "failed_getting_file_contents_e9ea19f4": { "message": "文件内容获取失败" },
   "file_storage_quota_exceeded_b7846cd1": { "message": "超出文件存储大小限制" },
   "file_url_c12b64be": { "message": "文件URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename }文件图标" },
@@ -384,6 +386,7 @@ const locale = {
   "link_7262adec": { "message": "链接" },
   "link_options_a16b758b": { "message": "链接选项" },
   "links_14b70841": { "message": "链接" },
+  "links_to_an_external_site_de74145d": { "message": "链接到外部网站。" },
   "load_more_35d33c7": { "message": "加载更多" },
   "loading_25990131": { "message": "加载中……" },
   "loading_bde52856": { "message": "正在加载" },
@@ -412,6 +415,8 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "中等" },
   "middle_27dc1d5": { "message": "中间" },
+  "minimize_file_preview_da911944": { "message": "最小化文件预览" },
+  "minimize_video_20aa554b": { "message": "最小化视频" },
   "minus_fd961e2e": { "message": "减号" },
   "minus_plus_3461f637": { "message": "减号/加号" },
   "misc_3b692ea7": { "message": "其他" },
@@ -501,6 +506,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi（变体）" },
   "pink_68ad45cb": { "message": "粉红色" },
   "pixels_52ece7d1": { "message": "像素" },
+  "play_media_comment_35257210": { "message": "播放媒体评论。" },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "播放{ name }的来自{ createdAt }的媒体评论。"
+  },
   "plus_d43cd4ec": { "message": "加号" },
   "plus_minus_f8be2e83": { "message": "加号/减号" },
   "posted_when_a578f5ab": { "message": "发布日期：{ when }" },
@@ -631,6 +640,10 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "支持的文件类型：SRT或WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "切换到优质 HTML 编辑器"
+  },
+  "switch_to_raw_html_editor_f970ae1a": { "message": "切换到原始 HTML 编辑器" },
   "switch_to_the_html_editor_146dfffd": { "message": "切换到 HTML 编辑器" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "切换到富文本编辑器"
@@ -645,6 +658,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "文本（可选）" },
   "text_position_8df8c162": { "message": "文字位置" },
   "text_size_887c2f6": { "message": "文字大小" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "目前正在处理文档预览。请稍后再试。"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "材料在公开域中"
   },
@@ -666,8 +682,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "厚右箭头" },
   "thick_rightward_arrow_a2e1839e": { "message": "厚向右箭头" },
   "thick_upward_arrow_acd20328": { "message": "厚向上箭头" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "无法在 Canvas 中显示此文档。"
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "无法在基本视图中呈现此公式。"
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "该图像目前不可用"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "虽然您的视频在浏览器里会有正确标题，但我们无法在数据库里更新。"

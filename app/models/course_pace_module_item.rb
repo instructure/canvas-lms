@@ -39,7 +39,7 @@ class CoursePaceModuleItem < ActiveRecord::Base
                   }
 
   def assignable_module_item
-    unless module_item&.assignment
+    unless module_item&.assignment && module_item&.tag_type == "context_module"
       errors.add(:module_item, "is not assignable")
     end
   end

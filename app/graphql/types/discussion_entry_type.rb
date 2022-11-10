@@ -70,7 +70,7 @@ module Types
     def quoted_entry
       if object.deleted?
         nil
-      elsif object.include_reply_preview && (Account.site_admin.feature_enabled?(:isolated_view) || Account.site_admin.feature_enabled?(:split_screen_view))
+      elsif object.include_reply_preview
         load_association(:parent_entry)
       end
     end
@@ -219,6 +219,19 @@ module Types
     field :root_entry, Types::DiscussionEntryType, null: true
     def root_entry
       load_association(:root_entry)
+    end
+
+    field :discussion_entry_versions_connection, Types::DiscussionEntryVersionType.connection_type, null: true
+    def discussion_entry_versions_connection
+      is_course_teacher = object.context.is_a?(Course) && object.context.user_is_instructor?(current_user)
+      is_group_teacher = object.context.is_a?(Group) && object.context&.course&.user_is_instructor?(current_user)
+      return nil unless is_course_teacher || is_group_teacher || object.user == current_user
+
+      if object.deleted?
+        nil
+      else
+        load_association(:discussion_entry_versions)
+      end
     end
   end
 end

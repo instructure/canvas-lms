@@ -21,7 +21,7 @@
 require_relative "../../lti2_spec_helper"
 require_relative "../views_helper"
 
-describe "/assignments/show" do
+describe "assignments/show" do
   let(:eula_url) { "https://www.test.com/eula" }
 
   it "renders" do

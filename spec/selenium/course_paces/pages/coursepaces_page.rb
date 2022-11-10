@@ -90,7 +90,7 @@ module CoursePacesPageObject
   end
 
   def edit_tray_close_button_selector
-    "button:contains('Close')"
+    "[data-testid='tray-close-button'] button"
   end
 
   def hypothetical_end_date_selector
@@ -261,9 +261,63 @@ module CoursePacesPageObject
 
   #------------------------- Redesign Selectors ----------------------
 
+  def apply_or_create_pace_button_selector
+    "[data-testid='apply-or-create-pace-button']"
+  end
+
+  def blueprint_label_selector
+    ".blueprint-label"
+  end
+
+  def course_pace_modal_x_selector
+    "[data-testid='course-pace-edit-close-x']"
+  end
+
   def course_pace_settings_button_selector
     "[data-testid='course-pace-settings']"
   end
+
+  def remove_pace_button_selector
+    "[data-testid='remove-pace-button']"
+  end
+
+  def remove_pace_modal_cancel_selector
+    "button:contains('Cancel')"
+  end
+
+  def remove_pace_modal_remove_selector
+    "[data-testid='remove-pace-confirm']"
+  end
+
+  def remove_pace_modal_x_selector
+    "[data-testid='instui-modal-close'] button"
+  end
+
+  def remove_pace_modal_selector(pace_type)
+    case pace_type
+    when :student
+      "[aria-label='Remove this Student Pace?']"
+    when :section
+      "[aria-label='Remove this Section Pace?']"
+    end
+  end
+
+  def reset_all_button_selector
+    "[data-testid='reset-all-button']"
+  end
+
+  def reset_all_cancel_button_selector
+    "[data-testid='reset-all-cancel-button']"
+  end
+
+  def reset_all_reset_button_selector
+    "[data-testid='reset-all-reset-button']"
+  end
+
+  def reset_all_x_button_selector
+    "[data-testid='reset-changes-modal'] [data-testid='instui-modal-close'] button"
+  end
+
   #------------------------- Elements --------------------------------
 
   def assignment_due_date
@@ -351,7 +405,7 @@ module CoursePacesPageObject
   end
 
   def edit_tray_close_button
-    fj(edit_tray_close_button_selector)
+    f(edit_tray_close_button_selector)
   end
 
   def hypothetical_end_date
@@ -487,9 +541,59 @@ module CoursePacesPageObject
   end
 
   #------------------------- Redesign Elements -----------------------
+
+  def apply_or_create_pace_button
+    f(apply_or_create_pace_button_selector)
+  end
+
+  def blueprint_label
+    f(blueprint_label_selector)
+  end
+
+  def course_pace_modal_x
+    f(course_pace_modal_x_selector)
+  end
+
   def course_pace_settings_button
     f(course_pace_settings_button_selector)
   end
+
+  def remove_pace_button
+    f(remove_pace_button_selector)
+  end
+
+  def remove_pace_modal(pace_type)
+    f(remove_pace_modal_selector(pace_type))
+  end
+
+  def remove_pace_modal_cancel
+    fj(remove_pace_modal_cancel_selector)
+  end
+
+  def remove_pace_modal_remove
+    f(remove_pace_modal_remove_selector)
+  end
+
+  def remove_pace_modal_x
+    f(remove_pace_modal_x_selector)
+  end
+
+  def reset_all_button
+    f(reset_all_button_selector)
+  end
+
+  def reset_all_cancel_button
+    f(reset_all_cancel_button_selector)
+  end
+
+  def reset_all_reset_button
+    f(reset_all_reset_button_selector)
+  end
+
+  def reset_all_x_button
+    f(reset_all_x_button_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   #----------------------- Click Items -------------------------------
 
@@ -590,6 +694,51 @@ module CoursePacesPageObject
 
   def click_weekends_checkbox
     skip_weekends_checkbox.click
+  end
+
+  #------------------------- Redesign Elements -----------------------
+  def click_apply_or_create_pace_button
+    apply_or_create_pace_button.click
+  end
+
+  def click_course_pace_settings_button
+    course_pace_settings_button.click
+  end
+
+  def click_course_pace_modal_x
+    course_pace_modal_x.click
+  end
+
+  def click_remove_pace_button
+    remove_pace_button.click
+  end
+
+  def click_remove_pace_modal_cancel
+    remove_pace_modal_cancel.click
+  end
+
+  def click_remove_pace_modal_remove
+    remove_pace_modal_remove.click
+  end
+
+  def click_remove_pace_modal_x
+    remove_pace_modal_x.click
+  end
+
+  def click_reset_all_button
+    reset_all_button.click
+  end
+
+  def click_reset_all_cancel_button
+    reset_all_cancel_button.click
+  end
+
+  def click_reset_all_reset_button
+    reset_all_reset_button.click
+  end
+
+  def click_reset_all_x_button
+    reset_all_x_button.click
   end
 
   #------------------------------Retrieve Text------------------------

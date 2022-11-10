@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import '@canvas/context-modules'
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from './backbone/views/WikiPageView'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'

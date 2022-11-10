@@ -125,6 +125,7 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
         {I18n.t('Get Started')}
       </Button>
       <Text
+        data-testid="course-pacing-more-info-link"
         color="secondary"
         as="div"
         dangerouslySetInnerHTML={{

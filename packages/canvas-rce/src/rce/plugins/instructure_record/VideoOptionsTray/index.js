@@ -235,7 +235,7 @@ export default function VideoOptionsTray(props) {
                             file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
                           }))}
                           uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                          languages={Bridge.languages}
+                          userLocale={Bridge.userLocale}
                           updateSubtitles={handleUpdateSubtitles}
                           liveRegion={getLiveRegion}
                         />

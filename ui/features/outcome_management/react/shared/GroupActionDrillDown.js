@@ -105,7 +105,7 @@ const GroupActionDrillDown = ({
   }
 
   const subgroups = isLoadingGroup ? (
-    <Select.Option id={LOADING_OPTION}>
+    <Select.Option id={LOADING_OPTION} key={LOADING_OPTION}>
       <Flex justifyItems="center">
         <Spinner renderTitle={I18n.t('Loading learning outcome groups')} />
       </Flex>
@@ -125,14 +125,15 @@ const GroupActionDrillDown = ({
   )
 
   const selectedGroup = isLoadingGroupDetail ? (
-    <Select.Option id={VIEW_OPTION} isDisabled={true} isHighlighted={false}>
+    <Select.Option id={VIEW_OPTION} key={VIEW_OPTION} isDisabled={true} isHighlighted={false}>
       {collections[selectedGroupId].name}
     </Select.Option>
   ) : (
-    <Select.Group renderLabel={collections[selectedGroupId].name}>
+    <Select.Group key="selected-group" renderLabel={collections[selectedGroupId].name}>
       {!disableActionLink ? (
         <Select.Option
           id={VIEW_OPTION}
+          key={VIEW_OPTION}
           isDisabled={disableActionLink}
           isHighlighted={disableActionLink ? false : isActionLinkHighlighted}
         >
@@ -163,6 +164,7 @@ const GroupActionDrillDown = ({
       options = [
         <Select.Option
           id={BACK_OPTION}
+          key={BACK_OPTION}
           isHighlighted={BACK_OPTION === highlightedOptionId}
           renderBeforeLabel={IconArrowOpenStartLine}
         >

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/eportfolios/_section_list" do
+describe "eportfolios/_section_list" do
   before(:once) do
     eportfolio_with_user
   end

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/users/new" do
+describe "users/new" do
   it "renders" do
     course_with_student
     view_context

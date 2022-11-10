@@ -256,12 +256,6 @@ class RCEWrapper extends React.Component {
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
     textareaId: PropTypes.string.isRequired,
-    languages: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-      })
-    ),
     readOnly: PropTypes.bool,
     tinymce: PropTypes.object,
     trayProps: trayPropTypes,
@@ -279,7 +273,6 @@ class RCEWrapper extends React.Component {
 
   static defaultProps = {
     trayProps: null,
-    languages: [{id: 'en', label: 'English'}],
     autosave: {enabled: false},
     highContrastCSS: [],
     ltiTools: [],
@@ -545,7 +538,7 @@ class RCEWrapper extends React.Component {
 
   insertImage(image) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertImage(editor, image)
+    const element = contentInsertion.insertImage(editor, image, this.getCanvasUrl())
 
     // Removes TinyMCE's caret &nbsp; text if exists.
     if (element?.nextSibling?.data?.trim() === '') {
@@ -614,13 +607,13 @@ class RCEWrapper extends React.Component {
 
   insertVideo(video) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertVideo(editor, video)
+    const element = contentInsertion.insertVideo(editor, video, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
   insertAudio(audio) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertAudio(editor, audio)
+    const element = contentInsertion.insertAudio(editor, audio, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
@@ -643,7 +636,7 @@ class RCEWrapper extends React.Component {
 
   insertLink(link) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertLink(editor, link)
+    const element = contentInsertion.insertLink(editor, link, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
@@ -1433,6 +1426,7 @@ class RCEWrapper extends React.Component {
 
   wrapOptions(options = {}) {
     const rcsExists = !!(this.props.trayProps?.host && this.props.trayProps?.jwt)
+    const userLocale = editorLanguage(this.language)
 
     const setupCallback = options.setup
 
@@ -1471,7 +1465,7 @@ class RCEWrapper extends React.Component {
 
       height: options.height || DEFAULT_RCE_HEIGHT,
 
-      language: editorLanguage(this.language),
+      language: userLocale,
 
       document_base_url: this.props.canvasOrigin,
 
@@ -1493,7 +1487,7 @@ class RCEWrapper extends React.Component {
           ...this.props.trayProps,
         }
         bridge.trayProps?.set(editor, trayPropsWithColor)
-        bridge.languages = this.props.languages
+        bridge.userLocale = userLocale
         bridge.canvasOrigin = this.props.canvasOrigin
         if (typeof setupCallback === 'function') {
           setupCallback(editor)
@@ -1878,6 +1872,7 @@ class RCEWrapper extends React.Component {
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
             key={this.id}
+            canvasOrigin={this.getCanvasUrl()}
             bridge={bridge}
             editor={this}
             onTrayClosing={this.handleContentTrayClosing}

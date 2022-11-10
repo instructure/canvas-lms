@@ -22,7 +22,6 @@ import editorOptions from './editorOptions'
 import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
 import getRCSProps from './getRCSProps'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import shouldUseFeature, {Feature} from './shouldUseFeature'
 
 const RCELoader = {
@@ -153,21 +152,6 @@ const RCELoader = {
       }
     }
 
-    const myLanguage = ENV.LOCALE
-    const languages = Object.keys(closedCaptionLanguages)
-      .map(locale => {
-        return {id: locale, label: closedCaptionLanguages[locale]}
-      })
-      .sort((a, b) => {
-        if (a.id === myLanguage) {
-          return -1
-        } else if (b.id === myLanguage) {
-          return 1
-        } else {
-          return a.label.localeCompare(b.label, myLanguage)
-        }
-      })
-
     // TODO: let client pass autosave_enabled in as a prop from the outside
     //       Assignmens2 student view is going to be doing their own autosave
     const autosave = {
@@ -185,7 +169,6 @@ const RCELoader = {
       textareaClassName: textarea.className,
       textareaId: textarea.id,
       trayProps: getRCSProps(),
-      languages,
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       ltiTools: window.INST?.editorButtons,
       autosave: tinyMCEInitOptions.autosave || autosave,

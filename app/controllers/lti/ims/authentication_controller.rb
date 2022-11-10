@@ -77,7 +77,8 @@ module Lti
         validate_launch_eligibility!
 
         render(
-          "lti/ims/authentication/authorize.html.erb",
+          "lti/ims/authentication/authorize",
+          formats: :html,
           layout: "borderless_lti",
           locals: {
             redirect_uri: redirect_uri,

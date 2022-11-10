@@ -267,15 +267,12 @@ const ColorPicker = createReactClass({
   // ===============
 
   closeModal() {
-    // eslint-disable-next-line react/no-is-mounted
-    if (this.isMounted()) {
-      this.setState({
-        isOpen: false,
-      })
+    this.setState({
+      isOpen: false,
+    })
 
-      if (this.props.afterClose) {
-        this.props.afterClose()
-      }
+    if (this.props.afterClose) {
+      this.props.afterClose()
     }
   },
 

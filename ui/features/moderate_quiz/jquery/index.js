@@ -96,12 +96,8 @@ window.moderation = {
       if (hr) {
         times.push(hr < 10 ? '0' + hr : hr)
       }
-      if (true || min) {
-        times.push(min < 10 ? '0' + min : min)
-      }
-      if (true || sec) {
-        times.push(sec < 10 ? '0' + sec : sec)
-      }
+      times.push(min < 10 ? '0' + min : min)
+      times.push(sec < 10 ? '0' + sec : sec)
       $row.find('.time').text(times.join(':'))
     })
   },

@@ -21,7 +21,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView.coffee'
+import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'

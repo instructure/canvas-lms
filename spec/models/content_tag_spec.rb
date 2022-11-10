@@ -951,5 +951,11 @@ describe ContentTag do
       expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
       expect(section_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
     end
+
+    it "does not make changes if the tag_type is not 'context_module'" do
+      assignment = @course.assignments.create!
+      tag = ContentTag.create!(context: @course, content: assignment, tag_type: "learning_outcome")
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(false)
+    end
   end
 end

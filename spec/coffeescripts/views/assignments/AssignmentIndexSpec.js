@@ -22,7 +22,7 @@ import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/
 import AssignmentGroupListView from 'ui/features/assignment_index/backbone/views/AssignmentGroupListView.coffee'
 import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView.coffee'
 import AssignmentSyncSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSyncSettingsView.coffee'
-import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView.coffee'
+import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView'
 import IndexView from 'ui/features/assignment_index/backbone/views/IndexView.coffee'
 import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'

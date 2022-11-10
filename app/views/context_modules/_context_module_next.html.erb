@@ -20,7 +20,7 @@
   context_module_next ||= nil
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
-  can_direct_share = can_do(@context, @current_user, :manage_content) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))
+  can_direct_share = can_do(@context, @current_user, :direct_share)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
 %>

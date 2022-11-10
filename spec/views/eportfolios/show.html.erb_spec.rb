@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/eportfolios/show" do
+describe "eportfolios/show" do
   before do
     assign(:domain_root_account, Account.default)
     eportfolio_with_user

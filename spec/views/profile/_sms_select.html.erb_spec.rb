@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/profile/_sms_select" do
+describe "profile/_sms_select" do
   it "renders" do
     course_with_student
     view_context

@@ -81,7 +81,7 @@ const mockAvailabities = [
     name: 'section 1',
   },
   {
-    id: 'U2VjdGlvbi00',
+    id: 'U2VjdGlvbi01',
     _id: '2',
     userCount: 99,
     name: 'section 2',

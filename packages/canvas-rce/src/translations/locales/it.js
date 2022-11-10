@@ -238,6 +238,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Freccia diagonale giù e destra"
   },
+  "download_filename_2baae924": { "message": "Scarica { filename }" },
   "downward_arrow_cca52012": { "message": "Freccia giù" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Triangolo che punta verso il basso"
@@ -296,6 +297,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra piccola" },
   "extracurricular_icon_67c8ca42": { "message": "Icona Extracurricolare" },
   "f_function_fe422d65": { "message": "F (funzione)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Impossibile ottenere contenuto file"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Quota spazio di archiviazione file superata"
   },
@@ -450,6 +454,9 @@ const locale = {
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Opzioni link" },
   "links_14b70841": { "message": "Link" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Collega a un sito esterno."
+  },
   "load_more_35d33c7": { "message": "Carica altro" },
   "loading_25990131": { "message": "Caricamento in corso..." },
   "loading_bde52856": { "message": "Caricamento" },
@@ -484,6 +491,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Medio" },
   "middle_27dc1d5": { "message": "Centro" },
+  "minimize_file_preview_da911944": {
+    "message": "Riduci a icona anteprima file"
+  },
+  "minimize_video_20aa554b": { "message": "Riduci a icona video" },
   "minus_fd961e2e": { "message": "Meno" },
   "minus_plus_3461f637": { "message": "Meno/Più" },
   "misc_3b692ea7": { "message": "Varie" },
@@ -583,6 +594,12 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variante)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixel" },
+  "play_media_comment_35257210": {
+    "message": "Commento sulla riproduzione del contenuto multimediale."
+  },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Commento sulla riproduzione del contenuto multimediale da parte di { name } da { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Più" },
   "plus_minus_f8be2e83": { "message": "Più/Meno" },
   "posted_when_a578f5ab": { "message": "Postato: { when }" },
@@ -741,6 +758,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipi di file supportati: SRT o WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Passa a editor HTML sicuro"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Passa a editor HTML non elaborato"
+  },
   "switch_to_the_html_editor_146dfffd": { "message": "Passa a editor html" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Passa a editor di testo RTF"
@@ -755,6 +778,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Testo (opzionale)" },
   "text_position_8df8c162": { "message": "Posizione testo" },
   "text_size_887c2f6": { "message": "Dimensione testo" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "L''anteprima del documento è attualmente in elaborazione. Riprova in seguito."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Il materiale è nel dominio pubblico"
   },
@@ -776,8 +802,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Freccia destra spessa" },
   "thick_rightward_arrow_a2e1839e": { "message": "Freccia destra spessa" },
   "thick_upward_arrow_acd20328": { "message": "Freccia su spessa" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Questo documento non può essere visualizzato in Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Impossibile eseguire il rendering di questa equazione nella visualizzazione base."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Questa immagine non è attualmente disponibile"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Anche se il tuo video avrà il titolo corretto nel browser, non siamo riusciti ad aggiornarlo nel database."

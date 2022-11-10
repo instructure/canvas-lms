@@ -35,10 +35,14 @@ describe('MentionDropdownOption tests', () => {
     expect(optionElement).toBeTruthy()
   })
 
-  it('should apply a data-ignore-a11y-check attribute on the avatar image', () => {
-    const {container} = setup()
+  it('should add a data-ignore-a11y-check attribute on all content nodes within the mention option', () => {
+    const {container, getByText} = setup()
     const img = container.querySelector('img')
+    const initialText = getByText(/dh/i)
+    const nameText = getByText(/davis hyer/i)
     expect(img).toHaveAttribute('data-ignore-a11y-check')
+    expect(initialText).toHaveAttribute('data-ignore-a11y-check')
+    expect(nameText).toHaveAttribute('data-ignore-a11y-check')
   })
 
   it('should call onSelect when selected', () => {

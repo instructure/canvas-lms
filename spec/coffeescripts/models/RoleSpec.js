@@ -17,7 +17,7 @@
  */
 
 import Role from 'ui/features/roster/backbone/models/Role'
-import Account from 'ui/features/account_settings/backbone/models/Account.coffee'
+import Account from 'ui/features/account_settings/backbone/models/Account'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('RoleModel', {

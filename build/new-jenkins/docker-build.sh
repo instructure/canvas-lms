@@ -36,7 +36,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2022-09-26.1"
+export CACHE_VERSION="2022-10-31.1"
 export DOCKER_BUILDKIT=1
 
 if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then

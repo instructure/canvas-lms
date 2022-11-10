@@ -21,7 +21,7 @@
   module_item ||= module_item_next
   item_data ||= { published_status: 'unpublished' }
   completion_criteria ||= nil
-  can_direct_share = can_do(@context, @current_user, :manage_content) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))
+  can_direct_share = can_do(@context, @current_user, :direct_share)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
 
   @module_item_image_tags ||= {

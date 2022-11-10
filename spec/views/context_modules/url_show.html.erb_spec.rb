@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/context_modules/url_show" do
+describe "context_modules/url_show" do
   it "renders" do
     course_factory
     view_context(@course, @user)

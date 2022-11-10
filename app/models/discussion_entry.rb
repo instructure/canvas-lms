@@ -29,6 +29,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
+  has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy
   has_many :legacy_subentries, -> { where("legacy=true") }, class_name: "DiscussionEntry", foreign_key: "parent_id"
   has_many :root_discussion_replies, -> { where("legacy=false OR legacy=true AND parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   has_many :discussion_subentries, -> { order(:created_at) }, class_name: "DiscussionEntry", foreign_key: "parent_id"
@@ -53,6 +54,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_create :set_root_account_id
   after_save :update_discussion
   after_save :context_module_action_later
+  after_save :create_discussion_entry_versions
   after_create :create_participants
   after_create :log_discussion_entry_metrics
   after_create :clear_planner_cache_for_participants
@@ -236,6 +238,23 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def create_discussion_entry_versions
+    if saved_changes.key?("message")
+      user = current_user || self.user
+
+      message_old, message_new = saved_changes["message"]
+      updated_at_old = saved_changes.key?("updated_at") ? saved_changes["updated_at"][0] : 1.minute.ago
+      updated_at_new = saved_changes.key?("updated_at") ? saved_changes["updated_at"][1] : Time.now
+
+      if discussion_entry_versions.count == 0 && !message_old.nil?
+        discussion_entry_versions.create!(root_account: root_account, user: user, version: 1, message: message_old, created_at: updated_at_old, updated_at: updated_at_old)
+      end
+
+      new_version = (discussion_entry_versions.maximum(:version) || 0) + 1
+      discussion_entry_versions.create!(root_account: root_account, user: user, version: new_version, message: message_new, created_at: updated_at_new, updated_at: updated_at_new)
+    end
+  end
+
   def update_topic_submission
     if discussion_topic.for_assignment?
       entries = discussion_topic.discussion_entries.where(user_id: user_id, workflow_state: "active")
@@ -372,6 +391,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
   # when there is no discussion_entry_participant for a user, it is considered unread
   scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ["unread", nil] }) }
+  scope :unread_for_user_before, ->(user, unread_before = 1.minute.ago.utc) { where(discussion_entry_participants: { workflow_state: ["unread", nil] }).or(where("discussion_entry_participants.workflow_state = 'read' AND COALESCE(discussion_entry_participants.read_at, '2022-10-28') >= ?", unread_before)).joins(participant_join_sql(user)) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id

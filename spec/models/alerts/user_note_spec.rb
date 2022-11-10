@@ -45,7 +45,7 @@ module Alerts
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
-        expect(-> { ::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days } })
+        expect { ::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days } }
           .to raise_error("Validation failed: Title is too long (maximum is 255 characters)")
       end
 

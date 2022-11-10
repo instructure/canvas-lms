@@ -203,11 +203,18 @@ class BigBlueButtonConference < WebConference
                           webcamsOnlyForModerator: settings[:share_other_webcams] ? false : true,
                         })
     end
-
     response = send_request(:create, req_params) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?
     save
+    InstStatsd::Statsd.increment("bigbluebutton.started")
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.record") if req_params[:record] == true
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_webcam") if req_params[:lockSettingsDisableCam] == false
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_microphone") if req_params[:lockSettingsDisableMic] == false
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.send_public_chat") if req_params[:lockSettingsDisablePublicChat] == false
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.send_private_chat") if req_params[:lockSettingsDisablePrivateChat] == false
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.enable_waiting_room") if req_params[:guestPolicy] == "ASK_MODERATOR"
+    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_other_webcams") if req_params[:webcamsOnlyForModerator] == false
     conference_key
   end
 

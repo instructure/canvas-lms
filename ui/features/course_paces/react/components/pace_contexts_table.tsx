@@ -39,7 +39,7 @@ export interface PaceContextsTableProps {
   isLoading: boolean
   responsiveSize: ResponsiveSizes
   setPage: (page: number) => void
-  handleContextSelect: (contextType: PaceContextTypes, contextId: string) => void
+  handleContextSelect: (paceContext: PaceContext) => void
 }
 
 interface Header {
@@ -51,12 +51,6 @@ const PACE_TYPES = {
   StudentEnrollment: I18n.t('Individual'),
   CourseSection: I18n.t('Section'),
   Course: I18n.t('Default'),
-}
-
-export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = {
-  course: 'Course',
-  section: 'Section',
-  student_enrollment: 'Enrollment',
 }
 
 const {Item: FlexItem} = Flex as any
@@ -119,7 +113,7 @@ const PaceContextsTable = ({
   const renderContextLink = (paceContext: PaceContext) => (
     <Link
       isWithinText={false}
-      onClick={() => handleContextSelect(CONTEXT_TYPE_MAP[contextType], paceContext.item_id)}
+      onClick={() => handleContextSelect(paceContext)}
     >
       <TruncateText>{paceContext.name}</TruncateText>
     </Link>
@@ -130,7 +124,7 @@ const PaceContextsTable = ({
     const appliedPace = paceContext?.applied_pace
     const appliedPaceType = paceContext?.applied_pace?.type || ''
     switch (contextType) {
-      case 'section':
+      case 'section': {
         const studentCountText = I18n.t(
           {
             one: '1 Student',
@@ -145,6 +139,7 @@ const PaceContextsTable = ({
           formatDate(appliedPace?.last_modified || ''),
         ]
         break
+      }
       case 'student_enrollment':
         values = [
           renderContextLink(paceContext),
@@ -165,6 +160,7 @@ const PaceContextsTable = ({
         {headers.map((headerTitle, i) => (
           <TableColHeader
             id={`header-table-${i}`}
+            // eslint-disable-next-line react/no-array-index-key
             key={`contexts-header-table-${i}`}
             width={headerTitle.width}
             theme={{padding: '0.75rem'}}
@@ -181,9 +177,14 @@ const PaceContextsTable = ({
   const renderRow = (paceContext: PaceContext) => {
     const rowCells = getValuesByContextType(paceContext)
     return (
-      <TableRow key={paceContext.item_id}>
+      <TableRow data-testid="course-pace-row" key={paceContext.item_id}>
         {rowCells.map((cell, index) => (
-          <TableCell key={`contexts-table-cell-${index}`} theme={{padding: '0.75rem'}}>
+          <TableCell
+            data-testid="course-pace-item"
+            // eslint-disable-next-line react/no-array-index-key
+            key={`contexts-table-cell-${index}`}
+            theme={{padding: '0.75rem'}}
+          >
             {cell}
           </TableCell>
         ))}
@@ -202,6 +203,7 @@ const PaceContextsTable = ({
         margin="none none small none"
       >
         {headers.map(({text: title}, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
             <FlexItem size="50%">
               <Text weight="bold">{title}</Text>
@@ -229,6 +231,7 @@ const PaceContextsTable = ({
       ) : (
         <View as="div" margin="large none" borderWidth="small small none small">
           <Table
+            data-testid="course-pace-context-table"
             caption={I18n.t('Course Paces Table')}
             themeOverride={{
               border: '2px solid black',
@@ -241,7 +244,14 @@ const PaceContextsTable = ({
           </Table>
         </View>
       )}
-      {pageCount > 1 && <Paginator loadPage={setPage} page={currentPage} pageCount={pageCount} />}
+      {pageCount > 1 && (
+        <Paginator
+          data-testid="context-table-paginator"
+          loadPage={setPage}
+          page={currentPage}
+          pageCount={pageCount}
+        />
+      )}
     </>
   )
 }

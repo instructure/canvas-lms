@@ -267,12 +267,33 @@ export const getOptimisticResponse = ({
         isolatedEntryId,
         quotedEntry,
         attachment: null,
+        discussionEntryVersionsConnection: {
+          nodes: [],
+          __typename: 'DiscussionEntryVersionConnection',
+        },
         __typename: 'DiscussionEntry',
       },
       errors: null,
       __typename: 'CreateDiscussionEntryPayload',
     },
   }
+}
+
+export const buildQuotedReply = (nodes, previewId) => {
+  if (!nodes) return ''
+  let preview = {}
+  nodes.every(reply => {
+    if (reply._id === previewId) {
+      preview = {
+        author: {shortName: getDisplayName(reply)},
+        createdAt: reply.createdAt,
+        previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
+      }
+      return false
+    }
+    return true
+  })
+  return preview
 }
 
 export const isAnonymous = discussionEntry =>

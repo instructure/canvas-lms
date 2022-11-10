@@ -110,7 +110,6 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           <Flex as="section" alignItems="end" wrap="wrap">
             <FlexItem margin="0 0 small">
               <Header
-                coursePace={coursePace}
                 isBlueprintLocked={isBlueprintLocked}
                 setIsBlueprintLocked={setIsBlueprintLocked}
                 handleDrawerToggle={() => setTrayOpen(!trayOpen)}

@@ -226,6 +226,7 @@ const locale = {
   "double_dagger_faf78681": { "message": "ダブルの短剣" },
   "down_and_left_diagonal_arrow_40ef602c": { "message": "下・左の対角線矢印" },
   "down_and_right_diagonal_arrow_6ea0f460": { "message": "下・右の対角線矢印" },
+  "download_filename_2baae924": { "message": "{ filename }をダウンロードする" },
   "downward_arrow_cca52012": { "message": "下向きの矢印" },
   "downward_pointing_triangle_2a12a601": { "message": "逆三角形" },
   "drag_a_file_here_1bf656d5": { "message": "ファイルをここにドラッグする" },
@@ -282,6 +283,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "超小型" },
   "extracurricular_icon_67c8ca42": { "message": "課外活動のアイコン" },
   "f_function_fe422d65": { "message": "F (関数)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "ファイルのコンテンツ取得に失敗しました"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "ファイル保存のサイズを超過"
   },
@@ -426,6 +430,9 @@ const locale = {
   "link_7262adec": { "message": "リンク" },
   "link_options_a16b758b": { "message": "リンクオプション" },
   "links_14b70841": { "message": "リンク" },
+  "links_to_an_external_site_de74145d": {
+    "message": "外部サイトにリンクしています。"
+  },
   "load_more_35d33c7": { "message": "もっと読み込む" },
   "loading_25990131": { "message": "読み込み中・・・" },
   "loading_bde52856": { "message": "読み込み中" },
@@ -456,6 +463,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "中" },
   "middle_27dc1d5": { "message": "中位" },
+  "minimize_file_preview_da911944": {
+    "message": "ファイル プレビューを最小化"
+  },
+  "minimize_video_20aa554b": { "message": "ビデオを最小化" },
   "minus_fd961e2e": { "message": "マイナス" },
   "minus_plus_3461f637": { "message": "マイナス/プラス" },
   "misc_3b692ea7": { "message": "その他" },
@@ -557,6 +568,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "パイ(変形)" },
   "pink_68ad45cb": { "message": "ピンク" },
   "pixels_52ece7d1": { "message": "ピクセル" },
+  "play_media_comment_35257210": { "message": "メディア コメントの再生。" },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "{ name }まで{ createdAt }からのメディアのコメントを再生します。"
+  },
   "plus_d43cd4ec": { "message": "プラス" },
   "plus_minus_f8be2e83": { "message": "プラス/マイナス" },
   "posted_when_a578f5ab": { "message": "投稿済み:{ when }" },
@@ -695,6 +710,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "サポートされるファイルタイプ：SRT または WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "「可愛い」htmlエディタに切り替える"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "「生の」htmlエディタに切り替える"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "htmlエディタに切り替える"
   },
@@ -711,6 +732,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "テキスト (オプション)" },
   "text_position_8df8c162": { "message": "テキストの位置" },
   "text_size_887c2f6": { "message": "テキストのサイズ" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "文書のプレビューは現在処理中です。後ほどもう一度やり直してください。"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "この資料はパブリック ドメインです"
   },
@@ -732,8 +756,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "下向きの太い矢印" },
   "thick_rightward_arrow_a2e1839e": { "message": "右向きの太い矢印" },
   "thick_upward_arrow_acd20328": { "message": "上向きの太い矢印" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "この文書は Canvas 内で表示できません。"
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "この方程式は基本ビューでは描画できません。"
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "この画像は現在利用できません"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "あなたのビデオのブラウザ内のタイトルは正しいものですが、データベース内でそれを更新できませんでした。"

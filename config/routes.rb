@@ -1393,9 +1393,6 @@ CanvasRails::Application.routes.draw do
                                                                                 as: "#{context}_dismiss_update_tool_proxy"
         put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :accept_update,
                                                                              as: "#{context}_accept_update_tool_proxy"
-
-        get "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/recreate_subscriptions", action: :recreate_subscriptions,
-                                                                                             as: "#{context}_recreate_subscriptions_tool_proxy"
       end
     end
 
@@ -2484,6 +2481,8 @@ CanvasRails::Application.routes.draw do
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
       put "jobs2/unstuck", action: :unstuck
+      get "jobs2/throttle/check", action: :throttle_check
+      put "jobs2/throttle", action: :throttle
       get "jobs2/stuck/strands", action: :stuck_strands, as: :jobs_stuck_strands
       get "jobs2/stuck/singletons", action: :stuck_singletons, as: :jobs_stuck_singletons
     end

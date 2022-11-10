@@ -36,12 +36,19 @@ const I18n = useI18nScope('course_paces_app')
 
 const {Panel: TabPanel} = Tabs as any
 
+export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = {
+  course: 'Course',
+  section: 'Section',
+  student_enrollment: 'Enrollment',
+}
+
 interface PaceContextsContentProps {
   currentPage: number
   paceContexts: PaceContext[]
   fetchPaceContexts: (contextType: APIPaceContextTypes, page?: number) => void
   selectedContextType: APIPaceContextTypes
   setSelectedContextType: (selectedContextType: APIPaceContextTypes) => void
+  setSelectedContext: (selectedPaceContext: PaceContext) => void
   setSelectedModalContext: (contextType: PaceContextTypes, contextId: string) => void
   pageCount: number
   setPage: (page: number) => void
@@ -56,6 +63,7 @@ export const PaceContent = ({
   selectedContextType,
   setSelectedModalContext,
   setSelectedContextType,
+  setSelectedContext,
   pageCount,
   setPage,
   isLoading,
@@ -81,6 +89,11 @@ export const PaceContent = ({
     setSelectedContextType(type[1])
   }
 
+  const handleContextSelect = (paceContext: PaceContext) => {
+    setSelectedContext(paceContext)
+    setSelectedModalContext(CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
+  }
+
   return (
     <Tabs onRequestTabChange={changeTab}>
       <TabPanel
@@ -92,7 +105,7 @@ export const PaceContent = ({
       >
         <PaceContextsTable
           contextType="section"
-          handleContextSelect={setSelectedModalContext}
+          handleContextSelect={handleContextSelect}
           currentPage={currentPage}
           paceContexts={paceContexts}
           pageCount={pageCount}
@@ -110,7 +123,7 @@ export const PaceContent = ({
       >
         <PaceContextsTable
           contextType="student_enrollment"
-          handleContextSelect={setSelectedModalContext}
+          handleContextSelect={handleContextSelect}
           currentPage={currentPage}
           paceContexts={paceContexts}
           pageCount={pageCount}
@@ -136,5 +149,6 @@ export default connect(mapStateToProps, {
   setPage: paceContextsActions.setPage,
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSelectedContextType: paceContextsActions.setSelectedContextType,
+  setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
 })(PaceContent)

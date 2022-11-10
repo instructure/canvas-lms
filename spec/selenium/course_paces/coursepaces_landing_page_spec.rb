@@ -20,11 +20,13 @@
 require_relative "pages/coursepaces_common_page"
 require_relative "pages/coursepaces_landing_page"
 require_relative "../courses/pages/courses_home_page"
+require_relative "pages/coursepaces_page"
 
 describe "course pace landing page" do
   include_context "in-process server selenium tests"
   include CoursePacesCommonPageObject
   include CoursePacesLandingPageObject
+  include CoursePacesPageObject
   include CoursesHomePage
 
   before :once do
@@ -43,13 +45,14 @@ describe "course pace landing page" do
     user_session @teacher
   end
 
-  context "course paces landing page elements" do
-    it "navigates to the course paces page when clicked", ignore_js_errors: true do
-      get "/courses/#{@course.id}/modules"
+  context "unpublished course paces landing page elements" do
+    it "navigates to the course paces page when clicked" do
+      get "/courses/#{@course.id}"
 
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
+      expect(create_default_pace_button.text).to eq("Create Default Pace")
     end
 
     it "lands on the getting started course pace landing page when visited the first time" do
@@ -57,26 +60,96 @@ describe "course pace landing page" do
 
       expect(create_default_pace_button.text).to eq("Create Default Pace")
       expect(get_started_button).to be_displayed
+      expect(course_paces_panda).to be_displayed
+    end
+
+    it "goes to go course pace creation page with Get Started button", custom_timeout: 30 do
+      visit_course_paces_page
+      click_get_started_button
+
+      expect(element_exists?(course_pace_modal_x_selector)).to be_truthy
+    end
+
+    it "provides a link to the canvas community user group" do
+      visit_course_paces_page
+      expect(element_value_for_attr(community_info_text, "href")).to include("community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing")
+    end
+  end
+
+  context "published course paces landing page" do
+    before :once do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+    end
+
+    it "navigates to the course paces page with publish info when clicked", custom_timeout: 25 do
+      get "/courses/#{@course.id}"
+
+      click_course_paces
+
+      expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
+      expect(create_default_pace_button.text).to eq("Edit Default Pace")
     end
 
     it "lands on the editing course pace landing page when visited" do
-      create_published_course_pace("Course Pace 1", "Module Assignment 1")
-
       visit_course_paces_page
 
       expect(create_default_pace_button.text).to eq("Edit Default Pace")
       expect(element_exists?(get_started_button_selector)).to be_falsey
     end
 
-    it "shows the student, section, and default course duration date" do
+    it "shows the context table and the student, section, and default course duration date" do
       @course.course_sections.create!(name: "New Section")
-      create_published_course_pace("Course Pace 1", "Module Assignment 1")
 
       visit_course_paces_page
 
+      expect(course_pace_context_table).to be_displayed
       expect(number_of_students.text).to include("1")
       expect(number_of_sections.text).to include("2")
-      expect(default_duration.text).to include("2 Days")
+      expect(default_duration.text).to include("2 days")
+    end
+  end
+
+  context "course pace table for sections" do
+    before :once do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+      3.times do |x|
+        @course.course_sections.create!(name: "New Section #{x}")
+      end
+    end
+
+    it "includes all sections, including the default section" do
+      visit_course_paces_page
+
+      expect(course_pace_table_rows.count).to eq(4)
+    end
+
+    it "section includes student_number and pace type" do
+      course_section = @course.course_sections.create!(name: "Best Section")
+      create_section_pace(course_section)
+
+      student_enrollment = Enrollment.find_by(user_id: @student.id)
+      student_enrollment.course_section = course_section
+      student_enrollment.save!
+      student_enrollment.reload
+
+      visit_course_paces_page
+
+      expect(context_row("Best Section").text).to include("1 Student Section")
+    end
+
+    it "sections are paginated when there are many sections in the list" do
+      15.times do |x|
+        @course.course_sections.create!(name: "Sections to Paginate #{x}")
+      end
+
+      visit_course_paces_page
+
+      expect(course_pace_table_rows.count).to eq(10)
+      expect(context_table_pagination).to be_displayed
+
+      click_context_table_page(2)
+
+      expect(course_pace_table_rows.count).to eq(9)
     end
   end
 end

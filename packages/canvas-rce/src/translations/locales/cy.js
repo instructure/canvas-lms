@@ -232,6 +232,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Saeth Croeslinol i lawr ac i’r dde"
   },
+  "download_filename_2baae924": { "message": "Llwytho { filename } i Lawr" },
   "downward_arrow_cca52012": { "message": "Saeth i lawr" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Triongl yn pwyntio i lawr"
@@ -290,6 +291,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Bach Iawn" },
   "extracurricular_icon_67c8ca42": { "message": "Eicon Allgwricwlar" },
   "f_function_fe422d65": { "message": "F (nodwedd)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Wedi methu cael cynnwys ffeil"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Wedi cyrraedd cwota storio ffeil"
   },
@@ -442,6 +446,9 @@ const locale = {
   "link_7262adec": { "message": "Dolen" },
   "link_options_a16b758b": { "message": "Opsiynau Dolen" },
   "links_14b70841": { "message": "Dolenni" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Dolenni at safle allanol."
+  },
   "load_more_35d33c7": { "message": "Llwytho Mwy" },
   "loading_25990131": { "message": "Wrthi’n llwytho..." },
   "loading_bde52856": { "message": "Wrthi’n llwytho" },
@@ -476,6 +483,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "middle_27dc1d5": { "message": "Canol" },
+  "minimize_file_preview_da911944": {
+    "message": "Lleihau’r Rhagolwg o’r Ffeil"
+  },
+  "minimize_video_20aa554b": { "message": "Lleihau Fideo" },
   "minus_fd961e2e": { "message": "Minws" },
   "minus_plus_3461f637": { "message": "Minws/Plws" },
   "misc_3b692ea7": { "message": "Amrywiol" },
@@ -575,6 +586,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Amrywiad)" },
   "pink_68ad45cb": { "message": "Pinc" },
   "pixels_52ece7d1": { "message": "Picseli" },
+  "play_media_comment_35257210": { "message": "Chwarae sylw ar gyfryngau." },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Chwarae sylw ar gyfryngau gan { name } o { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Plws" },
   "plus_minus_f8be2e83": { "message": "Plws/Minws" },
   "posted_when_a578f5ab": { "message": "Wedi postio: { when }" },
@@ -723,6 +738,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Mathau o ffeiliau y mae modd delio â nhw: SRT neu WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Newid i’r golygydd HTML hardd"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Newid i’r golygydd HTML crai"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Newid i’r golygydd html "
   },
@@ -739,6 +760,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Testun (dewisol)" },
   "text_position_8df8c162": { "message": "Lleoliad y Testun" },
   "text_size_887c2f6": { "message": "Maint y Testun" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Mae’r rhagolwg o’r ddogfen wrthi’n cael ei brosesu ar hyn o bryd. Rhowch gynnig arall arni rywbryd eto."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Mae’r deunydd yn y parth cyhoeddus"
   },
@@ -760,8 +784,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Saeth Trwchus i’r Dde" },
   "thick_rightward_arrow_a2e1839e": { "message": "Saeth Trwchus i’r Dde" },
   "thick_upward_arrow_acd20328": { "message": "Saeth Trwchus i Fyny" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Does dim modd dangos y ddogfen hon yn Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Does dim modd rendro’r hafaliad hwn yn y Wedd Syml."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Dydy''r ddelwedd hon ddim ar gael ar hyn o bryd."
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Er y bydd gan eich fideo y teitl cywir yn y porwr, nid ydym ni wedi gallu ei ddiweddaru yn y gronfa ddata."

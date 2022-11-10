@@ -473,12 +473,9 @@ const quizSubmission = (function () {
       if (hr) {
         times.push(I18n.t('hours_count', 'Hour', {count: hr}))
       }
-      if (true || min) {
-        times.push(I18n.t('minutes_count', 'Minute', {count: min}))
-      }
-      if (true || sec) {
-        times.push(I18n.t('seconds_count', 'Second', {count: sec}))
-      }
+      times.push(I18n.t('minutes_count', 'Minute', {count: min}))
+      times.push(I18n.t('seconds_count', 'Second', {count: sec}))
+
       $timeRunningFunc().text(times.join(', '))
     },
 

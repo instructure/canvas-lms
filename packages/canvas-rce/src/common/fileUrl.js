@@ -21,16 +21,31 @@
 // in mocha tests.
 import {parse, format} from 'url'
 
-function parseCanvasUrl(url) {
+function parseCanvasUrl(url, canvasOrigin = window.location.origin) {
   if (!url) {
     return null
   }
   const parsed = parse(url, true)
-  if (parsed.host && window.location.host !== parsed.host) {
+  const canvasHost = parse(canvasOrigin, true).host
+  if (parsed.host && canvasHost !== parsed.host) {
     return null
   }
   return parsed
 }
+
+export function absoluteToRelativeUrl(url, canvasOrigin) {
+  const parsed = parseCanvasUrl(url, canvasOrigin)
+  if (!parsed) {
+    return url
+  }
+  parsed.host = ''
+  parsed.hostname = ''
+  parsed.slashes = false
+  parsed.protocol = ''
+  const newUrl = format(parsed)
+  return newUrl
+}
+
 function changeDownloadToWrapParams(parsedUrl) {
   delete parsedUrl.search
   delete parsedUrl.query.download_frd
@@ -38,6 +53,7 @@ function changeDownloadToWrapParams(parsedUrl) {
   parsedUrl.pathname = parsedUrl.pathname.replace(/\/(?:download|preview)\/?$/, '')
   return parsedUrl
 }
+
 function addContext(parsedUrl, contextType, contextId) {
   // if this is a http://canvas/files... url. change it to be contextual
   if (/^\/files/.test(parsedUrl.pathname)) {
@@ -46,6 +62,7 @@ function addContext(parsedUrl, contextType, contextId) {
   }
   return parsedUrl
 }
+
 // simply replaces the download_frd url param with wrap
 // wrap=1 will (often) cause the resource to be loaded
 // in an iframe on canvas' files page
@@ -56,6 +73,7 @@ export function downloadToWrap(url) {
   }
   return format(changeDownloadToWrapParams(parsed))
 }
+
 // take a url to a file (e.g. /files/17), and convert it to
 // it's in-context url (e.g. /courses/2/files/17).
 // Add wrap=1 to the url so it previews, not downloads
@@ -82,6 +100,7 @@ export function fixupFileUrl(contextType, contextId, fileInfo) {
   }
   return fileInfo
 }
+
 // embedded resources, like an <img src=url> with /preview
 // in the url will not be logged as a view in canvas.
 // This is appropriate for images in some rce content.
@@ -99,6 +118,7 @@ export function prepEmbedSrc(url) {
   delete parsed.query.wrap
   return format(parsed)
 }
+
 // when the user opens a link to a resource, we want its view
 // logged, so remove /preview
 // Add wrap=1 to indicate clicking on the link should open a preview

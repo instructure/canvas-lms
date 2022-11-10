@@ -31,7 +31,7 @@
 /* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
+import closedCaptionLanguages from '@instructure/canvas-media'
 
 const I18n = useI18nScope('mepfeaturetracksinstructure')
 

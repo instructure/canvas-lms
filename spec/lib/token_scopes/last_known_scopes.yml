@@ -631,8 +631,6 @@
   path: "/api/v1/courses/:course_id/tool_proxies/:tool_proxy_id/update"
 - verb: PUT
   path: "/api/v1/courses/:course_id/tool_proxies/:tool_proxy_id/update"
-- verb: GET
-  path: "/api/v1/courses/:course_id/tool_proxies/:tool_proxy_id/recreate_subscriptions"
 - verb: DELETE
   path: "/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id"
 - verb: PUT
@@ -641,8 +639,6 @@
   path: "/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id/update"
 - verb: PUT
   path: "/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id/update"
-- verb: GET
-  path: "/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id/recreate_subscriptions"
 - verb: GET
   path: "/api/v1/courses/:course_id/external_feeds"
 - verb: POST

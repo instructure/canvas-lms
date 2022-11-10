@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/gradebooks/_grading_box" do
+describe "gradebooks/_grading_box" do
   it "renders" do
     course_with_student
     view_context

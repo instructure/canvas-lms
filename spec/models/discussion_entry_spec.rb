@@ -437,6 +437,40 @@ describe DiscussionEntry do
     expect(@topic_updated_at.to_i).not_to eq @topic.reload.updated_at.to_i
   end
 
+  describe ".unread_for_user_before(user, read_at)" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher)
+    end
+
+    it "returns all unread entries for user or entries unread before the given time" do
+      # it returns entries read after the given time, but
+      # it should be interpreted as, entries that were unread before the given time.
+
+      # scenario: you visit a page for unread entries;
+      # as you scroll the page you read entries at (later times, then you go to next page and entries are now read AFTER your initial QUERY time.
+
+      Timecop.safe_mode = false
+      Timecop.freeze(Time.utc(2013, 3, 13, 9, 12))
+      @entry1 = @topic.discussion_entries.create!(message: "entry 1 outside", user: @teacher)
+      @entry1.change_read_state("read", @student)
+
+      Timecop.freeze(Time.utc(2013, 3, 13, 10, 12))
+      @entry2 = @topic.discussion_entries.create!(message: "entry 2", user: @teacher)
+      @entry3 = @topic.discussion_entries.create!(message: "entry 3", user: @teacher)
+
+      @entry2.change_read_state("read", @student)
+
+      # Notice we read the entries 1 min after the the query issues
+      expect(DiscussionEntry.unread_for_user_before(@student, Time.utc(2013, 3, 13, 10, 11)).order("id").map(&:message)).to eq(["entry 2", "entry 3"])
+
+    ensure
+      Timecop.return
+      Timecop.safe_mode = true
+    end
+  end
+
   context "read/unread state" do
     before(:once) do
       course_with_teacher(active_all: true)
@@ -931,6 +965,38 @@ describe DiscussionEntry do
           expect(entry.author_name).to eq(user.short_name)
         end
       end
+    end
+  end
+
+  describe "discussion_entry_versions" do
+    let(:user) { user_model(name: "John Doe") }
+
+    it "creates version 1 on new entry" do
+      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+
+      expect(entry.discussion_entry_versions.count).to eq(1)
+      expect(entry.discussion_entry_versions.take.message).to eq(entry.message)
+    end
+
+    it "creates various versions on entry updates" do
+      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+
+      expect(entry.discussion_entry_versions.count).to eq(1)
+      expect(entry.discussion_entry_versions.take.message).to eq(entry.message)
+
+      entry.message = "Test 2"
+      entry.save!
+
+      expect(entry.discussion_entry_versions.count).to eq(2)
+      expect(entry.discussion_entry_versions.first.message).to eq(entry.message)
+
+      entry.message = "Test 3"
+      entry.save!
+
+      expect(entry.discussion_entry_versions.count).to eq(3)
+      expect(entry.discussion_entry_versions.first.message).to eq(entry.message)
+
+      expect(entry.discussion_entry_versions.pluck(:message)).to eq(["Test 3", "Test 2", "Test 1"])
     end
   end
 end

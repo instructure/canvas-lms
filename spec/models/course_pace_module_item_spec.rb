@@ -85,5 +85,12 @@ describe CoursePaceModuleItem do
       expect(@course_pace.course_pace_module_items.build(module_item: quiz_tag)).to be_valid
       expect(@course_pace.course_pace_module_items.build(module_item: header_tag)).not_to be_valid
     end
+
+    it "requires the module item to have the tag_type of 'context_module'" do
+      quiz = @course.quizzes.create!
+      quiz.save! # Save again to create associated assignment
+      tag = ContentTag.create!(context: @course, content: quiz, tag_type: "learning_outcome")
+      expect(@course_pace.course_pace_module_items.build(module_item: tag)).not_to be_valid
+    end
   end
 end

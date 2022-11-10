@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import {isUndefined} from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
-import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection.coffee'
-import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView.coffee'
+import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'
+import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView'
 import tz from '@canvas/timezone'
 import fakeENV from 'helpers/fakeENV'
 

@@ -41,9 +41,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
       entry.attachment_id = nil
     end
 
-    if !input[:include_reply_preview].nil? &&
-       entry.parent_entry &&
-       entry.parent_entry.id != entry.root_entry_id
+    if !input[:include_reply_preview].nil? && entry.parent_entry
       entry.include_reply_preview = input[:include_reply_preview]
     end
 

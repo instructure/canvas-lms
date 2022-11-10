@@ -21,6 +21,7 @@ import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './
 
 describe('contentInsertion', () => {
   let editor, node
+  const canvasOrigin = 'https://mycanvas.com:3000'
 
   beforeEach(() => {
     node = {
@@ -135,11 +136,29 @@ describe('contentInsertion', () => {
       }
     })
 
+    it('sets Canvas URLs to be relative', () => {
+      link.href = 'https://mycanvas.com:3000/some/path'
+      link.url = 'https://mycanvas.com:3000/some/path'
+      contentInsertion.insertLink(editor, link, canvasOrigin)
+      expect(editor.content).toEqual(
+        '<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>'
+      )
+    })
+
+    it('leaves non-Canvas URLs as absolute', () => {
+      link.href = 'https://yodawg.com:3001/some/path'
+      link.url = 'https://yodawg.com:3001/some/path'
+      contentInsertion.insertLink(editor, link, canvasOrigin)
+      expect(editor.content).toEqual(
+        '<a href="https://yodawg.com:3001/some/path" title="Here Be Links">Click On Me</a>'
+      )
+    })
+
     it('builds an anchor link with appropriate embed class', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link instructure_image_thumbnail" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
       )
     })
 
@@ -147,7 +166,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link instructure_scribd_file" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       )
     })
 
@@ -164,7 +183,9 @@ describe('contentInsertion', () => {
 
       it('uses the anchor text', () => {
         contentInsertion.insertLink(editor, link)
-        expect(editor.content).toEqual('<a href="/some/path" title="Here Be Links">anchor text</a>')
+        expect(editor.content).toEqual(
+          '<a href="/some/path?wrap=1" title="Here Be Links">anchor text</a>'
+        )
       })
 
       describe('with "forceRename" set to "true"', () => {
@@ -173,7 +194,7 @@ describe('contentInsertion', () => {
         it('uses the link "text"', () => {
           contentInsertion.insertLink(editor, link)
           expect(editor.content).toEqual(
-            '<a href="/some/path" title="Here Be Links">Click On Me</a>'
+            '<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>'
           )
         })
       })
@@ -183,7 +204,7 @@ describe('contentInsertion', () => {
       link.embed = {noPreview: true}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link no_preview" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link no_preview">Click On Me</a>'
       )
     })
 
@@ -192,7 +213,7 @@ describe('contentInsertion', () => {
       link.class = 'instructure_file_link foo'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a class="instructure_file_link foo" data-canvas-previewable="true" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" data-canvas-previewable="true" class="instructure_file_link foo">Click On Me</a>'
       )
     })
 
@@ -201,7 +222,7 @@ describe('contentInsertion', () => {
       link['data-course-type'] = 'wikiPages'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a data-course-type="wikiPages" data-published="true" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" data-course-type="wikiPages" data-published="true">Click On Me</a>'
       )
     })
 
@@ -241,7 +262,9 @@ describe('contentInsertion', () => {
       link.href = undefined
       link.url = '/other/path'
       contentInsertion.insertLink(editor, link)
-      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
+      expect(editor.content).toEqual(
+        '<a href="/other/path?wrap=1" title="Here Be Links">Click On Me</a>'
+      )
     })
 
     it('cleans a url with no protocol', () => {
@@ -306,6 +329,22 @@ describe('contentInsertion', () => {
       }
     })
 
+    it('sets Canvas URLs to be relative', () => {
+      image.href = 'https://mycanvas.com:3000/some/path'
+      image.url = 'https://mycanvas.com:3000/some/path'
+      contentInsertion.insertImage(editor, image, canvasOrigin)
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path"/>')
+    })
+
+    it('leaves non-Canvas URLs as absolute', () => {
+      image.href = 'https://yodawg.com:3001/some/path'
+      image.url = 'https://yodawg.com:3001/some/path'
+      contentInsertion.insertImage(editor, image, canvasOrigin)
+      expect(editor.content).toEqual(
+        '<img alt="Here Be Images" src="https://yodawg.com:3001/some/path"/>'
+      )
+    })
+
     it('it keeps the original image style when replaced', () => {
       const imageToReplace = document.createElement('img')
       imageToReplace.style.cssText = 'float: left;'
@@ -362,15 +401,7 @@ describe('contentInsertion', () => {
   })
 
   describe('insertEquation', () => {
-    it('builds image html from LaTeX', () => {
-      const tex = 'y = x^2'
-      const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
-      const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dblEncodedTex}?scale=1" data-ignore-a11y-check="">`
-      contentInsertion.insertEquation(editor, tex)
-      expect(editor.content).toEqual(imgHtml)
-    })
-
-    it('uses relative URL if no base is provided', () => {
+    it('builds relative image html from LaTeX', () => {
       const tex = 'y = x^2'
       const dblEncodedTex = window.encodeURIComponent(window.encodeURIComponent(tex))
       const imgHtml = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dblEncodedTex}?scale=1" data-ignore-a11y-check="">`
@@ -470,7 +501,7 @@ describe('contentInsertion', () => {
     it('inserts video from upload into iframe', () => {
       jest.spyOn(editor, 'insertContent')
       const video = videoFromUpload()
-      const result = contentInsertion.insertVideo(editor, video)
+      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
@@ -483,7 +514,7 @@ describe('contentInsertion', () => {
     it('inserts video from the course content tray', () => {
       jest.spyOn(editor, 'insertContent')
       const video = videoFromTray()
-      const result = contentInsertion.insertVideo(editor, video)
+      const result = contentInsertion.insertVideo(editor, video, canvasOrigin)
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
@@ -496,7 +527,7 @@ describe('contentInsertion', () => {
     it('links video if user has made a selection', () => {
       editor.selectionContent = 'link me'
       const video = videoFromTray()
-      contentInsertion.insertVideo(editor, video)
+      contentInsertion.insertVideo(editor, video, canvasOrigin)
       expect(editor.execCommand).toHaveBeenCalledWith('mceInsertLink', false, {
         class: 'instructure_file_link',
         'data-canvas-previewable': undefined,
@@ -519,7 +550,7 @@ describe('contentInsertion', () => {
 
     it('inserts audio from upload into iframe', () => {
       const audio = audioFromUpload()
-      const result = contentInsertion.insertAudio(editor, audio)
+      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
@@ -531,11 +562,11 @@ describe('contentInsertion', () => {
 
     it('inserts audio from the course content tray', () => {
       const audio = audioFromTray()
-      const result = contentInsertion.insertAudio(editor, audio)
+      const result = contentInsertion.insertAudio(editor, audio, canvasOrigin)
       expect(editor.execCommand).toHaveBeenCalledWith(
         'mceInsertContent',
         false,
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=/url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>',
         {skip_focus: true}
       )
       expect(result).toEqual('the inserted iframe')

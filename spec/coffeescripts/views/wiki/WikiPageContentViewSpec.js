@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView'
 import {subscribe} from 'jquery-tinypubsub'
 

@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ProgressBarView from './ProgressBarView.coffee'
+import ProgressBarView from './ProgressBarView'
 import template from '../../jst/alignment.handlebars'
 
 export default class AlignmentView extends Backbone.View {

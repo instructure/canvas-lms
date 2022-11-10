@@ -69,6 +69,41 @@ describe DiscussionEntryParticipant do
       end
     end
 
+    context "workflow_state.changed to read" do
+      it "set read_at to Time.now" do
+        Timecop.safe_mode = false
+        Timecop.freeze
+        # Make a new user a discussion entry participant to the old entry, so they will default unread.
+        student_2 = student_in_course(active_all: true).user
+        @entry.change_read_state("read", student_2)
+
+        participant_2 = @entry.find_existing_participant(student_2)
+        expect(participant_2.read_at).to be_within(10.seconds).of Time.now.utc
+      ensure
+        Timecop.return
+        Timecop.safe_mode = true
+      end
+    end
+
+    context "workflow_state.changed to not read" do
+      it "set read_at to nil" do
+        Timecop.safe_mode = false
+        Timecop.freeze
+        student_2 = student_in_course(active_all: true).user
+        @entry.change_read_state("read", student_2)
+
+        participant_2 = @entry.find_existing_participant(student_2)
+        expect(participant_2.read_at).to be_within(10.seconds).of Time.now.utc
+
+        @entry.change_read_state("unread", student_2)
+        participant_2.reload
+        expect(participant_2.read_at).to be(nil)
+      ensure
+        Timecop.return
+        Timecop.safe_mode = true
+      end
+    end
+
     it "returns early if there is no entry" do
       expect(DiscussionEntryParticipant.upsert_for_entries(nil, double)).to be_nil
     end

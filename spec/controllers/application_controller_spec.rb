@@ -187,12 +187,14 @@ RSpec.describe ApplicationController do
         it "sets the env var to true when the user can use it" do
           course_with_teacher(active_all: true)
           controller.instance_variable_set(:@current_user, @teacher)
+          controller.instance_variable_set(:@context, @course)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
         end
 
         it "sets the env var to false when the user can't use it" do
           course_with_student(active_all: true)
           controller.instance_variable_set(:@current_user, @student)
+          controller.instance_variable_set(:@context, @course)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
@@ -3021,34 +3023,50 @@ RSpec.describe ApplicationController, "#redirect_to_login" do
     end
   end
 
-  before do
-    get :index, format: format
-  end
+  describe "format specified" do
+    before do
+      get :index, format: format
+    end
 
-  context "given an unauthenticated json request" do
-    let(:format) { :json }
+    context "given an unauthenticated json request" do
+      let(:format) { :json }
 
-    specify { expect(response).to have_http_status :unauthorized }
-    specify { expect(json_parse.fetch("status")).to eq "unauthenticated" }
-  end
+      specify { expect(response).to have_http_status :unauthorized }
+      specify { expect(json_parse.fetch("status")).to eq "unauthenticated" }
+    end
 
-  shared_examples "redirectable to html login page" do
-    specify { expect(flash[:warning]).to eq "You must be logged in to access this page" }
-    specify { expect(session[:return_to]).to eq controller.clean_return_to(request.fullpath) }
-    specify { expect(response).to redirect_to login_url }
-    specify { expect(response).to have_http_status :found }
-    specify { expect(response.location).to eq login_url }
-  end
+    shared_examples "redirectable to html login page" do
+      specify { expect(flash[:warning]).to eq "You must be logged in to access this page" }
+      specify { expect(session[:return_to]).to eq controller.clean_return_to(request.fullpath) }
+      specify { expect(response).to redirect_to login_url }
+      specify { expect(response).to have_http_status :found }
+      specify { expect(response.location).to eq login_url }
+    end
 
-  context "given an unauthenticated html request" do
-    it_behaves_like "redirectable to html login page" do
-      let(:format) { :html }
+    context "given an unauthenticated html request" do
+      it_behaves_like "redirectable to html login page" do
+        let(:format) { :html }
+      end
+    end
+
+    context "given an unauthenticated pdf request" do
+      it_behaves_like "redirectable to html login page" do
+        let(:format) { :pdf }
+      end
     end
   end
 
-  context "given an unauthenticated pdf request" do
-    it_behaves_like "redirectable to html login page" do
-      let(:format) { :pdf }
+  describe "format unspecified" do
+    before do
+      request.headers["HTTP_ACCEPT"] = "*/*"
+      get :index
+    end
+
+    context "given an unauthenticated request" do
+      specify { expect(session[:return_to]).to eq controller.clean_return_to(request.fullpath) }
+      specify { expect(response).to redirect_to login_url }
+      specify { expect(response).to have_http_status :found }
+      specify { expect(response.location).to eq login_url }
     end
   end
 end

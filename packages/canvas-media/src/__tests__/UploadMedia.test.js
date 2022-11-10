@@ -34,8 +34,8 @@ const uploadMediaTranslations = {
     UPLOADING_ERROR: 'Upload Error',
     UPLOAD_MEDIA_LABEL: 'Upload Media',
     MEDIA_RECORD_NOT_AVAILABLE: 'Record not available',
-    PROGRESS_LABEL: 'Making progress'
-  }
+    PROGRESS_LABEL: 'Making progress',
+  },
 }
 
 function renderComponent(overrideProps = {}) {
@@ -45,7 +45,7 @@ function renderComponent(overrideProps = {}) {
         contextType: 'course',
         contextId: '17',
         origin: 'http://host:port',
-        jwt: 'whocares'
+        jwt: 'whocares',
       }}
       open={true}
       liveRegion={() => null}
@@ -54,6 +54,7 @@ function renderComponent(overrideProps = {}) {
       onDismiss={() => {}}
       tabs={{record: false, upload: true}}
       uploadMediaTranslations={uploadMediaTranslations}
+      userLocale="en"
       {...overrideProps}
     />
   )
@@ -135,7 +136,7 @@ describe('Upload Media', () => {
             contextType: 'course',
             contextId: '17',
             origin: 'http://host:port',
-            jwt: 'whocares'
+            jwt: 'whocares',
           }}
           open={true}
           liveRegion={() => null}
@@ -144,6 +145,7 @@ describe('Upload Media', () => {
           onDismiss={() => {}}
           tabs={{record: false, upload: false}}
           uploadMediaTranslations={uploadMediaTranslations}
+          userLocale="en"
         />
       )
 
@@ -154,7 +156,7 @@ describe('Upload Media', () => {
             contextType: 'course',
             contextId: '17',
             origin: 'http://host:port',
-            jwt: 'whocares'
+            jwt: 'whocares',
           }}
           open={true}
           liveRegion={() => null}
@@ -163,6 +165,7 @@ describe('Upload Media', () => {
           onDismiss={() => {}}
           tabs={{record: false, upload: true}}
           uploadMediaTranslations={uploadMediaTranslations}
+          userLocale="en"
         />
       )
 
@@ -181,7 +184,7 @@ describe('Upload Media', () => {
             contextType: 'course',
             contextId: '17',
             origin: 'http://host:port',
-            jwt: 'whocares'
+            jwt: 'whocares',
           }}
           open={true}
           liveRegion={() => null}
@@ -190,6 +193,7 @@ describe('Upload Media', () => {
           onDismiss={() => {}}
           tabs={{record: false, upload: true}}
           uploadMediaTranslations={uploadMediaTranslations}
+          userLocale="en"
         />
       )
 
@@ -200,7 +204,7 @@ describe('Upload Media', () => {
             contextType: 'course',
             contextId: '17',
             origin: 'http://host:port',
-            jwt: 'whocares'
+            jwt: 'whocares',
           }}
           open={true}
           liveRegion={() => null}
@@ -209,6 +213,7 @@ describe('Upload Media', () => {
           onDismiss={() => {}}
           tabs={{record: true, upload: false}}
           uploadMediaTranslations={uploadMediaTranslations}
+          userLocale="en"
         />
       )
 
@@ -224,7 +229,7 @@ describe('Upload Media', () => {
     beforeEach(() => {
       computerFile = new File(['bits'], 'dummy-video.mp4', {
         lastModifiedDate: 1568991600840,
-        type: 'video/mp4'
+        type: 'video/mp4',
       })
     })
 
@@ -243,7 +248,7 @@ describe('Upload Media', () => {
         disableSubmitWhileUploading: false,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
-        computerFile
+        computerFile,
       })
 
       fireEvent.click(getByText('Submit'))
@@ -255,7 +260,7 @@ describe('Upload Media', () => {
         disableSubmitWhileUploading: true,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
-        computerFile
+        computerFile,
       })
 
       fireEvent.click(getByText('Submit'))
@@ -265,13 +270,13 @@ describe('Upload Media', () => {
     it('is disabled while uploading if file title is empty', () => {
       computerFile = new File(['bits'], 'dummy-video.mp4', {
         lastModifiedDate: 1568991600840,
-        type: 'video/mp4'
+        type: 'video/mp4',
       })
       const {getByPlaceholderText, getByText} = renderComponent({
         disableSubmitWhileUploading: false,
         onStartUpload: jest.fn(),
         tabs: {upload: true},
-        computerFile
+        computerFile,
       })
       const submitButton = getByText('Submit').closest('button')
       const titleInput = getByPlaceholderText('File name')
@@ -291,8 +296,8 @@ describe('Upload Media', () => {
         tabs: {upload: true},
         computerFile: new File(['bits'], 'dummy-video.mp4', {
           lastModifiedDate: 1568991600840,
-          type: 'video/mp4'
-        })
+          type: 'video/mp4',
+        }),
       })
 
       fireEvent.click(getByText('Submit'))

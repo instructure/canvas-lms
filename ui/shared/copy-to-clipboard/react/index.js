@@ -50,6 +50,7 @@ const CopyToClipboard = props => {
         </Button>
       }
       inputRef={ref => setInputElement(ref)}
+      renderLabel={I18n.t('Copy to clipboard')}
     />
   )
 }

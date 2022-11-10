@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
+import {closedCaptionLanguages} from '@instructure/canvas-media'
 
 ready(() => {
   // get the media_id from something like
@@ -69,7 +69,7 @@ ready(() => {
     return {
       id: track.id,
       src: `/media_objects/${media_object.media_id}/media_tracks/${track.id}`,
-      label: closedCaptionLanguages[track.locale] || track.locale,
+      label: closedCaptionLanguages.find(lang => lang.id === track.locale)?.label || track.locale,
       type: track.kind,
       language: track.locale,
     }

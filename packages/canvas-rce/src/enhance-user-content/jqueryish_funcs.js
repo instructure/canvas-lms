@@ -27,23 +27,6 @@ export function visible(elem) {
   return !hidden(elem)
 }
 
-export function siblings(elem, selector) {
-  const r = []
-  const parent = elem.parentNode
-  if (!parent) return r
-
-  const candidates = Array.from(parent.querySelectorAll(selector))
-  if (candidates.length === 0) return r
-
-  let n = parent.firstChild
-  for (; n; n = n.nextSibling) {
-    if (n.nodeType === 1 && n !== elem && candidates.includes(n)) {
-      r.push(n)
-    }
-  }
-  return r
-}
-
 // start: the element where we start
 // selector: find an ancestor to elem that matches this
 // context: optional DOM element within which the matching element may be found

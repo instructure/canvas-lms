@@ -17,11 +17,15 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useEffect, useMemo, useRef} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {Tooltip} from '@instructure/ui-tooltip'
+
+const I18n = useI18nScope('conversations_2')
 
 export const AddressBookItem = ({
   children,
@@ -34,8 +38,11 @@ export const AddressBookItem = ({
   onSelect,
   onHover,
   menuRef,
+  observerEnrollments,
+  isOnObserverSubmenu,
 }) => {
   const itemRef = useRef()
+  const [observeesAreTruncated, setObserveesAreTruncated] = useState(false)
 
   // Scroll individual item into view when its selected or navigated towards
   useEffect(() => {
@@ -46,6 +53,24 @@ export const AddressBookItem = ({
       menuRef.current.scrollTop = menuItemOffsetTop - (menuHeight - itemHeight) / 2
     }
   }, [isKeyboardFocus, isSelected, menuRef])
+
+  const getObservees = () => {
+    return observerEnrollments
+      .map(observerEnrollment => observerEnrollment.associatedUser.name)
+      .join(', ')
+  }
+
+  const getObserveesText = () => {
+    return I18n.t('Observing: %{observees}', {
+      observees: getObservees(),
+    })
+  }
+
+  const updateObserveesAreTruncated = isTruncated => {
+    if (observeesAreTruncated !== isTruncated) {
+      setObserveesAreTruncated(isTruncated)
+    }
+  }
 
   return useMemo(
     () => (
@@ -84,6 +109,28 @@ export const AddressBookItem = ({
               <TruncateText>
                 <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
               </TruncateText>
+              {isOnObserverSubmenu && observerEnrollments && observerEnrollments.length > 0 && (
+                <Text size="small" color={isSelected ? 'secondary-inverse' : 'secondary'}>
+                  <TruncateText onUpdate={updateObserveesAreTruncated}>
+                    {observeesAreTruncated ? (
+                      <Tooltip
+                        isShowingContent={isSelected}
+                        renderTip={getObserveesText()}
+                        placement="bottom"
+                      >
+                        {getObserveesText()}
+                      </Tooltip>
+                    ) : (
+                      getObserveesText()
+                    )}
+                  </TruncateText>
+                </Text>
+              )}
+              {isOnObserverSubmenu && observerEnrollments && observerEnrollments.length === 0 && (
+                <Text size="small" color={isSelected ? 'secondary-inverse' : 'secondary'}>
+                  {I18n.t('Observing: nobody')}
+                </Text>
+              )}
             </Flex.Item>
             {iconAfter && (
               <Flex.Item align="center" margin="0 0 0 small">
@@ -95,7 +142,17 @@ export const AddressBookItem = ({
       </View>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [children, hasPopup, iconAfter, iconBefore, id, isSelected]
+    [
+      children,
+      hasPopup,
+      iconAfter,
+      iconBefore,
+      id,
+      isSelected,
+      observerEnrollments,
+      isOnObserverSubmenu,
+      observeesAreTruncated,
+    ]
   )
 }
 
@@ -140,6 +197,18 @@ AddressBookItem.propTypes = {
    * Boolean to determine if keyboard or mouse navigation is occuring
    */
   isKeyboardFocus: PropTypes.bool,
+  /**
+   * Array of observer enrollments
+   */
+  observerEnrollments: PropTypes.array,
+  /**
+   * Is the AddressBookContainer on an Observer submenu?
+   */
+  isOnObserverSubmenu: PropTypes.bool,
+}
+
+AddressBookItem.defaultProps = {
+  isOnObserverSubmenu: false,
 }
 
 export default AddressBookItem

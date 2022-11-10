@@ -60,6 +60,7 @@ const FreeFormComments = props => {
       onChange={(_unused, el) => {
         setComments(savedComments[el.value])
       }}
+      key="simple-select"
     >
       {[first, ...options]}
     </SimpleSelect>,

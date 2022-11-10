@@ -32,7 +32,7 @@ const mockSections = [
     name: 'section 2',
   },
   {
-    id: 'U2VjdGlvbi00',
+    id: 'U2VjdGlvbi01',
     _id: '1',
     userCount: 990,
     name: 'section 25',

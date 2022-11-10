@@ -18,9 +18,9 @@
 
 import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
-import Section from '@canvas/sections/backbone/models/Section.coffee'
+import Section from '@canvas/sections/backbone/models/Section'
 import SectionList from '@canvas/sections/backbone/collections/SectionCollection'
 
 QUnit.module('DueDateList', {

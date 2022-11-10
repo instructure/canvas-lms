@@ -28,7 +28,6 @@ import {
   IconAttachMediaLine,
 } from '@instructure/ui-icons'
 import UploadMedia from '@instructure/canvas-media'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {formatTracksForMediaPlayer} from '@canvas/canvas-media-player'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Link} from '@instructure/ui-link'
@@ -748,12 +747,9 @@ const MessageStudentsWhoDialog = ({
         tabs={{embed: false, record: true, upload: true}}
         uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
-        languages={Object.keys(closedCaptionLanguages).map(key => ({
-          id: key,
-          label: closedCaptionLanguages[key],
-        }))}
         rcsConfig={{contextId: userId, contextType: 'user'}}
         disableSubmitWhileUploading={true}
+        userLocale={ENV.LOCALE}
       />
     </>
   )

@@ -28,9 +28,14 @@ function createMockProps(opts = {}) {
     assetString: 'foo',
     href: 'courses/1',
     enrollmentType: 'StudentEnrollment',
+    id: '1',
     ...opts,
   }
 }
+
+beforeEach(() => {
+  fetch.mockResponse(JSON.stringify({}), {status: 200})
+})
 
 describe('DashboardCardHeaderHero', () => {
   it('doesnt add instFS query params if it doesnt use an inst-fs url', () => {

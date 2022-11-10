@@ -31,3 +31,9 @@ export const getPaceContexts = (
     params: apiParams,
   }).then(({json}) => json)
 }
+
+export const getDefaultPaceContext = (courseId: string) => {
+  return doFetchApi({
+    path: `/api/v1/courses/${courseId}/pace_contexts?type=course`,
+  }).then(({json}) => json?.pace_contexts?.[0])
+}

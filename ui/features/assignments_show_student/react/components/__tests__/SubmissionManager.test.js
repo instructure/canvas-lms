@@ -43,6 +43,8 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 jest.mock('../../apis/ContextModuleApi')
 
+jest.useFakeTimers()
+
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
 

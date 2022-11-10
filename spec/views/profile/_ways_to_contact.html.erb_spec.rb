@@ -20,10 +20,11 @@
 
 require_relative "../views_helper"
 
-describe "/profile/_ways_to_contact" do
+describe "profile/_ways_to_contact" do
   it "renders" do
     course_with_student
     view_context
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, [])
     assign(:other_channels, [])
     assign(:sms_channels, [])
@@ -33,11 +34,52 @@ describe "/profile/_ways_to_contact" do
     expect(response).not_to be_nil
   end
 
+  describe "can_edit_channels" do
+    before do
+      account_admin_user
+      view_context
+      communication_channel(@user, { username: "someone@somewhere.com", active_cc: true })
+      assign(:email_channels, @user.communication_channels.to_a)
+      assign(:other_channels, [])
+      assign(:sms_channels, [])
+      assign(:user, @user)
+    end
+
+    it "allows creation when can_edit_channels is true" do
+      assign(:user_data, { can_edit_channels: true })
+
+      render partial: "profile/ways_to_contact"
+      expect(response.body).to match(/delete_channel_link/)
+    end
+
+    it "allows deletion when can_edit_channels is true" do
+      assign(:user_data, { can_edit_channels: true })
+
+      render partial: "profile/ways_to_contact"
+      expect(response.body).to match(/add_contact_link/)
+    end
+
+    it "does not allow creation when can_edit_channels is false" do
+      assign(:user_data, { can_edit_channels: false })
+
+      render partial: "profile/ways_to_contact"
+      expect(response.body).not_to match(/delete_channel_link/)
+    end
+
+    it "does not allow deletion when can_edit_channels is false" do
+      assign(:user_data, { can_edit_channels: false })
+
+      render partial: "profile/ways_to_contact"
+      expect(response.body).not_to match(/add_contact_link/)
+    end
+  end
+
   it "does not show a student the confirm link" do
     course_with_student
     view_context
     communication_channel(@user, { username: "someone@somewhere.com" })
     expect(@user.communication_channels.first.state).to eq :unconfirmed
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
     assign(:sms_channels, [])
@@ -52,6 +94,7 @@ describe "/profile/_ways_to_contact" do
     view_context
     communication_channel(@user, { username: "someone@somewhere.com" })
     expect(@user.communication_channels.first.state).to eq :unconfirmed
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
     assign(:sms_channels, [])
@@ -66,6 +109,7 @@ describe "/profile/_ways_to_contact" do
     view_context
     communication_channel(@user, { username: "someone@somewhere.com", active_cc: true })
     expect(@user.communication_channels.first.state).to eq :active
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
     assign(:sms_channels, [])
@@ -80,6 +124,7 @@ describe "/profile/_ways_to_contact" do
     view_context
     communication_channel(@user, { username: "someone@somewhere.com", path_type: "push", active_cc: true })
     expect(@user.communication_channels.first.state).to eq :active
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, [])
     assign(:other_channels, @user.communication_channels.to_a)
     assign(:sms_channels, [])
@@ -96,6 +141,7 @@ describe "/profile/_ways_to_contact" do
     communication_channel(@user, { username: "someone@somewhere.com", path_type: "sms" })
     email = communication_channel(@user, { username: "someone@somewhere.com" })
     expect(@user.communication_channels.first.state).to eq :unconfirmed
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, @user.communication_channels.email.to_a)
     assign(:default_email_channel, @user.communication_channels.email.to_a.first)
     assign(:other_channels, @user.communication_channels.sms.to_a)
@@ -112,6 +158,7 @@ describe "/profile/_ways_to_contact" do
     view_context(@course, @student, @admin)
     communication_channel(@student, { username: "someone@somewhere.com" })
     expect(@student.communication_channels.first.state).to eq :unconfirmed
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, @student.communication_channels.to_a)
     assign(:other_channels, [])
     assign(:sms_channels, [])
@@ -124,6 +171,7 @@ describe "/profile/_ways_to_contact" do
   it 'does not show the "I want to log in" for non-default accounts' do
     course_with_student
     view_context
+    assign(:user_data, { can_edit_channels: true })
     assign(:email_channels, [])
     assign(:other_channels, [])
     assign(:sms_channels, [])

@@ -61,7 +61,8 @@ module Canvas::Twilio
         numbers_by_country[lookup_country(number.phone_number)] << number.phone_number
       end
 
-      numbers_by_country.to_h
+      numbers_by_country.default = nil
+      numbers_by_country
     end
   end
 

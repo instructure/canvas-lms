@@ -29,12 +29,19 @@ class ApiError extends React.Component {
   }
 
   renderErrorList() {
+    const timestamp = Date.now()
     return (
       <div className="addpeople__apierror">
         {I18n.t('The following users could not be created.')}
         <ul className="apierror__error_list">
-          {this.props.error.map(e => (
-            <li key={Date.now()}>{e}</li>
+          {this.props.error.map((e, i) => (
+            // Yes, this is gross. Yes, we should have another approach. Given the nature
+            // of this change, we are instead opting to simply guarantee uniqueness of the
+            // keys rather than determine a better distinquisher. If you happen upon this
+            // and would like to improve this, please do!
+            //
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={`${timestamp}-${i}`}>{e}</li>
           ))}
         </ul>
       </div>

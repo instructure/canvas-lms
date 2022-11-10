@@ -413,8 +413,7 @@ class AssignmentsController < ApplicationController
         # this will set @user_has_google_drive
         user_has_google_drive
 
-        @can_direct_share = @context.grants_right?(@current_user, session, :manage_content) ||
-                            (@context.is_a?(Course) && @context.concluded? && @context.grants_right?(@current_user, session, :read_as_admin))
+        @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)

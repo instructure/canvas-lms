@@ -370,4 +370,12 @@ describe('CalendarEventDetailsForm', () => {
     expectFieldsToBeEnabled(component, ['Title:', 'Date:', 'Calendar:', 'More Options', 'Submit'])
     expectFieldsToBeDisabled(component, ['Location:', 'From:', 'To:'])
   })
+
+  it('does not render the location input for child (section) events', () => {
+    const props = {...defaultProps}
+    props.event.calendarEvent.parent_event_id = '133'
+    const {getByText, queryByText} = render(<CalendarEventDetailsForm {...props} />)
+    expect(getByText('Title:')).toBeInTheDocument()
+    expect(queryByText('Location:')).not.toBeInTheDocument()
+  })
 })

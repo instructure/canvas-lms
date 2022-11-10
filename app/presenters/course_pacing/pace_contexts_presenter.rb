@@ -49,7 +49,7 @@ class CoursePacing::PaceContextsPresenter
       name: applied_pace.effective_name,
       type: applied_pace.type,
       duration: applied_pace.duration,
-      last_modified: applied_pace.published_at.utc
+      last_modified: applied_pace.published_at&.utc
     }
   end
 end

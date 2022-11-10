@@ -203,6 +203,7 @@
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Diagonaler Pfeil nach unten rechts"
   },
+  "download_filename_2baae924": { "message": "{ filename } herunterladen" },
   "downward_arrow_cca52012": { "message": "Abwärtspfeil" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Nach unten zeigendes Dreieck"
@@ -261,6 +262,9 @@
   "extra_small_9ae33252": { "message": "Extra klein" },
   "extracurricular_icon_67c8ca42": { "message": "Außerschulisches Symbol" },
   "f_function_fe422d65": { "message": "F (Funktion)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Abruf der Dateiinhalte fehlgeschlagen"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Dateispeicherquote überschritten"
   },
@@ -411,6 +415,9 @@
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link-Optionen" },
   "links_14b70841": { "message": "Links" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Links zu einer externen Website"
+  },
   "load_more_35d33c7": { "message": "Mehr laden" },
   "loading_25990131": { "message": "Wird geladen ..." },
   "loading_bde52856": { "message": "Wird geladen" },
@@ -443,6 +450,8 @@
   },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Mitte" },
+  "minimize_file_preview_da911944": { "message": "Dateivorschau minimieren" },
+  "minimize_video_20aa554b": { "message": "Video minimieren" },
   "minus_fd961e2e": { "message": "Minus" },
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Sonstige" },
@@ -548,6 +557,10 @@
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixel" },
+  "play_media_comment_35257210": { "message": "Medienkommentar wiedergeben" },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Medienkommentar durch { name } von { createdAt } wiedergeben."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/Minus" },
   "posted_when_a578f5ab": { "message": "Gepostet am: { when }" },
@@ -702,6 +715,12 @@
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Unterstützte Dateitypen: SRT oder WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Zum Pretty HTML-Editor wechseln"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Zum nur-HTML-Editor wechseln"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Zum HTML-Editor wechseln"
   },
@@ -718,6 +737,9 @@
   "text_optional_384f94f7": { "message": "Text (optional)" },
   "text_position_8df8c162": { "message": "Textposition" },
   "text_size_887c2f6": { "message": "Textgröße" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Die Dokumentvorschau wird gerade ausgeführt. Versuchen Sie es später noch einmal."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Das Material ist gemeinfrei."
   },
@@ -739,8 +761,14 @@
   "thick_right_arrow_3ed5e8f7": { "message": "Dicker Pfeil nach rechts" },
   "thick_rightward_arrow_a2e1839e": { "message": "Dicker Pfeil nach rechts" },
   "thick_upward_arrow_acd20328": { "message": "Dicker Aufwärtspfeil" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Dieses Dokument kann in Canvas nicht angezeigt werden."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Diese Gleichung kann in der Basisansicht nicht dargestellt werden."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Dieses Bild ist momentan nicht verfügbar."
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Obwohl Ihr Video im Browser den korrekten Titel hat, konnten wir ihn in der Datenbank nicht aktualisieren."

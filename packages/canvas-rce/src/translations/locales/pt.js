@@ -236,6 +236,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Seta diagonal para baixo e direita"
   },
+  "download_filename_2baae924": { "message": "Descarregar { filename }" },
   "downward_arrow_cca52012": { "message": "Seta para baixo" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Triângulo de Apontamento Descendente"
@@ -294,6 +295,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra Pequeno" },
   "extracurricular_icon_67c8ca42": { "message": "Ícone extracurricular" },
   "f_function_fe422d65": { "message": "F (função)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Falha na obtenção do conteúdo do ficheiro"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Quota de armazenamento de ficheiros excedida"
   },
@@ -446,6 +450,9 @@ const locale = {
   "link_7262adec": { "message": "Ligação" },
   "link_options_a16b758b": { "message": "Opções de Ligação" },
   "links_14b70841": { "message": "Links" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Ligações para um sitio externo"
+  },
   "load_more_35d33c7": { "message": "Carregar mais" },
   "loading_25990131": { "message": "A carregar..." },
   "loading_bde52856": { "message": "A carregar" },
@@ -480,6 +487,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Médio" },
   "middle_27dc1d5": { "message": "Médio" },
+  "minimize_file_preview_da911944": {
+    "message": "Minimizar visualização de arquivo"
+  },
+  "minimize_video_20aa554b": { "message": "Minimizar vídeo" },
   "minus_fd961e2e": { "message": "Menos" },
   "minus_plus_3461f637": { "message": "Menos/Menos" },
   "misc_3b692ea7": { "message": "Diversos" },
@@ -579,6 +590,12 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "play_media_comment_35257210": {
+    "message": "Reproduzir comentário de mídia."
+  },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Reproduzir comentários de mídia { name } de { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Mais" },
   "plus_minus_f8be2e83": { "message": "Mais/Menos" },
   "posted_when_a578f5ab": { "message": "Publicado: { when }" },
@@ -729,6 +746,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipos de ficheiros suportados: SRT ou WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Mudar para o Editor HTML bonito"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Mudar para o Editor HTML bruto"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Mudar para o editor html"
   },
@@ -745,6 +768,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Texto (opcional)" },
   "text_position_8df8c162": { "message": "Posição do texto" },
   "text_size_887c2f6": { "message": "Tamanho do texto" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "A pré-visualização do documento está a ser processada. É favor, tentar novamente mais tarde."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "O material é de domínio público"
   },
@@ -766,8 +792,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Seta à Direita espessa" },
   "thick_rightward_arrow_a2e1839e": { "message": "Seta à Direita Espessa" },
   "thick_upward_arrow_acd20328": { "message": "Seta grossa para cima" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Não é possível visualizar este documento dentro do Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Não é possível reproduzir esta equação em Vista Básica."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Esta imagem está actualmente indisponível"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Embora o seu vídeo tenha o título correto no navegador, não o atualizámos na base de dados."

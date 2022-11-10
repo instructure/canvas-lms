@@ -45,14 +45,14 @@ export default function ComputerPanel({
   accept,
   hasUploadedFile,
   label,
-  languages,
   liveRegion,
   setFile,
   setHasUploadedFile,
   theFile,
   uploadMediaTranslations,
   updateSubtitles,
-  bounds
+  userLocale,
+  bounds,
 }) {
   const {ADD_CLOSED_CAPTIONS_OR_SUBTITLES, LOADING_MEDIA} =
     uploadMediaTranslations.UploadMediaStrings
@@ -84,7 +84,7 @@ export default function ComputerPanel({
       if (document.fullscreenElement || document.webkitFullscreenElement) {
         boundingBox = {
           width: window.innerWidth,
-          height: window.innerHeight
+          height: window.innerHeight,
         }
       }
       const sz = sizeMediaPlayer(player, theFile.type, boundingBox)
@@ -175,7 +175,7 @@ export default function ComputerPanel({
             {mediaTracksCheckbox && (
               <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
                 <ClosedCaptionPanel
-                  languages={languages}
+                  userLocale={userLocale}
                   liveRegion={liveRegion}
                   uploadMediaTranslations={uploadMediaTranslations}
                   updateSubtitles={updateSubtitles}
@@ -205,7 +205,7 @@ export default function ComputerPanel({
           setMessages(msgs =>
             msgs.concat({
               text: uploadMediaTranslations.UploadMediaStrings.INVALID_FILE_TEXT,
-              type: 'error'
+              type: 'error',
             })
           )
         }}
@@ -226,12 +226,6 @@ ComputerPanel.propTypes = {
   accept: oneOfType([string, arrayOf(string)]),
   hasUploadedFile: bool,
   label: string.isRequired,
-  languages: arrayOf(
-    shape({
-      id: string,
-      label: string
-    })
-  ),
   liveRegion: func,
   setFile: func.isRequired,
   setHasUploadedFile: func.isRequired,
@@ -240,6 +234,7 @@ ComputerPanel.propTypes = {
   updateSubtitles: func.isRequired,
   bounds: shape({
     width: number.isRequired,
-    height: number.isRequired
-  })
+    height: number.isRequired,
+  }),
+  userLocale: string.isRequired,
 }

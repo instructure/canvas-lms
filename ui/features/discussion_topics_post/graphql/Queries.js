@@ -39,6 +39,7 @@ export const DISCUSSION_QUERY = gql`
     $sort: DiscussionSortOrderType
     $courseID: String
     $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment", "DesignerEnrollment"]
+    $unreadBefore: String
   ) {
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
@@ -62,6 +63,7 @@ export const DISCUSSION_QUERY = gql`
           filter: $filter
           sortOrder: $sort
           userSearchId: $userSearchId
+          unreadBefore: $unreadBefore
         ) {
           nodes {
             ...DiscussionEntry
@@ -94,6 +96,7 @@ export const DISCUSSION_QUERY = gql`
           rootEntries: $rootEntries
           filter: $filter
           searchTerm: $searchTerm
+          unreadBefore: $unreadBefore
         )
         searchEntryCount(filter: $filter, searchTerm: $searchTerm)
         groupSet {

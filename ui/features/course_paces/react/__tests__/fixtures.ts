@@ -32,6 +32,7 @@ import {
   PaceContextsState,
   PaceContextApiresponse,
   StoreState,
+  PaceContext,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
@@ -159,6 +160,7 @@ export const PACE_MODULE_2: Module = {
 
 export const PRIMARY_PACE: CoursePace = {
   id: '1',
+  name: 'Course 1',
   course_id: COURSE.id,
   course_section_id: undefined,
   user_id: undefined,
@@ -186,6 +188,21 @@ export const HEADING_STATS_API_RESPONSE = {
       applied_pace: {duration: 65},
     },
   ],
+}
+
+
+export const COURSE_PACE_CONTEXT:PaceContext = {
+  name: 'Course 1',
+  type: 'Course',
+  item_id: '78',
+  associated_section_count: 1,
+  associated_student_count: 31,
+  applied_pace: {
+    name: 'Course 1',
+    type: 'Course',
+    duration: 6,
+    last_modified: '2022-10-17T23:12:24Z',
+  },
 }
 
 export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiresponse = {
@@ -333,6 +350,7 @@ export const STUDENT_PACE: CoursePace = {
 
 export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
   selectedContextType: 'section',
+  selectedContext: PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0],
   entries: PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts,
   pageCount: 1,
   page: 1,

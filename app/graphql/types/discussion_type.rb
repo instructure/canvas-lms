@@ -114,6 +114,7 @@ module Types
       argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
       argument :user_search_id, String, required: false
+      argument :unread_before, String, required: false
     end
     def discussion_entries_connection(**args)
       get_entries(args)
@@ -276,6 +277,7 @@ module Types
       argument :filter, Types::DiscussionFilterType, required: false
       argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
+      argument :unread_before, String, required: false
     end
     def entries_total_pages(**args)
       get_entry_page_count(args)
@@ -319,7 +321,7 @@ module Types
       ).load(object)
     end
 
-    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false, user_search_id: nil)
+    def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
       Loaders::DiscussionEntryLoader.for(
@@ -328,7 +330,8 @@ module Types
         filter: filter,
         sort_order: sort_order,
         root_entries: root_entries,
-        user_search_id: user_search_id
+        user_search_id: user_search_id,
+        unread_before: unread_before
       ).load(object)
     end
   end

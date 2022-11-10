@@ -22,7 +22,7 @@ import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
   getOptimisticResponse,
-  getDisplayName,
+  buildQuotedReply,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -198,13 +198,14 @@ export const SplitScreenViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, includeReplyPreview, replyId, isAnonymousAuthor) => {
+  const onReplySubmit = (message, fileId, includeReplyPreview, replyId, isAnonymousAuthor) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         replyFromEntryId: replyId,
         isAnonymousAuthor,
         message,
+        fileId,
         includeReplyPreview,
         courseID: ENV.course_id,
       },
@@ -342,23 +343,6 @@ export const SplitScreenViewContainer = props => {
     })
   }
 
-  const buildQuotedReply = (nodes, previewId) => {
-    if (!nodes) return ''
-    let preview = {}
-    nodes.every(reply => {
-      if (reply._id === previewId) {
-        preview = {
-          author: {shortName: getDisplayName(reply)},
-          createdAt: reply.createdAt,
-          previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
-        }
-        return false
-      }
-      return true
-    })
-    return preview
-  }
-
   const entriesAreLoading = useCallback(() => {
     return splitScreenEntryOlderDirection.loading || splitScreenEntryNewerDirection.loading
   }, [splitScreenEntryNewerDirection.loading, splitScreenEntryOlderDirection.loading])
@@ -438,9 +422,10 @@ export const SplitScreenViewContainer = props => {
               <DiscussionEdit
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                onSubmit={(message, includeReplyPreview, _fileId, anonymousAuthorState) => {
+                onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
                   onReplySubmit(
                     message,
+                    fileId,
                     includeReplyPreview,
                     props.replyFromId,
                     anonymousAuthorState

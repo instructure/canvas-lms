@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/gradebooks/blank_submission" do
+describe "gradebooks/blank_submission" do
   it "renders" do
     render "gradebooks/blank_submission"
     expect(response).not_to be_nil

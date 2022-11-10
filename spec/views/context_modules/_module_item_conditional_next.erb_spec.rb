@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/context_modules/_module_item_conditional_next" do
+describe "context_modules/_module_item_conditional_next" do
   let_once(:module_item) do
     course_factory
     assignment_model course: @course

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# 5.6.2 - 2022-11-03
+
+### Added
+- User content enhancement function for rendering RCE-authored content
+
+### Changed
+- RCE now embeds relative links, and uses provided `canvasOrigin` to resolve them
+- No longer need to provide the list of closed-caption languages
+- Unsplash now respects plugin settings
+- Misc bug fixes and enhancements
+
 # 5.6.1 - 2022-09-14
 
 ### Added

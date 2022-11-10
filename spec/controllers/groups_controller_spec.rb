@@ -137,6 +137,183 @@ describe GroupsController do
       expect(names_json).to eq [student1.name, student2.name].to_set
       expect(response).to be_successful
     end
+
+    context "section_restricted" do
+      before do
+        # Create a section restricted user in their own section
+        @section1 = @course.course_sections.first
+        @other_section = @course.course_sections.create!(name: "Other Section")
+        @section_restricted_student = @course.enroll_student(user_model, section: @other_section, enrollment_state: "active").user
+        @section_restricted_student_2 = @course.enroll_student(user_model, section: @other_section, enrollment_state: "active").user
+        @section_restricted_student_3 = @course.enroll_student(user_model, section: @other_section, enrollment_state: "active").user
+        @other_student = @course.enroll_student(user_model, section: @section1, enrollment_state: "active").user
+        Enrollment.limit_privileges_to_course_section!(@course, @section_restricted_student, true)
+        Enrollment.limit_privileges_to_course_section!(@course, @section_restricted_student_2, true)
+        Enrollment.limit_privileges_to_course_section!(@course, @section_restricted_student_3, true)
+      end
+
+      context "teacher assigned group category" do
+        before do
+          # Create a groupset that allows self-signup and requires group members to be in same section
+          @group_category = GroupCategory.create(name: "Groups", context: @course)
+          @group_category.save!
+        end
+
+        it "does not show section restricted students groups with non-section members" do
+          # Group with the restricted user
+          group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
+          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.save
+
+          # Group with student from another section
+          group_with_user_in_different_section = @course.groups.create(name: "different section", group_category: @group_category)
+          group_with_user_in_different_section.add_user(@other_student)
+          group_with_user_in_different_section.save
+
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(1)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(1)
+        end
+
+        it "does not hide group if you are a group member" do
+          # Group with the restricted user
+          group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
+          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.save
+
+          # Group with student from another section
+          group_with_user_in_different_section = @course.groups.create(name: "different section", group_category: @group_category)
+          group_with_user_in_different_section.add_user(@other_student)
+          group_with_user_in_different_section.add_user(@section_restricted_student)
+          group_with_user_in_different_section.save
+
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(1)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(1)
+        end
+      end
+
+      context "self-signup non-section restricted group category" do
+        it "does not hide any groups from section restricted students" do
+          # Group Category that does not restrict sections of students
+          @group_category_non_restricted = GroupCategory.student_organized_for(@course)
+          @group_category_non_restricted.configure_self_signup(true, false)
+          @group_category_non_restricted.save!
+
+          # Group with the restricted user
+          group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category_non_restricted)
+          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.save
+
+          # Group with student from another section
+          group_with_user_in_different_section = @course.groups.create(name: "different section", group_category: @group_category_non_restricted)
+          group_with_user_in_different_section.add_user(@other_student)
+          group_with_user_in_different_section.save
+
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(2)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(2)
+        end
+      end
+
+      context "self-signup restricted group category" do
+        before do
+          # Create a groupset that allows self-signup and requires group members to be in same section
+          @group_category = GroupCategory.student_organized_for(@course)
+          @group_category.configure_self_signup(true, true)
+          @group_category.group_limit = 2
+          @group_category.save!
+        end
+
+        it "does not remove groups for teachers" do
+          # Group with the restricted user
+          group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
+          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.save
+
+          # Group with student from another section
+          group_with_user_in_different_section = @course.groups.create(name: "different section", group_category: @group_category)
+          group_with_user_in_different_section.add_user(@other_student)
+          group_with_user_in_different_section.save
+
+          # Teacher
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(2)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(2)
+        end
+
+        it "does not remove empty groups" do
+          # Empty Group
+          group_with_user_in_different_section = @course.groups.create(name: "Empty group", group_category: @group_category)
+          group_with_user_in_different_section.save
+
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(1)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(1)
+        end
+
+        it "does not remove full groups if users have the same section as the current user" do
+          # Group with the second restricted user
+          group_with_section_restricted_user_2 = @course.groups.create(name: "restricted and full group", group_category: @group_category)
+          group_with_section_restricted_user_2.add_user(@section_restricted_student_2)
+          group_with_section_restricted_user_2.add_user(@section_restricted_student_3)
+          group_with_section_restricted_user_2.save
+
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(1)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(1)
+        end
+
+        it "does not show groups with students from other sections to section restricted students" do
+          # Group with the restricted user
+          group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
+          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.save
+
+          # Group with student from another section
+          group_with_user_in_different_section = @course.groups.create(name: "different section", group_category: @group_category)
+          group_with_user_in_different_section.add_user(@other_student)
+          group_with_user_in_different_section.save
+          # Restricted user is logged in
+          user_session(@section_restricted_student)
+          get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+
+          expect(response).to be_successful
+          expect(json_parse(response.body).length).to eql(1)
+          expect(assigns[:groups]).not_to be_empty
+          expect(assigns[:groups].length).to eql(1)
+        end
+      end
+    end
   end
 
   describe "GET index" do

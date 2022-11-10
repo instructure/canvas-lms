@@ -20,7 +20,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {getAutoTrack} from '@canvas/canvas-media-player'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -48,10 +47,6 @@ import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('assignments_2_media_attempt')
-
-const languages = Object.keys(closedCaptionLanguages).map(key => {
-  return {id: key, label: closedCaptionLanguages[key]}
-})
 
 export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 
@@ -215,7 +210,7 @@ class MediaAttempt extends React.Component {
           tabs={this.state.mediaModalTabs}
           uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          languages={languages}
+          userLocale={ENV.LOCALE}
         />
         <StudentViewContext.Consumer>
           {context => (

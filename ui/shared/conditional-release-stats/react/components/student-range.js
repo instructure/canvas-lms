@@ -22,6 +22,7 @@ import StudentRangeItem from './student-range-item'
 
 const {object, func} = PropTypes
 
+// eslint-disable-next-line react/prefer-stateless-function
 export default class StudentRange extends React.Component {
   static propTypes = {
     range: object.isRequired,

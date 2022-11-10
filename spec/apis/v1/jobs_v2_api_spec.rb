@@ -640,6 +640,41 @@ describe "Jobs V2 API", type: :request do
       end
     end
 
+    context "throttling" do
+      before :once do
+        3.times { ::Kernel.delay(shard_id: 101).print }
+        2.times { ::Kernel.delay(shard_id: 101).printf }
+        ::Kernel.delay(shard_id: 102).printf
+      end
+
+      describe "throttle_check" do
+        it "lists counts" do
+          json = api_call(:get, "/api/v1/jobs2/throttle/check?term=Kernel.print",
+                          { controller: "jobs_v2", action: "throttle_check", format: "json",
+                            term: "Kernel.print" })
+          expect(json).to eq({ "matched_jobs" => 6, "matched_tags" => 2 })
+        end
+
+        it "filters by shard if given" do
+          json = api_call(:get, "/api/v1/jobs2/throttle/check?term=Kernel.print&shard_id=101",
+                          { controller: "jobs_v2", action: "throttle_check", format: "json",
+                            term: "Kernel.print", shard_id: 101 })
+          expect(json).to eq({ "matched_jobs" => 5, "matched_tags" => 2 })
+        end
+      end
+
+      describe "throttle" do
+        it "throttles selected jobs" do
+          json = api_call(:put, "/api/v1/jobs2/throttle?term=Kernel.print&shard_id=101&max_concurrent=2",
+                          { controller: "jobs_v2", action: "throttle", format: "json",
+                            term: "Kernel.print", shard_id: 101, max_concurrent: 2 })
+          expect(json["job_count"]).to eq 5
+          expect(Delayed::Job.where(strand: json["new_strand"], next_in_strand: true).count).to eq 2
+          expect(Delayed::Job.where(shard_id: 102).where.not(strand: nil).count).to eq 0
+        end
+      end
+    end
+
     context "global admin" do
       specs_require_sharding
 

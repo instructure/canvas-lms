@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
-import {renderLink} from '../../../contentRendering'
+import {renderLink, updateImage} from '../../../contentRendering'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
@@ -82,15 +82,7 @@ export default class TrayController {
     }
 
     if (imageOptions.displayAs === 'embed') {
-      // Workaround: When passing empty string to editor.dom.setAttribs it removes the attribute
-      $img.setAttribute('alt', imageOptions.altText)
-      editor.dom.setAttribs($img, {
-        src: imageOptions.url,
-        role: imageOptions.isDecorativeImage ? 'presentation' : null,
-        width: imageOptions.appliedWidth,
-        height: imageOptions.appliedHeight,
-      })
-
+      updateImage(editor, $img, imageOptions)
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
         target: $img,

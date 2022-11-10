@@ -625,8 +625,8 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
     props.filesToUpload = [
-      {id: '1', name: 'file1.pdf', isLoading: true, loaded: 10, total: 100},
-      {id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250},
+      {id: '1', _id: '1', name: 'file1.pdf', isLoading: true, loaded: 10, total: 100},
+      {id: '2', _id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250},
     ]
 
     const {getAllByRole} = render(

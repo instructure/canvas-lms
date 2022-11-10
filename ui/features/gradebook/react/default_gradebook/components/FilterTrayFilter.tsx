@@ -150,7 +150,7 @@ export default function ({
 
           {itemGroups.map(([id, name, items_]) => {
             return (
-              <OptionGroup value={id} renderLabel={name}>
+              <OptionGroup key={`item-groups-${id}`} value={id} renderLabel={name}>
                 {items_.map(([itemId, itemName]: [string, string]) => {
                   return (
                     <Option key={itemId} id={`${filter.id}-item-${itemId}`} value={itemId}>

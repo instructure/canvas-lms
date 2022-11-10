@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/calendars/_mini_calendar" do
+describe "calendars/_mini_calendar" do
   it "renders" do
     today = Time.zone.today
     render partial: "calendars/mini_calendar", locals: { current: today, first_day: today - 3, last_day: today + 30 }

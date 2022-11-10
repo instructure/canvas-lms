@@ -220,6 +220,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "سهم قطري لأسفل ويمين"
   },
+  "download_filename_2baae924": { "message": "تنزيل { filename }" },
   "downward_arrow_cca52012": { "message": "سهم لأسفل" },
   "downward_pointing_triangle_2a12a601": { "message": "مثلث يشير لأسفل" },
   "drag_a_file_here_1bf656d5": { "message": "إفلات ملف هنا" },
@@ -278,6 +279,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "صغير للغاية" },
   "extracurricular_icon_67c8ca42": { "message": "أيقونة الأنشطة غير الصفية" },
   "f_function_fe422d65": { "message": "F (دالة)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "تعذر الحصول على محتويات الملف"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "تم تجاوز حصة تخزين الملفات"
   },
@@ -422,6 +426,9 @@ const locale = {
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
   "links_14b70841": { "message": "الارتباطات" },
+  "links_to_an_external_site_de74145d": {
+    "message": "ارتباطات إلى موقع خارجي."
+  },
   "load_more_35d33c7": { "message": "تحميل المزيد" },
   "loading_25990131": { "message": "جارٍ التحميل..." },
   "loading_bde52856": { "message": "جارٍ التحميل" },
@@ -450,6 +457,8 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "متوسط" },
   "middle_27dc1d5": { "message": "الأوسط" },
+  "minimize_file_preview_da911944": { "message": "تصغير معاينة الملف" },
+  "minimize_video_20aa554b": { "message": "تصغير الفيديو" },
   "minus_fd961e2e": { "message": "سالب" },
   "minus_plus_3461f637": { "message": "سالب/موجب" },
   "misc_3b692ea7": { "message": "متنوع" },
@@ -547,6 +556,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (متغير)" },
   "pink_68ad45cb": { "message": "وردي" },
   "pixels_52ece7d1": { "message": "بكسل" },
+  "play_media_comment_35257210": { "message": "تشغيل تعليق الوسائط." },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "تشغيل تعليق الوسائط بواسطة { name } من { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "موجب" },
   "plus_minus_f8be2e83": { "message": "موجب/سالب" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
@@ -685,6 +698,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "التبديل إلي محرر HTML المنسق"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "التبديل إلي محرر HTML البسيط"
+  },
   "switch_to_the_html_editor_146dfffd": { "message": "التبديل إلي محرر html" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "التبديل إلى محرر النص المنسق"
@@ -699,6 +718,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "النص (اختياري)" },
   "text_position_8df8c162": { "message": "موضع النص" },
   "text_size_887c2f6": { "message": "حجم النص" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "تجري معالجة معاينة المستند حاليًا. الرجاء إعادة المحاولة لاحقًا."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "توجد المادة في المجال العام"
   },
@@ -720,8 +742,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Thick Right Arrow" },
   "thick_rightward_arrow_a2e1839e": { "message": "Thick Rightward Arrow" },
   "thick_upward_arrow_acd20328": { "message": "Thick Upward Arrow" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "لا يمكن عرض هذا المستند في Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "لا يمكن عرض هذه المعادلة في العرض الأساسي."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "هذه الصورة غير متوفرة حاليًا"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."

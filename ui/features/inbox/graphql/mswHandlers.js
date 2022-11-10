@@ -434,6 +434,7 @@ export const handlers = [
                 ],
                 __typename: 'EnrollmentConnection',
               },
+              observerEnrollmentsConnection: null,
             },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
@@ -475,6 +476,7 @@ export const handlers = [
                 ],
                 __typename: 'EnrollmentConnection',
               },
+              observerEnrollmentsConnection: null,
             },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
@@ -522,6 +524,7 @@ export const handlers = [
                 ],
                 __typename: 'EnrollmentConnection',
               },
+              observerEnrollmentsConnection: null,
             },
             {
               _id: '2',
@@ -546,6 +549,7 @@ export const handlers = [
                 ],
                 __typename: 'EnrollmentConnection',
               },
+              observerEnrollmentsConnection: null,
             },
             {
               _id: '3',
@@ -570,6 +574,7 @@ export const handlers = [
                 ],
                 __typename: 'EnrollmentConnection',
               },
+              observerEnrollmentsConnection: null,
             },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
@@ -578,6 +583,30 @@ export const handlers = [
         __typename: 'Recipients',
       }
       data.legacyNode.recipients = recipients
+    }
+    return res(ctx.data(data))
+  }),
+
+  graphql.query('GetRecipientsObservers', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        id: 'VXNlci0x',
+        __typename: 'User',
+        recipientsObservers: null,
+      },
+    }
+
+    if (req.variables.recipients.length > 0 && req.variables.contextCode) {
+      data.recipientsObservers = {
+        nodes: [
+          {
+            id: 'TWVzc2FnZWFibGVVc2VyLTM',
+            name: 'observer',
+            __typename: 'MessageableUser',
+            _id: '3',
+          },
+        ],
+      }
     }
     return res(ctx.data(data))
   }),

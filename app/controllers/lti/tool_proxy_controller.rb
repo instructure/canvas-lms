@@ -23,8 +23,7 @@ module Lti
 
     before_action :require_context
     before_action :require_user
-    before_action :set_tool_proxy, only: %i[destroy update accept_update dismiss_update recreate_subscriptions]
-    before_action :require_site_admin, only: [:recreate_subscriptions]
+    before_action :set_tool_proxy, only: %i[destroy update accept_update dismiss_update]
 
     def destroy
       if authorized_action(@context, @current_user, :update)
@@ -94,16 +93,6 @@ module Lti
       end
     end
 
-    def recreate_subscriptions
-      if @tool_proxy.nil? || @tool_proxy.workflow_state != "active"
-        render json: '{"status":"error", "error": "active tool proxy not found"}'
-        return
-      end
-
-      ToolProxyService.recreate_missing_subscriptions(@tool_proxy)
-      render json: '{"status":"success"}'
-    end
-
     private
 
     def set_tool_proxy
@@ -116,10 +105,6 @@ module Lti
           "old state: #{@tool_proxy.workflow_state}, new state: #{workflow_state}"
       end
       @tool_proxy.update_attribute(:workflow_state, workflow_state)
-
-      # destroy or create subscriptions
-      ToolProxyService.delete_subscriptions(@tool_proxy) if workflow_state == "deleted"
-      ToolProxyService.recreate_missing_subscriptions(@tool_proxy) if workflow_state == "active"
 
       # this needs to be moved to whatever changes the workflow state to active
       invalidate_nav_tabs_cache(@tool_proxy)

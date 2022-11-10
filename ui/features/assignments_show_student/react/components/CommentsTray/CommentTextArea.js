@@ -27,7 +27,6 @@ import UploadMedia from '@instructure/canvas-media'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {DEFAULT_ICON} from '@canvas/mime/react/mimeClassIconHelper'
 import FileList from '../../FileList'
@@ -39,10 +38,6 @@ import {UploadMediaStrings, MediaCaptureStrings} from '@canvas/upload-media-tran
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
 const I18n = useI18nScope('assignments_2')
-
-const languages = Object.keys(closedCaptionLanguages).map(key => {
-  return {id: key, label: closedCaptionLanguages[key]}
-})
 
 export default class CommentTextArea extends Component {
   static propTypes = {
@@ -339,7 +334,6 @@ export default class CommentTextArea extends Component {
                   <UploadMedia
                     contextId={this.props.assignment.env.courseId}
                     contextType="course"
-                    languages={languages}
                     liveRegion={() => document.getElementById('flash_screenreader_holder')}
                     onDismiss={this.onMediaModalDismiss}
                     onUploadComplete={(error, data) => {
@@ -352,6 +346,7 @@ export default class CommentTextArea extends Component {
                     }}
                     tabs={{embed: false, record: true, upload: true}}
                     uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+                    userLocale={ENV.LOCALE}
                     disableSubmitWhileUploading={true}
                   />
                   <Button

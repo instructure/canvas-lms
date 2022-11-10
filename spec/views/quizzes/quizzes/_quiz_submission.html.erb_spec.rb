@@ -21,7 +21,7 @@
 require_relative "../../../spec_helper"
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/_quiz_submission" do
+describe "quizzes/quizzes/_quiz_submission" do
   before do
     course_with_student
     view_context

@@ -228,6 +228,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Strzałka po przekątnej w dół i w prawo"
   },
+  "download_filename_2baae924": { "message": "Pobierz { filename }" },
   "downward_arrow_cca52012": { "message": "Strzałka w dół" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Trójkąt skierowany w dół"
@@ -288,6 +289,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Bardzo małe" },
   "extracurricular_icon_67c8ca42": { "message": "Ikona zajęć pozalekcyjnych" },
   "f_function_fe422d65": { "message": "F (funkcja)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Nie udało się pobrać zawartości pliku"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Przekroczono przydział magazynowania plików"
   },
@@ -434,6 +438,9 @@ const locale = {
   "link_7262adec": { "message": "Łącze" },
   "link_options_a16b758b": { "message": "Opcje łącza" },
   "links_14b70841": { "message": "Łącza" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Łącza do strony zewnętrznej."
+  },
   "load_more_35d33c7": { "message": "Wczytaj więcej" },
   "loading_25990131": { "message": "Wczytywanie..." },
   "loading_bde52856": { "message": "Wczytywanie" },
@@ -466,6 +473,8 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Średni" },
   "middle_27dc1d5": { "message": "Środkowy" },
+  "minimize_file_preview_da911944": { "message": "Minimalizuj podgląd pliku" },
+  "minimize_video_20aa554b": { "message": "Minimalizuj okno wideo" },
   "minus_fd961e2e": { "message": "Minus" },
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Różne" },
@@ -569,6 +578,12 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (wariant)" },
   "pink_68ad45cb": { "message": "Różowy" },
   "pixels_52ece7d1": { "message": "Piksele" },
+  "play_media_comment_35257210": {
+    "message": "Odtwórz komentarz multimedialny."
+  },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Odtwórz komentarz multimedialny { name } z { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/Minus" },
   "posted_when_a578f5ab": { "message": "Opublikował(a): { when }" },
@@ -723,6 +738,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Obsługiwane typy plików: SRT lub WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Przełącz na edytor przetworzonego HTML"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Przełącz na edytor nieprzetworzonego HTML"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Przełącz się do edytora html"
   },
@@ -739,6 +760,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Tekst (opcjonalny)" },
   "text_position_8df8c162": { "message": "Położenie tekstu" },
   "text_size_887c2f6": { "message": "Rozmiar tekstu" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Podgląd dokumentu jest teraz przetwarzany. Spróbuj ponownie później."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiał znajduje się w domenie publicznej"
   },
@@ -764,8 +788,14 @@ const locale = {
   "thick_upward_arrow_acd20328": {
     "message": "Strzałka w kierunku górnym pogrubiona"
   },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Nie można wyświetlić tego dokumentu w systemie Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Nie można odtworzyć równania w widoku podstawowym."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Obecnie ten obraz jest niedostępny"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Chociaż nagranie wideo będzie mieć prawidłowy tytuł w przeglądarce, nie udało się go zaktualizować w bazie danych."

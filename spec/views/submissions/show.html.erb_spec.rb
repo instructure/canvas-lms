@@ -22,7 +22,7 @@ require "spec_helper"
 require_relative "../views_helper"
 require_relative "../../selenium/helpers/groups_common"
 
-describe "/submissions/show" do
+describe "submissions/show" do
   include GroupsCommon
 
   before :once do
