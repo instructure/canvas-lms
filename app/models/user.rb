@@ -1748,6 +1748,10 @@ class User < ActiveRecord::Base
     preferences[:send_observed_names_in_notifications] == true
   end
 
+  def discussions_splitscreen_view?
+    !!preferences[:discussions_splitscreen_view?]
+  end
+
   def close_announcement(announcement)
     closed = get_preference(:closed_notifications).dup || []
     # serialize ids relative to the user
