@@ -395,6 +395,12 @@ module CanvasKaltura
       end
       raise Timeout::Error unless response
 
+      unless response.is_a?(Net::HTTPSuccess) || response.is_a?(Net::HTTPNotFound)
+        CanvasKaltura.error_handler.capture(
+          "Error from Kaltura service", { response: response, path: request.path }, :warn
+        )
+      end
+
       response
     end
   end
