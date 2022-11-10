@@ -22,18 +22,30 @@ module ContextModulesHelper
   include Api::V1::ContextModule
   include CyoeHelper
 
-  TRANSLATED_COMMENT_TYPE = {
-    Announcement: I18n.t("Announcement"),
-    Assignment: I18n.t("Assignment"),
-    Attachment: I18n.t("Attachment"),
-    ContextExternalTool: I18n.t("External Tool"),
-    ContextModuleSubHeader: I18n.t("Context Module Sub Header"),
-    DiscussionTopic: I18n.t("Discussion Topic"),
-    ExternalUrl: I18n.t("External Url"),
-    Quiz: I18n.t("Quiz"),
-    "Quizzes::Quiz": I18n.t("Quiz"),
-    WikiPage: I18n.t("Page")
-  }.freeze
+  def translated_content_type(content_type)
+    case content_type
+    when :Announcement
+      I18n.t("Announcement")
+    when :Assignment
+      I18n.t("Assignment")
+    when :Attachment
+      I18n.t("Attachment")
+    when :ContextExternalTool
+      I18n.t("External Tool")
+    when :ContextModuleSubHeader
+      I18n.t("Context Module Sub Header")
+    when :DiscussionTopic
+      I18n.t("Discussion Topic")
+    when :ExternalUrl
+      I18n.t("External Url")
+    when :"Quizzes::Quiz", :Quiz
+      I18n.t("Quiz")
+    when :WikiPage
+      I18n.t("Page")
+    else
+      I18n.t("Unknown Content Type")
+    end
+  end
 
   def cache_if_module(context_module, viewable, is_student, can_view_unpublished, user, context, &block)
     if context_module
@@ -159,7 +171,7 @@ module ContextModulesHelper
       return is_student ? I18n.t("Quiz") : I18n.t("New Quiz")
     end
 
-    TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t("Unknown Content Type")
+    translated_content_type(item.content_type.to_sym)
   end
 
   def module_item_new_quizzes_build_button_enabled?
