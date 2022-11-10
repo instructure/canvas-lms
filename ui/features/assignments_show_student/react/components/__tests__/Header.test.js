@@ -342,6 +342,7 @@ it('does not render the attempt select if peerReviewModeEnabled is set to true',
         anonymousUser: null,
         anonymousId: 'xaU9cd',
         workflowState: 'assigned',
+        assetSubmissionType: 'online_text_entry',
       },
     ],
   }
@@ -411,6 +412,7 @@ describe('submission workflow tracker', () => {
           anonymousUser: null,
           anonymousId: 'xaU9cd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
       ],
     }
@@ -736,6 +738,7 @@ describe('Add Comment/View Feedback button', () => {
           anonymousUser: null,
           anonymousId: 'xaU9cd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
       ],
     }
@@ -761,6 +764,7 @@ describe('Add Comment/View Feedback button', () => {
           anonymousUser: null,
           anonymousId: 'xaU9cd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
       ],
     }
@@ -792,6 +796,7 @@ describe('Peer reviews counter', () => {
           anonymousUser: null,
           anonymousId: 'xaU9cd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
       ],
     }
@@ -819,14 +824,17 @@ describe('Peer reviews counter', () => {
           {
             anonymousId: 'xaU9cd',
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymousId: 'maT9fd',
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymousId: 'vaN9fd',
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
         ],
       }
@@ -865,16 +873,19 @@ describe('Peer reviews counter', () => {
             anonymizedUser: {_id: '1'},
             anonymousId: null,
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymizedUser: {_id: '2'},
             anonymousId: null,
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymizedUser: {_id: '3'},
             anonymousId: null,
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
         ],
       }
@@ -910,10 +921,12 @@ describe('Peer reviews counter', () => {
         {
           anonymousId: 'xaU9cd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
         {
           anonymousId: 'maT9fd',
           workflowState: 'assigned',
+          assetSubmissionType: 'online_text_entry',
         },
       ],
     }

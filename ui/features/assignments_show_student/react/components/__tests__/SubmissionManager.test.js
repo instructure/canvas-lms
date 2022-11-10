@@ -390,12 +390,14 @@ describe('SubmissionManager', () => {
           {
             anonymousUser: null,
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned',
+            workflowState: 'completed',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymousUser: null,
             anonymousId: 'baT9cx',
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
         ],
       }
@@ -448,6 +450,43 @@ describe('SubmissionManager', () => {
       expect(peerReviewButton).not.toBeInTheDocument()
     })
 
+    it('renders a disabled "Peer Review" button when there are no available peer reviews', async () => {
+      props.submission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymizedUser: {_id: '1'},
+            anonymousId: 'xaU9cd',
+            workflowState: 'completed',
+            assetSubmissionType: 'online_text_entry',
+          },
+          {
+            anonymizedUser: {_id: '2'},
+            anonymousId: 'baT9cx',
+            workflowState: 'completed',
+            assetSubmissionType: 'online_text_entry',
+          },
+        ],
+      }
+
+      const {getByText, queryByRole} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
+
+      expect(getByText('Peer Review').closest('button')).toBeDisabled()
+    })
+
     it('redirects to the corresponding url when the anonymous peer reviews option is disabled and the "Peer Review" button is clicked', async () => {
       props.submission = {
         ...props.submission,
@@ -455,12 +494,14 @@ describe('SubmissionManager', () => {
           {
             anonymizedUser: {_id: '1'},
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned',
+            workflowState: 'completed',
+            assetSubmissionType: 'online_text_entry',
           },
           {
             anonymizedUser: {_id: '2'},
             anonymousId: 'baT9cx',
             workflowState: 'assigned',
+            assetSubmissionType: 'online_text_entry',
           },
         ],
       }
@@ -483,9 +524,9 @@ describe('SubmissionManager', () => {
       const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
       fireEvent.click(peerReviewButton)
 
-      const firstAssessment = props.submission.assignedAssessments[0]
+      const availableAssessment = props.submission.assignedAssessments[1]
       expect(window.location.assign).toHaveBeenCalledWith(
-        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?reviewee_id=${firstAssessment.anonymizedUser._id}`
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?reviewee_id=${availableAssessment.anonymizedUser._id}`
       )
     })
 
@@ -508,9 +549,9 @@ describe('SubmissionManager', () => {
       const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
       fireEvent.click(peerReviewButton)
 
-      const firstAssessment = props.submission.assignedAssessments[0]
+      const availableAssessment = props.submission.assignedAssessments[1]
       expect(window.location.assign).toHaveBeenCalledWith(
-        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?anonymous_asset_id=${firstAssessment.anonymousId}`
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?anonymous_asset_id=${availableAssessment.anonymousId}`
       )
     })
   })

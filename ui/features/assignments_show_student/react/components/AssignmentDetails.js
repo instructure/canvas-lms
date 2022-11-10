@@ -40,7 +40,7 @@ export default function AssignmentDetails({assignment}) {
             `${I18n.t('Peer:')} ${assignment.env.peerDisplayName}`}
           {assignment.dueAt && (
             <>
-              {' | '}
+              {assignment.env.peerReviewModeEnabled && ' | '}
               <FriendlyDatetime
                 data-test-id="due-date"
                 prefix={I18n.t('Due:')}

@@ -562,7 +562,12 @@ const SubmissionManager = ({assignment, submission}) => {
   }
 
   const handleRedirectToFirstPeerReview = () => {
-    const assessment = submission.assignedAssessments[0]
+    const assessment = submission.assignedAssessments.find(assessment =>
+      isAvailableToReview(assessment)
+    )
+    if (assessment === null) {
+      return
+    }
     let url = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}`
     if (assessment.anonymizedUser) {
       url += `?reviewee_id=${assessment.anonymizedUser._id}`
@@ -775,6 +780,10 @@ const SubmissionManager = ({assignment, submission}) => {
     )
   }
 
+  const isAvailableToReview = (assessment) => {
+    return assessment.assetSubmissionType !== null && assessment.workflowState === 'assigned'
+  }
+
   return (
     <>
       {isSubmitting ? <LoadingIndicator /> : renderAttemptTab()}
@@ -784,7 +793,12 @@ const SubmissionManager = ({assignment, submission}) => {
       </>
       {showConfetti ? <Confetti /> : null}
       <SubmissionCompletedModal
-        count={submission.assignedAssessments.length}
+        totalCount={submission.assignedAssessments.length}
+        availableCount={
+          submission.assignedAssessments.filter(assessment =>
+            isAvailableToReview(assessment)
+          ).length
+        }
         open={submissionCompletedModalOpen}
         onClose={() => handleCloseSubmissionCompletedModal()}
         onRedirect={() => handleRedirectToFirstPeerReview()}
