@@ -160,8 +160,8 @@ describe CoursePace do
   end
 
   describe "#duration" do
-    it "returns 0 if there are no module items" do
-      expect(@course_pace.duration).to eq 0
+    it "returns 1 if there are no module items" do
+      expect(@course_pace.duration).to eq 1
     end
 
     context "multiple paced module items exist" do
@@ -171,8 +171,8 @@ describe CoursePace do
         end
       end
 
-      it "returns the sum of all item durations" do
-        expect(@course_pace.duration).to eq 2
+      it "returns the sum of all item durations, taking into account the day of enrollment" do
+        expect(@course_pace.duration).to eq 3
       end
     end
   end
