@@ -4245,13 +4245,13 @@ describe User do
 
     it "returns false for a user when the setting is false" do
       u = User.create
-      u.preferences[:discussions_splitscreen_view?] = false
+      u.preferences[:discussions_splitscreen_view] = false
       expect(u.discussions_splitscreen_view?).to eq(false)
     end
 
     it "returns true for a user when the setting is true" do
       u = User.create
-      u.preferences[:discussions_splitscreen_view?] = true
+      u.preferences[:discussions_splitscreen_view] = true
       expect(u.discussions_splitscreen_view?).to eq(true)
     end
   end
