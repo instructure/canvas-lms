@@ -585,6 +585,9 @@ $(document).ready(function () {
         }
         if (item_type === 'quiz' && item_id === 'new') {
           quiz_type = $('input[name=quiz_engine_selection]:checked').val()
+          if (ENV.NEW_QUIZZES_BY_DEFAULT) {
+            quiz_type = 'assignment'
+          }
         }
         const quiz_lti = quiz_type === 'assignment'
         item_data = {
