@@ -29,12 +29,19 @@ import successSVG from '../../images/Success.svg'
 const I18n = useI18nScope('assignments_2')
 
 type Props = {
-  count: number
+  totalCount: number
+  availableCount: number
   onRedirect: () => void
   onClose: () => void
   open: boolean
 }
-const SubmissionCompletedModal: React.FC<Props> = ({count, onRedirect, onClose, open}) => {
+const SubmissionCompletedModal: React.FC<Props> = ({
+  totalCount,
+  availableCount,
+  onRedirect,
+  onClose,
+  open,
+}) => {
   const handleRedirect = () => {
     onRedirect()
   }
@@ -61,9 +68,14 @@ const SubmissionCompletedModal: React.FC<Props> = ({count, onRedirect, onClose, 
             <Text size="large">{I18n.t('Check back later to view feedback.')}</Text>
           </View>
         </View>
-        <View as="div" margin="small 0" textAlign="center">
-          <Text size="large" weight="bold" data-testid="peer-reviews-counter">
-            {I18n.t('You have %{count} Peer Reviews to complete', {count})}
+        <View as="div" margin="small 0 0" textAlign="center">
+          <Text size="large" weight="bold" data-testid="peer-reviews-total-counter">
+            {I18n.t('You have %{totalCount} Peer Reviews to complete', {totalCount})}
+          </Text>
+        </View>
+        <View as="div" margin="0 0" textAlign="center">
+          <Text data-testid="peer-reviews-available-counter">
+            {I18n.t('Peer submissions ready for review: %{availableCount}', {availableCount})}
           </Text>
         </View>
       </Modal.Body>
@@ -72,7 +84,7 @@ const SubmissionCompletedModal: React.FC<Props> = ({count, onRedirect, onClose, 
           {I18n.t('Close')}
         </Button>
         <Button
-          interaction={count == 0 ? 'disabled' : 'enabled'}
+          interaction={availableCount === 0 ? 'disabled' : 'enabled'}
           onClick={handleRedirect}
           variant="primary"
         >
@@ -86,7 +98,8 @@ const SubmissionCompletedModal: React.FC<Props> = ({count, onRedirect, onClose, 
 export default SubmissionCompletedModal
 
 SubmissionCompletedModal.propTypes = {
-  count: number.isRequired,
+  totalCount: number.isRequired,
+  availableCount: number.isRequired,
   onRedirect: func.isRequired,
   onClose: func.isRequired,
   open: bool.isRequired,
