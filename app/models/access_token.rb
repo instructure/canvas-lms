@@ -153,7 +153,11 @@ class AccessToken < ActiveRecord::Base
   end
 
   def needs_refresh?
-    expires_at && expires_at < Time.now.utc
+    # expires_at is only used for refreshable tokens, and therefore is only set on tokens
+    # from dev keys with auto_expire_tokens=true. We want to immediately respect
+    # auto_expire_tokens being flipped off, so ignore the expires_at in the
+    # db if the dev key no longer wants tokens to expire
+    developer_key&.auto_expire_tokens && expires_at && expires_at < Time.now.utc
   end
 
   def token=(new_token)
