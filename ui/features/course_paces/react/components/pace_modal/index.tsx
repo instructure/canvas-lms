@@ -146,7 +146,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
       <Modal.Header>
         <Flex>
           <FlexItem shouldGrow={true} shouldShrink={true} align="center">
-            <Heading level="h2">
+            <Heading data-testid="course-pace-title" level="h2">
               <TruncateText>{modalTitle()}</TruncateText>
             </Heading>
           </FlexItem>

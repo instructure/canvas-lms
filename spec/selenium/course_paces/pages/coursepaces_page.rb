@@ -277,6 +277,10 @@ module CoursePacesPageObject
     "[data-testid='course-pace-settings']"
   end
 
+  def course_pace_title_selector
+    "[data-testid='course-pace-title']"
+  end
+
   def remove_pace_button_selector
     "[data-testid='remove-pace-button']"
   end
@@ -556,6 +560,10 @@ module CoursePacesPageObject
 
   def course_pace_settings_button
     f(course_pace_settings_button_selector)
+  end
+
+  def course_pace_title
+    f(course_pace_title_selector)
   end
 
   def remove_pace_button
