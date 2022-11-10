@@ -15,18 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
+import User from '@canvas/users/backbone/models/User.coffee'
 
-import AccountUser from '../models/AccountUser'
+class AccountUser extends User {}
 
-export default class AccountUserCollection extends PaginatedCollection {
-  url() {
-    return `/api/v1/accounts/${this.options.account_id}/users`
-  }
-}
+AccountUser.prototype.defaults = {avatar_url: '/images/messages/avatar-50.png'}
 
-AccountUserCollection.prototype.model = AccountUser
-
-// #
-// The account id of this user collection
-AccountUserCollection.optionProperty('account_id')
+export default AccountUser
