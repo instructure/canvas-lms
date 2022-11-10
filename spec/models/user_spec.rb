@@ -4236,4 +4236,23 @@ describe User do
       end
     end
   end
+
+  describe "discussions_splitscreen_view" do
+    it "returns false for a user without the setting set" do
+      u = User.create
+      expect(u.discussions_splitscreen_view?).to eq(false)
+    end
+
+    it "returns false for a user when the setting is false" do
+      u = User.create
+      u.preferences[:discussions_splitscreen_view?] = false
+      expect(u.discussions_splitscreen_view?).to eq(false)
+    end
+
+    it "returns true for a user when the setting is true" do
+      u = User.create
+      u.preferences[:discussions_splitscreen_view?] = true
+      expect(u.discussions_splitscreen_view?).to eq(true)
+    end
+  end
 end
