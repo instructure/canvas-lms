@@ -218,7 +218,7 @@ export const getOptimisticResponse = ({
         message,
         ratingCount: null,
         ratingSum: null,
-        subentriesCount: null,
+        subentriesCount: 0,
         entryParticipant: {
           rating: false,
           read: true,

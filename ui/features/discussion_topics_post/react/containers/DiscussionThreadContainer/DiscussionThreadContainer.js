@@ -23,6 +23,7 @@ import {
   responsiveQuerySizes,
   isTopicAuthor,
   getDisplayName,
+  getOptimisticResponse,
   buildQuotedReply,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -326,22 +327,36 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
-  const onReplySubmit = (message, fileId, isAnonymousAuthor, includeReplyPreview) => {
+  const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
+    const getParentId = () => {
+      return props.discussionEntry.rootEntryId &&
+        props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+        ? props.discussionEntry.parentId
+        : props.discussionEntry._id
+    }
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        parentEntryId:
-          props.discussionEntry.rootEntryId &&
-          props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
-            ? props.discussionEntry.parentId
-            : props.discussionEntry._id,
+        parentEntryId: getParentId(),
         fileId,
         isAnonymousAuthor,
         includeReplyPreview,
         message,
         courseID: ENV.course_id,
       },
+      optimisticResponse: getOptimisticResponse({
+        message,
+        parentId: getParentId(),
+        rootEntryId: props.discussionEntry.rootEntryId,
+        quotedEntry:
+          includeReplyPreview && typeof buildQuotedReply === 'function'
+            ? buildQuotedReply([props.discussionEntry], getParentId())
+            : null,
+        isAnonymous:
+          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
+      }),
     })
+    props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
     setEditorExpanded(false)
   }
 
@@ -493,7 +508,13 @@ export const DiscussionThreadContainer = props => {
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
-                    onReplySubmit(message, fileId, anonymousAuthorState, includeReplyPreview)
+                    onReplySubmit(
+                      message,
+                      includeReplyPreview,
+                      props.discussionEntry.parentId,
+                      anonymousAuthorState,
+                      fileId
+                    )
                   }}
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
