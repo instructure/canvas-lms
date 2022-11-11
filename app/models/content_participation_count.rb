@@ -106,7 +106,12 @@ class ContentParticipationCount < ActiveRecord::Base
                                          AND submission_comments.provisional_grade_id IS NULL
                                          AND submission_comments.author_id <> ?
                                        SQL
-        (subs_with_grades + subs_with_comments).uniq
+        subs_with_assessments = Submission.active
+                                          .joins(:assignment, :rubric_assessments)
+                                          .where(submission_conditions)
+                                          .where.not(rubric_assessments: { data: nil })
+                                          .pluck(:id)
+        (subs_with_grades + subs_with_comments + subs_with_assessments).uniq
       end
       potential_ids.size - already_read_count(potential_ids, user)
     end

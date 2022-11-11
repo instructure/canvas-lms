@@ -367,12 +367,11 @@ describe ContentParticipation do
         expect(cpc.reload.unread_count).to eq 0
       end
 
-      it "participation count is not created when submission is not posted" do
+      it "creates participation count with unread_count = 0 when submisison is unposted" do
         @content.update_columns(posted_at: nil)
-
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        end.to change(ContentParticipationCount, :count).by 0
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        cpc = ContentParticipationCount.where(user_id: @student).first
+        expect(cpc.unread_count).to eq 0
       end
 
       context "when multiple submissions exist" do
