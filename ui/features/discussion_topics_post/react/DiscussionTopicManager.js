@@ -124,7 +124,7 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    setReplyFromId(discussionEntryId)
+    ENV.isolated_view ? setReplyFromId(discussionEntryId) : setReplyFromId(null)
     setIsolatedEntryId(isolatedId || discussionEntryId)
     if (ENV.isolated_view) {
       setIsolatedViewOpen(true)
