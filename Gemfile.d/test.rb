@@ -43,7 +43,7 @@ group :test do
 
   gem "selenium-webdriver", "~> 4.1.0", require: false
     gem "childprocess", "3.0.0", require: false
-  gem "webdrivers", "5.0.0", require: false
+  gem "webdrivers", "5.2.0", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
   gem "webmock", "3.8.2", require: false
