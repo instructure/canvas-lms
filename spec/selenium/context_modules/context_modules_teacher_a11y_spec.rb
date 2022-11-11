@@ -124,6 +124,14 @@ describe "context modules" do
       expect(locked_title[0]).to have_attribute("title", text_header)
     end
 
+    it "translates screenreader close text on new module dialog" do
+      @user.locale = "fi"
+      @user.save!
+      get "/courses/#{@course.id}/modules"
+      f(".add_module_link").click
+      expect(f(".ui-dialog-titlebar-close .ui-icon-closethick")).to include_text("Sulje")
+    end
+
     context "module item cog focus management", priority: "1" do
       before :once do
         create_modules(1)[0].add_item({ id: @assignment.id, type: "assignment" })
