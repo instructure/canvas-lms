@@ -24,6 +24,7 @@ module CC::Importer::Canvas
     include RubricsConverter
     include ModuleConverter
     include CoursePacesConverter
+    include BlueprintSettingsConverter
 
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
@@ -52,6 +53,7 @@ module CC::Importer::Canvas
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
       @course[:late_policy] = convert_late_policy(settings_doc(LATE_POLICY))
+      @course[:blueprint_settings] = convert_blueprint_settings(settings_doc(BLUEPRINT_SETTINGS))
     end
 
     def convert_course_settings(doc)

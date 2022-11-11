@@ -187,6 +187,10 @@ module Importers
         end
         migration.update_import_progress(90)
 
+        if migration.migration_settings[:import_blueprint_settings]
+          Importers::BlueprintSettingsImporter.process_migration(data, migration)
+        end
+
         # be very explicit about draft state courses, but be liberal toward legacy courses
         if course.wiki.has_no_front_page &&
            migration.for_course_copy? &&

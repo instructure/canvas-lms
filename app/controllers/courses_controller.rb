@@ -2683,6 +2683,7 @@ class CoursesController < ApplicationController
       )
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.migration_settings[:import_quizzes_next] = true if params.dig(:settings, :import_quizzes_next)
+      @content_migration.migration_settings[:import_blueprint_settings] = true if params.dig(:settings, :import_blueprint_settings)
       @content_migration.workflow_state = "created"
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = "1"

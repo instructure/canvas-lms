@@ -28,6 +28,7 @@ module CC
     include Rubrics
     include Events
     include CoursePaces
+    include BlueprintSettings
     include WebResources
 
     def add_canvas_non_cc_data
