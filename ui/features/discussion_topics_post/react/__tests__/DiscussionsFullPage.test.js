@@ -38,6 +38,7 @@ jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1000'}}),
   resolveAuthorRoles: () => [],
+  getOptimisticResponse: () => null,
 }))
 
 describe('DiscussionFullPage', () => {
@@ -475,6 +476,7 @@ describe('DiscussionFullPage', () => {
         parentEntryId: 'DiscussionEntry-default-mock',
         includeReplyPreview: false,
       }),
+      ...getDiscussionSubentriesQueryMock({discussionEntryID: 'DiscussionEntry-default-mock-1'}),
     ]
     const container = setup(mocks)
 
@@ -488,20 +490,14 @@ describe('DiscussionFullPage', () => {
     const rce = await container.findByTestId('DiscussionEdit-container')
     expect(rce.style.display).toBe('')
 
+    document.querySelectorAll('textarea')[0].value = 'This is a reply'
+
     const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
     fireEvent.click(doReplyButton)
 
     await waitFor(() =>
       expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
     )
-
-    // expect the highlight to exist for a while
-    jest.advanceTimersByTime(3000)
-    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
-
-    // expect the highlight to disappear
-    jest.advanceTimersByTime(3000)
-    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
@@ -515,6 +511,7 @@ describe('DiscussionFullPage', () => {
         parentEntryId: 'DiscussionEntry-default-mock',
         includeReplyPreview: true,
       }),
+      ...getDiscussionSubentriesQueryMock({includeRelativeEntry: true}),
     ]
     const container = setup(mocks)
 
@@ -531,6 +528,8 @@ describe('DiscussionFullPage', () => {
     const rce = await container.findByTestId('DiscussionEdit-container')
     expect(rce.style.display).toBe('')
 
+    document.querySelectorAll('textarea')[0].value = 'This is a reply'
+
     expect(await container.findByTestId('reply-preview')).toBeTruthy()
 
     const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
@@ -539,14 +538,6 @@ describe('DiscussionFullPage', () => {
     await waitFor(() =>
       expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
     )
-
-    // expect the highlight to exist for a while
-    jest.advanceTimersByTime(3000)
-    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
-
-    // expect the highlight to disappear
-    jest.advanceTimersByTime(3000)
-    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
 
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
