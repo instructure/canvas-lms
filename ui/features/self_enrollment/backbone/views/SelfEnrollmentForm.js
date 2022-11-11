@@ -157,7 +157,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
 
   loginErrors(errors) {
     const error = errors[errors.length - 1]
-    return {'pseudonym[password]': error}
+    return $.flashError({html: error}, 30000)
   }
 
   enrollErrors(errors) {
