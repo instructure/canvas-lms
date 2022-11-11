@@ -27,10 +27,19 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import ViewManager from './ViewManager'
+import UnavailablePeerReview from '../UnavailablePeerReview'
 
 const I18n = useI18nScope('assignments_2_submission_histories_query')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+
+function shouldDisplayUnavailablePeerReview({assignment, reviewerSubmission}) {
+  return (
+    reviewerSubmission !== null &&
+    assignment.env.peerReviewModeEnabled &&
+    !assignment.env.peerReviewAvailable
+  )
+}
 
 // eslint-disable-next-line react/prefer-stateless-function
 class SubmissionHistoriesQuery extends React.Component {
@@ -43,6 +52,19 @@ class SubmissionHistoriesQuery extends React.Component {
 
   render() {
     const {submission} = this.props.initialQueryData
+
+    if (shouldDisplayUnavailablePeerReview(this.props.initialQueryData)) {
+      return (
+        <>
+          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} />
+          <AssignmentToggleDetails
+            description={this.props.initialQueryData.assignment.description}
+          />
+          <UnavailablePeerReview />
+        </>
+      )
+    }
+
     if (!submission) {
       // User hasn't accepted course invite
       return (
