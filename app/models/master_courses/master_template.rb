@@ -159,6 +159,11 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     end
   end
 
+  def self.blueprint_eligible?(course)
+    !MasterCourses::ChildSubscription.is_child_course?(course) &&
+      !course.student_enrollments.not_fake.or(course.observer_enrollments).exists?
+  end
+
   def self.set_as_master_course(course)
     unique_constraint_retry do
       template = course.master_course_templates.for_full_course.first_or_create
