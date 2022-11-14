@@ -515,7 +515,6 @@ class Attachment < ActiveRecord::Base
     self.file_state ||= "available"
     assert_file_extension
     self.folder_id = nil if !folder || folder.context != context
-    self.folder_id = nil if folder&.deleted? && !deleted?
     self.folder_id ||= Folder.unfiled_folder(context).id rescue nil
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if root_attachment && new_record?
