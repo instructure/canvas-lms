@@ -40,7 +40,7 @@
       @include fontSize(18px);
       // temporary solution for new styles before crumbs are re-done:
       // we do not want to see the home link
-      &:first-of-type { display: none; }
+      &:first-of-type { visibility: hidden; }
       &:nth-child(2):before { display: none; }
 
       // We need to give the <span class="ellipsis"> a display other than inline so
