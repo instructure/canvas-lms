@@ -82,6 +82,7 @@ export const DiscussionEntry = {
           ...DiscussionEntryVersion
         }
       }
+      depth
     }
     ${Attachment.fragment}
     ${DiscussionEntryPermissions.fragment}
@@ -136,6 +137,7 @@ export const DiscussionEntry = {
       deleted: bool,
     }),
     discussionEntryVersionsConnection: DiscussionEntryVersion.shape,
+    depth: number,
   }),
 
   mock: ({
@@ -186,6 +188,7 @@ export const DiscussionEntry = {
       ],
       __typename: 'DiscussionEntryVersionConnection',
     },
+    depth = 1,
   } = {}) => ({
     id,
     _id,
@@ -210,6 +213,7 @@ export const DiscussionEntry = {
     parentId,
     quotedEntry,
     discussionEntryVersionsConnection,
+    depth,
     __typename: 'DiscussionEntry',
   }),
 }

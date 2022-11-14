@@ -195,6 +195,7 @@ export const getOptimisticResponse = ({
   isolatedEntryId = null,
   quotedEntry = null,
   isAnonymous = false,
+  depth = null,
 } = {}) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -276,6 +277,7 @@ export const getOptimisticResponse = ({
           nodes: [],
           __typename: 'DiscussionEntryVersionConnection',
         },
+        depth,
         __typename: 'DiscussionEntry',
       },
       errors: null,
