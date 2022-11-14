@@ -1116,6 +1116,9 @@ describe "Outcomes API", type: :request do
               expect_any_instance_of(OutcomesApiController).to receive(:get_outcome_alignments).with(any_args).and_return(
                 [mock_get_outcome_alignments(@outcome, "quizzes.quiz", "1", nil, new_quiz.id, "canvas.assignment.quizzes")]
               )
+              expect_any_instance_of(OutcomesApiController).to receive(:get_lmgb_results).with(any_args).and_return(
+                []
+              )
               json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                               controller: "outcomes_api",
                               action: "outcome_alignments",
