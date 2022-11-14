@@ -69,7 +69,7 @@ export default {
 
       if (
         !searchFilter ||
-        searchFilter.search_term.length >= minSearchLength ||
+        searchFilter.search_term.trim().length >= minSearchLength ||
         searchFilter.search_term === ''
       ) {
         dispatch(this.loadingUsers())
