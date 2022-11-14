@@ -96,6 +96,7 @@ class UnzipAttachment
 
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
+      not_created_folders = []
       CanvasUnzip.extract_archive(filename) do |entry, index|
         next if should_skip?(entry)
 
@@ -105,7 +106,18 @@ class UnzipAttachment
 
         folder_path_array += entry_path_array
         folder_name = folder_path_array.join("/")
-        folder = Folder.assert_path(folder_name, @context)
+        display_name = display_name(entry.name)
+        if not_created_folders.include?(folder_name)
+          @logger&.warn "Couldn't create file #{display_name}: #{folder_name} not created"
+          next
+        end
+        begin
+          folder = Folder.assert_path(folder_name, @context)
+        rescue ActiveRecord::StatementInvalid => e
+          @logger&.warn "Couldn't create sub-folder #{folder_name}: #{e.message}"
+          not_created_folders << folder_name
+          next
+        end
 
         update_progress(zip_stats.percent_complete(index))
 
@@ -125,8 +137,10 @@ class UnzipAttachment
         rescue Attachment::OverQuotaError
           f.unlink
           raise
+        rescue ActiveRecord::StatementInvalid => e
+          @logger&.warn "Couldn't create file #{display_name}: #{e.message}"
         rescue => e
-          @logger&.warn "Couldn't unzip archived file #{f.path}: #{e.message}"
+          @logger&.warn "Couldn't unzip archived file #{display_name}: #{e.message}"
         end
       end
       update_attachment_positions(id_positions)

@@ -108,7 +108,7 @@ class Folder < ActiveRecord::Base
   end
 
   def restrict_submission_folder_context
-    if for_submissions? && !context.is_a?(User) && !context.is_a?(Group)
+    if for_submissions? && %w[User Group].exclude?(context_type)
       errors.add(:submission_context_code, t("submissions folders must be created in User or Group context"))
       return false
     end
