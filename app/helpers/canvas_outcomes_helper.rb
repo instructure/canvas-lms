@@ -20,7 +20,7 @@
 
 module CanvasOutcomesHelper
   MAX_RETRIES = 3
-
+  THREAD_COUNT = 8
   class OSFetchError < StandardError; end
 
   def get_outcome_alignments(context, outcome_ids, additional_params = nil)
@@ -38,7 +38,6 @@ module CanvasOutcomesHelper
     )
     return if domain.nil? || jwt.nil?
 
-    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
     params = params.merge(additional_params) unless additional_params.nil?
     response = CanvasHttp.get(
       build_request_url(protocol, domain, "api/outcomes/list", params),
@@ -64,45 +63,77 @@ module CanvasOutcomesHelper
       user_uuid_list: user_uuids
     }
 
-    domain, jwt = extract_domain_jwt(
-      context.root_account,
-      "lmgb_results.show",
-      params
-    )
-    return if domain.nil? || jwt.nil?
+    threaded_request(context, "lmgb_results.show", "api/authoritative_results", params)
+  end
 
-    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
-    retry_count = 0
-    begin
-      response = CanvasHttp.get(
-        build_request_url(protocol, domain, "api/authoritative_results", params),
-        {
-          "Authorization" => jwt
-        }
-      )
-    rescue
-      retry_count += 1
-      retry if retry_count < MAX_RETRIES
-      raise OSFetchError, "Failed to fetch results for context #{context.id} #{params}"
-    end
+  def threaded_request(context, scope, endpoint, params)
+    responses = []
+    mutex = Mutex.new
+    batcher = OutcomesRequestBatcher.new(protocol, endpoint, context, scope, params)
+    requests = batcher.requests
 
-    if /^2/.match?(response.code.to_s)
-      begin
-        results = JSON.parse(response.body).deep_symbolize_keys[:results]
-        results.each do |result|
-          next if result[:attempts].nil?
-
-          result[:attempts].each do |attempt|
-            attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
-          end
+    Array.new(THREAD_COUNT) do
+      Thread.new(requests, responses) do |reqs, resp|
+        while (r = mutex.synchronize { reqs.pop })
+          response = get_request(context, r[:domain], r[:endpoint], r[:jwt], r[:params])
+          mutex.synchronize { resp.concat(response) } unless response.nil?
         end
-        results
-      rescue
-        raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
       end
-    else
-      raise OSFetchError, "Error retrieving results from Outcomes Service: #{response.body}"
+    end.each(&:join)
+    responses
+  end
+
+  def get_request(context, domain, endpoint, jwt, params, per_page = 200)
+    page_num = 1
+    total_pages = 1
+    all_results = []
+    loop do
+      pagination_params = {
+        per_page: per_page,
+        page: page_num
+      }
+
+      retry_count = 0
+      params = params.merge(pagination_params)
+      begin
+        response = CanvasHttp.get(
+          build_request_url(protocol, domain, endpoint, params),
+          {
+            "Authorization" => jwt
+          }
+        )
+      rescue
+        retry_count += 1
+        retry if retry_count < MAX_RETRIES
+        raise OSFetchError, "Failed to fetch results for context #{context.id} #{params}"
+      end
+
+      if /^2/.match?(response.code.to_s)
+        per_page = response.header["Per-Page"].to_i
+        total_pages = (response.header["Total"].to_f / per_page).ceil
+        begin
+          results = JSON.parse(response.body).deep_symbolize_keys[:results]
+          break if results.empty?
+
+          results.each do |result|
+            next if result[:attempts].nil?
+
+            result[:attempts].each do |attempt|
+              attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
+            end
+          end
+          all_results.concat(results)
+        rescue
+          raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
+        end
+      else
+        raise OSFetchError, "Error retrieving results from Outcomes Service: #{response.body}"
+      end
+      break if page_num >= total_pages
+
+      page_num += 1
     end
+    all_results
   end
 
   def set_outcomes_alignment_js_env(artifact, context, props)
@@ -119,7 +150,6 @@ module CanvasOutcomesHelper
     domain, jwt = extract_domain_jwt(context.root_account, "outcome_alignment_sets.create")
     return if domain.nil? || jwt.nil?
 
-    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
     host_url = "#{protocol}://#{domain}" if domain.present?
 
     js_env(
@@ -153,6 +183,10 @@ module CanvasOutcomesHelper
     end
 
     [domain, jwt]
+  end
+
+  def protocol
+    ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
   end
 
   def domain_key

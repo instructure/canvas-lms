@@ -383,68 +383,85 @@ describe CanvasOutcomesHelper do
           end
 
           it "raises error on non 2xx response" do
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 401, body: '{"valid_jwt":false}')
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 401, body: '{"valid_jwt":false}')
             expect { subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid) }.to raise_error(CanvasOutcomesHelper::OSFetchError, /Error retrieving results from Outcomes Service:/)
           end
 
           it "returns results with one assignment id" do
             expected_results = [{ result: "stuff" }]
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}', headers: { "Per-Page" => 200, "Total" => 1 })
             expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple assignment ids" do
             expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}', headers: { "Per-Page" => 200, "Total" => 2 })
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one outcome id" do
             expected_results = [{ result_one: "stuff" }]
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff"}]}', headers: { "Per-Page" => 200, "Total" => 1 })
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple outcome ids" do
             expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&per_page=200&page=1&user_uuid_list=#{one_user_uuid}")
+              .to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}', headers: { "Per-Page" => 200, "Total" => 2 })
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one user uuid" do
             expected_results = [{ result_one: "stuff1" }]
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"}]}', headers: { "Per-Page" => 200, "Total" => 1 })
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple user uuids" do
             expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{multiple_user_uuids}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{multiple_user_uuids}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}', headers: { "Per-Page" => 200, "Total" => 2 })
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", multiple_user_uuids)).to eq expected_results
           end
 
           it "returns empty array when assignment type is not matched" do
             expected_results = []
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type.no.match&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type.no.match&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 0 })
             expect(subject.get_lmgb_results(@course, "1", "assign.type.no.match", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when assignment ids are not matched" do
             expected_results = []
-            stub_get_lmgb_results("associated_asset_id_list=4,5&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
+            stub_get_lmgb_results("associated_asset_id_list=4,5&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 0 })
             expect(subject.get_lmgb_results(@course, "4,5", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when no outcome ids are matched" do
             expected_results = []
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=5&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=5&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 0 })
             expect(subject.get_lmgb_results(@course, "1", "assign.type", "5", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when no user uuids are matched" do
             expected_results = []
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=fake_no_match_uuid").to_return(status: 200, body: '{"results":[]}')
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=fake_no_match_uuid&per_page=200&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 200, "Total" => 0 })
             expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", "fake_no_match_uuid")).to eq expected_results
+          end
+
+          context "pagination" do
+            def get_results(num)
+              Array.new(num) { |i| { "result_#{i}": "stuff#{i}" } }
+            end
+
+            def get_response(num)
+              array_results = get_results(num)
+              { results: array_results }.to_json
+            end
+            it "fetches each page and returns concatentated results" do
+              stub_get_lmgb_results("associated_asset_id_list=1,2,3,4&associated_asset_type=assign.type&external_outcome_id_list=1,2,3,4&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: get_response(200), headers: { "Per-Page" => 200, "Total" => 201 })
+              stub_get_lmgb_results("associated_asset_id_list=1,2,3,4&associated_asset_type=assign.type&external_outcome_id_list=1,2,3,4&user_uuid_list=#{one_user_uuid}&per_page=200&page=2").to_return(status: 200, body: '{"results":[{"result_200":"stuff200"}]}', headers: { "Per-Page" => 200, "Total" => 201 })
+              expect(subject.get_lmgb_results(@course, "1,2,3,4", "assign.type", "1,2,3,4", one_user_uuid)).to eq get_results(201)
+            end
           end
         end
 
@@ -485,7 +502,7 @@ describe CanvasOutcomesHelper do
 
         it "returns results with one assignment id" do
           expected_results = [{ result: "stuff" }]
-          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
+          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}', headers: { "Per-Page" => 200, "Total" => 1 })
           expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end
 
@@ -539,11 +556,45 @@ describe CanvasOutcomesHelper do
             }
           ]
 
-          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}")
-            .to_return(status: 200, body: mocked_result.to_json.to_s)
+          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1")
+            .to_return(status: 200, body: mocked_result.to_json.to_s, headers: { "Per-Page" => 200, "Total" => 2 })
 
           expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end
+      end
+    end
+  end
+
+  describe "#threaded_request" do
+    before do
+      settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+      account.settings[:provision] = { "outcomes" => settings }
+      account.save!
+    end
+
+    def get_params(num_user_uuids, num_outcome_ids, num_asset_ids)
+      {
+        # using largest possible value for each datatype: character varying(255), bigint, bigit
+        user_uuid_list: Array.new(num_user_uuids) { "5LdvHVebADW0o0gpkaYGugCyK3meOXiwRGqmjTi10DQrwrEr1fcg7q3X5nq9YRVkMHNMv9rq9F6vvM34vpKByHSxuogLeMWV7jel77rHSN5sRaaNDc7aYILY6AU918ZpfTAlu47Hy1dyj0mHnQwXXAoLmwW5Z1aDsrP5K012u3IBxFIanos8Ig4RzNt9AzM4HatWKs3HU3I42tqcvoLaPzCnQwhqNYOXpagxUrfDD2ZXfpqrm5jZhDzB8nCfaA2" }.join(","),
+        external_outcome_id_list: Array.new(num_outcome_ids) { 9_223_372_036_854_775_807 }.join(","),
+        associated_asset_id_list: Array.new(num_asset_ids) { 9_223_372_036_854_775_807 }.join(","),
+        static_parameter: "static.value"
+      }
+    end
+
+    # context, scope, endpoint, sliced_params, static_params
+    context "does not thread request" do
+      it "if sliced_params are under the slice maximums" do
+        expect(subject).to receive(:get_request).once
+        subject.threaded_request(@course, "lmgb_results.show", "api/endpoint", get_params(1, 1, 1))
+      end
+    end
+
+    # context, scope, endpoint, sliced_params, static_params
+    context "uses threaded requests" do
+      it "sliced_params are over the slice maximums" do
+        expect(subject).to receive(:get_request).at_least(:twice)
+        subject.threaded_request(@course, "lmgb_results.show", "api/endpoint", get_params(250, 250, 250))
       end
     end
   end
