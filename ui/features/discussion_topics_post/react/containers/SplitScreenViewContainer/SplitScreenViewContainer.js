@@ -202,7 +202,7 @@ export const SplitScreenViewContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        replyFromEntryId: replyId,
+        parentEntryId: props.discussionEntryId,
         isAnonymousAuthor,
         message,
         fileId,
