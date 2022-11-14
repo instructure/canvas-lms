@@ -580,6 +580,7 @@ describe "Outcome Reports" do
         it "can handle null metadata" do
           response = Net::HTTPSuccess.new(1.1, 200, "OK")
           expect(response).to receive(:body).and_return(json_string_null_metadata)
+          expect(response).to receive(:header).and_return({ "Per-Page" => "200", "Total" => 1 }).twice
           expect(CanvasHttp).to receive(:get).with(any_args).and_return(response).once
 
           report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
@@ -592,6 +593,7 @@ describe "Outcome Reports" do
           response = Net::HTTPSuccess.new(1.1, 200, "OK")
           # once for parsing and then once for throwing the error
           expect(response).to receive(:body).and_return("not_valid_json").twice
+          expect(response).to receive(:header).and_return({ "Per-Page" => "200", "Total" => 0 }).twice
           expect(CanvasHttp).to receive(:get).with(any_args).and_return(response).once
 
           report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
