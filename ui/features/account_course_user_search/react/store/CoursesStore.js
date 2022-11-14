@@ -39,6 +39,7 @@ export default createStore({
       teacher_limit: 25,
       per_page: COURSES_TO_FETCH_PER_PAGE,
       no_avatar_fallback: '1',
+      search_term: originalParams.search_term?.trim(),
     }
     const propsToCleanUp = [
       'enrollment_term_id',
