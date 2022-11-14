@@ -265,8 +265,16 @@ module CoursePacesPageObject
     "[data-testid='apply-or-create-pace-button']"
   end
 
+  def assignment_info_selector
+    "[data-testid='course-pace-assignment-number']"
+  end
+
   def blueprint_label_selector
     ".blueprint-label"
+  end
+
+  def new_course_pace_end_date_selector
+    "[data-testid='coursepace-end-date']"
   end
 
   def course_pace_modal_x_selector
@@ -277,8 +285,20 @@ module CoursePacesPageObject
     "[data-testid='course-pace-settings']"
   end
 
+  def new_course_pace_start_date_selector
+    "[data-testid='coursepace-start-date']"
+  end
+
   def course_pace_title_selector
     "[data-testid='course-pace-title']"
+  end
+
+  def duration_info_selector
+    "[data-testid='course-pace-duration']"
+  end
+
+  def pace_info_selector
+    "[data-testid='pace-info']"
   end
 
   def remove_pace_button_selector
@@ -554,6 +574,14 @@ module CoursePacesPageObject
     f(blueprint_label_selector)
   end
 
+  def course_pace_assignment_info
+    f(assignment_info_selector)
+  end
+
+  def new_course_pace_end_date
+    f(new_course_pace_end_date_selector)
+  end
+
   def course_pace_modal_x
     f(course_pace_modal_x_selector)
   end
@@ -562,8 +590,20 @@ module CoursePacesPageObject
     f(course_pace_settings_button_selector)
   end
 
+  def new_course_pace_start_date
+    f(new_course_pace_start_date_selector)
+  end
+
   def course_pace_title
     f(course_pace_title_selector)
+  end
+
+  def duration_info
+    f(duration_info_selector)
+  end
+
+  def pace_info
+    f(pace_info_selector)
   end
 
   def remove_pace_button

@@ -48,7 +48,7 @@ describe "course pace page" do
 
   context "course paces bring up modal" do
     it "navigates to the course paces modal when Get Started clicked" do
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_get_started_button
 
@@ -56,7 +56,7 @@ describe "course pace page" do
     end
 
     it "navigates to course paces modal when Create Default Pace is clicked" do
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_create_default_pace_button
 
@@ -70,7 +70,7 @@ describe "course pace page" do
     end
 
     it "does not render Remove Pace button for default pace" do
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_create_default_pace_button
 
@@ -80,7 +80,7 @@ describe "course pace page" do
     it "does not render Remove Pace button for unpublished section pace" do
       @course.course_sections.create!(name: "New Section")
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_context_link("New Section")
 
@@ -88,7 +88,7 @@ describe "course pace page" do
     end
 
     it "does not render Remove Pace button for unpublished student pace" do
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_student_tab
 
@@ -101,7 +101,7 @@ describe "course pace page" do
       course_section = @course.course_sections.create!(name: "New Section")
       create_section_pace(course_section)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_context_link("New Section")
       expect(element_exists?(remove_pace_button_selector)).to be_truthy
@@ -111,7 +111,7 @@ describe "course pace page" do
       student_enrollment = Enrollment.find_by(user_id: @student.id)
       create_student_pace(student_enrollment)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_student_tab
 
@@ -129,7 +129,7 @@ describe "course pace page" do
       course_section = @course.course_sections.create!(name: "New Section")
       create_section_pace(course_section)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_context_link("New Section")
       click_remove_pace_button
@@ -141,7 +141,7 @@ describe "course pace page" do
       student_enrollment = Enrollment.find_by(user_id: @student.id)
       create_student_pace(student_enrollment)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_student_tab
       click_context_link(@student.name)
@@ -154,7 +154,7 @@ describe "course pace page" do
       course_section = @course.course_sections.create!(name: "New Section")
       create_section_pace(course_section)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_context_link("New Section")
       click_remove_pace_button
@@ -168,7 +168,7 @@ describe "course pace page" do
       student_enrollment = Enrollment.find_by(user_id: @student.id)
       create_student_pace(student_enrollment)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_student_tab
       click_context_link(@student.name)
@@ -183,7 +183,7 @@ describe "course pace page" do
       course_section = @course.course_sections.create!(name: "New Section")
       create_section_pace(course_section)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_context_link("New Section")
       click_remove_pace_button
@@ -197,7 +197,7 @@ describe "course pace page" do
       student_enrollment = Enrollment.find_by(user_id: @student.id)
       create_student_pace(student_enrollment)
 
-      get "/courses/#{@course.id}/course_pacing"
+      visit_course_paces_page
 
       click_student_tab
       click_context_link(@student.name)
@@ -206,6 +206,73 @@ describe "course pace page" do
 
       expect(element_exists?(remove_pace_modal_selector(:student))).to be_falsey
       expect(create_default_pace_button).to be_displayed
+    end
+  end
+
+  context "course pace header statistics" do
+    before :once do
+      @new_section_1 = @course.course_sections.create!(name: "New Section 1")
+      @student2 = user_factory(name: "Mary Seim", active_all: true, active_state: "active")
+      student_enrollment = @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+      student_enrollment.course_section = @new_section_1
+      student_enrollment.save!
+      # We need to run jobs because its progress gets stuck on the landing page otherwise!
+      run_jobs
+    end
+
+    it "shows the potential number of students in unpublished pace" do
+      visit_course_paces_page
+
+      click_create_default_pace_button
+
+      expect(pace_info.text).to include("2")
+    end
+
+    it "shows the actual number of students in published default pace" do
+      skip("LS-3608 this is broken right now")
+    end
+
+    it "shows the actual number of students in a section pace" do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+      create_section_pace(@new_section_1)
+
+      visit_course_paces_page
+      click_context_link(@new_section_1.name)
+
+      expect(pace_info.text).to include("1")
+    end
+
+    it "shows the number of assignments in the course pace" do
+      @course_module = create_course_module("New Module", "active")
+      @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
+      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+
+      visit_course_paces_page
+      click_context_link(@new_section_1.name)
+
+      expect(course_pace_assignment_info.text).to include("2")
+    end
+
+    it "shows the potential start and end data information in an unpublished course pace" do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+
+      visit_course_paces_page
+      click_context_link(@new_section_1.name)
+
+      # There's probably a better regex here
+      expect(new_course_pace_start_date.text).to include("Determined by course start date")
+      expect(new_course_pace_end_date.text).to include("Required end date")
+    end
+
+    it "shows the duration based on start and end dates in published course pace" do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+
+      visit_course_paces_page
+      click_context_link(@new_section_1.name)
+      # There's probably a better regex here
+      expect(duration_info.text).to include("weeks")
+      expect(duration_info.text).to include("day")
     end
   end
 end
