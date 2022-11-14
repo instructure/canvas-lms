@@ -25,9 +25,9 @@ module ScheduledPublication
   end
 
   def process_publish_at
-    if will_save_change_to_workflow_state?
+    if will_save_change_to_workflow_state? && workflow_state_in_database.present?
       # explicitly publishing / unpublishing the page clears publish_at
-      self.publish_at = nil unless workflow_state_in_database.nil? || @implicitly_published
+      self.publish_at = nil unless @implicitly_published
     elsif will_save_change_to_publish_at? &&
           publish_at&.>(Time.now.utc) &&
           context.root_account.feature_enabled?(:scheduled_page_publication)
