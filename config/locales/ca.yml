@@ -561,7 +561,7 @@ ca:
         from_name: "Des del"
         reply_to: "Respon a"
         sent_at: "Enviat el"
-        to: "Fins al"
+        to: Destinatari
       comm_messages_search_overview: 
         messages_viewed: "Notificacions enviades a *%{user}* del *%{start_date}* al *%{end_date}*."
       comm_messages_search_results: 
@@ -1269,7 +1269,7 @@ ca:
         custom_name_description: "Si se selecciona, substituirà la resta de títols enviats en les notificacions del Canvas."
         email_date: Data
         email_reply_to: "Respon a"
-        email_to: "Fins al"
+        email_to: Destinatari
         example: "Exemple:"
         external_services: "Notificacions enviades a serveis externs"
         external_services_label: "Mostra un advertiment emergent únic a la pàgina Preferències de notificació"
@@ -6126,7 +6126,7 @@ ca:
         course: Assignatura
         select_course: "Selecciona una assignatura"
         subject: Assumpte
-        to: "Fins al"
+        to: Destinatari
       links: 
         media_comment: Enregistra
       media_comment: "Comentari multimèdia"
@@ -13794,7 +13794,7 @@ ca:
         reply_to: "Respon a"
         sent_at: "Enviat el"
         subject: Assumpte
-        to: "Fins al"
+        to: Destinatari
     messages: 
       failure: "S'ha produït un error en enviar el vostre correu electrònic. Torneu a carregar la pàgina i torneu-ho a provar."
       success: "S'està lliurant el vostre correu electrònic."
@@ -22291,7 +22291,7 @@ ca:
   tls_7a2eaba5: TLS
   to_1126ab55: " al"
   to_35c6baa2: "al "
-  to_51406be9: "Fins al"
+  to_51406be9: Destinatari
   to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "Per accedir a la pàgina Persones de l'assignatura, Usuaris - visualitza la llista també ha d’estar habilitat."
   to_access_item_banks_for_a_course_item_banks_manag_a60a144f: "Per accedir als bancs d'elements d’una assignatura, cal habilitar també Bancs d'elements - administra l'usuari."
   to_access_item_banks_for_a_course_or_account_item__f1f7b0af: "Per accedir als bancs d'elements d’una assignatura o un usuari, cal habilitar també Bancs d'elements - administra l'usuari."
@@ -23858,7 +23858,7 @@ ca:
   welcome_name_a16afa7f: "Us donem la benvinguda, %{name}!"
   welcome_to_the_canvas_theme_editor_73091d1: "Us donem la benvinguda a l'Editor de temes del Canvas"
   welcome_to_the_cold_dark_void_of_name_65fc9839: "Benvingut al buit fosc i fred de %{name}."
-  welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Us donem la benvinguda a les vostres assignatures! Per personalitzar la llista d'assignatures, feu clic a l'en \"Totes les assignatures\" i marqueu amb una estrella totes les assignatures que voleu mostrar."
+  welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Us donem la benvinguda a les vostres assignatures! Per personalitzar la llista d'assignatures, feu clic a \"Totes les assignatures\" i marqueu amb una estrella totes les assignatures que voleu mostrar."
   welcome_to_your_subjects_to_customize_the_list_of__f6574116: "Us donem la benvinguda a les vostres matèries! Per personalitzar la llista de matèries, feu clic a l’enllaç \"Totes les matèries\" i marqueu amb una estrella totes les matèries que voleu mostrar."
   welcome_your_students_e1d96088: "Doneu la benvinguda als estudiants"
   well_below_mastery_37664bdc: "Molt per sota del domini"
