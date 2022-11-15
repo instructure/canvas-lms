@@ -11191,7 +11191,7 @@ es-ES:
   lbs_report_header_program_code: "Código del programa"
   lbs_report_header_scores: Puntuación
   lbs_report_header_student_name: "Nombre del estudiante"
-  lbs_report_notes: Notas
+  lbs_report_notes: Comentarios
   leadership_fae2a5dc: Liderazgo
   learn_how_to_use_google_meet_in_canvas_3e7aadd9: "Aprende a utilizar Google Meet en Canvas"
   learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "Aprende a utilizar Microsoft Teams en Canvas"
@@ -13784,10 +13784,10 @@ es-ES:
   move_group_77ae285d: "Mover grupo..."
   move_grouptitle_20927676: "Mover \"%{groupTitle}\""
   move_item_failed_8e4c1db6: "Ha habido un error al mover el elemento"
-  move_module_346b8112: "Mover contenido..."
-  move_module_90e6927e: "Mover contenido"
+  move_module_346b8112: "Mover módulo..."
+  move_module_90e6927e: "Mover módulo"
   move_module_contents_74fa15d5: "Mover módulo de contenidos"
-  move_module_item_77754119: "Mover contenido/Ítem"
+  move_module_item_77754119: "Mover módulo/Ítem"
   move_module_item_f525d6c8: "Mover ítem del contenido"
   move_navigation_item_f034cd8a: "Mover ítem de navegación"
   move_outcome_ce497e6c: "Mover competencia"
@@ -14288,8 +14288,8 @@ es-ES:
   note_this_is_not_your_official_score_f2d4582f: "*NOTA*: Esta NO es tu puntuación oficial."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Nota: La cuenta de este usuario utiliza autenticación delegada, pero permite una autenticación por contraseña de Canvas como respaldo. Los campos de contraseña de este formulario actualizan la contraseña de Canvas de reserva, *no* la autenticación delegada."
   note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "NOTA: Esta acción intentará deshacer la agrupación de la manera más completa posible; sin embargo, es posible que los usuarios agrupados no se restablezcan perfectamente a su estado previo."
-  notes_6cfc3988: "Notas:"
-  notes_c42e0fd5: Notas
+  notes_6cfc3988: "Comentarios:"
+  notes_c42e0fd5: Comentarios
   nothing_due_today_26217223: "No hay nada con fecha de entrega el día de hoy"
   nothing_due_today_for_course_coursename_e6e7e012: "Hoy no hay nada pendiente para la asignatura %{courseName}"
   nothing_else_due_7f8436af: "No hay más nada pendiente"
@@ -19440,7 +19440,7 @@ es-ES:
     no_outcome: "No se han seleccionado competencias"
     no_student: "No se ha seleccionado ningún estudiante"
     none: Ninguno
-    notes: Notas
+    notes: Comentarios
     on_paper: "En papel"
     online_quiz: "Prueba online"
     online_text_entry: "Entrada de texto online"
