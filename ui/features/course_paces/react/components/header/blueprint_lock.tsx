@@ -27,6 +27,7 @@ const I18n = useI18nScope('course_paces_blueprint_lock')
 interface PassedProps {
   readonly newPace: boolean
   readonly contextIsCoursePace: boolean
+  readonly bannerSelector: string
   setIsBlueprintLocked: (arg) => void
 }
 
@@ -46,7 +47,11 @@ export class BlueprintLock extends React.Component<PassedProps> {
   }
 
   componentDidMount() {
-    this.lockManager.init({itemType: 'course_pace', page: 'show'})
+    this.lockManager.init({
+      itemType: 'course_pace',
+      page: 'show',
+      bannerSelector: this.props.bannerSelector,
+    })
     this.isLocked = this.lockManager.state.isChildContent && this.lockManager.state.isLocked
     this.isChild = this.lockManager.state.isChildContent
     this.props.setIsBlueprintLocked(this.isLocked)
