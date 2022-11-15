@@ -47,7 +47,7 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 # write out a pid file
-pidfile '/var/run/puma.pid'
+pidfile './tmp/puma.pid'
 
 on_worker_boot do
   Rails.configuration.launch_darkly_client = LaunchDarkly::LDClient.new(ENV['LAUNCH_DARKLY_SDK_KEY'])

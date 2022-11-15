@@ -3,6 +3,7 @@
 #
 # This file is part of Canvas.
 #
+#
 # Canvas is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
 # Software Foundation, version 3 of the License.
@@ -14,6 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+gem 'dotenv-rails', :groups => [:development, :test]
 
 if CANVAS_RAILS5_0
   gem 'rails', '5.0.7.2'
@@ -62,7 +64,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.13.5'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.5', require: false
-gem 'ffi', '1.9.18', require: false
+gem 'ffi', '1.15.4', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.8', require: false
 gem 'httparty', '0.15.6'
