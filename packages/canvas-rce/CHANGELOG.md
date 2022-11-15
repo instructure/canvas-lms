@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# 5.6.8 - 2022-11-16
+
+### Added
+- User content enhancement option for opening Canvas links in a new tab
+
+### Changed
+- Fixed word count to no longer include contents of @mentions dropdown
+- Word count modal can be opened from the status bar
+- Fixed a bug related to uploading files in external apps
+
 # 5.6.3 - 2022-11-11
 
 ### Changed
