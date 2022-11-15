@@ -16,15 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+import {updateUserDiscussionsSplitscreenViewMock} from '../../../../graphql/Mocks'
 import {ChildTopic} from '../../../../graphql/ChildTopic'
+import {waitFor} from '@testing-library/dom'
+import {MockedProvider} from '@apollo/react-testing'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
+const onFailureStub = jest.fn()
+const onSuccessStub = jest.fn()
+const openMock = jest.fn()
 
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
@@ -36,10 +43,34 @@ beforeAll(() => {
       removeListener: jest.fn(),
     }
   })
+
+  window.ENV = {
+    course_id: '1',
+    SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
+    DISCUSSION: {
+      preferences: {
+        discussions_splitscreen_view: false,
+      },
+    },
+  }
 })
 
-const setup = props => {
-  return render(<DiscussionPostToolbar {...props} />)
+afterEach(() => {
+  onFailureStub.mockClear()
+  onSuccessStub.mockClear()
+  openMock.mockClear()
+})
+
+const setup = (props, mocks) => {
+  return render(
+    <MockedProvider mocks={mocks}>
+      <AlertManagerContext.Provider
+        value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+      >
+        <DiscussionPostToolbar {...props} />
+      </AlertManagerContext.Provider>
+    </MockedProvider>
+  )
 }
 
 describe('DiscussionPostToolbar', () => {
@@ -57,6 +88,32 @@ describe('DiscussionPostToolbar', () => {
     it('should not render clear search button by default', () => {
       const {queryByTestId} = setup()
       expect(queryByTestId('clear-search-button')).toBeNull()
+    })
+  })
+
+  describe('Splitscreen Button', () => {
+    it('should not render if split_screen_view ff is off', async () => {
+      window.ENV.split_screen_view = false
+      const {queryByTestId} = setup(
+        {},
+        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
+      )
+
+      expect(queryByTestId('splitscreenButton')).toBeNull()
+    })
+    it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
+      window.ENV.split_screen_view = true
+      const {getByTestId} = setup(
+        {},
+        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
+      )
+
+      const splitscreenButton = getByTestId('splitscreenButton')
+      fireEvent.click(splitscreenButton)
+
+      await waitFor(() => {
+        expect(onSuccessStub.mock.calls.length).toBe(1)
+      })
     })
   })
 
@@ -85,9 +142,8 @@ describe('DiscussionPostToolbar', () => {
     })
 
     it('"My Drafts" filter should be visible', () => {
-      window.ENV = {
-        draft_discussions: true,
-      }
+      window.ENV.draft_discussions = true
+
       const onViewFilterMock = jest.fn()
       const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
       const simpleSelect = getByLabelText('Filter by')

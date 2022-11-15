@@ -300,3 +300,15 @@ export const UPDATE_USER_GRADE = gql`
     }
   }
 `
+export const UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE = gql`
+  mutation UpdateUserDiscussionsSplitscreenView($discussionsSplitscreenView: Boolean!) {
+    __typename
+    updateUserDiscussionsSplitscreenView(
+      input: {discussionsSplitscreenView: $discussionsSplitscreenView}
+    ) {
+      user {
+        discussionsSplitscreenView
+      }
+    }
+  }
+`
