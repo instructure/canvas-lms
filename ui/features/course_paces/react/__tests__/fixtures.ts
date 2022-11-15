@@ -30,7 +30,7 @@ import {
   Sections,
   UIState,
   PaceContextsState,
-  PaceContextApiResponse,
+  PaceContextsApiResponse,
   StoreState,
   PaceContext,
 } from '../types'
@@ -204,7 +204,7 @@ export const COURSE_PACE_CONTEXT: PaceContext = {
   },
 }
 
-export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'A-C',
@@ -249,7 +249,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiResponse = {
   total_entries: 3,
 }
 
-export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'A-C',
@@ -268,7 +268,7 @@ export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextApiResponse = {
   total_entries: 1,
 }
 
-export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'Jon',
@@ -375,6 +375,10 @@ export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
   entriesPerRequest: 10,
   isLoading: true,
   searchTerm: '',
+  order: 'asc',
+  sortBy: 'name',
+  isLoadingDefault: false,
+  defaultPaceContext: COURSE_PACE_CONTEXT,
 }
 
 export const PROGRESS_RUNNING = {

@@ -25,9 +25,11 @@ import {paceContextsActions} from '../actions/pace_contexts'
 import {actions as uiActions} from '../actions/ui'
 import {
   APIPaceContextTypes,
+  OrderType,
   PaceContext,
   PaceContextTypes,
   ResponsiveSizes,
+  SortableColumn,
   StoreState,
 } from '../types'
 import PaceContextsTable from './pace_contexts_table'
@@ -47,8 +49,10 @@ export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = 
 interface PaceContextsContentProps {
   currentPage: number
   currentSearchTerm: string
+  currentSortBy: SortableColumn
+  currentOrderType: OrderType
   paceContexts: PaceContext[]
-  fetchPaceContexts: (contextType: APIPaceContextTypes, page?: number, searchTerm?: string) => void
+  fetchPaceContexts: typeof paceContextsActions.fetchPaceContexts
   selectedContextType: APIPaceContextTypes
   setSelectedContextType: (selectedContextType: APIPaceContextTypes) => void
   setSelectedContext: (selectedPaceContext: PaceContext) => void
@@ -56,6 +60,7 @@ interface PaceContextsContentProps {
   pageCount: number
   setPage: (page: number) => void
   setSearchTerm: typeof paceContextsActions.setSearchTerm
+  setOrderType: typeof paceContextsActions.setOrderType
   isLoading: boolean
   responsiveSize: ResponsiveSizes
 }
@@ -63,6 +68,8 @@ interface PaceContextsContentProps {
 export const PaceContent = ({
   currentPage,
   currentSearchTerm,
+  currentSortBy,
+  currentOrderType,
   paceContexts,
   fetchPaceContexts,
   selectedContextType,
@@ -72,6 +79,7 @@ export const PaceContent = ({
   pageCount,
   setPage,
   setSearchTerm,
+  setOrderType,
   isLoading,
   responsiveSize,
 }: PaceContextsContentProps) => {
@@ -81,21 +89,23 @@ export const PaceContent = ({
   useEffect(() => {
     let page = currentPage
     let searchTerm = currentSearchTerm
+    let orderType = currentOrderType
     // if switching tabs set page to 1 and reset search term
     if (currentTypeRef.current !== selectedContextType) {
       page = 1
       searchTerm = ''
+      orderType = 'asc'
       currentTypeRef.current = selectedContextType
-      setSearchTerm(searchTerm)
     }
-    fetchPaceContexts(selectedContextType, page, searchTerm)
+    fetchPaceContexts(selectedContextType, page, searchTerm, currentSortBy, orderType)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedContextType, currentPage])
+  }, [selectedContextType, currentPage, currentSortBy, currentOrderType])
 
   const changeTab = (_ev, {id}) => {
     const type = id.split('-')
     setSelectedContextType(type[1])
     setSearchTerm('')
+    setOrderType('asc')
   }
 
   const handleContextSelect = (paceContext: PaceContext) => {
@@ -125,9 +135,12 @@ export const PaceContent = ({
           contextType="section"
           handleContextSelect={handleContextSelect}
           currentPage={currentPage}
+          currentOrderType={currentOrderType}
+          currentSortBy={currentSortBy}
           paceContexts={paceContexts}
           pageCount={pageCount}
           setPage={setPage}
+          setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
         />
@@ -152,9 +165,12 @@ export const PaceContent = ({
           contextType="student_enrollment"
           handleContextSelect={handleContextSelect}
           currentPage={currentPage}
+          currentOrderType={currentOrderType}
+          currentSortBy={currentSortBy}
           paceContexts={paceContexts}
           pageCount={pageCount}
           setPage={setPage}
+          setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
         />
@@ -168,6 +184,8 @@ const mapStateToProps = (state: StoreState) => ({
   pageCount: state.paceContexts.pageCount,
   currentPage: state.paceContexts.page,
   currentSearchTerm: state.paceContexts.searchTerm,
+  currentSortBy: state.paceContexts.sortBy,
+  currentOrderType: state.paceContexts.order,
   isLoading: state.paceContexts.isLoading,
   selectedContextType: state.paceContexts.selectedContextType,
   responsiveSize: getResponsiveSize(state),
@@ -176,6 +194,7 @@ const mapStateToProps = (state: StoreState) => ({
 export default connect(mapStateToProps, {
   setPage: paceContextsActions.setPage,
   setSearchTerm: paceContextsActions.setSearchTerm,
+  setOrderType: paceContextsActions.setOrderType,
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSelectedContextType: paceContextsActions.setSelectedContextType,
   setSelectedContext: paceContextsActions.setSelectedContext,

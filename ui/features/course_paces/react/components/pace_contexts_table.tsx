@@ -17,9 +17,16 @@
  */
 
 import React, {useEffect, useState} from 'react'
+import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import {PaceContext, APIPaceContextTypes, ResponsiveSizes} from '../types'
+import {
+  PaceContext,
+  APIPaceContextTypes,
+  ResponsiveSizes,
+  OrderType,
+  SortableColumn,
+} from '../types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -28,6 +35,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Spinner} from '@instructure/ui-spinner'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
+import {paceContextsActions} from '../actions/pace_contexts'
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -36,15 +44,20 @@ export interface PaceContextsTableProps {
   contextType: APIPaceContextTypes
   pageCount: number
   currentPage: number
+  currentSortBy: SortableColumn | null
+  currentOrderType: OrderType
   isLoading: boolean
   responsiveSize: ResponsiveSizes
   setPage: (page: number) => void
+  setOrderType: typeof paceContextsActions.setOrderType
   handleContextSelect: (paceContext: PaceContext) => void
 }
 
 interface Header {
+  key: string
   text: string
   width: string
+  sortable?: boolean
 }
 
 const PACE_TYPES = {
@@ -53,6 +66,16 @@ const PACE_TYPES = {
   Course: I18n.t('Default'),
 }
 
+type SortType = {
+  [k in OrderType]: 'ascending' | 'descending'
+}
+
+const SORT_TYPE: SortType = {
+  asc: 'ascending',
+  desc: 'descending',
+}
+
+const {screenReaderFlashMessage} = $ as any
 const {Item: FlexItem} = Flex as any
 const {
   Body: TableBody,
@@ -64,15 +87,24 @@ const {
 
 const PaceContextsTable = ({
   currentPage,
+  currentSortBy,
+  currentOrderType,
   paceContexts = [],
   contextType,
   pageCount,
   setPage,
+  setOrderType,
   handleContextSelect,
   isLoading,
   responsiveSize,
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
+  const paceType = contextType === 'student_enrollment' ? 'student' : 'section'
+  const tableCaption = I18n.t('%{paceType} paces: sorted by %{sortBy} in %{orderType} order', {
+    paceType,
+    sortBy: currentSortBy,
+    orderType: SORT_TYPE[currentOrderType],
+  })
 
   useEffect(() => {
     setHeaders(getHeaderByContextType())
@@ -90,18 +122,18 @@ const PaceContextsTable = ({
     switch (contextType) {
       case 'section':
         headerCols = [
-          {text: I18n.t('Section'), width: '35%'},
-          {text: I18n.t('Section Size'), width: '25%'},
-          {text: I18n.t('Pace Type'), width: '20%'},
-          {text: I18n.t('Last Modified'), width: '20%'},
+          {key: 'name', text: I18n.t('Section'), width: '35%', sortable: true},
+          {key: 'size', text: I18n.t('Section Size'), width: '25%'},
+          {key: 'paceType', text: I18n.t('Pace Type'), width: '20%'},
+          {key: 'modified', text: I18n.t('Last Modified'), width: '20%'},
         ]
         break
       case 'student_enrollment':
         headerCols = [
-          {text: I18n.t('Student'), width: '35%'},
-          {text: I18n.t('Assigned Pace'), width: '25%'},
-          {text: I18n.t('Pace Type'), width: '20%'},
-          {text: I18n.t('Last Modified'), width: '20%'},
+          {key: 'name', text: I18n.t('Student'), width: '35%', sortable: true},
+          {key: 'pace', text: I18n.t('Assigned Pace'), width: '25%'},
+          {key: 'paceType', text: I18n.t('Pace Type'), width: '20%'},
+          {key: 'modified', text: I18n.t('Last Modified'), width: '20%'},
         ]
         break
       default:
@@ -151,25 +183,45 @@ const PaceContextsTable = ({
     return values
   }
 
-  const renderHeader = () => (
-    <TableHead>
-      <TableRow>
-        {headers.map((headerTitle, i) => (
-          <TableColHeader
-            id={`header-table-${i}`}
-            // eslint-disable-next-line react/no-array-index-key
-            key={`contexts-header-table-${i}`}
-            width={headerTitle.width}
-            theme={{padding: '0.75rem'}}
-          >
-            <View display="inline-block" minWidth="50%">
-              <Text weight="bold">{headerTitle.text}</Text>
-            </View>
-          </TableColHeader>
-        ))}
-      </TableRow>
-    </TableHead>
-  )
+  const handleSort = () => {
+    const newOrderType = currentOrderType === 'asc' ? 'desc' : 'asc'
+    const message = I18n.t('Sorted by %{sortBy} in %{orderType} order', {
+      sortBy: currentSortBy,
+      orderType: SORT_TYPE[newOrderType],
+    })
+
+    setOrderType(newOrderType)
+    screenReaderFlashMessage(message)
+  }
+
+  const renderHeader = () => {
+    const sortingProps = {
+      onRequestSort: handleSort,
+      sortDirection: currentSortBy ? SORT_TYPE[currentOrderType] : 'none',
+    }
+    return (
+      <TableHead renderSortLabel={I18n.t('Sort By')}>
+        <TableRow>
+          {headers.map(header => (
+            <TableColHeader
+              id={`header-table-${header.key}`}
+              key={`contexts-header-table-${header.key}`}
+              width={header.width}
+              theme={{padding: '0.75rem'}}
+              {...(header.sortable && {
+                ...sortingProps,
+                'data-testid': `sortable-column-${header.key}`,
+              })}
+            >
+              <View display="inline-block">
+                <Text weight="bold">{header.text}</Text>
+              </View>
+            </TableColHeader>
+          ))}
+        </TableRow>
+      </TableHead>
+    )
+  }
 
   const renderRow = (paceContext: PaceContext) => {
     const rowCells = getValuesByContextType(paceContext)
@@ -212,43 +264,48 @@ const PaceContextsTable = ({
     )
   }
 
-  if (isLoading)
-    return (
-      <View as="div" textAlign="center">
-        <Spinner size="large" renderTitle={I18n.t('Waiting for results to load')} />
-      </View>
-    )
+  const loadingView = () => (
+    <View as="div" textAlign="center">
+      <Spinner size="large" renderTitle={I18n.t('Waiting for results to load')} />
+    </View>
+  )
 
   return (
     <>
       {responsiveSize === 'small' ? (
-        <View data-testid="pace-contexts-mobile-view">
-          {paceContexts.map((paceContext: PaceContext) => renderMobileRow(paceContext))}
-        </View>
+        !isLoading && (
+          <View data-testid="pace-contexts-mobile-view">
+            {paceContexts.map((paceContext: PaceContext) => renderMobileRow(paceContext))}
+          </View>
+        )
       ) : (
         <View as="div" margin="none none large none" borderWidth="small small none small">
           <Table
             data-testid="course-pace-context-table"
-            caption={I18n.t('Course Paces Table')}
+            caption={tableCaption}
             themeOverride={{
               border: '2px solid black',
             }}
           >
             {renderHeader()}
-            <TableBody>
-              {paceContexts.map((paceContext: PaceContext) => renderRow(paceContext))}
-            </TableBody>
+            {!isLoading && (
+              <TableBody>
+                {paceContexts.map((paceContext: PaceContext) => renderRow(paceContext))}
+              </TableBody>
+            )}
           </Table>
         </View>
       )}
-      {pageCount > 1 && (
-        <Paginator
-          data-testid="context-table-paginator"
-          loadPage={setPage}
-          page={currentPage}
-          pageCount={pageCount}
-        />
-      )}
+      {isLoading
+        ? loadingView()
+        : pageCount > 1 && (
+            <Paginator
+              data-testid="context-table-paginator"
+              loadPage={setPage}
+              page={currentPage}
+              pageCount={pageCount}
+            />
+          )}
     </>
   )
 }

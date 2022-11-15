@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PaceContext, PaceContextsState, StoreState} from '../types'
+import {
+  PaceContext,
+  PaceContextsAsyncActionPayload,
+  PaceContextsApiResponse,
+  PaceContextsState,
+  StoreState,
+} from '../types'
 import {Constants as PaceContextsConstants} from '../actions/pace_contexts'
 
 export const paceContextsInitialState: PaceContextsState = {
@@ -30,6 +36,8 @@ export const paceContextsInitialState: PaceContextsState = {
   defaultPaceContext: null,
   isLoadingDefault: false,
   searchTerm: '',
+  sortBy: 'name',
+  order: 'asc',
 }
 
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
@@ -41,11 +49,16 @@ export const paceContextsReducer = (
 ): PaceContextsState => {
   switch (action.type) {
     case PaceContextsConstants.SET_PACE_CONTEXTS: {
-      const pageCount = Math.ceil(action.payload.result.total_entries / state.entriesPerRequest)
+      const payload: PaceContextsAsyncActionPayload = action.payload
+      const payloadResult = payload.result as PaceContextsApiResponse
+      const pageCount = Math.ceil(payloadResult.total_entries / state.entriesPerRequest)
       return {
         ...state,
-        entries: action.payload.result.pace_contexts,
-        page: action.payload.page,
+        entries: payloadResult.pace_contexts,
+        page: payload.page || 1,
+        searchTerm: payload.searchTerm || '',
+        sortBy: payload.sortBy!,
+        order: payload.orderType!,
         isLoading: false,
         pageCount,
       }
@@ -70,12 +83,14 @@ export const paceContextsReducer = (
         ...state,
         isLoadingDefault: action.payload,
       }
-    case PaceContextsConstants.SET_DEFAULT_PACE_CONTEXT:
+    case PaceContextsConstants.SET_DEFAULT_PACE_CONTEXT: {
+      const payload: PaceContextsAsyncActionPayload = action.payload
       return {
         ...state,
-        defaultPaceContext: action.payload.result,
+        defaultPaceContext: payload.result as PaceContext,
         isLoadingDefault: false,
       }
+    }
     case PaceContextsConstants.SET_SELECTED_PACE_CONTEXT:
       return {
         ...state,
@@ -90,6 +105,16 @@ export const paceContextsReducer = (
       return {
         ...state,
         searchTerm: action.payload,
+      }
+    case PaceContextsConstants.SET_SORT_BY:
+      return {
+        ...state,
+        sortBy: action.payload,
+      }
+    case PaceContextsConstants.SET_ORDER_TYPE:
+      return {
+        ...state,
+        order: action.payload,
       }
     default:
       return state
