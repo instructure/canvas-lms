@@ -139,7 +139,13 @@ function buildUrl(url) {
 }
 
 export function enhanceUserContent(container = document, opts = {}) {
-  const {customEnhanceFunc, canvasOrigin, kalturaSettings, disableGooglePreviews} = opts
+  const {
+    customEnhanceFunc,
+    canvasOrigin,
+    kalturaSettings,
+    disableGooglePreviews,
+    canvasLinksTarget,
+  } = opts
 
   const content =
     (container instanceof HTMLElement && container) ||
@@ -184,6 +190,14 @@ export function enhanceUserContent(container = document, opts = {}) {
 
             const absoluteUrl = new URL(potentialUrl, canvasOrigin)
             element.setAttribute(a, absoluteUrl.href)
+
+            if (
+              canvasLinksTarget &&
+              element.tagName === 'A' &&
+              (!element.getAttribute('target') || element.getAttribute('target') === '_blank')
+            ) {
+              element.setAttribute('target', canvasLinksTarget)
+            }
           }
         } catch (_ignore) {
           // canvasOrigin probably isn't a valid base url
@@ -192,7 +206,7 @@ export function enhanceUserContent(container = document, opts = {}) {
     }
 
     unenhanced_elem.querySelectorAll('a:not(.not_external, .external)').forEach(childLink => {
-      if (!isExternalLink(childLink)) return
+      if (!isExternalLink(childLink, canvasOrigin)) return
       if (childLink.tagName === 'IMG' || childLink.querySelectorAll('img').length > 0) return
       childLink.classList.add('external')
       childLink.setAttribute('target', '_blank')

@@ -170,13 +170,32 @@ describe('enhanceUserContent()', () => {
     describe('when the link has neither inline_disabled class or no_preview class', () => {
       it('has the file_preview_link class and the target attribute', () => {
         subject(
-          '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1" target="_blank">file</a>'
+          '<a id="alink" class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1" target="_blank">file</a>'
         )
         enhanceUserContent()
         const aTag = document.querySelector('a')
         expect(aTag.classList.contains('file_preview_link')).toBeTruthy()
         expect(aTag).toHaveAttribute('target')
       })
+    })
+  })
+
+  describe('internal links target attribute', () => {
+    it('is set to the provided options', () => {
+      // which is the case for img file links
+      subject(
+        `<a id="blank_target" title="Link" href="/courses/1/files/79?wrap=1" target="_blank">some file</a>
+        <a id="no_target" title="Link" href="/courses/1/files/79?wrap=1">a file</a>
+        <a id="a_target" title="Link" href="/courses/1/files/79?wrap=1" target="a_target">another file</a>`
+      )
+      enhanceUserContent(document, {
+        canvasOrigin: 'https://canvas.here',
+        canvasLinksTarget: 'open_here',
+      })
+
+      expect(document.getElementById('blank_target').getAttribute('target')).toEqual('open_here')
+      expect(document.getElementById('no_target').getAttribute('target')).toEqual('open_here')
+      expect(document.getElementById('a_target').getAttribute('target')).toEqual('a_target')
     })
   })
 
