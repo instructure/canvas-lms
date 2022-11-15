@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent} from '@testing-library/react'
+import {act, fireEvent, within} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
 import {
   COURSE,
@@ -43,10 +43,11 @@ jest.mock('../../actions/ui', () => ({
 
 const firstSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0]
 
-const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10`
-const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10`
+const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&sort=name&order=asc`
+const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=asc`
 const SECTION_PACE_CREATION_API = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${firstSection.item_id}`
-const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&search_term=A`
+const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&search_term=A&sort=name&order=asc`
+const STUDENT_CONTEXTS_API_WITH_DESC_SORTING = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=desc`
 
 const MINUTE = 1000 * 60
 const HOUR = MINUTE * 60
@@ -234,6 +235,42 @@ describe('PaceContextsContent', () => {
 
         const {findByText} = renderConnected(<PaceContent />)
         expect(await findByText(formattedDate)).toBeInTheDocument()
+      })
+    })
+
+    describe('Sortable Column', () => {
+      beforeEach(() => {
+        fetchMock.get(
+          STUDENT_CONTEXTS_API_WITH_DESC_SORTING,
+          JSON.stringify(PACE_CONTEXTS_STUDENTS_RESPONSE)
+        )
+      })
+
+      it('sorts the table in ascending order by default', async () => {
+        const {getByRole} = renderConnected(<PaceContent />)
+        const studentsTab = getByRole('tab', {name: 'Students'})
+        act(() => studentsTab.click())
+        expect(fetchMock.lastUrl()).toMatch(STUDENT_CONTEXTS_API)
+      })
+
+      it('toggles between ascending and descending order', async () => {
+        const {getByRole, findByTestId} = renderConnected(<PaceContent />)
+        const studentsTab = getByRole('tab', {name: 'Students'})
+        const getSortButton = async () => {
+          const sortableHeader = await findByTestId('sortable-column-name')
+          return within(sortableHeader).getByRole('button')
+        }
+        act(() => studentsTab.click())
+        // ascending order by default
+        expect(fetchMock.lastUrl()).toMatch(STUDENT_CONTEXTS_API)
+        let sortButton = await getSortButton()
+        act(() => sortButton.click())
+        // toggles to descending order
+        expect(fetchMock.lastUrl()).toMatch(STUDENT_CONTEXTS_API_WITH_DESC_SORTING)
+        // comes back to ascending order
+        sortButton = await getSortButton()
+        act(() => sortButton.click())
+        expect(fetchMock.lastUrl()).toMatch(STUDENT_CONTEXTS_API)
       })
     })
   })

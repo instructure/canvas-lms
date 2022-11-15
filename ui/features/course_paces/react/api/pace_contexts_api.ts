@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {APIPaceContextTypes} from '../types'
+import {APIPaceContextTypes, OrderType, SortableColumn} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const getPaceContexts = (
@@ -24,7 +24,9 @@ export const getPaceContexts = (
   contextType: APIPaceContextTypes,
   page: number,
   entriesPerRequest: number,
-  searchTerm: string
+  searchTerm: string,
+  sortBy?: SortableColumn,
+  orderType: OrderType = 'asc'
 ) => {
   const apiParams: Record<string, string | number> = {
     type: contextType.toLocaleLowerCase(),
@@ -33,6 +35,10 @@ export const getPaceContexts = (
   }
   if (searchTerm && searchTerm.length) {
     apiParams.search_term = searchTerm
+  }
+  if (sortBy) {
+    apiParams.sort = sortBy
+    apiParams.order = orderType
   }
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/pace_contexts`,
