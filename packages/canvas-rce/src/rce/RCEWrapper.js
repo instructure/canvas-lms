@@ -54,11 +54,12 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
+import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
-import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -1872,6 +1873,7 @@ class RCEWrapper extends React.Component {
           onFullscreen={this.handleClickFullscreen}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
+          onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
