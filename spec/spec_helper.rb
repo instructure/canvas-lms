@@ -460,6 +460,7 @@ RSpec.configure do |config|
   end
 
   def reset_all_the_things!
+    LocalCache.reset
     ReadOnlySecondaryStub.reset
     I18n.locale = :en
     Time.zone = "UTC"
