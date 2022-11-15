@@ -157,7 +157,7 @@ describe "Tutorials" do
     it "the 'x' button closes the End Course Set-up Tutorial modal", priority: "1" do
       get "/courses/#{@course.id}"
       fj("button:contains('Don\'t Show Again')").click
-      fj("button:contains('Close')").click
+      fj("span[data-testid='instui-modal-close'] button:contains('Close')").click
       expect(f(".NewUserTutorialTray")).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
     end

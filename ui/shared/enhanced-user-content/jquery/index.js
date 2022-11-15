@@ -631,6 +631,14 @@ function wireUpFilePreview() {
   })
 }
 
+const setDialogCloseText = () => {
+  // This is done here since we need to translate the close text, but don't
+  // have access to I18n from packages/jqueryui. Since we're eventually moving
+  // away from jqueryui and only have the single string to translate, its not
+  // worth setting up a translation pipeline there.
+  $.ui.dialog.prototype.options.closeText = I18n.t('Close')
+}
+
 export default function enhanceTheEntireUniverse() {
   ;[
     retriggerEarlyClicks,
@@ -654,6 +662,7 @@ export default function enhanceTheEntireUniverse() {
     confirmAndDeleteRightSideTodoItemsWhenClicked,
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,
+    setDialogCloseText,
   ]
     .map(isolate)
     .map(x => x())
