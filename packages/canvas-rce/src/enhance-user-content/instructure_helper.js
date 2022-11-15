@@ -37,9 +37,14 @@ export function getTld(hostname) {
     length = parts.length
   return (length > 1 ? [parts[length - 2], parts[length - 1]] : parts).join('.')
 }
-const locationTld = getTld(window.location.hostname)
 
-export function isExternalLink(element) {
+export function isExternalLink(element, canvasOrigin = window.location.origin) {
+  let canvasHost
+  try {
+    canvasHost = new URL(canvasOrigin).hostname
+  } catch (_ex) {
+    canvasHost = window.location.hostname
+  }
   const href = element.getAttribute('href')
   // if a browser doesnt support <a>.hostname then just dont mark anything as external, better to not get false positives.
   return !!(
@@ -47,7 +52,7 @@ export function isExternalLink(element) {
     href.length &&
     !href.match(/^(mailto\:|javascript\:)/) &&
     element.hostname &&
-    getTld(element.hostname) !== locationTld
+    getTld(element.hostname) !== getTld(canvasHost)
   )
 }
 
