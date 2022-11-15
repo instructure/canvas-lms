@@ -44,11 +44,11 @@ export default class LockBanner extends Component {
     },
   }
 
-  static setupRootNode() {
+  static setupRootNode(bannerSelector = false) {
     const bannerNode = document.createElement('div')
     bannerNode.id = 'blueprint-lock-banner'
     bannerNode.setAttribute('style', 'margin-bottom: 2em')
-    const contentNode = document.querySelector('#content')
+    const contentNode = document.querySelector(bannerSelector || '#content')
     return contentNode.insertBefore(bannerNode, contentNode.firstChild)
   }
 

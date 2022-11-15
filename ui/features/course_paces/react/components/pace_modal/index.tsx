@@ -166,6 +166,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
       <Modal.Body padding={props.responsiveSize === 'small' ? 'none small' : 'none large'}>
         <View
           as="div"
+          className="pace-redesign-inner-modal"
           maxWidth={props.responsiveSize === 'small' ? '100%' : '80%'}
           margin="none auto"
         >

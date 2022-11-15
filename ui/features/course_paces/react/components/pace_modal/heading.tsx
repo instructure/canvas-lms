@@ -112,6 +112,7 @@ const PaceModalHeading: React.FC<Props> = ({
           newPace={!coursePace.id}
           contextIsCoursePace={coursePace.context_type === 'Course'}
           setIsBlueprintLocked={setIsBlueprintLocked}
+          bannerSelector=".pace-redesign-inner-modal"
         />
       </FlexItem>
     </Flex>
