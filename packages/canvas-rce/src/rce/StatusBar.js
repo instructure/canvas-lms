@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, number, oneOf, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton, CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Badge} from '@instructure/ui-badge'
@@ -57,6 +57,7 @@ StatusBar.propTypes = {
   readOnly: bool,
   a11yBadgeColor: string,
   a11yErrorsCount: number,
+  onWordcountModalOpen: func.isRequired,
 }
 
 StatusBar.defaultProps = {
@@ -278,7 +279,14 @@ export default function StatusBar(props) {
     )
     return (
       <View display="inline-block" padding="0 small" data-testid="status-bar-word-count">
-        <Text>{wordCount}</Text>
+        <CondensedButton
+          data-btn-id="rce-wordcount-btn"
+          color="primary"
+          onClick={props.onWordcountModalOpen}
+          tabIndex={tabIndexForBtn('rce-wordcount-btn')}
+        >
+          {wordCount}
+        </CondensedButton>
       </View>
     )
   }
