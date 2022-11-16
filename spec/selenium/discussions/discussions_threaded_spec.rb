@@ -290,11 +290,9 @@ describe "threaded discussions" do
       Account.site_admin.enable_feature! :react_discussions_post
     end
 
-    context "Inline Thread mode" do
-      # When redesign is on and split-screen and isolated view are off
-      # This should be updated to have split-screen on and the setting off with VICE-3116
+    context "reply flow" do
       before do
-        @threaded_topic = create_discussion("inline view thread", "threaded")
+        @threaded_topic = create_discussion("threaded discussion", "threaded")
         @first_reply = @threaded_topic.discussion_entries.create!(
           user: @student,
           message: "1st level reply"
@@ -322,11 +320,20 @@ describe "threaded discussions" do
         )
       end
 
-      describe "reply flow" do
-        it "replies correctly to discussion topic" do
+      context "isolated view" do
+        # These tests should verify that isolated view quotes/eplies are not affected by split-screen code
+        # They will be removed with VICE-3227
+        # Note there is no way to reply in a thread without quoting in isolated view
+        before :once do
+          Account.site_admin.enable_feature!(:isolated_view)
+        end
+
+        before do
           user_session(@student)
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+        end
+
+        it "replies correctly to discussion topic" do
           f("button[data-testid='discussion-topic-reply']").click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to topic")
@@ -344,10 +351,110 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to first_reply" do
+          f("button[data-testid='threading-toolbar-reply']").click
+          wait_for_ajaximations
+          type_in_tiny("textarea", "replying to 1st level reply")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+
+          new_reply = DiscussionEntry.last
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 2
+          expect(new_reply.parent_id).to eq @first_reply.id
+          # Verify that reply was posted
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          # Verify that the correct level is opened
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+        end
+
+        it "replies correctly to second reply" do
+          f("button[data-testid='expand-button']").click
+          wait_for_ajaximations
+          ff("button[data-testid='threading-toolbar-reply']")[2].click
+          wait_for_ajaximations
+          type_in_tiny("textarea", "replying to 2nd level reply")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+
+          new_reply = DiscussionEntry.last
+
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 3
+          expect(new_reply.parent_id).to eq @second_reply.id
+          # Verify that reply was posted
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          # Verify that the correct reply is quoted
+          expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
+        end
+
+        it "replies correctly to third reply" do
+          f("button[data-testid='expand-button']").click
+          wait_for_ajaximations
+          ff("button[data-testid='threading-toolbar-reply']")[3].click
+          wait_for_ajaximations
+          type_in_tiny("textarea", "replying to 3rd level reply")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+
+          new_reply = DiscussionEntry.last
+
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 4
+          expect(new_reply.parent_id).to eq @third_reply.id
+          # Verify that reply was posted
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          # Verify that the correct reply is quoted
+          expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
+        end
+
+        it "replies correctly to fourth reply" do
+          f("button[data-testid='expand-button']").click
+          wait_for_ajaximations
+          ff("button[data-testid='threading-toolbar-reply']")[4].click
+          wait_for_ajaximations
+          type_in_tiny("textarea", "replying to 4th level reply")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+
+          new_reply = DiscussionEntry.last
+
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 5
+          expect(new_reply.parent_id).to eq @fourth_reply.id
+          # Verify that reply was posted
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          # Verify that the correct reply is quoted
+          expect(fj("div[data-testid='reply-preview']:contains('#{@fourth_reply.summary}')")).to be_present
+        end
+      end
+
+      context "Inline Thread mode" do
+        # When redesign is on and split-screen and isolated view are off
+        # This should be updated to have split-screen on and the setting off with VICE-3116
+
+        before do
           user_session(@student)
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+        end
 
+        it "replies correctly to discussion topic" do
+          f("button[data-testid='discussion-topic-reply']").click
+          wait_for_ajaximations
+          type_in_tiny("textarea", "replying to topic")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+
+          new_reply = DiscussionEntry.last
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 1
+          expect(new_reply.parent_id).to eq nil
+          expect(new_reply.discussion_topic_id).to eq @threaded_topic.id
+          # Verify that the correct level is opened
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          expect(fj("div:contains(#{@first_reply.summary})")).to be_present
+        end
+
+        it "replies correctly to first_reply" do
           f("button[data-testid='threading-toolbar-reply']").click
           wait_for_ajaximations
           type_in_tiny("textarea", "replying to 1st level reply")
@@ -364,10 +471,6 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to second reply" do
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
-
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           ff("button[data-testid='threading-toolbar-reply']")[2].click
@@ -387,10 +490,6 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to third reply" do
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
-
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           ff("button[data-testid='threading-toolbar-reply']")[2].click
@@ -414,9 +513,6 @@ describe "threaded discussions" do
         it "replies correctly to fourth reply" do
           # Should set the parent reply to be the root entry
           skip("Skip until work on VICE-3239 is done")
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
 
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
@@ -438,120 +534,105 @@ describe "threaded discussions" do
           expect(fj("div:contains(#{@second_reply.summary})")).to be_present
           expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>replying to 4th level reply</p>"
         end
-      end
 
-      describe "quote flow" do
-        it "quotes first_reply correctly" do
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+        describe "when quoting" do
+          it "quotes first_reply correctly" do
+            f("button[data-testid='thread-actions-menu']").click
+            f("span[data-testid='quote']").click
+            wait_for_ajaximations
 
-          f("button[data-testid='thread-actions-menu']").click
-          f("span[data-testid='quote']").click
-          wait_for_ajaximations
+            # Verify that it says it'll quote the correct entry
+            expect(fj("div[data-testid='reply-preview']:contains('#{@first_reply.summary}')")).to be_present
 
-          # Verify that it says it'll quote the correct entry
-          expect(fj("div[data-testid='reply-preview']:contains('#{@first_reply.summary}')")).to be_present
+            type_in_tiny("textarea", "quoting 1st level reply")
+            f("button[data-testid='DiscussionEdit-submit'").click
+            wait_for_ajaximations
 
-          type_in_tiny("textarea", "quoting 1st level reply")
-          f("button[data-testid='DiscussionEdit-submit'").click
-          wait_for_ajaximations
+            new_reply = DiscussionEntry.last
+            # Verify new entry data is correct
+            expect(new_reply.depth).to eq 2
+            expect(new_reply.parent_id).to eq @first_reply.id
+            # Verify that the correct quote is created after submission
+            expect(fj("div[data-testid='reply-preview']:contains('#{@first_reply.summary}')")).to be_present
+          end
 
-          new_reply = DiscussionEntry.last
-          # Verify new entry data is correct
-          expect(new_reply.depth).to eq 2
-          expect(new_reply.parent_id).to eq @first_reply.id
-          # Verify that the correct quote is created after submission
-          expect(fj("div[data-testid='reply-preview']:contains('#{@first_reply.summary}')")).to be_present
-        end
+          it "quotes second_reply correctly" do
+            f("button[data-testid='expand-button']").click
+            wait_for_ajaximations
+            ff("button[data-testid='thread-actions-menu']")[1].click
+            f("span[data-testid='quote']").click
+            wait_for_ajaximations
 
-        it "quotes second_reply correctly" do
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+            # Verify that it says it'll quote the correct entry
+            expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
 
-          f("button[data-testid='expand-button']").click
-          wait_for_ajaximations
-          ff("button[data-testid='thread-actions-menu']")[1].click
-          f("span[data-testid='quote']").click
-          wait_for_ajaximations
+            type_in_tiny("textarea", "Quoting 2nd level reply")
+            f("button[data-testid='DiscussionEdit-submit'").click
+            wait_for_ajaximations
 
-          # Verify that it says it'll quote the correct entry
-          expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
+            new_reply = DiscussionEntry.last
 
-          type_in_tiny("textarea", "Quoting 2nd level reply")
-          f("button[data-testid='DiscussionEdit-submit'").click
-          wait_for_ajaximations
+            # Verify new entry data is correct
+            expect(new_reply.depth).to eq 3
+            expect(new_reply.parent_id).to eq @second_reply.id
 
-          new_reply = DiscussionEntry.last
+            # Verify that the correct quote is created after submission
+            expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
+          end
 
-          # Verify new entry data is correct
-          expect(new_reply.depth).to eq 3
-          expect(new_reply.parent_id).to eq @second_reply.id
+          it "quotes third_reply correctly" do
+            skip("Until problems with VICE-3112 are fixed")
+            f("button[data-testid='expand-button']").click
+            wait_for_ajaximations
+            ff("button[data-testid='thread-actions-menu']")[2].click
+            f("span[data-testid='quote']").click
+            wait_for_ajaximations
 
-          # Verify that the correct quote is created after submission
-          expect(fj("div[data-testid='reply-preview']:contains('#{@second_reply.summary}')")).to be_present
-        end
+            # Verify that it says it'll quote the correct entry
+            expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
 
-        it "quotes third_reply correctly" do
-          skip("Until problems with VICE-3112 are fixed")
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+            type_in_tiny("textarea", "quoting 3rd level reply")
+            f("button[data-testid='DiscussionEdit-submit'").click
+            wait_for_ajaximations
 
-          f("button[data-testid='expand-button']").click
-          wait_for_ajaximations
-          ff("button[data-testid='thread-actions-menu']")[2].click
-          f("span[data-testid='quote']").click
-          wait_for_ajaximations
+            new_reply = DiscussionEntry.last
 
-          # Verify that it says it'll quote the correct entry
-          expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
+            # Verify new entry data is correct
+            expect(new_reply.depth).to eq 3
+            expect(new_reply.parent_id).to eq @second_reply.id
 
-          type_in_tiny("textarea", "quoting 3rd level reply")
-          f("button[data-testid='DiscussionEdit-submit'").click
-          wait_for_ajaximations
+            # Verify that the correct quote is created after submission
+            expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+          end
 
-          new_reply = DiscussionEntry.last
+          it "quotes fourth_reply correctly" do
+            skip("Until problems with VICE-3112 and VICE-3229 are fixed")
 
-          # Verify new entry data is correct
-          expect(new_reply.depth).to eq 3
-          expect(new_reply.parent_id).to eq @second_reply.id
+            f("button[data-testid='expand-button']").click
+            wait_for_ajaximations
+            wait_for_ajaximations
+            ff("button[data-testid='thread-actions-menu']")[3].click
+            f("span[data-testid='quote']").click
+            wait_for_ajaximations
 
-          # Verify that the correct quote is created after submission
-          expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
-          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
-        end
+            # Verify that it says it'll quote the correct entry
+            expect(fj("div[data-testid='reply-preview']:contains('#{@fourth_reply.summary}')")).to be_present
 
-        it "quotes fourth_reply correctly" do
-          skip("Until problems with VICE-3112 and VICE-3229 are fixed")
-          user_session(@student)
-          get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
-          expect(fj("div:contains(#{@threaded_topic.title})")).to be_present
+            type_in_tiny("textarea", "quoting 4th level reply")
+            f("button[data-testid='DiscussionEdit-submit'").click
+            wait_for_ajaximations
 
-          f("button[data-testid='expand-button']").click
-          wait_for_ajaximations
-          wait_for_ajaximations
-          ff("button[data-testid='thread-actions-menu']")[3].click
-          f("span[data-testid='quote']").click
-          wait_for_ajaximations
+            new_reply = DiscussionEntry.last
 
-          # Verify that it says it'll quote the correct entry
-          expect(fj("div[data-testid='reply-preview']:contains('#{@fourth_reply.summary}')")).to be_present
+            # Verify new entry data is correct
+            expect(new_reply.depth).to eq 2
+            expect(new_reply.parent_id).to eq @first_reply.id
 
-          type_in_tiny("textarea", "quoting 4th level reply")
-          f("button[data-testid='DiscussionEdit-submit'").click
-          wait_for_ajaximations
-
-          new_reply = DiscussionEntry.last
-
-          # Verify new entry data is correct
-          expect(new_reply.depth).to eq 2
-          expect(new_reply.parent_id).to eq @first_reply.id
-
-          # Verify that the correct quote is created after submission
-          expect(fj("div[data-testid='reply-preview']:contains('#{@fourth_reply.summary}')")).to be_present
-          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>quoting 4th level reply</p>"
+            # Verify that the correct quote is created after submission
+            expect(fj("div[data-testid='reply-preview']:contains('#{@fourth_reply.summary}')")).to be_present
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>quoting 4th level reply</p>"
+          end
         end
       end
     end
