@@ -25,7 +25,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
-  const [currentSearchValue, setCurrentSearchValue] = useState('')
+  const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
 
   useEffect(() => {
     const interval = setInterval(() => {
