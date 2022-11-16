@@ -401,7 +401,7 @@ describe LearningOutcomeResult do
         )
       end
 
-      it "deletes previous LearningOutcomeResult for the same user, learning outcome, and alignment" do
+      it "deletes result if there is a previous one for the same user, learning outcome, and alignment" do
         same_lor = @lor.clone
         same_lor.save!
         expect(LearningOutcomeResult.find(@lor.id).workflow_state).to eq("active")
@@ -423,6 +423,51 @@ describe LearningOutcomeResult do
         )
         expect(LearningOutcomeResult.find(@lor.id).workflow_state).to eq("active")
         expect(LearningOutcomeResult.find(new_lor.id).workflow_state).to eq("active")
+      end
+
+      describe "for QuestionBanks with questions used in multiple quizzes" do
+        before :once do
+          assessment_question_bank_with_questions
+          @outcome.align(@bank, course, mastery_score: 0.7)
+          @quiz1 = course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy: "keep_highest")
+          @quiz1.add_assessment_questions [@q1]
+          @quiz2 = course.quizzes.create!(title: "new quiz 2", shuffle_answers: true, quiz_type: "assignment", scoring_policy: "keep_highest")
+          @quiz2.add_assessment_questions [@q1]
+          @qb_alignment = ContentTag.find_by(content_type: "AssessmentQuestionBank")
+        end
+
+        it "creates a LearningOutcomeResult for the same user and learning outcome for different quizzes" do
+          lor1 = LearningOutcomeResult.create(
+            alignment: @qb_alignment,
+            user: student,
+            score: 2,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz1.id
+          )
+          lor2 = LearningOutcomeResult.create(
+            alignment: @qb_alignment,
+            user: student,
+            score: 2,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz2.id
+          )
+          expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
+          expect(LearningOutcomeResult.find(lor2.id).workflow_state).to eq("active")
+        end
+
+        it "deletes result if there is a previous one for the same user, learning outcome, and associated asset" do
+          lor1 = LearningOutcomeResult.create(
+            alignment: @qb_alignment,
+            user: student,
+            score: 2,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz1.id
+          )
+          same_lor = lor1.clone
+          same_lor.save!
+          expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
+          expect(LearningOutcomeResult.find(same_lor.id).workflow_state).to eq("deleted")
+        end
       end
     end
   end
