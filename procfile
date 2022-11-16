@@ -1,2 +1,3 @@
-web:	RAILS_ENV=development bundle exec rails s
-worker: RAILS_ENV=development bundle exec script/delayed_job run
+web:	 RAILS_ENV=development bundle exec rails s
+worker:  RAILS_ENV=development bundle exec script/delayed_job run
+echo: ruby echo_server.rb
