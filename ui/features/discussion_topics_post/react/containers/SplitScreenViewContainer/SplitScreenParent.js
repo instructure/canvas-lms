@@ -156,17 +156,11 @@ export const SplitScreenParent = props => {
           {props.discussionEntry.parentId && (
             <View as="div" padding="small none none small">
               <BackButton
-                onClick={() =>
-                  props.onOpenSplitScreenView(
-                    props.discussionEntry.parentId,
-                    props.discussionEntry.isolatedEntryId,
-                    false
-                  )
-                }
+                onClick={() => props.onOpenSplitScreenView(props.discussionEntry.parentId, false)}
               />
             </View>
           )}
-          {props.discussionEntry.parentId && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+          {props.discussionEntry.depth > 2 && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
             <Alert
               variant="warning"
               renderCloseButtonLabel="Close"
@@ -182,9 +176,13 @@ export const SplitScreenParent = props => {
               }}
             >
               <Text size={responsiveProps.textSize}>
-                {I18n.t(
-                  'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
-                )}
+                {props.discussionEntry.depth > 3
+                  ? I18n.t(
+                      'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+                    )
+                  : I18n.t(
+                      'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
+                    )}
               </Text>
             </Alert>
           )}

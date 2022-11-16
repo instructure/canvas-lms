@@ -280,13 +280,7 @@ const SplitScreenThreadContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        onClick={() =>
-          props.onOpenSplitScreenView(
-            props.discussionEntry._id,
-            props.discussionEntry.isolatedEntryId,
-            true
-          )
-        }
+        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, true)}
       />
     )
   }
@@ -315,7 +309,7 @@ const SplitScreenThreadContainer = props => {
         authorName={getDisplayName(props.discussionEntry)}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, null, false)}
+        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, false)}
       />
     )
   }
@@ -367,7 +361,6 @@ const SplitScreenThreadContainer = props => {
                         goToParent={() => {
                           props.onOpenSplitScreenView(
                             props.discussionEntry.rootEntryId,
-                            props.discussionEntry.rootEntryId,
                             false,
                             props.discussionEntry.rootEntryId
                           )
@@ -378,7 +371,6 @@ const SplitScreenThreadContainer = props => {
                             ? () => {
                                 props.onOpenSplitScreenView(
                                   props.discussionEntry.rootEntryId,
-                                  props.discussionEntry.rootEntryId,
                                   false,
                                   props.discussionEntry.quotedEntry._id
                                 )
@@ -387,11 +379,7 @@ const SplitScreenThreadContainer = props => {
                         }
                         onQuoteReply={() => {
                           setReplyFromId(props.discussionEntry._id)
-                          props.onOpenSplitScreenView(
-                            props.discussionEntry._id,
-                            props.discussionEntry.isolatedEntryId,
-                            true
-                          )
+                          props.onOpenSplitScreenView(props.discussionEntry._id, true)
                         }}
                         onReport={
                           props.discussionTopic.permissions?.studentReporting

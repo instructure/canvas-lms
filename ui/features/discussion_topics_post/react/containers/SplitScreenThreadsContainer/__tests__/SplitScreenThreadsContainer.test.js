@@ -359,6 +359,6 @@ describe('SplitScreenThreadsContainer', () => {
     fireEvent.click(getByTestId('thread-actions-menu'))
     fireEvent.click(queryByText('Go To Quoted Reply'))
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith('50', '50', false, '100')
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith('50', false, '100')
   })
 })

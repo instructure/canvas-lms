@@ -67,7 +67,9 @@ const DiscussionTopicManager = props => {
   }
 
   // Isolated View State
-  const [isolatedEntryId, setIsolatedEntryId] = useState(ENV.discussions_deep_link?.root_entry_id)
+  const [threadParentEntryId, setThreadParentEntryId] = useState(
+    ENV.discussions_deep_link?.root_entry_id
+  )
   const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(
     !!ENV.discussions_deep_link?.root_entry_id
@@ -126,16 +128,27 @@ const DiscussionTopicManager = props => {
   }, [highlightEntryId])
 
   const openView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
-    if (ENV.isolated_view) setReplyFromId(discussionEntryId)
-    setIsolatedEntryId(isolatedId || discussionEntryId)
     if (ENV.isolated_view) {
-      setIsolatedViewOpen(true)
+      openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
     }
+    if (ENV.split_screen_view) {
+      openSplitScreenView(discussionEntryId, withRCE, relativeId)
+    }
+  }
+
+  const openIsolatedView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
+    setReplyFromId(discussionEntryId)
+    setThreadParentEntryId(isolatedId || discussionEntryId)
+    setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
-    if (ENV.split_screen_view) {
-      setSplitScreenViewOpen(true)
-    }
+  }
+
+  const openSplitScreenView = (discussionEntryId, withRCE, relativeId = null) => {
+    setThreadParentEntryId(discussionEntryId)
+    setSplitScreenViewOpen(true)
+    setEditorExpanded(withRCE)
+    setRelativeEntryId(relativeId)
   }
 
   const closeView = () => {
@@ -363,19 +376,19 @@ const DiscussionTopicManager = props => {
                 />
               )
             )}
-            {ENV.isolated_view && isolatedEntryId && (
+            {ENV.isolated_view && threadParentEntryId && (
               <IsolatedViewContainer
                 relativeEntryId={relativeEntryId}
                 removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
                 updateDraftCache={updateDraftCache}
                 discussionTopic={discussionTopicQuery.data.legacyNode}
-                discussionEntryId={isolatedEntryId}
+                discussionEntryId={threadParentEntryId}
                 replyFromId={replyFromId}
                 open={isolatedViewOpen}
                 RCEOpen={editorExpanded}
                 setRCEOpen={setEditorExpanded}
                 onClose={closeView}
-                onOpenIsolatedView={openView}
+                onOpenIsolatedView={openIsolatedView}
                 goToTopic={goToTopic}
                 highlightEntryId={highlightEntryId}
                 setHighlightEntryId={setHighlightEntryId}
@@ -390,19 +403,19 @@ const DiscussionTopicManager = props => {
             onDismiss={() => setSplitScreenViewOpen(false)}
             data-testid="drawer-layout-tray"
           >
-            {ENV.split_screen_view && !ENV.isolated_view && isolatedEntryId && (
+            {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
               <View as="div">
                 <SplitScreenViewContainer
                   relativeEntryId={relativeEntryId}
                   removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
                   updateDraftCache={updateDraftCache}
                   discussionTopic={discussionTopicQuery.data.legacyNode}
-                  discussionEntryId={isolatedEntryId}
+                  discussionEntryId={threadParentEntryId}
                   open={isSplitScreenViewOpen}
                   RCEOpen={editorExpanded}
                   setRCEOpen={setEditorExpanded}
                   onClose={closeView}
-                  onOpenSplitScreenView={openView}
+                  onOpenSplitScreenView={openSplitScreenView}
                   goToTopic={goToTopic}
                   highlightEntryId={highlightEntryId}
                   setHighlightEntryId={setHighlightEntryId}
