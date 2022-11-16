@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 
 export default function (ed, document) {
@@ -42,6 +43,7 @@ export default function (ed, document) {
         label={formatMessage('Upload File')}
         panels={['COMPUTER']}
         onDismiss={handleDismiss}
+        canvasOrigin={bridge.canvasOrigin}
       />,
       container
     )

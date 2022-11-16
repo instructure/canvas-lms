@@ -94,6 +94,7 @@ function renderBody(
   allowNameChange,
   nameRef,
   rcsConfig,
+  canvasOrigin,
   isLoading
 ) {
   return isLoading() ? (
@@ -109,6 +110,7 @@ function renderBody(
       allowNameChange={allowNameChange}
       nameRef={nameRef}
       rcsConfig={rcsConfig}
+      canvasOrigin={canvasOrigin}
     />
   )
 }
@@ -311,7 +313,17 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       onUnmount={onUnmount}
       renderHeader={() => renderHeader(title, settings, onKeyDown, handleAlertDismissal, onClose)}
       renderBody={() =>
-        renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig, isLoading)
+        renderBody(
+          settings,
+          dispatch,
+          editor,
+          editing,
+          !replaceAll,
+          nameRef,
+          rcsConfig,
+          canvasOrigin,
+          isLoading
+        )
       }
       renderFooter={() =>
         renderFooter(

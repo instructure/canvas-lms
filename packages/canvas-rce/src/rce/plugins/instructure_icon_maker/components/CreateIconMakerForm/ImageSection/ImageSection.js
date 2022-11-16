@@ -50,7 +50,7 @@ const filterSectionStateMetadata = state => {
   return {mode, image, imageName, icon, iconFillColor, cropperSettings}
 }
 
-export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) => {
+export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, canvasOrigin}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const Upload = React.lazy(() => import('./Upload'))
   const SingleColor = React.lazy(() => import('./SingleColor'))
@@ -238,6 +238,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
                 onChange={onChange}
                 onLoading={scrollToBottom}
                 onLoaded={scrollToBottom}
+                canvasOrigin={canvasOrigin}
               />
             </Flex.Item>
           )}
