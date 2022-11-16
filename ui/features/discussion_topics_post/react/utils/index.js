@@ -21,6 +21,7 @@ import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import $ from '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -319,4 +320,23 @@ export const getDisplayName = discussionEntry => {
     return I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
   return discussionEntry.author?.displayName || discussionEntry.author?.shortName
+}
+
+export const showErrorWhenMessageTooLong = message => {
+  // use DISCUSSION_ENTRY_SIZE_LIMIT for tests,
+  // keep in mind, messages have opening and closing p tags,
+  // which are 7 characters in total
+  // since this is only to be used for testing
+  // that consideration will be up to the tester using
+  // this ENV var
+  //
+  // backend limitation is 64Kb -1
+  const limit = ENV.DISCUSSION_ENTRY_SIZE_LIMIT || 63999
+  const tooLong = new Blob([message]).size > limit
+  if (tooLong === true) {
+    const tooLongMessage = I18n.t('The message size has exceeded the maximum text length.')
+    $.flashError(tooLongMessage, 2000)
+    return true
+  }
+  return false
 }
