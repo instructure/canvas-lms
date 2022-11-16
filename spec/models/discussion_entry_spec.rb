@@ -67,13 +67,13 @@ describe DiscussionEntry do
     @course.disable_feature!(:react_discussions_post)
     expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
 
-    # Verify that course overruels split_screen_view as well
+    # Verify that course overrules split_screen_view as well
     Account.site_admin.disable_feature!(:isolated_view)
     Account.site_admin.enable_feature!(:split_screen_view)
     expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
-    # Verify that split_screen_view also returns discussion_entries.legacy as false
+    # Verify that split_screen_view also returns discussion_entries.legacy as true
     @course.enable_feature!(:react_discussions_post)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be false
+    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
   end
 
   it "preserves parent_id if valid" do

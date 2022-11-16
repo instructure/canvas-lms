@@ -321,7 +321,7 @@ describe "threaded discussions" do
       end
 
       context "isolated view" do
-        # These tests should verify that isolated view quotes/eplies are not affected by split-screen code
+        # These tests should verify that isolated view quotes/replies are not affected by split-screen code
         # They will be removed with VICE-3227
         # Note there is no way to reply in a thread without quoting in isolated view
         before :once do
@@ -581,7 +581,7 @@ describe "threaded discussions" do
           end
 
           it "quotes third_reply correctly" do
-            skip("Until problems with VICE-3112 are fixed")
+            skip("Until VICE-3243")
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             ff("button[data-testid='thread-actions-menu']")[2].click
@@ -607,7 +607,7 @@ describe "threaded discussions" do
           end
 
           it "quotes fourth_reply correctly" do
-            skip("Until problems with VICE-3112 and VICE-3229 are fixed")
+            skip("Until VICE-3243")
 
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
@@ -681,7 +681,6 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to second reply" do
-          skip("until VICE-3223")
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           ff("button[data-testid='threading-toolbar-reply']")[2].click
@@ -701,7 +700,6 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to third reply" do
-          skip("until VICE-3223")
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[2].click
@@ -721,12 +719,12 @@ describe "threaded discussions" do
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
           expect(fj("div:contains(#{@third_reply.summary})")).to be_present
+          # @mentions will be added in the next patchset
           # Verify that the correct @mentions is created
-          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+          # expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
         end
 
         it "replies correctly to fourth reply" do
-          skip("until VICE-3223")
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           ff("button[data-testid='expand-button']")[2].click
@@ -748,8 +746,9 @@ describe "threaded discussions" do
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
           expect(fj("div:contains(#{@second_reply.summary})")).to be_present
+          # @mentions will be added in the next patchset
           # Verify that the correct @mentions is created
-          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>replying to 4th level reply</p>"
+          # expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>replying to 4th level reply</p>"
         end
 
         describe "when quoting" do
@@ -796,7 +795,7 @@ describe "threaded discussions" do
           end
 
           it "quotes third_reply correctly" do
-            skip("until VICE-3223")
+            skip("until VICE-3243")
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             ff("button[data-testid='thread-actions-menu']")[3].click
@@ -823,8 +822,7 @@ describe "threaded discussions" do
           end
 
           it "quotes fourth_reply correctly" do
-            skip("until VICE-3223")
-
+            skip("until VICE-3243")
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             wait_for_ajaximations
