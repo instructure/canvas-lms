@@ -55,6 +55,34 @@ describe "Discussion Topic Search" do
       expect(f("#content")).not_to contain_jqcss("span:contains('foo')")
     end
 
+    it "preserves search term upon changing filter" do
+      @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "foo bar"
+      )
+
+      student = student_in_course(course: @course, name: "Jeff", active_all: true).user
+      user_session(student)
+
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+
+      f("input[placeholder='Search entries or author...']").send_keys("foo")
+      # need to wait for things outside what wait_for_ajaximations can catch
+      # rubocop:disable Lint/NoSleep
+      sleep 1
+      # rubocop:enable Lint/NoSleep
+
+      expect(fj("span:contains('foo bar')")).to be_present
+
+      f("span.discussions-filter-by-menu").click
+      wait_for_ajaximations
+      fj("li li:contains('Unread')").click
+      wait_for_ajaximations
+
+      expect(f("input[data-testid='search-filter']").attribute("value")).to eq "foo"
+    end
+
     it "resets to page 1 upon clearing search term" do
       (1..2).each do |number|
         @topic.discussion_entries.create!(
