@@ -23,6 +23,7 @@ import {
   getSpeedGraderUrl,
   getOptimisticResponse,
   buildQuotedReply,
+  getDisplayName,
 } from '../../utils'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -49,6 +50,7 @@ import PropTypes from 'prop-types'
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import * as ReactDOMServer from 'react-dom/server'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -264,6 +266,26 @@ export const SplitScreenViewContainer = props => {
     return rootEntryDraftMessage
   }
 
+  const getRCEStartingValue = () => {
+    let draftValue = ''
+    if (ENV.draft_discussions) {
+      draftValue = findDraftMessage(
+        splitScreenEntryOlderDirection.data.legacyNode.root_entry_id ||
+          splitScreenEntryOlderDirection.data.legacyNode._id
+      )
+    }
+    const mentionsValue =
+      splitScreenEntryOlderDirection.data.legacyNode.depth >= 3
+        ? ReactDOMServer.renderToString(
+            <span className="mceNonEditable mention" data-mention="1">
+              @{getDisplayName(splitScreenEntryOlderDirection.data.legacyNode)}
+            </span>
+          )
+        : ''
+
+    return mentionsValue + draftValue
+  }
+
   const splitScreenEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
@@ -453,10 +475,7 @@ export const SplitScreenViewContainer = props => {
                   ],
                   replyFromId
                 )}
-                value={findDraftMessage(
-                  splitScreenEntryOlderDirection.data.legacyNode.root_entry_id ||
-                    splitScreenEntryOlderDirection.data.legacyNode._id
-                )}
+                value={getRCEStartingValue()}
                 onSetDraftSaved={setDraftSaved}
                 draftSaved={draftSaved}
                 updateDraft={newDraftMessage => {

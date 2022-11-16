@@ -719,9 +719,8 @@ describe "threaded discussions" do
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
           expect(fj("div:contains(#{@third_reply.summary})")).to be_present
-          # @mentions will be added in the next patchset
           # Verify that the correct @mentions is created
-          # expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
         end
 
         it "replies correctly to fourth reply" do
@@ -746,9 +745,8 @@ describe "threaded discussions" do
           # Verify that the correct level is opened
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
           expect(fj("div:contains(#{@second_reply.summary})")).to be_present
-          # @mentions will be added in the next patchset
           # Verify that the correct @mentions is created
-          # expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>replying to 4th level reply</p>"
+          expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@fourth_reply.author_name}</span>replying to 4th level reply</p>"
         end
 
         describe "when quoting" do
