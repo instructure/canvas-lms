@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 
 export default function (ed, document, trayProps) {
@@ -43,6 +44,7 @@ export default function (ed, document, trayProps) {
         panels={panels}
         onDismiss={handleDismiss}
         trayProps={trayProps}
+        canvasOrigin={bridge.canvasOrigin}
       />,
       container
     )

@@ -61,6 +61,7 @@ const UploadFileModal = React.forwardRef(
       editor,
       contentProps,
       trayProps,
+      canvasOrigin,
       onSubmit,
       onDismiss,
       panels,
@@ -123,6 +124,7 @@ const UploadFileModal = React.forwardRef(
         jwt: trayProps.jwt,
         refreshToken: trayProps.refreshToken,
         host: trayProps.host,
+        canvasOrigin,
       })
 
     return (
@@ -309,6 +311,7 @@ UploadFileModal.propTypes = {
   editor: object.isRequired,
   contentProps: object,
   trayProps: object,
+  canvasOrigin: string,
   onSubmit: func,
   onDismiss: func.isRequired,
   panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),

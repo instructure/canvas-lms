@@ -414,7 +414,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
           return getFileUrlIfMissing(source, results)
         })
         .then(results => {
-          return fixupFileUrl(contextType, contextId, results)
+          return fixupFileUrl(contextType, contextId, results, source.canvasOrigin)
         })
         .then(results => {
           return generateThumbnailUrl(results, fileMetaProps.domObject, fileReader)
