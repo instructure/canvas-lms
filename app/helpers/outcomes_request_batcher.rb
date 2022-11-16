@@ -28,15 +28,15 @@ class OutcomesRequestBatcher
   private
 
   def split_requests(protocol, endpoint, context, scope, params)
+    requests = []
     domain, jwt = extract_domain_jwt(
       context.root_account,
       scope,
       params
     )
 
-    return if domain.nil? || jwt.nil?
+    return requests if domain.nil? || jwt.nil?
 
-    requests = []
     if jwt.bytesize < MAX_JWT_SIZE
       # No need to split the request because it is small enough.
       requests.push({ protocol: protocol, endpoint: endpoint, domain: domain, jwt: jwt, params: params })
