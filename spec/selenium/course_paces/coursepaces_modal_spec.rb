@@ -120,6 +120,107 @@ describe "course pace page" do
     end
   end
 
+  context "course paces modules" do
+    let(:module_title) { "First Module" }
+    let(:module_assignment_title) { "Module Assignment" }
+
+    before :once do
+      @course_module = create_course_module(module_title, "active")
+      @assignment = create_assignment(@course, module_assignment_title, "Module Assignment Description", 10, "published")
+      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
+    end
+
+    it "shows the module and module items in the course pace", custom_timeout: 25 do
+      discussion_title = "Module Discussion"
+      discussion_assignment = create_graded_discussion(@course, discussion_title, "published")
+      @course_module.add_item(id: discussion_assignment.id, type: "discussion_topic")
+      quiz_title = "Quiz Title"
+      quiz = create_quiz(@course, quiz_title)
+      @course_module.add_item(id: quiz.id, type: "quiz")
+
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(module_title_text(1)).to include(module_title)
+      expect(module_item_title_text(0)).to start_with(module_assignment_title)
+      expect(module_item_title_text(1)).to start_with(discussion_title)
+      expect(module_item_title_text(2)).to start_with(quiz_title)
+    end
+
+    it "shows the published status for items", custom_timeout: 25 do
+      unpublished_assignment = create_assignment(@course, "unpub assignment", "unpub description", 10, "unpublished")
+      @course_module.add_item(id: unpublished_assignment.id, type: "assignment")
+
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(module_item_publish_status[0]).to be_displayed
+      expect(module_item_unpublish_status[0]).to be_displayed
+    end
+
+    it "has a link to the assignment for the title" do
+      visit_course_paces_page
+      click_create_default_pace_button
+      title_element = module_item_title(@assignment.title)
+
+      expect(
+        element_value_for_attr(title_element, "href")
+      ).to include("courses/#{@course.id}/modules/items/#{@module_item.id}")
+    end
+
+    it "shows the points possible for a module item" do
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(module_item_points_possible[0].text).to eq("10 pts")
+    end
+
+    it "does not show a module item that is not an assignment", custom_timeout: 25 do
+      skip("LS-3614 will fix the issue addressed by this test in the redesign")
+      page = @course.wiki_pages.create!(title: "New Page Title")
+      @course_module.add_item(id: page.id, type: "wiki_page")
+      @course_module.add_item(type: "external_url",
+                              url: "http://example.com/lolcats",
+                              title: "pls view")
+      @course_module.add_item(type: "sub_header", title: "silly tag")
+
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(module_items.count).to eq(1)
+      expect(module_item_title_text(0)).to start_with(module_assignment_title)
+    end
+
+    it "does not show any publish status when no course pace created yet" do
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(publish_status_exists?).to be_falsey
+    end
+
+    it "updates duration to make Publish and Cancel buttons enabled", custom_timeout: 25 do
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      expect(apply_or_create_pace_button).not_to be_enabled
+
+      update_module_item_duration(0, 2)
+
+      expect(apply_or_create_pace_button).to be_enabled
+    end
+
+    it "does not allow duration to be set to negative number" do
+      visit_course_paces_page
+      click_create_default_pace_button
+
+      update_module_item_duration(0, "-1")
+
+      expect(duration_field[0].text).not_to eq("-1")
+    end
+  end
+
   context "Remove Pace Modal" do
     before :once do
       create_published_course_pace("Course Pace 1", "Module Assignment 1")
