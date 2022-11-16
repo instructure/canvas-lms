@@ -30,7 +30,8 @@ Bundler.require(*Rails.groups)
 module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk
-    config.hosts << "*.githubpreview.dev"
+    
+    config.hosts << "#{ENV['CODESPACE_NAME']}-3000.preview.app.github.dev"
 
     config.add_autoload_paths_to_load_path = false
 

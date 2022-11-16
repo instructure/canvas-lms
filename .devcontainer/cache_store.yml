@@ -1,0 +1,16 @@
+# Configure the cache_store by environment. Should be a hash at top level, one
+# key per environment, with configuration hashes as values.
+development:
+  cache_store: redis_cache_store
+  #
+  # # normally you'll want to define your redis servers in config/redis.yml and
+  # # not here, so that they are used for data as well as cache storage.
+  #
+  # # the only reason to define a server list here is if you want to use a
+  # # separate redis instance for cache and for data.
+  #
+  url:
+    - localhost
+  db: 0
+  #
+  #

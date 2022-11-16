@@ -2,11 +2,13 @@
 
 set -e
 
+sudo update-rc.d redis-server enable
+
+ruby -rerb -e 'puts ERB.new(File.read(".devcontainer/domain.yml.erb")).result(binding)' > config/domain.yml &&
 cp config/database.yml.codespaces config/database.yml &&
 cp config/security.yml.example config/security.yml &&
-cp config/domain.yml.example config/domain.yml &&
-cp config/cache_store.yml.example config/cache_store.yml && # edit
-cp .devcontainer/redis.yml.example config/redis.yml && 
+cp .devcontainer/cache_store.yml config/cache_store.yml &&
+cp .devcontainer/redis.yml config/redis.yml &&
 bundle install &&
 yarn install &&
 CANVAS_LMS_STATS_COLLECTION=opt_out \
