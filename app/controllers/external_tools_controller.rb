@@ -52,10 +52,19 @@ class ExternalToolsController < ApplicationController
   #   The partial name of the tools to match and return.
   #
   # @argument selectable [Boolean]
-  #   If true, then only tools that are meant to be selectable are returned
+  #   If true, then only tools that are meant to be selectable are returned.
   #
   # @argument include_parents [Boolean]
   #   If true, then include tools installed in all accounts above the current context
+  #
+  # @argument placement [String]
+  #   The placement type to filter by.
+  #
+  # @example_request
+  #
+  #   Return all tools at the current context as well as all tools from the parent, and filter the tools list to only those with a placement of 'editor_button'
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools?include_parents=true&placement=editor_button' \
+  #        -H "Authorization: Bearer <token>"
   #
   # @example_response
   #     [
