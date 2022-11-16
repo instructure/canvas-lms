@@ -15,7 +15,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-gem 'dotenv-rails', :groups => [:development, :test]
 
 if CANVAS_RAILS5_0
   gem 'rails', '5.0.7.2'
@@ -173,3 +172,4 @@ gem 'jquery-rails'
 gem 'rails-ujs'
 gem 'rb-readline'
 gem 'launchdarkly-server-sdk', '~> 6.0.0'
+gem 'dotenv-rails', :groups => [:development, :test]
