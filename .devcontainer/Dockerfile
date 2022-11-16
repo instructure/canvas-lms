@@ -10,10 +10,10 @@ RUN gem install bundler:2.2.17
 
 # Default value to allow debug server to serve content over GitHub Codespace's port forwarding service
 # The value is a comma-separated list of allowed domains
-ENV RAILS_DEVELOPMENT_HOSTS=".githubpreview.dev"
+ENV RAILS_DEVELOPMENT_HOSTS=".app.github.dev"
 
 # [Choice] Node.js version: lts/*, 16, 14, 12, 10
-ARG NODE_VERSION="lts/*"
+ARG NODE_VERSION="lts/Gallium"
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
 
 # [Optional] Uncomment this section to install additional OS packages.
