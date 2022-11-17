@@ -1,0 +1,2 @@
+web: 	 RAILS_ENV=development PORT=3000 bundle exec rails server
+worker:  RAILS_ENV=development bundle exec script/delayed_job run

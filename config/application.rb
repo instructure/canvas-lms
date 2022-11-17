@@ -1,3 +1,4 @@
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -101,6 +102,10 @@ module CanvasRails
         end
 
         config.logger = CanvasLogger.new(log_path, log_level, opts)
+    end
+
+    if ['development', 'test'].include? ENV['RAILS_ENV']
+      Dotenv.load('canvas.env')
     end
 
     # Activate observers that should always be running
