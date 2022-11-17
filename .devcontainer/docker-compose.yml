@@ -11,7 +11,7 @@ services:
         # Use -bullseye variants on local arm64/Apple Silicon.
         VARIANT: "2.7"
         # Optional Node.js version to install
-        NODE_VERSION: "lts/*"
+        NODE_VERSION: "16"
 
     volumes:
       - ..:/workspace:cached

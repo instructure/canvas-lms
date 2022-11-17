@@ -22,15 +22,9 @@ RUN gem install bundler:2.2.17
 ENV RAILS_DEVELOPMENT_HOSTS=".app.github.dev"
 
 # [Choice] Node.js version: lts/*, 16, 14, 12, 10
-ARG NODE_VERSION="lts/Gallium"
+ARG NODE_VERSION="16"
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends libxmlsec1-dev redis-server libidn11-dev
-
-# [Optional] Uncomment this line to install additional gems.
-# RUN gem install <your-gem-names-here>
-
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1

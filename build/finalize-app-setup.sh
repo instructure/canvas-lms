@@ -11,5 +11,6 @@ cp .devcontainer/cache_store.yml config/cache_store.yml
 cp .devcontainer/redis.yml config/redis.yml
 bundle install
 yarn install
-    bundle exec rake db:initial_setup &&
+
+bundle exec rake db:initial_setup
 bundle exec rails canvas:compile_assets_dev
