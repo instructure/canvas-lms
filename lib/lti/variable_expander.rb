@@ -1691,6 +1691,11 @@ module Lti
                          val&.to_json
                        }
 
+    register_expansion "com.instructure.Account.usage_metrics_enabled", [],
+                       lambda {
+                         @root_account.feature_enabled?(:send_usage_metrics)
+                       }
+
     private
 
     def unique_submission_dates

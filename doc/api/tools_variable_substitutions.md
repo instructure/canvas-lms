@@ -1501,3 +1501,10 @@ in Canvas-side GET request that triggers the LTI launch.
 ```
 [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
 ```
+## com.instructure.Account.usage_metrics_enabled
+
+
+**Availability**: *always*  
+
+
+
