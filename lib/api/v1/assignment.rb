@@ -977,7 +977,6 @@ module Api::V1::Assignment
     apply_external_tool_settings(assignment, assignment_params)
     overrides = pull_overrides_from_params(assignment_params)
 
-    invalid = { valid: false }
     if assignment_params[:allowed_extensions].present? && assignment_params[:allowed_extensions].length > Assignment.maximum_string_length
       assignment.errors.add("assignment[allowed_extensions]", I18n.t("Value too long, allowed length is %{length}", length: Assignment.maximum_string_length))
       return invalid
@@ -1001,6 +1000,10 @@ module Api::V1::Assignment
 
     if external_tool_tag_attributes&.include?(:url)
       assignment.lti_resource_link_url = external_tool_tag_attributes[:url]
+    end
+
+    if assignment.external_tool?
+      assignment.peer_reviews = false
     end
 
     {
