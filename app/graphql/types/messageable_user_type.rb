@@ -47,9 +47,7 @@ module Types
       return nil unless course_context.is_a?(Course)
       return nil unless course_context.user_is_instructor?(current_user)
 
-      load_association(:observer_enrollments).then do |observer_enrollments|
-        observer_enrollments.active_by_date.where.not(associated_user_id: nil).where(course: course_context).distinct
-      end
+      course_context.observer_enrollments.where(user: object).active_or_pending.where.not(associated_user_id: nil).distinct
     end
 
     field :common_groups_connection, Types::GroupType.connection_type, null: true
