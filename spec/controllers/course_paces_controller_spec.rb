@@ -388,6 +388,16 @@ describe CoursePacesController, type: :controller do
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
       end
 
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, { params: { course_id: @course.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+      end
+
       it "returns an instantiated course pace if one is not already available" do
         @course_pace.destroy
         expect(@course.course_paces.not_deleted.count).to eq(0)
@@ -440,6 +450,16 @@ describe CoursePacesController, type: :controller do
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
       end
 
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+      end
+
       it "returns an instantiated course pace if one is not already available" do
         expect(@course.course_paces.unpublished.for_section(@course_section).count).to eq(0)
         get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
@@ -479,6 +499,16 @@ describe CoursePacesController, type: :controller do
         expect(response).to be_successful
         expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(publised_section_pace.id)
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+      end
+
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, { params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id } }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
       end
 
       it "returns an instantiated section pace if one is already published and the user is in that section" do
