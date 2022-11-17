@@ -73,6 +73,17 @@ module FeatureFlags
       root_account.external_integration_keys.find_by(key_type: "salesforce_billing_country_code")&.key_value == "US"
     end
 
+    def self.usage_metrics_allowed_hook(context)
+      # Calling out here that `key_type: "salesforce_territory_region")&.key_value == "domestic"`
+      #   is totally made up right now and won't resolve anything until we add salesforce
+      #   data with these values
+      context&.root_account&.settings&.[](:enable_usage_metrics) ||
+        (context&.root_account&.external_integration_keys&.find_by(
+          key_type: "salesforce_billing_country_code")&.key_value == "US" &&
+          context&.root_account&.external_integration_keys&.find_by(
+            key_type: "salesforce_territory_region")&.key_value == "domestic")
+    end
+
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)
