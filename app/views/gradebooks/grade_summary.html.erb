@@ -169,7 +169,7 @@
               <% if @presenter.student_is_user? || @presenter.user_an_observer_of_student? %>
                 <a href="<%= context_url(@context, :context_assignment_url, assignment) %>"><%= assignment.title %></a>
               <% else %>
-                <a href="<%= speed_grader_course_gradebook_url({course_id: assignment.context_id, assignment_id: assignment}.merge({student_id: submission.user_id})) %>"><%= assignment.title %></a>
+                <a href="<%= speed_grader_course_gradebook_url({course_id: assignment.context_id, assignment_id: assignment}.merge({student_id: submission.user_id, only_path: true})) %>"><%= assignment.title %></a>
               <% end %>
             <% else %>
               <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
