@@ -29,6 +29,9 @@ const defaultProps = {
   gradebookEnv: {
     context_id: '1',
     enhanced_gradebook_filters: false,
+    course_settings: {
+      allow_final_grade_override: true,
+    },
     settings: {
       filter_rows_by: {
         section_id: null,

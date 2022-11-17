@@ -220,3 +220,14 @@ export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
   turnitinData?: PlagiarismDataMap
   vericiteData?: {provider: 'vericite'} & PlagiarismDataMap
 }
+
+export type FinalGradeOverride = {
+  courseGrade?: string
+  gradingPeriodGrades?: {
+    [gradingPeriodId: string]: string
+  }
+}
+
+export type FinalGradeOverrideMap = {
+  [userId: string]: FinalGradeOverride
+}

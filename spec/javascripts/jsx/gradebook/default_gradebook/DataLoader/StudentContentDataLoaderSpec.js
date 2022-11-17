@@ -273,36 +273,6 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       })
     })
 
-    QUnit.module('loading final grade overrides', () => {
-      test('optionally requests final grade overrides', async () => {
-        await load()
-        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 1)
-      })
-
-      test('optionally does not request final grade overrides', async () => {
-        gradebook.courseSettings.setAllowFinalGradeOverride(false)
-        await load()
-        strictEqual(FinalGradeOverrideApi.getFinalGradeOverrides.callCount, 0)
-      })
-
-      test('uses the given course id when loading final grade overrides', async () => {
-        await load()
-        const [courseId] = FinalGradeOverrideApi.getFinalGradeOverrides.lastCall.args
-        strictEqual(courseId, '1201')
-      })
-
-      test('updates Gradebook when the final grade overrides have loaded', async () => {
-        await load()
-        strictEqual(gradebook.finalGradeOverrides.setGrades.callCount, 1)
-      })
-
-      test('updates Gradebook with the loaded final grade overrides', async () => {
-        await load()
-        const [finalGradeOverrides] = gradebook.finalGradeOverrides.setGrades.lastCall.args
-        deepEqual(finalGradeOverrides, exampleData.finalGradeOverrides)
-      })
-    })
-
     QUnit.module('when submissions return before related students', contextHooks => {
       let events
 

@@ -68,6 +68,9 @@ export default function GradebookData(props: Props) {
   const isCustomColumnsLoading = useStore(state => state.isCustomColumnsLoading)
   const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
 
+  const finalGradeOverrides = useStore(state => state.finalGradeOverrides)
+  const fetchFinalGradeOverrides = useStore(state => state.fetchFinalGradeOverrides)
+
   const studentIds = useStore(state => state.studentIds, shallow)
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
   const fetchStudentIds = useStore(state => state.fetchStudentIds)
@@ -90,6 +93,7 @@ export default function GradebookData(props: Props) {
       dispatch: dispatch.current,
       performanceControls: performanceControls.current,
       hasModules: props.gradebookEnv.has_modules,
+      allowFinalGradeOverride: props.gradebookEnv.course_settings.allow_final_grade_override,
     })
     initializeAppliedFilters(
       props.gradebookEnv.settings.filter_rows_by || {},
@@ -101,6 +105,7 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.settings.filter_rows_by,
     props.gradebookEnv.settings.filter_columns_by,
     props.gradebookEnv.has_modules,
+    props.gradebookEnv.course_settings.allow_final_grade_override,
     initializeAppliedFilters,
   ])
 
@@ -112,16 +117,21 @@ export default function GradebookData(props: Props) {
     if (props.gradebookEnv.has_modules) {
       fetchModules()
     }
+    if (props.gradebookEnv.course_settings.allow_final_grade_override) {
+      fetchFinalGradeOverrides()
+    }
     fetchCustomColumns()
   }, [
-    fetchFilters,
-    fetchModules,
     fetchCustomColumns,
+    fetchFilters,
+    fetchFinalGradeOverrides,
+    fetchModules,
+    initializeStagedFilters,
+    props.gradebookEnv.course_settings.allow_final_grade_override,
     props.gradebookEnv.enhanced_gradebook_filters,
     props.gradebookEnv.has_modules,
-    initializeStagedFilters,
-    props.gradebookEnv.settings.filter_rows_by,
     props.gradebookEnv.settings.filter_columns_by,
+    props.gradebookEnv.settings.filter_rows_by,
   ])
 
   useEffect(() => {
@@ -152,6 +162,7 @@ export default function GradebookData(props: Props) {
       {...props}
       appliedFilters={appliedFilters}
       customColumns={customColumns}
+      fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
       flashAlerts={flashMessages}
@@ -162,6 +173,7 @@ export default function GradebookData(props: Props) {
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isModulesLoading={isModulesLoading}
       isStudentIdsLoading={isStudentIdsLoading}
+      finalGradeOverrides={finalGradeOverrides}
       modules={modules}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
       studentIds={studentIds}

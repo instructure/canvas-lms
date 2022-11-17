@@ -18,10 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {
-  getFinalGradeOverrides,
-  updateFinalGradeOverride,
-} from '@canvas/grading/FinalGradeOverrideApi'
+import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 import type Gradebook from '../Gradebook'
 
@@ -103,13 +100,5 @@ export default class FinalGradeOverrides {
         err: null,
       })
     }
-  }
-
-  loadFinalGradeOverrides() {
-    return getFinalGradeOverrides(this._gradebook.course.id).then(({finalGradeOverrides}) => {
-      if (finalGradeOverrides) {
-        this.setGrades(finalGradeOverrides)
-      }
-    })
   }
 }
