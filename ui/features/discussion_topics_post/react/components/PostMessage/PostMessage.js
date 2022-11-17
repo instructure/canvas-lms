@@ -78,6 +78,7 @@ export function PostMessage({...props}) {
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
+                rceIdentifier={`${props.discussionEntry._id}-edit`}
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}

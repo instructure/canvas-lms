@@ -523,6 +523,7 @@ export const DiscussionThreadContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
+                  rceIdentifier={props.discussionEntry._id}
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {

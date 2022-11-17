@@ -460,6 +460,7 @@ export const SplitScreenViewContainer = props => {
               margin="none none x-small"
             >
               <DiscussionEdit
+                rceIdentifier={props.discussionEntryId}
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                 onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
