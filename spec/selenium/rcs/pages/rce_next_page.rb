@@ -362,7 +362,7 @@ module RCENextPage
   end
 
   def indent_button
-    possibly_hidden_toolbar_button('button[aria-label="Increase Indent"')
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Increase Indent"')
   end
 
   def outdent_button
