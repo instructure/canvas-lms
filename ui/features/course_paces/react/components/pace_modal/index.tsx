@@ -36,6 +36,8 @@ import UnpublishedChangesTrayContents from '../unpublished_changes_tray_contents
 import UnpublishedWarningModal from '../header/unpublished_warning_modal'
 
 import {coursePaceActions} from '../../actions/course_paces'
+import {actions as uiActions} from '../../actions/ui'
+
 import {
   CoursePace,
   OptionalDate,
@@ -79,6 +81,7 @@ interface StoreProps {
 
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace
+  clearCategoryError: typeof uiActions.clearCategoryError
 }
 
 interface PassedProps {
@@ -117,6 +120,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
     if (props.unappliedChangesExist) {
       setPendingContext(props.coursePace.context_type)
     } else {
+      props.clearCategoryError('publish')
       props.onClose()
     }
   }
@@ -217,6 +221,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
           onConfirm={() => {
             setPendingContext('')
             props.onResetPace()
+            props.clearCategoryError('publish')
             props.onClose()
           }}
           contextType={props.coursePace.context_type}
@@ -257,4 +262,5 @@ export default connect(mapStateToProps, {
   onResetPace: coursePaceActions.onResetPace,
   compressDates: coursePaceActions.compressDates,
   uncompressDates: coursePaceActions.uncompressDates,
+  clearCategoryError: uiActions.clearCategoryError,
 })(PaceModal)
