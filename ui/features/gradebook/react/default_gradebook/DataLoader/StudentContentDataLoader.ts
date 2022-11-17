@@ -21,10 +21,19 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
+import type {Student} from '../../../../../api.d'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('gradebook')
+
+type Options = {
+  dispatch: RequestDispatch
+  gradebook: Gradebook
+  submissionsChunkSize: number
+  courseId: string
+  submissionsPerPage: number
+}
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
@@ -75,13 +84,7 @@ function flashSubmissionLoadError(): void {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(
-  courseId: string,
-  studentIds: string[],
-  options: {
-    dispatch: RequestDispatch
-  }
-) {
+function getStudentsChunk(courseId: string, studentIds: string[], options: Options) {
   const url = `/api/v1/courses/${courseId}/users`
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
@@ -91,17 +94,22 @@ function getStudentsChunk(
     user_ids: studentIds,
   }
 
-  return options.dispatch.getJSON(url, params)
+  return options.dispatch.getJSON<Student[]>(url, params)
 }
 
-function getSubmissionsForStudents(options, studentIds, allEnqueued, dispatch) {
+function getSubmissionsForStudents(
+  options: Options,
+  studentIds: string[],
+  allEnqueued,
+  dispatch: RequestDispatch
+) {
   return new Promise((resolve, reject) => {
     const {courseId, submissionsPerPage} = options
     const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
 
     dispatch
-      .getDepaginated(url, params, undefined, allEnqueued)
+      .getDepaginated<Student[]>(url, params, undefined, allEnqueued)
       .then(resolve)
       .catch(() => {
         flashSubmissionLoadError()
@@ -110,15 +118,7 @@ function getSubmissionsForStudents(options, studentIds, allEnqueued, dispatch) {
   })
 }
 
-function getContentForStudentIdChunk(
-  studentIds: string[],
-  options: {
-    dispatch: RequestDispatch
-    gradebook: Gradebook
-    submissionsChunkSize: number
-    courseId: string
-  }
-) {
+function getContentForStudentIdChunk(studentIds: string[], options: Options) {
   const {dispatch, gradebook, submissionsChunkSize} = options
 
   let resolveEnqueued
@@ -230,15 +230,8 @@ export default class StudentContentDataLoader {
       getNextChunk()
     })
       .then(() => {
-        const {courseSettings, finalGradeOverrides} = gradebook
-
-        let finalGradeOverridesRequest
-        if (courseSettings.allowFinalGradeOverride && finalGradeOverrides) {
-          finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
-        }
-
-        // wait for all student, submission, and final grade override requests to return
-        return Promise.all([...studentRequests, ...submissionRequests, finalGradeOverridesRequest])
+        // wait for all student, submission requests to return
+        return Promise.all([...studentRequests, ...submissionRequests])
       })
       .then(() => {
         gradebook.updateStudentsLoaded(true)

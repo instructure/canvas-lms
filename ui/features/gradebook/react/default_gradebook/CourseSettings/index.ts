@@ -42,7 +42,7 @@ export default class CourseSettings {
     this._settings.allowFinalGradeOverride = allow
   }
 
-  handleUpdated(settings: Settings) {
+  handleUpdated(settings: Settings, fetchFinalGradeOverrides: () => Promise<void>) {
     const previousSettings = {...this._settings}
     this._settings = {
       ...this._settings,
@@ -53,7 +53,7 @@ export default class CourseSettings {
       this._gradebook.updateColumns()
 
       if (this._settings.allowFinalGradeOverride) {
-        this._gradebook.finalGradeOverrides?.loadFinalGradeOverrides()
+        fetchFinalGradeOverrides()
       }
     }
   }

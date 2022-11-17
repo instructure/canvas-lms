@@ -19,13 +19,15 @@
 import axios from '@canvas/axios'
 import {camelize} from 'convert-case'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import {createClient, gql} from '@canvas/apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {FinalGradeOverrideMap} from './grading.d'
 
 const I18n = useI18nScope('finalGradeOverrideApi')
 
-export function getFinalGradeOverrides(courseId: string) {
+export function getFinalGradeOverrides(
+  courseId: string
+): Promise<void | {finalGradeOverrides: FinalGradeOverrideMap}> {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`
 
   return axios
@@ -36,7 +38,10 @@ export function getFinalGradeOverrides(courseId: string) {
       for (const studentId in response.data.final_grade_overrides) {
         const responseOverrides = response.data.final_grade_overrides[studentId]
         const studentOverrides: {
-          courseGrade?: string
+          courseGrade?: {
+            percentage: number | null
+            schemeKey: string | null
+          }
           gradingPeriodGrades?: {[gradingPeriodId: string]: string}
         } = (data.finalGradeOverrides[studentId] = {})
 

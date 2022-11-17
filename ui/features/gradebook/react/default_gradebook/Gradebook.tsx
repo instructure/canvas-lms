@@ -73,7 +73,7 @@ import type {
   PendingGradeInfo,
   SubmissionFilterValue,
 } from './gradebook.d'
-import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
+import type {CamelizedGradingPeriodSet, FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 import type {
   GridColumn,
   GridData,
@@ -232,9 +232,11 @@ export type GradebookProps = {
   currentUserId: string
   customColumns: CustomColumn[]
   dispatch: RequestDispatch
+  fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
   filterNavNode: HTMLElement
+  finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
@@ -2053,7 +2055,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         return this.gradebookSettingsModalButton.current?.focus()
       },
       onCourseSettingsUpdated: settings => {
-        return this.courseSettings.handleUpdated(settings)
+        return this.courseSettings.handleUpdated(settings, this.props.fetchFinalGradeOverrides)
       },
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       postPolicies: this.postPolicies,
@@ -4603,6 +4605,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.props.recentlyLoadedAssignmentGroups.assignmentGroups,
         this.props.recentlyLoadedAssignmentGroups.gradingPeriodIds
       )
+    }
+
+    // final grade overrides
+    if (
+      prevProps.finalGradeOverrides !== this.props.finalGradeOverrides &&
+      this.props.finalGradeOverrides
+    ) {
+      this.finalGradeOverrides?.setGrades(this.props.finalGradeOverrides)
     }
 
     // modules
