@@ -607,6 +607,30 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "when the assignment is an external tool do not allow peer reviews" do
+      before do
+        assignment.update!(peer_reviews: true)
+      end
+
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          name: "Edited name",
+          submission_types: ["external_tool"],
+          peer_reviews: true
+        )
+      end
+
+      it "allows updating the submission_types field" do
+        expect(assignment.external_tool?).to eq false
+
+        response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+        expect(response).to eq :ok
+        expect(assignment.external_tool?).to eq true
+        expect(assignment.peer_reviews).to eq false
+      end
+    end
+
     context 'when an assignment with submission type other than "online_quiz" has one student submission' do
       before do
         assignment.submit_homework(student, body: "my homework")
