@@ -1055,6 +1055,17 @@ describe "Users API", type: :request do
       end
     end
 
+    it "returns a list of users filtered by search_term as integration_id" do
+      @account = Account.default
+      user = User.create!(name: "Test User")
+      user.pseudonyms.create!(unique_id: "test@example.com", account: @account) { |p| p.sis_user_id = "xyz", p.integration_id = "abc" }
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: "abc" })
+
+      expect(json.count).to eq 1
+      expect(json.first["name"]).to eq user.name
+    end
+
     it "returns a list of users filtered by enrollment_type" do
       @account = Account.default
       # student enrollment created in before(:once) block
@@ -1980,7 +1991,7 @@ describe "Users API", type: :request do
                         controller: "profile", action: "profile_pics", user_id: @student.to_param, format: "json")
         to_set = json.first
 
-        old_source = to_set["type"] == "gravatar" ? "twitter" : "gravatar"
+        old_source = (to_set["type"] == "gravatar") ? "twitter" : "gravatar"
         @student.avatar_image_source = old_source
         @student.avatar_state = "locked"
         @student.save!

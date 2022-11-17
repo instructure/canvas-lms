@@ -391,15 +391,15 @@ class UsersController < ApplicationController
   #   Note that the API will prefer matching on canonical user ID if the ID has
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
-  #   administrative users will search on SIS ID, login ID, name, or email
-  #   address
+  #   administrative users will search on SIS ID, Integration ID, login ID,
+  #   name, or email address
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
   #   This can be a base role type of 'student', 'teacher',
   #   'ta', 'observer', or 'designer'.
   #
-  # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
+  # @argument sort [String, "username"|"email"|"sis_id"|"integration_id"|"last_login"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
