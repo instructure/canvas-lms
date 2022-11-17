@@ -96,6 +96,8 @@ const DiscussionTopicManager = props => {
     } else if (filter !== 'unread') {
       setUnreadBefore('')
     }
+    setPageNumber(0)
+    setSearchPageNumber(0)
   }, [filter, unreadBefore])
 
   // Reset search to 0 when inactive
