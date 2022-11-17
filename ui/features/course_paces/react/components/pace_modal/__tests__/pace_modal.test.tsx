@@ -29,13 +29,15 @@ import {
 
 import {PaceModal} from '..'
 
-const onClose = jest.fn()
+const onClose = jest.fn(),
+  clearCategoryError = jest.fn()
 
 const defaultProps = {
   coursePace: PRIMARY_PACE,
   isBlueprintLocked: false,
   isOpen: true,
   onClose,
+  clearCategoryError,
   onResetPace: jest.fn(),
   responsiveSize: 'large' as const,
   unappliedChangesExist: false,
@@ -55,13 +57,14 @@ afterEach(() => {
 })
 
 describe('PaceModal', () => {
-  it('calls onClose when dismiss button is clicked', () => {
+  it('calls onClose and clears publishing errors when dismiss button is clicked', () => {
     const {getByRole} = renderConnected(<PaceModal {...defaultProps} />)
 
     const closeButton = getByRole('button', {name: 'Close'})
     expect(closeButton).toBeInTheDocument()
     act(() => closeButton.click())
     expect(onClose).toHaveBeenCalled()
+    expect(clearCategoryError).toHaveBeenCalled()
   })
 
   it('renders the course title', () => {
