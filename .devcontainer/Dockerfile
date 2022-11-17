@@ -2,6 +2,15 @@
 ARG VARIANT=3.1-bullseye
 FROM mcr.microsoft.com/vscode/devcontainers/ruby:${VARIANT}
 
+ENV CANVAS_LMS_STATS_COLLECTION=opt_out
+ENV CANVAS_LMS_ACCOUNT_NAME=learn_good_things_school
+ENV CANVAS_LMS_ADMIN_EMAIL=admin@example.com
+ENV CANVAS_LMS_ADMIN_PASSWORD=secret123
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LC_CTYPE en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+
 # Install Rails
 RUN gem install rails webdrivers
 
