@@ -110,6 +110,8 @@ class CoursePacesController < ApplicationController
       else
         @course_pace = @course.course_paces.new(pace_params)
         @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+          next unless module_item.assignment
+
           @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
         end
       end
