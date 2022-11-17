@@ -429,3 +429,9 @@ copy_blueprint_settings:
   state: hidden
   display_name: Copy Blueprint Course settings
   description: Allows Blueprint Course settings to be exported and copied to another Blueprint Course
+send_usage_metrics:
+  state: hidden
+  display_name: Send usage metrics
+  description: Send usage metrics
+  applies_to: RootAccount
+  visible_on: usage_metrics_allowed_hook
