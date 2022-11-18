@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {connect} from 'react-redux'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
@@ -75,7 +75,7 @@ export const PaceContent = ({
   isLoading,
   responsiveSize,
 }: PaceContextsContentProps) => {
-  const [tab, setTab] = useState('tab-section')
+  const selectedTab = `tab-${selectedContextType}`
   const currentTypeRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -93,7 +93,6 @@ export const PaceContent = ({
   }, [selectedContextType, currentPage])
 
   const changeTab = (_ev, {id}) => {
-    setTab(id)
     const type = id.split('-')
     setSelectedContextType(type[1])
     setSearchTerm('')
@@ -110,7 +109,7 @@ export const PaceContent = ({
         key="tab-section"
         renderTitle={I18n.t('Sections')}
         id="tab-section"
-        isSelected={tab === 'tab-section'}
+        isSelected={selectedTab === 'tab-section'}
         padding="none"
       >
         <View
@@ -137,7 +136,7 @@ export const PaceContent = ({
         key="tab-student_enrollment"
         renderTitle={I18n.t('Students')}
         id="tab-student_enrollment"
-        isSelected={tab === 'tab-student_enrollment'}
+        isSelected={selectedTab === 'tab-student_enrollment'}
         padding="none"
       >
         <View
