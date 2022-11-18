@@ -75,7 +75,7 @@ export default class EquationEditorModal extends Component {
   }
 
   usedInCanvas() {
-    return ENV && ENV.hasOwnProperty('disable_keyboard_shortcuts')
+    return typeof ENV !== 'undefined' && ENV && ENV.hasOwnProperty('disable_keyboard_shortcuts')
   }
 
   // ********* //
