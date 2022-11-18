@@ -60,7 +60,7 @@ export type WordCountModalProps = {
 
 export const WordCountModal: React.FC<WordCountModalProps> = ({headers, rows, onDismiss}) => {
   return (
-    <Modal label={formatMessage('Word Count')} open={true}>
+    <Modal label={formatMessage('Word Count')} open={true} data-mce-component={true}>
       <Modal.Header>
         <CloseButton
           placement="end"
