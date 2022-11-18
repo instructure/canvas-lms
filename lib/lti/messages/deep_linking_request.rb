@@ -154,8 +154,9 @@ module Lti::Messages
           modal: MODAL_PLACEMENTS.include?(placement),
           placement: placement,
           context_module_id: @opts[:context_module_id],
-          assignment_id: assignment_id
-        }.compact)
+          assignment_id: assignment_id,
+          parent_frame_context: @opts[:parent_frame_context]
+        }.compact),
       }
     end
   end

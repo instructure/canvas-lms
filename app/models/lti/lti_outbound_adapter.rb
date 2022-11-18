@@ -54,6 +54,13 @@ module Lti
       link_params = opts[:link_params] || {}
       include_module_context = opts[:include_module_context] || false
 
+      if opts[:parent_frame_context]
+        uri = URI.parse(return_url)
+        new_query_ar = URI.decode_www_form(uri.query || "") << ["parent_frame_context", opts[:parent_frame_context]]
+        uri.query = URI.encode_www_form(new_query_ar)
+        return_url = uri.to_s
+      end
+
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
       lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
       lti_tool = Lti::LtiToolCreator.new(@tool).convert

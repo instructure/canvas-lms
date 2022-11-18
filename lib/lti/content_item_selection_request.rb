@@ -42,7 +42,8 @@ module Lti
         placement,
         expanded_variables,
         opts[:content_item_id],
-        opts[:assignment]
+        opts[:assignment],
+        opts[:parent_frame_context]
       )
 
       lti_launch
@@ -67,8 +68,8 @@ module Lti
 
     private
 
-    def launch_params(resource_url, placement, expanded_variables, content_item_id = nil, assignment = nil)
-      content_item_return_url = return_url(content_item_id)
+    def launch_params(resource_url, placement, expanded_variables, content_item_id = nil, assignment = nil, parent_frame_context = nil)
+      content_item_return_url = return_url(content_item_id, parent_frame_context)
 
       params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
                                           .merge(message_params(content_item_return_url))
@@ -113,13 +114,17 @@ module Lti
       Canvas::Security.create_jwt(data_hash)
     end
 
-    def return_url(content_item_id)
+    def return_url(content_item_id, parent_frame_context)
       return_url_opts = {
         service: "external_tool_dialog",
         host: @base_url.host,
         protocol: @base_url.scheme,
         port: @base_url.port
       }
+
+      if parent_frame_context
+        return_url_opts[:parent_frame_context] = parent_frame_context
+      end
 
       if content_item_id
         return_url_opts[:id] = content_item_id
