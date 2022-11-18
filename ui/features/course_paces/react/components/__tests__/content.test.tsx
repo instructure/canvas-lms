@@ -24,6 +24,7 @@ import {
   PACE_CONTEXTS_SECTIONS_RESPONSE,
   PACE_CONTEXTS_STUDENTS_RESPONSE,
   PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE,
+  DEFAULT_STORE_STATE,
 } from '../../__tests__/fixtures'
 import PaceContent from '../content'
 import fetchMock from 'fetch-mock'
@@ -90,6 +91,18 @@ describe('PaceContextsContent', () => {
     ).toBeInTheDocument()
     expect(
       await findByText(PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[1].name)
+    ).toBeInTheDocument()
+  })
+
+  it('sets the selected tab based on the selected pace context', async () => {
+    const paceContextsState = {
+      ...DEFAULT_STORE_STATE.paceContexts,
+      selectedContextType: 'student_enrollment',
+    }
+    const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+    const {findByText} = renderConnected(<PaceContent />, state)
+    expect(
+      await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0].name)
     ).toBeInTheDocument()
   })
 
