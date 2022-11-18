@@ -147,11 +147,16 @@ describe Lti::IMS::AuthenticationController do
       let(:expected_status) { 400 }
 
       it { is_expected.to have_http_status(expected_status) }
+
+      it "avoids rendering the redirect_uri form" do
+        expect(subject).not_to render_template("lti/ims/authentication/authorize")
+      end
     end
 
     shared_examples_for "non redirect_uri errors" do
       let(:expected_message) { raise "set in example" }
       let(:expected_error) { raise "set in example" }
+
       let(:error_object) do
         subject
         assigns[:oidc_error]
@@ -169,6 +174,10 @@ describe Lti::IMS::AuthenticationController do
 
       it "has the correct error code" do
         expect(error_object[:error]).to eq expected_error
+      end
+
+      it "renders the redirect_uri_form" do
+        expect(subject).to render_template("lti/ims/authentication/authorize")
       end
     end
 
