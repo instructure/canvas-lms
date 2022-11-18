@@ -74,11 +74,12 @@ export const SplitScreenThreadsContainer = props => {
     },
   })
 
+  const extractedSubentryNodes = props.discussionEntry.discussionSubentriesConnection?.nodes // extracting to new variable to use in useEffect deps
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
+        const entries = extractedSubentryNodes.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
         entryIds = entries.map(entry => entry._id)
@@ -100,11 +101,7 @@ export const SplitScreenThreadsContainer = props => {
 
       return () => clearInterval(interval)
     }
-  }, [
-    discussionEntriesToUpdate,
-    props.discussionEntry.discussionSubentriesConnection.nodes,
-    updateDiscussionEntriesReadState,
-  ])
+  }, [discussionEntriesToUpdate, extractedSubentryNodes, updateDiscussionEntriesReadState])
 
   const setToBeMarkedAsRead = entryId => {
     if (!discussionEntriesToUpdate.has(entryId)) {
