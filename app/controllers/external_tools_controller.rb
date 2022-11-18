@@ -559,7 +559,7 @@ class ExternalToolsController < ApplicationController
       jwt_body = Canvas::Security.decode_jwt(secure_params)
       link_params[:ext][:lti_assignment_id] = jwt_body[:lti_assignment_id] if jwt_body[:lti_assignment_id]
     end
-    opts = { launch_url: launch_url, link_params: link_params, launch_token: launch_token, context_module_id: params[:context_module_id] }
+    opts = { launch_url: launch_url, link_params: link_params, launch_token: launch_token, context_module_id: params[:context_module_id], parent_frame_context: params[:parent_frame_context] }
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, "message_type") if selection_type
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event
@@ -769,7 +769,8 @@ class ExternalToolsController < ApplicationController
       post_only: @tool.settings["post_only"].present?,
       launch_url: opts[:launch_url] || tool.extension_setting(placement, :url),
       content_item_id: opts[:content_item_id],
-      assignment: assignment
+      assignment: assignment,
+      parent_frame_context: opts[:parent_frame_context]
     }
 
     collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil

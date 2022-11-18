@@ -940,7 +940,6 @@ describe ExternalToolsController do
                              })
       resource_link = Lti::ResourceLink.create_with(@course, tool2, nil, "http://tool2.com/testing")
 
-      puts "getting the retrieve endpoint.... #{@course.id} with lookup_id: #{resource_link.lookup_uuid}"
       # supply a different url to the endpoint
       get "retrieve", params: { course_id: @course.id, resource_link_lookup_uuid: resource_link.lookup_uuid, url: "http://tool1.com" }
       expect(response).to be_successful
@@ -1387,6 +1386,15 @@ describe ExternalToolsController do
             let(:selection_launch_param) { assigns[:lti_launch].params["custom_selection"] }
             let(:contents_launch_param) { assigns[:lti_launch].params["custom_contents"] }
           end
+
+          it "forwards parent_frame_context to the content item return url" do
+            user_session(@teacher)
+            tool.resource_selection = { message_type: "ContentItemSelectionRequest" }
+            tool.save!
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id }
+            expect(response).to be_successful
+            expect(assigns[:lti_launch].params["content_item_return_url"]).to include("parent_frame_context=#{tool.id}")
+          end
         end
       end
 
@@ -1422,6 +1430,18 @@ describe ExternalToolsController do
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          end
+
+          it "forwards parent_frame_context to the deep link return url" do
+            tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+            tool.save!
+            user_session(@teacher)
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
+            deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+            return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
+            jwt = JSON::JWT.decode(return_jwt, :skip_verification)
+            expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+            expect(response).to be_successful
           end
         end
       end
