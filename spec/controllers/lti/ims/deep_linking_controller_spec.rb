@@ -47,6 +47,10 @@ module Lti
 
         it { is_expected.to be_ok }
 
+        it "renders the page" do
+          expect(subject).to render_template("lti/ims/deep_linking/deep_linking_response")
+        end
+
         it "sets the JS ENV" do
           expect(controller).to receive(:js_env).with(
             deep_link_response: {
