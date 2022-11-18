@@ -230,7 +230,7 @@ export const SplitScreenViewContainer = props => {
         parentId: createdEntryParentId,
         rootEntryId: rootTopicReplyId,
         quotedEntry: buildQuotedReply(
-          splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
+          splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection?.nodes,
           replyFromId
         ),
         isAnonymous:
@@ -471,8 +471,8 @@ export const SplitScreenViewContainer = props => {
                   [
                     splitScreenEntryOlderDirection.data.legacyNode,
                     ...splitScreenEntryOlderDirection.data?.legacyNode
-                      ?.discussionSubentriesConnection.nodes,
-                  ],
+                      ?.discussionSubentriesConnection?.nodes,
+                  ].filter(item => item),
                   replyFromId
                 )}
                 value={getRCEStartingValue()}
