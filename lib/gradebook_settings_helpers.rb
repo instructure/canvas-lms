@@ -19,24 +19,24 @@
 module GradebookSettingsHelpers
   private
 
-  def gradebook_includes
+  def gradebook_includes(user:, course:)
     @gradebook_includes ||= begin
-      course_id = @course.id
-      gb_settings = @user.preferences.fetch(:gradebook_settings, {}).fetch(course_id, {})
+      course_id = course.id
+      gb_settings = user.preferences.fetch(:gradebook_settings, {}).fetch(course_id, {})
 
       includes = []
       includes << :inactive if gb_settings.fetch('show_inactive_enrollments', "false") == "true"
-      if gb_settings.fetch('show_concluded_enrollments', "false") == "true" || @course.concluded?
+      if gb_settings.fetch('show_concluded_enrollments', "false") == "true" || course.concluded?
         includes << :completed
       end
       includes
     end
   end
 
-  def gradebook_enrollment_scope(course = @course)
+  def gradebook_enrollment_scope(user:, course:)
     scope = course.all_accepted_student_enrollments
-    scope = scope.where("enrollments.workflow_state <> 'inactive'") unless gradebook_includes.include?(:inactive)
-    scope = scope.where("enrollments.workflow_state <> 'completed'") unless gradebook_includes.include?(:completed)
+    scope = scope.where("enrollments.workflow_state <> 'inactive'") unless gradebook_includes(user: user, course: course).include?(:inactive)
+    scope = scope.where("enrollments.workflow_state <> 'completed'") unless gradebook_includes(user: user, course: course).include?(:completed)
     scope
   end
 

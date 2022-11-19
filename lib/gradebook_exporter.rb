@@ -38,8 +38,6 @@ class GradebookExporter
   end
 
   def to_csv
-    enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
-                                                           include: gradebook_includes)
     I18n.locale = @options[:locale] || infer_locale(
       context:      @course,
       user:         @user,
