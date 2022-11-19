@@ -65,7 +65,7 @@ class GradebookExporter
       @user,
       nil,
       include: gradebook_includes(user: @user, course: @course)
-    ).preload(:root_account, :sis_pseudonym)
+    )
     student_enrollments = enrollments_for_csv(enrollment_scope)
 
     student_section_names = {}
