@@ -67,7 +67,7 @@ class Assignment
       # Ensure that any test students are sorted last
       students = students.partition { |r| r.preferences[:fake_student] != true }.flatten
 
-      enrollments = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
+      enrollments = @course.apply_enrollment_visibility(gradebook_enrollment_scope(course: @course, user: @user), @user, nil,
                                                         include: gradebook_includes(user: @user, course: @course))
 
       is_provisional = @grading_role == :provisional_grader || @grading_role == :moderator
