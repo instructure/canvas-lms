@@ -90,7 +90,7 @@ import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 // @ts-ignore
-import InputFilterView from 'backbone-input-filter-view'
+import InputFilterView from '@canvas/backbone-input-filter-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'

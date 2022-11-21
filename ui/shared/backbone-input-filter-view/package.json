@@ -1,10 +1,10 @@
 {
-  "name": "backbone-input-filter-view",
+  "name": "@canvas/backbone-input-filter-view",
   "private": true,
   "version": "1.0.0",
   "author": "neme",
   "main": "./src/index",
   "dependencies": {
-    "backbone-input-view": "*"
+    "@canvas/backbone-input-view": "*"
   }
 }

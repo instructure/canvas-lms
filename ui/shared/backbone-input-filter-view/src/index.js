@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import InputView from 'backbone-input-view'
+import InputView from '@canvas/backbone-input-view'
 
 // Makes an input field that emits `input` and `select` events, and
 // automatically selects itself if the user presses the enter key (don't have
