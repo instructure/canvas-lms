@@ -205,6 +205,9 @@ export const DiscussionThreadContainer = props => {
     return rootEntryDraftMessage
   }
 
+  // Condense SplitScreen to one variable & link with the SplitScreenButton
+  const splitScreenOn = ENV.split_screen_view && props.userSplitScreenPreference
+
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -217,7 +220,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -258,7 +261,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -423,7 +426,7 @@ export const DiscussionThreadContainer = props => {
                             !ENV.isolated_view
                               ? () => {
                                   setReplyFromId(props.discussionEntry._id)
-                                  if (ENV.split_screen_view) {
+                                  if (ENV.isolated_view || splitScreenOn) {
                                     props.onOpenIsolatedView(
                                       props.discussionEntry._id,
                                       props.discussionEntry.isolatedEntryId,
@@ -505,7 +508,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: replyMarginDepth}}>
-            {editorExpanded && !(ENV.isolated_view || ENV.split_screen_view) && (
+            {editorExpanded && !(ENV.isolated_view || splitScreenOn) && (
               <View
                 display="block"
                 background="primary"
@@ -540,17 +543,19 @@ export const DiscussionThreadContainer = props => {
               </View>
             )}
           </div>
-          {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
-            <DiscussionSubentries
-              discussionTopic={props.discussionTopic}
-              discussionEntryId={props.discussionEntry._id}
-              depth={props.depth + 1}
-              markAsRead={props.markAsRead}
-              parentRefCurrent={threadRefCurrent}
-              highlightEntryId={props.highlightEntryId}
-              setHighlightEntryId={props.setHighlightEntryId}
-            />
-          )}
+          {(expandReplies || props.depth > 0) &&
+            !(ENV.isolated_view || splitScreenOn) &&
+            props.discussionEntry.subentriesCount > 0 && (
+              <DiscussionSubentries
+                discussionTopic={props.discussionTopic}
+                discussionEntryId={props.discussionEntry._id}
+                depth={props.depth + 1}
+                markAsRead={props.markAsRead}
+                parentRefCurrent={threadRefCurrent}
+                highlightEntryId={props.highlightEntryId}
+                setHighlightEntryId={props.setHighlightEntryId}
+              />
+            )}
         </>
       )}
     />
@@ -570,6 +575,7 @@ DiscussionThreadContainer.propTypes = {
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
 }
 
 DiscussionThreadContainer.defaultProps = {

@@ -638,8 +638,9 @@ describe "threaded discussions" do
 
       context "When split screen feature flag is on" do
         before :once do
-          # When VICE-3116 is completed, make sure to turn on the user preference
           Account.site_admin.enable_feature! :split_screen_view
+          @student.preferences[:discussions_splitscreen_view] = true
+          @student.save!
         end
 
         before do

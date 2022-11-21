@@ -18,7 +18,8 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
-import React, {useContext, useState} from 'react'
+import PropTypes from 'prop-types'
+import React, {useContext} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
@@ -26,43 +27,57 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('discussions_posts')
 
-export const SplitscreenButton = props => {
+export const SplitScreenButton = ({
+  setUserSplitScreenPreference,
+  userSplitScreenPreference,
+  ...props
+}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const [discussionsSplitscreenView, setDiscussionsSplitscreenView] = useState(
-    ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
-  )
 
   const [updateUserDiscussionsSplitscreenView] = useMutation(
     UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE,
     {
       onCompleted: data => {
         setOnSuccess('Splitscreen preference updated!')
-        setDiscussionsSplitscreenView(
+        setUserSplitScreenPreference(
           data?.updateUserDiscussionsSplitscreenView?.user?.discussionsSplitscreenView ||
-            !discussionsSplitscreenView
+            !userSplitScreenPreference
         )
       },
       onError: () => {
         setOnFailure(I18n.t('Unable to update splitscreen preference.'))
-        setDiscussionsSplitscreenView(!discussionsSplitscreenView)
+        setUserSplitScreenPreference(!userSplitScreenPreference)
       },
     }
   )
 
-  const onSplitscreenClick = () => {
+  const onSplitScreenClick = () => {
+    // We are safe to assume the response, because regardless of the mutation success we still act.
+    // Also this way we dont need to worry about setState delay
+    // Logic: if userSplitScreenPreference currently true, then it will be false, which means closeView.
+    if (userSplitScreenPreference) {
+      props.closeView()
+    }
     updateUserDiscussionsSplitscreenView({
-      variables: {discussionsSplitscreenView: !discussionsSplitscreenView},
+      variables: {discussionsSplitscreenView: !userSplitScreenPreference},
     })
   }
 
   return (
     <span className="discussions-splitscreen-button">
-      <Button onClick={onSplitscreenClick} data-testid="splitscreenButton">
-        {discussionsSplitscreenView ? I18n.t('View Inline') : I18n.t('View Split Screen')}
+      <Button onClick={onSplitScreenClick} data-testid="splitscreenButton">
+        {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
         <ScreenReaderContent>
-          {props.discussionsSplitscreenView ? I18n.t('View Inline') : I18n.t('View Split Screen')}
+          {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
         </ScreenReaderContent>
       </Button>
     </span>
   )
+}
+
+SplitScreenButton.propTypes = {
+  setUserSplitScreenPreference: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
+  setExpandReplies: PropTypes.func,
+  closeView: PropTypes.func,
 }

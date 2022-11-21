@@ -59,6 +59,9 @@ const DiscussionTopicManager = props => {
     searchPageNumber,
     setSearchPageNumber,
   }
+  const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
+    ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
+  )
 
   const goToTopic = () => {
     setSearchTerm('')
@@ -317,6 +320,9 @@ const DiscussionTopicManager = props => {
           <DrawerLayout.Content label="Splitscreen View Content">
             <DiscussionTopicToolbarContainer
               discussionTopic={discussionTopicQuery.data.legacyNode}
+              setUserSplitScreenPreference={setUserSplitScreenPreference}
+              userSplitScreenPreference={userSplitScreenPreference}
+              closeView={closeView}
             />
             <DiscussionTopicContainer
               updateDraftCache={updateDraftCache}
@@ -373,6 +379,7 @@ const DiscussionTopicManager = props => {
                   highlightEntryId={highlightEntryId}
                   setHighlightEntryId={setHighlightEntryId}
                   isSearchResults={!!searchTerm}
+                  userSplitScreenPreference={userSplitScreenPreference}
                 />
               )
             )}

@@ -34,7 +34,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {SplitscreenButton} from './SplitscreenButton'
+import {SplitScreenButton} from './SplitScreenButton'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
@@ -234,7 +234,11 @@ export const DiscussionPostToolbar = props => {
                 </Flex.Item>
                 {ENV.split_screen_view && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <SplitscreenButton />
+                    <SplitScreenButton
+                      setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+                      userSplitScreenPreference={props.userSplitScreenPreference}
+                      closeView={props.closeView}
+                    />
                   </Flex.Item>
                 )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
@@ -270,6 +274,9 @@ DiscussionPostToolbar.propTypes = {
   onSortClick: PropTypes.func,
   searchTerm: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
+  setUserSplitScreenPreference: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
+  closeView: PropTypes.func,
 }
 
 DiscussionPostToolbar.defaultProps = {

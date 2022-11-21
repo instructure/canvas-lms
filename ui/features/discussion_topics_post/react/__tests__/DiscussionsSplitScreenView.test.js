@@ -55,6 +55,11 @@ describe('DiscussionsSplitScreenView', () => {
           'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
         display_name: 'Hank Mccoy',
       },
+      DISCUSSION: {
+        preferences: {
+          discussions_splitscreen_view: true,
+        },
+      },
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
