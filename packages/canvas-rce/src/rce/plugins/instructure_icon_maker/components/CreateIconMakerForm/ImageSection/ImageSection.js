@@ -175,6 +175,7 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
                 embedImage={settings.embedImage}
                 state={state}
                 dispatch={dispatch}
+                mountNode={getImageSection}
                 rcsConfig={rcsConfig}
                 trayDispatch={onChange}
               />

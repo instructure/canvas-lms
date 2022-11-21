@@ -68,6 +68,15 @@ fake data which can be done in the [fake data store](./src/rcs/fake.js).
 
 Custom plugins live under the plugins [directory](./src/rce/plugins/).
 
+## Adding new Modals and Trays
+
+or anything else that gets mounted in a react portal comes with 2 requirements
+
+1. Include the attribute `data-mce-component={true}` on the `<Modal>` or ` <Tray>`. This tells the RCE
+   that the modal is part of the RCE and not to fire a `blur` event when it closes and loses focus.
+1. Include `mountNode={instuPopupMountNode}` on thew `<Modal>` or `<Tray>`. The `instuiPopupMountNode`
+   function is imported from `src/util/fullscreenHelpers` within the `canvas-rce` package or `@instructure/canvs-rce` from outside. This function will mount modals in the `<div class="rce-wrapper">` when the RCE is fullscreen, where it will not be hidden behind the RCE.
+
 ## Upgrading TinyMCE
 
 Update the version of `tinymce` and `@tinymce/tinymce-react` in `packge.json`, run `yarn install` and hope for the best.

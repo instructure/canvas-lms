@@ -38,7 +38,6 @@ import 'tinymce/plugins/wordcount/plugin'
 import 'tinymce/plugins/paste/plugin'
 import 'tinymce/plugins/table/plugin'
 import 'tinymce/plugins/hr/plugin'
-import 'tinymce/plugins/fullscreen/plugin'
 
 // add custom plugins
 import './plugins/instructure-ui-icons/plugin'

@@ -125,6 +125,13 @@ describe('RCEWrapper', () => {
       }
     }
 
+    if (!global.ResizeObserver) {
+      global.ResizeObserver = function ResizeObserver() {
+        this.observe = () => {}
+        this.unobserve = () => {}
+      }
+    }
+
     requireReactDeps()
     editorCommandSpy = sinon.spy()
     editor = {

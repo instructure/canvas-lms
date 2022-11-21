@@ -90,6 +90,7 @@
     "@instructure/ui-link": "7",
     "@instructure/ui-list": "7",
     "@instructure/ui-media-player": "7",
+    "@instructure/ui-menu": "7",
     "@instructure/ui-modal": "7",
     "@instructure/ui-motion": "7",
     "@instructure/ui-number-input": "^7",

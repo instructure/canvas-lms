@@ -23,6 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import formatMessage from '../../../../format-message'
 import {Header, CountRow} from '../utils/tableContent'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 // Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
 const {Head, Row, ColHeader, Body, Cell} = Table as any
@@ -60,7 +61,12 @@ export type WordCountModalProps = {
 
 export const WordCountModal: React.FC<WordCountModalProps> = ({headers, rows, onDismiss}) => {
   return (
-    <Modal label={formatMessage('Word Count')} open={true} data-mce-component={true}>
+    <Modal
+      label={formatMessage('Word Count')}
+      mountNode={instuiPopupMountNode}
+      open={true}
+      data-mce-component={true}
+    >
       <Modal.Header>
         <CloseButton
           placement="end"

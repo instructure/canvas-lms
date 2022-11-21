@@ -28,6 +28,7 @@ import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'
 import validateURL from '../../validateURL'
+import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
 
 const CREATE_LINK = 'create'
 const EDIT_LINK = 'edit'
@@ -80,6 +81,7 @@ export default function LinkOptionsDialog(props) {
       data-mce-component={true}
       as="form"
       label={label}
+      mountNode={instuiPopupMountNode}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}
       onExited={props.onExited}

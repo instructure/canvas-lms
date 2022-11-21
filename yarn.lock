@@ -2949,6 +2949,28 @@
     subtitle "2.0.3"
     wicg-inert "3.0.0"
 
+"@instructure/ui-menu@7", "@instructure/ui-menu@^7", "@instructure/ui-menu@^7.14.0", "@instructure/ui-menu@^7.8.0":
+  version "7.21.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-7.21.0.tgz#853a6dacf93b73ea4bf7e4293557f27b1f66f36f"
+  integrity sha512-u2fi6KU7/mtMDnFaONa8f7rVLcAV+AOvWCVn5vhZbc0oHdjUWsLJEgP02Qnc24n6qkAA6yQmpy1fn7/EWv5t8Q==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/console" "^7.21.0"
+    "@instructure/ui-a11y-utils" "^7.21.0"
+    "@instructure/ui-dom-utils" "^7.21.0"
+    "@instructure/ui-icons" "^7.21.0"
+    "@instructure/ui-popover" "^7.21.0"
+    "@instructure/ui-position" "^7.21.0"
+    "@instructure/ui-prop-types" "^7.21.0"
+    "@instructure/ui-react-utils" "^7.21.0"
+    "@instructure/ui-testable" "^7.21.0"
+    "@instructure/ui-themeable" "^7.21.0"
+    "@instructure/ui-utils" "^7.21.0"
+    "@instructure/uid" "^7.21.0"
+    classnames "^2"
+    keycode "^2"
+    prop-types "^15"
+
 "@instructure/ui-menu@^6.22.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-6.27.0.tgz#ea9ab1ddb51f9840c111eb8b8a7e5023e509174a"
@@ -2967,28 +2989,6 @@
     "@instructure/ui-themeable" "^6.27.0"
     "@instructure/ui-utils" "^6.27.0"
     "@instructure/uid" "^6.27.0"
-    classnames "^2"
-    keycode "^2"
-    prop-types "^15"
-
-"@instructure/ui-menu@^7", "@instructure/ui-menu@^7.14.0", "@instructure/ui-menu@^7.8.0":
-  version "7.14.0"
-  resolved "https://registry.yarnpkg.com/@instructure/ui-menu/-/ui-menu-7.14.0.tgz#5c2e76861f5f2ebffe960894cb2bfc089be98f9a"
-  integrity sha512-599mmeGezYYaHL0sm9pTaN7D/2mgvxUYqkE9owgFBOCWm7Fgb7hRtv2FGWvMt41WoO3qxeHEPR7OzascQweN6A==
-  dependencies:
-    "@babel/runtime" "^7.9.2"
-    "@instructure/console" "^7.14.0"
-    "@instructure/ui-a11y-utils" "^7.14.0"
-    "@instructure/ui-dom-utils" "^7.14.0"
-    "@instructure/ui-icons" "^7.14.0"
-    "@instructure/ui-popover" "^7.14.0"
-    "@instructure/ui-position" "^7.14.0"
-    "@instructure/ui-prop-types" "^7.14.0"
-    "@instructure/ui-react-utils" "^7.14.0"
-    "@instructure/ui-testable" "^7.14.0"
-    "@instructure/ui-themeable" "^7.14.0"
-    "@instructure/ui-utils" "^7.14.0"
-    "@instructure/uid" "^7.14.0"
     classnames "^2"
     keycode "^2"
     prop-types "^15"

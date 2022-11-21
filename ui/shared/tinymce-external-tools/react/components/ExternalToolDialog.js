@@ -29,6 +29,7 @@ import TinyMCEContentItem from '../../TinyMCEContentItem'
 import processEditorContentItems from '@canvas/deep-linking/processors/processEditorContentItems'
 import {Flex} from '@instructure/ui-flex'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {instuiPopupMountNode} from '@instructure/canvas-rce'
 
 const I18n = useI18nScope('ExternalToolDialog')
 
@@ -189,6 +190,7 @@ export default class ExternalToolDialog extends React.Component {
         </form>
         <Overlay
           open={open}
+          mountNode={instuiPopupMountNode}
           label={label}
           onOpen={this.handleOpen}
           onClose={this.handleRemove}

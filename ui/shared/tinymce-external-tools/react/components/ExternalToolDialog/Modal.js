@@ -21,11 +21,12 @@ import PropTypes from 'prop-types'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 
 export default function ExternalToolDialogModal(props) {
-  const {open, label, onOpen, onClose, onCloseButton, name, children} = props
+  const {open, label, onOpen, onClose, onCloseButton, name, mountNode, children} = props
   return (
     <CanvasModal
       data-mce-component={true}
       padding="0"
+      mountNode={mountNode}
       open={open}
       label={label}
       title={name}
@@ -41,6 +42,7 @@ export default function ExternalToolDialogModal(props) {
 ExternalToolDialogModal.propTypes = {
   open: PropTypes.bool,
   label: PropTypes.string.isRequired,
+  mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,

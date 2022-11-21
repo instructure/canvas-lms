@@ -22,6 +22,7 @@ import ExternalToolsHelper from './ExternalToolsHelper'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import ExternalToolDialog from './react/components/ExternalToolDialog'
 
 const I18n = useI18nScope('ExternalToolsPlugin')
 
@@ -31,14 +32,16 @@ const ExternalToolsPlugin = {
       return
     }
 
-    let dialog = {
-      // if somehow open gets called early, keep trying until it is ready
-      open: (...args) => setTimeout(() => dialog.open(...args), 50),
-    }
-    import('./react/components/ExternalToolDialog')
-      .then(({default: ExternalToolDialog}) => {
-        const dialogContainer = document.createElement('div')
-        document.body.appendChild(dialogContainer)
+    const ltiButtons = []
+    for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {
+      const current_button = _INST.editorButtons[idx]
+      const openDialog = () => {
+        let dialogContainer = document.getElementById('external-tool-dialog-container')
+        if (dialogContainer === null) {
+          dialogContainer = document.createElement('div')
+          dialogContainer.id = 'external-tool-dialog-container'
+          document.body.appendChild(dialogContainer)
+        }
         ReactDOM.render(
           <ExternalToolDialog
             win={window}
@@ -50,22 +53,10 @@ const ExternalToolsPlugin = {
           />,
           dialogContainer,
           function () {
-            dialog = this
+            this.open(current_button)
           }
         )
-      })
-      .catch(err => {
-        throw new Error(
-          'Problem loading ui/shared/tinymce-external-tools/react/components/ExternalToolDialog',
-          err
-        )
-      })
-
-    const ltiButtons = []
-    for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {
-      const current_button = _INST.editorButtons[idx]
-      // eslint-disable-next-line no-loop-func
-      const openDialog = () => dialog.open(current_button)
+      }
       ltiButtons.push(ExternalToolsHelper.buttonConfig(current_button, ed))
       ed.addCommand(`instructureExternalButton${current_button.id}`, openDialog)
     }

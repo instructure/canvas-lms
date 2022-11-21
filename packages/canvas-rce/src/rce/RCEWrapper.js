@@ -37,6 +37,13 @@ import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import RCEGlobals from './RCEGlobals'
 import defaultTinymceConfig from '../defaultTinymceConfig'
+import {
+  FS_ELEMENT,
+  FS_REQUEST,
+  FS_EXIT,
+  FS_CHANGEEVENT,
+  instuiPopupMountNode,
+} from '../util/fullscreenHelpers'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -222,12 +229,6 @@ function renderLoading() {
   return formatMessage('Loading')
 }
 
-// safari implements only the webkit prefixed version of the fullscreen api
-const FS_ELEMENT =
-  document.fullscreenElement === undefined ? 'webkitFullscreenElement' : 'fullscreenElement'
-const FS_REQUEST = document.body.requestFullscreen ? 'requestFullscreen' : 'webkitRequestFullscreen'
-const FS_EXIT = document.exitFullscreen ? 'exitFullscreen' : 'webkitExitFullscreen'
-
 let alertIdValue = 0
 
 @themeable(theme, styles)
@@ -313,6 +314,8 @@ class RCEWrapper extends React.Component {
 
     injectTinySkin()
 
+    // FWIW, for historic reaasons, the height does not include the
+    // height of the status bar (which used to be tinymce's)
     let ht = props.editorOptions?.height || DEFAULT_RCE_HEIGHT
     if (!Number.isNaN(ht)) {
       ht = `${ht}px`
@@ -337,8 +340,7 @@ class RCEWrapper extends React.Component {
       id: this.props.id || this.props.textareaId || `${Date.now()}`,
       height: ht,
       fullscreenState: {
-        headerDisp: 'static',
-        isTinyFullscreen: false,
+        prevHeight: ht,
       },
       a11yErrorsCount: 0,
       shouldShowEditor:
@@ -346,6 +348,8 @@ class RCEWrapper extends React.Component {
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
     }
+    this._statusBarId = `${this.state.id}_statusbar`
+
     this.pendingEventHandlers = []
 
     // Get top 2 favorited LTI Tools
@@ -370,6 +374,10 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
+
+    this.resizeObserver = new ResizeObserver(_entries => {
+      this._handleFullscreenResize()
+    })
   }
 
   getRequiredFeatureStatuses() {
@@ -728,8 +736,6 @@ class RCEWrapper extends React.Component {
   toggleView = newView => {
     // coming from the menubar, we don't have a newView,
 
-    const wasFullscreen = this._isFullscreen()
-    if (wasFullscreen) this._exitFullscreen()
     let newState
     switch (this.state.editorView) {
       case WYSIWYG_VIEW:
@@ -741,13 +747,7 @@ class RCEWrapper extends React.Component {
       case RAW_HTML_EDITOR_VIEW:
         newState = {editorView: newView || WYSIWYG_VIEW}
     }
-    this.setState(newState, () => {
-      if (wasFullscreen) {
-        window.setTimeout(() => {
-          this._enterFullscreen()
-        }, 200) // due to the animation it takes some time for fullscreen to complete
-      }
-    })
+    this.setState(newState)
     this.checkAccessibility()
     if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
       document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
@@ -758,42 +758,71 @@ class RCEWrapper extends React.Component {
   }
 
   _isFullscreen() {
-    return this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT]
+    return !!(this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT])
   }
 
   _enterFullscreen() {
-    switch (this.state.editorView) {
-      case PRETTY_HTML_EDITOR_VIEW:
-        this._prettyHtmlEditorRef.current.addEventListener(
-          'fullscreenchange',
-          this._toggleFullscreen
-        )
-        this._prettyHtmlEditorRef.current.addEventListener(
-          'webkitfullscreenchange',
-          this._toggleFullscreen
-        )
-        // if I don't focus first, FF complains that the element
-        // is not in the active browser tab and requestFullscreen fails
-        this._prettyHtmlEditorRef.current.focus()
-        this._prettyHtmlEditorRef.current[FS_REQUEST]()
-        break
-      case RAW_HTML_EDITOR_VIEW:
-        this.getTextarea().addEventListener('fullscreenchange', this._toggleFullscreen)
-        this.getTextarea().addEventListener('webkitfullscreenchange', this._toggleFullscreen)
-        this.getTextarea()[FS_REQUEST]()
-        break
-      case WYSIWYG_VIEW:
-        this.mceInstance().execCommand('mceFullScreen')
-        break
-    }
+    // tinymce mounts its menus and toolbars in this element, which is in the DOM
+    // at the bottom of the body. When we're fullscreen the menus need to be mounted
+    // in the fullscreen element or they won't show up. Let's move tinymce's mount point
+    // when we go into fullscreen, then put it back when we're finished.
+    const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
+    tinymenuhost.remove()
+    this._elementRef.current.appendChild(tinymenuhost)
+
+    this._elementRef.current.addEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
+    this.setState({
+      fullscreenState: {
+        prevHeight: this._elementRef.current.offsetHeight - this._getStatusBarHeight(),
+      },
+    })
+    this._elementRef.current[FS_REQUEST]()
   }
 
   _exitFullscreen() {
-    if (this.state.fullscreenState.isTinyFullscreen) {
-      this.mceInstance().execCommand('mceFullScreen')
-    } else if (document[FS_ELEMENT]) {
-      document[FS_ELEMENT][FS_EXIT]()
+    if (document[FS_ELEMENT]) {
+      const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
+      tinymenuhost.remove()
+      document.body.appendChild(tinymenuhost)
+      document[FS_EXIT]()
     }
+  }
+
+  _onFullscreenChange = event => {
+    if (document[FS_ELEMENT]) {
+      this.resizeObserver.observe(document[FS_ELEMENT])
+      window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
+      this._handleFullscreenResize()
+    } else {
+      event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
+      this.resizeObserver.unobserve(event.target)
+      window.visualViewport?.removeEventListener('resize', this._handleFullscreenResize)
+      this._setHeight(this.state.fullscreenState.prevHeight)
+    }
+    this.focusCurrentView()
+  }
+
+  _handleFullscreenResize = () => {
+    const ht = window.visualViewport?.height || document[FS_ELEMENT]?.offsetHeight
+    this._setHeight(ht - this._getStatusBarHeight())
+  }
+
+  _getStatusBarHeight() {
+    // the height prop is the height of the editor and does not include
+    // the status bar. we'll need this later.
+    return document.getElementById(this._statusBarId).offsetHeight
+  }
+
+  _setHeight(newHeight) {
+    const cssHeight = `${newHeight}px`
+    const ed = this.mceInstance()
+    const container = ed.getContainer()
+    if (container) {
+      container.style.height = cssHeight
+      ed.fire('ResizeEditor')
+    }
+    this.getTextarea().style.height = cssHeight
+    this.setState({height: cssHeight})
   }
 
   focus() {
@@ -988,11 +1017,7 @@ class RCEWrapper extends React.Component {
       this.openKBShortcutModal()
     } else if (event.code === 'Escape') {
       this._forceCloseFloatingToolbar()
-      if (this.state.fullscreenState.isTinyFullscreen) {
-        this.mceInstance().execCommand('mceFullScreen') // turn it off
-      } else {
-        bridge.hideTrays()
-      }
+      bridge.hideTrays()
     } else if (['n', 'N', 'd', 'D'].indexOf(event.key) !== -1) {
       // Prevent key events from bubbling up on touch screen device
       event.stopPropagation()
@@ -1061,7 +1086,7 @@ class RCEWrapper extends React.Component {
     textarea.style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
-    editor.on('FullscreenStateChanged', this._toggleFullscreen)
+    editor.on('FullscreenStateChanged', this._onFullscreenChange)
     // This propagates click events on the editor out of the iframe to the parent
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
@@ -1090,56 +1115,6 @@ class RCEWrapper extends React.Component {
     }
 
     this.props.onInitted?.(editor)
-  }
-
-  _toggleFullscreen = event => {
-    const isTinyFullscreen = event.state
-
-    const fullscreenState = {isTinyFullscreen}
-
-    const header = document.getElementById('header')
-    if (header) {
-      if (isTinyFullscreen) {
-        fullscreenState.headerDisp = header.style.display
-        header.style.display = 'none'
-      } else {
-        header.style.display = this.state.fullscreenState.headerDisp
-      }
-    }
-
-    this.setState({fullscreenState})
-
-    // if we're leaving fullscreen, remove event listeners on the fullscreen element
-    if (!document[FS_ELEMENT] && this.state.fullscreenElem) {
-      this.state.fullscreenElem.removeEventListener('fullscreenchange', this._toggleFullscreen)
-      this.state.fullscreenElem.removeEventListener(
-        'webkitfullscreenchange',
-        this._toggleFullscreen
-      )
-      this.setState({
-        fullscreenState: {
-          fullscreenElem: null,
-        },
-      })
-    }
-
-    // if we don't defer setState, the pretty editor's height isn't correct
-    // when entering fullscreen
-    window.setTimeout(() => {
-      if (document[FS_ELEMENT]) {
-        this.setState(state => {
-          return {
-            fullscreenState: {
-              ...state.fullscreenState,
-              fullscreenElem: document[FS_ELEMENT],
-            },
-          }
-        })
-      } else {
-        this.forceUpdate()
-      }
-      this.focusCurrentView()
-    }, 0)
   }
 
   _forceCloseFloatingToolbar = () => {
@@ -1389,7 +1364,17 @@ class RCEWrapper extends React.Component {
   onA11yChecker = () => {
     // eslint-disable-next-line promise/catch-or-return
     this.a11yCheckerReady.then(() => {
-      this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
+      const editor = this.mceInstance()
+      editor.execCommand(
+        'openAccessibilityChecker',
+        false,
+        {
+          mountNode: instuiPopupMountNode,
+        },
+        {
+          skip_focus: true,
+        }
+      )
     })
   }
 
@@ -1618,7 +1603,6 @@ class RCEWrapper extends React.Component {
           'lists',
           'textpattern',
           'hr',
-          'fullscreen',
           'instructure-ui-icons',
           'instructure_condensed_buttons',
           'instructure_links',
@@ -1820,7 +1804,7 @@ class RCEWrapper extends React.Component {
         <View as="div" borderRadius="medium" borderWidth="small">
           <RceHtmlEditor
             ref={this._prettyHtmlEditorRef}
-            height={document[FS_ELEMENT] ? `${window.screen.height}px` : this.state.height}
+            height={this.state.height}
             code={this.getCode()}
             onChange={value => {
               this.getTextarea().value = value
@@ -1891,6 +1875,8 @@ class RCEWrapper extends React.Component {
           />
         </div>
         <StatusBar
+          id={this._statusBarId}
+          rceIsFullscreen={this._isFullscreen()}
           readOnly={this.props.readOnly}
           onChangeView={newView => this.toggleView(newView)}
           path={this.state.path}

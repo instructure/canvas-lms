@@ -28,7 +28,7 @@ require_relative "../helpers/wiki_and_tiny_common"
 require_relative "pages/rce_next_page"
 require_relative "pages/rcs_sidebar_page"
 
-# rubocop:disable Specs/NoNoSuchElementError
+# rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
 
 # while there's a mix of instui 6 and 7 in canvas we're getting
 # "Warning: [themeable] A theme registry has already been initialized." js errors
@@ -222,7 +222,8 @@ describe "RCE next tests", ignore_js_errors: true do
         )
         visit_existing_wiki_edit(@course, "title")
         f("##{rce_page_body_ifr_id}").click
-        f("##{rce_page_body_ifr_id}").send_keys([:control, "a"], :backspace)
+        f("##{rce_page_body_ifr_id}").send_keys([:control, "a"])
+        f("##{rce_page_body_ifr_id}").send_keys(:backspace)
 
         in_frame rce_page_body_ifr_id do
           expect(f("#tinymce").text).to eql ""
@@ -969,12 +970,12 @@ describe "RCE next tests", ignore_js_errors: true do
         visit_front_page_edit(@course)
 
         click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
 
-        expect(rce_page_body_ifr_style).to eq("height: 100%; width: 100%;")
-
-        driver.action.send_keys(:escape).perform
-
-        expect(rce_page_body_ifr_style).to_not eq("height: 100%; width: 100%;")
+        click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq nil
       end
     end
 
@@ -1557,6 +1558,7 @@ describe "RCE next tests", ignore_js_errors: true do
       end
 
       it "can add image" do
+        skip("Works IRL but fails in selenium. Fix with MAT-1127")
         rce_wysiwyg_state_setup(@course)
         iconmaker_toolbar_button.click
         iconmaker_addimage_menu.click
@@ -1565,7 +1567,89 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(iconmaker_image_preview).to be_displayed
       end
     end
+
+    # rubocop:disable Specs/NoSeleniumWebDriverWait
+    describe "fullscreen" do
+      it "restores the rce to its original size on exiting fullscreen" do
+        visit_front_page_edit(@course)
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height")
+
+        click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        click_full_screen_button
+        rce_wrapper = f(".rce-wrapper")
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect(orig_height).to eql(rce_wrapper.css_value("height"))
+        end
+      end
+
+      it "restores the rce to its original size after switching to pretty html view" do
+        visit_front_page_edit(@course)
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        switch_to_html_view
+        click_full_screen_button
+
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+
+      it "restores the rce to its original while in pretty html view" do
+        visit_front_page_edit(@course)
+        switch_to_html_view
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        click_full_screen_button
+
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+
+      it "restores the rce to its original size after switching from pretty html view" do
+        visit_front_page_edit(@course)
+        switch_to_html_view
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        click_full_screen_button
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        switch_to_editor_view
+        click_full_screen_button
+
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+    end
+    # rubocop:enable Specs/NoSeleniumWebDriverWait
   end
 end
 
-# rubocop:enable Specs/NoNoSuchElementError
+# rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

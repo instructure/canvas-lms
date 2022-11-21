@@ -31,6 +31,7 @@ import {convertFileToBase64} from '../../../svg/utils'
 import {createCroppedImageSvg} from './imageCropUtils'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {DirectionRegion} from './DirectionRegion'
+import {instuiPopupMountNode} from '../../../../../../util/fullscreenHelpers'
 
 const handleSubmit = (onSubmit, cropperSettings, image) =>
   createCroppedImageSvg(cropperSettings, image)
@@ -103,6 +104,7 @@ export const ImageCropperModal = ({
       data-mce-component={true}
       as="form"
       label={formatMessage('Crop Image')}
+      mountNode={instuiPopupMountNode}
       size="large"
       open={open}
       onDismiss={onClose}

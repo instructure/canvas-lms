@@ -51,6 +51,7 @@ export const ColorSection = ({settings, onChange}) => (
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select an outline size.')}
         id="icon-outline-size"
+        mountNode={getColorSection}
         onChange={(e, option) => onChange({outlineSize: option.value})}
         renderLabel={formatMessage('Outline Size')}
         value={settings.outlineSize}
