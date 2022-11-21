@@ -21,10 +21,12 @@ import '@testing-library/jest-dom/extend-expect'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {queryHelpers} from '@testing-library/dom'
 import keycode from 'keycode'
+import {FS_ENABLED} from '../../util/fullscreenHelpers'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
 
 function defaultProps(props = {}) {
   return {
+    id: 'sb1',
     onToggleHtml: () => {},
     path: [],
     wordCount: 0,
@@ -33,6 +35,8 @@ function defaultProps(props = {}) {
     onKBShortcutModalOpen: () => {},
     onA11yChecker: () => {},
     onWordcountModalOpen: () => {},
+    onFullscreen: () => {},
+    onChangeView: () => {},
     ...props,
   }
 }
@@ -50,6 +54,10 @@ async function findDescribedByText(container) {
 }
 
 describe('RCE StatusBar', () => {
+  beforeEach(() => {
+    document[FS_ENABLED] = true
+  })
+
   it('calls callback when clicking kb shortcut button', () => {
     const onkbcallback = jest.fn()
     const {getByText} = renderStatusBar({onKBShortcutModalOpen: onkbcallback})
@@ -64,6 +72,27 @@ describe('RCE StatusBar', () => {
     const wordCountButton = getByTestId('status-bar-word-count').firstChild
     wordCountButton.click()
     expect(onWordcountCallback).toHaveBeenCalled()
+  })
+
+  it('displays all the buttons', () => {
+    renderStatusBar()
+    expect(document.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-fullscreen-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+  })
+
+  it('omits fullscreen button when fullscreen is not enabled', () => {
+    document[FS_ENABLED] = undefined
+    renderStatusBar()
+    expect(document.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+    expect(document.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
   })
 
   describe('in WYSIWYG mode', () => {

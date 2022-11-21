@@ -71,12 +71,13 @@ export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPane
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
 }
 
-const Upload = ({editor, dispatch, onChange}) => {
+const Upload = ({editor, dispatch, mountNode, onChange}) => {
   return (
     <UploadFile
       accept="image/*"
       editor={editor}
       label={formatMessage('Upload Image')}
+      mountNode={mountNode}
       panels={['COMPUTER']}
       onDismiss={() => {
         dispatch(actions.CLEAR_MODE)
@@ -91,6 +92,7 @@ Upload.propTypes = {
   editor: PropTypes.object.isRequired,
   dispatch: PropTypes.func,
   onChange: PropTypes.func,
+  mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
 }
 
 Upload.defaultProps = {

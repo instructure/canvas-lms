@@ -32,7 +32,23 @@ require('@instructure/ui-themes')
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
-    value: require('@sheerun/mutationobserver-shim')
+    value: require('@sheerun/mutationobserver-shim'),
+  })
+}
+
+if (!('ResizeObserver' in window)) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    configurable: true,
+    value: class IntersectionObserver {
+      observe() {
+        return null
+      }
+
+      unobserve() {
+        return null
+      }
+    },
   })
 }
 

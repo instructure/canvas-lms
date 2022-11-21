@@ -26,7 +26,7 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 
-const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
+const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur, rcsConfig}, ref) => {
   const menuFor = mode => (
     <Menu.Item
       key={mode.type}
@@ -45,6 +45,7 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
 
   return (
     <Menu
+      mountNode={mountNode}
       placement="bottom"
       ref={ref}
       onFocus={onFocus}

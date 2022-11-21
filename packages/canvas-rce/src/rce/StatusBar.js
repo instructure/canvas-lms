@@ -37,6 +37,7 @@ import {
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
+import {FS_ENABLED} from '../util/fullscreenHelpers'
 
 export const WYSIWYG_VIEW = 'WYSIWYG'
 export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
@@ -45,6 +46,8 @@ export const RAW_HTML_EDITOR_VIEW = 'RAW'
 // I don't know why eslint is reporting this, the props are all used
 /* eslint-disable react/no-unused-prop-types */
 StatusBar.propTypes = {
+  id: string.isRequired,
+  rceIsFullscreen: bool,
   onChangeView: func.isRequired,
   path: arrayOf(string),
   wordCount: number,
@@ -346,6 +349,7 @@ export default function StatusBar(props) {
 
   function renderFullscreen() {
     if (props.readOnly) return null
+    if (!document[FS_ENABLED]) return null
     if (props.editorView === RAW_HTML_EDITOR_VIEW && !('requestFullscreen' in document.body)) {
       // this is safari, which refuses to fullscreen a textarea
       return null
@@ -372,6 +376,7 @@ export default function StatusBar(props) {
   }
 
   function renderResizeHandle() {
+    if (props.rceIsFullscreen) return null
     return (
       <ResizeHandle
         data-btn-id="rce-resize-handle"
@@ -387,7 +392,8 @@ export default function StatusBar(props) {
   const flexJustify = isHtmlView() ? 'end' : 'start'
   return (
     <Flex
-      margin="x-small 0 x-small x-small"
+      id={props.id}
+      padding="x-small 0 x-small x-small"
       data-testid="RCEStatusBar"
       justifyItems={flexJustify}
       ref={statusBarRef}
