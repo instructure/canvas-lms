@@ -38,7 +38,12 @@ type Props = {
   filterItems: FilterDrilldownData
 }
 
-const FilterDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props) => {
+const FilterDropdown = ({
+  rootId = 'savedFilterPresets',
+  onOpenTray,
+  dataMap,
+  filterItems,
+}: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLElement>()
@@ -65,7 +70,7 @@ const FilterDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props)
     []
   )
 
-  const isRoot = currentItemId === '1'
+  const isRoot = currentItemId === 'savedFilterPresets'
 
   const setItemId = id => {
     setTempItemId(id)
@@ -80,7 +85,7 @@ const FilterDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props)
     if (isOpen && event?.keyCode === 9) {
       // 9 = Tab
       setIsOpen(false)
-      setTempItemId(dataMap['1'].id)
+      setTempItemId(dataMap.savedFilterPresets.id)
     }
   }
 
@@ -114,7 +119,7 @@ const FilterDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props)
           setIsOpen(true)
         }}
         onHideContent={() => {
-          setTempItemId(dataMap['1'].id)
+          setTempItemId(dataMap.savedFilterPresets.id)
           setIsOpen(false)
         }}
       >
