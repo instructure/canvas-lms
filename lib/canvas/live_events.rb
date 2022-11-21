@@ -70,6 +70,7 @@ module Canvas::LiveEvents
       course_id: course.global_id,
       uuid: course.uuid,
       account_id: course.global_account_id,
+      account_uuid: course.account.uuid,
       name: course.name,
       created_at: course.created_at,
       updated_at: course.updated_at,

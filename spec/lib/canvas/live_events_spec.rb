@@ -2201,6 +2201,41 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "course" do
+    before do
+      @course = course_model
+    end
+
+    let(:event_data) do
+      {
+        course_id: @course.global_id.to_s,
+        uuid: @course.uuid,
+        account_id: @course.global_account_id.to_s,
+        account_uuid: @course.account.uuid,
+        name: @course.name,
+        created_at: @course.created_at,
+        updated_at: @course.updated_at,
+        workflow_state: @course.workflow_state
+      }
+    end
+
+    context "created" do
+      it "triggers a course_created live event" do
+        expect_event("course_created", event_data).once
+        Canvas::LiveEvents.course_created(@course)
+      end
+    end
+
+    context "updated" do
+      it "triggers a course_udpated live event" do
+        @course.name = "Updated Course Name"
+        @course.save!
+        expect_event("course_updated", event_data).once
+        Canvas::LiveEvents.course_updated(@course)
+      end
+    end
+  end
+
   describe "master template child subscription" do
     before do
       @course = course_model
@@ -2211,6 +2246,7 @@ describe Canvas::LiveEvents do
     let(:child_subscription) do
       expect_event("course_updated", {
                      account_id: @master_template.course.account.global_id.to_s,
+                     account_uuid: @course.account.uuid,
                      course_id: @course.global_id.to_s,
                      created_at: anything,
                      name: @course.name,
