@@ -18,6 +18,7 @@
 
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
+import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
@@ -76,6 +77,9 @@ export const DiscussionTopicToolbarContainer = props => {
         searchTerm={currentSearchValue}
         discussionAnonymousState={props.discussionTopic.anonymousState}
         canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
+        setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+        userSplitScreenPreference={props.userSplitScreenPreference}
+        closeView={props.closeView}
       />
     </View>
   )
@@ -83,6 +87,9 @@ export const DiscussionTopicToolbarContainer = props => {
 
 DiscussionTopicToolbarContainer.propTypes = {
   discussionTopic: Discussion.shape,
+  setUserSplitScreenPreference: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
+  closeView: PropTypes.func,
 }
 
 export default DiscussionTopicToolbarContainer
