@@ -2786,6 +2786,15 @@ class Submission < ActiveRecord::Base
       a.grants_right?(viewing_user, :read) &&
         a.rubric_association == assignment.rubric_association
     end
+
+    if assignment.anonymous_peer_reviews?
+      filtered_assessments.each do |a|
+        if a.assessment_type == "peer_review"
+          a.assessor = nil # hide peer reviewer's identity
+        end
+      end
+    end
+
     filtered_assessments.sort_by do |a|
       [
         a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last,
