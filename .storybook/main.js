@@ -119,8 +119,6 @@ module.exports = {
         include: [
           path.resolve(canvasDir, 'ui'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
-          path.resolve(canvasDir, 'packages/backbone-input-filter-view/src'),
-          path.resolve(canvasDir, 'packages/backbone-input-view/src'),
           ...globPlugins('{app,spec_canvas}/coffeescripts/')
         ],
         use: ['coffee-loader']

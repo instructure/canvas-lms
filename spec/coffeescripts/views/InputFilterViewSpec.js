@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import InputFilterView from 'backbone-input-filter-view'
+import InputFilterView from '@canvas/backbone-input-filter-view'
 import 'helpers/jquery.simulate'
 
 let view
