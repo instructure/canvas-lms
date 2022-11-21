@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterDrilldownData} from '../gradebook.d'
-import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
@@ -42,7 +42,7 @@ export type FilterNavProps = {
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
   gradingPeriods: CamelizedGradingPeriod[]
-  studentGroupCategories: StudentGroupCategory[]
+  studentGroupCategories: StudentGroupCategoryMap
 }
 
 export default function FilterNav({
@@ -90,8 +90,8 @@ export default function FilterNav({
   })
 
   const dataMap: FilterDrilldownData = {
-    '1': {
-      id: '1',
+    savedFilterPresets: {
+      id: 'savedFilterPresets',
       parentId: null,
       name: I18n.t('Saved Filter Presets'),
       items: [],
@@ -101,7 +101,7 @@ export default function FilterNav({
   for (const filterPreset of filterPresets) {
     const item = {
       id: filterPreset.id,
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       name: filterPreset.name,
       isSelected: doFiltersMatch(appliedFilters, filterPreset.filters),
       onToggle: () => {
@@ -113,7 +113,7 @@ export default function FilterNav({
       },
     }
     dataMap[filterPreset.id] = item
-    dataMap['1'].items?.push(item)
+    dataMap.savedFilterPresets.items?.push(item)
   }
 
   const filterItems: FilterDrilldownData = {}
@@ -122,7 +122,7 @@ export default function FilterNav({
     filterItems.sections = {
       id: 'sections',
       name: I18n.t('Sections'),
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'section'),
       items: sections.map(a => ({
         id: a.id,
@@ -146,7 +146,7 @@ export default function FilterNav({
     filterItems.modules = {
       id: 'modules',
       name: I18n.t('Modules'),
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'module'),
       items: modules.map(m => ({
         id: m.id,
@@ -170,7 +170,7 @@ export default function FilterNav({
     filterItems['grading-periods'] = {
       id: 'grading-periods',
       name: I18n.t('Grading Periods'),
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'grading-period'),
       items: gradingPeriods.map(a => ({
         id: a.id,
@@ -195,7 +195,7 @@ export default function FilterNav({
     filterItems['assignment-groups'] = {
       id: 'assignment-groups',
       name: I18n.t('Assignment Groups'),
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'assignment-group'),
       items: assignmentGroups.map(a => ({
         id: a.id,
@@ -220,7 +220,7 @@ export default function FilterNav({
     filterItems['student-groups'] = {
       id: 'student-groups',
       name: I18n.t('Student Groups'),
-      parentId: '1',
+      parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'student-group'),
       itemGroups: Object.values(studentGroupCategories)
         .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
@@ -253,11 +253,11 @@ export default function FilterNav({
   filterItems.submissions = {
     id: 'submissions',
     name: I18n.t('Submissions'),
-    parentId: '1',
+    parentId: 'savedFilterPresets',
     isSelected: appliedFilters.some(c => c.type === 'submissions'),
     items: [
       {
-        id: '1',
+        id: 'savedFilterPresets',
         name: 'Has Ungraded Submissions',
         isSelected: appliedFilters.some(
           c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
@@ -295,7 +295,7 @@ export default function FilterNav({
   filterItems.startAndEndDate = {
     id: 'start-and-end-date',
     name: I18n.t('Start & End Date'),
-    parentId: '1',
+    parentId: 'savedFilterPresets',
     isSelected: appliedFilters.some(
       f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f)
     ),

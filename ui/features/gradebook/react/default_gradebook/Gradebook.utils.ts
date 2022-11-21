@@ -46,6 +46,7 @@ import type {
   Section,
   StudentGroup,
   StudentGroupCategory,
+  StudentGroupCategoryMap,
   StudentMap,
   Submission,
   SubmissionType,
@@ -271,7 +272,7 @@ export const getLabelForFilter = (
   gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
-  studentGroupCategories: StudentGroupCategory[]
+  studentGroupCategories: StudentGroupCategoryMap
 ) => {
   if (!filter.type) throw new Error('missing condition type')
 
