@@ -116,7 +116,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
         end
         if message.has_media_objects || input[:media_comment_id]
-          InstStatsd::Statsd.count("inbox.message.sent.media.react", conversations.count)
+          InstStatsd::Statsd.increment("inbox.message.sent.media.react")
         end
         if message[:attachment_ids].present?
           InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
