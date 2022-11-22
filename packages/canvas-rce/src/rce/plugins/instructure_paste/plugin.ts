@@ -22,15 +22,17 @@ import {get as getSession} from '../../../sidebar/actions/session'
 import {uploadToMediaFolder} from '../../../sidebar/actions/upload'
 import doFileUpload from '../shared/Upload/doFileUpload'
 import formatMessage from '../../../format-message'
-import {isImage, isAudioOrVideo} from '../shared/fileTypeUtils'
+import {isAudioOrVideo, isImage} from '../shared/fileTypeUtils'
 import {showFlashAlert} from '../../../common/FlashAlert'
+import tinymce from 'tinymce'
+import {TsMigrationAny} from '../../../types/ts-migration'
 
 // assume that if there are multiple RCEs on the page,
 // they all talk to the same canvas
 const config = {
-  store: null,
-  session: null, // null: we haven't gotten it yet, false: we don't need it
-  sessionPromise: null,
+  store: null as TsMigrationAny,
+  session: null as TsMigrationAny, // null: we haven't gotten it yet, false: we don't need it
+  sessionPromise: null as TsMigrationAny,
 }
 
 // when UploadFile renders
@@ -75,88 +77,84 @@ function getUsageRights(ed, document, theFile) {
   })
 }
 
-tinymce.create('tinymce.plugins.InstructurePastePlugin', {
-  init(ed) {
-    const store = initStore(bridge.trayProps.get(ed))
-
-    function handlePasteOrDrop(event) {
-      event.preventDefault()
-      const cbdata = event.clipboardData || event.dataTransfer // paste || drop
-      const files = cbdata.files
-      const types = cbdata.types
-
-      if (types.includes('Files')) {
-        if (files.length > 1) {
-          handleMultiFilePaste(files)
-          return
-        }
-        // we're pasting a file
-        const file = files[0]
-        if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
-          return
-        }
-        if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
-          // it's very doubtful that we won't have retrieved the session data yet,
-          // since it takes a while for the RCE to initialize, but if we haven't
-          // wait until we do to carry on and finish pasting.
-          // eslint-disable-next-line promise/catch-or-return
-          config.sessionPromise.finally(() => {
-            if (config.session === null) {
-              // we failed to get the session and don't know if usage rights are required in this course|group
-              // In all probability, the file upload will fail too, but I feel like we have to do something here.
-              showFlashAlert({
-                message: formatMessage(
-                  'If Usage Rights are required, the file will not publish until enabled in the Files page.'
-                ),
-                type: 'info',
-              })
-            }
-            if (config.session && config.session.usageRightsRequired) {
-              return getUsageRights(ed, document, file)
-            } else {
-              const fileMetaProps = {
-                altText: file.name,
-                contentType: file.type,
-                displayAs: 'embed',
-                isDecorativeImage: false,
-                name: file.name,
-                parentFolderId: 'media',
-                size: file.size,
-                domObject: file,
-              }
-              let tabContext = 'documents'
-              if (isImage(file.type)) {
-                tabContext = 'images'
-              } else if (isAudioOrVideo(file.type)) {
-                tabContext = 'media'
-              }
-              store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
-            }
-          })
-        }
-      } else if (types.includes('text/html')) {
-        const text = cbdata.getData('text/html')
-        ed.execCommand('mceInsertContent', false, text)
-      } else if (types.includes('text/plain')) {
-        const text = cbdata.getData('text/plain')
-        ed.execCommand('mceInsertContent', false, text)
-      } else {
-        showFlashAlert({
-          message: formatMessage("Sorry, we don't know how to paste that"),
-          type: 'info',
-        })
-      }
-    }
-    ed.on('paste', handlePasteOrDrop)
-    ed.on('drop', handlePasteOrDrop)
-  },
-})
-
 function handleMultiFilePaste(_files) {
   showFlashAlert({
     message: formatMessage("Sorry, we don't support multiple files."),
     type: 'info',
-  })
+  } as TsMigrationAny)
 }
 
-tinymce.PluginManager.add('instructure_paste', tinymce.plugins.InstructurePastePlugin)
+tinymce.PluginManager.add('instructure_paste', function (ed) {
+  const store = initStore(bridge.trayProps.get(ed))
+
+  function handlePasteOrDrop(event) {
+    event.preventDefault()
+    const cbdata = event.clipboardData || event.dataTransfer // paste || drop
+    const files = cbdata.files
+    const types = cbdata.types
+
+    if (types.includes('Files')) {
+      if (files.length > 1) {
+        handleMultiFilePaste(files)
+        return
+      }
+      // we're pasting a file
+      const file = files[0]
+      if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
+        return
+      }
+      if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
+        // it's very doubtful that we won't have retrieved the session data yet,
+        // since it takes a while for the RCE to initialize, but if we haven't
+        // wait until we do to carry on and finish pasting.
+        // eslint-disable-next-line promise/catch-or-return
+        config.sessionPromise.finally(() => {
+          if (config.session === null) {
+            // we failed to get the session and don't know if usage rights are required in this course|group
+            // In all probability, the file upload will fail too, but I feel like we have to do something here.
+            showFlashAlert({
+              message: formatMessage(
+                'If Usage Rights are required, the file will not publish until enabled in the Files page.'
+              ),
+              type: 'info',
+            } as TsMigrationAny)
+          }
+          if (config.session && config.session.usageRightsRequired) {
+            return getUsageRights(ed, document, file)
+          } else {
+            const fileMetaProps = {
+              altText: file.name,
+              contentType: file.type,
+              displayAs: 'embed',
+              isDecorativeImage: false,
+              name: file.name,
+              parentFolderId: 'media',
+              size: file.size,
+              domObject: file,
+            }
+            let tabContext = 'documents'
+            if (isImage(file.type)) {
+              tabContext = 'images'
+            } else if (isAudioOrVideo(file.type)) {
+              tabContext = 'media'
+            }
+            store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
+          }
+        })
+      }
+    } else if (types.includes('text/html')) {
+      const text = cbdata.getData('text/html')
+      ed.execCommand('mceInsertContent', false, text)
+    } else if (types.includes('text/plain')) {
+      const text = cbdata.getData('text/plain')
+      ed.execCommand('mceInsertContent', false, text)
+    } else {
+      showFlashAlert({
+        message: formatMessage("Sorry, we don't know how to paste that"),
+        type: 'info',
+      } as TsMigrationAny)
+    }
+  }
+  ed.on('paste', handlePasteOrDrop)
+  ed.on('drop', handlePasteOrDrop)
+})

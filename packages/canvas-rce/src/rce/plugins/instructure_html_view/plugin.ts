@@ -18,23 +18,23 @@
 
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
-
-tinymce.create('tinymce.plugins.InstructureHtmlView', {
-  init(ed) {
-    // Register commands
-    ed.addCommand('instructureHtmlView', clickCallback.bind(this, ed, document))
-
-    // Register menu items
-    ed.ui.registry.addMenuItem('instructure_html_view', {
-      text: formatMessage('HTML Editor'),
-      icon: 'htmlview',
-      onAction: () => ed.execCommand('instructureHtmlView'),
-      onSetup(api) {
-        api.setDisabled(false)
-      },
-    })
-  },
-})
+import tinymce from 'tinymce'
+import {TsMigrationAny} from '../../../types/ts-migration'
 
 // Register plugin
-tinymce.PluginManager.add('instructure_html_view', tinymce.plugins.InstructureHtmlView)
+tinymce.PluginManager.add('instructure_html_view', function (ed) {
+  // Register commands
+  ed.addCommand('instructureHtmlView', () => clickCallback())
+
+  // Register menu items
+  ed.ui.registry.addMenuItem('instructure_html_view', {
+    text: formatMessage('HTML Editor'),
+    icon: 'htmlview',
+    onAction: () => ed.execCommand('instructureHtmlView'),
+    onSetup(api) {
+      api.setDisabled(false)
+
+      return () => undefined
+    },
+  })
+})

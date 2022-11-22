@@ -19,17 +19,14 @@
 import dispatchInitEvent from './dispatchInitEvent'
 import {IconLtiLine} from '@instructure/ui-icons/es/svg'
 import clickCallback from './clickCallback'
-
-tinymce.create('tinymce.plugins.InstructureExternalTools', {
-  init(ed, url) {
-    document.addEventListener('tinyRCE/onExternalTools', event => {
-      clickCallback(ed, event.detail.ltiButtons)
-    })
-    ed.ui.registry.addIcon('lti', IconLtiLine.src)
-    dispatchInitEvent(ed, document, url)
-  },
-  icon: 'lti',
-})
+import tinymce from 'tinymce'
+import {TsMigrationAny} from '../../../types/ts-migration'
 
 // Register plugin
-tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools)
+tinymce.PluginManager.add('instructure_external_tools', function (ed, url) {
+  document.addEventListener('tinyRCE/onExternalTools', (event: TsMigrationAny) => {
+    clickCallback(ed, event.detail.ltiButtons)
+  })
+  ed.ui.registry.addIcon('lti', IconLtiLine.src)
+  dispatchInitEvent(ed, document, url)
+})

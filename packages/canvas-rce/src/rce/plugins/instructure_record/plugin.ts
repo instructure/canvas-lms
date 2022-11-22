@@ -23,6 +23,7 @@ import VideoTrayController from './VideoOptionsTray/TrayController'
 import AudioTrayController from './AudioOptionsTray/TrayController'
 import {isAudioElement, isVideoElement} from '../shared/ContentSelection'
 import {isOKToLink} from '../../contentInsertionUtils'
+import tinymce from 'tinymce'
 
 const videoTrayController = new VideoTrayController()
 const audioTrayController = new AudioTrayController()
@@ -33,7 +34,7 @@ const GROUP_PLUGIN_KEY = 'group_media'
 
 function getMenuItems(ed) {
   const contextType = ed.settings.canvas_rce_user_context.type
-  const items = []
+  const items: Array<{text: string; value: string}> = []
   if (ed.getParam('show_media_upload')) {
     // test if it's ok
     items.push({
@@ -79,106 +80,103 @@ function doMenuItem(ed, value) {
   }
 }
 
-tinymce.create('tinymce.plugins.InstructureRecord', {
-  init(ed) {
-    ed.addCommand('instructureRecord', clickCallback.bind(this, ed, document))
-    ed.addCommand('instructureTrayForMedia', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key, ed.id)
-    })
+// Register plugin
+tinymce.PluginManager.add('instructure_record', function (ed) {
+  ed.addCommand('instructureRecord', () => clickCallback(ed, document))
+  ed.addCommand('instructureTrayForMedia', (ui, plugin_key) => {
+    bridge.showTrayForPlugin(plugin_key, ed.id)
+  })
 
-    // Register menu items
-    ed.ui.registry.addNestedMenuItem('instructure_media', {
-      text: formatMessage('Media'),
-      icon: 'video',
-      getSubmenuItems: () =>
+  // Register menu items
+  ed.ui.registry.addNestedMenuItem('instructure_media', {
+    text: formatMessage('Media'),
+    icon: 'video',
+    getSubmenuItems: () =>
+      getMenuItems(ed).map(item => {
+        return {
+          type: 'menuitem',
+          text: item.text,
+          onAction: () => doMenuItem(ed, item.value),
+          onSetup: api => {
+            api.setDisabled(!isOKToLink(ed.selection.getContent()))
+            return () => {}
+          },
+        }
+      }),
+  })
+
+  // Register buttons
+  ed.ui.registry.addSplitButton('instructure_record', {
+    tooltip: formatMessage('Record/Upload Media'),
+    icon: 'video',
+    fetch: callback =>
+      callback(
         getMenuItems(ed).map(item => {
-          return {
-            type: 'menuitem',
-            text: item.text,
-            onAction: () => doMenuItem(ed, item.value),
-            onSetup: api => {
-              api.setDisabled(!isOKToLink(ed.selection.getContent()))
-              return () => {}
-            },
-          }
-        }),
-    })
-
-    // Register buttons
-    ed.ui.registry.addSplitButton('instructure_record', {
-      tooltip: formatMessage('Record/Upload Media'),
-      icon: 'video',
-      fetch(callback) {
-        const items = getMenuItems(ed).map(item => {
           return {
             type: 'choiceitem',
             text: item.text,
             value: item.value,
           }
         })
-        callback(items)
-      },
-      onAction(api) {
-        if (!api.isDisabled()) {
-          const first = getMenuItems(ed)[0].value
-          doMenuItem(ed, first)
-        }
-      },
-      onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
-      onSetup(api) {
-        function handleNodeChange(_e) {
-          api.setDisabled(!isOKToLink(ed.selection.getContent()))
-        }
-        setTimeout(handleNodeChange)
-        ed.on('NodeChange', handleNodeChange)
-        return () => {
-          ed.off('NodeChange', handleNodeChange)
-        }
-      },
-    })
+      ),
+    onAction(api) {
+      if (!api.isDisabled()) {
+        const first = getMenuItems(ed)[0].value
+        doMenuItem(ed, first)
+      }
+    },
+    onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
+    onSetup(api) {
+      function handleNodeChange(_e) {
+        api.setDisabled(!isOKToLink(ed.selection.getContent()))
+      }
+      setTimeout(handleNodeChange)
+      ed.on('NodeChange', handleNodeChange)
+      return () => {
+        ed.off('NodeChange', handleNodeChange)
+      }
+    },
+  })
 
-    /*
-     * Register the Video "Options" button that will open the Video Options
-     * tray.
-     */
-    const buttonAriaLabel = formatMessage('Show video options')
-    ed.ui.registry.addButton('instructure-video-options', {
-      onAction() {
-        // show the tray
-        videoTrayController.showTrayForEditor(ed)
-      },
+  /*
+   * Register the Video "Options" button that will open the Video Options
+   * tray.
+   */
+  const buttonAriaLabel = formatMessage('Show video options')
+  ed.ui.registry.addButton('instructure-video-options', {
+    onAction() {
+      // show the tray
+      videoTrayController.showTrayForEditor(ed)
+    },
 
-      text: formatMessage('Video Options'),
-      tooltip: buttonAriaLabel,
-    })
+    text: formatMessage('Video Options'),
+    tooltip: buttonAriaLabel,
+  })
 
-    ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
-      items: 'instructure-video-options',
-      position: 'node',
-      predicate: isVideoElement,
-      scope: 'node',
-    })
+  ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
+    items: 'instructure-video-options',
+    position: 'node',
+    predicate: isVideoElement,
+    scope: 'node',
+  })
 
-    ed.ui.registry.addButton('instructure-audio-options', {
-      onAction() {
-        audioTrayController.showTrayForEditor(ed)
-      },
-      text: formatMessage('Audio Options'),
-      tooltip: formatMessage('Show audio options'),
-    })
+  ed.ui.registry.addButton('instructure-audio-options', {
+    onAction() {
+      audioTrayController.showTrayForEditor(ed)
+    },
+    text: formatMessage('Audio Options'),
+    tooltip: formatMessage('Show audio options'),
+  })
 
-    ed.ui.registry.addContextToolbar('instructure-audio-toolbar', {
-      items: 'instructure-audio-options',
-      position: 'node',
-      predicate: isAudioElement,
-      scope: 'node',
-    })
-  },
-  remove(editor) {
+  ed.ui.registry.addContextToolbar('instructure-audio-toolbar', {
+    items: 'instructure-audio-options',
+    position: 'node',
+    predicate: isAudioElement,
+    scope: 'node',
+  })
+
+  ed.on('remove', editor => {
     audioTrayController.hideTrayForEditor(editor)
     videoTrayController.hideTrayForEditor(editor)
-  },
+  })
 })
-
-// Register plugin
-tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord)
