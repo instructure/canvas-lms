@@ -153,8 +153,21 @@ module Lti
                    moduleCreated: module_created
                  }.compact
                })
+        parent_frame_context = return_url_parameters[:parent_frame_context]
+        parent_frame_tool = parent_frame_context ? ContextExternalTool.find_by(id: parent_frame_context) : nil
+        if parent_frame_tool&.active? && parent_frame_tool&.developer_key&.internal_service
+          js_env({
+                   DEEP_LINKING_POST_MESSAGE_ORIGIN: origin(parent_frame_tool.url)
+                 }, true)
+        end
 
         render layout: "bare"
+      end
+
+      def origin(url)
+        uri = URI.parse(url)
+        origin = URI("#{uri.scheme}://#{uri.host}:#{uri.port}")
+        origin.to_s
       end
 
       def require_context_update_rights
