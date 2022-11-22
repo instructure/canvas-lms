@@ -89,8 +89,12 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
   let endDateValue, endHelpText
-  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
-    endDateValue = plannedEndDate
+  if (enrollmentType) {
+    if (window.ENV.FEATURES.course_paces_for_students) {
+      endDateValue = coursePace.end_date || plannedEndDate
+    } else {
+      endDateValue = plannedEndDate
+    }
     endHelpText = END_DATE_CAPTIONS.user
   } else {
     endDateValue =
