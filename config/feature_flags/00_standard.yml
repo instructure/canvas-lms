@@ -424,3 +424,9 @@ scheduled_page_publication:
   state: hidden
   display_name: Scheduled page publication
   description: Allows course pages to be published on a schedule
+send_usage_metrics:
+  state: hidden
+  display_name: Send usage metrics
+  description: Send usage metrics
+  applies_to: RootAccount
+  visible_on: usage_metrics_allowed_hook
