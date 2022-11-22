@@ -32,6 +32,19 @@ module Lti
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
 
+        let(:context_external_tool) do
+          ContextExternalTool.create!(
+            context: course.account,
+            url: "http://tool.url/login",
+            name: "test tool",
+            shared_secret: "secret",
+            consumer_key: "key",
+            developer_key: developer_key,
+            lti_version: "1.3"
+          )
+        end
+        let(:course) { course_model }
+
         it { is_expected.to be_ok }
 
         it "sets the JS ENV" do
@@ -53,6 +66,32 @@ module Lti
           )
 
           subject
+        end
+
+        context "when returning from a non-internal service" do
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            expect(controller).to receive(:js_env).with(anything)
+            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://tool.url" }, true)
+
+            subject
+          end
+        end
+
+        context "when returning from an internal service" do
+          before do
+            developer_key.update!(internal_service: true)
+          end
+
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            expect(controller).to receive(:js_env).with(anything)
+            expect(controller).to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://tool.url" }, true)
+
+            subject
+          end
         end
 
         context "when the messages/logs passed in are not strings" do
