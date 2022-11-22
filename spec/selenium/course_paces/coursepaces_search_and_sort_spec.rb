@@ -100,4 +100,56 @@ describe "course pace search and sort" do
       expect(course_pace_table_rows.count).to eq(10)
     end
   end
+
+  context "table sorting" do
+    before :once do
+      %w[a b c d e].each do |x|
+        @course.course_sections.create!(name: "#{x} section to search")
+      end
+      n_students_in_course(5, course: @course)
+      create_published_course_pace("Course Pace 1", "Module Assignment 1")
+    end
+
+    it "starts section table as sorted ascending by section name" do
+      visit_course_paces_page
+
+      expect(course_pace_table_rows.first.text).to include("a section to search")
+      expect(course_pace_table_rows.last.text).to include("e section to search")
+    end
+
+    it "sorts section table descending by section name when column heading clicked" do
+      visit_course_paces_page
+
+      click_table_column_name
+
+      expect(course_pace_table_rows.first.text).to include("e section to search")
+      expect(course_pace_table_rows.last.text).to include("a section to search")
+
+      click_table_column_name
+
+      expect(course_pace_table_rows.first.text).to include("a section to search")
+      expect(course_pace_table_rows.last.text).to include("e section to search")
+    end
+
+    it "starts student table as sorted ascending by student name" do
+      visit_course_paces_page
+      click_student_tab
+
+      expect(course_pace_table_rows.first.text).to include("Jessi Jenkins")
+      expect(course_pace_table_rows.last.text).to include("user 5")
+    end
+
+    it "sorts student table descending by student name when column heading clicked" do
+      visit_course_paces_page
+      click_student_tab
+      click_table_column_name
+
+      expect(course_pace_table_rows.first.text).to include("user 5")
+      expect(course_pace_table_rows.last.text).to include("Jessi Jenkins")
+
+      click_table_column_name
+      expect(course_pace_table_rows.first.text).to include("Jessi Jenkins")
+      expect(course_pace_table_rows.last.text).to include("user 5")
+    end
+  end
 end
