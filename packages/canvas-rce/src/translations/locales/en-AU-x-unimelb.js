@@ -99,7 +99,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Choose caption file" },
   "choose_usage_rights_33683854": { "message": "Choose usage rights..." },
   "circle_484abe63": { "message": "Circle" },
-  "circle_unordered_list_9e3a0763": { "message": "circle unordered list" },
   "clear_2084585f": { "message": "Clear" },
   "clear_image_3213fe62": { "message": "Clear image" },
   "clear_selected_file_82388e50": { "message": "Clear selected file" },
@@ -179,12 +178,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Decorative { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Decrease Indent" },
   "deep_purple_bb3e2907": { "message": "Deep Purple" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "default bulleted unordered list"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "default numerical ordered list"
-  },
   "definite_integral_fe7ffed1": { "message": "Definite Integral" },
   "degree_symbol_4a823d5f": { "message": "Degree Symbol" },
   "delimiters_4db4840d": { "message": "Delimiters" },
@@ -362,6 +355,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Icon Maker Icons" },
   "icon_options_7e32746e": { "message": "Icon Options" },
   "icon_options_tray_2b407977": { "message": "Icon Options Tray" },
+  "icon_preview_1782a1d9": { "message": "Icon Preview" },
   "icon_shape_30b61e7": { "message": "Icon Shape" },
   "icon_size_9353edea": { "message": "Icon Size" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -534,9 +528,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operators" },
   "or_9b70ccaa": { "message": "Or" },
   "orange_81386a62": { "message": "Orange" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Ordered and Unordered Lists"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Other editor shortcuts may be found at"
   },
@@ -690,7 +681,6 @@ const locale = {
   "square_subset_strict_7044e84f": { "message": "Square Subset (Strict)" },
   "square_superset_3be8dae1": { "message": "Square Superset" },
   "square_superset_strict_fa4262e4": { "message": "Square Superset (Strict)" },
-  "square_unordered_list_b15ce93b": { "message": "square unordered list" },
   "star_8d156e09": { "message": "Star" },
   "steel_blue_14296f08": { "message": "Steel Blue" },
   "styles_2aa721ef": { "message": "Styles" },
@@ -805,9 +795,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Upload Media" },
   "upload_record_media_e4207d72": { "message": "Upload/Record Media" },
   "uploading_19e8a4e7": { "message": "Uploading" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "uppercase alphabetic ordered list"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
   "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Uppercase Lambda" },
@@ -815,9 +802,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Uppercase Phi" },
   "uppercase_pi_fcc70f5e": { "message": "Uppercase Pi" },
   "uppercase_psi_6395acbe": { "message": "Uppercase Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "uppercase Roman numeral ordered list"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Uppercase Sigma" },
   "uppercase_theta_49afc891": { "message": "Uppercase Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "Uppercase Upsilon" },

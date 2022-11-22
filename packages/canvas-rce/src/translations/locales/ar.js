@@ -101,7 +101,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
   "choose_usage_rights_33683854": { "message": "اختر حقوق الاستخدام..." },
   "circle_484abe63": { "message": "الدائرة" },
-  "circle_unordered_list_9e3a0763": { "message": "قائمة دائرية غير المرتبة" },
   "clear_2084585f": { "message": "مسح" },
   "clear_image_3213fe62": { "message": "مسح الصورة" },
   "clear_selected_file_82388e50": { "message": "مسح الملف المحدد" },
@@ -179,12 +178,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } زينة" },
   "decrease_indent_d9cf469d": { "message": "تقليل المسافة البادئة" },
   "deep_purple_bb3e2907": { "message": "أرجواني داكن" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "قائمة افتراضية غير مرتبة بتعداد نقطي"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "قائمة افتراضية مرقمة غير مرتبة"
-  },
   "definite_integral_fe7ffed1": { "message": "قيمة التكامل المحدد" },
   "degree_symbol_4a823d5f": { "message": "رمز الدرجة" },
   "delimiters_4db4840d": { "message": "المحدِدات" },
@@ -360,6 +353,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "أيقونات صانع الأيقونات" },
   "icon_options_7e32746e": { "message": "خيارات الأيقونة" },
   "icon_options_tray_2b407977": { "message": "علبة خيارات الأيقونة" },
+  "icon_preview_1782a1d9": { "message": "معاينة الأيقونة" },
   "icon_shape_30b61e7": { "message": "شكل الأيقونة" },
   "icon_size_9353edea": { "message": "حجم الأيقونة" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -526,9 +520,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "المشغلون" },
   "or_9b70ccaa": { "message": "أو" },
   "orange_81386a62": { "message": "برتقالي" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "القوائم المرتبة وغير المرتبة"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "يمكن العثور على اختصارات أخرى للمحرر على"
   },
@@ -680,7 +671,6 @@ const locale = {
   "square_subset_strict_7044e84f": { "message": "Square Subset (Strict)" },
   "square_superset_3be8dae1": { "message": "Square Superset" },
   "square_superset_strict_fa4262e4": { "message": "Square Superset (Strict)" },
-  "square_unordered_list_b15ce93b": { "message": "قائمة مربعة غير مرتبة" },
   "star_8d156e09": { "message": "نجمة" },
   "steel_blue_14296f08": { "message": "أزرق فولاذي" },
   "styles_2aa721ef": { "message": "الأنماط" },
@@ -791,9 +781,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
   "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
   "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Uppercase Lambda" },
@@ -801,9 +788,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Uppercase Phi" },
   "uppercase_pi_fcc70f5e": { "message": "Uppercase Pi" },
   "uppercase_psi_6395acbe": { "message": "Uppercase Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "قائمة بأرقام رومانية مرتبة بأحرف كبيرة"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Uppercase Sigma" },
   "uppercase_theta_49afc891": { "message": "Uppercase Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "Uppercase Upsilon" },

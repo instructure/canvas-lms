@@ -97,7 +97,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "选择标题文件" },
   "choose_usage_rights_33683854": { "message": "选择使用权限..." },
   "circle_484abe63": { "message": "圆圈" },
-  "circle_unordered_list_9e3a0763": { "message": "圆形无序列表" },
   "clear_2084585f": { "message": "清除" },
   "clear_image_3213fe62": { "message": "清除图片" },
   "clear_selected_file_82388e50": { "message": "清除所选文件" },
@@ -171,10 +170,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "装饰{ TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "减少缩进" },
   "deep_purple_bb3e2907": { "message": "深紫色" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "默认项目符号无序列表"
-  },
-  "default_numerical_ordered_list_48dd3548": { "message": "默认数字有序列表" },
   "definite_integral_fe7ffed1": { "message": "定积分" },
   "degree_symbol_4a823d5f": { "message": "度数符号" },
   "delimiters_4db4840d": { "message": "分隔符" },
@@ -328,6 +323,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "图标编辑器图标" },
   "icon_options_7e32746e": { "message": "图标选项" },
   "icon_options_tray_2b407977": { "message": "图标选项托盘" },
+  "icon_preview_1782a1d9": { "message": "图标预览" },
   "icon_shape_30b61e7": { "message": "图标形状" },
   "icon_size_9353edea": { "message": "图标大小" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -480,7 +476,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "运算符" },
   "or_9b70ccaa": { "message": "或" },
   "orange_81386a62": { "message": "橙色" },
-  "ordered_and_unordered_lists_cfadfc38": { "message": "有序列表和无序列表" },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "其他编辑器快捷方式可见于"
   },
@@ -622,7 +617,6 @@ const locale = {
   "square_subset_strict_7044e84f": { "message": "平方子集（严格）" },
   "square_superset_3be8dae1": { "message": "平方超集" },
   "square_superset_strict_fa4262e4": { "message": "平方超集（严格）" },
-  "square_unordered_list_b15ce93b": { "message": "方形无序列表" },
   "star_8d156e09": { "message": "星形标记" },
   "steel_blue_14296f08": { "message": "钢青色" },
   "styles_2aa721ef": { "message": "样式" },
@@ -727,9 +721,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "上传媒体" },
   "upload_record_media_e4207d72": { "message": "上传/录制媒体" },
   "uploading_19e8a4e7": { "message": "正在上传" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "大写字母有序列表"
-  },
   "uppercase_delta_d4f4bc41": { "message": "大写 Delta" },
   "uppercase_gamma_86f492e9": { "message": "大写 Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "大写 Lambda" },
@@ -737,9 +728,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "大写 Phi" },
   "uppercase_pi_fcc70f5e": { "message": "大写 Pi" },
   "uppercase_psi_6395acbe": { "message": "大写 Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "大写罗马数字有序列表"
-  },
   "uppercase_sigma_dbb70e92": { "message": "大写 Sigma" },
   "uppercase_theta_49afc891": { "message": "大写 Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "大写 Upsilon" },

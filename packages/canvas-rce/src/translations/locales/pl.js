@@ -103,9 +103,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Wybierz plik z napisami" },
   "choose_usage_rights_33683854": { "message": "Wybierz prawa użytkowania..." },
   "circle_484abe63": { "message": "Okrąg" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "oznacz nieuporządkowaną listę"
-  },
   "clear_2084585f": { "message": "Wyczyść" },
   "clear_image_3213fe62": { "message": "Wyczyść obraz" },
   "clear_selected_file_82388e50": { "message": "Usuń wybrany plik" },
@@ -187,12 +184,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Dekoracyjny { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Zmniejsz wcięcie" },
   "deep_purple_bb3e2907": { "message": "Głęboki fiolet" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "domyślna nieuporządkowana lista wypunktowana"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "domyślna uporządkowana lista numeryczna"
-  },
   "definite_integral_fe7ffed1": { "message": "Całka oznaczona" },
   "degree_symbol_4a823d5f": { "message": "Symbol stopnia" },
   "delimiters_4db4840d": { "message": "Ograniczniki" },
@@ -372,6 +363,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Ikony Icon Maker" },
   "icon_options_7e32746e": { "message": "Opcje ikony" },
   "icon_options_tray_2b407977": { "message": "Panel opcji ikony" },
+  "icon_preview_1782a1d9": { "message": "Podgląd ikony" },
   "icon_shape_30b61e7": { "message": "Kształt ikony" },
   "icon_size_9353edea": { "message": "Rozmiar ikony" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -546,9 +538,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operatory" },
   "or_9b70ccaa": { "message": "Lub" },
   "orange_81386a62": { "message": "Pomarańczowy" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Listy uporządkowane i nieuporządkowane"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Skróty do innych edytorów można znaleźć na"
   },
@@ -718,9 +707,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Nadzbiór kwadratowy (ścisły)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "prostokątna nieuporządkowana lista"
-  },
   "star_8d156e09": { "message": "Gwiazdka" },
   "steel_blue_14296f08": { "message": "Stalowy niebieski" },
   "styles_2aa721ef": { "message": "Style" },
@@ -839,9 +825,6 @@ const locale = {
     "message": "Przekaż/zapisz pliki multimedialne"
   },
   "uploading_19e8a4e7": { "message": "Przekazywanie" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "uporządkowana lista alfabetyczna, duże litery"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Duża delta" },
   "uppercase_gamma_86f492e9": { "message": "Duża gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Duża lambda" },
@@ -849,9 +832,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Duże fi" },
   "uppercase_pi_fcc70f5e": { "message": "Duże pi" },
   "uppercase_psi_6395acbe": { "message": "Duże psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "uporządkowania lista numeryczna, duże cyfry rzymskie"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Duża sigma" },
   "uppercase_theta_49afc891": { "message": "Duża theta " },
   "uppercase_upsilon_8c1e623e": { "message": "Duży ipsylon" },

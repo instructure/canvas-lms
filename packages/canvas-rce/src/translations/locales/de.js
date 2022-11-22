@@ -103,9 +103,6 @@ const locale = {
     "message": "Nutzungsrechte auswählen ...."
   },
   "circle_484abe63": { "message": "Kreis" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "Ungeordnete Liste einkreisen"
-  },
   "clear_2084585f": { "message": "Löschen" },
   "clear_image_3213fe62": { "message": "Bild löschen" },
   "clear_selected_file_82388e50": { "message": "Ausgewählte Datei löschen" },
@@ -183,12 +180,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Dekorativer { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Einzug verkleinern" },
   "deep_purple_bb3e2907": { "message": "Dunkelviolett" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "Ungeordnete Liste standardmäßig mit Aufzählungszeichen"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "Standardmäßig numerisch sortierte Liste"
-  },
   "definite_integral_fe7ffed1": { "message": "Bestimmtes Integral" },
   "degree_symbol_4a823d5f": { "message": "Gradsymbol" },
   "delimiters_4db4840d": { "message": "Trennzeichen" },
@@ -370,6 +361,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Icon Maker-Symbole" },
   "icon_options_7e32746e": { "message": "Symbol-Optionen" },
   "icon_options_tray_2b407977": { "message": "Auswahl Symbol-Optionen" },
+  "icon_preview_1782a1d9": { "message": "Symbol-Vorschau" },
   "icon_shape_30b61e7": { "message": "Symbolform" },
   "icon_size_9353edea": { "message": "Symbolgröße" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -544,9 +536,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operatoren" },
   "or_9b70ccaa": { "message": "Oder" },
   "orange_81386a62": { "message": "Orange" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Geordnete und ungeordnete Listen"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Weitere Editor-Tastenkombinationen finden Sie unter"
   },
@@ -714,9 +703,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Quadratische Obermenge (Streng)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "Ungeordnete Liste abgleichen"
-  },
   "star_8d156e09": { "message": "Stern" },
   "steel_blue_14296f08": { "message": "Stahlblau" },
   "styles_2aa721ef": { "message": "Styles" },
@@ -833,9 +819,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Medien hochladen" },
   "upload_record_media_e4207d72": { "message": "Medien hochladen/aufzeichnen" },
   "uploading_19e8a4e7": { "message": "Wird hochgeladen" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "Alphabetisch geordnete Liste in Großbuchstaben"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta In Großbuchstaben" },
   "uppercase_gamma_86f492e9": { "message": "Gamma großgeschrieben" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda großgeschrieben" },
@@ -843,9 +826,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi großgeschrieben" },
   "uppercase_pi_fcc70f5e": { "message": "Pi großgeschrieben" },
   "uppercase_psi_6395acbe": { "message": "Psi großgeschrieben" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "Nach römischen Zahlen geordnete Liste in Großbuchstaben"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma großgeschrieben" },
   "uppercase_theta_49afc891": { "message": "Theta großgeschrieben" },
   "uppercase_upsilon_8c1e623e": { "message": "Ypsilon großgeschrieben" },

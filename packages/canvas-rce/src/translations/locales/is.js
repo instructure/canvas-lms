@@ -100,9 +100,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Veldu skjátextaskrá" },
   "choose_usage_rights_33683854": { "message": "Velja notkunarréttindi..." },
   "circle_484abe63": { "message": "Hringur" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "gera hring utan um óraðaðan lista"
-  },
   "clear_2084585f": { "message": "Hreinsa" },
   "clear_image_3213fe62": { "message": "Hreinsa mynd" },
   "clear_selected_file_82388e50": { "message": "Hreinsa valda skrá" },
@@ -182,12 +179,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Skrautlegt { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Minnka inndrag" },
   "deep_purple_bb3e2907": { "message": "Dökkfjólublár" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "sjálfvalið áherslumerktur óraðaður listi"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "sjálfvalið áherslumerktur raðaður listi"
-  },
   "definite_integral_fe7ffed1": { "message": "Ákveðin heild" },
   "degree_symbol_4a823d5f": { "message": "Gráðutákn" },
   "delimiters_4db4840d": { "message": "Afmarkarar" },
@@ -365,6 +356,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Tákngerðartákn" },
   "icon_options_7e32746e": { "message": "Valkostir tákns" },
   "icon_options_tray_2b407977": { "message": "Valkostabakki tákns" },
+  "icon_preview_1782a1d9": { "message": "Forskoðun tákns" },
   "icon_shape_30b61e7": { "message": "Form tákns" },
   "icon_size_9353edea": { "message": "Stærð tákns" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -533,9 +525,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Stjórnendur" },
   "or_9b70ccaa": { "message": "Eða" },
   "orange_81386a62": { "message": "Appelsínugulur" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Raðaðir og óraðaðir listar"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Aðra flýtivísa ritils má finna á"
   },
@@ -691,9 +680,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Ferningsyfirmengi (strangt)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "gera ferning utan um óraðaðan lista"
-  },
   "star_8d156e09": { "message": "Stjarna" },
   "steel_blue_14296f08": { "message": "Stálblár" },
   "styles_2aa721ef": { "message": "Stílar" },
@@ -804,9 +790,6 @@ const locale = {
     "message": "Hlaða/taka upp margmiðlunarefni"
   },
   "uploading_19e8a4e7": { "message": "Hleður upp" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "hástafa bókstafa raðaður listi"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta með stórum staf" },
   "uppercase_gamma_86f492e9": { "message": "Gamma með stórum staf" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda með stórum staf" },
@@ -814,9 +797,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi með stórum staf" },
   "uppercase_pi_fcc70f5e": { "message": "Pi með stórum staf" },
   "uppercase_psi_6395acbe": { "message": "Phi með stórum staf" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "hástafa rómverskar tölur raðaður listi"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma með stórum staf" },
   "uppercase_theta_49afc891": { "message": "Theta með stórum staf" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon með stórum staf" },
