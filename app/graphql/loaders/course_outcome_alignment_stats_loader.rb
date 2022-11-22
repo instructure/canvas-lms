@@ -28,24 +28,28 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
         return
       end
 
-      course_tags = ContentTag.active.where(context: course)
+      course_tags = ContentTag.not_deleted.where(context: course)
 
       total_outcomes = course_tags.learning_outcome_links
+
       total_outcomes_sub = ContentTag
                            .select("COUNT(*) as total_outcomes")
                            .from("(#{total_outcomes.to_sql}) AS s1")
 
       all_outcome_alignments = course_tags.learning_outcome_alignments.where(content_type: %w[Rubric Assignment AssessmentQuestionBank])
+
       all_outcome_alignments_sub = ContentTag
                                    .select("COUNT(*) as total_alignments, COUNT(DISTINCT s2.learning_outcome_id) as aligned_outcomes")
                                    .from("(#{all_outcome_alignments.to_sql}) AS s2")
 
       total_artifacts = Assignment.active.where(context: course)
+
       total_artifacts_sub = Assignment
                             .select("COUNT(*) as total_artifacts")
                             .from("(#{total_artifacts.to_sql}) AS s3")
 
       outcome_alignments_to_artifacts = course_tags.learning_outcome_alignments.where(content_type: "Assignment")
+
       outcome_alignments_to_artifacts_sub = ContentTag
                                             .select("COUNT(*) as artifact_alignments, COUNT(DISTINCT s4.content_id) as aligned_artifacts")
                                             .from("(#{outcome_alignments_to_artifacts.to_sql}) AS s4")
