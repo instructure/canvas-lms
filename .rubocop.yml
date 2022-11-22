@@ -88,6 +88,8 @@ Rails/ContentTag:
   Exclude:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
+Rails/DefaultScope:
+  Enabled: true
 Rails/DynamicFindBy:
   AllowedMethods:
     - find_by_confirmation_code # CommunicationChannel
