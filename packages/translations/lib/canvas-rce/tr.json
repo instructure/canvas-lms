@@ -42,9 +42,6 @@
   "cancel_caeb1e68": { "message": "İptal" },
   "choose_caption_file_9c45bc4e": { "message": "Alt yazı dosyasını seçin" },
   "choose_usage_rights_33683854": { "message": "Kullanıcı haklarını seçin..." },
-  "circle_unordered_list_9e3a0763": {
-    "message": "sıralanmamış listeyi yuvarlak içine al"
-  },
   "clear_2084585f": { "message": "Temizle" },
   "clear_selected_file_82388e50": { "message": "Seçili dosyayı temizle" },
   "click_to_embed_imagename_c41ea8df": {
@@ -225,9 +222,6 @@
   "upload_image_6120b609": { "message": "Görsel Yükle" },
   "upload_media_ce31135a": { "message": "Medya Dosyası Yükle" },
   "uploading_19e8a4e7": { "message": "Yükleniyor" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "Büyük harf alfabetik sıralı liste"
-  },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Kullanım Şartları:" },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {

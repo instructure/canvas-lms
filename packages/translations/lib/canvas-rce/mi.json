@@ -84,9 +84,6 @@
     "message": "Kōwhiria ngā mōtika whakamahi ..."
   },
   "circle_484abe63": { "message": "Porohita" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "Porohitatia te rārangi kore"
-  },
   "clear_2084585f": { "message": "Ūkui" },
   "clear_image_3213fe62": { "message": "Maamaa whakaahua" },
   "clear_selected_file_82388e50": {
@@ -172,12 +169,6 @@
   "decorative_type_upper_f2c95e3": { "message": "Whakapaipai { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Nuku Whakaiti" },
   "deep_purple_bb3e2907": { "message": "Hohonu Waiporoporo" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "Taunoa whakanuia rārangi kore"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "Taunoa tātai kua rārangitia"
-  },
   "definite_integral_fe7ffed1": { "message": "Tūturu Tautoko" },
   "degree_symbol_4a823d5f": { "message": "Tohu Tohu" },
   "delimiters_4db4840d": { "message": "Ngā Kaiwehe" },
@@ -357,6 +348,7 @@
   "icon_maker_icons_cc560f7e": { "message": "Tohu Kaihanga Ata" },
   "icon_options_7e32746e": { "message": "Kōwhiringa Ata" },
   "icon_options_tray_2b407977": { "message": "Paepae Kōwhiringa Ata" },
+  "icon_preview_1782a1d9": { "message": "Arokite Ata" },
   "icon_shape_30b61e7": { "message": "Tohu Hanga" },
   "icon_size_9353edea": { "message": "Tohu Rahi" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -535,9 +527,6 @@
   "operators_a2ef9a93": { "message": "Ngā Kaiwhakamahi" },
   "or_9b70ccaa": { "message": "Rānei" },
   "orange_81386a62": { "message": "Ārani" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Rārangi kua rārangitia me te kore rārangi"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Ētahi atu etita pokatata i kitea ai"
   },
@@ -703,7 +692,6 @@
   "square_superset_strict_fa4262e4": {
     "message": "Huinga Tuatoru Tapawha (Paua)"
   },
-  "square_unordered_list_b15ce93b": { "message": "Tapawhā rārangi kore" },
   "star_8d156e09": { "message": "Whetū" },
   "steel_blue_14296f08": { "message": "Te rino Kahurangi" },
   "styles_2aa721ef": { "message": "Ngā Kāhua" },
@@ -824,9 +812,6 @@
   "upload_media_ce31135a": { "message": "Tukuatu pāpāho" },
   "upload_record_media_e4207d72": { "message": "Tukuatu/Tāhopu Pāpāpho" },
   "uploading_19e8a4e7": { "message": "E tikiake ana" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "Wakapū teitei rārangi kua rārangitia"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Pūmatua Delta" },
   "uppercase_gamma_86f492e9": { "message": "Pūmatua Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Pūmatua Lambda" },
@@ -834,9 +819,6 @@
   "uppercase_phi_caa36724": { "message": "Pūmatua Ph" },
   "uppercase_pi_fcc70f5e": { "message": "Pūmatua Pi" },
   "uppercase_psi_6395acbe": { "message": "Pūmatua Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "Roman tātai teitei kua rārangitia"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Pūmatua Sigma" },
   "uppercase_theta_49afc891": { "message": "Pūmatua Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "Pūmatua Upsilon" },

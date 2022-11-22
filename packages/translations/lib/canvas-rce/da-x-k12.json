@@ -82,7 +82,6 @@
   "choose_caption_file_9c45bc4e": { "message": "Vælg billedtekstfil" },
   "choose_usage_rights_33683854": { "message": "Vælg brugsrettigheder ..." },
   "circle_484abe63": { "message": "Cirkel" },
-  "circle_unordered_list_9e3a0763": { "message": "cirkel usorteret liste" },
   "clear_2084585f": { "message": "Ryd" },
   "clear_image_3213fe62": { "message": "Ryd billede" },
   "clear_selected_file_82388e50": { "message": "Ryd valgt fil" },
@@ -164,12 +163,6 @@
   "decorative_type_upper_f2c95e3": { "message": "Dekorativ { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Formindsk indrykning" },
   "deep_purple_bb3e2907": { "message": "Dyb lilla" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "standard punktliste usorteret liste"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "standard numerisk sorteret liste"
-  },
   "definite_integral_fe7ffed1": { "message": "Bestemt integral" },
   "degree_symbol_4a823d5f": { "message": "Grad-symbol" },
   "delimiters_4db4840d": { "message": "Begrænsere" },
@@ -349,6 +342,7 @@
   "icon_maker_icons_cc560f7e": { "message": "Icon Maker-ikoner" },
   "icon_options_7e32746e": { "message": "Ikonindstillinger" },
   "icon_options_tray_2b407977": { "message": "Skuffe til ikonindstillinger" },
+  "icon_preview_1782a1d9": { "message": "Ikonforhåndsvisning" },
   "icon_shape_30b61e7": { "message": "Ikon-form" },
   "icon_size_9353edea": { "message": "Ikon-størrelse" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -521,9 +515,6 @@
   "operators_a2ef9a93": { "message": "Operatører" },
   "or_9b70ccaa": { "message": "Eller" },
   "orange_81386a62": { "message": "Orange" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Sorterede og usorterede lister"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andre redigeringsgenveje kan findes på"
   },
@@ -685,7 +676,6 @@
   "square_superset_strict_fa4262e4": {
     "message": "Kvadratisk overmængde (streng)"
   },
-  "square_unordered_list_b15ce93b": { "message": "firkantet usorteret liste" },
   "star_8d156e09": { "message": "Giv stjerne" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stile" },
@@ -800,9 +790,6 @@
   "upload_media_ce31135a": { "message": "Upload medier" },
   "upload_record_media_e4207d72": { "message": "Upload / optag medier" },
   "uploading_19e8a4e7": { "message": "Uploader" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "store bogstaver alfabetisk sorteret liste"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta med stort bogstav" },
   "uppercase_gamma_86f492e9": { "message": "Gamma med stort bogstav" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda med stort bogstav" },
@@ -810,9 +797,6 @@
   "uppercase_phi_caa36724": { "message": "Phi med stort bogstav" },
   "uppercase_pi_fcc70f5e": { "message": "Pi med stort bogstav" },
   "uppercase_psi_6395acbe": { "message": "Psi med stort bogstav" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "store bogstaver romertal sorteret liste"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma med stort bogstav" },
   "uppercase_theta_49afc891": { "message": "Theta med stort bogstav" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon med stort bogstav" },
