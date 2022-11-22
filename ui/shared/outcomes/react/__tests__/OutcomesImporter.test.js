@@ -64,6 +64,7 @@ it('disables the Outcome Views when upload starts', () => {
 it('resets the Outcome Views when upload is complete', () => {
   const resetOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
+  apiClient.queryImportCreatedGroupIds.mockReturnValue(Promise.resolve({data: []}))
   modal.instance().completeUpload(null, 10, true)
   expect(resetOutcomeViews).toHaveBeenCalled()
 })
@@ -103,6 +104,7 @@ it('shows a flash alert when upload fails', () => {
 it('shows a flash alert when upload successfully completes but with warnings', () => {
   const resetOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
+  apiClient.queryImportCreatedGroupIds.mockReturnValue(Promise.resolve({data: []}))
   modal.instance().completeUpload(null, 10, true)
   expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'warning',
