@@ -46,7 +46,6 @@
   "choose_usage_rights_33683854": {
     "message": "Válasszon a felhasználói jogokból..."
   },
-  "circle_unordered_list_9e3a0763": { "message": "rendezetlen lista körökkel" },
   "clear_2084585f": { "message": "Törlés" },
   "clear_selected_file_82388e50": { "message": "Kiválasztott fájl törlése" },
   "clear_selected_file_filename_2fe8a58e": {
@@ -100,12 +99,6 @@
   "date_added_ed5ad465": { "message": "Dátum hozzáadva" },
   "decrease_indent_d9cf469d": { "message": "Behúzás csökkentése" },
   "deep_purple_bb3e2907": { "message": "Sötétlila" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "alapértelmezett nem rendezett lista"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "alapértelmezett sorszámozott lista"
-  },
   "delimiters_4db4840d": { "message": "Elválasztó jelek" },
   "describe_the_video_2fe8f46a": { "message": "(A videó leírása)" },
   "details_98a31b68": { "message": "Részletek" },
@@ -272,9 +265,6 @@
   "operators_a2ef9a93": { "message": "Műveletek" },
   "or_9b70ccaa": { "message": "Vagy" },
   "orange_81386a62": { "message": "Narancs" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Rendezett és Rendezetlen Listák"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "További szerkesztési billentyűparancsokat találhat a következő helyen"
   },
@@ -328,9 +318,6 @@
   },
   "something_went_wrong_d238c551": { "message": "Hiba történt!" },
   "sort_by_e75f9e3e": { "message": "Rendezés alapja" },
-  "square_unordered_list_b15ce93b": {
-    "message": "rendezetlen lista négyzetekkel"
-  },
   "star_8d156e09": { "message": "Csillagozás" },
   "styles_2aa721ef": { "message": "Stílusok" },
   "submit_a3cc6859": { "message": "Beküldés" },
@@ -388,12 +375,6 @@
   "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
   "upload_record_media_e4207d72": { "message": "Média feltöltés/rögzítés" },
   "uploading_19e8a4e7": { "message": "Feltöltés" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "nagybetűs lista abc sorrendbe rendezve"
-  },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "nagybetűs lista római számok szerint rendezve"
-  },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Felhasználási jog:" },
   "usage_rights_required_5fe4dd68": {

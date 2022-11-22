@@ -84,9 +84,6 @@
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
   "choose_usage_rights_33683854": { "message": "Valitse käyttöoikeudet..." },
   "circle_484abe63": { "message": "Ympyrä" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "rengasta järjestämätön luettelo"
-  },
   "clear_2084585f": { "message": "Tyhjennä" },
   "clear_image_3213fe62": { "message": "Tyhjennä kuva" },
   "clear_selected_file_82388e50": { "message": "Tyhjennä valittu tiedosto" },
@@ -172,12 +169,6 @@
   "decorative_type_upper_f2c95e3": { "message": "Koriste { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Pienennä sisennystä" },
   "deep_purple_bb3e2907": { "message": "Tumman violetti" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "luetelmakohdista koostuva järjestämätön oletuslista"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "numeerinen järjestetty oletuslista"
-  },
   "definite_integral_fe7ffed1": { "message": "Ehdoton integraali" },
   "degree_symbol_4a823d5f": { "message": "Asteen symboli" },
   "delimiters_4db4840d": { "message": "Erottimet" },
@@ -365,6 +356,7 @@
   "icon_maker_icons_cc560f7e": { "message": "Kuvakkeen tekijän kuvakkeet" },
   "icon_options_7e32746e": { "message": "Kuvakeasetukset" },
   "icon_options_tray_2b407977": { "message": "Kuvakkeiden ilmoitusalue" },
+  "icon_preview_1782a1d9": { "message": "Kuvakkeen esikatselu" },
   "icon_shape_30b61e7": { "message": "Kuvakkeen muoto" },
   "icon_size_9353edea": { "message": "Kuvakkeen koko" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -539,9 +531,6 @@
   "operators_a2ef9a93": { "message": "Operaattorit" },
   "or_9b70ccaa": { "message": "Tai" },
   "orange_81386a62": { "message": "Oranssi" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Järjestetyt ja järjestämättömät listat"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Muu editorin pikakuvakkeet löytyvät"
   },
@@ -699,9 +688,6 @@
   "square_subset_strict_7044e84f": { "message": "Neliöosajoukko (tiukka)" },
   "square_superset_3be8dae1": { "message": "Neliöosajoukko" },
   "square_superset_strict_fa4262e4": { "message": "Neliöosajoukko (tiukka)" },
-  "square_unordered_list_b15ce93b": {
-    "message": "järjestä järjestämätön luettelo"
-  },
   "star_8d156e09": { "message": "Tähti" },
   "steel_blue_14296f08": { "message": "Teräksensininen" },
   "styles_2aa721ef": { "message": "Tyylit" },
@@ -820,9 +806,6 @@
   "upload_media_ce31135a": { "message": "Lataa mediaa" },
   "upload_record_media_e4207d72": { "message": "Lataa/Tallennusväline" },
   "uploading_19e8a4e7": { "message": "Ladataan" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "aakkosellinen järjestetty isojen kirjainten lista"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta" },
   "uppercase_gamma_86f492e9": { "message": "Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda" },
@@ -830,9 +813,6 @@
   "uppercase_phi_caa36724": { "message": "Phi" },
   "uppercase_pi_fcc70f5e": { "message": "Pi iso kirjain" },
   "uppercase_psi_6395acbe": { "message": "Psi iso kirjain" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "järjestetty roomalaisten numeroiden lista"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma iso kirjain" },
   "uppercase_theta_49afc891": { "message": "Theta iso kirjain" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon iso kirjain" },

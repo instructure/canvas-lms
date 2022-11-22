@@ -82,7 +82,6 @@
   },
   "choose_usage_rights_33683854": { "message": "使用権を選択..." },
   "circle_484abe63": { "message": "円" },
-  "circle_unordered_list_9e3a0763": { "message": "丸い番号無しリスト" },
   "clear_2084585f": { "message": "クリア" },
   "clear_image_3213fe62": { "message": "画像を消す" },
   "clear_selected_file_82388e50": { "message": "選択したファイルを消去する" },
@@ -168,12 +167,6 @@
   "decorative_type_upper_f2c95e3": { "message": "装飾的{ TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "インデントを減らす" },
   "deep_purple_bb3e2907": { "message": "ディープパープル" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "デフォルトの箇条書きの番号無しリスト"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "デフォルトの番号順リスト"
-  },
   "definite_integral_fe7ffed1": { "message": "定積分" },
   "degree_symbol_4a823d5f": { "message": "度数記号" },
   "delimiters_4db4840d": { "message": "デリミタ" },
@@ -347,6 +340,7 @@
   "icon_maker_icons_cc560f7e": { "message": "アイコンメーカーのアイコン" },
   "icon_options_7e32746e": { "message": "アイコンオプション" },
   "icon_options_tray_2b407977": { "message": "アイコンオプショントレイ" },
+  "icon_preview_1782a1d9": { "message": "アイコンプレビュー" },
   "icon_shape_30b61e7": { "message": "アイコンの形状" },
   "icon_size_9353edea": { "message": "アイコンのサイズ" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -515,9 +509,6 @@
   "operators_a2ef9a93": { "message": "演算子" },
   "or_9b70ccaa": { "message": "または" },
   "orange_81386a62": { "message": "オレンジ" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "番号付きリストと番号無しリスト"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "他のエディタショートカットは下記をご覧ください"
   },
@@ -671,7 +662,6 @@
   "square_subset_strict_7044e84f": { "message": "正方形部分集合 (厳密)" },
   "square_superset_3be8dae1": { "message": "正方形上位集合" },
   "square_superset_strict_fa4262e4": { "message": "正方形部分集合 (厳密)" },
-  "square_unordered_list_b15ce93b": { "message": "四角い番号無しリスト" },
   "star_8d156e09": { "message": "スター" },
   "steel_blue_14296f08": { "message": "スチールブルー" },
   "styles_2aa721ef": { "message": "スタイル" },
@@ -784,9 +774,6 @@
     "message": "メディアをアップロード/記録する"
   },
   "uploading_19e8a4e7": { "message": "アップロードしています" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "大文字のアルファベット順リスト"
-  },
   "uppercase_delta_d4f4bc41": { "message": "大文字のデルタ" },
   "uppercase_gamma_86f492e9": { "message": "大文字のガンマ" },
   "uppercase_lambda_c78d8ed4": { "message": "大文字のラムダ" },
@@ -794,9 +781,6 @@
   "uppercase_phi_caa36724": { "message": "大文字のファイ" },
   "uppercase_pi_fcc70f5e": { "message": "大文字のパイ" },
   "uppercase_psi_6395acbe": { "message": "大文字のプシー" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "大文字のローマ数字順リスト"
-  },
   "uppercase_sigma_dbb70e92": { "message": "大文字のシグマ" },
   "uppercase_theta_49afc891": { "message": "大文字のシータ" },
   "uppercase_upsilon_8c1e623e": { "message": "大文字のユプシロン" },
