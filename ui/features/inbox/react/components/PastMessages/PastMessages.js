@@ -24,6 +24,9 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('conversations_2')
 
 const PastMessage = props => (
   <View as="div" borderWidth="small none none none">
@@ -31,7 +34,7 @@ const PastMessage = props => (
       <Flex.Item>
         <Flex wrap="wrap">
           <Flex.Item shouldShrink={true} shouldGrow={true}>
-            <Text>{props.author.name}</Text>
+            <Text>{props?.author?.name || I18n.t('DELETED USER')}</Text>
           </Flex.Item>
           <Flex.Item>
             <Text weight="light">{DateHelper.formatDatetimeForDisplay(props.createdAt)}</Text>
