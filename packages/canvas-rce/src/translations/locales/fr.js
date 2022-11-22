@@ -109,9 +109,6 @@ const locale = {
     "message": "Choisir les droits d’utilisation..."
   },
   "circle_484abe63": { "message": "Cercle" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "liste non ordonnée à puces rondes"
-  },
   "clear_2084585f": { "message": "Effacer" },
   "clear_image_3213fe62": { "message": "Effacer image" },
   "clear_selected_file_82388e50": {
@@ -197,12 +194,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } décoratif" },
   "decrease_indent_d9cf469d": { "message": "Diminuer le retrait" },
   "deep_purple_bb3e2907": { "message": "Violet foncé" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "liste à puce non ordonnée par défaut"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "liste à puce ordonnée par défaut"
-  },
   "definite_integral_fe7ffed1": { "message": "Intégrale définie" },
   "degree_symbol_4a823d5f": { "message": "Symbole degré" },
   "delimiters_4db4840d": { "message": "Délimiteurs" },
@@ -390,6 +381,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Icônes Icon Maker" },
   "icon_options_7e32746e": { "message": "Options d’icône" },
   "icon_options_tray_2b407977": { "message": "Bac des options d''icône" },
+  "icon_preview_1782a1d9": { "message": "Aperçu de l’icône" },
   "icon_shape_30b61e7": { "message": "Forme de l’icône" },
   "icon_size_9353edea": { "message": "Taille de l’icône" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -574,9 +566,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Opérateurs" },
   "or_9b70ccaa": { "message": "Ou" },
   "orange_81386a62": { "message": "Orange" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Listes ordonnées et non ordonnées"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "D''autres raccourcis de l''éditeur peuvent être trouvés à l''adresse suivante"
   },
@@ -750,9 +739,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Original carré de (strict)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "liste non ordonnée à puces carrées"
-  },
   "star_8d156e09": { "message": "Marquer d’un astérisque" },
   "steel_blue_14296f08": { "message": "Bleu métallisé" },
   "styles_2aa721ef": { "message": "Styles" },
@@ -877,9 +863,6 @@ const locale = {
     "message": "Envoyer/enregistrer un fichier multimédia"
   },
   "uploading_19e8a4e7": { "message": "En cours d’importation" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "liste alphabétique ordonnée en majuscules"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta majuscule" },
   "uppercase_gamma_86f492e9": { "message": "Gamma majuscule" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda majuscule" },
@@ -887,9 +870,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi majuscule" },
   "uppercase_pi_fcc70f5e": { "message": "Pi majuscule" },
   "uppercase_psi_6395acbe": { "message": "Psi majuscule" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "liste numérique ordonnée en chiffres romains majuscules"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma majuscule" },
   "uppercase_theta_49afc891": { "message": "Thêta majuscule" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon majuscule" },

@@ -105,9 +105,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Escolher arquivo de legenda" },
   "choose_usage_rights_33683854": { "message": "Escolher direitos de uso..." },
   "circle_484abe63": { "message": "Circular" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "Lista não ordenada circular"
-  },
   "clear_2084585f": { "message": "Limpar" },
   "clear_image_3213fe62": { "message": "Limpar imagem" },
   "clear_selected_file_82388e50": { "message": "Limpar arquivo selecionado" },
@@ -191,12 +188,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Decorativo { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Diminuir Recuo" },
   "deep_purple_bb3e2907": { "message": "Roxo Profundo" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "Lista não ordenada padrão com marcadores"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "Lista ordenada padrão e numérica"
-  },
   "definite_integral_fe7ffed1": { "message": "Integral definida" },
   "degree_symbol_4a823d5f": { "message": "Símbolo de grau" },
   "delimiters_4db4840d": { "message": "Delimitadores" },
@@ -376,6 +367,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Ícones do criador de ícones" },
   "icon_options_7e32746e": { "message": "Opções de ícone" },
   "icon_options_tray_2b407977": { "message": "Bandeja de opções de ícone" },
+  "icon_preview_1782a1d9": { "message": "Prévia do ícone" },
   "icon_shape_30b61e7": { "message": "Forma do ícone" },
   "icon_size_9353edea": { "message": "Tamanho do ícone" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -558,9 +550,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operadores" },
   "or_9b70ccaa": { "message": "Ou" },
   "orange_81386a62": { "message": "Laranja" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Listas ordenadas e não ordenadas"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Outros atalhos do editor podem ser encontrados em"
   },
@@ -730,9 +719,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Superconjunto quadrado (estrito)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "Lista não ordenada quadrada"
-  },
   "star_8d156e09": { "message": "Adicionar aos favoritos" },
   "steel_blue_14296f08": { "message": "Azul aço" },
   "styles_2aa721ef": { "message": "Estilos" },
@@ -847,9 +833,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Fazer Upload de Mídia" },
   "upload_record_media_e4207d72": { "message": "Carregar/Gravar mídia" },
   "uploading_19e8a4e7": { "message": "Carregando" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "Lista ordenada alfabeticamente e letras maiúsculas"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta maiúsculas" },
   "uppercase_gamma_86f492e9": { "message": "Gama maiúscula" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda maiúscula" },
@@ -857,9 +840,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi maiúsculo" },
   "uppercase_pi_fcc70f5e": { "message": "Pi maiúsculo" },
   "uppercase_psi_6395acbe": { "message": "Psi maiúsculo" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "Lista ordenada numérica e romana com letras maiúsculas"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma maiúsculo" },
   "uppercase_theta_49afc891": { "message": "Teta maiúsculo" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon maiúsculo" },

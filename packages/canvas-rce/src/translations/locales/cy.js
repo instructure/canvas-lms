@@ -105,9 +105,6 @@ const locale = {
     "message": "Dewiswch hawliau defnyddio..."
   },
   "circle_484abe63": { "message": "Cylch" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "rhestr cylchoedd sydd ddim mewn trefn"
-  },
   "clear_2084585f": { "message": "Clirio" },
   "clear_image_3213fe62": { "message": "Clirio’r ddelwedd" },
   "clear_selected_file_82388e50": { "message": "Clirio''r ffeil dan sylw" },
@@ -191,12 +188,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Addurniadol { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Lleihau Mewnoliad" },
   "deep_purple_bb3e2907": { "message": "Porffor Tywyll" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "rhestr ddiofyn o bwyntiau bwled sydd ddim mewn trefn"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "rhestr ddiofyn o rifau sydd mewn trefn"
-  },
   "definite_integral_fe7ffed1": { "message": "Integryn Pendant" },
   "degree_symbol_4a823d5f": { "message": "Symbol Gradd" },
   "delimiters_4db4840d": { "message": "Amffinyddion" },
@@ -376,6 +367,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Eiconau’r Gwneuthurwr Eiconau" },
   "icon_options_7e32746e": { "message": "Opsiynau Eicon" },
   "icon_options_tray_2b407977": { "message": "Ardal Opsiynau Eicon" },
+  "icon_preview_1782a1d9": { "message": "Rhagolwg o’r Eicon" },
   "icon_shape_30b61e7": { "message": "Siâp yr Eicon" },
   "icon_size_9353edea": { "message": "Maint yr Eicon" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -554,9 +546,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Gweithredyddion" },
   "or_9b70ccaa": { "message": "Neu" },
   "orange_81386a62": { "message": "Oren" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Rhestrau Mewn Trefn a Rhestrau Ddim Mewn Trefn"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Mae bysellau hwylus golygu eraill i''w cael yn"
   },
@@ -716,9 +705,6 @@ const locale = {
   "square_subset_strict_7044e84f": { "message": "Is-set Sgwâr (Strict)" },
   "square_superset_3be8dae1": { "message": "Uwch-set Sgwâr" },
   "square_superset_strict_fa4262e4": { "message": "Uwch-set Sgwâr (Strict)" },
-  "square_unordered_list_b15ce93b": {
-    "message": "rhestr sgwariau sydd ddim mewn trefn"
-  },
   "star_8d156e09": { "message": "Seren" },
   "steel_blue_14296f08": { "message": "Durlas" },
   "styles_2aa721ef": { "message": "Arddulliau" },
@@ -835,9 +821,6 @@ const locale = {
     "message": "Llwytho i Fyny/Recordio Cyfryngau"
   },
   "uploading_19e8a4e7": { "message": "Llwytho i fyny" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "rhestr mewn trefn, mewn priflythrennau, yn nhrefn yr wyddor"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta Fawr" },
   "uppercase_gamma_86f492e9": { "message": "Gamma Fawr" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda Fawr" },
@@ -845,9 +828,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Phi Fawr" },
   "uppercase_pi_fcc70f5e": { "message": "Pi Fawr" },
   "uppercase_psi_6395acbe": { "message": "Psi Fawr" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "rhestr mewn trefn o rifolion Rhufeinig mewn priflythrennau"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma Fawr" },
   "uppercase_theta_49afc891": { "message": "Theta Fawr" },
   "uppercase_upsilon_8c1e623e": { "message": "Upsilon Fawr" },

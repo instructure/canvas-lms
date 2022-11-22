@@ -100,7 +100,6 @@ const locale = {
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
   "choose_usage_rights_33683854": { "message": "Vel bruksrett..." },
   "circle_484abe63": { "message": "Sirkel" },
-  "circle_unordered_list_9e3a0763": { "message": "sirkulær uordna liste" },
   "clear_2084585f": { "message": "Fjern" },
   "clear_image_3213fe62": { "message": "Tøm bilde" },
   "clear_selected_file_82388e50": { "message": "Fjern vald fil" },
@@ -180,12 +179,6 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Dekorativt { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Reduser innrykk" },
   "deep_purple_bb3e2907": { "message": "Mørk lilla" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "standard uordna liste med kulepunkt"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "standard numerisk ordna liste"
-  },
   "definite_integral_fe7ffed1": { "message": "Bestemt integral" },
   "degree_symbol_4a823d5f": { "message": "Grader-symbol" },
   "delimiters_4db4840d": { "message": "Skiljeteikn" },
@@ -514,9 +507,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operatør" },
   "or_9b70ccaa": { "message": "Eller" },
   "orange_81386a62": { "message": "Oransje" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Ordna og uordna lister"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andre hurtigtastar for redigering kan ein finne i"
   },
@@ -665,7 +655,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Kvadratisk Supersett (Streng)"
   },
-  "square_unordered_list_b15ce93b": { "message": "firkanta uordna liste" },
   "star_8d156e09": { "message": "Merk med stjerne" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stilar" },
@@ -771,9 +760,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Last opp media" },
   "upload_record_media_e4207d72": { "message": "Last opp/Ta opp media" },
   "uploading_19e8a4e7": { "message": "Lastar opp" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "alfabetisk ordna liste i store bokstavar"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Stor Delta" },
   "uppercase_gamma_86f492e9": { "message": "Stor Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Stor Lambda" },
@@ -781,9 +767,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Stor Phi" },
   "uppercase_pi_fcc70f5e": { "message": "Stor Pi" },
   "uppercase_psi_6395acbe": { "message": "Stor Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "numerisk ordna liste med romertal"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Stor Sigma" },
   "uppercase_theta_49afc891": { "message": "Stor Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "Stor Upsilon" },
