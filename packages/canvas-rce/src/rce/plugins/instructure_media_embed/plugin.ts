@@ -18,26 +18,23 @@
 
 import clickCallback from './clickCallback'
 import formatMessage from '../../../format-message'
-
-tinymce.create('tinymce.plugins.InstructureMediaEmbed', {
-  init(ed) {
-    ed.addCommand('instructureMediaEmbed', clickCallback.bind(this, ed, document))
-
-    // Register menu item
-    ed.ui.registry.addMenuItem('instructure_media_embed', {
-      text: formatMessage('Embed'),
-      icon: 'embed',
-      onAction: () => ed.execCommand('instructureMediaEmbed'),
-    })
-
-    // Register toolbar button
-    ed.ui.registry.addButton('instructure_media_embed', {
-      tooltip: formatMessage('Embed'),
-      icon: 'embed',
-      onAction: () => ed.execCommand('instructureMediaEmbed'),
-    })
-  },
-})
+import tinymce from 'tinymce'
 
 // Register plugin
-tinymce.PluginManager.add('instructure_media_embed', tinymce.plugins.InstructureMediaEmbed)
+tinymce.PluginManager.add('instructure_media_embed', function (ed) {
+  ed.addCommand('instructureMediaEmbed', () => clickCallback(ed, document))
+
+  // Register menu item
+  ed.ui.registry.addMenuItem('instructure_media_embed', {
+    text: formatMessage('Embed'),
+    icon: 'embed',
+    onAction: () => ed.execCommand('instructureMediaEmbed'),
+  })
+
+  // Register toolbar button
+  ed.ui.registry.addButton('instructure_media_embed', {
+    tooltip: formatMessage('Embed'),
+    icon: 'embed',
+    onAction: () => ed.execCommand('instructureMediaEmbed'),
+  })
+})

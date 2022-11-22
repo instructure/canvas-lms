@@ -16,16 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tinymce from 'tinymce'
-import formatMessage from '../../../format-message'
-import clickCallback from './clickCallback'
-
-tinymce.PluginManager.add('instructure_wordcount', function (ed) {
-  ed.addCommand('instructureWordcount', () => clickCallback(ed, document))
-
-  ed.ui.registry.addMenuItem('instructure_wordcount', {
-    text: formatMessage('Word Count'),
-    icon: 'character-count',
-    onAction: () => ed.execCommand('instructureWordcount'),
-  })
-})
+/**
+ * Alias for the `any` type to be used when migrating JavaScript to TypeScript. Use this to indicate that a cast to
+ * any was done solely for converting to TypeScript.
+ *
+ * Uses of this type should eventually be refactored out, either by updating the logic to be type-safe, or by converting
+ * it to a cast to regular `any` to indicate an intentional and necessary use of any.
+ */
+export type TsMigrationAny = any

@@ -20,12 +20,13 @@ import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
 import {isOKToLink} from '../../contentInsertionUtils'
+import tinymce, {Editor} from 'tinymce'
 
 const COURSE_PLUGIN_KEY = 'course_documents'
 const USER_PLUGIN_KEY = 'user_documents'
 const GROUP_PLUGIN_KEY = 'group_documents'
 
-function getMenuItems(ed) {
+function getMenuItems(ed: Editor) {
   const contextType = ed.settings.canvas_rce_user_context.type
   const items = [
     {
@@ -51,7 +52,7 @@ function getMenuItems(ed) {
   return items
 }
 
-function doMenuItem(ed, value) {
+function doMenuItem(ed: Editor, value: string) {
   switch (value) {
     case 'instructure_upload_document':
       ed.execCommand('mceInstructureDocuments')
@@ -71,65 +72,59 @@ function doMenuItem(ed, value) {
   }
 }
 
-tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
-  init(ed) {
-    // Register commands
-    ed.addCommand('mceInstructureDocuments', clickCallback.bind(this, ed, document))
-    ed.addCommand('instructureTrayForDocuments', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key, ed.id)
-    })
-
-    // Register menu items
-    ed.ui.registry.addNestedMenuItem('instructure_document', {
-      text: formatMessage('Document'),
-      icon: 'document',
-      getSubmenuItems: () =>
-        getMenuItems(ed).map(item => {
-          return {
-            type: 'menuitem',
-            text: item.text,
-            onAction: () => doMenuItem(ed, item.value),
-            onSetup: api => {
-              api.setDisabled(!isOKToLink(ed.selection.getContent()))
-              return () => {}
-            },
-          }
-        }),
-    })
-
-    // Register button
-    ed.ui.registry.addSplitButton('instructure_documents', {
-      tooltip: formatMessage('Documents'),
-      icon: 'document',
-      fetch(callback) {
-        const items = getMenuItems(ed).map(item => {
-          return {
-            type: 'choiceitem',
-            text: item.text,
-            value: item.value,
-          }
-        })
-        callback(items)
-      },
-      onAction(api) {
-        if (!api.isDisabled()) {
-          doMenuItem(ed, 'instructure_upload_document')
-        }
-      },
-      onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
-      onSetup(api) {
-        function handleNodeChange(_e) {
-          api.setDisabled(!isOKToLink(ed.selection.getContent()))
-        }
-        setTimeout(handleNodeChange)
-        ed.on('NodeChange', handleNodeChange)
-        return () => {
-          ed.off('NodeChange', handleNodeChange)
-        }
-      },
-    })
-  },
-})
-
 // Register plugin
-tinymce.PluginManager.add('instructure_documents', tinymce.plugins.InstructureDocumentsPlugin)
+tinymce.PluginManager.add('instructure_documents', function (ed) {
+  // Register commands
+  ed.addCommand('mceInstructureDocuments', () => clickCallback(ed, document))
+  ed.addCommand('instructureTrayForDocuments', (ui, plugin_key) => {
+    bridge.showTrayForPlugin(plugin_key, ed.id)
+  })
+
+  // Register menu items
+  ed.ui.registry.addNestedMenuItem('instructure_document', {
+    text: formatMessage('Document'),
+    icon: 'document',
+    getSubmenuItems: () =>
+      getMenuItems(ed).map(item => {
+        return {
+          type: 'menuitem',
+          text: item.text,
+          onAction: () => doMenuItem(ed, item.value),
+          onSetup: api => {
+            api.setDisabled(!isOKToLink(ed.selection.getContent()))
+            return () => {}
+          },
+        }
+      }),
+  })
+
+  // Register button
+  ed.ui.registry.addSplitButton('instructure_documents', {
+    tooltip: formatMessage('Documents'),
+    icon: 'document',
+    fetch: callback =>
+      callback(
+        getMenuItems(ed).map(item => ({
+          type: 'choiceitem',
+          text: item.text,
+          value: item.value,
+        }))
+      ),
+    onAction(api) {
+      if (!api.isDisabled()) {
+        doMenuItem(ed, 'instructure_upload_document')
+      }
+    },
+    onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
+    onSetup(api) {
+      function handleNodeChange(_e) {
+        api.setDisabled(!isOKToLink(ed.selection.getContent()))
+      }
+      setTimeout(handleNodeChange)
+      ed.on('NodeChange', handleNodeChange)
+      return () => {
+        ed.off('NodeChange', handleNodeChange)
+      }
+    },
+  })
+})

@@ -19,8 +19,9 @@
 import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 import {isOKToLink} from '../../contentInsertionUtils'
-import clickCallback, {CREATE_ICON_MAKER, LIST_ICON_MAKER, EDIT_ICON_MAKER} from './clickCallback'
+import clickCallback, {CREATE_ICON_MAKER, EDIT_ICON_MAKER, LIST_ICON_MAKER} from './clickCallback'
 import registerEditToolbar from './registerEditToolbar'
+import tinymce, {Editor} from 'tinymce'
 
 function getMenuItems() {
   return [
@@ -35,7 +36,7 @@ function getMenuItems() {
   ]
 }
 
-function handleOptionSelected(ed, value) {
+function handleOptionSelected(ed: Editor, value: string) {
   switch (value) {
     case 'instructure_create_icon_maker':
       ed.focus(true)
@@ -52,71 +53,67 @@ function handleOptionSelected(ed, value) {
   }
 }
 
-tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
-  init(ed) {
-    // Register tray control command
-    ed.addCommand('instructureTrayForIconMakerPlugin', (_ui, type) => {
-      if (type === LIST_ICON_MAKER) {
-        bridge.showTrayForPlugin(type, ed.id)
-      } else {
-        clickCallback(ed, document, type)
-      }
-    })
+// Register plugin
+tinymce.PluginManager.add('instructure_icon_maker', function (ed) {
+  // Register tray control command
+  ed.addCommand('instructureTrayForIconMakerPlugin', (_ui, type) => {
+    if (type === LIST_ICON_MAKER) {
+      bridge.showTrayForPlugin(type, ed.id)
+    } else {
+      clickCallback(ed, document, type)
+    }
+  })
 
-    // Register menu items
-    ed.ui.registry.addNestedMenuItem('instructure_icon_maker', {
-      text: formatMessage('Icon Maker Icons'),
-      icon: 'buttons',
-      getSubmenuItems: () =>
+  // Register menu items
+  ed.ui.registry.addNestedMenuItem('instructure_icon_maker', {
+    text: formatMessage('Icon Maker Icons'),
+    icon: 'buttons',
+    getSubmenuItems: () =>
+      getMenuItems().map(item => ({
+        type: 'menuitem',
+        text: item.text,
+        onAction: () => handleOptionSelected(ed, item.value),
+        onSetup: api => {
+          api.setDisabled(!isOKToLink(ed.selection.getContent()))
+          return () => {}
+        },
+      })),
+  })
+
+  // Register button
+  ed.ui.registry.addSplitButton('instructure_icon_maker', {
+    tooltip: formatMessage('Icon Maker Icons'),
+    icon: 'buttons',
+    fetch: callback =>
+      callback(
         getMenuItems().map(item => ({
-          type: 'menuitem',
-          text: item.text,
-          onAction: () => handleOptionSelected(ed, item.value),
-          onSetup: api => {
-            api.setDisabled(!isOKToLink(ed.selection.getContent()))
-            return () => {}
-          },
-        })),
-    })
-
-    // Register button
-    ed.ui.registry.addSplitButton('instructure_icon_maker', {
-      tooltip: formatMessage('Icon Maker Icons'),
-      icon: 'buttons',
-      fetch(callback) {
-        const items = getMenuItems().map(item => ({
           type: 'choiceitem',
           text: item.text,
           value: item.value,
         }))
-        callback(items)
-      },
-      onAction(api) {
-        if (!api.isDisabled()) {
-          handleOptionSelected(ed, 'instructure_create_icon_maker')
-        }
-      },
-      onItemAction: (_splitButtonApi, value) => handleOptionSelected(ed, value),
-      onSetup(api) {
-        function handleNodeChange(_e) {
-          api.setDisabled(!isOKToLink(ed.selection.getContent()))
-        }
-        setTimeout(handleNodeChange)
-        ed.on('NodeChange', handleNodeChange)
-        return () => {
-          ed.off('NodeChange', handleNodeChange)
-        }
-      },
-    })
-
-    // Register context toolbar for editing existing icon maker icons
-    registerEditToolbar(ed, api => {
+      ),
+    onAction(api) {
       if (!api.isDisabled()) {
-        handleOptionSelected(ed, 'instructure_edit_icon_maker')
+        handleOptionSelected(ed, 'instructure_create_icon_maker')
       }
-    })
-  },
-})
+    },
+    onItemAction: (_splitButtonApi, value) => handleOptionSelected(ed, value),
+    onSetup(api) {
+      function handleNodeChange(_e) {
+        api.setDisabled(!isOKToLink(ed.selection.getContent()))
+      }
+      setTimeout(handleNodeChange)
+      ed.on('NodeChange', handleNodeChange)
+      return () => {
+        ed.off('NodeChange', handleNodeChange)
+      }
+    },
+  })
 
-// Register plugin
-tinymce.PluginManager.add('instructure_icon_maker', tinymce.plugins.InstructureIconMakerPlugin)
+  // Register context toolbar for editing existing icon maker icons
+  registerEditToolbar(ed, api => {
+    if (!api.isDisabled()) {
+      handleOptionSelected(ed, 'instructure_edit_icon_maker')
+    }
+  })
+})

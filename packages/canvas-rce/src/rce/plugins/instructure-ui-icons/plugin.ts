@@ -38,14 +38,15 @@ import {
   IconRemoveLinkLine,
   IconStrikethroughLine,
   IconTextCenteredLine,
+  IconTextDirectionLtrLine,
+  IconTextDirectionRtlLine,
   IconTextEndLine,
   IconTextStartLine,
   IconTextSubscriptLine,
   IconTextSuperscriptLine,
-  IconTextDirectionLtrLine,
-  IconTextDirectionRtlLine,
   IconUnderlineLine,
 } from '@instructure/ui-icons/es/svg'
+import tinymce from 'tinymce'
 
 tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
   // the keys here are what tinymce calls it. the values are the svgs from instUI

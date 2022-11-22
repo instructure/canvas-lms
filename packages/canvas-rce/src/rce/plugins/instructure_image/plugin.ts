@@ -23,6 +23,7 @@ import {isOKToLink} from '../../contentInsertionUtils'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 import {ICON_MAKER_ATTRIBUTE} from '../instructure_icon_maker/svg/constants'
+import tinymce from 'tinymce'
 
 const COURSE_PLUGIN_KEY = 'course_images'
 const USER_PLUGIN_KEY = 'user_images'
@@ -76,100 +77,94 @@ function doMenuItem(ed, value) {
   }
 }
 
-tinymce.create('tinymce.plugins.InstructureImagePlugin', {
-  init(editor) {
-    // Register commands
-    editor.addCommand('mceInstructureImage', clickCallback.bind(this, editor, document))
-    editor.addCommand('instructureTrayForImages', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key, editor.id)
-    })
+tinymce.PluginManager.add('instructure_image', function (editor) {
+  // Register commands
+  editor.addCommand('mceInstructureImage', () => clickCallback(editor, document))
+  editor.addCommand('instructureTrayForImages', (ui, plugin_key) => {
+    bridge.showTrayForPlugin(plugin_key, editor.id)
+  })
 
-    // Register menu items
-    editor.ui.registry.addNestedMenuItem('instructure_image', {
-      text: formatMessage('Image'),
-      icon: 'image',
-      getSubmenuItems: () =>
-        getMenuItems(editor).map(item => {
-          return {
-            type: 'menuitem',
-            text: item.text,
-            onAction: () => doMenuItem(editor, item.value),
-            onSetup: api => {
-              api.setDisabled(!isOKToLink(editor.selection.getContent()))
-              return () => {}
-            },
-          }
-        }),
-    })
-
-    // Register buttons
-    editor.ui.registry.addSplitButton('instructure_image', {
-      tooltip: formatMessage('Images'),
-      icon: 'image',
-      fetch(callback) {
-        const items = getMenuItems(editor).map(item => {
-          return {
-            type: 'choiceitem',
-            text: item.text,
-            value: item.value,
-          }
-        })
-        callback(items)
-      },
-      onAction(api) {
-        if (!api.isDisabled()) {
-          doMenuItem(editor, 'instructure_upload_image')
+  // Register menu items
+  editor.ui.registry.addNestedMenuItem('instructure_image', {
+    text: formatMessage('Image'),
+    icon: 'image',
+    getSubmenuItems: () =>
+      getMenuItems(editor).map(item => {
+        return {
+          type: 'menuitem',
+          text: item.text,
+          onAction: () => doMenuItem(editor, item.value),
+          onSetup: api => {
+            api.setDisabled(!isOKToLink(editor.selection.getContent()))
+            return () => {}
+          },
         }
-      },
-      onItemAction: (_splitButtonApi, value) => doMenuItem(editor, value),
-      onSetup(api) {
-        function handleNodeChange(_e) {
-          api.setDisabled(!isOKToLink(editor.selection.getContent()))
-        }
-        setTimeout(handleNodeChange)
-        editor.on('NodeChange', handleNodeChange)
-        return () => {
-          editor.off('NodeChange', handleNodeChange)
-        }
-      },
-    })
+      }),
+  })
 
-    /*
-     * Register the Image "Options" button that will open the Image Options
-     * tray.
-     */
-
-    function canUpdateImageProps(node) {
-      return (
-        !node.classList.contains('equation_image') &&
-        isImageEmbed(node) &&
-        // don't show for icon maker
-        !node.getAttribute(ICON_MAKER_ATTRIBUTE)
+  // Register buttons
+  editor.ui.registry.addSplitButton('instructure_image', {
+    tooltip: formatMessage('Images'),
+    icon: 'image',
+    fetch(callback) {
+      callback(
+        getMenuItems(editor).map(item => ({
+          type: 'choiceitem',
+          text: item.text,
+          value: item.value,
+        }))
       )
-    }
-    const buttonAriaLabel = formatMessage('Show image options')
-    editor.ui.registry.addButton('instructure-image-options', {
-      onAction(/* buttonApi */) {
-        // show the tray
-        trayController.showTrayForEditor(editor)
-      },
+    },
+    onAction(api) {
+      if (!api.isDisabled()) {
+        doMenuItem(editor, 'instructure_upload_image')
+      }
+    },
+    onItemAction: (_splitButtonApi, value) => doMenuItem(editor, value),
+    onSetup(api) {
+      function handleNodeChange(_e) {
+        api.setDisabled(!isOKToLink(editor.selection.getContent()))
+      }
 
-      text: formatMessage('Image Options'),
-      tooltip: buttonAriaLabel,
-    })
+      setTimeout(handleNodeChange)
+      editor.on('NodeChange', handleNodeChange)
+      return () => {
+        editor.off('NodeChange', handleNodeChange)
+      }
+    },
+  })
 
-    editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
-      items: 'instructure-image-options',
-      position: 'node',
-      predicate: canUpdateImageProps,
-      scope: 'node',
-    })
-  },
+  /*
+   * Register the Image "Options" button that will open the Image Options
+   * tray.
+   */
 
-  remove(editor) {
-    trayController.hideTrayForEditor(editor)
-  },
+  function canUpdateImageProps(node: Element) {
+    return (
+      !node.classList.contains('equation_image') &&
+      isImageEmbed(node) &&
+      // don't show for icon maker
+      !node.getAttribute(ICON_MAKER_ATTRIBUTE)
+    )
+  }
+
+  const buttonAriaLabel = formatMessage('Show image options')
+  editor.ui.registry.addButton('instructure-image-options', {
+    onAction(/* buttonApi */) {
+      // show the tray
+      trayController.showTrayForEditor(editor)
+    },
+
+    text: formatMessage('Image Options'),
+    tooltip: buttonAriaLabel,
+  })
+
+  editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
+    items: 'instructure-image-options',
+    position: 'node',
+    predicate: canUpdateImageProps,
+    scope: 'node',
+  })
+
+  editor.on('remove', ed => trayController.hideTrayForEditor(ed))
 })
-
-// Register plugin
-tinymce.PluginManager.add('instructure_image', tinymce.plugins.InstructureImagePlugin)
