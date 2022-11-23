@@ -115,6 +115,7 @@ const locale = {
     "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Teslim Tarihi: Birden Çok Gün" },
+  "edit_c5fbea07": { "message": "Düzenle" },
   "edit_link_7f53bebb": { "message": "Bağlantıyı Düzenle" },
   "embed_828fac4a": { "message": "Göm" },
   "embed_image_1080badc": { "message": "Görsel Ekle" },

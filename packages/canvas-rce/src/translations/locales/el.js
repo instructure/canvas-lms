@@ -71,6 +71,7 @@ const locale = {
   "due_multiple_dates_cc0ee3f5": {
     "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
   },
+  "edit_c5fbea07": { "message": "Διαμόρφωση" },
   "embed_image_1080badc": { "message": "Ενσωμάτωση εικόνας" },
   "external_tools_6e77821": { "message": "Εξωτερικά Εργαλεία" },
   "files_c300e900": { "message": "Αρχεία" },

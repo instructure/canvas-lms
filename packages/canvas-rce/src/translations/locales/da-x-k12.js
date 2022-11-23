@@ -234,6 +234,7 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Rediger alternativ tekst for denne ikoninstans"
   },
+  "edit_c5fbea07": { "message": "Redigér" },
   "edit_course_link_5a5c3c59": { "message": "Rediger faglink" },
   "edit_equation_f5279959": { "message": "Rediger ligning" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {

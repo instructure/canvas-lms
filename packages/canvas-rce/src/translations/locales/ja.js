@@ -234,6 +234,7 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "このアイコンインスタンスのaltテキストを編集する"
   },
+  "edit_c5fbea07": { "message": "編集" },
   "edit_course_link_5a5c3c59": { "message": "コースリンクを編集" },
   "edit_equation_f5279959": { "message": "方程式を編集する" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
