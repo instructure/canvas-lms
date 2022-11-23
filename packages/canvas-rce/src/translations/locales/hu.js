@@ -145,6 +145,7 @@ const locale = {
     "message": "Határidő: Több határidő van érvényben"
   },
   "due_when_7eed10c6": { "message": "Határidő: { when }" },
+  "edit_c5fbea07": { "message": "Szerkesztés" },
   "edit_equation_f5279959": { "message": "Egyenlet szerkesztése" },
   "edit_link_7f53bebb": { "message": "Link szerkesztése" },
   "editor_statusbar_26ac81fc": { "message": "Szerkesztő állapotsor" },

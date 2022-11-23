@@ -216,6 +216,7 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "编辑此图标实例的替换文本"
   },
+  "edit_c5fbea07": { "message": "编辑" },
   "edit_course_link_5a5c3c59": { "message": "编辑课程链接" },
   "edit_equation_f5279959": { "message": "编辑等式" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {

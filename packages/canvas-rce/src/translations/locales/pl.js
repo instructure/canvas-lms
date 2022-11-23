@@ -236,6 +236,7 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Edytuj tekst alternatywny dla tej instancji ikony"
   },
+  "edit_c5fbea07": { "message": "Edytuj" },
   "edit_course_link_5a5c3c59": { "message": "Edytuj łącze do kursu" },
   "edit_equation_f5279959": { "message": "Edytuj równanie" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {

@@ -246,6 +246,7 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Editar texto alt para este ícone, por exemplo"
   },
+  "edit_c5fbea07": { "message": "Editar" },
   "edit_course_link_5a5c3c59": { "message": "Editar ligação da disciplina" },
   "edit_equation_f5279959": { "message": "Editar Equação" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
