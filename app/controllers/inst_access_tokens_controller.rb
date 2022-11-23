@@ -73,7 +73,7 @@ class InstAccessTokensController < ApplicationController
   private
 
   def token_string_for(inst_access_token)
-    if params[:unencrypted] && Rails.env.development?
+    if value_to_boolean(params[:unencrypted]) && Rails.env.development?
       inst_access_token.to_unencrypted_token_string
     else
       inst_access_token.to_token_string
