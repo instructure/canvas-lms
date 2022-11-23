@@ -26,6 +26,7 @@ module Lti
 
       include Lti::IMS::Concerns::DeepLinkingServices
       include Lti::IMS::Concerns::DeepLinkingModules
+      include Lti::Concerns::ParentFrame
 
       before_action :require_context
       before_action :validate_jwt
@@ -153,21 +154,14 @@ module Lti
                    moduleCreated: module_created
                  }.compact
                })
-        parent_frame_context = return_url_parameters[:parent_frame_context]
-        parent_frame_tool = parent_frame_context ? ContextExternalTool.find_by(id: parent_frame_context) : nil
-        if parent_frame_tool&.active? && parent_frame_tool&.developer_key&.internal_service
+        tool_origin = parent_frame_origin(return_url_parameters[:parent_frame_context])
+        if tool_origin
           js_env({
-                   DEEP_LINKING_POST_MESSAGE_ORIGIN: origin(parent_frame_tool.url)
+                   DEEP_LINKING_POST_MESSAGE_ORIGIN: tool_origin
                  }, true)
         end
 
         render layout: "bare"
-      end
-
-      def origin(url)
-        uri = URI.parse(url)
-        origin = URI("#{uri.scheme}://#{uri.host}:#{uri.port}")
-        origin.to_s
       end
 
       def require_context_update_rights
