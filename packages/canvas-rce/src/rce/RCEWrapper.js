@@ -48,7 +48,7 @@ import {
 import indicate from '../common/indicate'
 import bridge from '../bridge'
 import CanvasContentTray, {trayPropTypes} from './plugins/shared/CanvasContentTray'
-import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from './StatusBar'
+import StatusBar, {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
@@ -58,8 +58,8 @@ import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 import {
-  VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE,
+  VIDEO_SIZE_DEFAULT,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
@@ -136,7 +136,7 @@ const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
 const contentCSS = contentCSSBinding.template().replace(/tinymce__oxide--/g, '')
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
-// we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
+// we can move this to plugins/instructure-ui-icons/plugin.ts like the rest.
 function addKebabIcon(editor) {
   editor.ui.registry.addIcon(
     'more-drawer',

@@ -154,9 +154,9 @@ The <CanvasRce> toolbar prop looks like
 
 The RCE will add the `this`, `that`, and `another` toolbar items to the `format` toolbar.
 The items are the names registered with tinymce with `editor.ui.registry.addButton` by some plugin.
-See `demo/test-plugin/plugin.js` or anything under `src/rce/plugins` for
-examples. If the named toolbar exists, the items are merged in, removing any duplicates and appending the rest. If the named toolbar does not exist, it
-is created.
+See any of the `plugin.ts` files under `src/rce/plugins` for examples. If the named toolbar exists,
+the items are merged in, removing any duplicates and appending the rest. If the
+named toolbar does not exist, it is created.
 
 #### Adding to the menubar:
 

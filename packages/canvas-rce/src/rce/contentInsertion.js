@@ -18,18 +18,18 @@
 
 import classnames from 'classnames'
 import {
+  renderAudio,
   renderImage,
   renderLink,
   renderLinkedImage,
   renderVideo,
-  renderAudio,
 } from './contentRendering'
 import scroll from '../common/scroll'
 import {
   cleanUrl,
   getAnchorElement,
-  isOnlyTextSelected,
   isImageFigure,
+  isOnlyTextSelected,
 } from './contentInsertionUtils'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 import {absoluteToRelativeUrl} from '../common/fileUrl'
@@ -235,7 +235,7 @@ function textForLink(linkProps, editor, anchorElm) {
   return getAnchorText(editor.selection, anchorElm) || linkProps.text
 }
 
-// link edit/create logic based on tinymce/plugins/link/plugin.js
+// link edit/create logic based on tinymce/plugins/link/plugin.ts
 function insertUndecoratedLink(editor, linkProps, canvasOrigin) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
