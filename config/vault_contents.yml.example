@@ -19,8 +19,8 @@ development:
 #      google_docs_creds:
 #        secret_key: so-secret
 #      inst_access_signature:
-#        private_key: <private key in base 64>
-#        encryption_public_key: <public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
+#        private_key: <signing private key in base 64>
+#        encryption_public_key: <encryption public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
 #      sentry_dsn: garbage-dsn-here
 #      twilio_creds:
 #        account_sid: <sid>
