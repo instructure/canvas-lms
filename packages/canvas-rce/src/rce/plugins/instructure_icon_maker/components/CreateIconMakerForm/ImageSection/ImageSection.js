@@ -73,10 +73,12 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
   const isMetadataLoaded = useRef(false)
 
   useEffect(() => {
-    dispatch({
-      type: actions.SET_CROPPER_SETTINGS.type,
-      payload: {...state.cropperSettings, shape: settings.shape},
-    })
+    if (state.cropperSettings) {
+      dispatch({
+        type: actions.SET_CROPPER_SETTINGS.type,
+        payload: {...state.cropperSettings, shape: settings.shape},
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.shape])
 
