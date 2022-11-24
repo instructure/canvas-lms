@@ -697,6 +697,68 @@ describe ExternalToolsController do
     end
   end
 
+  shared_examples_for "an endpoint which uses parent_frame_context to set the CSP header" do
+    before do
+      user_session(@student)
+    end
+
+    let(:pfc_tool) do
+      @course.context_external_tools.create(
+        name: "instructure_tool", consumer_key: "foo", shared_secret: "bar",
+        url: "http://inst-tool.example.com/abc", lti_version: "1.1",
+        developer_key: DeveloperKey.new(
+          root_account: @course.root_account,
+          internal_service: true
+        )
+      )
+    end
+
+    let(:csp_header) { response.headers["Content-Security-Policy"] }
+
+    it "adds the tool URL to the header if the parent_frame_context tool is trusted" do
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to match %r{frame-ancestors [^;]*http://inst-tool.example.com(;| |$)}
+      # Make sure it also has 'self', which is added in application_controller.rb:
+      expect(csp_header).to match(/frame-ancestors [^;]*'self'/)
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool is not trusted" do
+      pfc_tool.developer_key.update! internal_service: false
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool is not active" do
+      pfc_tool.update! workflow_state: :deleted
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool's URL has unsafe characters" do
+      pfc_tool.update_attribute :url, "http://inst-tool.example.com;default-src"
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the parent_frame_context tool's URL to the header if it is a data URL" do
+      pfc_tool.update! url: "data:123"
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("data:abc")
+    end
+
+    it "doesn't add the parent_frame_context tool's URL to the header if the user is not authenticated" do
+      user_session(user_model)
+      subject
+      expect(response.status).to eq(401)
+      expect(csp_header.to_s).to_not include("inst-tool.example.com")
+    end
+  end
+
   describe "GET 'retrieve'" do
     let :account do
       Account.default
@@ -1019,6 +1081,15 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params["ext_lti_assignment_id"]).to eq lti_assignment_id
     end
 
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        get :retrieve, params: {
+          url: tool.url, course_id: @course.id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
+    end
+
     context "for Quizzes Next launch" do
       let(:assignment) do
         a = assignment_model(course: @course)
@@ -1329,6 +1400,16 @@ describe ExternalToolsController do
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params["custom_canvas_enrollment_state"]).to eq "inactive"
+    end
+
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        tool = new_valid_tool(@course)
+        get "resource_selection", params: {
+          course_id: @course.id, external_tool_id: tool.id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
     end
 
     context "with RCE parameters" do

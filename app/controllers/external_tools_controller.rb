@@ -33,11 +33,13 @@ class ExternalToolsController < ApplicationController
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, only: %i[retrieve show resource_selection]
   before_action :parse_context_codes, only: [:all_visible_nav_tools]
+  before_action :set_extra_csp_frame_ancestor!, only: %i[retrieve resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
   include Api::V1::ExternalTools
   include Lti::RedisMessageClient
   include Lti::Concerns::SessionlessLaunches
+  include Lti::Concerns::ParentFrame
   include K5Mode
 
   WHITELISTED_QUERY_PARAMS = [

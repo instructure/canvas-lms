@@ -88,11 +88,8 @@ class ExternalContentController < ApplicationController
              error_message: param_if_set(:lti_errormsg),
              error_log: param_if_set(:lti_errorlog)
            })
-    tool_origin = parent_frame_origin(params[:parent_frame_context])
-    if tool_origin
-      js_env({
-               DEEP_LINKING_POST_MESSAGE_ORIGIN: tool_origin
-             }, true)
+    if parent_frame_origin
+      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
     end
   end
 
