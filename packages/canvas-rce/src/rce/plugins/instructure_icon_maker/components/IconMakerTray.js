@@ -231,9 +231,13 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
     settings.color,
     settings.textColor,
     settings.text,
+    settings.textSize,
+    settings.textBackgroundColor,
+    settings.textPosition,
     settings.imageSettings,
     settings.outlineColor,
     settings.outlineSize,
+    settings.name,
   ])
 
   const handleSubmit = ({replaceFile = false}) => {
