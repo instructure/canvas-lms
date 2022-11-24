@@ -171,4 +171,10 @@ function processMetadataForBackwardCompatibility(metadataJson) {
   delete metadataJson.encodedImage
   delete metadataJson.encodedImageType
   delete metadataJson.encodedImageName
+
+  // Cleans image settings if there is no image or icon
+  const imageSettingsIcon = metadataJson?.imageSettings?.icon
+  if (!imageSettingsImage && !imageSettingsIcon) {
+    metadataJson.imageSettings = null
+  }
 }

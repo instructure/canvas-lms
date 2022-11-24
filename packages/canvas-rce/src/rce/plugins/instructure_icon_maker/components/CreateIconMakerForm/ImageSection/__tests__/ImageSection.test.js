@@ -180,6 +180,94 @@ describe('ImageSection', () => {
     })
   })
 
+  describe('when changing shape', () => {
+    it('updates cropper settings if has a value', async () => {
+      const overrides = {
+        settings: {
+          shape: 'square',
+          size: Size.Small,
+          imageSettings: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'square',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        },
+        editing: false,
+        editor: {},
+        onChange: jest.fn(),
+      }
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+      await waitFor(() => {
+        expect(overrides.onChange).toHaveBeenCalledWith({
+          type: 'SetImageSettings',
+          payload: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'circle',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        })
+      })
+    })
+
+    it('does not update cropper settings if is null', async () => {
+      const overrides = {
+        settings: {
+          shape: 'square',
+          size: Size.Small,
+          imageSettings: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: null,
+          },
+        },
+        editing: false,
+        editor: {},
+        onChange: jest.fn(),
+      }
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+
+      await waitFor(() => {
+        expect(overrides.onChange).not.toHaveBeenCalledWith({
+          type: 'SetCropperSettings',
+          payload: {
+            shape: 'circle',
+            rotation: 0,
+            scaleRatio: 1.0,
+            translateX: 0,
+            translateY: 0,
+          },
+        })
+      })
+    })
+  })
+
   describe('when the cropper FF is off', () => {
     let rendered
 

@@ -270,17 +270,14 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       imageName: '',
       icon: '',
       iconFillColor: '#000000',
-      cropperSettings: editing ? {shape: settings.shape} : null,
+      cropperSettings: null,
     }
   }
 
   const replaceInitialSettings = () => {
     const name = editing ? settings.name : undefined
     const textPosition = editing ? settings.textPosition : defaultState.textPosition
-    const imageSettings =
-      settings.imageSettings && !!settings.imageSettings.mode
-        ? settings.imageSettings
-        : defaultImageSettings()
+    const imageSettings = settings.imageSettings || defaultImageSettings()
 
     setInitialSettings({
       name,
