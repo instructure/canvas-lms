@@ -17,27 +17,63 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# Methods for controller actions which take a parent_frame_context param to
+# facilitate embedding inside trusted tools (e.g. New Quizzes). Depending on
+# the action then may need to one or both of these things:
+# 1. Set the origin to be used with postMessage to allow the embedded tool to
+#    send messages to the embedding (trusted) tool (usually set in js_env to
+#    the value of parent_frame_origin)
+# 2. Add the embedding tool's host to the Content-Security-Policy (CSP)
+#    header's frame-ancestor directive to allow the page to me loaded in an
+#    iframe embedded in the embedding tool. For this, call
+#    set_extra_csp_frame_ancestor!
 module Lti::Concerns
   module ParentFrame
     extend ActiveSupport::Concern
 
-    # Takes an id of a tool and returns the origin of that tool if it exists
-    # otherwise returns nil
-    def parent_frame_origin(tool_id)
-      tool = tool_id ? ContextExternalTool.find_by(id: tool_id) : nil
-      return nil unless tool&.active? && tool&.developer_key&.internal_service
+    private
 
-      if tool.url
-        override_parent_frame_origin(tool.url)
-      elsif tool.domain
-        "https://#{tool.domain}"
-      end
+    # Can be overridden by controller if the parent_frame_context (tool ID)
+    # comes from someplace else (as it does for DeepLinkingController)
+    def parent_frame_context
+      params[:parent_frame_context]
+    end
+
+    # Finds the tool with id parent_frame_context and returns the origin
+    # (host/scheme/port based off of URL/domain) of that tool if it exists.
+    # otherwise returns nil. Memoized.
+    def parent_frame_origin
+      return @parent_frame_origin if defined?(@parent_frame_origin)
+
+      tool = parent_frame_context.presence && ContextExternalTool.find_by(id: parent_frame_context)
+
+      @parent_frame_origin =
+        if !tool&.active? || !tool&.developer_key&.internal_service
+          nil
+        elsif tool.url
+          override_parent_frame_origin(tool.url)
+        elsif tool.domain
+          "https://#{tool.domain}"
+        end
     end
 
     def override_parent_frame_origin(url)
       uri = URI.parse(url)
       origin = URI("#{uri.scheme}://#{uri.host}:#{uri.port}")
       origin.to_s
+    end
+
+    # Overrides the method in ApplicationController, and is used there
+    def csp_frame_ancestors
+      [*super, @extra_csp_frame_ancestor].compact
+    end
+
+    def set_extra_csp_frame_ancestor!
+      # require http/https URI (e.g., no 'data' uris') & don't allow potential
+      # specially characters that could mess up header
+      if parent_frame_origin&.match(/^https?:[^ *;]+$/)
+        @extra_csp_frame_ancestor = parent_frame_origin
+      end
     end
   end
 end

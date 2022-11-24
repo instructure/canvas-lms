@@ -134,6 +134,11 @@ module Lti
         raise e
       end
 
+      # Overrides method in Lti::Concerns::ParentFrame
+      def parent_frame_context
+        return_url_parameters[:parent_frame_context]
+      end
+
       private
 
       def for_placement?(placement)
@@ -151,14 +156,11 @@ module Lti
                    errorlog: messaging_value("errorlog"),
                    ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
                    reloadpage: reload_page,
-                   moduleCreated: module_created
+                   moduleCreated: module_created,
                  }.compact
                })
-        tool_origin = parent_frame_origin(return_url_parameters[:parent_frame_context])
-        if tool_origin
-          js_env({
-                   DEEP_LINKING_POST_MESSAGE_ORIGIN: tool_origin
-                 }, true)
+        if parent_frame_origin
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
         end
 
         render layout: "bare"

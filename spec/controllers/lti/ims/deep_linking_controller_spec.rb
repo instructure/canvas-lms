@@ -72,14 +72,14 @@ module Lti
           subject
         end
 
+        # TODO: update all these with hash_including()
         context "when returning from a non-internal service" do
           let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
 
-          it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
-            expect(controller).to receive(:js_env).with(anything)
-            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://tool.url" }, true)
-
+          it "does not change the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
             subject
+            # base_url is the default
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq(@controller.request.base_url)
           end
         end
 
@@ -90,11 +90,9 @@ module Lti
 
           let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
 
-          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
-            expect(controller).to receive(:js_env).with(anything)
-            expect(controller).to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://tool.url" }, true)
-
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in js_env" do
             subject
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq("http://tool.url")
           end
         end
 
