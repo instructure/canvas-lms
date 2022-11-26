@@ -91,6 +91,7 @@ const locale = {
   "brick_f2656265": { "message": "Murstein" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
+  "cap_product_3a5265a6": { "message": "Cap-produkt" },
   "center_align_e68d9997": { "message": "Midtstill" },
   "centered_dot_64d5e378": { "message": "Sentrert prikk" },
   "centered_horizontal_dots_451c5815": {
@@ -214,6 +215,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Diagonal pil ned til høyre"
   },
+  "download_filename_2baae924": { "message": "Last ned { filename }" },
   "downward_arrow_cca52012": { "message": "Pil nedover" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Nedoverpeikande triangel"
@@ -273,6 +275,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Svært liten" },
   "extracurricular_icon_67c8ca42": { "message": "Utanomfaglig ikon" },
   "f_function_fe422d65": { "message": "F (Funksjon)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Henting av filinnhald mislukkast"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Lagringskvota er overskriden"
   },
@@ -325,6 +330,9 @@ const locale = {
   "group_navigation_99f191a": { "message": "Gruppenavigering" },
   "h_bar_bb94deae": { "message": "H Bar" },
   "hat_ea321e35": { "message": "Hatt" },
+  "having_trouble_initializing_copy_paste_but_it_can__7fb1f912": {
+    "message": "Uventa problem under initialisering av kopier/lim inn. Det fortsett etter beste evne"
+  },
   "heading_2_5b84eed2": { "message": "Overskrift 2" },
   "heading_3_2c83de44": { "message": "Overskrift 3" },
   "heading_4_b2e74be7": { "message": "Overskrift 4" },
@@ -347,8 +355,12 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Ikondesignar-ikon" },
   "icon_options_7e32746e": { "message": "Alternativ for ikon" },
   "icon_options_tray_2b407977": { "message": "Menyalternativ for ikon" },
+  "icon_preview_1782a1d9": { "message": "Ikon-førehandsvisning" },
   "icon_shape_30b61e7": { "message": "Ikonform" },
   "icon_size_9353edea": { "message": "Ikonstorleik" },
+  "if_usage_rights_are_required_the_file_will_not_be__5d2ca47": {
+    "message": "Dersom bruksrettighetar er påkrevd vil ikkje bli publiser, fram til dette er satt."
+  },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
   },
@@ -470,7 +482,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },
+  "nested_greater_than_d852e60d": { "message": "Nøsta større enn" },
+  "nested_less_than_27d17e58": { "message": "Nøsta mindre enn" },
   "next_page_d2a39853": { "message": "Neste side" },
+  "no_changes_to_save_d29f6e91": { "message": "Ingen endringar å lagre." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -520,6 +535,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "parallel_d55d6e38": { "message": "Parallell" },
   "partial_derivative_4a9159df": { "message": "Partiell (Derivert)" },
+  "paste_5963d1c1": { "message": "Lim inn" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personar" },
   "percentage_34ab7c2c": { "message": "Prosenttal" },
@@ -643,9 +659,17 @@ const locale = {
     "message": "Noko gjekk gale. Sjekk internettforbindelsen, last sida på ny, og prøv på nytt."
   },
   "something_went_wrong_d238c551": { "message": "Noko gjekk gale" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Klarte ikkje å lime inn"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Fleire filer er ikkje støtta."
+  },
   "sort_by_e75f9e3e": { "message": "Sorter etter" },
   "spades_suit_b37020c2": { "message": "Spar (Korttype)" },
   "square_511eb3b3": { "message": "Kvadrat" },
+  "square_cap_9ec88646": { "message": "Kvadratisk cap" },
+  "square_cup_b0665113": { "message": "Kvadratisk cup" },
   "square_root_e8bcbc60": { "message": "Kvadratrot" },
   "square_root_symbol_d0898a53": { "message": "Kvadratrotsymbol" },
   "square_subset_17be67cb": { "message": "Kvadratisk delmengd" },
@@ -675,6 +699,10 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Støtta filtypar: SRT og WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Byt til pen HTML-editor"
+  },
+  "switch_to_raw_html_editor_f970ae1a": { "message": "Byt til rå HTML-editor" },
   "switch_to_the_html_editor_146dfffd": { "message": "Byt til HTML-editor" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Byt til rikteksteditoren"
