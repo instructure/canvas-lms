@@ -263,6 +263,9 @@
     "canvas_planner_98ed106": {
         "message": "Canvas-planleggar"
     },
+    "cap_product_3a5265a6": {
+        "message": "Cap-produkt"
+    },
     "catalan_16f6b78f": {
         "message": "Katalansk"
     },
@@ -608,6 +611,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Diagonal pil ned til høyre"
     },
+    "download_filename_2baae924": {
+        "message": "Last ned { filename }"
+    },
     "downward_arrow_cca52012": {
         "message": "Pil nedover"
     },
@@ -793,6 +799,9 @@
     },
     "failed_getting_course_list_49846a93": {
         "message": "Henting av emnelista mislukkast"
+    },
+    "failed_getting_file_contents_e9ea19f4": {
+        "message": "Henting av filinnhald mislukkast"
     },
     "failed_getting_to_do_list_10ce2833": {
         "message": "Henting av gjerelista mislukkast"
@@ -980,6 +989,9 @@
     "hat_ea321e35": {
         "message": "Hatt"
     },
+    "having_trouble_initializing_copy_paste_but_it_can__7fb1f912": {
+        "message": "Uventa problem under initialisering av kopier/lim inn. Det fortsett etter beste evne"
+    },
     "heading_2_5b84eed2": {
         "message": "Overskrift 2"
     },
@@ -1052,11 +1064,17 @@
     "icon_options_tray_2b407977": {
         "message": "Menyalternativ for ikon"
     },
+    "icon_preview_1782a1d9": {
+        "message": "Ikon-førehandsvisning"
+    },
     "icon_shape_30b61e7": {
         "message": "Ikonform"
     },
     "icon_size_9353edea": {
         "message": "Ikonstorleik"
+    },
+    "if_usage_rights_are_required_the_file_will_not_be__5d2ca47": {
+        "message": "Dersom bruksrettighetar er påkrevd vil ikkje bli publiser, fram til dette er satt."
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
@@ -1433,6 +1451,12 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinja"
     },
+    "nested_greater_than_d852e60d": {
+        "message": "Nøsta større enn"
+    },
+    "nested_less_than_27d17e58": {
+        "message": "Nøsta mindre enn"
+    },
     "new_13daf639": {
         "message": "Ny"
     },
@@ -1450,6 +1474,9 @@
     },
     "next_page_d2a39853": {
         "message": "Neste side"
+    },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Ingen endringar å lagre."
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen innleveringsfristar er sett opp"
@@ -1603,6 +1630,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Partiell (Derivert)"
+    },
+    "paste_5963d1c1": {
+        "message": "Lim inn"
     },
     "peer_review_74f26a13": {
         "message": "Fagfellevurdering"
@@ -1970,6 +2000,12 @@
     "something_went_wrong_d238c551": {
         "message": "Noko gjekk gale"
     },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Klarte ikkje å lime inn"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Fleire filer er ikkje støtta."
+    },
     "sort_by_e75f9e3e": {
         "message": "Sorter etter"
     },
@@ -1981,6 +2017,12 @@
     },
     "square_511eb3b3": {
         "message": "Kvadrat"
+    },
+    "square_cap_9ec88646": {
+        "message": "Kvadratisk cap"
+    },
+    "square_cup_b0665113": {
+        "message": "Kvadratisk cup"
     },
     "square_root_e8bcbc60": {
         "message": "Kvadratrot"
@@ -2071,6 +2113,12 @@
     },
     "swedish_59a593ca": {
         "message": "Svensk"
+    },
+    "switch_to_pretty_html_editor_a3cee15f": {
+        "message": "Byt til pen HTML-editor"
+    },
+    "switch_to_raw_html_editor_f970ae1a": {
+        "message": "Byt til rå HTML-editor"
     },
     "switch_to_the_html_editor_146dfffd": {
         "message": "Byt til HTML-editor"
