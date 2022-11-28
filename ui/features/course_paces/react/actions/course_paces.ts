@@ -28,7 +28,7 @@ import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
 import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
 import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
-import {getPaceName} from '../reducers/course_paces'
+import {getPaceName, getIsUnpublishedNewPace} from '../reducers/course_paces'
 
 const I18n = useI18nScope('course_paces_actions')
 
@@ -130,6 +130,7 @@ const thunkActions = {
     return function pollingThunk(dispatch, getState) {
       const progress = getState().coursePace.publishingProgress
       const paceName = getPaceName(getState())
+      const isUnpublishedNewPace = getIsUnpublishedNewPace(getState())
       if (!progress || TERMINAL_PROGRESS_STATUSES.includes(progress.workflow_state)) return
 
       const pollingLoop = () =>
@@ -144,7 +145,9 @@ const thunkActions = {
             dispatch(uiActions.clearCategoryError('checkPublishStatus'))
             if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
-                message: I18n.t('%{paceName} updated', {paceName}),
+                message: isUnpublishedNewPace
+                  ? I18n.t('%{paceName} Pace created', {paceName})
+                  : I18n.t('%{paceName} Pace updated', {paceName}),
                 err: null,
                 type: 'success',
               })
@@ -268,10 +271,11 @@ const thunkActions = {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Removing pace...')))
       dispatch(uiActions.clearCategoryError('removePace'))
 
+      const paceName = getPaceName(getState())
       return Api.removePace(getState().coursePace)
         .then(() => {
           dispatch(uiActions.hidePaceModal())
-          showFlashSuccess(I18n.t('Pace removed'))()
+          showFlashSuccess(I18n.t('%{paceName} Pace removed', {paceName}))()
         })
         .catch(error => {
           dispatch(uiActions.setCategoryError('removePace', error?.toString()))

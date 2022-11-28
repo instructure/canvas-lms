@@ -52,13 +52,13 @@ describe "course pace landing page" do
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
-      expect(create_default_pace_button.text).to eq("Create Default Pace")
+      expect(create_default_pace_button.text).to eq("Create Course Pace")
     end
 
     it "lands on the getting started course pace landing page when visited the first time" do
       visit_course_paces_page
 
-      expect(create_default_pace_button.text).to eq("Create Default Pace")
+      expect(create_default_pace_button.text).to eq("Create Course Pace")
       expect(get_started_button).to be_displayed
       expect(course_paces_panda).to be_displayed
     end
@@ -87,13 +87,13 @@ describe "course pace landing page" do
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
-      expect(create_default_pace_button.text).to eq("Edit Default Pace")
+      expect(create_default_pace_button.text).to eq("Edit Default Course Pace")
     end
 
     it "lands on the editing course pace landing page when visited" do
       visit_course_paces_page
 
-      expect(create_default_pace_button.text).to eq("Edit Default Pace")
+      expect(create_default_pace_button.text).to eq("Edit Default Course Pace")
       expect(element_exists?(get_started_button_selector)).to be_falsey
     end
 

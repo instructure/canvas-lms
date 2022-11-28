@@ -73,11 +73,11 @@ const PaceModalHeading: React.FC<Props> = ({
   const getPaceTitle = () => {
     switch (coursePace.context_type) {
       case 'Section':
-        return I18n.t('Section Course Pacing')
+        return I18n.t('Section Pace')
       case 'Enrollment':
         return I18n.t('Student Pace')
       default:
-        return I18n.t('Default Course Pacing')
+        return I18n.t('Default Course Pace')
     }
   }
 

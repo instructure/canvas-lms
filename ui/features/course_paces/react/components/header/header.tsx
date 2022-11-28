@@ -126,10 +126,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
         ) : null}
         <Text>
           {I18n.t(
-            'Course Pacing is an automated tool ' +
-              'that creates a student schedule by combining' +
-              ' suggested hours per chapter, in-class school ' +
-              'days, and total hours to generate a date estimator.'
+            "Course Pacing is an automated tool that sets differentiated due dates for assessments and learning activities based on each students' enrollment date, enabling structured, self-paced learning in rolling enrollment courses."
           )}
         </Text>
         <View as="div" margin="small 0" borderRadius="medium" borderWidth="small" padding="medium">
@@ -192,8 +189,8 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                 }}
               >
                 {!props.coursePace.id && props.coursePace.context_type === 'Course'
-                  ? I18n.t('Create Default Pace')
-                  : I18n.t('Edit Default Pace')}
+                  ? I18n.t('Create Course Pace')
+                  : I18n.t('Edit Default Course Pace')}
               </Link>
             </FlexItem>
           </Flex>
