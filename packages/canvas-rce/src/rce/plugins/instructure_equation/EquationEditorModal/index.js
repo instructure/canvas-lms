@@ -31,7 +31,7 @@ import formatMessage from '../../../../format-message'
 
 import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
 import {containsAdvancedSyntax} from './advancedOnlySyntax'
-import advancedPreference from './advancedPreference'
+import * as advancedPreference from './advancedPreference'
 
 import {css} from 'aphrodite'
 import mathml from './mathml'
@@ -150,7 +150,7 @@ export default class EquationEditorModal extends Component {
 
   toggleAndUpdatePreference = () => {
     this.toggleAdvanced()
-    advancedPreference.isSet() ? advancedPreference.clear() : advancedPreference.set()
+    advancedPreference.isSet() ? advancedPreference.remove() : advancedPreference.set()
   }
 
   registerBasicEditorListener = () => {
