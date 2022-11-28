@@ -464,6 +464,33 @@ module Lti
         end
       end
 
+      context "com.instructure.Account.usage_metrics_enabled" do
+        subject { variable_expander.expand_variables!(exp_hash) }
+
+        let(:exp_hash) { { test: "$com.instructure.Account.usage_metrics_enabled" } }
+
+        context "when flag is disabled" do
+          before do
+            root_account.disable_feature! :send_usage_metrics
+          end
+
+          it "expands to false" do
+            expect(subject[:test]).to eq false
+          end
+        end
+
+        context "when flag is enabled and account allows it" do
+          before do
+            root_account.settings[:enable_usage_metrics] = true
+            root_account.enable_feature! :send_usage_metrics
+          end
+
+          it "expands to true" do
+            expect(subject[:test]).to eq true
+          end
+        end
+      end
+
       it "has a substitution for com.instructure.Assignment.lti.id" do
         exp_hash = { test: "$com.instructure.Assignment.lti.id" }
         variable_expander.expand_variables!(exp_hash)
