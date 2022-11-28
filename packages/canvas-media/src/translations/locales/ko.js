@@ -19,9 +19,9 @@
 import formatMessage from '../../format-message'
 
 const locale = {
-  "english_c60612e2": { "message": "영어" },
-  "greek_65c5b3f7": { "message": "그리스 문자" }
+  english_c60612e2: {message: '영어'},
+  greek_65c5b3f7: {message: '그리스 문자'},
+  loading_25990131: {message: '로드하는 중...'},
 }
-
 
 formatMessage.addLocale({ko: locale})
