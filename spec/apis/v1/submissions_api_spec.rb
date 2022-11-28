@@ -5369,6 +5369,43 @@ describe "Submissions API", type: :request do
       expect(@a1.submission_for_student(@student1)).to be_excused
     end
 
+    it "unexcuses assignments" do
+      @a1.grade_student @student1, excused: true, grader: @teacher
+      grade_data = {
+        grade_data: { @student1.id => { excuse: "0", posted_grade: nil } }
+      }
+
+      api_call(:post,
+               "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+               { controller: "submissions_api", action: "bulk_update",
+                 format: "json", section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
+      run_jobs
+
+      expect(@a1.submission_for_student(@student1)).to_not be_excused
+    end
+
+    it "posts do not set grader_id for unchanged scores" do
+      grade_data = {
+        grade_data: {
+          @student1.id => { posted_grade: nil },
+          @student2.id => { posted_grade: "-" }
+        }
+      }
+
+      api_call(:post,
+               "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+               { controller: "submissions_api", action: "bulk_update",
+                 format: "json", section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
+      run_jobs
+
+      submission1 = @a1.submission_for_student(@student1)
+      submission2 = @a1.submission_for_student(@student2)
+      expect(submission1.grader_id).to be_nil
+      expect(submission2.grader_id).to be_nil
+    end
+
     it "checks user ids for sections" do
       grade_data = {
         grade_data: {

@@ -2085,12 +2085,20 @@ class Assignment < ActiveRecord::Base
       submission.grader = grader
       submission.grader_id = opts[:grader_id] if opts.key?(:grader_id)
       submission.grade = grade
-      submission.score = score
       submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
-      if opts[:return_if_score_unchanged] && !submission.changed?
+      submission.score = score
+
+      changed_attributes = submission.changed_attributes
+      # only mark excused changed if it was a changed attributes and did not go from nil -> false
+      excused_changed = changed_attributes.key?(:excused) && !(changed_attributes[:excused].nil? && opts[:excused] == false)
+      score_changed = changed_attributes.key?(:score)
+
+      # return submission if excused did not change and score did not change
+      if opts[:return_if_score_unchanged] && !excused_changed && !score_changed
         submission.score_unchanged = true
         return submission
       end
+
       did_grade = true if score.present? || submission.excused?
     end
 
