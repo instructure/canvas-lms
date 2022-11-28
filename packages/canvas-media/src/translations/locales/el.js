@@ -19,11 +19,11 @@
 import formatMessage from '../../format-message'
 
 const locale = {
-  "greek_65c5b3f7": { "message": "Ελληνικά" },
-  "no_preview_is_available_for_this_file_f940114a": {
-    "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."
-  }
+  greek_65c5b3f7: {message: 'Ελληνικά'},
+  loading_25990131: {message: 'Φόρτωση...'},
+  no_preview_is_available_for_this_file_f940114a: {
+    message: 'Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο.',
+  },
 }
-
 
 formatMessage.addLocale({el: locale})
