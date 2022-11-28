@@ -42,6 +42,7 @@ import {
   isNewPace,
   isSectionPace,
   isStudentPace,
+  getPaceName,
 } from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import UnpublishedChangesIndicator from './unpublished_changes_indicator'
@@ -64,6 +65,7 @@ interface StoreProps {
   readonly unpublishedChanges: boolean
   readonly anyActiveRequests: boolean
   readonly isUnpublishedNewPace: boolean
+  readonly paceName: string
 }
 
 interface DispatchProps {
@@ -102,6 +104,7 @@ export const Footer: React.FC<ComponentProps> = ({
   anyActiveRequests,
   focusOnClose,
   isUnpublishedNewPace,
+  paceName,
 }) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
@@ -224,6 +227,7 @@ export const Footer: React.FC<ComponentProps> = ({
           onCancel={() => setRemovePaceModalOpen(false)}
           onConfirm={handleRemovePaceConfirmed}
           contextType={studentPace ? 'Enrollment' : 'Section'}
+          paceName={paceName}
         />
         <FlexItem>
           {showRemovePaceButton && (
@@ -301,6 +305,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0,
     anyActiveRequests: getAnyActiveRequests(state),
     isUnpublishedNewPace: getIsUnpublishedNewPace(state),
+    paceName: getPaceName(state),
   }
 }
 

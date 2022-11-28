@@ -55,7 +55,7 @@ describe "course pace page" do
       expect(course_pace_settings_button).to be_displayed
     end
 
-    it "navigates to course paces modal when Create Default Pace is clicked" do
+    it "navigates to course paces modal when Create Course Pace is clicked" do
       visit_course_paces_page
 
       click_create_default_pace_button

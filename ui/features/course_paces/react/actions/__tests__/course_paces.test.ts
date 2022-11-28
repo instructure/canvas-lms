@@ -176,7 +176,7 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
-        expect(screen.getAllByText('Neuromancy 300 updated')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('Neuromancy 300 Pace updated')[0]).toBeInTheDocument()
       })
     })
 
