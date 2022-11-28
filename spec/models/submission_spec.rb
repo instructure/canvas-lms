@@ -5144,6 +5144,26 @@ describe Submission do
       expect(@a1.submission_for_student(@u2).grade).to be_nil
     end
 
+    it "does not update grader_id if submission is blank or missing with -" do
+      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+                                     {
+                                       @a1.id => {
+                                         @u1.id => { posted_grade: nil }
+                                       },
+                                       @a1.id => {
+                                         @u2.id => { posted_grade: "-" }
+                                       }
+                                     })
+
+      submission1 = @a1.submission_for_student(@u1)
+      submission2 = @a1.submission_for_student(@u2)
+
+      expect(submission1.grade).to be_nil
+      expect(submission2.grade).to be_nil
+      expect(submission1.grader_id).to be_nil
+      expect(submission2.grader_id).to be_nil
+    end
+
     describe "submitting comments via bulk update" do
       let(:auto_assignment) { @a1 }
       let(:manual_assignment) do

@@ -1177,6 +1177,14 @@ describe GradebookImporter do
             )
             expect(student_submissions.map { |s| s["assignment_id"] }).to include @open_assignment.id
           end
+
+          it "does not grade submissions that had no grade and were marked with '-' in the import" do
+            importer_with_rows(
+              "Student,ID,Section,Assignment in closed period,Assignment in open period",
+              ",#{@student.id},,-,-"
+            )
+            expect(@gi.as_json[:students]).to be_empty
+          end
         end
 
         it "marks excused submission as 'EX' even if 'ex' is not capitalized" do
