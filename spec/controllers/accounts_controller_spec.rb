@@ -418,21 +418,31 @@ describe AccountsController do
 
       post "update", params: { id: subaccount.id, account: { settings: {} } }
       expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+      expect(subaccount.restrict_student_future_view[:value]).to be false
 
+      # TODO: Rails.version remove when rails 6.1 support removed
+      @controller.instance_variables.each { |ivar| @controller.remove_instance_variable(ivar) }
       post "update", params: { id: root_account.id, account: { settings: {
         restrict_student_future_view: { value: true }
       } } }
-      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
+      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+      expect(subaccount.restrict_student_future_view[:value]).to be true
 
+      # TODO: Rails.version remove when rails 6.1 support removed
+      @controller.instance_variables.each { |ivar| @controller.remove_instance_variable(ivar) }
       post "update", params: { id: subaccount.id, account: { settings: {
         restrict_student_future_view: { value: false }
       } } }
-      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be false
+      expect(subaccount.restrict_student_future_view[:value]).to be false
 
+      # TODO: Rails.version remove when rails 6.1 support removed
+      @controller.instance_variables.each { |ivar| @controller.remove_instance_variable(ivar) }
       post "update", params: { id: subaccount.id, account: { settings: {
         restrict_student_future_view: { value: true }
       } } }
-      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
+      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+      expect(subaccount.restrict_student_future_view[:value]).to be true
     end
 
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
