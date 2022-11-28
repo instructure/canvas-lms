@@ -1762,7 +1762,7 @@ describe Attachment do
     before do
       s3_storage!
       Attachment.current_root_account = @old_account
-      @root = attachment_model(filename: "unknown 2.loser")
+      @root = attachment_model(filename: "unknown 2.example")
       @child = attachment_model(root_attachment: @root)
 
       @old_object = double("old object")

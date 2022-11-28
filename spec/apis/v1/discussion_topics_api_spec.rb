@@ -2919,10 +2919,10 @@ describe DiscussionTopicsController, type: :request do
       ].sort_by { |h| h["id"] })
 
       reply_reply1_attachment_json = {
-        "content-type" => "application/loser",
+        "content-type" => "application/unknown",
         "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
-        "filename" => "unknown.loser",
-        "display_name" => "unknown.loser",
+        "filename" => "unknown.example",
+        "display_name" => "unknown.example",
         "id" => @attachment.id,
         "uuid" => @attachment.uuid,
         "folder_id" => @attachment.folder_id,

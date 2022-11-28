@@ -135,7 +135,7 @@ describe Lti::ContentItemResponse do
     it "gets the title for a file" do
       file = attachment_model(context: context)
       content_item_response = subject({ files: [file.id] })
-      expect(content_item_response.title).to eq "unknown.loser"
+      expect(content_item_response.title).to eq "unknown.example"
     end
 
     it "gets the title for a assignment" do
@@ -188,7 +188,7 @@ describe Lti::ContentItemResponse do
     it "gets the files content_type" do
       file = attachment_model(context: context)
       content_item_response = subject({ files: [file.id] })
-      expect(content_item_response.content_type).to eq "application/loser"
+      expect(content_item_response.content_type).to eq "application/unknown"
     end
 
     it "gets the content_type for non files" do

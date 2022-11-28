@@ -734,7 +734,7 @@ describe AccountsController do
 
       context "without :manage_storage_quotas" do
         before :once do
-          role = custom_account_role "quota-loser", account: @account
+          role = custom_account_role "quota-example", account: @account
           @account.role_overrides.create! permission: "manage_account_settings", enabled: true,
                                           role: role
           @account.account_users.create!(user: @user, role: role)

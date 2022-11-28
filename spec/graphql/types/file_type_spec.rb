@@ -121,7 +121,7 @@ describe Types::FileType do
 
     it "returns nil if the file is not a canvadocable type" do
       allow(Canvadocs).to receive(:enabled?).and_return true
-      @student_file.update!(content_type: "application/loser")
+      @student_file.update!(content_type: "application/unknown")
       expect(
         @resolver.resolve('submissionPreviewUrl(submissionId: "' + @submission.id.to_s + '")')
       ).to be_nil
