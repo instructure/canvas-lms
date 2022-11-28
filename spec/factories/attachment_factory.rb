@@ -31,7 +31,7 @@ Attachment.class_eval do
   # Marshal.dump, you can't have any singleton methods (which our
   # Rails 3 attachment_fu hacks do while saving)
   def marshal_dump
-    [attributes, instance_variable_get(:@new_record)]
+    [attributes, instance_variable_get(:@new_record), instance_variable_get(:@shard)]
   end
 
   def marshal_load(data)
@@ -39,6 +39,7 @@ Attachment.class_eval do
     instance_variable_set :@attributes, self.class.attributes_builder.build_from_database(data[0])
     instance_variable_set :@attributes_cache, {}
     instance_variable_set :@new_record, data[1]
+    instance_variable_set :@shard, data[2]
   end
 end
 
