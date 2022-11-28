@@ -780,7 +780,7 @@ describe Canvas::LiveEvents do
       attachment_model
 
       expect_event("asset_accessed", {
-        asset_name: "unknown.loser",
+        asset_name: "unknown.example",
         asset_type: "attachment",
         asset_id: @attachment.global_id.to_s,
         asset_subtype: nil,
@@ -799,7 +799,7 @@ describe Canvas::LiveEvents do
       context = OpenStruct.new(global_id: "1")
 
       expect_event("asset_accessed", {
-        asset_name: "unknown.loser",
+        asset_name: "unknown.example",
         asset_type: "attachment",
         asset_id: @attachment.global_id.to_s,
         asset_subtype: nil,

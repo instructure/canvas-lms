@@ -66,8 +66,8 @@ module Factories
       context: @context,
       size: 100,
       folder: folder,
-      content_type: "application/loser",
-      filename: "unknown.loser"
+      content_type: "application/unknown",
+      filename: "unknown.example"
     }
   end
 
