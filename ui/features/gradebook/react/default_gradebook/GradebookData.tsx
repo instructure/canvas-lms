@@ -75,6 +75,9 @@ export default function GradebookData(props: Props) {
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
   const fetchStudentIds = useStore(state => state.fetchStudentIds)
 
+  const sisOverrides = useStore(state => state.sisOverrides)
+  const fetchSisOverrides = useStore(state => state.fetchSisOverrides)
+
   const gradingPeriodAssignments = useStore(state => state.gradingPeriodAssignments)
   const isGradingPeriodAssignmentsLoading = useStore(
     state => state.isGradingPeriodAssignmentsLoading
@@ -120,16 +123,21 @@ export default function GradebookData(props: Props) {
     if (props.gradebookEnv.course_settings.allow_final_grade_override) {
       fetchFinalGradeOverrides()
     }
+    if (props.gradebookEnv.post_grades_feature) {
+      fetchSisOverrides()
+    }
     fetchCustomColumns()
   }, [
     fetchCustomColumns,
     fetchFilters,
     fetchFinalGradeOverrides,
     fetchModules,
+    fetchSisOverrides,
     initializeStagedFilters,
     props.gradebookEnv.course_settings.allow_final_grade_override,
     props.gradebookEnv.enhanced_gradebook_filters,
     props.gradebookEnv.has_modules,
+    props.gradebookEnv.post_grades_feature,
     props.gradebookEnv.settings.filter_columns_by,
     props.gradebookEnv.settings.filter_rows_by,
   ])
@@ -176,6 +184,7 @@ export default function GradebookData(props: Props) {
       finalGradeOverrides={finalGradeOverrides}
       modules={modules}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
+      sisOverrides={sisOverrides}
       studentIds={studentIds}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
