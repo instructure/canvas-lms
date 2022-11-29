@@ -767,9 +767,13 @@ class Conversation < ActiveRecord::Base
 
     course = context.is_a?(Course) ? context : context.context
 
-    # Can not reply if the course is hard or soft concluded
     if course.is_a?(Course) && (course.workflow_state == "completed" || course.soft_concluded?)
-      return true
+      visible_sections = course.sections_visible_to user
+      has_non_concluded_section = visible_sections.map(&:concluded?).include? false
+
+      unless has_non_concluded_section
+        return true
+      end
     end
 
     # can still reply if a teacher is involved
