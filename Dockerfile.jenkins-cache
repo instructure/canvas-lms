@@ -5,6 +5,7 @@ SHELL ["/usr/bin/bash", "-c"]
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
+  set -o errexit -o errtrace -o nounset -o pipefail && \
   shopt -s globstar && \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     --exclude='vendor/qti_migration_tool' \
@@ -65,8 +66,6 @@ RUN --mount=target=/tmp/src \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
     lib/logging_filter.rb \
-    lib/request_cache.rb \
-    lib/temp_cache.rb \
     lib/canvas/cdn.rb \
     lib/base/canvas/reloader.rb \
     .i18nignore \
