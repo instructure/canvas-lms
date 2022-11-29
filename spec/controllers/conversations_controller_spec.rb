@@ -965,6 +965,39 @@ describe ConversationsController do
       end
     end
 
+    context "soft concluded course with non-concluded section override" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.start_at = 2.days.ago
+        @course.conclude_at = 1.day.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @my_section = @course.course_sections.create!(name: "test section")
+        @my_section.start_at = 1.day.ago
+        @my_section.end_at = 5.days.from_now
+        @my_section.restrict_enrollments_to_section_dates = true
+        @my_section.save!
+
+        @course.enroll_student(@student, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: @my_section)
+
+        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: @my_section)
+      end
+
+      it "allows students to reply to teachers as long as their section is not concluded" do
+        teacher_convo = @teacher.initiate_conversation([@student])
+        teacher_convo.add_message("test")
+        teacher_convo.conversation.update_attribute(:context, @course)
+        teacher_convo.save!
+
+        user_session(@student)
+        post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+        expect(response).to be_successful
+      end
+    end
+
     it "refrains from duplicating the RCE-created media_comment" do
       course_with_student_logged_in(active_all: true)
       allow(InstStatsd::Statsd).to receive(:increment)
