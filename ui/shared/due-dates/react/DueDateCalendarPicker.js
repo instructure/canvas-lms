@@ -56,6 +56,7 @@ function DueDateCalendarPicker(props) {
     if (props.dateValue === oldDate.current) return
     oldDate.current = props.dateValue
     $(dateInput.current).data('inputdate', props.dateValue).val(formatDate(props.dateValue))
+    dateInput.current.setSelectionRange(0, 0)
   }, [formatDate, props.dateValue])
 
   function applyDefaultTimeIfNeeded(date) {
