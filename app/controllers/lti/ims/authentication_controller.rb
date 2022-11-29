@@ -25,6 +25,7 @@ module Lti
     # Launch: The authentication request
     class AuthenticationController < ApplicationController
       include Lti::RedisMessageClient
+      include Lti::Concerns::ParentFrame
 
       REQUIRED_PARAMS = %w[
         client_id
@@ -75,6 +76,7 @@ module Lti
         validate_current_user!
         validate_client_id!
         validate_launch_eligibility!
+        set_extra_csp_frame_ancestor! unless @oidc_error
 
         render(
           "lti/ims/authentication/authorize",
@@ -141,6 +143,11 @@ module Lti
 
       def canvas_domain
         decoded_jwt["canvas_domain"]
+      end
+
+      # Overrides method in Lti::Concerns::ParentFrame; used by set_extra_csp_frame_ancestor!
+      def parent_frame_context
+        decoded_jwt["parent_frame_context"]
       end
 
       def context
