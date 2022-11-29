@@ -325,6 +325,81 @@ describe "conversations new" do
         Account.default.enable_feature! :react_inbox
       end
 
+      context "date restricted courses" do
+        before do
+          @course.restrict_enrollments_to_course_dates = true
+          @course.restrict_student_past_view = true
+          @course.restrict_student_future_view = true
+          @course.save!
+        end
+
+        context "soft concluded course" do
+          before do
+            @course.conclude_at = 1.day.ago
+            @course.start_at = 2.days.ago
+            @course.save!
+          end
+
+          it "does not allow a student to create a new conversation when course is soft concluded" do
+            user_session(@s1)
+
+            get "/conversations"
+            f("button[data-testid='compose']").click
+            f("input[placeholder='Select Course']").click
+            fj("li:contains('#{@course.name}')").click
+            ff("input[aria-label='Address Book']")[1].click
+            wait_for_ajaximations
+            fj("li:contains('Teachers')").click
+            wait_for_ajaximations
+            fj("li:contains('#{@teacher.name}')").click
+            f("textarea[data-testid='message-body']").send_keys "Message to Teacher in soft concluded course"
+            fj("button:contains('Send')").click
+            wait_for_ajaximations
+
+            expect(fj("div:contains('Course concluded, unable to send messages')")).to be_present
+          end
+
+          it "does not allow a teacher to create a new conversation when course is soft concluded" do
+            user_session(@teacher)
+
+            get "/conversations"
+            f("button[data-testid='compose']").click
+            f("input[placeholder='Select Course']").click
+            fj("li:contains('#{@course.name}')").click
+            ff("input[aria-label='Address Book']")[1].click
+            wait_for_ajaximations
+            fj("li:contains('Students')").click
+            wait_for_ajaximations
+            fj("li:contains('#{@s1.name}')").click
+            f("textarea[data-testid='message-body']").send_keys "Message to Teacher in soft concluded course"
+            fj("button:contains('Send')").click
+            wait_for_ajaximations
+
+            expect(fj("div:contains('Course concluded, unable to send messages')")).to be_present
+          end
+
+          it "does not allow an observer to create a new conversation when course is soft concluded" do
+            observer_in_course(name: "Collins Ryan", active_all: true, associated_user_id: @s1).user
+
+            user_session(@observer)
+            get "/conversations"
+            f("button[data-testid='compose']").click
+            f("input[placeholder='Select Course']").click
+            fj("li:contains('#{@course.name}')").click
+            ff("input[aria-label='Address Book']")[1].click
+            wait_for_ajaximations
+            fj("li:contains('Students')").click
+            wait_for_ajaximations
+            fj("li:contains('#{@s1.name}')").click
+            f("textarea[data-testid='message-body']").send_keys "Message to Teacher in soft concluded course"
+            fj("button:contains('Send')").click
+            wait_for_ajaximations
+
+            expect(fj("div:contains('Course concluded, unable to send messages')")).to be_present
+          end
+        end
+      end
+
       context "when user_id and user_name url params exist" do
         it "properly sends a message based on url params" do
           site_admin_logged_in
