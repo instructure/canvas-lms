@@ -98,12 +98,18 @@ export const Module: React.FC<ComponentProps> = props => {
           justifyItems="center"
           padding={headerPadding}
         >
-          <View id="due-date-column-title">{I18n.t('Due Date')}</View>
+          <Tooltip
+            renderTip={I18n.t('Dates shown in Course Time Zone')}
+            placement="top"
+            on={['click', 'hover', 'focus']}
+          >
+            <View id="due-date-column-title" as="span" tabIndex="0">
+              {I18n.t('Due Date')}
+            </View>
+          </Tooltip>
           {props.compression > 0 && (
             <Tooltip
-              renderTip={I18n.t(
-                'Due Dates are being compressed based on your start and end dates.'
-              )}
+              renderTip={I18n.t('Due Dates are being compressed based on your start and end dates')}
               placement="top"
               on={['click', 'hover', 'focus']}
             >
@@ -213,20 +219,13 @@ export const Module: React.FC<ComponentProps> = props => {
                       justifyItems="center"
                       padding={headerPadding}
                     >
-                      <View id="days-column-title">{I18n.t('Days')}</View>
                       <Tooltip
-                        renderTip={I18n.t('Changing course pacing days may modify due dates.')}
+                        renderTip={I18n.t('Changing course pacing days may modify due dates')}
                         placement="top"
                         on={['click', 'hover', 'focus']}
                       >
-                        <View
-                          data-testid="days-tooltip"
-                          as="div"
-                          margin="0 0 0 x-small"
-                          tabIndex="0"
-                          role="button"
-                        >
-                          <IconInfoLine color="brand" title={I18n.t('info')} />
+                        <View id="days-column-title" as="span" tabIndex="0">
+                          {I18n.t('Days')}
                         </View>
                       </Tooltip>
                     </Flex>
