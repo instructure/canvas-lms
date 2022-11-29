@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,24 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type Gradebook from '../Gradebook'
-import type {RequestDispatch} from '@canvas/network'
+import {GetState, SetState} from 'zustand'
+import type {GradebookStore} from './index'
 import type {AssignmentGroup} from '../../../../../api.d'
 
-export default class SisOverridesLoader {
-  _gradebook: Gradebook
+export type SisOverrideState = {
+  areSisOverridesLoaded: boolean
+  sisOverrides: AssignmentGroup[]
+  fetchSisOverrides: () => Promise<void>
+}
 
-  _dispatch: RequestDispatch
+export default (
+  set: SetState<GradebookStore>,
+  get: GetState<GradebookStore>
+): SisOverrideState => ({
+  sisOverrides: [],
 
-  constructor({dispatch, gradebook}: {dispatch: RequestDispatch; gradebook: Gradebook}) {
-    this._dispatch = dispatch
-    this._gradebook = gradebook
-  }
+  areSisOverridesLoaded: false,
 
-  loadOverrides() {
-    const courseId = this._gradebook.course.id
-    const url = `/api/v1/courses/${courseId}/assignment_groups`
-
+  fetchSisOverrides: (): Promise<void> => {
+    const url = `/api/v1/courses/${get().courseId}/assignment_groups`
     const params = {
       exclude_assignment_submission_types: ['wiki_page'],
       exclude_response_fields: [
@@ -46,9 +48,13 @@ export default class SisOverridesLoader {
       override_assignment_dates: false,
     }
 
-    // eslint-disable-next-line promise/catch-or-return
-    this._dispatch.getDepaginated<AssignmentGroup[]>(url, params).then(data => {
-      this._gradebook.addOverridesToPostGradesStore(data)
-    })
-  }
-}
+    return get()
+      .dispatch.getDepaginated<AssignmentGroup[]>(url, params)
+      .then(sisOverrides => {
+        set({
+          areSisOverridesLoaded: true,
+          sisOverrides,
+        })
+      })
+  },
+})

@@ -259,6 +259,7 @@ export type GradebookProps = {
     gradingPeriodIds?: string[]
   }
   settingsModalButtonContainer: HTMLElement
+  sisOverrides: AssignmentGroup[]
   studentIds: string[]
   viewOptionsMenuNode: HTMLElement
 }
@@ -623,12 +624,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  loadOverridesForSIS = (): void => {
-    if (this.options.post_grades_feature) {
-      this.dataLoader.loadOverridesForSIS()
-    }
-  }
-
   addOverridesToPostGradesStore = (assignmentGroups: AssignmentGroup[]): void => {
     let assignment, group, j, k, len, len1, ref1
     for (j = 0, len = assignmentGroups.length; j < len; j++) {
@@ -837,7 +832,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.initGrid()
     this.initHeader()
     this.gridReady.resolve(null)
-    this.loadOverridesForSIS()
+    this.addOverridesToPostGradesStore(this.props.sisOverrides)
   }
 
   setupGrading = (students: GradebookStudent[]): void => {
@@ -4613,6 +4608,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.props.finalGradeOverrides
     ) {
       this.finalGradeOverrides?.setGrades(this.props.finalGradeOverrides)
+    }
+
+    // sis overrides
+    if (prevProps.sisOverrides !== this.props.sisOverrides) {
+      this.addOverridesToPostGradesStore(this.props.sisOverrides)
     }
 
     // modules
