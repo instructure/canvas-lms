@@ -11,5 +11,5 @@ RUN set -eux; \
   && mkdir -p \
     /home/docker/.bundle \
   # TODO: --without development \
-  && bundle install --jobs $(nproc) \
+  && { bundle install --jobs $(nproc) || bundle install; } \
   && rm -rf $GEM_HOME/cache
