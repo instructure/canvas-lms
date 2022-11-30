@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import {bool, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -42,7 +43,7 @@ function persistBadgeDisabled(state) {
   })
 }
 
-export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
+function ReleaseNotesList({badgeDisabled, setBadgeDisabled, forceUnreadPoll}) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [releaseNotes, setReleaseNotes] = useState([])
@@ -73,6 +74,12 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
   function updateBadgeDisabled(state) {
     persistBadgeDisabled(state)
     setBadgeDisabled(state)
+  }
+
+  if (forceUnreadPoll && releaseNotes.filter(n => n.new).length > 0) {
+    // We do this next time through the event loop to avoid upsetting React by updating two
+    // components at the same time
+    setTimeout(forceUnreadPoll, 0, 0)
   }
 
   return (
@@ -130,3 +137,11 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
     </View>
   )
 }
+
+ReleaseNotesList.propTypes = {
+  badgeDisabled: bool,
+  setBadgeDisabled: func,
+  forceUnreadPoll: func,
+}
+
+export default ReleaseNotesList
