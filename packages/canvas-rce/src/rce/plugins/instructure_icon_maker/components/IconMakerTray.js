@@ -239,7 +239,11 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       )
       .then(writeIconToRCE)
       .then(() => setIsOpen(false))
-      .catch(() => setStatus(statuses.ERROR))
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error(err)
+        setStatus(statuses.ERROR)
+      })
   }
 
   const writeIconToRCE = ({url, display_name}) => {
@@ -253,7 +257,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       // React wants this to be an object but we are just
       // passing along a string here. Using the style attribute
       // with all caps makes React ignore this fact
-      style: externalStyle,
+      STYLE: externalStyle, // DON'T CHANGE BEFORE READING COMMENT ABOVE
       width: externalWidth,
     }
 
