@@ -32,6 +32,7 @@ import {
   IconMarkAsReadLine,
   IconWarningBorderlessSolid,
   IconReplyAll2Line,
+  IconCommentLine,
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -54,6 +55,7 @@ export const ThreadActions = props => {
       goToQuotedReply: props.goToQuotedReply,
       onEdit: props.onEdit,
       onDelete: props.onDelete,
+      onQuoteReply: props.onQuoteReply,
       onOpenInSpeedGrader: props.onOpenInSpeedGrader,
       onMarkThreadAsRead: props.onMarkThreadAsRead,
       onReport: props.onReport,
@@ -176,6 +178,14 @@ const getMenuConfigs = props => {
       selectionCallback: props.onEdit,
     })
   }
+  if (props.onQuoteReply) {
+    options.push({
+      key: 'quote',
+      icon: <IconCommentLine />,
+      label: I18n.t('Quote Reply'),
+      selectionCallback: props.onQuoteReply,
+    })
+  }
   if (props.onDelete) {
     options.push({
       key: 'delete',
@@ -249,6 +259,7 @@ ThreadActions.propTypes = {
   goToParent: PropTypes.func,
   goToQuotedReply: PropTypes.func,
   onEdit: PropTypes.func,
+  onQuoteReply: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
   onReport: PropTypes.func,

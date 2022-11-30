@@ -25,6 +25,7 @@ import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
 
 const I18n = useI18nScope('student_context_trayAvatar')
 
+// eslint-disable-next-line react/prefer-stateless-function
 class Avatar extends React.Component {
   static propTypes = {
     user: PropTypes.shape({

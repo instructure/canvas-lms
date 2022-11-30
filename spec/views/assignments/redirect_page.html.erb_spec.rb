@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/assignments/redirect_page" do
+describe "assignments/redirect_page" do
   it "renders" do
     course_with_student
     view_context(@course, @user)

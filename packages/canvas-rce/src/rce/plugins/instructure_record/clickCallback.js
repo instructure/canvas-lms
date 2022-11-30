@@ -88,7 +88,7 @@ export default function (ed, document) {
               origin: originFromHost(contentProps.host),
               headers: headerFor(contentProps.jwt),
             }}
-            languages={Bridge.languages}
+            userLocale={Bridge.userLocale}
             open={true}
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}

@@ -30,7 +30,7 @@ export default class Bridge {
     })
 
     this.trayProps = new WeakMap()
-    this._languages = []
+    this.userLocale = 'en'
     this._controller = {}
     this._uploadMediaTranslations = null
     this._canvasOrigin = ''
@@ -81,14 +81,6 @@ export default class Bridge {
       this._mediaServerUploader = null
     }
     this._mediaServerUploader = new K5Uploader(session)
-  }
-
-  get languages() {
-    return this._languages
-  }
-
-  set languages(langs) {
-    this._languages = langs
   }
 
   get canvasOrigin() {

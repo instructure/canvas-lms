@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import _ from 'underscore'
 
 import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader'
 import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
@@ -67,6 +66,8 @@ function teardownFixtures() {
   // fast remove
   while (fixtures.firstChild) fixtures.removeChild(fixtures.firstChild)
 }
+
+const awhile = () => new Promise(resolve => setTimeout(resolve, 2))
 
 QUnit.module('SpeedGrader', rootHooks => {
   let history
@@ -188,46 +189,37 @@ QUnit.module('SpeedGrader', rootHooks => {
     },
   })
 
-  test('showDiscussion should not show private comments for a group assignment', () => {
+  test('showDiscussion should not show private comments for a group assignment', async () => {
     const originalKalturaSettings = INST.kalturaSettings
     INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
-    const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
-      func(elem, size, keepOriginalText)
-    })
     window.jsonData.GROUP_GRADING_MODE = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null
     SpeedGrader.EG.showDiscussion()
+    await awhile()
     sinon.assert.notCalled($.fn.append)
-    deferFake.restore()
     INST.kalturaSettings = originalKalturaSettings
   })
 
-  test('showDiscussion should show group comments for group assignments', () => {
+  test('showDiscussion should show group comments for group assignments', async () => {
     const originalKalturaSettings = INST.kalturaSettings
     INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
-    const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
-      func(elem, size, keepOriginalText)
-    })
     window.jsonData.GROUP_GRADING_MODE = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo'
     SpeedGrader.EG.showDiscussion()
+    await awhile()
     strictEqual(document.querySelector('.comment').innerText, 'a comment!')
-    deferFake.restore()
     INST.kalturaSettings = originalKalturaSettings
   })
 
-  test('thumbnails of media comments have screenreader text', () => {
+  test('thumbnails of media comments have screenreader text', async () => {
     const originalKalturaSettings = INST.kalturaSettings
     INST.kalturaSettings = {resource_domain: 'example.com', partner_id: 'asdf'}
-    const deferFake = sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
-      func(elem, size, keepOriginalText)
-    })
     SpeedGrader.EG.showDiscussion()
-    const screenreaderText = document.querySelector(
-      '.play_comment_link .screenreader-only'
-    ).innerText
+    await awhile()
+    const screenreaderText = document
+      .querySelector('.play_comment_link .screenreader-only')
+      .textContent.trim()
     strictEqual(screenreaderText, 'Play media comment by An Author from Jul 12, 2016 at 11:47pm.')
-    deferFake.restore()
     INST.kalturaSettings = originalKalturaSettings
   })
 
@@ -2365,7 +2357,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     notOk(result)
   })
 
-  QUnit.module('SpeedGrader#shouldParseGrade', {
+  QUnit.module('SpeedGrader#shouldParseGrade 2', {
     setup() {
       fakeENV.setup()
     },

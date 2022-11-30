@@ -77,6 +77,7 @@ export const AddressBook = ({
   currentFilter,
   activeCourseFilter,
   addressBookMessages,
+  isOnObserverSubmenu,
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -282,6 +283,8 @@ export const AddressBook = ({
           }}
           menuRef={menuRef}
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
+          observerEnrollments={menuItem.observerEnrollments}
+          isOnObserverSubmenu={isOnObserverSubmenu}
         >
           {menuItem.name}
         </AddressBookItem>
@@ -307,7 +310,7 @@ export const AddressBook = ({
   // Render header menu item
   const renderHeaderItem = text => {
     return (
-      <View as="div" padding="xx-small">
+      <View as="div" padding="xx-small" key="address-book-item-header">
         <Flex
           width="100%"
           margin="xxx-small none xxx-small xxx-small"
@@ -701,6 +704,7 @@ AddressBook.propTypes = {
   currentFilter: PropTypes.object,
   activeCourseFilter: PropTypes.object,
   addressBookMessages: PropTypes.array,
+  isOnObserverSubmenu: PropTypes.bool,
 }
 
 export default AddressBook

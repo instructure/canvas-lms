@@ -19,7 +19,7 @@
 #
 
 class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
-  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true, user_search_id: nil)
+  def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true, user_search_id: nil, unread_before: nil)
     super()
     @current_user = current_user
     @search_term = search_term
@@ -30,6 +30,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
     @relative_entry_id = relative_entry_id
     @before_entry = before_relative_entry
     @include_entry = include_relative_entry
+    @unread_before = unread_before
   end
 
   def perform(objects)
@@ -87,7 +88,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       end
 
       # unread filter is used like search results and need to exclude deleted entries
-      scope = scope.active.unread_for_user(@current_user) if @filter == "unread"
+      scope = scope.active.unread_for_user_before(@current_user, @unread_before) if @filter == "unread"
       scope = scope.where(workflow_state: "deleted") if @filter == "deleted"
       scope = scope.where(user_id: @user_search_id) unless @user_search_id.nil?
       scope = scope.preload(:user, :editor)

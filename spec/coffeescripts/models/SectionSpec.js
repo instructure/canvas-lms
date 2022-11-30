@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Section from '@canvas/sections/backbone/models/Section.coffee'
+import Section from '@canvas/sections/backbone/models/Section'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('modelsSection')

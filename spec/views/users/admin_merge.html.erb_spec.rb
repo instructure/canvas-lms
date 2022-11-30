@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/users/admin_merge" do
+describe "users/admin_merge" do
   it "only lists accounts that the user can merge users in" do
     user_factory
     @account = Account.create!(name: "My Root Account")

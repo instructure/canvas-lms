@@ -112,6 +112,7 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
   return (
     <View as="div" width="20rem" margin="0 auto large" padding="small">
       <CloseButton
+        data-testid="tray-close-button"
         placement="end"
         offset="small"
         onClick={() => handleTrayDismiss(false)}
@@ -123,6 +124,7 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
         </h4>
         {window.ENV.FEATURES.course_paces_redesign && (
           <CondensedButton
+            data-testid="reset-all-button"
             interaction={cancelDisabled ? 'disabled' : 'enabled'}
             onClick={() => setResetWarningModalOpen(true)}
             margin="small 0 0"

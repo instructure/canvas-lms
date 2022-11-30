@@ -49,7 +49,7 @@ describe('DiscussionFullPage', () => {
       per_page: 20,
       isolated_view_initial_page_size: 5,
       current_page: 0,
-      discussion_topic_id: '1',
+      discussion_topic_id: 'Discussion-default-mock',
       manual_mark_as_read: false,
       current_user: {
         id: 'PLACEHOLDER',
@@ -87,7 +87,7 @@ describe('DiscussionFullPage', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicManager discussionTopicId="1" />
+          <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
         </AlertManagerContext.Provider>
       </MockedProvider>
     )
@@ -183,7 +183,16 @@ describe('DiscussionFullPage', () => {
     })
 
     it('updates discussion entry', async () => {
-      const mocks = [...getDiscussionQueryMock(), ...updateDiscussionEntryMock()]
+      const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+      jest
+        .spyOn(global.Date, 'now')
+        .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+
+      const mocks = [
+        ...getDiscussionQueryMock({unreadBefore: unreadTime}),
+        ...getDiscussionQueryMock(),
+        ...updateDiscussionEntryMock(),
+      ]
       const container = setup(mocks)
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
 
@@ -208,9 +217,14 @@ describe('DiscussionFullPage', () => {
 
   describe('searchFilter', () => {
     it('filters by unread', async () => {
+      const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+      jest
+        .spyOn(global.Date, 'now')
+        .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+
       const mocks = [
         ...getDiscussionQueryMock(),
-        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false}),
+        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false, unreadBefore: unreadTime}),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
@@ -373,7 +387,16 @@ describe('DiscussionFullPage', () => {
     // For some reason when we add a reply to a discussion topic we end up performing
     // 2 additional discussion queries. Until we address that issue we need to specify
     // these queries in our mocks we provide to MockedProvider
-    const mocks = [...getDiscussionQueryMock(), ...createDiscussionEntryMock()]
+
+    const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+    jest
+      .spyOn(global.Date, 'now')
+      .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+    const mocks = [
+      ...getDiscussionQueryMock({unreadBefore: ''}),
+      ...getDiscussionQueryMock({unreadBefore: unreadTime}),
+      ...createDiscussionEntryMock(),
+    ]
     const container = setup(mocks)
 
     const replyButton = await container.findByTestId('discussion-topic-reply')
@@ -448,7 +471,10 @@ describe('DiscussionFullPage', () => {
   it('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock({replyFromEntryId: '1'}),
+      ...createDiscussionEntryMock({
+        replyFromEntryId: 'DiscussionEntry-default-mock',
+        includeReplyPreview: false,
+      }),
     ]
     const container = setup(mocks)
 
@@ -471,7 +497,52 @@ describe('DiscussionFullPage', () => {
 
     // expect the highlight to exist for a while
     jest.advanceTimersByTime(3000)
-    expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+    // expect the highlight to disappear
+    jest.advanceTimersByTime(3000)
+    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+    )
+  })
+
+  it('should show reply preview when replying to an entry', async () => {
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...createDiscussionEntryMock({
+        replyFromEntryId: 'DiscussionEntry-default-mock',
+        includeReplyPreview: true,
+      }),
+    ]
+    const container = setup(mocks)
+
+    const kebabMenu = await container.findByTestId('thread-actions-menu')
+    fireEvent.click(kebabMenu)
+
+    const quoteReplyMenuItem = await container.findByText('Quote Reply')
+    fireEvent.click(quoteReplyMenuItem)
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
+    const rce = await container.findByTestId('DiscussionEdit-container')
+    expect(rce.style.display).toBe('')
+
+    expect(await container.findByTestId('reply-preview')).toBeTruthy()
+
+    const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton)
+
+    await waitFor(() =>
+      expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
+    )
+
+    // expect the highlight to exist for a while
+    jest.advanceTimersByTime(3000)
+    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
 
     // expect the highlight to disappear
     jest.advanceTimersByTime(3000)
@@ -558,7 +629,7 @@ describe('DiscussionFullPage', () => {
 
     it('should highlight the deep linked discussion entry', async () => {
       window.ENV.discussions_deep_link = {
-        entry_id: '1',
+        entry_id: 'DiscussionEntry-default-mock',
         root_entry_id: null,
       }
       const container = setup(getDiscussionQueryMock())

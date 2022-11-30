@@ -80,7 +80,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   }, [])
 
   // some properties are only used on initialization
-  // Languages is a bit of a mess. Tinymce and Canvas
+  // Languages are a bit of a mess since Tinymce and Canvas
   // have 2 different sets of language names. normalizeLocale
   // takes the language prop and returns the locale Canvas knows,
   // editorLanguage takes the language prop and returns the
@@ -160,18 +160,6 @@ RCE.propTypes = {
   instRecordDisabled: bool,
   // locale of the user's language
   language: string,
-  // list of all supported languages. This is the list of languages
-  // shown to the user when adding closed captions to videos.
-  // If you are not supporting media uploads, this is not necessary.
-  // Defaults to [{id: 'en', label: 'English'}]
-  languages: arrayOf(
-    shape({
-      // the id is the locale
-      id: string.isRequired,
-      // the label to show in the UI
-      label: string.isRequired,
-    })
-  ),
   // function that returns the element where screenreader alerts go
   liveRegion: func,
   // array of lti tools available to the user

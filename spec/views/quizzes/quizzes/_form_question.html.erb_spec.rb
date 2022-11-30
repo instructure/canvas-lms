@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/_form_question" do
+describe "quizzes/quizzes/_form_question" do
   it "renders" do
     course_with_student
     view_context

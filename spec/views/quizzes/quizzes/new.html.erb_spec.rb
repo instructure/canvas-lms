@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/new" do
+describe "quizzes/quizzes/new" do
   def course_quiz(active = false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active

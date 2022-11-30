@@ -25,6 +25,7 @@ import assignmentShape from '../shapes/assignment'
 
 const {number} = PropTypes
 
+// eslint-disable-next-line react/prefer-stateless-function
 export default class StudentAssignmentItem extends React.Component {
   static propTypes = {
     assignment: assignmentShape.isRequired,

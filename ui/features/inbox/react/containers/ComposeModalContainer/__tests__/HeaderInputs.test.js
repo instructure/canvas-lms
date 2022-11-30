@@ -121,10 +121,12 @@ describe('HeaderInputs', () => {
       }
     })
 
-    const mockedRecipient = (props = {courseID: '1', courseRole: 'StudentEnrollment'}) => {
+    const mockedRecipient = (
+      props = {id: 'MockedRecipient', courseID: '1', courseRole: 'StudentEnrollment'}
+    ) => {
       return {
-        _id: '6',
-        id: 'TWVzc2FnZWFibGVVc2VyLTY=',
+        _id: props.id,
+        id: props.id,
         name: '5',
         commonCoursesInfo: [
           {
@@ -176,7 +178,7 @@ describe('HeaderInputs', () => {
     it('does not render if any recipient does not have a student enrollment in the shared course', async () => {
       const recipientPropInfo = defaultRecipientProps()
       recipientPropInfo.selectedRecipients.push(
-        mockedRecipient({courseID: '1', courseRole: 'TeacherEnrollment'})
+        mockedRecipient({id: 'MockedRecipient-2', courseID: '1', courseRole: 'TeacherEnrollment'})
       )
       const props = defaultProps(recipientPropInfo)
       const container = setup(props)

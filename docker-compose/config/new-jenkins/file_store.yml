@@ -4,7 +4,7 @@ development:
 
 test:
   storage: local
-  path_prefix: tmp/files
+  path_prefix: tmp/files/test<%= ENV["PARALLEL_INDEX"] %>
 
 ## amazon storage example. requires valid amazon_s3.yml
 production:

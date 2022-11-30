@@ -403,21 +403,5 @@ module Lti
         end
       end
     end
-
-    describe "#recreate_missing_subscriptions" do
-      it "recreates subscriptions directly on the tool" do
-        expect(tool_proxy).to receive(:manage_subscription)
-
-        ToolProxyService.recreate_missing_subscriptions(tool_proxy)
-      end
-    end
-
-    describe "#delete_subscriptions" do
-      it "deletes subscriptions directly on the tool" do
-        expect(tool_proxy).to receive(:delete_subscription)
-
-        ToolProxyService.delete_subscriptions(tool_proxy)
-      end
-    end
   end
 end

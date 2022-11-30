@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageRevisionsCollection from './backbone/collections/WikiPageRevisionsCollection'
 import WikiPageContentView from './backbone/views/WikiPageContentView'
 import WikiPageRevisionsView from './backbone/views/WikiPageRevisionsView'

@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import {isUndefined} from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
-import OutcomePopoverView from 'ui/features/grade_summary/backbone/views/OutcomePopoverView.coffee'
-import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView.coffee'
-import OutcomeView from 'ui/features/grade_summary/backbone/views/OutcomeView.coffee'
-import ProgressBarView from 'ui/features/grade_summary/backbone/views/ProgressBarView.coffee'
+import OutcomePopoverView from 'ui/features/grade_summary/backbone/views/OutcomePopoverView'
+import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView'
+import OutcomeView from 'ui/features/grade_summary/backbone/views/OutcomeView'
+import ProgressBarView from 'ui/features/grade_summary/backbone/views/ProgressBarView'
 import assertions from 'helpers/assertions'
 
 QUnit.module('OutcomeViewSpec', {
@@ -36,6 +37,7 @@ QUnit.module('OutcomeViewSpec', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.outcomeView, done, {a11yReport: true})
@@ -46,7 +48,7 @@ test('assign instance of ProgressBarView on init', function () {
 })
 
 test('have after render behavior', function () {
-  ok(isUndefined(this.outcomeView.popover, 'precondition'))
+  ok(isUndefined(this.outcomeView.popover), 'precondition')
   this.outcomeView.render()
   ok(this.outcomeView.popover instanceof OutcomePopoverView)
   ok(this.outcomeView.dialog instanceof OutcomeDialogView)

@@ -17,7 +17,7 @@
 
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 
-import AccountUser from '../models/AccountUser.coffee'
+import AccountUser from '../models/AccountUser'
 
 export default class AccountUserCollection extends PaginatedCollection {
   url() {

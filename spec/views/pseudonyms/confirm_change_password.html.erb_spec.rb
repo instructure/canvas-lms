@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/pseudonyms/confirm_change_password" do
+describe "pseudonyms/confirm_change_password" do
   it "renders" do
     user_factory
     assign(:user, @user)

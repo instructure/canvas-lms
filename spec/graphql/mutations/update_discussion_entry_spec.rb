@@ -120,13 +120,13 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       expect(@entry.reload.include_reply_preview).to be false
     end
 
-    it "cannot be true on a reply to a root entry" do
+    it "can be true on a reply to a root entry" do
       parent_entry = @topic.discussion_entries.create!(message: "I am the parent reply", user: @student, attachment: @attachment)
       entry = @topic.discussion_entries.create!(message: "I am the child reply", user: @student, attachment: @attachment, parent_id: parent_entry.id, include_reply_preview: false, root_entry_id: parent_entry.id)
       result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
       expect(result["errors"]).to be nil
       expect(result.dig("data", "updateDiscussionEntry", "errors")).to be nil
-      expect(entry.reload.include_reply_preview).to be false
+      expect(entry.reload.include_reply_preview).to be true
     end
 
     it "does set on reply to a child reply" do

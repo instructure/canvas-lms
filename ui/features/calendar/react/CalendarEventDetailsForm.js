@@ -43,14 +43,7 @@ import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
-const CalendarEventDetailsForm = ({
-  event,
-  isChild,
-  closeCB,
-  contextChangeCB,
-  setSetContextCB,
-  timezone,
-}) => {
+const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContextCB, timezone}) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
   const initTime = time => (!time || event.allDay ? '' : time)
@@ -73,7 +66,7 @@ const CalendarEventDetailsForm = ({
   const allContexts = event.allPossibleContexts
 
   const shouldEnableTimeFields = () => !isBlackout
-  const shouldShowLocationField = () => !isChild
+  const shouldShowLocationField = () => event.calendarEvent?.parent_event_id == null
   const shouldEnableLocationField = () => !isBlackout
   const shouldShowConferenceField = () => shouldShowConferences
   const shouldEnableConferenceField = () => !isBlackout

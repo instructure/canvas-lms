@@ -24,7 +24,7 @@ import {every, keys, isEmpty, intersection, map} from 'lodash'
 import DueDates from '@canvas/due-dates/react/DueDates'
 import OverrideStudentStore from '@canvas/due-dates/react/OverrideStudentStore'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
-import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import fakeENV from 'helpers/fakeENV'
 
 const findAllByTag = TestUtils.scryRenderedDOMComponentsWithTag

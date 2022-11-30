@@ -896,7 +896,7 @@ describe Account do
     a.save!
 
     user_factory
-    expect(a.grants_right?(@user, :create_courses)).to be_truthy
+    expect(a.manually_created_courses_account.grants_right?(@user, :create_courses)).to be_truthy
   end
 
   it "does not allow create_courses even to admins on site admin and children" do

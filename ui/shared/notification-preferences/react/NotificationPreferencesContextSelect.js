@@ -50,14 +50,16 @@ export default function NotificationPreferencesContextSelect(props) {
     <Flex justifyItems="space-between" margin="small 0">
       <SimpleSelect
         renderLabel={[
-          I18n.t('Settings for'),
-          <ScreenReaderContent>{props.currentContext.name}</ScreenReaderContent>,
+          <React.Fragment key="label">{I18n.t('Settings for')}</React.Fragment>,
+          <ScreenReaderContent key="screenreader-content">
+            {props.currentContext.name}
+          </ScreenReaderContent>,
         ]}
         value={props.currentContext.value || 'account'}
         onChange={handleChange}
         data-testId="settings-for-label"
       >
-        <SimpleSelect.Option id="account" value="account">
+        <SimpleSelect.Option id="account" value="account" key="account">
           {I18n.t('Account')}
         </SimpleSelect.Option>
         {sortedGroupedUniqueEnrollments.map(([termId, enrollments]) => (

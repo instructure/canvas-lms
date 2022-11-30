@@ -85,7 +85,6 @@ export const eventFormProps = () => {
   return {
     formHolder,
     event,
-    isChild: false,
     closeCB: jest.fn(),
     contextChangeCB: jest.fn(),
     setSetContextCB: jest.fn(),

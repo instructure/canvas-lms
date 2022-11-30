@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/moderate" do
+describe "quizzes/quizzes/moderate" do
   let(:num_students) { 5 }
 
   before do

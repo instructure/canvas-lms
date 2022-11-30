@@ -26,9 +26,10 @@ module UserSearch
       SearchTermHelper.validate_search_term(search_term)
 
       @is_id = search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
-      @include_login = context.grants_right?(searcher, session, :view_user_logins)
-      @include_email = context.grants_right?(searcher, session, :read_email_addresses)
-      @include_sis   = context.grants_any_right?(searcher, session, :read_sis, :manage_sis)
+      @include_login       = context.grants_right?(searcher, session, :view_user_logins)
+      @include_email       = context.grants_right?(searcher, session, :read_email_addresses)
+      @include_sis         = context.grants_any_right?(searcher, session, :read_sis, :manage_sis)
+      @include_integration = @include_sis
 
       context.shard.activate do
         users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
@@ -91,16 +92,17 @@ module UserSearch
                           LIMIT 1)
                           AS email")
         users_scope.order(Arel.sql("email#{order}"))
-      when "sis_id"
+      when "sis_id", "integration_id"
+        column = options[:sort] == "sis_id" ? "sis_user_id" : "integration_id"
         users_scope = users_scope.select(User.send(:sanitize_sql, [
-                                                     "users.*, (SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
+                                                     "users.*, (SELECT #{column} FROM #{Pseudonym.quoted_table_name}
           WHERE pseudonyms.user_id = users.id AND
             pseudonyms.workflow_state <> 'deleted' AND
             pseudonyms.account_id = ?
-          LIMIT 1) AS sis_user_id",
+          LIMIT 1) AS #{column}",
                                                      context.try(:resolved_root_account_id) || context.root_account_id
                                                    ]))
-        users_scope.order(Arel.sql("sis_user_id#{order}"))
+        users_scope.order(Arel.sql("#{column}#{order}"))
       else
         users_scope.select("users.*").order_by_sortable_name
       end
@@ -171,6 +173,7 @@ module UserSearch
         queries << ids_sql(users_scope, params) unless @is_id
         queries << login_sql(users_scope, params) if @include_login
         queries << sis_sql(users_scope, params) if @include_sis
+        queries << integration_sql(users_scope, params) if @include_integration
         queries << email_sql(users_scope, params) if @include_email
       end
       queries.compact.map(&:to_sql).join("\nUNION\n")
@@ -227,6 +230,16 @@ module UserSearch
           AND logins.workflow_state = 'active'")
                  .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
                  .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
+    end
+
+    def integration_sql(users_scope, params)
+      users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
+                 .joins(:pseudonyms)
+                 .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
+          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
+          AND logins.workflow_state = 'active'")
+                 .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
+                 .where(like_condition("pseudonyms.integration_id"), pattern: params[:pattern])
     end
 
     def email_sql(users_scope, params)

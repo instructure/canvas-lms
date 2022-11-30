@@ -613,7 +613,11 @@ describe('DiscussionTopicContainer', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
     waitFor(() =>
-      expect(container.queryByText('You must post before seeing replies.')).toBeInTheDocument()
+      expect(
+        container.queryByText(
+          'You must post before seeing replies. Edit history will be available to instructors.'
+        )
+      ).toBeInTheDocument()
     )
   })
 

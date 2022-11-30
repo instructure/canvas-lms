@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollments, Enrollment, StoreState} from '../types'
+import {Enrollments, Enrollment, StoreState, Section} from '../types'
 import {createSelector} from 'reselect'
 import natcompare from '@canvas/util/natcompare'
 
@@ -26,6 +26,11 @@ export const enrollmentsInitialState: Enrollments = (window.ENV.ENROLLMENTS || [
 
 export const getEnrollments = (state: StoreState): Enrollments => state.enrollments
 export const getEnrollment = (state: StoreState, id: number): Enrollment => state.enrollments[id]
+export const getEnrolledSection = (state: StoreState, id: number): Section | null => {
+  if (!id) return null
+  const sectionId = state.enrollments[id]?.section_id
+  return sectionId && state.sections[sectionId]
+}
 
 export const getSortedEnrollments = createSelector(
   getEnrollments,

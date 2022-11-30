@@ -220,6 +220,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Down And Right Diagonal Arrow"
   },
+  "download_filename_2baae924": { "message": "Download { filename }" },
   "downward_arrow_cca52012": { "message": "Downward Arrow" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Downward Pointing Triangle"
@@ -278,6 +279,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra Small" },
   "extracurricular_icon_67c8ca42": { "message": "Extracurricular Icon" },
   "f_function_fe422d65": { "message": "F (function)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Failed getting file contents"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "File storage quota exceeded"
   },
@@ -424,6 +428,9 @@ const locale = {
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link Options" },
   "links_14b70841": { "message": "Links" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Links to an external site."
+  },
   "load_more_35d33c7": { "message": "Load More" },
   "loading_25990131": { "message": "Loading..." },
   "loading_bde52856": { "message": "Loading" },
@@ -456,6 +463,8 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Middle" },
+  "minimize_file_preview_da911944": { "message": "Minimise File Preview" },
+  "minimize_video_20aa554b": { "message": "Minimise Video" },
   "minus_fd961e2e": { "message": "Minus" },
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Misc" },
@@ -555,6 +564,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Variant)" },
   "pink_68ad45cb": { "message": "Pink" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "play_media_comment_35257210": { "message": "Play media comment." },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Play media comment by { name } from { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/Minus" },
   "posted_when_a578f5ab": { "message": "Posted: { when }" },
@@ -697,6 +710,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Supported file types: SRT or WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Switch to pretty HTML Editor"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Switch to raw HTML Editor"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Switch to the html editor"
   },
@@ -713,6 +732,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Text (optional)" },
   "text_position_8df8c162": { "message": "Text Position" },
   "text_size_887c2f6": { "message": "Text Size" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "The document preview is currently being processed. Please try again later."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
   },
@@ -734,8 +756,14 @@ const locale = {
   "thick_right_arrow_3ed5e8f7": { "message": "Thick Right Arrow" },
   "thick_rightward_arrow_a2e1839e": { "message": "Thick Rightward Arrow" },
   "thick_upward_arrow_acd20328": { "message": "Thick Upward Arrow" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "This document cannot be displayed within Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "This equation cannot be rendered in Basic View."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "This image is currently unavailable"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Though your video will have the correct title in the browser, we failed to update it in the database."

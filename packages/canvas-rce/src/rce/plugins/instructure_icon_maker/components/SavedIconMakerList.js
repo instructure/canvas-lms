@@ -23,7 +23,7 @@ import Images from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
 import {ICON_MAKER_ICONS} from '../svg/constants'
 
-const SavedIconMakerList = ({sortBy, searchString, onImageEmbed}) => {
+const SavedIconMakerList = ({sortBy, searchString, onImageEmbed, canvasOrigin}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
 
@@ -41,6 +41,7 @@ const SavedIconMakerList = ({sortBy, searchString, onImageEmbed}) => {
             isLoading,
           },
         }}
+        canvasOrigin={canvasOrigin}
         sortBy={sortBy}
         searchString={searchString}
         onImageEmbed={onImageEmbed}
@@ -57,6 +58,7 @@ SavedIconMakerList.propTypes = {
   }),
   searchString: PropTypes.string,
   onImageEmbed: PropTypes.func,
+  canvasOrigin: PropTypes.string,
 }
 
 SavedIconMakerList.defaultProps = {

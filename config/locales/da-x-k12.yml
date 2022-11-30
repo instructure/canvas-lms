@@ -1402,7 +1402,9 @@ da-x-k12:
         turnitin_host: "Turnitin host"
         turnitin_pledge: Lighedsløfte
         turnitin_shared_secret: "Turnitin delt hemmelighed"
+        users_can_edit_comm_channels: "Brugere kan redigere deres kommunikationskanaler"
         users_can_edit_name: "Brugere kan redigere deres navn"
+        users_can_edit_profile: "Brugere kan redigere deres profil"
         value: "Deaktiver kommentarer på beskeder"
       links: 
         add_admins: Kontoadministratorer
@@ -1616,6 +1618,60 @@ da-x-k12:
         one: "%{file_size} *fra en fil*"
         other: "%{file_size} *fra %{count} filer*"
       uploaded_file_storage_header: "Lager til uploadede filer"
+    strategic_education: 
+      all_versions_submissions: 
+        parameters: 
+          account_reports: 
+            proserv: 
+              use_serialized_submission: 
+                check_box: "Brug serieliseret afleveringstidsstempel"
+      provisioning: 
+        parameters: 
+          account_reports: 
+            default: 
+              accounts: 
+                check_box: "Konti CSV"
+              courses: 
+                check_box: "Fag CSV"
+              enrollments: 
+                check_box: "Tilmeldinger CSV"
+              group_categories: 
+                login: 
+                  check_box: "Gruppekategorier CSV"
+              group_membership: 
+                login: 
+                  check_box: "Gruppemedlemskab CSV"
+              groups: 
+                check_box: "Grupper CSV"
+              pseudonyms: 
+                check_box: "Pseudonymer CSV"
+              question_bank_questions: 
+                check_box: "Spørgsmål i spørgsmålsbank"
+              question_banks: 
+                check_box: Spørgsmålsbanker
+              sections: 
+                check_box: "Sektioner CSV"
+              terms: 
+                check_box: "Skoleår CSV"
+              users: 
+                check_box: "Brugere CSV"
+              xlist: 
+                check_box: "Kombineret CSV"
+            sis_default: 
+              parameters: 
+                note: "*Skoleårsindstillinger påvirker kun fag, sektioner, tilmeldinger og X-liste-CSV-filer."
+      user_course_access_log: 
+        parameters: 
+          account_reports: 
+            usu: 
+              enrollment_type: 
+                header: Tilmeldingstype
+          all: "Alle tilmeldinger"
+          designer: "Tilmeldte designere"
+          observer: "Tilmeldte observatører"
+          students: "Tilmeldte elever"
+          ta: "Tilmeldte undervisningsassistenter"
+          teachers: "Tilmeldte lærere"
     student_assessment_scores_csv_parameters: 
       account_reports: 
         orbis: 
@@ -2005,7 +2061,7 @@ da-x-k12:
       dokumentanmærkninger eller vurderingskriterie kommentarer
   adjusting_due_dates_a5918b9c: "Justerer afleveringsdatoer ..."
   admin_4d3ba42f: Administrator
-  admin_analytics_description: "Aktivering viser Admin-analyse for at give oversigter over fag og elever. Når tændt, kan det tage 24 timer, før dataene vises. Lær mere, og giv feedback ved at deltage i *New Analytics-brugergruppen* i Canvas Community."
+  admin_analytics_description: "Aktivering viser Admin-analyse for at give oversigter over fag og elever. Lær mere, og giv feedback ved at deltage i *New Analytics-brugergruppen* i Canvas Community."
   admin_analytics_eacba735: Admin-analyse
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin-eksport for flere vurderingsperioder"
@@ -2047,6 +2103,7 @@ da-x-k12:
   after_the_assignment_is_graded_53754607: "Efter opgaven er bedømt"
   after_the_due_date_eee89c9c: "Efter forfaldsdato"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Efter det første forsøg kan du ikke skrive kommentarer, før du har afleveret opgaven."
+  after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Efter at have begrænset de valgte job, vil den nyoprettede streng blive valgt."
   ahead_21f22939: Foran
   ajax_errors: 
     error_heading: "Ajax-fejl: %{status_code}"
@@ -2244,6 +2301,8 @@ da-x-k12:
   allowed_for_subaccounts_courses_default_on_e485ec7f: "Tilladt for underkonti / fag, standard aktiveret"
   allows_a_grader_to_grade_discussions_as_they_read_e5af3b34: "Giver bedømmere mulighed for at bedømme diskussioner, mens de læser"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gør det muligt for en bruger at få adgang til linket Optræd som bruger på elevs kontekstkort"
+  allows_a_user_to_view_and_manage_all_item_banks_in_9368284f: "Giver en bruger mulighed for at se og administrere alle elementbanker på en konto direkte fra et fag og en konto."
+  allows_a_user_to_view_and_manage_all_item_banks_in_ae99d718: "Giver en bruger mulighed for at se og administrere alle elementbanker på en konto direkte fra et fag."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gør det muligt for en bruger at få vist SIS-ID’et i en brugers loginoplysninger."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gør det muligt for en bruger at få vist SIS-ID’er på siden Deltagere i et fag."
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: "Tillader skalaer og beregning for opfyldelse af læringsmål på konto- og fagniveau, hvilket erstatter kriteriebedømmelser og beregningsmetoder for læringsudbytter"
@@ -5808,6 +5867,7 @@ da-x-k12:
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbejder er web-baserede værktøjer for at arbejde kollektivt på opgaver som f.eks. at tage notater eller gruppere dokumenter. Start ved at tilføje en samarbejds-app."
   collaborations_tutorial_tray_9219d9d: "Selvstudiumområde for samarbejder"
   collapse_all_50275533: "Skjul alle"
+  collapse_all_686a13d3: "Skjul alle"
   collapse_all_modules_e092807c: "Skjul alle forløb"
   collapse_description_for_outcome_title_bcd9b8c9: "Skjul beskrivelse for læringsudbytte %{title}"
   collapse_discussion_thread_52bab65a: "Skjul diskussionstråd"
@@ -6978,6 +7038,7 @@ da-x-k12:
   copy_title_to_course_2a41a2f4: "Kopier %{title} til fag"
   copy_to_64f8456b: "Kopier til ..."
   copy_to_a5396a6f: "Kopier til ..."
+  copy_to_clipboard_493be1b: "Kopier til udklipsholder"
   copy_to_folder_32ecc3c3: "Kopiér til mappe"
   copying_628a9607: "Kopierer ..."
   copyright_and_license_information_must_be_provided_5feffaf: "Der skal gives ophavsrets- og licensoplysninger for filer, før de offentliggøres."
@@ -7074,6 +7135,7 @@ da-x-k12:
   count_days_de0c6a32: 
     one: "1 dag"
     other: "%{count} dage"
+    zero: ""
   count_discussions_found_fc326362: "%{count} diskussioner fundet."
   count_errors_prohibited_this_note_from_being_saved_fb546efe: 
     one: "1 fejl forhindrede denne note i at blive gemt:"
@@ -8613,6 +8675,7 @@ da-x-k12:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Dybt indlejrede svar understøttes ikke længere. Dit svar vises på den første side i denne tråd."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konference"
+  default_course_pacing_d18b6cda: "Standard fagtempo"
   default_dates_a0a2ae26: standarddatoer
   default_due_time_9d0e9140: "Standard afleveringstidspunkt"
   default_email_5cb9fa04: "Standard-e-mail:"
@@ -9035,6 +9098,7 @@ da-x-k12:
   discussion_post_count_report_2da4c6c: "Rapport over antal diskussionsopslag"
   discussion_posts_c998c9ad: Diskussionsopslag
   discussion_redesign_description: "Denne funktion forbedrer Canvas-oplevelsen inden for Diskussioner og Beskeder. Når dette flag er aktiveret, vises tidlig adgang til løbende forbedringer automatisk med hver frigivelse. For flere detaljer *se brugergruppen Diskussioner/Beskeder - nyt design* i Canvas Community."
+  discussion_redesign_discussion_entry_version_histo_f1878f4f: "Diskussioner - nyt design - Diskussionsindtastning versionshistorik"
   discussion_redesign_grading_view_467bf307: "Diskussioner - nyt design vurdering visning"
   discussion_reply_sorting_6a14676e: "Sortering af diskussionssvar"
   discussion_settings_2fbf0b95: Diskussionsindstillinger
@@ -9608,6 +9672,7 @@ da-x-k12:
   edit_grading_scheme_53091236: "Rediger vurderingsordning"
   edit_grading_scheme_title_ff41d916: "Rediger karaktersystem %{title}"
   edit_group_c8679dba: "Rediger gruppe"
+  edit_history_917c1e08: "Rediger historik"
   edit_home_page_ee907de9: "Rediger hjemmeside"
   edit_important_info_for_coursename_bdb3eb6c: "Rediger vigtig info for %{courseName}"
   edit_item_details_c9a7b9c5: "Rediger elementoplysninger"
@@ -10525,6 +10590,7 @@ da-x-k12:
   excused_5877183c: Undskyldt!
   excused_cf8792eb: Undskyldt
   exit_d0c7b013: Afslut
+  expand_all_8329940a: "Udvid alle"
   expand_all_bb64d2ea: "Udvid alle"
   expand_all_modules_a7d79134: "Udvid alle forløb"
   expand_closed_caption_languages_2642db5b: "Udvid sprog til undertekster"
@@ -10736,6 +10802,7 @@ da-x-k12:
   failed_to_save_selected_calendars_210b5e8f: "Valg af kalendere kunne ikke gemmes"
   failed_to_split_users_d9759007: "Det mislykkedes at opdele brugere."
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at aflevere kladde-kommentar"
+  failed_to_throttle_tag_error_356b24eb: "Kunne ikke begrænse tag: %{error}"
   failed_to_unblock_strand_singleton_b33324c1: "Kunne ikke fjerne blokeringen af streng/singleton"
   failed_to_update_account_notification_settings_194c1cd4: "Kunne ikke opdatere indstillinger for kontomeddelelser"
   failed_to_update_course_notification_settings_cbf0eb18: "Kunne ikke opdatere fagmeddelelsesindstillinger"
@@ -11005,6 +11072,7 @@ da-x-k12:
   find_training_resources_and_more_help_f148612c: "finder uddannelsesressourcer og mere hjælp"
   find_your_canvas_institution_45af99af: "Find din %{canvas} institution"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Find dine klasser eller fag i oversigten ..."
+  finding_matched_jobs_f7cd0e6d: "Finder matchede job"
   finish_bc343002: Færdig
   finished_19aaf6f5: Afsluttet
   finished_publishing_pace_597ffc4f: "Færdiggjorde offentliggørelsestempo"
@@ -11142,6 +11210,7 @@ da-x-k12:
   get_your_content_online_quickly_41fd925b: "Få dit indhold hurtigt online"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dine brugeres fejlrapporter lagt ud på Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få dine brugeres fejlrapporter lagt ud på Salesforce"
+  getting_recipients_observers_52d47cad: "Henter modtagere observatører"
   getting_started_with_collaborations_794240ba: "Start med samarbejde"
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Giv alle eleverne samme vurdering for *%{assignment.name}* ved at indtaste og aflevere en vurderingsværdi nedenfor:"
@@ -12469,7 +12538,9 @@ da-x-k12:
   html_editor_fb2ab713: HTML-editor
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_73849691: http
   http_response_code_832d6baa: "HTTP-svar: %{code}"
+  https_3a02e3fb: https
   hungarian_fc7d30c9: Ungarsk
   hungary_36_cd3e515b: "Ungarn (+36)"
   hypothetical_end_date_117d81cf: "Hypotetisk slutdato"
@@ -12924,6 +12995,7 @@ da-x-k12:
   include_last_activity_dates_4eb97ed5: "Inkluder seneste aktivitet-datoer;"
   include_last_activity_dates_ee2d3de0: "Inkluder seneste aktivitet-datoer"
   include_needs_grading_count_b8106ff7: "Inkluder antal behøver vurdering"
+  include_observers_fd1af75f: "Inkluder observatører"
   include_quoted_reply_in_message_d0c8af8a: "Medtag citeret svar i meddelelsen"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultater, når der gives besked om vurderinger.
@@ -13490,6 +13562,7 @@ da-x-k12:
   latest_f604a75: Seneste
   latest_outcome_import_context_is_not_self_300d5795: "latest_outcome_import kontekst er ikke selv"
   latest_score_905aa87b: "Seneste resultat"
+  latest_version_updatedat_510b6035: "Nyeste version %{updatedAt}"
   latex_equations_are_currently_migrated_as_images_a_1206c659: "LaTex regnestykker overføres i øjeblikket som billeder, og spørgsmålene bør ikke redigeres."
   latvian_2bbb6aab: Lettisk
   launch_external_tool_672c0409: "Start eksternt værktøj"
@@ -14205,6 +14278,7 @@ da-x-k12:
   mastery_scale_saved_34c64b6b: "Skala for opfyldelse af læringsmål gemt"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultat af opfyldelse af læringsmål afspejler det højeste resultat for en bedømt opgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultat af opfyldelse af læringsmål afspejler den nyligt bedømte opgave eller quiz."
+  matched_jobs_jobs_with_tags_tags_1d1fddb6: "Matchet %{jobs} job med %{tags} tags"
   matching_left_side_900f860b: "Matchende venstre side"
   matching_right_side_920e71b2: "Matchende højre side"
   math_scale_equation_images_5555a954: "Matematik: Billeder af skalaligninger"
@@ -16546,6 +16620,7 @@ da-x-k12:
   new_comment_discussion_topic_by_user_name_666ccfa: "Ny kommentar: %{discussion_topic} af %{user_name}"
   new_comment_for_discussion_topic_course_38febf3b: "Ny kommentar for %{discussion_topic}, %{course}"
   new_comment_on_announcement_discussion_topic_cours_7905b782: "Ny kommentar om besked %{discussion_topic}, %{course}"
+  new_concurrency_34882b5b: "Ny samtidighed"
   new_conference_8b483024: "Ny konference"
   new_conferences_a020a8a9: "Nye konferencer"
   new_content_from_app_9e6e8757: "Nyt indhold fra app"
@@ -16725,6 +16800,7 @@ da-x-k12:
   no_longer_available_1557d25d: "Ikke længere tilgængelig"
   no_longer_observing_user_efa5298a: "Observerer ikke længere %{user}"
   no_marks_5e7d2b59: "Ingen vurderinger"
+  no_matched_jobs_c1fc8222: "Ingen matchede job"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "Ingen resultater fundet. Indsæt en gyldig modtager."
   no_matches_to_your_search_16d3d3b1: "Ingen match for din søgning"
   no_matching_external_tool_found_ffc3abc3: "der blev ikke fundet noget matchende eksternt værktøj"
@@ -17261,8 +17337,11 @@ da-x-k12:
   observers_course_83850091: "Observatører (fag)"
   observers_remove_aafc8a88: "Observatører - Fjern"
   observers_remove_ad508fbe: "Observatører - fjern"
+  observers_were_not_included_please_try_again_2580461d: "Observatører var ikke inkluderet. Prøv igen."
   observing_f3c5e759: Observerer
+  observing_nobody_71c0a2ba: "Observerer: ingen"
   observing_observee_d31d5fa2: "Observerer: %{observee}"
+  observing_observees_ffb58017: "Observerer: %{observees}"
   observing_student_name_to_select_a_different_stude_e0466126: "Observerer %{student_name}. Gå tilbage til oversigten for at vælge en anden elev."
   observing_user_name_1a64e47b: "Observerer: %{user_name}"
   october_6b2bf82: Oktober
@@ -17857,6 +17936,7 @@ da-x-k12:
   permanent_num_strands_setting_141e8a0c: "Permanent num_strands indstilling"
   permission_must_be_enabled_for_someone_397e1ce3: "Tilladelse skal aktiveres for en bruger"
   permission_not_found_620b80d1: "Tilladelse ikke fundet"
+  permission_role_filter_8a9a3e68: "Rollefilter til tilladelser"
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Tilladelse til at ændre denne beregning af opfyldelse af læringsmål på fagniveau er aktiveret for:"
   permission_to_change_this_mastery_calculation_at_t_f292da7a: "Tilladelse til at ændre denne beregning af opfyldelse af læringsmål på kontoniveau er aktiveret for:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "Tilladelse til at ændre denne beregning af opfyldelse af læringsmål er aktiveret på kontoniveau for:"
@@ -18232,6 +18312,7 @@ da-x-k12:
         kcw_ui_conf: "KCW UI konf ID"
         partner_id: Partner-id
         player_ui_conf: "Player UI konf ID"
+        protocol: Protokol
         resource_domain: Ressourcedomæne
         rtmp_domain: RTMP-domæne
         secret_key: Administratorhemmelighed
@@ -20290,6 +20371,7 @@ da-x-k12:
   quizzes_view_submission_log_ec105e3e: "Quizzer - vis afleveringslog"
   quotas_account_settings_22c12b8d: "Kvoter (kontoindstillinger)"
   quote_ae4462ad: Citat
+  quote_reply_e56ad360: "Citer svar"
   radio_button_option_1_a8ec51f9: "Radioknap mulighed 1"
   radio_button_option_2_31e50043: "Radioknap mulighed 2"
   range_56b2f310: Interval
@@ -21346,6 +21428,7 @@ da-x-k12:
   section_84b5391: sektion
   section_added_83879254: "%{section} tilføjet"
   section_c7f66a0d: Sektion
+  section_course_pacing_8fb7efac: "Sæt fagtempo i sektioner"
   section_does_not_belong_to_course_for_this_discuss_39fd6808: "Sektion hører ikke til faget for dette diskussionsemne"
   section_ends_at_bb9df3c0: "Sektionen slutter"
   section_filter_cde54d0a: Sektionsfilter
@@ -21565,6 +21648,7 @@ da-x-k12:
   selected_filename_7552a8c0: "valgt %{filename}"
   selected_grade_942f40ba: "Udvalgt vurdering"
   selected_pages_have_been_deleted_82a7f965: "De valgte sider er blevet slettet"
+  selected_recipient_s_do_not_have_assigned_observer_69acfb83: "De(n) valgte modtager(e) har ikke tildelt observatører"
   selected_subtree_a7693937: "Valgt %{subtree}"
   selection_end_date_10fcc8c6: "Valgt slutdato"
   selection_height_9d57ec24: "Valg højde"
@@ -21767,6 +21851,7 @@ da-x-k12:
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP-bruger er blevet oprettet. Det kan tage op til fire timer for denne bruger at begynde at fungere."
   sftp_user_management_19868cb3: SFTP-brugerstyring
   shard_5d340495: Shard
+  shard_id_optional_382e5dda: "Shard-ID (valgfrit)"
   shard_shard_95c57736: "Shard: %{shard}"
   share_important_information_about_your_course_with_dceacbf9: |-
       Del vigtige oplysninger om dit fag med alle brugere.
@@ -22358,6 +22443,7 @@ da-x-k12:
   she_her_3f459cc2: "Hun / hende"
   shift_dates_b5a7b7a1: "Skift datoer"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Skift opgavens afleverings- og tilgængelighedsdatoer fremad med et antal dage."
+  shipping_country_code_as_reported_by_salesforce_631961fe: "Forsendelseslandekode som rapporteret af Salesforce"
   short_name_42f454a1: "Kort navn"
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "skal være selvindlysende, den rapporterende brugers canvas-id"
@@ -23429,6 +23515,7 @@ da-x-k12:
     trophy_case: Trofæ-sag
   tabs_5605547e: Faner
   tag_7bb005ff: Tag
+  tag_starts_with_9d5646eb: "Tag starter med"
   tagalog_74906db7: Tagalog
   tags_2b72a03b: Tags
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -24277,6 +24364,7 @@ da-x-k12:
               Denne tilladelse er ikke tilgængelig på underkontoniveau.
   this_permission_is_deprecated_please_reference_use_8ce8eb30: "Denne tilladelse er forældet. Se Brugere - Elever og Brugere - observatører."
   this_permission_is_only_supported_when_canvas_insi_85cc2938: "Denne tilladelse understøttes kun, når Canvas Insights er aktiveret for en konto. Kontakt din kundesucceschef for yderligere detaljer."
+  this_permission_must_be_disabled_for_users_to_only_451cfcc5: "Denne tilladelse skal deaktiveres, for at brugere kun kan se elementbanker, der er oprettet af dem, delt med dem fra en anden bruger eller delt indirekte via det fag, de er tilmeldt som instruktør."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Denne tilladelse påvirker kun fagbeskeder. For at administrere globale beskeder skal Globale beskeder - tilføj/redigér/slet være aktiveret."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Denne tilladelse styrer kun tilføjelse af brugere på kontoniveauet. For at tilføje brugere til et fag skal Brugere - tilføj/fjern elever til/fra fag eller Brugere - tilføj/fjern lærere, fagdesignere eller undervisningsassistenter til/fra faget også være aktiveret."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24363,11 +24451,11 @@ da-x-k12:
   this_topic_is_used_for_grading_efc6ca89: "Dette emne bruges til vurdering"
   this_topic_will_be_available_delayedpostat_6b47c4c3: "Dette emne vil være tilgængelig på %{delayedPostAt}"
   this_update_offers_enhanced_feature_functionality__c3c4ea51: |-
-      Denne opdatering tilbyder forbedret funktionalitet for 
-      konferencer på Big Blue Button. Brugere vil nu kunne aktivere 
-      venteværelset i deres konferenceindstillinger, de vil kunne 
-      tilføje en planlagt konference til deres kalender fra en konference, 
-      og de vil kunne opdatere/synkronisere konferencedeltagere, når nye deltagere 
+      Denne opdatering tilbyder forbedret funktionalitet for
+      konferencer på Big Blue Button. Brugere vil nu kunne aktivere
+      venteværelset i deres konferenceindstillinger, de vil kunne
+      tilføje en planlagt konference til deres kalender fra en konference,
+      og de vil kunne opdatere/synkronisere konferencedeltagere, når nye deltagere
       tilføjes eller fjernes.
   this_update_will_allow_more_options_for_bbb_confer_3d7d1d08: "Denne opdatering giver flere muligheder for BBB-konferencer"
   this_user_has_been_deleted_77e6c04b: "Denne bruger er blevet slettet"
@@ -24395,6 +24483,9 @@ da-x-k12:
   this_will_update_all_student_mastery_results_withi_934580d1: "Dette opdaterer alle elevernes resultater for opfyldelse af læringsmål inden for dette fag."
   threshold_in_hours_to_notify_students_within_f33820aa: "Tærskel (i timer) til at underrette eleverne"
   threshold_pts_45f0e5d8: "tærskel: %{pts}"
+  throttle_jobs_f61be56: "Begræns job"
+  throttle_tag_tag_ba5b9b50: "Begræns tag \"%{tag}\""
+  throttling_jobs_4a90578c: "Begrænser job"
   thu_59cbcffe: Tors
   ticket_successfully_submitted_f6254460: "Supportsag indsendt."
   ticketing_system_52205bff: "Supportsag system"
@@ -26276,6 +26367,7 @@ da-x-k12:
       resubmit_to_vericite: "Aflever igen til VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite Originalitetsscore -- mere information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite originalitetsscore - Se detaljeret rapport"
+  version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video-konferencevejledninger til klasseværelser på afstand"
@@ -26317,6 +26409,7 @@ da-x-k12:
   view_grades_8d3bae6c: "Vis vurderinger"
   view_grades_for_name_45aeb2f2: "Vis vurderinger for %{name}"
   view_groups_47b5f60c: "Vis grupper"
+  view_history_2dfb048: "Vis historik"
   view_important_dates_173c7e1b: "Se vigtige datoer"
   view_learning_analytics_beta_1c98a397: "Se Learning Analytics (Beta)"
   view_login_ids_for_users_142bbe7a: "Vis brugeres login-id’er"
@@ -26362,6 +26455,7 @@ da-x-k12:
   violation_log_tray_d4eff9f4: Overtrædelseslogbakke
   virtual_lectures_in_real_time_a1778dea: "Virtuelle foredrag i realtid"
   visibility_3ad7b08d: "Synlighed:"
+  visibility_selector_866f70df: Synlighedsvælger
   visible_assignments_scope_change_dbb84ebb: "Synlige opgaver - ændring af omfang"
   visit_864b4060: "Gå ind på"
   visit_canvas_guides_to_learn_more_8c7361ad: "Besøg *Canvas-vejledningerne* for at lære mere."
@@ -26704,6 +26798,7 @@ da-x-k12:
       Giver mulighed for at gemme kladder, når de elever skriver deres svar på et diskussionsemne
       i Diskussioner - nyt design
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Vil brugeroplysninger udstedt af denne nøgle blive præsenteret for Canvas eller til en peer-service (fx Canvas Data)?"
+  will_display_the_version_history_for_edited_discus_bbb7dfa: "Viser versionshistorikken for redigerede diskussionsindlæg i Nyt design UI"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Bevarer gennemsnittet af alle dine resultater"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Beholder det højeste af alle dine resultater"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Beholder det seneste af alle dine resultater"
@@ -26975,12 +27070,15 @@ da-x-k12:
   you_must_allow_at_least_one_group_to_attend_68531eab: "Du skal tillade, at mindst en gruppe deltager"
   you_must_attach_a_file_b6041092: "Du skal vedhæfte en fil"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Du skal vedhæfte mindst en fil til denne opgave"
+  you_must_be_authorized_to_manage_sis_in_order_to_r_a218ceb7: "Du skal være autoriseret til at administrere SIS for at genaktivere logins med et tilknyttet SIS-ID."
+  you_must_be_authorized_to_manage_sis_in_order_to_s_bb867901: "Du skal være autoriseret til at administrere SIS for at suspendere logins med et tilknyttet SIS-ID."
   you_must_choose_a_recipient_3171112f: "Du skal vælge en modtager"
   you_must_enter_a_date_f8eabfb1: "Du skal indtaste en dato"
   you_must_have_a_student_or_section_selected_a99e45df: "Du skal have valgt en elev eller sektion"
   you_must_input_a_section_b8d370fe: "Du skal indtaste en sektion"
   you_must_log_in_to_view_replies_9ccd4da0: "Du skal logge på for at se svar"
   you_must_post_before_seeing_replies_24f8bcd4: "Du skal lægge opslag ud, inden du kan se svar."
+  you_must_post_before_seeing_replies_edit_history_w_187aa561: "Du skal lægge opslag ud, inden du kan se svar. Redigeringshistorik vil være tilgængelig for instruktører."
   you_must_provide_a_date_with_a_time_ec369ff4: "Du skal angive en dato med et tidspunkt."
   you_must_provide_a_name_for_the_group_set_9e4cc97a: "Du skal angive et navn til gruppesættet"
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Du skal angive en lejer- og loginattribut for aktiveret Microsoft Teams-synkronisering"

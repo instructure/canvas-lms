@@ -34,6 +34,14 @@ export const AddressBookContainer = props => {
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
   const [canSendAllMessage, setCanSendAllMessage] = useState(false)
 
+  const isOnObserverSubmenu = () => {
+    return (
+      props.courseContextCode !== '' &&
+      filterHistory.find(item => item?.context?.contextID.match(/course_.+_observers/i)) !==
+        undefined
+    )
+  }
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (inputValue !== searchTerm) {
@@ -49,6 +57,7 @@ export const AddressBookContainer = props => {
       context: filterHistory[filterHistory.length - 1]?.context?.contextID,
       search: searchTerm,
       userID,
+      courseContextCode: props.courseContextCode,
     },
     notifyOnNetworkStatusChange: true,
   })
@@ -174,6 +183,7 @@ export const AddressBookContainer = props => {
         id: u.id,
         name: u.name,
         commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection),
+        observerEnrollments: u?.observerEnrollmentsConnection?.nodes || [],
         itemType: USER_TYPE,
       }
     })
@@ -252,6 +262,7 @@ export const AddressBookContainer = props => {
       currentFilter={filterHistory[filterHistory.length - 1]}
       activeCourseFilter={props.activeCourseFilter}
       addressBookMessages={props.addressBookMessages}
+      isOnObserverSubmenu={isOnObserverSubmenu()}
     />
   )
 }
@@ -291,12 +302,14 @@ AddressBookContainer.propTypes = {
    */
   hasSelectAllFilterOption: PropTypes.bool,
   addressBookMessages: PropTypes.array,
+  courseContextCode: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {
   onSelectedIdsChange: () => {},
   onInputValueChange: () => {},
   hasSelectAllFilterOption: false,
+  courseContextCode: '',
 }
 
 export default AddressBookContainer

@@ -525,6 +525,8 @@ class UsersController < ApplicationController
     # things needed on both k5 and classic dashboards
     create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
     create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
+    create_permission_alternate_account = @current_user.alternate_account_for_course_creation && @current_user.create_courses_right(@current_user.alternate_account_for_course_creation)
+
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -536,8 +538,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
              ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
-               PERMISSION: create_permission_root_account || create_permission_mcc_account,
-               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+               PERMISSION: create_permission_alternate_account || create_permission_root_account || create_permission_mcc_account,
+               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account) && !(@domain_root_account.feature_enabled?(:create_course_subaccount_picker) && create_permission_alternate_account),
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -1354,8 +1356,13 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.html do
           @body_classes << "full-width"
-          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
-                 USER_ID: @user.id)
+          js_env(
+            CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+            USER_ID: @user.id,
+            PERMISSIONS: {
+              can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis)
+            }
+          )
           render status: status
         end
         format.json do

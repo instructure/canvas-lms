@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import _ from 'underscore'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome.coffee'
-import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView.coffee'
-import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView.coffee'
+import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView'
+import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/OutcomeLineGraphView'
 
 QUnit.module('OutcomeDialogViewSpec', {
   setup() {

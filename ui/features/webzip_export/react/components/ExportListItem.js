@@ -24,6 +24,7 @@ import '@canvas/datetime'
 
 const I18n = useI18nScope('webzip_exports')
 
+// eslint-disable-next-line react/prefer-stateless-function
 class ExportListItem extends React.Component {
   static propTypes = {
     date: PropTypes.string.isRequired,

@@ -551,6 +551,46 @@ describe DiscussionTopicsController do
         user_session(user)
       end
 
+      it "sets ATTACHMENTS_FOLDER_ID" do
+        subject
+
+        expect(discussion).not_to be_for_assignment
+        expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id.to_s
+      end
+
+      context "no current user" do
+        it "public course sets ATTACHMENTS_FOLDER_ID" do
+          Account.default.enable_feature! :react_discussions_post
+          # in the controller 'can_read_and_visible' must be true, which is a complex flow to simulate
+          allow_any_instance_of(DiscussionTopic).to receive(:grants_right?).and_return(true)
+          allow_any_instance_of(DiscussionTopic).to receive(:visible_for?).and_return(true)
+
+          course.update(is_public: true)
+          discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
+          discussion.assignment.infer_times
+          discussion.assignment.saved_by = :discussion_topic
+          discussion.save
+          remove_user_session
+
+          subject
+          expect(discussion).to be_for_assignment
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id.to_s
+        end
+      end
+
+      context "for_assignment" do
+        it "sets ATTACHMENTS_FOLDER_ID" do
+          discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
+          discussion.assignment.infer_times
+          discussion.assignment.saved_by = :discussion_topic
+          discussion.save
+
+          subject
+          expect(discussion).to be_for_assignment
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq user.submissions_folder(discussion.course).id.to_s
+        end
+      end
+
       it "sets @page_title to Topic: @topic.title" do
         subject
         expect(assigns(:page_title)).to eq "Topic: #{discussion.title}"

@@ -101,6 +101,13 @@ module.exports = [
   },
 
   {
+    rule: 'Special case for backbone extensions in packages',
+    source: 'packages/backbone-input-view/**',
+    target: 'ui/shared/backbone/**',
+    specifier: 'package',
+  },
+
+  {
     rule: `
       Modules of the same Canvas package (ui/shared/*) should import each
       other using relative specifiers.

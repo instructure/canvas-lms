@@ -32,6 +32,7 @@ export default class ContextGroupCollection extends PaginatedCollection {
     const params = {
       include: ['users', 'group_category', 'permissions'],
       include_inactive_users: 'true',
+      section_restricted: 'true',
     }
     return url_base + $.param(params)
   }

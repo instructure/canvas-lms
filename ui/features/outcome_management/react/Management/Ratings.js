@@ -273,8 +273,8 @@ const Ratings = ({
             )}
           </Table.Row>
         </Table.Head>
-        {ratings.map(({description, points}, index) => (
-          <Table.Body>
+        {ratings.map(({description, points, key}, index) => (
+          <Table.Body key={key}>
             <Table.Row theme={{borderColor: 'white'}}>
               <Table.Cell theme={{padding: '0.5rem 0rem'}}>
                 {renderRatingDescription(description, index + 1)}

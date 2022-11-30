@@ -21,7 +21,6 @@ import {bool, func, number, object, objectOf, oneOfType, string} from 'prop-type
 import {createChainedFunction} from '@instructure/ui-utils'
 import RCE from '@instructure/canvas-rce/es/rce/RCE'
 import getRCSProps from '../getRCSProps'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import EditorConfig from '../tinymce.config'
 import loadEventListeners from '../loadEventListeners'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
@@ -46,24 +45,6 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
     ...rest
   } = props
 
-  const [languages] = useState(() => {
-    const myLanguage = ENV.LOCALE
-
-    const langlist = Object.keys(closedCaptionLanguages)
-      .map(locale => {
-        return {id: locale, label: closedCaptionLanguages[locale]}
-      })
-      .sort((a, b) => {
-        if (a.id === myLanguage) {
-          return -1
-        } else if (b.id === myLanguage) {
-          return 1
-        } else {
-          return a.label.localeCompare(b.label, myLanguage)
-        }
-      })
-    return langlist
-  })
   const [RCSProps] = useState(getRCSProps())
   const [tinymceConfig] = useState(() => {
     // tinymce is a global by now via import of CanvasRce importing tinyRCE
@@ -118,7 +99,6 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       highContrastCSS={window.ENV?.url_for_high_contrast_tinymce_editor_css}
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}
       language={window.ENV?.LOCALE || 'en'}
-      languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       ltiTools={window.INST?.editorButtons}
       maxInitRenderedRCEs={props.maxInitRenderedRCEs}

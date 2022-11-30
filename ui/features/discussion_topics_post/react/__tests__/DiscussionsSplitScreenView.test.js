@@ -77,7 +77,7 @@ describe('DiscussionsSplitScreenView', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicManager discussionTopicId="1" />
+          <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
         </AlertManagerContext.Provider>
       </MockedProvider>
     )

@@ -699,6 +699,8 @@ describe Types::UserType do
   end
 
   context "observerEnrollmentsConnection" do
+    specs_require_sharding
+
     let(:teacher_type) do
       GraphQLTypeTester.new(
         @teacher,
@@ -718,16 +720,26 @@ describe Types::UserType do
     end
 
     before do
-      @student1 = student_in_course(active_all: true).user
-      @student2 = student_in_course(active_all: true).user
+      @shard1.activate do
+        @student1 = student_in_course(active_all: true).user
+        @student2 = student_in_course(active_all: true).user
 
-      @student1_observer = observer_in_course(active_all: true, associated_user_id: @student1).user
-      @student2_observer = observer_in_course(active_all: true, associated_user_id: @student2).user
+        @student1_observer = observer_in_course(active_all: true, associated_user_id: @student1).user
+        @student2_observer = observer_in_course(active_all: true, associated_user_id: @student2).user
+      end
+
+      @shard2.activate do
+        @student2_observer2 = User.create
+        enrollment = @course.enroll_user(@student2_observer2, "ObserverEnrollment")
+        enrollment.associated_user = @student2
+        enrollment.workflow_state = "active"
+        enrollment.save
+      end
     end
 
     it "returns associatedUser ids" do
       result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"course_#{@course.id}\") { nodes { associatedUser { _id } } } } } }")
-      expect(result).to match_array([[@student1.id.to_s], [@student2.id.to_s]])
+      expect(result).to match_array([[@student1.id.to_s], [@student2.id.to_s], [@student2.id.to_s]])
     end
 
     it "returns empty associatedUser ids" do
@@ -737,12 +749,12 @@ describe Types::UserType do
 
     it "returns nil when context is empty" do
       result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
-      expect(result).to match_array([nil, nil])
+      expect(result).to match_array([nil, nil, nil])
     end
 
     it "returns nil when not teacher" do
       result = student_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
-      expect(result).to match_array([nil])
+      expect(result).to match_array([nil, nil])
     end
   end
 

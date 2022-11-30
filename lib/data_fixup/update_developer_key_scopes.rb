@@ -30,9 +30,7 @@ module DataFixup
 
       DeveloperKey.where(id: start_at..end_at).and(or_conditions).find_in_batches do |dk_batch|
         dk_batch.each do |dk|
-          dk.scopes = dk.scopes.map do |scope|
-            scope_changes[scope] || scope
-          end
+          dk.scopes = dk.scopes.map { |scope| scope_changes[scope] || scope }.reject { |scope| scope == "DELETED" }
           begin
             dk.save!
           rescue ActiveRecord::RecordInvalid => e

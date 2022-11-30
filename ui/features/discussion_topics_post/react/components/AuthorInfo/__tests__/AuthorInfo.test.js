@@ -22,6 +22,7 @@ import {CURRENT_USER, SearchContext} from '../../../utils/constants'
 import {render} from '@testing-library/react'
 import React from 'react'
 import {User} from '../../../../graphql/User'
+import {DiscussionEntryVersion} from '../../../../graphql/DiscussionEntryVersion'
 
 const setup = ({
   author = User.mock({displayName: 'Harry Potter', courseRoles: ['Student', 'TA']}),
@@ -36,6 +37,7 @@ const setup = ({
   showCreatedAsTooltip = false,
   searchTerm = '',
   isTopicAuthor = true,
+  discussionEntryVersions = [],
 } = {}) =>
   render(
     <SearchContext.Provider value={{searchTerm}}>
@@ -51,6 +53,7 @@ const setup = ({
         lastReplyAtDisplay={lastReplyAtDisplay}
         showCreatedAsTooltip={showCreatedAsTooltip}
         isTopicAuthor={isTopicAuthor}
+        discussionEntryVersions={discussionEntryVersions}
       />
     </SearchContext.Provider>
   )
@@ -198,6 +201,50 @@ describe('AuthorInfo', () => {
     it('renders the author instead of the anonymous author if present', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock()})
       expect(container.getByText('Harry Potter')).toBeInTheDocument()
+    })
+  })
+
+  describe('when discussion_entry_version_history FF is off', () => {
+    beforeAll(() => {
+      window.ENV.discussion_entry_version_history = false
+    })
+
+    it('does not renders View History link', () => {
+      const container = setup({
+        discussionEntryVersions: [
+          DiscussionEntryVersion.mock({version: 3, message: 'Message 3'}),
+          DiscussionEntryVersion.mock({version: 2, message: 'Message 2'}),
+          DiscussionEntryVersion.mock({version: 1, message: 'Message 1'}),
+        ],
+      })
+
+      expect(container.queryByText('View History')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when discussion_entry_version_history FF is on', () => {
+    beforeAll(() => {
+      window.ENV.discussion_entry_version_history = true
+    })
+
+    it('renders View History link', () => {
+      const container = setup({
+        discussionEntryVersions: [
+          DiscussionEntryVersion.mock({version: 3, message: 'Message 3'}),
+          DiscussionEntryVersion.mock({version: 2, message: 'Message 2'}),
+          DiscussionEntryVersion.mock({version: 1, message: 'Message 1'}),
+        ],
+      })
+
+      expect(container.queryByText('View History')).toBeInTheDocument()
+    })
+
+    it('does not renders View History link when there is only one version', () => {
+      const container = setup({
+        discussionEntryVersions: [DiscussionEntryVersion.mock({version: 1, message: 'Message 1'})],
+      })
+
+      expect(container.queryByText('View History')).not.toBeInTheDocument()
     })
   })
 })

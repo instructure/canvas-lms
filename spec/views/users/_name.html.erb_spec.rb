@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/users/name" do
+describe "users/name" do
   it "allows deletes for unmanagaged pseudonyms with correct privileges" do
     account_admin_user account: Account.default
     course_with_student account: Account.default

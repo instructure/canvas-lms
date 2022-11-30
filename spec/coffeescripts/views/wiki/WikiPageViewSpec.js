@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
+import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/gradebooks/submissions_zip_upload", type: :view do
+describe "gradebooks/submissions_zip_upload", type: :view do
   before do
     course_with_student
     view_context

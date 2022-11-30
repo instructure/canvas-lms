@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentLtiLinkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentLtiLinkSubmissionView.coffee'
+import ExternalContentLtiLinkSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentLtiLinkSubmissionView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 

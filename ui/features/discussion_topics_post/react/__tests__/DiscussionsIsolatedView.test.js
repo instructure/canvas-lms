@@ -47,7 +47,7 @@ describe('DiscussionsIsolatedView', () => {
       per_page: 20,
       isolated_view_initial_page_size: 5,
       current_page: 0,
-      discussion_topic_id: '1',
+      discussion_topic_id: 'Discussion-default-mock',
       course_id: '1',
       isolated_view: true,
       current_user: {
@@ -78,7 +78,7 @@ describe('DiscussionsIsolatedView', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicManager discussionTopicId="1" />
+          <DiscussionTopicManager discussionTopicId="Discussion-default-mock" />
         </AlertManagerContext.Provider>
       </MockedProvider>
     )

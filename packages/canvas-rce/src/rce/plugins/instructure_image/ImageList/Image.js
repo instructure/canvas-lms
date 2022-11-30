@@ -26,15 +26,15 @@ import {View} from '@instructure/ui-view'
 
 import dragHtml from '../../../../sidebar/dragHtml'
 import formatMessage from '../../../../format-message'
-import {renderImage as renderImageHtml} from '../../../contentRendering'
+import {renderImage} from '../../../contentRendering'
 
-export default function Image({focusRef, image, onClick, isIconMaker}) {
+export default function Image({focusRef, image, onClick, isIconMaker, canvasOrigin}) {
   const imgTitle = formatMessage('Click to embed {imageName}', {
     imageName: image.display_name,
   })
 
   function handleDragStart(event) {
-    dragHtml(event, renderImageHtml(image))
+    dragHtml(event, renderImage(image, canvasOrigin))
   }
 
   function handleDragEnd() {
@@ -102,6 +102,7 @@ Image.propTypes = {
   }).isRequired,
   onClick: func.isRequired,
   isIconMaker: bool,
+  canvasOrigin: string.isRequired,
 }
 
 Image.defaultProps = {

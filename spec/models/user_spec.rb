@@ -744,6 +744,24 @@ describe User do
     end
   end
 
+  describe "#alternate_account_for_course_creation?" do
+    let(:sub_account) { Account.create!(parent_account: Account.default) }
+    let(:sub_sub_account) { Account.create!(parent_account: sub_account) }
+    let(:sub_sub_admin) { account_admin_user(account: sub_sub_account) }
+
+    it "return appropriately for lower level admins" do
+      expect(sub_sub_admin.alternate_account_for_course_creation).to eq sub_sub_account
+    end
+
+    it "caches the account properly" do
+      enable_cache(:redis_cache_store) do
+        @user = sub_sub_admin
+        expect(@user).to receive(:account_users).and_return(double(active: [])).once
+        2.times { @user.alternate_account_for_course_creation }
+      end
+    end
+  end
+
   describe "#courses_with_primary_enrollment" do
     it "returns appropriate courses with primary enrollment" do
       user_factory
@@ -2223,7 +2241,7 @@ describe User do
 
     it "doesn't create channels with empty paths" do
       @user = User.create!
-      expect(-> { @user.email = "" }).to raise_error("Validation failed: Path can't be blank, Email is invalid")
+      expect { @user.email = "" }.to raise_error("Validation failed: Path can't be blank, Email is invalid")
       expect(@user.communication_channels.any?).to be_falsey
     end
 
@@ -3773,6 +3791,78 @@ describe User do
     end
   end
 
+  describe "user_can_edit_profile?" do
+    before(:once) do
+      user_with_pseudonym
+      @pseudonym.account.settings[:users_can_edit_profile] = false
+      @pseudonym.account.save!
+    end
+
+    it "does not allow editing user name by default" do
+      expect(@user.user_can_edit_profile?).to eq false
+    end
+
+    it "allows editing user name if the pseudonym allows this" do
+      @pseudonym.account.settings[:users_can_edit_profile] = true
+      @pseudonym.account.save!
+      expect(@user.user_can_edit_profile?).to eq true
+    end
+
+    describe "multiple pseudonyms" do
+      before(:once) do
+        @other_account = Account.create name: "Other Account"
+        @other_account.settings[:users_can_edit_profile] = true
+        @other_account.save!
+        user_with_pseudonym(user: @user, account: @other_account)
+      end
+
+      it "allows editing if one pseudonym's account allows this" do
+        expect(@user.user_can_edit_profile?).to eq true
+      end
+
+      it "doesn't allow editing if only a deleted pseudonym's account allows this" do
+        @user.pseudonyms.where(account_id: @other_account).first.destroy
+        expect(@user.user_can_edit_profile?).to eq false
+      end
+    end
+  end
+
+  describe "user_can_edit_comm_channels?" do
+    before(:once) do
+      user_with_pseudonym
+      @pseudonym.account.settings[:users_can_edit_comm_channels] = false
+      @pseudonym.account.save!
+    end
+
+    it "does not allow editing user name by default" do
+      expect(@user.user_can_edit_comm_channels?).to eq false
+    end
+
+    it "allows editing user name if the pseudonym allows this" do
+      @pseudonym.account.settings[:users_can_edit_comm_channels] = true
+      @pseudonym.account.save!
+      expect(@user.user_can_edit_comm_channels?).to eq true
+    end
+
+    describe "multiple pseudonyms" do
+      before(:once) do
+        @other_account = Account.create name: "Other Account"
+        @other_account.settings[:users_can_edit_comm_channels] = true
+        @other_account.save!
+        user_with_pseudonym(user: @user, account: @other_account)
+      end
+
+      it "allows editing if one pseudonym's account allows this" do
+        expect(@user.user_can_edit_comm_channels?).to eq true
+      end
+
+      it "doesn't allow editing if only a deleted pseudonym's account allows this" do
+        @user.pseudonyms.where(account_id: @other_account).first.destroy
+        expect(@user.user_can_edit_comm_channels?).to eq false
+      end
+    end
+  end
+
   describe "limit_parent_app_web_access?" do
     before(:once) do
       user_with_pseudonym
@@ -3999,7 +4089,7 @@ describe User do
       expect(@user.create_courses_right(@account)).to be_nil
       @account.settings[:no_enrollments_can_create_courses] = true
       @account.save!
-      expect(@user.create_courses_right(@account)).to be(:no_enrollments)
+      expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:no_enrollments)
     end
 
     it "does not count deleted teacher enrollments" do

@@ -20,7 +20,7 @@
 
 require_relative "../../views_helper"
 
-describe "/quizzes/quizzes/_take_quiz_right_side" do
+describe "quizzes/quizzes/_take_quiz_right_side" do
   it "displays quiz due date" do
     course_with_student
     view_context

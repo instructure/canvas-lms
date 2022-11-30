@@ -234,6 +234,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Diagonaalinen nuoli alas ja oikealle"
   },
+  "download_filename_2baae924": { "message": "Lataa { filename }" },
   "downward_arrow_cca52012": { "message": "Nuoli alaspäin" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Alaspäin osoittava kolmio"
@@ -298,6 +299,9 @@ const locale = {
     "message": "Kouluajan ulkopuolisen kohteen kuvake"
   },
   "f_function_fe422d65": { "message": "F (funktio)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Tiedoston sisällön haku epäonnistui"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Tiedoston tallennustilan kiintiö ylitetty"
   },
@@ -448,6 +452,9 @@ const locale = {
   "link_7262adec": { "message": "Linkki" },
   "link_options_a16b758b": { "message": "Linkin asetukset" },
   "links_14b70841": { "message": "Linkit" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Linkittyy ulkoiselle sivustolle."
+  },
   "load_more_35d33c7": { "message": "Lataa lisää" },
   "loading_25990131": { "message": "Ladataan..." },
   "loading_bde52856": { "message": "Ladataan" },
@@ -482,6 +489,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Tietoväline" },
   "middle_27dc1d5": { "message": "Kohtalainen" },
+  "minimize_file_preview_da911944": {
+    "message": "Minimoi tiedoston esikatselu"
+  },
+  "minimize_video_20aa554b": { "message": "Minimoi video" },
   "minus_fd961e2e": { "message": "Miinus" },
   "minus_plus_3461f637": { "message": "Miinus/plus" },
   "misc_3b692ea7": { "message": "Sekalainen" },
@@ -581,6 +592,10 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Muuttuja)" },
   "pink_68ad45cb": { "message": "Vaaleanpunainen" },
   "pixels_52ece7d1": { "message": "Pikselit" },
+  "play_media_comment_35257210": { "message": "Toista mediakommentti." },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Toista mediakommentti { name } kohteesta { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/miinus" },
   "posted_when_a578f5ab": { "message": "Lähetetty: { when }" },
@@ -725,6 +740,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tuetut tiedostotyypit: SRT tai WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Vaihda Pretty HTLM -tekstieditoriin"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Vaihda HTML-raakatekstieditoriin"
+  },
   "switch_to_the_html_editor_146dfffd": { "message": "Vaihda tekstieditoriin" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Vaihda tekstimuotoilueditoriin"
@@ -739,6 +760,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Teksti (valinnainen)" },
   "text_position_8df8c162": { "message": "Tekstin paikka" },
   "text_size_887c2f6": { "message": "Tekstikoko" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Asiakirjan esikatselua käsitellään parhaillaan. Yritä myöhemmin uudelleen."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiaali on vapaasti käytössä (public domain)."
   },
@@ -768,8 +792,14 @@ const locale = {
   "thick_upward_arrow_acd20328": {
     "message": "Paksu ylöspäin suuntaava nuoli"
   },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Tätä asiakirjaa ei voi näyttää Canvasissa."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Tätä kaavaa ei voida hahmontaa perusnäkymässä."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Tämä kuva ei ole tällä hetkellä saatavissa"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Vaikka videollasi on oikea otsikko selaimessa, sen päivitys tietokannassa epäonnistui."

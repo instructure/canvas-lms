@@ -205,6 +205,7 @@
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Ned og højre diagonal pil"
   },
+  "download_filename_2baae924": { "message": "Download { filename }" },
   "downward_arrow_cca52012": { "message": "Pil ned" },
   "downward_pointing_triangle_2a12a601": { "message": "Nedadpegende trekant" },
   "drag_a_file_here_1bf656d5": { "message": "Træk en fil her hen" },
@@ -263,6 +264,9 @@
   "extra_small_9ae33252": { "message": "Ekstra lille" },
   "extracurricular_icon_67c8ca42": { "message": "Fritids-ikon" },
   "f_function_fe422d65": { "message": "F (funktion)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Kunne ikke hente filindhold"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Kvote for fillagring er overskredet"
   },
@@ -411,6 +415,9 @@
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link-muligheder" },
   "links_14b70841": { "message": "Links" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Links til en ekstern webside."
+  },
   "load_more_35d33c7": { "message": "Indlæs flere" },
   "loading_25990131": { "message": "Indlæser ..." },
   "loading_bde52856": { "message": "Indlæser" },
@@ -443,6 +450,10 @@
   },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "I midten" },
+  "minimize_file_preview_da911944": {
+    "message": "Minimer fil-forhåndsvisning"
+  },
+  "minimize_video_20aa554b": { "message": "Minimer video" },
   "minus_fd961e2e": { "message": "Minus" },
   "minus_plus_3461f637": { "message": "Minus/plus" },
   "misc_3b692ea7": { "message": "Bland" },
@@ -540,6 +551,10 @@
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Lyserød" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "play_media_comment_35257210": { "message": "Afspil medie kommentar." },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Afspil mediekommentar af { name } fra { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/minus" },
   "posted_when_a578f5ab": { "message": "Slået op: { when }" },
@@ -690,6 +705,12 @@
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Understøttede filtyper: SRT eller WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Skift til det pæne HTML-redigeringsværktøj"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Skift til det rå HTML-redigeringsværktøj"
+  },
   "switch_to_the_html_editor_146dfffd": {
     "message": "Skift til det rå html-redigeringsværktøj"
   },
@@ -706,6 +727,9 @@
   "text_optional_384f94f7": { "message": "Tekst (valgfrit)" },
   "text_position_8df8c162": { "message": "Tekstposition" },
   "text_size_887c2f6": { "message": "Tekststørrelse" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Dokumentets forhåndsvisning bliver behandlet i øjeblikket. Prøv igen senere."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialer er på det offentlige domæne"
   },
@@ -727,8 +751,14 @@
   "thick_right_arrow_3ed5e8f7": { "message": "Tyk højre pil" },
   "thick_rightward_arrow_a2e1839e": { "message": "Tyk højre-pegende pil" },
   "thick_upward_arrow_acd20328": { "message": "Tyk opadgående pil" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Dette dokument kan ikke vises i Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Dette regnestykke kan ikke gengives i Basisvisning."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Dette billede er for øjeblikket ikke tilgængeligt"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Selvom din video har den rigtige titel i browseren, kunne vi ikke opdatere den i databasen."

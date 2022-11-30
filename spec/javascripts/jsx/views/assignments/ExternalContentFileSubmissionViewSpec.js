@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentFileSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentFileSubmissionView.coffee'
+import ExternalContentFileSubmissionView from 'ui/features/submit_assignment/backbone/views/ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import axios from '@canvas/axios'
@@ -45,9 +45,6 @@ QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
     }
     model = new Backbone.Model(contentItem)
     view = new ExternalContentFileSubmissionView()
-    {
-    }
-    model
   },
 
   teardown() {

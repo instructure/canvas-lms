@@ -21,12 +21,14 @@ require_relative "../common"
 require_relative "pages/coursepaces_common_page"
 require_relative "pages/coursepaces_page"
 require_relative "../helpers/blueprint_common"
+require_relative "pages/coursepaces_landing_page"
 
 describe "blueprinted course pace page" do
   include_context "in-process server selenium tests"
   include CoursePacesCommonPageObject
   include CoursePacesPageObject
   include BlueprintCourseCommon
+  include CoursePacesLandingPageObject
 
   before :once do
     # Set up blueprint relations
@@ -121,6 +123,91 @@ describe "blueprinted course pace page" do
         expect(settings_button).to be_disabled
         expect(publish_button).to be_disabled
         expect(duration_field[0]).to be_disabled
+      end
+    end
+  end
+
+  context "course paces redesign" do
+    before :once do
+      Account.site_admin.enable_feature!(:course_paces_redesign)
+      Account.site_admin.enable_feature!(:course_paces_for_students)
+    end
+
+    context "master course" do
+      context "with an unpublished pace" do
+        before do
+          visit_course_paces_page course_id_override: @master.id
+          click_create_default_pace_button
+        end
+
+        it "loads the lock manager" do
+          expect(blueprint_lock_icon_button).to be_displayed
+        end
+
+        it "allows no locking while the pace is unpublished" do
+          expect(blueprint_container_for_pacing).to be_inactive
+        end
+      end
+
+      context "with a published pace" do
+        before :once do
+          @course_pace = CoursePace.create! course: @master, workflow_state: "active"
+          @course_pace.course_pace_module_items.create! module_item: @module_item
+        end
+
+        before do
+          visit_course_paces_page course_id_override: @master.id
+        end
+
+        it "allows pace locking" do
+          click_edit_default_pace_button
+          expect(blueprint_container_for_pacing).not_to be_inactive
+        end
+
+        it "disables the lock button for section paces" do
+          click_context_link(@section_name)
+          expect(blueprint_container_for_pacing).to be_inactive
+        end
+      end
+    end
+
+    context "child course" do
+      before do
+        @course_pace = CoursePace.create! course: @master, workflow_state: "active"
+        @course_pace.course_pace_module_items.create! module_item: @module_item
+        run_master_course_migration(@master)
+      end
+
+      context "unlocked" do
+        before do
+          visit_course_paces_page course_id_override: @minion.id
+          wait_for_ajaximations
+          click_edit_default_pace_button
+        end
+
+        it "loads the lock manager no-toggle label", custom_timeout: 30 do
+          expect(blueprint_child_course_label).to be_displayed
+          expect(course_pace_settings_button).not_to be_disabled
+          expect(duration_field[0]).not_to be_disabled
+        end
+      end
+
+      context "locking" do
+        before do
+          course_pace_tag = MasterCourses::MasterContentTag.where(master_template_id: @template.id, content_type: "CoursePace")
+          course_pace_tag.update(restrictions: { content: true })
+          run_master_course_migration(@master)
+        end
+
+        it "disables all editing and publishing elements", ignore_js_errors: true, custom_timeout: 25 do
+          visit_course_paces_page course_id_override: @minion.id
+          wait_for_ajaximations
+          click_edit_default_pace_button
+
+          # this should be uncommented when the settings button is properly disabled
+          # expect(click_course_pace_settings_button).to be_disabled
+          expect(duration_field[0]).to be_disabled
+        end
       end
     end
   end

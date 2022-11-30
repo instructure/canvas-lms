@@ -185,12 +185,14 @@ class Role < ActiveRecord::Base
   end
 
   # Should order course roles so we get "StudentEnrollment", custom student roles, "Teacher Enrollment", custom teacher roles, etc
+  # then sort alphabetically within groups
   def display_sort_index
-    if course_role?
-      (ENROLLMENT_TYPES.index(base_role_type) * 2) + (built_in? ? 0 : 1)
-    else
-      built_in? ? 0 : 1
-    end
+    group_order = if course_role?
+                    (ENROLLMENT_TYPES.index(base_role_type) * 2) + (built_in? ? 0 : 1)
+                  else
+                    built_in? ? 0 : 1
+                  end
+    [group_order, Canvas::ICU.collation_key(label)]
   end
 
   alias_method :destroy_permanently!, :destroy

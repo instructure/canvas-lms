@@ -581,6 +581,9 @@
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Flecha diagonal hacia abajo y hacia la derecha"
     },
+    "download_filename_2baae924": {
+        "message": "Descargar { filename }"
+    },
     "downward_arrow_cca52012": {
         "message": "Flecha hacia abajo"
     },
@@ -748,6 +751,9 @@
     },
     "failed_getting_course_list_49846a93": {
         "message": "Ha habido un error al acceder a la lista de la asignatura"
+    },
+    "failed_getting_file_contents_e9ea19f4": {
+        "message": "Ha habido un error al obtener el contenido"
     },
     "failed_getting_to_do_list_10ce2833": {
         "message": "Ha habido un error al acceder a la lista de tareas pendientes"
@@ -1166,6 +1172,9 @@
     "links_14b70841": {
         "message": "Enlaces"
     },
+    "links_to_an_external_site_de74145d": {
+        "message": "Enlaces a un sitio externo."
+    },
     "load_more_35d33c7": {
         "message": "Cargar más"
     },
@@ -1261,6 +1270,12 @@
     },
     "middle_27dc1d5": {
         "message": "El medio"
+    },
+    "minimize_file_preview_da911944": {
+        "message": "Minimizar la vista previa del archivo"
+    },
+    "minimize_video_20aa554b": {
+        "message": "Minimizar el vídeo"
     },
     "minus_fd961e2e": {
         "message": "Menos"
@@ -1549,6 +1564,12 @@
     },
     "pixels_52ece7d1": {
         "message": "Píxeles"
+    },
+    "play_media_comment_35257210": {
+        "message": "Reproducir comentario multimedia."
+    },
+    "play_media_comment_by_name_from_createdat_c230123d": {
+        "message": "Reproducir comentario multimedia de { name } desde { createdAt }."
     },
     "plus_d43cd4ec": {
         "message": "Más"
@@ -1952,6 +1973,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tipos de archivos admitidos: SRT o WebVTT"
     },
+    "switch_to_pretty_html_editor_a3cee15f": {
+        "message": "Cambiar a editor HTML descriptivo"
+    },
+    "switch_to_raw_html_editor_f970ae1a": {
+        "message": "Cambiar a editor de HTML sin procesar"
+    },
     "switch_to_the_html_editor_146dfffd": {
         "message": "Cambiar al editor html"
     },
@@ -1996,6 +2023,9 @@
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "La fecha y la hora de entrega de esta tarea pendiente han vencido"
+    },
+    "the_document_preview_is_currently_being_processed__7d9ea135": {
+        "message": "Todavía se está procesando la vista previa del documento. Inténtalo de nuevo más tarde."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "El material es de dominio público"
@@ -2042,8 +2072,14 @@
     "thick_upward_arrow_acd20328": {
         "message": "Flecha gruesa hacia arriba"
     },
+    "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+        "message": "Este documento no se puede mostrar en Canvas."
+    },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Esta ecuación no se puede representar en vista básica."
+    },
+    "this_image_is_currently_unavailable_25c68857": {
+        "message": "Esta imagen no está disponible actualmente"
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Aunque tu vídeo tendrá el título correcto en el navegador, no pudimos actualizarlo en la base de datos."

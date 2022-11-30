@@ -20,6 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import tz from '@canvas/timezone'
 
+// eslint-disable-next-line react/prefer-stateless-function
 class DatetimeDisplay extends React.Component {
   render() {
     const datetime =

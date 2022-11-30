@@ -51,9 +51,10 @@ export function isExternalLink(element) {
   )
 }
 
-export function showFilePreview(event) {
+export function showFilePreview(event, opts = {}) {
+  const {canvasOrigin, disableGooglePreviews} = {...opts}
   let target = null
-  if (event.target.href) {
+  if (event.target?.href) {
     target = event.target
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
@@ -68,15 +69,15 @@ export function showFilePreview(event) {
     target.classList.contains('inline_disabled') ||
     target.classList.contains('preview_in_overlay')
   ) {
-    showFilePreviewInOverlay(event)
+    showFilePreviewInOverlay(event, canvasOrigin)
   } else {
-    showFilePreviewInline(event)
+    showFilePreviewInline(event, disableGooglePreviews)
   }
 }
 
-export function showFilePreviewInOverlay(event) {
+export function showFilePreviewInOverlay(event, canvasOrigin) {
   let target = null
-  if (event.target.href) {
+  if (event.target?.href) {
     target = event.target
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
@@ -95,14 +96,11 @@ export function showFilePreviewInOverlay(event) {
     // 1. what window should be be using
     // 2. is that the right origin?
     // 3. this is temporary until we can decouple the file previewer from canvas
-    window.top.postMessage(
-      {subject: 'preview_file', file_id, verifier},
-      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
-    )
+    window.top.postMessage({subject: 'preview_file', file_id, verifier}, canvasOrigin)
   }
 }
 
-export function showFilePreviewInline(event) {
+export function showFilePreviewInline(event, disableGooglePreviews) {
   if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
     // if any modifier keys are pressed, do the browser default thing
     return
@@ -125,6 +123,7 @@ export function showFilePreviewInline(event) {
     {
       method: 'GET',
       headers: {Accept: 'application/json'},
+      credentials: 'include',
     }
   )
     .then(response => {
@@ -137,7 +136,8 @@ export function showFilePreviewInline(event) {
       removeLoadingImage($link)
       if (
         attachment &&
-        (isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
+        ((!disableGooglePreviews && isPreviewable(attachment.content_type)) ||
+          attachment.canvadoc_session_url)
       ) {
         $link.setAttribute('aria-expanded', 'true')
 
@@ -150,6 +150,7 @@ export function showFilePreviewInline(event) {
           attachment_preview_processing:
             attachment.workflow_state === 'pending_upload' ||
             attachment.workflow_state === 'processing',
+          disableGooglePreviews,
         })
         const $minimizeLink = document.createElement('a')
         $minimizeLink.setAttribute('href', '#')

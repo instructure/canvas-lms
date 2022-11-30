@@ -10,7 +10,7 @@ if [ -f "$PIDFILE" ]; then
   rm "$PIDFILE"
 fi
 
-bundle exec rdebug-ide \
+bin/rdebug-ide \
   --host 0.0.0.0 \
   --port 1234 --dispatcher-port 26162 \
   --skip-wait-for-start \

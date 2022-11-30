@@ -19,7 +19,7 @@
 import htmlEscape from 'escape-html'
 import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 import formatMessage from '../format-message'
-import {closest, siblings, show, hide, insertAfter, getData, setData} from './jqueryish_funcs'
+import {closest, show, hide, insertAfter, getData, setData} from './jqueryish_funcs'
 import {youTubeID, isExternalLink, getTld, showFilePreview} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
 
@@ -139,17 +139,14 @@ function buildUrl(url) {
 }
 
 export function enhanceUserContent(container = document, opts = {}) {
-  const customEnhanceFunc = opts.customEnhanceFunc
-  const canvasOrigin = opts.canvasOrigin || window.location?.origin
-
-  if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
-    return
-  }
+  const {customEnhanceFunc, canvasOrigin, kalturaSettings, disableGooglePreviews} = opts
 
   const content =
     (container instanceof HTMLElement && container) ||
     document.getElementById('content') ||
     document
+
+  const showFilePreviewEx = event => showFilePreview(event, {canvasOrigin, disableGooglePreviews})
 
   content
     .querySelectorAll('.user_content:not(.enhanced)')
@@ -157,10 +154,16 @@ export function enhanceUserContent(container = document, opts = {}) {
 
   content.querySelectorAll('.unenhanced').forEach(unenhanced_elem => {
     unenhanced_elem.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src')
+
+      if (!/^\/[^/]/.test(src)) {
+        return
+      }
+
       // if the image file is unpublished it's replaced with the lock image
       // and canvas adds hidden=1 to the URL.
       // we also need to strip the alt text
-      if (/hidden=1$/.test(img.getAttribute('src'))) {
+      if (/hidden=1$/.test(src)) {
         img.setAttribute('alt', formatMessage('This image is currently unavailable'))
       }
     })
@@ -168,12 +171,19 @@ export function enhanceUserContent(container = document, opts = {}) {
 
     // guarantee relative links point to canvas
     if (canvasOrigin) {
-      unenhanced_elem.querySelectorAll('a').forEach(link => {
+      const attributes = ['href', 'src']
+      const selector = '[href], [src]'
+
+      unenhanced_elem.querySelectorAll(selector).forEach(element => {
         try {
-          const href = link.getAttribute('href')
-          if (href[0] !== '#') {
-            const url = new URL(href, canvasOrigin)
-            link.setAttribute('href', url.href)
+          for (const a of attributes) {
+            const potentialUrl = element.getAttribute(a)
+            if (!/^\/[^/]/.test(potentialUrl)) {
+              continue
+            }
+
+            const absoluteUrl = new URL(potentialUrl, canvasOrigin)
+            element.setAttribute(a, absoluteUrl.href)
           }
         } catch (_ignore) {
           // canvasOrigin probably isn't a valid base url
@@ -215,7 +225,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       }
 
       if (file_link.textContent.trim()) {
-        file_link.addEventListener('click', showFilePreview)
+        file_link.addEventListener('click', showFilePreviewEx)
 
         const filename = file_link.textContent
         // instructure_file_link_holder is used to find file_preview_link
@@ -263,14 +273,15 @@ export function enhanceUserContent(container = document, opts = {}) {
       '.instructure_file_link_holder a.file_preview_link, .instructure_file_link_holder a.scribd_file_preview_link'
     )
     .forEach($link => {
-      if (siblings($link, '.preview_container').length) {
+      if ($link.classList.contains('previewable')) {
         return
       }
 
       const preview_id = previewId()
       $link.setAttribute('aria-expanded', 'false')
       $link.setAttribute('aria-controls', preview_id)
-      $link.addEventListener('click', showFilePreview)
+      $link.classList.add('previewable')
+      $link.addEventListener('click', showFilePreviewEx)
       const $preview_container = document.createElement('div')
       $preview_container.setAttribute('role', 'region')
       $preview_container.setAttribute('class', 'preview_container')
@@ -293,11 +304,11 @@ export function enhanceUserContent(container = document, opts = {}) {
 
     if ($anchor.matches('.instructure_inline_media_comment')) {
       $anchor.classList.remove('no-underline')
-      mediaCommentThumbnail($anchor, 'normal')
+      mediaCommentThumbnail($anchor, 'normal', false, kalturaSettings)
     }
 
     if ($anchor.matches('.instructure_video_link, .instructure_audio_link')) {
-      mediaCommentThumbnail($anchor, 'normal', true)
+      mediaCommentThumbnail($anchor, 'normal', true, kalturaSettings)
     }
 
     if (!$anchor.matches('.youtubed')) {

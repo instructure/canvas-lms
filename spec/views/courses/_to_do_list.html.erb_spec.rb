@@ -19,7 +19,7 @@
 
 require_relative "../views_helper"
 
-describe "courses/_to_do_list.html.erb" do
+describe "courses/_to_do_list" do
   include AssignmentsHelper
 
   context "as a student" do

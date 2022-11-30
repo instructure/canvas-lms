@@ -263,6 +263,7 @@ const SplitScreenThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
+        fileId,
         removeAttachment: !fileId,
       },
     })

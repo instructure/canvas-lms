@@ -21,6 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('react_collaborations')
 
+// eslint-disable-next-line react/prefer-stateless-function
 class Spinner extends React.Component {
   render() {
     return (

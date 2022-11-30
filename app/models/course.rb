@@ -1895,6 +1895,12 @@ class Course < ActiveRecord::Base
     # because students can't see prior enrollments)
     given { |user| grants_all_rights?(user, :read_roster, :read_as_admin) }
     can :read_prior_roster
+
+    given do |user|
+      grants_any_right?(user, :manage_content, :manage_course_content_add) ||
+        (concluded? && grants_right?(user, :read_as_admin))
+    end
+    can :direct_share
   end
 
   def allows_gradebook_uploads?

@@ -45,7 +45,7 @@ describe('IsolatedViewContainer', () => {
     window.ENV = {
       per_page,
       isolated_view_initial_page_size,
-      discussion_topic_id: '1',
+      discussion_topic_id: 'Discussion-default-mock',
       manual_mark_as_read: false,
       current_user: {
         id: 'PLACEHOLDER',
@@ -82,7 +82,7 @@ describe('IsolatedViewContainer', () => {
 
   const defaultProps = overrides => ({
     discussionTopic: Discussion.mock(),
-    discussionEntryId: '1',
+    discussionEntryId: 'DiscussionEntry-default-mock',
     open: true,
     onClose,
     onOpenIsolatedView,
@@ -130,7 +130,11 @@ describe('IsolatedViewContainer', () => {
     expect(goToParentButton).toBeInTheDocument()
     fireEvent.click(goToParentButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '1', false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith(
+      'DiscussionEntry-default-mock',
+      'DiscussionEntry-default-mock',
+      false
+    )
   })
 
   it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {

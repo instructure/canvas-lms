@@ -20,7 +20,11 @@ export default class FakeEditor {
   constructor(textareaId) {
     this.id = textareaId
     this._$container = null
-    this.rceWrapper = {}
+    this.rceWrapper = {
+      getCanvasUrl: () => {
+        'https://mycanvas.com:3000'
+      },
+    }
     this.callbacks = {}
 
     this._selectedNode = null

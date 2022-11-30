@@ -34,6 +34,8 @@ import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
+import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -147,6 +149,13 @@ export const AuthorInfo = props => {
                   showCreatedAsTooltip={props.showCreatedAsTooltip}
                   timestampTextSize={responsiveProps.timestampTextSize}
                 />
+                {ENV.discussion_entry_version_history &&
+                  props.discussionEntryVersions.length > 1 && (
+                    <DiscussionEntryVersionHistory
+                      textSize={responsiveProps.timestampTextSize}
+                      discussionEntryVersions={props.discussionEntryVersions}
+                    />
+                  )}
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -206,6 +215,7 @@ AuthorInfo.propTypes = {
    * Boolean to determine if the author is the topic author
    */
   isTopicAuthor: PropTypes.bool,
+  discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
 }
 
 const Timestamps = props => {

@@ -1545,7 +1545,7 @@ describe Enrollment do
     it "sends later for a single student" do
       expect(Enrollment).to receive(:delay_if_production)
         .with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"))
-        .and_return(Enrollment)
+        .and_call_original
       # The delegation works correctly in both cases, just the introspection of the method
       # kwargs by rspec is different between ruby versions
       if RUBY_VERSION >= "2.7.0"

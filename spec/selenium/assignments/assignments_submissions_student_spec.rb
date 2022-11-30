@@ -445,7 +445,7 @@ describe "submissions" do
 
         local_storage!
 
-        add_file(fixture_file_upload(fixture_fn, "application/x-sh"),
+        add_file(fixture_file_upload(filename, "application/x-sh"),
                  @student, filename)
         File.read(fixture_file_path(fixture_fn))
         assignment = @course.assignments.create!(title: "assignment 1",

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/submissions/show_preview" do
+describe "submissions/show_preview" do
   it "renders" do
     course_with_student
     view_context

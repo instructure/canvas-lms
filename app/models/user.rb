@@ -129,6 +129,7 @@ class User < ActiveRecord::Base
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :mentions, inverse_of: :user
   has_many :discussion_entry_drafts, inverse_of: :user
+  has_many :discussion_entry_versions, inverse_of: :user
   has_many :all_attachments, as: "context", class_name: "Attachment"
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, class_name: "Quizzes::QuizStudentVisibility"
@@ -1908,6 +1909,14 @@ class User < ActiveRecord::Base
     pseudonym.account rescue Account.default
   end
 
+  def alternate_account_for_course_creation
+    Rails.cache.fetch_with_batched_keys("alternate_account_for_course_creation", batch_object: self, batched_keys: :account_users) do
+      account_users.active.detect do |au|
+        break au.account if au.root_account_id == account.id && au.account.grants_any_right?(self, :manage_courses, :manage_courses_add)
+      end
+    end
+  end
+
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     cache_key = [association, enrollment_uuid, options].cache_key
     @courses_with_primary_enrollment ||= {}
@@ -2111,7 +2120,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def can_content_share?
+  def can_view_content_shares?
     non_student_enrollment? || account_membership?
   end
 
@@ -2776,6 +2785,20 @@ class User < ActiveRecord::Base
     accounts.any?(&:users_can_edit_name?)
   end
 
+  def user_can_edit_profile?
+    accounts = pseudonyms.shard(self).active.map(&:account)
+    return true if accounts.empty?
+
+    accounts.any?(&:users_can_edit_profile?)
+  end
+
+  def user_can_edit_comm_channels?
+    accounts = pseudonyms.shard(self).active.map(&:account)
+    return true if accounts.empty?
+
+    accounts.any?(&:users_can_edit_comm_channels?)
+  end
+
   def limit_parent_app_web_access?
     pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
   end
@@ -3279,7 +3302,7 @@ class User < ActiveRecord::Base
     student_right = account.root_account.students_can_create_courses? && scope.where(type: %w[StudentEnrollment ObserverEnrollment]).exists?
     return :student if student_right && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
     return :student if student_right && account == account.root_account.manually_created_courses_account
-    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists?
+    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists? && account == account.root_account.manually_created_courses_account
 
     nil
   end

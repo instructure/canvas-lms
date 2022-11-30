@@ -17,7 +17,6 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
@@ -27,7 +26,7 @@ import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {uploadFiles} from '@canvas/upload-file'
@@ -38,6 +37,8 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
+import {useLazyQuery} from 'react-apollo'
+import {RECIPIENTS_OBSERVERS_QUERY} from '../../../graphql/Queries'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -59,7 +60,73 @@ const ComposeModalContainer = props => {
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
+  const [loadingObservers, setLoadingObservers] = useState(false)
+  const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
 
+  const [
+    getRecipientsObserversQuery,
+    {
+      data: recipientsObserversData,
+      loading: recipientsObserversDataLoading,
+      error: recipientsObserversError,
+    },
+  ] = useLazyQuery(RECIPIENTS_OBSERVERS_QUERY)
+
+  useEffect(() => {
+    if (recipientsObserversError) {
+      setIncludeObserversMessages({
+        text: I18n.t('Observers were not included. Please try again.'),
+        type: 'error',
+      })
+      setLoadingObservers(false)
+    } else if (recipientsObserversDataLoading) {
+      setLoadingObservers(true)
+    } else {
+      setLoadingObservers(false)
+      if (!recipientsObserversData) {
+        return
+      }
+      const observersToAdd = recipientsObserversData?.legacyNode?.recipientsObservers?.nodes || []
+
+      if (observersToAdd.length > 0) {
+        const newObservers = observersToAdd.map(u => {
+          return {
+            _id: u._id,
+            id: u.id,
+            name: u.name,
+            itemType: 'user',
+          }
+        })
+
+        // Make sure no observers are added twice
+        const selectedRecipientIds = new Set(props.selectedIds.map(item => item.id))
+        const uniqueSelectedIds = [
+          ...props.selectedIds,
+          ...newObservers.filter(item => !selectedRecipientIds.has(item.id)),
+        ]
+
+        props.onSelectedIdsChange(uniqueSelectedIds)
+      } else {
+        setIncludeObserversMessages({
+          text: I18n.t('Selected recipient(s) do not have assigned Observers'),
+          type: 'info',
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipientsObserversData, recipientsObserversDataLoading, recipientsObserversError])
+
+  const getRecipientsObserver = () => {
+    if (selectedContext?.contextID) {
+      getRecipientsObserversQuery({
+        variables: {
+          userID: ENV.current_user_id?.toString(),
+          contextCode: selectedContext?.contextID,
+          recipientIds: props.selectedIds.map(rec => rec?._id || rec.id),
+        },
+      })
+    }
+  }
   const onMediaUploadComplete = (err, data) => {
     if (err) {
       setOnFailure(I18n.t('There was an error uploading the media.'))
@@ -320,6 +387,11 @@ const ComposeModalContainer = props => {
                   courseMessages={courseMessages}
                   data-testid="compose-modal-inputs"
                   isPrivateConversation={props.isPrivateConversation}
+                  selectedContext={selectedContext}
+                  getRecipientsObserver={getRecipientsObserver}
+                  areObserversLoading={loadingObservers}
+                  includeObserversMessages={includeObserversMessages}
+                  setIncludeObserversMessages={setIncludeObserversMessages}
                 />
               )}
             </ModalBody>
@@ -353,13 +425,11 @@ const ComposeModalContainer = props => {
         tabs={{embed: false, record: true, upload: true}}
         uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
-        languages={Object.keys(closedCaptionLanguages).map(key => {
-          return {id: key, label: closedCaptionLanguages[key]}
-        })}
         rcsConfig={{
           contextId: ENV.current_user_id,
           contextType: 'user',
         }}
+        userLocale={ENV.LOCALE}
       />
       <ModalSpinner
         label={I18n.t('Sending Message')}

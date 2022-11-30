@@ -270,6 +270,11 @@ module.exports = {
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off',
 
+        'jest/no-jasmine-globals': 'error',
+        'no-constant-condition': 'error',
+        'react-hooks/exhaustive-deps': 'error',
+        'react/prefer-stateless-function': 'error',
+
         // TODO: resolve and remove these overrides
         'react/no-string-refs': 'warn',
         'react/no-this-in-sfc': 'warn',
@@ -277,7 +282,6 @@ module.exports = {
         'react/no-access-state-in-setstate': 'warn',
         'react/no-find-dom-node': 'warn',
         'react/no-unused-prop-types': 'warn',
-        'react/prefer-stateless-function': 'warn',
       },
     },
     {

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/assignments/_syllabus_content" do
+describe "assignments/_syllabus_content" do
   context "js_env CAN_READ" do
     def setup_and_render_context(type, opts = {})
       case type

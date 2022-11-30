@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
+import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
 import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView'
 import {waitFor} from '@testing-library/react'

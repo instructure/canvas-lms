@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "shared/_fullstory_snippet.html.erb" do
+describe "shared/_fullstory_snippet" do
   before do
     @context = {}
     @current_user = User.new

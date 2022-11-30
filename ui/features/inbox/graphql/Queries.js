@@ -33,6 +33,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
     $search: String
     $afterUser: String
     $afterContext: String
+    $courseContextCode: String!
   ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
@@ -63,6 +64,14 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
                     name
                     id
                     _id
+                  }
+                }
+              }
+              observerEnrollmentsConnection(contextCode: $courseContextCode) {
+                nodes {
+                  associatedUser {
+                    _id
+                    name
                   }
                 }
               }
@@ -267,4 +276,21 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
   }
   ${SubmissionComment.fragment}
   ${PageInfo.fragment}
+`
+
+export const RECIPIENTS_OBSERVERS_QUERY = gql`
+  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds) {
+          nodes {
+            id
+            name
+            _id
+          }
+        }
+      }
+    }
+  }
 `

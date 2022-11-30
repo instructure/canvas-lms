@@ -16,18 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import OutcomeResultCollection from '../collections/OutcomeResultCollection.coffee'
+import OutcomeResultCollection from '../collections/OutcomeResultCollection'
 import DialogBaseView from '@canvas/dialog-base-view'
 import CollectionView from '@canvas/backbone-collection-view'
 import AlignmentView from './AlignmentView'
-import ProgressBarView from './ProgressBarView.coffee'
+import ProgressBarView from './ProgressBarView'
 import template from '../../jst/outcome_detail.handlebars'
 
-export default class OutcomeDetailView extends DialogBaseView {
-  static initClass() {
-    this.prototype.template = template
-  }
-
+class OutcomeDetailView extends DialogBaseView {
   dialogOptions() {
     return {
       containerId: 'outcome_detail',
@@ -77,4 +73,7 @@ export default class OutcomeDetailView extends DialogBaseView {
     return {...json, progress: this.progress}
   }
 }
-OutcomeDetailView.initClass()
+
+OutcomeDetailView.prototype.template = template
+
+export default OutcomeDetailView

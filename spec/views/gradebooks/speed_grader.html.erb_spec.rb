@@ -22,7 +22,7 @@ require_relative "../../spec_helper"
 require_relative "../views_helper"
 require_relative "../../selenium/helpers/groups_common"
 
-describe "/gradebooks/speed_grader" do
+describe "gradebooks/speed_grader" do
   include GroupsCommon
 
   let(:locals) do

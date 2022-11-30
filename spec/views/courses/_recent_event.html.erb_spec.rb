@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/courses/_recent_event" do
+describe "courses/_recent_event" do
   it "renders" do
     course_with_student
     assignment = @course.assignments.create!(title: "my assignment")

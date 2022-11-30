@@ -109,7 +109,9 @@ describe('ShowFolder', () => {
   describe('Send To file menu item', () => {
     test('renders a modal for sending the file, when clicked', () => {
       const props = {...defaultProps()}
-      props.currentFolder.files = new FilesCollection([{id: '1'}])
+      props.currentFolder.files = new FilesCollection([
+        {id: '1', created_at: '2022-01-01T00:00:00', modified_at: '2022-01-01T00:00:00'},
+      ])
       props.currentFolder.files.loadedAll = true
       const {queryByRole} = render(<ShowFolder {...props} />)
       queryByRole('menuitem', {hidden: true, name: 'Send To...'}).click()
@@ -120,7 +122,9 @@ describe('ShowFolder', () => {
   describe('Copy To file menu item', () => {
     test('renders a modal for sending the file, when clicked', async () => {
       const props = {...defaultProps()}
-      props.currentFolder.files = new FilesCollection([{id: '1'}])
+      props.currentFolder.files = new FilesCollection([
+        {id: '1', created_at: '2022-01-01T00:00:00', modified_at: '2022-01-01T00:00:00'},
+      ])
       props.currentFolder.files.loadedAll = true
       const {queryByRole} = render(<ShowFolder {...props} />)
       queryByRole('menuitem', {hidden: true, name: 'Copy To...'}).click()

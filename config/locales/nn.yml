@@ -2741,7 +2741,13 @@ nn:
   allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Lar brukar sjå knappen for Nye kunngjeringar på heimesida"
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Lar brukaren sjå knappen Ny kunngjering på heimesida. Lar brukaren legge til ny kunngjering på sida Kunngjeringar."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Gir brukar løyve til å sjå ny vurderingsoversikt."
+  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Lar brukar sjå berekningsfana for læringsmål og sette duglegberekninger for læringsmål på emnenivå."
+  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Lar brukar sjå berekningsfana for læringsmål og sette duglegberekninger for læringsmål på konto- og emnenivå."
+  allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Gir ein brukar løyve til å sjå administrer læringsmål-fana på konto- og emnenivå."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_a93a23d2: "Gir ein brukar løyve til å sjå meistring av læringsmål-fana og sette ekspertiseskalaer for læringsmål på konto- og emnenivå."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_d9626906: "Gir ein brukar løyve til å sjå meistring av læringsmål-fana og sette ekspertiseskalaer for læringsmål på emnenivå."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Gir ein brukar løyve til å sjå personmenyvalet i emnenavigasjonen."
+  allows_user_to_view_the_previous_sis_import_dates__1716ddb5: "Gir brukar løyve til å sjå førre datoar for SIS-import, -feilmeldingar og importerte element."
   allows_user_to_view_the_prior_enrollments_button_i_b04b8132: "Lar brukar sjå knappen for Tidligare påmeldingar i emnets personside"
   allows_user_to_view_the_publish_button_in_a_course_c18d0360: "Lar brukar sjå knappen for publisering i eit emnekort for eit upublisert emne (Kortvisning Dashbord)"
   allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "Lar brukar sjå knappane for publiser emne og avpubliser emne på emnets heimeside. Lar brukar sjå knappen for publisering i eit emnekort for eit upublisert emne (Kortvisning Dashbord)"
@@ -4041,6 +4047,7 @@ nn:
       filter: Forsøk
     submission_attempts: Forsøk
   assignments_2_e88d7a26: "Oppgåver 2"
+  assignments_2_student_description: "Denne funksjonaliteten bedrer arbeidsflyten for innlevering av oppgåver og tilbakemeldingar for studentar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk med kvar release. Sjå *Assignment Enhancements User Group* i Canvas Community for fleire detaljer."
   assignments_2_student_error_page_3ca3e0df: "Side med studentfeilmeldingar for Assignments 2"
   assignments_2_student_initial_query_error_52aa5ebd: "Studentfeilmeldingar om spørring i Assignment 2"
   assignments_2_teacher_view_3cd3aeda: "Oppgåver 2 - Sjå som faglærar"
@@ -8408,6 +8415,7 @@ nn:
   deduction_interval_e18bd51: Frådragsintervall
   deep_orange_4c7eea99: "Mørk oransje"
   deep_purple_bb3e2907: "Mørk lilla"
+  deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djupt nøsta svar er ikkje lenger støtta. Svaret ditt vil bli vist på første sida av denne tråden."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konferanse"
   default_dates_a0a2ae26: Standarddatoar
@@ -8761,6 +8769,9 @@ nn:
   disabling_f594bda: "Slår av..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Slå av Post til SIS er ikkje tilgjengeleg for ikkje-publiserte emne"
   disabling_sync_to_name_failed_e7521ebb: "Slå av synkronisering til %{name} mislukkast"
+  disabling_the_assignments_and_quizzes_add_permissi_e06f1379: "Å deaktivere Oppgåver og quizar - legg til løyvet vil overstyre (dersom aktivert) «vurderingsskjema - legg til / rediger / slett»-løyvet, og forhindre brukaren frå å opprette vurderingsskjema for ei spesifikk oppgåve."
+  disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Å deaktivere \"Oppgåver og quizar - slett\"-løyvet vil overstyre (dersom aktivert) «vurderingsskjema - legg til / rediger / slett»-løyvet, og forhindre brukaren frå å slette eit vurderingsskjema frå ei spesifikk oppgåve."
+  disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Å deaktivere \"Oppgåver og quizar - rediger\"-løyvet vil overstyre (dersom aktivert) «vurderingsskjema - legg til / rediger / slett»-løyvet, og forhindre brukaren frå å redigere eit vurderingsskjema for ei spesifikk oppgåve."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "Deaktivering av grunnskuletemaet endrar skrifttypen i Canvas-brukargrensesnittet for alle brukarar i emnet ditt"
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
       Deaktiverer du funksjonen Læringsstier, blir konfigurerte oppgåver og innhald til alle studenter frigjort.
@@ -8799,6 +8810,7 @@ nn:
   discussion_mention_c70cb87a: "Tagging i diskusjon"
   discussion_post_count_report_2da4c6c: "Rapport av antall diskusjonsinnlegg"
   discussion_posts_c998c9ad: Diskusjonsinnlegg
+  discussion_redesign_description: "Denne funksjonaliteten bedrer opplevelsen for diskusjonar og kunngjeringar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk med kvar release. Sjå *Discussions/Announcements Redesign user group* i Canvas Community for fleire detaljer."
   discussion_settings_2fbf0b95: Diskusjonsinnstillingar
   discussion_submission_781d5d33: "Innsending av diskusjon"
   discussion_topic: 
@@ -9241,6 +9253,7 @@ nn:
   downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av emneinnhald gir tilgang til innhald når du ikkje er på nett. Innhaldet kan omfatte filer, sider, oppgåver, diskusjonsemne og quizar. Klikk på \"Generer EPUB\" for kvart emne og opne med eReader-programvare for vising."
   draft_92507c72: (utkast)
   draft_comment_b2376ea4: "Kommentar til utkast"
+  draft_comment_warning_modal_in_speedgrader_ded232c1: "Kommentar til utkast til varslingsmodal i SpeedGrader"
   draft_discussion_entries_98d93a9d: "Utkast diskusjonsinnlegg"
   draft_saved_eba9cfeb: "Utkast lagra"
   drag_a_file_here_39357b48: "Dra fila hit"
@@ -9601,8 +9614,10 @@ nn:
   enabled_web_services_f620b2be: "Aktiverte nettenester"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer redesigna Send melding til studenter som... menyen som gjer det mogeleg å sende melding til observatørar i tillegg til studentar"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
+  enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gjer det mogeleg for modal å advare brukar når eit kommentarutkast blir ståande som upublisert i SpeedGrader."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
   enables_the_course_templates_feature_globally_79d5302f: "Aktiverer funksjonalitet for emnemalar globalt"
+  enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Aktiverer Microsoft Immersive Reader-knappen i støtta områder på Canvas. Knappen kan fortsatt vere aktivert i eit emne uavhengig av denne innstillingen, dersom kontoadministratoren har aktivert det for alle brukarar."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Aktivering av Grunnskuletemaet endrar skrifttypen i Canvas-brukargrensesnittet og forenklar emnenavigeringsmenyen for alle brukarar i emnet ditt."
   encourage_class_participation_4e069479: "Oppmod til deltaking"
   encourage_student_discourse_7836b9f7: "Legg til rette for studentdialog"
@@ -10328,6 +10343,7 @@ nn:
   failed_to_load_the_to_do_sidebar_b6169202: "Innlasting av gjeremålsfana mislukkast"
   failed_to_load_todos_93cfc2d2: "Innlasting av gjeremål mislukkast"
   failed_to_log_in_7ceec561: "Kan ikkje logge på"
+  failed_to_opt_out_of_the_canvas_for_elementary_das_cf7210f0: "Kunne ikkje velge bort Canvas for grunnskule-dashbordet."
   failed_to_perform_search_c918100f: "Kunne ikkje gjennomføre søk"
   failed_to_publish_draft_comment_853761e9: "Kunne ikkje publisere kommentar til utkast"
   failed_to_remove_catalog_settings_f5359b2b: "Kan ikkje fjerne kataloginnstillingar"
@@ -10381,6 +10397,7 @@ nn:
   feature_options_enable_disable_7e748054: "Funksjonsval - tillat/ikkje tillat"
   feature_options_view_a170e80c: "Funksjonsval - vis"
   feature_preview_5e1216a0: "Førehandsvisning av funksjonar"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Førehandsvisning av funksjonar — Ved å skru på, inkluderast pågåande oppdateringar utanfor den vanlige release-planen"
   featured_83f6041d: Framheva
   featured_help_links_d805fe44: "Framheva hjelpelenker"
   features: 
@@ -10597,6 +10614,7 @@ nn:
   fix_missing_policy_grade_change_records_c404507c: "Fiks manglande retningslinje for vurderingsendringsoversikt"
   flagged_as_possible_spam_ebbc4683: "Flagg som mogleg søppelpost"
   flags_ce30e8e3: Flagg
+  flags_tab_updates_c4c209f1: "Oppdateringar til funksjonsflagg-fana"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11098,6 +11116,7 @@ nn:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Vurderingsoversikt og SpeedGrader er utilgjengelege dersom både 'Vurderingar - endre' og 'Vurderingar - vis alle vurderingar' er slått av."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Vurderingsoversikt og SpeedGrader vil være utilgjengelege dersom både Vurderingar - endre og Vurderingar - sjå alle vurderingar er skrudd av."
   gradebook_context_name_9dbae5bc: "Vurderingsoversikt - %{context_name}"
+  gradebook_csv_export_assignment_order_matches_the__9044f08e: "Rekkefølge på oppgåver i CSV-eksport av vurderingsoversikt samsvarer med Vurderingsoversikt-tabellen"
   gradebook_csv_headers_include_grading_period_1015185c: "Topptekst i CSV til Vurderingsoversikt inkluderer karaktersetjingsperiode"
   gradebook_csvs: 
     grades_filename: Vurderingar
@@ -13386,7 +13405,7 @@ nn:
             Canvas brukarstøtte
       locked_topic: 
         body: |-
-            Meldinga med tittelen "%{subject}" kan ikkje leverast fordi diskusjonsemnet er låst. Om du vil prøve å kontakte nokon gjennom Canvas, kan du logge deg på og sende ei melding frå Innboksen.
+            Meldinga med tittelen "%{subject}" kan ikkje leverast fordi diskusjonsemnet er låst. Om du vil prøve å kontakte nokon gjennom Canvas, kan du logge deg på kontoen din og sende ei melding ved å bruke Innboksen.
             
             Takk,
             Canvas brukarstøtte
@@ -24196,6 +24215,8 @@ nn:
       For å sjå Personoversikta på kontonivå, må 'Brukarar - vis liste' vere slått på.
       
       Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar.
+  to_access_the_student_interactions_report_courses__e8432cd0: "For å sjå rapporten om studentars interaksjon, må Emne - sjå bruksrapportar være aktivert."
+  to_access_the_student_interactions_report_grades_v_69105662: "For å sjå rapporten om studentars interaksjon, må Vurderingar - sjå alle vurderingar være aktivert."
   to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "For å kunne opptre som anna bruker må \"Brukarar - opptre som\" vere slått på"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
@@ -24212,6 +24233,7 @@ nn:
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
   to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "For å legge til eller fjerne brukarar i eit emne må det naudsynte løyve vere slått på (f.eks Brukarar - Faglærar)"
+  to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "For å legge studentar til i eit modereringssett, må Vurderingar - sjå alle vurderingar være skrudd på."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: "For å legge til brukarar i eit emne, må 'Brukarar - legg til / fjern studentar frå andre emne til dette emnet' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassitentar' òg vere slått på."
   to_add_users_to_a_course_users_add_remove_students_888b391e: |-
       For å legge brukarar til eit emne, må 'Brukarar - legg til / fjern studentar frå emne' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå emne' òg vere slått på.
@@ -24530,7 +24552,7 @@ nn:
       Brukarar kan sjå individuelle vurderingsskjema for oppgåver så lenge 'Emneinnhald - vis' og 'Oppgåver og quizar - legg til / endre / slett' òg er slått på.
   to_view_the_people_page_courses_view_list_must_be__c1d54670: "For å sjå personoversikta må \"Emne - vis liste\" være aktivert"
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "For å sjå fana med rapportar, må 'Emne - sjå bruksrapportar' òg vere slått på."
-  to_view_the_student_interactions_report_grades_vie_68f791b0: "For å sjå rapporten om studentars interaksjon så må \"Vurderingar - sjå alle vurderingar og emner - sjå bruksrapport\" være aktivert"
+  to_view_the_student_interactions_report_grades_vie_68f791b0: "For å sjå rapporten om studentars interaksjon så må \"Vurderingar - sjå alle vurderingar og emner - sjå bruksrapportar\" være aktivert"
   to_view_the_submission_log_quizzes_view_submission_b8353d6e: "For å sjå innleveringsloggen så må \"Quizar - sjå innleveringslogg\" være aktivert"
   to_view_the_user_details_page_for_a_student_users__51d98047: "For å sjå brukardetaljarsida for ein student, må 'Brukarar - legg til / fjern studentar i / frå emne' òg vere slått på. "
   to_view_the_user_details_page_for_a_student_users__5d0ca2d5: "For å sjå brukardetaljarsida for ein student, må 'Brukarar - legg til / fjern studentar i / frå emne' òg vere slått på. "

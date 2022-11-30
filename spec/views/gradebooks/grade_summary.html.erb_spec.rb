@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "/gradebooks/grade_summary" do
+describe "gradebooks/grade_summary" do
   it "renders" do
     course_with_student
     view_context

@@ -305,6 +305,8 @@ class Account < ActiveRecord::Base
   add_setting :enable_alerts, boolean: true, root_only: true
   add_setting :enable_eportfolios, boolean: true, root_only: true
   add_setting :users_can_edit_name, boolean: true, root_only: true, default: true
+  add_setting :users_can_edit_profile, boolean: true, root_only: true, default: true
+  add_setting :users_can_edit_comm_channels, boolean: true, root_only: true, default: true
   add_setting :open_registration, boolean: true, root_only: true
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false

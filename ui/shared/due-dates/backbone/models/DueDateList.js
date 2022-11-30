@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
-import Section from '@canvas/sections/backbone/models/Section.coffee'
+import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
+import Section from '@canvas/sections/backbone/models/Section'
 
 export default class DueDateList {
   constructor(overrides, sections, assignment) {

@@ -23,7 +23,7 @@ class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
   SEARCH_LIMIT = 100
 
-  MANAGE_ENDPOINTS = %i[manage requeue unstuck].freeze
+  MANAGE_ENDPOINTS = %i[manage requeue unstuck throttle].freeze
   before_action :require_view_jobs, except: MANAGE_ENDPOINTS
   before_action :require_manage_jobs, only: MANAGE_ENDPOINTS
 
@@ -439,6 +439,66 @@ class JobsV2Controller < ApplicationController
     end
   end
 
+  # @{not an}API Test throttle search term
+  #
+  # @argument term [Required, String]
+  #   The search term. Will find unstranded queued jobs whose tags start with this term.
+  #
+  # @argument shard_id [Optional, Integer]
+  #   If given, limit search to jobs on this shard
+  #
+  # @example_response
+  #   {
+  #     matched_jobs: 103,
+  #     matched_tags: 7
+  #   }
+  #
+  def throttle_check
+    GuardRail.activate(:secondary) do
+      term = params[:term]
+      raise ActionController::BadRequest, "missing term" unless term.present?
+
+      scope = throttle_scope(term, params[:shard_id])
+      render json: {
+        matched_jobs: scope.count,
+        matched_tags: scope.distinct.count(:tag)
+      }
+    end
+  end
+
+  # @{not an}API Throttle jobs with a specific tag pattern by stranding them
+  #
+  # @argument term [Required, String]
+  #   The search term. Unstranded queued jobs whose tags start with this term
+  #   (case sensitively) will be throttled.
+  #
+  # @argument shard_id [Optional, Integer]
+  #   If given, limit to jobs on this shard
+  #
+  # @argument max_concurrent [Optional, Integer]
+  #   The number of matched jobs to allow to run concurrently. Default 1
+  #
+  # @example_response
+  #   {
+  #     job_count: 110,
+  #     new_strand: "tmp_strand_2b369177"
+  #   }
+  #
+  def throttle
+    term = params[:term]
+    raise ActionController::BadRequest, "missing term" unless term.present?
+
+    max_concurrent = params[:max_concurrent]&.to_i || 1
+
+    scope = throttle_scope(term, params[:shard_id])
+    job_count, new_strand = ::Delayed::Job.apply_temp_strand!(scope, max_concurrent: max_concurrent)
+
+    render json: {
+      job_count: job_count,
+      new_strand: new_strand
+    }
+  end
+
   protected
 
   def require_bucket
@@ -499,6 +559,14 @@ class JobsV2Controller < ApplicationController
     when "account" then scope.where(account_id: @domain_root_account)
     else scope
     end
+  end
+
+  def throttle_scope(search_term, shard_id)
+    scope = Delayed::Job
+            .where(strand: nil, singleton: nil, locked_by: nil)
+            .where(ActiveRecord::Base.wildcard("tag", search_term, type: :right, case_sensitive: true))
+    scope = scope.where(shard_id: shard_id) if shard_id.present?
+    scope
   end
 
   def grouped_info_json(row, group, base_time:, group_statuses: nil)

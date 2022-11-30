@@ -439,9 +439,6 @@ class DiscussionTopicsController < ApplicationController
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
-        js_env({
-                 DIRECT_SHARE_ENABLED: @context.is_a?(Course) && (hash[:permissions][:manage_content] || (@context.concluded? && hash[:permissions][:read_as_admin]))
-               }, true)
         set_tutorial_js_env
 
         if user_can_edit_course_settings?
@@ -790,12 +787,14 @@ class DiscussionTopicsController < ApplicationController
                split_screen_view: Account.site_admin.feature_enabled?(:split_screen_view),
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
+               discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
-                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : ""
+                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
+                 ATTACHMENTS_FOLDER_ID: (@topic.for_assignment? && !@current_user.nil?) ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id
                },
                apollo_caching: @current_user &&
                  Account.site_admin.feature_enabled?(:apollo_caching),

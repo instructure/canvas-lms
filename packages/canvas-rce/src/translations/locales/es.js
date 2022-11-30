@@ -236,6 +236,7 @@ const locale = {
   "down_and_right_diagonal_arrow_6ea0f460": {
     "message": "Flecha diagonal hacia abajo y a la derecha"
   },
+  "download_filename_2baae924": { "message": "Descargar { filename }" },
   "downward_arrow_cca52012": { "message": "Flecha hacia abajo" },
   "downward_pointing_triangle_2a12a601": {
     "message": "Triángulo apuntando hacia abajo"
@@ -294,6 +295,9 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra pequeño" },
   "extracurricular_icon_67c8ca42": { "message": "Ícono extracurricular" },
   "f_function_fe422d65": { "message": "F (función)" },
+  "failed_getting_file_contents_e9ea19f4": {
+    "message": "Error al obtener el contenido del archivo"
+  },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Capacidad de almacenamiento de archivos excedida"
   },
@@ -448,6 +452,9 @@ const locale = {
   "link_7262adec": { "message": "Enlace" },
   "link_options_a16b758b": { "message": "Opciones de enlace" },
   "links_14b70841": { "message": "Enlaces" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Enlaces a un sitio externo."
+  },
   "load_more_35d33c7": { "message": "Cargar más" },
   "loading_25990131": { "message": "Cargando..." },
   "loading_bde52856": { "message": "Cargando" },
@@ -480,6 +487,10 @@ const locale = {
   },
   "medium_5a8e9ead": { "message": "Regular" },
   "middle_27dc1d5": { "message": "El medio" },
+  "minimize_file_preview_da911944": {
+    "message": "Minimice la vista previa del archivo"
+  },
+  "minimize_video_20aa554b": { "message": "Minimice el video" },
   "minus_fd961e2e": { "message": "Menos" },
   "minus_plus_3461f637": { "message": "Menos/más" },
   "misc_3b692ea7": { "message": "Varios" },
@@ -585,6 +596,12 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variante)" },
   "pink_68ad45cb": { "message": "Rosado" },
   "pixels_52ece7d1": { "message": "Pixeles" },
+  "play_media_comment_35257210": {
+    "message": "Reproducir comentario de multimedia."
+  },
+  "play_media_comment_by_name_from_createdat_c230123d": {
+    "message": "Reproducir comentario multimedia de { name } desde { createdAt }."
+  },
   "plus_d43cd4ec": { "message": "Más" },
   "plus_minus_f8be2e83": { "message": "Más/menos" },
   "posted_when_a578f5ab": { "message": "Publicado: { when }" },
@@ -739,6 +756,12 @@ const locale = {
   "supported_file_types_srt_or_webvtt_7d827ed": {
     "message": "Tipos de archivos admitidos: SRT o WebVTT"
   },
+  "switch_to_pretty_html_editor_a3cee15f": {
+    "message": "Cambiar al Editor de HTML acondicionado"
+  },
+  "switch_to_raw_html_editor_f970ae1a": {
+    "message": "Cambiar al Editor de HTML en crudo"
+  },
   "switch_to_the_html_editor_146dfffd": { "message": "Cambiar al editor html" },
   "switch_to_the_rich_text_editor_63c1ecf6": {
     "message": "Cambiar al editor de texto enriquecido"
@@ -753,6 +776,9 @@ const locale = {
   "text_optional_384f94f7": { "message": "Texto (opcional)" },
   "text_position_8df8c162": { "message": "Posición del texto" },
   "text_size_887c2f6": { "message": "Tamaño del texto" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Todavía se está procesando la vista previa del documento. Inténtelo de nuevo más tarde."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "El material es de dominio público"
   },
@@ -778,8 +804,14 @@ const locale = {
     "message": "Flecha gruesa hacia la derecha"
   },
   "thick_upward_arrow_acd20328": { "message": "Flecha gruesa hacia arriba" },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Este documento no se puede mostrar en Canvas."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Esta ecuación no se puede representar en vista básica."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "Esta imagen no está disponible actualmente"
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Aunque su video tendrá el título correcto en el navegador, no pudimos actualizarlo en la base de datos."

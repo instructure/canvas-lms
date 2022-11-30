@@ -23,6 +23,7 @@ import useComputerPanelFocus from './useComputerPanelFocus'
 import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
+import closedCaptionLanguages, {sortedClosedCaptionLanguageList} from './closedCaptionLanguages'
 import * as CONSTANTS from './shared/constants'
 
 export {
@@ -37,5 +38,7 @@ export {
   LoadingIndicator,
   saveMediaRecording,
   saveClosedCaptions,
-  CONSTANTS
+  closedCaptionLanguages,
+  sortedClosedCaptionLanguageList,
+  CONSTANTS,
 }
