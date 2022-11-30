@@ -177,4 +177,11 @@ function processMetadataForBackwardCompatibility(metadataJson) {
   if (!imageSettingsImage && !imageSettingsIcon) {
     metadataJson.imageSettings = null
   }
+
+  // Replaces cropper settings' shape using icon's shape
+  const cropperSettingsShape = metadataJson?.imageSettings?.cropperSettings?.shape
+  const shape = metadataJson?.shape
+  if (shape && cropperSettingsShape && shape !== cropperSettingsShape) {
+    metadataJson.imageSettings.cropperSettings.shape = shape
+  }
 }
