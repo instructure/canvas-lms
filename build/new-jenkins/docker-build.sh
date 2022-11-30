@@ -36,7 +36,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2022-10-31.1"
+export CACHE_VERSION="2022-11-30.1"
 export DOCKER_BUILDKIT=1
 
 if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then
@@ -100,6 +100,7 @@ WEBPACK_RUNNER_PARTS=(
   $WEBPACK_RUNNER_DOCKERFILE_MD5
   $WEBPACK_RUNNER_MD5
   $WEBPACK_RUNNER_DEPENDENCIES_MD5
+  $WEBPACK_RUNNER_VENDOR_MD5
 )
 WEBPACK_ASSETS_PARTS=(
   "${WEBPACK_RUNNER_PARTS[@]}"

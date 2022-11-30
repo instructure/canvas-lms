@@ -8,7 +8,6 @@ RUN --mount=target=/tmp/src \
   set -o errexit -o errtrace -o nounset -o pipefail && \
   shopt -s globstar && \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
-    --exclude='vendor/qti_migration_tool' \
     config/canvas_rails_switcher.rb \
     Gemfile \
     Gemfile.d \
@@ -20,7 +19,6 @@ RUN --mount=target=/tmp/src \
     engines/**/Gemfile \
     engines/**/*.gemspec \
     engines/**/version.rb \
-    vendor \
     \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \
@@ -93,6 +91,12 @@ RUN --mount=target=/tmp/src \
     | tee /tmp/dst/webpack-runner.tar | md5sum > /tmp/dst/webpack-runner.tar.md5 && \
   \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
+    --exclude='vendor/qti_migration_tool' \
+    vendor \
+    \
+    | tee /tmp/dst/webpack-runner-vendor.tar | md5sum > /tmp/dst/webpack-runner-vendor.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     app/stylesheets \
     config/brandable_css.yml \
     config/browsers.yml \
@@ -122,4 +126,5 @@ RUN --mount=target=/tmp/src \
   echo "YARN_RUNNER_MD5=$(cat /tmp/dst/yarn-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
   echo "WEBPACK_BUILDER_MD5=$(cat /tmp/dst/webpack-builder.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
   echo "WEBPACK_RUNNER_MD5=$(cat /tmp/dst/webpack-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
-  echo "WEBPACK_RUNNER_DEPENDENCIES_MD5=$(cat /tmp/dst/webpack-runner-dependencies.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh
+  echo "WEBPACK_RUNNER_DEPENDENCIES_MD5=$(cat /tmp/dst/webpack-runner-dependencies.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
+  echo "WEBPACK_RUNNER_VENDOR_MD5=$(cat /tmp/dst/webpack-runner-vendor.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh
