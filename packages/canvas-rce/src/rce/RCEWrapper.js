@@ -1627,7 +1627,7 @@ class RCEWrapper extends React.Component {
           'instructure_external_tools',
           'a11y_checker',
           'wordcount',
-          RCEGlobals.getFeatures().rce_better_paste ? 'instructure_paste' : 'paste',
+          rcsExists && RCEGlobals.getFeatures().rce_better_paste ? 'instructure_paste' : 'paste',
           ...canvasPlugins,
         ],
         sanitizePlugins(options.plugins)
