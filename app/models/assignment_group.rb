@@ -41,7 +41,7 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :touch_context
   after_save :update_student_grades
 
-  GROUP_NAMES = [ 'Checkpoint', 'Close Reading Project', 'Discussion', 'Exams', 'Final Exam', 'Pretest', 'Project', 'Workbook' ].freeze
+  GROUP_NAMES = [ 'Assignments', 'Checkpoint', 'Close Reading Project', 'Discussion', 'Exams', 'Final Exam', 'Pretest', 'Project', 'Workbook' ].freeze
 
   def generate_default_values
     if self.name.blank?
