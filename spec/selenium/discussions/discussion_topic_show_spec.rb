@@ -32,6 +32,8 @@ describe "Discussion Topic Show" do
         posted_at: "2017-07-09 16:32:34",
         user: @teacher
       )
+      mod = @course.context_modules.create! name: "module 1"
+      mod.add_item(type: "discussion_topic", id: @topic.id)
     end
 
     before do
@@ -44,6 +46,7 @@ describe "Discussion Topic Show" do
       expect(f("body")).not_to contain_jqcss("header#mobile-header")
       expect(f("body")).not_to contain_jqcss("header#header")
       expect(f("input[placeholder='Search entries or author...']")).to be_present
+      expect(f("body")).not_to contain_jqcss("div#module_sequence_footer")
     end
 
     it "shows the correct number of rubrics in the find rubric option" do
