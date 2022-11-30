@@ -345,6 +345,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "banana",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -352,7 +353,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -368,6 +368,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -375,7 +376,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -391,6 +391,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -398,7 +399,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": true,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -603,6 +603,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": "display:block; margin-left:auto; margin-right:auto;",
             "alt_text": "one blue pine",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -610,7 +611,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": "134",
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": "display:block; margin-left:auto; margin-right:auto;",
             "width": "156",
           }
         `)
