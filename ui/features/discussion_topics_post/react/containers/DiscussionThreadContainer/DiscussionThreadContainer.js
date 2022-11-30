@@ -332,10 +332,16 @@ export const DiscussionThreadContainer = props => {
 
   const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
     const getParentId = () => {
-      return props.discussionEntry.rootEntryId &&
-        props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
-        ? props.discussionEntry.parentId
-        : props.discussionEntry._id
+      switch (props.discussionEntry.depth) {
+        case 1:
+          return props.discussionEntry._id
+        case 2:
+          return props.discussionEntry._id
+        case 3:
+          return props.discussionEntry.parentId
+        default:
+          return props.discussionEntry.rootEntryId
+      }
     }
     createDiscussionEntry({
       variables: {
@@ -530,8 +536,7 @@ export const DiscussionThreadContainer = props => {
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
-                    props.discussionEntry.rootEntryId &&
-                    props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+                    props.discussionEntry.depth > 2
                       ? ReactDOMServer.renderToString(
                           <span className="mceNonEditable mention" data-mention="1">
                             @{getDisplayName(props.discussionEntry)}
