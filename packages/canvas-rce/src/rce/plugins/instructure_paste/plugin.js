@@ -30,6 +30,7 @@ import {showFlashAlert} from '../../../common/FlashAlert'
 const config = {
   store: null,
   session: null, // null: we haven't gotten it yet, false: we don't need it
+  sessionPromise: null,
 }
 
 // when UploadFile renders
@@ -47,20 +48,18 @@ function initStore(initProps) {
   }
   if (config.session === null) {
     if (initProps.host && initProps.jwt) {
-      getSession(config.store.dispatch, config.store.getState)
+      config.sessionPromise = getSession(config.store.dispatch, config.store.getState)
         .then(() => {
           config.session = config.store.getState().session
         })
         .catch(_err => {
-          showFlashAlert({
-            message: formatMessage(
-              'Having trouble initializing copy/paste, but it can still limp along'
-            ),
-            type: 'error',
-          })
+          // eslint-disable-next-line no-console
+          console.error('The Paste plugin failed to get canvas session data.')
         })
     } else {
+      // RCEWrapper will keep us from getting here, but we really should do something anyway.
       config.session = false
+      config.sessionPromise = Promise.resolve()
     }
   }
   return config.store
@@ -97,34 +96,43 @@ tinymce.create('tinymce.plugins.InstructurePastePlugin', {
           return
         }
         if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
-          if (config.session === null) {
-            showFlashAlert({
-              message: formatMessage(
-                'If Usage Rights are required the file will not be published until set on the Files page.'
-              ),
-              type: 'info',
-            })
-          } else if (config.session && config.session.usageRightsRequired) {
-            return getUsageRights(ed, document, file)
-          } else {
-            const fileMetaProps = {
-              altText: file.name,
-              contentType: file.type,
-              displayAs: 'embed',
-              isDecorativeImage: false,
-              name: file.name,
-              parentFolderId: 'media',
-              size: file.size,
-              domObject: file,
+          // it's very doubtful that we won't have retrieved the session data yet,
+          // since it takes a while for the RCE to initialize, but if we haven't
+          // wait until we do to carry on and finish pasting.
+          // eslint-disable-next-line promise/catch-or-return
+          config.sessionPromise.finally(() => {
+            if (config.session === null) {
+              // we failed to get the session and don't know if usage rights are required in this course|group
+              // In all probability, the file upload will fail too, but I feel like we have to do something here.
+              showFlashAlert({
+                message: formatMessage(
+                  'If Usage Rights are required, the file will not publish until enabled in the Files page.'
+                ),
+                type: 'info',
+              })
             }
-            let tabContext = 'documents'
-            if (isImage(file.type)) {
-              tabContext = 'images'
-            } else if (isAudioOrVideo(file.type)) {
-              tabContext = 'media'
+            if (config.session && config.session.usageRightsRequired) {
+              return getUsageRights(ed, document, file)
+            } else {
+              const fileMetaProps = {
+                altText: file.name,
+                contentType: file.type,
+                displayAs: 'embed',
+                isDecorativeImage: false,
+                name: file.name,
+                parentFolderId: 'media',
+                size: file.size,
+                domObject: file,
+              }
+              let tabContext = 'documents'
+              if (isImage(file.type)) {
+                tabContext = 'images'
+              } else if (isAudioOrVideo(file.type)) {
+                tabContext = 'media'
+              }
+              store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
             }
-            store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
-          }
+          })
         }
       } else if (types.includes('text/html')) {
         const text = cbdata.getData('text/html')
