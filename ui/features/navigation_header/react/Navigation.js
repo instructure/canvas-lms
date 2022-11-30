@@ -32,6 +32,11 @@ import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const I18n = useI18nScope('Navigation')
 
+// We don't need to poll for new release notes very often since we expect
+// new ones to appear only infrequently. The act of viewing them will reset
+// the badge at the time of viewing.
+const RELEASE_NOTES_POLL_INTERVAL = 60 * 60 * 1000 // one hour
+
 const CoursesTray = React.lazy(() =>
   import(
     /* webpackChunkName: "[request]" */
@@ -115,31 +120,35 @@ export default class Navigation extends React.Component {
     unreadComponent: UnreadCounts,
   }
 
-  state = {
-    groups: [],
-    accounts: [],
-    courses: [],
-    help: [],
-    profile: [],
-    unreadSharesCount: 0,
-    isTrayOpen: false,
-    type: null,
-    coursesLoading: false,
-    coursesAreLoaded: false,
-    observedUserId: '',
-    accountsLoading: false,
-    accountsAreLoaded: false,
-    groupsLoading: false,
-    groupsAreLoaded: false,
-    helpLoading: false,
-    helpAreLoaded: false,
-    profileAreLoading: false,
-    profileAreLoaded: false,
-    historyLoading: false,
-    historyAreLoaded: false,
-    releaseNotesPollInterval: 30000,
-    releaseNotesBadgeDisabled:
-      !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled,
+  constructor(props) {
+    super(props)
+    this.forceUnreadReleaseNotesPoll = undefined
+    this.setReleaseNotesUnreadPollNow = this.setReleaseNotesUnreadPollNow.bind(this)
+    this.state = {
+      groups: [],
+      accounts: [],
+      courses: [],
+      help: [],
+      profile: [],
+      unreadSharesCount: 0,
+      isTrayOpen: false,
+      type: null,
+      coursesLoading: false,
+      coursesAreLoaded: false,
+      observedUserId: '',
+      accountsLoading: false,
+      accountsAreLoaded: false,
+      groupsLoading: false,
+      groupsAreLoaded: false,
+      helpLoading: false,
+      helpAreLoaded: false,
+      profileAreLoading: false,
+      profileAreLoaded: false,
+      historyLoading: false,
+      historyAreLoaded: false,
+      releaseNotesBadgeDisabled:
+        !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled,
+    }
   }
 
   componentDidMount() {
@@ -310,14 +319,6 @@ export default class Navigation extends React.Component {
     })
   }
 
-  handlePollingInterval = count => {
-    if (count > 0) {
-      this.setState({releaseNotesPollInterval: 30000})
-    } else {
-      this.setState({releaseNotesPollInterval: 300000})
-    }
-  }
-
   renderTrayContent() {
     switch (this.state.type) {
       case 'courses':
@@ -383,6 +384,7 @@ export default class Navigation extends React.Component {
             showNotes={ENV.FEATURES.embedded_release_notes}
             badgeDisabled={this.state.releaseNotesBadgeDisabled}
             setBadgeDisabled={val => this.setState({releaseNotesBadgeDisabled: val})}
+            forceUnreadPoll={this.forceUnreadReleaseNotesPoll}
           />
         )
       default:
@@ -446,10 +448,15 @@ export default class Navigation extends React.Component {
     return I18n.t(
       {
         one: 'One unread release note.',
-        other: '%{count} release notes.',
+        other: '%{count} unread release notes.',
       },
       {count}
     )
+  }
+
+  setReleaseNotesUnreadPollNow(callback) {
+    if (typeof this.forceUnreadReleaseNotesPoll === 'undefined')
+      this.forceUnreadReleaseNotesPoll = callback
   }
 
   render() {
@@ -534,8 +541,8 @@ export default class Navigation extends React.Component {
             }
             dataUrl="/api/v1/release_notes/unread_count"
             srText={this.releaseNotesBadgeText}
-            onUpdate={this.handlePollingInterval}
-            pollIntervalMs={this.state.releaseNotesPollInterval}
+            pollIntervalMs={RELEASE_NOTES_POLL_INTERVAL}
+            pollNowPassback={this.setReleaseNotesUnreadPollNow}
           />
         )}
       </>
