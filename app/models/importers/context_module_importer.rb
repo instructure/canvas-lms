@@ -24,6 +24,9 @@ module Importers
 
     MAX_URL_LENGTH = 2000
 
+    ASSIGNMENT_GROUP_NAMES = AssignmentGroup::GROUP_NAMES.map{|n| n.downcase.gsub(/\s/, "_")}
+
+
     def self.linked_resource_type_class(type)
       case type
         when /wiki_type|wikipage/i
@@ -166,24 +169,41 @@ module Importers
       item.content_tags.where.not(:migration_id => nil).
         where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
-      if hash[:completion_requirements]
-        c_reqs = []
-        hash[:completion_requirements].each do |req|
-          if item_ref = item_map[req[:item_migration_id]]
-            req[:id] = item_ref.id
-            req.delete :item_migration_id
-            c_reqs << req
+      if non_zero_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
+        non_zero_thresholds.each_key do |threshold_name|
+          content_type = threshold_name == 'discussion' ? 'DiscussionTopic' : 'Assignment'
+          content_tags = item.content_tags.where(content_type: content_type)
+          content_tags.each do |tag|
+            RequirementsService.add_unit_item_with_min_score(context_module: item, content_tag: tag, threshold_type: threshold_name)
           end
         end
-        if c_reqs.length > 0
-          item.completion_requirements = c_reqs
-          item.save
+      else
+        if hash[:completion_requirements]
+          c_reqs = []
+          hash[:completion_requirements].each do |req|
+            if item_ref = item_map[req[:item_migration_id]]
+              req[:id] = item_ref.id
+              req.delete :item_migration_id
+              c_reqs << req
+            end
+          end
+          if c_reqs.length > 0
+            item.completion_requirements = c_reqs
+            item.save
+          end
         end
       end
 
       item
     end
-
+    def self.get_default_course_thresholds(assignment_group_names)
+      thresholds = {}
+      assignment_group_names.each do |group_name|
+        setting_name = "#{group_name}_score_threshold"
+        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', threshold_type: setting_name)
+      end
+      thresholds.reject{ |key, value| !value.positive? }
+    end
 
     def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access
