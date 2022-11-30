@@ -533,7 +533,11 @@ const MessageStudentsWhoDialog = ({
                 value={selectedCriterion.value}
               >
                 {availableCriteria.map(criterion => (
-                  <Option id={criterion.value} key={criterion.value} value={criterion.value}>
+                  <Option
+                    id={`criteria_${criterion.value}`}
+                    key={criterion.value}
+                    value={criterion.value}
+                  >
                     {criterion.title}
                   </Option>
                 ))}
