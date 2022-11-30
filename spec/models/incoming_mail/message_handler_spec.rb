@@ -209,6 +209,7 @@ describe IncomingMail::MessageHandler do
 
         context "with a locked discussion topic generic_error" do
           it "constructs the message correctly" do
+            allow(InstStatsd::Statsd).to receive(:increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
@@ -235,11 +236,13 @@ describe IncomingMail::MessageHandler do
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
           end
         end
 
         context "with a generic reply to error" do
           it "constructs the message correctly" do
+            allow(InstStatsd::Statsd).to receive(:increment)
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
@@ -266,6 +269,7 @@ describe IncomingMail::MessageHandler do
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.catch_all")
           end
         end
 
