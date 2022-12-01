@@ -37,6 +37,7 @@ import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {generateModalLauncherId} from '../utils/utils'
+import NoResults from './no_results'
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -254,7 +255,7 @@ const PaceContextsTable = ({
         as="div"
         background="secondary"
         padding="xx-small small"
-        margin="none none small none"
+        margin="small 0"
       >
         {headers.map(({text: title}, index) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -275,6 +276,14 @@ const PaceContextsTable = ({
     </View>
   )
 
+  if (!isLoading && paceContexts.length === 0) {
+    return (
+      <View as="div" borderWidth="0 small small small">
+        <NoResults />
+      </View>
+    )
+  }
+
   return (
     <>
       {responsiveSize === 'small' ? (
@@ -284,14 +293,8 @@ const PaceContextsTable = ({
           </View>
         )
       ) : (
-        <View as="div" margin="none none large none" borderWidth="small small none small">
-          <Table
-            data-testid="course-pace-context-table"
-            caption={tableCaption}
-            themeOverride={{
-              border: '2px solid black',
-            }}
-          >
+        <View as="div" margin="none none large none" borderWidth="0 small">
+          <Table data-testid="course-pace-context-table" caption={tableCaption}>
             {renderHeader()}
             {!isLoading && (
               <TableBody>
