@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import formatMessage from '../../../../../../format-message'
 import {actions, modes} from '../../../reducers/imageSection'
 import {actions as trayActions} from '../../../reducers/svgSettings'
@@ -32,6 +32,10 @@ import ModeSelect from './ModeSelect'
 import PropTypes from 'prop-types'
 import {ImageCropperSettingsPropTypes} from '../ImageCropper/propTypes'
 import {MAX_IMAGE_SIZE_BYTES} from './compressionUtils'
+import {createCroppedImageSvg} from '../ImageCropper/imageCropUtils'
+import {convertFileToBase64} from '../../../svg/utils'
+import {ImageSettingsPropTypes} from './propTypes'
+import _ from 'lodash'
 
 const getCompressionMessage = () =>
   formatMessage(
@@ -41,12 +45,12 @@ const getCompressionMessage = () =>
     }
   )
 
-function renderImagePreview({image, loading}) {
+function renderImagePreview({loading}, embedImage) {
   return (
     <PreviewIcon
       variant="large"
       testId="selected-image-preview"
-      image={image}
+      image={embedImage}
       loading={loading}
       checkered={true}
     />
@@ -63,7 +67,7 @@ function renderImageName({imageName}) {
   )
 }
 
-function renderImageActionButtons({mode, collectionOpen}, dispatch, setFocus, ref) {
+function renderImageActionButtons({mode, collectionOpen}, dispatch, trayDispatch, setFocus, ref) {
   const showCropButton =
     [modes.uploadImages.type, modes.courseImages.type].includes(mode) && !collectionOpen
   return (
@@ -80,7 +84,13 @@ function renderImageActionButtons({mode, collectionOpen}, dispatch, setFocus, re
       <IconButton
         ref={ref}
         screenReaderLabel={formatMessage('Clear image')}
-        onClick={() => dispatch(actions.RESET_ALL)}
+        onClick={() => {
+          dispatch(actions.RESET_ALL)
+          trayDispatch({
+            type: trayActions.SET_EMBED_IMAGE,
+            payload: null,
+          })
+        }}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
         data-testid="clear-image"
@@ -91,7 +101,7 @@ function renderImageActionButtons({mode, collectionOpen}, dispatch, setFocus, re
   )
 }
 
-export const ImageOptions = ({state, dispatch, mountNode, rcsConfig, trayDispatch}) => {
+export const ImageOptions = ({state, settings, dispatch, mountNode, rcsConfig, trayDispatch}) => {
   const [isImageActionFocused, setIsImageActionFocused] = useState(false)
   const imageActionRef = useCallback(
     el => {
@@ -100,14 +110,47 @@ export const ImageOptions = ({state, dispatch, mountNode, rcsConfig, trayDispatc
     [isImageActionFocused]
   )
 
+  // After submitting cropper modal a new embedded image should be generated
+  useEffect(() => {
+    if (
+      state.cropperSettings &&
+      settings.imageSettings &&
+      !_.isEqual(state.cropperSettings, settings.imageSettings?.cropperSettings)
+    ) {
+      if (state.cropperSettings.shape !== settings.shape) {
+        trayDispatch({shape: state.cropperSettings.shape})
+      }
+      createCroppedImageSvg(state.cropperSettings, settings.imageSettings.image)
+        .then(generatedSvg =>
+          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+        )
+        .then(base64Image => {
+          trayDispatch({
+            type: trayActions.SET_EMBED_IMAGE,
+            payload: base64Image,
+          })
+        })
+        // eslint-disable-next-line no-console
+        .catch(error => console.error(error))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.cropperSettings])
+
   const {image} = state
+  const {shape, embedImage} = settings
   return (
     <Flex padding="small">
-      <Flex.Item margin="0 small 0 0">{renderImagePreview(state)}</Flex.Item>
+      <Flex.Item margin="0 small 0 0">{renderImagePreview(state, embedImage)}</Flex.Item>
       <Flex.Item>{renderImageName(state)}</Flex.Item>
       <Flex.Item margin="0 0 0 auto">
         {image ? (
-          renderImageActionButtons(state, dispatch, setIsImageActionFocused, imageActionRef)
+          renderImageActionButtons(
+            state,
+            dispatch,
+            trayDispatch,
+            setIsImageActionFocused,
+            imageActionRef
+          )
         ) : (
           <ModeSelect
             dispatch={dispatch}
@@ -120,23 +163,19 @@ export const ImageOptions = ({state, dispatch, mountNode, rcsConfig, trayDispatc
         )}
         {state.cropperOpen && (
           <ImageCropperModal
+            shape={shape}
             open={state.cropperOpen}
             onClose={() => dispatch({type: actions.SET_CROPPER_OPEN.type, payload: false})}
-            onSubmit={(settings, generatedImage) => {
-              trayDispatch({
-                type: trayActions.SET_EMBED_IMAGE,
-                payload: generatedImage,
-              })
+            onSubmit={cropperSettings => {
               dispatch({
                 type: actions.SET_CROPPER_SETTINGS.type,
-                payload: settings,
+                payload: cropperSettings,
               })
             }}
             image={image}
             cropSettings={state.cropperSettings}
             message={state.compressed ? getCompressionMessage() : null}
             loading={!image}
-            trayDispatch={trayDispatch}
           />
         )}
       </Flex.Item>
@@ -153,6 +192,11 @@ ImageOptions.propTypes = {
     cropperOpen: PropTypes.bool.isRequired,
     cropperSettings: ImageCropperSettingsPropTypes,
     compressed: PropTypes.bool.isRequired,
+  }).isRequired,
+  settings: PropTypes.shape({
+    shape: PropTypes.string,
+    embedImage: PropTypes.string,
+    imageSettings: ImageSettingsPropTypes,
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired,

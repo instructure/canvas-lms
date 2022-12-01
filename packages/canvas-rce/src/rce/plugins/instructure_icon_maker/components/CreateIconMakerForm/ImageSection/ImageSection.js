@@ -18,6 +18,7 @@
 
 import React, {useReducer, useEffect, useRef, Suspense} from 'react'
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
@@ -34,6 +35,7 @@ import {ColorInput} from '../../../../shared/ColorInput'
 import {convertFileToBase64} from '../../../svg/utils'
 import {transformForShape} from '../../../svg/image'
 import SingleColorSVG from './SingleColor/svg'
+import {createCroppedImageSvg} from '../ImageCropper/imageCropUtils'
 
 const IMAGE_SECTION_ID = 'icon-maker-tray-image-section'
 const getImageSection = () => document.querySelector(`#${IMAGE_SECTION_ID}`)
@@ -71,16 +73,6 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
   const metadata = filterSectionStateMetadata(state)
 
   const isMetadataLoaded = useRef(false)
-
-  useEffect(() => {
-    if (state.cropperSettings) {
-      dispatch({
-        type: actions.SET_CROPPER_SETTINGS.type,
-        payload: {...state.cropperSettings, shape: settings.shape},
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.shape])
 
   useEffect(() => {
     const transform = transformForShape(settings.shape, settings.size)
@@ -134,6 +126,30 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
     }
   }, [onChange, state.icon, state.iconFillColor])
 
+  // After a new shape is selected in shape section a new embedded image should be generated
+  useEffect(() => {
+    if (state.cropperSettings && settings.shape !== state.cropperSettings.shape) {
+      const newCropperSettings = {...state.cropperSettings, shape: settings.shape}
+      dispatch({
+        type: actions.SET_CROPPER_SETTINGS.type,
+        payload: newCropperSettings,
+      })
+      createCroppedImageSvg(newCropperSettings, settings.imageSettings.image)
+        .then(generatedSvg =>
+          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+        )
+        .then(base64Image => {
+          onChange({
+            type: svgActions.SET_EMBED_IMAGE,
+            payload: base64Image,
+          })
+        })
+        // eslint-disable-next-line no-console
+        .catch(error => console.error(error))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.shape])
+
   useEffect(() => {
     if (
       settings.imageSettings &&
@@ -172,8 +188,8 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
             </Flex.Item>
             <Flex.Item>
               <ImageOptions
-                embedImage={settings.embedImage}
                 state={state}
+                settings={settings}
                 dispatch={dispatch}
                 mountNode={getImageSection}
                 rcsConfig={rcsConfig}
@@ -220,4 +236,16 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
       </Flex>
     </Group>
   )
+}
+
+ImageSection.propTypes = {
+  settings: PropTypes.object.isRequired,
+  editor: PropTypes.object.isRequired,
+  rcsConfig: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  canvasOrigin: PropTypes.string,
+}
+
+ImageSection.defaultProps = {
+  onChange: () => {},
 }
