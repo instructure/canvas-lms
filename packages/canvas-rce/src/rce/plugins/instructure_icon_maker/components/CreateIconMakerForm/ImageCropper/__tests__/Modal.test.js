@@ -21,14 +21,6 @@ import {render, screen, waitFor} from '@testing-library/react'
 import {ImageCropperModal} from '../Modal'
 import userEvent from '@testing-library/user-event'
 
-jest.mock('../imageCropUtils', () => ({
-  createCroppedImageSvg: jest.fn(() =>
-    Promise.resolve({
-      outerHTML: null,
-    })
-  ),
-}))
-
 describe('ImageCropperModal', () => {
   let props
 
@@ -40,6 +32,7 @@ describe('ImageCropperModal', () => {
     props = {
       open: true,
       onSubmit: jest.fn(),
+      onClose: jest.fn(),
       image: 'data:image/png;base64,asdfasdfjksdf==',
       trayDispatch: jest.fn(),
     }
@@ -75,31 +68,27 @@ describe('ImageCropperModal', () => {
     })
   })
 
-  it('call onSubmit function with correct args', async () => {
+  it('calls onClose function', async () => {
     renderComponent()
     const button = screen.getByRole('button', {name: /save/i})
     userEvent.click(button)
     await waitFor(() => {
-      expect(props.onSubmit).toHaveBeenCalledWith(
-        {
-          rotation: 0,
-          scaleRatio: 1,
-          shape: 'square',
-          translateX: 0,
-          translateY: 0,
-        },
-        'data:image/svg+xml;base64,bnVsbA=='
-      )
+      expect(props.onClose).toHaveBeenCalled()
     })
   })
 
-  it('calls trayDispatch with the correct args', async () => {
-    renderComponent()
-    userEvent.click(screen.getByTestId('shape-select-dropdown'))
-    userEvent.click(screen.getByText('Circle'))
-    userEvent.click(screen.getByRole('button', {name: /save/i}))
+  it('call onSubmit function with correct args', async () => {
+    renderComponent({shape: 'circle'})
+    const button = screen.getByRole('button', {name: /save/i})
+    userEvent.click(button)
     await waitFor(() => {
-      expect(props.trayDispatch).toHaveBeenCalledWith({shape: 'circle'})
+      expect(props.onSubmit).toHaveBeenCalledWith({
+        rotation: 0,
+        scaleRatio: 1,
+        shape: 'circle',
+        translateX: 0,
+        translateY: 0,
+      })
     })
   })
 })

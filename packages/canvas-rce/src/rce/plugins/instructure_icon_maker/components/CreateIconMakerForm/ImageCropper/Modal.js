@@ -27,18 +27,9 @@ import formatMessage from '../../../../../../format-message'
 import {cropperSettingsReducer, actions, defaultState} from '../../../reducers/imageCropper'
 import {Preview} from './Preview'
 import {Controls} from './controls'
-import {convertFileToBase64} from '../../../svg/utils'
-import {createCroppedImageSvg} from './imageCropUtils'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {DirectionRegion} from './DirectionRegion'
 import {instuiPopupMountNode} from '../../../../../../util/fullscreenHelpers'
-
-const handleSubmit = (onSubmit, cropperSettings, image) =>
-  createCroppedImageSvg(cropperSettings, image)
-    .then(generatedSvg =>
-      convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
-    )
-    .then(base64Image => onSubmit(cropperSettings, base64Image))
 
 const renderBody = (image, settings, dispatch, message, loading) => {
   if (loading) {
@@ -85,15 +76,20 @@ const renderFooter = (settings, onClose) => {
 
 export const ImageCropperModal = ({
   open,
+  shape,
   onClose,
   onSubmit,
   image,
   message,
   cropSettings,
   loading,
-  trayDispatch,
 }) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
+
+  useEffect(() => {
+    shape !== settings.shape && dispatch({type: actions.SET_SHAPE, payload: shape})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shape])
 
   useEffect(() => {
     cropSettings && dispatch({type: actions.UPDATE_SETTINGS, payload: cropSettings})
@@ -110,11 +106,11 @@ export const ImageCropperModal = ({
       onDismiss={onClose}
       onSubmit={e => {
         e.preventDefault()
-        trayDispatch({shape: settings.shape})
         // Direction is only used while in cropper and
         // should not be embedded in the icon's metadata
-        const {direction, ...otherSettings} = settings
-        handleSubmit(onSubmit, otherSettings, image).then(onClose).catch(onClose)
+        const {direction, ...cropperSettings} = settings
+        onSubmit(cropperSettings)
+        onClose()
       }}
       shouldCloseOnDocumentClick={false}
     >
@@ -140,13 +136,14 @@ ImageCropperModal.propTypes = {
   cropSettings: ImageCropperSettingsPropTypes,
   message: PropTypes.string,
   open: PropTypes.bool,
+  shape: PropTypes.string,
   onClose: PropTypes.func,
   onSubmit: PropTypes.func,
   loading: PropTypes.bool,
-  trayDispatch: PropTypes.func.isRequired,
 }
 
 ImageCropperModal.defaultProps = {
+  shape: 'square',
   open: false,
   cropSettings: null,
   message: null,
