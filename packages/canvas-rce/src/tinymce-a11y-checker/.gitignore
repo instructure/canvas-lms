@@ -1,5 +1,6 @@
 node_modules
 lib
+es
 src/translations.json
 coverage
 cypress/videos

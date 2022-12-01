@@ -235,6 +235,7 @@ exports[`render matches snapshot with errors 1`] = `
                           >
                             <Link
                               color="link"
+                              forceButtonRole={true}
                               href="http://some-url"
                               iconPlacement="start"
                               isWithinText={true}

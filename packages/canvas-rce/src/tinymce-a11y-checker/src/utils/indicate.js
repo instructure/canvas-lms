@@ -1,6 +1,7 @@
 import offset from "bloody-offset"
 
 const MARGIN = 3
+const THROTTLE = 10
 
 export function indicatorRegion(
   editorFrame,
@@ -25,9 +26,18 @@ export function indicatorRegion(
   }
 }
 
-export function clearIndicators() {
+function indicatorContainer() {
+  return (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.body
+  )
+}
+
+export function clearIndicators(parent) {
+  const container = parent || indicatorContainer()
   Array.from(
-    document.querySelectorAll(".a11y-checker-selection-indicator")
+    container.querySelectorAll(".a11y-checker-selection-indicator")
   ).forEach(existingElem => {
     existingElem.parentNode.removeChild(existingElem)
   })
@@ -62,36 +72,45 @@ export default function indicate(editor, elem, margin = MARGIN) {
   `
   )
 
-  document.body.appendChild(el)
+  indicatorContainer().appendChild(el)
 
   el.style.opacity = 0.8
   el.style.transition = "opacity 0.4s"
 
-  const adjust = () => {
-    const boundingRect = elem.getBoundingClientRect()
-    const region = indicatorRegion(editorFrame, elem, offset, boundingRect)
-    const editorFrameOffset = offset(editorFrame)
-    el.style.left = `${region.left - margin}px`
-    el.style.top = `${region.top - margin}px`
-    el.style.display = "block"
-    if (boundingRect.top < 0) {
-      const newHeight = region.height + boundingRect.top
-      if (newHeight < 0) {
-        el.style.display = "none"
+  let lastAdjust = 0
+  const adjust = (timestamp) => {
+    if (timestamp - lastAdjust > THROTTLE) {
+      lastAdjust = timestamp
+
+      if (el.parentElement === null) {
+        return
       }
-      const newTop = region.height - newHeight
-      el.style.height = `${newHeight}px`
-      el.style.marginTop = `${newTop}px`
-    }
-    if (boundingRect.bottom > editorFrameOffset.height) {
-      const newHeight =
-        region.height + (editorFrameOffset.height - boundingRect.bottom)
-      if (newHeight < 0) {
-        el.style.display = "none"
+
+      const boundingRect = elem.getBoundingClientRect()
+      const region = indicatorRegion(editorFrame, elem, offset, boundingRect)
+      const editorFrameOffset = offset(editorFrame)
+      el.style.left = `${region.left - margin}px`
+      el.style.top = `${region.top - margin}px`
+      el.style.display = "block"
+      if (boundingRect.top < 0) {
+        const newHeight = region.height + boundingRect.top
+        if (newHeight < 0) {
+          el.style.display = "none"
+        }
+        const newTop = region.height - newHeight
+        el.style.height = `${newHeight}px`
+        el.style.marginTop = `${newTop}px`
       }
-      el.style.height = `${newHeight}px`
+      if (boundingRect.bottom > editorFrameOffset.height) {
+        const newHeight =
+          region.height + (editorFrameOffset.height - boundingRect.bottom)
+        if (newHeight < 0) {
+          el.style.display = "none"
+        }
+        el.style.height = `${newHeight}px`
+      }
+      window.requestAnimationFrame(adjust)
     }
-    window.requestAnimationFrame(adjust)
   }
 
   window.requestAnimationFrame(adjust)
