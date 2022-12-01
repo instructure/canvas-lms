@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "./concerns/deep_linking_spec_helper"
+require_relative "../concerns/parent_frame_shared_examples"
 
 module Lti
   module IMS
@@ -72,7 +73,6 @@ module Lti
           subject
         end
 
-        # TODO: update all these with hash_including()
         context "when returning from a non-internal service" do
           let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
 
@@ -94,6 +94,11 @@ module Lti
             subject
             expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq("http://tool.url")
           end
+        end
+
+        it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+          let(:return_url_params) { { placement: placement, parent_frame_context: pfc_tool.id } }
+          let(:pfc_tool_context) { course }
         end
 
         context "when the messages/logs passed in are not strings" do

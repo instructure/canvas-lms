@@ -33,6 +33,7 @@ module Lti
       before_action :validate_return_url_data
       before_action :require_context_update_rights
       before_action :require_tool
+      before_action :set_extra_csp_frame_ancestor!
 
       def deep_linking_response
         # one single non-line item content item for an existing module using
