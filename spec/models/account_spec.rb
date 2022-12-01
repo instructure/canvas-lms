@@ -736,7 +736,7 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms read_files]
+    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms read_files launch_external_tool]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     conditional_access += [:view_bounced_emails, :view_account_calendar_details] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
@@ -779,8 +779,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -831,8 +831,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -1313,34 +1313,49 @@ describe Account do
       expect(@subaccount.grants_right?(User.new, :read_global_outcomes)).to be_falsey
     end
 
-    it "does not grant :read_outcomes to user's outside the account" do
-      expect(Account.default.grants_right?(User.new, :read_outcomes)).to be_falsey
+    shared_examples_for "a permission granted to account admins and enrollees" do |perm|
+      it "does not grant #{perm} to user's outside the account" do
+        expect(Account.default.grants_right?(User.new, perm)).to be_falsey
+      end
+
+      it "grants #{perm} to account admins" do
+        account_admin_user(account: Account.default)
+        expect(Account.default.grants_right?(@admin, perm)).to be_truthy
+      end
+
+      it "grants #{perm} to subaccount admins" do
+        account_admin_user(account: Account.default.sub_accounts.create!)
+        expect(Account.default.grants_right?(@admin, perm)).to be_truthy
+      end
+
+      it "grants #{perm} to enrollees in account courses" do
+        course_factory(account: Account.default)
+        teacher_in_course
+        student_in_course
+        expect(Account.default.grants_right?(@teacher, perm)).to be_truthy
+        expect(Account.default.grants_right?(@student, perm)).to be_truthy
+      end
+
+      it "grants #{perm} to enrollees in subaccount courses" do
+        course_factory(account: Account.default.sub_accounts.create!)
+        teacher_in_course
+        student_in_course
+        expect(Account.default.grants_right?(@teacher, perm)).to be_truthy
+        expect(Account.default.grants_right?(@student, perm)).to be_truthy
+      end
+
+      it "grants launch_external_tool to site admin users" do
+        sa_user = account_admin_user account: Account.site_admin
+        expect(Account.default.grants_right?(sa_user, perm)).to be_truthy
+      end
     end
 
-    it "grants :read_outcomes to account admins" do
-      account_admin_user(account: Account.default)
-      expect(Account.default.grants_right?(@admin, :read_outcomes)).to be_truthy
+    describe "read_outcomes permission" do
+      it_behaves_like "a permission granted to account admins and enrollees", :read_outcomes
     end
 
-    it "grants :read_outcomes to subaccount admins" do
-      account_admin_user(account: Account.default.sub_accounts.create!)
-      expect(Account.default.grants_right?(@admin, :read_outcomes)).to be_truthy
-    end
-
-    it "grants :read_outcomes to enrollees in account courses" do
-      course_factory(account: Account.default)
-      teacher_in_course
-      student_in_course
-      expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
-      expect(Account.default.grants_right?(@student, :read_outcomes)).to be_truthy
-    end
-
-    it "grants :read_outcomes to enrollees in subaccount courses" do
-      course_factory(account: Account.default.sub_accounts.create!)
-      teacher_in_course
-      student_in_course
-      expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
-      expect(Account.default.grants_right?(@student, :read_outcomes)).to be_truthy
+    describe "launch_external_tool permission" do
+      it_behaves_like "a permission granted to account admins and enrollees", :launch_external_tool
     end
 
     context "view_account_calendar_details permission" do

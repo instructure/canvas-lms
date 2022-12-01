@@ -303,8 +303,10 @@ describe Lti::IMS::AuthenticationController do
       it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
         # The shared examples require `subject` to make the request -- this is
         # already set up above in the parent rspec context
-        let(:context) { course_model }
-        let(:pfc_tool_context) { context }
+
+        # Make sure user has access in the PFC tool (enrollment in tool's course)
+        let(:enrollment) { course_with_teacher(user: user, active_all: true) }
+        let(:pfc_tool_context) { enrollment.course }
 
         let(:lti_message_hint) do
           Canvas::Security.create_jwt(

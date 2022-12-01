@@ -45,10 +45,14 @@ module Lti::Concerns
     def parent_frame_origin
       return @parent_frame_origin if defined?(@parent_frame_origin)
 
+      # Don't look up tools for unauthenticated users
+      return nil unless @current_user && @current_pseudonym
+
       tool = parent_frame_context.presence && ContextExternalTool.find_by(id: parent_frame_context)
 
       @parent_frame_origin =
-        if !tool&.active? || !tool&.developer_key&.internal_service
+        if !tool&.active? || !tool&.developer_key&.internal_service ||
+           !tool.context&.grants_any_right?(@current_user, session, :read, :launch_external_tool)
           nil
         elsif tool.url
           override_parent_frame_origin(tool.url)
