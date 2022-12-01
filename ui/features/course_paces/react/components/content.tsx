@@ -127,7 +127,7 @@ export const PaceContent = ({
           padding="small"
           background="secondary"
           margin="large none none none"
-          borderWidth="small small none small"
+          borderWidth="small"
         >
           <Search contextType="section" />
         </View>
@@ -157,7 +157,7 @@ export const PaceContent = ({
           padding="small"
           background="secondary"
           margin="large none none none"
-          borderWidth="small small none small"
+          borderWidth="small"
         >
           <Search contextType="student_enrollment" />
         </View>
