@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {difference} from 'lodash'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
-import StudentContentDataLoader from './StudentContentDataLoader'
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
@@ -28,15 +26,10 @@ export default class DataLoader {
 
   customColumnsDataLoader: CustomColumnsDataLoader
 
-  studentContentDataLoader: StudentContentDataLoader
-
-  fetchStudentIds: () => Promise<string[]>
-
   constructor({
     dispatch,
     gradebook,
     performanceControls,
-    fetchStudentIds,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
@@ -44,7 +37,6 @@ export default class DataLoader {
     fetchStudentIds: () => Promise<string[]>
   }) {
     this._gradebook = gradebook
-    this.fetchStudentIds = fetchStudentIds
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
@@ -53,41 +45,10 @@ export default class DataLoader {
       performanceControls,
     }
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
-    this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
   }
 
   async loadInitialData() {
-    return this.__loadGradebookData()
-  }
-
-  loadCustomColumnData(customColumnId: string) {
-    this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
-  }
-
-  reloadStudentData() {
-    const gradebook = this._gradebook
-
-    gradebook.updateStudentsLoaded(false)
-    gradebook.updateSubmissionsLoaded(false)
-
-    return this.__loadGradebookData()
-  }
-
-  // PRIVATE
-
-  async __loadGradebookData() {
     const dataLoader = this
-    const gradebook = this._gradebook
-
-    // Store currently-loaded student ids for diffing below.
-    const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
-
-    // Begin loading Student IDs before any other data.
-    const studentIds = await this.fetchStudentIds()
-
-    const studentIdsToLoad = difference(studentIds, loadedStudentIds)
-
-    await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
 
     /*
      * Load custom column data if:
@@ -95,10 +56,14 @@ export default class DataLoader {
      *   Custom columns are done loading, and at least one of them is being shown in the Gradebook.
      */
     if (
-      !gradebook.contentLoadStates.customColumnsLoaded ||
-      gradebook.listVisibleCustomColumns().length > 0
+      !this._gradebook.contentLoadStates.customColumnsLoaded ||
+      this._gradebook.listVisibleCustomColumns().length > 0
     ) {
       dataLoader.customColumnsDataLoader.loadCustomColumnsData()
     }
+  }
+
+  loadCustomColumnData(customColumnId: string) {
+    this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
   }
 }
