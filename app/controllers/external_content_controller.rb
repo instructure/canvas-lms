@@ -90,6 +90,7 @@ class ExternalContentController < ApplicationController
            })
     if parent_frame_origin
       js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+      set_extra_csp_frame_ancestor!
     end
   end
 
