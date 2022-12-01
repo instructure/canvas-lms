@@ -267,23 +267,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     }
 
-    test('loads student content', async () => {
-      sinon.spy(dataLoader.studentContentDataLoader, 'load')
-      await loadInitialData()
-      strictEqual(dataLoader.studentContentDataLoader.load.callCount, 1)
-    })
-
     test('loads custom column data', async () => {
       sinon.spy(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData')
       await loadInitialData()
       strictEqual(dataLoader.customColumnsDataLoader.loadCustomColumnsData.callCount, 1)
-    })
-
-    test('loads custom column data after submissions finish loading', async () => {
-      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
-        strictEqual(gradebook.updateSubmissionsLoaded.withArgs(true).callCount, 1)
-      })
-      await loadInitialData()
     })
   })
 })

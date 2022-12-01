@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useCallback} from 'react'
 import shallow from 'zustand/shallow'
 import {camelize} from 'convert-case'
 import Gradebook from './Gradebook'
@@ -73,7 +73,12 @@ export default function GradebookData(props: Props) {
 
   const studentIds = useStore(state => state.studentIds, shallow)
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
+  const recentlyLoadedStudents = useStore(state => state.recentlyLoadedStudents)
+  const recentlyLoadedSubmissions = useStore(state => state.recentlyLoadedSubmissions)
   const fetchStudentIds = useStore(state => state.fetchStudentIds)
+  const loadStudentData = useStore(state => state.loadStudentData)
+  const isStudentDataLoaded = useStore(state => state.isStudentDataLoaded)
+  const isSubmissionDataLoaded = useStore(state => state.isSubmissionDataLoaded)
 
   const sisOverrides = useStore(state => state.sisOverrides)
   const fetchSisOverrides = useStore(state => state.fetchSisOverrides)
@@ -127,11 +132,13 @@ export default function GradebookData(props: Props) {
       fetchSisOverrides()
     }
     fetchCustomColumns()
+    loadStudentData()
   }, [
     fetchCustomColumns,
     fetchFilters,
     fetchFinalGradeOverrides,
     fetchModules,
+    loadStudentData,
     fetchSisOverrides,
     initializeStagedFilters,
     props.gradebookEnv.course_settings.allow_final_grade_override,
@@ -165,6 +172,10 @@ export default function GradebookData(props: Props) {
     loadAssignmentGroups,
   ])
 
+  const reloadStudentData = useCallback(() => {
+    loadStudentData()
+  }, [loadStudentData])
+
   return (
     <Gradebook
       {...props}
@@ -181,10 +192,15 @@ export default function GradebookData(props: Props) {
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isModulesLoading={isModulesLoading}
       isStudentIdsLoading={isStudentIdsLoading}
+      isStudentDataLoaded={isStudentDataLoaded}
+      isSubmissionDataLoaded={isSubmissionDataLoaded}
       finalGradeOverrides={finalGradeOverrides}
       modules={modules}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
       sisOverrides={sisOverrides}
+      recentlyLoadedStudents={recentlyLoadedStudents}
+      recentlyLoadedSubmissions={recentlyLoadedSubmissions}
+      reloadStudentData={reloadStudentData}
       studentIds={studentIds}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}

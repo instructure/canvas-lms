@@ -127,6 +127,7 @@ export const defaultGradebookProps: GradebookProps = {
     {id: '2', name: 'Another Module', position: 2},
     {id: '3', name: 'Module 2', position: 3},
   ],
+  reloadStudentData: () => {},
   settingsModalButtonContainer: document.createElement('div'),
   sisOverrides: [],
   studentIds: [],

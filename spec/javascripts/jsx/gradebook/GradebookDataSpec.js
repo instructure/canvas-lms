@@ -162,7 +162,6 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook()
-    sinon.stub(gradebook.dataLoader, 'reloadStudentData')
   })
 
   test('makes a call to update column headers', () => {
