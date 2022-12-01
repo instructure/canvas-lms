@@ -169,15 +169,9 @@ module Importers
       item.content_tags.where.not(:migration_id => nil).
         where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
-      if non_zero_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
-        non_zero_thresholds.each_key do |threshold_name|
-          content_type = threshold_name == 'discussion' ? 'DiscussionTopic' : 'Assignment'
-          content_tags = item.content_tags.where(content_type: content_type)
-          content_tags.each do |tag|
-            RequirementsService.add_unit_item_with_min_score(context_module: item, content_tag: tag, threshold_type: threshold_name)
-          end
-        end
-      else
+      non_zero_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
+
+      unless non_zero_thresholds.any?
         if hash[:completion_requirements]
           c_reqs = []
           hash[:completion_requirements].each do |req|
