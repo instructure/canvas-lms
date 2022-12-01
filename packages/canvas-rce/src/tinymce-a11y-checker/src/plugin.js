@@ -14,13 +14,14 @@ tinymce.create("tinymce.plugins.AccessibilityChecker", {
   init: function (ed) {
     ed.addCommand("openAccessibilityChecker", function (
       ui,
-      { done, config, additionalRules }
+      { done, config, additionalRules, mountNode }
     ) {
       ReactDOM.render(
         <Checker
           getBody={ed.getBody.bind(ed)}
           editor={ed}
           additionalRules={additionalRules}
+          mountNode={mountNode}
         />,
         container,
         function () {
