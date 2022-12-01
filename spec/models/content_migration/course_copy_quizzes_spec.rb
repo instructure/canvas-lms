@@ -383,6 +383,20 @@ describe ContentMigration do
       expect(bank_to.assessment_questions.active.count).to eq 1
     end
 
+    it "avoids duplicates due to alphanumeric ids" do
+      bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
+      bank1.assessment_questions.create!(question_data: {
+                                           "question_type" => "multiple_choice_question",
+                                           "name" => "test question",
+                                           "answers" => [
+                                             { "id" => "1aB", "text" => "Correct", "weight" => 100 },
+                                             { "id" => "1y3", "text" => "Incorrect", "weight" => 0 }
+                                           ],
+                                         })
+      run_course_copy
+      expect(@copy_to.assessment_questions.first.question_data[:answers].pluck(:id).uniq.count).to eq(2)
+    end
+
     it "does not copy plain text question comments as html" do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       bank1.assessment_questions.create!(question_data: {
