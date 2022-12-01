@@ -106,6 +106,7 @@ describe ExternalContentController do
 
       it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
         subject do
+          user_session(account_admin_user(account: Account.site_admin))
           post(
             :success,
             params: {
@@ -162,6 +163,7 @@ describe ExternalContentController do
 
         context "when returning from an internal service" do
           before do
+            user_session(account_admin_user(account: Account.site_admin))
             developer_key.update!(internal_service: true)
           end
 

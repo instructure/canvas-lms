@@ -1380,7 +1380,10 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !cached_account_users_for(user).empty? }
-    can %i[read read_as_admin manage update delete read_outcomes read_terms read_files]
+    can %i[
+      read read_as_admin manage update delete
+      read_outcomes read_terms read_files launch_external_tool
+    ]
 
     given { |user| root_account? && cached_all_account_users_for(user).any? }
     can :read_terms
@@ -1398,7 +1401,7 @@ class Account < ActiveRecord::Base
 
     # any user with an association to this account can read the outcomes in the account
     given { |user| user && user_account_associations.where(user_id: user).exists? }
-    can :read_outcomes
+    can [:read_outcomes, :launch_external_tool]
 
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
