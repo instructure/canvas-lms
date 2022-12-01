@@ -31,7 +31,7 @@ require "dynamic_settings/prefix_proxy"
 module DynamicSettings
   CONSUL_READ_OPTIONS = %i[recurse stale].freeze
   KV_NAMESPACE = "config/canvas"
-  CACHE_KEY_PREFIX = "dynamic_settings/"
+  CACHE_KEY_PREFIX = "dynamic_settings/*"
 
   class << self
     attr_accessor :environment
@@ -158,7 +158,8 @@ module DynamicSettings
     alias_method :kv_proxy, :find
 
     def reset_cache!
-      cache.delete_matched(/^#{CACHE_KEY_PREFIX}/o)
+      # Only Redis glob strings are supported! see: https://redis.io/commands/keys/
+      cache.delete_matched(CACHE_KEY_PREFIX)
     end
   end
 end

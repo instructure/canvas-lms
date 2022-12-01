@@ -26,6 +26,7 @@ import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
 import bridge from '../../../../../bridge'
 import base64EncodedFont from '../../svg/font'
+import * as shouldIgnoreCloseRef from '../../utils/IconMakerClose'
 
 jest.useFakeTimers()
 jest.mock('../../../../../bridge')
@@ -35,7 +36,6 @@ jest.mock('../../../shared/StoreContext')
 jest.mock('../../utils/useDebouncedValue', () =>
   jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
 )
-
 const startIconMakerUpload = jest
   .fn()
   .mockResolvedValue({url: 'https://uploaded.url', display_name: 'untitled.svg'})
@@ -58,7 +58,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   }
 
   let rcs
-
   const renderComponent = (componentProps = {}) => {
     return render(<IconMakerTray {...defaults} {...componentProps} />)
   }
@@ -88,6 +87,61 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     await act(async () => {
       jest.runOnlyPendingTimers()
     })
+  })
+
+  it('blocks first onclose event when element in rce clicked', async () => {
+    const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
+    const ed = new FakeEditor()
+    ed.id = 'editorId'
+    ed.on('click', () => document.body.click())
+    const {getByText, findByTestId} = render(
+      <>
+        <div data-id={ed.id}>
+          <button type="button">Outside button</button>
+        </div>
+        <IconMakerTray {...defaults} editor={ed} />
+      </>
+    )
+
+    const addImageButton = getByText('Add Image')
+    act(() => userEvent.click(addImageButton))
+    const singleColorOption = getByText('Single Color Image')
+    act(() => userEvent.click(singleColorOption))
+    const artIcon = await findByTestId('icon-maker-art')
+    act(() => userEvent.click(artIcon))
+
+    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
+    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
+    act(() => userEvent.click(getByText('Outside button')))
+    act(() => ed.fire('click'))
+    await waitFor(() => expect(ignoreSpy.mock.results.length).toBe(2))
+    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(true))
+    await waitFor(() => expect(ignoreSpy.mock.results[1].value).toBe(false))
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledTimes(1))
+  })
+
+  it('closes when outside element clicked', async () => {
+    const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
+    const {getByText, findByTestId} = render(
+      <>
+        <button type="button">Outside button</button>
+        <IconMakerTray {...defaults} />
+      </>
+    )
+
+    const addImageButton = getByText('Add Image')
+    act(() => userEvent.click(addImageButton))
+    const singleColorOption = getByText('Single Color Image')
+    act(() => userEvent.click(singleColorOption))
+    const artIcon = await findByTestId('icon-maker-art')
+    act(() => userEvent.click(artIcon))
+
+    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
+    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
+    act(() => userEvent.click(getByText('Outside button')))
+    await waitFor(() => expect(ignoreSpy).toHaveBeenCalled())
+    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(false))
+    await waitFor(() => expect(window.confirm).toHaveBeenCalled())
   })
 
   it('renders the create view', () => {
@@ -205,7 +259,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <metadata>
-              {"type":"image/svg+xml-icon-maker-icons","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
+              {"type":"image/svg+xml-icon-maker-icons","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
             </metadata>
             <svg
               fill="none"
@@ -217,16 +271,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
               <g
                 fill="#000000"
               >
-                <clippath
-                  id="clip-path-for-embed"
-                >
-                  <rect
-                    height="114"
-                    width="114"
-                    x="4"
-                    y="4"
-                  />
-                </clippath>
                 <rect
                   height="114"
                   width="114"
@@ -301,6 +345,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "banana",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -308,7 +353,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -324,6 +368,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -331,7 +376,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -347,6 +391,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": null,
             "alt_text": "",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -354,7 +399,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": null,
             "isDecorativeImage": true,
             "src": "https://uploaded.url",
-            "style": null,
             "width": null,
           }
         `)
@@ -559,6 +603,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
+            "STYLE": "display:block; margin-left:auto; margin-right:auto;",
             "alt_text": "one blue pine",
             "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
             "data-inst-icon-maker-icon": true,
@@ -566,7 +611,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "height": "134",
             "isDecorativeImage": false,
             "src": "https://uploaded.url",
-            "style": "display:block; margin-left:auto; margin-right:auto;",
             "width": "156",
           }
         `)

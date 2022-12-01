@@ -467,6 +467,7 @@ describe ContentMigration do
       @copy_from.homeroom_course = true
       @copy_from.course_color = "#123456"
       @copy_from.alt_name = "drama"
+      @copy_from.time_zone = "Alaska"
       @copy_from.save!
 
       tool = external_tool_1_3_model(context: @copy_from)
@@ -502,6 +503,7 @@ describe ContentMigration do
       expect(@copy_to.homeroom_course).to eq true
       expect(@copy_to.course_color).to eq "#123456"
       expect(@copy_to.alt_name).to eq "drama"
+      expect(@copy_to.time_zone.name).to eq "Alaska"
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS

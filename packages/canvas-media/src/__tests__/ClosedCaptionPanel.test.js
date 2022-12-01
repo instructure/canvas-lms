@@ -18,7 +18,10 @@
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 
-import ClosedCaptionCreator from '../ClosedCaptionCreator'
+import ClosedCaptionCreator, {ClosedCaptionPanel} from '../ClosedCaptionCreator'
+import getTranslations from '../getTranslations'
+
+jest.mock('../getTranslations', () => jest.fn(locale => Promise.resolve({[locale]: {}})))
 
 function makeProps(options = {}) {
   return {
@@ -47,7 +50,7 @@ function makeProps(options = {}) {
   }
 }
 
-describe('ClosedCaptionPanel', () => {
+describe('ClosedCaptionCreator', () => {
   const selectFile = (element, file) => {
     fireEvent.change(element, {
       target: {
@@ -63,15 +66,22 @@ describe('ClosedCaptionPanel', () => {
     document.body.appendChild(node)
   })
 
+  describe('default export', () => {
+    it('loads translations', () => {
+      render(<ClosedCaptionCreator {...makeProps({userLocale: 'es'})} />)
+      expect(getTranslations).toHaveBeenCalledWith('es')
+    })
+  })
+
   it('renders normally', () => {
-    const {getByTestId} = render(<ClosedCaptionCreator {...makeProps()} />)
+    const {getByTestId} = render(<ClosedCaptionPanel {...makeProps()} />)
     expect(getByTestId('CC-CreatorRow-choosing')).toBeInTheDocument()
   })
 
   it('selects a file', () => {
     const updateSubtitles = jest.fn()
     const {container, getByText, getByPlaceholderText, getByTestId} = render(
-      <ClosedCaptionCreator {...makeProps({updateSubtitles})} />
+      <ClosedCaptionPanel {...makeProps({updateSubtitles})} />
     )
     const selectLang = getByPlaceholderText('select language')
     fireEvent.click(selectLang)
@@ -91,7 +101,7 @@ describe('ClosedCaptionPanel', () => {
 
   it('adds a new row and focused language selector when + is clicked', () => {
     const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
-      <ClosedCaptionCreator {...makeProps()} />
+      <ClosedCaptionPanel {...makeProps()} />
     )
     expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
 
@@ -118,7 +128,7 @@ describe('ClosedCaptionPanel', () => {
 
   it('deletes a row when trashcan is clicked', () => {
     const {container, getByText, getByPlaceholderText, getAllByTestId} = render(
-      <ClosedCaptionCreator {...makeProps()} />
+      <ClosedCaptionPanel {...makeProps()} />
     )
     expect(getAllByTestId('CC-CreatorRow-choosing').length).toBe(1)
 
@@ -164,7 +174,7 @@ describe('ClosedCaptionPanel', () => {
   describe('focus', () => {
     it('moves to next CC on deleting one', () => {
       const {container, getByText, getAllByTestId} = render(
-        <ClosedCaptionCreator
+        <ClosedCaptionPanel
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
@@ -190,7 +200,7 @@ describe('ClosedCaptionPanel', () => {
 
     it('moves to add button on deleting last current one', () => {
       const {container, getByText, getAllByTestId} = render(
-        <ClosedCaptionCreator
+        <ClosedCaptionPanel
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
@@ -217,7 +227,7 @@ describe('ClosedCaptionPanel', () => {
 
     it('moves to language select on clicking the add button', () => {
       const {container, getByText, getByPlaceholderText} = render(
-        <ClosedCaptionCreator
+        <ClosedCaptionPanel
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},
@@ -240,7 +250,7 @@ describe('ClosedCaptionPanel', () => {
       // the user has existing captions, clicks + to start adding a new one,
       // then jumps up and deletes one of the existing ones.
       const {container, getByText, getByPlaceholderText} = render(
-        <ClosedCaptionCreator
+        <ClosedCaptionPanel
           {...makeProps({
             subtitles: [
               {locale: 'en', file: {name: 'en.srt'}},

@@ -50,7 +50,7 @@ describe('buildSvg()', () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-icon-maker-icons","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
+          {"type":"image/svg+xml-icon-maker-icons","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","imageSettings":null}
         </metadata>
         <svg
           fill="none"
@@ -62,15 +62,6 @@ describe('buildSvg()', () => {
           <g
             fill="#000"
           >
-            <clippath
-              id="clip-path-for-embed"
-            >
-              <circle
-                cx="109"
-                cy="109"
-                r="105"
-              />
-            </clippath>
             <circle
               cx="109"
               cy="109"
@@ -123,15 +114,6 @@ describe('buildSvg()', () => {
           <g
             fill="none"
           >
-            <clippath
-              id="clip-path-for-embed"
-            >
-              <circle
-                cx="109"
-                cy="109"
-                r="105"
-              />
-            </clippath>
             <circle
               cx="109"
               cy="109"
@@ -173,7 +155,7 @@ describe('buildSvg()', () => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-icon-maker-icons","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
+          {"type":"image/svg+xml-icon-maker-icons","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","imageSettings":null}
         </metadata>
         <svg
           fill="none"
@@ -185,15 +167,6 @@ describe('buildSvg()', () => {
           <g
             fill="#000"
           >
-            <clippath
-              id="clip-path-for-embed"
-            >
-              <circle
-                cx="109"
-                cy="109"
-                r="105"
-              />
-            </clippath>
             <circle
               cx="109"
               cy="109"

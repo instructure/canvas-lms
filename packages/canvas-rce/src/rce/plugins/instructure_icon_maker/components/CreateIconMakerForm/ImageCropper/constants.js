@@ -32,7 +32,6 @@ export const BUTTON_ROTATION_DEGREES = 90
 export const BACKGROUND_SQUARE_SIZE = 16
 
 export const DEFAULT_CROPPER_SETTINGS = {
-  image: null,
   shape: 'square',
   rotation: 0,
   scaleRatio: MIN_SCALE_RATIO,

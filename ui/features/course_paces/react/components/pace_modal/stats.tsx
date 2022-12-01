@@ -89,8 +89,12 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
   let endDateValue, endHelpText
-  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
-    endDateValue = plannedEndDate
+  if (enrollmentType) {
+    if (window.ENV.FEATURES.course_paces_for_students) {
+      endDateValue = coursePace.end_date || plannedEndDate
+    } else {
+      endDateValue = plannedEndDate
+    }
     endHelpText = END_DATE_CAPTIONS.user
   } else {
     endDateValue =
@@ -214,7 +218,11 @@ export const PaceModalStats: React.FC<PassedProps> = ({
         >
           <IconAssignmentLine color="alert" size="small" theme={{alertColor: '#0374B5'}} />
         </View>
-        <View display="inline-block" margin="small none none none">
+        <View
+          data-testid="course-pace-assignment-number"
+          display="inline-block"
+          margin="small none none none"
+        >
           {getColoredText('#30203A', I18n.t('Assignments'))}
           {getColoredText('#0374B5', assignments, {as: 'div', weight: 'bold'})}
         </View>
@@ -261,7 +269,11 @@ export const PaceModalStats: React.FC<PassedProps> = ({
         >
           <IconClockLine color="alert" size="small" theme={{alertColor: '#068447'}} />
         </View>
-        <View display="inline-block" margin="small none none none">
+        <View
+          data-testid="course-pace-duration"
+          display="inline-block"
+          margin="small none none none"
+        >
           {getColoredText('#30203A', I18n.t('Duration'))}
           {getColoredText('#068447', duration, {as: 'div', weight: 'bold'})}
         </View>
@@ -271,7 +283,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
 
   return (
     <Flex
-      data-testid="projected-dates-redesing"
+      data-testid="projected-dates-redesign"
       direction={shrink ? 'column' : 'row'}
       margin="none none small none"
       alignItems="stretch"

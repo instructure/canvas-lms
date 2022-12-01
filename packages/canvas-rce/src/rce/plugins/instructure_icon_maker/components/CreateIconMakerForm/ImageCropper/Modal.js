@@ -32,14 +32,14 @@ import {createCroppedImageSvg} from './imageCropUtils'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {DirectionRegion} from './DirectionRegion'
 
-const handleSubmit = (onSubmit, settings) =>
-  createCroppedImageSvg(settings)
+const handleSubmit = (onSubmit, cropperSettings, image) =>
+  createCroppedImageSvg(cropperSettings, image)
     .then(generatedSvg =>
       convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
     )
-    .then(base64Image => onSubmit(settings, base64Image))
+    .then(base64Image => onSubmit(cropperSettings, base64Image))
 
-const renderBody = (settings, dispatch, message, loading) => {
+const renderBody = (image, settings, dispatch, message, loading) => {
   if (loading) {
     return (
       <Flex justifyItems="center" margin="">
@@ -62,7 +62,7 @@ const renderBody = (settings, dispatch, message, loading) => {
         <Controls settings={settings} dispatch={dispatch} />
       </Flex.Item>
       <Flex.Item>
-        <Preview settings={settings} dispatch={dispatch} />
+        <Preview image={image} settings={settings} dispatch={dispatch} />
       </Flex.Item>
       <DirectionRegion direction={settings.direction} />
     </Flex>
@@ -93,9 +93,6 @@ export const ImageCropperModal = ({
   trayDispatch,
 }) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
-  useEffect(() => {
-    dispatch({type: actions.SET_IMAGE, payload: image})
-  }, [image])
 
   useEffect(() => {
     cropSettings && dispatch({type: actions.UPDATE_SETTINGS, payload: cropSettings})
@@ -115,7 +112,7 @@ export const ImageCropperModal = ({
         // Direction is only used while in cropper and
         // should not be embedded in the icon's metadata
         const {direction, ...otherSettings} = settings
-        handleSubmit(onSubmit, otherSettings).then(onClose).catch(onClose)
+        handleSubmit(onSubmit, otherSettings, image).then(onClose).catch(onClose)
       }}
       shouldCloseOnDocumentClick={false}
     >
@@ -128,7 +125,7 @@ export const ImageCropperModal = ({
         />
         <Heading>{formatMessage('Crop Image')}</Heading>
       </Modal.Header>
-      <Modal.Body>{renderBody(settings, dispatch, message, loading)}</Modal.Body>
+      <Modal.Body>{renderBody(image, settings, dispatch, message, loading)}</Modal.Body>
       {!loading && (
         <Modal.Footer id="imageCropperFooter">{renderFooter(settings, onClose)}</Modal.Footer>
       )}

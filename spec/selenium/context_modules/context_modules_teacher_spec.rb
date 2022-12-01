@@ -677,5 +677,47 @@ describe "context modules" do
         expect(is_checked(f("#external_tool_create_new_tab"))).to be_truthy
       end
     end
+
+    context "with quizzes_next and new_quizzes_modules_support flags enabled" do
+      before :once do
+        @course.enable_feature! :quizzes_next
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+        @course.context_modules.create!(name: "Course Quizzes")
+      end
+
+      it "lets user select classic quiz or new quiz when new_quizzes_by_default is disabled" do
+        @course.disable_feature! :new_quizzes_by_default
+        get "/courses/#{@course.id}/modules"
+
+        add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
+          expect(f("#quizs_select")).to contain_css("input[name=quiz_engine_selection]")
+          expect(f("#quizs_select .new")).to include_text("New Quizzes")
+          expect(f("#quizs_select .new")).to include_text("Classic Quizzes")
+          f("label[for=classic_quizzes_radio]").click
+        end
+        expect(ContentTag.last.content.is_a?(Quizzes::Quiz)).to be_truthy
+      end
+
+      it "creates a new quiz by default when new_quizzes_by_default is enabled" do
+        @course.enable_feature! :new_quizzes_by_default
+        get "/courses/#{@course.id}/modules"
+
+        add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do
+          expect(f("#quizs_select")).not_to contain_css("input[name=quiz_engine_selection]")
+          expect(f("#quizs_select .new")).not_to include_text("New Quizzes")
+          expect(f("#quizs_select .new")).not_to include_text("Classic Quizzes")
+        end
+        expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
+      end
+    end
   end
 end

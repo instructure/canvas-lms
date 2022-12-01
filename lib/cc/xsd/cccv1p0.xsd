@@ -104,6 +104,7 @@
         <xs:element name="homeroom_course" type="xs:boolean" minOccurs="0"/>
         <xs:element name="course_color" type="xs:string" minOccurs="0"/>
         <xs:element name="alt_name" type="xs:string" minOccurs="0"/>
+        <xs:element name="time_zone" type="xs:string" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="banner_image_url" type="xs:string" minOccurs="0"/>
@@ -890,5 +891,44 @@
       <xs:element name="late_submission_minimum_percent" type="optional_float" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
+
+  <xs:complexType name="blueprint_restriction">
+    <xs:attribute name="content_type" type="xs:string" use="required"/>
+    <xs:attribute name="content" type="xs:boolean" use="optional"/>
+    <xs:attribute name="points" type="xs:boolean" use="optional"/>
+    <xs:attribute name="due_dates" type="xs:boolean" use="optional"/>
+    <xs:attribute name="availability_dates" type="xs:boolean" use="optional"/>
+    <xs:attribute name="state" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+
+  <xs:element name="blueprint_settings">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="use_default_restrictions_by_type" type="xs:boolean"/>
+        <xs:element name="restrictions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="restriction" type="blueprint_restriction" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="restricted_items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="use_default_restrictions" type="xs:boolean"/>
+                    <xs:element name="restriction" type="blueprint_restriction"/>
+                  </xs:all>
+                  <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>

@@ -44,6 +44,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
 
   dispatch({...actions.SET_IMAGE, payload: ''})
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+  onChange({type: svgActions.SET_EMBED_IMAGE, payload: ''})
   if (canCompressImage() && shouldCompressImage(dataBlob)) {
     try {
       // If compression fails, use the original one
@@ -56,6 +57,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
     dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
   }
   dispatch({...actions.SET_IMAGE, payload: image})
+  onChange({type: svgActions.SET_EMBED_IMAGE, payload: image})
 }
 
 const Course = ({dispatch, onChange, onLoading, onLoaded}) => {

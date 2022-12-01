@@ -18,7 +18,6 @@
 
 import {difference} from 'lodash'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
-import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
@@ -28,8 +27,6 @@ export default class DataLoader {
   _gradebook: Gradebook
 
   customColumnsDataLoader: CustomColumnsDataLoader
-
-  sisOverridesLoader: SisOverridesLoader
 
   studentContentDataLoader: StudentContentDataLoader
 
@@ -56,7 +53,6 @@ export default class DataLoader {
       performanceControls,
     }
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
-    this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
   }
 
@@ -66,10 +62,6 @@ export default class DataLoader {
 
   loadCustomColumnData(customColumnId: string) {
     this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
-  }
-
-  loadOverridesForSIS() {
-    this.sisOverridesLoader.loadOverrides()
   }
 
   reloadStudentData() {

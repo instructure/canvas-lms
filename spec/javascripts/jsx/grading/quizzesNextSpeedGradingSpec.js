@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import quizzesNextSpeedGrading from 'ui/features/speed_grader/quizzesNextSpeedGrading'
+import QuizzesNextSpeedGrading from 'ui/features/speed_grader/QuizzesNextSpeedGrading'
 
 const postMessageStub = sinon.stub()
 const fakeIframeHolder = {
@@ -65,9 +65,10 @@ const resetStubs = function () {
   refreshFullRubricStub.reset()
   setGradeReadOnlStub.reset()
   showSubmissionDetailsStub.reset()
+  postMessageStub.reset()
 }
 
-QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
+QUnit.module('QuizzesNextSpeedGrading', suiteHooks => {
   let speedGraderWindow
 
   suiteHooks.beforeEach(() => {
@@ -81,170 +82,193 @@ QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
     resetStubs()
   })
 
-  test('adds a message event listener to window', () => {
-    quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    ok(addEventListenerStub.calledWith('message'))
-  })
-
-  test('sets grade to read only with a quizzesNext.register message', () => {
-    const fns = quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    fns.onMessage({data: {subject: 'quizzesNext.register'}})
-    ok(fakeEG.setGradeReadOnly.calledWith(true))
-  })
-
-  test('calls the registerCallback with a quizzesNext.register message', () => {
-    const fns = quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    fns.onMessage({data: {subject: 'quizzesNext.register'}})
-    ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
-  })
-
-  test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', () => {
-    const fns = quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-    ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
-  })
-
-  test('calls the correct functions on EG', () => {
-    const fnsToCallOnEG = [
-      'refreshSubmissionsToView',
-      'showGrade',
-      'showDiscussion',
-      'showRubric',
-      'updateStatsInHeader',
-      'refreshFullRubric',
-      'setGradeReadOnly',
-    ]
-
-    const fns = quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    const fakeSubmissionData = {}
-    fns.quizzesNextChange(fakeSubmissionData)
-
-    fnsToCallOnEG.forEach(egFunction => {
-      ok(fakeEG[egFunction].called)
-    })
-  })
-
-  test('postChangeSubmissionMessage postMessage with the submission data', () => {
-    const fns = quizzesNextSpeedGrading(
-      fakeEG,
-      fakeIframeHolder,
-      registerCbStub,
-      refreshGradesCbStub,
-      speedGraderWindow
-    )
-    const arbitrarySubmissionData = {}
-    fns.postChangeSubmissionMessage(arbitrarySubmissionData)
-    ok(showSubmissionDetailsStub.called)
-    ok(
-      postMessageStub.calledWith({
-        submission: arbitrarySubmissionData,
-        subject: 'canvas.speedGraderSubmissionChange',
-      })
-    )
-  })
-
-  QUnit.module('polling for refreshed grades', contextHooks => {
-    let originalSubmission
-    let submission
-    let numRequests
-    let onMessage
-
-    contextHooks.beforeEach(() => {
-      submission = {graded_at: '2016-07-11T19:22:14Z'}
-      originalSubmission = {graded_at: '2016-07-11T19:22:14Z'}
-      numRequests = 1
-      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, numRequests)
-      onMessage = quizzesNextSpeedGrading(
+  QUnit.module('setup', () => {
+    test('adds a message event listener to window', () => {
+      QuizzesNextSpeedGrading.setup(
         fakeEG,
         fakeIframeHolder,
         registerCbStub,
         refreshGradesCbStub,
         speedGraderWindow
-      ).onMessage
+      )
+      ok(addEventListenerStub.calledWith('message'))
     })
 
-    test('re-polls for updated grades if submission graded_at has not been updated', () => {
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      ok(refreshGrades)
+    test('sets grade to read only with a quizzesNext.register message', () => {
+      const fns = QuizzesNextSpeedGrading.setup(
+        fakeEG,
+        fakeIframeHolder,
+        registerCbStub,
+        refreshGradesCbStub,
+        speedGraderWindow
+      )
+      fns.onMessage({data: {subject: 'quizzesNext.register'}})
+      ok(fakeEG.setGradeReadOnly.calledWith(true))
     })
 
-    test('re-polls for updated grades if submission graded_at was originally blank and is still blank', () => {
-      originalSubmission.graded_at = null
-      submission.graded_at = null
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      ok(refreshGrades)
+    test('calls the registerCallback with a quizzesNext.register message', () => {
+      const fns = QuizzesNextSpeedGrading.setup(
+        fakeEG,
+        fakeIframeHolder,
+        registerCbStub,
+        refreshGradesCbStub,
+        speedGraderWindow
+      )
+      fns.onMessage({data: {subject: 'quizzesNext.register'}})
+      ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
     })
 
-    test('re-polls for updated grades if submission graded_at was originally present and is now blank', () => {
-      originalSubmission.graded_at = '2016-07-11T19:22:14Z'
-      submission.graded_at = null
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      ok(refreshGrades)
+    test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', () => {
+      const fns = QuizzesNextSpeedGrading.setup(
+        fakeEG,
+        fakeIframeHolder,
+        registerCbStub,
+        refreshGradesCbStub,
+        speedGraderWindow
+      )
+      fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+      ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
     })
 
-    test('does not re-poll for updated grades if submission graded_at was originally blank and is now set', () => {
-      originalSubmission.graded_at = null
-      submission.graded_at = '2016-07-11T19:22:14Z'
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      notOk(refreshGrades)
+    test('calls the correct functions on EG', () => {
+      const fnsToCallOnEG = [
+        'refreshSubmissionsToView',
+        'showGrade',
+        'showDiscussion',
+        'showRubric',
+        'updateStatsInHeader',
+        'refreshFullRubric',
+        'setGradeReadOnly',
+      ]
+
+      const fns = QuizzesNextSpeedGrading.setup(
+        fakeEG,
+        fakeIframeHolder,
+        registerCbStub,
+        refreshGradesCbStub,
+        speedGraderWindow
+      )
+      const fakeSubmissionData = {}
+      fns.quizzesNextChange(fakeSubmissionData)
+
+      fnsToCallOnEG.forEach(egFunction => {
+        ok(fakeEG[egFunction].called)
+      })
     })
 
-    test('does not re-poll for updated grades if submission graded_at has been updated', () => {
-      originalSubmission.graded_at = '2016-07-11T19:22:14Z'
-      submission.graded_at = '2016-07-12T19:22:14Z'
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      notOk(refreshGrades)
+    test('postChangeSubmissionMessage postMessage with the submission data', () => {
+      const fns = QuizzesNextSpeedGrading.setup(
+        fakeEG,
+        fakeIframeHolder,
+        registerCbStub,
+        refreshGradesCbStub,
+        speedGraderWindow
+      )
+      const arbitrarySubmissionData = {}
+      fns.postChangeSubmissionMessage(arbitrarySubmissionData)
+      ok(showSubmissionDetailsStub.called)
+      ok(
+        postMessageStub.calledWith({
+          submission: arbitrarySubmissionData,
+          subject: 'canvas.speedGraderSubmissionChange',
+        })
+      )
     })
 
-    test('does not re-poll if max requests have been made (even if graded_at has not been updated)', () => {
-      originalSubmission.graded_at = '2016-07-11T19:22:14Z'
-      submission.graded_at = '2016-07-11T19:22:14Z'
-      numRequests = speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
-      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, numRequests)
-      const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      notOk(refreshGrades)
-    })
+    QUnit.module('polling for refreshed grades', contextHooks => {
+      let originalSubmission
+      let submission
+      let numRequests
+      let onMessage
 
-    test('defaults to 20 max requests', () => {
-      originalSubmission.graded_at = '2016-07-11T19:22:14Z'
-      submission.graded_at = '2016-07-11T19:22:14Z'
-      delete speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
-      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 19)
-      let refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      ok(refreshGrades)
-      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 20)
-      refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-      notOk(refreshGrades)
+      contextHooks.beforeEach(() => {
+        submission = {graded_at: '2016-07-11T19:22:14Z'}
+        originalSubmission = {graded_at: '2016-07-11T19:22:14Z'}
+        numRequests = 1
+        refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, numRequests)
+        onMessage = QuizzesNextSpeedGrading.setup(
+          fakeEG,
+          fakeIframeHolder,
+          registerCbStub,
+          refreshGradesCbStub,
+          speedGraderWindow
+        ).onMessage
+      })
+
+      test('re-polls for updated grades if submission graded_at has not been updated', () => {
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        ok(refreshGrades)
+      })
+
+      test('re-polls for updated grades if submission graded_at was originally blank and is still blank', () => {
+        originalSubmission.graded_at = null
+        submission.graded_at = null
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        ok(refreshGrades)
+      })
+
+      test('re-polls for updated grades if submission graded_at was originally present and is now blank', () => {
+        originalSubmission.graded_at = '2016-07-11T19:22:14Z'
+        submission.graded_at = null
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        ok(refreshGrades)
+      })
+
+      test('does not re-poll for updated grades if submission graded_at was originally blank and is now set', () => {
+        originalSubmission.graded_at = null
+        submission.graded_at = '2016-07-11T19:22:14Z'
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        notOk(refreshGrades)
+      })
+
+      test('does not re-poll for updated grades if submission graded_at has been updated', () => {
+        originalSubmission.graded_at = '2016-07-11T19:22:14Z'
+        submission.graded_at = '2016-07-12T19:22:14Z'
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        notOk(refreshGrades)
+      })
+
+      test('does not re-poll if max requests have been made (even if graded_at has not been updated)', () => {
+        originalSubmission.graded_at = '2016-07-11T19:22:14Z'
+        submission.graded_at = '2016-07-11T19:22:14Z'
+        numRequests = speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
+        refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, numRequests)
+        const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        notOk(refreshGrades)
+      })
+
+      test('defaults to 20 max requests', () => {
+        originalSubmission.graded_at = '2016-07-11T19:22:14Z'
+        submission.graded_at = '2016-07-11T19:22:14Z'
+        delete speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
+        refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 19)
+        let refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        ok(refreshGrades)
+        refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 20)
+        refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+        notOk(refreshGrades)
+      })
+    })
+  })
+
+  QUnit.module('postGradeByQuestionChangeMessage', () => {
+    test('posts a message with the enabled state of the grade by question feature', () => {
+      QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage(fakeIframeHolder, true)
+      ok(
+        postMessageStub.calledOnceWith({
+          subject: 'canvas.speedGraderGradeByQuestionChange',
+          enabled: true,
+        })
+      )
+
+      postMessageStub.resetHistory()
+      QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage(fakeIframeHolder, false)
+      ok(
+        postMessageStub.calledOnceWith({
+          subject: 'canvas.speedGraderGradeByQuestionChange',
+          enabled: false,
+        })
+      )
     })
   })
 })

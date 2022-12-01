@@ -208,10 +208,10 @@ export type AssignmentGroup = {
   assignments: Assignment[]
   group_weight: number
   id: string
-  integration_data: any
+  integration_data: unknown
   name: string
   position: number
-  rules: any
+  rules: unknown
   sis_source_id: null | string
 }
 
@@ -252,7 +252,6 @@ export type Section = {
   end_at: null | string
   id: string
   integration_id: null | string
-  name: string
   name: string
   nonxlist_course_id: null | string
   restrict_enrollments_to_section_dates: null | boolean

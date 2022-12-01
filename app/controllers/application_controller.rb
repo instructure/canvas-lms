@@ -315,7 +315,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
     calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign course_paces_for_students send_usage_metrics
+    course_paces_redesign course_paces_for_students send_usage_metrics rce_better_paste
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -799,20 +799,19 @@ class ApplicationController < ActionController::Base
     require_user
   end
 
+  def csp_frame_ancestors
+    # Allow iframing on all vanity domains as well as the canonical one
+    unless @domain_root_account.nil?
+      HostUrl.context_hosts(@domain_root_account, request.host)
+    end
+  end
+
   def set_response_headers
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
-      #
-      # Allow iframing on all vanity domains as well as the canonical one
-      #
-      equivalent_domains = []
-      unless @domain_root_account.nil?
-        equivalent_domains = HostUrl.context_hosts(@domain_root_account, request.host)
-      end
-
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(" ")};")
+      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)

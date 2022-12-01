@@ -49,7 +49,6 @@ module Factories
   def valid_course_pace_attributes
     {
       workflow_state: "active",
-      end_date: "2021-09-30",
       exclude_weekends: true,
       hard_end_dates: true,
       published_at: Time.current,
@@ -61,7 +60,6 @@ module Factories
   def valid_section_pace_attributes(section)
     {
       workflow_state: "active",
-      end_date: "2021-09-30",
       exclude_weekends: true,
       hard_end_dates: true,
       published_at: Time.current,
@@ -73,7 +71,6 @@ module Factories
   def valid_student_enrollment_pace_attributes(student_enrollment)
     {
       workflow_state: "active",
-      end_date: "2021-09-30",
       exclude_weekends: true,
       hard_end_dates: true,
       published_at: Time.current,

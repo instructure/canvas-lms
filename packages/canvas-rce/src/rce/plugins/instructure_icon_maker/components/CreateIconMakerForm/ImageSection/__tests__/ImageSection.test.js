@@ -180,6 +180,94 @@ describe('ImageSection', () => {
     })
   })
 
+  describe('when changing shape', () => {
+    it('updates cropper settings if has a value', async () => {
+      const overrides = {
+        settings: {
+          shape: 'square',
+          size: Size.Small,
+          imageSettings: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'square',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        },
+        editing: false,
+        editor: {},
+        onChange: jest.fn(),
+      }
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+      await waitFor(() => {
+        expect(overrides.onChange).toHaveBeenCalledWith({
+          type: 'SetImageSettings',
+          payload: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'circle',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        })
+      })
+    })
+
+    it('does not update cropper settings if is null', async () => {
+      const overrides = {
+        settings: {
+          shape: 'square',
+          size: Size.Small,
+          imageSettings: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: null,
+          },
+        },
+        editing: false,
+        editor: {},
+        onChange: jest.fn(),
+      }
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+
+      await waitFor(() => {
+        expect(overrides.onChange).not.toHaveBeenCalledWith({
+          type: 'SetCropperSettings',
+          payload: {
+            shape: 'circle',
+            rotation: 0,
+            scaleRatio: 1.0,
+            translateX: 0,
+            translateY: 0,
+          },
+        })
+      })
+    })
+  })
+
   describe('when the cropper FF is off', () => {
     let rendered
 
@@ -302,7 +390,6 @@ describe('ImageSection', () => {
         })
         const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
         expect(payload.cropperSettings).toEqual({
-          image: 'data:image/png;base64,asdfasdfjksdf==',
           shape: 'square',
           rotation: 0,
           scaleRatio: 1.1,
@@ -382,14 +469,13 @@ describe('ImageSection', () => {
   })
 
   describe('when the "course images" mode is selected', () => {
-    let getByTestId, getByText, getByTitle
+    let getByTestId, getByText
 
     beforeEach(() => {
       const rendered = subject({rcsConfig: {features: {icon_maker_cropper: true}}})
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
-      getByTitle = rendered.getByTitle
 
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Course Images'))
@@ -401,67 +487,6 @@ describe('ImageSection', () => {
 
     it('scrolls the component into view smoothly 😎', async () => {
       await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({behavior: 'smooth'}))
-    })
-
-    describe('and an image is clicked', () => {
-      let originalFileReader
-      const flushPromises = () => new Promise(setTimeout)
-
-      beforeEach(() => {
-        fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
-
-        originalFileReader = FileReader
-        Object.defineProperty(global, 'FileReader', {
-          writable: true,
-          value: jest.fn().mockImplementation(() => ({
-            readAsDataURL() {
-              this.onloadend()
-            },
-            result: 'data:image/png;base64,asdfasdfjksdf==',
-          })),
-        })
-
-        // Click the first image
-        fireEvent.click(getByTitle('Click to embed image_one.png'))
-      })
-
-      afterEach(() => {
-        fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
-        Object.defineProperty(global, 'FileReader', {
-          writable: true,
-          value: originalFileReader,
-        })
-      })
-
-      it('dispatches an action to update parent state image', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImage',
-          payload: 'data:image/png;base64,asdfasdfjksdf==',
-        })
-      })
-
-      it('dispatches an action to update parent state image type', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImageType',
-          payload: 'Course',
-        })
-      })
-
-      it('dispatches an action to update parent state image name', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImageName',
-          payload: 'grid.png',
-        })
-      })
     })
   })
 
@@ -562,9 +587,11 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
+                imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  mode: 'Course',
+                  imageName: 'banana.jpg',
+                },
               },
               editing: true,
             },
@@ -582,9 +609,11 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
+                imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  mode: 'Course',
+                  imageName: 'banana.jpg',
+                },
               },
               editing: true,
             },
@@ -604,10 +633,9 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
                 imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  imageName: 'banana.jpg',
                   mode: 'SingleColor',
                   icon: 'art',
                 },
@@ -630,10 +658,9 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
                 imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  imageName: 'banana.jpg',
                   mode: 'SingleColor',
                   icon: 'art',
                   iconFillColor: '#00FF00',

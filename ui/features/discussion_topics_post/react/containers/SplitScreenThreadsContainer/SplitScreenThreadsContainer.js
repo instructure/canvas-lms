@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
+import {
+  AUTO_MARK_AS_READ_DELAY,
+  SearchContext,
+  DiscussionManagerUtilityContext,
+} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
@@ -70,11 +74,12 @@ export const SplitScreenThreadsContainer = props => {
     },
   })
 
+  const extractedSubentryNodes = props.discussionEntry.discussionSubentriesConnection?.nodes // extracting to new variable to use in useEffect deps
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
+        const entries = extractedSubentryNodes.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
         entryIds = entries.map(entry => entry._id)
@@ -96,11 +101,7 @@ export const SplitScreenThreadsContainer = props => {
 
       return () => clearInterval(interval)
     }
-  }, [
-    discussionEntriesToUpdate,
-    props.discussionEntry.discussionSubentriesConnection.nodes,
-    updateDiscussionEntriesReadState,
-  ])
+  }, [discussionEntriesToUpdate, extractedSubentryNodes, updateDiscussionEntriesReadState])
 
   const setToBeMarkedAsRead = entryId => {
     if (!discussionEntriesToUpdate.has(entryId)) {
@@ -194,6 +195,7 @@ const SplitScreenThreadContainer = props => {
   const [reportingError, setReportingError] = useState(false)
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const {filter} = useContext(SearchContext)
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
 
@@ -275,14 +277,7 @@ const SplitScreenThreadContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        isIsolatedView={true}
-        onClick={() =>
-          props.onOpenSplitScreenView(
-            props.discussionEntry._id,
-            props.discussionEntry.isolatedEntryId,
-            true
-          )
-        }
+        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, true)}
       />
     )
   }
@@ -311,7 +306,7 @@ const SplitScreenThreadContainer = props => {
         authorName={getDisplayName(props.discussionEntry)}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
-        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, null, false)}
+        onClick={() => props.onOpenSplitScreenView(props.discussionEntry._id, false)}
       />
     )
   }
@@ -363,7 +358,6 @@ const SplitScreenThreadContainer = props => {
                         goToParent={() => {
                           props.onOpenSplitScreenView(
                             props.discussionEntry.rootEntryId,
-                            props.discussionEntry.rootEntryId,
                             false,
                             props.discussionEntry.rootEntryId
                           )
@@ -374,13 +368,16 @@ const SplitScreenThreadContainer = props => {
                             ? () => {
                                 props.onOpenSplitScreenView(
                                   props.discussionEntry.rootEntryId,
-                                  props.discussionEntry.rootEntryId,
                                   false,
                                   props.discussionEntry.quotedEntry._id
                                 )
                               }
                             : null
                         }
+                        onQuoteReply={() => {
+                          setReplyFromId(props.discussionEntry._id)
+                          props.onOpenSplitScreenView(props.discussionEntry._id, true)
+                        }}
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

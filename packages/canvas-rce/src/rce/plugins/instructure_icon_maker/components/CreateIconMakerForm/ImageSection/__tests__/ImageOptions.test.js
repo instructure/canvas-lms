@@ -31,6 +31,7 @@ jest.mock('../../ImageCropper/imageCropUtils', () => ({
 
 describe('ImageOptions', () => {
   const dispatchFn = jest.fn()
+  const trayDispatchFn = jest.fn()
   const defaultProps = {
     state: {
       image: null,
@@ -42,7 +43,7 @@ describe('ImageOptions', () => {
     },
     dispatch: dispatchFn,
     rcsConfig: {},
-    trayDispatch: () => {},
+    trayDispatch: trayDispatchFn,
   }
 
   beforeAll(() => {
@@ -95,8 +96,8 @@ describe('ImageOptions', () => {
     it('sets state image when submitting', async () => {
       await waitFor(() => {
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        expect(dispatchFn.mock.calls[0][0]).toEqual({
-          type: 'SetImage',
+        expect(trayDispatchFn).toHaveBeenCalledWith({
+          type: 'SetEmbedImage',
           payload: 'data:image/svg+xml;base64,bnVsbA==',
         })
       })
@@ -105,10 +106,9 @@ describe('ImageOptions', () => {
     it('sets state cropper settings when submitting', async () => {
       await waitFor(() => {
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        expect(dispatchFn.mock.calls[1][0]).toEqual({
+        expect(dispatchFn).toHaveBeenCalledWith({
           type: 'SetCropperSettings',
           payload: {
-            image: 'data:image/png;base64,asdfasdfjksdf==',
             rotation: 0,
             scaleRatio: 1,
             shape: 'square',

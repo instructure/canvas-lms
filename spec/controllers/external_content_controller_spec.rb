@@ -101,6 +101,80 @@ describe ExternalContentController do
           lti_errorlog: '{"html"=>"errorlog somehtml"}'
         )
       end
+
+      describe "DEEP_LINKING_POST_MESSAGE_ORIGIN" do
+        subject do
+          post(
+            :success,
+            params: {
+              service: "external_tool_dialog",
+              course_id: c.id,
+              parent_frame_context: tool.id
+            }
+          )
+        end
+
+        let(:tool) do
+          c.context_external_tools.create!(
+            {
+              name: "test tool",
+              domain: "test.com",
+              consumer_key: "fake_oauth_consumer_key",
+              shared_secret: "secret",
+              developer_key: developer_key,
+              url: "http://test.com/login",
+            }
+          )
+        end
+        let(:developer_key) do
+          key = DeveloperKey.new
+          key.generate_rsa_keypair!
+          key.save!
+          key.developer_key_account_bindings.first.update!(
+            workflow_state: "on"
+          )
+          key
+        end
+
+        context "when returning from a non-internal service" do
+          it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            subject
+          end
+        end
+
+        context "when returning from an internal service" do
+          before do
+            developer_key.update!(internal_service: true)
+          end
+
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            allow(controller).to receive(:js_env)
+            subject
+            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+          end
+
+          context "when the tool has a domain and not a url" do
+            let(:tool) do
+              c.context_external_tools.create!(
+                {
+                  name: "test tool",
+                  domain: "test.com",
+                  consumer_key: "fake_oauth_consumer_key",
+                  shared_secret: "secret",
+                  developer_key: developer_key,
+                }
+              )
+            end
+
+            it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+              allow(controller).to receive(:js_env)
+              subject
+              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, true)
+            end
+          end
+        end
+      end
     end
 
     context "external_tool service_id" do

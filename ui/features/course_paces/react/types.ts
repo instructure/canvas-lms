@@ -153,6 +153,9 @@ export interface UIState {
   readonly editingBlackoutDates: boolean
 }
 
+export type SortableColumn = 'name' | null
+export type OrderType = 'asc' | 'desc'
+
 export interface PaceContextsState {
   readonly selectedContextType: APIPaceContextTypes
   readonly selectedContext: PaceContext | null
@@ -163,6 +166,9 @@ export interface PaceContextsState {
   readonly isLoading: boolean
   readonly defaultPaceContext: PaceContext | null
   readonly isLoadingDefault: false
+  readonly searchTerm: string
+  readonly sortBy: SortableColumn
+  readonly order: OrderType
 }
 
 export interface StoreState {
@@ -192,9 +198,17 @@ export interface PaceContext {
   applied_pace: Pace | null
 }
 
-export interface PaceContextApiresponse {
+export interface PaceContextsApiResponse {
   pace_contexts: PaceContext[]
   total_entries: number
+}
+
+export interface PaceContextsAsyncActionPayload {
+  result: PaceContextsApiResponse | PaceContext
+  page?: number
+  searchTerm?: string
+  sortBy?: SortableColumn
+  orderType?: OrderType
 }
 
 /* Random types  */

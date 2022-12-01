@@ -36,14 +36,19 @@ export const ShapeSection = ({settings, onChange}) => {
   useEffect(() => {
     // if the user has an embedded image, we need to re-crop it so it fits the new shape
     if (settings.imageSettings?.cropperSettings) {
-      createCroppedImageSvg({...settings.imageSettings.cropperSettings, shape: settings.shape})
+      const newCropperSettings = {...settings.imageSettings.cropperSettings, shape: settings.shape}
+      createCroppedImageSvg(newCropperSettings, settings.imageSettings.image)
         .then(generatedSvg =>
           convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
         )
         .then(base64Image => {
           onChange({
-            type: actions.SET_ENCODED_IMAGE,
+            type: actions.SET_EMBED_IMAGE,
             payload: base64Image,
+          })
+          onChange({
+            type: actions.SET_IMAGE_SETTINGS,
+            payload: {...settings.imageSettings, cropperSettings: newCropperSettings},
           })
         })
         // eslint-disable-next-line no-console

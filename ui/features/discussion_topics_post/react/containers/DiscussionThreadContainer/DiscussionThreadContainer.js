@@ -23,6 +23,7 @@ import {
   responsiveQuerySizes,
   isTopicAuthor,
   getDisplayName,
+  getOptimisticResponse,
   buildQuotedReply,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -204,6 +205,9 @@ export const DiscussionThreadContainer = props => {
     return rootEntryDraftMessage
   }
 
+  // Condense SplitScreen to one variable & link with the SplitScreenButton
+  const splitScreenOn = ENV.split_screen_view && props.userSplitScreenPreference
+
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -216,7 +220,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -257,7 +261,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -326,22 +330,36 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
-  const onReplySubmit = (message, fileId, isAnonymousAuthor, includeReplyPreview) => {
+  const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
+    const getParentId = () => {
+      return props.discussionEntry.rootEntryId &&
+        props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+        ? props.discussionEntry.parentId
+        : props.discussionEntry._id
+    }
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        replyFromEntryId:
-          props.discussionEntry.rootEntryId &&
-          props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
-            ? props.discussionEntry.parentId
-            : props.discussionEntry._id,
+        parentEntryId: getParentId(),
         fileId,
         isAnonymousAuthor,
         includeReplyPreview,
         message,
         courseID: ENV.course_id,
       },
+      optimisticResponse: getOptimisticResponse({
+        message,
+        parentId: getParentId(),
+        rootEntryId: props.discussionEntry.rootEntryId,
+        quotedEntry:
+          includeReplyPreview && typeof buildQuotedReply === 'function'
+            ? buildQuotedReply([props.discussionEntry], getParentId())
+            : null,
+        isAnonymous:
+          !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
+      }),
     })
+    props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
     setEditorExpanded(false)
   }
 
@@ -405,10 +423,18 @@ export const DiscussionThreadContainer = props => {
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
                           onQuoteReply={
-                            !(ENV.isolated_view || ENV.split_screen_view)
+                            !ENV.isolated_view
                               ? () => {
                                   setReplyFromId(props.discussionEntry._id)
-                                  setEditorExpanded(true)
+                                  if (ENV.isolated_view || splitScreenOn) {
+                                    props.onOpenIsolatedView(
+                                      props.discussionEntry._id,
+                                      props.discussionEntry.isolatedEntryId,
+                                      true
+                                    )
+                                  } else {
+                                    setEditorExpanded(true)
+                                  }
                                 }
                               : null
                           }
@@ -482,7 +508,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: replyMarginDepth}}>
-            {editorExpanded && !(ENV.isolated_view || ENV.split_screen_view) && (
+            {editorExpanded && !(ENV.isolated_view || splitScreenOn) && (
               <View
                 display="block"
                 background="primary"
@@ -493,7 +519,13 @@ export const DiscussionThreadContainer = props => {
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
-                    onReplySubmit(message, fileId, anonymousAuthorState, includeReplyPreview)
+                    onReplySubmit(
+                      message,
+                      includeReplyPreview,
+                      props.discussionEntry.parentId,
+                      anonymousAuthorState,
+                      fileId
+                    )
                   }}
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
@@ -511,17 +543,19 @@ export const DiscussionThreadContainer = props => {
               </View>
             )}
           </div>
-          {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
-            <DiscussionSubentries
-              discussionTopic={props.discussionTopic}
-              discussionEntryId={props.discussionEntry._id}
-              depth={props.depth + 1}
-              markAsRead={props.markAsRead}
-              parentRefCurrent={threadRefCurrent}
-              highlightEntryId={props.highlightEntryId}
-              setHighlightEntryId={props.setHighlightEntryId}
-            />
-          )}
+          {(expandReplies || props.depth > 0) &&
+            !(ENV.isolated_view || splitScreenOn) &&
+            props.discussionEntry.subentriesCount > 0 && (
+              <DiscussionSubentries
+                discussionTopic={props.discussionTopic}
+                discussionEntryId={props.discussionEntry._id}
+                depth={props.depth + 1}
+                markAsRead={props.markAsRead}
+                parentRefCurrent={threadRefCurrent}
+                highlightEntryId={props.highlightEntryId}
+                setHighlightEntryId={props.setHighlightEntryId}
+              />
+            )}
         </>
       )}
     />
@@ -541,6 +575,7 @@ DiscussionThreadContainer.propTypes = {
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
 }
 
 DiscussionThreadContainer.defaultProps = {

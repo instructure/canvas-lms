@@ -25,3 +25,15 @@ rce_ux_improvements:
   display_name: RCE UX Improvements
   description: Improve and streamline the RCE button and tray UX
   applies_to: SiteAdmin
+rce_better_paste:
+  state: hidden
+  display_name: Enhanced RCE paste from clipboard
+  description: Handle pasting of files, especially images.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on

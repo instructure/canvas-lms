@@ -82,10 +82,13 @@ class CoursePacesController < ApplicationController
   def new
     @course_pace = case @context
                    when Course
+                     @context.course_paces.primary.published.take ||
                      @context.course_paces.primary.not_deleted.take
                    when CourseSection
+                     @course.course_paces.for_section(@context).published.take ||
                      @course.course_paces.for_section(@context).not_deleted.take
                    when Enrollment
+                     @course.course_paces.for_user(@context.user).published.take ||
                      @course.course_paces.for_user(@context.user).not_deleted.take
                    end
     load_and_run_progress
@@ -107,6 +110,8 @@ class CoursePacesController < ApplicationController
       else
         @course_pace = @course.course_paces.new(pace_params)
         @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+          next unless module_item.assignment
+
           @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
         end
       end

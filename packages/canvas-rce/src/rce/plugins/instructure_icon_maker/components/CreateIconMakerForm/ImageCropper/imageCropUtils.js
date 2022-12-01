@@ -23,8 +23,8 @@ import {PREVIEW_HEIGHT} from './constants'
 
 const CLIP_PATH_ID = 'clip-path-for-cropped-image'
 
-export async function createCroppedImageSvg(settings) {
-  const {image, shape} = settings
+export async function createCroppedImageSvg(cropperSettings, image) {
+  const {shape} = cropperSettings
   const {imageWidth, imageHeight} = await fetchImageMetadata(image)
 
   const squareDimension = imageHeight
@@ -39,7 +39,8 @@ export async function createCroppedImageSvg(settings) {
     imageWidth,
     imageHeight,
     squareDimension,
-    settings,
+    image,
+    settings: cropperSettings,
   })
 
   rootElement.appendChild(defs)
@@ -72,14 +73,14 @@ const convertTranslationUnits = (translationPixels, imageHeight) => {
   return (imageHeight * translationPixels) / PREVIEW_HEIGHT
 }
 
-const createMainSvgGroup = ({imageWidth, imageHeight, squareDimension, settings}) => {
+const createMainSvgGroup = ({imageWidth, imageHeight, squareDimension, image, settings}) => {
   const mainGroup = createSvgElement('g', {
     'clip-path': `url(#${CLIP_PATH_ID})`,
   })
   const imageElement = createSvgElement('image', {
     width: imageWidth,
     height: imageHeight,
-    href: settings.image,
+    href: image,
   })
   setTransformAttribute({
     imageElement,

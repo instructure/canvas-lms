@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {Component} from 'react'
+import React, {Component, useEffect, useState} from 'react'
 import {arrayOf, func, objectOf, shape, string} from 'prop-types'
 import formatMessage from 'format-message'
 
@@ -24,13 +24,37 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
+import getTranslations from '../getTranslations'
 import ClosedCaptionCreatorRow from './ClosedCaptionCreatorRow'
 import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 
 // TODO:
 //   - Limit file creation
+//   - Convert ClosedCaptionCreator into a function component and the
+//     getTranslation stuff into a hook (see UploadMedia.js too)
 
-export default class ClosedCaptionPanel extends Component {
+export default function ClosedCaptionCreator(props) {
+  const [translationsLoaded, setTranslationsLoaded] = useState(false)
+
+  useEffect(() => {
+    getTranslations(props.userLocale)
+      .catch(() => {
+        // ignore and fallback to english
+      })
+      .finally(() => {
+        setTranslationsLoaded(true)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (translationsLoaded) {
+    return <ClosedCaptionPanel {...props} />
+  } else {
+    return <div />
+  }
+}
+
+export class ClosedCaptionPanel extends Component {
   static propTypes = {
     liveRegion: func.isRequired,
     subtitles: arrayOf(

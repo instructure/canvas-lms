@@ -404,7 +404,7 @@ const CanvasInbox = () => {
   const firstConversation = selectedConversations.length > 0 ? selectedConversations[0] : {}
 
   const myConversationParticipant = firstConversation?.participants?.find(
-    node => node.user._id === ENV.current_user_id
+    node => node?.user?._id === ENV.current_user_id
   )
   const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
 
@@ -537,7 +537,7 @@ const CanvasInbox = () => {
     } else {
       setDisplayUnarchiveButton(
         selectedConversations[0].participants?.some(cp => {
-          return cp.user._id === userID && cp.workflowState === 'archived'
+          return cp?.user?._id === userID && cp.workflowState === 'archived'
         })
       )
     }

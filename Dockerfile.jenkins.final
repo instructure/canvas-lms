@@ -4,7 +4,10 @@ ARG COMPILE_ADDITIONAL_ASSETS=0
 
 COPY --chown=docker:docker . ${APP_HOME}
 
-RUN cp -v docker-compose/config/redis.yml config && \
+RUN \
+  --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
+  tar --no-same-owner -xf /cache-helper/webpack-runner-vendor.tar -C ${APP_HOME} && \
+  cp -v docker-compose/config/redis.yml config && \
   cp -v docker-compose/config/selenium.yml config/ && \
   cp -vR docker-compose/config/new-jenkins/* config/ && \
   cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml && \

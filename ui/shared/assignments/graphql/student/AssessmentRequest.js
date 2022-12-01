@@ -28,6 +28,7 @@ export const AssessmentRequest = {
       }
       anonymousId
       workflowState
+      assetSubmissionType
     }
   `,
 

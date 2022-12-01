@@ -256,6 +256,16 @@ describe WikiPage do
       end
     end
 
+    it "works on a newly created page" do
+      new_page = @course.wiki_pages.create!(title: "test page", workflow_state: "unpublished", publish_at: 1.hour.from_now)
+
+      Timecop.travel(61.minutes.from_now) do
+        run_jobs
+        expect(new_page.reload).to be_published
+        expect(new_page.publish_at).not_to be_nil
+      end
+    end
+
     it "doesn't publish prematurely if the publish_at date changes" do
       @page.update publish_at: 2.hours.from_now
       @page.update publish_at: 4.hours.from_now

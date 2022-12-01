@@ -113,6 +113,14 @@
       </div>
     <% end %>
     <div id="date_shift"></div>
+    <% if @context.root_account.feature_enabled?(:copy_blueprint_settings) && MasterCourses::MasterTemplate.is_master_course?(@context) %>
+      <div class="controls">
+        <label class="checkbox">
+          <input type="checkbox" name="settings[import_blueprint_settings]">
+          <%= t('Copy Blueprint Course settings') %>
+        </label>
+      </div>
+    <% end %>
   </div>
 
   <div class='form-actions'>

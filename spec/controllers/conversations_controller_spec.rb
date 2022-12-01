@@ -541,7 +541,7 @@ describe ConversationsController do
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
-          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.legacy", 2)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.legacy")
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 2)
           expect(response).to be_successful
 

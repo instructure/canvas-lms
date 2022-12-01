@@ -178,6 +178,75 @@ describe AssignmentGroup do
     expect(result["never_drop"]).to eql(expected)
   end
 
+  it "converts rules decimal values into integers" do
+    custom_rules_hash = {
+      drop_lowest: 1.1,
+      drop_highest: 2.9,
+      never_drop: [1, 2]
+    }.with_indifferent_access
+    assignment_group_model.rules_hash = custom_rules_hash
+    expect(@ag.rules).to eql("drop_lowest:1\ndrop_highest:2\nnever_drop:1\nnever_drop:2\n")
+  end
+
+  it "converts string values into integers" do
+    custom_rules_hash = {
+      drop_lowest: "123abc",
+      drop_highest: 2,
+      never_drop: [1, 2]
+    }.with_indifferent_access
+    assignment_group_model.rules_hash = custom_rules_hash
+    expect(@ag.rules).to eql("drop_lowest:123\ndrop_highest:2\nnever_drop:1\nnever_drop:2\n")
+  end
+
+  it "validate is false when drop_lowest is negative" do
+    rules = "drop_lowest:-1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+    assignment_group_model rules: rules
+    @ag.validate_rules = true
+    @ag.reload
+    @course.assignments.create!(title: "test", assignment_group: @ag)
+    expect(@ag.validate).to eql(false)
+    expect(@ag.errors.full_messages).to eql(["Rules Drop rules must be a positive number"])
+  end
+
+  it "validate is false when drop_highest is negative" do
+    rules = "drop_lowest:1\ndrop_highest:-1\nnever_drop:1\nnever_drop:2\n"
+    assignment_group_model rules: rules
+    @ag.validate_rules = true
+    @ag.reload
+    @course.assignments.create!(title: "test", assignment_group: @ag)
+    expect(@ag.validate).to eql(false)
+    expect(@ag.errors.full_messages).to eql(["Rules Drop rules must be a positive number"])
+  end
+
+  it "validate is false when drop_lowest is greater than number of assignments" do
+    rules = "drop_lowest:2\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+    assignment_group_model rules: rules
+    @ag.validate_rules = true
+    @ag.reload
+    @course.assignments.create!(title: "test", assignment_group: @ag)
+    expect(@ag.validate).to eql(false)
+    expect(@ag.errors.full_messages).to eql(["Rules Drop rules cannot be higher than the number of assignments"])
+  end
+
+  it "validate is false when drop_highest and drop_lowest are valid" do
+    rules = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+    assignment_group_model rules: rules
+    @ag.validate_rules = true
+    @ag.reload
+    @course.assignments.create!(title: "test", assignment_group: @ag)
+    expect(@ag.validate).to eql(true)
+  end
+
+  it "validate is true when ndrop_highest is greater than number of assignments" do
+    rules = "drop_lowest:1\ndrop_highest:2\nnever_drop:1\nnever_drop:2\n"
+    assignment_group_model rules: rules
+    @ag.validate_rules = true
+    @ag.reload
+    @course.assignments.create!(title: "test", assignment_group: @ag)
+    expect(@ag.validate).to eql(false)
+    expect(@ag.errors.full_messages).to eql(["Rules Drop rules cannot be higher than the number of assignments"])
+  end
+
   it "returns never_drop list as strings if `stringify_json_ids` is true" do
     expected = %w[9 22 16 4]
     rules = "drop_highest:25\n"

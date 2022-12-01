@@ -27,6 +27,8 @@ import {getIconFromType, isImage} from '../rce/plugins/shared/fileTypeUtils'
 import {showFlashError} from '../common/FlashAlert'
 import natcompare from '../common/natcompare'
 
+export const PENDING_MEDIA_ENTRY_ID = 'maybe'
+
 class FileBrowser extends React.Component {
   static propTypes = {
     allowUpload: PropTypes.bool,
@@ -291,10 +293,12 @@ class FileBrowser extends React.Component {
   formatFileInfo(apiFile, opts = {}) {
     const {collections} = this.state
     const context = collections[apiFile.folderId].context
+    const isMediaPending = apiFile.mediaEntryId === PENDING_MEDIA_ENTRY_ID
     const file = {
       api: apiFile,
       id: apiFile.id,
       name: apiFile.name,
+      isDisabled: isMediaPending,
       src: `${context}/files/${apiFile.id}/preview${
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
@@ -304,6 +308,9 @@ class FileBrowser extends React.Component {
     if (apiFile.iframeUrl) {
       // it's a media_object
       file.src = apiFile.iframeUrl
+    }
+    if (isMediaPending) {
+      file.descriptor = formatMessage('Media file is processing. Please try again later.')
     }
     return file
   }
@@ -348,7 +355,10 @@ class FileBrowser extends React.Component {
   }
 
   onFileClick = file => {
-    this.props.selectFile(this.state.items[file.id])
+    const selectedItem = this.state.items[file.id]
+    if (selectedItem.isDisabled) return
+
+    this.props.selectFile(selectedItem)
   }
 
   findFolderForFile(file) {

@@ -36,6 +36,7 @@ export type ComponentProps = {
   onCancel: () => void
   onConfirm: () => void
   readonly contextType: PaceContextTypes
+  readonly paceName: string
 }
 
 const MODAL_HEADER_TEXT = {
@@ -43,39 +44,44 @@ const MODAL_HEADER_TEXT = {
   Enrollment: I18n.t('Remove this Student Pace?'),
 }
 
-const MODAL_BODY_TEXT = {
-  Section: I18n.t(
-    'This section pace will be removed and the pace will revert back to the default pace.'
-  ),
-  Enrollment: I18n.t(
-    'This student pace will be removed and the pace will revert back to the previously assigned pace.'
-  ),
-}
-
 export const RemovePaceWarningModal: React.FC<ComponentProps> = ({
   open,
   onCancel,
   onConfirm,
   contextType,
-}) => (
-  <Modal size="small" open={open} onDismiss={onCancel} label={MODAL_HEADER_TEXT[contextType]}>
-    <ModalBody>
-      <View>
-        <Text>{MODAL_BODY_TEXT[contextType]}</Text>
-      </View>
-    </ModalBody>
-    <ModalFooter>
-      <View>
-        <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
-        <Button
-          data-testid="remove-pace-confirm"
-          margin="0 x-small"
-          onClick={onConfirm}
-          color="danger"
-        >
-          {I18n.t('Remove')}
-        </Button>
-      </View>
-    </ModalFooter>
-  </Modal>
-)
+  paceName,
+}) => {
+  const renderModalBodyText = () =>
+    contextType === 'Section'
+      ? I18n.t(
+          '%{paceName} Pace will be removed. This pace will revert back to the default pace.',
+          {paceName}
+        )
+      : I18n.t(
+          '%{paceName} Pace will be removed. This pace will revert back to the previously assigned pace.',
+          {paceName}
+        )
+
+  return (
+    <Modal size="small" open={open} onDismiss={onCancel} label={MODAL_HEADER_TEXT[contextType]}>
+      <ModalBody>
+        <View>
+          <Text>{renderModalBodyText()}</Text>
+        </View>
+      </ModalBody>
+      <ModalFooter>
+        <View>
+          <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
+          <Button
+            data-testid="remove-pace-confirm"
+            margin="0 x-small"
+            onClick={onConfirm}
+            color="danger"
+          >
+            {I18n.t('Remove')}
+          </Button>
+        </View>
+      </ModalFooter>
+    </Modal>
+  )
+}

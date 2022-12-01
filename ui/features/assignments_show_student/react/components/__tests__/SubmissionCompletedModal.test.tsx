@@ -32,7 +32,8 @@ describe('SubmissionCompletedModal', () => {
   function renderComponent(overrides = {}) {
     return render(
       <SubmissionCompletedModal
-        count={1}
+        totalCount={5}
+        availableCount={1}
         onRedirect={onRedirect}
         onClose={onClose}
         open={true}
@@ -59,25 +60,32 @@ describe('SubmissionCompletedModal', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('does disable the Peer Review button when there are 0 peer reviews', () => {
-    const {getByRole} = renderComponent({count: 0})
+  it('does disable the Peer Review button when there are 0 available peer reviews', () => {
+    const {getByRole} = renderComponent({availableCount: 0, totalCount: 0})
     expect(getByRole('button', {name: /Peer Review/})).toBeDisabled()
   })
 
-  it('does enable the Peer Review button when there is 1 peer review', () => {
-    const {getByRole} = renderComponent({count: 1})
+  it('does enable the Peer Review button when there is 1 available peer review', () => {
+    const {getByRole} = renderComponent()
     expect(getByRole('button', {name: /Peer Review/})).toBeEnabled()
   })
 
-  it('does enable the Peer Review button when there are more than 1 peer review', () => {
-    const {getByRole} = renderComponent({count: 7})
+  it('does enable the Peer Review button when there are more than 1 available peer review', () => {
+    const {getByRole} = renderComponent({availableCount: 3, totalCount: 5})
     expect(getByRole('button', {name: /Peer Review/})).toBeEnabled()
   })
 
-  it('does set the peer reviews counter based on the count prop', () => {
-    const {getByTestId} = renderComponent({count: 7})
-    expect(getByTestId('peer-reviews-counter')).toHaveTextContent(
-      'You have 7 Peer Reviews to complete'
+  it('does set the peer reviews total counter based on the totalCount prop', () => {
+    const {getByTestId} = renderComponent()
+    expect(getByTestId('peer-reviews-total-counter')).toHaveTextContent(
+      'You have 5 Peer Reviews to complete'
+    )
+  })
+
+  it('does set the peer reviews available counter based on the availableCount prop', () => {
+    const {getByTestId} = renderComponent()
+    expect(getByTestId('peer-reviews-available-counter')).toHaveTextContent(
+      'Peer submissions ready for review: 1'
     )
   })
 })

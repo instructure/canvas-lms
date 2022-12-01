@@ -18,6 +18,7 @@
 import React from 'react'
 import {DiscussionEdit} from '../DiscussionEdit'
 import {render, fireEvent, waitFor} from '@testing-library/react'
+import $ from '@canvas/rails-flash-notifications'
 
 const setup = props => {
   return render(<DiscussionEdit {...props} />)
@@ -46,6 +47,12 @@ const defaultProps = ({
 })
 
 describe('DiscussionEdit', () => {
+  const oldEnv = window.ENV
+
+  afterEach(() => {
+    window.ENV = oldEnv
+  })
+
   describe('Rendering', () => {
     it('should render', () => {
       const component = setup(defaultProps())
@@ -74,17 +81,31 @@ describe('DiscussionEdit', () => {
       expect(onCancelMock.mock.calls.length).toBe(1)
     })
 
-    it('should fire obSubmit when clicked', () => {
+    it('should fire onSubmit when clicked', () => {
       const onSubmitMock = jest.fn()
       const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
       expect(onSubmitMock.mock.calls.length).toBe(1)
     })
+
+    it('should trigger error on submit when value is too long', () => {
+      const flashStub = jest.spyOn($, 'flashError')
+      window.ENV.DISCUSSION_ENTRY_SIZE_LIMIT = 10
+      const onSubmitMock = jest.fn()
+      const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock, value: '<p>1234</p>'}))
+      const submitButton = getByTestId('DiscussionEdit-submit')
+      fireEvent.click(submitButton)
+      expect(flashStub).toHaveBeenCalledWith(
+        'The message size has exceeded the maximum text length.',
+        2000
+      )
+      expect(onSubmitMock.mock.calls.length).toBe(0)
+    })
   })
 
   describe('Draft messages', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       window.ENV = {
         draft_discussions: true,
       }
@@ -104,7 +125,7 @@ describe('DiscussionEdit', () => {
   })
 
   describe('Anonymous Response Selector', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       ENV.current_user = {display_name: 'Ronald Weasley', avatar_image_url: ''}
     })
 

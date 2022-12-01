@@ -119,6 +119,10 @@ module CanvasOutcomesHelper
             next if result[:attempts].nil?
 
             result[:attempts].each do |attempt|
+              # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
+              # to parse the result returned from outcome service
+              next unless attempt[:metadata].is_a? String
+
               attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
             end
           end

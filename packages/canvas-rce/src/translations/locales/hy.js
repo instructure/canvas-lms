@@ -73,6 +73,7 @@ const locale = {
   "discussions_index_6c36ced": { "message": "Քննարկումների ցուցիչ" },
   "done_54e3d4b6": { "message": "Պատրաստ է" },
   "due_multiple_dates_cc0ee3f5": { "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ" },
+  "edit_c5fbea07": { "message": "Խմբագրել" },
   "embed_image_1080badc": { "message": "Տեղադրել պատկերը" },
   "external_tools_6e77821": { "message": "Արտաքին գործիքներ" },
   "files_c300e900": { "message": "Ֆայլեր" },

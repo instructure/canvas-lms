@@ -93,6 +93,7 @@ const locale = {
     "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Очікується: Кілька дат" },
+  "edit_c5fbea07": { "message": "Редагувати" },
   "embed_image_1080badc": { "message": "Вставити забраження" },
   "external_tools_6e77821": { "message": "Зовнішні інструменти" },
   "files_c300e900": { "message": "Файли" },

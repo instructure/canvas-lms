@@ -54,6 +54,8 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
+import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
@@ -375,8 +377,9 @@ class RCEWrapper extends React.Component {
       new_equation_editor = false,
       new_math_equation_handling = false,
       rce_ux_improvements = false,
+      rce_better_paste = false,
     } = this.props.features
-    return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
+    return {new_equation_editor, new_math_equation_handling, rce_ux_improvements, rce_better_paste}
   }
 
   getRequiredConfigValues() {
@@ -553,56 +556,78 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
   insertImagePlaceholder(fileMetaProps) {
-    let width, height
-    let align = 'middle'
-    if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
-      const image = new Image()
-      image.src = fileMetaProps.domObject.preview
-      width = image.width
-      height = image.height
-      // we constrain the <img> to max-width: 100%, so scale the size down if necessary
-      const maxWidth = this.iframe.contentDocument.body.clientWidth
-      if (width > maxWidth) {
-        height = Math.round((maxWidth / width) * height)
-        width = maxWidth
-      }
-      width = `${width}px`
-      height = `${height}px`
-    } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
-      width = VIDEO_SIZE_DEFAULT.width
-      height = VIDEO_SIZE_DEFAULT.height
-      align = 'bottom'
-    } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
-      width = AUDIO_PLAYER_SIZE.width
-      height = AUDIO_PLAYER_SIZE.height
-      align = 'bottom'
-    } else {
-      width = `${fileMetaProps.name.length}rem`
-      height = '1rem'
-    }
-    // if you're wondering, the &nbsp; scatter about in the svg
-    // is because tinymce will strip empty elements
-    const markup = `
-    <span
-      aria-label="${formatMessage('Loading')}"
-      data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
-      style="width: ${width}; height: ${height}; vertical-align: ${align};"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
-        <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
-          <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-          <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-          &nbsp;
-        </g>
-        &nbsp;
-      </svg>
-    </span>`
+    const prom = new Promise((resolve, reject) => {
+      let width, height
+      let align = 'middle'
+      if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
+        const image = new Image()
+        image.onload = () => {
+          width = image.width
+          height = image.height
 
-    const editor = this.mceInstance()
-    editor.undoManager.ignore(() => {
-      editor.execCommand('mceInsertContent', false, markup)
+          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
+
+          // we constrain the <img> to max-width: 100%, so scale the size down if necessary
+          const maxWidth = this.iframe.contentDocument.body.clientWidth
+          if (width > maxWidth) {
+            height = Math.round((maxWidth / width) * height)
+            width = maxWidth
+          }
+          width = `${width}px`
+          height = `${height}px`
+
+          insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
+          resolve()
+        }
+        image.onerror = () => {
+          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
+          reject()
+        }
+        image.src = fileMetaProps.domObject.preview || URL.createObjectURL(fileMetaProps.domObject)
+      } else {
+        if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
+          width = VIDEO_SIZE_DEFAULT.width
+          height = VIDEO_SIZE_DEFAULT.height
+          align = 'bottom'
+        } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
+          width = AUDIO_PLAYER_SIZE.width
+          height = AUDIO_PLAYER_SIZE.height
+          align = 'bottom'
+        } else {
+          width = `${fileMetaProps.name.length}rem`
+          height = '1rem'
+        }
+        insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
+        resolve()
+      }
+
+      function insertImagePlaceholderFRD(editor, imgName, imgWidth, imgHeight, imgAlign) {
+        // if you're wondering, the &nbsp; scatter about in the svg
+        // is because tinymce will strip empty elements
+        const markup = `
+<span
+  aria-label="${formatMessage('Loading')}"
+  data-placeholder-for="${encodeURIComponent(imgName)}"
+  style="width: ${imgWidth}; height: ${imgHeight}; vertical-align: ${imgAlign};"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
+    <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
+      <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      &nbsp;
+    </g>
+    &nbsp;
+  </svg>
+</span>`
+
+        editor.undoManager.ignore(() => {
+          editor.execCommand('mceInsertContent', false, markup)
+        })
+      }
     })
+    return prom
   }
 
   insertVideo(video) {
@@ -1041,7 +1066,7 @@ class RCEWrapper extends React.Component {
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.document.body.click(), true)
-    editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
+    editor.on('Cut Change input Undo Redo', debounce(this.handleInputChange, 1000))
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
@@ -1317,9 +1342,11 @@ class RCEWrapper extends React.Component {
   /* *********** end autosave support *************** */
 
   onWordCountUpdate = e => {
+    const shouldIgnore = countShouldIgnore(this.editor, 'body', 'words')
+    const updatedCount = e.wordCount.words - shouldIgnore
     this.setState(state => {
-      if (e.wordCount.words !== state.wordCount) {
-        return {wordCount: e.wordCount.words}
+      if (updatedCount !== state.wordCount) {
+        return {wordCount: updatedCount}
       } else return null
     })
   }
@@ -1437,6 +1464,7 @@ class RCEWrapper extends React.Component {
           'instructure_documents',
           'instructure_equation',
           'instructure_external_tools',
+          'instructure_wordcount',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
@@ -1502,12 +1530,19 @@ class RCEWrapper extends React.Component {
       content_style: contentCSS,
 
       menubar: mergeMenuItems('edit view insert format tools table', possibleNewMenubarItems),
+
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
+      // note: the tinymce paste command is used here instead of instructure_paste
+      // since we currently can't effectively paste using the clipboard api anyway.
       // we include all the canvas specific items in the menu and toolbar
       // and rely on tinymce only showing them if the plugin is provided.
       menu: mergeMenu(
         {
+          edit: {
+            title: formatMessage('Edit'),
+            items: `undo redo | cut copy paste | selectall`,
+          },
           format: {
             title: formatMessage('Format'),
             items:
@@ -1518,7 +1553,7 @@ class RCEWrapper extends React.Component {
             items:
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
-          tools: {title: formatMessage('Tools'), items: 'wordcount lti_tools_menuitem'},
+          tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'},
         },
         options.menu
@@ -1577,7 +1612,6 @@ class RCEWrapper extends React.Component {
         [
           'autolink',
           'media',
-          'paste',
           'table',
           'link',
           'directionality',
@@ -1593,6 +1627,7 @@ class RCEWrapper extends React.Component {
           'instructure_external_tools',
           'a11y_checker',
           'wordcount',
+          RCEGlobals.getFeatures().rce_better_paste ? 'instructure_paste' : 'paste',
           ...canvasPlugins,
         ],
         sanitizePlugins(options.plugins)
@@ -1868,6 +1903,7 @@ class RCEWrapper extends React.Component {
           onFullscreen={this.handleClickFullscreen}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
+          onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray

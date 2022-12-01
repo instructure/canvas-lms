@@ -161,11 +161,28 @@ describe('contentRendering', () => {
         '<a href="http://example.com" data-mce-href="http://example.com"><img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy"/></a>'
       )
     })
+
     it('renders a linked image if object has link property', () => {
       image.link = 'http://someurl'
       const rendered = contentRendering.renderImage(image)
       expect(rendered).toEqual(
         '<a href="http://someurl" target="_blank" rel="noopener noreferrer"><img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy"/></a>'
+      )
+    })
+
+    it('rewrites image urls if they are from the current origin', () => {
+      image.href = 'https://instructure.com/courses/1/files/1/download?verifier=xyzzy'
+      const rendered = contentRendering.renderImage(image, 'https://instructure.com')
+      expect(rendered).toEqual(
+        '<img alt="Here Be Images" src="/courses/1/files/1/preview?verifier=xyzzy"/>'
+      )
+    })
+
+    it('rewrites image urls if they are relative', () => {
+      image.href = '/courses/1/files/1/download?verifier=xyzzy'
+      const rendered = contentRendering.renderImage(image, 'https://instructure.com')
+      expect(rendered).toEqual(
+        '<img alt="Here Be Images" src="/courses/1/files/1/preview?verifier=xyzzy"/>'
       )
     })
   })

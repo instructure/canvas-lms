@@ -23,6 +23,7 @@ unless defined? BASE_FIXTURE_DIR
   VISTA_FIXTURE_DIR = BASE_FIXTURE_DIR + "bb_vista/"
   BB8_FIXTURE_DIR = BASE_FIXTURE_DIR + "bb8/"
   BB9_FIXTURE_DIR = BASE_FIXTURE_DIR + "bb9/"
+  BBULTRA_FIXTURE_DIR = BASE_FIXTURE_DIR + "bbultra/"
   RESPONDUS_FIXTURE_DIR = BASE_FIXTURE_DIR + "respondus/"
   ANGEL_FIXTURE_DIR = BASE_FIXTURE_DIR + "angel/"
   CENGAGE_FIXTURE_DIR = BASE_FIXTURE_DIR + "cengage/"
@@ -105,6 +106,10 @@ end
 
 def bb9_question_dir
   File.join(BB9_FIXTURE_DIR, "questions")
+end
+
+def bbultra_question_dir
+  File.join(BBULTRA_FIXTURE_DIR, "questions")
 end
 
 def respondus_question_dir

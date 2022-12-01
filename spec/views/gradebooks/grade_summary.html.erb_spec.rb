@@ -113,7 +113,7 @@ describe "gradebooks/grade_summary" do
       @assignment.grade_student(@student, score: 10, grader: @teacher)
 
       @assignment_url = context_url(@course, :context_assignment_url, @assignment)
-      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id }))
+      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id, only_path: true }))
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
     end
 
@@ -210,7 +210,7 @@ describe "gradebooks/grade_summary" do
       @assignment.grade_student(@student, score: 10, grader: @teacher)
 
       @assignment_url = context_url(@course, :context_assignment_url, @assignment)
-      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id }))
+      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id, only_path: true }))
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
     end
 

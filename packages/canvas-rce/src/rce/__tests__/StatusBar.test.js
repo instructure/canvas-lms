@@ -32,6 +32,7 @@ function defaultProps(props = {}) {
     onResize: () => {},
     onKBShortcutModalOpen: () => {},
     onA11yChecker: () => {},
+    onWordcountModalOpen: () => {},
     ...props,
   }
 }
@@ -57,12 +58,20 @@ describe('RCE StatusBar', () => {
     expect(onkbcallback).toHaveBeenCalled()
   })
 
+  it('calls callback when clicking wordcount button', () => {
+    const onWordcountCallback = jest.fn()
+    const {getByTestId} = renderStatusBar({onWordcountModalOpen: onWordcountCallback})
+    const wordCountButton = getByTestId('status-bar-word-count').firstChild
+    wordCountButton.click()
+    expect(onWordcountCallback).toHaveBeenCalled()
+  })
+
   describe('in WYSIWYG mode', () => {
     it('cycles focus with right arrow keys', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(5)
+      expect(buttons.length).toEqual(6)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -78,7 +87,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(5)
+      expect(buttons.length).toEqual(6)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
@@ -238,7 +247,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({readOnly: true})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(2)
+      expect(buttons.length).toEqual(3)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -254,7 +263,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({readOnly: true})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(2)
+      expect(buttons.length).toEqual(3)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])

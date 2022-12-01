@@ -32,7 +32,24 @@ module Lti
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
 
+        let(:context_external_tool) do
+          ContextExternalTool.create!(
+            context: course.account,
+            url: "http://tool.url/login",
+            name: "test tool",
+            shared_secret: "secret",
+            consumer_key: "key",
+            developer_key: developer_key,
+            lti_version: "1.3"
+          )
+        end
+        let(:course) { course_model }
+
         it { is_expected.to be_ok }
+
+        it "renders the page" do
+          expect(subject).to render_template("lti/ims/deep_linking/deep_linking_response")
+        end
 
         it "sets the JS ENV" do
           expect(controller).to receive(:js_env).with(
@@ -47,11 +64,36 @@ module Lti
                 [:retrieve, account, :external_tools],
                 host: "test.host"
               ),
-              reloadpage: false
+              reloadpage: false,
+              moduleCreated: false
             }
           )
 
           subject
+        end
+
+        # TODO: update all these with hash_including()
+        context "when returning from a non-internal service" do
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "does not change the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            subject
+            # base_url is the default
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq(@controller.request.base_url)
+          end
+        end
+
+        context "when returning from an internal service" do
+          before do
+            developer_key.update!(internal_service: true)
+          end
+
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in js_env" do
+            subject
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq("http://tool.url")
+          end
         end
 
         context "when the messages/logs passed in are not strings" do
@@ -612,6 +654,11 @@ module Lti
                   it "leaves module items unpublished" do
                     subject
                     expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
+                  end
+
+                  it "tells the frontend a module was created" do
+                    subject
+                    expect(assigns.dig(:js_env, :deep_link_response, :moduleCreated)).to be true
                   end
                 end
 

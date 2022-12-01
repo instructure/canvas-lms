@@ -16,8 +16,20 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative "./state_poller"
 
 module CustomWaitMethods
+  # #initialize and #to_s are overwritten to allow message customization
+  class SlowCodePerformance < ::Timeout::Error
+    def initialize(message) # rubocop:disable Lint/MissingSuper
+      @message = message
+    end
+
+    def to_s
+      @message
+    end
+  end
+
   def wait_for_dom_ready
     result = driver.execute_async_script(<<~JS)
       var callback = arguments[arguments.length - 1];
@@ -32,7 +44,7 @@ module CustomWaitMethods
             callback(0);
           }
         }
-      };
+      }
     JS
     raise "left page before domready" if result != 0
   end
@@ -91,67 +103,32 @@ module CustomWaitMethods
     raise "element #{selector} did not appear or was not transient" if result != 0
   end
 
+  # NOTE: for "__CANVAS_IN_FLIGHT_XHR_REQUESTS__" see "ui/boot/index.js"
+  AJAX_REQUESTS_SCRIPT = "return window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__"
   def wait_for_ajax_requests(bridge = nil)
     bridge = driver if bridge.nil?
 
-    result = bridge.execute_async_script(<<~JS)
-      var callback = arguments[arguments.length - 1];
-      // see code in ui/boot/index.js for where
-      // __CANVAS_IN_FLIGHT_XHR_REQUESTS__ and 'canvasXHRComplete' come from
-      if (typeof window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__  === 'undefined') {
-        callback(-1);
-      } else if (window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__ === 0) {
-        callback(0);
-      } else {
-        var fallbackCallback = window.setTimeout(function() {
-          callback(-2);
-        }, #{(SeleniumDriverSetup.timeouts[:script] * 1000) - 500})
-
-        function onXHRCompleted () {
-          // while there are no outstanding requests, a new one could be
-          // chained immediately afterwards in this thread of execution,
-          // e.g. $.get(url).then(() => $.get(otherUrl))
-          //
-          // so wait a tick just to be sure we're done
-          setTimeout(function() {
-            if (window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__ === 0) {
-              window.removeEventListener('canvasXHRComplete', onXHRCompleted)
-              window.clearTimeout(fallbackCallback);
-              callback(0)
-            }
-          }, 0)
-        }
-        window.addEventListener('canvasXHRComplete', onXHRCompleted)
-      }
-    JS
-    raise "ajax requests not completed" if result == -2
-
-    result
+    res = StatePoller.await(0) { bridge.execute_script(AJAX_REQUESTS_SCRIPT) || 0 }
+    raise SlowCodePerformance, "AJAX requests not done after #{res[:spent]}s: #{res[:got]}" if res[:got] > 0
   end
 
+  # NOTE: for "$.timers" see https://github.com/jquery/jquery/blob/6c2c7362fb18d3df7c2a7b13715c2763645acfcb/src/effects.js#L638
+  ANIMATION_COUNT_SCRIPT = "return (typeof($) !== 'undefined' && $.timers) ? $.timers.length : 0"
+  ANIMATION_ELEMENTS_SCRIPT =
+    "return $.timers.map(t => (" \
+    " t.elem.tagName + (t.elem.id?'#'+t.elem.id:'') + (t.elem.className?'.'+t.elem.className.replaceAll(' ','.'):'')" \
+    "))"
   def wait_for_animations(bridge = nil)
     bridge = driver if bridge.nil?
 
-    bridge.execute_async_script(<<~JS)
-      var callback = arguments[arguments.length - 1];
-      if (typeof($) == 'undefined') {
-        callback(-1);
-      } else if ($.timers.length == 0) {
-        callback(0);
-      } else {
-        var _stop = $.fx.stop;
-        $.fx.stop = function() {
-          $.fx.stop = _stop;
-          _stop.apply(this, arguments);
-          callback(0);
-        }
-      }
-    JS
+    res = StatePoller.await(0) { bridge.execute_script(ANIMATION_COUNT_SCRIPT) || 0 }
+    if res[:got] > 0
+      pending = (bridge.execute_script(ANIMATION_ELEMENTS_SCRIPT) || []).join("\n")
+      raise SlowCodePerformance, "JQuery animations not done after #{res[:spent]}s: #{res[:got]}\n#{pending}"
+    end
   end
 
   def wait_for_ajaximations(bridge = nil)
-    bridge = driver if bridge.nil?
-
     wait_for_ajax_requests(bridge)
     wait_for_animations(bridge)
   end

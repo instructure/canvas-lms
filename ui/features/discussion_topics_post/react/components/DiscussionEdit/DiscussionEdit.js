@@ -25,7 +25,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {IconCheckMarkLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
-import {responsiveQuerySizes} from '../../utils'
+import {responsiveQuerySizes, showErrorWhenMessageTooLong} from '../../utils'
 import {View} from '@instructure/ui-view'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
@@ -215,6 +215,9 @@ export const DiscussionEdit = props => {
                   <Button
                     onClick={() => {
                       if (props.onSubmit) {
+                        if (showErrorWhenMessageTooLong(rceContent)) {
+                          return
+                        }
                         props.onSubmit(
                           rceContent,
                           includeReplyPreview,

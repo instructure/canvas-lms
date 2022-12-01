@@ -110,7 +110,7 @@ describe('SplitScreenViewContainer', () => {
 
     fireEvent.click(backButton)
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith('77', '77', false)
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith('77', false)
   })
 
   it('should go to root reply when clicking Go To Parent', async () => {
@@ -130,11 +130,7 @@ describe('SplitScreenViewContainer', () => {
     expect(goToParentButton).toBeInTheDocument()
     fireEvent.click(goToParentButton)
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith(
-      'DiscussionEntry-default-mock',
-      'DiscussionEntry-default-mock',
-      false
-    )
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith('DiscussionEntry-default-mock', false)
   })
 
   it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {
@@ -380,7 +376,7 @@ describe('SplitScreenViewContainer', () => {
     const viewRepliesButton = await findByText('View Replies')
     fireEvent.click(viewRepliesButton)
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith('104', null, false)
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith('104', false)
   })
 
   it('calls the onOpenSplitScreenView callback when clicking reply', async () => {
@@ -392,10 +388,10 @@ describe('SplitScreenViewContainer', () => {
       })
     )
 
-    const replyButton = await findAllByText('Quote')
-    fireEvent.click(replyButton[0])
+    const replyButton = await findAllByText('Reply')
+    fireEvent.click(replyButton[1])
 
-    expect(onOpenSplitScreenView).toHaveBeenCalledWith('104', null, true)
+    expect(onOpenSplitScreenView).toHaveBeenCalledWith('104', true)
   })
 
   describe('replying', () => {

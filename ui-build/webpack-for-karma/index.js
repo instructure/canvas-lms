@@ -100,8 +100,6 @@ module.exports = {
         include: [
           path.join(canvasDir, 'ui'),
           path.join(canvasDir, 'spec/coffeescripts'),
-          path.join(canvasDir, 'packages/backbone-input-filter-view/src'),
-          path.join(canvasDir, 'packages/backbone-input-view/src'),
         ].concat(
           glob.sync('gems/plugins/*/{app,spec_canvas}/coffeescripts/', {
             cwd: canvasDir,

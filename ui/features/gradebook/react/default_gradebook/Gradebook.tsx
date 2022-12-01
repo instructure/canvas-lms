@@ -73,7 +73,7 @@ import type {
   PendingGradeInfo,
   SubmissionFilterValue,
 } from './gradebook.d'
-import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
+import type {CamelizedGradingPeriodSet, FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 import type {
   GridColumn,
   GridData,
@@ -90,7 +90,7 @@ import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 // @ts-ignore
-import InputFilterView from 'backbone-input-filter-view'
+import InputFilterView from '@canvas/backbone-input-filter-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
@@ -232,9 +232,11 @@ export type GradebookProps = {
   currentUserId: string
   customColumns: CustomColumn[]
   dispatch: RequestDispatch
+  fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
   filterNavNode: HTMLElement
+  finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
@@ -257,6 +259,7 @@ export type GradebookProps = {
     gradingPeriodIds?: string[]
   }
   settingsModalButtonContainer: HTMLElement
+  sisOverrides: AssignmentGroup[]
   studentIds: string[]
   viewOptionsMenuNode: HTMLElement
 }
@@ -621,12 +624,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  loadOverridesForSIS = (): void => {
-    if (this.options.post_grades_feature) {
-      this.dataLoader.loadOverridesForSIS()
-    }
-  }
-
   addOverridesToPostGradesStore = (assignmentGroups: AssignmentGroup[]): void => {
     let assignment, group, j, k, len, len1, ref1
     for (j = 0, len = assignmentGroups.length; j < len; j++) {
@@ -835,7 +832,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.initGrid()
     this.initHeader()
     this.gridReady.resolve(null)
-    this.loadOverridesForSIS()
+    this.addOverridesToPostGradesStore(this.props.sisOverrides)
   }
 
   setupGrading = (students: GradebookStudent[]): void => {
@@ -2053,7 +2050,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         return this.gradebookSettingsModalButton.current?.focus()
       },
       onCourseSettingsUpdated: settings => {
-        return this.courseSettings.handleUpdated(settings)
+        return this.courseSettings.handleUpdated(settings, this.props.fetchFinalGradeOverrides)
       },
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       postPolicies: this.postPolicies,
@@ -4226,7 +4223,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const assignment = this.getAssignment(assignmentId)
     const manager = new SetDefaultGradeDialogManager(
       assignment,
-      this.studentsThatCanSeeAssignment(assignmentId),
+      this.visibleStudentsThatCanSeeAssignment(assignmentId),
       this.options.context_id,
       this.getFilterRowsBySetting('sectionId'),
       isAdmin(),
@@ -4603,6 +4600,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.props.recentlyLoadedAssignmentGroups.assignmentGroups,
         this.props.recentlyLoadedAssignmentGroups.gradingPeriodIds
       )
+    }
+
+    // final grade overrides
+    if (
+      prevProps.finalGradeOverrides !== this.props.finalGradeOverrides &&
+      this.props.finalGradeOverrides
+    ) {
+      this.finalGradeOverrides?.setGrades(this.props.finalGradeOverrides)
+    }
+
+    // sis overrides
+    if (prevProps.sisOverrides !== this.props.sisOverrides) {
+      this.addOverridesToPostGradesStore(this.props.sisOverrides)
     }
 
     // modules

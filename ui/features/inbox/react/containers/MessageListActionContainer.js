@@ -43,7 +43,7 @@ const MessageListActionContainer = props => {
     const selectedStates =
       props.selectedConversations
         .map(cp =>
-          cp.participants?.find(participant => participant.user._id === ENV.current_user?.id)
+          cp.participants?.find(participant => participant?.user?._id === ENV.current_user?.id)
         )
         .map(node => node?.workflowState) || []
     return selectedStates

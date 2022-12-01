@@ -19,7 +19,7 @@
 import React, {useState, useCallback} from 'react'
 import formatMessage from '../../../../../../format-message'
 import {actions, modes} from '../../../reducers/imageSection'
-
+import {actions as trayActions} from '../../../reducers/svgSettings'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconCropLine, IconTrashLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
@@ -122,8 +122,8 @@ export const ImageOptions = ({state, dispatch, rcsConfig, trayDispatch}) => {
             open={state.cropperOpen}
             onClose={() => dispatch({type: actions.SET_CROPPER_OPEN.type, payload: false})}
             onSubmit={(settings, generatedImage) => {
-              dispatch({
-                type: actions.SET_IMAGE.type,
+              trayDispatch({
+                type: trayActions.SET_EMBED_IMAGE,
                 payload: generatedImage,
               })
               dispatch({

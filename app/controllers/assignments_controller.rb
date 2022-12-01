@@ -138,6 +138,7 @@ class AssignmentsController < ApplicationController
     peer_review_available = submission.present? && @assignment.submitted?(submission: submission) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
 
     js_env({
+             a2_student_view: render_a2_student_view?,
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
              peer_review_available: peer_review_available,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,

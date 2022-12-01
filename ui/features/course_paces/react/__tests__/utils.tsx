@@ -22,12 +22,13 @@ import {createStore, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
 import ReduxThunk from 'redux-thunk'
 
-import {DefaultStoreState, DEFAULT_STORE_STATE} from './fixtures'
+import {DEFAULT_STORE_STATE} from './fixtures'
+import {StoreState} from '../types'
 import reducers from '../reducers/reducers'
 
 export const renderConnected = (
   component: React.ReactElement,
-  preloadedState: DefaultStoreState = DEFAULT_STORE_STATE
+  preloadedState: StoreState = DEFAULT_STORE_STATE
 ) => render(<Provider store={withMiddleware(reducers, preloadedState)}>{component}</Provider>)
 
 // We need to use a middleware to mock async actions

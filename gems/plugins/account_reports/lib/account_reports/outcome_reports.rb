@@ -197,6 +197,8 @@ module AccountReports
     end
 
     def outcomes_new_quiz_scope
+      return [] unless account.feature_enabled?(:outcome_service_results_to_canvas)
+
       students = account.learning_outcome_links.active
                         .select(<<~SQL.squish)
                           distinct on (#{outcome_order}, p.id, s.id, a.id)

@@ -44,11 +44,14 @@ describe CoursePacing::PaceContextsService do
     context "for type 'student_enrollment'" do
       let(:student) { user_model(name: "Foo Bar") }
       let(:student_two) { user_model(name: "Bar Foo") }
+      let(:fake_student) { user_model(name: "Fake Student") }
       let!(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
       let!(:enrollment_two) { course.enroll_student(student_two, enrollment_state: "active") }
+      let!(:fake_enrollment) { course.enroll_user(fake_student, "StudentViewEnrollment") }
 
       it "returns an array of the student enrollments" do
         expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+        expect(subject.contexts_of_type("student_enrollment")).not_to include fake_enrollment
       end
 
       context "when a user has multiple enrollment sources in a course" do

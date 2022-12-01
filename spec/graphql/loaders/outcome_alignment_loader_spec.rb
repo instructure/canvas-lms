@@ -245,4 +245,25 @@ describe Loaders::OutcomeAlignmentLoader do
       end
     end
   end
+
+  context "when outcome is aligned to a question bank and the bank name is updated" do
+    before do
+      @bank.title = "Updated bank name"
+      @bank.save!
+    end
+
+    it "resolves the title of the question bank alignment to the updated bank name" do
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment[:content_type] == "AssessmentQuestionBank"
+
+            expect(alignment[:title]).to eq "Updated bank name"
+          end
+        end
+      end
+    end
+  end
 end

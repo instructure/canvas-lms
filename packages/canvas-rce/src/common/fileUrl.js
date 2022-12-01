@@ -80,12 +80,12 @@ export function downloadToWrap(url) {
 // If it is a user file, add the verifier
 // NOTE: this can be removed once canvas-rce-api is updated
 //       to normalize the file URLs it returns.
-export function fixupFileUrl(contextType, contextId, fileInfo) {
+export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
   // it's annoying, but depending on how we got here
   // the file may have an href or a url
   const key = fileInfo.href ? 'href' : 'url'
   if (fileInfo[key]) {
-    let parsed = parseCanvasUrl(fileInfo[key])
+    let parsed = parseCanvasUrl(fileInfo[key], canvasOrigin)
     if (!parsed) {
       return fileInfo
     }
@@ -106,8 +106,8 @@ export function fixupFileUrl(contextType, contextId, fileInfo) {
 // This is appropriate for images in some rce content.
 // Remove wrap=1 to indicate we want the file downloaded
 // (which is necessary to show in an <img> tag), not viewed
-export function prepEmbedSrc(url) {
-  const parsed = parseCanvasUrl(url)
+export function prepEmbedSrc(url, canvasOrigin = window.location.origin) {
+  const parsed = parseCanvasUrl(url, canvasOrigin)
   if (!parsed) {
     return url
   }

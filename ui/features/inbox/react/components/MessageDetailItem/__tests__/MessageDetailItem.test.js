@@ -87,6 +87,33 @@ describe('MessageDetailItem', () => {
     expect(getByText('attachment1.jpeg')).toBeInTheDocument()
   })
 
+  it('shows media attachment link if it exists', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: 'This is the body text for the message.',
+        mediaComment: {
+          _id: '123',
+          title: 'Course Video',
+          mediaSources: [
+            {
+              type: 'video',
+              src: 'course-video-test',
+              height: '800',
+              width: '300',
+            },
+          ],
+        },
+      },
+      contextName: 'Fake Course 1',
+    }
+
+    const {getByText} = render(<MessageDetailItem {...props} />)
+    expect(getByText('Course Video')).toBeInTheDocument()
+  })
+
   it('does not render the reply or reply all options when function is not provided', () => {
     const props = {
       conversationMessage: {

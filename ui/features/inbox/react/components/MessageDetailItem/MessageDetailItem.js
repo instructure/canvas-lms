@@ -20,7 +20,6 @@ import {Avatar} from '@instructure/ui-avatar'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
-import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
@@ -31,10 +30,12 @@ import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
+import {MediaAttachment} from '@canvas/message-attachments'
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
+  const {conversationMessage: {mediaComment} = {}} = props
 
   return (
     <Responsive
@@ -119,8 +120,15 @@ export const MessageDetailItem = ({...props}) => {
               })}
             </List>
           )}
-          {props.conversationMessage.mediaComment && (
-            <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
+          {mediaComment && (
+            <MediaAttachment
+              file={{
+                mediaID: mediaComment._id,
+                title: mediaComment.title,
+                mediaTracks: mediaComment.media_tracks,
+                mediaSources: mediaComment.mediaSources,
+              }}
+            />
           )}
         </>
       )}

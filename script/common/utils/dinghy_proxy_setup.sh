@@ -2,19 +2,35 @@
 source script/common/utils/common.sh
 
 function setup_dinghy_proxy {
+  DOMAIN_TLD="docker"
+
+  while ! [ -z "$1" ]; do
+    case $1 in
+      --domain-tld)
+        shift
+        DOMAIN_TLD=$1
+        ;;
+      *)
+        echo "Unrecognized option: $1"
+        return 1
+        ;;
+    esac
+    shift
+  done
+
   if [[ "$(docker ps -aq --filter ancestor=codekitchen/dinghy-http-proxy)" == "" ]]; then
     docker run -d --restart=always \
     -v /var/run/docker.sock:/tmp/docker.sock:ro \
     -v ~/.dinghy/certs:/etc/nginx/certs \
     -p 80:80 -p 443:443 -p 19322:19322/udp \
-    -e DNS_IP=192.168.42.42  -e CONTAINER_NAME=http-proxy \
+    -e DNS_IP=192.168.42.42  -e CONTAINER_NAME=http-proxy -e DOMAIN_TLD=$DOMAIN_TLD \
     --name http-proxy \
     codekitchen/dinghy-http-proxy
 
     sudo mkdir -p /etc/resolver
 
-    echo 'nameserver 192.168.42.42' | sudo tee /etc/resolver/docker > /dev/null
-    echo 'port 19322' | sudo tee -a /etc/resolver/docker > /dev/null
+    echo 'nameserver 192.168.42.42' | sudo tee /etc/resolver/$DOMAIN_TLD > /dev/null
+    echo 'port 19322' | sudo tee -a /etc/resolver/$DOMAIN_TLD > /dev/null
 
     if [[ ! -f /Library/LaunchDaemons/com.user.lo0-loopback.plist ]]; then
       message "There's no plist for the loopback. Creating plist file"

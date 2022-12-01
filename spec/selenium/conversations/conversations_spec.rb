@@ -178,6 +178,33 @@ describe "conversations new" do
         expect(fj("span:contains('Message unarchived!')")).to be_present
       end
     end
+
+    context "conversation with a message from a hard-deleted user" do
+      before do
+        user_to_delete = User.create!(name: "Student To Be Deleted")
+        user_to_delete_enrollment = @course.enroll_student(user_to_delete)
+        user_to_delete_enrollment.update_attribute(:workflow_state, "active")
+        @participant = conversation(@teacher, @s[0], user_to_delete, body: "hi there", workflow_state: "unread")
+        @convo = @participant.conversation
+        @convo.update_attribute(:subject, "testing conversation with deleted users")
+        @convo.add_message(user_to_delete, "message from deleted user")
+        user_to_delete.destroy
+        user_to_delete_enrollment.reload.destroy_permanently!
+        user_to_delete.destroy_permanently!
+      end
+
+      it "displays message list correctly" do
+        get "/conversations"
+        conversation_list_item = f("div[data-testid='conversation']")
+        conversation_list_item.click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+
+        expect(conversation_list_item.text).to include "DELETED USER,"
+        expect(messages.count).to eq 2
+        expect(messages[0].text).to include "DELETED USER, #{@s[0].name}"
+      end
+    end
   end
 
   context "when react_inbox feature flag is off" do

@@ -1296,6 +1296,17 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(lti_favorite_modal).to be_displayed
       end
 
+      describe "Edit menubar menu", ignore_js_errors: true do
+        it "shows tinymce flash alert on selecting 'Paste'" do
+          rce_wysiwyg_state_setup(@course)
+          menubar_open_menu("Edit")
+          menubar_menu_item("Paste").click
+          alert = f('.tox-notification--error[role="alert"]')
+          expect(alert).to be_displayed
+          expect(alert.text).to include "Your browser doesn't support direct access to the clipboard."
+        end
+      end
+
       describe "Tools menubar menu", ignore_js_errors: true do
         it "includes Apps menu item in" do
           rce_wysiwyg_state_setup(@course)
@@ -1527,6 +1538,21 @@ describe "RCE next tests", ignore_js_errors: true do
         in_frame rce_page_body_ifr_id do
           expect(f("#test-image").attribute("onerror")).to be_nil
         end
+      end
+    end
+
+    context "Icon Maker Tray" do
+      before do
+        Account.site_admin.enable_feature!(:buttons_and_icons_root_account)
+      end
+
+      it "can add image" do
+        rce_wysiwyg_state_setup(@course)
+        iconmaker_toolbar_button.click
+        iconmaker_addimage_menu.click
+        iconmaker_singlecolor_option.click
+        iconmaker_singlecolor_articon.click
+        expect(iconmaker_image_preview).to be_displayed
       end
     end
   end

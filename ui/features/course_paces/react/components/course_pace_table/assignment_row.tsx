@@ -128,6 +128,16 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     )
   }
 
+  componentDidUpdate(prevProps: Readonly<ComponentProps>) {
+    // reconcile the memoized local state duration with the redux state duration if the
+    // latter changes, for example due to onResetPace
+    if (prevProps.coursePaceItem.duration !== this.props.coursePaceItem.duration) {
+      // we're checking that a redux state change has occurred before calling setState
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({duration: String(this.props.coursePaceItem.duration)})
+    }
+  }
+
   /* Helpers */
 
   newDuration = (newDueDate: string | moment.Moment) => {

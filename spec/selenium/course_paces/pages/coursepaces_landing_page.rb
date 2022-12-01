@@ -85,6 +85,18 @@ module CoursePacesLandingPageObject
     "#tab-tab-student_enrollment"
   end
 
+  def search_input_selector
+    "[data-testid='search-input']"
+  end
+
+  def search_button_selector
+    "[data-testid='search-button']"
+  end
+
+  def table_column_name_selector
+    "[data-testid='sortable-column-name']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def community_info_text
@@ -151,6 +163,18 @@ module CoursePacesLandingPageObject
     f(student_tab_selector)
   end
 
+  def search_input
+    f(search_input_selector)
+  end
+
+  def search_button
+    f(search_button_selector)
+  end
+
+  def table_column_name
+    f(table_column_name_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   #----------------------- Click Items -------------------------------
 
@@ -184,6 +208,14 @@ module CoursePacesLandingPageObject
 
   def click_student_tab
     student_tab.click
+  end
+
+  def click_search_button
+    search_button.click
+  end
+
+  def click_table_column_name
+    table_column_name.click
   end
 
   #------------------------Retrieve Text -----------------------------

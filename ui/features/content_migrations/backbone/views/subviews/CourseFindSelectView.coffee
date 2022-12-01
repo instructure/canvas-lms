@@ -140,6 +140,7 @@ export default class CourseFindSelectView extends Backbone.View
   updateSelect: (event, ui) =>
     @setSourceCourseId ui.item.id
     @$courseSelect.val ui.item.id if @$courseSelect.length
+    @trigger 'course_changed', ui.item
 
   # After selecting a course via the dropdown menu, update the search
   # field to keep the inputs in sync. Also set the source course id

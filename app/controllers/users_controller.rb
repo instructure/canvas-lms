@@ -391,15 +391,15 @@ class UsersController < ApplicationController
   #   Note that the API will prefer matching on canonical user ID if the ID has
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
-  #   administrative users will search on SIS ID, login ID, name, or email
-  #   address
+  #   administrative users will search on SIS ID, Integration ID, login ID,
+  #   name, or email address
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
   #   This can be a base role type of 'student', 'teacher',
   #   'ta', 'observer', or 'designer'.
   #
-  # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
+  # @argument sort [String, "username"|"email"|"sis_id"|"integration_id"|"last_login"]
   #   The column to sort results by.
   #
   # @argument order [String, "asc"|"desc"]
@@ -881,6 +881,7 @@ class UsersController < ApplicationController
       @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end
 
+    MasterCourses::MasterTemplate.preload_is_master_course(@courses)
     render json: @courses.map { |c|
       { label: c.nickname_for(@current_user),
         id: c.id,
@@ -891,7 +892,8 @@ class UsersController < ApplicationController
         account_name: c.enrollment_term.root_account.name,
         account_id: c.enrollment_term.root_account.id,
         start_at: datetime_string(c.start_at, :verbose, nil, true),
-        end_at: datetime_string(c.conclude_at, :verbose, nil, true) }
+        end_at: datetime_string(c.conclude_at, :verbose, nil, true),
+        blueprint: MasterCourses::MasterTemplate.is_master_course?(c) }
     }
   end
 

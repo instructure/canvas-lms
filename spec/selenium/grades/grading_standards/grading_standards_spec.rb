@@ -190,7 +190,7 @@ describe "grading standards" do
     it "edit current grading scheme", priority: "2" do
       element = ff(".displaying a").select { |a| a.text == "" }
       element[0].click
-      expect(f(".ui-dialog-titlebar").text).to eq("View/Edit Grading Scheme\nclose")
+      expect(f(".ui-dialog-titlebar").text).to eq("View/Edit Grading Scheme\nClose")
     end
   end
 end

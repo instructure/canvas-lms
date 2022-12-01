@@ -49,9 +49,10 @@ class PeriodicJobs
     run_at
   end
 
-  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false, connection_class: nil)
-    callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
-    Shard.with_each_shard(Shard.in_current_region, exception: callback) do
+  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false, connection_class: nil, error_callback: nil)
+    error_callback ||= -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
+
+    Shard.with_each_shard(Shard.in_current_region, exception: error_callback) do
       current_shard = Shard.current(connection_class)
       strand = "#{klass}.#{method}:#{current_shard.database_server.id}"
       # TODO: allow this to work with redis jobs
@@ -79,12 +80,12 @@ def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false
   )
 end
 
-def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false)
+def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false, error_callback: nil)
   DatabaseServer.send_in_each_region(
     PeriodicJobs,
     :with_each_shard_by_database_in_region,
     { singleton: "periodic:region: #{klass}.#{method}" },
-    klass, method, *args, jitter: jitter, local_offset: local_offset, connection_class: ActiveRecord::Base
+    klass, method, *args, jitter: jitter, local_offset: local_offset, connection_class: ActiveRecord::Base, error_callback: error_callback
   )
 end
 
