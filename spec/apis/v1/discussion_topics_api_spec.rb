@@ -601,6 +601,7 @@ describe DiscussionTopicsController, type: :request do
         "group_category_id" => nil,
         "topic_children" => [],
         "group_topic_children" => [],
+        "is_announcement" => false,
         "anonymous_state" => nil }
     end
 
@@ -1796,6 +1797,7 @@ describe DiscussionTopicsController, type: :request do
       "lock_at" => nil,
       "created_at" => gtopic.created_at.iso8601,
       "id" => gtopic.id,
+      "is_announcement" => false,
       "user_name" => @user.name,
       "last_reply_at" => gtopic.last_reply_at.as_json,
       "message" => "<p>content here</p>",
