@@ -145,7 +145,7 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^4.1.1"
+    "tinymce-a11y-checker": "^4.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7",
