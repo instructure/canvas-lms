@@ -28,8 +28,6 @@ const defaultProps = {
   context_type: 'Course',
   context_id: '17',
   newPace: false,
-  isBlueprintLocked: false,
-  setIsBlueprintLocked: () => {},
   fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 }
 

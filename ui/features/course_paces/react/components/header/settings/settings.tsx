@@ -61,7 +61,7 @@ interface DispatchProps {
 
 interface PassedProps {
   readonly margin?: string
-  readonly isBlueprintLocked: boolean
+  readonly isBlueprintLocked: boolean | undefined
 }
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps

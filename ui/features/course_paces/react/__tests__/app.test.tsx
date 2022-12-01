@@ -24,11 +24,13 @@ import {PRIMARY_PACE} from './fixtures'
 import {App} from '../app'
 
 const pollForPublishStatus = jest.fn()
+const setBlueprintLocked = jest.fn()
 const setResponsiveSize = jest.fn()
 
 const defaultProps = {
   loadingMessage: '',
   pollForPublishStatus,
+  setBlueprintLocked,
   responsiveSize: 'large' as const,
   setResponsiveSize,
   showLoadingOverlay: false,

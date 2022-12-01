@@ -43,6 +43,7 @@ export enum Constants {
   START_SYNCING = 'UI/START_SYNCING',
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
+  SET_BLUEPRINT_LOCK = 'COURSE_PACE/SET_BLUEPRINT_LOCK',
 }
 
 /* Action creators */
@@ -68,6 +69,7 @@ export const regularActions = {
   syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED),
   setSelectedContextType: (selectedContextType: PaceContextTypes) =>
     createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),
+  setBlueprintLocked: (locked?: boolean) => createAction(Constants.SET_BLUEPRINT_LOCK, locked),
 }
 
 export const thunkActions = {

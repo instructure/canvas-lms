@@ -49,7 +49,12 @@ import {
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getShowProjections, getSyncing, getSelectedContextType} from '../../reducers/ui'
+import {
+  getShowProjections,
+  getSyncing,
+  getSelectedContextType,
+  getBlueprintLocked,
+} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 import {Change} from '../../utils/change_tracking'
 
@@ -65,11 +70,11 @@ interface PassedProps {
   readonly isStacked: boolean
   readonly coursePaceItem: CoursePaceItem
   readonly dueDate: string | moment.Moment
-  readonly blueprintLocked: boolean
 }
 
 interface StoreProps {
   readonly coursePace: CoursePace
+  readonly blueprintLocked: boolean | undefined
   readonly excludeWeekends: boolean
   readonly coursePaceItemPosition: number
   readonly blackoutDates: BlackoutDate[]
@@ -262,9 +267,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         </Flex>
       )
     }
-
-    const disabledByBlueprintLock =
-      this.props.blueprintLocked && this.props.context_type === 'Course'
+    const disabledByBlueprintLock = this.props.blueprintLocked
     const itemChange = this.props.coursePaceItemChanges.find(
       c => c.newValue.module_item_id === this.props.coursePaceItem.module_item_id
     )
@@ -370,6 +373,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
   return {
     coursePace,
     excludeWeekends: getExcludeWeekends(state),
+    blueprintLocked: getBlueprintLocked(state),
     coursePaceItemPosition: getCoursePaceItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
     isSyncing: getSyncing(state),

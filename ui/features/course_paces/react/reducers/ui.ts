@@ -22,6 +22,7 @@ import {StoreState, UIState} from '../types'
 import {Constants as UIConstants, UIAction} from '../actions/ui'
 import {getCoursePaceType, getPacePublishing} from './course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
+import {Constants as CoursePaceConstants} from '../actions/course_paces'
 
 export const initialState: UIState = {
   autoSaving: false,
@@ -36,6 +37,7 @@ export const initialState: UIState = {
   showPaceModal: false,
   responsiveSize: 'large',
   showProjections: true,
+  blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
 }
 
 /* Selectors */
@@ -67,6 +69,7 @@ export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoading
 export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
+export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -115,6 +118,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, showPaceModal: true}
     case UIConstants.SET_SELECTED_PACE_CONTEXT_TYPE:
       return {...state, selectedContextType: action.payload}
+    case UIConstants.SET_BLUEPRINT_LOCK:
+      return {...state, blueprintLocked: action.payload}
     default:
       return state
   }

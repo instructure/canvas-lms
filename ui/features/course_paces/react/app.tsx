@@ -64,6 +64,7 @@ interface StoreProps {
 interface DispatchProps {
   readonly pollForPublishStatus: typeof coursePaceActions.pollForPublishStatus
   readonly setResponsiveSize: typeof actions.setResponsiveSize
+  readonly setBlueprintLocked: typeof actions.setBlueprintLocked
   readonly hidePaceModal: typeof actions.hidePaceModal
 }
 
@@ -76,6 +77,7 @@ type ResponsiveComponentProps = ComponentProps & {
 export const App: React.FC<ResponsiveComponentProps> = ({
   loadingMessage,
   setResponsiveSize,
+  setBlueprintLocked,
   showLoadingOverlay,
   hidePaceModal,
   modalOpen,
@@ -93,11 +95,19 @@ export const App: React.FC<ResponsiveComponentProps> = ({
     pollForPublishStatus()
   }, [pollForPublishStatus])
 
-  const [isBlueprintLocked, setIsBlueprintLocked] = useState(false)
-
   useEffect(() => {
     setResponsiveSize(responsiveSize)
   }, [responsiveSize, setResponsiveSize])
+
+  useEffect(() => {
+    setBlueprintLocked(
+      window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course &&
+        window.ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
+        coursePace.context_type === 'Course'
+    )
+    // this should run on first render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleModalClose = () => {
     hidePaceModal()
@@ -110,8 +120,6 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           <Flex as="section" alignItems="end" wrap="wrap">
             <FlexItem margin="0 0 small">
               <Header
-                isBlueprintLocked={isBlueprintLocked}
-                setIsBlueprintLocked={setIsBlueprintLocked}
                 handleDrawerToggle={() => setTrayOpen(!trayOpen)}
                 responsiveSize={responsiveSize}
               />
@@ -125,7 +133,6 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           </Flex>
           <PaceModal
             isOpen={modalOpen}
-            isBlueprintLocked={isBlueprintLocked}
             changes={unpublishedChanges}
             onClose={() => handleModalClose()}
             handleDrawerToggle={() => setTrayOpen(!trayOpen)}
@@ -137,14 +144,10 @@ export const App: React.FC<ResponsiveComponentProps> = ({
         <>
           <View>
             <Errors />
-            <Header
-              isBlueprintLocked={isBlueprintLocked}
-              setIsBlueprintLocked={setIsBlueprintLocked}
-              handleDrawerToggle={() => setTrayOpen(!trayOpen)}
-            />
+            <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
           </View>
-          <Body blueprintLocked={isBlueprintLocked} />
-          <Footer blueprintLocked={isBlueprintLocked} responsiveSize={responsiveSize} />
+          <Body />
+          <Footer responsiveSize={responsiveSize} />
           <Tray
             label={I18n.t('Unpublished Changes tray')}
             open={trayOpen}
@@ -207,6 +210,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   pollForPublishStatus: coursePaceActions.pollForPublishStatus,
+  setBlueprintLocked: actions.setBlueprintLocked,
   setResponsiveSize: actions.setResponsiveSize,
   hidePaceModal: actions.hidePaceModal,
 })(ResponsiveApp)

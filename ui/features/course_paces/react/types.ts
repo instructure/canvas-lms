@@ -151,6 +151,7 @@ export interface UIState {
   readonly showPaceModal: boolean
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
+  readonly blueprintLocked?: boolean
 }
 
 export type SortableColumn = 'name' | null
