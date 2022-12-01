@@ -5345,6 +5345,7 @@ describe AssignmentsApiController, type: :request do
                                                  "can_lock" => true,
                                                  "comments_disabled" => false,
                                                  "locked_for_user" => false,
+                                                 "is_announcement" => false,
                                                  "root_topic_id" => @topic.root_topic_id,
                                                  "podcast_url" => nil,
                                                  "podcast_has_student_posts" => false,
