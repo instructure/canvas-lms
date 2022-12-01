@@ -87,7 +87,6 @@ interface DispatchProps {
 
 interface PassedProps {
   readonly changes?: SummarizedChange[]
-  readonly isBlueprintLocked: boolean
   readonly responsiveSize: ResponsiveSizes
   readonly isOpen: boolean
   readonly onClose: () => void
@@ -96,7 +95,6 @@ interface PassedProps {
 const {Item: FlexItem} = Flex as any
 
 export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = props => {
-  const [isBlueprintLocked, setIsBlueprintLocked] = useState(props.isBlueprintLocked)
   const [pendingContext, setPendingContext] = useState('')
   const [trayOpen, setTrayOpen] = useState(false)
   const closeButtonRef = useRef<HTMLElement | null>(null)
@@ -187,11 +185,9 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
             </View>
             <PaceModalHeading
               enrolledSection={props.enrolledSection}
-              isBlueprintLocked={props.isBlueprintLocked}
               coursePace={props.coursePace}
               paceContext={props.selectedPaceContext}
               contextName={props.paceName}
-              setIsBlueprintLocked={setIsBlueprintLocked}
             />
             <PaceModalStats
               coursePace={props.coursePace}
@@ -203,7 +199,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
               compression={props.compression}
               responsiveSize={props.responsiveSize}
             />
-            <Body blueprintLocked={isBlueprintLocked} />
+            <Body />
             <Tray
               label={I18n.t('Unpublished Changes tray')}
               open={trayOpen}
@@ -237,7 +233,6 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
       </Modal.Body>
       <Modal.Footer theme={{padding: '0'}}>
         <Footer
-          blueprintLocked={isBlueprintLocked}
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}
           responsiveSize={props.responsiveSize}

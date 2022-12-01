@@ -36,11 +36,9 @@ const studentPaceContext = PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]
 
 const defaultProps = {
   coursePace: PRIMARY_PACE,
-  isBlueprintLocked: false,
   contextName: '',
   paceContext: coursePaceContext,
   enrolledSection: SECTION_1,
-  setIsBlueprintLocked: jest.fn(),
 }
 
 describe('PaceModalHeading', () => {

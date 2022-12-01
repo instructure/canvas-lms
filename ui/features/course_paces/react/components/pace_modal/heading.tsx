@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
+import {connect} from 'react-redux'
 
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {CoursePace, PaceContext, Section} from '../../types'
+import {CoursePace, PaceContext, Section, StoreState} from '../../types'
 import {Text} from '@instructure/ui-text'
 import {IconUserSolid} from '@instructure/ui-icons'
+import {getBlueprintLocked} from '../../reducers/ui'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
 
@@ -33,20 +35,21 @@ interface Props {
   readonly coursePace: CoursePace
   readonly contextName: string
   readonly enrolledSection: Section
-  readonly isBlueprintLocked: boolean
   readonly paceContext: PaceContext
-  readonly setIsBlueprintLocked: (newValue: boolean) => void
+}
+
+interface StoreProps {
+  readonly blueprintLocked: boolean | undefined
 }
 
 const {Item: FlexItem} = Flex as any
 
-const PaceModalHeading: React.FC<Props> = ({
+const PaceModalHeading: React.FC<Props & StoreProps> = ({
   coursePace,
   contextName,
-  isBlueprintLocked,
   paceContext,
-  setIsBlueprintLocked,
   enrolledSection,
+  blueprintLocked,
 }) => {
   const renderPaceInfo = () => {
     if (['Section', 'Course'].includes(coursePace.context_type)) {
@@ -108,18 +111,17 @@ const PaceModalHeading: React.FC<Props> = ({
     <Flex as="section" justifyItems="space-between">
       <FlexItem>{renderDetails()}</FlexItem>
       <FlexItem margin="none none auto none">
-        <Settings
-          isBlueprintLocked={isBlueprintLocked && coursePace.context_type === 'Course'}
-          margin="0 0 0 small"
-        />
-        <BlueprintLock
-          newPace={!coursePace.id}
-          contextIsCoursePace={coursePace.context_type === 'Course'}
-          setIsBlueprintLocked={setIsBlueprintLocked}
-          bannerSelector=".pace-redesign-inner-modal"
-        />
+        <Settings isBlueprintLocked={blueprintLocked} margin="0 0 0 small" />
+        <BlueprintLock newPace={!coursePace.id} bannerSelector=".pace-redesign-inner-modal" />
       </FlexItem>
     </Flex>
   )
 }
-export default PaceModalHeading
+
+const mapStateToProps = (state: StoreState): StoreProps => {
+  return {
+    blueprintLocked: getBlueprintLocked(state),
+  }
+}
+
+export default connect(mapStateToProps)(PaceModalHeading)

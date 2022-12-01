@@ -41,7 +41,6 @@ const defaultProps = {
   removePace,
   blackoutDatesUnsynced: false,
   blackoutDatesSyncing: false,
-  blueprintLocked: false,
   handleCancel,
   responsiveSize: 'large' as const,
   anyActiveRequests: false,

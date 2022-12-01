@@ -731,6 +731,8 @@ class ContentMigration < ActiveRecord::Base
       item_scope = case klass
                    when "Attachment"
                      context.attachments.not_deleted.where(migration_id: mig_ids)
+                   when "CoursePace"
+                     context.course_paces.where(migration_id: mig_ids)
                    else
                      klass.constantize.where(context_id: context, context_type: "Course", migration_id: mig_ids)
                           .where.not(workflow_state: "deleted")

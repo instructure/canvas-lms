@@ -176,7 +176,6 @@ describe "course pace page" do
     end
 
     it "does not show a module item that is not an assignment", custom_timeout: 25 do
-      skip("LS-3614 will fix the issue addressed by this test in the redesign")
       page = @course.wiki_pages.create!(title: "New Page Title")
       @course_module.add_item(id: page.id, type: "wiki_page")
       @course_module.add_item(type: "external_url",

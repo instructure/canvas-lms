@@ -34,7 +34,6 @@ const onClose = jest.fn(),
 
 const defaultProps = {
   coursePace: PRIMARY_PACE,
-  isBlueprintLocked: false,
   isOpen: true,
   onClose,
   clearCategoryError,
