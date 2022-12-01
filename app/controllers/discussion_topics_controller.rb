@@ -895,7 +895,6 @@ class DiscussionTopicsController < ApplicationController
               INITIAL_POST_REQUIRED: @initial_post_required,
               THREADED: @topic.threaded?,
               ALLOW_RATING: @topic.allow_rating,
-              SORT_BY_RATING: @topic.sort_by_rating,
               TODO_DATE: @topic.todo_date,
               IS_ASSIGNMENT: @topic.assignment_id?,
               ASSIGNMENT_ID: @topic.assignment_id,
