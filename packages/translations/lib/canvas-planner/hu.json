@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Remek vita" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Csodálatos feladat" },
   "add_to_do_7537af64": { "message": "Teendő hozzáadása" },
   "add_to_do_7def3c37": { "message": "Teendő hozzáadása" },
   "address_3159962f": { "message": "Cím:" },
   "all_day_fb42c4fc": { "message": "Egész nap" },
   "all_items_loaded_aa256183": { "message": "Minden elem betöltve" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Csodálatos vitafeladat"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Hiba történt, amikor megpróbálta elvetni a lehetőséget."
   },
@@ -45,6 +50,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "A Tennivaló Listád Elkezdése"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Az alábbiakban egy példa látható arra, hogy a tanulók hogyan látják az órarendjüket"
+  },
   "calendar_a8563bb2": { "message": "Naptár" },
   "calendar_event_89aadc1c": { "message": "Naptáresemény" },
   "canvas_planner_98ed106": { "message": "Canvas Tervező" },
@@ -56,13 +64,13 @@
     "message": "{ count, plural,\n     =0 {# lehetőség}\n    one {# lehetőség}\n  other {# lehetőség}\n}"
   },
   "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {# hiányzó elem elrejtése}\n  other {# hiányzó elem elrejtése}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {# elvégzett elem mutatása}\n  other {# elvégzett elem mutatása}\n}"
   },
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {# hiányzó elem megjelenítése}\n  other {# hiányzó elem megjelenítése}\n}"
   },
   "course_8a63b4a3": { "message": "Kurzus" },
   "course_to_do_bcbbab54": { "message": "Tennivalók { course } tantárgyból" },
@@ -90,13 +98,32 @@
   "error_loading_grades_e0b38f4d": {
     "message": "Hiba történt az értékelések betöltése közben."
   },
+  "error_loading_items_5218438e": { "message": "Error loading items" },
   "error_loading_more_items_3f109d9f": {
     "message": "Nem sikerült több elemet betölteni"
   },
   "error_loading_past_items_2881dbb1": {
     "message": "Hiba történt a korábbi elemek betöltése közben."
   },
+  "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "Felmentve" },
+  "extended_9a58dcb6": { "message": "Extended" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Failed getting course list"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Failed getting To Do list"
+  },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Failed peeking into your future"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Failed peeking into your past"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Failed saving changes on { name }."
+  },
+  "failed_to_delete_name_bdd7b810": { "message": "Failed to delete { name }." },
   "failed_to_delete_to_do_64edff49": {
     "message": "Nem sikerült a tennivaló törlése"
   },
@@ -109,7 +136,11 @@
   "failed_to_save_to_do_ddc7503b": {
     "message": "Nem sikerült a tennivaló mentése"
   },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Failure loading the To Do list"
+  },
   "feedback_6dcc1991": { "message": "Visszajelzés" },
+  "fun_quiz_47ab0b0": { "message": "Fun quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Ugrás a vezérlőpult kártya nézetére"
   },
@@ -120,7 +151,15 @@
     "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
   },
   "join_6cafecca": { "message": "Csatlakozás" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "join active online meeting"
+  },
+  "join_online_meeting_b1725843": { "message": "join online meeting" },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Jump to navigation toolbar"
+  },
   "jump_to_today_254ccf41": { "message": "Ugrás a mai napra" },
+  "language_arts_35b79a8b": { "message": "Language Arts" },
   "late_2be42b88": { "message": "Késve" },
   "load_more_a36f9cf9": { "message": "Továbbiak betöltése" },
   "load_prior_dates_f2b0f6f0": { "message": "Korábbi dátumok betöltése" },
@@ -136,6 +175,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Úgy tűnik, itt nincsen semmi."
   },
+  "math_ede93050": { "message": "Math" },
   "missing_1a256b3b": { "message": "Hiányzik" },
   "missing_items_for_title_516511f8": {
     "message": "Hiányzó elem ehhez: { title }"
@@ -152,6 +192,7 @@
     "message": "Nincs hozzárendelve esedékességi dátum"
   },
   "no_grade_3b4d7f3e": { "message": "Nincs értékelés" },
+  "nothing_due_this_week_d45c9ef9": { "message": "Nothing Due This Week" },
   "nothing_for_now_e3e3ce2a": { "message": "Egyelőre semmi" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Itt semmi nem igényli a figyelmét."
@@ -185,9 +226,12 @@
   "previous_month_bb1e3c84": { "message": "Előző hónap" },
   "pts_699bd9aa": { "message": "pont" },
   "quiz_e0dcce8f": { "message": "Kvíz" },
+  "redo_363c58b7": { "message": "Redo" },
   "reminder_date_4564d12d": { "message": "Emlékeztető: { date }" },
   "replies_4a8577c8": { "message": "Válaszok" },
   "save_11a80ec3": { "message": "Mentés" },
+  "schedule_preview_3bcda153": { "message": "Schedule Preview" },
+  "science_8d92214a": { "message": "Science" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Görgessen felfelé, hogy lássa az előzményeket!"
   },
@@ -196,6 +240,7 @@
   },
   "show_all_ae37d610": { "message": "Összes megjelenítése" },
   "show_my_grades_ebd08684": { "message": "Az értékeléseim mutatása" },
+  "social_studies_13fa30c7": { "message": "Social Studies" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate }-tól/től { endDate }-ig"
   },
@@ -208,16 +253,21 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime }-tól/től { endTime }-ig"
   },
+  "student_to_do_c018c835": { "message": "Student To Do" },
   "submitted_318fad53": { "message": "Beadva" },
   "success_to_do_created_e34ed395": {
     "message": "Sikerült: tennivaló létrehozva"
   },
   "task_16b0ef38": { "message": "Feladat" },
+  "the_best_assignment_15e98be1": { "message": "The best assignment" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Ekkorra kell megcsinálni ezt"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Ehhez az elemhez nincsenek pontok rendelve."
+  },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "There is nothing planned for today."
   },
   "time_2b5aac58": { "message": "Idő" },
   "title_ee03d132": { "message": "Cím" },
@@ -234,6 +284,11 @@
   },
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Használja a nyíl billentyűket az opció kiválasztására!"
+  },
+  "view_next_week_7f61f755": { "message": "View next week" },
+  "view_previous_week_6f83849f": { "message": "View previous week" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Weekly schedule navigation"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Tegnap ekkor: { date }" },
   "yesterday_c6bd6abf": { "message": "Tegnap" },
