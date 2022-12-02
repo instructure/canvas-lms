@@ -23,7 +23,8 @@ describe FeatureFlags::UsageMetricsPredicate do
   let(:external_integration_keys) { nil }
   let(:root_account) { double(settings: settings, external_integration_keys: external_integration_keys) }
   let(:context) { double(root_account: root_account) }
-  let(:predicate) { FeatureFlags::UsageMetricsPredicate.new context }
+  let(:region) { nil }
+  let(:predicate) { FeatureFlags::UsageMetricsPredicate.new context, region }
 
   it "defaults to false" do
     expect(predicate.call).to be_falsey
@@ -37,13 +38,13 @@ describe FeatureFlags::UsageMetricsPredicate do
     end
   end
 
-  describe "when in domestic territory and us billing" do
+  describe "when US billing country and approved US aws region" do
     let(:external_integration_keys) do
       keys = double
       allow(keys).to receive(:find_by).with({ key_type: "salesforce_billing_country_code" }) { double(key_value: "US") }
-      allow(keys).to receive(:find_by).with({ key_type: "salesforce_territory_region" }) { double(key_value: "domestic") }
       keys
     end
+    let(:region) { "us-east-1" }
 
     it "returns true" do
       expect(predicate.call).to be_truthy
