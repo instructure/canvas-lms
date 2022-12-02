@@ -221,6 +221,12 @@ describe Api do
       expect(@api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}")).to eq lti_course
     end
 
+    it "finds group by lti_context_id" do
+      lti_group = Group.create!(context: course_factory)
+      Lti::Asset.opaque_identifier_for(lti_group)
+      expect(@api.api_find(Group, "lti_context_id:#{lti_group.lti_context_id}")).to eq lti_group
+    end
+
     it "finds account by lti_context_id" do
       account = Account.create!(name: "account")
       account.lti_context_id = Canvas::Security.hmac_sha1(account.asset_string.to_s, "key")
