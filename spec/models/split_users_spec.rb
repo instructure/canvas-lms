@@ -153,6 +153,26 @@ describe SplitUsers do
         expect(source_user.reload.past_lti_ids.count).to eq 1
       end
 
+      it "restores lti_id and uuid when these were overwritten by move_lti_ids" do
+        restored_orig_lti_id = restored_user.lti_id
+        restored_orig_uuid = restored_user.uuid
+        restored_lti_context_id = Lti::Asset.opaque_identifier_for(restored_user)
+        source_orig_lti_id = source_user.lti_id
+        source_orig_uuid = source_user.uuid
+        # (source_lti_context_id must be nil for this move to actually happen)
+        UserMerge.from(restored_user).into(source_user)
+        expect(source_user.reload.lti_id).to eq restored_orig_lti_id
+        expect(source_user.uuid).to eq restored_orig_uuid
+        expect(source_user.lti_context_id).to eq restored_lti_context_id
+        SplitUsers.split_db_users(source_user)
+        expect(source_user.reload.lti_id).to eq source_orig_lti_id
+        expect(source_user.uuid).to eq source_orig_uuid
+        expect(source_user.lti_context_id).to be_nil
+        expect(restored_user.reload.lti_id).to eq restored_orig_lti_id
+        expect(restored_user.uuid).to eq restored_orig_uuid
+        expect(restored_user.lti_context_id).to eq restored_lti_context_id
+      end
+
       it "splits multiple users if no merge_data is specified" do
         enrollment1 = course1.enroll_student(restored_user, enrollment_state: "active")
         enrollment2 = course1.enroll_student(source_user, enrollment_state: "active")
