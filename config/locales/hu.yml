@@ -2027,6 +2027,7 @@ hu:
   all_quiz_submissions_report_72a6d2fa: "Minden kvíz beadási riportja"
   all_roles_f3bba14d: "Minden szerep"
   all_rubrics_5114c466: "Összes értékelőtábla"
+  all_scopename_scopes_6c220783: "Az összes %{scopeName} hatókör"
   all_sections_daf11554: "Minden szekció"
   all_start_dates_must_be_before_the_end_date_d949eca9: "A záródátum nem lehet a kezdődátumnál korábbi. Minden kezdődátumnak a záródátumot meg kell előznie."
   all_student_groups_f74cd6c3: "Minden hallgatói csoport"
@@ -2214,6 +2215,7 @@ hu:
   allows_user_to_delete_course_sections_19193a35: "Lehetővé teszi a felhasználó számára a kurzusszekciók törlését."
   allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Lehetővé teszi a felhasználó számára a kérdésbankok törlését egy kurzusban vagy fiókban."
   allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Lehetővé teszi a felhasználó számára a kvízek törlését a kurzusban."
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Lehetővé teszi a felhasználó számára, hogy egy kurzust Blueprint Course-ként jelöljön ki."
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Lehetővé teszi a felhasználó számára, hogy különböző feladatokat rendeljen  az egyes hallgatókhoz."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Lehetővé teszi a felhasználók számára, hogy megkettőzzenek egy kurzuson belüli feladatokat."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Lehetővé teszi a felhasználó számára a kvízek megkettőzését egy kurzusban."
@@ -2239,10 +2241,184 @@ hu:
   allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "Lehetővé teszi a felhasználó számára az osztályzatok szerkesztését az Osztálynaplóban."
   allows_user_to_edit_grading_schemes_98c35117: "Az osztályzási rendszer szerkesztésének engedélyezése a felhasználó számára."
   allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "Lehetővé teszi a felhasználó számára az egyes feladatok, oldalak vagy fórumok zárbeállításainak szerkesztését."
+  allows_user_to_edit_lock_settings_on_the_assignmen_4c347262: "Lehetővé teszi a felhasználó számára a zárolási beállítások szerkesztését a Feladatok és a Kvízek indexoldalakon."
+  allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: "Lehetővé teszi a felhasználó számára a kérdésbankok szerkesztését egy kurzusban vagy fiókon."
+  allows_user_to_edit_the_course_sis_id_e1eccee3: "Lehetővé teszi a felhasználó számára a kurzus SIS azonosítójának szerkesztését."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Lehetővé teszi a felhasználó számára a kurzus tematikájának szerkesztését."
+  allows_user_to_edit_title_description_or_remove_co_483daae5: "Lehetővé teszi a felhasználó számára, hogy szerkessze a címet, a leírást, vagy eltávolítsa az együttműködőket az összes együttműködésben."
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Lehetővé teszi a felhasználó számára a feladatcsoport súlyozásának engedélyezését és szerkesztését a kurzusban."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Lehetővé teszi a felhasználó számára az Osztálynapló exportálását vesszővel elválasztott értékek (CSV) fájlba."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Lehetővé teszi a felhasználó számára a Blueprint kurzusok szűrését fiókszintként. Lehetővé teszi a felhasználó számára társított kurzusok hozzáadását."
+  allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Lehetővé teszi a felhasználó számára, hogy a tanuló nevében párosítási kódot hozzon létre, amelyet megoszthat a megfigyelővel."
+  allows_user_to_generate_login_logout_activity_repo_bba62f2: "Lehetővé teszi a felhasználó számára, hogy bejelentkezési/kijelentkezési tevékenység jelentést készítsen a Felügyeleti eszközökben."
+  allows_user_to_import_a_zip_file_97bd7db2: "Lehetővé teszi a felhasználó számára, hogy zip fájlt importáljon."
+  allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Lehetővé teszi a felhasználó számára a fiók tanulási eredményeinek importálását."
+  allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Lehetővé teszi a felhasználó számára a tartalom importálását a Course Import Tool segítségével."
+  allows_user_to_import_course_learning_outcomes_2ca3f18f: "Lehetővé teszi a felhasználó számára a kurzus tanulási eredményeinek importálását."
+  allows_user_to_import_resources_from_commons_into__79e8255e: "Lehetővé teszi a felhasználó számára, hogy erőforrásokat importáljon a Commonsból egy kurzusba."
+  allows_user_to_import_sis_data_583b20a5: "Lehetővé teszi a felhasználó számára a SIS-adatok importálását."
+  allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Lehetővé teszi a felhasználóknak, hogy kedveljék a fórumbejegyzéseket, ha a Csak az értékelők lájkolhatják jelölőnégyzet ki van választva."
+  allows_user_to_manage_assignment_settings_35d94690: "Lehetővé teszi a felhasználó számára a feladatbeállítások kezelését."
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Lehetővé teszi a felhasználó számára a Blueprint Course beállításainak kezelését a kurzusbeállításokban."
+  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Lehetővé teszi a felhasználó számára, hogy a Fiókbeállításokban kezelje a Funkcióbeállításokat."
+  allows_user_to_manage_modules_create_add_items_edi_9459e815: "Lehetővé teszi a felhasználó számára a modulok kezelését (létrehozása, elemek hozzáadása, modulbeállítások szerkesztése, közzététel, közzététel visszavonása stb.)."
+  allows_user_to_manage_observers_associated_with_st_4b45f2be: "Lehetővé teszi a felhasználó számára, hogy kezelje a fiók hallgatóihoz társított megfigyelőket."
+  allows_user_to_manage_shared_resources_in_the_acco_edcd69a6: "Lehetővé teszi a felhasználó számára a fiók megosztott erőforrásainak kezelését."
+  allows_user_to_manage_the_visibility_options_in_co_e781e4e4: "Lehetővé teszi a felhasználó számára a láthatósági beállítások kezelését a kurzusbeállításokban vagy új kurzus létrehozásakor."
+  allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Lehetővé teszi a felhasználónak, hogy manuálisan adjon hozzá alkalmazást a Fiókbeállításokban."
+  allows_user_to_manually_add_an_app_in_course_setti_cf39f581: "Lehetővé teszi a felhasználónak egy alkalmazás manuális hozzáadását és törlését a kurzusbeállításokban."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Lehetővé teszi a felhasználónak, hogy manuálisan adjon hozzá és töröljön alkalmazást a Fiókbeállításokban."
+  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Lehetővé teszi a felhasználónak egy alkalmazás manuális hozzáadását és törlését a kurzusbeállításokban."
+  allows_user_to_manually_delete_an_app_in_account_s_a4b872dd: "Lehetővé teszi a felhasználónak, hogy manuálisan törölje az alkalmazást a Fiókbeállításokban."
+  allows_user_to_manually_delete_an_app_in_course_se_f6015d14: "Lehetővé teszi a felhasználónak, hogy manuálisan töröljön egy alkalmazást a kurzusbeállításokban."
+  allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Lehetővé teszi a felhasználónak egy kvíz moderálását és a kvíz statisztikai oldalának megtekintését."
+  allows_user_to_modify_user_account_details_e16fb115: "Lehetővé teszi a felhasználó számára, hogy módosítsa a felhasználói fiók adatait."
+  allows_user_to_move_group_members_to_another_group_697d8da9: "Lehetővé teszi a felhasználónak, hogy csoporttagokat helyezzen át egy másik csoportba egy fiókban vagy kurzusban."
+  allows_user_to_move_group_members_to_another_group_fc9d8d92: "Lehetővé teszi a felhasználó számára, hogy csoporttagokat helyezzen át a kurzus egy másik csoportjába."
   allows_user_to_publish_and_unpublish_pages_e9397f80: "Az oldalakat publikálhatja vagy a publikálást visszavonhatja a felhasználó."
+  allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Lehetővé teszi a felhasználó számára, hogy véletlenszerűen hozzárendeljen felhasználókat egy kurzuscsoporthoz."
+  allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Lehetővé teszi a felhasználó számára, hogy véletlenszerűen hozzárendeljen felhasználókat egy fiókhoz vagy kurzuscsoporthoz."
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Lehetővé teszi a felhasználó számára, hogy kurzussablonként eltávolítson egy kurzust a kurzusbeállításokban."
+  allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Lehetővé teszi a felhasználó számára, hogy eltávolítsa egy tanuló szekcióba való beiratkozását vagy szerepkörét."
+  allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Lehetővé teszi a felhasználók számára, hogy eltávolítsák és egyesítsék a felhasználókat egy fiókban."
+  allows_user_to_remove_designers_from_a_course_fa9e887e: "Lehetővé teszi a felhasználó számára a tervezők eltávolítását a kurzusról."
+  allows_user_to_remove_group_members_from_course_gr_4f745b58: "Lehetővé teszi a felhasználó számára a csoporttagok eltávolítását a kurzuscsoportokból."
+  allows_user_to_remove_observers_from_a_course_e090d53e: "Lehetővé teszi a felhasználó számára a megfigyelők eltávolítását a kurzusról."
+  allows_user_to_remove_students_from_a_course_70952ba6: "Lehetővé teszi a felhasználók számára, hogy eltávolítsák a hallgatókat a kurzusból."
+  allows_user_to_remove_students_from_account_or_cou_845945f9: "Lehetővé teszi a felhasználók számára, hogy eltávolítsák a hallgatókat a fiókokból vagy a kurzuscsoportokból."
+  allows_user_to_remove_tas_from_a_course_c8002894: "Lehetővé teszi a felhasználó számára a Segédoktatók eltávolítását a tanfolyamról."
+  allows_user_to_remove_teachers_from_a_course_6d627914: "Lehetővé teszi a felhasználó számára, hogy eltávolítson oktatókat a kurzusból."
+  allows_user_to_rename_course_sections_928982f0: "Lehetővé teszi a felhasználó számára a kurzusszekciók átnevezését."
+  allows_user_to_rename_course_sections_allows_user__8e9e7bac: "Lehetővé teszi a felhasználó számára a kurzusszekciókátnevezését. Lehetővé teszi a felhasználó számára, hogy módosítsa a kurzusszekciók kezdő és befejező dátumát. Lehetővé teszi a felhasználó számára a szekciók keresztlistázását."
+  allows_user_to_reply_to_a_discussion_post_83f43e19: "Lehetővé teszi a felhasználó számára, hogy válaszoljon egy vitabejegyzésre."
+  allows_user_to_resend_course_invitations_from_the__2822fe53: "Lehetővé teszi a felhasználó számára a kurzusmeghívók újraküldését a kurzus Résztvevők oldalról."
+  allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: "Lehetővé teszi a felhasználó számára a moderált és anonim feladatok ellenőrzési nyomvonalának áttekintését."
+  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "Lehetővé teszi a felhasználó számára, hogy feladatazonosító alapján keressen az osztályzatváltozási naplókban."
+  allows_user_to_search_by_course_id_or_assignment_i_1f41eb6a: "Lehetővé teszi a felhasználó számára, hogy kurzusazonosító vagy feladatazonosító alapján keressen a Felügyeleti eszközök osztályzatmódosítási naplóiban (alfiók szintjén nem érhető el.)"
+  allows_user_to_search_for_account_users_via_primar_db535df4: "Lehetővé teszi a felhasználók számára, hogy a fiók Résztvevők oldalán elsődleges e-mail címmel keressenek fiókfelhasználókat."
+  allows_user_to_search_for_other_users_by_login_id__2b0bd8c9: "Lehetővé teszi a felhasználó számára, hogy bejelentkezési azonosító alapján keressen más felhasználókat a kurzus Résztvevők oldalán."
+  allows_user_to_search_for_other_users_by_login_id__3edb3702: "Lehetővé teszi a felhasználó számára, hogy a fiók Résztvevők oldalán más felhasználókat keressen bejelentkezési azonosítója alapján."
+  allows_user_to_search_for_other_users_via_primary__c1da56c8: "Lehetővé teszi a felhasználó számára, hogy más felhasználókat keressen az elsődleges e-mail címen keresztül a kurzus Résztvevők oldalán."
+  allows_user_to_search_for_other_users_via_primary__c95888c8: "Lehetővé teszi a felhasználó számára, hogy más felhasználókat keressen a Résztvevők oldalon található elsődleges e-mail címeken keresztül."
+  allows_user_to_search_grade_change_logs_by_grader__406d1976: "Lehetővé teszi a felhasználó számára, hogy osztályozó vagy tanuló szerint keressen az érdemjegy-változási naplókban a Felügyeleti eszközökben."
+  allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "Lehetővé teszi a felhasználó számára, hogy lássa a kurzusok listáját a fiókjában."
+  allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: "Lehetővé teszi a felhasználó számára, hogy a fiókstatisztikában megtekintse a nemrégiben megkezdett és befejezett kurzusok listáját."
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: "Lehetővé teszi a felhasználó számára, hogy kurzussablonként válasszon kurzust a Kurzusbeállításokban."
+  allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Lehetővé teszi a felhasználó számára, hogy végső osztályzatot válasszon ki a moderált feladatokhoz."
+  allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Lehetővé teszi a felhasználó számára, hogy kurzus kiválasztása nélkül küldjön üzenetet a Beszélgetésekben."
+  allows_user_to_send_messages_to_individual_course__9347e1e2: "Lehetővé teszi a felhasználó számára, hogy üzeneteket küldjön a kurzus egyes tagjainak."
+  allows_user_to_set_a_template_for_an_account_34fe3695: "Lehetővé teszi a felhasználó számára, hogy sablont állítson be egy fiókhoz."
+  allows_user_to_set_an_account_to_not_use_a_templat_d34fe23c: "Lehetővé teszi a felhasználó számára, hogy úgy állítsa be fiókját, hogy ne használjon sablont."
+  allows_user_to_share_a_quiz_to_commons_6746e0da: "Lehetővé teszi a felhasználónak, hogy megosszon egy kvízt a Közössel."
+  allows_user_to_share_an_assignment_to_commons_5b0fd98b: "Lehetővé teszi a felhasználónak, hogy megosszon egy feladatot a Közösben."
+  allows_user_to_share_assignments_to_commons_or_edi_c70ddf7: "Lehetővé teszi a felhasználó számára, hogy hozzárendeléseket osszon meg a Közösben, vagy szerkessze a korábban megosztott tartalmat."
+  allows_user_to_share_course_items_directly_with_ot_e5793d35: "Lehetővé teszi a felhasználó számára, hogy közvetlenül megosszon kurzuselemeket más felhasználókkal."
+  allows_user_to_start_conferences_they_created_281b03ea: "Lehetővé teszi a felhasználó számára az általa létrehozott konferenciák elindítását."
+  allows_user_to_sync_blueprint_courses_db4fcc03: "Lehetővé teszi a felhasználó számára a Blueprint kurzusok szinkronizálását."
+  allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Lehetővé teszi a felhasználó számára, hogy frissítse a tanuló szekcióba való beiratkozását vagy szerepkörét."
+  allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Lehetővé teszi a felhasználó számára a kurzus SIS azonosítójának megtekintését."
+  allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Lehetővé teszi a felhasználó számára a Gyorsértékelőre mutató hivatkozások megtekintését a feladatokból."
+  allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: "Lehetővé teszi a felhasználónak, hogy megtekintsen egy hivatkozást az intézményi naplóra a Felhasználó adatai oldal oldalsávjában."
+  allows_user_to_view_access_reports_f7be7a84: "Lehetővé teszi a felhasználó számára a hozzáférési jelentések megtekintését."
+  allows_user_to_view_account_analytics_98fbc6ad: "Lehetővé teszi a felhasználó számára a fiókelemzések megtekintését."
+  allows_user_to_view_all_item_banks_in_a_course_3b603780: "Lehetővé teszi a felhasználónak, hogy megtekintse a kurzus összes elembankját."
+  allows_user_to_view_all_item_banks_in_the_account_36f5f214: "Lehetővé teszi a felhasználónak, hogy megtekintse a fiókban lévő összes tételbankot."
+  allows_user_to_view_all_replies_within_a_discussio_fea861da: "Lehetővé teszi a felhasználónak, hogy megtekintse az összes választ egy vitatémán belül."
+  allows_user_to_view_analytics_link_in_the_user_set_56867782: "Lehetővé teszi a felhasználó számára, hogy megtekintse az analitikai hivatkozást a felhasználói beállítások menüben."
+  allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Lehetővé teszi a felhasználók számára, hogy megtekintsenek és hozzáadjanak felhasználókat egy együttműködésben."
+  allows_user_to_view_and_configure_reports_in_accou_d3cee49f: "Lehetővé teszi a felhasználó számára a jelentések megtekintését és konfigurálását a Fiókbeállításokban."
+  allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "Lehetővé teszi a felhasználónak a SIS-azonosító és az integrációs azonosító megtekintését és szerkesztését a felhasználó bejelentkezési adatai között."
+  allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Lehetővé teszi a felhasználó számára, hogy adatokat tekintsen meg és szúrjon be a SIS ID mezőbe."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "Lehetővé teszi a felhasználónak, hogy kérdéseket tekintsen meg és kapcsoljon össze egy kvízben a fiókszintű kérdésbankokkal."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: "Lehetővé teszi a felhasználónak, hogy megtekintse és összekapcsolja a kérdéseket egy kvízben a kurzusszintű kérdésbankokkal."
+  allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Lehetővé teszi a felhasználó számára, hogy megtekintse és kezelje a teljes fiók hitelesítési beállításait."
+  allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Lehetővé teszi a felhasználó számára a kurzusok megtekintését és kezelését a fiókban."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Engedélyezi a felhasználónak, hogy megtekintse és kezelje a hozzáférési engedélyeket."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_aa3fea8: "Lehetővé teszi a felhasználónak a Kvóták lap megtekintését és kezelését a Fiókbeállításokban. A felhasználó beállíthatja az alapértelmezett kurzus, felhasználói és csoportos tárolási kvótákat."
+  allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "Lehetővé teszi a felhasználónak a fiók alfiókjainak megtekintését és kezelését."
+  allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Lehetővé teszi a felhasználó számára a fiók féléveinek megtekintését és kezelését."
+  allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Lehetővé teszi a felhasználónak a Fiókbeállítások Beállítások és Értesítések lapjainak megtekintését és kezelését."
+  allows_user_to_view_and_modify_login_information_f_78f3a544: "Lehetővé teszi a felhasználónak, hogy megtekintse és módosítsa a felhasználó bejelentkezési adatait."
+  allows_user_to_view_blueprint_sync_history_d545cb7d: "Lehetővé teszi a felhasználó számára a Blueprint Sync előzményeinek megtekintését."
+  allows_user_to_view_course_activity_information_fo_e420113b: "Lehetővé teszi a felhasználó számára, hogy megtekintse a fiókhoz tartozó kurzustevékenység-információkat."
+  allows_user_to_view_course_analytics_through_the_c_192889dc: "Lehetővé teszi a felhasználó számára a kurzuselemzések megtekintését a kurzus irányítópulton keresztül."
+  allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Lehetővé teszi a felhasználó számára, hogy megtekintse a kurzus és a hallgatói elemzéseket a kurzus kezdőlapján vagy a személyek oldalon."
+  allows_user_to_view_course_announcements_e71afc2: "Lehetővé teszi a felhasználó számára, hogy megtekintse a kurzus hirdetményeket."
+  allows_user_to_view_course_discussions_23346fa1: "Lehetővé teszi a felhasználó számára, hogy megtekintse a kurzusfórumokat."
+  allows_user_to_view_course_sis_id_3a1818a5: "Lehetővé teszi a felhasználó számára a kurzus SIS azonosítójának megtekintését."
+  allows_user_to_view_course_status_choose_home_page_21bf32a8: "Lehetővé teszi a felhasználó számára a kurzus állapota, a kezdőlap kiválasztása és a kurzusbeállítások ellenőrzőlista gombjainak megtekintését a kezdőlapon."
+  allows_user_to_view_edit_and_delete_collaborations_f2281cb0: "Lehetővé teszi a felhasználó számára az általuk létrehozott együttműködések megtekintését, szerkesztését és törlését."
+  allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: "Lehetővé teszi a felhasználó számára az általuk létrehozott konferenciák megtekintését, szerkesztését és törlését."
+  allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Lehetővé teszi a felhasználó számára, hogy megtekintse a beiratkozásokat a Szekciók lapon."
+  allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Lehetővé teszi a felhasználónak, hogy megtekintse a Kari napló bejegyzéseit a Hallgatói interakciók jelentésben."
+  allows_user_to_view_faculty_journal_information_fo_3c725307: "Lehetővé teszi a felhasználó számára, hogy megtekintse az egyes hallgatók intézményi folyóiratának adatait."
+  allows_user_to_view_feature_options_in_account_set_befc6b83: "Lehetővé teszi a felhasználó számára, hogy a Fiókbeállításokban megtekintse a Funkcióbeállításokat."
+  allows_user_to_view_gradebook_9720b3e2: "Lehetővé teszi a felhasználónak az Osztálynapló megtekintését."
+  allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Lehetővé teszi a felhasználó számára, hogy megtekinthesse az osztályozó megjegyzéseit egy értékelőtáblához a Gyorsértékelőben."
+  allows_user_to_view_groups_in_a_course_8a95805b: "Lehetővé teszi a felhasználó számára, hogy csoportokat tekintsen meg egy kurzusban."
+  allows_user_to_view_last_activity_and_total_activi_105b5bc3: "Lehetővé teszi a felhasználó számára, hogy megtekintse a legutóbbi tevékenységre és az összes tevékenységre vonatkozó információkat a Résztvevők oldalon."
+  allows_user_to_view_last_activity_and_total_activi_1455c521: "Lehetővé teszi a felhasználó számára az Utolsó tevékenység és az Összes tevékenység jelentések megtekintését."
+  allows_user_to_view_last_activity_and_total_activi_786a7286: "Lehetővé teszi a felhasználónak, hogy megtekintse az Utolsó tevékenység és az Összes tevékenység adatait a Résztvevők oldalon."
+  allows_user_to_view_list_of_users_in_the_account_1802ad42: "Lehetővé teszi a felhasználónak, hogy megtekintse a fiók felhasználói listáját."
+  allows_user_to_view_list_of_users_in_the_course_pe_9ab1309c: "Lehetővé teszi a felhasználó számára, hogy megtekintse a felhasználók listáját a kurzus Résztvevők oldalán."
+  allows_user_to_view_login_id_information_for_stude_70930399: "Lehetővé teszi a felhasználó számára, hogy megtekintse a tanulók bejelentkezési azonosító adatait."
+  allows_user_to_view_login_id_information_for_users_895256fb: "Lehetővé teszi a felhasználó számára, hogy megtekintse a felhasználók bejelentkezési azonosító adatait."
+  allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "Lehetővé teszi a felhasználónak a bejelentkezési azonosítók megtekintését a kurzus Résztvevők oldalán."
+  allows_user_to_view_login_logout_activity_of_users_e11dd2de: "Lehetővé teszi a felhasználónak, hogy megtekintse a felhasználók be-/kijelentkezési tevékenységét a Felügyeleti eszközökben."
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Lehetővé teszi a felhasználó számára a kurzussablonok nevének megtekintését a root fiókban."
+  allows_user_to_view_page_history_and_set_front_pag_c2321326: "Lehetővé teszi a felhasználó számára az oldalelőzmények megtekintését és a kezdőlap beállítását."
+  allows_user_to_view_previously_created_collaborati_d3a37402: "Lehetővé teszi a felhasználó számára a korábban létrehozott együttműködések megtekintését."
+  allows_user_to_view_prior_enrollments_df5286d: "Lehetővé teszi a felhasználó számára, hogy megtekintse a korábbi regisztrációkat."
+  allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "Lehetővé teszi a felhasználó számára, hogy megtekintse a kurzusok közzétett és még nem publikált tartalmát."
+  allows_user_to_view_recent_announcements_on_the_co_e56c881e: "Lehetővé teszi a felhasználó számára a legutóbbi bejelentések megtekintését a kurzus kezdőlapján."
+  allows_user_to_view_student_analytics_89bfd9e8: "Lehetővé teszi a felhasználó számára a tanulói elemzések megtekintését."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "Lehetővé teszi a felhasználó számára, hogy megtekintse a hallgatói környezeti kártyákat a hirdetményekben és a beszélgetésekre adott válaszokban."
+  allows_user_to_view_student_grades_pages_e0091b20: "Lehetővé teszi a felhasználónak a tanulói osztályzatok oldalainak megtekintését."
+  allows_user_to_view_student_quiz_logs_e1c4491: "Lehetővé teszi a felhasználónak a tanulói kvíznaplók megtekintését."
+  allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Lehetővé teszi a felhasználók számára, hogy megtekintsék a tanulói eredményeket, megtekintsék a kvíz statisztikákat, és hozzáférjenek egy kvízhez a Gyorsértékelőben."
+  allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Lehetővé teszi a felhasználó számára, hogy tanulóspecifikus adatokat tekintsen meg az Analitika szolgáltatásban."
+  allows_user_to_view_the_announcements_link_in_cour_b3522273: "Lehetővé teszi a felhasználó számára a Hirdetmények hivatkozás megtekintését a Kurzusnavigációban."
+  allows_user_to_view_the_clone_group_set_button_for_d68aab98: "Lehetővé teszi a felhasználónak, hogy megtekintse a Csoport klónozása gombot egy fiókhoz vagy kurzuscsoporthoz."
+  allows_user_to_view_the_clone_group_set_button_for_f975352: "Lehetővé teszi a felhasználónak, hogy megtekintse a Csoport klónozása gombját egy kurzuscsoporthoz."
+  allows_user_to_view_the_conclude_course_button_e90a1175: "Lehetővé teszi a felhasználónak a Kurzus befejezése gomb használatát."
+  allows_user_to_view_the_course_grading_scheme_32a6042: "Lehetővé teszi a felhasználó számára a kurzus értékelési rendszerének megtekintését."
+  allows_user_to_view_the_course_setup_checklist_but_4d7524f0: "Lehetővé teszi a felhasználó számára a kurzusbeállítási ellenőrzőlista gombjának megtekintését."
+  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Lehetővé teszi a felhasználó számára a Kurzusstatisztika gomb megtekintését a Kurzusbeállításokban."
+  allows_user_to_view_the_delete_this_course_button_92a4c832: "Lehetővé teszi a felhasználó számára a Kurzus törlése gomb megtekintését."
+  allows_user_to_view_the_discussions_link_in_course_80ab2fca: "Lehetővé teszi a felhasználónak, hogy megtekintse a Fórumok hivatkozást a Kurzusnavigációban."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Lehetővé teszi a felhasználó számára az ePortfolio moderálási oldalának megtekintését és az ePortfolio spam tartalmának kezelését."
+  allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Lehetővé teszi a felhasználónak az intézményi napló hivatkozás megtekintését a Globális Navigációban."
+  allows_user_to_view_the_group_home_pages_of_all_st_b463b0f9: "Lehetővé teszi a felhasználónak, hogy megtekintse az összes diákcsoport csoport kezdőlapját."
+  allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Lehetővé teszi a felhasználó számára az Új hirdetmény gomb megtekintését a Kezdőlapon."
+  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Lehetővé teszi a felhasználó számára, hogy megtekintse az Eredmények számítása lapot, és beállítsa az eredmény jártassági számításait a kurzus szintjén."
+  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Lehetővé teszi a felhasználó számára, hogy megtekintse az Eredményszámítások lapot, és beállítsa az eredmény jártassági számításait a fiók és a kurzus szintjén."
+  allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Lehetővé teszi a felhasználónak az Eredmények kezelése lap megtekintését fiók- és kurzusszinten."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_a93a23d2: "Lehetővé teszi a felhasználó számára, hogy megtekintse az Eredmények elsajátítása lapot, és beállítsa az eredmények elsajátítási skáláit a fiók és a kurzus szintjén."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_d9626906: "Lehetővé teszi a felhasználó számára, hogy megtekintse az Eredmények elsajátítása lapot, és kurzusszinten állítsa be az eredmények elsajátítási skáláit."
+  allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Lehetővé teszi a felhasználó számára a Résztvevők hivatkozás megtekintését a kurzusnavigációban."
+  allows_user_to_view_the_previous_sis_import_dates__1716ddb5: "Lehetővé teszi a felhasználónak a korábbi SIS-importálási dátumok, hibák és importált elemek megtekintését."
+  allows_user_to_view_the_prior_enrollments_button_i_b04b8132: "Lehetővé teszi a felhasználónak, hogy megtekintse az Előzetes beiratkozások gombot a kurzus Résztvevők oldalán."
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "Lehetővé teszi a felhasználónak, hogy megtekintse a Közzététel gombot egy nem közzétett kurzus kurzuskártyáján (kártyanézet irányítópultja)."
+  allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "Lehetővé teszi a felhasználó számára a Kurzus közzététele és a Kurzus közzétételének visszavonása gombok megtekintését a kurzus kezdőlapján. Lehetővé teszi a felhasználónak, hogy megtekintse a Közzététel gombot egy nem közzétett kurzus kurzuskártyáján (kártyanézet irányítópultja)."
+  allows_user_to_view_the_publish_course_and_unpubli_aac98465: "Lehetővé teszi a felhasználó számára a Kurzus közzététele és a Kurzus közzétételének visszavonása gombok megtekintését a kurzus kezdőlapján."
+  allows_user_to_view_the_reset_course_content_butto_75c8c410: "Lehetővé teszi a felhasználó számára a Kurzustartalom visszaállítása gomb megtekintését."
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: "Lehetővé teszi a felhasználó számára az Értékelőtáblák hivatkozás megtekintését a kurzusnavigációban."
+  allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "Lehetővé teszi a felhasználónak, hogy megtekintse a SIS-azonosítót a felhasználó bejelentkezési adatai között."
+  allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Lehetővé teszi a felhasználónak, hogy megtekintse a felhasználói SIS-azonosító oszlopot a kvízelemzési CSV-fájlban."
+  allows_user_to_view_user_details_for_course_users_ec1b6218: "Lehetővé teszi a felhasználó számára, hogy megtekintse a kurzus felhasználóinak felhasználói adatait."
+  allows_user_to_view_user_sis_ids_68a9d218: "Lehetővé teszi a felhasználó számára a felhasználói SIS-azonosítók megtekintését."
+  allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Lehetővé teszi a felhasználó számára a felhasználói SIS-azonosítók megtekintését a kurzus Résztvevők oldalán."
+  allows_user_to_weight_assignment_groups_95cb11b2: "Lehetővé teszi a felhasználó számára súly-hozzárendelési csoportokat."
+  allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Lehetővé teszi a felhasználók számára, hogy barátságos leírást adjanak az eredményekhez a tanulói és szülői nézetben a tanulói tanulási mesteri osztályzatban."
+  allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Lehetővé teszi a felhasználók számára, hogy LTI-eszközöket adjanak hozzá Conference_selection elhelyezéstípussal"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Segítségével a felhasználók engedélyezhetik a \"Gyorsértékelő Hallgatói csoportok szerinti szűrésének elindítása\" kurzusfunkciót a kurzusbeállításokban. Bekapcsolt állapotban a Gyorsértékelő csak azokat a hallgatókat fogja betölteni, akik az Új osztálynaplóban kiválasztott adott hallgatói csoportba tartoznak."
+  allows_users_to_import_groups_in_a_course_a8b5c73e: "Lehetővé teszi a felhasználók számára, hogy csoportokat importáljanak egy kurzusba."
+  allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Lehetővé teszi a felhasználók számára több fiók egyesítését (megfelelő hitelesítő adatok birtokában)."
+  allows_users_to_save_and_search_frequently_used_fe_806f8999: "Lehetővé teszi a felhasználók számára a gyakran használt visszajelzések mentését és keresését a Gyorsértékelőben használható megjegyzések könyvtárában."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Engedélyezi, hogy a nemzetközi telefonszámmal rendelkező hallgatók szöveges üzeneteket kapjanak a Canvas-tól."
+  already_have_a_canvas_account_c4368ac9: "Már van Canvas-fiókja?"
+  also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Vegye figyelembe azt is, hogy a Microsoft Teams nem tudja támogatni azokat a kurzusokat, amelyeknél több mint %{max_enrollments} vagy több mint %{max_owners} tulajdonos. Ha a kurzus túllépi ezeket a határokat, a szinkronizálás valószínűleg megszakad."
+  alumno_88c80e37: Alumnus
   always_3a59e701: Mindig
   always_include_dates_1ae2935e: "Mindig tartalmazza a dátumokat"
   always_include_dates_74b3721d: "Dátumok Befoglalása Mindig;"
@@ -2302,6 +2478,7 @@ hu:
   an_error_occurred_while_loading_late_policies_c415f676: "Hiba történt a késői házirendek betöltésekor"
   an_error_occurred_while_loading_selected_group_8b80d3d5: "Hiba történt a kiválasztott csoport betöltése közben."
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Hiba történt a jártassági számítás betöltése közben:%{error}"
+  an_error_occurred_while_loading_the_mastery_scale__871f3531: "Hiba történt a jártassági skála betöltésekor: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Hiba történt a közlemények zárolásakor."
   an_error_occurred_while_migrating_405ac0b5: "Hiba történt a migrálás során"
   an_error_occurred_while_moving_these_outcomes_plea_208f372: 
@@ -2311,6 +2488,7 @@ hu:
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
     one: "Hiba történt a tanulási eredmény mozgatása közben. Kérem próbálja újra!"
     other: "Hiba történt a tanulási eredmények mozgatása közben. Kérem próbálja újra!"
+  an_error_occurred_while_removing_this_group_groupt_2c343304: "Hiba történt a csoport eltávolítása közben: \"%{groupTitle}\" egy vagy több olyan eredményt tartalmaz, amelyek jelenleg a tartalomhoz vannak igazítva."
   an_error_occurred_while_removing_this_group_please_bd9407ff: "Hiba történt a csoport eltávolítása közben. Kérem próbálja újra!"
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Hiba történt a QR-kód lekérése közben"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Hiba történt a fiók jártassági értékelésének mentése közben"
@@ -2332,7 +2510,9 @@ hu:
   an_error_ocurred_while_loading_unsynced_changes_aed0d04d: "Hiba történt a nem szinkronizált módosítások betöltése közben"
   an_error_ocurred_while_publishing_course_3760cf04: "Hiba történt a kurzus közzététele közben"
   an_error_ocurred_while_saving_the_appointment_grou_e19452cd: "Hiba történt a megbeszéléscsoport mentése közben"
+  an_existing_canvas_user_with_the_sis_id_user_id_ha_4b64d1c1: "Egy meglévő Canvas-felhasználó az %{user_id} SIS ID-vel már igényelte %{other_user_id} user_id által kért bejelentkezési adatait, kihagyva"
   an_existing_canvas_user_with_the_sis_id_user_id_or_64c7d5fa: "Már létezik egy Canvas felhasználó a %{user_id} SIS ID-vel vagy a %{login} belépési névvel, átugrás"
+  an_existing_canvas_user_with_the_user_id_has_alrea_aabbea6e: "Egy meglévő Canvas-felhasználó az %{user_id} azonosítóval már igényelte %{other_user_id} user_id által kért bejelentkezési adatait, kihagyva"
   an_existing_canvas_user_with_the_user_id_has_alrea_e487b0: "Egy létező Canvas felhasználó az %{user_id} azonosítóval már lefoglalta a %{other_user_id} által kért integration_id-t, átugrás"
   an_existing_user_does_not_match_existing_user_ids__156c7a52: "Egyetlen létező felhasználó sem felel meg a megadott %{user_id} SIS ID-vel való bejelentkezéshez, átugrás"
   an_export_is_already_in_progress_54270f01: "Egy exportálás már folyamatban van,"
@@ -2344,6 +2524,7 @@ hu:
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "Egy SFTP-felhasználó csak root fiókból kezelhető."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Egy váratlan hiba történt: lásd a hibajelentést %{id}"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Ismeretlen hiba lépett fel. Ellenőrizze a CSV-fájlt, vagy próbálja újra később."
+  an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: "Ismeretlen hiba történt. Kérjük, nézze meg a #canvas-sre címen a Slackben."
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ismeretlen szerverhiba történt. Kérjük, próbálja újra!"
   an_update_is_available_for_toolname_bba3fa2: "A frissítés elérhető a következő számára: %{toolName}"
   analytics: 
@@ -2386,6 +2567,7 @@ hu:
   animals_nature_8bc03431: "Állatok és természet"
   annotation_89e402e0: Annotáció
   annotation_notification_685eaeb9: "Annotációs értesítés"
+  annotation_teacher_notification_c5e4db1f: "Annotáció Oktatói értesítés"
   announcement: 
     no_title: "Nincs cím"
   announcement_creation_failed_f7d227f5: "A hirdetmény létrehozása sikertelen"
@@ -2433,9 +2615,16 @@ hu:
   announcements_a4b8ed4a: Hirdetmények
   announcements_account_4e9df626: "Közlemények (fiók)"
   announcements_cannot_be_duplicated_2de8824c: "a közlemények nem duplikálhatók"
+  announcements_deleted_successfully_7d77e9e1: "A hirdetmények sikeresen törölve"
+  announcements_from_the_past_four_months_cefbc99c: "Az elmúlt négy hónap hirdetményei"
   announcements_list_c75fc413: "Hirdetmények listája"
+  announcements_locked_successfully_43d58107: "A hirdetmények zárolása sikeresen megtörtént"
+  announcements_tutorial_tray_994287d6: "Hirdetmények tutoriál tálca"
+  announcements_unlocked_successfully_1432da9d: "A hirdetmények zárolása sikeresen feloldva"
   announcements_view_1019d00d: "Hirdetmények - áttekintés"
+  anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "Anonimizálja az oktatók által az ehhez a feladathoz benyújtott összes megjegyzést a DocViewerben"
   anonymize_all_instructor_comments_and_annotations__713924c9: "Tegyen névtelenné minden oktatói megjegyzést és kommentárt a DocViewer fájlkezelőn belül"
+  anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "A névtelen feladatok alapértelmezés szerint el vannak rejtve, és akkor is manuálisan kell közzétenni őket, ha a kurzus beállítása Automatikus."
   anonymous_assignments_must_be_manually_posted_a13d2ca5: "A névtelen feladatokat manuálisan kell beküldeni"
   anonymous_discussion_1e9b981: "Névtelen vita |"
   anonymous_discussion_54517e84: "Névtelen vita"
@@ -2452,12 +2641,22 @@ hu:
   anonymous_moderated_marking_801bbb65: "Névtelen, moderált osztályzás"
   anonymous_moderated_marking_allows_teachers_to_sel_af80885d: "A Névtelen, moderált osztályzás lehetővé teszi, hogy az oktatók moderátorokat jelöljenek ki a feladatok névtelen értékeléséhez. Ezután a moderátorok kiválaszthatnak a listából vagy megadhatnak egy egyéni osztályzatot."
   anonymous_off_7985fcaf: "Névtelen mód kikapcsolva"
+  anonymous_on_c5fa120d: "Névtelenség Be"
   anonymous_re_submission_assignment_title_d9402721: "Névtelen újraküldés: %{assignment_title}"
+  anonymous_student_91b9d664: "Névtelen hallgató"
+  anonymous_submission_annotation_student_id_assignm_25eb88c9: "Névtelen benyújtás megjegyzése: Hallgató (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Névtelen küldés: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Névtelen hozzászólás a leadáshoz: Hallgató (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Névtelen hozzászólás a leadáshoz: Hallgató (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice_student: "A névtelen témák jelenleg nem érhetők el."
+  anonymous_topic_notice_teacher: "A névtelen témákhoz nem lehet hozzáférni, ha nincs engedélyezve a Fórumok/Hirdetmények Újratervezés funkció előnézete."
+  anonymous_turned_off_8118a0b: "A Névtelenség kikapcsolva"
+  anonymous_turned_on_fe56f997: "A Névtelenség bekapcsolva"
   anonymous_user: "Névtelen felhasználó"
   anonymous_user_d984b9ce: "Névtelen felhasználó"
+  anonymous_was_never_turned_on_e5e8aeda: "A Névtelenség soha nem volt bekapcsolva"
+  anonymous_was_turned_off_300d25ec: "A Névtelenség ki volt kapcsolva"
+  anonymous_you_e708af99: "Névtelen (Ön)"
   anonymously_graded_59149570: "Névtelenül értékelve"
   anonymously_graded_assignments_can_t_be_group_assi_ddb00bb2: "A névtelenül értékelt feladatokat nem lehet csoportos feladatként beállítani."
   another_assignment_name_369f8481: "Másik feladat név"
@@ -2478,6 +2677,7 @@ hu:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Válaszok megjelenítése az utolsó próbálkozás után"
   any_sub_account_ec7069f2: "Bármely alfiók"
   any_term_d49af19f: "Bármely félév"
+  anyone_with_a_direct_link_private_b3bc9661: "Bárki, akinek közvetlen linkje van (privát)"
   anyone_with_the_url_9d7e5e07: "Bárki az adott URL-címmel"
   api_7bd66e19: API
   api_host_ddaf400e: "API hoszt:"
@@ -2489,6 +2689,8 @@ hu:
   app_placements_6d877225: "Alkalmazás elhelyezések"
   app_reregistration_87cc8817: "Applikáció újraregisztrálása "
   app_was_installed_by_admin_and_is_locked_3bee4d39: "%{app}lett telepítve a rendszergazda által, és zárolva van"
+  app_was_installed_by_the_master_course_and_is_lock_dbeb24a6: "A %{app} programot a mesterkurzus telepítette, és zárolva van"
+  app_was_installed_by_the_master_course_e55ba1d7: "A %{app} programot a mesterkurzus telepítette"
   appears_at_the_top_of_the_global_navigation_tray_t_f293877e: "Megjelenik a mobil méretű képernyőkön megnyíló globális navigációs tálca tetejénél. Kijelző magasság:  48 pixel. Elfogadott formátumok: svg, png, jpg, gif"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Hozzáfűz egy számot minden eseménycím végére (pl. Esemény 1, Esemény 2, stb)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Hozzáfűz egy számot minden eseménycím végére (pl. Esemény 1, Esemény 2, stb) for=\"append_iterator"
@@ -2535,6 +2737,7 @@ hu:
     wiki_front_page_default_content_course: "Üdvözöljük a kurzus új wikioldalán!"
     wiki_front_page_default_content_group: "Üdvözöljük az új csoport wikioldalon!"
   application_id_2aa1640f: "Alkalmazás azonosítója"
+  application_not_authorized_for_tenant_please_make__4d5e2607: "Az alkalmazás nem engedélyezett bérlő számára. Kérjük, győződjön meg arról, hogy a rendszergazdája hozzáférést biztosított számunkra a Microsoft-bérlőhöz való hozzáféréshez."
   application_secret_e6803c7e: "Alkalmazás titkos kód"
   applied_cc7be774: Alkalmazott
   applied_filters_63a90ccd: "Alkalmazott szűrők:"
@@ -2551,6 +2754,7 @@ hu:
   apply_to_92f70c8c: "Erre vonatkozólag:"
   applying_new_styles_to_subaccounts_e8aeeef2: "Új stílusok alkalmazása az alfiókokra"
   applying_please_be_patient_f7b5f244: "Az alkalmazás folyamatban, kérjük várjon"
+  applying_score_to_ungraded_7311df9a: "Pontszám alkalmazása az Osztályzat nélkülire"
   appointment_group: 
     errors: 
       invalid_end_at: "A megbeszélés időpontjának vége előbb van mint a kezdete"
@@ -2574,11 +2778,27 @@ hu:
   arabic_c5c87acd: Arab
   arc_a935e585: ARC
   archive_3f794d7e: Archívum
+  archive_operation_failed_5504706: "Az archiválási művelet nem sikerült"
   archive_selected_d64506ca: "Archívum kiválasztva"
   archived_de543437: Archivált
   are_you_sure_26795d3c: "Biztos benne?"
+  are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
+    one: "Biztos benne, hogy el kívánja távolítani ezt az eredményt ebből a fiókból?"
+    other: "Biztos benne, hogy el kívánja távolítani ezt a  %{count}eredményt ebből a fiókból?"
+  are_you_sure_that_you_want_to_remove_these_count_o_8ad349c4: 
+    one: "Biztos benne, hogy el kívánja távolítani ezt az eredményt a kurzusból?"
+    other: "Biztos benne, hogy el akarja távolítani ezt a %{count} eredményt ebből a kurzusból?"
+  are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: "Biztos benne, hogy el kívánja távolítani ezt a csoportot és annak összes tartalmát a kurzusából?"
+  are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: "Biztos benne, hogy el kívánja távolítani ezt a csoportot és annak összes tartalmát a fiókjából?"
+  are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe: 
+    one: "Biztosan archiválni szeretné ezeknek a beszélgetéseknek a másolatait?"
+    other: "Biztosan archiválni szeretné a beszélgetés másolatát?"
+  are_you_sure_you_want_to_archive_your_copy_of_thes_92c9b8f1: 
+    one: "Biztosan archiválni szeretné ezeknek a beszélgetéseknek a másolatát?"
+    other: "Biztosan archiválni szeretné a beszélgetés másolatát?"
   are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496: "Biztos benne, hogy mégsem? A változtatásai talán nincsenek elmentve."
   are_you_sure_you_want_to_cancel_your_appointment_w_dbbd27eb: "Biztos benne, hogy törli a megbeszélést vele: %{name}? "
+  are_you_sure_you_want_to_change_the_state_of_this__18c6a72: "Biztosan módosítani szeretné ennek a fejlesztői kulcsnak az állapotát?"
   are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Biztos benne, hogy bemásolja a végső jegyet? Ez felülírja a meglévő jegyet."
   are_you_sure_you_want_to_deactivate_this_user_they_3fdaab79: "Biztos benne, hogy deaktiválja a felhasználót? Az inaktív felhasználók nem fognak tudni részt venni a kurzusokban."
   are_you_sure_you_want_to_delete_domain_domain_c9b4b5f5: "Biztos benne, hogy törölni szeretné %{domain}domaint?"
@@ -2589,7 +2809,9 @@ hu:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Biztos benne, hogy törli ezt a feladatot?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Biztos benne, hogy törli ezt a megjegyzést?"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Biztos, hogy törli ezt a fejlesztői kulcsot?"
+  are_you_sure_you_want_to_delete_this_developer_key_ce246033: "Biztosan törli ezt a fejlesztői kulcsot? Ez a művelet törli a fejlesztői kulcshoz társított összes eszközt is."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Biztos benne, hogy törli ezt a fórumot?"
+  are_you_sure_you_want_to_delete_this_domain_lookup_f7d8bbba: "Biztosan törli ezt a domainkeresést?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "Biztos benne, hogy törli ezt a bejegyzést?"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "Biztos benne, hogy törli ezt az eseményt?"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "Biztos benne, hogy törli ezt az osztályzási időszakot?"
@@ -2597,18 +2819,31 @@ hu:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Biztos benne, hogy törli ezt az osztályzási rendszert?"
   are_you_sure_you_want_to_delete_this_page_2185844: "Biztos benne, hogy törli ezt az oldalt?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Biztos, hogy törölni akarja ezt a felvételt?"
+  are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Biztosan törli ezt az értékelőtáblát? Az értékelőtáblához jelenleg társított bármely kurzus továbbra is hozzáférhet, de új kurzusok nem fogják tudni használni."
+  are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Biztosan törli ezt az értékelőtáblát? Ez a művelet eltávolítja ezt a értékelőtábla társítást az aktuális kurzus összes hozzárendeléséből, és törli a meglévő kapcsolódó értékeléseket."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Biztos benne, hogy törölni szeretné ezt az elemet?"
+  are_you_sure_you_want_to_delete_this_topic_c0466e91: "Biztosan törli ezt a témát?"
+  are_you_sure_you_want_to_delete_this_track_f5a16357: "Biztosan törli ezt a számot?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Biztos benne, hogy törli az üzenetváltás másolatát? Ezt a műveletet nem lehet visszavonni."
     other: "Biztos benne, hogy törli az üzenetváltások másolatát? Ezt a műveletet nem lehet visszavonni."
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Biztos benne, hogy törli az üzenet másolatát? Ezt a műveletet nem lehet visszavonni."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Biztos benne, hogy törli a foglalását erre az eseményre?"
+  are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Biztosan letiltja a szinkronizálást a következővel: %{sisName} az összes feladatnál?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Biztos benne, hogy ezt szeretné? Ezt a műveletet nem lehet visszavonni és felülírja a létező értékeléseket az osztálynaplóban."
+  are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Biztos benne, hogy véglegesen eltávolítja a felhasználót az ÖSSZES fiókból?"
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Biztosan közzé szeretné tenni a feladat érdemjegyeit a tanulóknak?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Biztosan folytatja? A végrehajtott módosítások nem kerülnek mentésre."
+  are_you_sure_you_want_to_remove_this_item_7887ce31: "Biztosan eltávolítja ezt az elemet?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Biztos benne, hogy el szeretné távolítani ezt az eszközt?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Biztos benne, hogy szeretné törölni ezt a felhasználót?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Biztos benne, hogy szeretné törölni ennek a felhasználónak a profilképét?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Biztos benne, hogy kifogásolható tartalomként jelenti ezt a profilképet?"
+  are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Biztosan újraszinkronizálja ezeket az érdemjegyeket a tanulói információs rendszerrel?"
+  are_you_sure_you_want_to_stop_observing_name_b040e7ab: "Biztos, hogy abbahagyja a %{name} megfigyelését?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Biztos benne, hogy be akarja küldeni ezt a megjegyzést?"
+  are_you_sure_you_want_to_sync_these_grades_to_the__ca3c28a4: "Biztosan szinkronizálni szeretné ezeket az érdemjegyeket a tanulói információs rendszerrel? Ezt csak akkor szabad megtennie, ha az összes érdemjegyét véglegesítette."
+  are_you_sure_you_want_to_unenroll_in_this_subject__30f60c48: "Biztos, hogy leiratkozik erről a tantárgyból? A továbbiakban nem láthatja a tantárgyi névsort, nem kommunikálhat közvetlenül a tanárokkal, és többé nem láthatja a tantárgyi eseményeket sem a falán, sem értesítésként."
   argentina_54_375d6af4: "Argentína (+54)"
   armenian_12da6118: Örmény
   arrange_by_a121617c: "Rendezés ez alapján"
@@ -2616,6 +2851,7 @@ hu:
   arrange_columns_by_due_date_f74f9e2d: "Oszlopok rendezése határidő alapján"
   arrange_columns_by_points_48da9ba3: "Oszlopok rendezése pontok alapján"
   artifact_f7003de5: Műalkotás
+  artist_info_for_username_for_description_12d5d862: "%{userName} előadói adatai a %{description} számára"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "A mezőbe írás közben a csoportok listája automatikusan szűrésre kerül, vagyis csak azokat a neveket tartalmazza, amelyek egyeznek a beírt szöveggel."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "A mezőbe írás közben az eredménylista automatikusan frissül."
   ascending_b3c87427: Emelkedő
@@ -2641,9 +2877,14 @@ hu:
   assessment_question_id_4eacadb3: "értékelésikérdés azonosítója"
   assessment_title_7ab69b66: "értékelés címe"
   assessment_type_81a73b9c: "értékelés típusa"
+  asset_string_ddeaf719: "Asset String"
   assign_eedf72bb: Hozzárendelés
   assign_reviews_on_date_7e48ec50: "Értékelés hozzárendelése dátumhoz"
+  assign_to_6b806cd9: "Hozzárendelés:"
+  assign_to_95404a83: Hozzárendelés
   assign_to_c46e21: "Feladatkiosztás a következő felhasználóknak:"
+  assigned_permissions_6f6fecb6: "Hozzárendelt engedélyek"
+  assigned_roles_ace6c950: "Kiosztott szerepek"
   assignment: 
     assignment_group_must_have_group: "Kérjük, válasszon ki egy feladatcsoportot ehhez a feladathoz"
     at_least_one_file_type: "Kérjük, adjon meg legalább egy támogatott fájltípust"
@@ -2671,6 +2912,7 @@ hu:
     name_is_required: "A név megadása kötelező!"
     points_possible_number: "Az elérhető pontokat számként kell megadni"
     select_external_tool_dialog_title: "Külső eszköz konfigurálása"
+    student_annotation: "hallgatói megjegyzés"
     submission_action_take_quiz: "%{title} kitöltése"
     submission_action_turn_in_assignment: "%{title} bekapcsolása"
     submission_types: 
@@ -2692,10 +2934,16 @@ hu:
     titles: 
       assignment_rubric_details: "Feladat értékelőtáblájának részletei"
   assignment_976578a8: Feladat
+  assignment_a381313e: "Feladat #:"
+  assignment_and_link_selection_557faf38: "Feladat és hivatkozás kiválasztása"
+  assignment_assignment_submission_paper_view_8a4c9776: "Feladat %{assignment} benyújtása Papírnézet"
+  assignment_assignment_submission_plain_text_view_b217d372: "Feladat %{assignment} beküldése Egyszerű szöveges nézet"
   assignment_comments_e43ed898: "Feladathoz tartozó megjegyzések"
   assignment_created_assignment_name_course_name_324a5639: "Feladat létrehozva - %{assignment_name}, %{course_name}"
   assignment_created_b3ee04d7: "Feladat létrehozva"
   assignment_d8387b78: feladat
+  assignment_dates_dccc98de: "Feladat dátumai"
+  assignment_dates_saved_successfully_78e0f355: "A Feladat dátumok sikeresen elmentve."
   assignment_details_collapsed_55b67150: "feladat részletei elrejtve"
   assignment_details_dialog: 
     average_score: "Átlagos pontszám:"
@@ -2709,7 +2957,10 @@ hu:
     scores_lower_than_the_average: "Alacsonyabb pontszámok, mint az átlag %{average}"
     total_graded_submissions: "Összes értékelt beadandó: "
   assignment_details_expanded_20c6f0c7: "feladat részletei megjelenítve"
+  assignment_details_updated_493f410b: "A Feladat részletei frissítve"
+  assignment_does_not_accept_this_submission_type_38a55c27: "A Feladat nem fogadja el ezt a beküldési típust"
   assignment_does_not_exist_74178c34: "a feladat nem létezik"
+  assignment_edit_6dced39f: "Feladat szerkesztése"
   assignment_editview: 
     at_least_one_file_type: "Kérjük, adjon meg legalább egy támogatott fájltípust"
     at_least_one_submission_type: "Kérjük, adjon meg legalább egy beadandó típust"
@@ -2722,6 +2973,13 @@ hu:
   assignment_extensions_cac06daa: "Feladat Kiegészítések"
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Értékelt feladat: %{grade} ehhez: %{assignment_name} itt: %{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "A feladatra adott értékelések már publikálva lettek."
+  assignment_grades_have_already_been_released_4c8a91b: "A Feladat osztályzatok már megjelentek."
+  assignment_grades_will_be_visible_to_students_as_s_62975ef6: |-
+      
+      A feladatok érdemjegyei azonnal láthatók lesznek a tanulók számára, amint beírják őket. A már elrejtett érdemjegyek rejtve maradnak.
+  assignment_grades_will_be_visible_to_students_as_s_bfbea571: |-
+      
+      A feladatok érdemjegyei azonnal láthatók lesznek a tanulók számára, amint beírják őket. A már elrejtett érdemjegyek rejtve maradnak.
   assignment_grading_type: 
     gpa_scale_explainer: "Mit jelent a GPA skála szerinti osztályzás?"
     grading_type_options: 
@@ -2738,10 +2996,14 @@ hu:
     default_name: Feladatok
     default_title: Feladatok
   assignment_group_1a781505: Feladatcsoport
+  assignment_group_export_fd77c394: "Feladatcsoport exportálása"
   assignment_group_filter_c03f8a1d: "Feladat Csoport szűrő"
   assignment_group_selector: 
     assignment_group_must_have_group: "Kérjük, válasszon ki egy feladatcsoportot ehhez a feladathoz"
   assignment_group_was_saved_successfully_5caa27d3: "Feladatcsoport sikeresen el lett mentve"
+  assignment_group_weight_data_report_449e1d1d: "Feladatcsoport súlyadatok jelentése"
+  assignment_group_weights_and_drop_rules_can_t_be_e_7b5f305d: "A Feladatcsoportok súlyozása és az eldobási szabályok nem szerkeszthetők, mert az egyik csoportban olyan hozzárendelések vannak, amelyek határideje le van zárva."
+  assignment_group_weights_can_t_be_edited_because_t_b6b591ae: "A Feladatcsoportok súlyozása nem szerkeszthető, mert az egyik csoportban olyan hozzárendelések vannak, amelyek határideje le van zárva."
   assignment_group_weights_dialog: 
     buttons: 
       save: Mentés
@@ -2761,9 +3023,14 @@ hu:
       frozen_assignments_error: "Zárolt feladatot tartalmazó csoport nem törölhető."
   assignment_groups_bc9cc3c9: Feladatcsoportok
   assignment_groups_weight_2f1a5a7c: "Feladatcsoport súlyok"
+  assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "A feladatnak zárolt dátuma van. A határidő nem állítható be a zárolt dátumtartományon kívül."
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} értékelve lett erre: %{name}."
   assignment_id_96baa1b7: feladatazonosító
   assignment_id_b040cee0: Feladatazonosító
+  assignment_is_reassigned_dd6b6ef2: "A Feladat újra van rendelve."
+  assignment_locked_a6233228: "Feladat zárolva"
+  assignment_locked_until_future_date_80cd0df2: "A feladat jövőbeli időpontig zárolva"
+  assignment_locked_with_prerequisite_5b8cb148: "A feladat előfeltétellel zárolva"
   assignment_menu_91fe3716: "Feladat menü"
   assignment_missing_assignment_name_in_course_code_7f940b35: "Feladat hiányzik: %{assignment_name} ebben: %{course_code}"
   assignment_muted_4cb590a4: "Inaktív állapotú feladat"
@@ -2772,6 +3039,7 @@ hu:
     unmute_assignment: "Feladat inaktivitása feloldva"
     unmute_button: "Feladat inaktivitása feloldva"
     unmuting_assignment: "Feladat aktívvá tétele..."
+  assignment_name_12eadcbd: "Feladat neve"
   assignment_name_a_z_aeefaa36: "Feladat neve - A-Z"
   assignment_name_b2d87383: "Feladat neve"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, mostanra esedékes"
@@ -2780,19 +3048,30 @@ hu:
   assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) nincs határideje"
   assignment_name_is_now_due_80025e91: "%{assignment_name} most esedékes:"
   assignment_name_is_now_due_no_due_date_d3127a8f: "%{assignment_name} most esedékes: nincs határidő"
+  assignment_name_is_required_9d17311b: "A Feladat neve kötelező"
+  assignment_name_options_43b1795: "feladat %{name} opció"
   assignment_name_z_a_34f92f4b: "Feladat neve - Z-A"
+  assignment_names_858b1880: "Feladat nevek"
+  assignment_options_1e5b7074: "Feladat opciók"
   assignment_override: 
     student_count: 
       one: "%{count} hallgató"
       other: "%{count} hallgató"
+  assignment_path_selected_e80191d1: "Feladat útvonal kiválasztva"
   assignment_preview_3833e819: "%{assignment}előnézete"
+  assignment_scheduling_e2a3eaf6: "Feladat ütemezése"
+  assignment_score_summary_f1dc9708: "Feladat pontszám összefoglalója"
   assignment_selection_6bff05c4: Feladatkiválasztás
+  assignment_set_set_index_28b1f973: "Feladat halmaz %{set_index}"
+  assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Beküldött anyagok feltöltve"
   assignment_title_82b4422e: "Feladat címe:"
   assignment_title_8a707dd2: feladatcím
   assignment_title_e3192978: "Feladat: %{title} "
   assignment_type_60255aac: "Feladat típusa"
+  assignment_unmuted_2cffe4ca: "A Feladat némítása feloldva"
   assignment_updated_c7482598: "A feladat frissítve."
   assignment_url_37c849c6: "feladat url-je"
+  assignment_view_1206a60b: Feladatnézet
   assignment_was_deleted_8320d26d: "Feladat törölve lett"
   assignment_weights_d4bcf9ab: "A feladat súlyozása"
   assignments: 
@@ -2905,6 +3184,7 @@ hu:
       freeze_properties: "Feladat tulajdonságainak zárolása másoláskor"
       notify_content_change: "Felhasználók értesítése arról, hogy a tartalom módosult"
       points_possible: Pont
+      submission_attempts: "Beküldési kísérletek"
     errors: 
       delete_reminder_failed: "A törlés sikertelen"
       google_docs_masquerade_rejected: "A Google Dokumentumokhoz nem lehet nézetváltás közben csatlakozni."
@@ -3016,6 +3296,12 @@ hu:
       assignment_delete: "Ez a feladat sikeresen törölve lett"
       assignment_not_available: "A kért feladat nem érhető el a kurzus ezen szekciójában."
       created: "A feladat létrehozása sikeres"
+      quizzes_published: 
+        one: "1 kvíz sikeresen közzétéve!"
+        other: "%{count} kvíz sikeresen közzétéve!"
+      quizzes_unpublished: 
+        one: "1 kvíz közzététele sikeresen visszavonva!"
+        other: "%{count} kvíz közzététele sikeresen visszavonva!"
     overdue_assignments: "Lejárt feladatok"
     past_assignments: "Korábbi feladatok"
     peer_review_assignment: 
@@ -3059,7 +3345,7 @@ hu:
         manually_assign_peer_reviews: "Társértékelők manuális hozzárendelése"
         require_peer_reviews: "Társértékelést igényel"
       locked_until: "Értékelések hozzárendelése"
-      peer_reviews_assign_at_explanation: "A határidő utáni időpontnak kell lennie. Ha üresen marad, a határidő lesz beállítva."
+      peer_reviews_assign_at_explanation: "Ha üres, a határidőt használja."
       peer_reviews_header: Társértékelések
       reviews_per_user: "Felhasználónkénti értékelések"
     points_possible_number: "Az elérhető pontokat számként kell megadni"
@@ -3159,6 +3445,7 @@ hu:
         allow_text_entry: "Szöveges bevitel"
         allow_url: Webcím
         allowed_extensions: "Megengedett fájlformátumok"
+        allows_annotated_document: "Hallgatói megjegyzés"
         restrict_file_extensions: "Feltölthető fájltípusok korlátozása"
       online_entry_options: "Online beviteli lehetőségek"
       submission_type: "Beadás típusa"
@@ -3245,7 +3532,9 @@ hu:
             Megjegyzések hozzáfűzéséhez kattintson a "Szerkesztés" gombra az oldal tetején.
       labels: 
         assignments_summary: Kurzusösszegzés
+        important_info_description: "Fontos információ Leírás"
         syllabus_body: "Tematika leírása"
+        syllabus_course_summary: "Mutasd a kurzus összefoglalóját"
         syllabus_description: "Tematika leírása"
       links: 
         edit_syllabus_description: Szerkesztés
@@ -3306,24 +3595,46 @@ hu:
       filter: Próbálkozások
     submission_attempts: Próbálkozások
   assignments_2_e88d7a26: "Feladatok 2"
+  assignments_2_student_description: "Ez a funkció javítja a tanulók feladatbeküldési és visszajelzési munkafolyamatát. Ha ez a jelző engedélyezve van, minden kiadáskor automatikusan megjelenik a folyamatban lévő fejlesztésekhez való korai hozzáférés. A részletekért tekintse meg a Canvas közösség *Assignment Enhancements felhasználói csoportját*."
+  assignments_989ed7fb: feladatok
+  assignments_and_quizzes_add_b1473591: "Feladatok és kvízek - hozzáadás"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Feladatok és Kvízek - hozzáadás / szerkesztés / törlés"
+  assignments_and_quizzes_delete_84ecc680: "Feladatok és kvízek – törlés"
+  assignments_and_quizzes_edit_1c23f658: "Feladatok és kvízek – szerkesztés"
   assignments_api: 
     invalid_date_time: "Érvénytelen dátum a következő attribútumhoz: %{attribute} "
     invalid_submission_types: "Érvénytelen a beadás típusa"
   assignments_dce45885: "# feladat"
+  assignments_group_menu_c2522316: "Hozzárendelések csoport menü"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Az ebben a csoportban lévő feladatokhoz nem tartoznak pontszámok, és nem fognak beszámítani a jegy számításába."
+  assignments_include_quizzes_graded_discussions_and_182e5899: "A feladatok közé tartoznak a kvízek, osztályozott viták és sokféle online beküldés (fájlok, képek, szövegek, URL-ek és média). Rendelje hozzá őket egy kurzusban mindenkihez, vagy rendeljen különböző határidőket bizonyos szakaszokhoz vagy felhasználókhoz. Hozzon létre feladatcsoportokat a feladatok rendszerezéséhez és súlycsoportok százalékos arányához. Engedélyezze a Peer Review funkciót, hogy a tanulók áttekinthessék egymás munkáját."
+  assignments_index_menu_4088a035: "Feladatok index menüje"
   assignments_list_fe3e54be: Feladatok
+  assignments_loaded_72ee472c: "Feladatok betöltve"
+  assignments_report_faea72b9: Feladatjelentés
   assignments_settings_30613d0c: Feladatbeállítások
   assignments_speedgrader_2fbd6df4: "Feladatok, Gyorsértékelő"
+  assignments_tutorial_tray_4cc844b: "Feladatok oktató tálca"
   assignments_usage_report_50671804: "Feladatok használati jelentése"
   associated_74756cc4: Hozzárendelve
   associated_account_course_id_d87a01c5: "Hozzárendelt fiók/kurzus azonosítója "
   associated_account_name_91854e37: "Hozzárendelt fiók neve"
+  associated_accounts_c4c0689d: "Kapcsolódó fiókok"
   associated_course_name_9b5b1945: "Hozzárendelt kurzus neve"
+  associated_tool_domains_ba5767c5: "Kapcsolódó eszköztartományok"
+  associated_with_10_accounts_dc29a105: "10+ fiókkal társítva"
+  associated_with_count_accounts_be191ced: 
+    one: "Egy fiókhoz van társítva"
+    other: "%{count} fiókkal társítva"
+    zero: "Nincs társítva egyetlen fiókhoz sem"
   associations_3fd4abe8: Hozzárendelések
+  associations_saved_successfully_48b9eae3: "A társítások sikeresen mentve"
+  at_least_one_scope_must_be_selected_97d6fce9: "Legalább egy hatókört ki kell választani."
+  at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Legalább egy szekciót ki kell választani az osztályzatok szekciónkénti közzétételéhez."
   at_the_bottom_a6a5f0fe: "A lap alján"
   at_the_top_fa836591: "A lap tetején"
   attach_4234a79b: Csatolás
+  attach_a_file_86a4fc00: "Fájl csatolása"
   attach_files_to_discussions_bd16c245: "Fájlok csatolása a fórumokhoz"
   attach_terms_2b8770a5: "Félév hozzárendelése"
   attached_d7423f41: Mellékelve
@@ -3339,15 +3650,17 @@ hu:
     over_quota: "A letöltött fájl túllépi a kvótát."
     title: 
       migration_list: "Társított fájlok"
-    upload_error_invalid_response_code: "Hibás válasz kód, várt: 200, kapott: %{code}"
+    upload_error_invalid_response_code: "Érvénytelen válaszkód, %{code} a következőhöz: %{url} a várt 200 helyett"
     upload_error_invalid_url: "URL elemzése sikertelen: %{url}"
     upload_error_over_quota: "a fájl mérete meghaladja a kvótát: %{bytes} bájt"
     upload_error_relative_uri: "Nincs host szolgáltató erre a webcímre: %{url}"
     upload_error_timeout: "A kérés túllépte az időkorlátot: %{url}"
-    upload_error_too_many_redirects: "Túl sok átirányítás"
+    upload_error_too_many_redirects: "Túl sok átirányítás a következőhöz: %{url}"
     upload_error_unexpected: "Ismeretlen hiba történt a letöltés közben erről a webcímről: %{url}"
   attachment_deffe5a9: Melléklet
   attempt_3dd42b18: próbálkozás
+  attempt_attempt_d3911720: "%{attempt} kísérlet"
+  attempt_attempt_feedback_1b042ff5: "%{attempt} kísérlet Visszajelzés"
   attempt_f2691284: Próbálkozás
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Megkísérli automatikusan felismerni a mezőelválasztókat a kompatibilis űrlapexportokban a beállított nyelv számformátuma alapján."
   attendance_ca433183: Jelenlét
@@ -4219,6 +4532,8 @@ hu:
   chile_56_88238b47: Chile(+56)
   china_86_36913b7a: "Kína (+86)"
   chinese_111d37f6: Kínai
+  chinese_simplified_7f0bd370: "Kínai egyszerűsített"
+  chinese_traditional_8a7f759d: "Kínai (hagyományos"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Válasszon egy színt vagy becenevet a következő kurzusnak: %{course}"
   choose_a_course_85ef72b9: "Válasszon kurzust"
   choose_a_course_home_page_8059c7b: "Kurzus kezdőlapjának megadása"
@@ -8212,6 +8527,7 @@ hu:
   files_toolbar_2f2f0976: "Fájlok eszköztár"
   files_uploaded_519844ed: "Feltöltött fájlok"
   filetype_not_allowed_40556acb: "fájltípus nem engedélyezett"
+  filipino_33339264: Filipino
   fill_in_the_blank_answer_d83b83bb: "Behelyettesítős válasz"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Töltse ki az üres részeket, olvassa el a kapcsolódó szöveget"
   filled_5d8c39e: Kitöltve
@@ -9388,6 +9704,7 @@ hu:
   iceland_354_1a03c558: "Izland (+354)"
   icelandic_9d6d35de: Izlandi
   icon_215a1dc6: Ikon
+  icon_maker_icons_cc560f7e: "Icon Maker Icons"
   icon_url_ecce6557: "Ikon URL:"
   icons: 
     discussion_submission: Fórumbeadás
@@ -12605,6 +12922,7 @@ hu:
   norway_47_bc598662: "Norvégia (+47)"
   norwegian_53f391ec: Norvég
   norwegian_bokmal_ad5843fa: "Norwegian Bokmål"
+  norwegian_nynorsk_c785f8a6: "Norwegian Nynorsk"
   not_a_number: "pozitív számnak kell lennie"
   not_a_valid_date_d3ac20ba: "Érvénytelen dátum"
   not_a_valid_utf_8_string_string_7f6819c: "Nem egy érvényes UTF-8 karaktersorozat: %{string}"
@@ -12989,6 +13307,7 @@ hu:
       goto_assignment: g
       menu: m
       sort: s
+  olive_6a3e4d6b: Olive
   oman_968_46f8d901: "Omán (+968)"
   on_8f7190e5: Bekapcsolt
   on_paper_46d0ba36: Papíron
@@ -13344,6 +13663,7 @@ hu:
     provision_catalog: "Katalógus létesítése"
   permissions_365c49e: Engedélyek
   permissions_manage_9eea4f8f: "Engedélyek - kezelés"
+  persian_a8cadb95: Persian
   peru_51_d3d38d1f: "Peru (+51)"
   philippines_63_a4f62138: "Fülöp-szigetek (+63)"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "válasszon célt, a hibákat ide elküldjük"
@@ -13366,6 +13686,7 @@ hu:
   plain_text_view_7640af4c: "Egyszerű szövegnézet"
   planner_7fd46783: Tervező
   play_1a47eaa7: Lejátszás
+  play_media_comment_35257210: "Play media comment."
   play_media_comment_8614d30f: "Médiatartalom lejátszása"
   please_add_a_due_date_1d433d2: "Kérem, adjon hozzá egy határidőt"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Kérjük, adjon meg legalább egy nem üres választ."
@@ -17356,6 +17677,7 @@ hu:
     assessment_request_title: "Társértékelés %{title} számára"
   student_5da6bfd1: Hallgató
   student_921b864d: hallgató
+  student_annotation_f6810b5c: "Hallgatói megjegyzés"
   student_assignment_outcome_map_title: "Hallgatói alkalmasság"
   student_author_id_just_made_a_new_comment_on_the_a_115d92e6: "Egy hallgató (%{author_id}) épp új megjegyzést fűzött egy másik hallgató (%{user_id}) névtelenül beadott munkájához: %{assignment_title}"
   student_collaborations_create_b9e312c1: "Hallgatók közti együttműködés - létrehozás"
@@ -17999,6 +18321,7 @@ hu:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Ez az osztályzat nem egyezik meg a hallgató nézetben lévővel, mivel néhány feladat inaktívvá lett téve"
   this_grade_is_unusually_high_60533c20: "Ez az értékelés szokatlanul magas"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Ez a kép háttér vízjelként jelenik meg az Ön oldalán. Elfogadott formátumok: png, svg, gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: "This image is currently unavailable"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Ez egy vesszőkkel elválasztott megbízható URL-eket tartalmazó lista. Amennyiben megbízik bármilyen erről a listáról származó URL-ben, a CSRF token átadásra kerül, amikor a Canvasba bejelentkezik."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Ez a funkció lehetővé teszi egy reszponzív elrendezésű felület létrehozását"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Ez egy médiamegjegyzés, *kattintson ide a megtekintéshez*."
@@ -18325,6 +18648,7 @@ hu:
   today_76e10f9c: Ma
   toggle_editing_answer_text_as_html_9a93fe6: "A válasz szövegének szerkesztése HTML formátumban"
   toggle_module_visibility_781a2f6c: "modul láthatóságának megváltoztatása"
+  toggle_tooltip_d3b7cb86: "Toggle tooltip"
   tolerance_value_9e96573c: Tűrésérték
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Túl sok bejelentkezési kísérlet. Próbálja újra később, vagy lépjen kapcsolatba a rendszer-adminisztrátorral."
   too_many_members_b8b15069: "Túl sok tag"
@@ -19471,3 +19795,4 @@ hu:
     upload: Feltöltés
     zip_options: "Zip fájl beállítások"
   zip_no_folder_error: "A megadott mappa nem található ebben a kurzusban."
+  zoom_f3e54d69: Zoom
