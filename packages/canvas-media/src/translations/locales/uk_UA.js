@@ -19,11 +19,12 @@
 import formatMessage from '../../format-message'
 
 const locale = {
-  greek_65c5b3f7: {message: 'Грецький'},
-  loading_25990131: {message: 'Завантаження...'},
-  no_preview_is_available_for_this_file_f940114a: {
-    message: 'Попередній перегляд  для цього файлу недоступний.',
-  },
+  "greek_65c5b3f7": { "message": "Грецький" },
+  "loading_25990131": { "message": "Завантаження..." },
+  "no_preview_is_available_for_this_file_f940114a": {
+    "message": "Попередній перегляд  для цього файлу недоступний."
+  }
 }
+
 
 formatMessage.addLocale({'uk-UA': locale})
