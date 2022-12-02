@@ -20,12 +20,13 @@
 
 module FeatureFlags
   class UsageMetricsPredicate
-    def initialize(context)
+    def initialize(context, region)
       @context = context
+      @region = region
     end
 
     def call
-      overridden? || (us_billing_code? && domestic_territory?)
+      overridden? || (us_billing_code? && in_approved_us_aws_region?)
     end
 
     private
@@ -35,18 +36,11 @@ module FeatureFlags
     end
 
     def us_billing_code?
-      verify_external_integration? "salesforce_billing_country_code", "US"
+      @context&.root_account&.external_integration_keys&.find_by(key_type: "salesforce_billing_country_code")&.key_value == "US"
     end
 
-    # Calling out here that `key_type: "salesforce_territory_region")&.key_value == "domestic"`
-    #   is totally made up right now and won't resolve anything until we add salesforce
-    #   data with these values
-    def domestic_territory?
-      verify_external_integration? "salesforce_territory_region", "domestic"
-    end
-
-    def verify_external_integration?(key, value)
-      @context&.root_account&.external_integration_keys&.find_by(key_type: key)&.key_value == value
+    def in_approved_us_aws_region?
+      ["us-east-1", "us-west-2"].include? @region
     end
   end
 end
