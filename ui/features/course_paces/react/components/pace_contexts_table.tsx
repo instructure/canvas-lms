@@ -36,6 +36,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 import {paceContextsActions} from '../actions/pace_contexts'
+import {generateModalLauncherId} from '../utils/utils'
 
 const I18n = useI18nScope('course_paces_app')
 
@@ -143,7 +144,11 @@ const PaceContextsTable = ({
   }
 
   const renderContextLink = (paceContext: PaceContext) => (
-    <Link isWithinText={false} onClick={() => handleContextSelect(paceContext)}>
+    <Link
+      id={generateModalLauncherId(paceContext)}
+      isWithinText={false}
+      onClick={() => handleContextSelect(paceContext)}
+    >
       <TruncateText>{paceContext.name}</TruncateText>
     </Link>
   )

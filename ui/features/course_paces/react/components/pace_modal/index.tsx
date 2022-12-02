@@ -62,6 +62,7 @@ import PaceModalHeading from './heading'
 import {getSelectedPaceContext} from '../../reducers/pace_contexts'
 import {getEnrolledSection} from '../../reducers/enrollments'
 import PaceModalStats from './stats'
+import {generateModalLauncherId} from '../../utils/utils'
 
 const I18n = useI18nScope('course_paces_modal')
 
@@ -116,12 +117,18 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
     return `${title}: ${props.paceName}`
   }
 
+  const restoreFocus = () => {
+    const launcherId = generateModalLauncherId(props.selectedPaceContext)
+    document.getElementById(launcherId)?.focus()
+  }
+
   const handleClose = () => {
     if (props.unappliedChangesExist) {
       setPendingContext(props.coursePace.context_type)
     } else {
       props.clearCategoryError('publish')
       props.onClose()
+      restoreFocus()
     }
   }
 
@@ -223,6 +230,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
             props.onResetPace()
             props.clearCategoryError('publish')
             props.onClose()
+            restoreFocus()
           }}
           contextType={props.coursePace.context_type}
         />
