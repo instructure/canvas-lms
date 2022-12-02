@@ -36,8 +36,8 @@ pipeline {
     DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
-    SELENIUM_NODE_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-node-chrome:101.0"
-    SELENIUM_HUB_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-hub:4.1"
+    SELENIUM_NODE_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-node-chrome:107.0"
+    SELENIUM_HUB_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-hub:4.6"
   }
 
   stages {
