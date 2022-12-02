@@ -116,3 +116,17 @@ ags_improved_course_concluded_response_codes:
     along with a helpful message indicating that the tool cannot access concluded
     courses.
   applies_to: RootAccount
+deep_linking_use_window_parent:
+  state: hidden
+  display_name: Use window.parent in Deep Linking Response
+  description: |-
+    If enabled, the deep linking response JS will send postMessages
+    to window.parent instead of window.top. This enables the deep linking
+    response to correctly send content items to New Quizzes, when a tool is
+    launched from NQ.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: on
