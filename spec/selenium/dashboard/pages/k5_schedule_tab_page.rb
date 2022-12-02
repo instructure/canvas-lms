@@ -255,7 +255,7 @@ module K5ScheduleTabPageObject
 
   def update_todo_title(old_todo_title, new_todo_title)
     todo_element = todo_title_input(old_todo_title)
-    todo_element.send_keys([:command, "a"], :backspace, new_todo_title)
+    replace_content(todo_element, new_todo_title)
   end
 
   #------------------------Helper Methods------------------------#
