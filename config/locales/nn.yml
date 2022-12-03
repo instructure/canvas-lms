@@ -2741,8 +2741,8 @@ nn:
   allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Lar brukar sjå knappen for Nye kunngjeringar på heimesida"
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Lar brukaren sjå knappen Ny kunngjering på heimesida. Lar brukaren legge til ny kunngjering på sida Kunngjeringar."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Gir brukar løyve til å sjå ny vurderingsoversikt."
-  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Lar brukar sjå berekningsfana for læringsmål og sette duglegberekninger for læringsmål på emnenivå."
-  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Lar brukar sjå berekningsfana for læringsmål og sette duglegberekninger for læringsmål på konto- og emnenivå."
+  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Lar brukar sjå berekningsfana for læringsmål og sette resultatberkningar for læringsmål på emnenivå."
+  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Lar brukar sjå berekningsfana for læringsmål og sette resultatberekningar for læringsmål på konto- og emnenivå."
   allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Gir ein brukar løyve til å sjå administrer læringsmål-fana på konto- og emnenivå."
   allows_user_to_view_the_outcomes_mastery_tab_and_s_a93a23d2: "Gir ein brukar løyve til å sjå meistring av læringsmål-fana og sette ekspertiseskalaer for læringsmål på konto- og emnenivå."
   allows_user_to_view_the_outcomes_mastery_tab_and_s_d9626906: "Gir ein brukar løyve til å sjå meistring av læringsmål-fana og sette ekspertiseskalaer for læringsmål på emnenivå."
@@ -4047,7 +4047,7 @@ nn:
       filter: Forsøk
     submission_attempts: Forsøk
   assignments_2_e88d7a26: "Oppgåver 2"
-  assignments_2_student_description: "Denne funksjonaliteten bedrer arbeidsflyten for innlevering av oppgåver og tilbakemeldingar for studentar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk med kvar release. Sjå *Assignment Enhancements User Group* i Canvas Community for fleire detaljer."
+  assignments_2_student_description: "Denne funksjonaliteten betrar arbeidsflyten for innlevering av oppgåver og tilbakemeldingar for studentar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk ved kvar release. Sjå *Assignment Enhancements User Group* i Canvas Community for fleire detaljer."
   assignments_2_student_error_page_3ca3e0df: "Side med studentfeilmeldingar for Assignments 2"
   assignments_2_student_initial_query_error_52aa5ebd: "Studentfeilmeldingar om spørring i Assignment 2"
   assignments_2_teacher_view_3cd3aeda: "Oppgåver 2 - Sjå som faglærar"
@@ -8810,7 +8810,7 @@ nn:
   discussion_mention_c70cb87a: "Tagging i diskusjon"
   discussion_post_count_report_2da4c6c: "Rapport av antall diskusjonsinnlegg"
   discussion_posts_c998c9ad: Diskusjonsinnlegg
-  discussion_redesign_description: "Denne funksjonaliteten bedrer opplevelsen for diskusjonar og kunngjeringar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk med kvar release. Sjå *Discussions/Announcements Redesign user group* i Canvas Community for fleire detaljer."
+  discussion_redesign_description: "Denne funksjonaliteten bedrer opplevelsen for diskusjonar og kunngjeringar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk ved kvar release. Sjå *Discussions/Announcements Redesign user group* i Canvas Community for fleire detaljar."
   discussion_settings_2fbf0b95: Diskusjonsinnstillingar
   discussion_submission_781d5d33: "Innsending av diskusjon"
   discussion_topic: 
@@ -9612,7 +9612,7 @@ nn:
   enabled_locked_3cf7c256: "Aktivert (låst)"
   enabled_unlocked_8d3a5df7: "Slått på (opplåst)"
   enabled_web_services_f620b2be: "Aktiverte nettenester"
-  enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer redesigna Send melding til studenter som... menyen som gjer det mogeleg å sende melding til observatørar i tillegg til studentar"
+  enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer ei redesigna Send melding til studenter som... menyen som gjer det mogeleg å sende melding til observatørar i tillegg til studentar"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gjer det mogeleg for modal å advare brukar når eit kommentarutkast blir ståande som upublisert i SpeedGrader."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
@@ -9649,6 +9649,7 @@ nn:
   enhance_color_contrast_of_content_685ddd49: "Forbetre bildekontrast til innhald"
   enhanced_grade_change_auditing_2b155dfa: "Forbetra revisjon av vurderingsendring "
   enhanced_gradebook_filters_a3be5e7d: "Forbetra filter i Karakteroversikt"
+  enhanced_gradebook_filters_description: "Denne funksjonaliteten betrar mogelegheitene for filtrering i Canvas vurderingsoversikt. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk ved kvar release. Sjå *Gradebook Filters User Group* i Canvas Community for fleire detaljar."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Forsterkar fargekontrasten for tekst, knappar osb."
   enroll_in_subject_9c1f1c18: "Meld deg på emnet"
   enrolled_a6a517cd: Påmeld
@@ -11115,6 +11116,7 @@ nn:
   gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "Vurderingsoversikt og SpeedGrader vil vere utilgjengeleg dersom både 'Vurderingar - endre' og 'Vurderingar - vis alle vurderingar' er slått av."
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Vurderingsoversikt og SpeedGrader er utilgjengelege dersom både 'Vurderingar - endre' og 'Vurderingar - vis alle vurderingar' er slått av."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Vurderingsoversikt og SpeedGrader vil være utilgjengelege dersom både Vurderingar - endre og Vurderingar - sjå alle vurderingar er skrudd av."
+  gradebook_assignment_search_and_redesign_409c5b21: "Søk og redesign av vurderingsoversiktoppgåver"
   gradebook_context_name_9dbae5bc: "Vurderingsoversikt - %{context_name}"
   gradebook_csv_export_assignment_order_matches_the__9044f08e: "Rekkefølge på oppgåver i CSV-eksport av vurderingsoversikt samsvarer med Vurderingsoversikt-tabellen"
   gradebook_csv_headers_include_grading_period_1015185c: "Topptekst i CSV til Vurderingsoversikt inkluderer karaktersetjingsperiode"
@@ -11675,6 +11677,7 @@ nn:
       pages: Sider
       people: Personar
   group_a8f5ed9c: Gruppe
+  group_add_permission_is_needed_to_create_a_new_gro_3cd0d1b5: "Løyve til å legge til gruppe er påkrevd for å opprette ny gruppekategori"
   group_announcements_f6e0fc8c: Gruppekunngjeringar
   group_assignment_7060989f: Gruppeoppgåve
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Gruppeoppgåver kan ikkje vurderast anonymt"
@@ -12155,6 +12158,7 @@ nn:
   haven_t_been_graded_d7dee5bb: "Er ikkje vurdert"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
+  heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Obs! Ein gyldig Salesforce konto-ID er mellom 15 og 18 alfanumeriske teikn lang."
   hebrew_88fbf778: Hebraisk
   hello_name_cabdd4ce: "Hei %{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
@@ -12327,6 +12331,9 @@ nn:
   hiding_grades_will_refresh_your_browser_this_may_t_65085e24: "Nettlesaren oppdaterast når du skjuler vurderingsresultat. Det kan ta litt tid."
   high_b5cbd048: Høy
   high_contrast_course_colors_5750fb5: "Emnefargar med høg kontrast"
+  high_contrast_course_colors_description: |-
+      Emnefarger meg høg kontrast gjer systemfargene og fargeveljaren mørkare
+      (ikkje manuelt valde) for å betre kontrasten.
   high_contrast_description: |-
       Høgkontrast forsterkar fargekontrasten i brukargrensesnittet (tekst, knappar osb.), og gjer desse elementa
       tydelegare og enklare å finne. Merk: Institusjonsutsjånaden blir deaktivert.
@@ -12440,6 +12447,7 @@ nn:
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
   howard_assignment_scores_96556db2: "Howard oppgåveresultat"
   howard_assignments_report_f3254802: "Howard oppgåverapport"
+  however_if_these_additional_permissions_are_enable_35d3082c: "likevel, dersom desse ekstra løyve er skrudd på, men Sider - oppdater løyve ikkje er skrudd på, kan brukaren framleis justere innstillinger for innhaldslås på individuelle sier i eit Blueprint moderemne."
   html5_media_recorder_in_rce_bb59b78f: "HTML5 mediainnspelar i RCE"
   html_editor_fb2ab713: HTML-redigeringsprogram
   html_fc8563c6: html
@@ -12484,6 +12492,7 @@ nn:
   id_del_alumno_bc4bcf8a: "ID del Alumno"
   id_del_curso_4ef15337: "ID del Curso"
   id_id_4e148481: "ID: %{id}"
+  id_of_the_term_you_want_to_run_the_report_for_you__603974dc: "ID til semesteret du ynskjer å køyre rapporten på. Du kan også bruke verdien 'active_terms' for å køyre rapporten på aktive semester."
   id_token_fa5f144e: ID-token
   identification_values_86d9ffda: Identifikasjonsparameterar
   identifier_format_6ca23365: Identifikatorformat
@@ -12501,13 +12510,20 @@ nn:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Dersom ein attributt er merka som 'berre for klargjering', blir han berre nytta når 'Siste liten-klargjering' opprettar ein ny brukar. Attributten vil ikkje bli oppdatert kvar gong brukaren loggar inn. "
+  if_an_enrollment_is_created_via_sis_only_admins_ca_729493d3: "Dersom ei påmelding er oppretta via SIS, er det kun administratorer som kan fjerne påmeldinga frå emnet."
   if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Dersom eit LTI verktøy konfigurert med plasseringa er installert, vil vise ei ny oppføring i
       oppgåvetypemenyen for å raskt konfigurere oppgåva til verktøyet
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Dersom Blueprint-emne - legg til / endre / slett og Emne - ladministrer er skrudd på, men Oppgåver og quizar - rediger ikkje er skrudd på, kan blueprint låseinnstillingar for ei oppgåve bli administrert frå oppgåvedetaljer sida."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Dersom både 'Vurderingar - endre' og 'Vurderingar - sjå alle vurderingar' er slått av, vil vurderingsoversikta vere skjult i emnenavigasjonen."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Dersom både 'Vurderingar - endre' og 'Vurderingar - vis alle vurderingar' er slått av, vil vurderingsoversikta vere skjult i emnemenyen."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Dersom Commons er installert vert favorisert innhald importert frå Canvas."
+  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "Dersom Emneinnhald - legg til / rediger / slett er skrudd på og Studentsamarbeid - opprett er skrudd av, vil brukaren ikkje kunne opprette nye samarbeid, men vil kunne sjå, redigere og slette alle samarbeid."
+  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "Dersom Emneinnhald - legg til / rediger / slett er skrudd på og Studentsamarbeid - opprett er skrudd av, vil brukaren ikkje kunne opprette nye samarbeid, men vil kunne sjå, redigere og slette alle samarbeid."
+  if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "Dersom emnesynlegheit er begrensa til brukarar påmeldt i emnet, lar dette løyvet brukaren sjå emneinnhald utan å være påmeld emnet."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Dersom “Emner - legg til / rediger / slett” og “Emner - angre sletting” også er aktivert, kan ein brukar på kontonivå gjenopprette sletta emner i Administratorverktøy."
+  if_courses_manage_and_courses_undelete_are_also_en_9047d4b3: "Dersom Emne - administrer og Emner - gjenopprett også er skrudd på, kan ein brukar på konto-nivå kunne gjenopprette sletta emner i administratorverktøy."
+  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Dersom Emne - administrer er skrudd på, men Blueprint-emne - legg til / endre / tilknytt / slett er skrudd av, kan brukarar framleis synkronisere Blueprint emner og sjå synkroniseringshistorikk."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Dersom deaktivert, vil læringsmålsida kun vere i lesemodus og knappen administrer vurderingsskjema er skjult. Ein brukar kan framleis sjå vurderingsskjema for individuelle oppgåver frå Oppgåver. "
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Dersom deaktivert kan brukar framleis sjå, laste ned og pakke filer i ei zipfil. "
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
@@ -12519,12 +12535,25 @@ nn:
       Dersom emnet kun er synleg for medlemma på emnet, dette løyvet
       gir ein brukar tilgang til å sjå emneinnhald utan å vere medlem på emnet.
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Brukar vil framleis ha tilgang til emneinnstillingar sjølv om den er slått av. Brukar kan ikkje administrere enkeltståande innhaldselement på emne utan naudsynt løyve for den innhaldstypen. Dersom emnet kun er synleg for medlemma på emnet, dette løyvet gir ein brukar tilgang til å sjå emneinnhald utan å vere medlem på emnet."
+  if_disabled_user_will_still_have_access_to_course__fbf32c87: "Dersom skrudd av, vil brukaren framleis ha tilgang til emneinnstillingar."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Dersom aktivert, vil tilgang til LTI 1.3 og LTI Advantage bli mogleg."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Dersom skrudd på, tillét djup lenking frå modulindeksen via ein modal."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Dersom slått på, vil den tillate at eit læringsmål scorer høgare enn maksimumscoren som er satt for eit vurderingskriterium. "
+  if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Dersom skrudd på, tillét støtting for fleire djuplenker for oppgåver og modular."
+  if_enabled_allows_new_window_postmessage_subjects__4a9f97f2: |-
+      Dersom skrudd på, tillét nye window.postMessage emne for LTI-plattform
+      lagringsspesifikasjon, og sender alle svar til alle postMessage.
+  if_enabled_an_unauthorized_response_from_the_json__bfa846d9: |-
+      Dersom skrudd på, returnerer ei "unauthorized" respons frå JSON API 403
+      (Forbidden) i staden for ein 401-kode, for å samsvare med HTTP standardar.
+      Når API'en returnerer JSON feilmeldingane "unauthenticated" eller "unauthorized",
+      vil "status"-feltet ikkje vere lokalisert; det vil alltid bli gjeve på
+      engelsk.
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: "Dersom aktivert, vil Canvas tillate at verktøy kan returnere fleire innhaldselement i ein og same spørjing på emnemodulsida"
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Dersom denne er slått på, vil Common Cartridge-importfunksjonen konvertere HTML-filer til infosider. "
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Dersom aktivert, må innhaldsdesignar informere om opphavsrett og lisens for filene før dei blir publiserte. Dette gjeld berre dersom Better File Browsing også er aktivert."
   if_enabled_copyright_and_license_information_must__2a551827: "Dersom aktivert, må opphavsrett- og lisensinformasjon vere på plass før filer er publiserte."
+  if_enabled_creates_assignments_from_lineitems_in_d_90089a84: "Oppretter oppgåver frå LineItems i djuplenke-meldinger, dersom skrudd på."
   if_enabled_graphql_queries_will_not_require_users__46a8b655: "Dersom aktivert, vil ikkje GraphQL-spørjingar krevje at brukarar er innlogga eller at dei må bruke ein tilgangstoken."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Dersom OAuth 1.0a-signatur er slått på, kan den brukast av LTI-verktøy for tilgang til Membership-Service-API-en"
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
@@ -12535,6 +12564,7 @@ nn:
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Sourcedids som er brukt av Canvas til Basic Outcomes vil bli krypterte dersom dei er slått på. "
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Innleveringshistorikk for New Quizzes-quizar er handsama separat dersom funksjonsvalet er slått på."
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Innleveringshistorikk for Quizzes.Next er handsama separat dersom funksjonsvalet er slått på."
+  if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: "Synkronisering av emnepåmeldingar til Microsoft Groups vil være tilgjengelig, dersom skrudd på. Kontoadministratorer kan skru på dette i kontoinnstillinger."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Ein får valet om å ha vurderingskriterium utan moglege poeng dersom dette er slått på."
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Dersom skrudd på, vil områdeadministrator utviklarnøkkel-brukargrensesnittet kun vise
@@ -12542,35 +12572,71 @@ nn:
       Canvas førekomstar der root kontoar er på same fragment
       som områdeadministratorkontoen. Funksjonar i andre førekomstar
       fungerer allereie slik.
+  if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "Dersom LTI - Legg til er skrudd av, kan brukarar framleis installere godkjende appar gjennom Canvas App Center (dersom dette er skrudd på for din institusjon). Dersom LTI - slett er skrudd av, kan dei ikkje slette manuelt installerte appar. "
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Dersom ekspertisesakalaer er skrudd på, vil rapporten bli avkorta til å ikkje inkludere utrekningsmetode, utrekningsintegrasjon, ekspertisepoeng, eller vurderingar"
+  if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
+      Dersom new quizzes er skrudd på, tillét dette opprettinga og administrasjonen av spørsmålsbankar
+      eigd av spesifikke emner og rotkontoen i new quizzes
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Dersom ingen er vald, vis til alle i heile underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Dersom ingen er markert viser du til alle som høyrer til kontoen)"
+  if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Dersom eit eller alle løyve er skrudd av, kan brukarar framleis sjå og laste ned filer til ei zip-fil."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Dersom forbetringane av den nye teksteditoren òg er aktivert,
       vil editoren autolagre innhaldet ditt mens du arbeider
+  if_set_allows_submission_status_to_be_changed_from_156f57f: "Tillét innleveringsstatus å bli endra frå SpeedGrader, dersom satt."
+  if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Fjernar forsinkinga som normalt kjem når ein søker etter studenter, dersom satt."
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Dersom funksjonen er aktivert vil karakterutrekninga sjå vekk frå anonyme oppgåveinnleveringar som ikkje er posta når totalresultat reknast ut."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Dersom denne er på, vil CSV vurderingsoversikteksportøren leggje til tittelen på dei valde vurderingsperiodane til topptekstane der verdiane varierer avhengig av vurderingsperiode."
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Dersom funksjonen er aktivert vil vurderingsoversikta porsjonere lasting av oppgåver ved å hente oppgåver frå valt karaktersetjingsperiode først. "
+  if_set_the_order_of_assignments_in_gradebook_csv_e_bf5c663e: "Rekkefølga til oppgåver i CSV-eksporten til vurderingsoversikten vil samsvare med rekkefølga i vurderingsoversikten, dersom satt."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Dersom denne er på, slår den av Post-til-SIS-funksjonalitet for oppgåver når karaktersetjingsperiode lukker, Gjeld kun når innstillingane for \"Aktiver ny SIS-integrasjon\" er aktivert. "
+  if_sis_data_manage_is_disabled_and_sis_data_read_i_3db0be5: "Dersom SIS Data - administrer er skrudd av og SIS Data - les er skrudd på, kan brukarar kun sjå emne-, brukar, og underkonto SIS-ID'er."
+  if_sis_data_manage_is_enabled_and_sis_data_read_is_155d15ef: "Dersom SIS Data - administrer er skrudd på og SIS Data - les er skrudd av, overstyrer kontoløyvet emneløyevet."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøyet. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøy. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av. "
+  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Dersom funksjonen ekspertiseskalaer for læringsmål på konto- og emnenivå er skrudd på, vil administrer fana vise eit oppdatert brukargrensesnitt. Læringsmålsida vil vise to ekstra faner som frakoplar meistringsskalaer og duglegberekninger frå administrering av læringsmål."
+  if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Dersom dei ekstra løyva er skrudd på, men dette løyvet er skrudd av, kan låseinnstillingar redigerast på individuelle diskusjonar."
+  if_the_course_content_permission_enabled_and_web_c_85f91e32: "Dersom løyve for emneinnhald er skrudd på og Webkonferanse - opprett er skrudd av, kan brukaren framleis administrere konferansar."
+  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Dersom funksjonen er skrudd på og dette løyvet er skrudd av, vil læringsmål sida innehalde tre faner: Administrer, Meistring og Berekning."
+  if_the_open_registration_account_setting_is_enable_10b1965c: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til designarar til eit emne frå emnesida via e-postadresse eller innloggings-ID sjølv om designaren ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_1e679e07: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til undervisningsassistenter til eit emne frå emnesida via e-postadresse eller innloggings-ID sjølv om undervisningsassistenten ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_2f43fcc0: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar til eit emne frå Personer sida via e-postadresse eller innloggings-ID sjølv om studenten ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_474c98c2: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til designarar til eit emne frå Personar sida via e-postadresse eller innloggings-ID sjølv om designaren ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_87662428: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til observatorar til eit emne frå emnesida via e-postadresse eller innloggings-ID sjølv om observatoren ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_99a8a04a: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar til eit emne frå emnesida via e-postadresse eller innloggings-ID sjølv om studenten ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_9ca710e2: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til lærarar til eit emne frå Personar sida via e-postadresse eller innloggings-ID sjølv om læraren ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_9e63fda6: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til observatorar til eit emne frå Personar sida via e-postadresse eller innloggings-ID sjølv om observatoren ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_b6fdaab4: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til undervisningsassistenter til eit emne frå Personar sida via e-postadresse eller innloggings-ID sjølv om undervisningsassistenten ikkje har ein Canvaskonto frå før."
+  if_the_open_registration_account_setting_is_enable_e7f97cf0: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til lærarar til eit emne frå emnesida via e-postadresse eller innloggings-ID sjølv om læraren ikkje har ein Canvaskonto frå før."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar eller observatørar til eit emne via e-postadresse eller innloggings-ID sjølv om studenten eller observatøren ikke har ein Canvaskonto frå før."
+  if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Dersom valet som krev at brukarar skriv eit innlegg før dei kan sjå svar er vald i ein diskusjon, må brukarar skrive eit svar for å sjå alle innlegg dersom ikkje Diskusjonar - moderer også er skrudd på."
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Dersom Sider - oppdater løyve er skrudd av, kan brukaren framleis justere innstillingar for innhaldslås på individuelle sider i eit Blueprintmoderemne."
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "Dersom desse ytterlegare løyva er skrudd på, men Oppgåver og Quizzar - legg til / endre / slett er skrudd av, kan låseinnstillingane til Blueprint for ei oppgåve bli administrert frå oppgåva si detaljar side."
+  if_this_account_already_uses_sftp_please_reach_out_377296d1: "Dersom denne kontoen allereie brukar SFTP, ta kontakt i Slack på #canvas-sre. Brukarnamnet deira samsvarar ikkje med vår standard for brukarnamn."
+  if_this_account_does_not_use_sftp_currently_press__eb1b3b88: "Dersom denne kontoen for tida ikkje brukar SFTP, trykk på aktiver for å opprette ein SFTP-brukar."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Dersom dette løyvet er slått av, men løyvet for å legge til/endre/slette emne er slått på, kan brukaren legge til nye emne på konto-nivå."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
       Dersom dette løyvet er slått av og 'Emne - legg til / endre / slett' er slått på,
       kan brukarar opprette eit nytt emne ved å klikke på legg til nytt emne-knappen i konto-
       innstillingar.
+  if_this_permission_is_disabled_and_courses_add_is__acccce1b: "Dersom dette løyvet er slått av, men løyvet for å legge til emne er slått på, kan brukaren legge til nye emne på konto-nivå."
+  if_this_permission_is_disabled_and_users_view_logi_9dbd9236: "Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar."
+  if_this_permission_is_disabled_at_the_account_leve_1b0e403f: "Dersom dette løyvet er skrudd av på kontonivå, kan ikkje brukaren sjå nokon eksisterande kontogrupper. På emnenivå kan brukaren sjå, men har ikkje tilgang til  nokon eksisterande grupper, inkludert grupper oppretta av studenten."
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "Dersom dette løyvet deaktiveres på kontonivå, vil ikkje brukarar lenger sjå eksisterande kontogrupper. På emnenivå vil brukarar sjå, men ikkje ha tilgang til, eksisterande grpper, inkludert grupper oppretta av studentar. For å sjå grupper, må 'Brukarar - vis liste' òg vere slått på. For å legge til grupper på kontonivå frå ei CSV-fil, må 'SIS-data - import' òg vere slått på. "
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "Dersom løyvet er deaktivert kan brukarar kun sjå eksisterande grupper, inkludert grupper oppretta av studentar."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Dersom dette løyvet er slått av, kan brukarar framleis opprette eller legge til vurderingskriterium så lenge 'Oppgåver og quizar - legg til / endre / slett' er slått på."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Sjølv om dette løyvet er slått av, kan brukarar framleis installere godkjende appar gjennom Canvas App Center (så fremt det er gjort tilgjengeleg for institusjonen). Brukarar kan imidlertid ikkje manuelt slette eksterne appar etter at dei er lagde til. "
+  if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "Dersom dette løyvet er skrudd av, kan brukarar framleis installere godkjende appar gjennom Canvas App Center (dersom skrudd på hos din institusjon)."
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Dersom dette løyvet er slått på og 'Emne - sjå liste' er slått av, kan brukarar legge til nye emne med å klikke på legg til nytt emne-knappen i kontoinnstillingar."
+  if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "Dersom dette løyvet er skrudd på, og dersom Brukarar - vis primær e-postadresse er skrudd av, vil brukarar sjå e-postadresse som innloggings-ID'er."
+  if_this_permission_is_enabled_the_learning_mastery_af45b0ca: "Dersom dette løyvet er skrudd på, vil fana for læringsbasert meisting visast på læringsmålsida i staden for vurderingsskjema sida."
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "Dersom dette løyvet er aktivert er det ikkje nødvendig for brukarar at 'SIS-data - leseløyve' er aktivert. Dette kontoløyvet overstyrer emneløyve. For å forhindre brukarar fra å administrere SIS-ID-er på emnenivå må både «SIS-data - administrer» og «SIS-data - lese» være skrudd av. For å legge til brukarar i emner via SIS-ID må «Brukarar - legg til / fjern studenter frå emner» og/eller «Brukarar - legg til / fjern lærarar, emnedesignere eller LA-er frå emner» også være aktivert."
   if_this_permission_is_enabled_users_do_not_need_th_e3d0f334: |-
       Dersom dette løyvet er slått på, er det ikkje naudsynt å slå på 'SIS-data - les'. Løyvet på kontonivå overstyrer løyvet på emnenivå. For å hindre at brukarar kan administrere SIS-ID-ar på emnenivå, må både 'SIS-data - administrer' og SIS-data - les' vere slått av.
       For å legge til brukarar på emne via SIS-ID, må 'Brukarar - legg til / fjern studentar frå emne' og/eller 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emne' òg vere slått på.
+  if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Dersom dette løyvet er skrudd på, treng brukarar at ikkje SIS Data - les løyvet er skrudd på. Kontoløyvet overstyrer emneløyvet,"
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Hvis sant, nyttast den serialiserte innsendinga for submitted_at-dato"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Dersom 'Brukarar - administrer innloggingsdetaljar' eller 'Statistikk - vis' er slått på, vil ein brukar kunne generere inn-/utloggingsaktivitet i administrasjonsverktøy. For å skjule valet for inn-/utloggingsaktivitet i administrasjonsverktøy, må begge løyva vere slått av."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Dersom «Brukarar - administrer innloggingsdetaljer» eller «Statistikk - vis» er aktiverte vil brukaren kunne generere inn-/utloggingsaktivitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse løyva være skrudd av."
