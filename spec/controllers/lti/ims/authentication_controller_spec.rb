@@ -231,7 +231,23 @@ describe Lti::IMS::AuthenticationController do
 
       it "sends the state" do
         subject
-        expect(assigns.dig(:id_token, :state)).to eq state
+        expect(assigns.dig(:launch_parameters, :state)).to eq state
+      end
+
+      it "sends the default lti_storage_target" do
+        subject
+        expect(assigns.dig(:launch_parameters, :lti_storage_target)).to eq Lti::PlatformStorage::DEFAULT_TARGET
+      end
+
+      context "when platform storage flag is enabled" do
+        before do
+          Account.site_admin.enable_feature! :lti_platform_storage
+        end
+
+        it "sends the actual lti_storage_target" do
+          subject
+          expect(assigns.dig(:launch_parameters, :lti_storage_target)).to eq Lti::PlatformStorage::FORWARDING_TARGET
+        end
       end
 
       context "when there are additional query params on the redirect_uri" do

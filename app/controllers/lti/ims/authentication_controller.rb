@@ -84,7 +84,7 @@ module Lti
           layout: "borderless_lti",
           locals: {
             redirect_uri: redirect_uri,
-            parameters: @oidc_error || id_token
+            parameters: @oidc_error || launch_parameters
           }
         )
       end
@@ -166,10 +166,15 @@ module Lti
         end
       end
 
+      def launch_parameters
+        @launch_parameters ||= id_token.merge({
+                                                state: oidc_params[:state],
+                                                lti_storage_target: Lti::PlatformStorage.lti_storage_target
+                                              })
+      end
+
       def id_token
-        @id_token ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
-                                                                                                    state: oidc_params[:state]
-                                                                                                  })
+        @id_token ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce)
       end
 
       def authorize_redirect_url
