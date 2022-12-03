@@ -1,9 +1,9 @@
 {
     "a_great_discussion_6526a6d9": {
-        "message": "Remek vita"
+        "message": "Egy remek vita"
     },
     "a_wonderful_assignment_d3139d9b": {
-        "message": "Csodálatos feladat"
+        "message": "Egy csodálatos feladat"
     },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Hozzáférés a remek HTML-szerkesztőhöz"
@@ -288,7 +288,7 @@
         "message": "Kínai egyszerűsített"
     },
     "chinese_traditional_8a7f759d": {
-        "message": "Kínai (hagyományos"
+        "message": "Kínai (hagyományos)"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
@@ -342,7 +342,7 @@
         "message": "Zárt feliratok"
     },
     "clubs_suit_c1ffedff": {
-        "message": "Klubok (öltöny)"
+        "message": "Treff (kártyaszín)"
     },
     "collaborations_5c56c15f": {
         "message": "Együttműködés"
@@ -393,7 +393,7 @@
         "message": "{ count, plural,\n     =0 {# lehetőség}\n    one {# lehetőség}\n  other {# lehetőség}\n}"
     },
     "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {# hiányzó elem elrejtése}\n  other {# hiányzó elem elrejtése}\n}"
+        "message": "{ count, plural,\n    one {# hiányzó elem elrejtése}\n  other {# hiányzó elemek elrejtése}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# elem betöltve}\n  other {# elem betöltve}\n}"
@@ -402,7 +402,7 @@
         "message": "{ count, plural,\n    one {# elvégzett elem mutatása}\n  other {# elvégzett elem mutatása}\n}"
     },
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {# hiányzó elem megjelenítése}\n  other {# hiányzó elem megjelenítése}\n}"
+        "message": "{ count, plural,\n    one {# hiányzó elem megjelenítése}\n  other {# hiányzó elemek megjelenítése}\n}"
     },
     "course_8a63b4a3": {
         "message": "Kurzus"
@@ -507,7 +507,7 @@
         "message": "Határozott integrál"
     },
     "degree_symbol_4a823d5f": {
-        "message": "Degree Symbol"
+        "message": "Fokozat szimbólum"
     },
     "delete_a6efa79d": {
         "message": "Törlés"
@@ -519,10 +519,7 @@
         "message": "Delta"
     },
     "describe_the_icon_f6a18823": {
-        "message": "(Describe the icon)"
-    },
-    "describe_the_type_ff448da5": {
-        "message": "(Describe the { TYPE })"
+        "message": "(Írja le az ikont)"
     },
     "describe_the_video_2fe8f46a": {
         "message": "(A videó leírása)"
@@ -534,19 +531,19 @@
         "message": "Részletek:"
     },
     "diagonal_dots_7d71b57e": {
-        "message": "Diagonal Dots"
+        "message": "Átlós pontok"
     },
     "diamond_b8dfe7ae": {
-        "message": "Diamond"
+        "message": "Gyémánt"
     },
     "diamonds_suit_526abaaf": {
-        "message": "Diamonds (Suit)"
+        "message": "Káró (kártyaszín)"
     },
     "digamma_258ade94": {
         "message": "Digamma"
     },
     "dimension_type_f5fa9170": {
-        "message": "Dimension Type"
+        "message": "Méret típusa"
     },
     "dimensions_45ddb7b7": {
         "message": "Méretek"
@@ -555,10 +552,10 @@
         "message": "Irányítottság"
     },
     "directly_edit_latex_b7e9235b": {
-        "message": "Directly Edit LaTeX"
+        "message": "Közvetlenül szerkesztheti a LaTeX-et"
     },
     "disable_preview_222bdf72": {
-        "message": "Disable Preview"
+        "message": "Előnézet letiltása"
     },
     "discussion_6719c51d": {
         "message": "Fórum"
@@ -570,7 +567,7 @@
         "message": "Fórumok indexe"
     },
     "disjoint_union_e74351a8": {
-        "message": "Disjoint Union"
+        "message": "Diszjunkt únió"
     },
     "dismiss_itemtitle_a9fae1b3": {
         "message": "{ itemTitle } elvetése"
@@ -591,7 +588,7 @@
         "message": "Szöveges link megjelenítése (új lapfülön jelenik meg)"
     },
     "division_sign_72190870": {
-        "message": "Division Sign"
+        "message": "Osztás jele"
     },
     "document_678cd7bf": {
         "message": "Dokumentum"
@@ -603,22 +600,19 @@
         "message": "Kész"
     },
     "double_dagger_faf78681": {
-        "message": "Double Dagger"
+        "message": "Dupla Tőr"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
-        "message": "Down And Left Diagonal Arrow"
+        "message": "Le és Balra Átlós Nyíl"
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
-        "message": "Down And Right Diagonal Arrow"
-    },
-    "download_filename_2baae924": {
-        "message": "Download { filename }"
+        "message": "Lefelé és Jobbra Átlós Nyíl"
     },
     "downward_arrow_cca52012": {
-        "message": "Downward Arrow"
+        "message": "Lefelé mutató nyíl"
     },
     "downward_pointing_triangle_2a12a601": {
-        "message": "Downward Pointing Triangle"
+        "message": "Lefelé mutató háromszög"
     },
     "drag_a_file_here_1bf656d5": {
         "message": "Húzzon ide egy fájlt"
@@ -645,22 +639,22 @@
         "message": "Holland"
     },
     "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
-        "message": "Edit alt text for this icon instance"
+        "message": "Az ikonpéldány alternatív szövegének szerkesztése"
     },
     "edit_c5fbea07": {
         "message": "Szerkesztés"
     },
     "edit_course_link_5a5c3c59": {
-        "message": "Edit Course Link"
+        "message": "Kurzus hivatkozás szerkesztése"
     },
     "edit_equation_f5279959": {
         "message": "Egyenlet szerkesztése"
     },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
-        "message": "Edit Existing Icon Maker Icon"
+        "message": "Meglévő Ikonkészítő Ikon szerkesztése"
     },
     "edit_icon_2c6b0e91": {
-        "message": "Edit Icon"
+        "message": "Szerkesztés ikon"
     },
     "edit_link_7f53bebb": {
         "message": "Link szerkesztése"
@@ -687,22 +681,22 @@
         "message": "beágyazott tartalom"
     },
     "empty_set_91a92df4": {
-        "message": "Empty Set"
+        "message": "Üres készlet"
     },
     "encircled_dot_8f5e51c": {
-        "message": "Encircled Dot"
+        "message": "Bekerített pont"
     },
     "encircled_minus_72745096": {
-        "message": "Encircled Minus"
+        "message": "Bekerített mínusz"
     },
     "encircled_plus_36d8d104": {
-        "message": "Encircled Plus"
+        "message": "Bekerített Plusz"
     },
     "encircled_times_5700096d": {
-        "message": "Encircled Times"
+        "message": "Bekerített idők"
     },
     "engineering_icon_f8f3cf43": {
-        "message": "Engineering Icon"
+        "message": "Mérnöki ikon"
     },
     "english_australia_dc405d82": {
         "message": "English (Australia)"
@@ -714,7 +708,7 @@
         "message": "English (Canada)"
     },
     "english_icon_25bfe845": {
-        "message": "English Icon"
+        "message": "Angol ikon"
     },
     "english_united_kingdom_a613f831": {
         "message": "English (United Kingdom)"
@@ -726,28 +720,28 @@
         "message": "Epsilon"
     },
     "epsilon_variant_d31f1e77": {
-        "message": "Epsilon (Variant)"
+        "message": "Epsilon (változat)"
     },
     "equals_sign_c51bdc58": {
-        "message": "Equals Sign"
+        "message": "Egyenlő jel"
     },
     "equation_1c5ac93c": {
         "message": "Egyenlet"
     },
     "equation_editor_39fbc3f1": {
-        "message": "Equation Editor"
+        "message": "Egyenletszerkesztő"
     },
     "equivalence_class_7b0f11c0": {
-        "message": "Equivalence Class"
+        "message": "Egyenértékűségi osztály"
     },
     "equivalent_identity_654b3ce5": {
-        "message": "Equivalent (Identity)"
+        "message": "Egyenértékű (identitás)"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Hiba történt az értékelések betöltése közben."
     },
     "error_loading_items_5218438e": {
-        "message": "Error loading items"
+        "message": "Hiba az elemek betöltésekor"
     },
     "error_loading_more_items_3f109d9f": {
         "message": "Nem sikerült több elemet betölteni"
@@ -762,25 +756,25 @@
         "message": "Eta"
     },
     "exciting_discussion_9f67bd0a": {
-        "message": "Exciting discussion"
+        "message": "Izgalmas vita"
     },
     "excused_cf8792eb": {
         "message": "Felmentve"
     },
     "exists_2e62bdaa": {
-        "message": "Exists"
+        "message": "Létezik"
     },
     "expand_preview_by_default_2abbf9f8": {
-        "message": "Expand preview by Default"
+        "message": "Az előnézet kibontása alapértelmezés szerint"
     },
     "expand_to_see_types_f5d29352": {
         "message": "Kiterjesztés a(z) { types } megtekintéséhez"
     },
     "extended_9a58dcb6": {
-        "message": "Extended"
+        "message": "Kiterjedt"
     },
     "external_link_d3f9e62a": {
-        "message": "External Link"
+        "message": "külső hivatkozás"
     },
     "external_tools_6e77821": {
         "message": "Külső eszközök"
@@ -789,34 +783,31 @@
         "message": "Extra nagy"
     },
     "extra_small_9ae33252": {
-        "message": "Extra Small"
+        "message": "Extra kicsi"
     },
     "extracurricular_icon_67c8ca42": {
-        "message": "Extracurricular Icon"
+        "message": "Tanórán kívüli ikon"
     },
     "f_function_fe422d65": {
-        "message": "F (function)"
+        "message": "F (függvény)"
     },
     "failed_getting_course_list_49846a93": {
-        "message": "Failed getting course list"
+        "message": "Nem sikerült lekérni a kurzuslistát"
     },
     "failed_getting_file_contents_e9ea19f4": {
-        "message": "Failed getting file contents"
+        "message": "Nem sikerült beolvasni a fájl tartalmát"
     },
     "failed_getting_to_do_list_10ce2833": {
-        "message": "Failed getting To Do list"
+        "message": "Nem sikerült elérni a Teendők listáját"
     },
     "failed_peeking_into_your_future_e95b9306": {
-        "message": "Failed peeking into your future"
+        "message": "Nem sikerült bepillantani a jövődbe"
     },
     "failed_peeking_into_your_past_5bec2323": {
-        "message": "Failed peeking into your past"
+        "message": "Nem sikerült bepillantani a múltadba"
     },
     "failed_saving_changes_on_name_1e100ad": {
-        "message": "Failed saving changes on { name }."
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "Failed to delete { name }."
+        "message": "Nem sikerült elmenteni a változtatásokat a következőn: { name }."
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "Nem sikerült a tennivaló törlése"
@@ -831,7 +822,7 @@
         "message": "Nem sikerült a tennivaló mentése"
     },
     "failure_loading_the_to_do_list_c61895c8": {
-        "message": "Failure loading the To Do list"
+        "message": "Nem sikerült betölteni a To Do listát"
     },
     "feedback_6dcc1991": {
         "message": "Visszajelzés"
@@ -840,7 +831,7 @@
         "message": "Fájlnév"
     },
     "file_storage_quota_exceeded_b7846cd1": {
-        "message": "File storage quota exceeded"
+        "message": "Túllépte a fájltárolási kvótát"
     },
     "file_url_c12b64be": {
         "message": "Fájl URL"
@@ -861,13 +852,13 @@
         "message": "Fájlok indexe"
     },
     "filipino_33339264": {
-        "message": "Filipino"
+        "message": "filippínó"
     },
     "finnish_4df2923d": {
         "message": "Finn"
     },
     "flat_music_76d5a5c3": {
-        "message": "Flat (Music)"
+        "message": "Lapos (zene)"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Az elem opciók eszköztár fókuszba helyezése"
@@ -876,7 +867,7 @@
         "message": "Könyvtárfa"
     },
     "for_all_b919f972": {
-        "message": "For All"
+        "message": "Mindenkinek"
     },
     "format_4247a9c5": {
         "message": "Formátum"
@@ -885,7 +876,7 @@
         "message": "Formázás"
     },
     "forward_slash_3f90f35e": {
-        "message": "Forward Slash"
+        "message": "Perjel"
     },
     "found_auto_saved_content_3f6e4ca5": {
         "message": "Automatikusan mentett tartalmat találtunk"
@@ -894,7 +885,7 @@
         "message": "{ count, plural,\n     =0 {# eredmény}\n    one {# eredmény}\n  other {# eredmény}\n} található"
     },
     "fraction_41bac7af": {
-        "message": "Fraction"
+        "message": "Tört"
     },
     "french_33881544": {
         "message": "Francia"
@@ -906,7 +897,7 @@
         "message": "Teljes képernyő"
     },
     "fun_quiz_47ab0b0": {
-        "message": "Fun quiz"
+        "message": "Szórakoztató kvíz"
     },
     "galician_7e4508b5": {
         "message": "Galíciai"
@@ -921,7 +912,7 @@
         "message": "Német"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
-        "message": "GIF/PNG format images larger than { size } KB are not currently supported."
+        "message": "A(z) { size } KB-nál nagyobb GIF/PNG formátumú képek jelenleg nem támogatottak."
     },
     "go_to_card_view_dashboard_9d03970e": {
         "message": "Ugrás a vezérlőpult kártya nézetére"
@@ -945,10 +936,10 @@
         "message": "Értékelések betöltve"
     },
     "greater_than_e98af662": {
-        "message": "Greater Than"
+        "message": "Nagyobb, mint"
     },
     "greater_than_or_equal_b911949a": {
-        "message": "Greater Than Or Equal"
+        "message": "Nagyobb, mint vagy egyenlő"
     },
     "greek_65c5b3f7": {
         "message": "Görög"
@@ -957,7 +948,7 @@
         "message": "Zöld"
     },
     "grey_a55dceff": {
-        "message": "Grey"
+        "message": "Szürke"
     },
     "group_documents_8bfd6ae6": {
         "message": "Csoport dokumentumok"
@@ -972,10 +963,10 @@
         "message": "Csoport képek"
     },
     "group_isomorphism_45b1458c": {
-        "message": "Group Isomorphism"
+        "message": "Csoport izomorfizmus"
     },
     "group_link_63e626b3": {
-        "message": "Group Link"
+        "message": "Csoport hivatkozás"
     },
     "group_links_9493129e": {
         "message": "Csoport hivatkozások"
@@ -987,16 +978,13 @@
         "message": "Csoportnavigáció"
     },
     "h_bar_bb94deae": {
-        "message": "H Bar"
+        "message": "H Bár"
     },
     "haitian_creole_7eb4195b": {
         "message": "Haiti"
     },
     "hat_ea321e35": {
-        "message": "Hat"
-    },
-    "having_trouble_initializing_copy_paste_but_it_can__7fb1f912": {
-        "message": "Having trouble initializing copy/paste, but it can still limp along"
+        "message": "Kalap"
     },
     "heading_2_5b84eed2": {
         "message": "Címsor 2"
@@ -1008,10 +996,10 @@
         "message": "Címsor 4"
     },
     "health_icon_8d292eb5": {
-        "message": "Health Icon"
+        "message": "Egészségügyi ikon"
     },
     "hearts_suit_e50e04ca": {
-        "message": "Hearts (Suit)"
+        "message": "Kőr (kártyaszín)"
     },
     "hebrew_88fbf778": {
         "message": "Héber"
@@ -1020,13 +1008,13 @@
         "message": "Magasság"
     },
     "hexagon_d8468e0d": {
-        "message": "Hexagon"
+        "message": "Hatszög"
     },
     "hide_description_bfb5502e": {
-        "message": "Hide description"
+        "message": "Leírás elrejtése"
     },
     "hide_title_description_caf092ef": {
-        "message": "Hide { title } description"
+        "message": "A { title } leírásának elrejtése"
     },
     "hindi_9bcd4b34": {
         "message": "Hindi"
@@ -1035,7 +1023,7 @@
         "message": "Kezdőlap"
     },
     "html_code_editor_fd967a44": {
-        "message": "html code editor"
+        "message": "html kódszerkesztő"
     },
     "html_editor_fb2ab713": {
         "message": "HTML szerkesztő"
@@ -1056,34 +1044,31 @@
         "message": "Ikon"
     },
     "icon_8168b2f8": {
-        "message": "icon"
+        "message": "ikon"
     },
     "icon_color_b86dd6d6": {
-        "message": "Icon Color"
+        "message": "Ikon színe"
     },
     "icon_maker_icons_cc560f7e": {
-        "message": "Icon Maker Icons"
+        "message": "Ikon készítő ikonok"
     },
     "icon_options_7e32746e": {
-        "message": "Icon Options"
+        "message": "Ikon Opciók"
     },
     "icon_options_tray_2b407977": {
-        "message": "Icon Options Tray"
+        "message": "Ikon Lehetőségek tálca"
     },
     "icon_preview_1782a1d9": {
-        "message": "Icon Preview"
+        "message": "Ikon előnézet"
     },
     "icon_shape_30b61e7": {
-        "message": "Icon Shape"
+        "message": "Ikon alakja"
     },
     "icon_size_9353edea": {
-        "message": "Icon Size"
+        "message": "Ikon mérete"
     },
     "if_left_empty_link_text_will_display_as_course_lin_61087540": {
-        "message": "If left empty link, text will display as course link name"
-    },
-    "if_usage_rights_are_required_the_file_will_not_be__5d2ca47": {
-        "message": "If Usage Rights are required the file will not be published until set on the Files page."
+        "message": "Ha üresen hagyja a hivatkozást, a szöveg kurzushivatkozás neveként jelenik meg"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Ha nem választja ki most a felhasználási jogokat, a fájl nem lesz publikálva a feltöltés után."
@@ -1101,22 +1086,22 @@
         "message": "Képbeállítások tálca"
     },
     "image_to_crop_3a34487d": {
-        "message": "Image to crop"
+        "message": "Kép kivágása"
     },
     "images_7ce26570": {
         "message": "Képek"
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
-        "message": "Imaginary Portion (of Complex Number)"
+        "message": "Képzelt rész (komplex szám)"
     },
     "in_element_of_19ca2f33": {
-        "message": "In (Element Of)"
+        "message": "Ebben"
     },
     "increase_indent_6af90f7c": {
         "message": "Behúzás növelése"
     },
     "indefinite_integral_6623307e": {
-        "message": "Indefinite Integral"
+        "message": "Határozatlan Integrál"
     },
     "indigo_2035fc55": {
         "message": "Indigókék"
@@ -1125,10 +1110,10 @@
         "message": "Indonéz"
     },
     "inference_fed5c960": {
-        "message": "Inference"
+        "message": "Következtetés"
     },
     "infinity_7a10f206": {
-        "message": "Infinity"
+        "message": "Végtelen"
     },
     "insert_593145ef": {
         "message": "Beszúrás"
@@ -1143,13 +1128,13 @@
         "message": "Matematikai képlet beszúrása"
     },
     "integers_336344e1": {
-        "message": "Integers"
+        "message": "Egész számok"
     },
     "intersection_cd4590e4": {
-        "message": "Intersection"
+        "message": "Metszet"
     },
     "invalid_entry_f7d2a0f5": {
-        "message": "Invalid entry."
+        "message": "Érvénytelen bejegyzés."
     },
     "invalid_file_c11ba11": {
         "message": "Érvénytelen fájl."
@@ -1179,13 +1164,13 @@
         "message": "Csatlakozás"
     },
     "join_active_online_meeting_d9d892b2": {
-        "message": "join active online meeting"
+        "message": "Csatlakozzon aktív online találkozóhoz"
     },
     "join_online_meeting_b1725843": {
-        "message": "join online meeting"
+        "message": "Csatlakozzon online találkozóhoz"
     },
     "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "Jump to navigation toolbar"
+        "message": "Ugrás a navigációs eszköztárra"
     },
     "jump_to_today_254ccf41": {
         "message": "Ugrás a mai napra"
@@ -1194,7 +1179,7 @@
         "message": "Kappa"
     },
     "kappa_variant_eb64574b": {
-        "message": "Kappa (Variant)"
+        "message": "Kappa (változat)"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Billentyűparancsok"
@@ -1206,13 +1191,13 @@
         "message": "Lambda"
     },
     "language_arts_35b79a8b": {
-        "message": "Language Arts"
+        "message": "Nyelvi művészet"
     },
     "language_arts_icon_a798b0f8": {
-        "message": "Language Arts Icon"
+        "message": "Nyelv Művészetek Ikon"
     },
     "languages_icon_9d20539": {
-        "message": "Languages Icon"
+        "message": "Nyelvek ikon"
     },
     "large_9c5e80e7": {
         "message": "Nagy"
@@ -1224,49 +1209,49 @@
         "message": "Lett"
     },
     "left_align_43d95491": {
-        "message": "Left Align"
+        "message": "Balra igazítás"
     },
     "left_angle_bracket_c87a6d07": {
-        "message": "Left Angle Bracket"
+        "message": "Bal csúcsos zárójel"
     },
     "left_arrow_4fde1a64": {
-        "message": "Left Arrow"
+        "message": "Bal nyíl"
     },
     "left_arrow_with_hook_5bfcad93": {
-        "message": "Left Arrow With Hook"
+        "message": "Balra nyíl Horoggal"
     },
     "left_ceiling_ee9dd88a": {
-        "message": "Left Ceiling"
+        "message": "Bal kerekítés (felső)"
     },
     "left_curly_brace_1726fb4": {
-        "message": "Left Curly Brace"
+        "message": "Bal kapcsos zárójel"
     },
     "left_downard_harpoon_arrow_1d7b3d2e": {
-        "message": "Left Downard Harpoon Arrow"
+        "message": "Bal lefelé mutató szigonynyíl"
     },
     "left_floor_29ac2274": {
-        "message": "Left Floor"
+        "message": "Bal kerekítés (alsó)"
     },
     "left_to_right_e9b4fd06": {
         "message": "Balról jobbra"
     },
     "left_upward_harpoon_arrow_3a562a96": {
-        "message": "Left Upward Harpoon Arrow"
+        "message": "Bal felfelé mutató szigonynyíl"
     },
     "leftward_arrow_1e4765de": {
-        "message": "Leftward Arrow"
+        "message": "Balra mutató nyíl"
     },
     "leftward_pointing_triangle_d14532ce": {
-        "message": "Leftward Pointing Triangle"
+        "message": "Balra mutató háromszög"
     },
     "less_than_a26c0641": {
-        "message": "Less Than"
+        "message": "Kevesebb, mint"
     },
     "less_than_or_equal_be5216cb": {
-        "message": "Less Than Or Equal"
+        "message": "Kevesebb, mint vagy egyenlő"
     },
     "library_icon_ae1e54cf": {
-        "message": "Library Icon"
+        "message": "Könyvtár ikon"
     },
     "light_blue_5374f600": {
         "message": "Világoskék"
@@ -1308,7 +1293,7 @@
         "message": "Töltődik"
     },
     "loading_closed_captions_subtitles_failed_95ceef47": {
-        "message": "loading closed captions/subtitles failed."
+        "message": "a feliratok betöltése nem sikerült."
     },
     "loading_failed_b3524381": {
         "message": "Sikertelen betöltés..."
@@ -1332,7 +1317,7 @@
         "message": "Betöltés, kérjük, várjon"
     },
     "loading_preview_9f077aa1": {
-        "message": "Loading preview"
+        "message": "Előnézet betöltése"
     },
     "location_3b6ff307": {
         "message": "Helyszín:"
@@ -1341,22 +1326,22 @@
         "message": "Zárolva"
     },
     "logical_equivalence_76fca396": {
-        "message": "Logical Equivalence"
+        "message": "Logikai ekvivalencia"
     },
     "logical_equivalence_short_8efd7b4f": {
-        "message": "Logical Equivalence (Short)"
+        "message": "Logikai ekvivalencia (rövid)"
     },
     "logical_equivalence_short_and_thick_1e1f654d": {
-        "message": "Logical Equivalence (Short And Thick)"
+        "message": "Logikai ekvivalencia (rövid és vastag)"
     },
     "logical_equivalence_thick_662dd3f2": {
-        "message": "Logical Equivalence (Thick)"
+        "message": "Logikai ekvivalencia (vastag)"
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Úgy tűnik, itt nincsen semmi."
     },
     "low_horizontal_dots_cc08498e": {
-        "message": "Low Horizontal Dots"
+        "message": "Alacsony vízszintes pontok"
     },
     "macedonian_6ed541af": {
         "message": "Macedón"
@@ -1374,25 +1359,25 @@
         "message": "Māori (New Zealand)"
     },
     "maps_to_e5ef7382": {
-        "message": "Maps To"
+        "message": "Térképek ide"
     },
     "math_ede93050": {
         "message": "Math"
     },
     "math_icon_ad4e9d03": {
-        "message": "Math Icon"
+        "message": "Matek ikon"
     },
     "media_af190855": {
         "message": "Média"
     },
     "media_file_is_processing_please_try_again_later_58a6d49": {
-        "message": "Media file is processing. Please try again later."
+        "message": "A médiafájl feldolgozás alatt áll. Kérlek, próbáld újra később."
     },
     "medium_5a8e9ead": {
         "message": "Közepes"
     },
     "middle_27dc1d5": {
-        "message": "Middle"
+        "message": "Középső"
     },
     "minimize_file_preview_da911944": {
         "message": "Fájl előnézet méretének csökkentése"
@@ -1401,10 +1386,10 @@
         "message": "Videó méretének csökkentése"
     },
     "minus_fd961e2e": {
-        "message": "Minus"
+        "message": "Mínusz"
     },
     "minus_plus_3461f637": {
-        "message": "Minus/Plus"
+        "message": "Mínusz/Plusz"
     },
     "misc_3b692ea7": {
         "message": "Egyéb"
@@ -1425,16 +1410,13 @@
         "message": "Mu"
     },
     "multi_color_image_63d7372f": {
-        "message": "Multi Color Image"
+        "message": "Többszínű kép"
     },
     "multiplication_sign_15f95c22": {
-        "message": "Multiplication Sign"
+        "message": "Szorzás jele"
     },
     "music_icon_4db5c972": {
-        "message": "Music Icon"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Must be at least { percentage }%"
+        "message": "Zene Ikon"
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Legalább { width } x { height } pixel szükséges"
@@ -1446,7 +1428,7 @@
         "message": "Az én értékeléseim"
     },
     "n_th_root_9991a6e4": {
-        "message": "N-th Root"
+        "message": "N-edik gyök"
     },
     "nabla_1e216d25": {
         "message": "Nabla"
@@ -1454,23 +1436,20 @@
     "name_1aed4a1b": {
         "message": "Név"
     },
-    "name_color_ceec76ff": {
-        "message": "{ name } ({ color })"
-    },
     "natural_music_54a70258": {
-        "message": "Natural (Music)"
+        "message": "Természetes (zene)"
     },
     "natural_numbers_3da07060": {
-        "message": "Natural Numbers"
+        "message": "Természetes számok"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigáljon a menün vagy eszköztáron át"
     },
     "nested_greater_than_d852e60d": {
-        "message": "Nested Greater Than"
+        "message": "Beágyazott nagyobb, mint"
     },
     "nested_less_than_27d17e58": {
-        "message": "Nested Less Than"
+        "message": "Beágyazott kevesebb, mint"
     },
     "new_13daf639": {
         "message": "Új"
@@ -1491,7 +1470,7 @@
         "message": "Következő oldal"
     },
     "no_changes_to_save_d29f6e91": {
-        "message": "No changes to save."
+        "message": "Nincs mentendő módosítás."
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nincs hozzárendelve esedékességi dátum"
@@ -1521,7 +1500,7 @@
         "message": "Nincs"
     },
     "none_selected_b93d56d2": {
-        "message": "None Selected"
+        "message": "Egy sincs kiválasztva"
     },
     "norwegian_53f391ec": {
         "message": "Norvég"
@@ -1530,31 +1509,31 @@
         "message": "Norwegian Bokmål"
     },
     "norwegian_nynorsk_c785f8a6": {
-        "message": "Norwegian Nynorsk"
+        "message": "norvég Nynorsk"
     },
     "not_equal_6e2980e6": {
-        "message": "Not Equal"
+        "message": "Nem egyenlő"
     },
     "not_in_not_an_element_of_fb1ffb54": {
-        "message": "Not In (Not An Element Of)"
+        "message": "Nincs benne (nem egy eleme)"
     },
     "not_negation_1418ebb8": {
-        "message": "Not (Negation)"
+        "message": "Nem (tagadás)"
     },
     "not_subset_dc2b5e84": {
-        "message": "Not Subset"
+        "message": "Nem részhalmaz"
     },
     "not_subset_strict_23d282bf": {
-        "message": "Not Subset (Strict)"
+        "message": "Nem részhalmaz (szigorú)"
     },
     "not_superset_5556b913": {
-        "message": "Not Superset"
+        "message": "Nem Superset"
     },
     "not_superset_strict_24e06f36": {
-        "message": "Not Superset (Strict)"
+        "message": "Nem szuperkészlet (szigorú)"
     },
     "nothing_due_this_week_d45c9ef9": {
-        "message": "Nothing Due This Week"
+        "message": "Ezen a héten semmi sem esedékes"
     },
     "nothing_for_now_e3e3ce2a": {
         "message": "Egyelőre semmi"
@@ -1584,28 +1563,28 @@
         "message": "{ numPoints } pont"
     },
     "octagon_e48be9f": {
-        "message": "Octagon"
+        "message": "Nyolcszög"
     },
     "olive_6a3e4d6b": {
-        "message": "Olive"
+        "message": "Olajbogyó"
     },
     "omega_8f2c3463": {
         "message": "Omega"
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
-        "message": "One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image"
+        "message": "Az ikonok mentéséhez a következő stílusok egyikét kell hozzáadni: Ikon színe, Körvonal mérete, Ikon szövege vagy Kép"
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Csak a legutóbbi értékelési periódus látható."
     },
     "open_circle_e9bd069": {
-        "message": "Open Circle"
+        "message": "Nyitott kör"
     },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Nyissa meg a billentyűkombinációk párbeszédablakot"
     },
     "open_title_application_fd624fc5": {
-        "message": "Open { title } application"
+        "message": "Nyissa meg a { title } alkalmazást"
     },
     "operators_a2ef9a93": {
         "message": "Műveletek"
@@ -1626,10 +1605,10 @@
         "message": "További szerkesztési billentyűparancsokat találhat a következő helyen"
     },
     "outline_color_3ef2cea7": {
-        "message": "Outline Color"
+        "message": "Vázlat színe"
     },
     "outline_size_a6059a21": {
-        "message": "Outline Size"
+        "message": "Vázlat mérete"
     },
     "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
         "message": "{ p } nem egy érvényes protokoll; lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható"
@@ -1644,13 +1623,13 @@
         "message": "Bekezdés"
     },
     "parallel_d55d6e38": {
-        "message": "Parallel"
+        "message": "Párhuzamos"
     },
     "partial_derivative_4a9159df": {
-        "message": "Partial (Derivative)"
+        "message": "Részleges (származék)"
     },
     "paste_5963d1c1": {
-        "message": "Paste"
+        "message": "Beillesztés"
     },
     "peer_review_74f26a13": {
         "message": "Társértékelés"
@@ -1668,49 +1647,46 @@
         "message": "Százalék"
     },
     "percentage_must_be_a_number_8033c341": {
-        "message": "Percentage must be a number"
+        "message": "A százaléknak számnak kell lennie"
     },
     "performing_arts_icon_f3497486": {
-        "message": "Performing Arts Icon"
+        "message": "Előadóművészeti ikon"
     },
     "perpendicular_7c48ede4": {
-        "message": "Perpendicular"
+        "message": "Merőleges"
     },
     "persian_a8cadb95": {
-        "message": "Persian"
+        "message": "perzsa"
     },
     "phi_4ac33b6d": {
         "message": "Phi"
     },
     "phi_variant_c9bb3ac5": {
-        "message": "Phi (Variant)"
+        "message": "Phi (változat)"
     },
     "physical_education_icon_d7dffd3e": {
-        "message": "Physical Education Icon"
+        "message": "Testnevelés ikon"
     },
     "pi_dc4f0bd8": {
         "message": "Pi"
     },
     "pi_variant_10f5f520": {
-        "message": "Pi (Variant)"
+        "message": "Pi (változat)"
     },
     "pink_68ad45cb": {
         "message": "Rózsaszín"
     },
     "pixels_52ece7d1": {
-        "message": "Pixels"
+        "message": "Pixelek"
     },
     "play_media_comment_35257210": {
-        "message": "Play media comment."
-    },
-    "play_media_comment_by_name_from_createdat_c230123d": {
-        "message": "Play media comment by { name } from { createdAt }."
+        "message": "Média megjegyzés lejátszása."
     },
     "plus_d43cd4ec": {
-        "message": "Plus"
+        "message": "Plusz"
     },
     "plus_minus_f8be2e83": {
-        "message": "Plus/Minus"
+        "message": "Plusz minusz"
     },
     "points_bceb5005": {
         "message": "pontszám"
@@ -1728,13 +1704,13 @@
         "message": "Közzétéve: { when }"
     },
     "power_set_4f26f316": {
-        "message": "Power Set"
+        "message": "Hatványhalmaz"
     },
     "precedes_196b9aef": {
-        "message": "Precedes"
+        "message": "Megelőzi"
     },
     "precedes_equal_20701e84": {
-        "message": "Precedes Equal"
+        "message": "Megelőzi az egyenlőt"
     },
     "preformatted_d0670862": {
         "message": "Előre formázott"
@@ -1743,10 +1719,10 @@
         "message": "Előnézet"
     },
     "preview_in_overlay_ed772c46": {
-        "message": "Preview in overlay"
+        "message": "Előnézet a fedvényben"
     },
     "preview_inline_9787330": {
-        "message": "Preview inline"
+        "message": "Soron belüli előnézet"
     },
     "previous_month_bb1e3c84": {
         "message": "Előző hónap"
@@ -1755,16 +1731,16 @@
         "message": "Előző oldal"
     },
     "prime_917ea60e": {
-        "message": "Prime"
+        "message": "Prím"
     },
     "prime_numbers_13464f61": {
-        "message": "Prime Numbers"
+        "message": "Prímszámok"
     },
     "product_39cf144f": {
-        "message": "Product"
+        "message": "Szorzat"
     },
     "proportional_f02800cc": {
-        "message": "Proportional"
+        "message": "Arányos"
     },
     "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
         "message": "A protokoll lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható "
@@ -1788,7 +1764,7 @@
         "message": "Lila"
     },
     "quaternions_877024e0": {
-        "message": "Quaternions"
+        "message": "Kvaterniók"
     },
     "quiz_e0dcce8f": {
         "message": "Kvíz"
@@ -1797,13 +1773,13 @@
         "message": "Kvízek"
     },
     "rational_numbers_80ddaa4a": {
-        "message": "Rational Numbers"
+        "message": "Racionális számok"
     },
     "real_numbers_7c99df94": {
-        "message": "Real Numbers"
+        "message": "Valós számok"
     },
     "real_portion_of_complex_number_7dad33b5": {
-        "message": "Real Portion (of Complex Number)"
+        "message": "Valódi rész (a komplex számból)"
     },
     "record_7c9448b": {
         "message": "Felvétel"
@@ -1815,13 +1791,13 @@
         "message": "Vörös"
     },
     "redo_363c58b7": {
-        "message": "Redo"
+        "message": "Újra"
     },
     "relationships_6602af70": {
         "message": "Kapcsolatok"
     },
     "religion_icon_246e0be1": {
-        "message": "Religion Icon"
+        "message": "Vallás ikon"
     },
     "reminder_date_4564d12d": {
         "message": "Emlékeztető: { date }"
@@ -1839,7 +1815,7 @@
         "message": "Visszaállítás"
     },
     "resize_ec83d538": {
-        "message": "Resize"
+        "message": "Átméretezés"
     },
     "restore_auto_save_deccd84b": {
         "message": "Visszaállítás automatikus mentésből?"
@@ -1851,79 +1827,79 @@
         "message": "Rho"
     },
     "rho_variant_415245cd": {
-        "message": "Rho (Variant)"
+        "message": "Rho (változat)"
     },
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
     },
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-        "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
+        "message": "Rich Text terület. A Rich Content Editor parancsikonjaihoz nyomja meg az ALT+0 billentyűkombinációt."
     },
     "right_align_39e7a32a": {
-        "message": "Right Align"
+        "message": "Jobbra igazítás"
     },
     "right_angle_bracket_d704e2d6": {
-        "message": "Right Angle Bracket"
+        "message": "Jobb csúcsos zárójel"
     },
     "right_arrow_35e0eddf": {
-        "message": "Right Arrow"
+        "message": "Jobb nyíl"
     },
     "right_arrow_with_hook_29d92d31": {
-        "message": "Right Arrow With Hook"
+        "message": "Jobbra Nyíl Horoggal"
     },
     "right_ceiling_839dc744": {
-        "message": "Right Ceiling"
+        "message": "Jobb kerekítés (felső)"
     },
     "right_curly_brace_5159d5cd": {
-        "message": "Right Curly Brace"
+        "message": "Jobb kapcsos zárójel"
     },
     "right_downward_harpoon_arrow_d71b114f": {
-        "message": "Right Downward Harpoon Arrow"
+        "message": "Jobbra lefelé mutató szigonynyíl"
     },
     "right_floor_5392d5cf": {
-        "message": "Right Floor"
+        "message": "Jobb kerekítés (alsó)"
     },
     "right_to_left_9cfb092a": {
         "message": "Jobbról balra"
     },
     "right_upward_harpoon_arrow_f5a34c73": {
-        "message": "Right Upward Harpoon Arrow"
+        "message": "Jobb felfelé szigony nyíl"
     },
     "rightward_arrow_32932107": {
-        "message": "Rightward Arrow"
+        "message": "Jobbra nyíl"
     },
     "rightward_pointing_triangle_60330f5c": {
-        "message": "Rightward Pointing Triangle"
+        "message": "Jobbra mutató háromszög"
     },
     "romanian_13670c1e": {
         "message": "Román"
     },
     "rotate_image_90_degrees_2ab77c05": {
-        "message": "Rotate image -90 degrees"
+        "message": "Kép elforgatása -90 fokkal"
     },
     "rotate_image_90_degrees_6c92cd42": {
-        "message": "Rotate image 90 degrees"
+        "message": "Kép elforgatása 90 fokkal"
     },
     "rotation_9699c538": {
-        "message": "Rotation"
+        "message": "Forgatás"
     },
     "russian_1e3e197": {
         "message": "Orosz"
     },
     "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
-        "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
+        "message": "Sajnos a szép HTML-szerkesztő nem érhető el billentyűzettel. Itt érheti el a nyers HTML-szerkesztőt."
     },
     "save_11a80ec3": {
         "message": "Mentés"
     },
     "saved_icon_maker_icons_df86e2a1": {
-        "message": "Saved Icon Maker Icons"
+        "message": "Mentett Icon Maker ikonok"
     },
     "schedule_preview_3bcda153": {
-        "message": "Schedule Preview"
+        "message": "Ütemezési előnézet"
     },
     "science_8d92214a": {
-        "message": "Science"
+        "message": "Tudomány"
     },
     "script_l_42a7b254": {
         "message": "Script L"
@@ -1941,7 +1917,7 @@
         "message": "Kifejezés keresése"
     },
     "select_crop_shape_d441feeb": {
-        "message": "Select crop shape"
+        "message": "Válassza ki a kivágás alakját"
     },
     "select_language_7c93a900": {
         "message": "Válasszon nyelvet"
@@ -1950,25 +1926,25 @@
         "message": "Kiválasztva"
     },
     "selected_linkfilename_c093b1f2": {
-        "message": "Selected { linkFileName }"
+        "message": "Kijelölve: { linkFileName }"
     },
     "serbian_7187f1f2": {
         "message": "Szerb"
     },
     "set_minus_b46e9b88": {
-        "message": "Set Minus"
+        "message": "Mínusz beállítása"
     },
     "sharp_music_ab956814": {
-        "message": "Sharp (Music)"
+        "message": "Kettőskereszt (zene)"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
-        "message": "Shift-O to open the pretty html editor."
+        "message": "Shift-O a szép html-szerkesztő megnyitásához."
     },
     "show_all_ae37d610": {
         "message": "Összes megjelenítése"
     },
     "show_audio_options_b489926b": {
-        "message": "Show audio options"
+        "message": "Hangbeállítások megjelenítése"
     },
     "show_image_options_1e2ecc6b": {
         "message": "Képbeállítások mutatása"
@@ -1986,19 +1962,16 @@
         "message": "Sigma"
     },
     "sigma_variant_8155625": {
-        "message": "Sigma (Variant)"
+        "message": "Sigma (változat)"
     },
     "single_color_image_4e5d4dbc": {
-        "message": "Single Color Image"
+        "message": "Egyszínű kép"
     },
     "single_color_image_color_95fa9a87": {
-        "message": "Single Color Image Color"
+        "message": "Egyszínű kép színe"
     },
     "size_b30e1077": {
         "message": "Méret"
-    },
-    "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
-        "message": "Size of caption file is greater than the maximum { max } kb allowed file size."
     },
     "slovak_69f48e1b": {
         "message": "Szlovák"
@@ -2010,10 +1983,10 @@
         "message": "Kicsi"
     },
     "social_studies_13fa30c7": {
-        "message": "Social Studies"
+        "message": "Társadalom kutatások"
     },
     "solid_circle_9f061dfc": {
-        "message": "Solid Circle"
+        "message": "Kitöltött kör"
     },
     "something_went_wrong_89195131": {
         "message": "Hiba történt!"
@@ -2022,52 +1995,52 @@
         "message": "Hiba történt! Nem tudom, mit mutassak."
     },
     "something_went_wrong_check_your_connection_reload__c7868286": {
-        "message": "Something went wrong. Check your connection, reload the page, and try again."
+        "message": "Valami elromlott. Ellenőrizze a kapcsolatot, töltse be újra az oldalt, és próbálja újra."
     },
     "something_went_wrong_d238c551": {
         "message": "Hiba történt!"
     },
     "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-        "message": "Sorry, we don''t know how to paste that"
+        "message": "Sajnáljuk, nem tudjuk, hogyan kell beilleszteni"
     },
     "sorry_we_don_t_support_multiple_files_fb9478b0": {
-        "message": "Sorry, we don''t support multiple files."
+        "message": "Sajnáljuk, nem támogatunk több fájlt."
     },
     "sort_by_e75f9e3e": {
         "message": "Rendezés alapja"
     },
     "spades_suit_b37020c2": {
-        "message": "Spades (Suit)"
+        "message": "Treff (kártyszín)"
     },
     "spanish_de9de5d6": {
         "message": "Spanyol"
     },
     "square_511eb3b3": {
-        "message": "Square"
+        "message": "Négyzet"
     },
     "square_cap_9ec88646": {
-        "message": "Square Cap"
+        "message": "Négyzet alakú sapka"
     },
     "square_cup_b0665113": {
-        "message": "Square Cup"
+        "message": "Négyzetes kupa"
     },
     "square_root_e8bcbc60": {
-        "message": "Square Root"
+        "message": "Négyzetgyök"
     },
     "square_root_symbol_d0898a53": {
-        "message": "Square Root Symbol"
+        "message": "Négyzetgyök szimbólum"
     },
     "square_subset_17be67cb": {
-        "message": "Square Subset"
+        "message": "Négyzetes részhalmaz (szigorú)"
     },
     "square_subset_strict_7044e84f": {
-        "message": "Square Subset (Strict)"
+        "message": "Négyzetes részhalmaz (szigorú)"
     },
     "square_superset_3be8dae1": {
-        "message": "Square Superset"
+        "message": "Négyzetes csoporthalmaz"
     },
     "square_superset_strict_fa4262e4": {
-        "message": "Square Superset (Strict)"
+        "message": "Négyzetes csoporthalmaz (szigorú)"
     },
     "star_8d156e09": {
         "message": "Csillagozás"
@@ -2085,10 +2058,10 @@
         "message": "{ startTime }-tól/től { endTime }-ig"
     },
     "steel_blue_14296f08": {
-        "message": "Steel Blue"
+        "message": "Acélkék"
     },
     "student_to_do_c018c835": {
-        "message": "Student To Do"
+        "message": "Diák tennivaló"
     },
     "styles_2aa721ef": {
         "message": "Stílusok"
@@ -2103,34 +2076,34 @@
         "message": "alsó index"
     },
     "subset_19c1a92f": {
-        "message": "Subset"
+        "message": "Részhalmaz"
     },
     "subset_strict_8d8948d6": {
-        "message": "Subset (Strict)"
+        "message": "részhalmaz (szigorú)"
     },
     "succeeds_9cc31be9": {
-        "message": "Succeeds"
+        "message": "Sikerül"
     },
     "succeeds_equal_158e8c3a": {
-        "message": "Succeeds Equal"
+        "message": "Siker egyenlő"
     },
     "success_to_do_created_e34ed395": {
         "message": "Sikerült: tennivaló létrehozva"
     },
     "sum_b0842d31": {
-        "message": "Sum"
+        "message": "Összeg"
     },
     "superscript_8cb349a2": {
         "message": "felső index"
     },
     "superscript_and_subscript_37f94a50": {
-        "message": "Superscript and Subscript"
+        "message": "Felső index és alsó index"
     },
     "superset_c4db8a7a": {
-        "message": "Superset"
+        "message": "Csoporthalmaz"
     },
     "superset_strict_c77dd6d2": {
-        "message": "Superset (Strict)"
+        "message": "Csoporthalmaz (szigorú)"
     },
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Támogatott fájltípusok: SRT vagy WebVTT"
@@ -2142,16 +2115,16 @@
         "message": "Svéd"
     },
     "switch_to_pretty_html_editor_a3cee15f": {
-        "message": "Switch to pretty HTML Editor"
+        "message": "Váltson a szép HTML-szerkesztőre"
     },
     "switch_to_raw_html_editor_f970ae1a": {
-        "message": "Switch to raw HTML Editor"
+        "message": "Váltson a nyers HTML-szerkesztőre"
     },
     "switch_to_the_html_editor_146dfffd": {
-        "message": "Switch to the html editor"
+        "message": "Váltson át a html szerkesztőre"
     },
     "switch_to_the_rich_text_editor_63c1ecf6": {
-        "message": "Switch to the rich text editor"
+        "message": "Váltson a rich text szerkesztőre"
     },
     "syllabus_f191f65b": {
         "message": "Tematika"
@@ -2175,25 +2148,25 @@
         "message": "Szöveg"
     },
     "text_background_color_16e61c3f": {
-        "message": "Text Background Color"
+        "message": "Szöveg háttérszíne"
     },
     "text_color_acf75eb6": {
-        "message": "Text Color"
+        "message": "Szöveg szín"
     },
     "text_optional_384f94f7": {
-        "message": "Text (optional)"
+        "message": "Szöveg (nem kötelező)"
     },
     "text_position_8df8c162": {
-        "message": "Text Position"
+        "message": "Szöveg pozíciója"
     },
     "text_size_887c2f6": {
-        "message": "Text Size"
+        "message": "Szövegméret"
     },
     "thai_8f9bc548": {
         "message": "Thai"
     },
     "the_best_assignment_15e98be1": {
-        "message": "The best assignment"
+        "message": "A legjobb feladat"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Ekkorra kell megcsinálni ezt"
@@ -2211,40 +2184,40 @@
         "message": "Az anyag kivételt képez- pl. tisztességes felhasználás, árajánlási jog vagy mások a vonatkozó szerzői jogi törvények alapján"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
-        "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor."
+        "message": "A szép html-szerkesztő nem érhető el billentyűzettel. Nyomja meg a Shift O billentyűt a nyers html szerkesztő megnyitásához."
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Ehhez az elemhez nincsenek pontok rendelve."
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "There is nothing planned for today."
+        "message": "Mára nincs tervben semmi."
     },
     "therefore_d860e024": {
-        "message": "Therefore"
+        "message": "Ezért"
     },
     "theta_ce2d2350": {
         "message": "Theta"
     },
     "theta_variant_fff6da6f": {
-        "message": "Theta (Variant)"
+        "message": "Theta (változat)"
     },
     "thick_downward_arrow_b85add4c": {
-        "message": "Thick Downward Arrow"
+        "message": "Vastag Lefelé nyíl"
     },
     "thick_left_arrow_d5f3e925": {
-        "message": "Thick Left Arrow"
+        "message": "Vastag bal nyíl"
     },
     "thick_leftward_arrow_6ab89880": {
-        "message": "Thick Leftward Arrow"
+        "message": "Vastag balra nyíl"
     },
     "thick_right_arrow_3ed5e8f7": {
-        "message": "Thick Right Arrow"
+        "message": "Vastag jobbra nyíl"
     },
     "thick_rightward_arrow_a2e1839e": {
-        "message": "Thick Rightward Arrow"
+        "message": "Vastag jobbra nyíl"
     },
     "thick_upward_arrow_acd20328": {
-        "message": "Thick Upward Arrow"
+        "message": "Vastag Felfelé nyíl"
     },
     "this_document_cannot_be_displayed_within_canvas_7aba77be": {
         "message": "Ezt a dokumentumot nem lehet megtekinteni a Canvasban. "
@@ -2253,7 +2226,7 @@
         "message": "Ezt az egyenletet nem lehet megjeleníteni alapnézetben."
     },
     "this_image_is_currently_unavailable_25c68857": {
-        "message": "This image is currently unavailable"
+        "message": "Ez a kép jelenleg nem érhető el"
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Bár a videója a megfelelő címmel jelenik majd meg a böngészőben, az adatbázisban nem sikerült frissíteni."
@@ -2288,11 +2261,8 @@
     "today_at_date_8ac30d6": {
         "message": "Ma ekkor: { date }"
     },
-    "toggle_summary_group_413df9ac": {
-        "message": "Toggle { summary } group"
-    },
     "toggle_tooltip_d3b7cb86": {
-        "message": "Toggle tooltip"
+        "message": "Eszköztipp váltása"
     },
     "tomorrow_9a6c9a00": {
         "message": "Holnap"
@@ -2313,13 +2283,13 @@
         "message": "Tálca"
     },
     "triangle_6072304e": {
-        "message": "Triangle"
+        "message": "Háromszög"
     },
     "turkish_5b69578b": {
         "message": "Török"
     },
     "turnstile_yields_f9e76df1": {
-        "message": "Turnstile (Yields)"
+        "message": "Forgóajtó (hozamok)"
     },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "Nyomjon Control F9-et a kép opciók eléréséhez { text }"
@@ -2337,19 +2307,19 @@
         "message": "Nem lehet készként megjelölni."
     },
     "union_e6b57a53": {
-        "message": "Union"
+        "message": "Unió"
     },
     "unpublished_dfd8801": {
         "message": "nem publikált"
     },
     "untitled_efdc2d7d": {
-        "message": "untitled"
+        "message": "névtelen"
     },
     "up_and_left_diagonal_arrow_e4a74a23": {
-        "message": "Up And Left Diagonal Arrow"
+        "message": "Fel és Balra Átlós Nyíl"
     },
     "up_and_right_diagonal_arrow_935b902e": {
-        "message": "Up And Right Diagonal Arrow"
+        "message": "Felfelé és Jobbra Átlós Nyíl"
     },
     "upload_document_253f0478": {
         "message": "Dokumentum feltöltése"
@@ -2370,52 +2340,52 @@
         "message": "Feltöltés"
     },
     "uppercase_delta_d4f4bc41": {
-        "message": "Uppercase Delta"
+        "message": "Delta nagybetűvel"
     },
     "uppercase_gamma_86f492e9": {
-        "message": "Uppercase Gamma"
+        "message": "Gamma nagybetűvel"
     },
     "uppercase_lambda_c78d8ed4": {
-        "message": "Uppercase Lambda"
+        "message": "Nagybetűs Lambda"
     },
     "uppercase_omega_8aedfa2": {
-        "message": "Uppercase Omega"
+        "message": "Nagy Omega"
     },
     "uppercase_phi_caa36724": {
-        "message": "Uppercase Phi"
+        "message": "nagybetűs Phi"
     },
     "uppercase_pi_fcc70f5e": {
-        "message": "Uppercase Pi"
+        "message": "Nagy Pi"
     },
     "uppercase_psi_6395acbe": {
-        "message": "Uppercase Psi"
+        "message": "Nagy Psi"
     },
     "uppercase_sigma_dbb70e92": {
-        "message": "Uppercase Sigma"
+        "message": "Nagy Sigma"
     },
     "uppercase_theta_49afc891": {
-        "message": "Uppercase Theta"
+        "message": "Theta nagybetűvel"
     },
     "uppercase_upsilon_8c1e623e": {
-        "message": "Uppercase Upsilon"
+        "message": "Upsilon nagybetűvel"
     },
     "uppercase_xi_341e8556": {
-        "message": "Uppercase Xi"
+        "message": "Xi nagybetűvel"
     },
     "upsilon_33651634": {
         "message": "Upsilon"
     },
     "upward_and_downward_pointing_arrow_fa90a918": {
-        "message": "Upward And Downward Pointing Arrow"
+        "message": "Felfelé és Lefelé mutató nyíl"
     },
     "upward_and_downward_pointing_arrow_thick_d420fdef": {
-        "message": "Upward And Downward Pointing Arrow (Thick)"
+        "message": "Felfelé és lefelé mutató nyíl (vastag)"
     },
     "upward_arrow_9992cb2d": {
-        "message": "Upward Arrow"
+        "message": "Felfelé mutató nyíl"
     },
     "upward_pointing_triangle_d078d7cb": {
-        "message": "Upward Pointing Triangle"
+        "message": "Felfelé mutató háromszög"
     },
     "url_22a5f3b8": {
         "message": "URL"
@@ -2430,22 +2400,22 @@
         "message": "Használja a nyíl billentyűket az opció kiválasztására!"
     },
     "use_arrow_keys_to_select_a_shape_c8eb57ed": {
-        "message": "Use arrow keys to select a shape."
+        "message": "A nyílbillentyűkkel válasszon ki egy alakzatot."
     },
     "use_arrow_keys_to_select_a_size_699a19f4": {
-        "message": "Use arrow keys to select a size."
+        "message": "Használja a nyílbillentyűket a méret kiválasztásához."
     },
     "use_arrow_keys_to_select_a_text_position_72f9137c": {
-        "message": "Use arrow keys to select a text position."
+        "message": "A nyílbillentyűkkel válassza ki a szöveg pozícióját."
     },
     "use_arrow_keys_to_select_a_text_size_65e89336": {
-        "message": "Use arrow keys to select a text size."
+        "message": "A nyílbillentyűkkel válassza ki a szöveg méretét."
     },
     "use_arrow_keys_to_select_an_outline_size_e009d6b0": {
-        "message": "Use arrow keys to select an outline size."
+        "message": "A nyílbillentyűkkel válassza ki a körvonal méretét."
     },
     "used_by_screen_readers_to_describe_the_content_of__4f14b4e4": {
-        "message": "Used by screen readers to describe the content of an { TYPE }"
+        "message": "A képernyőolvasók egy { TYPE } tartalmának leírására használják"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Képernyőolvasók által egy kép tartalmának leírásához használt szöveg"
@@ -2466,13 +2436,13 @@
         "message": "A felhasználó médiafájljai"
     },
     "vector_notation_cf6086ab": {
-        "message": "Vector (Notation)"
+        "message": "Vektor (jelölés)"
     },
     "vertical_bar_set_builder_notation_4300495f": {
-        "message": "Vertical Bar (Set Builder Notation)"
+        "message": "Függőleges sáv (Set Builder Notation)"
     },
     "vertical_dots_bfb21f14": {
-        "message": "Vertical Dots"
+        "message": "Függőleges pontok"
     },
     "video_options_24ef6e5d": {
         "message": "Videóbeállítások"
@@ -2493,28 +2463,28 @@
         "message": "Megtekintés"
     },
     "view_description_30446afc": {
-        "message": "View description"
+        "message": "Leírás megtekintése"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "A gyors elérés billentyűkombinációk megtekintése"
     },
     "view_next_week_7f61f755": {
-        "message": "View next week"
+        "message": "Jövő hét megtekintése"
     },
     "view_previous_week_6f83849f": {
-        "message": "View previous week"
+        "message": "Az előző hét megtekintése"
     },
     "view_title_description_67940918": {
-        "message": "View { title } description"
+        "message": "Tekintse meg a { title } leírását"
     },
     "weekly_schedule_navigation_6b042645": {
-        "message": "Weekly schedule navigation"
+        "message": "Heti menetrend navigáció"
     },
     "welsh_42ab94b1": {
         "message": "Walesi"
     },
     "white_87fa64fd": {
-        "message": "White"
+        "message": "fehér"
     },
     "width_492fec76": {
         "message": "Szélesség"
@@ -2529,7 +2499,7 @@
         "message": "Wiki kezdőlap"
     },
     "wreath_product_200b38ef": {
-        "message": "Wreath Product"
+        "message": "Koszorú termék"
     },
     "xi_149681d0": {
         "message": "Xi"
@@ -2550,7 +2520,7 @@
         "message": "Önnek média visszajelzése van."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
-        "message": "You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?"
+        "message": "Nem mentett módosítások vannak az Ikonkészítő tálcán. Folytatja a változtatások mentése nélkül?"
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Nem tölthet fel egy üres fájlt."
@@ -2561,19 +2531,16 @@
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Elérte a legelső tennivalót!"
     },
-    "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
-        "message": "Your image has been compressed for Icon Maker. Images less than { size } KB will not be compressed."
-    },
     "zeta_5ef24f0e": {
         "message": "Zeta"
     },
     "zoom_f3e54d69": {
-        "message": "Zoom"
+        "message": "Zoomolás"
     },
     "zoom_in_image_bb97d4f": {
-        "message": "Zoom in image"
+        "message": "Kép nagyítása"
     },
     "zoom_out_image_d0a0a2ec": {
-        "message": "Zoom out image"
+        "message": "Kép kicsinyítése"
     }
 }
