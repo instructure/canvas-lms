@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if Account.site_admin.feature_enabled?(:lti_platform_storage) %>
+<% if Lti::PlatformStorage.flag_enabled? %>
   <%= iframe(
     lti_post_message_forwarding_url,
-    name: 'post_message_forwarding',
-    title: 'post_message_forwarding',
-    id: 'post_message_forwarding',
+    name: Lti::PlatformStorage::FORWARDING_TARGET,
+    title: Lti::PlatformStorage::FORWARDING_TARGET,
+    id: Lti::PlatformStorage::FORWARDING_TARGET,
     sandbox: "allow-scripts allow-same-origin",
     style: "display:none;"
   ) %>

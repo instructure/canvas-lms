@@ -39,7 +39,7 @@ module Lti
     after_action :set_extra_csp_frame_ancestor!
 
     def post_message_forwarding
-      unless flag_enabled?
+      unless Lti::PlatformStorage.flag_enabled?
         render status: :not_found
         return
       end
@@ -112,10 +112,6 @@ module Lti
 
     def current_domain
       request.base_url
-    end
-
-    def flag_enabled?
-      Account.site_admin.feature_enabled?(:lti_platform_storage)
     end
 
     def decoded_jwt
