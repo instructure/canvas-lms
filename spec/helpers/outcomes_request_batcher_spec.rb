@@ -76,25 +76,42 @@ describe OutcomesRequestBatcher do
       }
       batcher = OutcomesRequestBatcher.new("http", "endpoint", @course, "lmgb_results.show", params)
       requests = batcher.requests
-      expect(requests.size).to eq 8
+      expect(requests.size).to eq 16
 
+      # Splitting is a bit weird in regards to what parameter it picks to split. All of these are used for the
+      # expected_results array to make reading this test easier.
+      asset_ids_first_quarter = (1..250).to_a.join(",")
+      asset_ids_second_quarter = (251..500).to_a.join(",")
+      asset_ids_third_quarter = (501..750).to_a.join(",")
+      asset_ids_forth_quarter = (751..1000).to_a.join(",")
       asset_ids_first_half = (1..500).to_a.join(",")
-      outcome_ids_first_half = (1..500).to_a.join(",")
-      user_ids_first_half = (1..25).to_a.map { |x| "5Iiwic2NvcGUiOiJsbWdiX3Jlc3VsdHMuc2hvdyIsImV4cCI6MTY2O-#{x}" }.join(",")
 
-      asset_ids_last_half = (501..1000).to_a.join(",")
-      outcome_ids_last_half = (501..1000).to_a.join(",")
+      outcome_ids_third_quarter  = (501..750).to_a.join(",")
+      outcome_ids_forth_quarter  = (751..1000).to_a.join(",")
+      outcome_ids_first_half     = (1..500).to_a.join(",")
+      outcome_ids_last_half      = (501..1000).to_a.join(",")
+
+      user_ids_first_half = (1..25).to_a.map { |x| "5Iiwic2NvcGUiOiJsbWdiX3Jlc3VsdHMuc2hvdyIsImV4cCI6MTY2O-#{x}" }.join(",")
       user_ids_last_half = (26..49).to_a.map { |x| "5Iiwic2NvcGUiOiJsbWdiX3Jlc3VsdHMuc2hvdyIsImV4cCI6MTY2O-#{x}" }.join(",")
 
+      # Important thing is that all permutations are called
       expected_results = [
-        [asset_ids_first_half, outcome_ids_first_half, user_ids_first_half],
-        [asset_ids_first_half, outcome_ids_first_half, user_ids_last_half],
-        [asset_ids_first_half, outcome_ids_last_half, user_ids_first_half],
-        [asset_ids_first_half, outcome_ids_last_half, user_ids_last_half],
-        [asset_ids_last_half, outcome_ids_first_half, user_ids_first_half],
-        [asset_ids_last_half, outcome_ids_first_half, user_ids_last_half],
-        [asset_ids_last_half, outcome_ids_last_half, user_ids_first_half],
-        [asset_ids_last_half, outcome_ids_last_half, user_ids_last_half],
+        [asset_ids_first_quarter, outcome_ids_first_half, user_ids_first_half],
+        [asset_ids_second_quarter, outcome_ids_first_half, user_ids_first_half],
+        [asset_ids_first_quarter, outcome_ids_first_half, user_ids_last_half],
+        [asset_ids_second_quarter, outcome_ids_first_half, user_ids_last_half],
+        [asset_ids_first_half, outcome_ids_third_quarter, user_ids_first_half],
+        [asset_ids_first_half, outcome_ids_forth_quarter, user_ids_first_half],
+        [asset_ids_first_half, outcome_ids_third_quarter, user_ids_last_half],
+        [asset_ids_first_half, outcome_ids_forth_quarter, user_ids_last_half],
+        [asset_ids_third_quarter, outcome_ids_first_half, user_ids_first_half],
+        [asset_ids_forth_quarter, outcome_ids_first_half, user_ids_first_half],
+        [asset_ids_third_quarter, outcome_ids_first_half, user_ids_last_half],
+        [asset_ids_forth_quarter, outcome_ids_first_half, user_ids_last_half],
+        [asset_ids_third_quarter, outcome_ids_last_half, user_ids_first_half],
+        [asset_ids_forth_quarter, outcome_ids_last_half, user_ids_first_half],
+        [asset_ids_third_quarter, outcome_ids_last_half, user_ids_last_half],
+        [asset_ids_forth_quarter, outcome_ids_last_half, user_ids_last_half],
       ]
 
       requests.each_with_index do |request, index|
