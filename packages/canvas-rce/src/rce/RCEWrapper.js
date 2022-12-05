@@ -265,7 +265,6 @@ class RCEWrapper extends React.Component {
     trayProps: trayPropTypes,
     toolbar: toolbarPropType,
     menu: menuPropType,
-    plugins: PropTypes.arrayOf(PropTypes.string),
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
@@ -359,6 +358,8 @@ class RCEWrapper extends React.Component {
         .filter(e => e.favorite)
         .map(e => `instructure_external_button_${e.id}`)
         .slice(0, 2) || []
+
+    this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
 
     this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
 
@@ -1454,7 +1455,6 @@ class RCEWrapper extends React.Component {
           'instructure_documents',
           'instructure_equation',
           'instructure_external_tools',
-          'instructure_wordcount',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
@@ -1605,6 +1605,13 @@ class RCEWrapper extends React.Component {
       toolbar_mode: 'floating',
       toolbar_sticky: true,
 
+      // In regards to the ability to disable plugins:
+      // we only have to explicitly manage the removal of plugins
+      // here, i.e., we don't have to explicitly remove them from the
+      // menu and toolbar merging. At this time, tinymce itself
+      // handles all of that complexity. It that ever changes in the
+      // future in an upgraded version, we will have to update the
+      // logic in those other places as well.
       plugins: mergePlugins(
         [
           'autolink',
@@ -1623,10 +1630,13 @@ class RCEWrapper extends React.Component {
           'instructure_external_tools',
           'a11y_checker',
           'wordcount',
+          'instructure_wordcount',
           rcsExists && RCEGlobals.getFeatures().rce_better_paste ? 'instructure_paste' : 'paste',
           ...canvasPlugins,
         ],
-        sanitizePlugins(options.plugins)
+        // filter out the plugins designated for removal
+        sanitizePlugins(options.plugins)?.filter(p => p.length > 0 && p[0] !== '-'),
+        this.pluginsToExclude
       ),
       textpattern_patterns: [
         {start: '* ', cmd: 'InsertUnorderedList'},
@@ -1902,6 +1912,7 @@ class RCEWrapper extends React.Component {
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
           onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
+          disabledPlugins={this.pluginsToExclude}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
@@ -1995,15 +2006,29 @@ function mergeToolbar(standard, custom) {
 
 // standard: incoming array of plugin names
 // custom: array of plugin names to merge
-// returns: the merged result, duplicates removed
-function mergePlugins(standard, custom) {
-  if (!custom) return standard
-
+// exclusions: array of plugins to remove
+// returns: the merged result, duplicates and exclusions removed
+function mergePlugins(standard, custom = [], exclusions = []) {
   const union = new Set(standard)
-  for (const p of custom) {
-    union.add(p)
+
+  for (const c of custom) {
+    union.add(c)
   }
+
+  for (const e of exclusions) {
+    union.delete(e)
+  }
+
   return [...union]
+}
+
+// plugins is an array of strings
+// the convention is that plugins starting with '-',
+// i.e. a hyphen, are to be disabled in the RCE instance
+function parsePluginsToExclude(plugins) {
+  return plugins
+    .filter(plugin => plugin.length > 0 && plugin[0] === '-')
+    .map(pluginToIgnore => pluginToIgnore.slice(1))
 }
 
 export default RCEWrapper
@@ -2015,4 +2040,5 @@ export {
   mergeMenu,
   mergeToolbar,
   mergePlugins,
+  parsePluginsToExclude,
 }
