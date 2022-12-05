@@ -27,6 +27,7 @@ import RCEWrapper, {
   mergeMenu,
   mergeToolbar,
   mergePlugins,
+  parsePluginsToExclude,
 } from '../../src/rce/RCEWrapper'
 
 const textareaId = 'myUniqId'
@@ -1235,23 +1236,31 @@ describe('RCEWrapper', () => {
         standardPlugins = ['foo', 'bar', 'baz']
       })
 
-      it('returns input of no custom plugins are provided', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        assert.deepStrictEqual(mergePlugins(a), a)
+      it('returns input if no custom or excluded plugins are provided', () => {
+        const standard = sleazyDeepCopy(standardPlugins)
+        assert.deepStrictEqual(mergePlugins(standard), standard)
       })
 
       it('merges items into the plugins', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        const b = ['fizz', 'buzz']
-        const result = standardPlugins.concat(b)
-        assert.deepStrictEqual(mergePlugins(a, b), result)
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['fizz', 'buzz']
+        const result = standardPlugins.concat(custom)
+        assert.deepStrictEqual(mergePlugins(standard, custom), result)
       })
 
       it('removes duplicates', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        const b = ['foo', 'fizz']
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['foo', 'fizz']
         const result = standardPlugins.concat(['fizz'])
-        assert.deepStrictEqual(mergePlugins(a, b), result)
+        assert.deepStrictEqual(mergePlugins(standard, custom), result)
+      })
+
+      it('removes plugins marked to exlude', () => {
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['foo', 'fizz']
+        const exclusions = ['fizz', 'baz']
+        const result = ['foo', 'bar']
+        assert.deepStrictEqual(mergePlugins(standard, custom, exclusions), result)
       })
     })
 
@@ -1264,6 +1273,14 @@ describe('RCEWrapper', () => {
       it('removes instructure_media from plugins if instRecordDisabled is set', () => {
         const instance = createBasicElement({instRecordDisabled: true})
         assert.ok(!instance.tinymceInitOptions.plugins.includes('instructure_record'))
+      })
+    })
+
+    describe('parsePluginsToExclude', () => {
+      it('returns cleaned versions of plugins prefixed with a hyphen', () => {
+        const plugins = ['-abc', 'def', '-ghi', 'jkl']
+        const result = ['abc', 'ghi']
+        assert.deepStrictEqual(parsePluginsToExclude(plugins), result)
       })
     })
   })

@@ -351,4 +351,30 @@ describe('RCE StatusBar', () => {
     a11yButton.click()
     expect(onA11yCallback).toHaveBeenCalled()
   })
+
+  describe('disabledPlugins', () => {
+    it('does not show the ally checker button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['ally_checker']})
+      const allyCheckerBtn = queryByRole('button', {name: /accessibility checker/i})
+      expect(allyCheckerBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the wordcount button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_wordcount']})
+      const wordCountBtn = queryByRole('button', {name: /0 words/i})
+      expect(wordCountBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the html view button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_html_view']})
+      const htmlViewBtn = queryByRole('button', {name: /switch to the html editor/i})
+      expect(htmlViewBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the fullscreen button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_fullscreen']})
+      const fullscreenBtn = queryByRole('button', {name: /fullscreen/i})
+      expect(fullscreenBtn).not.toBeInTheDocument()
+    })
+  })
 })
