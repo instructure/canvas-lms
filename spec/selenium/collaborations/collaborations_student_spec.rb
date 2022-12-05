@@ -94,4 +94,20 @@ describe "collaborations" do
       expect(ff("#collaborations .collaboration")).to have_size(1)
     end
   end
+
+  context "lti_collaborations" do
+    before do
+      course_with_teacher(active_all: true, name: "teacher@example.com")
+      student_in_course(course: @course, name: "Don Draper", active_all: true)
+      @course.account.set_feature_flag!(:new_collaborations, "on")
+      @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS_NEW, hidden: true }]
+      @course.save!
+    end
+
+    it "does not allow to navigate if page is disabled" do
+      user_session(@student)
+      get "/courses/#{@course.id}/lti_collaborations"
+      assert_flash_notice_message "That page has been disabled for this course"
+    end
+  end
 end

@@ -243,7 +243,7 @@ class CollaborationsController < ApplicationController
 
   def lti_index
     return unless authorized_action(@context, @current_user, :read) &&
-                  tab_enabled?(@context.class::TAB_COLLABORATIONS)
+                  tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW)
 
     @page_title = t("lti_collaborations", "External Collaborations")
     @body_classes << "full-width padless-content"
