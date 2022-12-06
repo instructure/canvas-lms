@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Rhannol (Deilliadol)"
     },
+    "paste_5963d1c1": {
+        "message": "Gludo"
+    },
     "peer_review_74f26a13": {
         "message": "Adolygiad gan Gyd-fyfyrwyr"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Aeth rhywbeth o’i le"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Yn anffodus, nid ydym ni’n gwybod sut i ludo hwn"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Yn anffodus, nid ydym ni’n gallu delio â mwy nag un ffeil."
     },
     "sort_by_e75f9e3e": {
         "message": "Trefnu yn ôl"

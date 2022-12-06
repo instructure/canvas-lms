@@ -504,6 +504,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
   "parallel_d55d6e38": { "message": "Paralèl" },
   "partial_derivative_4a9159df": { "message": "Pasyèl (Derive)" },
+  "paste_5963d1c1": { "message": "Kole" },
   "pentagon_17d82ea3": { "message": "Pentagòn" },
   "people_b4ebb13c": { "message": "Moun" },
   "percentage_34ab7c2c": { "message": "Pousantaj" },
@@ -634,6 +635,12 @@
     "message": "Gen yon bagay ki mal fèt. Verifye koneksyon ou, relanse paj la epi eseye ankò."
   },
   "something_went_wrong_d238c551": { "message": "Gen yon bagay ki pase mal" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Dezole, nou pa konn kijan pou nou kole sa a"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Dezole, nou pa rekonpet fichye miltip yo."
+  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "spades_suit_b37020c2": { "message": "Pik (Konbinezon)" },
   "square_511eb3b3": { "message": "Kare" },

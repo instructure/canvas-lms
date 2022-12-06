@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Parziale (derivato)"
     },
+    "paste_5963d1c1": {
+        "message": "Incolla"
+    },
     "peer_review_74f26a13": {
         "message": "Revisione paritaria"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Si è verificato un problema"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Spiacenti, non sappiamo come incollarlo"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Spiacenti, non supportiamo più file."
     },
     "sort_by_e75f9e3e": {
         "message": "Ordina per"

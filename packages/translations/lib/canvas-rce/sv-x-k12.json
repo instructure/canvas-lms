@@ -536,6 +536,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiell (derivat)" },
+  "paste_5963d1c1": { "message": "Klistra in" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personer" },
   "percentage_34ab7c2c": { "message": "Procent" },
@@ -670,6 +671,12 @@
     "message": "Någonting gick fel. Kontrollera din anslutning, läs in sidan igen och försök igen."
   },
   "something_went_wrong_d238c551": { "message": "Något gick fel" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Tyvärr, vi kan inte klistra in det"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Tyvärr, vi stöder inte flera filer."
+  },
   "sort_by_e75f9e3e": { "message": "Sortera efter" },
   "spades_suit_b37020c2": { "message": "Spader (kortlek)" },
   "square_511eb3b3": { "message": "Kvadrat" },

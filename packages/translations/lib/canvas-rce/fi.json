@@ -544,6 +544,7 @@
   "paragraph_5e5ad8eb": { "message": "Kappale" },
   "parallel_d55d6e38": { "message": "Rungon suuntainen" },
   "partial_derivative_4a9159df": { "message": "Osittainen (johdannainen)" },
+  "paste_5963d1c1": { "message": "Liitä" },
   "pentagon_17d82ea3": { "message": "Viisikulmio" },
   "people_b4ebb13c": { "message": "Henkilöt" },
   "percentage_34ab7c2c": { "message": "Prosenttimäärä" },
@@ -678,6 +679,12 @@
     "message": "Jotakin meni pieleen. Tarkista yhteytesi, lataa sivu uudelleen ja yritä uudelleen."
   },
   "something_went_wrong_d238c551": { "message": "Jotakin meni pieleen." },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Pahoittelut, emme tiedä, kuinka liittää tuo"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Pahoittelut, emme tue useita tiedostoja."
+  },
   "sort_by_e75f9e3e": { "message": "Lajitteluperuste" },
   "spades_suit_b37020c2": { "message": "Pata (suit)" },
   "square_511eb3b3": { "message": "Neliö" },

@@ -548,6 +548,7 @@
   "paragraph_5e5ad8eb": { "message": "Alinea" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiële afgeleide" },
+  "paste_5963d1c1": { "message": "Plakken" },
   "pentagon_17d82ea3": { "message": "Vijfhoek" },
   "people_b4ebb13c": { "message": "Personen" },
   "percentage_34ab7c2c": { "message": "Percentage" },
@@ -688,6 +689,12 @@
     "message": "Er is iets misgegaan. Controleer je verbinding, laad de pagina opnieuw en probeer het nog eens."
   },
   "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Helaas, we weten niet hoe we dat moeten plakken"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Helaas, we bieden geen ondersteuning voor meerdere bestanden."
+  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
   "square_511eb3b3": { "message": "Vierkant" },

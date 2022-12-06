@@ -512,6 +512,7 @@
   "paragraph_5e5ad8eb": { "message": "الفقرة" },
   "parallel_d55d6e38": { "message": "موازي" },
   "partial_derivative_4a9159df": { "message": "جزئي (مشتق)" },
+  "paste_5963d1c1": { "message": "لصق" },
   "pentagon_17d82ea3": { "message": "خماسي" },
   "people_b4ebb13c": { "message": "أشخاص" },
   "percentage_34ab7c2c": { "message": "نسبة مئوية" },
@@ -640,6 +641,12 @@
     "message": "حدث خطأ ما. تحقق من الاتصال وأعد تحميل الصفحة وأعد المحاولة."
   },
   "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "عذرًا، لا نعلم طريقة لصق هذا"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "عذرًا، لا مدعم ملفات متعددة."
+  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "مربع" },

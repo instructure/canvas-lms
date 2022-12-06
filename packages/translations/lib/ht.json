@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Pasyèl (Derive)"
     },
+    "paste_5963d1c1": {
+        "message": "Kole"
+    },
     "peer_review_74f26a13": {
         "message": "Revisyon Kamarad"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Gen yon bagay ki pase mal"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Dezole, nou pa konn kijan pou nou kole sa a"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Dezole, nou pa rekonpet fichye miltip yo."
     },
     "sort_by_e75f9e3e": {
         "message": "Triye Pa"

@@ -528,6 +528,7 @@
   "paragraph_5e5ad8eb": { "message": "Absatz" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Teilweise (abgeleitet)" },
+  "paste_5963d1c1": { "message": "Einfügen" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Teilnehmer*innen" },
   "percentage_34ab7c2c": { "message": "Prozentsatz" },
@@ -668,6 +669,12 @@
     "message": "Etwas ging schief. Überprüfen Sie Ihre Verbindung, laden Sie die Seite noch einmal und versuchen Sie es erneut."
   },
   "something_went_wrong_d238c551": { "message": "Etwas ging schief." },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Leider wissen nicht nicht, wie man das einfügt"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Leider unterstützen wir nicht mehrere Dateien."
+  },
   "sort_by_e75f9e3e": { "message": "Sortieren nach" },
   "spades_suit_b37020c2": { "message": "Pik (Spielkartenfarbe)" },
   "square_511eb3b3": { "message": "Viereck" },

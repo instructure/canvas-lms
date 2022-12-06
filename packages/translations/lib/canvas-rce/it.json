@@ -548,6 +548,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragrafo" },
   "parallel_d55d6e38": { "message": "Parallelo" },
   "partial_derivative_4a9159df": { "message": "Parziale (derivato)" },
+  "paste_5963d1c1": { "message": "Incolla" },
   "pentagon_17d82ea3": { "message": "Pentagono" },
   "people_b4ebb13c": { "message": "Persone" },
   "percentage_34ab7c2c": { "message": "Percentuale" },
@@ -692,6 +693,12 @@
     "message": "Si è verificato un errore. Controlla la connessione, ricarica la pagina e riprova."
   },
   "something_went_wrong_d238c551": { "message": "Si è verificato un problema" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Spiacenti, non sappiamo come incollarlo"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Spiacenti, non supportiamo più file."
+  },
   "sort_by_e75f9e3e": { "message": "Ordina per" },
   "spades_suit_b37020c2": { "message": "Picche (seme)" },
   "square_511eb3b3": { "message": "Quadrato" },

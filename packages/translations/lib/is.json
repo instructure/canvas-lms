@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Hluti (afleitt)"
     },
+    "paste_5963d1c1": {
+        "message": "Líma"
+    },
     "peer_review_74f26a13": {
         "message": "Jafningjamat"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Eitthvað mistókst"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Því miður, við vitum ekki hvernig á að líma það"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Því miður styðjum við ekki margar skrár."
     },
     "sort_by_e75f9e3e": {
         "message": "Raða eftir"
