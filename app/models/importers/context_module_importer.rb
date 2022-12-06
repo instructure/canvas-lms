@@ -169,9 +169,9 @@ module Importers
       item.content_tags.where.not(:migration_id => nil).
         where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
-      non_zero_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
+      account_level_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
 
-      unless non_zero_thresholds.any?
+      unless account_level_thresholds.any?
         if hash[:completion_requirements]
           c_reqs = []
           hash[:completion_requirements].each do |req|
@@ -193,10 +193,9 @@ module Importers
     def self.get_default_course_thresholds(assignment_group_names)
       thresholds = {}
       assignment_group_names.each do |group_name|
-        setting_name = "#{group_name}_score_threshold"
-        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', threshold_type: setting_name)
+        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', threshold_type: group_name)
       end
-      thresholds.reject{ |key, value| !value.positive? }
+      thresholds
     end
 
     def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
