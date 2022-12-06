@@ -104,6 +104,22 @@ export default class DeveloperKeyModal extends React.Component {
     return Boolean(redirect_uris && redirect_uris.trim().length !== 0)
   }
 
+  get hasInvalidRedirectUris() {
+    if (!this.hasRedirectUris) {
+      return false
+    }
+
+    return this.developerKey.redirect_uris.split('\n').some(val => val.length > 4096)
+  }
+
+  alertAboutInvalidRedirectUris() {
+    $.flashError(
+      I18n.t(
+        "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
+      )
+    )
+  }
+
   updateConfigurationMethod = configurationMethod => this.setState({configurationMethod})
 
   submitForm = () => {
@@ -127,6 +143,10 @@ export default class DeveloperKeyModal extends React.Component {
         return
       }
       toSubmit.scopes = this.props.selectedScopes
+    }
+    if (this.hasInvalidRedirectUris) {
+      this.alertAboutInvalidRedirectUris()
+      return
     }
 
     return dispatch(
@@ -170,6 +190,9 @@ export default class DeveloperKeyModal extends React.Component {
     if (!this.hasRedirectUris && !this.isUrlConfig) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       this.setState({submitted: true})
+      return
+    } else if (this.hasInvalidRedirectUris) {
+      this.alertAboutInvalidRedirectUris()
       return
     }
     let settings = {}

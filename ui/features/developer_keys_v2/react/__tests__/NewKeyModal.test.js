@@ -512,6 +512,55 @@ it('flashes an error if redirect_uris is empty', () => {
   wrapper.unmount()
 })
 
+describe('redirect_uris is too long', () => {
+  let flashStub
+  const createOrEditSpy = jest.fn()
+  const actions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
+  const devKey = {
+    ...developerKey,
+    require_scopes: true,
+    redirect_uris: 'https://example.com/' + 'a'.repeat(4096),
+  }
+  const state = {...editDeveloperKeyState, developerKey: devKey}
+  const expectedMsg =
+    "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
+  let wrapper
+
+  beforeEach(() => {
+    flashStub = jest.spyOn($, 'flashError')
+    wrapper = mount(
+      modal({
+        createLtiKeyState,
+        createOrEditDeveloperKeyState: state,
+        listDeveloperKeyScopesState,
+        actions,
+        selectedScopes,
+      })
+    )
+  })
+
+  afterEach(() => {
+    flashStub.mockClear()
+    wrapper.unmount()
+  })
+
+  describe('and the key being saved is an LTI key', () => {
+    it('tries to flash an error saying the given redirect_uri is too long', () => {
+      wrapper.instance().saveLtiToolConfiguration()
+      expect(wrapper.instance().hasInvalidRedirectUris).toBeTruthy()
+      expect(flashStub).toHaveBeenCalledWith(expectedMsg)
+    })
+  })
+
+  describe('and the key being saved is an API key', () => {
+    it('tries to flash an error saying the given redirect_uri is too long', () => {
+      wrapper.instance().submitForm()
+      expect(wrapper.instance().hasInvalidRedirectUris).toBeTruthy()
+      expect(flashStub).toHaveBeenCalledWith(expectedMsg)
+    })
+  })
+})
+
 it('renders the saved toolConfiguration if it is present in state', () => {
   const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
