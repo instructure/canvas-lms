@@ -34,6 +34,7 @@ import {
   IconKeyboardShortcutsLine,
   IconMiniArrowEndLine,
   IconFullScreenLine,
+  IconExitFullScreenLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
@@ -354,7 +355,9 @@ export default function StatusBar(props) {
       // this is safari, which refuses to fullscreen a textarea
       return null
     }
-    const fullscreen = formatMessage('Fullscreen')
+    const fullscreen = props.rceIsFullscreen
+      ? formatMessage('Exit Fullscreen')
+      : formatMessage('Fullscreen')
     return (
       <IconButton
         data-btn-id="rce-fullscreen-btn"
@@ -370,7 +373,7 @@ export default function StatusBar(props) {
         withBackground={false}
         withBorder={false}
       >
-        <IconFullScreenLine />
+        {props.rceIsFullscreen ? <IconExitFullScreenLine /> : <IconFullScreenLine />}
       </IconButton>
     )
   }

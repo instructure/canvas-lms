@@ -75,24 +75,35 @@ describe('RCE StatusBar', () => {
   })
 
   it('displays all the buttons', () => {
-    renderStatusBar()
-    expect(document.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-fullscreen-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+    const {container} = renderStatusBar()
+    expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
   })
 
   it('omits fullscreen button when fullscreen is not enabled', () => {
     document[FS_ENABLED] = undefined
-    renderStatusBar()
-    expect(document.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
-    expect(document.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+    const {container} = renderStatusBar()
+    expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+  })
+
+  it('replaces fullscreen with exit fullscreen if RCE is fullscreen', () => {
+    const {container, rerender} = renderStatusBar({rceIsFullscreen: false})
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]').textContent).toEqual(
+      'Fullscreen'
+    )
+    rerender(<StatusBar {...defaultProps({rceIsFullscreen: true})} />)
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]').textContent).toEqual(
+      'Exit Fullscreen'
+    )
   })
 
   describe('in WYSIWYG mode', () => {
@@ -316,13 +327,15 @@ describe('RCE StatusBar', () => {
 
       rerender(
         <StatusBar
-          onToggleHtml={() => {}}
-          path={[]}
-          wordCount={0}
-          editorView={RAW_HTML_EDITOR_VIEW}
-          onResize={() => {}}
-          onKBShortcutModalOpen={() => {}}
-          onA11yChecker={() => {}}
+          {...defaultProps({
+            onToggleHtml: () => {},
+            path: [],
+            wordCount: 0,
+            editorView: RAW_HTML_EDITOR_VIEW,
+            onResize: () => {},
+            onKBShortcutModalOpen: () => {},
+            onA11yChecker: () => {},
+          })}
         />
       )
 

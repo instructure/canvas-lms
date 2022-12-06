@@ -27,6 +27,7 @@ import {
   IconBulletListSquareLine,
   IconClearTextFormattingLine,
   IconDocumentLine,
+  IconExitFullScreenLine,
   IconFullScreenLine,
   IconImageLine,
   IconIndentLine,
@@ -116,6 +117,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
     rtl: IconTextDirectionRtlLine,
     'chevron-down': IconArrowOpenDownLine,
     fullscreen: IconFullScreenLine,
+    fullscreen_exit: IconExitFullScreenLine,
     // svg copied from StatusBar.js
     htmlview: {
       src: `<svg viewBox="0 0 24 24" font-size="16px" width="24" height="24" ">
