@@ -528,6 +528,7 @@
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "parallel_d55d6e38": { "message": "Parallell" },
   "partial_derivative_4a9159df": { "message": "Delvis (derivat)" },
+  "paste_5963d1c1": { "message": "Lim inn" },
   "pentagon_17d82ea3": { "message": "Femkant" },
   "people_b4ebb13c": { "message": "Personer" },
   "percentage_34ab7c2c": { "message": "Prosent" },
@@ -658,6 +659,12 @@
     "message": "Noe gikk galt. Kontroller tilkoblingen din, last inn siden på nytt og prøv igjen."
   },
   "something_went_wrong_d238c551": { "message": "Noe gikk galt" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Beklager, vi vet ikke hvordan vi limer inn det"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Beklager, vi støtter ikke flere filer."
+  },
   "sort_by_e75f9e3e": { "message": "Sortert på" },
   "spades_suit_b37020c2": { "message": "Spar (type)" },
   "square_511eb3b3": { "message": "Square" },

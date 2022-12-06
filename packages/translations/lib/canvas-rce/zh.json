@@ -468,6 +468,7 @@
   "paragraph_5e5ad8eb": { "message": "段落" },
   "parallel_d55d6e38": { "message": "平行" },
   "partial_derivative_4a9159df": { "message": "偏（导数）" },
+  "paste_5963d1c1": { "message": "粘贴" },
   "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "人员" },
   "percentage_34ab7c2c": { "message": "百分数" },
@@ -586,6 +587,12 @@
     "message": "出了些问题。检查您的网络连接，重新加载页面并重试。"
   },
   "something_went_wrong_d238c551": { "message": "出了些问题" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "抱歉，不知道如何粘贴"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "抱歉，不支持多个文件。"
+  },
   "sort_by_e75f9e3e": { "message": "排序" },
   "spades_suit_b37020c2": { "message": "黑桃（花色）" },
   "square_511eb3b3": { "message": "方形" },

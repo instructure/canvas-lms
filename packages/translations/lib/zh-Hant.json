@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "部份（導數）"
     },
+    "paste_5963d1c1": {
+        "message": "貼上"
+    },
     "peer_review_74f26a13": {
         "message": "同儕互評"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "似乎出問題了"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "很抱歉，我們不知道如何貼上"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "很抱歉，我們不支援多個檔案。"
     },
     "sort_by_e75f9e3e": {
         "message": "排序依據"

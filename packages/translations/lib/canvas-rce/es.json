@@ -548,6 +548,7 @@
   "paragraph_5e5ad8eb": { "message": "Párrafo" },
   "parallel_d55d6e38": { "message": "Paralelo" },
   "partial_derivative_4a9159df": { "message": "Parcial (derivada)" },
+  "paste_5963d1c1": { "message": "Pegar" },
   "pentagon_17d82ea3": { "message": "Pentágono" },
   "people_b4ebb13c": { "message": "Personas" },
   "percentage_34ab7c2c": { "message": "Porcentaje" },
@@ -690,6 +691,12 @@
     "message": "Algo salió mal. Verifique su conexión, vuelva a cargar la página y vuelva a intentarlo."
   },
   "something_went_wrong_d238c551": { "message": "Se produjo un error." },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Lo sentimos, no sabemos cómo pegarlo."
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Lo sentimos, no admitimos archivos múltiples."
+  },
   "sort_by_e75f9e3e": { "message": "Organizar según" },
   "spades_suit_b37020c2": { "message": "Espadas (palo)" },
   "square_511eb3b3": { "message": "Cuadrado" },

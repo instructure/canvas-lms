@@ -522,6 +522,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragraph" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partial (Derivative)" },
+  "paste_5963d1c1": { "message": "Paste" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "People" },
   "percentage_34ab7c2c": { "message": "Percentage" },
@@ -652,6 +653,12 @@
     "message": "Something went wrong. Check your connection, reload the page, and try again."
   },
   "something_went_wrong_d238c551": { "message": "Something went wrong" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Sorry, we don''t know how to paste that"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Sorry, we don''t support multiple files."
+  },
   "sort_by_e75f9e3e": { "message": "Sort By" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "Square" },

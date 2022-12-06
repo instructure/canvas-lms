@@ -554,6 +554,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragraphe" },
   "parallel_d55d6e38": { "message": "Parallèle" },
   "partial_derivative_4a9159df": { "message": "Partiel (dérivé)" },
+  "paste_5963d1c1": { "message": "Coller" },
   "pentagon_17d82ea3": { "message": "Pentagone" },
   "people_b4ebb13c": { "message": "Personnes" },
   "percentage_34ab7c2c": { "message": "Pourcentage" },
@@ -700,6 +701,12 @@
     "message": "Une erreur est survenue. Vérifiez votre connexion, rechargez la page, et essayez de nouveau."
   },
   "something_went_wrong_d238c551": { "message": "Une erreur est survenue" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Désolé, nous ne savons pas comment coller ça"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Désolé, nous ne prenons pas en charge les fichiers multiples."
+  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "spades_suit_b37020c2": { "message": "Pique (combinaison)" },
   "square_511eb3b3": { "message": "Carré" },

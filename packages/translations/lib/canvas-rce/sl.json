@@ -540,6 +540,7 @@
   "paragraph_5e5ad8eb": { "message": "Odstavek" },
   "parallel_d55d6e38": { "message": "Vzporedno" },
   "partial_derivative_4a9159df": { "message": "Delno (izpeljanka)" },
+  "paste_5963d1c1": { "message": "Prilepi" },
   "pentagon_17d82ea3": { "message": "Peterokotnik" },
   "people_b4ebb13c": { "message": "Sodelujoči" },
   "percentage_34ab7c2c": { "message": "Odstotek" },
@@ -682,6 +683,12 @@
     "message": "Prišlo je do težav. Preverite povezavo, osvežite stran in poskusite znova."
   },
   "something_went_wrong_d238c551": { "message": "Prišlo je do težav" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Oprostite, tega ne znamo prilepiti"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Oprostite, ni podpore za delo z več datotekami."
+  },
   "sort_by_e75f9e3e": { "message": "Razvrsti po" },
   "spades_suit_b37020c2": { "message": "Piki (obleka)" },
   "square_511eb3b3": { "message": "Kvadrat" },

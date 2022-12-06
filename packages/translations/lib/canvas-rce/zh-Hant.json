@@ -472,6 +472,7 @@
   "paragraph_5e5ad8eb": { "message": "段落" },
   "parallel_d55d6e38": { "message": "平行" },
   "partial_derivative_4a9159df": { "message": "部份（導數）" },
+  "paste_5963d1c1": { "message": "貼上" },
   "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "成員" },
   "percentage_34ab7c2c": { "message": "百分比" },
@@ -592,6 +593,12 @@
     "message": "出現問題。請檢查您的連線，重新載入頁面，然後再試一次。"
   },
   "something_went_wrong_d238c551": { "message": "似乎出問題了" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "很抱歉，我們不知道如何貼上"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "很抱歉，我們不支援多個檔案。"
+  },
   "sort_by_e75f9e3e": { "message": "排序依據" },
   "spades_suit_b37020c2": { "message": "黑桃（花色）" },
   "square_511eb3b3": { "message": "正方形" },

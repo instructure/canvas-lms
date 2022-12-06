@@ -522,6 +522,7 @@
   "paragraph_5e5ad8eb": { "message": "段落" },
   "parallel_d55d6e38": { "message": "並列" },
   "partial_derivative_4a9159df": { "message": "部分(微分)" },
+  "paste_5963d1c1": { "message": "貼り付け" },
   "pentagon_17d82ea3": { "message": "ペンタゴン" },
   "people_b4ebb13c": { "message": "メンバー" },
   "percentage_34ab7c2c": { "message": "割合" },
@@ -652,6 +653,12 @@
     "message": "問題が発生しました。接続を確認し、ページを再読み込みして、もう一度やり直してください。"
   },
   "something_went_wrong_d238c551": { "message": "なにかが失敗しました" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "申し訳ありませんが、貼り付けの方法がわかりません"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "申し訳ありませんが、複数ファイルの貼り付けには対応していません。"
+  },
   "sort_by_e75f9e3e": { "message": "分類する" },
   "spades_suit_b37020c2": { "message": "スペード (1組)" },
   "square_511eb3b3": { "message": "四角" },

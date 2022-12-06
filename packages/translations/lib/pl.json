@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Pochodna cząstkowa"
     },
+    "paste_5963d1c1": {
+        "message": "Wklej"
+    },
     "peer_review_74f26a13": {
         "message": "Recenzja drugiego uczestnika"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Coś poszło nie tak"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "Niestety, nie wiemy, jak to wkleić."
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "Niestety, ta funkcja nie obsługuje wielu plików."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortuj wg"

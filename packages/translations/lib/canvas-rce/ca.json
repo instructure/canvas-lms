@@ -558,6 +558,7 @@
   "paragraph_5e5ad8eb": { "message": "Paràgraf" },
   "parallel_d55d6e38": { "message": "Paral·lel" },
   "partial_derivative_4a9159df": { "message": "Parcial (derivat)" },
+  "paste_5963d1c1": { "message": "Enganxa" },
   "pentagon_17d82ea3": { "message": "Pentàgon" },
   "people_b4ebb13c": { "message": "Persones" },
   "percentage_34ab7c2c": { "message": "Percentatge" },
@@ -704,6 +705,12 @@
     "message": "Alguna cosa no ha anat bé. Comproveu la connexió, torneu a carregar la pàgina i proveu-ho de nou."
   },
   "something_went_wrong_d238c551": { "message": "Alguna cosa no ha anat bé" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "No sabem què hem de fer per enganxar això"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "No admetem diversos fitxers."
+  },
   "sort_by_e75f9e3e": { "message": "Ordena per" },
   "spades_suit_b37020c2": { "message": "Piques (coll de cartes)" },
   "square_511eb3b3": { "message": "Quadrat" },

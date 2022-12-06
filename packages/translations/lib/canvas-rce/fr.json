@@ -558,6 +558,7 @@
   "paragraph_5e5ad8eb": { "message": "Paragraphe" },
   "parallel_d55d6e38": { "message": "Parallèle" },
   "partial_derivative_4a9159df": { "message": "Dérivée partielle" },
+  "paste_5963d1c1": { "message": "Coller" },
   "pentagon_17d82ea3": { "message": "Pentagone" },
   "people_b4ebb13c": { "message": "Personnes" },
   "percentage_34ab7c2c": { "message": "Pourcentage" },
@@ -706,6 +707,12 @@
     "message": "Un problème est survenu. Vérifiez votre connexion, rechargez la page, puis réessayez."
   },
   "something_went_wrong_d238c551": { "message": "Un problème est survenu" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Désolé, nous ne savons pas comment coller cela."
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Désolé, nous ne prenons en charge qu''un seul fichier à la fois."
+  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "spades_suit_b37020c2": { "message": "Pique (cartes)" },
   "square_511eb3b3": { "message": "Carré" },

@@ -1643,6 +1643,9 @@
     "partial_derivative_4a9159df": {
         "message": "Parcial (derivat)"
     },
+    "paste_5963d1c1": {
+        "message": "Enganxa"
+    },
     "peer_review_74f26a13": {
         "message": "Revisió entre companys"
     },
@@ -2017,6 +2020,12 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Alguna cosa no ha anat bé"
+    },
+    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+        "message": "No sabem què hem de fer per enganxar això"
+    },
+    "sorry_we_don_t_support_multiple_files_fb9478b0": {
+        "message": "No admetem diversos fitxers."
     },
     "sort_by_e75f9e3e": {
         "message": "Ordena per"

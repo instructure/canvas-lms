@@ -530,6 +530,7 @@
   "paragraph_5e5ad8eb": { "message": "Akapit" },
   "parallel_d55d6e38": { "message": "Równoległość" },
   "partial_derivative_4a9159df": { "message": "Pochodna cząstkowa" },
+  "paste_5963d1c1": { "message": "Wklej" },
   "pentagon_17d82ea3": { "message": "Pięciokąt" },
   "people_b4ebb13c": { "message": "Ludzie" },
   "percentage_34ab7c2c": { "message": "Wartość procentowa" },
@@ -670,6 +671,12 @@
     "message": "Coś poszło nie tak. Sprawdź połączenie, odśwież stronę i spróbuj ponownie."
   },
   "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Niestety, nie wiemy, jak to wkleić."
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Niestety, ta funkcja nie obsługuje wielu plików."
+  },
   "sort_by_e75f9e3e": { "message": "Sortuj wg" },
   "spades_suit_b37020c2": { "message": "Piki (kolor)" },
   "square_511eb3b3": { "message": "Kwadrat" },
