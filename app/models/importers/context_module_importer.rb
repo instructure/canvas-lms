@@ -193,7 +193,7 @@ module Importers
     def self.get_default_course_thresholds(assignment_group_names)
       thresholds = {}
       assignment_group_names.each do |group_name|
-        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', threshold_type: group_name)
+        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', assignment_group_name: group_name)
       end
       thresholds
     end
