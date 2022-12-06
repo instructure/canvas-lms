@@ -4427,6 +4427,17 @@ describe Submission do
       sub = @assignment.submit_homework(@user, attachments: [f])
       expect(sub.attachments).to eq []
     end
+
+    it "includes attachments in a user group that are not in a section group" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.attachments).to eq [f]
+    end
   end
 
   describe "versioned_attachments" do
@@ -4463,6 +4474,17 @@ describe Submission do
         submission.versioned_attachments
         expect(submission.versioned_attachments).to include user_attachment
       end
+    end
+
+    it "includes attachments uploaded from group by user without matching section id" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.versioned_attachments).to eq [f]
     end
   end
 
