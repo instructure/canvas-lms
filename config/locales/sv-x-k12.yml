@@ -202,6 +202,7 @@ sv-x-k12:
   a_name_for_this_set_is_required_222bad23: "Det krävs ett namn för den här uppsättningen"
   a_name_is_required_b5df38a9: "Ett namn krävs"
   a_new_assignment_has_been_created_for_your_course__12b72639: "En ny uppgift har skapats för din kurs, %{course_name}"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "En ny modul har skapats med innehållet som returnerats från verktyget. Gå till sidan Moduler om du vill se den."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ett partner-ID krävs för att använda akademiska riktmärken"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "En partnernyckel krävs för att använda akademiska riktmärken"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Det finns en premiumversion av BigBlueButton som medger det antal samtidiga konferenser som köpts (var och en med 1 värd och upp till 99 deltagare), utan lagringsbegränsningar för inspelade konferenser och med dedikerad infrastruktur för bättre prestanda."
@@ -2053,6 +2054,7 @@ sv-x-k12:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lägger till analys på en elevs kontextkort."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Lägger till kommentarbank för uppgiftskommentarer inom SpeedGrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Lägger till granulära behörigheter för att lägga till och ta bort varje roll och en separat behörighet för övriga kursadministratörsåtgärder."
+  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Lägger till alternativet att bedöma baserat på frågan i SpeedGrader för Quizzes.Next Quizzes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Lägger till indikatorer på sidan för inlämningsinformation som visar elever att det finns olästa
       dokumentnoteringar eller matriskommentarer
@@ -2312,6 +2314,7 @@ sv-x-k12:
       Låter administratörer visa en logg med information om senast körda
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter koppling av lärandemål för innehåll som inte ges poäng"
+  allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Tillåter att inställningar för Blueprint-kurser exporteras och kopieras till en annan Blueprint-kurs"
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Tillåter att Canvas skickar iWork-filer till Docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Tillåt att kurssidor publiceras enligt schema"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Tillåt att elevgrupper i en kurs skapas med en uppladdad CSV-fil"
@@ -2336,6 +2339,7 @@ sv-x-k12:
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Ger lärare och TA-baserade roller åtkomst till närvaroverktyget."
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Ger lärare möjlighet att dölja kurssektioner från elever på sidan Personer när det finns mer än en sektion i kursen."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gör att lärare kan markera omdömesdata för massexport till SIS-integrationer."
+  allows_teachers_with_the_proper_permissions_to_sub_6dc94b17: "Tillåter att lärare med rätt behörigheter lämnar in uppgifter med filuppladdningar å elevers vägnar."
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Ger att lärare, TA-baserade roller åtkomst till närvaroverktyget."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillåter kopiering av moduler i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillåt kopiering av kalenderhändelser"
@@ -3664,6 +3668,8 @@ sv-x-k12:
   assignment_group: 
     default_name: Uppgifter
     default_title: Uppgifter
+    drop_rules_must_be_positive: "Droppregler måste vara ett positivt tal"
+    drop_rules_too_high: "Droppregler får inte vara högre än antalet uppgifter"
   assignment_group_1a781505: Uppgiftsgrupp
   assignment_group_export_fd77c394: "Export av uppgiftsgrupp"
   assignment_group_filter_c03f8a1d: "Filter för uppgiftsgrupp"
@@ -4601,7 +4607,7 @@ sv-x-k12:
   batch_edit_6d41d0d7: Massredigera
   batch_edit_dates_f1ec3df2: "Massredigera datum"
   bb_display: "Blackboard Learn"
-  bb_file_description: "Blackboard 6/7/8/9 – exportfil i ZIP-format"
+  bb_file_description: "Blackboard 6/7/8/9/Ultra-export .zip-fil"
   bb_name: "Blackboard Converter"
   bbb_modal_update_e27b10e: "Uppdatering för BBB-modal"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Var en hjälte och be din lärare fixa den här länken."
@@ -4638,6 +4644,7 @@ sv-x-k12:
     recording_setting: Inspelning
     recording_setting_enabled_description: "Aktivera inspelning för den här konferensen"
   bigeasy_locale: sv_SE
+  billing_country_code_as_reported_by_salesforce_625bbb4e: "Landskod för fakturering rapporterad av Salesforce"
   blackboard: 
     no_manifest: "Den här komprimerade Blackboard-filen saknar filen imsmanifest.xml i rotkatalogen."
   blackout_date_5fc44c2b: Blackout-datum
@@ -5248,6 +5255,7 @@ sv-x-k12:
     ics_description_user: "Kalenderhändelser för användaren %{user_name}"
     ics_title: "%{course_or_group_name} Kalender (Canvas)"
     invalid_date_or_time: "Ogiltigt datum eller tid för %{attr}"
+  calendar_feed_url_b7b91e7b: "URL för kalenderflöde"
   calendar_removed_1c841af4: "Kalender borttagen"
   calendar_series_e1b7a4bc: Kalenderserier
   calendars: 
@@ -6476,6 +6484,8 @@ sv-x-k12:
       folder_picker: 
         default_select_folder: "Välj en mapp"
         upload_to: "Ladda upp till"
+      import_blueprint_settings: 
+        checkbox_label: "Importera inställningar för Blueprint-kurs"
       import_quizzes_next_view: 
         import_new_quizzes: "Importera befintliga quiz som *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes är den Canvas-bedömningsmotorn.%{p_p}Kontakta din systemadministratör om du vill veta mer eller besök"
@@ -7025,6 +7035,7 @@ sv-x-k12:
   conversations_send_messages_to_individual_course_m_733620b: "Konversationer – skicka meddelanden till enskilda kursdeltagare"
   copy_9748f9f: Kopiera
   copy_assignment_name_to_another_course_b62d0a54: "Kopiera uppgiften %{name} till en annan kurs"
+  copy_blueprint_course_settings_31a97e96: "Kopiera inställningar för Blueprint-kurs"
   copy_list_of_shard_ids_d51cd846: "Kopiera listan över skärv-ID:n"
   copy_operation_started_successfully_b2f236a1: "Kopieringen startades"
   copy_page_to_another_course_405cc07c: "Kopiera sidan till en annan kurs"
@@ -7129,6 +7140,9 @@ sv-x-k12:
     one: "1 dag"
     other: "%{count} dagar"
     zero: ""
+  count_days_ago_406937d: 
+    one: "1 dag sedan"
+    other: "%{count} dagar sedan"
   count_days_de0c6a32: 
     one: "1 dag"
     other: "%{count} dagar"
@@ -7163,6 +7177,9 @@ sv-x-k12:
   count_hours_1bd03883: 
     one: "1 timme"
     other: "%{count} timmar"
+  count_hours_ago_322dcc79: 
+    one: "1 timme sedan"
+    other: "%{count} timmar sedan"
   count_images_found_for_term_a93635ed: "%{count} bilder hittades för %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} har raderats."
@@ -7184,6 +7201,7 @@ sv-x-k12:
     one: "1 minut"
     other: "%{count} minuter"
     zero: "mindre än 1 minut"
+  count_minutes_ago_c1b7d7ef: "%{count} minuter sedan"
   count_more_beba6428: "%{count} till"
   count_must_be_0_4abb84b3: "COUNT måste vara > 0"
   count_must_be_greater_than_0_f8f88358: "COUNT måste vara större än 0"
@@ -7333,6 +7351,9 @@ sv-x-k12:
   count_weeks_11fbd2dc: 
     one: "1 vecka"
     other: "%{count} veckor"
+  count_weeks_ago_9393928c: 
+    one: "1 vecka sedan"
+    other: "%{count} veckor sedan"
   count_weeks_d03afdd8: 
     one: "1 vecka"
     other: "%{count} veckor"
@@ -7497,6 +7518,7 @@ sv-x-k12:
   course_image_settings_eba3ec55: Kursbildinställningar
   course_implemented_apps_fa658f5a: "Appar implementerade i kursen"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kursen är redan associerad med en plan"
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Kursen är oläslig och kan inte anges som Blueprint-kurs"
   course_landing_page_49a53ade: "Kursens landningssida"
   course_level_notification_preferences_require_a_co_2f0a618: "För uppdatering krävs ett course_id för aviseringsinställningar på kursnivå"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Aviseringar på kursnivå ärvs från dina aviseringsinställningar på kontonivån. Om du ändrar aviseringar för den här kursen åsidosätts aviseringar på kontonivån."
@@ -8669,6 +8691,7 @@ sv-x-k12:
   deduction_interval_e18bd51: Avdragsintervall
   deep_orange_4c7eea99: "Djup orange"
   deep_purple_bb3e2907: "Djup lila"
+  deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Djup inkapslade svar stöds inte längre. Ditt svar visas på den sida du för närvarande har öppen."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djup inkapslade svar stöds inte längre. Ditt svar visas på första sidan av den här tråden."
   default_9db103d: Standard
   default_conference_title: "%{course_name} Konferens"
@@ -9933,6 +9956,7 @@ sv-x-k12:
   enhanced_grade_change_auditing_2b155dfa: "Förbättrad granskning av bedömningsändringar"
   enhanced_gradebook_filters_a3be5e7d: "Förbättrade filter för bedömningsboken"
   enhanced_gradebook_filters_description: "Den här funktionen tillhandahåller förbättrade filtreringsalterativ i Canvas bedömningsbok. När den här flaggan är aktiverad kommer tidig åtkomst till pågående förbättringar att visas automatiskt i alla nya versioner. Fullständig information finns i *Användargruppen Bedömningsboksfilter* i Canvas-communityn."
+  enhanced_rce_paste_from_clipboard_30ddb011: "Utökat urklipp från innehållsredigeraren"
   enhances_the_canvas_experience_within_the_learning_8031b650: "Ger en förbättrad upplevelse av Canvas i bedömningsöversikten för måluppfyllelse."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Ökar färgkontrasten på text, knappar med mera."
   enroll_in_subject_9c1f1c18: "Registrera sig för ämne"
@@ -10371,6 +10395,7 @@ sv-x-k12:
   error_embedding_content_from_tool_49bb698e: "Det gick inte att bädda in innehåll från verktyget"
   error_exporting_gradebook_msg_6ea31e2f: "Ett fel uppstod vid export av bedömningsöversikt: %{msg}"
   error_fetching_access_token_1445a9e3: "Fel vid hämtning av åtkomsttoken"
+  error_fetching_rubric_data_66432f54: "Fel vid hämtning av matrisdata"
   error_fetching_user_details_7c85d23: "Fel vid hämtning av användarinformation"
   error_importing_outcomes_59a4fe81: "Ett fel inträffade när lärandemål importerades"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} i intervallet för måluppfyllelsevägen %{index}"
@@ -10402,6 +10427,7 @@ sv-x-k12:
   error_sending_submission_d32dc075: "Det gick inte att skicka inlämningen"
   error_starting_content_share_18fb1532: "Fel vid start av innehållsdelning"
   error_starting_save_operation_81bcb99: "Fel vid start av sparåtgärd:"
+  error_submitting_rubric_83daca8b: "Fel vid inlämning av matris"
   error_submitting_to_plagiarism_service_9b0748cb: "Ett fel inträffade vid inlämning till plagiattjänsten"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Det gick inte att skicka in till plagiattjänsten. Du kan skicka in igen från SpeedGrader."
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Fel: Verktyget returnerade inte en URL till Canvas"
@@ -10754,6 +10780,7 @@ sv-x-k12:
   failed_to_delete_internal_setting_b85d397c: "Det gick inte att radera intern inställning"
   failed_to_delete_role_label_27959de3: "Det gick inte att ta bort rollen %{label}"
   failed_to_delete_selected_pages_26fa87db: "Det gick inte att radera valda sidor"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Det gick inte att exportera inställningar för Blueprint-kurs"
   failed_to_export_course_paces_e17583ba: "Det gick inte att exportera kurstakter"
   failed_to_export_pace_plans_9832daac: "Det gick inte att exportera taktplanerna"
   failed_to_ignore_assignment_46565fa3: "Det gick inte att ignorera uppgiften"
@@ -11267,6 +11294,7 @@ sv-x-k12:
   grade_9c6f076d: Omdöme
   grade_a91e433e: "Omdöme:"
   grade_assignment_7c1abc11: "Bedöm %{assignment}"
+  grade_by_question_9d9b8a71: "Bedöm baserat på fråga"
   grade_calculator_performance_improvements_564af0de: "Förbättrade prestanda i bedömningsberäkningar"
   grade_change_activity_75fb525: "Ändringsaktivitet för omdömen"
   grade_change_log_231f90e4: "Ändringslogg för bedömning"
@@ -12226,6 +12254,7 @@ sv-x-k12:
   grouptitle_was_successfully_updated_658f725e: "%{groupTitle} uppdaterades."
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: "Haitisk kreol"
+  handle_pasting_of_files_especially_images_7c19b19c: "Hantera inklistring av filer, speciellt bilder."
   handlebars_helpers: 
     time: 
       event: "%{date} kl %{time}"
@@ -13218,6 +13247,9 @@ sv-x-k12:
   invalid_address_book_strategy_904a7ada: "Ogiltig adressbok-strategi."
   invalid_authenticity_token_b753558c: "Ogiltig autenticitetstoken"
   invalid_aws_configuration_e8a6ae0f: "Ogiltig AWS-konfiguration"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Ogiltig blueprint-låst objekttyp %{type} för objekt %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Ogiltiga blueprintbegränsade typer i importpaket. Använder standard"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Ogiltiga blueprintbegränsningar för objekt %{id}"
   invalid_byday_byday_6e361e78: "Ogiltigt BYDAY '%{byday}'"
   invalid_bymonth_bymonth_91f621b3: "Ogiltigt BYMONTH '%{bymonth}'"
   invalid_bymonthday_bymonthday_87791c1b: "Ogiltigt BYMONTHDAY '%{bymonthday}'"
@@ -13449,6 +13481,7 @@ sv-x-k12:
   june_a58d8523: Juni
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Bara en vanlig fråga, kommentar, idé eller förslag"
   just_in_time_provisioning_382a0354: "Just in Time-tillhandahållande"
+  just_now_526a643c: "Just nu"
   jwk_method_6d5d0c84: "* JWK-metod"
   jwts_4f397c85: JWTs
   k12_description: "Uppdatera de ikoner i  den globala navigeringsmenyn som verkar meningsfullt att uppdatera, speciellt i en K12-miljö."
@@ -17744,6 +17777,7 @@ sv-x-k12:
   pace_removed_8e625df7: "Takt borttagen"
   pace_type_76cf749: Takttyp
   pacename_updated_2a2c4d77: "%{paceName} har uppdaterats"
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} takter: sorterade efter %{sortBy} i %{orderType} ordning"
   package_error: "Fel vid identifiering av pakettyp: %{error}"
   package_export_from_d6e2b073: "Paketexport från"
   page_50c4823d: Sida
@@ -17898,6 +17932,7 @@ sv-x-k12:
   peer_reviews_e3a55964: Kamratrespons
   peer_service_6b4828b9: Peer-tjänst
   peer_services_102357e3: Referent-tjänster
+  peer_submissions_ready_for_review_availablecount_3ac80091: "Kamratresponsinlämningar klara för granskning: %{availableCount}"
   pending_3e506a5b: Väntar
   pending_enforcement_eb32e3d: "Väntar på verkställande"
   pending_f1ed53c7: avvaktar
@@ -20249,6 +20284,7 @@ sv-x-k12:
       surveys: Enkäter
     toggle_message: "växla synlighet för quiz"
   quizzes_index_menu_1ce11b54: "Indexmeny för quiz"
+  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next Bedöm baserat på frågor i SpeedGrader"
   quizzes_next_importing_75e63f67: "Quizzes.Next Importerar"
   quizzes_public: 
     alerts: 
@@ -21071,6 +21107,7 @@ sv-x-k12:
   rubric_deleted_3d9efc18: "Matris har tagits bort"
   rubric_fc39da76: Matris
   rubric_updated_103e24dc: "Matris har uppdaterats"
+  rubric_was_successfully_submitted_b0766474: "Matrisen lämnades in"
   rubrics: 
     index: 
       account_rubrics: "Matriser på kontot"
@@ -21369,6 +21406,8 @@ sv-x-k12:
   search_flickr_6f28b02e: "Sök på flickr"
   search_for_a_deleted_course_by_id_f553398d: "Sök efter en raderad kurs med ID"
   search_for_files_7541fb28: "Sök efter filer"
+  search_for_sections_62e90cf4: "Sök efter sektioner"
+  search_for_students_ed16c2de: "Sök efter elever"
   search_for_your_school_or_institution_1eb2eeaf: "Sök efter din skola eller din institution"
   search_form_fcaa38f7: Sökformulär
   search_grading_periods_e947a3e9: "Sök efter bedömningsperioder ..."
@@ -21722,6 +21761,7 @@ sv-x-k12:
   send_to_a879095e: "Skicka till:"
   send_to_b940900a: "Skicka till..."
   send_to_ce05b460: "Skicka till"
+  send_usage_metrics_cecc7a7d: "Skicka användningsmatriser"
   sending_bf324366: "Skickar ..."
   sending_message_75923692: "Skickar meddelandet"
   sending_message_8ac5bc90: "Skickar meddelande ..."
@@ -22721,6 +22761,7 @@ sv-x-k12:
   sorted_ascending_b6d61547: "Sorterade stigande"
   sorted_by_ascending_af61f8ca: "Sortera stigande"
   sorted_by_descending_824c4300: "Sortera fallande"
+  sorted_by_sortby_in_ordertype_order_55c8cf9a: "Sorterad efter %{sortBy} i följande ordning %{orderType}"
   sorted_descending_1e30f0d5: "Sorterade fallande"
   sorted_descending_84ec84c8: "sorterade fallande."
   sorted_direction_by_columnname_d049ac44: "Sorterad %{direction} efter %{columnName}"
@@ -23331,6 +23372,7 @@ sv-x-k12:
   submit_file_using_name_bc8d7b71: "Skicka in filen med %{name}"
   submit_for_student_d90838e8: "Skicka in för elev"
   submit_media_file_f334c1ba: "Skicka in mediafil"
+  submit_on_behalf_of_student_af674b95: "Lämna in å elevers vägnar"
   submit_ticket_5515ffd: "Skicka ärende"
   submitted_318fad53: Inskickad
   submitted_at_4d5ea3aa: Inlämnad
@@ -23847,6 +23889,7 @@ sv-x-k12:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: "Det maximala antalet bedömare för den här uppgiften har uppnåtts."
   the_media_id_does_not_correspond_to_an_existing_me_eab16c08: "%{media_id} matchar inte något befintligt medieobjekt"
   the_media_object_id_must_match_an_existing_media_o_62195fef: "media_object_id måste matcha ett befintligt medieobjekt"
+  the_message_size_has_exceeded_the_maximum_text_len_9e86b291: "Den här meddelandestorleken överskrider maxlängden för text."
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       Meddelandet med namnet ”%{subject}” kunde inte levereras eftersom diskussionen har raderats. Om du försöker kontakta någon genom Canvas kan du försöka logga in på ditt konto och skicka ett meddelande till personen i fråga med inkorg-verktyget.
                 
@@ -25540,6 +25583,7 @@ sv-x-k12:
   unable_to_toggle_placement_833db6ff: "Det gick inte att växla placering"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Det går inte att överföra filen till lagringstjänsten. Tjänsten kan ligga nere, eller kan du behöva logga in till Canvas på nytt."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Det gick inte att uppdatera inställningarna för Microsoft Teams Sync. Försök igen. Kontakta supporten om problemet kvarstår."
+  unable_to_update_splitscreen_preference_4d449fa5: "Det går inte att uppdatera inställningen för delad skärm."
   unaccepted_students_aa68ea98: "Icke-godkända elever"
   unarchive_f245e2d6: "Ta bort arkivering"
   unarchive_operation_failed_22c42032: "Det gick inte att hämta från arkivet"
@@ -26400,6 +26444,7 @@ sv-x-k12:
   view_groups_47b5f60c: "Visa Grupper"
   view_history_2dfb048: "Visa historik"
   view_important_dates_173c7e1b: "Visa viktiga datum"
+  view_inline_ffb3928b: "Visa inbäddning"
   view_learning_analytics_beta_1c98a397: "Visa lärandeanalyser (beta)"
   view_login_ids_for_users_142bbe7a: "Visa inloggnings-ID:n för användare"
   view_longer_description_6b762087: "visa längre beskrivning"
@@ -26418,6 +26463,7 @@ sv-x-k12:
   view_range_student_details_8116d68a: "Visa intervall för elevdetaljer"
   view_replies_8565a729: "Visa svar"
   view_rubric_d71cce10: "Visa matris"
+  view_split_screen_ca35b78a: "Visa delad skärm"
   view_submission_ff3da5d: "Visa inlämning"
   view_the_assignment_e61ca4fc: "Visa uppgiften"
   view_the_discussion_link_c4dbdef: "Visa diskussionen: %{link}."
@@ -27028,6 +27074,7 @@ sv-x-k12:
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Du har avpublicerat diskussionsämnet."
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "Du har avregistrerat dig från diskussionsämnet."
   you_have_successfully_updated_the_discussion_topic_b2910500: "Du har uppdaterat diskussionsämnet."
+  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "Du har %{totalCount} kamratresponser att slutföra"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "Du har opublicerade ändringar i din kurstakt. Om du fortsätter kommer dessa ändringar att ignoreras."
   you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "Du har avpublicerade ändringar i din kurstakt. Om du fortsätter kommer dessa ändringar att ignoreras."
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: "Du har opublicerade ändringar i din kurs taktplan. Om du fortsätter kommer dessa ändringar att ignoreras."
@@ -27085,6 +27132,7 @@ sv-x-k12:
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Du måste ange om du vill aktivera eller inaktivera Microsoft Teams Sync."
   you_must_use_a_number_912ce4bd: "Du måste använda en siffra"
   you_must_use_a_positive_number_203b86fe: "Du måste använda en positiv siffra"
+  you_must_use_an_integer_78d2530f: "Du måste använda ett heltal"
   you_need_to_preview_changes_before_saving_85e60232: "Du måste \"förhandsgranska ändringar\" innan du sparar"
   you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "Du måste \"förhandsgranska ändringar\" innan du kan tillämpa det här på ditt konto"
   you_need_to_save_before_applying_to_this_account_7436a5ae: "Du måste \"spara\" innan du kan tillämpa det här på ditt konto"
