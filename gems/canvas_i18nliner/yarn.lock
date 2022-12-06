@@ -691,8 +691,8 @@ punycode@^1.4.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
 qs@~6.3.0:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.3.1.tgz#918c0b3bcd36679772baf135b1acb4c1651ed79d"
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.3.3.tgz#645c23bd6def4d552f258f0aadfeea6fd57f5a86"
 
 regenerator-runtime@^0.10.0:
   version "0.10.3"
