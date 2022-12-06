@@ -1352,7 +1352,7 @@ class Submission < ActiveRecord::Base
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
       next unless (a.context_type == "User" && a.context_id == user_id) ||
-                  (a.context_type == "Group" && a.context_id == group_id) ||
+                  (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                   (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
                   attachment_fake_belongs_to_group(a)
 
@@ -1783,7 +1783,7 @@ class Submission < ActiveRecord::Base
   def versioned_attachments=(attachments)
     @versioned_attachments = Array(attachments).compact.select do |a|
       (a.context_type == "User" && (a.context_id == user_id || a.user_id == user_id)) ||
-        (a.context_type == "Group" && a.context_id == group_id) ||
+        (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
         (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
         attachment_fake_belongs_to_group(a)
     end
