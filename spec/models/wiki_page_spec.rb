@@ -294,6 +294,13 @@ describe WikiPage do
       end
     end
 
+    it "publishes when a past publish_at date is set" do
+      @page.publish_at = 1.hour.ago
+      @page.save!
+      expect(@page.reload).to be_published
+      expect(@page.publish_at).not_to be_nil
+    end
+
     it "clears a publish_at date when manually publishing" do
       @page.publish_at = 1.hour.from_now
       @page.save!
