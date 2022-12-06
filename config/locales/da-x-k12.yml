@@ -202,6 +202,7 @@ da-x-k12:
   a_name_for_this_set_is_required_222bad23: "Der kræves et navn for dette sæt"
   a_name_is_required_b5df38a9: "Et navn er påkrævet"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Der er blevet oprettet en ny opgave til dit fag, %{course_name}"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "Et nyt forløb er blevet oprettet med indholdet returneret fra værktøjet. Hvis du gerne vil se det, så besøg siden Forløb."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Et partner-id er påkrævet for at bruge Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "En partner-nøgle er påkrævet for at bruge Academic Benchmarks"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "En premiumversion af BigBlueButton er tilgængelig. Den tilbyder samtidige konferencer baseret på købt antal (hver med 1 vært og op til 99 deltagere), ingen lagerbegrænsninger for optagelser og dedikeret infrastruktur for bedre ydeevne."
@@ -2056,6 +2057,7 @@ da-x-k12:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Føjer analyse til en elevs kontekstkort."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Tilføjer kommentarbank for opgavekommentarer i Speedgrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Tilføjer detaljerede tilladelser for tilføjelse og fjernelse af hver rolle og en separat tilladelse til andre fagadministratorhandlinger"
+  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Tilføjer muligheden for at give vurdering pr. spørgsmål i SpeedGrader for Quizzes.Next-quizzer"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Føjer visuelle indikatorer til siden med afleveringsdetaljer for at fortælle de elever, at der findes ikke-læste
       dokumentanmærkninger eller vurderingskriterie kommentarer
@@ -2315,6 +2317,7 @@ da-x-k12:
       Lader administratorer se en logfil med oplysninger om alle de nyligt kørte
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillader tilpasning af læringsudbytter for indhold uden vurdering"
+  allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Tillader, at indstillinger til Blueprint-fag eksporteres og kopieres til et andet Blueprint-fag"
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Lader Canvas sende iWork-filer til docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Tillader, at fagsider offentliggøres efter en tidsplan"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Tillader, at fagets elevgrupper oprettes efter csv-upload"
@@ -2339,6 +2342,7 @@ da-x-k12:
   allows_teacher_ta_based_roles_to_access_the_attend_bf92234: "Gør det muligt for roller, der er baseret på lærer eller undervisningsassistent, at få adgang til værktøjet Tilstedeværelse."
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Lader lærere skjule fagsektioner for eleverne på siden Deltagere, når der er mere end en sektion i faget."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Giver underviserne mulighed for at markere vurderingsoplysninger, som skal eksporteres i bulk til SIS-integrationer."
+  allows_teachers_with_the_proper_permissions_to_sub_6dc94b17: "Giver lærere med de rette tilladelser mulighed for at indsende filuploadopgaver på vegne af deres elever."
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Gør det muligt for lærer-baserede roller at få adgang til værktøjet Tilstedeværelse."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillader duplikering af forløb i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillader duplikering af kalenderbegivenheder"
@@ -3667,6 +3671,8 @@ da-x-k12:
   assignment_group: 
     default_name: Opgaver
     default_title: Opgaver
+    drop_rules_must_be_positive: "Slip-regler skal være et positivt tal"
+    drop_rules_too_high: "Slip-regler må ikke være højere end antallet af opgaver"
   assignment_group_1a781505: Opgavegruppe
   assignment_group_export_fd77c394: "Opgave gruppeeksport"
   assignment_group_filter_c03f8a1d: "Opgave gruppefilter"
@@ -4604,7 +4610,7 @@ da-x-k12:
   batch_edit_6d41d0d7: "Redigering af flere"
   batch_edit_dates_f1ec3df2: "Redigering af flere datoer"
   bb_display: "Blackboard Learn"
-  bb_file_description: "Blackboard 6/7/8/9 eksporter .zip-fil"
+  bb_file_description: "Blackboard 6/7/8/9/Ultra eksporter .zip-fil"
   bb_name: "Blackboard Converter"
   bbb_modal_update_e27b10e: "BBB modal-opdatering"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Vær en helt, og bed din instruktør om at ordne dette link."
@@ -4641,6 +4647,7 @@ da-x-k12:
     recording_setting: Optager
     recording_setting_enabled_description: "Aktivér optagelse af denne konference"
   bigeasy_locale: da_DK
+  billing_country_code_as_reported_by_salesforce_625bbb4e: "Faktureringslandekode som rapporteret af Salesforce"
   blackboard: 
     no_manifest: "Denne Blackboard .zip indeholder ikke nogen imsmanifest.xml fil i rodmappen."
   blackout_date_5fc44c2b: Blackout-dato
@@ -5251,6 +5258,7 @@ da-x-k12:
     ics_description_user: "Kalenderbegivenheder for brugeren, %{user_name}"
     ics_title: "%{course_or_group_name} kalender (Canvas)"
     invalid_date_or_time: "Ugyldig dato eller ugyldig dato og klokkeslæt for %{attr}"
+  calendar_feed_url_b7b91e7b: Kalenderfeed-url
   calendar_removed_1c841af4: "Kalender blev fjernet"
   calendar_series_e1b7a4bc: Kalenderserie
   calendars: 
@@ -6479,6 +6487,8 @@ da-x-k12:
       folder_picker: 
         default_select_folder: "Vælg mappe"
         upload_to: "Upload til"
+      import_blueprint_settings: 
+        checkbox_label: "Importer indstillinger til Blueprint-fag"
       import_quizzes_next_view: 
         import_new_quizzes: "Importer eksisterende quizzer som *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes er den nye vurderingsfunktion i Canvas.%{p_p}For at lære mere skal du kontakte din systemadministrator eller besøge"
@@ -7028,6 +7038,7 @@ da-x-k12:
   conversations_send_messages_to_individual_course_m_733620b: "Samtaler - send beskeder til enkelte af fagets deltagere"
   copy_9748f9f: Kopi
   copy_assignment_name_to_another_course_b62d0a54: "Kopiér opgave %{name} til et andet fag"
+  copy_blueprint_course_settings_31a97e96: "Kopiér indstillinger til Blueprint-fag"
   copy_list_of_shard_ids_d51cd846: "Kopier liste over shard-ID'er"
   copy_operation_started_successfully_b2f236a1: "Kopiering blev påbegyndt"
   copy_page_to_another_course_405cc07c: "Kopiér side til et andet fag"
@@ -7132,6 +7143,9 @@ da-x-k12:
     one: "1 dag"
     other: "%{count} dage"
     zero: ""
+  count_days_ago_406937d: 
+    one: "For 1 dag siden"
+    other: "for %{count} dage siden"
   count_days_de0c6a32: 
     one: "1 dag"
     other: "%{count} dage"
@@ -7166,6 +7180,9 @@ da-x-k12:
   count_hours_1bd03883: 
     one: "1 time"
     other: "%{count} timer"
+  count_hours_ago_322dcc79: 
+    one: "For 1 time siden"
+    other: "%{count} timer siden"
   count_images_found_for_term_a93635ed: "%{count} billeder fundet for %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} blev slettet."
@@ -7187,6 +7204,7 @@ da-x-k12:
     one: "1 minut"
     other: "%{count} minutter"
     zero: "mindre end 1 minut"
+  count_minutes_ago_c1b7d7ef: "For %{count} minutter siden"
   count_more_beba6428: "%{count} mere"
   count_must_be_0_4abb84b3: "COUNT skal være > 0"
   count_must_be_greater_than_0_f8f88358: "ANTAL skal være større end 0"
@@ -7336,6 +7354,9 @@ da-x-k12:
   count_weeks_11fbd2dc: 
     one: "1 uge"
     other: "%{count} uger"
+  count_weeks_ago_9393928c: 
+    one: "1 uge siden"
+    other: "%{count} uger siden"
   count_weeks_d03afdd8: 
     one: "1 uge"
     other: "%{count} uger"
@@ -7500,6 +7521,7 @@ da-x-k12:
   course_image_settings_eba3ec55: "Indstillinger for fagets billede"
   course_implemented_apps_fa658f5a: "App'er der er implementeret i faget"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Faget er allerede knyttet til en plan"
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Faget er udelukket fra at blive indstillet til som blueprint"
   course_landing_page_49a53ade: "Fagets landingsside"
   course_level_notification_preferences_require_a_co_2f0a618: "Meddelelsespræferencer på fagniveau kræver, at en course_id opdaterer"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Meddelelser på fagniveau nedarves fra dine meddelelsesindstillinger på kontoniveau. Justering af meddelelser for dette fag tilsidesætter meddelelser på kontoniveau."
@@ -8672,6 +8694,7 @@ da-x-k12:
   deduction_interval_e18bd51: Fradragsinterval
   deep_orange_4c7eea99: "Dyb orange"
   deep_purple_bb3e2907: "Dyb lilla"
+  deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Dybt indlejrede svar understøttes ikke længere. Dit svar vil blive vist på den side, du er på i øjeblikket."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Dybt indlejrede svar understøttes ikke længere. Dit svar vises på den første side i denne tråd."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konference"
@@ -9936,6 +9959,7 @@ da-x-k12:
   enhanced_grade_change_auditing_2b155dfa: "Forbedret vurderingsændrings-audit"
   enhanced_gradebook_filters_a3be5e7d: "Forbedrede filtre for vurderingsoversigt"
   enhanced_gradebook_filters_description: "Denne funktion giver forbedrede filtreringsmuligheder i Canvas-vurderingsoversigten. Når dette flag er aktiveret, vises tidlig adgang til løbende forbedringer automatisk med hver frigivelse. For flere detaljer henvises der til *brugergruppen for vurderingsoversigt-filtre* i Canvas Community."
+  enhanced_rce_paste_from_clipboard_30ddb011: "Forbedret RCE-indsætning fra udklipsholder"
   enhances_the_canvas_experience_within_the_learning_8031b650: "Forbedrer Canvas-oplevelsen i vurderingsoversigten for opfyldelse af læringsmål."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Forbedrer farvekontrasten på tekst, knapper osv."
   enroll_in_subject_9c1f1c18: "Tilmeld dig emnet"
@@ -10374,6 +10398,7 @@ da-x-k12:
   error_embedding_content_from_tool_49bb698e: "Fejl ved indlejring af indhold fra værktøjet"
   error_exporting_gradebook_msg_6ea31e2f: "Fejl ved eksport af vurderingsoversigt: %{msg}"
   error_fetching_access_token_1445a9e3: "Fejl ved hentning af adgangs-token"
+  error_fetching_rubric_data_66432f54: "Fejl ved hentning af vurderingskriterier data"
   error_fetching_user_details_7c85d23: "Fejl ved hentning af brugeroplysninger"
   error_importing_outcomes_59a4fe81: "Fejl ved import af læringsudbytter"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} inden for læringssti-området %{index}"
@@ -10405,6 +10430,7 @@ da-x-k12:
   error_sending_submission_d32dc075: "Fejl ved indsendelse af aflevering"
   error_starting_content_share_18fb1532: "Fejl ved påbegyndelse af indholdsdeling"
   error_starting_save_operation_81bcb99: "Fejl ved forsøg på at gemme:"
+  error_submitting_rubric_83daca8b: "Fejl ved indsendelse af vurderingskriterier"
   error_submitting_to_plagiarism_service_9b0748cb: "Fejl ved indsendelse til plagieringstjeneste"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Fejl ved indsendelse til plagieringstjeneste. Du kan indsende fra SpeedGrader igen."
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Fejl: Værktøjet returnerede ikke en URL til Canvas"
@@ -10757,6 +10783,7 @@ da-x-k12:
   failed_to_delete_internal_setting_b85d397c: "Kunne ikke slette intern indstilling"
   failed_to_delete_role_label_27959de3: "Kunne ikke slette rolle %{label}"
   failed_to_delete_selected_pages_26fa87db: "Kunne ikke slette valgte sider"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Kunne ikke eksportere indstillinger til blueprint-fag"
   failed_to_export_course_paces_e17583ba: "Eksport af fagtempoer mislykkedes"
   failed_to_export_pace_plans_9832daac: "Kunne ikke eksportere tempoplaner"
   failed_to_ignore_assignment_46565fa3: "Kunne ikke ignorere opgaven"
@@ -11270,6 +11297,7 @@ da-x-k12:
   grade_9c6f076d: Vurdering
   grade_a91e433e: "Vurdering:"
   grade_assignment_7c1abc11: "Vurder %{assignment}"
+  grade_by_question_9d9b8a71: "Giv vurdering pr. spørgsmål"
   grade_calculator_performance_improvements_564af0de: "Forbedringer af vurderingsberegnerens ydeevne"
   grade_change_activity_75fb525: Vurderingsændringer
   grade_change_log_231f90e4: Vurderingsændringslog
@@ -12229,6 +12257,7 @@ da-x-k12:
   grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" blev opdateret."
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: "Haitisk kreolsk"
+  handle_pasting_of_files_especially_images_7c19b19c: "Håndter indsætning af filer, især billeder."
   handlebars_helpers: 
     time: 
       event: "%{date} kl. %{time}"
@@ -13221,6 +13250,9 @@ da-x-k12:
   invalid_address_book_strategy_904a7ada: "Ugyldig adressebog-strategi"
   invalid_authenticity_token_b753558c: "Ugyldigt godkendelses-token"
   invalid_aws_configuration_e8a6ae0f: "Ugyldig AWS-konfiguration"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Ugyldig blueprint låst elementtype %{type} for element %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Ugyldige blueprint-begrænsningstyper i importeret pakke; ved brug af standardindstillinger"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Ugyldige blueprint-begrænsninger for element %{id}"
   invalid_byday_byday_6e361e78: "Ugyldig BYDAY '%{byday}'"
   invalid_bymonth_bymonth_91f621b3: "Ugyldig BYMONTH '%{bymonth}'"
   invalid_bymonthday_bymonthday_87791c1b: "Ugyldig BYMONTHDAY '%{bymonthday}'"
@@ -13452,6 +13484,7 @@ da-x-k12:
   june_a58d8523: Juni
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Blot et tilfældigt spørgsmål, kommentar, idé, forslag"
   just_in_time_provisioning_382a0354: "Just in Time-melding"
+  just_now_526a643c: "Lige nu"
   jwk_method_6d5d0c84: "* JWK-metode"
   jwts_4f397c85: JWTs
   k12_description: "Opdater ikonerne i menuen Global navigation, så de giver mere mening specifikt i et folkeskolemiljø."
@@ -17747,6 +17780,7 @@ da-x-k12:
   pace_removed_8e625df7: "Tempo fjernet"
   pace_type_76cf749: Tempotype
   pacename_updated_2a2c4d77: "%{paceName} opdateret"
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} tempoer: sorteret efter %{sortBy} i %{orderType} rækkefølge"
   package_error: "Fejl under identificering af pakketype: %{error}"
   package_export_from_d6e2b073: "Pakke-eksport fra"
   page_50c4823d: Side
@@ -17901,6 +17935,7 @@ da-x-k12:
   peer_reviews_e3a55964: Elev-elev-vurderinger
   peer_service_6b4828b9: Peer-service
   peer_services_102357e3: Elev-elev-tjenester
+  peer_submissions_ready_for_review_availablecount_3ac80091: "Peer-indsendelser klar til gennemgang: %{availableCount}"
   pending_3e506a5b: Afventer
   pending_enforcement_eb32e3d: "Afventer håndhævelse"
   pending_f1ed53c7: Afventer
@@ -20259,6 +20294,7 @@ da-x-k12:
       surveys: Spørgeundersøgelser
     toggle_message: "skift quizzens synlighed"
   quizzes_index_menu_1ce11b54: "Indeksmenu for quizzer"
+  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next Giv vurdering pr. spørgsmål i SpeedGrader"
   quizzes_next_importing_75e63f67: "Quizzes.Next importeres"
   quizzes_public: 
     alerts: 
@@ -21081,6 +21117,7 @@ da-x-k12:
   rubric_deleted_3d9efc18: "Vurderingskriterie slettet"
   rubric_fc39da76: Vurderingskriterium
   rubric_updated_103e24dc: "Vurderingskriterie opdateret"
+  rubric_was_successfully_submitted_b0766474: "Vurderingskriterier blev indsendt"
   rubrics: 
     index: 
       account_rubrics: "Vurderingskriterier for konto"
@@ -21379,6 +21416,8 @@ da-x-k12:
   search_flickr_6f28b02e: "Søg flickr"
   search_for_a_deleted_course_by_id_f553398d: "Søg efter et slettet fag med id"
   search_for_files_7541fb28: "Søger efter filer"
+  search_for_sections_62e90cf4: "Søg efter sektioner"
+  search_for_students_ed16c2de: "Søg efter elever"
   search_for_your_school_or_institution_1eb2eeaf: "Søg efter din skole eller institution"
   search_form_fcaa38f7: Søgeformular
   search_grading_periods_e947a3e9: "Søg vurderingsperioder ..."
@@ -21732,6 +21771,7 @@ da-x-k12:
   send_to_a879095e: "Send til:"
   send_to_b940900a: "Send til ..."
   send_to_ce05b460: "Send til"
+  send_usage_metrics_cecc7a7d: "Send forbrugsdata"
   sending_bf324366: "Sender ..."
   sending_message_75923692: "Sender besked"
   sending_message_8ac5bc90: "Sender besked ..."
@@ -22727,6 +22767,7 @@ da-x-k12:
   sorted_ascending_b6d61547: "sorteret stigende"
   sorted_by_ascending_af61f8ca: "Sorteret efter stigende"
   sorted_by_descending_824c4300: "Sorteret efter faldende"
+  sorted_by_sortby_in_ordertype_order_55c8cf9a: "Sorteret efter %{sortBy} i %{orderType} rækkefølge"
   sorted_descending_1e30f0d5: "sorteret faldende"
   sorted_descending_84ec84c8: "sorteret i faldende rækkefølge"
   sorted_direction_by_columnname_d049ac44: "Sorteret %{direction} efter %{columnName}"
@@ -23337,6 +23378,7 @@ da-x-k12:
   submit_file_using_name_bc8d7b71: "Send fil vha. %{name}"
   submit_for_student_d90838e8: "Aflever for elev"
   submit_media_file_f334c1ba: "Indsend mediefil"
+  submit_on_behalf_of_student_af674b95: "Indsend på vegne af elev"
   submit_ticket_5515ffd: "Opret supportsag"
   submitted_318fad53: Afleveret
   submitted_at_4d5ea3aa: Afleveret
@@ -23855,6 +23897,7 @@ da-x-k12:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: "Det maksimale antal bedømmere er nået for denne opgave."
   the_media_id_does_not_correspond_to_an_existing_me_eab16c08: "%{media_id} svarer ikke til et eksisterende medieobjekt"
   the_media_object_id_must_match_an_existing_media_o_62195fef: "media_object_id skal matche et eksisterende medieobjekt"
+  the_message_size_has_exceeded_the_maximum_text_len_9e86b291: "Beskedstørrelsen har overskredet den maksimale tekstlængde."
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       Beskeden med overskriften "%{subject}" kunne ikke leveres, fordi diskussionsemnet er blevet slettet. Hvis du prøver at kontakte en person gennem Canvas, kan du prøve at logge ind på din konto, og sende dem en besked ved brug af indbakkeværktøjet.
       
@@ -25551,6 +25594,7 @@ da-x-k12:
   unable_to_toggle_placement_833db6ff: "Kunne ikke skifte placering"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Kunne ikke overføre filen til lagertjenesten. Tjenesten kan være nede, eller du skal måske logge ind på Canvas igen."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Kan ikke opdatere indstillingerne for Microsoft Teams-synkronisering. Prøv igen. Hvis problemet fortsætter, bedes du kontakte support."
+  unable_to_update_splitscreen_preference_4d449fa5: "Kan ikke opdatere præference for opdelt skærm."
   unaccepted_students_aa68ea98: "Ikke accepterede elever"
   unarchive_f245e2d6: "Fjern fra arkivet"
   unarchive_operation_failed_22c42032: "Fjernelse af arkiveringen mislykkedes"
@@ -26411,6 +26455,7 @@ da-x-k12:
   view_groups_47b5f60c: "Vis grupper"
   view_history_2dfb048: "Vis historik"
   view_important_dates_173c7e1b: "Se vigtige datoer"
+  view_inline_ffb3928b: "Vis indbygget"
   view_learning_analytics_beta_1c98a397: "Se Learning Analytics (Beta)"
   view_login_ids_for_users_142bbe7a: "Vis brugeres login-id’er"
   view_longer_description_6b762087: "vis længere beskrivelse"
@@ -26429,6 +26474,7 @@ da-x-k12:
   view_range_student_details_8116d68a: "Se område i elevens detaljer"
   view_replies_8565a729: "Se svar"
   view_rubric_d71cce10: "Vis vurderingskriterie"
+  view_split_screen_ca35b78a: "Se delt skærm"
   view_submission_ff3da5d: "Vis aflevering"
   view_the_assignment_e61ca4fc: "Vis opgaven"
   view_the_discussion_link_c4dbdef: "Vis diskussionen: %{link}."
@@ -27039,6 +27085,7 @@ da-x-k12:
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Du har fjernet offentliggørelsen af diskussionsemnet."
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "Du har afmeldt dig fra diskussionsemnet."
   you_have_successfully_updated_the_discussion_topic_b2910500: "Du har opdateret diskussionsemnet."
+  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "Du har %{totalCount} elev-elev vurderinger, der skal fuldføres"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "Du har ikke-offentliggjorte ændringer i dit fagtempo. Hvis du fortsætter, kasseres disse ændringer."
   you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "Du har ikke-offentliggjorte ændringer i dit fagtempo. Hvis du fortsætter, kasseres disse ændringer."
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: "Du har ikke offentliggjorte ændringer til dit fags tempoplan. Hvis du fortsætter, kasseres disse ændringer."
@@ -27096,6 +27143,7 @@ da-x-k12:
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Du skal angive, om Microsoft Teams-synkronisering skal aktiveres eller deaktiveres"
   you_must_use_a_number_912ce4bd: "Du skal bruge et tal"
   you_must_use_a_positive_number_203b86fe: "Du skal bruge et positivt tal"
+  you_must_use_an_integer_78d2530f: "Du skal bruge et heltal"
   you_need_to_preview_changes_before_saving_85e60232: "Du skal \"forhåndsvise ændringer\" før du gemmer"
   you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "Du skal \"forhåndsvise ændringer\", før du kan anvende dem i din konto"
   you_need_to_save_before_applying_to_this_account_7436a5ae: "Du skal \"gemme\" før du anvender dette i denne konto"
