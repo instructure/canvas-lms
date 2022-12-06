@@ -38,6 +38,7 @@ import {sanitizePlugins} from './sanitizePlugins'
 import RCEGlobals from './RCEGlobals'
 import defaultTinymceConfig from '../defaultTinymceConfig'
 import {
+  FS_ENABLED,
   FS_ELEMENT,
   FS_REQUEST,
   FS_EXIT,
@@ -757,6 +758,10 @@ class RCEWrapper extends React.Component {
     this.mceInstance().fire(VIEW_CHANGE, {target: this.editor, newView: newState.editorView})
   }
 
+  toggleFullscreen = () => {
+    this.handleClickFullscreen()
+  }
+
   _isFullscreen() {
     return !!(this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT])
   }
@@ -1464,6 +1469,10 @@ class RCEWrapper extends React.Component {
       canvasPlugins.push('instructure_icon_maker')
     }
 
+    if (document[FS_ENABLED]) {
+      canvasPlugins.push('instructure_fullscreen')
+    }
+
     const possibleNewMenubarItems = this.props.editorOptions.menu
       ? Object.keys(this.props.editorOptions.menu).join(' ')
       : undefined
@@ -1539,7 +1548,10 @@ class RCEWrapper extends React.Component {
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
           tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem'},
-          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'},
+          view: {
+            title: formatMessage('View'),
+            items: 'instructure_fullscreen instructure_exit_fullscreen instructure_html_view',
+          },
         },
         options.menu
       ),

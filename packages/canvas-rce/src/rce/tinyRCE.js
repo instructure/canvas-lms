@@ -53,6 +53,7 @@ import './plugins/instructure_media_embed/plugin'
 import './plugins/instructure_icon_maker/plugin'
 import './plugins/instructure_wordcount/plugin'
 import './plugins/instructure_paste/plugin'
+import './plugins/instructure_fullscreen/plugin'
 
 import 'tinymce-a11y-checker'
 

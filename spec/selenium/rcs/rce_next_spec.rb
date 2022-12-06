@@ -969,11 +969,11 @@ describe "RCE next tests", ignore_js_errors: true do
       it "opens rce in full screen with button in status bar" do
         visit_front_page_edit(@course)
 
-        click_full_screen_button
+        full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq f(".rce-wrapper")
 
-        click_full_screen_button
+        exit_full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq nil
       end
@@ -1576,11 +1576,11 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wrapper = f(".rce-wrapper")
         orig_height = rce_wrapper.css_value("height")
 
-        click_full_screen_button
+        full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq f(".rce-wrapper")
 
-        click_full_screen_button
+        exit_full_screen_button.click
         rce_wrapper = f(".rce-wrapper")
         Selenium::WebDriver::Wait.new(timeout: 1.0).until do
           expect(orig_height).to eql(rce_wrapper.css_value("height"))
@@ -1593,13 +1593,12 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wrapper = f(".rce-wrapper")
         orig_height = rce_wrapper.css_value("height").to_i
 
-        click_full_screen_button
+        full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq f(".rce-wrapper")
 
         switch_to_html_view
-        click_full_screen_button
-
+        exit_full_screen_button.click
         rce_wrapper = f(".rce-wrapper")
         new_height = rce_wrapper.css_value("height").to_i
         Selenium::WebDriver::Wait.new(timeout: 1.0).until do
@@ -1614,12 +1613,11 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wrapper = f(".rce-wrapper")
         orig_height = rce_wrapper.css_value("height").to_i
 
-        click_full_screen_button
+        full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq f(".rce-wrapper")
 
-        click_full_screen_button
-
+        exit_full_screen_button.click
         rce_wrapper = f(".rce-wrapper")
         new_height = rce_wrapper.css_value("height").to_i
         Selenium::WebDriver::Wait.new(timeout: 1.0).until do
@@ -1634,13 +1632,12 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wrapper = f(".rce-wrapper")
         orig_height = rce_wrapper.css_value("height").to_i
 
-        click_full_screen_button
+        full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
         expect(fs_elem).to eq f(".rce-wrapper")
 
         switch_to_editor_view
-        click_full_screen_button
-
+        exit_full_screen_button.click
         rce_wrapper = f(".rce-wrapper")
         new_height = rce_wrapper.css_value("height").to_i
         Selenium::WebDriver::Wait.new(timeout: 1.0).until do
