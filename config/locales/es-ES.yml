@@ -192,6 +192,7 @@ es-ES:
   a_name_for_this_set_is_required_222bad23: "Es obligatorio un nombre para este conjunto"
   a_name_is_required_b5df38a9: "El nombre es obligatorio"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Se ha creado una actividad nueva para tu asignatura, %{course_name}"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "Se ha creado un módulo con el contenido obtenido de la herramienta. Si quieres verlo, dirígete a la página Módulos."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Se requiere un identificador de socio para utilizar Academic Benchmark"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Se requiere una clave de socio para utilizar Academic Benchmark"
   a_process_is_already_in_progress_f4495f5e: "Ya hay un proceso en curso."
@@ -1763,6 +1764,7 @@ es-ES:
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Añade enlace de analíticas en el menú de configuraciones del usuario."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Añade análisis a la ventana de contexto de un estudiante."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Añade permisos granulares para añadir o eliminar cada rol, y un permiso separado para otras acciones del administrador de la asignatura"
+  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Añade la opción para evaluar por pregunta en SpeedGrader para Quizzes.Next exámenes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Añade indicadores visuales a la página de detalles de la entrega para decirle a los estudiantes que hay
       notas o comentarios de rúbrica no leídos en el documento
@@ -1979,6 +1981,7 @@ es-ES:
       Permite a los administradores ver un registro que contiene información sobre todas las mutaciones
       GraphQL realizadas recientemente
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permite ajustar las competencias al contenido sin puntuación"
+  allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Permite que la configuración de la asignatura Blueprint se pueda exportar y copiar en otra asignatura Blueprint"
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Permite a Canvas enviar archivos iWork a docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permitir que las páginas de la asignatura se publiquen en el programa"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que los enlaces de ayuda se etiqueten como destacados o nuevos y muestra a la vista el enlace de ayuda destacado en el menú de ayuda."
@@ -1991,6 +1994,7 @@ es-ES:
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Permite configurar las valoraciones del criterio y las opciones del procedimiento de cálculo para competencias individuales."
   allows_students_to_access_other_student_groups_wit_43918810: "Permite a los estudiantes acceder a otros grupos de estudiantes dentro de un conjunto de grupos con un enlace directo."
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Permite sincronizar los miembros de las asignaturas de Canvas en un Microsoft Team"
+  allows_teachers_with_the_proper_permissions_to_sub_6dc94b17: "Permitir a los profesores con los permisos correspondientes enviar archivos de actividades en representación de sus estudiantes."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Permite la duplicación de módulos en Canvas"
   allows_the_gradebook_importer_to_recognize_and_app_6f11fd0c: "Permite al importador del Libro de notas reconocer y aplicar cambios para anular puntuaciones."
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Permite que el aplicador de políticas de entrega no presentado emita eventos en vivo de submission_updated para cada entrega que se marque como no presentado."
@@ -2929,6 +2933,8 @@ es-ES:
   assignment_group: 
     default_name: Actividades
     default_title: Actividades
+    drop_rules_must_be_positive: "Las reglas de nunca abandonar deben ser un número positivo"
+    drop_rules_too_high: "Las reglas de nunca abandonar deben ser superiores al número de actividades"
   assignment_group_1a781505: "Grupo de actividades"
   assignment_group_export_fd77c394: "Exportar grupo de actividades"
   assignment_group_filter_c03f8a1d: "Filtro del grupo de actividades"
@@ -3709,7 +3715,7 @@ es-ES:
   batch_edit_6d41d0d7: "Edición por lote"
   batch_edit_dates_f1ec3df2: "Fechas de edición por lote"
   bb_display: "Blackboard Learn"
-  bb_file_description: "Exportar archivo .zip de Blackboard 6/7/8/9"
+  bb_file_description: "Exportar archivo .zip de Blackboard 6/7/8/9/Ultra"
   bb_name: "Blackboard Converter"
   bbb_modal_update_e27b10e: "Actualización modal de BBB"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Sería de gran ayuda que pidieras a tu profesor que arregle este enlace."
@@ -3743,6 +3749,7 @@ es-ES:
     create_time: "Crear hora"
     recording_setting: Grabación
     recording_setting_enabled_description: "Habilitar la grabación para esta conferencia"
+  billing_country_code_as_reported_by_salesforce_625bbb4e: "Facturación del país de envío según lo indicado por Salesforce"
   blackboard: 
     no_manifest: "Este archivo .zip de Blackboard no tiene imsmanifest.xml en el directorio raíz."
   blackout_date_5fc44c2b: "Fecha de suspensión"
@@ -4230,6 +4237,7 @@ es-ES:
     ics_description_user: "Eventos de calendario para el usuario, %{user_name}"
     ics_title: "Calendario (Canvas) %{course_or_group_name}"
     invalid_date_or_time: "Fecha incorrecta o fecha y hora incorrecta para %{attr}"
+  calendar_feed_url_b7b91e7b: "Url de la actividad del calendario"
   calendar_removed_1c841af4: "Calendario eliminado"
   calendar_series_e1b7a4bc: "Series del calendario"
   calendars: 
@@ -5348,6 +5356,8 @@ es-ES:
       folder_picker: 
         default_select_folder: "Seleccionar carpeta"
         upload_to: "Cargar a"
+      import_blueprint_settings: 
+        checkbox_label: "Importar la configuración de la asignatura Blueprint"
       import_quizzes_next_view: 
         import_new_quizzes: "Importar pruebas existentes como *Nuevas Pruebas*"
         import_new_quizzes_help_text: "Nuevas pruebas es el nuevo motor de prueba de Canvas.%{p_p}Para obtener más información, ponte en contacto con el administrador del sistema o visita"
@@ -5824,6 +5834,7 @@ es-ES:
   conversations_send_messages_to_individual_course_m_733620b: "Conversaciones: enviar mensajes a miembros individuales de la asignatura"
   copy_9748f9f: Copiar
   copy_assignment_name_to_another_course_b62d0a54: "Copiar actividad %{name} a otra asignatura"
+  copy_blueprint_course_settings_31a97e96: "Copiar la configuración de la asignatura Blueprint"
   copy_list_of_shard_ids_d51cd846: "Copiar lista de identificadores en compartición"
   copy_operation_started_successfully_b2f236a1: "La operación de copia ha comenzado correctamente"
   copy_page_to_another_course_405cc07c: "Copiar página a otra asignatura"
@@ -5920,6 +5931,9 @@ es-ES:
     one: 1 día
     other: "%{count} días"
     zero: ""
+  count_days_ago_406937d: 
+    one: "Hace 1 día"
+    other: "hace %{count} días"
   count_days_de0c6a32: 
     one: "1 día"
     other: "%{count} días"
@@ -5951,6 +5965,9 @@ es-ES:
   count_hours_1bd03883: 
     one: "1 hora"
     other: "%{count} horas"
+  count_hours_ago_322dcc79: 
+    one: "Hace 1 hora"
+    other: "hace %{count} horas"
   count_images_found_for_term_a93635ed: "Se han encontrado %{count} imágenes para %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} eliminado correctamente."
@@ -5972,6 +5989,7 @@ es-ES:
     one: "1 minuto"
     other: "%{count} minutos"
     zero: "menos de 1 minuto"
+  count_minutes_ago_c1b7d7ef: "hace %{count} minutos"
   count_more_beba6428: "%{count} más"
   count_must_be_0_4abb84b3: "El RECUENTO debe ser > 0"
   count_must_be_greater_than_0_f8f88358: "El RECUENTO debe ser mayor que 0"
@@ -6106,6 +6124,9 @@ es-ES:
   count_weeks_11fbd2dc: 
     one: "1 semana"
     other: "%{count} semanas"
+  count_weeks_ago_9393928c: 
+    one: "Hace 1 semana"
+    other: "Hace %{count} semanas"
   count_weeks_d03afdd8: 
     one: 1 semana
     other: "%{count} semanas"
@@ -6262,6 +6283,7 @@ es-ES:
   course_image_settings_eba3ec55: "Configuraciones de la imagen de la asignatura"
   course_implemented_apps_fa658f5a: "Aplicaciones implementadas a la asignatura"
   course_is_already_associated_with_a_blueprint_4d9407cb: "La asignatura ya está asociada con un proyecto"
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "La asignatura no cumple con los requisitos de configuración como Blueprint"
   course_level_notification_preferences_require_a_co_2f0a618: "Las preferencias de notificación de los niveles de las asignaturas requieren una course_id para actualizarse"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Las notificaciones a nivel de la asignatura se heredan de tus configuraciones de notificaciones a nivel de la cuenta. Al ajustar las notificaciones de esta asignatura se anulan las notificaciones a nivel de la cuenta."
   course_list: 
@@ -7297,6 +7319,7 @@ es-ES:
   decrease_indent_de6343ab: "Reducir sangría"
   deduction_interval_e18bd51: "Intervalo de deducción"
   deep_purple_bb3e2907: "Morado oscuro"
+  deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Las respuestas muy anidadas ya no son compatibles. Tu respuesta aparecerá en la página en la que estás actualmente."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Las respuestas muy anidadas ya no son compatibles. Tu respuesta aparecerá en la primera página de este hilo de mensajes."
   default_9db103d: Predeterminado
   default_conference_title: "Conferencia de %{course_name}"
@@ -8268,6 +8291,7 @@ es-ES:
   enhance_color_contrast_of_content_685ddd49: "Aumentar el contraste de colores del contenido"
   enhanced_gradebook_filters_a3be5e7d: "Filtros mejorados del libro de notas"
   enhanced_gradebook_filters_description: "Esta característica ofrece opciones de filtrado mejoradas en el libro de notas Cuando esta marca está habilitada, el acceso anticipado a las mejoras continuas se mostrará de forma automática con cada versión. Para más información, véase el *Grupo de usuario con filtros del libro de notas* en la comunidad de Canvas."
+  enhanced_rce_paste_from_clipboard_30ddb011: "Editor de contenido enriquecido con función mejorada para pegar desde el portapapeles"
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Aumenta el contraste de colores del texto, los botones, etc."
   enroll_in_subject_9c1f1c18: "Inscribirse en el tema"
   enrolled_a6a517cd: Inscrito
@@ -8633,6 +8657,7 @@ es-ES:
   error_embedding_content_from_tool_49bb698e: "Ha habido un error al incorporar contenido desde la herramienta"
   error_exporting_gradebook_msg_6ea31e2f: "Ha habido un error al exportar el libro de notas: %{msg}"
   error_fetching_access_token_1445a9e3: "Ha habido un error al obtener el autentificador de acceso"
+  error_fetching_rubric_data_66432f54: "No se ha podido obtener la fecha de la rúbrica"
   error_fetching_user_details_7c85d23: "Ha habido un error al obtener los detalles del usuario"
   error_importing_outcomes_59a4fe81: "Ha habido un error al importar las competencias"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} en el intervalo de las rutas de dominio %{index}"
@@ -8661,6 +8686,7 @@ es-ES:
   error_sending_submission_d32dc075: "Ha habido un error al enviar la entrega"
   error_starting_content_share_18fb1532: "Ha habido un error al comenzar a compartir contenido"
   error_starting_save_operation_81bcb99: "Ha habido un error al iniciar la operación de guardado:"
+  error_submitting_rubric_83daca8b: "No se ha podido enviar la rúbrica"
   error_submitting_to_plagiarism_service_9b0748cb: "Ha habido un error al entregar al servicio contra el plagio"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Ha habido un error al entregar al servicio contra el plagio. Puedes volver a entregarlo desde SpeedGrader."
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Error: La herramienta no ha devuelto una URL a Canvas"
@@ -8975,6 +9001,7 @@ es-ES:
   failed_to_delete_internal_setting_b85d397c: "Ha habido un error al eliminar la configuración interna"
   failed_to_delete_role_label_27959de3: "Ha habido un error al eliminar el rol %{label}"
   failed_to_delete_selected_pages_26fa87db: "Ha habido un error al eliminar las páginas seleccionadas"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Ha habido un error al exportar la configuración de la asignatura Blueprint"
   failed_to_export_course_paces_e17583ba: "Ha habido un error al exportar el ritmo de avance de la asignatura"
   failed_to_export_pace_plans_9832daac: "No se ha podido exportar Pace Plans"
   failed_to_ignore_assignment_46565fa3: "Ha habido un error al ignorar la actividad"
@@ -9431,6 +9458,7 @@ es-ES:
   grade_9c6f076d: Nota
   grade_a91e433e: "Nota:"
   grade_assignment_7c1abc11: "Nota %{assignment}"
+  grade_by_question_9d9b8a71: "Evaluar por pregunta"
   grade_change_activity_75fb525: "Actividad de cambio de nota"
   grade_change_log_231f90e4: "Registro del cambio de nota"
   grade_change_notifications_98461261: "Notificaciones de cambio de la nota"
@@ -10138,6 +10166,7 @@ es-ES:
   grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" se ha actualizado correctamente."
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: "Criollo haitiano"
+  handle_pasting_of_files_especially_images_7c19b19c: "Gestionar el pegado de los archivos, especialmente las imágenes."
   handler_7912052f: Gestor
   has_been_automatically_selected_based_upon_where_t_61f805c5: "se ha seleccionado automáticamente en función del lugar en el que la instancia de Canvas de esta cuenta está ubicada. En algunos casos puede ser una región diferente."
   has_similarity_score_d5f332b4: "Tiene puntuación de similitud"
@@ -10912,6 +10941,9 @@ es-ES:
   internet2_254c6ca6: Internet2
   interval_must_be_0_e7b8eb5: "El INTERVALO debe ser > 0"
   invalid_authenticity_token_b753558c: "Autentificador de autenticidad incorrecto"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Elemento Blueprint no válido de tipo %{type} bloqueado para el elemento %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Hay tipos de restricción no válidos en el paquete importado, se pasarán a utilizar los predeterminados"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Hay restricciones no válidas para el elemento %{id}"
   invalid_byday_byday_6e361e78: "BYDAY '%{byday}' incorrecto"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH '%{bymonth}' incorrecto"
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' incorrecto"
@@ -11130,6 +11162,7 @@ es-ES:
   june_a58d8523: Junio
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Solo una pregunta, comentario, idea o sugerencia informal"
   just_in_time_provisioning_382a0354: "Aprovisionamiento justo a tiempo"
+  just_now_526a643c: "Hace un momento"
   jwk_method_6d5d0c84: "* método JWK"
   jwts_4f397c85: JWTs
   k12_description: "Actualiza los iconos del menú de navegación global que sean más convenientes, especialmente en un entorno K-12."
@@ -13428,14 +13461,14 @@ es-ES:
           excused: "Esta actividad ha sido justificada."
           link_message: "Haz clic aquí para revisar la actividad"
           no_date_set: "No se ha establecido la fecha"
-          not_applicable: "No procede"
+          not_applicable: N/A
           regraded_date: "reevaluado: %{date}"
           score: "puntuación: %{score} de %{total}"
           score_pending: "El profesor tiene pendiente la revisión de la puntuación"
           subject: "La nota ha cambiado: %{assignment}, %{context}"
         link_message: "Puedes revisar la actividad aquí:"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
         score: "puntuación:  %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
@@ -13444,20 +13477,20 @@ es-ES:
         body_sms: "tu nota de %{title} en %{context} acaba de cambiar."
         more_info: "Más información en %{url}"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
         score: "puntuación:  %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
       summary: 
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
         score: "puntuación:  %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "La nota ha cambiado: %{title}, %{context}"
       twitter: 
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación:  %{score} de %{total}"
         score_pending: "(revisión pendiente)"
         tweet: "Alerta de Canvas: cambio de nota %{date}"
@@ -13472,30 +13505,30 @@ es-ES:
           graded_date: "evaluado: %{date}"
           link_message: "Haz clic aquí para revisar la actividad"
           no_date_set: "No se ha establecido la fecha"
-          not_applicable: "No procede"
+          not_applicable: N/A
           score: "puntuación: %{score} de %{total}"
           score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
           subject: "Actividad evaluada: %{assignment}, %{context}"
         link_message: "Puedes revisar la actividad aquí:"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación:  %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "Actividad evaluada: %{assignment}, %{context}"
       sms: 
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación:  %{score} de %{total}"
         sms_body: "%{assignment} se ha evaluado."
       summary: 
         graded_date: "evaluado: %{date}"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación:  %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
         subject: "Actividad evaluada: %{assignment}, %{context}"
       twitter: 
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación:  %{score} de %{total}"
         score_pending_review: "(revisión pendiente)"
         tweet: "Alerta de Canvas: evaluada: %{assignment}, %{context}"
@@ -13514,7 +13547,7 @@ es-ES:
         body_sms: "tu nota para %{title}, %{context} acaba de cambiar."
         more_info: "Más información en %{url}"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         regraded_date: "reevaluado: %{date}"
         score: "puntuación:  %{score} de %{total}"
         score_pending: "El profesor tiene pendiente la revisión de la puntuación"
@@ -13535,12 +13568,12 @@ es-ES:
           graded_date: "evaluado: %{date}"
           link: "Puedes verlo aquí"
           no_date_set: "No se ha establecido la fecha"
-          not_applicable: "No procede"
+          not_applicable: N/A
           score: "puntuación: %{score} de %{total}"
           score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
         link_message: "Puedes verlo aquí: %{link}."
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
       sms: 
@@ -13548,12 +13581,12 @@ es-ES:
         graded_date: "evaluado: %{date}"
         link_message: "Más información en %{link}."
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación: %{score} de %{total}"
       summary: 
         graded_date: "evaluado: %{date}"
         no_date_set: "No se ha establecido la fecha"
-        not_applicable: "No procede"
+        not_applicable: N/A
         score: "puntuación: %{score} de %{total}"
         score_pending_review: "El profesor tiene pendiente la revisión de la puntuación"
     submissions_posted: 
@@ -13964,8 +13997,8 @@ es-ES:
   my_subjects_61936afb: "Mis temas"
   my_themes_b72217b8: "Mis temas"
   n_554bc493: "n"
-  n_a_d5d5a207: "no procede"
-  n_a_d6f6c42f: "No procede"
+  n_a_d5d5a207: n/a
+  n_a_d6f6c42f: N/A
   n_contextscount_more_2f708db4: "+ %{n_contextsCount} más"
   n_count_alignments_a45bebe7: "*%{n_count}* ajustes"
   n_groupweight_percentage_of_total_2ae4d996: "%{n_groupWeight_percentage} del total"
@@ -13974,7 +14007,7 @@ es-ES:
   n_points_precision_2_strip_insig_points_60ad6f21: "%{n_points_precision_2_strip_insig} Puntos"
   n_pointspossible_points_possible_1d098245: "%{n_pointsPossible} puntos posibles"
   n_pointspossible_pts_73274d36: "%{n_pointsPossible} puntos"
-  na_3dbb9cfd: "No procede"
+  na_3dbb9cfd: N/A
   name: "Importador de Academic Benchmark"
   name_1aed4a1b: Nombre
   name_3806192d: "Nombre:"
@@ -15037,6 +15070,7 @@ es-ES:
   pace_removed_8e625df7: "Ritmo eliminado"
   pace_type_76cf749: "Tipo de ritmo"
   pacename_updated_2a2c4d77: "%{paceName} actualizado"
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} ritmo del curso: ordenado por %{sortBy} en orden %{orderType}"
   package_error: "Error al identificar el tipo de paquete: %{error}"
   package_export_from_d6e2b073: "Paquete exportado de"
   page_50c4823d: Página
@@ -15182,6 +15216,7 @@ es-ES:
   peer_reviews_e3a55964: "Revisiones entre compañeros"
   peer_service_6b4828b9: "Servicio entre compañeros"
   peer_services_102357e3: "Servicios entre compañeros"
+  peer_submissions_ready_for_review_availablecount_3ac80091: "Entregas entre compañeros listas para la revisión: %{availableCount}"
   pending_3e506a5b: Pendiente
   pending_enforcement_eb32e3d: "Ejecución pendiente"
   pending_f1ed53c7: pendiente
@@ -16514,7 +16549,7 @@ es-ES:
       high_score: "Puntuación alta"
       low_score: "Puntuación baja"
       mean: "Puntuación promedio"
-      not_available_abbrev: "No procede"
+      not_available_abbrev: N/A
       quiz_summary: "Resumen de la prueba"
       stdev: "Desviación típica"
       table_description: "Todos los resúmenes de estadísticas se han convertido en entregas"
@@ -17293,6 +17328,7 @@ es-ES:
       surveys: Encuestas
     toggle_message: "Cambiar la visibilidad de la prueba"
   quizzes_index_menu_1ce11b54: "Menú de índice de pruebas"
+  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next evalúa por pregunta en SpeedGrader"
   quizzes_public: 
     alerts: 
       no_valid_combinations: "El sistema no ha podido generar ninguna combinación correcta para los parámetros dados"
@@ -18022,6 +18058,7 @@ es-ES:
   rubric_deleted_3d9efc18: "Se ha eliminado una rúbrica"
   rubric_fc39da76: Rúbrica
   rubric_updated_103e24dc: "Se ha actualizado una rúbrica"
+  rubric_was_successfully_submitted_b0766474: "Se ha enviado la rúbrica"
   rubrics: 
     index: 
       account_rubrics: "Rúbricas de la cuenta"
@@ -18146,7 +18183,7 @@ es-ES:
   score_grade_8742b368: "%{score} (%{grade})"
   score_hidden_f345f875: "Puntuación: (oculto)"
   score_letter_grade_b3bb9e52: "%{score} nota por letra"
-  score_n_a_34dfdcda: "Puntuación: No procede"
+  score_n_a_34dfdcda: "Puntuación: N/A"
   score_out_of_points_84f44331: "(%{score} de %{points})"
   score_out_of_points_possible_88f370fd: "%{score} de %{points_possible}"
   score_out_of_points_possible_points_bbaea991: "%{score} de %{points_possible} puntos"
@@ -18295,6 +18332,8 @@ es-ES:
   search_flickr_6f28b02e: "Buscar flickr"
   search_for_a_deleted_course_by_id_f553398d: "Buscar una asignatura eliminada por identificación"
   search_for_files_7541fb28: "Buscar archivos"
+  search_for_sections_62e90cf4: "Buscar por secciones"
+  search_for_students_ed16c2de: "Buscar por estudiantes"
   search_for_your_school_or_institution_1eb2eeaf: "Buscar tu escuela o tu centro"
   search_form_fcaa38f7: "Buscar formulario"
   search_grading_periods_e947a3e9: "Buscar periodos de evaluación..."
@@ -18623,6 +18662,7 @@ es-ES:
   send_to_7881bf0e: "Enviar a..."
   send_to_a879095e: "Enviar a:"
   send_to_b940900a: "Enviar a..."
+  send_usage_metrics_cecc7a7d: "Enviar métricas de uso"
   sending_bf324366: Enviando...
   sending_message_75923692: "Enviando mensaje"
   sending_message_8ac5bc90: "Enviando mensaje..."
@@ -19414,6 +19454,7 @@ es-ES:
   sorted_ascending_3138603c: "ordenado de forma ascendente."
   sorted_by_ascending_af61f8ca: "Ordenado en forma ascendente"
   sorted_by_descending_824c4300: "Ordenado en forma descendente"
+  sorted_by_sortby_in_ordertype_order_55c8cf9a: "Ordenado por %{sortBy} en orden %{orderType}"
   sorted_descending_84ec84c8: "ordenado de forma descendente."
   sorted_direction_by_columnname_d049ac44: "Se ha ordenado %{direction} por %{columnName}"
   source_code_2395ca74: "Código fuente"
@@ -19679,7 +19720,7 @@ es-ES:
   student_messages_b0a242d: "Mensajes del estudiante"
   student_module_completion_c113d05f: "Finalización del contenido del estudiante"
   student_must_complete_one_of_these_requirements_6046eb3a: "El estudiante debe completar uno de estos requisitos"
-  student_n_a_30b1753f: "Estudiante: No procede"
+  student_n_a_30b1753f: "Estudiante: N/A"
   student_name: "Nombre del estudiante"
   student_name_a30d555e: "Estudiante: %{name}"
   student_name_b446c661: "nombre del estudiante"
@@ -19987,6 +20028,7 @@ es-ES:
   submit_file_using_label_9fa4bbb7: "Entregar archivo con %{label}"
   submit_for_student_d90838e8: "Entregar para el estudiante"
   submit_media_file_f334c1ba: "Entregar archivo multimedia"
+  submit_on_behalf_of_student_af674b95: "Enviar en representación del estudiante"
   submit_ticket_5515ffd: "Entregar ticket"
   submitted_318fad53: Entregado
   submitted_at_4d5ea3aa: "Entregado a"
@@ -20434,6 +20476,7 @@ es-ES:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: "Para esta actividad, se ha alcanzado el número máximo de evaluadores."
   the_media_id_does_not_correspond_to_an_existing_me_eab16c08: "La %{media_id} no corresponde a un objeto multimedia existente"
   the_media_object_id_must_match_an_existing_media_o_62195fef: "la media_object_id debe coincidir con un objeto multimedia existente"
+  the_message_size_has_exceeded_the_maximum_text_len_9e86b291: "El tamaño del mensaje supera la longitud máxima del texto."
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       El mensaje titulado “%{subject}” no se ha podido entregar porque el tema del foro de discusión se ha eliminado. Si estás intentando ponerte en contacto con alguien a través de Canvas, puedes intentar iniciar sesión desde tu cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.
       
@@ -21708,6 +21751,7 @@ es-ES:
   unable_to_toggle_placement_833db6ff: "No se puede activar/desactivar la ubicación"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "No se puede transmitir el archivo al servicio de almacenamiento. Es posible que el servicio no esté funcionando o que tenga que volver a iniciar sesión en Canvas."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "No se pueden actualizar las configuraciones de la sincronización de Microsoft Teams. Inténtalo de nuevo. Si el problema continúa, ponte en contacto con el servicio de asistencia."
+  unable_to_update_splitscreen_preference_4d449fa5: "No se ha podido actualizar la preferencia de pantalla partida."
   unaccepted_students_aa68ea98: "Estudiantes no aceptados"
   unarchive_f245e2d6: Desarchivar
   unarchive_operation_failed_22c42032: "No se puede completar la operación de desarchivar"
@@ -22483,6 +22527,7 @@ es-ES:
   view_groups_47b5f60c: "Ver grupos"
   view_history_2dfb048: "Ver historial"
   view_important_dates_173c7e1b: "Ver fechas importantes"
+  view_inline_ffb3928b: "Ver online"
   view_login_ids_for_users_142bbe7a: "Ver identificaciones de inicio de sesión de los usuarios"
   view_longer_description_6b762087: "ver descripción más detallada"
   view_missing_missing_items_for_course_coursename_e7509012: "Consultar %{missing} ítems no presentados para la asignatura %{courseName}"
@@ -22498,6 +22543,7 @@ es-ES:
   view_range_student_details_8116d68a: "Ver la gama de detalles del estudiante"
   view_replies_8565a729: "Ver respuestas"
   view_rubric_d71cce10: "Ver rúbrica"
+  view_split_screen_ca35b78a: "Ver pantalla partida"
   view_submission_ff3da5d: "Ver entrega"
   view_the_assignment_e61ca4fc: "Ver la actividad"
   view_the_discussion_link_c4dbdef: "Ver el foro de discusión: %{link}."
@@ -23027,6 +23073,7 @@ es-ES:
   you_have_successfully_subscribed_to_the_discussion_a577c521: "Te has suscrito correctamente al tema del foro de discusión."
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "Has eliminado correctamente tu suscripción al tema del foro de discusión."
   you_have_successfully_updated_the_discussion_topic_b2910500: "Has actualizado correctamente el tema del foro de discusión."
+  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "Tienes revisiones entre %{totalCount} compañeros que realizar"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "No has publicado los cambios en tu ritmo de avance de la asignatura. Si continúas, se descartarán estos cambios."
   you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "No has publicado los cambios en tu ritmo de avance de la asignatura. Si continúas, se descartarán estos cambios."
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: "No ha publicado los cambios en su Pace Plan de la asignatura. Si continúa, se descartarán estos cambios."
@@ -23079,6 +23126,7 @@ es-ES:
   you_must_specify_a_usage_right_5eb57f87: "Debes especificar un derecho de uso."
   you_must_use_a_number_912ce4bd: "Debes utilizar un número"
   you_must_use_a_positive_number_203b86fe: "Debes utilizar un número positivo"
+  you_must_use_an_integer_78d2530f: "Debes utilizar un entero"
   you_need_to_preview_changes_before_saving_85e60232: "Necesitas “Previsualizar tus cambios” antes de guardarlos"
   you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "Necesitas “Previsualizar cambios” antes de que puedas aplicarlos a tu cuenta"
   you_need_to_save_before_applying_to_this_account_7436a5ae: "Necesitas “Guardar” antes de aplicarlos a tu cuenta"
