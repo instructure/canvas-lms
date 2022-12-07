@@ -129,7 +129,10 @@ export default class TrayController {
           })
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {
-              this.$videoContainer.contentWindow.location.reload()
+              this.$videoContainer.contentWindow.postMessage(
+                {subject: 'reload_media', media_object_id: videoOptions.media_object_id},
+                bridge.canvasOrigin
+              )
             }
           })
           .catch(ex => {
