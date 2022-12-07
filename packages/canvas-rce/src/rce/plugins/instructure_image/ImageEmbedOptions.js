@@ -102,10 +102,14 @@ export function fromVideoEmbed($element) {
     $videoDoc = $videoIframe.contentDocument
     if ($videoDoc) {
       $videoElem = $videoDoc.querySelector('video')
-    }
-    if ($videoElem && ($videoElem.loadedmetadata || $videoElem.readyState >= 1)) {
-      naturalWidth = $videoElem.videoWidth
-      naturalHeight = $videoElem.videoHeight
+
+      if ($videoElem && ($videoElem.loadedmetadata || $videoElem.readyState >= 1)) {
+        naturalWidth = $videoElem.videoWidth
+        naturalHeight = $videoElem.videoHeight
+      }
+    } else {
+      naturalHeight = $videoIframe.clientHeight
+      naturalWidth = $videoIframe.clientWidth
     }
   }
 
