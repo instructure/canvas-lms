@@ -15462,6 +15462,7 @@ pl:
   invalid_address_book_strategy_904a7ada: "Nieprawidłowa strategia książki adresowej."
   invalid_authenticity_token_b753558c: "Nieprawidłowy token uwierzytelniania"
   invalid_aws_configuration_e8a6ae0f: "Nieprawidłowa konfiguracja AWS"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Nieprawidłowy typ zablokowanego elementu Blueprint %{type} dla elementu %{id}"
   invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Nieprawidłowe typy ograniczeń Blueprint w importowanym pakiecie; wykorzystane zostaną domyślne"
   invalid_blueprint_restrictions_for_item_id_63aae663: "Nieprawidłowe ograniczenia Blueprint dla elementu %{id}"
   invalid_byday_byday_6e361e78: "Nieprawidłowy BYDAY '%{byday}'"
