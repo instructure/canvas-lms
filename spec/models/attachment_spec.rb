@@ -2264,47 +2264,75 @@ describe Attachment do
     include WebMock::API
 
     context "instfs branch" do
-      before do
+      before :once do
         user_model
         attachment_model(context: @user)
-        public_url = "http://www.example.com/foo"
+        @public_url = "http://www.example.com/foo"
+        @attachment.update md5: Digest::SHA512.hexdigest("test response body")
+      end
+
+      before do
         allow(@attachment).to receive(:instfs_hosted?).and_return true
-        allow(@attachment).to receive(:public_url).and_return public_url
-
-        stub_request(:get, public_url)
-          .to_return(status: 200, body: "test response body", headers: {})
+        allow(@attachment).to receive(:public_url).and_return @public_url
       end
 
-      it "streams data to the block given" do
-        callback = false
-        @attachment.open do |data|
-          expect(data).to eq "test response body"
-          callback = true
+      context "with good data" do
+        before do
+          stub_request(:get, @public_url)
+            .to_return(status: 200, body: "test response body", headers: {})
         end
-        expect(callback).to eq true
-      end
 
-      it "streams to a tempfile without a block given" do
-        file = @attachment.open
-        expect(file).to be_a(Tempfile)
-        expect(file.read).to eq("test response body")
-      end
-
-      it "retries without duplicating already downloaded data" do
-        # WebMock operates at too high a level to simulate a read timeout, so we'll hack the Tempfile
-        # to raise one after the first write to it so we can test the exception flow
-        raised = false
-        allow(CanvasHttp::CircuitBreaker).to receive(:trip_if_necessary)
-        expect_any_instance_of(Tempfile).to receive(:<<).at_least(:once).and_wrap_original do |m, *args|
-          m.call(*args)
-          unless raised
-            raised = true
-            raise Net::ReadTimeout
+        it "streams data to the block given" do
+          callback = false
+          @attachment.open do |data|
+            expect(data).to eq "test response body"
+            callback = true
           end
+          expect(callback).to eq true
         end
-        file = @attachment.open
-        expect(file).to be_a(Tempfile)
-        expect(file.read).to eq("test response body")
+
+        it "streams to a tempfile without a block given" do
+          file = @attachment.open
+          expect(file).to be_a(Tempfile)
+          expect(file.read).to eq("test response body")
+        end
+
+        it "retries without duplicating already downloaded data" do
+          # WebMock operates at too high a level to simulate a read timeout, so we'll hack the Tempfile
+          # to raise one after the first write to it so we can test the exception flow
+          raised = false
+          allow(CanvasHttp::CircuitBreaker).to receive(:trip_if_necessary)
+          expect_any_instance_of(Tempfile).to receive(:<<).at_least(:once).and_wrap_original do |m, *args|
+            m.call(*args)
+            unless raised
+              raised = true
+              raise Net::ReadTimeout
+            end
+          end
+          file = @attachment.open
+          expect(file).to be_a(Tempfile)
+          expect(file.read).to eq("test response body")
+        end
+      end
+
+      context "with bad data and :integrity_check" do
+        # return bad data the first time, then correct data the second time
+        before do
+          stub_request(:get, @public_url)
+            .to_return(status: 200, body: "bad response body :( :(").then
+            .to_return(status: 200, body: "test response body")
+        end
+
+        # since we already sent bad data to the block, we can't fix this
+        it "raises an error in the block flow" do
+          expect { @attachment.open(integrity_check: true) { |data| data } }.to raise_error(Attachment::CorruptedDownload)
+        end
+
+        # we should rewind/truncate the tempfile and try the download again (but also log the exception)
+        it "retries the download in the tempfile flow" do
+          expect(Canvas::Errors).to receive(:capture_exception).with(:attachment, Attachment::CorruptedDownload, :info).once
+          expect(@attachment.open(integrity_check: true).read).to eq "test response body"
+        end
       end
     end
 
