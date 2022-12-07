@@ -50,6 +50,16 @@ ready(() => {
     }
   }
 
+  window.addEventListener(
+    'message',
+    event => {
+      if (event?.data?.subject === 'reload_media' && media_id === event?.data?.media_object_id) {
+        window.location.reload()
+      }
+    },
+    false
+  )
+
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
   // if the user takes the video fullscreen and back, the documentElement winds up
   // with scrollbars, even though everything is the right size.
