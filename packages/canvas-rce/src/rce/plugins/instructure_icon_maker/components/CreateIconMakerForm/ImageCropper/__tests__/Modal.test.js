@@ -82,7 +82,6 @@ describe('ImageCropperModal', () => {
     await waitFor(() => {
       expect(props.onSubmit).toHaveBeenCalledWith(
         {
-          image: 'data:image/png;base64,asdfasdfjksdf==',
           rotation: 0,
           scaleRatio: 1,
           shape: 'square',

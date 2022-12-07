@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import bridge from '../../../../bridge'
 import clickCallback from '../clickCallback'
 import {getAllByLabelText, queryByRole, getByRole} from '@testing-library/react'
 
@@ -36,6 +37,7 @@ describe('Instructure Image Plugin: clickCallback', () => {
         initializeMedia() {},
       },
     }
+    bridge.trayProps.set(editor, trayProps)
   })
   afterEach(() => {
     document.querySelector('.canvas-rce-upload-container').remove()

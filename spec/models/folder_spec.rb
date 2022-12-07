@@ -528,10 +528,6 @@ describe Folder do
   end
 
   describe "#for_student_annotation_documents?" do
-    before(:once) do
-      @course = Course.create!
-    end
-
     it "is false when it does not have the correct unique_type" do
       annotation_documents_folder = @course.student_annotation_documents_folder
       folder_without_unique_type = @course.folders.create!(
@@ -545,6 +541,18 @@ describe Folder do
 
     it "is true when the folder is the student annotation documents folder for a course" do
       expect(@course.student_annotation_documents_folder).to be_for_student_annotation_documents
+    end
+  end
+
+  describe "#destroy" do
+    it "destroys sub-folders and files" do
+      parent_folder = folder_model
+      child_folder = folder_model(parent_folder_id: parent_folder.id)
+      attachment = attachment_model(folder: child_folder)
+      parent_folder.destroy
+      expect(parent_folder).to be_deleted
+      expect(child_folder.reload).to be_deleted
+      expect(attachment.reload).to be_deleted
     end
   end
 end

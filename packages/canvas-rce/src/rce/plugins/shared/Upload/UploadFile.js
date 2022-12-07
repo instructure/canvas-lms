@@ -118,10 +118,13 @@ export function UploadFile({
   onDismiss,
   requireA11yAttributes = true,
   trayProps,
+  canvasOrigin,
   onSubmit = handleSubmit,
+  preselectedFile = undefined,
 }) {
   const [modalBodyWidth, setModalBodyWidth] = useState(undefined)
   const [modalBodyHeight, setModalBodyHeight] = useState(undefined)
+  const [theFile] = useState(preselectedFile)
   const bodyRef = React.useRef()
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
@@ -142,13 +145,15 @@ export function UploadFile({
   }, [modalBodyHeight, modalBodyWidth])
 
   return (
-    <StoreProvider {...trayProps}>
+    <StoreProvider {...trayProps} canvasOrigin={canvasOrigin}>
       {contentProps => (
         <UploadFileModal
           ref={bodyRef}
+          preselectedFile={theFile}
           editor={editor}
           trayProps={trayProps}
           contentProps={contentProps}
+          canvasOrigin={canvasOrigin}
           onSubmit={onSubmit}
           onDismiss={onDismiss}
           panels={panels}
@@ -172,4 +177,6 @@ UploadFile.propTypes = {
   panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
   requireA11yAttributes: bool,
   trayProps: object,
+  canvasOrigin: string,
+  preselectedFile: object, // a JS File
 }

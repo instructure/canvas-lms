@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -60,6 +61,7 @@ export const SplitScreenParent = props => {
   })
 
   const {setOnSuccess} = useContext(AlertManagerContext)
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
@@ -154,17 +156,11 @@ export const SplitScreenParent = props => {
           {props.discussionEntry.parentId && (
             <View as="div" padding="small none none small">
               <BackButton
-                onClick={() =>
-                  props.onOpenSplitScreenView(
-                    props.discussionEntry.parentId,
-                    props.discussionEntry.isolatedEntryId,
-                    false
-                  )
-                }
+                onClick={() => props.onOpenSplitScreenView(props.discussionEntry.parentId, false)}
               />
             </View>
           )}
-          {props.discussionEntry.parentId && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
+          {props.discussionEntry.depth > 2 && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
             <Alert
               variant="warning"
               renderCloseButtonLabel="Close"
@@ -180,9 +176,13 @@ export const SplitScreenParent = props => {
               }}
             >
               <Text size={responsiveProps.textSize}>
-                {I18n.t(
-                  'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
-                )}
+                {props.discussionEntry.depth > 3
+                  ? I18n.t(
+                      'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+                    )
+                  : I18n.t(
+                      'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
+                    )}
               </Text>
             </Alert>
           )}
@@ -223,6 +223,10 @@ export const SplitScreenParent = props => {
                             },
                           })
                         }
+                        onQuoteReply={() => {
+                          setReplyFromId(props.discussionEntry._id)
+                          props.setRCEOpen(true)
+                        }}
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

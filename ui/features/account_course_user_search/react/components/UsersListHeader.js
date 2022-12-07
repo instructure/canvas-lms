@@ -25,12 +25,12 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
 export default function UsersListHeader(props) {
-  const {id, tipAsc, tipDesc, label, onUpdateFilters, columnHeaderRef} = props
+  const {id, tipAsc, tipDesc, label, onUpdateFilters, sortColumnHeaderRef} = props
   const {sort, order, search_term, role_filter_id} = props.searchFilter
   const newOrder = (sort === id && order === 'asc') || (!sort && id === 'username') ? 'desc' : 'asc'
 
   const handleFilterUpdate = event => {
-    if (event && event.currentTarget) columnHeaderRef(event.currentTarget)
+    if (event && event.currentTarget) sortColumnHeaderRef(event.currentTarget)
     onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
   }
 
@@ -41,7 +41,7 @@ export default function UsersListHeader(props) {
       <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
         <Link
           isWithinText={false}
-          id={`${id}-button`}
+          id={`${id}-sort`}
           as="button"
           renderIcon={sort === id ? SortIcon : undefined}
           iconPlacement="end"
@@ -60,7 +60,7 @@ UsersListHeader.propTypes = {
   tipDesc: string.isRequired,
   label: string.isRequired,
   onUpdateFilters: func.isRequired,
-  columnHeaderRef: func.isRequired,
+  sortColumnHeaderRef: func.isRequired,
   searchFilter: shape({
     sort: string,
     order: string,

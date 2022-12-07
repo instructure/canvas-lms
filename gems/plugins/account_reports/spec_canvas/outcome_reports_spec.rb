@@ -656,8 +656,20 @@ describe "Outcome Reports" do
         let(:outcome_ids) { @outcome.id.to_s }
         let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
-        it "does not call OS when FF is off" do
+        it "does not call OS when FF is off for the account" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+
+          expect(outcome_reports).not_to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results).to be_empty
+        end
+
+        it "does not call OS when FF is off for course" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          @course1.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+
           # get_lmgb_results is still called, but the first line checks is the FF is enabled and returns nil if OFF
           # In that case, get_lmgb_results returns nil
           expect(outcome_reports).to receive(:get_lmgb_results)

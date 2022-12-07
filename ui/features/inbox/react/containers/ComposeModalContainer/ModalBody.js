@@ -50,7 +50,9 @@ const ModalBody = props => (
               file={{
                 mediaID: props.mediaUploadFile.mediaObject.media_object.media_id,
                 src: URL.createObjectURL(props.mediaUploadFile.uploadedFile),
-                title: props.mediaUploadFile.mediaObject.media_object.title,
+                title:
+                  props.mediaUploadFile.mediaObject.media_object.user_entered_title ??
+                  props.mediaUploadFile.mediaObject.media_object.title,
                 type: props.mediaUploadFile.mediaObject.media_object.media_type,
                 mediaTracks: props.mediaUploadFile.mediaObject.media_object.media_tracks,
               }}

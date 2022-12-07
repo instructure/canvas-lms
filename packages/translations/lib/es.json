@@ -32,6 +32,12 @@
     "address_3159962f": {
         "message": "Dirección:"
     },
+    "afrikaans_da0fe6ee": {
+        "message": "Afrikáans"
+    },
+    "albanian_21ed929e": {
+        "message": "Albanés"
+    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -110,8 +116,14 @@
     "apps_54d24a47": {
         "message": "Aplicaciones"
     },
+    "arabic_c5c87acd": {
+        "message": "Árabe"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "¿Está seguro de que desea eliminar este ítem del planificador?"
+    },
+    "armenian_12da6118": {
+        "message": "Armenio"
     },
     "arrows_464a3e54": {
         "message": "Flechas"
@@ -197,6 +209,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Inicio de su Historial de cosas por hacer"
     },
+    "belarusian_b2f19c76": {
+        "message": "Bielorruso"
+    },
     "below_81d4dceb": {
         "message": "Debajo"
     },
@@ -230,6 +245,9 @@
     "brick_f2656265": {
         "message": "Ladrillo"
     },
+    "bulgarian_feccab7e": {
+        "message": "Búlgaro"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -248,6 +266,9 @@
     "cap_product_3a5265a6": {
         "message": "Extremo de producto"
     },
+    "catalan_16f6b78f": {
+        "message": "Catalán"
+    },
     "center_align_e68d9997": {
         "message": "Alineación central"
     },
@@ -260,6 +281,15 @@
     "chi_54a32644": {
         "message": "Chi"
     },
+    "chinese_111d37f6": {
+        "message": "Chino"
+    },
+    "chinese_simplified_7f0bd370": {
+        "message": "Chino simplificado"
+    },
+    "chinese_traditional_8a7f759d": {
+        "message": "Chino tradicional"
+    },
     "choose_caption_file_9c45bc4e": {
         "message": "Elegir archivo de subtítulos"
     },
@@ -268,9 +298,6 @@
     },
     "circle_484abe63": {
         "message": "Círculo"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "marque con un círculo la lista no ordenada"
     },
     "clear_2084585f": {
         "message": "Eliminar"
@@ -416,6 +443,9 @@
     "creative_commons_license_725584ae": {
         "message": "Licencia Creative Commons:"
     },
+    "croatian_d713d655": {
+        "message": "Croata"
+    },
     "crop_image_41bf940c": {
         "message": "Delimitar imagen"
     },
@@ -434,8 +464,14 @@
     "cyan_c1d5f68a": {
         "message": "Cian"
     },
+    "czech_9aa2cbe4": {
+        "message": "Checo"
+    },
     "dagger_57e0f4e5": {
         "message": "Daga"
+    },
+    "danish_c18cdac8": {
+        "message": "Danés"
     },
     "date_added_ed5ad465": {
         "message": "Fecha de agregado"
@@ -466,12 +502,6 @@
     },
     "deep_purple_bb3e2907": {
         "message": "Morado oscuro"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "lista no ordenada con viñetas predeterminada"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "lista numérica ordenada predeterminada"
     },
     "definite_integral_fe7ffed1": {
         "message": "Integral definida"
@@ -611,6 +641,9 @@
     "due_when_7eed10c6": {
         "message": "Fecha límite: { when }"
     },
+    "dutch_6d05cee5": {
+        "message": "Holandés"
+    },
     "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
         "message": "Editar texto alternativo para esta instancia de ícono"
     },
@@ -671,8 +704,20 @@
     "engineering_icon_f8f3cf43": {
         "message": "Ícono de ingeniería"
     },
+    "english_australia_dc405d82": {
+        "message": "Inglés (Australia)"
+    },
+    "english_c60612e2": {
+        "message": "Inglés"
+    },
+    "english_canada_12688ee4": {
+        "message": "Inglés (Canadá)"
+    },
     "english_icon_25bfe845": {
         "message": "Ícono de ingles"
+    },
+    "english_united_kingdom_a613f831": {
+        "message": "Inglés (Reino Unido)"
     },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Ingresar al menos 3 caracteres para buscar"
@@ -709,6 +754,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Error al cargar ítems anteriores"
+    },
+    "estonian_5e8e2fa4": {
+        "message": "Estonio"
     },
     "eta_b8828f99": {
         "message": "Eta"
@@ -812,6 +860,12 @@
     "files_index_af7c662b": {
         "message": "Índice de archivos"
     },
+    "filipino_33339264": {
+        "message": "Filipino"
+    },
+    "finnish_4df2923d": {
+        "message": "Finés"
+    },
     "flat_music_76d5a5c3": {
         "message": "Bemol (música)"
     },
@@ -842,17 +896,29 @@
     "fraction_41bac7af": {
         "message": "Fracción"
     },
+    "french_33881544": {
+        "message": "Francés"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "Francés (Canadá)"
+    },
     "fullscreen_873bf53f": {
         "message": "Pantalla completa"
     },
     "fun_quiz_47ab0b0": {
         "message": "Examen divertido"
     },
+    "galician_7e4508b5": {
+        "message": "Gallego"
+    },
     "gamma_1767928": {
         "message": "Gamma"
     },
     "generating_preview_45b53be0": {
         "message": "Generando la vista previa..."
+    },
+    "german_3ec99bbb": {
+        "message": "Alemán"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Actualmente no se admiten imágenes en formato GIF/PNG de más de { size } KB."
@@ -923,6 +989,9 @@
     "h_bar_bb94deae": {
         "message": "Barra H"
     },
+    "haitian_creole_7eb4195b": {
+        "message": "Criollo haitiano"
+    },
     "hat_ea321e35": {
         "message": "Sombrero"
     },
@@ -941,6 +1010,9 @@
     "hearts_suit_e50e04ca": {
         "message": "Corazones (palo)"
     },
+    "hebrew_88fbf778": {
+        "message": "Hebreo"
+    },
     "height_69b03e15": {
         "message": "Altura"
     },
@@ -953,6 +1025,9 @@
     "hide_title_description_caf092ef": {
         "message": "Ocultar descripción { title }"
     },
+    "hindi_9bcd4b34": {
+        "message": "Hindi"
+    },
     "home_351838cd": {
         "message": "Página de inicio"
     },
@@ -962,11 +1037,17 @@
     "html_editor_fb2ab713": {
         "message": "Editor HTML"
     },
+    "hungarian_fc7d30c9": {
+        "message": "Húngaro"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "He obtenido permiso para utilizar este archivo."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Soy el titular de los derechos de autor"
+    },
+    "icelandic_9d6d35de": {
+        "message": "Islandés"
     },
     "icon_215a1dc6": {
         "message": "Ícono"
@@ -985,6 +1066,9 @@
     },
     "icon_options_tray_2b407977": {
         "message": "Bandeja de opciones de íconos"
+    },
+    "icon_preview_1782a1d9": {
+        "message": "Vista preliminar del ícono"
     },
     "icon_shape_30b61e7": {
         "message": "Forma del ícono"
@@ -1031,6 +1115,9 @@
     "indigo_2035fc55": {
         "message": "Índigo"
     },
+    "indonesian_5f6accd6": {
+        "message": "Indonesio"
+    },
     "inference_fed5c960": {
         "message": "Inferencia"
     },
@@ -1070,8 +1157,17 @@
     "iota_11c932a9": {
         "message": "Iota"
     },
+    "irish_567e109f": {
+        "message": "Irlandés"
+    },
+    "italian_bd3c792d": {
+        "message": "Italiano"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } { items, plural,\n     =1 {ítem}\n  other {ítems}\n} completado(s)"
+    },
+    "japanese_b5721ca7": {
+        "message": "Japonés"
     },
     "join_6cafecca": {
         "message": "Unirse"
@@ -1097,6 +1193,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Acceso rápido de teclado"
     },
+    "korean_da812d9": {
+        "message": "Coreano"
+    },
     "lambda_4f602498": {
         "message": "Lambda"
     },
@@ -1114,6 +1213,9 @@
     },
     "late_2be42b88": {
         "message": "Atrasado"
+    },
+    "latvian_2bbb6aab": {
+        "message": "Letón"
     },
     "left_align_43d95491": {
         "message": "Alineación a la izquierda"
@@ -1174,6 +1276,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Enlaces a un sitio externo."
+    },
+    "lithuanian_5adcbe24": {
+        "message": "Lituano"
     },
     "load_more_35d33c7": {
         "message": "Cargar más"
@@ -1247,8 +1352,20 @@
     "low_horizontal_dots_cc08498e": {
         "message": "Puntos horizontales bajos"
     },
+    "macedonian_6ed541af": {
+        "message": "Macedonio"
+    },
     "magenta_4a65993c": {
         "message": "Magenta"
+    },
+    "malay_f5dddce4": {
+        "message": "Malayo"
+    },
+    "maltese_916925e8": {
+        "message": "Maltés"
+    },
+    "maori_new_zealand_5380a95f": {
+        "message": "Māori (Nueva Zelanda)"
     },
     "maps_to_e5ef7382": {
         "message": "Mapas a"
@@ -1400,6 +1517,15 @@
     "none_selected_b93d56d2": {
         "message": "Nada seleccionado"
     },
+    "norwegian_53f391ec": {
+        "message": "Noruego"
+    },
+    "norwegian_bokmal_ad5843fa": {
+        "message": "Noruego Bokmål"
+    },
+    "norwegian_nynorsk_c785f8a6": {
+        "message": "Noruego Nynorsk"
+    },
     "not_equal_6e2980e6": {
         "message": "No igual"
     },
@@ -1490,9 +1616,6 @@
     "orange_81386a62": {
         "message": "Anaranjado"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "Listas ordenadas y no ordenadas"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Puede encontrar otros atajos de editor en"
     },
@@ -1544,6 +1667,9 @@
     "perpendicular_7c48ede4": {
         "message": "Perpendicular"
     },
+    "persian_a8cadb95": {
+        "message": "Persa"
+    },
     "phi_4ac33b6d": {
         "message": "Phi"
     },
@@ -1582,6 +1708,12 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } puntos"
+    },
+    "polish_4cf2ecaf": {
+        "message": "Polaco"
+    },
+    "portuguese_9c212cf4": {
+        "message": "Portugués"
     },
     "posted_when_a578f5ab": {
         "message": "Publicado: { when }"
@@ -1754,6 +1886,9 @@
     "rightward_pointing_triangle_60330f5c": {
         "message": "Triángulo apuntando hacia la derecha"
     },
+    "romanian_13670c1e": {
+        "message": "Rumano"
+    },
     "rotate_image_90_degrees_2ab77c05": {
         "message": "Rotar imagen -90 grados"
     },
@@ -1762,6 +1897,9 @@
     },
     "rotation_9699c538": {
         "message": "Rotación"
+    },
+    "russian_1e3e197": {
+        "message": "Ruso"
     },
     "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
         "message": "Lamentablemente, no se puede acceder al Editor HTML agradable desde el teclado. Acceda al Editor de HTML sin formato aquí."
@@ -1804,6 +1942,9 @@
     },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } seleccionado"
+    },
+    "serbian_7187f1f2": {
+        "message": "Serbio"
     },
     "set_minus_b46e9b88": {
         "message": "Fijar menor"
@@ -1850,6 +1991,12 @@
     "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
         "message": "El tamaño del archivo de subtítulos es superior al tamaño del archivo permitido de { max } kB."
     },
+    "slovak_69f48e1b": {
+        "message": "Eslovaco"
+    },
+    "slovenian_30ae5208": {
+        "message": "Esloveno"
+    },
     "small_b070434a": {
         "message": "Pequeño"
     },
@@ -1877,6 +2024,9 @@
     "spades_suit_b37020c2": {
         "message": "Espadas (palo)"
     },
+    "spanish_de9de5d6": {
+        "message": "Español"
+    },
     "square_511eb3b3": {
         "message": "Cuadrado"
     },
@@ -1903,9 +2053,6 @@
     },
     "square_superset_strict_fa4262e4": {
         "message": "Superconjunto cuadrado (estricto)"
-    },
-    "square_unordered_list_b15ce93b": {
-        "message": "lista cuadrada no ordenada"
     },
     "star_8d156e09": {
         "message": "Estrella"
@@ -1973,6 +2120,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tipos de archivos admitidos: SRT o WebVTT"
     },
+    "swahili_5caeb4ba": {
+        "message": "Suajili"
+    },
+    "swedish_59a593ca": {
+        "message": "Sueco"
+    },
     "switch_to_pretty_html_editor_a3cee15f": {
         "message": "Cambiar al Editor de HTML acondicionado"
     },
@@ -1990,6 +2143,9 @@
     },
     "tab_arrows_4cf5abfc": {
         "message": "Tabulador/flechas"
+    },
+    "tagalog_74906db7": {
+        "message": "Tagalo"
     },
     "task_16b0ef38": {
         "message": "Tarea"
@@ -2017,6 +2173,9 @@
     },
     "text_size_887c2f6": {
         "message": "Tamaño del texto"
+    },
+    "thai_8f9bc548": {
+        "message": "Tailandés"
     },
     "the_best_assignment_15e98be1": {
         "message": "La mejor tarea"
@@ -2141,6 +2300,9 @@
     "triangle_6072304e": {
         "message": "Triángulo"
     },
+    "turkish_5b69578b": {
+        "message": "Turco"
+    },
     "turnstile_yields_f9e76df1": {
         "message": "Trinquete (da resultados)"
     },
@@ -2152,6 +2314,9 @@
     },
     "type_control_f9_to_access_table_options_text_92141329": {
         "message": "presione Control F9 para acceder a las opciones de tabla. { text }"
+    },
+    "ukrainian_945b00b7": {
+        "message": "Ucraniano"
     },
     "unable_to_mark_as_complete_8141856d": {
         "message": "No se puede marcar como completada."
@@ -2189,9 +2354,6 @@
     "uploading_19e8a4e7": {
         "message": "Cargando"
     },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "lista ordenada alfabéticamente en mayúsculas"
-    },
     "uppercase_delta_d4f4bc41": {
         "message": "Delta en mayúsculas"
     },
@@ -2212,9 +2374,6 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Psi en mayúsculas"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "lista ordenada de números romanos en mayúsculas"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Sigma en mayúsculas"
@@ -2312,6 +2471,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Reproductor de video para { title }"
     },
+    "vietnamese_e7a76583": {
+        "message": "Vietnamita"
+    },
     "view_ba339f93": {
         "message": "Ver"
     },
@@ -2332,6 +2494,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navegación de programación semanal"
+    },
+    "welsh_42ab94b1": {
+        "message": "Galés"
     },
     "white_87fa64fd": {
         "message": "Blanco"
@@ -2362,6 +2527,9 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Ayer"
+    },
+    "yiddish_f96986df": {
+        "message": "Yidis"
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Tiene una valoración de multimedia."

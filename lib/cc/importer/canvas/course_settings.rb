@@ -24,6 +24,7 @@ module CC::Importer::Canvas
     include RubricsConverter
     include ModuleConverter
     include CoursePacesConverter
+    include BlueprintSettingsConverter
 
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
@@ -52,6 +53,7 @@ module CC::Importer::Canvas
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
       @course[:late_policy] = convert_late_policy(settings_doc(LATE_POLICY))
+      @course[:blueprint_settings] = convert_blueprint_settings(settings_doc(BLUEPRINT_SETTINGS))
     end
 
     def convert_course_settings(doc)
@@ -65,7 +67,7 @@ module CC::Importer::Canvas
          group_weighting_scheme storage_quota grading_standard_identifier_ref
          overridden_course_visibility root_account_uuid
          image_url image_identifier_ref banner_image_url banner_image_identifier_ref
-         course_color alt_name].each do |string_type|
+         course_color alt_name time_zone].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end

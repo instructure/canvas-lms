@@ -31,6 +31,7 @@ import type {
   Section,
   StudentGroup,
   StudentGroupCategory,
+  StudentGroupCategoryMap,
 } from '../../../../../api.d'
 import natcompare from '@canvas/util/natcompare'
 
@@ -66,7 +67,7 @@ export type FilterNavFilterProps = {
   modules: Module[]
   onChange: any
   sections: Section[]
-  studentGroupCategories: StudentGroupCategory[]
+  studentGroupCategories: StudentGroupCategoryMap
 }
 
 type MenuItem = [id: string, name: string]

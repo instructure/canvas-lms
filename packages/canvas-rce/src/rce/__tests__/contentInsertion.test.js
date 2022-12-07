@@ -333,7 +333,7 @@ describe('contentInsertion', () => {
       image.href = 'https://mycanvas.com:3000/some/path'
       image.url = 'https://mycanvas.com:3000/some/path'
       contentInsertion.insertImage(editor, image, canvasOrigin)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path"/>')
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
     })
 
     it('leaves non-Canvas URLs as absolute', () => {

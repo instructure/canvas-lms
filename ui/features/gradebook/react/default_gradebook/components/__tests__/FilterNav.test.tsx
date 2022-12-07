@@ -28,6 +28,45 @@ import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
 
+const defaultAssignmentGroupProps = {
+  rules: {},
+  sis_source_id: null,
+  integration_data: null,
+}
+
+const defaultSectionProps = {
+  course_id: '1',
+  created_at: '1970-01-01T00:00:00Z',
+  end_at: null,
+  integration_id: null,
+  nonxlist_course_id: null,
+  restrict_enrollments_to_section_dates: null,
+  sis_course_id: null,
+  sis_import_id: null,
+  sis_section_id: null,
+  start_at: null,
+}
+
+const defaultGradingPeriodProps = {
+  endDate: new Date(4),
+  isClosed: false,
+}
+
+const StudentGroupCategoryProps = {
+  allows_multiple_memberships: false,
+  auto_leader: null,
+  context_type: 'course',
+  course_id: '1',
+  created_at: '1970-01-01T00:00:00Z',
+  group_limit: null,
+  is_member: false,
+  protected: false,
+  role: null,
+  self_signup: null,
+  sis_group_category_id: null,
+  sis_import_id: null,
+}
+
 const defaultProps: FilterNavProps = {
   modules: [
     {id: '1', name: 'Module 1', position: 1},
@@ -35,22 +74,48 @@ const defaultProps: FilterNavProps = {
     {id: '3', name: 'Module 3', position: 3},
   ],
   assignmentGroups: [
-    {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
-    {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
-    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []},
+    {
+      ...defaultAssignmentGroupProps,
+      id: '4',
+      name: 'Assignment Group 4',
+      position: 1,
+      group_weight: 0,
+      assignments: [],
+    },
+    {
+      id: '5',
+      name: 'Assignment Group 5',
+      position: 2,
+      group_weight: 0,
+      assignments: [],
+      integration_data: null,
+      rules: null,
+      sis_source_id: null,
+    },
+    {
+      id: '6',
+      name: 'Assignment Group 6',
+      position: 3,
+      group_weight: 0,
+      assignments: [],
+      integration_data: null,
+      rules: null,
+      sis_source_id: null,
+    },
   ],
   sections: [
-    {id: '7', name: 'Section 7'},
-    {id: '8', name: 'Section 8'},
-    {id: '9', name: 'Section 9'},
+    {...defaultSectionProps, id: '7', name: 'Section 7'},
+    {...defaultSectionProps, id: '8', name: 'Section 8'},
+    {...defaultSectionProps, id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
-    {id: '1', title: 'Grading Period 1', startDate: 1},
-    {id: '2', title: 'Grading Period 2', startDate: 2},
-    {id: '3', title: 'Grading Period 3', startDate: 3},
+    {...defaultGradingPeriodProps, id: '1', title: 'Grading Period 1', startDate: new Date(1)},
+    {...defaultGradingPeriodProps, id: '2', title: 'Grading Period 2', startDate: new Date(2)},
+    {...defaultGradingPeriodProps, id: '3', title: 'Grading Period 3', startDate: new Date(3)},
   ],
   studentGroupCategories: {
     '1': {
+      ...StudentGroupCategoryProps,
       id: '1',
       name: 'Student Group Category 1',
       groups: [
@@ -72,7 +137,7 @@ const defaultAppliedFilters: Filter[] = [
 
 const defaultFilterPresets: FilterPreset[] = [
   {
-    id: 'preset-1',
+    id: '1',
     name: 'Filter Preset 1',
     filters: [
       {

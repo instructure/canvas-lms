@@ -32,6 +32,12 @@
     "address_3159962f": {
         "message": "العنوان:"
     },
+    "afrikaans_da0fe6ee": {
+        "message": "الأفريقانية"
+    },
+    "albanian_21ed929e": {
+        "message": "الألبانية"
+    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -110,8 +116,14 @@
     "apps_54d24a47": {
         "message": "التطبيق"
     },
+    "arabic_c5c87acd": {
+        "message": "العربية"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
+    },
+    "armenian_12da6118": {
+        "message": "الأرمينية"
     },
     "arrows_464a3e54": {
         "message": "الأسهم"
@@ -197,6 +209,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "بداية سجل قائمة المهام الخاصة بك"
     },
+    "belarusian_b2f19c76": {
+        "message": "البيلاروسية"
+    },
     "below_81d4dceb": {
         "message": "الأسفل"
     },
@@ -230,6 +245,9 @@
     "brick_f2656265": {
         "message": "قرميد"
     },
+    "bulgarian_feccab7e": {
+        "message": "البلغارية"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -248,6 +266,9 @@
     "cap_product_3a5265a6": {
         "message": "Cap Product"
     },
+    "catalan_16f6b78f": {
+        "message": "الكاتالونية"
+    },
     "center_align_e68d9997": {
         "message": "محاذاة إلى الوسط"
     },
@@ -260,6 +281,15 @@
     "chi_54a32644": {
         "message": "Chi"
     },
+    "chinese_111d37f6": {
+        "message": "الصينية"
+    },
+    "chinese_simplified_7f0bd370": {
+        "message": "الصينية المبسطة"
+    },
+    "chinese_traditional_8a7f759d": {
+        "message": "الصينية التقليدية"
+    },
     "choose_caption_file_9c45bc4e": {
         "message": "اختر ملف تسميات توضيحية"
     },
@@ -268,9 +298,6 @@
     },
     "circle_484abe63": {
         "message": "الدائرة"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "قائمة دائرية غير المرتبة"
     },
     "clear_2084585f": {
         "message": "مسح"
@@ -416,6 +443,9 @@
     "creative_commons_license_725584ae": {
         "message": "ترخيص المشاع الإبداعي:"
     },
+    "croatian_d713d655": {
+        "message": "الكرواتية"
+    },
     "crop_image_41bf940c": {
         "message": "قص الصورة"
     },
@@ -434,8 +464,14 @@
     "cyan_c1d5f68a": {
         "message": "سماوي"
     },
+    "czech_9aa2cbe4": {
+        "message": "التشيكية"
+    },
     "dagger_57e0f4e5": {
         "message": "Dagger"
+    },
+    "danish_c18cdac8": {
+        "message": "الدنماركية"
     },
     "date_added_ed5ad465": {
         "message": "تاريخ الإضافة"
@@ -466,12 +502,6 @@
     },
     "deep_purple_bb3e2907": {
         "message": "أرجواني داكن"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "قائمة افتراضية غير مرتبة بتعداد نقطي"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "قائمة افتراضية مرقمة غير مرتبة"
     },
     "definite_integral_fe7ffed1": {
         "message": "قيمة التكامل المحدد"
@@ -611,6 +641,9 @@
     "due_when_7eed10c6": {
         "message": "تاريخ الاستحقاق: { when }"
     },
+    "dutch_6d05cee5": {
+        "message": "الهولندية"
+    },
     "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
         "message": "تحرير نصًا بديلًا لمثيل الأيقونة هذا"
     },
@@ -671,8 +704,20 @@
     "engineering_icon_f8f3cf43": {
         "message": "أيقونة الهندسة"
     },
+    "english_australia_dc405d82": {
+        "message": "الإنجليزية (أستراليا)"
+    },
+    "english_c60612e2": {
+        "message": "الإنجليزية"
+    },
+    "english_canada_12688ee4": {
+        "message": "الإنجليزية (كندا)"
+    },
     "english_icon_25bfe845": {
         "message": "أيقونة الإنجليزية"
+    },
+    "english_united_kingdom_a613f831": {
+        "message": "الإنجليزية (المملكة المتحدة)"
     },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "أدخل 3 أحرف على الأقل للبحث"
@@ -709,6 +754,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "حدث خطأ في تحميل العناصر السابقة"
+    },
+    "estonian_5e8e2fa4": {
+        "message": "الإستونية"
     },
     "eta_b8828f99": {
         "message": "Eta"
@@ -812,6 +860,12 @@
     "files_index_af7c662b": {
         "message": "فهرس الملفات"
     },
+    "filipino_33339264": {
+        "message": "الفلبينية"
+    },
+    "finnish_4df2923d": {
+        "message": "الفنلندية"
+    },
     "flat_music_76d5a5c3": {
         "message": "Flat (موسيقى)"
     },
@@ -842,17 +896,29 @@
     "fraction_41bac7af": {
         "message": "كسر"
     },
+    "french_33881544": {
+        "message": "الفرنسية"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "الفرنسية (كندا)"
+    },
     "fullscreen_873bf53f": {
         "message": "ملء الشاشة"
     },
     "fun_quiz_47ab0b0": {
         "message": "اختبار موجز مرح"
     },
+    "galician_7e4508b5": {
+        "message": "الغاليسية"
+    },
     "gamma_1767928": {
         "message": "Gamma"
     },
     "generating_preview_45b53be0": {
         "message": "جارٍ إنشاء المعاينة..."
+    },
+    "german_3ec99bbb": {
+        "message": "الألمانية"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "الصور بتنسيق GIF/PNG أكبر من { size } كيلوبايت غير مدعومة حاليًا."
@@ -923,6 +989,9 @@
     "h_bar_bb94deae": {
         "message": "شريط H"
     },
+    "haitian_creole_7eb4195b": {
+        "message": "الكريولية الهايتية"
+    },
     "hat_ea321e35": {
         "message": "قبعة"
     },
@@ -941,6 +1010,9 @@
     "hearts_suit_e50e04ca": {
         "message": "Hearts (Suit)"
     },
+    "hebrew_88fbf778": {
+        "message": "العبرية"
+    },
     "height_69b03e15": {
         "message": "الارتفاع"
     },
@@ -953,6 +1025,9 @@
     "hide_title_description_caf092ef": {
         "message": "إخفاء وصف { title }"
     },
+    "hindi_9bcd4b34": {
+        "message": "الهندية"
+    },
     "home_351838cd": {
         "message": "الصفحة الرئيسية"
     },
@@ -962,11 +1037,17 @@
     "html_editor_fb2ab713": {
         "message": "محرر HTML"
     },
+    "hungarian_fc7d30c9": {
+        "message": "المجرية"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "لقد حصلت على إذن لاستخدام هذا الملف."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "أمتلك حق النشر"
+    },
+    "icelandic_9d6d35de": {
+        "message": "الأيسلندية"
     },
     "icon_215a1dc6": {
         "message": "الأيقونة"
@@ -985,6 +1066,9 @@
     },
     "icon_options_tray_2b407977": {
         "message": "علبة خيارات الأيقونة"
+    },
+    "icon_preview_1782a1d9": {
+        "message": "معاينة الأيقونة"
     },
     "icon_shape_30b61e7": {
         "message": "شكل الأيقونة"
@@ -1031,6 +1115,9 @@
     "indigo_2035fc55": {
         "message": "نيلي"
     },
+    "indonesian_5f6accd6": {
+        "message": "الإندونيسية"
+    },
     "inference_fed5c960": {
         "message": "الاستنتاج"
     },
@@ -1070,8 +1157,17 @@
     "iota_11c932a9": {
         "message": "Iota"
     },
+    "irish_567e109f": {
+        "message": "الأيرلندية"
+    },
+    "italian_bd3c792d": {
+        "message": "الإيطالية"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
+    },
+    "japanese_b5721ca7": {
+        "message": "اليابانية"
     },
     "join_6cafecca": {
         "message": "انضمام"
@@ -1097,6 +1193,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "اختصارات لوحة المفاتيح"
     },
+    "korean_da812d9": {
+        "message": "الكورية"
+    },
     "lambda_4f602498": {
         "message": "Lambda"
     },
@@ -1114,6 +1213,9 @@
     },
     "late_2be42b88": {
         "message": "متأخر"
+    },
+    "latvian_2bbb6aab": {
+        "message": "اللاتفية"
     },
     "left_align_43d95491": {
         "message": "محاذاة إلى اليسار"
@@ -1174,6 +1276,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "ارتباطات إلى موقع خارجي."
+    },
+    "lithuanian_5adcbe24": {
+        "message": "الليتوانية"
     },
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
@@ -1247,8 +1352,20 @@
     "low_horizontal_dots_cc08498e": {
         "message": "نقاط أفقية منخفضة"
     },
+    "macedonian_6ed541af": {
+        "message": "المقدونية"
+    },
     "magenta_4a65993c": {
         "message": "ماجنتا"
+    },
+    "malay_f5dddce4": {
+        "message": "الماليزية"
+    },
+    "maltese_916925e8": {
+        "message": "المالطية"
+    },
+    "maori_new_zealand_5380a95f": {
+        "message": "ماوري (نيوزلندا)"
     },
     "maps_to_e5ef7382": {
         "message": "Maps To"
@@ -1400,6 +1517,15 @@
     "none_selected_b93d56d2": {
         "message": "لم يتم تحديد شيء"
     },
+    "norwegian_53f391ec": {
+        "message": "النرويجية"
+    },
+    "norwegian_bokmal_ad5843fa": {
+        "message": "النرويجية (بوكمال)"
+    },
+    "norwegian_nynorsk_c785f8a6": {
+        "message": "النرويجية (نينورسك)"
+    },
     "not_equal_6e2980e6": {
         "message": "لا يساوي"
     },
@@ -1490,9 +1616,6 @@
     "orange_81386a62": {
         "message": "برتقالي"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "القوائم المرتبة وغير المرتبة"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "يمكن العثور على اختصارات أخرى للمحرر على"
     },
@@ -1544,6 +1667,9 @@
     "perpendicular_7c48ede4": {
         "message": "عمودي"
     },
+    "persian_a8cadb95": {
+        "message": "الفارسية"
+    },
     "phi_4ac33b6d": {
         "message": "Phi"
     },
@@ -1582,6 +1708,12 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } من النقاط"
+    },
+    "polish_4cf2ecaf": {
+        "message": "البولندية"
+    },
+    "portuguese_9c212cf4": {
+        "message": "البرتغالية"
     },
     "posted_when_a578f5ab": {
         "message": "المنشور: { when }"
@@ -1754,6 +1886,9 @@
     "rightward_pointing_triangle_60330f5c": {
         "message": "مثلث يشير لليمين"
     },
+    "romanian_13670c1e": {
+        "message": "الرومانية"
+    },
     "rotate_image_90_degrees_2ab77c05": {
         "message": "تدوير الصورة زاوية -90"
     },
@@ -1762,6 +1897,9 @@
     },
     "rotation_9699c538": {
         "message": "تدوير"
+    },
+    "russian_1e3e197": {
+        "message": "الروسية"
     },
     "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
         "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
@@ -1804,6 +1942,9 @@
     },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } المحدد"
+    },
+    "serbian_7187f1f2": {
+        "message": "الصربية"
     },
     "set_minus_b46e9b88": {
         "message": "Set Minus"
@@ -1850,6 +1991,12 @@
     "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
         "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
     },
+    "slovak_69f48e1b": {
+        "message": "السلوفاكية"
+    },
+    "slovenian_30ae5208": {
+        "message": "السلوفينية"
+    },
     "small_b070434a": {
         "message": "صغير"
     },
@@ -1877,6 +2024,9 @@
     "spades_suit_b37020c2": {
         "message": "Spades (Suit)"
     },
+    "spanish_de9de5d6": {
+        "message": "الإسبانية"
+    },
     "square_511eb3b3": {
         "message": "مربع"
     },
@@ -1903,9 +2053,6 @@
     },
     "square_superset_strict_fa4262e4": {
         "message": "Square Superset (Strict)"
-    },
-    "square_unordered_list_b15ce93b": {
-        "message": "قائمة مربعة غير مرتبة"
     },
     "star_8d156e09": {
         "message": "نجمة"
@@ -1973,6 +2120,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "أنواع الملفات المدعومة: SRT أو WebVTT"
     },
+    "swahili_5caeb4ba": {
+        "message": "السواحلية"
+    },
+    "swedish_59a593ca": {
+        "message": "السويدية"
+    },
     "switch_to_pretty_html_editor_a3cee15f": {
         "message": "التبديل إلي محرر HTML المنسق"
     },
@@ -1990,6 +2143,9 @@
     },
     "tab_arrows_4cf5abfc": {
         "message": "ضغط/أسهم"
+    },
+    "tagalog_74906db7": {
+        "message": "التغالوغ"
     },
     "task_16b0ef38": {
         "message": "مهمة"
@@ -2017,6 +2173,9 @@
     },
     "text_size_887c2f6": {
         "message": "حجم النص"
+    },
+    "thai_8f9bc548": {
+        "message": "التايوانية"
     },
     "the_best_assignment_15e98be1": {
         "message": "أفضل مهمة"
@@ -2141,6 +2300,9 @@
     "triangle_6072304e": {
         "message": "مثلث"
     },
+    "turkish_5b69578b": {
+        "message": "التركية"
+    },
     "turnstile_yields_f9e76df1": {
         "message": "Turnstile (Yields)"
     },
@@ -2152,6 +2314,9 @@
     },
     "type_control_f9_to_access_table_options_text_92141329": {
         "message": "اضغط Control F9 للوصول إلى اختيارات الجدول. { text }"
+    },
+    "ukrainian_945b00b7": {
+        "message": "الأوكرانية"
     },
     "unable_to_mark_as_complete_8141856d": {
         "message": "يتعذر وضع علامة مكتمل."
@@ -2189,9 +2354,6 @@
     "uploading_19e8a4e7": {
         "message": "جارٍ التحميل"
     },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
-    },
     "uppercase_delta_d4f4bc41": {
         "message": "Uppercase Delta"
     },
@@ -2212,9 +2374,6 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Uppercase Psi"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "قائمة بأرقام رومانية مرتبة بأحرف كبيرة"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Uppercase Sigma"
@@ -2312,6 +2471,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "مشغل الفيديو لـ { title }"
     },
+    "vietnamese_e7a76583": {
+        "message": "الفيتنامية"
+    },
     "view_ba339f93": {
         "message": "عرض"
     },
@@ -2332,6 +2494,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "التنقل للجدول الأسبوعي"
+    },
+    "welsh_42ab94b1": {
+        "message": "الويلزية"
     },
     "white_87fa64fd": {
         "message": "أبيض"
@@ -2362,6 +2527,9 @@
     },
     "yesterday_c6bd6abf": {
         "message": "أمس"
+    },
+    "yiddish_f96986df": {
+        "message": "اليديشية"
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "لديك ملاحظات وسائط."

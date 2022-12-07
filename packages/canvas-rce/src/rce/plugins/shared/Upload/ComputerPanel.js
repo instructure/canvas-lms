@@ -22,7 +22,7 @@
 // See @instructure/canvas-media/src/ComputerPanel.js
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {arrayOf, func, instanceOf, number, oneOfType, shape, string} from 'prop-types'
+import {arrayOf, func, number, object, oneOfType, shape, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -273,7 +273,8 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
 }
 
 ComputerPanel.propTypes = {
-  theFile: instanceOf(File),
+  // instanceof File or the File object from DataTransfer which seems to be different
+  theFile: object,
   setFile: func.isRequired,
   setError: func.isRequired,
   accept: oneOfType([string, arrayOf(string)]),

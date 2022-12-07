@@ -12,7 +12,8 @@
     "skipLibCheck": true, // don't do type-checking on dependencies' internal types for improved performance
     "strict": true, // enables a bunch of strict mode family options. See https://www.typescriptlang.org/tsconfig#strict
     "target": "ES2020", // support the most modern JS features (let babel handle transpilation)
-    "noImplicitAny": false // temporarily allows un-typed variables (and imports) to be automatically defined as "any"
+    "noImplicitAny": false, // temporarily allows un-typed variables (and imports) to be automatically defined as "any"
+    "experimentalDecorators": true
   },
   "include": ["src/**/*"]
 }

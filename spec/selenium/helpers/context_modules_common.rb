@@ -244,7 +244,7 @@ module ContextModulesCommon
     wait_for_ajaximations
 
     # make a selection on the file rename dialog
-    fj("button:contains(\"#{click_button}\")").click
+    fj("div[data-testid=canvas-modal] button:contains(\"#{click_button}\")").click
     wait_for_ajaximations
 
     folder_select

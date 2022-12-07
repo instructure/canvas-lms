@@ -143,7 +143,7 @@ export default class LockManager {
   }
 
   renderBanner() {
-    if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode()
+    if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode(this.props?.bannerSelector)
     ReactDOM.render(
       <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
       this.bannerNode

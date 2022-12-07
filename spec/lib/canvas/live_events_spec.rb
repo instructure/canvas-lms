@@ -780,7 +780,7 @@ describe Canvas::LiveEvents do
       attachment_model
 
       expect_event("asset_accessed", {
-        asset_name: "unknown.loser",
+        asset_name: "unknown.example",
         asset_type: "attachment",
         asset_id: @attachment.global_id.to_s,
         asset_subtype: nil,
@@ -799,7 +799,7 @@ describe Canvas::LiveEvents do
       context = OpenStruct.new(global_id: "1")
 
       expect_event("asset_accessed", {
-        asset_name: "unknown.loser",
+        asset_name: "unknown.example",
         asset_type: "attachment",
         asset_id: @attachment.global_id.to_s,
         asset_subtype: nil,
@@ -1613,6 +1613,7 @@ describe Canvas::LiveEvents do
       it "includes result in created live event" do
         expect_event("learning_outcome_result_created", {
           learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
           mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
@@ -1636,6 +1637,31 @@ describe Canvas::LiveEvents do
         result.update!(attempt: 1)
         expect_event("learning_outcome_result_updated", {
           learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
+          mastery: result.mastery,
+          score: result.score,
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          title: result.title,
+          percent: result.percent,
+          workflow_state: result.workflow_state
+        }.compact!).once
+
+        Canvas::LiveEvents.learning_outcome_result_updated(result)
+      end
+
+      it "includes result in updated live event when outcome is deleted" do
+        outcome = LearningOutcome.find(result.learning_outcome_id)
+        outcome.destroy
+        expect_event("learning_outcome_result_updated", {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
           mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
@@ -1713,6 +1739,7 @@ describe Canvas::LiveEvents do
           learning_outcome_id: @outcome.id.to_s,
           context_type: @outcome.context_type,
           context_id: @outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           display_name: @outcome.display_name,
           short_description: @outcome.short_description,
           description: @outcome.description,
@@ -1726,6 +1753,28 @@ describe Canvas::LiveEvents do
 
         Canvas::LiveEvents.learning_outcome_created(@outcome)
       end
+
+      it "triggers a learning_outcome_created live event for a global outcome" do
+        @global_outcome = outcome_model(global: true, title: "global outcome")
+
+        expect_event("learning_outcome_created", {
+          learning_outcome_id: @global_outcome.id.to_s,
+          context_type: nil,
+          context_id: nil,
+          context_uuid: nil,
+          display_name: @global_outcome.display_name,
+          short_description: @global_outcome.short_description,
+          description: @global_outcome.description,
+          vendor_guid: @global_outcome.vendor_guid,
+          calculation_method: @global_outcome.calculation_method,
+          calculation_int: @global_outcome.calculation_int,
+          rubric_criterion: @global_outcome.rubric_criterion,
+          title: @global_outcome.title,
+          workflow_state: @global_outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(@global_outcome)
+      end
     end
 
     context "updated" do
@@ -1738,6 +1787,7 @@ describe Canvas::LiveEvents do
           learning_outcome_id: @outcome.id.to_s,
           context_type: @outcome.context_type,
           context_id: @outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           display_name: @outcome.display_name,
           short_description: @outcome.short_description,
           description: @outcome.description,
@@ -1751,6 +1801,31 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@outcome)
+      end
+
+      it "triggers a learning_outcome_updated live event for a global outcome" do
+        @global_outcome = outcome_model(global: true, title: "global outcome")
+
+        @global_outcome.update!(short_description: "this is new")
+
+        expect_event("learning_outcome_updated", {
+          learning_outcome_id: @global_outcome.id.to_s,
+          context_type: nil,
+          context_id: nil,
+          context_uuid: nil,
+          display_name: @global_outcome.display_name,
+          short_description: @global_outcome.short_description,
+          description: @global_outcome.description,
+          vendor_guid: @global_outcome.vendor_guid,
+          calculation_method: @global_outcome.calculation_method,
+          calculation_int: @global_outcome.calculation_int,
+          rubric_criterion: @global_outcome.rubric_criterion,
+          title: @global_outcome.title,
+          updated_at: @global_outcome.updated_at,
+          workflow_state: @global_outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_updated(@global_outcome)
       end
     end
   end
@@ -1767,6 +1842,7 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_group_created", {
           learning_outcome_group_id: @outcome_group.id.to_s,
           context_id: @outcome_group.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           context_type: @outcome_group.context_type,
           title: @outcome_group.title,
           description: @outcome_group.description,
@@ -1776,6 +1852,24 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_group_created(@outcome_group)
+      end
+
+      it "triggers a learning_outcome_group_created live event for a global outcome group" do
+        @global_outcome_group = LearningOutcomeGroup.create(title: "global")
+
+        expect_event("learning_outcome_group_created", {
+          learning_outcome_group_id: @global_outcome_group.id.to_s,
+          context_id: nil,
+          context_uuid: nil,
+          context_type: nil,
+          title: @global_outcome_group.title,
+          description: @global_outcome_group.description,
+          vendor_guid: @global_outcome_group.vendor_guid,
+          parent_outcome_group_id: nil,
+          workflow_state: @global_outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_created(@global_outcome_group)
       end
     end
 
@@ -1788,6 +1882,7 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_group_updated", {
           learning_outcome_group_id: @outcome_group.id.to_s,
           context_id: @outcome_group.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           context_type: @outcome_group.context_type,
           title: @outcome_group.title,
           description: @outcome_group.description,
@@ -1798,6 +1893,27 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_group_updated(@outcome_group)
+      end
+
+      it "triggers a learning_outcome_group_updated live event for a global outcome group" do
+        @global_outcome_group = LearningOutcomeGroup.create(title: "global")
+
+        @global_outcome_group.update!(title: "this is new")
+
+        expect_event("learning_outcome_group_updated", {
+          learning_outcome_group_id: @global_outcome_group.id.to_s,
+          context_id: nil,
+          context_uuid: nil,
+          context_type: nil,
+          title: @global_outcome_group.title,
+          description: @global_outcome_group.description,
+          vendor_guid: @global_outcome_group.vendor_guid,
+          parent_outcome_group_id: nil,
+          updated_at: @global_outcome_group.updated_at,
+          workflow_state: @global_outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_updated(@global_outcome_group)
       end
     end
   end
@@ -1818,6 +1934,7 @@ describe Canvas::LiveEvents do
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
           learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state
@@ -1839,6 +1956,28 @@ describe Canvas::LiveEvents do
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
           learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state,
+          updated_at: link.updated_at
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_updated(link)
+      end
+
+      it "triggers a learning_outcome_link_updated live event when outcome is deleted" do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+        @outcome.destroy
+
+        expect_event("learning_outcome_link_updated", {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,
@@ -1953,10 +2092,10 @@ describe Canvas::LiveEvents do
   describe "outcome friendly description" do
     before do
       @context = course_model
-      outcome = @context.created_learning_outcomes.create!({ title: "new outcome" })
+      @outcome = @context.created_learning_outcomes.create!({ title: "new outcome" })
       description = "A friendly description"
       @friendlyDescription = OutcomeFriendlyDescription.create!(
-        learning_outcome: outcome,
+        learning_outcome: @outcome,
         context: @context,
         description: description
       )
@@ -1971,6 +2110,7 @@ describe Canvas::LiveEvents do
                        description: @friendlyDescription.description,
                        workflow_state: @friendlyDescription.workflow_state,
                        learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
                        root_account_id: @friendlyDescription.root_account_id.to_s
                      }).once
 
@@ -1989,8 +2129,26 @@ describe Canvas::LiveEvents do
                        context_id: @friendlyDescription.context_id.to_s,
                        workflow_state: @friendlyDescription.workflow_state,
                        learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
                        root_account_id: @friendlyDescription.root_account_id.to_s,
                        description: new_description,
+                       updated_at: @friendlyDescription.updated_at,
+                     }).once
+
+        Canvas::LiveEvents.outcome_friendly_description_updated(@friendlyDescription)
+      end
+
+      it "triggers an outcome_friendly_description_udpated live event when the outcome is deleted" do
+        @outcome.destroy
+        expect_event("outcome_friendly_description_updated", {
+                       outcome_friendly_description_id: @friendlyDescription.id.to_s,
+                       context_type: @friendlyDescription.context_type,
+                       context_id: @friendlyDescription.context_id.to_s,
+                       workflow_state: @friendlyDescription.workflow_state,
+                       learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
+                       root_account_id: @friendlyDescription.root_account_id.to_s,
+                       description: @friendlyDescription.description,
                        updated_at: @friendlyDescription.updated_at,
                      }).once
 
@@ -2043,6 +2201,41 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "course" do
+    before do
+      @course = course_model
+    end
+
+    let(:event_data) do
+      {
+        course_id: @course.global_id.to_s,
+        uuid: @course.uuid,
+        account_id: @course.global_account_id.to_s,
+        account_uuid: @course.account.uuid,
+        name: @course.name,
+        created_at: @course.created_at,
+        updated_at: @course.updated_at,
+        workflow_state: @course.workflow_state
+      }
+    end
+
+    context "created" do
+      it "triggers a course_created live event" do
+        expect_event("course_created", event_data).once
+        Canvas::LiveEvents.course_created(@course)
+      end
+    end
+
+    context "updated" do
+      it "triggers a course_udpated live event" do
+        @course.name = "Updated Course Name"
+        @course.save!
+        expect_event("course_updated", event_data).once
+        Canvas::LiveEvents.course_updated(@course)
+      end
+    end
+  end
+
   describe "master template child subscription" do
     before do
       @course = course_model
@@ -2053,6 +2246,7 @@ describe Canvas::LiveEvents do
     let(:child_subscription) do
       expect_event("course_updated", {
                      account_id: @master_template.course.account.global_id.to_s,
+                     account_uuid: @course.account.uuid,
                      course_id: @course.global_id.to_s,
                      created_at: anything,
                      name: @course.name,

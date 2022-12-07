@@ -269,6 +269,16 @@ describe Lti::LtiOutboundAdapter do
       expect(payload.keys).not_to include "ext_lti_assignment_id"
     end
 
+    it "passes parent_frame_context to the return url if supplied" do
+      adapter.prepare_tool_launch("http://example.com/tool_launch?foo=bar", variable_expander, {
+                                    launch_url: "http://www.tool.com/launch/url?firstname=rory",
+                                    resource_type: "resource_selection",
+                                    parent_frame_context: "123456"
+                                  })
+      payload = adapter.generate_post_payload(assignment: assignment)
+      expect(payload["ext_content_return_url"]).to include "&parent_frame_context=123456"
+    end
+
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect { adapter.generate_post_payload }.to raise_error(RuntimeError, "Called generate_post_payload before calling prepare_tool_launch")
     end

@@ -57,6 +57,7 @@ export default function (props = {}) {
     searchString,
     sortBy,
     all_files,
+    canvasOrigin,
   } = props
   /* eslint-enable prefer-const */
 
@@ -81,6 +82,7 @@ export default function (props = {}) {
       jwt,
       refreshToken,
       host,
+      canvasOrigin,
     })
   }
 

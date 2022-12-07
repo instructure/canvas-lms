@@ -1,6 +1,6 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "5.6.2",
+  "version": "5.6.9",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
   "module": "es/index.js",
@@ -101,6 +101,7 @@
     "@instructure/ui-simple-select": "7",
     "@instructure/ui-spinner": "7",
     "@instructure/ui-svg-images": "7",
+    "@instructure/ui-table": "7",
     "@instructure/ui-tabs": "7",
     "@instructure/ui-text": "7",
     "@instructure/ui-text-area": "7",

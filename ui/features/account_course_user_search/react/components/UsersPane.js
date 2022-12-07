@@ -54,8 +54,8 @@ export default class UsersPane extends React.Component {
     this.state = {
       userList: props.store.getState().userList,
       srMessageDisplayed: false,
+      sortColumnHeader: null,
     }
-    this.columnHeader = null
     this.debouncedDispatchApplySearchFilter = debounce(
       this.handleApplyingSearchFilter,
       SEARCH_DEBOUNCE_TIME
@@ -73,9 +73,9 @@ export default class UsersPane extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.columnHeader && this.columnHeader.id) {
-      const columnHeaderButton = document.getElementById(this.columnHeader.id)
-      if (columnHeaderButton) columnHeaderButton.focus()
+    if (this.state.sortColumnHeader?.id) {
+      const sortColumnHeaderButton = document.getElementById(this.state.sortColumnHeader.id)
+      sortColumnHeaderButton?.focus()
     }
   }
 
@@ -99,15 +99,6 @@ export default class UsersPane extends React.Component {
     if (!preserveLastPageValue) this.setState({knownLastPage: undefined})
   }
 
-  setColumnHeaderRef = element => {
-    if (element) this.columnHeader = element
-  }
-
-  updateQueryString = () => {
-    const searchFilter = this.props.store.getState().userList.searchFilter
-    this.props.onUpdateQueryParams(searchFilter)
-  }
-
   handleUpdateSearchFilter = searchFilter => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}))
     this.debouncedDispatchApplySearchFilter()
@@ -120,6 +111,19 @@ export default class UsersPane extends React.Component {
   handleSetPage = page => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page}))
     this.handleApplyingSearchFilter(true)
+  }
+
+  handleToggleSRMessage = (show = false) => {
+    this.setState({sortColumnHeader: null, srMessageDisplayed: show})
+  }
+
+  handleSetSortColumnHeaderRef = element => {
+    if (element) this.setState({sortColumnHeader: element})
+  }
+
+  updateQueryString = () => {
+    const searchFilter = this.props.store.getState().userList.searchFilter
+    this.props.onUpdateQueryParams(searchFilter)
   }
 
   render() {
@@ -137,9 +141,7 @@ export default class UsersPane extends React.Component {
           {...searchFilter}
           accountId={accountId.toString()}
           roles={this.props.roles}
-          toggleSRMessage={(show = false) => {
-            this.setState({srMessageDisplayed: show})
-          }}
+          toggleSRMessage={this.handleToggleSRMessage}
         />
 
         {!isEmpty(users) && !isLoading && (
@@ -150,7 +152,7 @@ export default class UsersPane extends React.Component {
             users={users}
             handleSubmitEditUserForm={this.handleSubmitEditUserForm}
             permissions={this.state.userList.permissions}
-            columnHeaderRef={this.setColumnHeaderRef}
+            sortColumnHeaderRef={this.handleSetSortColumnHeaderRef}
           />
         )}
 

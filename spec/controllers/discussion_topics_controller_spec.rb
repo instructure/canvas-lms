@@ -551,6 +551,12 @@ describe DiscussionTopicsController do
         user_session(user)
       end
 
+      it "sets user preference discussions_splitscreen_view" do
+        subject
+
+        expect(assigns[:js_env][:DISCUSSION][:preferences][:discussions_splitscreen_view]).to eq user.discussions_splitscreen_view?
+      end
+
       it "sets ATTACHMENTS_FOLDER_ID" do
         subject
 

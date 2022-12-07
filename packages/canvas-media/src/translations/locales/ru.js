@@ -18,11 +18,7 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {
-  "no_preview_is_available_for_this_file_f940114a": {
-    "message": "Предварительный просмотр для этого файла невозможен."
-  }
-}
+const locale = { "english_c60612e2": { "message": "Английский" } }
 
 
 formatMessage.addLocale({ru: locale})

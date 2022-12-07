@@ -115,6 +115,7 @@ export const DiscussionTopicRepliesContainer = props => {
             removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
             updateDraftCache={props.updateDraftCache}
             setHighlightEntryId={props.setHighlightEntryId}
+            userSplitScreenPreference={props.userSplitScreenPreference}
           />
         )
       })}
@@ -141,6 +142,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   updateDraftCache: PropTypes.func,
   isSearchResults: PropTypes.bool,
   setHighlightEntryId: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
 }
 
 export default DiscussionTopicRepliesContainer

@@ -697,6 +697,68 @@ describe ExternalToolsController do
     end
   end
 
+  shared_examples_for "an endpoint which uses parent_frame_context to set the CSP header" do
+    before do
+      user_session(@student)
+    end
+
+    let(:pfc_tool) do
+      @course.context_external_tools.create(
+        name: "instructure_tool", consumer_key: "foo", shared_secret: "bar",
+        url: "http://inst-tool.example.com/abc", lti_version: "1.1",
+        developer_key: DeveloperKey.new(
+          root_account: @course.root_account,
+          internal_service: true
+        )
+      )
+    end
+
+    let(:csp_header) { response.headers["Content-Security-Policy"] }
+
+    it "adds the tool URL to the header if the parent_frame_context tool is trusted" do
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to match %r{frame-ancestors [^;]*http://inst-tool.example.com(;| |$)}
+      # Make sure it also has 'self', which is added in application_controller.rb:
+      expect(csp_header).to match(/frame-ancestors [^;]*'self'/)
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool is not trusted" do
+      pfc_tool.developer_key.update! internal_service: false
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool is not active" do
+      pfc_tool.update! workflow_state: :deleted
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the URL to the header if the parent_frame_context tool's URL has unsafe characters" do
+      pfc_tool.update_attribute :url, "http://inst-tool.example.com;default-src"
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("inst-tool.example.com")
+    end
+
+    it "doesn't add the parent_frame_context tool's URL to the header if it is a data URL" do
+      pfc_tool.update! url: "data:123"
+      subject
+      expect(response).to be_successful
+      expect(csp_header).to_not include("data:abc")
+    end
+
+    it "doesn't add the parent_frame_context tool's URL to the header if the user is not authenticated" do
+      user_session(user_model)
+      subject
+      expect(response.status).to eq(401)
+      expect(csp_header.to_s).to_not include("inst-tool.example.com")
+    end
+  end
+
   describe "GET 'retrieve'" do
     let :account do
       Account.default
@@ -940,7 +1002,6 @@ describe ExternalToolsController do
                              })
       resource_link = Lti::ResourceLink.create_with(@course, tool2, nil, "http://tool2.com/testing")
 
-      puts "getting the retrieve endpoint.... #{@course.id} with lookup_id: #{resource_link.lookup_uuid}"
       # supply a different url to the endpoint
       get "retrieve", params: { course_id: @course.id, resource_link_lookup_uuid: resource_link.lookup_uuid, url: "http://tool1.com" }
       expect(response).to be_successful
@@ -1018,6 +1079,15 @@ describe ExternalToolsController do
       jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
       get :retrieve, params: { url: tool.url, account_id: account.id, secure_params: jwt }
       expect(assigns[:lti_launch].params["ext_lti_assignment_id"]).to eq lti_assignment_id
+    end
+
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        get :retrieve, params: {
+          url: tool.url, course_id: @course.id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
     end
 
     context "for Quizzes Next launch" do
@@ -1332,6 +1402,16 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params["custom_canvas_enrollment_state"]).to eq "inactive"
     end
 
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        tool = new_valid_tool(@course)
+        get "resource_selection", params: {
+          course_id: @course.id, external_tool_id: tool.id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
+    end
+
     context "with RCE parameters" do
       subject do
         user_session(@student)
@@ -1387,6 +1467,15 @@ describe ExternalToolsController do
             let(:selection_launch_param) { assigns[:lti_launch].params["custom_selection"] }
             let(:contents_launch_param) { assigns[:lti_launch].params["custom_contents"] }
           end
+
+          it "forwards parent_frame_context to the content item return url" do
+            user_session(@teacher)
+            tool.resource_selection = { message_type: "ContentItemSelectionRequest" }
+            tool.save!
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id }
+            expect(response).to be_successful
+            expect(assigns[:lti_launch].params["content_item_return_url"]).to include("parent_frame_context=#{tool.id}")
+          end
         end
       end
 
@@ -1422,6 +1511,18 @@ describe ExternalToolsController do
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          end
+
+          it "forwards parent_frame_context to the deep link return url" do
+            tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+            tool.save!
+            user_session(@teacher)
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
+            deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+            return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
+            jwt = JSON::JWT.decode(return_jwt, :skip_verification)
+            expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+            expect(response).to be_successful
           end
         end
       end

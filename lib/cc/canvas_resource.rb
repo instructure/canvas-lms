@@ -28,6 +28,7 @@ module CC
     include Rubrics
     include Events
     include CoursePaces
+    include BlueprintSettings
     include WebResources
 
     def add_canvas_non_cc_data
@@ -189,6 +190,10 @@ module CC
 
         if @course.default_post_policy.present?
           c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
+        end
+
+        if @course.time_zone != @course.account.default_time_zone
+          c.time_zone @course.time_zone.name
         end
 
         if @course.account.feature_enabled?(:final_grades_override)

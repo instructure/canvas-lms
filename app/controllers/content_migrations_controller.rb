@@ -183,6 +183,7 @@ class ContentMigrationsController < ApplicationController
       js_env(NEW_QUIZZES_IMPORT_THIRD: new_quizzes_import_third_party?)
       js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
       js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
+      js_env(BLUEPRINT_ELIGIBLE_IMPORT: @domain_root_account.feature_enabled?(:copy_blueprint_settings) && MasterCourses::MasterTemplate.blueprint_eligible?(@context))
       set_tutorial_js_env
     end
   end
@@ -297,6 +298,11 @@ class ContentMigrationsController < ApplicationController
   #
   # @argument settings[importer_skips] [Optional,Array,"all_course_settings"|"visibility_settings"]
   #   Set of importers to skip, even if otherwise selected by migration settings.
+  #
+  # @argument settings[import_blueprint_settings] [Boolean]
+  #   Import the "use as blueprint course" setting as well as the list of locked items
+  #   from the source course or package. The destination course must not be associated
+  #   with an existing blueprint course and cannot have any student or observer enrollments.
   #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course

@@ -293,7 +293,7 @@ module ConversationsHelper
       raise InvalidContextError
     end
 
-    if context.is_a?(Course) && context.workflow_state == "completed" && !context.grants_right?(@current_user, session, :read_as_admin)
+    if context.is_a?(Course) && (context.workflow_state == "completed" || context.soft_concluded?)
       raise CourseConcludedError
     end
   end

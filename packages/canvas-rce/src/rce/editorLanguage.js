@@ -84,7 +84,10 @@ function editorLanguage(locale) {
   if (locale.match('-x-')) {
     locale = locale.split('-x-')[0]
   }
-  return mapping[locale]
+  if (mapping[locale]) {
+    return mapping[locale]
+  }
+  return mapping[locale.split('-')[0]]
 }
 
 module.exports = editorLanguage

@@ -233,5 +233,8 @@ module Types
         load_association(:discussion_entry_versions)
       end
     end
+
+    field :depth, Integer, null: true
+    delegate :depth, to: :object
   end
 end

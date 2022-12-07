@@ -258,6 +258,7 @@ export default function CanvasMediaPlayer(props) {
 }
 
 export function setPlayerSize(player, type, boundingBox, playerContainer, resizeContainer = true) {
+  const playerIsVisible = player.offsetWidth > 0 && player.offsetHeight > 0
   const {width, height} = sizeMediaPlayer(player, type, boundingBox)
   player.style.width = width
   player.style.height = height
@@ -265,7 +266,7 @@ export function setPlayerSize(player, type, boundingBox, playerContainer, resize
   player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
 
   // videos that are wide-and-short portrait need to shrink the parent
-  if (resizeContainer && playerContainer && player.videoWidth > player.videoHeight) {
+  if (playerIsVisible && resizeContainer && playerContainer && player.videoWidth > player.videoHeight) {
     playerContainer.style.width = width
     playerContainer.style.height = height
 

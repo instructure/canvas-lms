@@ -23,6 +23,7 @@ IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key:
 
 class ExternalContentController < ApplicationController
   include Lti::Concerns::Oembed
+  include Lti::Concerns::ParentFrame
 
   protect_from_forgery except: [:selection_test, :success], with: :exception
 
@@ -87,6 +88,9 @@ class ExternalContentController < ApplicationController
              error_message: param_if_set(:lti_errormsg),
              error_log: param_if_set(:lti_errorlog)
            })
+    if parent_frame_origin
+      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+    end
   end
 
   def normalize_deprecated_data!

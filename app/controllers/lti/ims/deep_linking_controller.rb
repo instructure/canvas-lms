@@ -26,6 +26,7 @@ module Lti
 
       include Lti::IMS::Concerns::DeepLinkingServices
       include Lti::IMS::Concerns::DeepLinkingModules
+      include Lti::Concerns::ParentFrame
 
       before_action :require_context
       before_action :validate_jwt
@@ -108,6 +109,7 @@ module Lti
         # * create a new module or use existing one
         # * add valid content items to this module
         # * show any errors to the user
+        # * if a module was created, alert it and then navigate to modules page
         # * reload the page
         context_module = if create_new_module?
                            @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
@@ -125,11 +127,16 @@ module Lti
           end
         end
 
-        render_content_items
+        render_content_items(module_created: create_new_module?)
       rescue => e
         code ||= response_code_for_rescue(e) if e
         InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: code })
         raise e
+      end
+
+      # Overrides method in Lti::Concerns::ParentFrame
+      def parent_frame_context
+        return_url_parameters[:parent_frame_context]
       end
 
       private
@@ -138,7 +145,7 @@ module Lti
         return_url_parameters[:placement]&.to_sym == placement
       end
 
-      def render_content_items(items: content_items, reload_page: true)
+      def render_content_items(items: content_items, reload_page: true, module_created: false)
         js_env({
                  deep_link_response: {
                    placement: return_url_parameters[:placement],
@@ -148,9 +155,13 @@ module Lti
                    errormsg: messaging_value("errormsg"),
                    errorlog: messaging_value("errorlog"),
                    ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
-                   reloadpage: reload_page
+                   reloadpage: reload_page,
+                   moduleCreated: module_created,
                  }.compact
                })
+        if parent_frame_origin
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+        end
 
         render layout: "bare"
       end

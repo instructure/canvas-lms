@@ -56,13 +56,16 @@ const ComposeModalManager = props => {
 
   const getReplyRecipients = () => {
     if (isSubmissionCommentsType) return
+
     const lastAuthor = props.conversationMessage
       ? props.conversationMessage?.author
       : props.conversation?.messages[0].author
+
     if (
       lastAuthor &&
+      lastAuthor?._id &&
       props.isReply &&
-      lastAuthor._id.toString() !== ENV.current_user_id.toString()
+      lastAuthor?._id.toString() !== ENV.current_user_id.toString()
     ) {
       return [lastAuthor]
     } else {
@@ -233,7 +236,7 @@ const ComposeModalManager = props => {
       props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)
     } else {
-      if (errorMessage[0]?.message) {
+      if (errorMessage && errorMessage[0]?.message) {
         setModalError(errorMessage[0].message)
       } else if (isSubmissionCommentsType) {
         setModalError(I18n.t('Error creating Submission Comment'))

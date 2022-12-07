@@ -399,6 +399,65 @@ describe('handleExternalContentReady', () => {
       expect(document.querySelector('iframe')).toBeNull()
     })
   })
+
+  describe('and truthy ENV.a2_student_view', () => {
+    beforeAll(() => {
+      ENV = {
+        ...ENV,
+        a2_student_view: true,
+      }
+    })
+
+    afterAll(() => {
+      delete ENV.a2_student_view
+    })
+
+    it('does not insert content items into the editor', async () => {
+      const win = fakeWindow()
+      const jqObj = {
+        unbind: noop,
+      }
+      win.$.mockReturnValue(jqObj)
+      const instance = await getInstance(container, {
+        win,
+      })
+      const data = {
+        contentItems: [fakeContentItem('foo')],
+      }
+      instance.handleExternalContentReady({}, data)
+      expect(win.$).not.toHaveBeenCalledWith('#editor-id')
+      expect(send).not.toHaveBeenCalledWith(jqObj, 'insert_code', 'foo')
+    })
+
+    it('does not replace content items in the editor', async () => {
+      const win = fakeWindow()
+      const jqObj = {
+        unbind: noop,
+      }
+      win.$.mockReturnValue(jqObj)
+      const instance = await getInstance(container, {
+        win,
+      })
+      const data = {
+        contentItems: [fakeRCEReplaceContentItem('foo')],
+      }
+      instance.handleExternalContentReady({}, data)
+      expect(win.$).not.toHaveBeenCalledWith('#editor-id')
+      expect(send).not.toHaveBeenCalledWith(jqObj, 'set_code', 'foo')
+    })
+
+    it('closes the dialog', async () => {
+      const instance = await getInstance(container)
+      instance.open({name: 'foo', id: 1})
+      const data = {
+        contentItems: [fakeContentItem('foo'), fakeRCEReplaceContentItem('bar')],
+      }
+      instance.handleExternalContentReady({}, data)
+      await waitForAssertion(() => {
+        expect(document.querySelector('iframe')).toBeNull()
+      })
+    })
+  })
 })
 
 describe('handleDeepLinking', () => {

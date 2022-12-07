@@ -32,6 +32,12 @@
     "address_3159962f": {
         "message": "Aðsetur:"
     },
+    "afrikaans_da0fe6ee": {
+        "message": "Afrikaans"
+    },
+    "albanian_21ed929e": {
+        "message": "Albanska"
+    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -110,8 +116,14 @@
     "apps_54d24a47": {
         "message": "Smáforrit"
     },
+    "arabic_c5c87acd": {
+        "message": "Arabíska"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Ertu viss um að þú viljir eyða þessu skipulagi?"
+    },
+    "armenian_12da6118": {
+        "message": "Armenska"
     },
     "arrows_464a3e54": {
         "message": "Örvar"
@@ -197,6 +209,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Upphaf verkefnasögu þinnar"
     },
+    "belarusian_b2f19c76": {
+        "message": "Hvítrússneska"
+    },
     "below_81d4dceb": {
         "message": "Undir"
     },
@@ -230,6 +245,9 @@
     "brick_f2656265": {
         "message": "Kubbur"
     },
+    "bulgarian_feccab7e": {
+        "message": "Búlgarska"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -248,6 +266,9 @@
     "cap_product_3a5265a6": {
         "message": "Stafafeldi"
     },
+    "catalan_16f6b78f": {
+        "message": "Katalónska"
+    },
     "center_align_e68d9997": {
         "message": "Miðjujafna"
     },
@@ -260,6 +281,15 @@
     "chi_54a32644": {
         "message": "Khí"
     },
+    "chinese_111d37f6": {
+        "message": "Kínverska"
+    },
+    "chinese_simplified_7f0bd370": {
+        "message": "Kínverska einfölduð"
+    },
+    "chinese_traditional_8a7f759d": {
+        "message": "Kínverska hefðbundin"
+    },
     "choose_caption_file_9c45bc4e": {
         "message": "Veldu skjátextaskrá"
     },
@@ -268,9 +298,6 @@
     },
     "circle_484abe63": {
         "message": "Hringur"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "gera hring utan um óraðaðan lista"
     },
     "clear_2084585f": {
         "message": "Hreinsa"
@@ -416,6 +443,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons leyfi:"
     },
+    "croatian_d713d655": {
+        "message": "Króatíska"
+    },
     "crop_image_41bf940c": {
         "message": "Sníða mynd"
     },
@@ -434,8 +464,14 @@
     "cyan_c1d5f68a": {
         "message": "Blágrænn"
     },
+    "czech_9aa2cbe4": {
+        "message": "Tékkneska"
+    },
     "dagger_57e0f4e5": {
         "message": "Tvíkross"
+    },
+    "danish_c18cdac8": {
+        "message": "Danska"
     },
     "date_added_ed5ad465": {
         "message": "Dagsetning bætt við"
@@ -466,12 +502,6 @@
     },
     "deep_purple_bb3e2907": {
         "message": "Dökkfjólublár"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "sjálfvalið áherslumerktur óraðaður listi"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "sjálfvalið áherslumerktur raðaður listi"
     },
     "definite_integral_fe7ffed1": {
         "message": "Ákveðin heild"
@@ -611,6 +641,9 @@
     "due_when_7eed10c6": {
         "message": "Skil: { when }"
     },
+    "dutch_6d05cee5": {
+        "message": "Hollenska"
+    },
     "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
         "message": "Breyta öðrum texta fyrir þetta tákndæmi"
     },
@@ -671,8 +704,20 @@
     "engineering_icon_f8f3cf43": {
         "message": "Verkfræði tákn"
     },
+    "english_australia_dc405d82": {
+        "message": "Enska (Ástralía)"
+    },
+    "english_c60612e2": {
+        "message": "Enska"
+    },
+    "english_canada_12688ee4": {
+        "message": "Enska (Kanada)"
+    },
     "english_icon_25bfe845": {
         "message": "Ensku tákn"
+    },
+    "english_united_kingdom_a613f831": {
+        "message": "Enska (Bretland)"
     },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Sláðu inn minnst 3 stafi til að leita"
@@ -709,6 +754,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Villa kom upp við að hlaða eldri atriðum"
+    },
+    "estonian_5e8e2fa4": {
+        "message": "Eistneska"
     },
     "eta_b8828f99": {
         "message": "Eta"
@@ -812,6 +860,12 @@
     "files_index_af7c662b": {
         "message": "Skráalisti"
     },
+    "filipino_33339264": {
+        "message": "Filippeyska"
+    },
+    "finnish_4df2923d": {
+        "message": "Finnska"
+    },
     "flat_music_76d5a5c3": {
         "message": "Flat (tónlist)"
     },
@@ -842,17 +896,29 @@
     "fraction_41bac7af": {
         "message": "Brot"
     },
+    "french_33881544": {
+        "message": "Franska"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "Franska (Kanada)"
+    },
     "fullscreen_873bf53f": {
         "message": "Allur skjárinn"
     },
     "fun_quiz_47ab0b0": {
         "message": "Skemmtilegar spurningar"
     },
+    "galician_7e4508b5": {
+        "message": "Galisíska"
+    },
     "gamma_1767928": {
         "message": "Gamma"
     },
     "generating_preview_45b53be0": {
         "message": "Býr til forskoðun..."
+    },
+    "german_3ec99bbb": {
+        "message": "Þýska"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Myndir á GIF/PNG sniði sem eru stærri en { size } KB eru ekki studdar eins og er."
@@ -923,6 +989,9 @@
     "h_bar_bb94deae": {
         "message": "H-stika"
     },
+    "haitian_creole_7eb4195b": {
+        "message": "Haítí-kreólska"
+    },
     "hat_ea321e35": {
         "message": "Hat"
     },
@@ -941,6 +1010,9 @@
     "hearts_suit_e50e04ca": {
         "message": "Hjörtu (búningur)"
     },
+    "hebrew_88fbf778": {
+        "message": "Hebreska"
+    },
     "height_69b03e15": {
         "message": "Hæð"
     },
@@ -953,6 +1025,9 @@
     "hide_title_description_caf092ef": {
         "message": "Fela { title } lýsingu"
     },
+    "hindi_9bcd4b34": {
+        "message": "Hindí"
+    },
     "home_351838cd": {
         "message": "Heim"
     },
@@ -962,11 +1037,17 @@
     "html_editor_fb2ab713": {
         "message": "HTML ritill"
     },
+    "hungarian_fc7d30c9": {
+        "message": "Ungverska"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Ég hef heimild til að nota þessa skrá."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ég hef höfundarréttinn"
+    },
+    "icelandic_9d6d35de": {
+        "message": "Íslenska"
     },
     "icon_215a1dc6": {
         "message": "Tákn"
@@ -985,6 +1066,9 @@
     },
     "icon_options_tray_2b407977": {
         "message": "Valkostabakki tákns"
+    },
+    "icon_preview_1782a1d9": {
+        "message": "Forskoðun tákns"
     },
     "icon_shape_30b61e7": {
         "message": "Form tákns"
@@ -1031,6 +1115,9 @@
     "indigo_2035fc55": {
         "message": "Dimmfjólublár"
     },
+    "indonesian_5f6accd6": {
+        "message": "Indónesíska"
+    },
     "inference_fed5c960": {
         "message": "Ályktun"
     },
@@ -1070,8 +1157,17 @@
     "iota_11c932a9": {
         "message": "jóta"
     },
+    "irish_567e109f": {
+        "message": "Írska"
+    },
+    "italian_bd3c792d": {
+        "message": "Ítalska"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
+    },
+    "japanese_b5721ca7": {
+        "message": "Japanska"
     },
     "join_6cafecca": {
         "message": "Taka þátt"
@@ -1097,6 +1193,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Flýtilyklar"
     },
+    "korean_da812d9": {
+        "message": "Kóreska"
+    },
     "lambda_4f602498": {
         "message": "Lambda"
     },
@@ -1114,6 +1213,9 @@
     },
     "late_2be42b88": {
         "message": "Seint"
+    },
+    "latvian_2bbb6aab": {
+        "message": "Lettneska"
     },
     "left_align_43d95491": {
         "message": "Vinstri jafna"
@@ -1174,6 +1276,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tenglar á ytra svæði."
+    },
+    "lithuanian_5adcbe24": {
+        "message": "Litháíska"
     },
     "load_more_35d33c7": {
         "message": "Hlaða meira"
@@ -1247,8 +1352,20 @@
     "low_horizontal_dots_cc08498e": {
         "message": "Lágir láréttir miðjupunktar"
     },
+    "macedonian_6ed541af": {
+        "message": "Makedóníska"
+    },
     "magenta_4a65993c": {
         "message": "Blárauður"
+    },
+    "malay_f5dddce4": {
+        "message": "Malaíska"
+    },
+    "maltese_916925e8": {
+        "message": "Maltneska"
+    },
+    "maori_new_zealand_5380a95f": {
+        "message": "Māori (Nýja-Sjáland)"
     },
     "maps_to_e5ef7382": {
         "message": "Varpanir til"
@@ -1400,6 +1517,15 @@
     "none_selected_b93d56d2": {
         "message": "Ekkert valið"
     },
+    "norwegian_53f391ec": {
+        "message": "Norska"
+    },
+    "norwegian_bokmal_ad5843fa": {
+        "message": "Norskt bókmál"
+    },
+    "norwegian_nynorsk_c785f8a6": {
+        "message": "Ný-norska"
+    },
     "not_equal_6e2980e6": {
         "message": "Ekki jafnt"
     },
@@ -1490,9 +1616,6 @@
     "orange_81386a62": {
         "message": "Appelsínugulur"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "Raðaðir og óraðaðir listar"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Aðra flýtivísa ritils má finna á"
     },
@@ -1544,6 +1667,9 @@
     "perpendicular_7c48ede4": {
         "message": "Hornréttur"
     },
+    "persian_a8cadb95": {
+        "message": "Persneska"
+    },
     "phi_4ac33b6d": {
         "message": "Fí"
     },
@@ -1582,6 +1708,12 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } punktar"
+    },
+    "polish_4cf2ecaf": {
+        "message": "Pólska"
+    },
+    "portuguese_9c212cf4": {
+        "message": "Portúgalska"
     },
     "posted_when_a578f5ab": {
         "message": "Birt: { when }"
@@ -1754,6 +1886,9 @@
     "rightward_pointing_triangle_60330f5c": {
         "message": "Þríhyrningur sem bendir til hægri"
     },
+    "romanian_13670c1e": {
+        "message": "Rúmenska"
+    },
     "rotate_image_90_degrees_2ab77c05": {
         "message": "Snúa mynd -90 gráður"
     },
@@ -1762,6 +1897,9 @@
     },
     "rotation_9699c538": {
         "message": "Snúningur"
+    },
+    "russian_1e3e197": {
+        "message": "Rússneska"
     },
     "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
         "message": "Því miður er ekki hægt að nota lyklaborð með pretty HTML ritlinum. Aðgangur að hráa HTML ritlinum hér."
@@ -1804,6 +1942,9 @@
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Valið { linkFileName }"
+    },
+    "serbian_7187f1f2": {
+        "message": "Serbneska"
     },
     "set_minus_b46e9b88": {
         "message": "Mínusmengi"
@@ -1850,6 +1991,12 @@
     "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
         "message": "Stærð skjátextaskrár er stærri en { max } kb leyfileg mesta skráarstærð."
     },
+    "slovak_69f48e1b": {
+        "message": "Slóvakíska"
+    },
+    "slovenian_30ae5208": {
+        "message": "Slóvenska"
+    },
     "small_b070434a": {
         "message": "Lítil"
     },
@@ -1877,6 +2024,9 @@
     "spades_suit_b37020c2": {
         "message": "Spaðar (búningur)"
     },
+    "spanish_de9de5d6": {
+        "message": "Spænska"
+    },
     "square_511eb3b3": {
         "message": "Ferningur"
     },
@@ -1903,9 +2053,6 @@
     },
     "square_superset_strict_fa4262e4": {
         "message": "Ferningsyfirmengi (strangt)"
-    },
-    "square_unordered_list_b15ce93b": {
-        "message": "gera ferning utan um óraðaðan lista"
     },
     "star_8d156e09": {
         "message": "Stjarna"
@@ -1973,6 +2120,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Studdar skráagerðir: SRT eða WebVTT"
     },
+    "swahili_5caeb4ba": {
+        "message": "Svahílí"
+    },
+    "swedish_59a593ca": {
+        "message": "Sænska"
+    },
     "switch_to_pretty_html_editor_a3cee15f": {
         "message": "Skipta yfir í pretty HTML-ritil"
     },
@@ -1990,6 +2143,9 @@
     },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/örvar"
+    },
+    "tagalog_74906db7": {
+        "message": "Tagalog"
     },
     "task_16b0ef38": {
         "message": "Verk"
@@ -2017,6 +2173,9 @@
     },
     "text_size_887c2f6": {
         "message": "Textastærð"
+    },
+    "thai_8f9bc548": {
+        "message": "Tælenska"
     },
     "the_best_assignment_15e98be1": {
         "message": "Bestu verkefnin"
@@ -2141,6 +2300,9 @@
     "triangle_6072304e": {
         "message": "Þríhyrningur"
     },
+    "turkish_5b69578b": {
+        "message": "Tyrkneska"
+    },
     "turnstile_yields_f9e76df1": {
         "message": "Kross (afrakstur)"
     },
@@ -2152,6 +2314,9 @@
     },
     "type_control_f9_to_access_table_options_text_92141329": {
         "message": "sláðu inn Ctrl F9 til að fá aðgang að töfluvalkostum. { text }"
+    },
+    "ukrainian_945b00b7": {
+        "message": "Úkraínska"
     },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Ekki tókst að merkja þetta sem fullklárað."
@@ -2189,9 +2354,6 @@
     "uploading_19e8a4e7": {
         "message": "Hleður upp"
     },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "hástafa bókstafa raðaður listi"
-    },
     "uppercase_delta_d4f4bc41": {
         "message": "Delta með stórum staf"
     },
@@ -2212,9 +2374,6 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Phi með stórum staf"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "hástafa rómverskar tölur raðaður listi"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Sigma með stórum staf"
@@ -2312,6 +2471,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Myndbandsspilari fyrir { title }"
     },
+    "vietnamese_e7a76583": {
+        "message": "Víetnamska"
+    },
     "view_ba339f93": {
         "message": "Skoða"
     },
@@ -2332,6 +2494,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Leiðarstýring vikulegrar stundatölfu"
+    },
+    "welsh_42ab94b1": {
+        "message": "Velska"
     },
     "white_87fa64fd": {
         "message": "Hvítur"
@@ -2362,6 +2527,9 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Í gær"
+    },
+    "yiddish_f96986df": {
+        "message": "Jiddíska"
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Þú er með margmiðlunarsvörun."

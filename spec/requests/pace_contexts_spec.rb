@@ -54,7 +54,7 @@ describe "Pace Contexts API" do
         applied_pace_json = course_json["applied_pace"]
         expect(applied_pace_json["name"]).to eq course.name
         expect(applied_pace_json["type"]).to eq "Course"
-        expect(applied_pace_json["duration"]).to eq 0
+        expect(applied_pace_json["duration"]).to eq 1
         expect(Time.parse(applied_pace_json["last_modified"])).to be_within(1.second).of(default_pace.published_at)
       end
 
@@ -367,6 +367,39 @@ describe "Pace Contexts API" do
           expect(response.status).to eq 200
           json = JSON.parse(response.body)
           expect(json["pace_contexts"].pluck("name")).to eq ["Bar Foo", "Foo Bar"]
+        end
+      end
+    end
+
+    context "when a search_term is specified" do
+      context "sections" do
+        before do
+          add_section("Section A", course: course)
+          add_section("Section B", course: course)
+          add_section("Section C", course: course)
+        end
+
+        it "filters by the section name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", search_term: "a", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Unnamed Course", "Section A"]
+        end
+      end
+
+      context "student enrollments" do
+        before do
+          student = user_model(name: "Student Foo", sortable_name: "A, Foo")
+          student_two = user_model(name: "Student Bar", sortable_name: "B, Foo")
+          course.enroll_student(student, enrollment_state: "active")
+          course.enroll_student(student_two, enrollment_state: "active")
+        end
+
+        it "filters by the user name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", search_term: "bAr", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Student Bar"]
         end
       end
     end

@@ -299,9 +299,6 @@
   "circle_484abe63": {
     "message": "Circle"
   },
-  "circle_unordered_list_9e3a0763": {
-    "message": "circle unordered list"
-  },
   "clear_2084585f": {
     "message": "Clear"
   },
@@ -505,12 +502,6 @@
   },
   "deep_purple_bb3e2907": {
     "message": "Deep Purple"
-  },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "default bulleted unordered list"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "default numerical ordered list"
   },
   "definite_integral_fe7ffed1": {
     "message": "Definite Integral"
@@ -1004,6 +995,9 @@
   "hat_ea321e35": {
     "message": "Hat"
   },
+  "having_trouble_initializing_copy_paste_but_it_can__7fb1f912": {
+    "message": "Having trouble initializing copy/paste, but it can still limp along"
+  },
   "heading_2_5b84eed2": {
     "message": "Heading 2"
   },
@@ -1087,6 +1081,9 @@
   },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "If left empty link, text will display as course link name"
+  },
+  "if_usage_rights_are_required_the_file_will_not_be__5d2ca47": {
+    "message": "If Usage Rights are required the file will not be published until set on the Files page."
   },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
@@ -1627,9 +1624,6 @@
   "orange_81386a62": {
     "message": "Orange"
   },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Ordered and Unordered Lists"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Other editor shortcuts may be found at"
   },
@@ -1656,6 +1650,9 @@
   },
   "partial_derivative_4a9159df": {
     "message": "Partial (Derivative)"
+  },
+  "paste_5963d1c1": {
+    "message": "Paste"
   },
   "peer_review_74f26a13": {
     "message": "Peer Review"
@@ -2032,6 +2029,12 @@
   "something_went_wrong_d238c551": {
     "message": "Something went wrong"
   },
+  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
+    "message": "Sorry, we don''t know how to paste that"
+  },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Sorry, we don''t support multiple files."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sort By"
   },
@@ -2067,9 +2070,6 @@
   },
   "square_superset_strict_fa4262e4": {
     "message": "Square Superset (Strict)"
-  },
-  "square_unordered_list_b15ce93b": {
-    "message": "square unordered list"
   },
   "star_8d156e09": {
     "message": "Star"
@@ -2371,9 +2371,6 @@
   "uploading_19e8a4e7": {
     "message": "Uploading"
   },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "uppercase alphabetic ordered list"
-  },
   "uppercase_delta_d4f4bc41": {
     "message": "Uppercase Delta"
   },
@@ -2394,9 +2391,6 @@
   },
   "uppercase_psi_6395acbe": {
     "message": "Uppercase Psi"
-  },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "uppercase Roman numeral ordered list"
   },
   "uppercase_sigma_dbb70e92": {
     "message": "Uppercase Sigma"

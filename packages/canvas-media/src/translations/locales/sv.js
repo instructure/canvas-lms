@@ -18,11 +18,7 @@
 
 import formatMessage from '../../format-message'
 
-const locale = {
-  "no_preview_is_available_for_this_file_f940114a": {
-    "message": "Förhandsvisning är inte tillgänglig för den här filen."
-  }
-}
+const locale = {}
 
 
 formatMessage.addLocale({sv: locale})

@@ -48,7 +48,7 @@ describe('PaceModalHeading', () => {
     const {getByTestId} = renderConnected(
       <PaceModalHeading {...defaultProps} contextName={PRIMARY_PACE.name || ''} />
     )
-    expect(getByTestId('pace-type').textContent).toBe('Default Course Pacing')
+    expect(getByTestId('pace-type').textContent).toBe('Default Course Pace')
     expect(getByTestId('section-name').textContent).toBe(PRIMARY_PACE.name)
     expect(getByTestId('pace-info').textContent).toBe(
       `Students${coursePaceContext.associated_student_count}`
@@ -63,7 +63,7 @@ describe('PaceModalHeading', () => {
         paceContext={sectionPaceContext}
       />
     )
-    expect(getByTestId('pace-type').textContent).toBe('Section Course Pacing')
+    expect(getByTestId('pace-type').textContent).toBe('Section Pace')
     expect(getByTestId('section-name').textContent).toBe('My custom section pace')
     expect(getByTestId('pace-info').textContent).toBe(
       `Students${sectionPaceContext.associated_student_count}`

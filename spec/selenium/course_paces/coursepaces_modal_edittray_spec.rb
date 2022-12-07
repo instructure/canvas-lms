@@ -113,13 +113,16 @@ describe "course paces edit tray" do
       visit_course_paces_page
       click_create_default_pace_button
 
+      expect(duration_field[0]).to have_value "2"
       update_module_item_duration(0, 3)
+      expect(duration_field[0]).to have_value "3"
       click_unpublished_changes_button
       click_reset_all_button
       click_reset_all_reset_button
 
       expect(unpublished_changes_tray_exists?).to be_falsey
       expect(publish_status.text).to eq("No pending changes to apply")
+      expect(duration_field[0]).to have_value "2"
     end
 
     it "does not reset content when Reset All modal Cancel button is selected" do

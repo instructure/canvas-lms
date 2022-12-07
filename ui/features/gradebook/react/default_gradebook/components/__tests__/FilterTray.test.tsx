@@ -30,7 +30,7 @@ const originalState = store.getState()
 
 const defaultFilterPresets: FilterPreset[] = [
   {
-    id: 'preset-1',
+    id: '1',
     name: 'Filter Preset 1',
     filters: [
       {

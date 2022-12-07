@@ -491,6 +491,7 @@ module ApplicationHelper
             "domain",
             "resource_domain",
             "rtmp_domain",
+            "protocol",
             "partner_id",
             "subpartner_id",
             "player_ui_conf",

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
@@ -144,13 +144,18 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   })
 
   describe('"Closed Captions Panel"', () => {
-    it('is displayed when feature flag is true', () => {
+    it('is displayed when feature flag is true', async () => {
       renderComponent()
-      expect(tray.$closedCaptionPanel).toBeInTheDocument()
+      await waitFor(() => {
+        expect(tray.$closedCaptionPanel).toBeInTheDocument()
+      })
     })
 
-    it('does not steal focus when changing other parts of the tray', () => {
+    it('does not steal focus when changing other parts of the tray', async () => {
       renderComponent()
+      await waitFor(() => {
+        expect(tray.$closedCaptionPanel).toBeInTheDocument()
+      })
       tray.$titleTextField.focus()
       tray.setTitleText('hello')
       expect(tray.$titleTextField).toBe(document.activeElement)

@@ -58,11 +58,6 @@ module SeleniumDriverSetup
     "http://#{app_host_and_port}"
   end
 
-  # prevents subsequent specs from failing because tooltips are showing etc.
-  def move_mouse_to_known_position
-    driver.action.move_to_location(0, 0).perform if driver.ready_for_interaction
-  end
-
   class ServerStartupError < RuntimeError; end
 
   class << self

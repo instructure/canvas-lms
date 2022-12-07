@@ -68,57 +68,38 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
   QUnit.module('#handleUpdated()', hooks => {
     hooks.beforeEach(() => {
       buildGradebook()
-
-      sinon.stub(gradebook.finalGradeOverrides, 'loadFinalGradeOverrides')
       sinon.stub(gradebook, 'updateColumns')
     })
 
     QUnit.module('when "allow final grade override" becomes enabled', contextHooks => {
       contextHooks.beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(false)
-        gradebook.courseSettings.handleUpdated({
-          allowFinalGradeOverride: true,
-        })
+        gradebook.courseSettings.handleUpdated(
+          {
+            allowFinalGradeOverride: true,
+          },
+          () => {}
+        )
       })
 
       test('updates columns in the Gradebook grid', () => {
         strictEqual(gradebook.updateColumns.callCount, 1)
-      })
-
-      test('loads final grade overrides', () => {
-        strictEqual(gradebook.finalGradeOverrides.loadFinalGradeOverrides.callCount, 1)
       })
     })
 
     QUnit.module('when "allow final grade override" becomes disabled', contextHooks => {
       contextHooks.beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(true)
-        gradebook.courseSettings.handleUpdated({
-          allowFinalGradeOverride: false,
-        })
+        gradebook.courseSettings.handleUpdated(
+          {
+            allowFinalGradeOverride: false,
+          },
+          () => {}
+        )
       })
 
       test('updates columns in the Gradebook grid', () => {
         strictEqual(gradebook.updateColumns.callCount, 1)
-      })
-
-      test('does not load final grade overrides', () => {
-        strictEqual(gradebook.finalGradeOverrides.loadFinalGradeOverrides.callCount, 0)
-      })
-    })
-
-    QUnit.module('when "allow final grade override" is not changed', contextHooks => {
-      contextHooks.beforeEach(() => {
-        gradebook.courseSettings.setAllowFinalGradeOverride(true)
-        gradebook.courseSettings.handleUpdated({})
-      })
-
-      test('does not update columns in the Gradebook grid', () => {
-        strictEqual(gradebook.updateColumns.callCount, 0)
-      })
-
-      test('does not load final grade overrides', () => {
-        strictEqual(gradebook.finalGradeOverrides.loadFinalGradeOverrides.callCount, 0)
       })
     })
   })

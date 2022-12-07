@@ -335,6 +335,19 @@ describe UsersController do
       expect(json_parse.map { |c| c["label"] }).to eq %w[A]
     end
 
+    it "includes blueprint" do
+      course_with_teacher_logged_in(course_name: "Blueprint!", active_all: 1)
+      @course1 = @course
+      @course2 = course_with_teacher(course_name: "NotBlueprint", user: @teacher, active_all: 1).course
+      MasterCourses::MasterTemplate.set_as_master_course(@course1)
+
+      get "manageable_courses", params: { user_id: @teacher.id }
+      expect(response).to be_successful
+      courses = json_parse
+      expect(courses.find { |c| c["id"] == @course1.id }["blueprint"]).to eq true
+      expect(courses.find { |c| c["id"] == @course2.id }["blueprint"]).to eq false
+    end
+
     context "query matching" do
       before do
         course_with_teacher_logged_in(course_name: "Extra course", active_all: 1)

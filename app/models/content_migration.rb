@@ -30,7 +30,7 @@ class ContentMigration < ActiveRecord::Base
   belongs_to :source_course, class_name: "Course"
   belongs_to :root_account, class_name: "Account"
   has_one :content_export
-  has_many :migration_issues
+  has_many :migration_issues, dependent: :destroy
   has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
   serialize :migration_settings
@@ -383,6 +383,7 @@ class ContentMigration < ActiveRecord::Base
     expires_at ||= Setting.get("content_migration_job_expiration_hours", "48").to_i.hours.from_now
     return if blocked_by_current_migration?(plugin, retry_count, expires_at)
 
+    migration_issues.delete_all
     set_default_settings
 
     plugin ||= Canvas::Plugin.find(migration_type)

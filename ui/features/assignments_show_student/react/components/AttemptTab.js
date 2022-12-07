@@ -480,6 +480,14 @@ export default class AttemptTab extends Component {
       selectedType = assignment.submissionTypes[0]
     }
 
+    if (
+      submission.submissionType !== null &&
+      submission.submissionType !== selectedType &&
+      submission.submissionStatus === 'submitted'
+    ) {
+      selectedType = submission.submissionType
+    }
+
     const submittingForGroup =
       assignment.groupSet != null &&
       !assignment.gradeGroupStudentsIndividually &&

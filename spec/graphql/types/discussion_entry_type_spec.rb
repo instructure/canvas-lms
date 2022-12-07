@@ -60,6 +60,7 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
     expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
+    expect(type.resolve("depth")).to eq parent_entry.depth
   end
 
   it "returns successfully on nil messages" do

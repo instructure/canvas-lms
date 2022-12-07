@@ -75,6 +75,42 @@ describe('FileBrowser', () => {
       expect(file).toBeInTheDocument()
     })
 
+    describe('when a media file is still processing', () => {
+      it('the view contains the file name and a "media ... processing..." message', async () => {
+        const {getByText} = subject(props)
+        const folder = await waitFor(() => getByText('My files'))
+        fireEvent.click(folder)
+        const mediaProcessingMessage = await waitFor(() =>
+          getByText('Media file is processing. Please try again later.')
+        )
+        const pendingMediaFileName = await waitFor(() => getByText('im-still-pending.mp4'))
+
+        expect(mediaProcessingMessage).toBeInTheDocument()
+        expect(pendingMediaFileName).toBeInTheDocument()
+      })
+
+      it('clicking on the file does not invoke "selectFile"', async () => {
+        const {getByText} = subject(props)
+        const folder = await waitFor(() => getByText('My files'))
+        fireEvent.click(folder)
+        const pendingMediaFileName = await waitFor(() => getByText('im-still-pending.mp4'))
+        fireEvent.click(pendingMediaFileName)
+        expect(props.selectFile).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when file is an Icon Maker icon', () => {
+      it('clicking on the file invokes "selectFile"', async () => {
+        const {getByText} = subject(props)
+        const folder = await waitFor(() => getByText('My files'))
+        fireEvent.click(folder)
+        const iconMakerFile = await waitFor(() => getByText('icon-maker-icon.svg'))
+        expect(iconMakerFile).toBeInTheDocument()
+        fireEvent.click(iconMakerFile)
+        expect(props.selectFile).toHaveBeenCalled()
+      })
+    })
+
     describe('when "useContextAssets" is true', () => {
       beforeEach(() => (props = defaultProps({useContextAssets: true})))
 

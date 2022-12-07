@@ -82,6 +82,7 @@ module CC
         run_and_set_progress(:add_media_objects, 90, I18n.t("course_exports.errors.media_files", "Failed to export some media files"), @html_exporter)
         run_and_set_progress(:create_basic_lti_links, 91, I18n.t("course_exports.errors.lti_links", "Failed to export some external tool configurations"))
         run_and_set_progress(:create_tool_profiles, 92, I18n.t("course_exports.errors.tool_profiles", "Failed to export some tool profiles"))
+        run_and_set_progress(:create_blueprint_settings, 93, I18n.t("Failed to export blueprint course settings"))
       end
     end
 

@@ -135,7 +135,6 @@ if (ENV.use_high_contrast) {
     // 'loadend' gets fired after both successful and errored requests
     this.addEventListener('loadend', () => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
-      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
     })
     return send.apply(this, arguments)
   }
@@ -148,7 +147,6 @@ if (ENV.use_high_contrast) {
     // eslint-disable-next-line promise/catch-or-return
     promise.finally(() => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
-      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
     })
     return promise
   }

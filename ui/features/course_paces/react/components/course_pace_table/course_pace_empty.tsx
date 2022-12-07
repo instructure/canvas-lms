@@ -70,11 +70,11 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
             </FlexItem>
             <FlexItem>
               <Text as="div" weight="bold">
-                {I18n.t('Create a Default Course Pace')}
+                {I18n.t('Create a Course Pace')}
               </Text>
               <Text>
                 {I18n.t(
-                  'Get started with configuring the course material due dates for the overall course'
+                  'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.'
                 )}
               </Text>
             </FlexItem>
@@ -101,11 +101,11 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
             </FlexItem>
             <FlexItem>
               <Text as="div" weight="bold">
-                {I18n.t('Customize Sections and Individual Student Paces')}
+                {I18n.t('Customize Section and Student Paces')}
               </Text>
               <Text>
                 {I18n.t(
-                  'Then adjust Sections and Students pacing individually for a personalized schedule'
+                  'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).'
                 )}
               </Text>
             </FlexItem>
@@ -130,11 +130,9 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
         as="div"
         dangerouslySetInnerHTML={{
           __html:
-            '*' +
+            '* ' +
             I18n.t(
-              'Please note once a Course Pace is set up, all existing assignment,' +
-                ' quizzes, discussions due dates will be controlled by Course Pacing. ' +
-                'You can read more details in the *Course Pacing User Group*.',
+              'Please note that once a Course Pace is saved, all due dates for existing assessments and learning materials will be controlled by Course Pacing. Learn more about Course Pacing in the *Course Pacing User Group*.',
               {
                 wrappers: [
                   `<a target="_blank" href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">$1</a>`,

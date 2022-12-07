@@ -132,6 +132,12 @@ class ContentTag < ActiveRecord::Base
     true
   end
 
+  def self.polymorphic_class_for(name)
+    return nil if TABLELESS_CONTENT_TYPES.include?(name)
+
+    super
+  end
+
   def touch_context_if_learning_outcome
     if (tag_type == "learning_outcome_association" || tag_type == "learning_outcome") && skip_touch.blank?
       context_type.constantize.where(id: context_id).update_all(updated_at: Time.now.utc)
@@ -183,9 +189,10 @@ class ContentTag < ActiveRecord::Base
       (content_ids[t.content_type] ||= []) << t.content_id if t.content_type && t.content_id
     end
     content_ids.each do |type, ids|
+      next if TABLELESS_CONTENT_TYPES.include?(type)
+
       klass = type.constantize
       next unless klass < ActiveRecord::Base
-      next if klass < Tableless
 
       if klass.new.respond_to?(:could_be_locked=)
         klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
@@ -362,7 +369,7 @@ class ContentTag < ActiveRecord::Base
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
                              .where(context_type: context_type, context_id: context_id, content_id: outcome)
-                             .where("id<>?", self).first
+                             .where.not(id: self).take
       unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)

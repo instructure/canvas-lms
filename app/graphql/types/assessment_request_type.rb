@@ -49,5 +49,10 @@ module Types
         end
       end
     end
+
+    field :asset_submission_type, String, null: true
+    def asset_submission_type
+      load_association(:asset).then(&:submission_type)
+    end
   end
 end

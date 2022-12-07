@@ -33,7 +33,7 @@ import * as Alerts from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
-import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
+import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import StatusPill from '@canvas/grading-status-pill'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -298,6 +298,10 @@ const utils = {
     // strings "true" or "false", but now we store boolean true/false values.
     const settingVal = userSettings.get('eg_hide_student_names')
     return settingVal === true || settingVal === 'true' || ENV.force_anonymous_grading
+  },
+  sortByCriteria() {
+    const settingVal = userSettings.get('eg_sort_by')
+    return settingVal || 'alphabetically'
   },
 }
 
@@ -671,21 +675,41 @@ function setupHeader() {
     submitSettingsForm(e) {
       e.preventDefault()
 
-      userSettings.set('eg_sort_by', $('#eg_sort_by').val())
+      const sortBy = $('#eg_sort_by').val()
+      const sortByChanged = sortBy !== utils.sortByCriteria()
+      userSettings.set('eg_sort_by', sortBy)
+
+      let hideNamesChanged = false
       if (!ENV.force_anonymous_grading) {
-        userSettings.set('eg_hide_student_names', $('#hide_student_names').prop('checked'))
+        const hideNames = $('#hide_student_names').prop('checked')
+        hideNamesChanged = hideNames !== utils.shouldHideStudentNames()
+        userSettings.set('eg_hide_student_names', hideNames)
       }
 
-      $(e.target)
-        .find('.submit_button')
-        .attr('disabled', 'true')
-        .text(I18n.t('buttons.saving_settings', 'Saving Settings...'))
-      const gradeByQuestion = $('#enable_speedgrader_grade_by_question').prop('checked')
+      const isClassicQuiz = !!window.jsonData.context.quiz
+      const needsReload = hideNamesChanged || sortByChanged || isClassicQuiz
+      if (needsReload) {
+        $(e.target)
+          .find('.submit_button')
+          .attr('disabled', 'true')
+          .text(I18n.t('buttons.saving_settings', 'Saving Settings...'))
+      } else {
+        this.elements.settings.form.dialog('close')
+      }
+
+      const gradeByQuestion = !!$('#enable_speedgrader_grade_by_question').prop('checked')
+      if (gradeByQuestion !== ENV.GRADE_BY_QUESTION) {
+        ENV.GRADE_BY_QUESTION = gradeByQuestion
+        QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage($iframe_holder, gradeByQuestion)
+      }
+
       // eslint-disable-next-line promise/catch-or-return
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion,
       }).then(() => {
-        SpeedgraderHelpers.reloadPage()
+        if (needsReload) {
+          SpeedgraderHelpers.reloadPage()
+        }
       })
     },
 
@@ -2790,7 +2814,13 @@ EG = {
   },
 
   renderLtiLaunch($div, urlBase, submission) {
-    const externalToolUrl = submission.external_tool_url || submission.url
+    let externalToolUrl = submission.external_tool_url || submission.url
+
+    if (ENV.NQ_GRADE_BY_QUESTION_ENABLED && window.jsonData.quiz_lti && externalToolUrl) {
+      const quizToolUrl = new URL(externalToolUrl)
+      quizToolUrl.searchParams.set('grade_by_question_enabled', String(ENV.GRADE_BY_QUESTION))
+      externalToolUrl = quizToolUrl.href
+    }
 
     urlBase += SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)
 
@@ -4278,7 +4308,7 @@ export default {
         externalToolLaunchOptions = launchOptions
       }
     }
-    quizzesNextSpeedGrading(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
+    QuizzesNextSpeedGrading.setup(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
 
     // fire off the request to get the jsonData
     window.jsonData = {}

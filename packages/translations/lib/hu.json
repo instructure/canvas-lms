@@ -191,9 +191,6 @@
     "choose_usage_rights_33683854": {
         "message": "Válasszon a felhasználói jogokból..."
     },
-    "circle_unordered_list_9e3a0763": {
-        "message": "rendezetlen lista körökkel"
-    },
     "clear_2084585f": {
         "message": "Törlés"
     },
@@ -337,12 +334,6 @@
     },
     "deep_purple_bb3e2907": {
         "message": "Sötétlila"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "alapértelmezett nem rendezett lista"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "alapértelmezett sorszámozott lista"
     },
     "delete_a6efa79d": {
         "message": "Törlés"
@@ -968,9 +959,6 @@
     "orange_81386a62": {
         "message": "Narancs"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "Rendezett és Rendezetlen Listák"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "További szerkesztési billentyűparancsokat találhat a következő helyen"
     },
@@ -1160,9 +1148,6 @@
     "spanish_de9de5d6": {
         "message": "Spanyol"
     },
-    "square_unordered_list_b15ce93b": {
-        "message": "rendezetlen lista négyzetekkel"
-    },
     "star_8d156e09": {
         "message": "Csillagozás"
     },
@@ -1336,12 +1321,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Feltöltés"
-    },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "nagybetűs lista abc sorrendbe rendezve"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "nagybetűs lista római számok szerint rendezve"
     },
     "url_22a5f3b8": {
         "message": "URL"

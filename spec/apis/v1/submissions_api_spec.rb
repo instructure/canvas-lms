@@ -1193,10 +1193,10 @@ describe "Submissions API", type: :request do
          "extra_attempts" => nil,
          "attachments" =>
          [
-           { "content-type" => "application/loser",
+           { "content-type" => "application/unknown",
              "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
-             "filename" => "unknown.loser",
-             "display_name" => "unknown.loser",
+             "filename" => "unknown.example",
+             "display_name" => "unknown.example",
              "upload_status" => "success",
              "id" => sub1.attachments.first.id,
              "uuid" => sub1.attachments.first.uuid,
@@ -1296,10 +1296,10 @@ describe "Submissions API", type: :request do
               "display_name" => nil },
             "attachments" =>
             [
-              { "content-type" => "application/loser",
+              { "content-type" => "application/unknown",
                 "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
-                "filename" => "unknown.loser",
-                "display_name" => "unknown.loser",
+                "filename" => "unknown.example",
+                "display_name" => "unknown.example",
                 "upload_status" => "success",
                 "id" => sub1.attachments.first.id,
                 "uuid" => sub1.attachments.first.uuid,

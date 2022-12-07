@@ -28,13 +28,13 @@ import {
   IconTroubleLine,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-
 import {CURRENT_USER} from '../../utils/constants'
 import React from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {SplitScreenButton} from './SplitScreenButton'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
@@ -200,7 +200,7 @@ export const DiscussionPostToolbar = props => {
                   </span>
                 </Flex.Item>
                 {/* Sort */}
-                <Flex.Item padding={responsiveProps.padding}>
+                <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                   <Tooltip
                     renderTip={
                       props.sortDirection === 'desc'
@@ -232,6 +232,15 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
+                {ENV.split_screen_view && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <SplitScreenButton
+                      setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+                      userSplitScreenPreference={props.userSplitScreenPreference}
+                      closeView={props.closeView}
+                    />
+                  </Flex.Item>
+                )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
                   <Flex.Item shouldGrow={true}>
                     <Flex justifyItems="end">
@@ -265,6 +274,9 @@ DiscussionPostToolbar.propTypes = {
   onSortClick: PropTypes.func,
   searchTerm: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
+  setUserSplitScreenPreference: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
+  closeView: PropTypes.func,
 }
 
 DiscussionPostToolbar.defaultProps = {

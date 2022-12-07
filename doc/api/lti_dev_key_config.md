@@ -35,7 +35,7 @@ The request also includes a `login_hint` that is passed in the next step. Last, 
 
 <a name="step-2"></a>
 ###Step 2: Authentication Request
-To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
+To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST, however, this request needs to be a redirect in the user’s browser and not made server to server as we need to validate the current user's session data. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
 
 - `https://canvas.instructure.com/api/lti/authorize_redirect` (if launched from a **production** environment)
 - `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)

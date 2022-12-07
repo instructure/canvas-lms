@@ -66,15 +66,15 @@ module FeatureFlags
       root_account.settings&.dig(:provision, "lti").present?
     end
 
+    def self.docviewer_enable_iwork_visible_on_hook(context)
+      root_account = context.root_account
+
+      # Right now Apple only has a server in the US, to comply with GDPR, we'll only turn this on for folks in the US.
+      root_account.external_integration_keys.find_by(key_type: "salesforce_billing_country_code")&.key_value == "US"
+    end
+
     def self.usage_metrics_allowed_hook(context)
-      # Calling out here that `key_type: "salesforce_territory_region")&.key_value == "domestic"`
-      #   is totally made up right now and won't resolve anything until we add salesforce
-      #   data with these values
-      context&.root_account&.settings&.[](:enable_usage_metrics) ||
-        (context&.root_account&.external_integration_keys&.find_by(
-          key_type: "salesforce_billing_country_code")&.key_value == "US" &&
-          context&.root_account&.external_integration_keys&.find_by(
-            key_type: "salesforce_territory_region")&.key_value == "domestic")
+      UsageMetricsPredicate.new(context, Shard.current.database_server.config[:region]).call
     end
 
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)

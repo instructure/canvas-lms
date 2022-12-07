@@ -551,6 +551,22 @@ describe "Pages API", type: :request do
         expect(error[1][0]["message"]).to eq("The front page cannot be unpublished")
       end
 
+      it "does not error when creating a new page with the same name as the front page" do
+        page_title = "The Black Keys Fandom 101"
+        original_page = @course.wiki_pages.create!(title: page_title, body: "whatever")
+        original_page.publish
+        original_page.set_as_front_page!
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                        { controller: "wiki_pages_api", action: "create", format: "json", course_id: @course.to_param },
+                        { wiki_page: { title: page_title, body: body } },
+                        {}, { expected_status: 200 })
+        new_page = @course.wiki_pages.where(url: json["url"]).first!
+
+        expect(@course.wiki.front_page).to eq original_page
+        expect(new_page.title).to eq "#{page_title}-2"
+      end
+
       it "processes body with process_incoming_html_content" do
         allow_any_instance_of(WikiPagesApiController).to receive(:process_incoming_html_content).and_return("processed content")
 

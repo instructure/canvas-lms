@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questestinterop>
+  <assessment title="Session 2 Response Assignment">
+    <assessmentmetadata>
+      <bbmd_asi_object_id>_2979639_1</bbmd_asi_object_id>
+      <bbmd_asitype>Assessment</bbmd_asitype>
+      <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+      <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+      <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+      <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+      <bbmd_is_disabled>false</bbmd_is_disabled>
+      <bbmd_negative_points_ind>N</bbmd_negative_points_ind>
+      <bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind>
+      <bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind>
+      <bbmd_numbertype>none</bbmd_numbertype>
+      <bbmd_partialcredit></bbmd_partialcredit>
+      <bbmd_orientationtype>vertical</bbmd_orientationtype>
+      <bbmd_is_extracredit>false</bbmd_is_extracredit>
+      <qmd_absolutescore_max>10.000000000000000</qmd_absolutescore_max>
+      <qmd_weighting>0</qmd_weighting>
+      <qmd_instructornotes></qmd_instructornotes>
+    </assessmentmetadata>
+    <rubric view="All">
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </rubric>
+    <presentation_material>
+      <flow_mat class="Block">
+        <material>
+          <mat_extension>
+            <mat_formattedtext type="HTML"/>
+          </mat_extension>
+        </material>
+      </flow_mat>
+    </presentation_material>
+    <section>
+      <sectionmetadata>
+        <bbmd_asi_object_id>_2979640_1</bbmd_asi_object_id>
+        <bbmd_asitype>Section</bbmd_asitype>
+        <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+        <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+        <bbmd_questiontype>Multiple Choice</bbmd_questiontype>
+        <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+        <bbmd_is_disabled>false</bbmd_is_disabled>
+        <bbmd_negative_points_ind>N</bbmd_negative_points_ind>
+        <bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind>
+        <bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind>
+        <bbmd_numbertype>none</bbmd_numbertype>
+        <bbmd_partialcredit></bbmd_partialcredit>
+        <bbmd_orientationtype>vertical</bbmd_orientationtype>
+        <bbmd_is_extracredit>false</bbmd_is_extracredit>
+        <qmd_absolutescore_max>10.000000000000000</qmd_absolutescore_max>
+        <qmd_weighting>0</qmd_weighting>
+        <qmd_instructornotes></qmd_instructornotes>
+      </sectionmetadata>
+      <item maxattempts="0">
+        <itemmetadata>
+          <bbmd_asi_object_id>_2979641_1</bbmd_asi_object_id>
+          <bbmd_asitype>Item</bbmd_asitype>
+          <bbmd_assessmenttype>Test</bbmd_assessmenttype>
+          <bbmd_sectiontype>Subsection</bbmd_sectiontype>
+          <bbmd_questiontype>Presentation Only</bbmd_questiontype>
+          <bbmd_is_from_cartridge>false</bbmd_is_from_cartridge>
+          <bbmd_is_disabled>false</bbmd_is_disabled>
+          <bbmd_negative_points_ind>N</bbmd_negative_points_ind>
+          <bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind>
+          <bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind>
+          <bbmd_numbertype>none</bbmd_numbertype>
+          <bbmd_partialcredit></bbmd_partialcredit>
+          <bbmd_orientationtype>vertical</bbmd_orientationtype>
+          <bbmd_is_extracredit>false</bbmd_is_extracredit>
+          <qmd_absolutescore_max>0</qmd_absolutescore_max>
+          <qmd_weighting>0</qmd_weighting>
+          <qmd_instructornotes></qmd_instructornotes>
+        </itemmetadata>
+        <presentation>
+          <flow class="Block">
+            <flow class="QUESTION_BLOCK">
+              <flow class="FORMATTED_TEXT_BLOCK">
+                <material>
+                  <mat_extension>
+                    <mat_formattedtext type="HTML">oi</mat_formattedtext>
+                  </mat_extension>
+                </material>
+              </flow>
+            </flow>
+            <flow class="RESPONSE_BLOCK"/>
+          </flow>
+        </presentation>
+        <resprocessing scoremodel="SumOfScores">
+          <outcomes>
+            <decvar varname="SCORE" vartype="Decimal" defaultval="0" minvalue="0" maxvalue="0.00000"/>
+          </outcomes>
+          <respcondition title="correct">
+            <conditionvar/>
+            <setvar variablename="SCORE" action="Set">SCORE.max</setvar>
+            <displayfeedback linkrefid="correct" feedbacktype="Response"/>
+          </respcondition>
+          <respcondition title="incorrect">
+            <conditionvar>
+              <other/>
+            </conditionvar>
+            <setvar variablename="SCORE" action="Set">0</setvar>
+            <displayfeedback linkrefid="incorrect" feedbacktype="Response"/>
+          </respcondition>
+        </resprocessing>
+        <itemfeedback ident="correct" view="All">
+          <flow_mat class="Block">
+            <flow_mat class="FORMATTED_TEXT_BLOCK">
+              <material>
+                <mat_extension>
+                  <mat_formattedtext type="HTML"/>
+                </mat_extension>
+              </material>
+            </flow_mat>
+          </flow_mat>
+        </itemfeedback>
+        <itemfeedback ident="incorrect" view="All">
+          <flow_mat class="Block">
+            <flow_mat class="FORMATTED_TEXT_BLOCK">
+              <material>
+                <mat_extension>
+                  <mat_formattedtext type="HTML"/>
+                </mat_extension>
+              </material>
+            </flow_mat>
+          </flow_mat>
+        </itemfeedback>
+      </item>
+    </section>
+  </assessment>
+</questestinterop>

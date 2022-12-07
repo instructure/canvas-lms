@@ -22,17 +22,6 @@ describe('cropperSettingsReducer()', () => {
   let initialState = {}
   const subject = action => cropperSettingsReducer(initialState, action)
 
-  it('handles "SetImage" actions', () => {
-    const nextState = subject({
-      type: 'SetImage',
-      payload: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==',
-    })
-
-    expect(nextState).toMatchObject({
-      image: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==',
-    })
-  })
-
   it('handles "SetShape" actions', () => {
     const nextState = subject({
       type: 'SetShape',
@@ -44,6 +33,17 @@ describe('cropperSettingsReducer()', () => {
     })
   })
 
+  it('handles "SetRotation" actions', () => {
+    const nextState = subject({
+      type: 'SetRotation',
+      payload: 90,
+    })
+
+    expect(nextState).toMatchObject({
+      rotation: 90,
+    })
+  })
+
   it('handles "SetScaleRatio" actions', () => {
     const nextState = subject({
       type: 'SetScaleRatio',
@@ -52,6 +52,53 @@ describe('cropperSettingsReducer()', () => {
 
     expect(nextState).toMatchObject({
       scaleRatio: 1.5,
+    })
+  })
+
+  it('handles "SetTranslateX" actions', () => {
+    const nextState = subject({
+      type: 'SetTranslateX',
+      payload: 100,
+    })
+
+    expect(nextState).toMatchObject({
+      translateX: 100,
+    })
+  })
+
+  it('handles "SetTranslateY" actions', () => {
+    const nextState = subject({
+      type: 'SetTranslateY',
+      payload: 100,
+    })
+
+    expect(nextState).toMatchObject({
+      translateY: 100,
+    })
+  })
+
+  it('handles "UpdateSettings" actions', () => {
+    const nextState = subject({
+      type: 'UpdateSettings',
+      payload: {translateX: 100, translateY: 100},
+    })
+
+    expect(nextState).toMatchObject({
+      translateX: 100,
+      translateY: 100,
+    })
+  })
+
+  it('handles "ResetSettings" actions', () => {
+    const nextState = subject({
+      type: 'ResetSettings',
+    })
+
+    expect(nextState).toMatchObject({
+      rotation: 0,
+      scaleRatio: 1.0,
+      translateX: 0,
+      translateY: 0,
     })
   })
 

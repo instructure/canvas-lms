@@ -26,6 +26,7 @@ import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
   UPDATE_DISCUSSION_TOPIC,
+  UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE,
 } from './Mutations'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
@@ -414,7 +415,7 @@ export const subscribeToDiscussionTopicMock = ({
 export const createDiscussionEntryMock = ({
   discussionTopicId = 'Discussion-default-mock',
   message = '',
-  replyFromEntryId = null,
+  parentEntryId = null,
   fileId = null,
   includeReplyPreview = null,
   isAnonymousAuthor = false,
@@ -427,7 +428,7 @@ export const createDiscussionEntryMock = ({
         discussionTopicId,
         message,
         isAnonymousAuthor,
-        ...(replyFromEntryId !== null && {replyFromEntryId}),
+        ...(parentEntryId !== null && {parentEntryId}),
         ...(fileId !== null && {fileId}),
         ...(includeReplyPreview !== null && {includeReplyPreview}),
         ...(courseID !== null && {courseID}),
@@ -444,6 +445,32 @@ export const createDiscussionEntryMock = ({
           errors: null,
           __typename: 'CreateDiscussionEntryPayload',
         },
+      },
+    },
+  },
+]
+
+export const updateUserDiscussionsSplitscreenViewMock = ({
+  discussionsSplitscreenView = true,
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE,
+      variables: {
+        discussionsSplitscreenView,
+      },
+    },
+    result: {
+      data: {
+        updateUserDiscussionsSplitscreenView: {
+          user: {
+            discussionsSplitscreenView: true,
+            __typename: 'User',
+          },
+          errors: null,
+          __typename: 'updateUserDiscussionsSplitscreenViewPayload',
+        },
+        __typename: 'Mutation',
       },
     },
   },

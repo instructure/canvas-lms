@@ -28,7 +28,7 @@ module Types
     field :body, String, null: false
     field :created_at, Types::DateTimeType, null: true
 
-    field :author, UserType, null: false
+    field :author, UserType, null: true
     def author
       load_association(:author)
     end
@@ -37,7 +37,7 @@ module Types
     def recipients
       load_association(:conversation_message_participants).then do |cmps|
         # handle case where user sent a message to themself or if cmp is bad ex: hard deleted user.
-        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? } unless cmps.size == 1
+        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? || cmp.user.nil? } unless cmps.size == 1
         Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
       end
     end

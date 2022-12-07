@@ -200,14 +200,39 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "Unable to send messages to users in #{@course.name}"
   end
 
-  it "allows creating conversations in concluded courses for teachers" do
+  it "does not allow creating conversations in concluded courses for teachers" do
     teacher2 = teacher_in_course(active_all: true).user
-    @course.update!(workflow_state: "claimed")
+    @course.update!(workflow_state: "completed")
 
     result = run_mutation({ recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
+
+    expect(result.dig("data", "createConversation", "conversations")).to be nil
     expect(
-      result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
-    ).to eq "yo"
+      result.dig("data", "createConversation", "errors", 0, "message")
+    ).to eq "Unable to send messages to users in #{@course.name}"
+  end
+
+  it "does not allow creating conversations in soft concluded courses for students" do
+    @course.soft_conclude!
+    @course.save
+    result = run_mutation(recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string)
+
+    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(
+      result.dig("data", "createConversation", "errors", 0, "message")
+    ).to eq "Course concluded, unable to send messages"
+  end
+
+  it "does not allow creating conversations in soft concluded courses for teachers" do
+    teacher2 = teacher_in_course(active_all: true).user
+    @course.soft_conclude!
+    @course.save
+    result = run_mutation({ recipients: [teacher2.id.to_s], body: "yo", context_code: @course.asset_string }, @teacher)
+
+    expect(result.dig("data", "createConversation", "conversations")).to be nil
+    expect(
+      result.dig("data", "createConversation", "errors", 0, "message")
+    ).to eq "Course concluded, unable to send messages"
   end
 
   it "requires permissions for sending to other students" do
@@ -325,12 +350,12 @@ RSpec.describe Mutations::CreateConversation do
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.react")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2)
-      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.react", 2).at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react").at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2).at_least(:twice)
-      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2).at_least(:twice)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react").at_least(:twice)
       expect(Conversation.count).to eql(@old_count + 4)
       result = user_type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { subject } } }")
       expect(result).to match(["yo 2", "yo 2", "yo 1", "yo 1"])

@@ -1448,6 +1448,33 @@ describe Submission do
         end
       end
     end
+
+    context "when submitting to a New Quiz LTI assignment" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        @assignment.quiz_lti!
+        @assignment.save!
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
+      end
+
+      it "does grade missing new quiz submissions" do
+        Timecop.freeze(@date) do
+          submission.apply_late_policy
+          expect(submission.score).to eq 200
+        end
+      end
+    end
   end
 
   describe "#apply_late_policy_before_save" do
@@ -6030,6 +6057,48 @@ describe Submission do
 
         expect(submission.visible_rubric_assessments_for(@student, attempt: 0))
           .to contain_exactly(assessment_before_submitting)
+      end
+    end
+
+    context "anonymous peer reviews" do
+      before(:once) do
+        course = Course.create!
+        @reviewed_student = course.enroll_student(User.create!, workflow_state: "active").user
+        reviewing_student = course.enroll_student(User.create!, workflow_state: "active").user
+        @grading_teacher = course.enroll_teacher(User.create!, workflow_state: "active").user
+
+        assignment = course.assignments.create!(peer_reviews: true, anonymous_peer_reviews: true)
+        rubric_association = rubric_association_model(context: course, association_object: assignment, purpose: "grading")
+
+        @submission = assignment.submission_for_student(@reviewed_student)
+        @submission.assessment_requests.create!(
+          user: @reviewed_student,
+          assessor: reviewing_student,
+          assessor_asset: assignment.submission_for_student(reviewing_student)
+        )
+        rubric_association.rubric_assessments.create!({
+                                                        artifact: @submission,
+                                                        assessment_type: "peer_review",
+                                                        assessor: reviewing_student,
+                                                        rubric: rubric_association.rubric,
+                                                        user: @reviewed_student
+                                                      })
+
+        rubric_association.rubric_assessments.create!({
+                                                        artifact: @submission,
+                                                        assessment_type: "grading",
+                                                        assessor: @grading_teacher,
+                                                        rubric: rubric_association.rubric,
+                                                        user: @reviewed_student
+                                                      })
+      end
+
+      it "includes rubric assessments from teachers grading with identity attached" do
+        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[0].assessor).to eql(@grading_teacher)
+      end
+
+      it "does not include peer reviewer's identity when viewed by the reviewee" do
+        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[1].assessor).to eql(nil)
       end
     end
   end

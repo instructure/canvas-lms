@@ -37,6 +37,7 @@ import addIconMakerAttributes from '../utils/addIconMakerAttributes'
 import {validIcon} from '../utils/iconValidation'
 import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
+import {shouldIgnoreClose} from '../utils/IconMakerClose'
 
 const INVALID_MESSAGE = formatMessage(
   'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
@@ -94,6 +95,7 @@ function renderBody(
   allowNameChange,
   nameRef,
   rcsConfig,
+  canvasOrigin,
   isLoading
 ) {
   return isLoading() ? (
@@ -109,6 +111,7 @@ function renderBody(
       allowNameChange={allowNameChange}
       nameRef={nameRef}
       rcsConfig={rcsConfig}
+      canvasOrigin={canvasOrigin}
     />
   )
 }
@@ -159,9 +162,9 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
   // initialSettings and settings to behave unexpectedly
   const initialSettingsRef = useRef(initialSettings)
   const settingsRef = useRef(settings)
-
+  const statusRef = useRef(status)
   settingsRef.current = useMemo(() => settings, [settings])
-
+  statusRef.current = useMemo(() => status, [status])
   initialSettingsRef.current = useMemo(() => initialSettings, [initialSettings])
 
   useEffect(() => {
@@ -174,7 +177,9 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
 
   const storeProps = useStoreProps()
 
-  const onClose = () => {
+  const onClose = event => {
+    if (shouldIgnoreClose(event?.target, editor?.id)) return
+    if (statusRef?.current === statuses.LOADING) return
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
     // eslint-disable-next-line no-restricted-globals, no-alert
@@ -206,7 +211,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
     settings.color,
     settings.textColor,
     settings.text,
-    settings.encodedImage,
+    settings.imageSettings,
     settings.outlineColor,
     settings.outlineSize,
   ])
@@ -234,7 +239,11 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       )
       .then(writeIconToRCE)
       .then(() => setIsOpen(false))
-      .catch(() => setStatus(statuses.ERROR))
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.error(err)
+        setStatus(statuses.ERROR)
+      })
   }
 
   const writeIconToRCE = ({url, display_name}) => {
@@ -248,7 +257,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       // React wants this to be an object but we are just
       // passing along a string here. Using the style attribute
       // with all caps makes React ignore this fact
-      style: externalStyle,
+      STYLE: externalStyle, // DON'T CHANGE BEFORE READING COMMENT ABOVE
       width: externalWidth,
     }
 
@@ -265,17 +274,14 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       imageName: '',
       icon: '',
       iconFillColor: '#000000',
-      cropperSettings: editing ? {shape: settings.shape} : null,
+      cropperSettings: null,
     }
   }
 
   const replaceInitialSettings = () => {
     const name = editing ? settings.name : undefined
     const textPosition = editing ? settings.textPosition : defaultState.textPosition
-    const imageSettings =
-      settings.imageSettings && !!settings.imageSettings.mode
-        ? settings.imageSettings
-        : defaultImageSettings()
+    const imageSettings = settings.imageSettings || defaultImageSettings()
 
     setInitialSettings({
       name,
@@ -311,7 +317,17 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       onUnmount={onUnmount}
       renderHeader={() => renderHeader(title, settings, onKeyDown, handleAlertDismissal, onClose)}
       renderBody={() =>
-        renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig, isLoading)
+        renderBody(
+          settings,
+          dispatch,
+          editor,
+          editing,
+          !replaceAll,
+          nameRef,
+          rcsConfig,
+          canvasOrigin,
+          isLoading
+        )
       }
       renderFooter={() =>
         renderFooter(

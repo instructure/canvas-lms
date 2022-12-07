@@ -65,10 +65,6 @@ class ActiveRecord::Base
       end
     end
 
-    def default_scope(*)
-      raise "please don't ever use default_scope. it may seem like a great solution, but I promise, it isn't"
-    end
-
     def vacuum
       # can't vacuum in a transaction
       return if Rails.env.test?

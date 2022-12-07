@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
-import InputFilterView from 'backbone-input-filter-view'
+import InputFilterView from '@canvas/backbone-input-filter-view'
 import UserView from './UserView'
 import UserDateRangeSearchFormView from './UserDateRangeSearchFormView'
 import AuthLoggingCollection from '../collections/AuthLoggingCollection'

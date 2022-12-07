@@ -81,6 +81,7 @@ const locale = {
     "message": "بکشید و رها کنید، یا برای مرور رایانه کلیک کنید"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "مهلت: چند تاریخ" },
+  "edit_c5fbea07": { "message": "ویرایش" },
   "embed_828fac4a": { "message": "قراردادن" },
   "embed_image_1080badc": { "message": "درج تصویر" },
   "external_tools_6e77821": { "message": "ابزارهای بیرونی" },

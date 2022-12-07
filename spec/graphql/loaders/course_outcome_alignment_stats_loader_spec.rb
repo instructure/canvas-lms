@@ -194,5 +194,23 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
         end
       end
     end
+
+    it "excludes deleted quizzes with questions from question bank from calculation of indirect alignments" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's)
+      # artifact alignments = 0 (q1 from quiz aligned to out through bank but quiz is deleted)
+      @quiz.add_assessment_questions [@q1]
+      @quiz.destroy
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 1
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 11
+          expect(stats[:total_artifacts]).to eq 0
+          expect(stats[:aligned_artifacts]).to eq 0
+          expect(stats[:artifact_alignments]).to eq 0
+        end
+      end
+    end
   end
 end

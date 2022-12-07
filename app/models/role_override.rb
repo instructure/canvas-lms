@@ -1521,6 +1521,20 @@ class RoleOverride < ActiveRecord::Base
         restrict_future_enrollments: true,
         applies_to_concluded: ["TeacherEnrollment", "TaEnrollment"]
       },
+      proxy_assignment_submission: {
+        label: -> { t("Instructors can submit on behalf of students") },
+        label_v2: -> { t("Submissions - instructor proxy") },
+        available_to: %w[
+          TaEnrollment
+          TeacherEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: [],
+        account_allows: lambda do |_a|
+          Account.site_admin.feature_enabled?(:proxy_file_uploads)
+        end
+      },
       read_announcements: {
         label: -> { t("View announcements") },
         label_v2: -> { t("Announcements - view") },

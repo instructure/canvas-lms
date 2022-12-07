@@ -33,11 +33,13 @@ class ExternalToolsController < ApplicationController
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, only: %i[retrieve show resource_selection]
   before_action :parse_context_codes, only: [:all_visible_nav_tools]
+  before_action :set_extra_csp_frame_ancestor!, only: %i[retrieve resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
 
   include Api::V1::ExternalTools
   include Lti::RedisMessageClient
   include Lti::Concerns::SessionlessLaunches
+  include Lti::Concerns::ParentFrame
   include K5Mode
 
   WHITELISTED_QUERY_PARAMS = [
@@ -52,10 +54,19 @@ class ExternalToolsController < ApplicationController
   #   The partial name of the tools to match and return.
   #
   # @argument selectable [Boolean]
-  #   If true, then only tools that are meant to be selectable are returned
+  #   If true, then only tools that are meant to be selectable are returned.
   #
   # @argument include_parents [Boolean]
   #   If true, then include tools installed in all accounts above the current context
+  #
+  # @argument placement [String]
+  #   The placement type to filter by.
+  #
+  # @example_request
+  #
+  #   Return all tools at the current context as well as all tools from the parent, and filter the tools list to only those with a placement of 'editor_button'
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools?include_parents=true&placement=editor_button' \
+  #        -H "Authorization: Bearer <token>"
   #
   # @example_response
   #     [
@@ -550,7 +561,7 @@ class ExternalToolsController < ApplicationController
       jwt_body = Canvas::Security.decode_jwt(secure_params)
       link_params[:ext][:lti_assignment_id] = jwt_body[:lti_assignment_id] if jwt_body[:lti_assignment_id]
     end
-    opts = { launch_url: launch_url, link_params: link_params, launch_token: launch_token, context_module_id: params[:context_module_id] }
+    opts = { launch_url: launch_url, link_params: link_params, launch_token: launch_token, context_module_id: params[:context_module_id], parent_frame_context: params[:parent_frame_context] }
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, "message_type") if selection_type
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event
@@ -760,7 +771,8 @@ class ExternalToolsController < ApplicationController
       post_only: @tool.settings["post_only"].present?,
       launch_url: opts[:launch_url] || tool.extension_setting(placement, :url),
       content_item_id: opts[:content_item_id],
-      assignment: assignment
+      assignment: assignment,
+      parent_frame_context: opts[:parent_frame_context]
     }
 
     collaboration = opts[:content_item_id].present? ? ExternalToolCollaboration.find(opts[:content_item_id]) : nil

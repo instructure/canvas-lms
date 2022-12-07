@@ -32,6 +32,12 @@
     "address_3159962f": {
         "message": "Adrès:"
     },
+    "afrikaans_da0fe6ee": {
+        "message": "Afrikaans"
+    },
+    "albanian_21ed929e": {
+        "message": "Albanyen"
+    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -110,8 +116,14 @@
     "apps_54d24a47": {
         "message": "Apps"
     },
+    "arabic_c5c87acd": {
+        "message": "Arab"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Èske vrèman ou vle elemine eleman planifikatè sa a?"
+    },
+    "armenian_12da6118": {
+        "message": "Amenyen"
     },
     "arrows_464a3e54": {
         "message": "Flèch"
@@ -197,6 +209,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Kòmansman Istwa Tach ou yo"
     },
+    "belarusian_b2f19c76": {
+        "message": "Byeloris"
+    },
     "below_81d4dceb": {
         "message": "Anba"
     },
@@ -230,6 +245,9 @@
     "brick_f2656265": {
         "message": "Brik"
     },
+    "bulgarian_feccab7e": {
+        "message": "Bilga"
+    },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
@@ -248,6 +266,9 @@
     "cap_product_3a5265a6": {
         "message": "Kaskèt Pwodui"
     },
+    "catalan_16f6b78f": {
+        "message": "Catalan"
+    },
     "center_align_e68d9997": {
         "message": "Aliyen nan Sant"
     },
@@ -260,6 +281,15 @@
     "chi_54a32644": {
         "message": "Chi"
     },
+    "chinese_111d37f6": {
+        "message": "Chinwa"
+    },
+    "chinese_simplified_7f0bd370": {
+        "message": "Chinwa Senplifye"
+    },
+    "chinese_traditional_8a7f759d": {
+        "message": "Chinwa Tradisyonèl"
+    },
     "choose_caption_file_9c45bc4e": {
         "message": "Chwazi fichye soutit"
     },
@@ -268,9 +298,6 @@
     },
     "circle_484abe63": {
         "message": "Sèk"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "Antoure lis ki pa òdone"
     },
     "clear_2084585f": {
         "message": "Efase"
@@ -416,6 +443,9 @@
     "creative_commons_license_725584ae": {
         "message": "Lisans Creative Commons"
     },
+    "croatian_d713d655": {
+        "message": "Krowat"
+    },
     "crop_image_41bf940c": {
         "message": "Koupe imaj"
     },
@@ -434,8 +464,14 @@
     "cyan_c1d5f68a": {
         "message": "Blesyèl"
     },
+    "czech_9aa2cbe4": {
+        "message": "Tchèk"
+    },
     "dagger_57e0f4e5": {
         "message": "Ponya"
+    },
+    "danish_c18cdac8": {
+        "message": "Danwa"
     },
     "date_added_ed5ad465": {
         "message": "Dat Ajoute"
@@ -466,12 +502,6 @@
     },
     "deep_purple_bb3e2907": {
         "message": "Mov Fonse"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "lis non òdone a pis pa defo"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "lis nimerik pa defo"
     },
     "definite_integral_fe7ffed1": {
         "message": "Entegral Defini"
@@ -611,6 +641,9 @@
     "due_when_7eed10c6": {
         "message": "Delè: { when }"
     },
+    "dutch_6d05cee5": {
+        "message": "Olandè"
+    },
     "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
         "message": "Modifye tèks alt la pou enstans ikpon s a"
     },
@@ -671,8 +704,20 @@
     "engineering_icon_f8f3cf43": {
         "message": "Ikòn Jeni"
     },
+    "english_australia_dc405d82": {
+        "message": "Anglè (Australia)"
+    },
+    "english_c60612e2": {
+        "message": "Anglè"
+    },
+    "english_canada_12688ee4": {
+        "message": "Anglè (Canada)"
+    },
     "english_icon_25bfe845": {
         "message": "Ikòn Anglè"
+    },
+    "english_united_kingdom_a613f831": {
+        "message": "Anglè (United Kingdom)"
     },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Antre omwen 3 karaktè pou ka chèche"
@@ -709,6 +754,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Erè chajman eleman pase yo"
+    },
+    "estonian_5e8e2fa4": {
+        "message": "Estonyen"
     },
     "eta_b8828f99": {
         "message": "Eta"
@@ -812,6 +860,12 @@
     "files_index_af7c662b": {
         "message": "Endis Fichye"
     },
+    "filipino_33339264": {
+        "message": "Filipin"
+    },
+    "finnish_4df2923d": {
+        "message": "Fenlandè"
+    },
     "flat_music_76d5a5c3": {
         "message": "Plat (Mizik)"
     },
@@ -842,17 +896,29 @@
     "fraction_41bac7af": {
         "message": "Fraksyon"
     },
+    "french_33881544": {
+        "message": "Fransè"
+    },
+    "french_canada_c3d92fa6": {
+        "message": "Fransè (Kanada)"
+    },
     "fullscreen_873bf53f": {
         "message": "Plen Ekran"
     },
     "fun_quiz_47ab0b0": {
         "message": "Quiz amizan"
     },
+    "galician_7e4508b5": {
+        "message": "Galisyen"
+    },
     "gamma_1767928": {
         "message": "Gamma"
     },
     "generating_preview_45b53be0": {
         "message": "Jenerasyon apèsi..."
+    },
+    "german_3ec99bbb": {
+        "message": "Alman"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Imaj nan fòma GIF/PNG ki depase { size } KB yo pa konpatib pou kounye a."
@@ -923,6 +989,9 @@
     "h_bar_bb94deae": {
         "message": "Ba H"
     },
+    "haitian_creole_7eb4195b": {
+        "message": "Kreyòl Ayisyen"
+    },
     "hat_ea321e35": {
         "message": "Chapo"
     },
@@ -941,6 +1010,9 @@
     "hearts_suit_e50e04ca": {
         "message": "Kè (Konbinezon)"
     },
+    "hebrew_88fbf778": {
+        "message": "Ebre"
+    },
     "height_69b03e15": {
         "message": "Wotè"
     },
@@ -953,6 +1025,9 @@
     "hide_title_description_caf092ef": {
         "message": "Kache { title } deskripsyon"
     },
+    "hindi_9bcd4b34": {
+        "message": "Endou"
+    },
     "home_351838cd": {
         "message": "Akèy"
     },
@@ -962,11 +1037,17 @@
     "html_editor_fb2ab713": {
         "message": "Editè HTML"
     },
+    "hungarian_fc7d30c9": {
+        "message": "Ongwa"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Mwen gen otorizasyon pou itilize fichye sa a."
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Mwen gen dwa dotè a"
+    },
+    "icelandic_9d6d35de": {
+        "message": "Islandè"
     },
     "icon_215a1dc6": {
         "message": "Ikòn"
@@ -985,6 +1066,9 @@
     },
     "icon_options_tray_2b407977": {
         "message": "Plato Opsyon Ikòn"
+    },
+    "icon_preview_1782a1d9": {
+        "message": "Apèsi ikòn"
     },
     "icon_shape_30b61e7": {
         "message": "Fòm Ikòn"
@@ -1031,6 +1115,9 @@
     "indigo_2035fc55": {
         "message": "Indigo"
     },
+    "indonesian_5f6accd6": {
+        "message": "Endonezyen"
+    },
     "inference_fed5c960": {
         "message": "Enferans"
     },
@@ -1070,8 +1157,17 @@
     "iota_11c932a9": {
         "message": "Iota"
     },
+    "irish_567e109f": {
+        "message": "Ilandè"
+    },
+    "italian_bd3c792d": {
+        "message": "Italyen"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } eleman { items, plural,\n     =1 {eleman}\n  other {konplete}\n}"
+    },
+    "japanese_b5721ca7": {
+        "message": "Japonè"
     },
     "join_6cafecca": {
         "message": "Antre"
@@ -1097,6 +1193,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Rakousi Klavye"
     },
+    "korean_da812d9": {
+        "message": "Koreyen"
+    },
     "lambda_4f602498": {
         "message": "Lambda"
     },
@@ -1114,6 +1213,9 @@
     },
     "late_2be42b88": {
         "message": "An reta"
+    },
+    "latvian_2bbb6aab": {
+        "message": "Latvyen"
     },
     "left_align_43d95491": {
         "message": "Aliyen Agoch"
@@ -1174,6 +1276,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Lyen pou ale sou sit ekstèn."
+    },
+    "lithuanian_5adcbe24": {
+        "message": "Lityanyen"
     },
     "load_more_35d33c7": {
         "message": "Chaje Plis"
@@ -1247,8 +1352,20 @@
     "low_horizontal_dots_cc08498e": {
         "message": "Pwen Orizontal Ba"
     },
+    "macedonian_6ed541af": {
+        "message": "Masedonyen"
+    },
     "magenta_4a65993c": {
         "message": "Magenta"
+    },
+    "malay_f5dddce4": {
+        "message": "Malezyen"
+    },
+    "maltese_916925e8": {
+        "message": "Maltè"
+    },
+    "maori_new_zealand_5380a95f": {
+        "message": "Māori (New Zealand)"
     },
     "maps_to_e5ef7382": {
         "message": "Kat Pou"
@@ -1400,6 +1517,15 @@
     "none_selected_b93d56d2": {
         "message": "Anyen Seleksyone"
     },
+    "norwegian_53f391ec": {
+        "message": "Nòvejyen"
+    },
+    "norwegian_bokmal_ad5843fa": {
+        "message": "Bokmål Nòvejyen"
+    },
+    "norwegian_nynorsk_c785f8a6": {
+        "message": "Norwegian Nynorsk"
+    },
     "not_equal_6e2980e6": {
         "message": "Pa Egal"
     },
@@ -1490,9 +1616,6 @@
     "orange_81386a62": {
         "message": "Zoranj"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "Lis Òdone e non Òdone"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Ou ka jwenn lòt rakousi editè nan"
     },
@@ -1544,6 +1667,9 @@
     "perpendicular_7c48ede4": {
         "message": "Pèpandikilè"
     },
+    "persian_a8cadb95": {
+        "message": "Lang Pès"
+    },
     "phi_4ac33b6d": {
         "message": "Phi"
     },
@@ -1582,6 +1708,12 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } pwen"
+    },
+    "polish_4cf2ecaf": {
+        "message": "Polonè"
+    },
+    "portuguese_9c212cf4": {
+        "message": "Pòtigè"
     },
     "posted_when_a578f5ab": {
         "message": "Poste: { when }"
@@ -1754,6 +1886,9 @@
     "rightward_pointing_triangle_60330f5c": {
         "message": "Triyang ki Bay Adwat"
     },
+    "romanian_13670c1e": {
+        "message": "Woumen"
+    },
     "rotate_image_90_degrees_2ab77c05": {
         "message": "Pivote Imaj de -90 degre"
     },
@@ -1762,6 +1897,9 @@
     },
     "rotation_9699c538": {
         "message": "Wotasyon"
+    },
+    "russian_1e3e197": {
+        "message": "Ris"
     },
     "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
         "message": "Malerezman, bèl editè HTML la pa aksesib sou klavye. Gen aksè a bèl editè HTML la la a."
@@ -1804,6 +1942,9 @@
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Seleksyone { linkFileName }"
+    },
+    "serbian_7187f1f2": {
+        "message": "Sèb"
     },
     "set_minus_b46e9b88": {
         "message": "Ansanm Mwens"
@@ -1850,6 +1991,12 @@
     "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
         "message": "Fichye soutit la depase kantite maksimòm { max } kb yo otorize a."
     },
+    "slovak_69f48e1b": {
+        "message": "Slovak"
+    },
+    "slovenian_30ae5208": {
+        "message": "Slovèn"
+    },
     "small_b070434a": {
         "message": "Piti"
     },
@@ -1877,6 +2024,9 @@
     "spades_suit_b37020c2": {
         "message": "Pik (Konbinezon)"
     },
+    "spanish_de9de5d6": {
+        "message": "Panyòl"
+    },
     "square_511eb3b3": {
         "message": "Kare"
     },
@@ -1903,9 +2053,6 @@
     },
     "square_superset_strict_fa4262e4": {
         "message": "Superset Kare (Estrik)"
-    },
-    "square_unordered_list_b15ce93b": {
-        "message": "lis kare non òdone"
     },
     "star_8d156e09": {
         "message": "Etwal"
@@ -1973,6 +2120,12 @@
     "supported_file_types_srt_or_webvtt_7d827ed": {
         "message": "Tip fichye ki aksepte: SRT oswa WebVTT"
     },
+    "swahili_5caeb4ba": {
+        "message": "Swaeli"
+    },
+    "swedish_59a593ca": {
+        "message": "Swedwa"
+    },
     "switch_to_pretty_html_editor_a3cee15f": {
         "message": "Pase a yon bèl editè HTML"
     },
@@ -1990,6 +2143,9 @@
     },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/Flèch"
+    },
+    "tagalog_74906db7": {
+        "message": "Tagalog"
     },
     "task_16b0ef38": {
         "message": "Tach"
@@ -2017,6 +2173,9 @@
     },
     "text_size_887c2f6": {
         "message": "Gwosè Tèks"
+    },
+    "thai_8f9bc548": {
+        "message": "Taylandè"
     },
     "the_best_assignment_15e98be1": {
         "message": "Meyè devwa a"
@@ -2141,6 +2300,9 @@
     "triangle_6072304e": {
         "message": "Triyang"
     },
+    "turkish_5b69578b": {
+        "message": "Tik"
+    },
     "turnstile_yields_f9e76df1": {
         "message": "Tounikè (Rannman)"
     },
@@ -2152,6 +2314,9 @@
     },
     "type_control_f9_to_access_table_options_text_92141329": {
         "message": "tape Control F9 pouw gen aksè a opsyon tablo yo. { text }"
+    },
+    "ukrainian_945b00b7": {
+        "message": "Ikrenyen"
     },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Enposib pou make kòm konplè."
@@ -2189,9 +2354,6 @@
     "uploading_19e8a4e7": {
         "message": "Chajman"
     },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "lis alfabetik an majiskil"
-    },
     "uppercase_delta_d4f4bc41": {
         "message": "Delta an Majiskil"
     },
@@ -2212,9 +2374,6 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Psi an Majiskil"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "lis òdone chif Women an majiskil"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Sigma an Majiskil"
@@ -2312,6 +2471,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Lektè videyo pou { title }"
     },
+    "vietnamese_e7a76583": {
+        "message": "Vyentamyen"
+    },
     "view_ba339f93": {
         "message": "Afiche"
     },
@@ -2332,6 +2494,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigasyon kalandriye pa semenn"
+    },
+    "welsh_42ab94b1": {
+        "message": "Galwa"
     },
     "white_87fa64fd": {
         "message": "Blan"
@@ -2362,6 +2527,9 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Yè"
+    },
+    "yiddish_f96986df": {
+        "message": "Yiddish"
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Ou gen kòmantè miltimedya."

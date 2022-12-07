@@ -53,9 +53,6 @@ export const DEFAULT_SETTINGS = {
   textColor: '#000000',
   textBackgroundColor: null,
   textPosition: 'below',
-  encodedImage: '',
-  encodedImageType: '',
-  encodedImageName: '',
   // Additional external attributes
   externalStyle: null,
   externalWidth: null,
@@ -69,6 +66,7 @@ export const DEFAULT_SETTINGS = {
   height: 0,
   transform: '',
   imageSettings: null,
+  embedImage: null,
   error: null,
 }
 

@@ -96,6 +96,27 @@ describe('ContentTabs', () => {
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
     })
 
+    it('renders the last submission type if the assignment submissionTypes attribute has changed', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          lockInfo: {isLocked: true},
+          submissionTypes: ['online_text_entry'],
+        },
+        Submission: {
+          ...SubmissionMocks.submitted,
+          attachments: [{displayName: 'test.jpg'}],
+          submissionType: 'online_upload',
+        },
+      })
+
+      const {findByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      )
+      expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
+    })
+
     it('renders the last submission if the assignment was submitted and marked late', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {lockInfo: {isLocked: true}},
