@@ -118,10 +118,40 @@ export default function CanvasMediaPlayer(props) {
   const handlePlayerSize = useCallback(
     _event => {
       const player = window.document.body.querySelector('video')
-      setPlayerSize(player, props.type, boundingBox(), null, props.resizeContainer)
+      const playerParent = containerRef.current
+      setPlayerSize(
+        player,
+        props.type,
+        boundingBox(),
+        window.frameElement || playerParent,
+        props.resizeContainer
+      )
+      if (shouldPostReloadMessage()) {
+        window.postMessage(
+          {subject: 'reload_media', media_object_id: props.media_id},
+          window.location.origin
+        )
+      }
     },
-    [props.type, props.resizeContainer]
+    [props.type, props.resizeContainer, props.media_id]
   )
+
+  // should be false when in canvas proper, but true when in an LTI like New Quizzes
+  const shouldPostReloadMessage = () => {
+    const player = window.document.body.querySelector('video')
+    let playerWidth = parseInt(player?.style?.width, 10)
+    let playerHeight = parseInt(player?.style?.height, 10)
+    if (Number.isNaN(playerWidth)) playerWidth = 0
+    if (Number.isNaN(playerHeight)) playerHeight = 0
+
+    const playerParent = containerRef.current
+    const playerIframe = playerParent?.parentElement?.parentElement
+    const hasSizeDifference =
+      playerIframe?.clientWidth !== playerWidth || playerIframe?.clientHeight !== playerHeight
+    if (hasSizeDifference) return true
+
+    return false
+  }
 
   const fetchSources = useCallback(
     async function () {
@@ -266,7 +296,12 @@ export function setPlayerSize(player, type, boundingBox, playerContainer, resize
   player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
 
   // videos that are wide-and-short portrait need to shrink the parent
-  if (playerIsVisible && resizeContainer && playerContainer && player.videoWidth > player.videoHeight) {
+  if (
+    playerIsVisible &&
+    resizeContainer &&
+    playerContainer &&
+    player.videoWidth > player.videoHeight
+  ) {
     playerContainer.style.width = width
     playerContainer.style.height = height
 
