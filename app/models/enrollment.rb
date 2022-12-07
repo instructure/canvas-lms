@@ -849,6 +849,10 @@ class Enrollment < ActiveRecord::Base
     if result
       user.try(:update_account_associations)
       scores.update_all(updated_at: Time.zone.now, workflow_state: :deleted)
+      Enrollment.recompute_final_score_in_singleton(
+        user.id,
+        course.id
+      )
 
       Assignment.remove_user_as_final_grader(user_id, course_id) if remove_user_as_final_grader?
     end

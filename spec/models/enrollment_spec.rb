@@ -1079,6 +1079,12 @@ describe Enrollment do
           expect(@enrollment.computed_final_score).to eq 80.3
         end
 
+        it "forgets scores on destroyed enrollments" do
+          @enrollment.scores.create!(final_score: 55.2)
+          @enrollment.destroy
+          expect(@enrollment.computed_final_score).to be_nil
+        end
+
         it "uses the value from the associated score object, even if it is nil" do
           @enrollment.scores.create!(final_score: nil)
           expect(@enrollment.computed_final_score).to eq nil
