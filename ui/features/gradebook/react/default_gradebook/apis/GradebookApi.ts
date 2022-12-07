@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {underscore} from 'convert-case'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {serializeFilter} from '../Gradebook.utils'
-import type {GradebookSettings, ColumnOrderSettings, FilterPreset} from '../gradebook.d'
+import type {CustomColumn, FilterPreset, GradebookSettings} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebookGradebookApi')
 
@@ -39,7 +39,7 @@ function createTeacherNotesColumn(courseId: string) {
       title: I18n.t('Notes'),
     },
   }
-  return axios.post(url, data)
+  return axios.post<CustomColumn>(url, data)
 }
 
 function updateTeacherNotesColumn(courseId: string, columnId: string, attr) {
@@ -65,11 +65,6 @@ function updateSubmission(
 function saveUserSettings(courseId: string, gradebook_settings: GradebookSettings) {
   const url = `/api/v1/courses/${courseId}/gradebook_settings`
   return axios.put(url, {gradebook_settings})
-}
-
-function updateColumnOrder(courseId: string, columnOrder: ColumnOrderSettings) {
-  const url = `/courses/${courseId}/gradebook/save_gradebook_column_order`
-  return axios.post(url, {column_order: columnOrder})
 }
 
 function createGradebookFilterPreset(courseId: string, filter: FilterPreset) {
@@ -103,7 +98,6 @@ export default {
   createTeacherNotesColumn,
   deleteGradebookFilterPreset,
   saveUserSettings,
-  updateColumnOrder,
   updateGradebookFilterPreset,
   updateSubmission,
   updateTeacherNotesColumn,

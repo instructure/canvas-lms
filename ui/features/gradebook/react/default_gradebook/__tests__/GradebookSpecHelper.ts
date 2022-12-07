@@ -122,18 +122,22 @@ export const defaultGradebookProps: GradebookProps = {
   isModulesLoading: false,
   isStudentIdsLoading: false,
   locale: 'en',
+  loadDataForCustomColumn: () => Promise.resolve(),
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Another Module', position: 2},
     {id: '3', name: 'Module 2', position: 3},
   ],
+  recentlyLoadedCustomColumnData: null,
   reloadStudentData: () => {},
+  reorderCustomColumns: () => Promise.resolve(),
   settingsModalButtonContainer: document.createElement('div'),
   sisOverrides: [],
   studentIds: [],
   viewOptionsMenuNode: document.createElement('div'),
   performanceControls: new PerformanceControls(),
   isCustomColumnsLoading: false,
+  updateColumnOrder: () => Promise.resolve(),
 }
 
 export function createGradebook(

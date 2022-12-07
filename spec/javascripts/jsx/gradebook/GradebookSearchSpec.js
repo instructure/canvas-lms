@@ -81,13 +81,11 @@ QUnit.module('Gradebook', suiteHooks => {
   QUnit.module('#_updateEssentialDataLoaded()', () => {
     function createInitializedGradebook(options) {
       gradebook = createGradebook(options)
-      sinon.stub(gradebook.dataLoader, 'loadInitialData')
       sinon.stub(gradebook, 'finishRenderingUI')
 
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)
       gradebook.setAssignmentsLoaded()
-      gradebook.setCustomColumnsLoaded(true)
     }
 
     function waitForTick() {
@@ -111,7 +109,6 @@ QUnit.module('Gradebook', suiteHooks => {
 
     test('does not finish rendering the UI when custom columns are not loaded', async () => {
       createInitializedGradebook()
-      gradebook.setCustomColumnsLoaded(false)
       gradebook._updateEssentialDataLoaded()
       await waitForTick()
       strictEqual(gradebook.finishRenderingUI.callCount, 0)

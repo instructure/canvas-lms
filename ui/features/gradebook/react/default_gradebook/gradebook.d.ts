@@ -406,6 +406,11 @@ export type CustomColumn = {
   title: string
 }
 
+export type CustomColumnData = {
+  user_id: string
+  content: unknown
+}
+
 export type SerializedComment = {
   id: string
   comment: string

@@ -61,6 +61,7 @@ import type {
   ContentLoadStates,
   CourseContent,
   CustomColumn,
+  CustomColumnData,
   Filter,
   FilteredContentInfo,
   FlashAlertType,
@@ -111,7 +112,6 @@ import CurveGradesDialogManager from './CurveGradesDialogManager'
 import GradebookApi from './apis/GradebookApi'
 import SubmissionCommentApi from './apis/SubmissionCommentApi'
 import CourseSettings from './CourseSettings/index'
-import DataLoader from './DataLoader/index'
 import FinalGradeOverrides from './FinalGradeOverrides/index'
 import AssignmentRowCellPropFactory from './GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
 import TotalGradeOverrideCellPropFactory from './GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
@@ -159,13 +159,14 @@ import '@canvas/util/jquery/fixDialogButtons'
 
 import {
   assignmentSearchMatcher,
-  buildCustomColumn,
   buildAssignmentGroupColumnFn,
+  buildCustomColumn,
   buildStudentColumn,
   compareAssignmentDueDates,
   confirmViewUngradedAsZero,
   doesSubmissionNeedGrading,
   ensureAssignmentVisibility,
+  escapeStudentContent,
   findFilterValuesOfType,
   findSubmissionFilterValue,
   forEachSubmission,
@@ -230,10 +231,15 @@ export type GradebookProps = {
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
   customColumns: CustomColumn[]
+  recentlyLoadedCustomColumnData: null | {
+    customColumnId: string
+    columnData: CustomColumnData[]
+  }
   dispatch: RequestDispatch
   fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
+  loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
   filterNavNode: HTMLElement
   finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashAlertType[]
@@ -245,7 +251,7 @@ export type GradebookProps = {
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   hideGrid?: boolean
-  isCustomColumnsLoading: boolean
+  isCustomColumnsLoaded: boolean
   isFiltersLoading: boolean
   isGradingPeriodAssignmentsLoading: boolean
   isModulesLoading: boolean
@@ -262,9 +268,11 @@ export type GradebookProps = {
   recentlyLoadedStudents: Student[]
   recentlyLoadedSubmissions: UserSubmissionGroup[]
   reloadStudentData: () => void
+  reorderCustomColumns: (customColumnIds: string[]) => Promise<void>
   settingsModalButtonContainer: HTMLElement
   sisOverrides: AssignmentGroup[]
   studentIds: string[]
+  updateColumnOrder: (courseId: string, columnOrder: ColumnOrderSettings) => Promise<void>
   viewOptionsMenuNode: HTMLElement
 }
 
@@ -309,8 +317,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   viewOptionsMenu?: HTMLElement
 
-  studentViewStudents: StudentMap = {}
-
   keyboardNav?: GradebookKeyboardNav
 
   filteredContentInfo: FilteredContentInfo = {
@@ -354,6 +360,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   students: StudentMap = {}
 
+  studentViewStudents: StudentMap = {}
+
   totalColumnPositionChanged?: boolean
 
   uid?: string
@@ -364,8 +372,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   courseSettings: CourseSettings
-
-  dataLoader: DataLoader
 
   downloadedSubmissionsMap: {
     [assignmentId: string]: boolean
@@ -444,12 +450,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {
       allowFinalGradeOverride: this.options.course_settings.allow_final_grade_override,
-    })
-    this.dataLoader = new DataLoader({
-      gradebook: this,
-      dispatch: props.dispatch,
-      performanceControls: props.performanceControls,
-      fetchStudentIds: props.fetchStudentIds,
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)
@@ -587,16 +587,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         })()
         if (!_.isEqual(currentCustomColumnIds, updatedCustomColumnIds)) {
           // eslint-disable-next-line promise/catch-or-return
-          this.reorderCustomColumns(updatedCustomColumnIds).then(() => {
-            const colsById = _(this.gradebookContent.customColumns).indexBy(function (c) {
-              return c.id
-            })
-            if (this?.gradebookContent.customColumns) {
-              this.gradebookContent.customColumns = _(updatedCustomColumnIds).map(
-                id => colsById[id]
-              )
+          this.props.reorderCustomColumns(updatedCustomColumnIds).then(() => {
+            const colsById: {
+              [columnId: string]: CustomColumn
+            } = _(this.gradebookContent.customColumns).indexBy((c: CustomColumn) => c.id)
+            if (this.gradebookContent.customColumns) {
+              this.gradebookContent.customColumns = updatedCustomColumnIds.map(id => colsById[id])
             }
-            return this?.gradebookContent.customColumns
+            return this.gradebookContent.customColumns
           })
         }
       } else {
@@ -661,7 +659,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
     }
-    const ref2: string[] = _.uniq(studentsWithHiddenAssignments)
+    const ref2: string[] = [...new Set(studentsWithHiddenAssignments)]
     for (k = 0, len1 = ref2.length; k < len1; k++) {
       studentId = ref2[k]
       student = this.student(studentId)
@@ -678,27 +676,32 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   gotCustomColumns = (columns: CustomColumn[]) => {
-    this.gradebookContent.customColumns = columns
+    // prepare array of objects to be mutated
+    // necessary until we remove object mutation from this file
+    this.gradebookContent.customColumns = structuredClone(columns)
     columns.forEach(column => {
       const customColumn = buildCustomColumn(column)
       this.gridData.columns.definitions[customColumn.id] = customColumn
     })
-    this.setCustomColumnsLoaded(true)
     this._updateEssentialDataLoaded()
   }
 
-  gotCustomColumnDataChunk = (customColumnId: string, columnData): void => {
-    let datum, j, len, student
+  gotCustomColumnDataChunk = (customColumnId: string, columnData: CustomColumnData[]): void => {
     const studentIds: string[] = []
-    for (j = 0, len = columnData.length; j < len; j++) {
-      datum = columnData[j]
-      student = this.student(datum.user_id)
+    for (let j = 0, len = columnData.length; j < len; j++) {
+      const datum = columnData[j]
+      const student = this.student(datum.user_id)
       if (student != null) {
         student[`custom_col_${customColumnId}`] = datum.content
         studentIds.push(student.id) // ignore filtered students
+      } else {
+        this.courseContent.students.preloadStudentData(datum.user_id, {
+          [`custom_col_${customColumnId}`]: datum.content,
+        })
       }
     }
-    this.invalidateRowsForStudentIds(_.uniq(studentIds))
+
+    this.invalidateRowsForStudentIds([...new Set(studentIds)])
   }
 
   // Assignment Group Data & Lifecycle Methods
@@ -761,27 +764,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   gotChunkOfStudents = (students: Student[]) => {
     this.courseContent.assignmentStudentVisibility = {}
-    const escapeStudentContent = student => {
-      const unescapedName = student.name
-      const unescapedSortableName = student.sortable_name
-      const unescapedFirstName = student.first_name
-      const unescapedLastName = student.last_name
-
-      // TODO: selectively escape fields
-      const escapedStudent = htmlEscape(student)
-      escapedStudent.name = unescapedName
-      escapedStudent.sortable_name = unescapedSortableName
-      escapedStudent.first_name = unescapedFirstName
-      escapedStudent.last_name = unescapedLastName
-
-      escapedStudent?.enrollments.forEach(enrollment => {
-        const gradesUrl = enrollment?.grades?.html_url
-        if (gradesUrl) {
-          enrollment.grades.html_url = htmlEscape.unescape(gradesUrl)
-        }
-      })
-      return escapedStudent
-    }
     students.forEach(student => {
       student.enrollments = _.filter(
         student.enrollments,
@@ -789,10 +771,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       )
       student.sections = student.enrollments.map(e => e.course_section_id)
       const isStudentView = student.enrollments[0].type === 'StudentViewEnrollment'
+      // TODO: avoid mutating the student object
+      escapeStudentContent(student)
+      if (this.courseContent.students.preloadedStudentData[student.id]) {
+        Object.assign(student, this.courseContent.students.preloadedStudentData[student.id])
+      }
       if (isStudentView) {
-        this.studentViewStudents[student.id] = escapeStudentContent(student)
+        this.studentViewStudents[student.id] = student
       } else {
-        this.students[student.id] = escapeStudentContent(student)
+        this.students[student.id] = student
       }
       student.computed_current_score || (student.computed_current_score = 0)
       student.computed_final_score || (student.computed_final_score = 0)
@@ -811,7 +798,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     ])
     // eslint-disable-next-line promise/catch-or-return
     this.gridReady.promise.then(() => {
-      return this.setupGrading(students)
+      this.setupGrading(students)
     })
     if (this.isFilteringRowsBySearchTerm()) {
       // When filtering, students cannot be matched until loaded. The grid must
@@ -1007,12 +994,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         column_order: this.getColumnOrder(),
       })
     }
-  }
-
-  reorderCustomColumns = (ids: string[]) => {
-    return $.ajaxJSON(this.options.reorder_custom_columns_url, 'POST', {
-      order: ids,
-    })
   }
 
   saveCustomColumnOrder = (): void => {
@@ -1295,7 +1276,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     _.each(this.assignments, assignment => {
       return this.updateAssignmentEffectiveDueDates(assignment)
     })
-    changedStudentIds = _.uniq(changedStudentIds)
+    changedStudentIds = [...new Set(changedStudentIds)]
     const students = changedStudentIds.map(this.student)
     this.setupGrading(students)
     if (!this.props.hideGrid) {
@@ -1372,7 +1353,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     const changedColumnIds = Object.keys(changedColumnHeaders).map(getAssignmentColumnId)
     this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(changedColumnIds)
-    return this.updateRowCellsForStudentIds(_.uniq(changedStudentIds))
+    return this.updateRowCellsForStudentIds([...new Set(changedStudentIds)])
   }
 
   submissionsForStudent = (student: GradebookStudent) => {
@@ -2190,18 +2171,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const newSortOrder = {direction, sortType: criterion}
     const {freezeTotalGrade} = this.getColumnOrder()
 
-    return GradebookApi.updateColumnOrder(this.options.context_id, {
-      ...newSortOrder,
-      freezeTotalGrade,
-    }).then(() => {
-      this.setColumnOrder(newSortOrder)
-      const columns = this.gridData.columns.scrollable.map(
-        columnId => this.gridData.columns.definitions[columnId]
-      )
-      const fn = this.makeColumnSortFn(newSortOrder)
-      columns.sort(fn)
-      this.gridData.columns.scrollable = columns.map(column => column.id)
-    })
+    return this.props
+      .updateColumnOrder(this.options.context_id, {
+        ...newSortOrder,
+        freezeTotalGrade,
+      })
+      .then(() => {
+        this.setColumnOrder(newSortOrder)
+        const columns = this.gridData.columns.scrollable.map(
+          columnId => this.gridData.columns.definitions[columnId]
+        )
+        const fn = this.makeColumnSortFn(newSortOrder)
+        columns.sort(fn)
+        this.gridData.columns.scrollable = columns.map(column => column.id)
+      })
   }
 
   saveUpdatedUserSettings = ({
@@ -2277,7 +2260,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return promise.then(() => {
       if (showNotes) {
         this.showNotesColumn()
-        this.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
+        this.props.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
       } else {
         this.hideNotesColumn()
       }
@@ -2395,21 +2378,22 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   setVisibleGridColumns = () => {
     let assignmentGroupId, ref1
-    let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
-    })
+    let parentColumnIds = this.gridData.columns.frozen.filter(
+      columnId => !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
+    )
     if (this.gridDisplaySettings.showSeparateFirstLastNames) {
       parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
     } else {
       parentColumnIds = ['student'].concat(parentColumnIds)
     }
-    const customColumnIds = this.listVisibleCustomColumns().map(column => {
-      return getCustomColumnId(column.id)
-    })
+    const visibleCustomColumns = this.gradebookContent.customColumns.filter(
+      column => !column.hidden
+    )
+    const customColumnIds = visibleCustomColumns.map(column => getCustomColumnId(column.id))
     const assignments = this.filterAssignments(Object.values(this.assignments))
-    const scrollableColumns = assignments.map(assignment => {
-      return this.gridData.columns.definitions[getAssignmentColumnId(assignment.id)]
-    })
+    const scrollableColumns = assignments.map(
+      assignment => this.gridData.columns.definitions[getAssignmentColumnId(assignment.id)]
+    )
     if (!this.hideAggregateColumns()) {
       for (assignmentGroupId in this.assignmentGroups) {
         const column =
@@ -2971,10 +2955,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Grid Update Methods
-  updateStudentRow = student => {
-    const index = this.gridData.rows.findIndex(row => {
-      return row.id === student.id
-    })
+  updateStudentRow = (student: Student) => {
+    const index = this.gridData.rows.findIndex(row => row.id === student.id)
     if (index !== -1) {
       this.gridData.rows[index] = this.buildRow(student)
       return this.gradebookGrid?.invalidateRow(index)
@@ -3029,12 +3011,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   handleColumnHeaderMenuClose = () => this.keyboardNav?.handleMenuOrDialogClose()
 
   toggleNotesColumn = () => {
-    const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId)
-    })
-    const customColumnIds = this.listVisibleCustomColumns().map(column => {
-      return getCustomColumnId(column.id)
-    })
+    const parentColumnIds = this.gridData.columns.frozen.filter(
+      columnId => !/^custom_col_/.test(columnId)
+    )
+    const visibleCustomColumns = this.gradebookContent.customColumns.filter(
+      column => !column.hidden
+    )
+    const customColumnIds = visibleCustomColumns.map(column => getCustomColumnId(column.id))
     this.gridData.columns.frozen = [...parentColumnIds, ...customColumnIds]
     return this.updateGrid()
   }
@@ -3045,7 +3028,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.teacherNotesNotYetLoaded = false
       const notesColumn = this.getTeacherNotesColumn()
       if (!notesColumn) throw new Error('error loading notes column')
-      this.dataLoader.loadCustomColumnData(notesColumn.id)
+      this.props.loadDataForCustomColumn(notesColumn.id)
     }
     if ((ref1 = this.getTeacherNotesColumn()) != null) {
       ref1.hidden = false
@@ -3111,16 +3094,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   invalidateRowsForStudentIds = (studentIds: string[]) => {
-    let j, len, rowIndex
     const rowIndices = this.listRowIndicesForStudentIds(studentIds)
-    for (j = 0, len = rowIndices.length; j < len; j++) {
-      rowIndex = rowIndices[j]
+    for (let j = 0, len = rowIndices.length; j < len; j++) {
+      const rowIndex = rowIndices[j]
       if (rowIndex != null) {
         this.gradebookGrid?.invalidateRow(rowIndex)
       }
     }
     this.gradebookGrid?.render()
-    return null // skip building an unused array return value
   }
 
   updateTotalGradeColumn = () => {
@@ -3742,10 +3723,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return (this.contentLoadStates.assignmentGroupsLoaded = loaded)
   }
 
-  setCustomColumnsLoaded = (loaded: boolean) => {
-    return (this.contentLoadStates.customColumnsLoaded = loaded)
-  }
-
   setGradingPeriodAssignmentsLoaded = (loaded: boolean) => {
     return (this.contentLoadStates.gradingPeriodAssignmentsLoaded = loaded)
   }
@@ -4139,11 +4116,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return column != null && !column.hidden
   }
 
-  listVisibleCustomColumns = () =>
-    this.gradebookContent.customColumns.filter(function (column) {
-      return !column.hidden
-    }) || []
-
   // Context Module Data & Lifecycle Methods
   updateContextModules = (contextModules: Module[]) => {
     this.setContextModules(contextModules)
@@ -4200,7 +4172,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         return (studentsToInvalidate[submission.user_id] = true)
       }
     })
-    const studentIds = _.uniq(Object.keys(studentsToInvalidate))
+    const studentIds = [...new Set(Object.keys(studentsToInvalidate))]
     studentIds.forEach(studentId => {
       return this.calculateStudentGrade(this.students[studentId])
     })
@@ -4300,7 +4272,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           this.hideNotesColumn()
         } else {
           this.showNotesColumn()
-          this.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
+          this.props.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
         }
         this.setTeacherNotesColumnUpdating(false)
         return this.renderViewOptionsMenu()
@@ -4576,7 +4548,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (
       this.contentLoadStates.studentIdsLoaded &&
       !this.props.isModulesLoading &&
-      this.contentLoadStates.customColumnsLoaded &&
+      this.props.isCustomColumnsLoaded &&
       this.contentLoadStates.assignmentGroupsLoaded &&
       this.assignmentsLoadedForCurrentView() &&
       (!this.gradingPeriodSet || this.contentLoadStates.gradingPeriodAssignmentsLoaded)
@@ -4590,18 +4562,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   componentDidUpdate(prevProps: GradebookProps, prevState: GradebookState) {
-    // Until GradebookGrid is rendered reactively, it will need to be rendered
-    // once and only once. It depends on all essential data from the initial
-    // data load. When all of that data has loaded, this deferred promise will
-    // resolve and render the grid. As a promise, it only resolves once.
-    if (
-      !(prevState.isEssentialDataLoaded && prevState.isGridLoaded) &&
-      this.state.isEssentialDataLoaded &&
-      this.state.isGridLoaded
-    ) {
-      this.finishRenderingUI()
-    }
-
     // Here we keep track of data loading states
     //   and filter changes until we use hooks
 
@@ -4668,21 +4628,22 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     // custom columns
-    // two scenarios in which to build custom column state:
-    //   1. custom columns finished loading; student data already loaded
-    //   2. student data stopped loading; custom columns already loaded
     if (
-      (prevProps.isCustomColumnsLoading !== this.props.isCustomColumnsLoading &&
-        !this.props.isCustomColumnsLoading &&
-        this.props.isStudentDataLoaded) ||
-      (prevProps.isStudentDataLoaded !== this.props.isStudentDataLoaded &&
-        this.props.isStudentDataLoaded &&
-        !this.props.isCustomColumnsLoading)
+      prevProps.isCustomColumnsLoaded !== this.props.isCustomColumnsLoaded &&
+      this.props.isCustomColumnsLoaded
     ) {
       this.gotCustomColumns(this.props.customColumns)
-      this.dataLoader.loadInitialData().catch(() => {
-        FlashAlert.showFlashError(I18n.t('There was an error fetching data for Gradebook'))
-      })
+    }
+
+    // custom column data
+    if (
+      prevProps.recentlyLoadedCustomColumnData !== this.props.recentlyLoadedCustomColumnData &&
+      this.props.recentlyLoadedCustomColumnData
+    ) {
+      this.gotCustomColumnDataChunk(
+        this.props.recentlyLoadedCustomColumnData.customColumnId,
+        this.props.recentlyLoadedCustomColumnData.columnData
+      )
     }
 
     const didAppliedFilterValuesChange =
@@ -4783,6 +4744,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
 
       this.updateColumns()
+    }
+
+    // Until GradebookGrid is rendered reactively, it will need to be rendered
+    // once and only once. It depends on all essential data from the initial
+    // data load. When all of that data has loaded, this deferred promise will
+    // resolve and render the grid. As a promise, it only resolves once.
+    if (
+      !(prevState.isEssentialDataLoaded && prevState.isGridLoaded) &&
+      this.state.isEssentialDataLoaded &&
+      this.state.isGridLoaded
+    ) {
+      this.finishRenderingUI()
     }
   }
 

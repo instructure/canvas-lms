@@ -207,7 +207,7 @@ QUnit.module('Gradebook Grid Columns', suiteHooks => {
       createGradebookAndAddData()
       gridSpecHelper = new SlickGridSpecHelper(gradebook.gradebookGrid)
       reorderApiResponse = $.Deferred()
-      sinon.stub(gradebook, 'reorderCustomColumns').returns(reorderApiResponse)
+      sinon.stub(gradebook.props, 'reorderCustomColumns').returns(reorderApiResponse)
       sinon.stub(gradebook, 'saveCustomColumnOrder')
       gradebook.gradebookGrid.events.onColumnsReordered.subscribe((_event, columns) => {
         reorderEventData = columns

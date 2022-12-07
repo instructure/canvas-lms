@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type Course = {
+export type Course = Readonly<{
   id: string
-}
+}>
 
 export type Enrollment = {
   course_section_id: string
@@ -28,12 +28,13 @@ export type Enrollment = {
   }
 }
 
-export type Student = {
+export type Student = Readonly<{
   id: string
   name: string
+  avatar_url: string
+}> & {
   displayName: string
   sortable_name: string
-  avatar_url: string
   enrollments: Enrollment[]
   loaded: boolean
   initialized: boolean
@@ -77,7 +78,7 @@ export type StudentGroup = Partial<
   'id' | 'name'
 >
 
-export type StudentGroupCategory = {
+export type StudentGroupCategory = Readonly<{
   allows_multiple_memberships: boolean
   auto_leader: null | string
   context_type: string
@@ -93,7 +94,7 @@ export type StudentGroupCategory = {
   self_signup: null | string
   sis_group_category_id: null | string
   sis_import_id: null | string
-}
+}>
 
 export type StudentGroupMap = {
   [id: string]: StudentGroup
@@ -124,8 +125,11 @@ export type Override = {
   course_section_id: string | null
 }
 
-export type Assignment = {
+export type Assignment = Readonly<{
   allowed_attmpts: number
+  created_at: string
+  id: string
+  html_url: string
   allowed_extensions: string[]
   annotatable_attachment_id: null | string
   anonymize_students: boolean
@@ -134,16 +138,11 @@ export type Assignment = {
   anonymous_peer_reviews: boolean
   assessment_requests: AssessmentRequest[]
   assignment_group_id: string
-  assignment_group: AssignmentGroup // assigned after fetch?
   assignment_id: string
-  assignment_visibility: string[]
   automatic_peer_reviews: boolean
   can_duplicate: boolean
   course_id: string
-  created_at: string
-  due_at: string | null
   due_date_required: boolean
-  effectiveDueDates: UserDueDateMap
   final_grader_id: null | string
   grade_group_students_individually: boolean
   graded_submissions_exist: boolean
@@ -157,11 +156,8 @@ export type Assignment = {
   group_category_id: string | null
   has_overrides: boolean
   has_submitted_submissions: boolean
-  html_url: string
-  id: string
   important_dates: boolean
   in_quiz_assignment: boolean
-  inClosedGradingPeriod: boolean
   integration_data: any
   integration_id: string
   intra_group_peer_reviews: boolean
@@ -181,7 +177,6 @@ export type Assignment = {
   original_course_id: null | string
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
-  overrides: Override[]
   peer_reviews: boolean
   points_possible: number
   position: number
@@ -198,14 +193,20 @@ export type Assignment = {
   updated_at: string
   user_id: string
   workflow_state: WorkflowState
+}> & {
+  assignment_group: AssignmentGroup // assigned after fetch?
+  assignment_visibility: string[]
+  due_at: string | null
+  effectiveDueDates: UserDueDateMap
+  inClosedGradingPeriod: boolean
+  overrides: Override[]
 }
 
 export type AssignmentMap = {
   [id: string]: Assignment
 }
 
-export type AssignmentGroup = {
-  assignments: Assignment[]
+export type AssignmentGroup = Readonly<{
   group_weight: number
   id: string
   integration_data: unknown
@@ -213,18 +214,20 @@ export type AssignmentGroup = {
   position: number
   rules: unknown
   sis_source_id: null | string
+}> & {
+  assignments: Assignment[]
 }
 
 export type AssignmentGroupMap = {
   [id: string]: AssignmentGroup
 }
 
-export type AssessmentRequest = {
+export type AssessmentRequest = Readonly<{
   anonymous_id?: string
   user_id?: string
   user_name?: string
   available: boolean
-}
+}>
 
 export type AttachmentData = {
   attachment: Attachment
@@ -236,17 +239,17 @@ export type Attachment = {
   created_at: string
 }
 
-export type Module = {
+export type Module = Readonly<{
   id: string
   name: string
   position: number
-}
+}>
 
 export type ModuleMap = {
   [id: string]: Module
 }
 
-export type Section = {
+export type Section = Readonly<{
   course_id: string
   created_at: string
   end_at: null | string
@@ -259,7 +262,7 @@ export type Section = {
   sis_import_id: null | string
   sis_section_id: null | string
   start_at: null | string
-}
+}>
 
 export type SectionMap = {
   [id: string]: Section
@@ -384,7 +387,7 @@ export type SubmissionAttemptsComments = {
   }
 }
 
-export type GradingPeriodSet = {
+export type GradingPeriodSet = Readonly<{
   account_id: string
   course_id: null | string
   created_at: string
@@ -396,4 +399,4 @@ export type GradingPeriodSet = {
   updated_at: string
   weighted: boolean
   workflow_state: WorkflowState
-}
+}>
