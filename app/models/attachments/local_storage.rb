@@ -64,7 +64,8 @@ class Attachments::LocalStorage
     ["Signature", signature]
   end
 
-  def open(...)
+  def open(integrity_check: false, **)
+    attachment.validate_hash { |hash_context| hash_context.file(attachment.full_filename) } if integrity_check
     if block_given?
       File.open(attachment.full_filename, "rb") do |file|
         chunk = file.read(4096)

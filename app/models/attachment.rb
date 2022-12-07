@@ -958,26 +958,34 @@ class Attachment < ActiveRecord::Base
   # If +temp_folder+ is given, and a local temporary file is created, this
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
-  def open(temp_folder: nil, &block)
+  #
+  # If +integrity_check+ is set, the file's MD5 or SHA512 hash will be
+  # computed (during the download if possible) and a CorruptedDownload error
+  # will be raised if it doesn't match the stored value.
+  def open(temp_folder: nil, integrity_check: false, &block)
     if instfs_hosted?
       if block
-        streaming_download(&block)
+        streaming_download(integrity_check: integrity_check, &block)
       else
         create_tempfile(temp_folder: temp_folder) do |tempfile|
-          streaming_download(tempfile)
+          streaming_download(tempfile, integrity_check: integrity_check)
         end
       end
     else
-      store.open(temp_folder: temp_folder, &block)
+      store.open(temp_folder: temp_folder, integrity_check: integrity_check, &block)
     end
   end
 
   class FailedResponse < StandardError; end
+
+  class CorruptedDownload < StandardError; end
+
   # GETs this attachment's public_url and streams the response to the
   # passed block; this is a helper function for #open
   # (you should call #open instead of this)
-  private def streaming_download(dest = nil, &block)
+  private def streaming_download(dest = nil, integrity_check: false, &block)
     retries ||= 0
+    corrupt_retries ||= 0
     bytes_read ||= 0
 
     # avoid corrupting the output stream if we retry after data has been received
@@ -990,13 +998,16 @@ class Attachment < ActiveRecord::Base
       end
     end
 
-    CanvasHttp.get(public_url) do |response|
-      raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
+    validate_hash(enable: integrity_check) do |hash_context|
+      CanvasHttp.get(public_url) do |response|
+        raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
-      response.read_body do |data|
-        bytes_read += data.size
-        dest << data if dest
-        yield(data) if block
+        response.read_body do |data|
+          bytes_read += data.size
+          dest << data if dest
+          yield(data) if block
+          hash_context.update(data) if hash_context
+        end
       end
     end
   rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout, IOError, Errno::ECONNRESET, Errno::ECONNABORTED, Errno::ETIMEDOUT => e
@@ -1006,6 +1017,33 @@ class Attachment < ActiveRecord::Base
       retry
     else
       raise e
+    end
+  rescue CorruptedDownload => e
+    if can_retry.call && (corrupt_retries += 1) < Setting.get(:corrupt_download_retries, "2").to_i
+      Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
+      retry
+    else
+      raise e
+    end
+  end
+
+  # used by #open or its dependencies with integrity_check: true
+  def validate_hash(enable: true)
+    # the md5 column is probably actually a SHA512 unless this file is old, in which case it
+    # could be MD5 or missing. if we're not using Inst-FS, it's MD5.
+    hash_context = if enable && md5
+                     if md5.size == 32
+                       Digest::MD5.new
+                     elsif md5.size == 128
+                       Digest::SHA512.new
+                     end
+                   end
+
+    yield hash_context
+
+    if hash_context && (digest = hash_context.hexdigest) != md5
+      raise CorruptedDownload, "incorrect hash on downloaded file: #{digest}"
     end
   end
 

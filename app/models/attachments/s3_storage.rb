@@ -98,10 +98,11 @@ class Attachments::S3Storage
     ["x-amz-signature", signature]
   end
 
-  def open(temp_folder: nil)
+  def open(temp_folder: nil, integrity_check: false)
     tempfile = attachment.create_tempfile(temp_folder: temp_folder) do |file|
       attachment.s3object.get(response_target: file)
     end
+    attachment.validate_hash { |hash_context| hash_context.file(tempfile.path) } if integrity_check
 
     if block_given?
       File.open(tempfile.path, "rb") do |file|
