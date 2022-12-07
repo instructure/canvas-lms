@@ -537,6 +537,20 @@ describe CanvasOutcomesHelper do
           expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end
 
+        it "can parse null metadata" do
+          mocked_result = "{\"results\":[{\"associated_asset_id\":1,\"attempts\":[{\"id\":\"id\",\"metadata\":\"null\"}]}]}"
+          expected_results = [{
+            associated_asset_id: 1,
+            attempts: [{
+              id: "id",
+              metadata: nil
+            }]
+          }]
+          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}&per_page=200&page=1")
+            .to_return(status: 200, body: mocked_result, headers: { "Per-Page" => 200, "Total" => 2 })
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
+        end
+
         it "can parse json metadata" do
           mocked_result = "{\"results\":[{\"associated_asset_id\":1,\"attempts\":[{\"id\":\"id\",\"metadata\":{\"quiz_metadata\":{\"quiz_id\":\"5\",\"title\":\"NewQuizOnePoint\",\"points_possible\":1.0,\"points\":0.0}}}]}]}"
           expected_results = [{
