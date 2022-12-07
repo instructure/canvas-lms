@@ -41,7 +41,11 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
-import {SearchContext, DiscussionManagerUtilityContext} from '../../utils/constants'
+import {
+  SearchContext,
+  DiscussionManagerUtilityContext,
+  AllThreadsState,
+} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
@@ -60,7 +64,8 @@ import {Text} from '@instructure/ui-text'
 const I18n = useI18nScope('discussion_topics_post')
 
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
+    useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [expandReplies, setExpandReplies] = useState(false)
@@ -330,6 +335,25 @@ export const DiscussionThreadContainer = props => {
       }
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
+
+  useEffect(() => {
+    if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
+      setExpandReplies(true)
+    }
+    if (allThreadsStatus === AllThreadsState.Collapsed && expandReplies) {
+      setExpandReplies(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allThreadsStatus])
+
+  useEffect(() => {
+    if (expandReplies && !expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads([...expandedThreads, props.discussionEntry._id])
+    } else if (!expandReplies && expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads(expandedThreads.filter(v => v !== props.discussionEntry._id))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandReplies])
 
   const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
     const getParentId = () => {

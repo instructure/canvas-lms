@@ -25,7 +25,12 @@ import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/Di
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {getOptimisticResponse, responsiveQuerySizes} from './utils'
-import {HIGHLIGHT_TIMEOUT, SearchContext, DiscussionManagerUtilityContext} from './utils/constants'
+import {
+  HIGHLIGHT_TIMEOUT,
+  SearchContext,
+  DiscussionManagerUtilityContext,
+  AllThreadsState,
+} from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -48,6 +53,8 @@ const DiscussionTopicManager = props => {
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
+  const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
+  const [expandedThreads, setExpandedThreads] = useState([])
   const searchContext = {
     searchTerm,
     setSearchTerm,
@@ -59,6 +66,10 @@ const DiscussionTopicManager = props => {
     setPageNumber,
     searchPageNumber,
     setSearchPageNumber,
+    allThreadsStatus,
+    setAllThreadsStatus,
+    expandedThreads,
+    setExpandedThreads,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
     ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
