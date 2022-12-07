@@ -1405,4 +1405,8 @@ module ApplicationHelper
   def find_heap_application_id
     DynamicSettings.find(tree: :private)[:heap_app_id]
   end
+
+  def load_heap?
+    find_heap_application_id && @domain_root_account.feature_enabled?(:send_usage_metrics)
+  end
 end
