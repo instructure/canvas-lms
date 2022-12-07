@@ -1112,4 +1112,22 @@ module RCENextPage
   def document_menubar_button
     menu_option_by_name("Upload Document")
   end
+
+  def rce_selection_focus_offset
+    # rubocop:disable Specs/NoExecuteScript
+    driver.execute_script(
+      # language=javascript
+      "return document.querySelector('#wiki_page_body_ifr').contentDocument.getSelection().focusOffset"
+    )
+    # rubocop:enable Specs/NoExecuteScript
+  end
+
+  def clear_rce_selection
+    # rubocop:disable Specs/NoExecuteScript
+    driver.execute_script(
+      # language=javascript
+      "return document.querySelector('#wiki_page_body_ifr').contentDocument.getSelection().removeAllRanges()"
+    )
+    # rubocop:enable Specs/NoExecuteScript
+  end
 end

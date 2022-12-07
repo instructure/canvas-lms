@@ -1119,7 +1119,86 @@ class RCEWrapper extends React.Component {
       )
     }
 
+    this._setupSelectionSaving(editor)
+
     this.props.onInitted?.(editor)
+  }
+
+  /**
+   * Sets up selection saving and restoration logic.
+   *
+   * There are certain actions a user can take when the RCE is not focused that clear the selection inside the
+   * editor, such as invoking the Find feature of the browser. If the user then tries to insert content without
+   * going back to the editor, the content would be inserted at the top of the RCE, instead of where their cursor
+   * was.
+   *
+   * This method adds logic that saves and restores the selection to work around the issue.
+   *
+   * @private
+   */
+  _setupSelectionSaving = editor => {
+    let savedSelection = null
+    let selectionWasReset = false
+    let editorHasFocus = false
+
+    const restoreSelectionIfNecessary = () => {
+      if (savedSelection && selectionWasReset) {
+        this.editor.selection.setRng(savedSelection.range, savedSelection.isForward)
+        selectionWasReset = false
+      }
+    }
+
+    editor.on('blur', () => {
+      editorHasFocus = false
+      selectionWasReset = false
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
+      }
+    })
+
+    editor.on('focus', () => {
+      // We need to restore the selection when the editor regains focus because sometimes the editor regains
+      // focus without the user setting the selection themselves (such as when they interact with the toolbar)
+      // and if we didn't, we would end up saving the reset selection before a user managed to actually insert
+      // content.
+      restoreSelectionIfNecessary()
+
+      editorHasFocus = true
+      selectionWasReset = false
+    })
+
+    editor.on('SelectionChange', () => {
+      if (editorHasFocus) {
+        // We don't care if a selection reset occurs when the editor has focus, the user probably intended that
+        // At least they will see the effect
+        return
+      }
+
+      const selection = this.editor.selection.normalize()
+
+      // Detect a browser-reset selection (e.g. From invoking the Find command)
+      if (
+        selection.startContainer?.nodeName === 'BODY' &&
+        selection.startContainer === selection.endContainer &&
+        selection.startOffset === 0 &&
+        selection.endOffset === 0
+      ) {
+        selectionWasReset = true
+      }
+    })
+
+    editor.on('BeforeExecCommand', () => {
+      restoreSelectionIfNecessary()
+    })
+
+    editor.on('ExecCommand', (/* event */) => {
+      // Commands may have modified the selection, we need to recapture it
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
+      }
+    })
   }
 
   _forceCloseFloatingToolbar = () => {
