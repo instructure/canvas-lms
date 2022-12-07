@@ -21,17 +21,7 @@ class FixupLti2SubscriptionDeveloperKeyScopes < ActiveRecord::Migration[6.1]
   tag :postdeploy
   disable_ddl_transaction!
 
-  SCOPE_CHANGES = {
-    "url:GET|/api/v1/courses/:course_id/tool_proxies/:tool_proxy_id/recreate_subscriptions" => "DELETED",
-    "url:GET|/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id/recreate_subscriptions" => "DELETED"
-  }.freeze
-
   def up
-    DeveloperKey.find_ids_in_ranges(batch_size: 1000) do |start_at, end_at|
-      DataFixup::UpdateDeveloperKeyScopes.delay_if_production(
-        priority: Delayed::LOW_PRIORITY,
-        n_strand: ["DataFixup::UpdateDeveloperKeyScopes", Shard.current.database_server.id]
-      ).run(start_at, end_at, SCOPE_CHANGES)
-    end
+    DataFixup::UpdateDeveloperKeyScopes.run
   end
 end
