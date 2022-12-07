@@ -799,10 +799,13 @@ class ApplicationController < ActionController::Base
     require_user
   end
 
+  # This can be appended to with << if needed
   def csp_frame_ancestors
-    # Allow iframing on all vanity domains as well as the canonical one
-    unless @domain_root_account.nil?
-      HostUrl.context_hosts(@domain_root_account, request.host)
+    @csp_frame_ancestors ||= [].tap do |list|
+      # Allow iframing on all vanity domains as well as the canonical one
+      unless @domain_root_account.nil?
+        list.concat HostUrl.context_hosts(@domain_root_account, request.host)
+      end
     end
   end
 
@@ -811,7 +814,7 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.join(" ")};")
+      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)

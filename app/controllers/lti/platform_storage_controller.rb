@@ -36,7 +36,7 @@ module Lti
   # * forwarding listener: ui/features/post_message_forwarding/index.ts
   # * postMessage docs: doc/api/lti_window_post_message.md
   class PlatformStorageController < ApplicationController
-    prepend_after_action :tweak_header
+    after_action :set_extra_csp_frame_ancestor!
 
     def post_message_forwarding
       unless flag_enabled?
@@ -72,8 +72,9 @@ module Lti
     # is already added when an account turns on the CSP, it may be easier. but what to do for accounts
     # that have it off (which is the majority)
     # TODO: resolve these above TODOs before enabling the lti_platform_storage flag (see INTEROP-7714)
-    def tweak_header
-      headers["Content-Security-Policy"]&.gsub!(/;/, " #{URI.parse(parent_domain)&.host};")
+
+    def set_extra_csp_frame_ancestor!
+      csp_frame_ancestors << URI.parse(parent_domain)&.host
     end
 
     # Per the LTI Platform Storage spec, postMessages from tools to get and put data

@@ -63,16 +63,11 @@ module Lti::Concerns
       origin.to_s
     end
 
-    # Overrides the method in ApplicationController, and is used there
-    def csp_frame_ancestors
-      [*super, @extra_csp_frame_ancestor].compact
-    end
-
     def set_extra_csp_frame_ancestor!
       # require http/https URI (e.g., no 'data' uris') & don't allow potential
       # specially characters that could mess up header
       if parent_frame_origin&.match(/^https?:[^ *;]+$/)
-        @extra_csp_frame_ancestor = parent_frame_origin
+        csp_frame_ancestors << parent_frame_origin
       end
     end
   end
