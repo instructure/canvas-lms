@@ -65,8 +65,12 @@ export default function GradebookData(props: Props) {
   const fetchModules = useStore(state => state.fetchModules)
 
   const customColumns = useStore(state => state.customColumns, shallow)
-  const isCustomColumnsLoading = useStore(state => state.isCustomColumnsLoading)
+  const isCustomColumnsLoaded = useStore(state => state.isCustomColumnsLoaded)
   const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
+  const loadDataForCustomColumn = useStore(state => state.loadDataForCustomColumn)
+  const recentlyLoadedCustomColumnData = useStore(state => state.recentlyLoadedCustomColumnData)
+  const reorderCustomColumns = useStore(state => state.reorderCustomColumns)
+  const updateColumnOrder = useStore(state => state.updateColumnOrder)
 
   const finalGradeOverrides = useStore(state => state.finalGradeOverrides)
   const fetchFinalGradeOverrides = useStore(state => state.fetchFinalGradeOverrides)
@@ -102,6 +106,7 @@ export default function GradebookData(props: Props) {
       performanceControls: performanceControls.current,
       hasModules: props.gradebookEnv.has_modules,
       allowFinalGradeOverride: props.gradebookEnv.course_settings.allow_final_grade_override,
+      reorderCustomColumnsUrl: props.gradebookEnv.reorder_custom_columns_url,
     })
     initializeAppliedFilters(
       props.gradebookEnv.settings.filter_rows_by || {},
@@ -114,6 +119,7 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.settings.filter_columns_by,
     props.gradebookEnv.has_modules,
     props.gradebookEnv.course_settings.allow_final_grade_override,
+    props.gradebookEnv.reorder_custom_columns_url,
     initializeAppliedFilters,
   ])
 
@@ -181,13 +187,15 @@ export default function GradebookData(props: Props) {
       {...props}
       appliedFilters={appliedFilters}
       customColumns={customColumns}
+      loadDataForCustomColumn={loadDataForCustomColumn}
+      recentlyLoadedCustomColumnData={recentlyLoadedCustomColumnData}
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
       flashAlerts={flashMessages}
       gradingPeriodAssignments={gradingPeriodAssignments}
       hideGrid={false}
-      isCustomColumnsLoading={isCustomColumnsLoading}
+      isCustomColumnsLoaded={isCustomColumnsLoaded}
       isFiltersLoading={isFiltersLoading}
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isModulesLoading={isModulesLoading}
@@ -201,10 +209,12 @@ export default function GradebookData(props: Props) {
       recentlyLoadedStudents={recentlyLoadedStudents}
       recentlyLoadedSubmissions={recentlyLoadedSubmissions}
       reloadStudentData={reloadStudentData}
+      reorderCustomColumns={reorderCustomColumns}
       studentIds={studentIds}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}
+      updateColumnOrder={updateColumnOrder}
     />
   )
 }

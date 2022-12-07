@@ -91,19 +91,6 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
     })
   })
 
-  QUnit.module('#setCustomColumnsLoaded()', () => {
-    test('optionally sets custom columns as "loaded"', () => {
-      gradebook.setCustomColumnsLoaded(true)
-      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, true)
-    })
-
-    test('optionally sets custom columns as "not loaded"', () => {
-      gradebook.setCustomColumnsLoaded(true)
-      gradebook.setCustomColumnsLoaded(false)
-      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, false)
-    })
-  })
-
   QUnit.module('#setGradingPeriodAssignmentsLoaded()', () => {
     test('optionally sets grading period assignments as "loaded"', () => {
       gradebook.setGradingPeriodAssignmentsLoaded(true)

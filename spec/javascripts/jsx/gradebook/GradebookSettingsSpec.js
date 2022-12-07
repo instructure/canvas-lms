@@ -615,7 +615,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       },
     })
     sinon.stub(GradebookApi, 'saveUserSettings').resolves()
-    sinon.stub(GradebookApi, 'updateColumnOrder').resolves()
     sinon.stub(GradebookApi, 'updateTeacherNotesColumn').resolves()
 
     sinon.stub(FlashAlert, 'showFlashError')
@@ -626,7 +625,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     FlashAlert.showFlashError.restore()
 
     GradebookApi.updateTeacherNotesColumn.restore()
-    GradebookApi.updateColumnOrder.restore()
     GradebookApi.saveUserSettings.restore()
     GradebookApi.createTeacherNotesColumn.restore()
 
@@ -635,34 +633,11 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   })
 
   const teacherNotesColumn = () =>
-    gradebook.listVisibleCustomColumns().find(column => column.id === '9999')
+    gradebook.gradebookContent.customColumns
+      .filter(column => !column.hidden)
+      .find(column => column.id === '9999')
 
   QUnit.module('when updating column sort settings', () => {
-    test('calls the updateColumnOrder API function with the updated settings', async () => {
-      await gradebook.handleViewOptionsUpdated({
-        columnSortSettings: {criterion: 'points', direction: 'ascending'},
-      })
-
-      strictEqual(GradebookApi.updateColumnOrder.callCount, 1)
-      deepEqual(GradebookApi.updateColumnOrder.lastCall.args, [
-        '100',
-        {
-          direction: 'ascending',
-          sortType: 'points',
-          freezeTotalGrade: false,
-        },
-      ])
-    })
-
-    test('does not call updateColumnOrder if the column settings have not changed', async () => {
-      gradebook.setColumnOrder({sortType: 'due_date', direction: 'ascending'})
-      await gradebook.handleViewOptionsUpdated({
-        columnSortSettings: {criterion: 'due_date', direction: 'ascending'},
-      })
-
-      strictEqual(GradebookApi.updateColumnOrder.callCount, 0)
-    })
-
     test('sorts the grid columns when the API call completes', async () => {
       await gradebook.handleViewOptionsUpdated({
         columnSortSettings: {criterion: 'points', direction: 'ascending'},
@@ -674,25 +649,6 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         'total_grade',
         'total_grade_override',
       ])
-    })
-
-    test('does not sort the grid columns if the API call fails', async () => {
-      QUnit.expect(1)
-      GradebookApi.updateColumnOrder.rejects(new Error('no'))
-
-      try {
-        await gradebook.handleViewOptionsUpdated({
-          columnSortSettings: {criterion: 'points', direction: 'ascending'},
-        })
-      } catch {
-        deepEqual(gradebook.gridData.columns.scrollable, [
-          'assignment_2301',
-          'assignment_2302',
-          'assignment_group_2201',
-          'total_grade',
-          'total_grade_override',
-        ])
-      }
     })
   })
 
