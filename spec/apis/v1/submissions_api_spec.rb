@@ -2819,6 +2819,12 @@ describe "Submissions API", type: :request do
       end
 
       it "allows concluded students to view their submission" do
+        one_week_prior = 1.week.ago
+        @assignment1.due_at = one_week_prior
+        @assignment1.save!
+        @assignment2.due_at = one_week_prior
+        @assignment2.save!
+
         enrollment = @course.student_enrollments.where(user_id: @student1).first
         enrollment.conclude
 
