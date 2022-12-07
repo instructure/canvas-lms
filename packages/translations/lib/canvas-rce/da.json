@@ -142,12 +142,10 @@
   "course_files_62deb8f8": { "message": "Fagets filer" },
   "course_files_a31f97fc": { "message": "Fagets filer" },
   "course_images_f8511d04": { "message": "Fagbilleder" },
-  "course_link_b369426": { "message": "Faglink" },
   "course_links_b56959b9": { "message": "Faglinks" },
   "course_media_ec759ad": { "message": "Fagmedier" },
   "course_navigation_dd035109": { "message": "Fagnavigation" },
   "create_icon_110d6463": { "message": "Opret ikon" },
-  "create_icon_maker_icon_c716bffe": { "message": "Opret Icon Maker-ikon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
@@ -188,7 +186,6 @@
     "message": "Vis tekstlink (åbnes i en ny fane)"
   },
   "division_sign_72190870": { "message": "Divisionstegn" },
-  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumenter" },
   "done_54e3d4b6": { "message": "Udført" },
   "double_dagger_faf78681": { "message": "Dobbelt kors" },
@@ -215,7 +212,6 @@
   },
   "edit_c5fbea07": { "message": "Redigér" },
   "edit_course_link_5a5c3c59": { "message": "Rediger faglink" },
-  "edit_equation_f5279959": { "message": "Rediger ligning" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Rediger eksisterende Icon Maker-ikon"
   },
@@ -240,7 +236,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Lig med-symbol" },
-  "equation_1c5ac93c": { "message": "Regnestykke" },
   "equation_editor_39fbc3f1": {
     "message": "Redigeringsværktøj til regnestykker"
   },
@@ -252,7 +247,6 @@
     "message": "Udvid forhåndsvisning som standard"
   },
   "expand_to_see_types_f5d29352": { "message": "Udvid for at se { types }" },
-  "external_link_d3f9e62a": { "message": "Eksternt link" },
   "external_tools_6e77821": { "message": "Eksterne værktøjer" },
   "extra_large_b6cdf1ff": { "message": "Ekstra stor" },
   "extra_small_9ae33252": { "message": "Ekstra lille" },
@@ -313,7 +307,6 @@
   "group_files_82e5dcdb": { "message": "Gruppefiler" },
   "group_images_98e0ac17": { "message": "Gruppens billeder" },
   "group_isomorphism_45b1458c": { "message": "Gruppe isomorfisme" },
-  "group_link_63e626b3": { "message": "Gruppelink" },
   "group_links_9493129e": { "message": "Gruppelinks" },
   "group_media_2f3d128a": { "message": "Gruppens medier" },
   "group_navigation_99f191a": { "message": "Gruppenavigation" },
@@ -332,7 +325,6 @@
   },
   "home_351838cd": { "message": "Startside" },
   "html_code_editor_fd967a44": { "message": "html kode-editor" },
-  "html_editor_fb2ab713": { "message": "HTML-editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Jeg har opnået tilladelse til at bruge denne fil."
   },
@@ -368,9 +360,7 @@
   "inference_fed5c960": { "message": "Udledning" },
   "infinity_7a10f206": { "message": "Uendelighed" },
   "insert_593145ef": { "message": "Indsæt" },
-  "insert_equella_links_49a8dacd": { "message": "Indsæt Equella-links" },
   "insert_link_6dc23cae": { "message": "Indsæt link" },
-  "insert_math_equation_57c6e767": { "message": "Indsæt matematikregnestykke" },
   "integers_336344e1": { "message": "Heltal" },
   "intersection_cd4590e4": { "message": "Fællesmængde" },
   "invalid_entry_f7d2a0f5": { "message": "Ugyldig indtastning." },
@@ -579,11 +569,9 @@
     "message": "Reel del (af komplekst tal)"
   },
   "record_7c9448b": { "message": "Optag" },
-  "record_upload_media_5fdce166": { "message": "Optag/overfør medier" },
   "red_8258edf3": { "message": "Rød" },
   "relationships_6602af70": { "message": "Forhold" },
   "religion_icon_246e0be1": { "message": "Religion-ikon" },
-  "remove_link_d1f2f4d0": { "message": "Fjern link" },
   "replace_e61834a7": { "message": "Erstat" },
   "reset_95a81614": { "message": "Nulstil" },
   "resize_ec83d538": { "message": "Tilpas størrelse" },
@@ -626,7 +614,6 @@
     "message": "Desværre er det pæne HTML-redigeringsværktøj ikke tilgængeligt på tastaturet. Få adgang til det rå HTML-redigeringsværktøj her."
   },
   "save_11a80ec3": { "message": "Gem" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Gemte Icon Maker-ikoner" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Søg" },
   "search_term_b2d2235": { "message": "Søgeord" },
@@ -639,10 +626,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O for at åbne det pæne html-redigeringsværktøj."
   },
-  "show_audio_options_b489926b": { "message": "Vis lydindstillinger" },
-  "show_image_options_1e2ecc6b": { "message": "Vis billedindstillinger" },
-  "show_link_options_545338fd": { "message": "Vis linkindstillinger" },
-  "show_video_options_6ed3721a": { "message": "Vis videoindstillinger" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enkeltfarvet billede" },
@@ -663,12 +646,6 @@
     "message": "Noget gik galt. Tjek din forbindelse, genindlæs siden, og prøv igen."
   },
   "something_went_wrong_d238c551": { "message": "Noget gik galt" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Beklager, vi ved ikke, hvordan man indsætter det"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Beklager, vi understøtter ikke flere filer."
-  },
   "sort_by_e75f9e3e": { "message": "Sorter efter" },
   "spades_suit_b37020c2": { "message": "Spar (kulør)" },
   "square_511eb3b3": { "message": "Kvadrat" },
@@ -792,11 +769,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Op og højre diagonal pil"
   },
-  "upload_document_253f0478": { "message": "Upload dokument" },
   "upload_file_fd2361b8": { "message": "Overfør fil" },
   "upload_image_6120b609": { "message": "Upload billede" },
   "upload_media_ce31135a": { "message": "Upload medier" },
-  "upload_record_media_e4207d72": { "message": "Upload / optag medier" },
   "uploading_19e8a4e7": { "message": "Uploader" },
   "uppercase_delta_d4f4bc41": { "message": "Delta med stort bogstav" },
   "uppercase_gamma_86f492e9": { "message": "Gamma med stort bogstav" },

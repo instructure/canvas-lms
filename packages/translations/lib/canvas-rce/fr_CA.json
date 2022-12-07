@@ -150,14 +150,10 @@
   "course_files_62deb8f8": { "message": "Fichiers du cours" },
   "course_files_a31f97fc": { "message": "Fichiers du cours" },
   "course_images_f8511d04": { "message": "Images du cours" },
-  "course_link_b369426": { "message": "Lien vers le cours" },
   "course_links_b56959b9": { "message": "Liens du cours" },
   "course_media_ec759ad": { "message": "Support média du cours" },
   "course_navigation_dd035109": { "message": "Navigation du cours" },
   "create_icon_110d6463": { "message": "Créer une icône" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Créer icône de Créateur d’icône"
-  },
   "creative_commons_license_725584ae": {
     "message": "Licence Creative Commons :"
   },
@@ -198,7 +194,6 @@
     "message": "Afficher le lien texte (s’ouvre dans un nouvel onglet)"
   },
   "division_sign_72190870": { "message": "Signe de division" },
-  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documents" },
   "done_54e3d4b6": { "message": "Terminé" },
   "double_dagger_faf78681": { "message": "Double poignard" },
@@ -227,7 +222,6 @@
   },
   "edit_c5fbea07": { "message": "Modifier" },
   "edit_course_link_5a5c3c59": { "message": "Modifier le lien du cours" },
-  "edit_equation_f5279959": { "message": "Modifier l’équation" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Modifier l’icône Maker Icon existante"
   },
@@ -252,7 +246,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variant)" },
   "equals_sign_c51bdc58": { "message": "Signe égal" },
-  "equation_1c5ac93c": { "message": "Équation" },
   "equation_editor_39fbc3f1": { "message": "Editeur d''équation" },
   "equivalence_class_7b0f11c0": { "message": "Classe d''équivalence" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (Identité)" },
@@ -262,7 +255,6 @@
     "message": "Développer l’aperçu par défaut"
   },
   "expand_to_see_types_f5d29352": { "message": "Agrandir pour voir { types }" },
-  "external_link_d3f9e62a": { "message": "Lien externe" },
   "external_tools_6e77821": { "message": "Outils externes" },
   "extra_large_b6cdf1ff": { "message": "Très grande" },
   "extra_small_9ae33252": { "message": "Très petit" },
@@ -327,7 +319,6 @@
   "group_files_82e5dcdb": { "message": "Fichiers du groupe" },
   "group_images_98e0ac17": { "message": "Images de groupe" },
   "group_isomorphism_45b1458c": { "message": "Isomorphisme de groupe" },
-  "group_link_63e626b3": { "message": "Lien du groupe" },
   "group_links_9493129e": { "message": "Liens de groupe" },
   "group_media_2f3d128a": { "message": "Média de Groupes" },
   "group_navigation_99f191a": { "message": "Barre de navigation des groupes" },
@@ -346,7 +337,6 @@
   },
   "home_351838cd": { "message": "Accueil" },
   "html_code_editor_fd967a44": { "message": "éditeur de code HTML" },
-  "html_editor_fb2ab713": { "message": "Éditeur HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "J’ai obtenu l’autorisation d’utiliser ce fichier."
   },
@@ -386,11 +376,7 @@
   "inference_fed5c960": { "message": "Inférence" },
   "infinity_7a10f206": { "message": "Infinité" },
   "insert_593145ef": { "message": "Insérer" },
-  "insert_equella_links_49a8dacd": { "message": "Insérer les liens Equella" },
   "insert_link_6dc23cae": { "message": "Insérer un lien" },
-  "insert_math_equation_57c6e767": {
-    "message": "Insérer une équation mathématique"
-  },
   "integers_336344e1": { "message": "Nombre entier" },
   "intersection_cd4590e4": { "message": "Intersection" },
   "invalid_entry_f7d2a0f5": { "message": "Saisie non valide." },
@@ -607,13 +593,9 @@
     "message": "Portion réelle (d''un nombre complexe)"
   },
   "record_7c9448b": { "message": "Enregistrer" },
-  "record_upload_media_5fdce166": {
-    "message": "Enregistrer/téléverser support média"
-  },
   "red_8258edf3": { "message": "Rouge" },
   "relationships_6602af70": { "message": "Relations" },
   "religion_icon_246e0be1": { "message": "Icône Religion" },
-  "remove_link_d1f2f4d0": { "message": "Retirer le lien" },
   "replace_e61834a7": { "message": "Remplacer" },
   "reset_95a81614": { "message": "Réinitialiser" },
   "resize_ec83d538": { "message": "Redimensionner" },
@@ -658,9 +640,6 @@
     "message": "Malheureusement, l’éditeur Pretty HTML n’est pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
   },
   "save_11a80ec3": { "message": "Enregistrer" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Icônes enregistrées de Créateur d’icône"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Rechercher" },
   "search_term_b2d2235": { "message": "Mots clés de recherche" },
@@ -677,10 +656,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "MAJ-O pour ouvrir l’éditeur Pretty HTML."
   },
-  "show_audio_options_b489926b": { "message": "Afficher les options audio" },
-  "show_image_options_1e2ecc6b": { "message": "Afficher les options d’image" },
-  "show_link_options_545338fd": { "message": "Afficher les options de lien" },
-  "show_video_options_6ed3721a": { "message": "Afficher les options de vidéo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variant)" },
   "single_color_image_4e5d4dbc": { "message": "Image monochrome" },
@@ -701,12 +676,6 @@
     "message": "Une erreur est survenue. Vérifiez votre connexion, rechargez la page, et essayez de nouveau."
   },
   "something_went_wrong_d238c551": { "message": "Une erreur est survenue" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Désolé, nous ne savons pas comment coller ça"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Désolé, nous ne prenons pas en charge les fichiers multiples."
-  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "spades_suit_b37020c2": { "message": "Pique (combinaison)" },
   "square_511eb3b3": { "message": "Carré" },
@@ -836,13 +805,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Flèche diagonale vers le haut et vers la droite"
   },
-  "upload_document_253f0478": { "message": "Téléverser le document" },
   "upload_file_fd2361b8": { "message": "Téléverser le fichier" },
   "upload_image_6120b609": { "message": "Téléverser une image" },
   "upload_media_ce31135a": { "message": "Téléverser un fichier multimédia" },
-  "upload_record_media_e4207d72": {
-    "message": "Téléverser/enregistrer un support média"
-  },
   "uploading_19e8a4e7": { "message": "Téléversement" },
   "uppercase_delta_d4f4bc41": { "message": "Delta majuscule" },
   "uppercase_gamma_86f492e9": { "message": "Gamma majuscule" },

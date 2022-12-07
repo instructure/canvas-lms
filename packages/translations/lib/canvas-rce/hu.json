@@ -142,14 +142,10 @@
   "course_files_62deb8f8": { "message": "Kurzusfájlok" },
   "course_files_a31f97fc": { "message": "Tanfolyam fájlok" },
   "course_images_f8511d04": { "message": "Kurzus képei" },
-  "course_link_b369426": { "message": "Kurzus link" },
   "course_links_b56959b9": { "message": "Kurzus linkjei" },
   "course_media_ec759ad": { "message": "Kurzus média" },
   "course_navigation_dd035109": { "message": "Kurzusnavigáció" },
   "create_icon_110d6463": { "message": "Ikon létrehozása" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Hozzon létre Icon Maker ikont"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licenc:"
   },
@@ -191,7 +187,6 @@
     "message": "Szöveges link megjelenítése (új lapfülön jelenik meg)"
   },
   "division_sign_72190870": { "message": "Osztás jele" },
-  "document_678cd7bf": { "message": "Dokumentum" },
   "documents_81393201": { "message": "Dokumentumok" },
   "done_54e3d4b6": { "message": "Kész" },
   "double_dagger_faf78681": { "message": "Dupla Tőr" },
@@ -221,7 +216,6 @@
   },
   "edit_c5fbea07": { "message": "Szerkesztés" },
   "edit_course_link_5a5c3c59": { "message": "Kurzus hivatkozás szerkesztése" },
-  "edit_equation_f5279959": { "message": "Egyenlet szerkesztése" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Meglévő Ikonkészítő Ikon szerkesztése"
   },
@@ -246,7 +240,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (változat)" },
   "equals_sign_c51bdc58": { "message": "Egyenlő jel" },
-  "equation_1c5ac93c": { "message": "Egyenlet" },
   "equation_editor_39fbc3f1": { "message": "Egyenletszerkesztő" },
   "equivalence_class_7b0f11c0": { "message": "Egyenértékűségi osztály" },
   "equivalent_identity_654b3ce5": { "message": "Egyenértékű (identitás)" },
@@ -258,7 +251,6 @@
   "expand_to_see_types_f5d29352": {
     "message": "Kiterjesztés a(z) { types } megtekintéséhez"
   },
-  "external_link_d3f9e62a": { "message": "külső hivatkozás" },
   "external_tools_6e77821": { "message": "Külső eszközök" },
   "extra_large_b6cdf1ff": { "message": "Extra nagy" },
   "extra_small_9ae33252": { "message": "Extra kicsi" },
@@ -317,7 +309,6 @@
   "group_files_82e5dcdb": { "message": "Csoportfájlok" },
   "group_images_98e0ac17": { "message": "Csoport képek" },
   "group_isomorphism_45b1458c": { "message": "Csoport izomorfizmus" },
-  "group_link_63e626b3": { "message": "Csoport hivatkozás" },
   "group_links_9493129e": { "message": "Csoport hivatkozások" },
   "group_media_2f3d128a": { "message": "Csoport média" },
   "group_navigation_99f191a": { "message": "Csoportnavigáció" },
@@ -336,7 +327,6 @@
   },
   "home_351838cd": { "message": "Kezdőlap" },
   "html_code_editor_fd967a44": { "message": "html kódszerkesztő" },
-  "html_editor_fb2ab713": { "message": "HTML szerkesztő" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Szereztem jogosultságot ennek a fájlnak a használatához."
   },
@@ -372,11 +362,7 @@
   "inference_fed5c960": { "message": "Következtetés" },
   "infinity_7a10f206": { "message": "Végtelen" },
   "insert_593145ef": { "message": "Beszúrás" },
-  "insert_equella_links_49a8dacd": { "message": "Equella linkek beszúrása" },
   "insert_link_6dc23cae": { "message": "Link beszúrása" },
-  "insert_math_equation_57c6e767": {
-    "message": "Matematikai képlet beszúrása"
-  },
   "integers_336344e1": { "message": "Egész számok" },
   "intersection_cd4590e4": { "message": "Metszet" },
   "invalid_entry_f7d2a0f5": { "message": "Érvénytelen bejegyzés." },
@@ -580,13 +566,9 @@
     "message": "Valódi rész (a komplex számból)"
   },
   "record_7c9448b": { "message": "Felvétel" },
-  "record_upload_media_5fdce166": {
-    "message": "Médiafájl rögzítése/feltöltése"
-  },
   "red_8258edf3": { "message": "Vörös" },
   "relationships_6602af70": { "message": "Kapcsolatok" },
   "religion_icon_246e0be1": { "message": "Vallás ikon" },
-  "remove_link_d1f2f4d0": { "message": "Link eltávolítása" },
   "replace_e61834a7": { "message": "Csere" },
   "reset_95a81614": { "message": "Visszaállítás" },
   "resize_ec83d538": { "message": "Átméretezés" },
@@ -631,7 +613,6 @@
     "message": "Sajnos a szép HTML-szerkesztő nem érhető el billentyűzettel. Itt érheti el a nyers HTML-szerkesztőt."
   },
   "save_11a80ec3": { "message": "Mentés" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Mentett Icon Maker ikonok" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Keresés" },
   "search_term_b2d2235": { "message": "Kifejezés keresése" },
@@ -646,10 +627,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O a szép html-szerkesztő megnyitásához."
   },
-  "show_audio_options_b489926b": { "message": "Hangbeállítások megjelenítése" },
-  "show_image_options_1e2ecc6b": { "message": "Képbeállítások mutatása" },
-  "show_link_options_545338fd": { "message": "Linkbeállítások mutatása" },
-  "show_video_options_6ed3721a": { "message": "Videóbeállítások mutatása" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (változat)" },
   "single_color_image_4e5d4dbc": { "message": "Egyszínű kép" },
@@ -665,12 +642,6 @@
     "message": "Valami elromlott. Ellenőrizze a kapcsolatot, töltse be újra az oldalt, és próbálja újra."
   },
   "something_went_wrong_d238c551": { "message": "Hiba történt!" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Sajnáljuk, nem tudjuk, hogyan kell beilleszteni"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Sajnáljuk, nem támogatunk több fájlt."
-  },
   "sort_by_e75f9e3e": { "message": "Rendezés alapja" },
   "spades_suit_b37020c2": { "message": "Treff (kártyszín)" },
   "square_511eb3b3": { "message": "Négyzet" },
@@ -793,11 +764,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Felfelé és Jobbra Átlós Nyíl"
   },
-  "upload_document_253f0478": { "message": "Dokumentum feltöltése" },
   "upload_file_fd2361b8": { "message": "Fájl feltöltése" },
   "upload_image_6120b609": { "message": "Kép feltöltése" },
   "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
-  "upload_record_media_e4207d72": { "message": "Média feltöltés/rögzítés" },
   "uploading_19e8a4e7": { "message": "Feltöltés" },
   "uppercase_delta_d4f4bc41": { "message": "Delta nagybetűvel" },
   "uppercase_gamma_86f492e9": { "message": "Gamma nagybetűvel" },

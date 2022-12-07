@@ -140,12 +140,10 @@
   "course_files_62deb8f8": { "message": "Námskeiðsskrár" },
   "course_files_a31f97fc": { "message": "Námskeiðsskrár" },
   "course_images_f8511d04": { "message": "Myndir námskeiðs" },
-  "course_link_b369426": { "message": "Námskeiðstengill" },
   "course_links_b56959b9": { "message": "Tenglar námskeiðs" },
   "course_media_ec759ad": { "message": "Margmiðlunarefni námskeiðs" },
   "course_navigation_dd035109": { "message": "Leiðarnet námskeiðs" },
   "create_icon_110d6463": { "message": "Búa til tákn" },
-  "create_icon_maker_icon_c716bffe": { "message": "Búa til tákngerðartákn" },
   "creative_commons_license_725584ae": { "message": "Creative Commons leyfi:" },
   "crop_image_41bf940c": { "message": "Sníða mynd" },
   "crop_image_807ebb08": { "message": "Klippa mynd" },
@@ -184,7 +182,6 @@
     "message": "Sýna textatengil (opnast í nýjum flipa)"
   },
   "division_sign_72190870": { "message": "Deilingartákn" },
-  "document_678cd7bf": { "message": "Skjal" },
   "documents_81393201": { "message": "Skjöl" },
   "done_54e3d4b6": { "message": "Lokið" },
   "double_dagger_faf78681": { "message": "Tvöfaldur tvíkross" },
@@ -213,7 +210,6 @@
   },
   "edit_c5fbea07": { "message": "Breyta" },
   "edit_course_link_5a5c3c59": { "message": "Breyta námskeiðstengli" },
-  "edit_equation_f5279959": { "message": "Breyta jöfnu" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Breyta núverandi tákngerðartákni"
   },
@@ -238,7 +234,6 @@
   "epsilon_54bb8afa": { "message": "Epsílon" },
   "epsilon_variant_d31f1e77": { "message": "Epsílon (afbrigði)" },
   "equals_sign_c51bdc58": { "message": "Samasemmerki" },
-  "equation_1c5ac93c": { "message": "Jafna" },
   "equation_editor_39fbc3f1": { "message": "Jöfnuritstjóri" },
   "equivalence_class_7b0f11c0": { "message": "Jafngildisflokkur" },
   "equivalent_identity_654b3ce5": { "message": "Jafngildi (auðkenni)" },
@@ -248,7 +243,6 @@
     "message": "Víkka forskoðun sjálfgefið"
   },
   "expand_to_see_types_f5d29352": { "message": "Útvíkka til að sjá { types }" },
-  "external_link_d3f9e62a": { "message": "Ytri tengill" },
   "external_tools_6e77821": { "message": "Ytri tæki" },
   "extra_large_b6cdf1ff": { "message": "Sérstaklega stórar" },
   "extra_small_9ae33252": { "message": "Sérstaklega smátt" },
@@ -309,7 +303,6 @@
   "group_files_82e5dcdb": { "message": "Hópskrár" },
   "group_images_98e0ac17": { "message": "Myndir hóps" },
   "group_isomorphism_45b1458c": { "message": "Hópeinslögun" },
-  "group_link_63e626b3": { "message": "Hóptengill" },
   "group_links_9493129e": { "message": "Hóptenglar" },
   "group_media_2f3d128a": { "message": "Miðlar hóps" },
   "group_navigation_99f191a": { "message": "Leiðarstýring hóps" },
@@ -326,7 +319,6 @@
   "hide_title_description_caf092ef": { "message": "Fela { title } lýsingu" },
   "home_351838cd": { "message": "Heim" },
   "html_code_editor_fd967a44": { "message": "html kóðaritill" },
-  "html_editor_fb2ab713": { "message": "HTML ritill" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ég hef heimild til að nota þessa skrá."
   },
@@ -362,9 +354,7 @@
   "inference_fed5c960": { "message": "Ályktun" },
   "infinity_7a10f206": { "message": "Óendanleiki" },
   "insert_593145ef": { "message": "Setja inn" },
-  "insert_equella_links_49a8dacd": { "message": "Setja inn Equella tengla" },
   "insert_link_6dc23cae": { "message": "Setja inn tengil" },
-  "insert_math_equation_57c6e767": { "message": "Setja inn stærðfræðijöfnu" },
   "integers_336344e1": { "message": "Heilar tölur" },
   "intersection_cd4590e4": { "message": "Sniðmengi" },
   "invalid_entry_f7d2a0f5": { "message": "Ógild færsla." },
@@ -569,13 +559,9 @@
     "message": "Raunverulegur hluti (af flókinni tölu)"
   },
   "record_7c9448b": { "message": "Upptaka" },
-  "record_upload_media_5fdce166": {
-    "message": "Taka/hlaða upp margmiðlunarefni"
-  },
   "red_8258edf3": { "message": "Rauður" },
   "relationships_6602af70": { "message": "Sambönd" },
   "religion_icon_246e0be1": { "message": "Trúar tákn" },
-  "remove_link_d1f2f4d0": { "message": "Fjarlægja tengil" },
   "replace_e61834a7": { "message": "Skipta út" },
   "reset_95a81614": { "message": "Endurstilla" },
   "resize_ec83d538": { "message": "Breyta stærð" },
@@ -614,7 +600,6 @@
     "message": "Því miður er ekki hægt að nota lyklaborð með pretty HTML ritlinum. Aðgangur að hráa HTML ritlinum hér."
   },
   "save_11a80ec3": { "message": "Vista" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Vistað Tákngerðartákn" },
   "script_l_42a7b254": { "message": "Forskrift L" },
   "search_280d00bd": { "message": "Leita" },
   "search_term_b2d2235": { "message": "Leitarhugtak" },
@@ -627,10 +612,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O til að opna pretty html ritilinn."
   },
-  "show_audio_options_b489926b": { "message": "Sýna hljóðvalkosti" },
-  "show_image_options_1e2ecc6b": { "message": "Sýna valkosti myndar" },
-  "show_link_options_545338fd": { "message": "Sýna tengla valkosti" },
-  "show_video_options_6ed3721a": { "message": "Sýna myndbandsvalkosti" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (afbrigði)" },
   "single_color_image_4e5d4dbc": { "message": "Einlita mynd" },
@@ -649,12 +630,6 @@
     "message": "Eitthvað fór úrskeiðis. Athugaðu tenginguna þína, endurhlaða síðuna og reyndu aftur."
   },
   "something_went_wrong_d238c551": { "message": "Eitthvað mistókst" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Því miður, við vitum ekki hvernig á að líma það"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Því miður styðjum við ekki margar skrár."
-  },
   "sort_by_e75f9e3e": { "message": "Raða eftir" },
   "spades_suit_b37020c2": { "message": "Spaðar (búningur)" },
   "square_511eb3b3": { "message": "Ferningur" },
@@ -770,13 +745,9 @@
   "untitled_efdc2d7d": { "message": "ónefnt" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Upp og vinstri skáör" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Upp og hægri skáör" },
-  "upload_document_253f0478": { "message": "Hlaða upp skjali" },
   "upload_file_fd2361b8": { "message": "Hlaða upp skrá" },
   "upload_image_6120b609": { "message": "Hleð upp mynd" },
   "upload_media_ce31135a": { "message": "Hlaða upp miðli" },
-  "upload_record_media_e4207d72": {
-    "message": "Hlaða/taka upp margmiðlunarefni"
-  },
   "uploading_19e8a4e7": { "message": "Hleður upp" },
   "uppercase_delta_d4f4bc41": { "message": "Delta með stórum staf" },
   "uppercase_gamma_86f492e9": { "message": "Gamma með stórum staf" },

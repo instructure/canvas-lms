@@ -332,9 +332,6 @@
     "home_351838cd": {
         "message": "صفحه اصلی"
     },
-    "html_editor_fb2ab713": {
-        "message": "ویرایشگر HTML"
-    },
     "hungarian_fc7d30c9": {
         "message": "مجارستانی"
     },
@@ -374,14 +371,8 @@
     "insert_593145ef": {
         "message": "درج"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Insert Equella Links"
-    },
     "insert_link_6dc23cae": {
         "message": "درج پیوند"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "درج معادله ریاضی"
     },
     "invalid_file_type_881cc9b2": {
         "message": "نوع فایل معتبر نیست"

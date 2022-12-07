@@ -136,14 +136,10 @@
   "course_files_62deb8f8": { "message": "ملفات المساق" },
   "course_files_a31f97fc": { "message": "ملفات المساق" },
   "course_images_f8511d04": { "message": "صور المساق" },
-  "course_link_b369426": { "message": "رابط المساق" },
   "course_links_b56959b9": { "message": "روابط المساق" },
   "course_media_ec759ad": { "message": "وسائط المساق" },
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
   "create_icon_110d6463": { "message": "إنشاء أيقونة" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "إنشاء أيقونة صانع الأيقونات"
-  },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
   "crop_image_41bf940c": { "message": "قص الصورة" },
   "crop_image_807ebb08": { "message": "قص صورة" },
@@ -182,7 +178,6 @@
     "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
   },
   "division_sign_72190870": { "message": "علامة القسمة" },
-  "document_678cd7bf": { "message": "مستند" },
   "documents_81393201": { "message": "المستندات" },
   "done_54e3d4b6": { "message": "تم" },
   "double_dagger_faf78681": { "message": "Double Dagger" },
@@ -211,7 +206,6 @@
   },
   "edit_c5fbea07": { "message": "تحرير" },
   "edit_course_link_5a5c3c59": { "message": "تحرير ارتباط المساق" },
-  "edit_equation_f5279959": { "message": "تحرير المعادلة" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "تحرير أيقونة صانع الأيقونات"
   },
@@ -236,7 +230,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (متغير)" },
   "equals_sign_c51bdc58": { "message": "علامة يساوي" },
-  "equation_1c5ac93c": { "message": "معادلة" },
   "equation_editor_39fbc3f1": { "message": "محرر المعادلات" },
   "equivalence_class_7b0f11c0": { "message": "فئة تكافؤ" },
   "equivalent_identity_654b3ce5": { "message": "مكافئ (هوية)" },
@@ -246,7 +239,6 @@
     "message": "توسيع المعاينة افتراضيًا"
   },
   "expand_to_see_types_f5d29352": { "message": "التوسيع لرؤية { types }" },
-  "external_link_d3f9e62a": { "message": "الرابط الخارجي" },
   "external_tools_6e77821": { "message": "الأدوات الخارجية" },
   "extra_large_b6cdf1ff": { "message": "كبير جداً" },
   "extra_small_9ae33252": { "message": "صغير للغاية" },
@@ -305,7 +297,6 @@
   "group_files_82e5dcdb": { "message": "ملفات المجموعة" },
   "group_images_98e0ac17": { "message": "صور المجموعة" },
   "group_isomorphism_45b1458c": { "message": "تساوي شكل المجموعة" },
-  "group_link_63e626b3": { "message": "رابط المجموعة" },
   "group_links_9493129e": { "message": "تجميع الارتباطات" },
   "group_media_2f3d128a": { "message": "وسائط المجموعة" },
   "group_navigation_99f191a": { "message": "التنقل عبر المجموعة" },
@@ -322,7 +313,6 @@
   "hide_title_description_caf092ef": { "message": "إخفاء وصف { title }" },
   "home_351838cd": { "message": "الصفحة الرئيسية" },
   "html_code_editor_fd967a44": { "message": "محرر التعليمات البرمجية HTML" },
-  "html_editor_fb2ab713": { "message": "محرر HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "لقد حصلت على إذن لاستخدام هذا الملف."
   },
@@ -358,9 +348,7 @@
   "inference_fed5c960": { "message": "الاستنتاج" },
   "infinity_7a10f206": { "message": "ما لا نهاية" },
   "insert_593145ef": { "message": "إدخال" },
-  "insert_equella_links_49a8dacd": { "message": "إدراج ارتباطات Equella" },
   "insert_link_6dc23cae": { "message": "إدراج ارتباط" },
-  "insert_math_equation_57c6e767": { "message": "إدخال معادلة رياضية" },
   "integers_336344e1": { "message": "أعداد صحيحة" },
   "intersection_cd4590e4": { "message": "تقاطع" },
   "invalid_entry_f7d2a0f5": { "message": "إدخال غير صالح." },
@@ -563,11 +551,9 @@
     "message": "الجزء الحقيقي (من العدد المركب)"
   },
   "record_7c9448b": { "message": "تسجيل" },
-  "record_upload_media_5fdce166": { "message": "تسجيل/تحميل الوسائط" },
   "red_8258edf3": { "message": "أحمر" },
   "relationships_6602af70": { "message": "العلاقات" },
   "religion_icon_246e0be1": { "message": "أيقونة الدين" },
-  "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
   "replace_e61834a7": { "message": "استبدال" },
   "reset_95a81614": { "message": "إعادة التعيين" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
@@ -604,9 +590,6 @@
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
   },
   "save_11a80ec3": { "message": "حفظ" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "تم حفظ أيقونة صانع الأيقونات"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "بحث" },
   "search_term_b2d2235": { "message": "مصطلح البحث" },
@@ -619,10 +602,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
   },
-  "show_audio_options_b489926b": { "message": "إظهار خيارات الصوت" },
-  "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
-  "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
-  "show_video_options_6ed3721a": { "message": "إظهار خيارات الفيديو" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (متغير)" },
   "single_color_image_4e5d4dbc": { "message": "صورة بلون واحد" },
@@ -641,12 +620,6 @@
     "message": "حدث خطأ ما. تحقق من الاتصال وأعد تحميل الصفحة وأعد المحاولة."
   },
   "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "عذرًا، لا نعلم طريقة لصق هذا"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "عذرًا، لا مدعم ملفات متعددة."
-  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "مربع" },
@@ -762,11 +735,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
-  "upload_document_253f0478": { "message": "تحميل المستند" },
   "upload_file_fd2361b8": { "message": "تحميل ملف" },
   "upload_image_6120b609": { "message": "تحميل صورة" },
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
-  "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
   "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
   "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
