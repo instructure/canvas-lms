@@ -74,7 +74,7 @@ module FeatureFlags
     end
 
     def self.usage_metrics_allowed_hook(context)
-      UsageMetricsPredicate.new(context).call
+      UsageMetricsPredicate.new(context, Shard.current.database_server.config[:region]).call
     end
 
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
