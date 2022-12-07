@@ -136,14 +136,10 @@
   "course_files_62deb8f8": { "message": "Kursdateien" },
   "course_files_a31f97fc": { "message": "Kursdateien" },
   "course_images_f8511d04": { "message": "Kursbilder" },
-  "course_link_b369426": { "message": "Link zum Kurs" },
   "course_links_b56959b9": { "message": "Kurs-Links" },
   "course_media_ec759ad": { "message": "Kursmedien" },
   "course_navigation_dd035109": { "message": "Kursnavigation" },
   "create_icon_110d6463": { "message": "Symbol „Erstellen“" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Icon Maker erstellen-Symbol"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
   },
@@ -184,7 +180,6 @@
     "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
   },
   "division_sign_72190870": { "message": "Divisionszeichen" },
-  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumente" },
   "done_54e3d4b6": { "message": "Fertig" },
   "double_dagger_faf78681": { "message": "Doppelkreuz" },
@@ -213,7 +208,6 @@
   },
   "edit_c5fbea07": { "message": "Ändern" },
   "edit_course_link_5a5c3c59": { "message": "Link zum Bearbeiten des Kurses" },
-  "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Vorhandenes Icon Maker-Symbol bearbeiten"
   },
@@ -238,7 +232,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Gleichheitszeichen" },
-  "equation_1c5ac93c": { "message": "Gleichung" },
   "equation_editor_39fbc3f1": { "message": "Formel-Editor" },
   "equivalence_class_7b0f11c0": { "message": "Äquivalenzklasse" },
   "equivalent_identity_654b3ce5": { "message": "Äquivalent (Identität)" },
@@ -248,7 +241,6 @@
     "message": "Vorschau standardmäßig erweitern"
   },
   "expand_to_see_types_f5d29352": { "message": "{ types } erweitern" },
-  "external_link_d3f9e62a": { "message": "Externer Link" },
   "external_tools_6e77821": { "message": "Externe Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groß" },
   "extra_small_9ae33252": { "message": "Extra klein" },
@@ -309,7 +301,6 @@
   "group_files_82e5dcdb": { "message": "Gruppendateien" },
   "group_images_98e0ac17": { "message": "Gruppenbilder" },
   "group_isomorphism_45b1458c": { "message": "Gruppenisomorphismus" },
-  "group_link_63e626b3": { "message": "Gruppenverknüpfung" },
   "group_links_9493129e": { "message": "Gruppen-Links" },
   "group_media_2f3d128a": { "message": "Gruppenmedien" },
   "group_navigation_99f191a": { "message": "Gruppennavigation" },
@@ -328,7 +319,6 @@
   },
   "home_351838cd": { "message": "Start" },
   "html_code_editor_fd967a44": { "message": "HTML-Code-Editor" },
-  "html_editor_fb2ab713": { "message": "HTML-Editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ich habe die Berechtigung zur Nutzung dieser Datei erhalten."
   },
@@ -366,9 +356,7 @@
   "inference_fed5c960": { "message": "Schlussfolgerung" },
   "infinity_7a10f206": { "message": "Unendlichkeit" },
   "insert_593145ef": { "message": "Einfügen" },
-  "insert_equella_links_49a8dacd": { "message": "Equella-Links einfügen" },
   "insert_link_6dc23cae": { "message": "Link einfügen" },
-  "insert_math_equation_57c6e767": { "message": "Math. Gleichung einfügen" },
   "integers_336344e1": { "message": "Ganze Zahlen" },
   "intersection_cd4590e4": { "message": "Schnittfläche" },
   "invalid_entry_f7d2a0f5": { "message": "Ungültiger Eintrag." },
@@ -583,11 +571,9 @@
     "message": "Reeller Teil (einer komplexen Zahl)"
   },
   "record_7c9448b": { "message": "Aufnehmen" },
-  "record_upload_media_5fdce166": { "message": "Medien aufzeichnen/hochladen" },
   "red_8258edf3": { "message": "Rot" },
   "relationships_6602af70": { "message": "Beziehungen" },
   "religion_icon_246e0be1": { "message": "Religionssymbol" },
-  "remove_link_d1f2f4d0": { "message": "Link entfernen" },
   "replace_e61834a7": { "message": "Ersetzen" },
   "reset_95a81614": { "message": "Zurücksetzen" },
   "resize_ec83d538": { "message": "Größe ändern" },
@@ -630,9 +616,6 @@
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."
   },
   "save_11a80ec3": { "message": "Speichern" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Icon Maker-Symbole gespeichert"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Suchen" },
   "search_term_b2d2235": { "message": "Suchbegriff" },
@@ -647,10 +630,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O, um den Pretty HTML-Editor zu öffnen."
   },
-  "show_audio_options_b489926b": { "message": "Audiooptionen anzeigen" },
-  "show_image_options_1e2ecc6b": { "message": "Bildoptionen anzeigen" },
-  "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
-  "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Einfarbiges Bild" },
@@ -669,12 +648,6 @@
     "message": "Etwas ging schief. Überprüfen Sie Ihre Verbindung, laden Sie die Seite noch einmal und versuchen Sie es erneut."
   },
   "something_went_wrong_d238c551": { "message": "Etwas ging schief." },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Leider wissen nicht nicht, wie man das einfügt"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Leider unterstützen wir nicht mehrere Dateien."
-  },
   "sort_by_e75f9e3e": { "message": "Sortieren nach" },
   "spades_suit_b37020c2": { "message": "Pik (Spielkartenfarbe)" },
   "square_511eb3b3": { "message": "Viereck" },
@@ -800,11 +773,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Diagonaler Pfeil nach oben rechts"
   },
-  "upload_document_253f0478": { "message": "Dokument hochladen" },
   "upload_file_fd2361b8": { "message": "Datei hochladen" },
   "upload_image_6120b609": { "message": "Bild hochladen" },
   "upload_media_ce31135a": { "message": "Medien hochladen" },
-  "upload_record_media_e4207d72": { "message": "Medien hochladen/aufzeichnen" },
   "uploading_19e8a4e7": { "message": "Wird hochgeladen" },
   "uppercase_delta_d4f4bc41": { "message": "Delta In Großbuchstaben" },
   "uppercase_gamma_86f492e9": { "message": "Gamma großgeschrieben" },

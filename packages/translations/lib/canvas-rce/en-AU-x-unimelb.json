@@ -136,12 +136,10 @@
   "course_files_62deb8f8": { "message": "Subject Files" },
   "course_files_a31f97fc": { "message": "Subject files" },
   "course_images_f8511d04": { "message": "Subject Images" },
-  "course_link_b369426": { "message": "Subject Link" },
   "course_links_b56959b9": { "message": "Subject Links" },
   "course_media_ec759ad": { "message": "Subject Media" },
   "course_navigation_dd035109": { "message": "Subject Navigation" },
   "create_icon_110d6463": { "message": "Create Icon" },
-  "create_icon_maker_icon_c716bffe": { "message": "Create Icon Maker Icon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"
   },
@@ -182,7 +180,6 @@
     "message": "Display Text Link (Opens in a new tab)"
   },
   "division_sign_72190870": { "message": "Division Sign" },
-  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documents" },
   "done_54e3d4b6": { "message": "Done" },
   "double_dagger_faf78681": { "message": "Double Dagger" },
@@ -211,7 +208,6 @@
   },
   "edit_c5fbea07": { "message": "Edit" },
   "edit_course_link_5a5c3c59": { "message": "Edit Subject Link" },
-  "edit_equation_f5279959": { "message": "Edit Equation" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Existing Icon Maker Icon"
   },
@@ -236,7 +232,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variant)" },
   "equals_sign_c51bdc58": { "message": "Equals Sign" },
-  "equation_1c5ac93c": { "message": "Equation" },
   "equation_editor_39fbc3f1": { "message": "Equation Editor" },
   "equivalence_class_7b0f11c0": { "message": "Equivalence Class" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (Identity)" },
@@ -246,7 +241,6 @@
     "message": "Expand preview by Default"
   },
   "expand_to_see_types_f5d29352": { "message": "Expand to see { types }" },
-  "external_link_d3f9e62a": { "message": "External Link" },
   "external_tools_6e77821": { "message": "External Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra Large" },
   "extra_small_9ae33252": { "message": "Extra Small" },
@@ -305,7 +299,6 @@
   "group_files_82e5dcdb": { "message": "Group files" },
   "group_images_98e0ac17": { "message": "Group Images" },
   "group_isomorphism_45b1458c": { "message": "Group Isomorphism" },
-  "group_link_63e626b3": { "message": "Group Link" },
   "group_links_9493129e": { "message": "Group Links" },
   "group_media_2f3d128a": { "message": "Group Media" },
   "group_navigation_99f191a": { "message": "Group Navigation" },
@@ -324,7 +317,6 @@
   },
   "home_351838cd": { "message": "Home" },
   "html_code_editor_fd967a44": { "message": "html code editor" },
-  "html_editor_fb2ab713": { "message": "HTML Editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "I have obtained permission to use this file."
   },
@@ -360,9 +352,7 @@
   "inference_fed5c960": { "message": "Inference" },
   "infinity_7a10f206": { "message": "Infinity" },
   "insert_593145ef": { "message": "Insert" },
-  "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
   "insert_link_6dc23cae": { "message": "Insert Link" },
-  "insert_math_equation_57c6e767": { "message": "Insert Maths Equation" },
   "integers_336344e1": { "message": "Integers" },
   "intersection_cd4590e4": { "message": "Intersection" },
   "invalid_entry_f7d2a0f5": { "message": "Invalid entry." },
@@ -571,11 +561,9 @@
     "message": "Real Portion (of Complex Number)"
   },
   "record_7c9448b": { "message": "Record" },
-  "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
   "red_8258edf3": { "message": "Red" },
   "relationships_6602af70": { "message": "Relationships" },
   "religion_icon_246e0be1": { "message": "Religion Icon" },
-  "remove_link_d1f2f4d0": { "message": "Remove Link" },
   "replace_e61834a7": { "message": "Replace" },
   "reset_95a81614": { "message": "Reset" },
   "resize_ec83d538": { "message": "Resize" },
@@ -614,7 +602,6 @@
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
   "save_11a80ec3": { "message": "Save" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Saved Icon Maker Icons" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },
@@ -627,10 +614,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O to open the pretty html editor."
   },
-  "show_audio_options_b489926b": { "message": "Show audio options" },
-  "show_image_options_1e2ecc6b": { "message": "Show image options" },
-  "show_link_options_545338fd": { "message": "Show link options" },
-  "show_video_options_6ed3721a": { "message": "Show video options" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variant)" },
   "single_color_image_4e5d4dbc": { "message": "Single Colour Image" },
@@ -651,12 +634,6 @@
     "message": "Something went wrong. Check your connection, reload the page, and try again."
   },
   "something_went_wrong_d238c551": { "message": "Something went wrong" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Sorry, we don''t know how to paste that"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Sorry, we don''t support multiple files."
-  },
   "sort_by_e75f9e3e": { "message": "Sort By" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "Square" },
@@ -776,11 +753,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
-  "upload_document_253f0478": { "message": "Upload Document" },
   "upload_file_fd2361b8": { "message": "Upload File" },
   "upload_image_6120b609": { "message": "Upload Image" },
   "upload_media_ce31135a": { "message": "Upload Media" },
-  "upload_record_media_e4207d72": { "message": "Upload/Record Media" },
   "uploading_19e8a4e7": { "message": "Uploading" },
   "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
   "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },

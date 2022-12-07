@@ -144,14 +144,10 @@
   "course_files_62deb8f8": { "message": "Cursusbestanden" },
   "course_files_a31f97fc": { "message": "Cursusbestanden" },
   "course_images_f8511d04": { "message": "Cursusafbeeldingen" },
-  "course_link_b369426": { "message": "Cursuslink" },
   "course_links_b56959b9": { "message": "Cursuslinks" },
   "course_media_ec759ad": { "message": "Cursusmedia" },
   "course_navigation_dd035109": { "message": "Cursusnavigatie" },
   "create_icon_110d6463": { "message": "Pictogram maken" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Pictogrammaker-pictogram maken"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
@@ -192,7 +188,6 @@
     "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
   },
   "division_sign_72190870": { "message": "Deelteken" },
-  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documenten" },
   "done_54e3d4b6": { "message": "Gereed" },
   "double_dagger_faf78681": { "message": "Double Dagger" },
@@ -221,7 +216,6 @@
   },
   "edit_c5fbea07": { "message": "Bewerken" },
   "edit_course_link_5a5c3c59": { "message": "Cursuslink bewerken" },
-  "edit_equation_f5279959": { "message": "Vergelijking bewerken" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Bestaand Icon Maker-pictogram bewerken"
   },
@@ -246,7 +240,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Gelijkteken" },
-  "equation_1c5ac93c": { "message": "Vergelijking" },
   "equation_editor_39fbc3f1": { "message": "Vergelijkingseditor" },
   "equivalence_class_7b0f11c0": { "message": "Equivalentieklasse" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (identiteit)" },
@@ -258,7 +251,6 @@
   "expand_to_see_types_f5d29352": {
     "message": "Uitklappen om te bekijken { types }"
   },
-  "external_link_d3f9e62a": { "message": "Externe link" },
   "external_tools_6e77821": { "message": "Externe tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groot" },
   "extra_small_9ae33252": { "message": "Extra klein" },
@@ -323,7 +315,6 @@
   "group_files_82e5dcdb": { "message": "Groepsbestanden" },
   "group_images_98e0ac17": { "message": "Afbeeldingen groeperen" },
   "group_isomorphism_45b1458c": { "message": "Groepsisomorfie" },
-  "group_link_63e626b3": { "message": "Groepslink" },
   "group_links_9493129e": { "message": "Groeplinks" },
   "group_media_2f3d128a": { "message": "Media groeperen" },
   "group_navigation_99f191a": { "message": "Groepsnavigatie" },
@@ -342,7 +333,6 @@
   },
   "home_351838cd": { "message": "Startpagina" },
   "html_code_editor_fd967a44": { "message": "HTML-code-editor" },
-  "html_editor_fb2ab713": { "message": "HTML-editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ik heb toestemming gekregen om dit bestand te gebruiken."
   },
@@ -378,13 +368,7 @@
   "inference_fed5c960": { "message": "gevolgtrekking" },
   "infinity_7a10f206": { "message": "Oneindigheid" },
   "insert_593145ef": { "message": "Invoegen" },
-  "insert_equella_links_49a8dacd": {
-    "message": "Equella-koppelingen invoegen"
-  },
   "insert_link_6dc23cae": { "message": "Koppeling invoegen" },
-  "insert_math_equation_57c6e767": {
-    "message": "Wiskundige vergelijking invoeren"
-  },
   "integers_336344e1": { "message": "Gehele getallen" },
   "intersection_cd4590e4": { "message": "Snijpunt" },
   "invalid_entry_f7d2a0f5": { "message": "Ongeldige invoer." },
@@ -603,11 +587,9 @@
     "message": "Reëel deel (van complex getal)"
   },
   "record_7c9448b": { "message": "Opnemen" },
-  "record_upload_media_5fdce166": { "message": "Media opnemen/uploaden" },
   "red_8258edf3": { "message": "Rood" },
   "relationships_6602af70": { "message": "Relaties" },
   "religion_icon_246e0be1": { "message": "Religiepictogram" },
-  "remove_link_d1f2f4d0": { "message": "Link verwijderen" },
   "replace_e61834a7": { "message": "Vervangen" },
   "reset_95a81614": { "message": "Opnieuw instellen" },
   "resize_ec83d538": { "message": "Grootte wijzigen" },
@@ -648,9 +630,6 @@
     "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
   },
   "save_11a80ec3": { "message": "Opslaan" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Opgeslagen pictogrammaker-pictogrammen"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Zoeken" },
   "search_term_b2d2235": { "message": "Zoekterm" },
@@ -665,10 +644,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
-  "show_audio_options_b489926b": { "message": "Audio-opties weergeven" },
-  "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
-  "show_link_options_545338fd": { "message": "Linkopties weergeven" },
-  "show_video_options_6ed3721a": { "message": "Video-opties weergeven" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enkelkleurige afbeelding" },
@@ -689,12 +664,6 @@
     "message": "Er is iets misgegaan. Controleer je verbinding, laad de pagina opnieuw en probeer het nog eens."
   },
   "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Helaas, we weten niet hoe we dat moeten plakken"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Helaas, we bieden geen ondersteuning voor meerdere bestanden."
-  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
   "square_511eb3b3": { "message": "Vierkant" },
@@ -824,11 +793,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Pijl omhoog en rechts diagonaal"
   },
-  "upload_document_253f0478": { "message": "Document uploaden" },
   "upload_file_fd2361b8": { "message": "Bestand uploaden" },
   "upload_image_6120b609": { "message": "Afbeelding uploaden" },
   "upload_media_ce31135a": { "message": "Media uploaden" },
-  "upload_record_media_e4207d72": { "message": "Media uploaden/opnemen" },
   "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
   "uppercase_delta_d4f4bc41": { "message": "Delta in kapitalen" },
   "uppercase_gamma_86f492e9": { "message": "Gamma in kapitalen" },

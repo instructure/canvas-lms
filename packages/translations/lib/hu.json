@@ -419,9 +419,6 @@
     "course_images_f8511d04": {
         "message": "Kurzus képei"
     },
-    "course_link_b369426": {
-        "message": "Kurzus link"
-    },
     "course_links_b56959b9": {
         "message": "Kurzus linkjei"
     },
@@ -436,9 +433,6 @@
     },
     "create_icon_110d6463": {
         "message": "Ikon létrehozása"
-    },
-    "create_icon_maker_icon_c716bffe": {
-        "message": "Hozzon létre Icon Maker ikont"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons licenc:"
@@ -590,9 +584,6 @@
     "division_sign_72190870": {
         "message": "Osztás jele"
     },
-    "document_678cd7bf": {
-        "message": "Dokumentum"
-    },
     "documents_81393201": {
         "message": "Dokumentumok"
     },
@@ -646,9 +637,6 @@
     },
     "edit_course_link_5a5c3c59": {
         "message": "Kurzus hivatkozás szerkesztése"
-    },
-    "edit_equation_f5279959": {
-        "message": "Egyenlet szerkesztése"
     },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Meglévő Ikonkészítő Ikon szerkesztése"
@@ -725,9 +713,6 @@
     "equals_sign_c51bdc58": {
         "message": "Egyenlő jel"
     },
-    "equation_1c5ac93c": {
-        "message": "Egyenlet"
-    },
     "equation_editor_39fbc3f1": {
         "message": "Egyenletszerkesztő"
     },
@@ -772,9 +757,6 @@
     },
     "extended_9a58dcb6": {
         "message": "Kiterjedt"
-    },
-    "external_link_d3f9e62a": {
-        "message": "külső hivatkozás"
     },
     "external_tools_6e77821": {
         "message": "Külső eszközök"
@@ -965,9 +947,6 @@
     "group_isomorphism_45b1458c": {
         "message": "Csoport izomorfizmus"
     },
-    "group_link_63e626b3": {
-        "message": "Csoport hivatkozás"
-    },
     "group_links_9493129e": {
         "message": "Csoport hivatkozások"
     },
@@ -1024,9 +1003,6 @@
     },
     "html_code_editor_fd967a44": {
         "message": "html kódszerkesztő"
-    },
-    "html_editor_fb2ab713": {
-        "message": "HTML szerkesztő"
     },
     "hungarian_fc7d30c9": {
         "message": "Magyar"
@@ -1118,14 +1094,8 @@
     "insert_593145ef": {
         "message": "Beszúrás"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Equella linkek beszúrása"
-    },
     "insert_link_6dc23cae": {
         "message": "Link beszúrása"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "Matematikai képlet beszúrása"
     },
     "integers_336344e1": {
         "message": "Egész számok"
@@ -1784,9 +1754,6 @@
     "record_7c9448b": {
         "message": "Felvétel"
     },
-    "record_upload_media_5fdce166": {
-        "message": "Médiafájl rögzítése/feltöltése"
-    },
     "red_8258edf3": {
         "message": "Vörös"
     },
@@ -1801,9 +1768,6 @@
     },
     "reminder_date_4564d12d": {
         "message": "Emlékeztető: { date }"
-    },
-    "remove_link_d1f2f4d0": {
-        "message": "Link eltávolítása"
     },
     "replace_e61834a7": {
         "message": "Csere"
@@ -1892,9 +1856,6 @@
     "save_11a80ec3": {
         "message": "Mentés"
     },
-    "saved_icon_maker_icons_df86e2a1": {
-        "message": "Mentett Icon Maker ikonok"
-    },
     "schedule_preview_3bcda153": {
         "message": "Ütemezési előnézet"
     },
@@ -1943,20 +1904,8 @@
     "show_all_ae37d610": {
         "message": "Összes megjelenítése"
     },
-    "show_audio_options_b489926b": {
-        "message": "Hangbeállítások megjelenítése"
-    },
-    "show_image_options_1e2ecc6b": {
-        "message": "Képbeállítások mutatása"
-    },
-    "show_link_options_545338fd": {
-        "message": "Linkbeállítások mutatása"
-    },
     "show_my_grades_ebd08684": {
         "message": "Az értékeléseim mutatása"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Videóbeállítások mutatása"
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -1999,12 +1948,6 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Hiba történt!"
-    },
-    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-        "message": "Sajnáljuk, nem tudjuk, hogyan kell beilleszteni"
-    },
-    "sorry_we_don_t_support_multiple_files_fb9478b0": {
-        "message": "Sajnáljuk, nem támogatunk több fájlt."
     },
     "sort_by_e75f9e3e": {
         "message": "Rendezés alapja"
@@ -2321,9 +2264,6 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Felfelé és Jobbra Átlós Nyíl"
     },
-    "upload_document_253f0478": {
-        "message": "Dokumentum feltöltése"
-    },
     "upload_file_fd2361b8": {
         "message": "Fájl feltöltése"
     },
@@ -2332,9 +2272,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Médiafájl feltöltése"
-    },
-    "upload_record_media_e4207d72": {
-        "message": "Média feltöltés/rögzítés"
     },
     "uploading_19e8a4e7": {
         "message": "Feltöltés"

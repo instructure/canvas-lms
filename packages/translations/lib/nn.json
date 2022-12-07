@@ -419,9 +419,6 @@
     "course_images_f8511d04": {
         "message": "Hent bilde frå emnefiler"
     },
-    "course_link_b369426": {
-        "message": "Emnelenke"
-    },
     "course_links_b56959b9": {
         "message": "Emnelenker"
     },
@@ -436,9 +433,6 @@
     },
     "create_icon_110d6463": {
         "message": "Lag ikon"
-    },
-    "create_icon_maker_icon_c716bffe": {
-        "message": "Lag ikondesignar-ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
@@ -593,9 +587,6 @@
     "division_sign_72190870": {
         "message": "Divisjonssymbol"
     },
-    "document_678cd7bf": {
-        "message": "Dokument"
-    },
     "documents_81393201": {
         "message": "Dokument"
     },
@@ -652,9 +643,6 @@
     },
     "edit_course_link_5a5c3c59": {
         "message": "Rediger emnelenke"
-    },
-    "edit_equation_f5279959": {
-        "message": "Endre likning"
     },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Rediger eksisterande ikondesignar-ikon"
@@ -731,9 +719,6 @@
     "equals_sign_c51bdc58": {
         "message": "Likskapsteikn"
     },
-    "equation_1c5ac93c": {
-        "message": "Likning"
-    },
     "equation_editor_39fbc3f1": {
         "message": "Likningseditor"
     },
@@ -778,9 +763,6 @@
     },
     "extended_9a58dcb6": {
         "message": "Utvida"
-    },
-    "external_link_d3f9e62a": {
-        "message": "Ekstern lenke"
     },
     "external_tools_6e77821": {
         "message": "Eksterne verktøy"
@@ -968,9 +950,6 @@
     "group_isomorphism_45b1458c": {
         "message": "Gruppeisomorfi"
     },
-    "group_link_63e626b3": {
-        "message": "Gruppelenke"
-    },
     "group_links_9493129e": {
         "message": "Grupper lenker"
     },
@@ -1026,9 +1005,6 @@
         "message": "Heim"
     },
     "html_code_editor_fd967a44": {
-        "message": "HTML-editor"
-    },
-    "html_editor_fb2ab713": {
         "message": "HTML-editor"
     },
     "hungarian_fc7d30c9": {
@@ -1118,14 +1094,8 @@
     "insert_593145ef": {
         "message": "Set inn"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Sett inn Equella-lenker"
-    },
     "insert_link_6dc23cae": {
         "message": "Sett inn lenke"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "Sett inn matematikklikning"
     },
     "integers_336344e1": {
         "message": "Heiltal"
@@ -1781,9 +1751,6 @@
     "record_7c9448b": {
         "message": "Spel inn"
     },
-    "record_upload_media_5fdce166": {
-        "message": "Ta opp / last opp media"
-    },
     "red_8258edf3": {
         "message": "Raud"
     },
@@ -1798,9 +1765,6 @@
     },
     "reminder_date_4564d12d": {
         "message": "Påminning: { date }"
-    },
-    "remove_link_d1f2f4d0": {
-        "message": "Fjern lenke"
     },
     "replace_e61834a7": {
         "message": "Erstatt"
@@ -1886,9 +1850,6 @@
     "save_11a80ec3": {
         "message": "Lagre"
     },
-    "saved_icon_maker_icons_df86e2a1": {
-        "message": "Lagra ikondesignar-ikon"
-    },
     "schedule_preview_3bcda153": {
         "message": "Førehandsvising av timeplan"
     },
@@ -1934,20 +1895,8 @@
     "show_all_ae37d610": {
         "message": "Vis alt"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativ"
-    },
-    "show_image_options_1e2ecc6b": {
-        "message": "Vis alternativ for bilde"
-    },
-    "show_link_options_545338fd": {
-        "message": "Vis lenkealternativ"
-    },
     "show_my_grades_ebd08684": {
         "message": "Vis vurderingsresultata mine"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videoalternativ"
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -1993,12 +1942,6 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Noko gjekk gale"
-    },
-    "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-        "message": "Klarte ikkje å lime inn"
-    },
-    "sorry_we_don_t_support_multiple_files_fb9478b0": {
-        "message": "Fleire filer er ikkje støtta."
     },
     "sort_by_e75f9e3e": {
         "message": "Sorter etter"
@@ -2315,9 +2258,6 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Diagonal pil opp til høgre"
     },
-    "upload_document_253f0478": {
-        "message": "Last opp dokument"
-    },
     "upload_file_fd2361b8": {
         "message": "Last opp fil"
     },
@@ -2326,9 +2266,6 @@
     },
     "upload_media_ce31135a": {
         "message": "Last opp media"
-    },
-    "upload_record_media_e4207d72": {
-        "message": "Last opp/Ta opp media"
     },
     "uploading_19e8a4e7": {
         "message": "Lastar opp"

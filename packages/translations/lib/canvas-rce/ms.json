@@ -144,12 +144,10 @@
   "course_files_62deb8f8": { "message": "Fail Kursus" },
   "course_files_a31f97fc": { "message": "Fail kursus" },
   "course_images_f8511d04": { "message": "Imej Kursus" },
-  "course_link_b369426": { "message": "Pautan Kursus" },
   "course_links_b56959b9": { "message": "Pautan Kursus" },
   "course_media_ec759ad": { "message": "Media Kursus" },
   "course_navigation_dd035109": { "message": "Navigasi Kursus" },
   "create_icon_110d6463": { "message": "Cipta Ikon" },
-  "create_icon_maker_icon_c716bffe": { "message": "Cipta Ikon Pembuat Ikon" },
   "creative_commons_license_725584ae": { "message": "Lesen Creative Commons:" },
   "crop_image_41bf940c": { "message": "Pangkas imej" },
   "crop_image_807ebb08": { "message": "Pangkas Imej" },
@@ -185,7 +183,6 @@
     "message": "Paparkan Pautan Teks (Dibuka dalam tab baharu)"
   },
   "division_sign_72190870": { "message": "Papan Tanda Bahagian" },
-  "document_678cd7bf": { "message": "Dokumen" },
   "documents_81393201": { "message": "Dokumen" },
   "done_54e3d4b6": { "message": "Siap" },
   "double_dagger_faf78681": { "message": "Simbol Anotasi" },
@@ -207,7 +204,6 @@
   },
   "due_when_7eed10c6": { "message": "Cukup tempoh: { when }" },
   "edit_c5fbea07": { "message": "Edit" },
-  "edit_equation_f5279959": { "message": "Edit Persamaan" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Ikon Pembuat Ikon Sedia Ada"
   },
@@ -232,7 +228,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varian)" },
   "equals_sign_c51bdc58": { "message": "Tanda Sama Dengan" },
-  "equation_1c5ac93c": { "message": "Persamaan" },
   "equation_editor_39fbc3f1": { "message": "Editor Persamaan" },
   "equivalence_class_7b0f11c0": { "message": "Kelas Kesetaraan" },
   "equivalent_identity_654b3ce5": { "message": "Kesetaraan (Identiti)" },
@@ -244,7 +239,6 @@
   "expand_to_see_types_f5d29352": {
     "message": "Kembangkan untuk melihat { types }"
   },
-  "external_link_d3f9e62a": { "message": "Pautan Luar" },
   "external_tools_6e77821": { "message": "Alat Luar" },
   "extra_large_b6cdf1ff": { "message": "Amat Besar" },
   "extra_small_9ae33252": { "message": "Amat Kecil" },
@@ -301,7 +295,6 @@
   "group_files_82e5dcdb": { "message": "Fail Kumpulan" },
   "group_images_98e0ac17": { "message": "Imej Kumpulan" },
   "group_isomorphism_45b1458c": { "message": "Isomorfisme Kumpulan" },
-  "group_link_63e626b3": { "message": "Pautan Kumpulan" },
   "group_links_9493129e": { "message": "Pautan Kumpulan" },
   "group_media_2f3d128a": { "message": "Media Kumpulan" },
   "group_navigation_99f191a": { "message": "Navigasi Kumpulan" },
@@ -320,7 +313,6 @@
   },
   "home_351838cd": { "message": "Laman Utama" },
   "html_code_editor_fd967a44": { "message": "editor kod html" },
-  "html_editor_fb2ab713": { "message": "Editor HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Saya telah mendapatkan keizinan untuk menggunakan fail ini."
   },
@@ -346,11 +338,7 @@
   "inference_fed5c960": { "message": "Inferens" },
   "infinity_7a10f206": { "message": "Infiniti" },
   "insert_593145ef": { "message": "Sisipkan" },
-  "insert_equella_links_49a8dacd": { "message": "Sisipkan Pautan Equella" },
   "insert_link_6dc23cae": { "message": "Sisipkan Pautan" },
-  "insert_math_equation_57c6e767": {
-    "message": "Sisipkan Persamaan Matematik"
-  },
   "integers_336344e1": { "message": "Integer" },
   "intersection_cd4590e4": { "message": "Persilangan" },
   "invalid_entry_f7d2a0f5": { "message": "Masukan tidak sah." },
@@ -548,11 +536,9 @@
     "message": "Bahagian Sebenar (Nombor Kompleks)"
   },
   "record_7c9448b": { "message": "Rakam" },
-  "record_upload_media_5fdce166": { "message": "Rakam/Muat Naik Media" },
   "red_8258edf3": { "message": "Merah" },
   "relationships_6602af70": { "message": "Hubungan" },
   "religion_icon_246e0be1": { "message": "Ikon Agama" },
-  "remove_link_d1f2f4d0": { "message": "Alih Keluar Pautan" },
   "resize_ec83d538": { "message": "Saiz Semula" },
   "restore_auto_save_deccd84b": {
     "message": "Pulihkan penyimpanan automatik?"
@@ -591,9 +577,6 @@
     "message": "Sayangnya, editor HTML rapi tidak dapat diakses dengan papan kekunci. Dapatkan akses kepada editor HTML mentah di sini."
   },
   "save_11a80ec3": { "message": "Simpan" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Ikon Pembuat Ikon Disimpan"
-  },
   "script_l_42a7b254": { "message": "Skrip L" },
   "search_280d00bd": { "message": "Cari" },
   "search_term_b2d2235": { "message": "Kata Kunci Carian" },
@@ -605,10 +588,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift+O untuk membuka editor HTML rapi."
   },
-  "show_audio_options_b489926b": { "message": "Tunjuk pilihan audio" },
-  "show_image_options_1e2ecc6b": { "message": "Tunjuk pilihan imej" },
-  "show_link_options_545338fd": { "message": "Tunjuk pilihan pautan" },
-  "show_video_options_6ed3721a": { "message": "Tunjuk pilihan video" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Varian)" },
   "single_color_image_4e5d4dbc": { "message": "Imej Warna Tunggal" },
@@ -724,11 +703,9 @@
   "untitled_efdc2d7d": { "message": "tidak bertajuk" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Panah Barat Laut" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Panah Timur Laut" },
-  "upload_document_253f0478": { "message": "Muat Naik Dokumen" },
   "upload_file_fd2361b8": { "message": "Muat Naik Fail" },
   "upload_image_6120b609": { "message": "Muat Naik Imej" },
   "upload_media_ce31135a": { "message": "Muat Naik Media" },
-  "upload_record_media_e4207d72": { "message": "Muat Naik/Rakam Media" },
   "uploading_19e8a4e7": { "message": "Sedang memuat naik" },
   "uppercase_delta_d4f4bc41": { "message": "Delta Huruf Besar" },
   "uppercase_gamma_86f492e9": { "message": "Gama Huruf Besar" },

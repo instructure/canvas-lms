@@ -132,12 +132,10 @@
   "course_files_62deb8f8": { "message": "Fichye Kou" },
   "course_files_a31f97fc": { "message": "Fichye kou" },
   "course_images_f8511d04": { "message": "Imaj Kou" },
-  "course_link_b369426": { "message": "Lyen Kou" },
   "course_links_b56959b9": { "message": "Lyen Kou" },
   "course_media_ec759ad": { "message": "Medya Kou" },
   "course_navigation_dd035109": { "message": "Navigasyon Kou" },
   "create_icon_110d6463": { "message": "Kreye ikòn" },
-  "create_icon_maker_icon_c716bffe": { "message": "Kreye Ikòn Kreyatè Ikòn" },
   "creative_commons_license_725584ae": { "message": "Lisans Creative Commons" },
   "crop_image_41bf940c": { "message": "Koupe imaj" },
   "crop_image_807ebb08": { "message": "Koupe Imaj" },
@@ -176,7 +174,6 @@
     "message": "Lyen Afichaj Tèks (Ouvri nan yon nouvo onglè)"
   },
   "division_sign_72190870": { "message": "Siy Divizyon" },
-  "document_678cd7bf": { "message": "Dokiman" },
   "documents_81393201": { "message": "Dokiman" },
   "done_54e3d4b6": { "message": "Fini" },
   "double_dagger_faf78681": { "message": "Doub Ponya" },
@@ -205,7 +202,6 @@
   },
   "edit_c5fbea07": { "message": "Modifye" },
   "edit_course_link_5a5c3c59": { "message": "Modifye Lyen Kou" },
-  "edit_equation_f5279959": { "message": "Modifye Ekwasyon" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Modifye Ikòn Kreyatè Ikòn ki Egziste"
   },
@@ -230,7 +226,6 @@
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varyan)" },
   "equals_sign_c51bdc58": { "message": "Siy Egal" },
-  "equation_1c5ac93c": { "message": "Ekwasyon" },
   "equation_editor_39fbc3f1": { "message": "Editè Ekwasyon" },
   "equivalence_class_7b0f11c0": { "message": "Klas Ekivalans" },
   "equivalent_identity_654b3ce5": { "message": "Ekivalan (Idantite)" },
@@ -238,7 +233,6 @@
   "exists_2e62bdaa": { "message": "Egziste" },
   "expand_preview_by_default_2abbf9f8": { "message": "Elaji apèsi pa Defo" },
   "expand_to_see_types_f5d29352": { "message": "Elaji pou w wè { types }" },
-  "external_link_d3f9e62a": { "message": "Lyen Ekstèn" },
   "external_tools_6e77821": { "message": "Zouti Ekstèn" },
   "extra_large_b6cdf1ff": { "message": "Ekxtra Laj" },
   "extra_small_9ae33252": { "message": "Piti Anpil" },
@@ -295,7 +289,6 @@
   "group_files_82e5dcdb": { "message": "Gwoup fichye" },
   "group_images_98e0ac17": { "message": "Gwoupe Imaj" },
   "group_isomorphism_45b1458c": { "message": "Gwoup Izomòfis" },
-  "group_link_63e626b3": { "message": "Lyen Gwoup" },
   "group_links_9493129e": { "message": "Lyen Gwoup" },
   "group_media_2f3d128a": { "message": "Gwoupe Medya" },
   "group_navigation_99f191a": { "message": "Navigasyon Gwoup" },
@@ -314,7 +307,6 @@
   },
   "home_351838cd": { "message": "Akèy" },
   "html_code_editor_fd967a44": { "message": "editè kòd html" },
-  "html_editor_fb2ab713": { "message": "Editè HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Mwen gen otorizasyon pou itilize fichye sa a."
   },
@@ -350,9 +342,7 @@
   "inference_fed5c960": { "message": "Enferans" },
   "infinity_7a10f206": { "message": "Enfinite" },
   "insert_593145ef": { "message": "Ensere" },
-  "insert_equella_links_49a8dacd": { "message": "Ensere lyen Equella" },
   "insert_link_6dc23cae": { "message": "Ensere Lyen" },
-  "insert_math_equation_57c6e767": { "message": "Ensere Ekwasyon Matematik" },
   "integers_336344e1": { "message": "Antye" },
   "intersection_cd4590e4": { "message": "Entèseksyon" },
   "invalid_entry_f7d2a0f5": { "message": "Antre Envalid." },
@@ -555,11 +545,9 @@
     "message": "Pòsyon Reyèl (yon Nonm Konplèks)"
   },
   "record_7c9448b": { "message": "Anrejistre" },
-  "record_upload_media_5fdce166": { "message": "Anrejistre/Chaje Medya" },
   "red_8258edf3": { "message": "Wouj" },
   "relationships_6602af70": { "message": "Relasyon" },
   "religion_icon_246e0be1": { "message": "Ikòn Relijyon" },
-  "remove_link_d1f2f4d0": { "message": "Elimine Lyen" },
   "replace_e61834a7": { "message": "Ranplase" },
   "reset_95a81614": { "message": "Reinisyalize" },
   "resize_ec83d538": { "message": "Redimansyone" },
@@ -598,7 +586,6 @@
     "message": "Malerezman, bèl editè HTML la pa aksesib sou klavye. Gen aksè a bèl editè HTML la la a."
   },
   "save_11a80ec3": { "message": "Anrejistre" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Sovgade Ikòn Kreyatè Ikòn" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Chèche" },
   "search_term_b2d2235": { "message": "Tèm Rechèch" },
@@ -613,10 +600,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O pou ka ouvri bèl editè html la."
   },
-  "show_audio_options_b489926b": { "message": "Afiche opsyon odyo" },
-  "show_image_options_1e2ecc6b": { "message": "Afiche opsyon imaj" },
-  "show_link_options_545338fd": { "message": "Afiche opsyon lyen" },
-  "show_video_options_6ed3721a": { "message": "Afiche opsyon videyo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Varyan)" },
   "single_color_image_4e5d4dbc": { "message": "Imaj Yon sèl Koulè" },
@@ -635,12 +618,6 @@
     "message": "Gen yon bagay ki mal fèt. Verifye koneksyon ou, relanse paj la epi eseye ankò."
   },
   "something_went_wrong_d238c551": { "message": "Gen yon bagay ki pase mal" },
-  "sorry_we_don_t_know_how_to_paste_that_f05d939": {
-    "message": "Dezole, nou pa konn kijan pou nou kole sa a"
-  },
-  "sorry_we_don_t_support_multiple_files_fb9478b0": {
-    "message": "Dezole, nou pa rekonpet fichye miltip yo."
-  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "spades_suit_b37020c2": { "message": "Pik (Konbinezon)" },
   "square_511eb3b3": { "message": "Kare" },
@@ -758,11 +735,9 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Flèch Dyagonal Anwo e Adwat"
   },
-  "upload_document_253f0478": { "message": "Chaje Dokiman" },
   "upload_file_fd2361b8": { "message": "Transfere Fichye" },
   "upload_image_6120b609": { "message": "Transfere Imaj" },
   "upload_media_ce31135a": { "message": "Transfè Medya" },
-  "upload_record_media_e4207d72": { "message": "Transfè/Anrejistre Medya" },
   "uploading_19e8a4e7": { "message": "Chajman" },
   "uppercase_delta_d4f4bc41": { "message": "Delta an Majiskil" },
   "uppercase_gamma_86f492e9": { "message": "Gamma an Majiskil" },
