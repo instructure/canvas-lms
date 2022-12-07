@@ -40,7 +40,7 @@ import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {Spinner} from '@instructure/ui-spinner'
 import {SearchContext, DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
@@ -55,6 +55,7 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -607,7 +608,16 @@ const DiscussionSubentries = props => {
   }
 
   if (subentries.loading) {
-    return <LoadingIndicator />
+    return (
+      <Flex justifyItems="start" margin="0 large" padding="0 x-large">
+        <Flex.Item>
+          <Spinner renderTitle={I18n.t('Loading more replies')} size="x-small" />
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <Text>{I18n.t('Loading replies...')}</Text>
+        </Flex.Item>
+      </Flex>
+    )
   }
 
   return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (
