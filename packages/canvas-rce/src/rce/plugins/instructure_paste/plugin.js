@@ -93,6 +93,9 @@ tinymce.create('tinymce.plugins.InstructurePastePlugin', {
         }
         // we're pasting a file
         const file = files[0]
+        if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
+          return
+        }
         if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
           if (config.session === null) {
             showFlashAlert({
