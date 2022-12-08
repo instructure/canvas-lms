@@ -47,6 +47,12 @@ export default class DeveloperKeyModal extends React.Component {
     return `/api/v1/accounts/${this.props.ctx.params.contextId}/developer_keys`
   }
 
+  get keySavedSuccessfully() {
+    const {developerKeyCreateOrEditSuccessful, developerKeyCreateOrEditPending} =
+      this.props.createOrEditDeveloperKeyState
+    return developerKeyCreateOrEditSuccessful && !developerKeyCreateOrEditPending
+  }
+
   get developerKey() {
     return {...this.props.createOrEditDeveloperKeyState.developerKey, ...this.state.developerKey}
   }
@@ -126,6 +132,9 @@ export default class DeveloperKeyModal extends React.Component {
     return dispatch(
       createOrEditDeveloperKey({developer_key: toSubmit}, this.developerKeyUrl(), method)
     ).then(() => {
+      if (this.keySavedSuccessfully) {
+        this.props.handleSuccessfulSave()
+      }
       this.closeModal()
     })
   }
@@ -203,6 +212,7 @@ export default class DeveloperKeyModal extends React.Component {
         .then(
           () => {
             this.setState({isSaving: false})
+            this.props.handleSuccessfulSave()
             this.closeModal()
           },
           () => this.setState({isSaving: false})
