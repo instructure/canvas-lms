@@ -947,32 +947,28 @@ class Attachment < ActiveRecord::Base
   # collected (for instance, using the Tempfile class). Calling close on the
   # object may clean up things faster.
   #
-  # By default, this method will stream the file as it is read, if it's stored
-  # remotely and streaming is possible.  If opts[:need_local_file] is true,
-  # then a local Tempfile will be created if necessary and the IO object
-  # returned will always respond_to :path and :rewind, and have the right file
-  # extension.
+  # This method will return a local file object supporting #path, #rewind, etc.
+  # unless a block is given, in which case chunked data will be streamed to it.
   #
   # Be warned! If local storage is used, a File handle to the actual file will
   # be returned, not a Tempfile handle. So don't rm the file's .path or
   # anything crazy like that. If you need to test whether you can move the file
-  # at .path, or if you need to copy it, check if the file is_a?(Tempfile) (and
-  # pass :need_local_file => true of course).
+  # at .path, or if you need to copy it, check if the file is_a?(Tempfile).
   #
-  # If opts[:temp_folder] is given, and a local temporary file is created, this
+  # If +temp_folder+ is given, and a local temporary file is created, this
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
-  def open(opts = {}, &block)
+  def open(temp_folder: nil, &block)
     if instfs_hosted?
       if block
         streaming_download(&block)
       else
-        create_tempfile(opts) do |tempfile|
+        create_tempfile(temp_folder: temp_folder) do |tempfile|
           streaming_download(tempfile)
         end
       end
     else
-      store.open(opts, &block)
+      store.open(temp_folder: temp_folder, &block)
     end
   end
 
@@ -996,12 +992,12 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def create_tempfile(opts)
-    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
-      FileUtils.mkdir_p(opts[:temp_folder])
+  def create_tempfile(temp_folder: nil)
+    if temp_folder.present? && !File.exist?(temp_folder)
+      FileUtils.mkdir_p(temp_folder)
     end
     tempfile = Tempfile.new(["attachment_#{id}", extension],
-                            opts[:temp_folder].presence || Dir.tmpdir)
+                            temp_folder.presence || Dir.tmpdir)
     tempfile.binmode
     yield tempfile
     tempfile.rewind

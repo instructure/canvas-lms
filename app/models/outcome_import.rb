@@ -103,7 +103,7 @@ class OutcomeImport < ApplicationRecord
     root_account.shard.activate do
       job_started!
       I18n.locale = locale if locale.present?
-      file = attachment.open(need_local_file: true)
+      file = attachment.open
 
       Outcomes::CSVImporter.new(self, file).run do |status|
         status[:errors].each do |row, error|

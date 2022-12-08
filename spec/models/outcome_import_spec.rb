@@ -108,7 +108,7 @@ describe OutcomeImport, type: :model do
 
     def fake_attachment(file)
       instance_double(Attachment).tap do |attachment_double|
-        allow(attachment_double).to receive(:open).with(need_local_file: true).and_return(file)
+        allow(attachment_double).to receive(:open).and_return(file)
       end
     end
 
