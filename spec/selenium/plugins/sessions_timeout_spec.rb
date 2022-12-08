@@ -29,7 +29,7 @@ describe "Sessions Timeout" do
         Account.site_admin.account_users.create!(user: @user)
       end
 
-      it "requires session expiration to be at least 20 minutes" do
+      xit "requires session expiration to be at least 20 minutes" do
         get "/plugins/sessions"
         unless f("#plugin_setting_disabled").displayed?
           f("#accounts_select option:nth-child(2)").click
