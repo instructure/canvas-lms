@@ -103,7 +103,7 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
   })
 
   return (
-    <View as="div" maxWidth={responsiveSize === 'large' ? '55%' : '100%'} margin="0 auto 0 auto">
+    <View as="div" maxWidth={responsiveSize !== 'small' ? '55%' : '100%'} margin="0 auto 0 auto">
       {alerts.map(a => (
         <ExpandableErrorAlert
           key={a.category}

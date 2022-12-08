@@ -361,8 +361,8 @@ describe "course pace page" do
       click_context_link(@new_section_1.name)
 
       # There's probably a better regex here
-      expect(new_course_pace_start_date.text).to include("Determined by course start date")
-      expect(new_course_pace_end_date.text).to include("Required end date")
+      expect(new_course_pace_start_date.text).to include("Start Date")
+      expect(new_course_pace_end_date.text).to include("End Date")
     end
 
     it "shows the duration based on start and end dates in published course pace" do

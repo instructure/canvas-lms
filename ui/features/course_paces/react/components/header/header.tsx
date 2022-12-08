@@ -132,11 +132,11 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
         <View as="div" margin="small 0" borderRadius="medium" borderWidth="small" padding="medium">
           <Flex
             justifyItems="space-between"
-            direction={props.responsiveSize === 'large' ? 'row' : 'column'}
+            direction={props.responsiveSize !== 'small' ? 'row' : 'column'}
           >
             <FlexItem>
-              <Flex justifyItems={props.responsiveSize === 'large' ? 'start' : 'center'}>
-                {props.responsiveSize === 'large' ? (
+              <Flex justifyItems={props.responsiveSize !== 'small' ? 'start' : 'center'}>
+                {props.responsiveSize !== 'small' ? (
                   <FlexItem padding="0 medium 0 0">
                     <IconCoursesLine size="small" />
                   </FlexItem>
@@ -178,7 +178,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             <FlexItem
               fontSize="0.875rem"
               textAlign="center"
-              margin={props.responsiveSize === 'large' ? '0' : 'small 0 0'}
+              margin={props.responsiveSize !== 'small' ? '0' : 'small 0 0'}
             >
               <Link
                 id={generateModalLauncherId({

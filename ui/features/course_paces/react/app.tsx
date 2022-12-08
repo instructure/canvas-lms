@@ -185,10 +185,12 @@ export const ResponsiveApp: React.FC<ComponentProps> = props => (
   <Responsive
     query={{
       small: {maxWidth: '40rem'},
-      large: {minWidth: '40rem'},
+      medium: {minWidth: '40rem', maxWidth: '80rem'},
+      large: {minWidth: '80rem'},
     }}
     props={{
       small: {responsiveSize: 'small'},
+      medium: {responsiveSize: 'medium'},
       large: {responsiveSize: 'large'},
     }}
   >
