@@ -52,7 +52,11 @@ const PaceModalHeading: React.FC<Props> = ({
     if (['Section', 'Course'].includes(coursePace.context_type)) {
       return (
         <>
-          <Text>{I18n.t('Students')}</Text>
+          <Text>
+            {coursePace.context_type === 'Course'
+              ? I18n.t('Students enrolled in this course')
+              : I18n.t('Students enrolled in this section')}
+          </Text>
           <Text as="div" weight="bold">
             {paceContext?.associated_student_count}
           </Text>
