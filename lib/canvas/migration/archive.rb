@@ -95,7 +95,7 @@ module Canvas::Migration
         end
       elsif @settings[:attachment_id]
         att = Attachment.find(@settings[:attachment_id])
-        att.open(temp_folder: config[:data_folder], need_local_file: true)
+        att.open(temp_folder: config[:data_folder])
       else
         raise "No migration file found"
       end

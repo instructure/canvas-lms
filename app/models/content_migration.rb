@@ -802,7 +802,6 @@ class ContentMigration < ActiveRecord::Base
 
     config = ConfigFile.load("external_migration") || {}
     @exported_data_zip = exported_attachment.open(
-      need_local_file: true,
       temp_folder: config[:data_folder]
     )
     @exported_data_zip

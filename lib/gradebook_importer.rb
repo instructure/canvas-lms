@@ -688,7 +688,7 @@ class GradebookImporter
   end
 
   def csv_stream(&block)
-    csv_file = attachment.open(need_local_file: true)
+    csv_file = attachment.open
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
       converters: %i[nil decimal_comma_to_period],

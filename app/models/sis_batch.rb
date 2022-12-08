@@ -379,7 +379,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = if self.data[:file_path]
                    File.open(self.data[:file_path], "rb")
                  else
-                   attachment.open(need_local_file: true)
+                   attachment.open
                  end
     @data_file
   end

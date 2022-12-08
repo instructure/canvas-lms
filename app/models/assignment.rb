@@ -2603,7 +2603,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def generate_comments_from_files(_, attachment, commenter, progress)
-    file = attachment.open(need_local_file: true)
+    file = attachment.open
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
