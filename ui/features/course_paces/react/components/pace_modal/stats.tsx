@@ -84,7 +84,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   responsiveSize,
 }) => {
   const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
-  const [shrink, setShrink] = useState(responsiveSize === 'small')
+  const [shrink, setShrink] = useState(responsiveSize !== 'large')
   const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
@@ -103,7 +103,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   }
 
   useEffect(() => {
-    const isSmallScreen = responsiveSize === 'small'
+    const isSmallScreen = responsiveSize !== 'large'
     const dateFormat = isSmallScreen ? coursePaceDateShortFormatter : coursePaceDateFormatter
     setDateFormat(dateFormat)
     setShrink(isSmallScreen)
