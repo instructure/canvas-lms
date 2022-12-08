@@ -85,6 +85,7 @@ const ComposeModalManager = props => {
       conversationID: props.conversation?._id,
       participants: getReplyRecipientIDs(),
       ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
+      first: props.isForward && props.conversationMessage ? 1 : null,
     },
     notifyOnNetworkStatusChange: true,
     skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType,
