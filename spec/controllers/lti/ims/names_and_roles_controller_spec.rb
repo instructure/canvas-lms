@@ -661,6 +661,33 @@ describe Lti::IMS::NamesAndRolesController do
           end
         end
 
+        context "and the resource link contains additional custom params" do
+          let(:resource_link) do
+            rl = assignment_with_rlid_1.primary_resource_link
+            rl.update!(custom: custom_params)
+            rl
+          end
+          let(:tool) do
+            tool = super()
+            tool.settings[:custom_fields] = tool_params
+            tool.save!
+            tool
+          end
+          let(:custom_params) { { "foo" => "bar" } }
+          let(:tool_params) { { "baz" => "qux" } }
+          let(:expected_params) { custom_params.merge(tool_params).with_indifferent_access }
+          let(:rlid_param) { rlid_param_1 }
+
+          it "includes the custom params from the tool and the resource link" do
+            tool
+            resource_link
+            send_request
+            expect(json[:members][0][:message][0]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+              expected_params
+            )
+          end
+        end
+
         context "for an assignment assigned to everyone" do
           it "returns all course members" do
             send_request
@@ -1269,6 +1296,33 @@ describe Lti::IMS::NamesAndRolesController do
             let(:pass_thru_params) { super().merge(role: "http://purl.imsglobal.org/vocab/lis/v2/membership#Member") }
 
             it_behaves_like "returns assigned paginated group members"
+          end
+        end
+
+        context "and the resource link contains additional custom params" do
+          let(:resource_link) do
+            rl = assignment_with_rlid_1.primary_resource_link
+            rl.update!(custom: custom_params)
+            rl
+          end
+          let(:tool) do
+            tool = super()
+            tool.settings[:custom_fields] = tool_params
+            tool.save!
+            tool
+          end
+          let(:custom_params) { { "foo" => "bar" } }
+          let(:tool_params) { { "baz" => "qux" } }
+          let(:expected_params) { custom_params.merge(tool_params).with_indifferent_access }
+          let(:rlid_param) { rlid_param_1 }
+
+          it "includes the custom params from the tool and the resource link" do
+            tool
+            resource_link
+            send_request
+            expect(json[:members][0][:message][0]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+              expected_params
+            )
           end
         end
       end

@@ -146,6 +146,7 @@ module Api
         scope: "root_account_id" }.freeze,
     "groups" =>
         { lookups: { "sis_group_id" => "sis_source_id",
+                     "lti_context_id" => "lti_context_id",
                      "id" => "id" }.freeze,
           is_not_scoped_to_account: ["id"].freeze,
           scope: "root_account_id" }.freeze,

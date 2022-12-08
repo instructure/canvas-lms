@@ -23,6 +23,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {func} from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 export function Embed({onSubmit, onDismiss}) {
   const [embedCode, setEmbedCode] = useState('')
@@ -31,6 +32,7 @@ export function Embed({onSubmit, onDismiss}) {
     <Modal
       data-mce-component={true}
       label={formatMessage('Embed')}
+      mountNode={instuiPopupMountNode}
       size="medium"
       onDismiss={onDismiss}
       open={true}

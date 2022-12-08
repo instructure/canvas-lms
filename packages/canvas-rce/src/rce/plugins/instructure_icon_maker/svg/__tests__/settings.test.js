@@ -511,7 +511,7 @@ describe('useSvgSettings()', () => {
           imageSettings: {
             cropperSettings: {
               image: 'data:image/svg+xml;base64,aaa',
-              shape: 'circle',
+              shape: 'triangle',
             },
             image: 'data:image/svg+xml;base64,bbb',
             mode: 'Course',
@@ -539,7 +539,7 @@ describe('useSvgSettings()', () => {
             "height": 0,
             "imageSettings": Object {
               "cropperSettings": Object {
-                "shape": "circle",
+                "shape": "triangle",
               },
               "image": "data:image/svg+xml;base64,aaa",
               "mode": "Course",
@@ -574,7 +574,7 @@ describe('useSvgSettings()', () => {
           encodedImageName: 'peanut',
           imageSettings: {
             cropperSettings: {
-              shape: 'circle',
+              shape: 'triangle',
             },
             image: 'data:image/svg+xml;base64,bbb',
             mode: 'Course',
@@ -602,7 +602,7 @@ describe('useSvgSettings()', () => {
             "height": 0,
             "imageSettings": Object {
               "cropperSettings": Object {
-                "shape": "circle",
+                "shape": "triangle",
               },
               "image": "data:image/svg+xml;base64,bbb",
               "mode": "Course",
@@ -745,7 +745,7 @@ describe('useSvgSettings()', () => {
             "textPosition":"below",
             "imageSettings": {
               "cropperSettings": {
-                "shape": "circle"
+                "shape": "triangle"
               },
               "image": "data:image/svg+xml;base64,ORIGINAL"
             }
@@ -772,7 +772,7 @@ describe('useSvgSettings()', () => {
           "height": 0,
           "imageSettings": Object {
             "cropperSettings": Object {
-              "shape": "circle",
+              "shape": "triangle",
             },
             "image": "data:image/svg+xml;base64,ORIGINAL",
           },
@@ -911,6 +911,85 @@ describe('useSvgSettings()', () => {
           "externalWidth": null,
           "height": 0,
           "imageSettings": null,
+          "isDecorative": false,
+          "name": "Test Icon",
+          "originalName": "Test Icon",
+          "outlineColor": "#06A3B7",
+          "outlineSize": "small",
+          "shape": "triangle",
+          "size": "large",
+          "text": "Some Text",
+          "textBackgroundColor": "#06A3B7",
+          "textColor": "#009606",
+          "textPosition": "below",
+          "textSize": "medium",
+          "transform": "",
+          "translateX": 0,
+          "translateY": 0,
+          "type": "image/svg+xml-icon-maker-icons",
+          "width": 0,
+          "x": 0,
+          "y": 0,
+        }
+      `)
+    })
+
+    it("replaces the cropper settings shape with icon's shape it they don't match", async () => {
+      body = `
+          {
+            "name":"Test Icon",
+            "alt":"a test image",
+            "shape":"triangle",
+            "size":"large",
+            "color":"#FF2717",
+            "outlineColor":"#06A3B7",
+            "outlineSize":"small",
+            "text":"Some Text",
+            "textSize":"medium",
+            "textColor":"#009606",
+            "textBackgroundColor":"#06A3B7",
+            "textPosition":"below",
+            "imageSettings": {
+              "mode": "Course",
+              "image": "data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ==",
+              "imageName": "banana.jpg",
+              "icon": "",
+              "iconFillColor": "",
+              "cropperSettings": {
+                "shape": "square"
+              }
+            }
+          }`
+      overwriteUrl()
+
+      const {result, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, canvasOrigin)
+      )
+
+      await waitForValueToChange(() => {
+        return result.current[0]
+      })
+
+      expect(result.current[0]).toMatchInlineSnapshot(`
+        Object {
+          "alt": "a red circle",
+          "color": "#FF2717",
+          "embedImage": "data:image/svg+xml;base64,CROPPED",
+          "error": null,
+          "externalHeight": null,
+          "externalStyle": null,
+          "externalWidth": null,
+          "height": 0,
+          "imageSettings": Object {
+            "cropperSettings": Object {
+              "shape": "triangle",
+            },
+            "icon": "",
+            "iconFillColor": "",
+            "image": "data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ==",
+            "imageName": "banana.jpg",
+            "mode": "Course",
+          },
           "isDecorative": false,
           "name": "Test Icon",
           "originalName": "Test Icon",

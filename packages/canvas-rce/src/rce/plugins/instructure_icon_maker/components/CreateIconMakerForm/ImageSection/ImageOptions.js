@@ -91,7 +91,7 @@ function renderImageActionButtons({mode, collectionOpen}, dispatch, setFocus, re
   )
 }
 
-export const ImageOptions = ({state, dispatch, rcsConfig, trayDispatch}) => {
+export const ImageOptions = ({state, dispatch, mountNode, rcsConfig, trayDispatch}) => {
   const [isImageActionFocused, setIsImageActionFocused] = useState(false)
   const imageActionRef = useCallback(
     el => {
@@ -111,6 +111,7 @@ export const ImageOptions = ({state, dispatch, rcsConfig, trayDispatch}) => {
         ) : (
           <ModeSelect
             dispatch={dispatch}
+            mountNode={mountNode}
             ref={imageActionRef}
             onFocus={() => setIsImageActionFocused(true)}
             onBlur={() => setIsImageActionFocused(false)}
@@ -156,4 +157,5 @@ ImageOptions.propTypes = {
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired,
   trayDispatch: PropTypes.func.isRequired,
+  mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
 }

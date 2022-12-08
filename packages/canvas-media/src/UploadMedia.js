@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {bool, func, instanceOf, shape, string} from 'prop-types'
+import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import React, {Suspense, useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {isEqual} from 'lodash'
@@ -75,6 +75,7 @@ export class UploadMediaModal extends React.Component {
   static propTypes = {
     disableSubmitWhileUploading: bool,
     liveRegion: func,
+    mountNode: oneOfType([element, func]),
     rcsConfig: shape({
       contextId: string,
       contextType: string,
@@ -384,6 +385,7 @@ export class UploadMediaModal extends React.Component {
     return (
       <Modal
         label={UPLOAD_MEDIA_LABEL}
+        mountNode={this.props.mountNode}
         size="large"
         onDismiss={this.onModalClose}
         open={this.props.open}

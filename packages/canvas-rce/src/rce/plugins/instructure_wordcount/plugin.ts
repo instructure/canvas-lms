@@ -16,20 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tinymce, {Editor} from 'tinymce'
+import tinymce from 'tinymce'
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 
-tinymce.create('tinymce.plugins.InstructureWordcount', {
-  init(ed: Editor) {
-    ed.addCommand('instructureWordcount', clickCallback.bind(this, ed, document))
+tinymce.PluginManager.add('instructure_wordcount', function (ed) {
+  ed.addCommand('instructureWordcount', () => clickCallback(ed, document))
 
-    ed.ui.registry.addMenuItem('instructure_wordcount', {
-      text: formatMessage('Word Count'),
-      icon: 'character-count',
-      onAction: () => ed.execCommand('instructureWordcount'),
-    })
-  },
+  ed.ui.registry.addMenuItem('instructure_wordcount', {
+    text: formatMessage('Word Count'),
+    icon: 'character-count',
+    onAction: () => ed.execCommand('instructureWordcount'),
+  })
 })
-
-tinymce.PluginManager.add('instructure_wordcount', tinymce.plugins.InstructureWordcount)

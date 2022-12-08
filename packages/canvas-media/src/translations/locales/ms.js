@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,26 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const STORE = window.sessionStorage
-const KEY = 'NEE_should_reopen_advanced'
+import formatMessage from '../../format-message'
 
-const advancedPreference = {
-  isSet() {
-    return !!JSON.parse(STORE.getItem(KEY))
-  },
-
-  set() {
-    try {
-      STORE.setItem(KEY, 'true')
-    } catch (exception) {
-      // eslint-disable-next-line no-console
-      console.error(`Storing ${KEY} failed: `, exception)
-    }
-  },
-
-  clear() {
-    STORE.removeItem(KEY)
-  },
+const locale = {
+  "file_name_8fd421ff": { "message": "Nama fail" },
+  "greek_65c5b3f7": { "message": "Bahasa Greek" },
+  "loading_25990131": { "message": "Memuatkan..." },
+  "no_preview_is_available_for_this_file_f940114a": {
+    "message": "Tiada pratonton tersedia untuk fail ini."
+  }
 }
 
-export {advancedPreference as default, STORE, KEY}
+
+formatMessage.addLocale({ms: locale})

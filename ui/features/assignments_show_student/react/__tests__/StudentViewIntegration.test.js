@@ -24,6 +24,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
+  STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
   SUBMISSION_HISTORIES_QUERY,
   USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
@@ -35,6 +36,8 @@ import StudentViewQuery from '../components/StudentViewQuery'
 jest.mock('../components/AttemptSelect')
 
 describe('student view integration tests', () => {
+  const oldENV = window.ENV
+
   beforeEach(() => {
     window.ENV = {
       context_asset_string: 'test_1',
@@ -44,6 +47,10 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
+  })
+
+  afterEach(() => {
+    window.ENV = oldENV
   })
 
   describe('StudentViewQuery', () => {
@@ -235,6 +242,85 @@ describe('student view integration tests', () => {
       )
 
       expect(queryByRole('button', {name: 'View Rubric'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('peer reviews', () => {
+    function createGraphqlMocks() {
+      const mocks = [
+        {
+          query: STUDENT_VIEW_QUERY,
+          variables: {assignmentLid: '1', submissionID: '1'},
+        },
+        {
+          query: STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
+          variables: {assignmentLid: '1', submissionID: '1', reviewerSubmissionID: '2'},
+        },
+        {
+          query: SUBMISSION_HISTORIES_QUERY,
+          variables: {submissionID: '1'},
+          overrides: {
+            Node: {__typename: 'Submission'},
+            SubmissionHistoryConnection: {nodes: [{attempt: 3}, {attempt: 4}]},
+          },
+        },
+      ]
+
+      const mockResults = Promise.all(
+        mocks.map(async ({query, variables, overrides}) => {
+          const result = await mockQuery(query, overrides, variables)
+          return {
+            request: {query, variables},
+            result,
+          }
+        })
+      )
+      return mockResults
+    }
+
+    it('renders empty state when peer review mode is enabled but there are no submissions to review', async () => {
+      window.ENV.peer_review_mode_enabled = true
+      window.ENV.peer_review_available = false
+
+      const mocks = await createGraphqlMocks()
+      const {findByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+        </MockedProvider>
+      )
+      expect(
+        await findByText('There are no submissions available to review just yet.')
+      ).toBeInTheDocument()
+    })
+
+    it('does not render empty state when peer review mode is disabled', async () => {
+      window.ENV.peer_review_mode_enabled = false
+      window.ENV.peer_review_available = false
+
+      const mocks = await createGraphqlMocks()
+      const {queryByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+        </MockedProvider>
+      )
+      expect(
+        await queryByText('There are no submissions available to review just yet.')
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not render empty state when peer review mode is enabled and there are submissions to review', async () => {
+      window.ENV.peer_review_mode_enabled = true
+      window.ENV.peer_review_available = true
+
+      const mocks = await createGraphqlMocks()
+      const {queryByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+        </MockedProvider>
+      )
+      expect(
+        await queryByText('There are no submissions available to review just yet.')
+      ).not.toBeInTheDocument()
     })
   })
 })

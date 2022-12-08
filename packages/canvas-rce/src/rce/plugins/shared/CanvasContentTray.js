@@ -34,6 +34,7 @@ import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
 import {getIcon} from './linkUtils'
 import {LinkDisplay} from './LinkDisplay'
+import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
 
 /**
  * Returns the translated tray label
@@ -452,6 +453,7 @@ export default function CanvasContentTray(props) {
             filterSettings.contentSubtype,
             contentProps.contextType
           )}
+          mountNode={instuiPopupMountNode}
           open={isOpen}
           placement="end"
           size="regular"

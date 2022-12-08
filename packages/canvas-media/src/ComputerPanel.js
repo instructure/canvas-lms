@@ -79,6 +79,8 @@ export default function ComputerPanel({
 
   const handlePlayerSize = useCallback(
     _event => {
+      if (previewPanelRef.current === null) return
+
       const player = previewPanelRef.current.querySelector('video')
       let boundingBox = {width, height}
       if (document.fullscreenElement || document.webkitFullscreenElement) {

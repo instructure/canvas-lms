@@ -28,7 +28,7 @@ class ContentParticipation < ActiveRecord::Base
   belongs_to :user
 
   before_create :set_root_account_id
-  after_save :update_participation_count, if: :call_update_participation_count?
+  after_save :update_participation_count
 
   validates :content_type, :content_id, :user_id, :workflow_state, :content_item, presence: true
   validates :content_item, inclusion: { in: CONTENT_ITEMS }
@@ -61,17 +61,11 @@ class ContentParticipation < ActiveRecord::Base
     participant
   end
 
-  def call_update_participation_count?
-    return true unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
-    content.posted?
-  end
-
   def update_participation_count
     return unless saved_change_to_workflow_state?
 
     offset = if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-               unread_count_offset
+               content.posted? ? unread_count_offset : 0
              else
                ((workflow_state == "unread") ? 1 : -1)
              end
@@ -100,25 +94,15 @@ class ContentParticipation < ActiveRecord::Base
 
       participant = create_first_participation_item(participations, content, user, workflow_state, content_item)
 
-      participant ||= update_existing_participation_item(participations, workflow_state, content_item)
+      participant ||= update_existing_participation_item(participations, workflow_state, content_item, content)
 
       participant ||= add_participation_item(participations, content, user, workflow_state, content_item)
 
-      participant.save! if save_participant?(participant, content)
+      participant.save! if participant.new_record? || participant.changed?
     end
 
     participant
   end
-
-  def self.save_participant?(participant, content)
-    return true if participant.new_record?
-
-    # skip changing the read state if the submission is not posted
-    return false if !content.posted? && participant.workflow_state_changed?
-
-    participant.changed?
-  end
-  private_class_method :save_participant?
 
   def self.create_first_participation_item(participations, content, user, workflow_state, content_item)
     return if participations.any?
@@ -130,10 +114,10 @@ class ContentParticipation < ActiveRecord::Base
   end
   private_class_method :create_first_participation_item
 
-  def self.update_existing_participation_item(participations, workflow_state, content_item)
+  def self.update_existing_participation_item(participations, workflow_state, content_item, content)
     participant = participations.find { |p| p.content_item == content_item }
 
-    return participant if participant.nil? || same_workflow_state?(participant, workflow_state)
+    return participant if participant.nil? || !content.posted? || same_workflow_state?(participant, workflow_state)
 
     participations -= [participant]
 

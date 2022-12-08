@@ -148,7 +148,7 @@ export default function CommentContent(props) {
     'Add a comment to complete your peer review. You will only see comments written by you.'
   )
 
-  const peerReviewReadyText = I18n.t('You are now able to submit your peer review')
+  const peerReviewReadyText = I18n.t('Your peer review is complete!')
 
   let placeholder
   if (!props.comments.length) {

@@ -213,4 +213,72 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
       end
     end
   end
+
+  context "calculates properly alignment stats for both published and unpublished artifacts" do
+    before do
+      outcome_alignment_stats_model
+      @assignment5 = @course.assignments.create!
+      @discussion_topic = @course.discussion_topics.create!(
+        user: @teacher,
+        title: "graded discussion",
+        assignment: @assignment5
+      )
+      @rubric.associate_with(@assignment5, @course, purpose: "grading")
+
+      @course.account.enable_feature!(:outcome_alignment_summary)
+    end
+
+    def unpublish_artifacts(*args)
+      args.each do |arg|
+        arg.workflow_state = "unpublished"
+        arg.save
+      end
+    end
+
+    it "when all of the artifacts are published" do
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 4
+          expect(stats[:total_artifacts]).to eq 5
+          expect(stats[:aligned_artifacts]).to eq 3
+          expect(stats[:artifact_alignments]).to eq 3
+        end
+      end
+    end
+
+    it "when some of the artifacts are unpublished" do
+      unpublish_artifacts(@assignment1, @discussion_topic)
+
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 4
+          expect(stats[:total_artifacts]).to eq 5
+          expect(stats[:aligned_artifacts]).to eq 3
+          expect(stats[:artifact_alignments]).to eq 3
+        end
+      end
+    end
+
+    it "when all of the artifacts are unpublished" do
+      unpublish_artifacts(@assignment1, @assignment2, @assignment3, @assignment4, @discussion_topic)
+
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 4
+          expect(stats[:total_artifacts]).to eq 5
+          expect(stats[:aligned_artifacts]).to eq 3
+          expect(stats[:artifact_alignments]).to eq 3
+        end
+      end
+    end
+  end
 end

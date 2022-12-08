@@ -74,7 +74,7 @@ jest.mock('../advancedPreference', () => {
   return {
     isSet: jest.fn(),
     set: jest.fn(),
-    clear: jest.fn(),
+    remove: jest.fn(),
   }
 })
 
@@ -338,7 +338,7 @@ describe('EquationEditorModal', () => {
       advancedPreference.isSet.mockReturnValueOnce(true)
       renderModal()
       toggleMode()
-      expect(advancedPreference.clear).toHaveBeenCalled()
+      expect(advancedPreference.remove).toHaveBeenCalled()
     })
 
     it('is set when the user toggles from basic to advanced mode', () => {

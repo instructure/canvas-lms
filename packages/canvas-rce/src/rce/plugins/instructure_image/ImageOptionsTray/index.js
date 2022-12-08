@@ -31,6 +31,7 @@ import ImageOptionsForm from '../../shared/ImageOptionsForm'
 import {getTrayHeight, isExternalUrl} from '../../shared/trayUtils'
 import validateURL from '../../instructure_links/validateURL'
 import UrlPanel from '../../shared/Upload/UrlPanel'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onEntered, onExited, onRequestClose, onSave, open, isIconMaker} = props
@@ -150,6 +151,7 @@ export default function ImageOptionsTray(props) {
     <Tray
       data-mce-component={true}
       label={trayLabel}
+      mountNode={instuiPopupMountNode}
       onDismiss={onRequestClose}
       onEntered={onEntered}
       onExited={onExited}

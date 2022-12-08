@@ -21,11 +21,12 @@ import PropTypes from 'prop-types'
 import CanvasTray from '@canvas/trays/react/Tray'
 
 export default function ExternalToolDialogTray(props) {
-  const {open, label, onOpen, onClose, onCloseButton, name, children} = props
+  const {open, label, onOpen, onClose, onCloseButton, name, mountNode, children} = props
   return (
     <CanvasTray
       open={open}
       label={label}
+      mountNode={mountNode}
       title={name}
       onOpen={onOpen}
       onClose={onClose}
@@ -43,6 +44,7 @@ export default function ExternalToolDialogTray(props) {
 ExternalToolDialogTray.propTypes = {
   open: PropTypes.bool,
   label: PropTypes.string.isRequired,
+  mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,

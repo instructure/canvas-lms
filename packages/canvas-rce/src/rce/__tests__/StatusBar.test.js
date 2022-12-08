@@ -21,10 +21,12 @@ import '@testing-library/jest-dom/extend-expect'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {queryHelpers} from '@testing-library/dom'
 import keycode from 'keycode'
+import {FS_ENABLED} from '../../util/fullscreenHelpers'
 import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
 
 function defaultProps(props = {}) {
   return {
+    id: 'sb1',
     onToggleHtml: () => {},
     path: [],
     wordCount: 0,
@@ -33,6 +35,8 @@ function defaultProps(props = {}) {
     onKBShortcutModalOpen: () => {},
     onA11yChecker: () => {},
     onWordcountModalOpen: () => {},
+    onFullscreen: () => {},
+    onChangeView: () => {},
     ...props,
   }
 }
@@ -50,6 +54,10 @@ async function findDescribedByText(container) {
 }
 
 describe('RCE StatusBar', () => {
+  beforeEach(() => {
+    document[FS_ENABLED] = true
+  })
+
   it('calls callback when clicking kb shortcut button', () => {
     const onkbcallback = jest.fn()
     const {getByText} = renderStatusBar({onKBShortcutModalOpen: onkbcallback})
@@ -64,6 +72,38 @@ describe('RCE StatusBar', () => {
     const wordCountButton = getByTestId('status-bar-word-count').firstChild
     wordCountButton.click()
     expect(onWordcountCallback).toHaveBeenCalled()
+  })
+
+  it('displays all the buttons', () => {
+    const {container} = renderStatusBar()
+    expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+  })
+
+  it('omits fullscreen button when fullscreen is not enabled', () => {
+    document[FS_ENABLED] = undefined
+    const {container} = renderStatusBar()
+    expect(container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-a11y-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-wordcount-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-edit-btn"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-btn-id="rce-resize-handle"]')).toBeInTheDocument()
+  })
+
+  it('replaces fullscreen with exit fullscreen if RCE is fullscreen', () => {
+    const {container, rerender} = renderStatusBar({rceIsFullscreen: false})
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]').textContent).toEqual(
+      'Fullscreen'
+    )
+    rerender(<StatusBar {...defaultProps({rceIsFullscreen: true})} />)
+    expect(container.querySelector('[data-btn-id="rce-fullscreen-btn"]').textContent).toEqual(
+      'Exit Fullscreen'
+    )
   })
 
   describe('in WYSIWYG mode', () => {
@@ -287,13 +327,15 @@ describe('RCE StatusBar', () => {
 
       rerender(
         <StatusBar
-          onToggleHtml={() => {}}
-          path={[]}
-          wordCount={0}
-          editorView={RAW_HTML_EDITOR_VIEW}
-          onResize={() => {}}
-          onKBShortcutModalOpen={() => {}}
-          onA11yChecker={() => {}}
+          {...defaultProps({
+            onToggleHtml: () => {},
+            path: [],
+            wordCount: 0,
+            editorView: RAW_HTML_EDITOR_VIEW,
+            onResize: () => {},
+            onKBShortcutModalOpen: () => {},
+            onA11yChecker: () => {},
+          })}
         />
       )
 
@@ -308,5 +350,31 @@ describe('RCE StatusBar', () => {
     const a11yButton = getByText('Accessibility Checker')
     a11yButton.click()
     expect(onA11yCallback).toHaveBeenCalled()
+  })
+
+  describe('disabledPlugins', () => {
+    it('does not show the ally checker button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['ally_checker']})
+      const allyCheckerBtn = queryByRole('button', {name: /accessibility checker/i})
+      expect(allyCheckerBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the wordcount button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_wordcount']})
+      const wordCountBtn = queryByRole('button', {name: /0 words/i})
+      expect(wordCountBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the html view button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_html_view']})
+      const htmlViewBtn = queryByRole('button', {name: /switch to the html editor/i})
+      expect(htmlViewBtn).not.toBeInTheDocument()
+    })
+
+    it('does not show the fullscreen button when the plugin is disabled', () => {
+      const {queryByRole} = renderStatusBar({disabledPlugins: ['instructure_fullscreen']})
+      const fullscreenBtn = queryByRole('button', {name: /fullscreen/i})
+      expect(fullscreenBtn).not.toBeInTheDocument()
+    })
   })
 })

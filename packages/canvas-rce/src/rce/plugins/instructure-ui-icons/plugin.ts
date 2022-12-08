@@ -27,6 +27,7 @@ import {
   IconBulletListSquareLine,
   IconClearTextFormattingLine,
   IconDocumentLine,
+  IconExitFullScreenLine,
   IconFullScreenLine,
   IconImageLine,
   IconIndentLine,
@@ -38,14 +39,15 @@ import {
   IconRemoveLinkLine,
   IconStrikethroughLine,
   IconTextCenteredLine,
+  IconTextDirectionLtrLine,
+  IconTextDirectionRtlLine,
   IconTextEndLine,
   IconTextStartLine,
   IconTextSubscriptLine,
   IconTextSuperscriptLine,
-  IconTextDirectionLtrLine,
-  IconTextDirectionRtlLine,
   IconUnderlineLine,
 } from '@instructure/ui-icons/es/svg'
+import tinymce from 'tinymce'
 
 tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
   // the keys here are what tinymce calls it. the values are the svgs from instUI
@@ -115,6 +117,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
     rtl: IconTextDirectionRtlLine,
     'chevron-down': IconArrowOpenDownLine,
     fullscreen: IconFullScreenLine,
+    fullscreen_exit: IconExitFullScreenLine,
     // svg copied from StatusBar.js
     htmlview: {
       src: `<svg viewBox="0 0 24 24" font-size="16px" width="24" height="24" ">

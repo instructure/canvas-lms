@@ -76,7 +76,7 @@ export function isOnlyTextSelected(html) {
 
 export function isOKToLink(html) {
   // I know, parsing html with regexp is dangerous, but this is called way too often
-  // from the instructure_link/plugin.js to create the nodes for a better check
+  // from the instructure_link/plugin.ts to create the nodes for a better check
   if (/(?:<(iframe|audio|video)|data-placeholder-for)/.test(html)) {
     return false
   }

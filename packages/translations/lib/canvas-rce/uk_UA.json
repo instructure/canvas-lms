@@ -87,7 +87,6 @@
   "group_files_82e5dcdb": { "message": "Файли групи" },
   "group_navigation_99f191a": { "message": "Навігація групи" },
   "home_351838cd": { "message": "На домашню сторінку" },
-  "html_editor_fb2ab713": { "message": "HTML-редактор" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Я отримав дозвіл на використання цього файлу."
   },
@@ -101,11 +100,7 @@
   "increase_indent_6af90f7c": { "message": "Збільшити відступ" },
   "indigo_2035fc55": { "message": "Індиго" },
   "insert_593145ef": { "message": "Вставка" },
-  "insert_equella_links_49a8dacd": { "message": "Вставити посилання Equella" },
   "insert_link_6dc23cae": { "message": "Вставити посилання" },
-  "insert_math_equation_57c6e767": {
-    "message": "Вставити математичну формулу"
-  },
   "invalid_file_type_881cc9b2": { "message": "Недійсний тип файлу" },
   "invalid_url_cbde79f": { "message": "Невірний URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Гарячі клавіши" },
@@ -150,7 +145,6 @@
   "purple_7678a9fc": { "message": "Фіолетовий" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
   "record_7c9448b": { "message": "Записати" },
-  "record_upload_media_5fdce166": { "message": "Запис/завантаження медіа" },
   "red_8258edf3": { "message": "Червоний" },
   "relationships_6602af70": { "message": "Зв''язки" },
   "replace_e61834a7": { "message": "Замінити" },

@@ -410,9 +410,6 @@
     "home_351838cd": {
         "message": "Ana Sayfa"
     },
-    "html_editor_fb2ab713": {
-        "message": "HTML Düzenleyici"
-    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Bu dosyayı kullanmak için iznim var."
     },
@@ -443,14 +440,8 @@
     "insert_593145ef": {
         "message": "Ekle"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Equella Bağlantısı Ekle"
-    },
     "insert_link_6dc23cae": {
         "message": "Bağlantı Ekle"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "Matematik Denklemi Ekle"
     },
     "invalid_file_c11ba11": {
         "message": "Geçersiz Dosya"
@@ -733,9 +724,6 @@
     },
     "unpublished_dfd8801": {
         "message": "yayınlanmadı"
-    },
-    "upload_document_253f0478": {
-        "message": "Belge Yükle"
     },
     "upload_file_fd2361b8": {
         "message": "Dosya Yükle"

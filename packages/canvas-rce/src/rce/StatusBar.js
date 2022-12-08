@@ -34,9 +34,11 @@ import {
   IconKeyboardShortcutsLine,
   IconMiniArrowEndLine,
   IconFullScreenLine,
+  IconExitFullScreenLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
+import {FS_ENABLED} from '../util/fullscreenHelpers'
 
 export const WYSIWYG_VIEW = 'WYSIWYG'
 export const PRETTY_HTML_EDITOR_VIEW = 'PRETTY'
@@ -45,6 +47,8 @@ export const RAW_HTML_EDITOR_VIEW = 'RAW'
 // I don't know why eslint is reporting this, the props are all used
 /* eslint-disable react/no-unused-prop-types */
 StatusBar.propTypes = {
+  id: string.isRequired,
+  rceIsFullscreen: bool,
   onChangeView: func.isRequired,
   path: arrayOf(string),
   wordCount: number,
@@ -58,11 +62,13 @@ StatusBar.propTypes = {
   a11yBadgeColor: string,
   a11yErrorsCount: number,
   onWordcountModalOpen: func.isRequired,
+  disabledPlugins: arrayOf(string),
 }
 
 StatusBar.defaultProps = {
   a11yBadgeColor: '#0374B5',
   a11yErrorsCount: 0,
+  disabledPlugins: [],
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -126,6 +132,10 @@ export default function StatusBar(props) {
 
     return () => clearTimeout(timerid)
   }, [props.editorView]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function isAvailable(plugin) {
+    return !props.disabledPlugins.includes(plugin)
+  }
 
   function preferredHtmlEditor() {
     if (props.preferredHtmlEditor) return props.preferredHtmlEditor
@@ -262,7 +272,7 @@ export default function StatusBar(props) {
         >
           <IconKeyboardShortcutsLine />
         </IconButton>
-        {props.readOnly || renderA11yButton()}
+        {props.readOnly || (isAvailable('ally_checker') && renderA11yButton())}
       </View>
     )
   }
@@ -284,6 +294,7 @@ export default function StatusBar(props) {
           color="primary"
           onClick={props.onWordcountModalOpen}
           tabIndex={tabIndexForBtn('rce-wordcount-btn')}
+          title={formatMessage('View word and character counts')}
         >
           {wordCount}
         </CondensedButton>
@@ -346,11 +357,14 @@ export default function StatusBar(props) {
 
   function renderFullscreen() {
     if (props.readOnly) return null
+    if (!document[FS_ENABLED]) return null
     if (props.editorView === RAW_HTML_EDITOR_VIEW && !('requestFullscreen' in document.body)) {
       // this is safari, which refuses to fullscreen a textarea
       return null
     }
-    const fullscreen = formatMessage('Fullscreen')
+    const fullscreen = props.rceIsFullscreen
+      ? formatMessage('Exit Fullscreen')
+      : formatMessage('Fullscreen')
     return (
       <IconButton
         data-btn-id="rce-fullscreen-btn"
@@ -366,12 +380,13 @@ export default function StatusBar(props) {
         withBackground={false}
         withBorder={false}
       >
-        <IconFullScreenLine />
+        {props.rceIsFullscreen ? <IconExitFullScreenLine /> : <IconFullScreenLine />}
       </IconButton>
     )
   }
 
   function renderResizeHandle() {
+    if (props.rceIsFullscreen) return null
     return (
       <ResizeHandle
         data-btn-id="rce-resize-handle"
@@ -387,7 +402,8 @@ export default function StatusBar(props) {
   const flexJustify = isHtmlView() ? 'end' : 'start'
   return (
     <Flex
-      margin="x-small 0 x-small x-small"
+      id={props.id}
+      padding="x-small 0 x-small x-small"
       data-testid="RCEStatusBar"
       justifyItems={flexJustify}
       ref={statusBarRef}
@@ -400,10 +416,10 @@ export default function StatusBar(props) {
       <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}
         <div className={css(styles.separator)} />
-        {renderWordCount()}
+        {isAvailable('instructure_wordcount') && renderWordCount()}
         <div className={css(styles.separator)} />
-        {renderToggleHtml()}
-        {renderFullscreen()}
+        {isAvailable('instructure_html_view') && renderToggleHtml()}
+        {isAvailable('instructure_fullscreen') && renderFullscreen()}
         {renderResizeHandle()}
       </Flex.Item>
     </Flex>

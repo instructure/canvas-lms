@@ -43,10 +43,6 @@ export default class SideCommentDiscussionTopic extends MaterializedDiscussionTo
 
     for (const entry of this.data.entries) {
       entry.replies.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
-
-      if (ENV.DISCUSSION.SORT_BY_RATING) {
-        entry.replies.sort((a, b) => (a.rating_sum || 0) - (b.rating_sum || 0))
-      }
     }
 
     return this.data

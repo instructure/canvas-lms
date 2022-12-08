@@ -28,12 +28,15 @@ module ScheduledPublication
     if will_save_change_to_workflow_state? && workflow_state_in_database.present?
       # explicitly publishing / unpublishing the page clears publish_at
       self.publish_at = nil unless @implicitly_published
-    elsif will_save_change_to_publish_at? &&
-          publish_at&.>(Time.now.utc) &&
-          context.root_account.feature_enabled?(:scheduled_page_publication)
-      # setting a publish_at date in the future unpublishes the page
-      self.workflow_state = "unpublished"
-      @schedule_publication = true
+    elsif will_save_change_to_publish_at? && context.root_account.feature_enabled?(:scheduled_page_publication)
+      if publish_at&.>(Time.now.utc)
+        # setting a publish_at date in the future unpublishes the page
+        self.workflow_state = "unpublished"
+        @schedule_publication = true
+      else
+        # setting a publish_at date in the past publishes the page
+        self.workflow_state = "active"
+      end
     end
   end
 
