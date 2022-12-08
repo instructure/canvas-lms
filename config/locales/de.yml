@@ -18111,16 +18111,16 @@ de:
           link: "Sie können die Aufgabe hier ansehen"
     summaries: 
       email: 
-        daily_body: "Sie möchten eine tägliche Zusammenfassung einiger Benachrichtigungen zu Ihrem Canvas-Kontos erhalten. Unten sehen Sie den Bericht für den %{date}:"
+        daily_body: "Gemäß Ihren aktuellen Benachrichtigungseinstellungen erhalten Sie eine tägliche Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos. Unten sehen Sie die Zusammenfassung für den %{date}:"
         html: 
           click_to_preferences: "Klicken Sie hier, um Ihre Benachrichtigungseinstellungen zu bearbeiten."
-          daily_body: "Sie möchten eine tägliche Zusammenfassung einiger Benachrichtigungen zu Ihrem Canvas-Kontos erhalten. Unten sehen Sie den Bericht für den %{date}:"
+          daily_body: "Gemäß Ihren aktuellen Benachrichtigungseinstellungen erhalten Sie eine tägliche Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos. Unten sehen Sie die Zusammenfassung für den %{date}:"
           subject: "Aktuelle Canvas-Benachrichtigungen"
           view: "Zum Anzeigen klicken"
-          weekly_body: "Sie haben sich entschieden, eine täglichen Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos zu erhalten. Unten sehen Sie den Bericht für die Woche bis zum %{date}:"
+          weekly_body: "Gemäß Ihren aktuellen Benachrichtigungseinstellungen erhalten Sie eine wöchentliche Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos. Unten sehen Sie die Zusammenfassung für die Woche bis zum %{date}:"
         notifications_link: "Ihre Benachrichtigungseinstellungen können Sie jederzeit auf folgender Seite ändern:"
         subject: "Aktuelle Canvas-Benachrichtigungen"
-        weekly_body: "Sie haben sich entschieden, eine täglichen Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos zu erhalten.  Unten sehen Sie den Bericht für die Woche bis zum %{date}:"
+        weekly_body: "Gemäß Ihren aktuellen Benachrichtigungseinstellungen erhalten Sie eine wöchentliche Zusammenfassung bestimmter Benachrichtigungen Ihres Canvas-Benutzerkontos. Unten sehen Sie die Zusammenfassung für die Woche bis zum %{date}:"
       sms: 
         notifications_sms: "%{notifications_count} neue Benachrichtigungen unter %{url}"
       twitter: 
