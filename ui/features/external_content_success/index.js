@@ -35,27 +35,6 @@ const data = ENV.retrieved_data
 const callback = ENV.service
 let parentWindow = window.parent || window.opener
 
-ExternalContentSuccess.getIFrameSrc = function () {
-  let src = parentWindow.$('[data-cid="Modal"]').find('iframe').attr('src')
-
-  if (src === undefined) {
-    src = parentWindow.$('[data-cid="Tray"]').find('iframe').attr('src')
-  }
-
-  return src
-}
-
-ExternalContentSuccess.getLaunchType = function () {
-  const src = ExternalContentSuccess.getIFrameSrc()
-
-  if (src === undefined) {
-    return undefined
-  }
-
-  const params = new URLSearchParams(src.split('?')[1])
-  return params.get('launch_type')
-}
-
 ExternalContentSuccess.dataReady = function (data, service_id) {
   const e = $.Event('externalContentReady')
   e.contentItems = data
@@ -145,10 +124,6 @@ ExternalContentSuccess.start = async function () {
     parentWindow = parentWindow.parent
   }
 
-  if (parentWindow.$ === undefined) {
-    parentWindow.$ = $
-  }
-
   await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
 
   if (ENV.oembed) {
@@ -174,8 +149,6 @@ ExternalContentSuccess.start = async function () {
           )
         )
     )
-  } else if (ExternalContentSuccess.getLaunchType() === 'assignment_index_menu') {
-    parentWindow.location.reload()
   } else {
     ExternalContentSuccess.dataReady(data, service_id)
     ExternalContentSuccess.a2DataReady(data)
