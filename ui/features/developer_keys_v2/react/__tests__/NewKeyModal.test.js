@@ -317,31 +317,83 @@ describe('a11y checks', () => {
 
   describe('flash alerts checks', () => {
     const successfulSaveStub = jest.fn()
-    const unsuccessfulSaveStub = jest.fn()
+
+    function createWrapper(stateOverrides, actionOverrides) {
+      return mount(
+        modal({
+          createOrEditDeveloperKeyState: {
+            ...createDeveloperKeyState,
+            developerKey: {
+              ...developerKey,
+              tool_configuration: {
+                ...validToolConfig,
+              },
+            },
+            ...stateOverrides,
+          },
+          actions: {
+            ...fakeActions,
+            ...actionOverrides,
+          },
+          handleSuccessfulSave: successfulSaveStub,
+        })
+      )
+    }
 
     afterEach(() => {
       successfulSaveStub.mockClear()
-      unsuccessfulSaveStub.mockClear()
     })
-    describe('Developer Key gets edited and saved successfully', () => {
-      const updateLtiKeyStub = jest.fn().mockResolvedValue({
-        developer_key: developerKey,
-        tool_configuration: validToolConfig,
+    describe('LTI Developer Key is being created', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve({
+              developer_key: developerKey,
+              tool_configuration: validToolConfig,
+            })
+          }
+        })
+
+        const wrapper = createWrapper(
+          {isLtiKey: true},
+          {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+        )
+
+        await wrapper.instance().saveLtiToolConfiguration()
+
+        expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
       })
 
-      it('calls the provided success handler function', async () => {
-        const wrapper = mount(
-          modal({
-            createOrEditDeveloperKeyState: {
-              ...createDeveloperKeyState,
-            },
-            actions: {
-              ...fakeActions,
-              updateLtiKey: updateLtiKeyStub,
-            },
-            handleSuccessfulSave: successfulSaveStub,
-          })
+      it("doesn't flash an alert if the key fails to be created", async () => {
+        const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.reject(new Error('testing'))
+          }
+        })
+
+        const wrapper = createWrapper(
+          {isLtiKey: true},
+          {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
         )
+
+        await wrapper.instance().saveLtiToolConfiguration()
+
+        expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalled()
+        wrapper.unmount()
+      })
+    })
+
+    describe('LTI Developer Key is being edited', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const updateLtiKeyStub = jest.fn().mockResolvedValue({
+          developer_key: developerKey,
+          tool_configuration: validToolConfig,
+        })
+
+        const wrapper = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
         await wrapper
           .instance()
@@ -349,6 +401,71 @@ describe('a11y checks', () => {
 
         expect(updateLtiKeyStub).toHaveBeenCalled()
         expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
+      })
+
+      it("doesn't try to flash an alert if the key fails to save", async () => {
+        const updateLtiKeyStub = jest.fn().mockRejectedValue(null)
+        const wrapper = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
+
+        await wrapper
+          .instance()
+          .saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+
+        expect(updateLtiKeyStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalled()
+        wrapper.unmount()
+      })
+    })
+
+    // Turns out, for API keys, there's no difference in the code path taken,
+    // at least with respect to flashing an alert
+    describe('API Dev Key is being created/edited', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const createOrEditStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve(null)
+          }
+        })
+
+        // TODO: Modify this state so that it shows a key being created, not being edited.
+        const wrapper = createWrapper(
+          {
+            developerKeyCreateOrEditSuccessful: true,
+            developerKeyCreateOrEditPending: false,
+            developerKeyCreateOrEditFailed: false,
+          },
+          {createOrEditDeveloperKey: createOrEditStub}
+        )
+
+        await wrapper.instance().submitForm()
+
+        expect(createOrEditStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
+      })
+
+      it("doesn't flash an alert if the key fails to save", async () => {
+        const createOrEditStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve(null)
+          }
+        })
+
+        // TODO: Modify this state so that it shows a key being created, not being edited.
+        const wrapper = createWrapper(
+          {
+            developerKeyCreateOrEditSuccessful: false,
+            developerKeyCreateOrEditPending: false,
+            developerKeyCreateOrEditFailed: true,
+          },
+          {createOrEditDeveloperKey: createOrEditStub}
+        )
+
+        await wrapper.instance().submitForm()
+
+        expect(createOrEditStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalledTimes(1)
         wrapper.unmount()
       })
     })
