@@ -14,14 +14,14 @@ push() {
   return $?
 }
 
-git checkout -B sync-translations-media && \
+git checkout -q -B sync-translations-media && \
   git add -A src && \
   git commit -m "[i18n] Update canvas-media translations." && \
   push
 
 echo $OUTPUT
 
-git checkout $CURRENT_BRANCH
+git checkout -q $CURRENT_BRANCH
 
 if [ ! -z "$OUTPUT" ]; then
   URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+')
