@@ -580,6 +580,14 @@ describe CoursePace do
       expect(result[:end_date_context]).to eq("term")
     end
 
+    it "returns section end date if applicable" do
+      other_section = @course.course_sections.create! name: "other_section", end_at: "2022-01-30"
+      section_plan = @course.course_paces.create! course_section: other_section
+      result = section_plan.effective_end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-30"))
+      expect(result[:end_date_context]).to eq("section")
+    end
+
     it "returns nil if no fixed date is available" do
       @course.restrict_enrollments_to_course_dates = false
       @course.enrollment_term.update start_at: nil, end_at: nil

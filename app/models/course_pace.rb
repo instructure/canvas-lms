@@ -318,12 +318,14 @@ class CoursePace < ActiveRecord::Base
 
     is_student_plan = course.student_enrollments.find_by(user_id: user_id).present? if user_id
 
-    date = ((is_student_plan || hard_end_dates) && self[:end_date]) || range_end
+    date = ((is_student_plan || hard_end_dates) && self[:end_date]) || course_section&.end_at || range_end
     date = date&.to_date
 
     if with_context
       context = if is_student_plan
                   "user"
+                elsif course_section&.end_at
+                  "section"
                 elsif date
                   hard_end_dates ? "hard" : valid_date_range.end_at[:date_context]
                 else
