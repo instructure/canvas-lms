@@ -88,12 +88,13 @@ tinymce.PluginManager.add('instructure_paste', function (ed) {
   const store = initStore(bridge.trayProps.get(ed))
 
   function handlePasteOrDrop(event) {
-    event.preventDefault()
+    if (event.instructure_handled_already) return
     const cbdata = event.clipboardData || event.dataTransfer // paste || drop
     const files = cbdata.files
     const types = cbdata.types
 
     if (types.includes('Files')) {
+      event.preventDefault()
       if (files.length > 1) {
         handleMultiFilePaste(files)
         return
@@ -142,17 +143,10 @@ tinymce.PluginManager.add('instructure_paste', function (ed) {
           }
         })
       }
-    } else if (types.includes('text/html')) {
-      const text = cbdata.getData('text/html')
-      ed.execCommand('mceInsertContent', false, text)
-    } else if (types.includes('text/plain')) {
-      const text = cbdata.getData('text/plain')
-      ed.execCommand('mceInsertContent', false, text)
     } else {
-      showFlashAlert({
-        message: formatMessage("Sorry, we don't know how to paste that"),
-        type: 'info',
-      } as TsMigrationAny)
+      // delegate to tinymce and prevent infinite recursion
+      event.instructure_handled_already = true
+      ed.fire('paste', event)
     }
   }
   ed.on('paste', handlePasteOrDrop)
