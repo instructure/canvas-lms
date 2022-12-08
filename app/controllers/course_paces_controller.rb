@@ -64,7 +64,8 @@ class CoursePacesController < ApplicationController
              COURSE_PACE: CoursePacePresenter.new(@course_pace).as_json,
              COURSE_PACE_PROGRESS: @progress_json,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
-             MASTER_COURSE_DATA: master_course_data
+             MASTER_COURSE_DATA: master_course_data,
+             IS_MASQUERADING: @current_user && @real_current_user && @real_current_user != @current_user
            })
 
     js_bundle :course_paces

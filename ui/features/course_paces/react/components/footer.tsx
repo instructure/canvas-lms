@@ -108,6 +108,7 @@ export const Footer: React.FC<ComponentProps> = ({
 }) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
+  const userIsMasquerading = window.ENV.IS_MASQUERADING
   const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
 
   const handlePublish = useCallback(() => {
@@ -215,7 +216,7 @@ export const Footer: React.FC<ComponentProps> = ({
   }
 
   return (
-    <View as="div" width="100%">
+    <View as="div" width="100%" margin={useRedesign && userIsMasquerading ? '0 0 x-large' : '0'}>
       {showCondensedView && (
         <View as="div" textAlign="center" borderWidth="0 0 small 0" padding="xx-small">
           {renderChangesIndicator()}
