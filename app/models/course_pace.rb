@@ -319,6 +319,13 @@ class CoursePace < ActiveRecord::Base
     is_student_plan = course.student_enrollments.find_by(user_id: user_id).present? if user_id
 
     date = ((is_student_plan || hard_end_dates) && self[:end_date]) || course_section&.end_at || range_end
+
+    if is_student_plan
+      date ||= CoursePaceDueDatesCalculator
+               .new(self)
+               .get_due_dates(course_pace_module_items, start_date: Date.today)[course_pace_module_items.last&.module_item_id]
+    end
+
     date = date&.to_date
 
     if with_context
