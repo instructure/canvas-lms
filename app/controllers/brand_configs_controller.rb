@@ -224,7 +224,7 @@ class BrandConfigsController < ApplicationController
     progress = Progress.new(context: @current_user, tag: :brand_config_save_and_sync_to_s3)
     progress.user = @current_user
     progress.reset!
-    progress.process_job(brand_config, :save_and_sync_to_s3!, priority: Delayed::HIGH_PRIORITY)
+    progress.process_job(brand_config, :save_and_sync_to_s3!, { priority: Delayed::HIGH_PRIORITY })
     progress
   end
 

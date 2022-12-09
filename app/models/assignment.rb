@@ -1379,8 +1379,11 @@ class Assignment < ActiveRecord::Base
   def refresh_course_content_participation_counts
     progress = context.progresses.build(tag: "refresh_content_participation_counts")
     progress.save!
-    progress.process_job(context, :refresh_content_participation_counts,
-                         singleton: "refresh_content_participation_counts:#{context.global_id}")
+    progress.process_job(
+      context,
+      :refresh_content_participation_counts,
+      { singleton: "refresh_content_participation_counts:#{context.global_id}" }
+    )
   end
 
   def time_zone_edited
