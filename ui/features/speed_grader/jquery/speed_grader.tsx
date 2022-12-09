@@ -2775,6 +2775,7 @@ EG = {
         this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
         externalToolLoaded = true
       } else {
+        QuizzesNextSpeedGrading.postChangeSubmissionVersionMessage($iframe_holder, submission)
         $iframe_holder.show()
       }
     } else {
