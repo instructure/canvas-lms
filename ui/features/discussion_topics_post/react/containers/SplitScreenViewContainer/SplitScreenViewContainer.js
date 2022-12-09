@@ -544,7 +544,7 @@ export const SplitScreenViewContainer = props => {
       <Flex>
         <Flex.Item width="480px" shouldGrow={true} shouldShrink={true}>
           <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
-            Thread
+            {I18n.t('Thread')}
           </Heading>
         </Flex.Item>
         <Flex.Item>
