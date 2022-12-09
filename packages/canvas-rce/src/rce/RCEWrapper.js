@@ -1460,6 +1460,10 @@ class RCEWrapper extends React.Component {
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
+    const pastePlugins =
+      rcsExists && RCEGlobals.getFeatures().rce_better_paste
+        ? ['instructure_paste', 'paste']
+        : ['paste']
 
     if (
       rcsExists &&
@@ -1631,7 +1635,7 @@ class RCEWrapper extends React.Component {
           'a11y_checker',
           'wordcount',
           'instructure_wordcount',
-          rcsExists && RCEGlobals.getFeatures().rce_better_paste ? 'instructure_paste' : 'paste',
+          ...pastePlugins,
           ...canvasPlugins,
         ],
         // filter out the plugins designated for removal
