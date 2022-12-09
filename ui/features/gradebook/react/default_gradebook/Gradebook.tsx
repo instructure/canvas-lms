@@ -833,7 +833,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.initGrid()
     this.initHeader()
     this.gridReady.resolve(null)
-    this.addOverridesToPostGradesStore(this.props.sisOverrides)
+    if (this.options.post_grades_feature) {
+      this.addOverridesToPostGradesStore(this.props.sisOverrides)
+    }
   }
 
   setupGrading = (students: GradebookStudent[]): void => {
@@ -1961,7 +1963,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradebookExportUrl: this.options.export_gradebook_csv_url,
       postGradesLtis: this.postGradesLtis,
       postGradesFeature: {
-        enabled: this.options.post_grades_feature != null && !this.disablePostGradesFeature,
+        enabled: this.options.post_grades_feature && !this.disablePostGradesFeature,
         returnFocusTo: focusReturnPoint,
         label: this.options.sis_name,
         store: this.postGradesStore,
