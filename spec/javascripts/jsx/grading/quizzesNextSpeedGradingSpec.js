@@ -271,4 +271,23 @@ QUnit.module('QuizzesNextSpeedGrading', suiteHooks => {
       )
     })
   })
+
+  QUnit.module('postChangeSubmissionVersionMessage', () => {
+    test('posts a message with the external_tool_url set to show quiz attempt', () => {
+      const submission = {
+        url: 'http://quiz-lti.docker/lti/launch?participant_session_id=1&quiz_session_id=1',
+      }
+      QuizzesNextSpeedGrading.postChangeSubmissionVersionMessage(fakeIframeHolder, submission)
+      ok(
+        postMessageStub.calledOnceWith({
+          subject: 'canvas.speedGraderSubmissionChange',
+          submission: {
+            ...submission,
+            external_tool_url:
+              'http://quiz-lti.docker/lti/launch?participant_session_id=1&quiz_session_id=1',
+          },
+        })
+      )
+    })
+  })
 })

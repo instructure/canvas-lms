@@ -104,7 +104,19 @@ export function postGradeByQuestionChangeMessage($iframe_holder, enabled) {
   sendPostMessage($iframe_holder, message)
 }
 
+export function postChangeSubmissionVersionMessage($iframe_holder, submission) {
+  const message = {
+    subject: 'canvas.speedGraderSubmissionChange',
+    submission: {...submission, external_tool_url: submission.url},
+  }
+  const contentWindow = $iframe_holder.children()[0]?.contentWindow
+  if (contentWindow) {
+    contentWindow.postMessage(message, '*')
+  }
+}
+
 export default {
   setup,
   postGradeByQuestionChangeMessage,
+  postChangeSubmissionVersionMessage,
 }
