@@ -64,7 +64,7 @@ class Attachments::LocalStorage
     ["Signature", signature]
   end
 
-  def open(**)
+  def open(...)
     if block_given?
       File.open(attachment.full_filename, "rb") do |file|
         chunk = file.read(4096)
