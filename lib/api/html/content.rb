@@ -186,7 +186,7 @@ module Api
       end
 
       def parsed_html
-        @parsed_html ||= Nokogiri::HTML5.fragment(html, nil, CanvasSanitize::SANITIZE[:parser_options])
+        @parsed_html ||= Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
       end
 
       def apply_user_content_attributes(node, user_content)
