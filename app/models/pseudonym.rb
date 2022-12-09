@@ -35,7 +35,6 @@ class Pseudonym < ActiveRecord::Base
   validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
   validates_presence_of :account_id
   validate :must_be_root_account
-  validates :integration_id, uniqueness: true
   # allows us to validate the user and pseudonym together, before saving either
   validates_each :user_id do |record, attr, value|
     record.errors.add(attr, "blank?") unless value || record.user
