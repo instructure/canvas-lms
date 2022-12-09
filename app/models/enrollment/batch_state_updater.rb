@@ -96,7 +96,7 @@ class Enrollment::BatchStateUpdater
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
     updates = { workflow_state: workflow_state, updated_at: Time.now.utc }
     updates[:sis_batch_id] = sis_batch.id if sis_batch
-    Enrollment.where(id: batch).update_all_locked_in_order(updates)
+    Enrollment.where(id: batch).update_all_locked_in_order(**updates)
     data
   end
 
