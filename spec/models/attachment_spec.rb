@@ -2289,6 +2289,23 @@ describe Attachment do
         expect(file).to be_a(Tempfile)
         expect(file.read).to eq("test response body")
       end
+
+      it "retries without duplicating already downloaded data" do
+        # WebMock operates at too high a level to simulate a read timeout, so we'll hack the Tempfile
+        # to raise one after the first write to it so we can test the exception flow
+        raised = false
+        allow(CanvasHttp::CircuitBreaker).to receive(:trip_if_necessary)
+        expect_any_instance_of(Tempfile).to receive(:<<).at_least(:once).and_wrap_original do |m, *args|
+          m.call(*args)
+          unless raised
+            raised = true
+            raise Net::ReadTimeout
+          end
+        end
+        file = @attachment.open
+        expect(file).to be_a(Tempfile)
+        expect(file.read).to eq("test response body")
+      end
     end
 
     context "s3_storage" do

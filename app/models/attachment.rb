@@ -978,14 +978,31 @@ class Attachment < ActiveRecord::Base
   # (you should call #open instead of this)
   private def streaming_download(dest = nil, &block)
     retries ||= 0
+    bytes_read ||= 0
+
+    # avoid corrupting the output stream if we retry after data has been received
+    can_retry = -> { bytes_read == 0 || (!block && dest.respond_to?(:rewind) && dest.respond_to?(:truncate)) }
+    prep_retry = lambda do
+      if bytes_read > 0
+        dest.rewind
+        dest.truncate(0)
+        bytes_read = 0
+      end
+    end
+
     CanvasHttp.get(public_url) do |response|
       raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
-      response.read_body(dest, &block)
+      response.read_body do |data|
+        bytes_read += data.size
+        dest << data if dest
+        yield(data) if block
+      end
     end
-  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
-    if (retries += 1) < Setting.get(:streaming_download_retries, "5").to_i
+  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout, IOError, Errno::ECONNRESET, Errno::ECONNABORTED, Errno::ETIMEDOUT => e
+    if can_retry.call && (retries += 1) < Setting.get(:streaming_download_retries, "5").to_i
       Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
       retry
     else
       raise e
