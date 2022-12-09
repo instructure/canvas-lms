@@ -194,7 +194,7 @@ class InfoController < ApplicationController
       # returns a boolean
       jobs: check.call { Delayed::Job.connection.active? },
       # returns a boolean
-      postgresql: check.call { Account.connection.active? },
+      postgresql: check.call { Account.connection.active? && GuardRail.activate(:secondary) { Account.connection.active? } },
       # nil response treated as truthy
       ha_cache: check.call { MultiCache.cache.fetch("readiness").nil? },
       # ensures `gulp rev` has ran; returns a string, treated as truthy
