@@ -17,63 +17,48 @@
  */
 
 import formatMessage from '../../../../format-message'
+import {Editor} from 'tinymce'
+import {toolbarIconHelperFor} from '../../../../util/tinymce-plugin-util'
 
-export default function register(editor) {
-  const superAndSub = [
+export default function register(editor: Editor) {
+  const styleInfos = [
     {
-      name: 'superscript',
+      icon: 'superscript',
       text: formatMessage('Superscript'),
       cmd: 'Superscript',
     },
     {
-      name: 'subscript',
+      icon: 'subscript',
       text: formatMessage('Subscript'),
       cmd: 'Subscript',
     },
   ]
+
   const buttonLabel = formatMessage('Superscript and Subscript')
+  const defaultIcon = styleInfos[0].icon
 
-  editor.ui.registry.addSplitButton('inst_superscript', {
+  editor.ui.registry.addMenuButton('inst_superscript', {
     tooltip: buttonLabel,
-    icon: 'superscript',
-    fetch: callback => {
-      const items = superAndSub.map(button => {
-        return {
-          type: 'choiceitem',
+    icon: defaultIcon,
+    fetch: callback =>
+      callback(
+        styleInfos.map(button => ({
+          type: 'menuitem',
           value: button.cmd,
-          icon: button.name,
+          icon: button.icon,
           text: button.text,
-        }
-      })
-      callback(items)
-    },
-
-    onAction: () => {
-      const activeSetting = superAndSub.find(b => editor.formatter.match(b.name))
-      const cmd = activeSetting ? activeSetting.cmd : 'Superscript'
-      editor.execCommand(cmd)
-    },
-
-    onItemAction: (splitButtonApi, value) => editor.execCommand(value),
-
-    select: value => {
-      const button = superAndSub.find(b => b.cmd === value)
-      return editor.formatter.match(button.name)
-    },
+          onAction: () => editor.execCommand(button.cmd),
+        }))
+      ),
 
     onSetup: api => {
-      const $svgContainer = editor.$(
-        `.tox-split-button[aria-label="${buttonLabel}"] .tox-icon`,
-        document
-      )
-      const allIcons = editor.ui.registry.getAll().icons
-      function nodeChangeHandler() {
-        const activeButton = superAndSub.find(b => editor.formatter.match(b.name))
-        const icon = activeButton ? activeButton.name : 'superscript'
+      const iconHelper = toolbarIconHelperFor(editor, buttonLabel)
 
-        const svg = allIcons[icon]
-        api.setActive(!!activeButton)
-        $svgContainer.html(svg)
+      function nodeChangeHandler() {
+        const activeStyleInfo = styleInfos.find(b => editor.formatter.match(b.icon))
+
+        api.setActive(!!activeStyleInfo)
+        iconHelper.updateIcon(activeStyleInfo?.icon || defaultIcon)
       }
 
       nodeChangeHandler()

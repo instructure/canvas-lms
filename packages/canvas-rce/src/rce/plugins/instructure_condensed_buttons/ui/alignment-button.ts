@@ -17,8 +17,10 @@
  */
 
 import formatMessage from '../../../../format-message'
+import {Editor} from 'tinymce'
+import {toolbarIconHelperFor} from '../../../../util/tinymce-plugin-util'
 
-export default function (editor) {
+export default function (editor: Editor) {
   const alignToolbarButtons = [
     {
       name: 'alignleft',
@@ -42,47 +44,29 @@ export default function (editor) {
 
   const alignButtonLabel = formatMessage('Align')
 
-  editor.ui.registry.addSplitButton('align', {
+  editor.ui.registry.addMenuButton('align', {
     tooltip: alignButtonLabel,
     icon: 'align-left',
-    fetch: callback => {
-      const items = alignToolbarButtons.map(button => {
-        return {
-          type: 'choiceitem',
+    fetch: callback =>
+      callback(
+        alignToolbarButtons.map(button => ({
+          type: 'menuitem',
           value: button.cmd,
           icon: button.icon,
           text: button.text,
-        }
-      })
-      callback(items)
-    },
-
-    onAction: () => {
-      const activeAlignment = alignToolbarButtons.find(b => editor.formatter.match(b.name))
-      const cmd = activeAlignment ? activeAlignment.cmd : 'JustifyLeft'
-      editor.execCommand(cmd)
-    },
-
-    onItemAction: (splitButtonApi, value) => editor.execCommand(value),
-
-    select: value => {
-      const button = alignToolbarButtons.find(b => b.cmd === value)
-      return editor.formatter.match(button.name)
-    },
+          onAction: () => editor.execCommand(button.cmd),
+        }))
+      ),
 
     onSetup: api => {
-      const $svgContainer = editor.$(
-        `.tox-split-button[aria-label="${alignButtonLabel}"] .tox-icon`,
-        document
-      )
-      const allIcons = editor.ui.registry.getAll().icons
+      const iconHelper = toolbarIconHelperFor(editor, alignButtonLabel)
 
       function nodeChangeHandler() {
         const activeAlignment = alignToolbarButtons.find(b => editor.formatter.match(b.name))
         const icon = activeAlignment ? activeAlignment.icon : 'align-left'
-        const svg = allIcons[icon]
+
         api.setActive(!!activeAlignment)
-        $svgContainer.html(svg)
+        iconHelper.updateIcon(icon)
       }
 
       nodeChangeHandler()

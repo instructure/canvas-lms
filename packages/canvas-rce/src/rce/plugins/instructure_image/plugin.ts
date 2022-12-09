@@ -102,25 +102,19 @@ tinymce.PluginManager.add('instructure_image', function (editor) {
       }),
   })
 
-  // Register buttons
-  editor.ui.registry.addSplitButton('instructure_image', {
+  // Register toolbar button
+  editor.ui.registry.addMenuButton('instructure_image', {
     tooltip: formatMessage('Images'),
     icon: 'image',
-    fetch(callback) {
+    fetch: callback =>
       callback(
         getMenuItems(editor).map(item => ({
-          type: 'choiceitem',
+          type: 'menuitem',
           text: item.text,
           value: item.value,
+          onAction: () => doMenuItem(editor, item.value),
         }))
-      )
-    },
-    onAction(api) {
-      if (!api.isDisabled()) {
-        doMenuItem(editor, 'instructure_upload_image')
-      }
-    },
-    onItemAction: (_splitButtonApi, value) => doMenuItem(editor, value),
+      ),
     onSetup(api) {
       function handleNodeChange(_e) {
         api.setDisabled(!isOKToLink(editor.selection.getContent()))

@@ -106,26 +106,18 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
   })
 
   // Register buttons
-  ed.ui.registry.addSplitButton('instructure_record', {
+  ed.ui.registry.addMenuButton('instructure_record', {
     tooltip: formatMessage('Record/Upload Media'),
     icon: 'video',
     fetch: callback =>
       callback(
-        getMenuItems(ed).map(item => {
-          return {
-            type: 'choiceitem',
-            text: item.text,
-            value: item.value,
-          }
-        })
+        getMenuItems(ed).map(item => ({
+          type: 'menuitem',
+          text: item.text,
+          value: item.value,
+          onAction: () => doMenuItem(ed, item.value),
+        }))
       ),
-    onAction(api) {
-      if (!api.isDisabled()) {
-        const first = getMenuItems(ed)[0].value
-        doMenuItem(ed, first)
-      }
-    },
-    onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
     onSetup(api) {
       function handleNodeChange(_e) {
         api.setDisabled(!isOKToLink(ed.selection.getContent()))

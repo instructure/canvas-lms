@@ -98,26 +98,21 @@ tinymce.PluginManager.add('instructure_documents', function (ed) {
       }),
   })
 
-  // Register button
-  ed.ui.registry.addSplitButton('instructure_documents', {
+  // Register toolbar button
+  ed.ui.registry.addMenuButton('instructure_documents', {
     tooltip: formatMessage('Documents'),
     icon: 'document',
     fetch: callback =>
       callback(
         getMenuItems(ed).map(item => ({
-          type: 'choiceitem',
+          type: 'menuitem',
           text: item.text,
           value: item.value,
+          onAction: () => doMenuItem(ed, item.value),
         }))
       ),
-    onAction(api) {
-      if (!api.isDisabled()) {
-        doMenuItem(ed, 'instructure_upload_document')
-      }
-    },
-    onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
     onSetup(api) {
-      function handleNodeChange(_e) {
+      function handleNodeChange() {
         api.setDisabled(!isOKToLink(ed.selection.getContent()))
       }
       setTimeout(handleNodeChange)
