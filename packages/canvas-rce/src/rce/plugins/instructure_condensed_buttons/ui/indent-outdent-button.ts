@@ -17,14 +17,9 @@
  */
 
 import formatMessage from '../../../../format-message'
+import {Editor} from 'tinymce'
 
-export default function register(editor) {
-  const baseIndentButton = {
-    tooltip: formatMessage('Increase Indent'),
-    icon: 'indent',
-    onAction: () => editor.execCommand('indent'),
-  }
-
+export default function register(editor: Editor) {
   const indentButtons = [
     {
       name: 'indent',
@@ -38,32 +33,21 @@ export default function register(editor) {
     },
   ]
 
-  editor.ui.registry.addSplitButton('inst_indent', {
-    ...baseIndentButton,
-    fetch: callback => {
-      const items = indentButtons.map(button => {
-        return {
-          type: 'choiceitem',
+  const buttonLabel = formatMessage('Increase Indent')
+
+  editor.ui.registry.addMenuButton('inst_indent', {
+    tooltip: buttonLabel,
+    icon: 'indent',
+
+    fetch: callback =>
+      callback(
+        indentButtons.map(button => ({
+          type: 'menuitem',
           value: button.cmd,
           icon: button.name,
           text: button.text,
-        }
-      })
-      callback(items)
-    },
-    onAction: () => {
-      const cmd = 'indent'
-      editor.execCommand(cmd)
-    },
-    onItemAction: (splitButtonApi, value) => editor.execCommand(value),
-    onSetup: () => {
-      function onNodeChange() {
-        editor.$(`.tox-split-button[aria-label="${baseIndentButton.tooltip}"] .tox-tbtn`, document)
-      }
-      setTimeout(onNodeChange) // hide one of the buttons on first render
-
-      editor.on('NodeChange', onNodeChange)
-      return () => editor.off('NodeChange', onNodeChange)
-    },
+          onAction: () => editor.execCommand(button.cmd),
+        }))
+      ),
   })
 }

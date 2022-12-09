@@ -103,8 +103,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
 
       click_pages_accordion
       click_course_item_link(title)
@@ -128,8 +127,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         select_all_in_tiny(f("#wiki_page_body"))
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_pages_accordion
         click_course_item_link(title)
@@ -221,8 +219,10 @@ describe "RCE next tests", ignore_js_errors: true do
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
         )
         visit_existing_wiki_edit(@course, "title")
+
+        select_all_in_tiny(f("#wiki_page_body"))
+
         f("##{rce_page_body_ifr_id}").click
-        f("##{rce_page_body_ifr_id}").send_keys([:control, "a"])
         f("##{rce_page_body_ifr_id}").send_keys(:backspace)
 
         in_frame rce_page_body_ifr_id do
@@ -245,8 +245,7 @@ describe "RCE next tests", ignore_js_errors: true do
           f("#lnk").send_keys(%i[end return])
         end
 
-        click_document_toolbar_menu_button
-        click_course_documents
+        click_course_documents_toolbar_menuitem
         wait_for_ajaximations
 
         click_document_link(title)
@@ -306,8 +305,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -326,8 +324,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_quizzes_accordion
         click_course_item_link(title)
@@ -344,8 +341,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_announcements_accordion
         click_course_item_link(title)
@@ -364,8 +360,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_discussions_accordion
         click_course_item_link(title)
@@ -384,8 +379,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_modules_accordion
         click_course_item_link(title)
@@ -400,8 +394,7 @@ describe "RCE next tests", ignore_js_errors: true do
         title = "Files"
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_navigation_accordion
         click_course_item_link(title)
@@ -418,8 +411,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_announcement_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -439,8 +431,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_assignment_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_modules_accordion
         click_course_item_link(title)
@@ -456,8 +447,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_discussion_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
         click_course_item_link(title)
 
@@ -476,8 +466,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_quiz_page(@course, @quiz)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -497,8 +486,7 @@ describe "RCE next tests", ignore_js_errors: true do
         visit_syllabus(@course)
         click_edit_syllabus
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -521,8 +509,7 @@ describe "RCE next tests", ignore_js_errors: true do
         switch_to_editor_view
 
         def switch_trays
-          click_links_toolbar_menu_button
-          click_course_links
+          click_course_links_toolbar_menuitem
           wait_for_ajaximations
           expect(course_links_tray).to be_displayed
 
@@ -552,8 +539,8 @@ describe "RCE next tests", ignore_js_errors: true do
         @assignment = @course.assignments.create!(name: title, workflow_state: "published")
 
         visit_new_announcement_page(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
 
         expect(assignment_published_status).to be_displayed
@@ -562,8 +549,7 @@ describe "RCE next tests", ignore_js_errors: true do
         @assignment.save!
         visit_new_announcement_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         expect(assignment_unpublished_status).to be_displayed
       end
@@ -575,8 +561,8 @@ describe "RCE next tests", ignore_js_errors: true do
           @course.assignments.create!(name: title, workflow_state: "published", due_at: due_at)
 
         visit_new_announcement_page(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
         wait_for_ajaximations
         expect(assignment_due_date_exists?(due_at)).to eq true
@@ -598,8 +584,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
           visit_front_page_edit(@course)
 
-          click_links_toolbar_menu_button
-          click_course_links
+          click_course_links_toolbar_menuitem
 
           click_discussions_accordion
           click_course_item_link(title)
@@ -626,8 +611,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_pages_accordion
 
@@ -652,8 +636,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_document_toolbar_menu_button
-        click_course_documents
+        click_course_documents_toolbar_menuitem
 
         expect(course_document_links.count).to eq(2)
 
@@ -676,9 +659,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_images_toolbar_menu_button
-        click_course_images
-        wait_for_ajaximations
+        click_course_images_toolbar_menuitem
         expect(image_links.count).to eq(2)
 
         enter_search_data("ico")
@@ -714,8 +695,8 @@ describe "RCE next tests", ignore_js_errors: true do
         add_embedded_image(title2)
 
         visit_front_page_edit(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         enter_search_data("ico")
         click_pages_accordion
         expect(course_item_links_list.count).to eq(1)
@@ -732,8 +713,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
     it "clicks on sidebar images tab" do
       visit_front_page_edit(@course)
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       expect(course_images_tray).to be_displayed
     end
@@ -748,8 +728,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       click_image_link(title)
 
@@ -772,8 +751,7 @@ describe "RCE next tests", ignore_js_errors: true do
       f("##{rce_page_body_ifr_id}").click
       select_text_of_element_by_id("para")
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       click_image_link(title)
 
@@ -811,8 +789,7 @@ describe "RCE next tests", ignore_js_errors: true do
       visit_existing_wiki_edit(@course, page_title)
 
       def switch_trays
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
         wait_for_ajaximations
         expect(course_links_tray).to be_displayed
 
@@ -912,8 +889,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_document_toolbar_menu_button
-      click_course_documents
+      click_course_documents_toolbar_menuitem
 
       click_document_link(title)
 
@@ -982,8 +958,7 @@ describe "RCE next tests", ignore_js_errors: true do
     it "closes the course links tray when pressing esc", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
 
       expect(tray_container_exists?).to eq true
 
@@ -1000,8 +975,7 @@ describe "RCE next tests", ignore_js_errors: true do
     it "closes the course images tray when pressing esc", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
       expect(tray_container_exists?).to eq true
 
       driver.action.send_keys(:escape).perform
@@ -1014,8 +988,7 @@ describe "RCE next tests", ignore_js_errors: true do
     it "opens upload image modal when clicking upload option" do
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_upload_image
+      click_upload_image_toolbar_menuitem
 
       expect(upload_image_modal).to be_displayed
     end
@@ -1025,8 +998,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Upload/Record Media")).to be_displayed
@@ -1039,8 +1012,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
@@ -1052,8 +1025,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({ "hide_rte_button" => true })
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
@@ -1065,8 +1038,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
-        click_document_toolbar_menu_button
-        click_upload_document
+
+        click_upload_document_toolbar_menuitem
 
         expect(upload_document_modal).to be_displayed
       end
@@ -1076,8 +1049,7 @@ describe "RCE next tests", ignore_js_errors: true do
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
 
-        click_media_toolbar_menu_button
-        click_upload_media
+        click_upload_media_toolbar_menuitem
 
         expect(upload_media_modal).to be_displayed
       end
@@ -1090,8 +1062,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
       click_assignments_accordion
 
       source = course_item_link(title)
@@ -1127,15 +1098,13 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_new_assignment_page(@course)
 
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
 
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("myimage")
 
       click_close_button
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
 
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("myimage")
@@ -1406,30 +1375,6 @@ describe "RCE next tests", ignore_js_errors: true do
       end
     end
 
-    describe "Insert content toolbar button default actions" do
-      it "does the right thing when clicking the toolbar button" do
-        double("CanvasKaltura::ClientV3")
-        allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
-        rce_wysiwyg_state_setup(@course)
-
-        click_links_toolbar_button
-        expect(insert_link_modal).to be_displayed
-        f("body").send_keys :escape # close the modal
-
-        click_images_toolbar_button
-        expect(upload_image_modal).to be_displayed
-        f("body").send_keys :escape
-
-        click_media_toolbar_button
-        expect(upload_media_modal).to be_displayed
-        f("body").send_keys :escape
-
-        click_document_toolbar_button
-        expect(upload_file_modal).to be_displayed
-        f("body").send_keys :escape
-      end
-    end
-
     describe "the content tray" do
       after { driver.local_storage.clear }
 
@@ -1440,15 +1385,15 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wysiwyg_state_setup(@course)
 
         driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         wait_for_ajaximations
         expect(fj("li:contains('#{title}')")).to be_displayed
 
         click_content_tray_close_button
         wait_for_animations
-        click_document_toolbar_menu_button
-        click_user_documents
+
+        click_user_documents_toolbar_menuitem
         wait_for_ajaximations
 
         change_content_tray_content_type("Links")
@@ -1560,7 +1505,7 @@ describe "RCE next tests", ignore_js_errors: true do
       it "can add image" do
         skip("Works IRL but fails in selenium. Fix with MAT-1127")
         rce_wysiwyg_state_setup(@course)
-        iconmaker_toolbar_button.click
+        create_icon_toolbar_menuitem.click
         iconmaker_addimage_menu.click
         iconmaker_singlecolor_option.click
         iconmaker_singlecolor_articon.click

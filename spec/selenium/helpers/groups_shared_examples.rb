@@ -167,7 +167,7 @@ shared_examples "announcements_page_v2" do
 
     get announcements_page
     expect_new_page_load { f("#add_announcement").click }
-    click_links_toolbar_menu_button
+
     click_group_links
     wait_for_ajaximations
     announcements_accordion_button.click
@@ -179,8 +179,8 @@ shared_examples "announcements_page_v2" do
     add_test_files
     get announcements_page
     expect_new_page_load { f("#add_announcement").click }
-    click_document_toolbar_menu_button
-    click_group_documents
+
+    click_group_documents_toolbar_menuitem
     wait_for_ajaximations
     expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
@@ -234,8 +234,8 @@ shared_examples "pages_page" do |context|
 
     get "/groups/#{@testgroup.first.id}/pages/test_page/edit"
     wait_for_tiny(edit_wiki_css)
-    click_document_toolbar_menu_button
-    click_group_documents
+
+    click_group_documents_toolbar_menuitem
     wait_for_ajaximations
 
     expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
@@ -278,7 +278,6 @@ shared_examples "discussions_page" do |context|
     get discussions_page
     expect_new_page_load { f("#add_discussion").click }
 
-    click_links_toolbar_menu_button
     click_group_links
 
     click_discussions_accordion
@@ -292,8 +291,8 @@ shared_examples "discussions_page" do |context|
     add_test_files
     get discussions_page
     expect_new_page_load { f("#add_discussion").click }
-    click_document_toolbar_menu_button
-    click_group_documents
+
+    click_group_documents_toolbar_menuitem
     wait_for_ajaximations
 
     expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
