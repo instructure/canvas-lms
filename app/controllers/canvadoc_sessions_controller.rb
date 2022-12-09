@@ -84,6 +84,7 @@ class CanvadocSessionsController < ApplicationController
         enable_annotations: blob["enable_annotations"],
         use_cloudfront: true
       }
+      opts[:send_usage_metrics] = @current_user.account.feature_enabled?(:send_usage_metrics) if @current_user
 
       submission_id = blob["submission_id"]
       if submission_id
