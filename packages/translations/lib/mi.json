@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Arepa"
     },
-    "align_11050992": {
-        "message": "Whakarārangi"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Whakahurihuri me ngā Rārangi"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Catalan"
     },
-    "center_align_e68d9997": {
-        "message": "Tiaro Pokapū"
-    },
     "centered_dot_64d5e378": {
         "message": "Pokapū Ira"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Whakapaipai { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Nuku Whakaiti"
     },
     "deep_purple_bb3e2907": {
         "message": "Hohonu Waiporoporo"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "Kei roto (Huahanga o)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Nuku Whakanui"
-    },
     "indefinite_integral_6623307e": {
         "message": "Noa Tautoko"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Latvian"
-    },
-    "left_align_43d95491": {
-        "message": "Tiaro Mauī"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Taiapa Koki Mauī"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Horahanga Kupu Taunaki. Pēhia te ALT+0 mo Taonga Ihirangi Etita pokatata."
     },
-    "right_align_39e7a32a": {
-        "message": "Tiaro Matau"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Taiapa Koki Matau"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Tuhinga nui"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Tuhituhi me te Tuhituhi"
     },
     "superset_c4db8a7a": {
         "message": "Hupiripiri"

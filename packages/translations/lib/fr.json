@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Aligner"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Alignement et listes"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Catalan"
     },
-    "center_align_e68d9997": {
-        "message": "Alignement central"
-    },
     "centered_dot_64d5e378": {
         "message": "Point médian"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } décoratif"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Diminuer le retrait"
     },
     "deep_purple_bb3e2907": {
         "message": "Violet foncé"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "Appartient à (élément de)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Augmenter le retrait"
-    },
     "indefinite_integral_6623307e": {
         "message": "Intégrale indéfinie"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Letton"
-    },
-    "left_align_43d95491": {
-        "message": "Alignement à gauche"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Crochet angulaire à gauche"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Zone de texte enrichi Appuyez sur ALT+0 pour obtenir les raccourcis de l''éditeur de contenu enrichi."
     },
-    "right_align_39e7a32a": {
-        "message": "Alignement à droite"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Chevron vers la droite"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "En exposant"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Indice et exposant"
     },
     "superset_c4db8a7a": {
         "message": "Sur-ensemble"

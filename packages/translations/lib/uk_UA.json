@@ -14,9 +14,6 @@
     "address_3159962f": {
         "message": "Адреса:"
     },
-    "align_11050992": {
-        "message": "Вирівняти"
-    },
     "all_4321c3a1": {
         "message": "Всі"
     },
@@ -227,9 +224,6 @@
     "date_time_d9fbf2d7": {
         "message": "Дата та час:"
     },
-    "decrease_indent_d9cf469d": {
-        "message": "Зменшити відступ"
-    },
     "deep_purple_bb3e2907": {
         "message": "Темно-фіолетовий"
     },
@@ -388,9 +382,6 @@
     },
     "images_7ce26570": {
         "message": "Зображення"
-    },
-    "increase_indent_6af90f7c": {
-        "message": "Збільшити відступ"
     },
     "indigo_2035fc55": {
         "message": "Індиго"

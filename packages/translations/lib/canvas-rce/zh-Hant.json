@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "添加副本/字幕" },
   "add_image_60b2de07": { "message": "添加影像" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "對齊" },
   "alignment_and_lists_5cebcb69": { "message": "對齊及清單" },
   "all_4321c3a1": { "message": "全部" },
   "all_apps_a50dea49": { "message": "所有應用程式" },
@@ -69,7 +68,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "取消" },
   "cap_product_3a5265a6": { "message": "便帽產品" },
-  "center_align_e68d9997": { "message": "置中對齊" },
   "centered_dot_64d5e378": { "message": "中心點" },
   "centered_horizontal_dots_451c5815": { "message": "中心水平點" },
   "chi_54a32644": { "message": "χ" },
@@ -145,7 +143,6 @@
   "date_added_ed5ad465": { "message": "添加的日期" },
   "decorative_icon_9a7f3fc3": { "message": "裝飾圖示" },
   "decorative_type_upper_f2c95e3": { "message": "裝飾 { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "減少縮排" },
   "deep_purple_bb3e2907": { "message": "深紫色" },
   "definite_integral_fe7ffed1": { "message": "有限積分" },
   "degree_symbol_4a823d5f": { "message": "度數符號" },
@@ -314,7 +311,6 @@
     "message": "虛數部份（複數的）"
   },
   "in_element_of_19ca2f33": { "message": "在（某個元素）" },
-  "increase_indent_6af90f7c": { "message": "增加縮進" },
   "indefinite_integral_6623307e": { "message": "無限積分" },
   "indigo_2035fc55": { "message": "靛藍色" },
   "inference_fed5c960": { "message": "推論" },
@@ -335,7 +331,6 @@
   "language_arts_icon_a798b0f8": { "message": "語言文學圖示" },
   "languages_icon_9d20539": { "message": "語言圖示" },
   "large_9c5e80e7": { "message": "大" },
-  "left_align_43d95491": { "message": "靠左對齊" },
   "left_angle_bracket_c87a6d07": { "message": "左角括號" },
   "left_arrow_4fde1a64": { "message": "左箭頭" },
   "left_arrow_with_hook_5bfcad93": { "message": "左箭頭與鉤號" },
@@ -527,7 +522,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "多種格式的文字區。請按 ALT+0 使用多種格式的內容編輯器捷徑。"
   },
-  "right_align_39e7a32a": { "message": "靠右對齊" },
   "right_angle_bracket_d704e2d6": { "message": "右角括號" },
   "right_arrow_35e0eddf": { "message": "右箭頭" },
   "right_arrow_with_hook_29d92d31": { "message": "右箭頭與鉤號" },
@@ -598,7 +592,6 @@
   "succeeds_equal_158e8c3a": { "message": "之後等於" },
   "sum_b0842d31": { "message": "總和" },
   "superscript_8cb349a2": { "message": "上標" },
-  "superscript_and_subscript_37f94a50": { "message": "上標和下標" },
   "superset_c4db8a7a": { "message": "母集合" },
   "superset_strict_c77dd6d2": { "message": "母集合（嚴格）" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

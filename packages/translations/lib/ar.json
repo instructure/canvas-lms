@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "محاذاة"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "المحاذاة والقوائم"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "الكاتالونية"
     },
-    "center_align_e68d9997": {
-        "message": "محاذاة إلى الوسط"
-    },
     "centered_dot_64d5e378": {
         "message": "نقطة مركزية"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } زينة"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "تقليل المسافة البادئة"
     },
     "deep_purple_bb3e2907": {
         "message": "أرجواني داكن"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "In (Element Of)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "زيادة المسافة البادئة"
-    },
     "indefinite_integral_6623307e": {
         "message": "قيمة التكامل غير المحدد"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "اللاتفية"
-    },
-    "left_align_43d95491": {
-        "message": "محاذاة إلى اليسار"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Left Angle Bracket"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "مساحة النص المنسق اضغط على ALT+0 لاختصارات محرر المحتوى المنسق."
     },
-    "right_align_39e7a32a": {
-        "message": "محاذاة إلى اليمين"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Right Angle Bracket"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "مرتفع"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "مرتفع ومنخفض"
     },
     "superset_c4db8a7a": {
         "message": "Superset"

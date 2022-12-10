@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Alef"
     },
-    "align_11050992": {
-        "message": "Dostosuj"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Wyrównanie i listy"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Kataloński"
     },
-    "center_align_e68d9997": {
-        "message": "Wyśrodkuj"
-    },
     "centered_dot_64d5e378": {
         "message": "Kropka wyśrodkowana"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekoracyjny { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Zmniejsz wcięcie"
     },
     "deep_purple_bb3e2907": {
         "message": "Głęboki fiolet"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "W (element)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Zwiększ wcięcie"
-    },
     "indefinite_integral_6623307e": {
         "message": "Całka nieoznaczona"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Łotewski"
-    },
-    "left_align_43d95491": {
-        "message": "Wyrównaj do lewej"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Lewy nawias ostrokątny"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Obszar tekstu sformatowanego Naciśnij ALT+0, aby wyświetlić skróty edytora tekstu sformatowanego."
     },
-    "right_align_39e7a32a": {
-        "message": "Wyrównaj do prawej"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Prawy nawias ostrokątny"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Indeks górny"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Indeks górny i dolny"
     },
     "superset_c4db8a7a": {
         "message": "Nadzbiór"

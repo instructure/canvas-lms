@@ -10,7 +10,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Adicionar Legenda/Legendas" },
   "add_image_60b2de07": { "message": "Adicionar imagem" },
   "aleph_f4ffd155": { "message": "Alef" },
-  "align_11050992": { "message": "Alinhar" },
   "alignment_and_lists_5cebcb69": { "message": "Alinhamento e Listas" },
   "all_4321c3a1": { "message": "Todos" },
   "all_apps_a50dea49": { "message": "Todas as aplicações" },
@@ -75,7 +74,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancelar" },
   "cap_product_3a5265a6": { "message": "Tampa Produto" },
-  "center_align_e68d9997": { "message": "Alinhamento ao centro" },
   "centered_dot_64d5e378": { "message": "Ponto centrado" },
   "centered_horizontal_dots_451c5815": {
     "message": "Pontos Horizontais Centrados"
@@ -165,7 +163,6 @@
   "date_added_ed5ad465": { "message": "Data adicionada" },
   "decorative_icon_9a7f3fc3": { "message": "Ícone decorativo" },
   "decorative_type_upper_f2c95e3": { "message": "Decorativo { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Diminuir Avanço" },
   "deep_purple_bb3e2907": { "message": "Roxo Escuro" },
   "definite_integral_fe7ffed1": { "message": "Integral Definitivo" },
   "degree_symbol_4a823d5f": { "message": "Símbolo de Grau" },
@@ -366,7 +363,6 @@
     "message": "Porção imaginária (de número complexo)"
   },
   "in_element_of_19ca2f33": { "message": "Em (Elemento De)" },
-  "increase_indent_6af90f7c": { "message": "Aumentar Avanço" },
   "indefinite_integral_6623307e": { "message": "Integral Indefinido" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inferência" },
@@ -387,7 +383,6 @@
   "language_arts_icon_a798b0f8": { "message": "Ícone das Artes Linguísticas" },
   "languages_icon_9d20539": { "message": "Ícone de Idiomas" },
   "large_9c5e80e7": { "message": "Ampla" },
-  "left_align_43d95491": { "message": "Alinhamento à esquerda" },
   "left_angle_bracket_c87a6d07": { "message": "Suporte de ângulo esquerdo" },
   "left_arrow_4fde1a64": { "message": "Seta à esquerda" },
   "left_arrow_with_hook_5bfcad93": { "message": "Seta à esquerda com gancho" },
@@ -605,7 +600,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Área de Rich Text. Prima ALT+0 para obter atalhos do Editor de Conteúdo Rico."
   },
-  "right_align_39e7a32a": { "message": "Alinhamento à direita" },
   "right_angle_bracket_d704e2d6": { "message": "Suporte de ângulo reto" },
   "right_arrow_35e0eddf": { "message": "Seta à direita" },
   "right_arrow_with_hook_29d92d31": { "message": "Seta à direita com gancho" },
@@ -688,9 +682,6 @@
   "succeeds_equal_158e8c3a": { "message": "Sucesso igual" },
   "sum_b0842d31": { "message": "Soma" },
   "superscript_8cb349a2": { "message": "Superescrito" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Super-escrito e Assinatura"
-  },
   "superset_c4db8a7a": { "message": "Superconjunto" },
   "superset_strict_c77dd6d2": { "message": "Superconjunto (Estrito)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

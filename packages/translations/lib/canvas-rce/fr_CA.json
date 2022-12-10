@@ -10,7 +10,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Ajouter des sous-titres/CC" },
   "add_image_60b2de07": { "message": "Ajouter une image" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Aligner" },
   "alignment_and_lists_5cebcb69": { "message": "Alignement et listes" },
   "all_4321c3a1": { "message": "Tout" },
   "all_apps_a50dea49": { "message": "Toutes les applications" },
@@ -75,7 +74,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annuler" },
   "cap_product_3a5265a6": { "message": "Produit Maj" },
-  "center_align_e68d9997": { "message": "Aligner au centre" },
   "centered_dot_64d5e378": { "message": "Point centré" },
   "centered_horizontal_dots_451c5815": {
     "message": "Points centrés horizontaux"
@@ -167,7 +165,6 @@
   "date_added_ed5ad465": { "message": "Date ajoutée" },
   "decorative_icon_9a7f3fc3": { "message": "Icône décorative" },
   "decorative_type_upper_f2c95e3": { "message": "Décoratif { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Diminuer le retrait" },
   "deep_purple_bb3e2907": { "message": "Violet foncé" },
   "definite_integral_fe7ffed1": { "message": "Intégrale définie" },
   "degree_symbol_4a823d5f": { "message": "Symbole de degré" },
@@ -370,7 +367,6 @@
     "message": "Portion imaginaire (d''un nombre complexe)"
   },
   "in_element_of_19ca2f33": { "message": "Dans (élément de)" },
-  "increase_indent_6af90f7c": { "message": "Augmenter le retrait" },
   "indefinite_integral_6623307e": { "message": "Intégrale indéfinie" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inférence" },
@@ -391,7 +387,6 @@
   "language_arts_icon_a798b0f8": { "message": "Icône Arts de la langue" },
   "languages_icon_9d20539": { "message": "Icône Langues" },
   "large_9c5e80e7": { "message": "Large" },
-  "left_align_43d95491": { "message": "Alignement à gauche" },
   "left_angle_bracket_c87a6d07": { "message": "Support d''angle gauche" },
   "left_arrow_4fde1a64": { "message": "Flèche gauche" },
   "left_arrow_with_hook_5bfcad93": { "message": "Flèche gauche avec crochet" },
@@ -611,7 +606,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Zone de texte enrichi. Appuyez sur ALT+0 pour les raccourcis de l’éditeur de texte enrichi."
   },
-  "right_align_39e7a32a": { "message": "Alignement à droite" },
   "right_angle_bracket_d704e2d6": { "message": "Support à angle droit" },
   "right_arrow_35e0eddf": { "message": "Flèche droite" },
   "right_arrow_with_hook_29d92d31": { "message": "Flèche droite avec crochet" },
@@ -702,7 +696,6 @@
   "succeeds_equal_158e8c3a": { "message": "Réussir l''égalité" },
   "sum_b0842d31": { "message": "Somme" },
   "superscript_8cb349a2": { "message": "Description" },
-  "superscript_and_subscript_37f94a50": { "message": "Exposant et indice" },
   "superset_c4db8a7a": { "message": "Sur-ensemble" },
   "superset_strict_c77dd6d2": { "message": "Sur-ensemble (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

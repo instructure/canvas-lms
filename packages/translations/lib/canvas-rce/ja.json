@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "CC /字幕を追加" },
   "add_image_60b2de07": { "message": "画像を追加" },
   "aleph_f4ffd155": { "message": "アレフ" },
-  "align_11050992": { "message": "位置調整" },
   "alignment_and_lists_5cebcb69": { "message": "配置とリスト" },
   "all_4321c3a1": { "message": "すべて" },
   "all_apps_a50dea49": { "message": "すべてのアプリ" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "キャンセル" },
   "cap_product_3a5265a6": { "message": "キャップ製品" },
-  "center_align_e68d9997": { "message": "センターアライン" },
   "centered_dot_64d5e378": { "message": "中央の点" },
   "centered_horizontal_dots_451c5815": { "message": "中央の水平ドット" },
   "chi_54a32644": { "message": "チ" },
@@ -161,7 +159,6 @@
   "date_added_ed5ad465": { "message": "追加された日付" },
   "decorative_icon_9a7f3fc3": { "message": "装飾アイコン" },
   "decorative_type_upper_f2c95e3": { "message": "装飾的{ TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "インデントを減らす" },
   "deep_purple_bb3e2907": { "message": "ディープパープル" },
   "definite_integral_fe7ffed1": { "message": "定積分" },
   "degree_symbol_4a823d5f": { "message": "度数記号" },
@@ -350,7 +347,6 @@
     "message": "複素数の虚数部分"
   },
   "in_element_of_19ca2f33": { "message": "（）内（の要素）" },
-  "increase_indent_6af90f7c": { "message": "インデントを増やす" },
   "indefinite_integral_6623307e": { "message": "不定積分" },
   "indigo_2035fc55": { "message": "インディゴ" },
   "inference_fed5c960": { "message": "推論" },
@@ -371,7 +367,6 @@
   "language_arts_icon_a798b0f8": { "message": "語学のアイコン" },
   "languages_icon_9d20539": { "message": "言語のアイコン" },
   "large_9c5e80e7": { "message": "大" },
-  "left_align_43d95491": { "message": "左揃え" },
   "left_angle_bracket_c87a6d07": { "message": "左傾きブラケット" },
   "left_arrow_4fde1a64": { "message": "左の矢印" },
   "left_arrow_with_hook_5bfcad93": { "message": "左矢印フック付き" },
@@ -579,7 +574,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "リッチテキストエリアリッチコンテンツエディターのショートカットは、ALT+0を押してください。"
   },
-  "right_align_39e7a32a": { "message": "右揃え" },
   "right_angle_bracket_d704e2d6": { "message": "直角ブラケット" },
   "right_arrow_35e0eddf": { "message": "右の矢印" },
   "right_arrow_with_hook_29d92d31": { "message": "右矢印フック付き" },
@@ -650,7 +644,6 @@
   "succeeds_equal_158e8c3a": { "message": "成功イコール" },
   "sum_b0842d31": { "message": "合計" },
   "superscript_8cb349a2": { "message": "上付き" },
-  "superscript_and_subscript_37f94a50": { "message": "上付き文字と下付き文字" },
   "superset_c4db8a7a": { "message": "部分集合" },
   "superset_strict_c77dd6d2": { "message": "部分集合 (厳密)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

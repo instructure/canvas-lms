@@ -11,17 +11,11 @@
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
     },
-    "decrease_indent_d9cf469d": {
-        "message": "Уменьшить отступ"
-    },
     "english_c60612e2": {
         "message": "Английский"
     },
     "icon_215a1dc6": {
         "message": "Значок"
-    },
-    "increase_indent_6af90f7c": {
-        "message": "Увеличить отступ"
     },
     "links_to_an_external_site_de74145d": {
         "message": "Ссылки на внешний сайт."

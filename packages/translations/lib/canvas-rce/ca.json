@@ -10,7 +10,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Afegeix CC/subtítols" },
   "add_image_60b2de07": { "message": "Afegeix la imatge" },
   "aleph_f4ffd155": { "message": "Àlef" },
-  "align_11050992": { "message": "Alinea" },
   "alignment_and_lists_5cebcb69": { "message": "Alineació i llistes" },
   "all_4321c3a1": { "message": "Tot" },
   "all_apps_a50dea49": { "message": "Totes les aplicacions" },
@@ -75,7 +74,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel·la" },
   "cap_product_3a5265a6": { "message": "Producte amb tapa" },
-  "center_align_e68d9997": { "message": "Alineació centrada" },
   "centered_dot_64d5e378": { "message": "Punt centrat" },
   "centered_horizontal_dots_451c5815": {
     "message": "Punts horitzontals centrats"
@@ -167,7 +165,6 @@
   "date_added_ed5ad465": { "message": "Data afegida" },
   "decorative_icon_9a7f3fc3": { "message": "Icona decorativa" },
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } decoratiu" },
-  "decrease_indent_d9cf469d": { "message": "Redueix la sagnia" },
   "deep_purple_bb3e2907": { "message": "Porpra fosc" },
   "definite_integral_fe7ffed1": { "message": "Integral definida" },
   "degree_symbol_4a823d5f": { "message": "Símbol de grau" },
@@ -372,7 +369,6 @@
     "message": "Porció imaginària (d’un número complex)"
   },
   "in_element_of_19ca2f33": { "message": "A (un element de)" },
-  "increase_indent_6af90f7c": { "message": "Augmenta la sagnia" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
   "indigo_2035fc55": { "message": "Indi" },
   "inference_fed5c960": { "message": "Inferència" },
@@ -393,7 +389,6 @@
   "language_arts_icon_a798b0f8": { "message": "Icona d''arts lingüístiques" },
   "languages_icon_9d20539": { "message": "Icona d’idiomes" },
   "large_9c5e80e7": { "message": "Gran" },
-  "left_align_43d95491": { "message": "Alineació esquerra" },
   "left_angle_bracket_c87a6d07": { "message": "Parèntesi angular esquerre" },
   "left_arrow_4fde1a64": { "message": "Fletxa esquerra" },
   "left_arrow_with_hook_5bfcad93": { "message": "Fletxa esquerra amb ganxo" },
@@ -619,7 +614,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Àrea de text enriquit. Premeu ALT+0 per accedir a les dreceres de l’editor de contingut enriquit."
   },
-  "right_align_39e7a32a": { "message": "Alineació dreta" },
   "right_angle_bracket_d704e2d6": { "message": "Parèntesi angular dret" },
   "right_arrow_35e0eddf": { "message": "Fletxa dreta" },
   "right_arrow_with_hook_29d92d31": { "message": "Fletxa dreta amb ganxo" },
@@ -706,7 +700,6 @@
   "succeeds_equal_158e8c3a": { "message": "El succeïdor és igual que" },
   "sum_b0842d31": { "message": "Suma" },
   "superscript_8cb349a2": { "message": "Superíndex" },
-  "superscript_and_subscript_37f94a50": { "message": "Superíndex i subíndex" },
   "superset_c4db8a7a": { "message": "Superconjunt" },
   "superset_strict_c77dd6d2": { "message": "Superconjunt (estricte)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

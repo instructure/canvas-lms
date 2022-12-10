@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Ychwanegu CC/Is-deitlau" },
   "add_image_60b2de07": { "message": "Ychwanegu Delwedd" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Alinio" },
   "alignment_and_lists_5cebcb69": { "message": "Aliniad a Rhestrau" },
   "all_4321c3a1": { "message": "Y cyfan" },
   "all_apps_a50dea49": { "message": "Pob Ap" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Canslo" },
   "cap_product_3a5265a6": { "message": "Cynnyrch Cap" },
-  "center_align_e68d9997": { "message": "Alinio i’r Canol" },
   "centered_dot_64d5e378": { "message": "Dot Canolog" },
   "centered_horizontal_dots_451c5815": {
     "message": "Dotiau Llorweddol Canolog"
@@ -161,7 +159,6 @@
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
   "decorative_icon_9a7f3fc3": { "message": "Eicon Addurniadol" },
   "decorative_type_upper_f2c95e3": { "message": "Addurniadol { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Lleihau Mewnoliad" },
   "deep_purple_bb3e2907": { "message": "Porffor Tywyll" },
   "definite_integral_fe7ffed1": { "message": "Integryn Pendant" },
   "degree_symbol_4a823d5f": { "message": "Symbol Gradd" },
@@ -356,7 +353,6 @@
     "message": "Cyfran Ddychmygol (o Rif Cymhleth)"
   },
   "in_element_of_19ca2f33": { "message": "Yn (Elfen O)" },
-  "increase_indent_6af90f7c": { "message": "Cynyddu Mewnoliad" },
   "indefinite_integral_6623307e": { "message": "Integryn Amhendant" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Casgliad" },
@@ -377,7 +373,6 @@
   "language_arts_icon_a798b0f8": { "message": "Eicon Celfyddydau Iaith" },
   "languages_icon_9d20539": { "message": "Eicon Ieithoedd" },
   "large_9c5e80e7": { "message": "Mawr" },
-  "left_align_43d95491": { "message": "Alinio i’r Chwith" },
   "left_angle_bracket_c87a6d07": { "message": "Braced Ongl Chwith" },
   "left_arrow_4fde1a64": { "message": "Saeth i’r Chwith" },
   "left_arrow_with_hook_5bfcad93": {
@@ -593,7 +588,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Ardal Testun Cyfoethog. Pwyswch ALT+0 ar gyfer bysellau cyflym y Golygydd Cynnwys Cyfoethog."
   },
-  "right_align_39e7a32a": { "message": "Alinio i’r Dde" },
   "right_angle_bracket_d704e2d6": { "message": "Braced Ongl Dde" },
   "right_arrow_35e0eddf": { "message": "Saeth i’r Dde" },
   "right_arrow_with_hook_29d92d31": { "message": "Saeth i’r Dde gyda Bachyn" },
@@ -672,9 +666,6 @@
   "succeeds_equal_158e8c3a": { "message": "Ar ôl Hafalnod" },
   "sum_b0842d31": { "message": "Swm" },
   "superscript_8cb349a2": { "message": "Uwchysgrif" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Uwch-ysgrif ac Is-ysgrif"
-  },
   "superset_c4db8a7a": { "message": "Uwch-set" },
   "superset_strict_c77dd6d2": { "message": "Uwch-set (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Alef"
     },
-    "align_11050992": {
-        "message": "Poravnaj"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Poravnava in seznami"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "katalonščina"
     },
-    "center_align_e68d9997": {
-        "message": "Sredinska poravnava"
-    },
     "centered_dot_64d5e378": {
         "message": "Središčna pika"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativni { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Zmanjšaj zamik"
     },
     "deep_purple_bb3e2907": {
         "message": "Temno škrlatna"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "V (element)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Povečaj zamik"
-    },
     "indefinite_integral_6623307e": {
         "message": "Nedoločeni integral"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "letonščina"
-    },
-    "left_align_43d95491": {
-        "message": "Leva poravnava"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Levi kotni oklepaj"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Območje besedila Pritisnite ALT+0 za bližnjico do urejevalnika."
     },
-    "right_align_39e7a32a": {
-        "message": "Desna poravnava"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Desni kotni oklepaj"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Nadpisano"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Dvignjeno in spuščeno"
     },
     "superset_c4db8a7a": {
         "message": "Nadmnožica"
