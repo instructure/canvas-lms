@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Jafna"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Stillingar og listar"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Katalónska"
     },
-    "center_align_e68d9997": {
-        "message": "Miðjujafna"
-    },
     "centered_dot_64d5e378": {
         "message": "Miðjupunktur"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Skrautlegt { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Minnka inndrag"
     },
     "deep_purple_bb3e2907": {
         "message": "Dökkfjólublár"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "Í (hluti af)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Auka inndrag"
-    },
     "indefinite_integral_6623307e": {
         "message": "Óákveðin heild"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Lettneska"
-    },
-    "left_align_43d95491": {
-        "message": "Vinstri jafna"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Vinstri hornsvigi"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Svæði með miklum texta. Ýttu á ALT+0 fyrir flýtilykla Rich Content ritils."
     },
-    "right_align_39e7a32a": {
-        "message": "Hægri jafna"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Hægri hornsvigi"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Yfirskrift"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Yfirskrift og undirskrift"
     },
     "superset_c4db8a7a": {
         "message": "Yfirmengi"

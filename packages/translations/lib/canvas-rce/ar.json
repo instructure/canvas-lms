@@ -10,7 +10,6 @@
   },
   "add_image_60b2de07": { "message": "إضافة صورة" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "محاذاة" },
   "alignment_and_lists_5cebcb69": { "message": "المحاذاة والقوائم" },
   "all_4321c3a1": { "message": "الكل" },
   "all_apps_a50dea49": { "message": "كافة التطبيقات" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "إلغاء" },
   "cap_product_3a5265a6": { "message": "Cap Product" },
-  "center_align_e68d9997": { "message": "محاذاة إلى الوسط" },
   "centered_dot_64d5e378": { "message": "نقطة مركزية" },
   "centered_horizontal_dots_451c5815": { "message": "نقاط أفقية مركزية" },
   "chi_54a32644": { "message": "Chi" },
@@ -151,7 +149,6 @@
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
   "decorative_icon_9a7f3fc3": { "message": "أيقونة زينة" },
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } زينة" },
-  "decrease_indent_d9cf469d": { "message": "تقليل المسافة البادئة" },
   "deep_purple_bb3e2907": { "message": "أرجواني داكن" },
   "definite_integral_fe7ffed1": { "message": "قيمة التكامل المحدد" },
   "degree_symbol_4a823d5f": { "message": "رمز الدرجة" },
@@ -342,7 +339,6 @@
     "message": "الجزء التخيلي (من العدد المركب)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element Of)" },
-  "increase_indent_6af90f7c": { "message": "زيادة المسافة البادئة" },
   "indefinite_integral_6623307e": { "message": "قيمة التكامل غير المحدد" },
   "indigo_2035fc55": { "message": "نيلي" },
   "inference_fed5c960": { "message": "الاستنتاج" },
@@ -363,7 +359,6 @@
   "language_arts_icon_a798b0f8": { "message": "أيقونة آداب اللغة" },
   "languages_icon_9d20539": { "message": "أيقونة اللغات" },
   "large_9c5e80e7": { "message": "كبير" },
-  "left_align_43d95491": { "message": "محاذاة إلى اليسار" },
   "left_angle_bracket_c87a6d07": { "message": "Left Angle Bracket" },
   "left_arrow_4fde1a64": { "message": "Left Arrow" },
   "left_arrow_with_hook_5bfcad93": { "message": "Left Arrow With Hook" },
@@ -567,7 +562,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "مساحة النص المنسق اضغط على ALT+0 لاختصارات محرر المحتوى المنسق."
   },
-  "right_align_39e7a32a": { "message": "محاذاة إلى اليمين" },
   "right_angle_bracket_d704e2d6": { "message": "Right Angle Bracket" },
   "right_arrow_35e0eddf": { "message": "Right Arrow" },
   "right_arrow_with_hook_29d92d31": { "message": "Right Arrow With Hook" },
@@ -642,7 +636,6 @@
   "succeeds_equal_158e8c3a": { "message": "Succeeds Equal" },
   "sum_b0842d31": { "message": "Sum" },
   "superscript_8cb349a2": { "message": "مرتفع" },
-  "superscript_and_subscript_37f94a50": { "message": "مرتفع ومنخفض" },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

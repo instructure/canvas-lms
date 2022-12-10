@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Igazítás"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Igazítások és listák"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Katalán"
     },
-    "center_align_e68d9997": {
-        "message": "Középre igazítás"
-    },
     "centered_dot_64d5e378": {
         "message": "Középre helyezett pont"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekoratív { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Behúzás csökkentése"
     },
     "deep_purple_bb3e2907": {
         "message": "Sötétlila"
@@ -1073,9 +1064,6 @@
     "in_element_of_19ca2f33": {
         "message": "Ebben"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Behúzás növelése"
-    },
     "indefinite_integral_6623307e": {
         "message": "Határozatlan Integrál"
     },
@@ -1177,9 +1165,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Lett"
-    },
-    "left_align_43d95491": {
-        "message": "Balra igazítás"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Bal csúcsos zárójel"
@@ -1799,9 +1784,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Rich Text terület. A Rich Content Editor parancsikonjaihoz nyomja meg az ALT+0 billentyűkombinációt."
     },
-    "right_align_39e7a32a": {
-        "message": "Jobbra igazítás"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Jobb csúcsos zárójel"
     },
@@ -2038,9 +2020,6 @@
     },
     "superscript_8cb349a2": {
         "message": "felső index"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Felső index és alsó index"
     },
     "superset_c4db8a7a": {
         "message": "Csoporthalmaz"

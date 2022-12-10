@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Dodaj CC/napisy" },
   "add_image_60b2de07": { "message": "Dodaj zdjęcie" },
   "aleph_f4ffd155": { "message": "Alef" },
-  "align_11050992": { "message": "Dostosuj" },
   "alignment_and_lists_5cebcb69": { "message": "Wyrównanie i listy" },
   "all_4321c3a1": { "message": "Wszystkie" },
   "all_apps_a50dea49": { "message": "Wszystkie aplikacje" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Anuluj" },
   "cap_product_3a5265a6": { "message": "G mnożenie" },
-  "center_align_e68d9997": { "message": "Wyśrodkuj" },
   "centered_dot_64d5e378": { "message": "Kropka wyśrodkowana" },
   "centered_horizontal_dots_451c5815": {
     "message": "Wyśrodkowane kropki poziomo"
@@ -159,7 +157,6 @@
   "date_added_ed5ad465": { "message": "Data dodania" },
   "decorative_icon_9a7f3fc3": { "message": "Ikona dekoracyjna" },
   "decorative_type_upper_f2c95e3": { "message": "Dekoracyjny { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Zmniejsz wcięcie" },
   "deep_purple_bb3e2907": { "message": "Głęboki fiolet" },
   "definite_integral_fe7ffed1": { "message": "Całka oznaczona" },
   "degree_symbol_4a823d5f": { "message": "Symbol stopnia" },
@@ -354,7 +351,6 @@
     "message": "Część urojona (liczby zespolonej)"
   },
   "in_element_of_19ca2f33": { "message": "W (element)" },
-  "increase_indent_6af90f7c": { "message": "Zwiększ wcięcie" },
   "indefinite_integral_6623307e": { "message": "Całka nieoznaczona" },
   "indigo_2035fc55": { "message": "Indygo" },
   "inference_fed5c960": { "message": "Wniosek" },
@@ -375,7 +371,6 @@
   "language_arts_icon_a798b0f8": { "message": "Ikona języków obcych" },
   "languages_icon_9d20539": { "message": "Ikona języków" },
   "large_9c5e80e7": { "message": "Duży" },
-  "left_align_43d95491": { "message": "Wyrównaj do lewej" },
   "left_angle_bracket_c87a6d07": { "message": "Lewy nawias ostrokątny" },
   "left_arrow_4fde1a64": { "message": "Strzałka w lewo" },
   "left_arrow_with_hook_5bfcad93": { "message": "Strzałka w lewo zawinięta" },
@@ -595,7 +590,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Obszar tekstu sformatowanego Naciśnij ALT+0, aby wyświetlić skróty edytora tekstu sformatowanego."
   },
-  "right_align_39e7a32a": { "message": "Wyrównaj do prawej" },
   "right_angle_bracket_d704e2d6": { "message": "Prawy nawias ostrokątny" },
   "right_arrow_35e0eddf": { "message": "Strzałka w prawo" },
   "right_arrow_with_hook_29d92d31": { "message": "Strzałka w prawo zawinięta" },
@@ -680,7 +674,6 @@
   "succeeds_equal_158e8c3a": { "message": "Następuje po lub równa się" },
   "sum_b0842d31": { "message": "Suma" },
   "superscript_8cb349a2": { "message": "Indeks górny" },
-  "superscript_and_subscript_37f94a50": { "message": "Indeks górny i dolny" },
   "superset_c4db8a7a": { "message": "Nadzbiór" },
   "superset_strict_c77dd6d2": { "message": "Nadzbiór (ścisły)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

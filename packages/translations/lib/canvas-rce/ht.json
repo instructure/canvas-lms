@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Ajoute CC/Soutit" },
   "add_image_60b2de07": { "message": "Ajoute Imaj" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Aliyen" },
   "alignment_and_lists_5cebcb69": { "message": "Aliyman ak Lis" },
   "all_4321c3a1": { "message": "Tout" },
   "all_apps_a50dea49": { "message": "Tout App yo" },
@@ -69,7 +68,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Anile" },
   "cap_product_3a5265a6": { "message": "Kaskèt Pwodui" },
-  "center_align_e68d9997": { "message": "Aliyen nan Sant" },
   "centered_dot_64d5e378": { "message": "Pwen Santre" },
   "centered_horizontal_dots_451c5815": { "message": "Pwen Santre Orizontal" },
   "chi_54a32644": { "message": "Chi" },
@@ -147,7 +145,6 @@
   "date_added_ed5ad465": { "message": "Dat Ajoute" },
   "decorative_icon_9a7f3fc3": { "message": "Ikòn Dekoratif" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorasyon { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Diminye Endantasyon" },
   "deep_purple_bb3e2907": { "message": "Mov Fonse" },
   "definite_integral_fe7ffed1": { "message": "Entegral Defini" },
   "degree_symbol_4a823d5f": { "message": "Senbòl Degre" },
@@ -336,7 +333,6 @@
     "message": "Pòsyon Imajinè (Nonm Konplèks)"
   },
   "in_element_of_19ca2f33": { "message": "Nan (Eleman de)" },
-  "increase_indent_6af90f7c": { "message": "Ogmante Endantasyon" },
   "indefinite_integral_6623307e": { "message": "Entegral Endefini" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Enferans" },
@@ -357,7 +353,6 @@
   "language_arts_icon_a798b0f8": { "message": "Ikòn Langaj Da" },
   "languages_icon_9d20539": { "message": "Ikòn Langaj" },
   "large_9c5e80e7": { "message": "Laj" },
-  "left_align_43d95491": { "message": "Aliyen Agoch" },
   "left_angle_bracket_c87a6d07": { "message": "Sipò Ang Goch" },
   "left_arrow_4fde1a64": { "message": "Flèch Agoch" },
   "left_arrow_with_hook_5bfcad93": { "message": "Flèch Agoch avèk Kwochè" },
@@ -563,7 +558,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Zòn Teks Rich Peze  ALT+0 pou rakousi Editè Kontni Rich."
   },
-  "right_align_39e7a32a": { "message": "Aliyen Adwat" },
   "right_angle_bracket_d704e2d6": { "message": "Sipò Ang Dwat" },
   "right_arrow_35e0eddf": { "message": "Flèch Adwat" },
   "right_arrow_with_hook_29d92d31": { "message": "Flèch Adwat avèk Kwochè" },
@@ -640,9 +634,6 @@
   "succeeds_equal_158e8c3a": { "message": "Siksè Egal" },
   "sum_b0842d31": { "message": "Sòm" },
   "superscript_8cb349a2": { "message": "An Ekspozan" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superscript ak Subscript"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (Estrik)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

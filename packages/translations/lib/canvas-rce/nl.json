@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "CC/ondertiteling toevoegen" },
   "add_image_60b2de07": { "message": "Afbeelding toevoegen" },
   "aleph_f4ffd155": { "message": "Alef" },
-  "align_11050992": { "message": "Uitlijnen" },
   "alignment_and_lists_5cebcb69": { "message": "Koppeling en lijsten" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle apps" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Annuleren" },
   "cap_product_3a5265a6": { "message": "Cap-product" },
-  "center_align_e68d9997": { "message": "Gecentreerd uitlijnen" },
   "centered_dot_64d5e378": { "message": "Gecentreerde punt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Gecentreerde horizontale punten"
@@ -161,7 +159,6 @@
   "date_added_ed5ad465": { "message": "Datum toegevoegd" },
   "decorative_icon_9a7f3fc3": { "message": "Decoratief pictogram" },
   "decorative_type_upper_f2c95e3": { "message": "Decoratief { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Inspringen verkleinen" },
   "deep_purple_bb3e2907": { "message": "Diep paars" },
   "definite_integral_fe7ffed1": { "message": "Bepaalde integraal" },
   "degree_symbol_4a823d5f": { "message": "Gradensymbool" },
@@ -362,7 +359,6 @@
     "message": "Denkbeeldig deel (van complex getal)"
   },
   "in_element_of_19ca2f33": { "message": "In (element van)" },
-  "increase_indent_6af90f7c": { "message": "Inspringen vergroten" },
   "indefinite_integral_6623307e": { "message": "Onbepaalde integraal" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "gevolgtrekking" },
@@ -383,7 +379,6 @@
   "language_arts_icon_a798b0f8": { "message": "Linguïstiekpictogram" },
   "languages_icon_9d20539": { "message": "Talenpictogram" },
   "large_9c5e80e7": { "message": "Groot" },
-  "left_align_43d95491": { "message": "Links uitlijnen" },
   "left_angle_bracket_c87a6d07": { "message": "Recht haakje links" },
   "left_arrow_4fde1a64": { "message": "Pijl-links" },
   "left_arrow_with_hook_5bfcad93": { "message": "Pijl-links met hoek" },
@@ -605,7 +600,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich Text-gebied. Druk op ALT+0 voor Rich Content Editor-sneltoetsen."
   },
-  "right_align_39e7a32a": { "message": "Rechts uitlijnen" },
   "right_angle_bracket_d704e2d6": { "message": "Recht haakje rechts" },
   "right_arrow_35e0eddf": { "message": "Pijl-rechts" },
   "right_arrow_with_hook_29d92d31": { "message": "Pijl-rechts met hoek" },
@@ -690,9 +684,6 @@
   "succeeds_equal_158e8c3a": { "message": "Volgt op gelijk" },
   "sum_b0842d31": { "message": "Som" },
   "superscript_8cb349a2": { "message": "Superscript" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superscript en subscript"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (strikt)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

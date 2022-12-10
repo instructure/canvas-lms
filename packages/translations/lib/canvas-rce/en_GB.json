@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Add CC/Subtitles" },
   "add_image_60b2de07": { "message": "Add Image" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Align" },
   "alignment_and_lists_5cebcb69": { "message": "Alignment and Lists" },
   "all_4321c3a1": { "message": "All" },
   "all_apps_a50dea49": { "message": "All Apps" },
@@ -71,7 +70,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel" },
   "cap_product_3a5265a6": { "message": "Cap Product" },
-  "center_align_e68d9997": { "message": "Centre Align" },
   "centered_dot_64d5e378": { "message": "Centred Dot" },
   "centered_horizontal_dots_451c5815": { "message": "Centred Horizontal Dots" },
   "chi_54a32644": { "message": "Chi" },
@@ -153,7 +151,6 @@
   "date_added_ed5ad465": { "message": "Date added" },
   "decorative_icon_9a7f3fc3": { "message": "Decorative Icon" },
   "decorative_type_upper_f2c95e3": { "message": "Decorative { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Decrease indent" },
   "deep_purple_bb3e2907": { "message": "Deep purple" },
   "definite_integral_fe7ffed1": { "message": "Definite Integral" },
   "degree_symbol_4a823d5f": { "message": "Degree Symbol" },
@@ -346,7 +343,6 @@
     "message": "Imaginary Portion (of Complex Number)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element Of)" },
-  "increase_indent_6af90f7c": { "message": "Increase indent" },
   "indefinite_integral_6623307e": { "message": "Indefinite Integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inference" },
@@ -367,7 +363,6 @@
   "language_arts_icon_a798b0f8": { "message": "Language Arts Icon" },
   "languages_icon_9d20539": { "message": "Languages Icon" },
   "large_9c5e80e7": { "message": "Large" },
-  "left_align_43d95491": { "message": "Left Align" },
   "left_angle_bracket_c87a6d07": { "message": "Left Angle Bracket" },
   "left_arrow_4fde1a64": { "message": "Left Arrow" },
   "left_arrow_with_hook_5bfcad93": { "message": "Left Arrow With Hook" },
@@ -577,7 +572,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
   },
-  "right_align_39e7a32a": { "message": "Right Align" },
   "right_angle_bracket_d704e2d6": { "message": "Right Angle Bracket" },
   "right_arrow_35e0eddf": { "message": "Right Arrow" },
   "right_arrow_with_hook_29d92d31": { "message": "Right Arrow With Hook" },
@@ -656,9 +650,6 @@
   "succeeds_equal_158e8c3a": { "message": "Succeeds Equal" },
   "sum_b0842d31": { "message": "Sum" },
   "superscript_8cb349a2": { "message": "Superscript" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superscript and Subscript"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

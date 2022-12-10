@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Tasaa"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Kohdistukset ja luettelot"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "katalaani"
     },
-    "center_align_e68d9997": {
-        "message": "Keskuksen linjaus"
-    },
     "centered_dot_64d5e378": {
         "message": "Keskitetty piste"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Koriste { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Pienennä sisennystä"
     },
     "deep_purple_bb3e2907": {
         "message": "Tumman violetti"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "(/elementti)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Suurenna sisennystä"
-    },
     "indefinite_integral_6623307e": {
         "message": "Epämääräinen integraali"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "latvia"
-    },
-    "left_align_43d95491": {
-        "message": "Vasen linjaus"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Vasen kulmakiinnike"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Monipuolisen tekstieditorin sisältökenttä Paina ALT+0, jos haluat nähdä tekstimuotoilueditorin pikakuvakkeita."
     },
-    "right_align_39e7a32a": {
-        "message": "Oikea linjaus"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Oikea kulmakiinnike"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Yläindeksi"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Ylä- ja alaindeksi"
     },
     "superset_c4db8a7a": {
         "message": "Osajoukko"

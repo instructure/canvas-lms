@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "アレフ"
     },
-    "align_11050992": {
-        "message": "位置調整"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "配置とリスト"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "カタロニア語"
     },
-    "center_align_e68d9997": {
-        "message": "センターアライン"
-    },
     "centered_dot_64d5e378": {
         "message": "中央の点"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "装飾的{ TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "インデントを減らす"
     },
     "deep_purple_bb3e2907": {
         "message": "ディープパープル"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "（）内（の要素）"
     },
-    "increase_indent_6af90f7c": {
-        "message": "インデントを増やす"
-    },
     "indefinite_integral_6623307e": {
         "message": "不定積分"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "ラトビア語"
-    },
-    "left_align_43d95491": {
-        "message": "左揃え"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "左傾きブラケット"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "リッチテキストエリアリッチコンテンツエディターのショートカットは、ALT+0を押してください。"
     },
-    "right_align_39e7a32a": {
-        "message": "右揃え"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "直角ブラケット"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "上付き"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "上付き文字と下付き文字"
     },
     "superset_c4db8a7a": {
         "message": "部分集合"

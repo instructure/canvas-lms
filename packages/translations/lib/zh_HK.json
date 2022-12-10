@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "對齊"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "對齊及清單"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "加泰隆尼亞語"
     },
-    "center_align_e68d9997": {
-        "message": "置中對齊"
-    },
     "centered_dot_64d5e378": {
         "message": "中心點"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "裝飾 { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "減少縮排"
     },
     "deep_purple_bb3e2907": {
         "message": "深紫色"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "在（某個元素）"
     },
-    "increase_indent_6af90f7c": {
-        "message": "增加縮進"
-    },
     "indefinite_integral_6623307e": {
         "message": "無限積分"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "拉脫維亞語"
-    },
-    "left_align_43d95491": {
-        "message": "靠左對齊"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "左角括號"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "多種格式的文字區。請按 ALT+0 使用多種格式的內容編輯器捷徑。"
     },
-    "right_align_39e7a32a": {
-        "message": "靠右對齊"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "右角括號"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "上標"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "上標和下標"
     },
     "superset_c4db8a7a": {
         "message": "母集合"

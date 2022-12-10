@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Lägg till CC/undertext" },
   "add_image_60b2de07": { "message": "Lägg till bild" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Justera" },
   "alignment_and_lists_5cebcb69": { "message": "Justering och listor" },
   "all_4321c3a1": { "message": "Alla" },
   "all_apps_a50dea49": { "message": "Alla appar" },
@@ -71,7 +70,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "cap_product_3a5265a6": { "message": "Takprodukt" },
-  "center_align_e68d9997": { "message": "Centrera" },
   "centered_dot_64d5e378": { "message": "Centrerad punkt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Centrerade horisontella punkter"
@@ -159,7 +157,6 @@
   "date_added_ed5ad465": { "message": "Tillagt datum" },
   "decorative_icon_9a7f3fc3": { "message": "Dekorativ ikon" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativ { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Minska indrag" },
   "deep_purple_bb3e2907": { "message": "Mörklila" },
   "definite_integral_fe7ffed1": { "message": "Bestämd integral" },
   "degree_symbol_4a823d5f": { "message": "Gradersymbol" },
@@ -356,7 +353,6 @@
     "message": "Imaginärdel (av komplexa nummer)"
   },
   "in_element_of_19ca2f33": { "message": "I (element av)" },
-  "increase_indent_6af90f7c": { "message": "Öka indrag" },
   "indefinite_integral_6623307e": { "message": "Obestämd integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Slutsats" },
@@ -377,7 +373,6 @@
   "language_arts_icon_a798b0f8": { "message": "Språkvetenskapsikon" },
   "languages_icon_9d20539": { "message": "Språkikon" },
   "large_9c5e80e7": { "message": "Stor" },
-  "left_align_43d95491": { "message": "Vänsterjustera" },
   "left_angle_bracket_c87a6d07": { "message": "Vänster hakparentes" },
   "left_arrow_4fde1a64": { "message": "Vänster pil" },
   "left_arrow_with_hook_5bfcad93": { "message": "Vänsterpil med krok" },
@@ -593,7 +588,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
   },
-  "right_align_39e7a32a": { "message": "Högerjustera" },
   "right_angle_bracket_d704e2d6": { "message": "Höger hakparentes" },
   "right_arrow_35e0eddf": { "message": "Högerpil" },
   "right_arrow_with_hook_29d92d31": { "message": "Högerpil med krok" },
@@ -674,9 +668,6 @@
   "succeeds_equal_158e8c3a": { "message": "Efterträder lika med" },
   "sum_b0842d31": { "message": "Summa" },
   "superscript_8cb349a2": { "message": "Upphöjd" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Upphöjd och nedsänkt text"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (strikt)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Justera"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Justering och listor"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Katalanska"
     },
-    "center_align_e68d9997": {
-        "message": "Centrera"
-    },
     "centered_dot_64d5e378": {
         "message": "Centrerad punkt"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativ { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Minska indrag"
     },
     "deep_purple_bb3e2907": {
         "message": "Mörklila"
@@ -1082,9 +1073,6 @@
     "in_element_of_19ca2f33": {
         "message": "I (element av)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Öka indrag"
-    },
     "indefinite_integral_6623307e": {
         "message": "Obestämd integral"
     },
@@ -1186,9 +1174,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Lettiska"
-    },
-    "left_align_43d95491": {
-        "message": "Vänsterjustera"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Vänster hakparentes"
@@ -1817,9 +1802,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
     },
-    "right_align_39e7a32a": {
-        "message": "Högerjustera"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Höger hakparentes"
     },
@@ -2059,9 +2041,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Upphöjd"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Upphöjd och nedsänkt text"
     },
     "superset_c4db8a7a": {
         "message": "Superset"

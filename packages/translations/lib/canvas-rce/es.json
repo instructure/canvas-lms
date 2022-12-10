@@ -10,7 +10,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Agregar CC/subtítulos" },
   "add_image_60b2de07": { "message": "Agregar imagen" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Alinear" },
   "alignment_and_lists_5cebcb69": { "message": "Alineación y listas" },
   "all_4321c3a1": { "message": "Todo" },
   "all_apps_a50dea49": { "message": "Todas las aplicaciones" },
@@ -75,7 +74,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancelar" },
   "cap_product_3a5265a6": { "message": "Extremo de producto" },
-  "center_align_e68d9997": { "message": "Alineación central" },
   "centered_dot_64d5e378": { "message": "Punto centrado" },
   "centered_horizontal_dots_451c5815": {
     "message": "Puntos horizontales centrados"
@@ -165,7 +163,6 @@
   "date_added_ed5ad465": { "message": "Fecha de agregado" },
   "decorative_icon_9a7f3fc3": { "message": "Ícono decorativo" },
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } decorativo" },
-  "decrease_indent_d9cf469d": { "message": "Reducir sangría" },
   "deep_purple_bb3e2907": { "message": "Morado oscuro" },
   "definite_integral_fe7ffed1": { "message": "Integral definida" },
   "degree_symbol_4a823d5f": { "message": "Símbolo de grados" },
@@ -364,7 +361,6 @@
     "message": "Parte imaginaria (de números complejos)"
   },
   "in_element_of_19ca2f33": { "message": "En (elemento de)" },
-  "increase_indent_6af90f7c": { "message": "Aumentar sangría" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
   "indigo_2035fc55": { "message": "Índigo" },
   "inference_fed5c960": { "message": "Inferencia" },
@@ -385,7 +381,6 @@
   "language_arts_icon_a798b0f8": { "message": "Ícono de artes del lenguaje" },
   "languages_icon_9d20539": { "message": "Ícono de idiomas" },
   "large_9c5e80e7": { "message": "Grande" },
-  "left_align_43d95491": { "message": "Alineación a la izquierda" },
   "left_angle_bracket_c87a6d07": { "message": "Símbolo de mayor" },
   "left_arrow_4fde1a64": { "message": "Flecha izquierda" },
   "left_arrow_with_hook_5bfcad93": { "message": "Flecha izquierda con gancho" },
@@ -609,7 +604,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Área del texto enriquecido. Presione ALT+0 para acceder a los atajos del Editor de contenido enriquecido."
   },
-  "right_align_39e7a32a": { "message": "Alineación a la derecha" },
   "right_angle_bracket_d704e2d6": { "message": "Símbolo de menor" },
   "right_arrow_35e0eddf": { "message": "Flecha a la derecha" },
   "right_arrow_with_hook_29d92d31": {
@@ -694,9 +688,6 @@
   "succeeds_equal_158e8c3a": { "message": "Sigue al igual" },
   "sum_b0842d31": { "message": "Suma" },
   "superscript_8cb349a2": { "message": "Superíndice" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superíndice y subíndice"
-  },
   "superset_c4db8a7a": { "message": "Superconjunto" },
   "superset_strict_c77dd6d2": { "message": "Superconjunto (estricto)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

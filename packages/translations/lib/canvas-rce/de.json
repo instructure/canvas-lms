@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "CC / Untertitel hinzufügen" },
   "add_image_60b2de07": { "message": "Bild hinzufügen" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Ausrichten" },
   "alignment_and_lists_5cebcb69": { "message": "Ausrichtung und Listen" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle Apps" },
@@ -71,7 +70,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "© 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Abbrechen" },
   "cap_product_3a5265a6": { "message": "Cap-Produkt" },
-  "center_align_e68d9997": { "message": "Mittig ausrichten" },
   "centered_dot_64d5e378": { "message": "Zentrierter Punkt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Zentrierte horizontale Punkte"
@@ -153,7 +151,6 @@
   "date_added_ed5ad465": { "message": "Datum hinzugefügt" },
   "decorative_icon_9a7f3fc3": { "message": "Dekoratives Symbol" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativer { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Einzug verkleinern" },
   "deep_purple_bb3e2907": { "message": "Dunkelviolett" },
   "definite_integral_fe7ffed1": { "message": "Bestimmtes Integral" },
   "degree_symbol_4a823d5f": { "message": "Gradsymbol" },
@@ -350,7 +347,6 @@
     "message": "Imaginärer Teil (einer komplexen Zahl)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element von)" },
-  "increase_indent_6af90f7c": { "message": "Einzug vergrößern" },
   "indefinite_integral_6623307e": { "message": "Unbestimmtes Integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Schlussfolgerung" },
@@ -371,7 +367,6 @@
   "language_arts_icon_a798b0f8": { "message": "Symbol für „Sprachkunst“" },
   "languages_icon_9d20539": { "message": "Sprachen-Symbol" },
   "large_9c5e80e7": { "message": "Groß" },
-  "left_align_43d95491": { "message": "Linksbündig" },
   "left_angle_bracket_c87a6d07": { "message": "Spitze Klammer links" },
   "left_arrow_4fde1a64": { "message": "Pfeil nach links" },
   "left_arrow_with_hook_5bfcad93": { "message": "Pfeil nach links mit Haken" },
@@ -589,7 +584,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich-Text-Bereich. Drücken Sie <Alt>+0, um Tastaturkürzel im Rich-Content-Editor anzuzeigen."
   },
-  "right_align_39e7a32a": { "message": "Rechtsbündig" },
   "right_angle_bracket_d704e2d6": { "message": "Eckige Klammer links" },
   "right_arrow_35e0eddf": { "message": "Pfeil nach rechts" },
   "right_arrow_with_hook_29d92d31": {
@@ -674,9 +668,6 @@
   "succeeds_equal_158e8c3a": { "message": "Folgt Gleich" },
   "sum_b0842d31": { "message": "Summe" },
   "superscript_8cb349a2": { "message": "Hochgestellt" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Hochgestellt und Tiefgestellt"
-  },
   "superset_c4db8a7a": { "message": "Obermenge" },
   "superset_strict_c77dd6d2": { "message": "Obermenge (Streng)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

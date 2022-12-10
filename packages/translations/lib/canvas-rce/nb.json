@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Legg til CC/Undertekst" },
   "add_image_60b2de07": { "message": "Legg til bilde" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Tilpass" },
   "alignment_and_lists_5cebcb69": { "message": "Tilpasning og lister" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle apper" },
@@ -71,7 +70,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "cap_product_3a5265a6": { "message": "Capsprodukt" },
-  "center_align_e68d9997": { "message": "Midtstilt" },
   "centered_dot_64d5e378": { "message": "Sentrert prikk" },
   "centered_horizontal_dots_451c5815": {
     "message": "Sentrerte horisontale prikker"
@@ -157,7 +155,6 @@
   "date_added_ed5ad465": { "message": "Lagt til dato" },
   "decorative_icon_9a7f3fc3": { "message": "Dekorativt ikon" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativt { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Reduser innrykk" },
   "deep_purple_bb3e2907": { "message": "Mørkelilla" },
   "definite_integral_fe7ffed1": { "message": "Bestemt heltall" },
   "degree_symbol_4a823d5f": { "message": "Gradsymbol" },
@@ -352,7 +349,6 @@
     "message": "Imaginær del (av komplekst tall)"
   },
   "in_element_of_19ca2f33": { "message": "I (element av)" },
-  "increase_indent_6af90f7c": { "message": "Øk innryk" },
   "indefinite_integral_6623307e": { "message": "Ubestemt heltall" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inferens" },
@@ -373,7 +369,6 @@
   "language_arts_icon_a798b0f8": { "message": "Språkkunst-ikon" },
   "languages_icon_9d20539": { "message": "Språk-ikon" },
   "large_9c5e80e7": { "message": "Stor" },
-  "left_align_43d95491": { "message": "Venstrestilt" },
   "left_angle_bracket_c87a6d07": { "message": "Venstre vinkelparantes" },
   "left_arrow_4fde1a64": { "message": "Venstre pil" },
   "left_arrow_with_hook_5bfcad93": { "message": "Venstre pil med krok" },
@@ -587,7 +582,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rikt tekstområde Trykk Alt+0 for Rich teksteditor-snarveier."
   },
-  "right_align_39e7a32a": { "message": "Høyrestilt" },
   "right_angle_bracket_d704e2d6": { "message": "Høyre vinkelparantes" },
   "right_arrow_35e0eddf": { "message": "Høyre pil" },
   "right_arrow_with_hook_29d92d31": { "message": "Høyre pil med krok" },
@@ -666,7 +660,6 @@
   "succeeds_equal_158e8c3a": { "message": "Lykkes er lik" },
   "sum_b0842d31": { "message": "Sum" },
   "superscript_8cb349a2": { "message": "Hevet skrift" },
-  "superscript_and_subscript_37f94a50": { "message": "Hevet og nedsenket" },
   "superset_c4db8a7a": { "message": "Supersett" },
   "superset_strict_c77dd6d2": { "message": "Supersett (streng)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
