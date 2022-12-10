@@ -380,7 +380,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = if self.data[:file_path]
                    File.open(self.data[:file_path], "rb")
                  else
-                   attachment.open
+                   attachment.open(integrity_check: true)
                  end
     @data_file
   end
