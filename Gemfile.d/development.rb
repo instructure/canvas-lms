@@ -26,6 +26,9 @@ group :development do
   gem "active_record_query_trace", "1.8", require: false
 
   gem "byebug", "11.1.3", platform: :mri
-  gem "debase", "0.2.5.beta2", require: false
-  gem "ruby-debug-ide", "0.7.3", require: false
+  # These gems aren't compatible with newer rubies; just use the built-in debug gem instead
+  if RUBY_VERSION < "3.0"
+    gem "debase", "0.2.5.beta2", require: false
+    gem "ruby-debug-ide", "0.7.3", require: false
+  end
 end

@@ -62,7 +62,7 @@ gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.10.0"
 gem "canvas_connect", "0.3.16"
-  gem "adobe_connect", "1.0.10", require: false
+  gem "adobe_connect", "1.0.11", require: false
 gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "ddtrace", "0.42.0", require: false
@@ -112,13 +112,16 @@ gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
 gem "net-ldap", "0.16.3", require: false
-gem "nokogiri", "1.12.5", require: false
+gem "net-imap", "0.2.3", require: false
+gem "net-pop", "0.1.1", require: false
+gem "net-smtp", "0.3.1", require: false
+gem "nokogiri", "1.13.8", require: false
 gem "oauth", "0.5.4", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
-gem "pg_query", "2.1.2"
+gem "pg_query", "2.2.0"
 gem "prawn-rails", "1.3.0"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
@@ -137,7 +140,7 @@ gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
-  gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
+  gem "nokogiri-xmlsec-instructure", "0.10.2", require: false
 gem "sanitize", "6.0.0", require: false
 gem "sentry-ruby", "5.1.0"
 gem "sentry-rails", "5.1.0"
