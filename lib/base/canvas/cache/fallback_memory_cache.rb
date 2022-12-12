@@ -21,7 +21,7 @@ module Canvas
     class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
       include FallbackExpirationCache
 
-      def read_entry(key, *opts)
+      def read_entry(key, **opts)
         super
       rescue TypeError => e
         if Rails.env.development? && e.message.include?("can't be referred to")
