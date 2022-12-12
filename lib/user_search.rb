@@ -260,8 +260,8 @@ module UserSearch
       Setting.get("user_search_with_full_complexity", "true") == "true"
     end
 
-    def wildcard_pattern(value, options)
-      ActiveRecord::Base.wildcard_pattern(value, options)
+    def wildcard_pattern(value, **options)
+      ActiveRecord::Base.wildcard_pattern(value, **options)
     end
   end
 end
