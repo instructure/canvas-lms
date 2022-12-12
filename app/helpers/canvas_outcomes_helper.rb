@@ -34,7 +34,7 @@ module CanvasOutcomesHelper
     domain, jwt = extract_domain_jwt(
       context.root_account,
       "lmgb_results.show",
-      params
+      **params
     )
     return if domain.nil? || jwt.nil?
 
