@@ -344,7 +344,7 @@ class JobsV2Controller < ApplicationController
       progress.process_job(JobsV2Controller,
                            :run_unstucker!,
                            { priority: Delayed::HIGH_PRIORITY },
-                           { shard_ids: Array(params[:job_shards]) })
+                           shard_ids: Array(params[:job_shards]))
       render json: { status: "pending", progress: progress_json(progress, @current_user, session) }
     end
   end
