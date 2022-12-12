@@ -30,9 +30,14 @@ import useStore, {updateState} from './stores'
 const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('grade_summary')
 
-function SubmissionCommentsTray() {
+type SubmissionCommentsTrayProps = {
+  onDismiss?: () => void
+}
+
+function SubmissionCommentsTray({onDismiss}: SubmissionCommentsTrayProps) {
   const handleDismiss = () => {
     updateState({submissionTrayOpen: false})
+    onDismiss?.()
   }
 
   const submissionComments = useStore(state => state.submissionCommentsTray)

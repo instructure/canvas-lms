@@ -759,3 +759,13 @@ $outcome-border: 1px solid #BCC2CA;
     padding-#{direction(right)}: $ic-sp + 2;
   }
 }
+
+@media print {
+  .comment_thread_show_print {
+    display: table-row !important;
+  }
+
+  [data-cid="Tray"] {
+    display: none
+  }
+}
