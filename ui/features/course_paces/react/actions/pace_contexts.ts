@@ -67,7 +67,7 @@ const thunkActions = {
     sortBy?: SortableColumn,
     orderType?: OrderType
   ): ThunkAction<void, StoreState, void, Action> => {
-    return async (dispatch, getState) => {
+    return async function fetchPaceContextsThunk(dispatch, getState) {
       dispatch(createAction(Constants.SET_LOADING, true))
       const {coursePace, paceContexts} = getState()
       const response = await Api.getPaceContexts(

@@ -310,13 +310,20 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.removePace()
       await thunkedAction(asyncDispatch, getState)
 
-      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls.length).toBe(5)
       expect(asyncDispatch.mock.calls[0]).toEqual([
         uiActions.showLoadingOverlay('Removing pace...'),
       ])
       expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('removePace')])
       expect(asyncDispatch.mock.calls[2]).toEqual([uiActions.hidePaceModal()])
-      expect(asyncDispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
+      expect(asyncDispatch.mock.calls[4]).toEqual([uiActions.hideLoadingOverlay()])
+    })
+
+    it('fetches the pace context info again', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const getState = mockGetState({...PRIMARY_PACE}, PRIMARY_PACE)
+      await coursePaceActions.removePace()(asyncDispatch, getState)
+      expect(asyncDispatch.mock.calls[3].toString()).toMatch('fetchPaceContextsThunk')
     })
 
     it('calls the destroy pace API', async () => {
