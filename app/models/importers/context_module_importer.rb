@@ -24,6 +24,9 @@ module Importers
 
     MAX_URL_LENGTH = 2000
 
+    ASSIGNMENT_GROUP_NAMES = AssignmentGroup::GROUP_NAMES.map{|n| n.downcase.gsub(/\s/, "_")}
+
+
     def self.linked_resource_type_class(type)
       case type
         when /wiki_type|wikipage/i
@@ -166,24 +169,34 @@ module Importers
       item.content_tags.where.not(:migration_id => nil).
         where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
-      if hash[:completion_requirements]
-        c_reqs = []
-        hash[:completion_requirements].each do |req|
-          if item_ref = item_map[req[:item_migration_id]]
-            req[:id] = item_ref.id
-            req.delete :item_migration_id
-            c_reqs << req
+      account_level_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
+
+      unless account_level_thresholds.any?
+        if hash[:completion_requirements]
+          c_reqs = []
+          hash[:completion_requirements].each do |req|
+            if item_ref = item_map[req[:item_migration_id]]
+              req[:id] = item_ref.id
+              req.delete :item_migration_id
+              c_reqs << req
+            end
           end
-        end
-        if c_reqs.length > 0
-          item.completion_requirements = c_reqs
-          item.save
+          if c_reqs.length > 0
+            item.completion_requirements = c_reqs
+            item.save
+          end
         end
       end
 
       item
     end
-
+    def self.get_default_course_thresholds(assignment_group_names)
+      thresholds = {}
+      assignment_group_names.each do |group_name|
+        thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', assignment_group_name: group_name)
+      end
+      thresholds
+    end
 
     def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access

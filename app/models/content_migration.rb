@@ -36,6 +36,7 @@ class ContentMigration < ActiveRecord::Base
   after_save :check_for_blocked_migration
 
   DATE_FORMAT = "%m/%d/%Y"
+  ASSIGNMENT_GROUP_NAMES = AssignmentGroup::GROUP_NAMES.map{|n| n.downcase.gsub(/\s/, "_")}
 
   attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
 
