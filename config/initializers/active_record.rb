@@ -1681,7 +1681,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def foreign_key_for(from_table, **options)
     return unless supports_foreign_keys?
 
-    fks = foreign_keys(from_table).select { |fk| fk.defined_for?(options) }
+    fks = foreign_keys(from_table).select { |fk| fk.defined_for?(**options) }
     # prefer a FK on a column named after the table
     if options[:to_table]
       column = foreign_key_column_for(options[:to_table])
@@ -1717,7 +1717,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     options = { name: index_name, unique: true, if_not_exists: true }.tap do |hash|
       hash[:algorithm] = :concurrently if klass.exists?
     end
-    add_index klass.table_name, [column_name, primary_column], options
+    add_index klass.table_name, [column_name, primary_column], **options
     set_replica_identity klass.table_name, index_name
   end
 
