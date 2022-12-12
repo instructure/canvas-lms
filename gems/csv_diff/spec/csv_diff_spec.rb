@@ -24,7 +24,7 @@ describe CsvDiff::Diff do
 
   # not a let because I want a new object returned each time
   def csv1(options = { headers: true })
-    CSV.new(<<~CSV, options)
+    CSV.new(<<~CSV, **options)
       pk1,col1,pk2,col2
       a,b,c,d
       1,2,3,4
