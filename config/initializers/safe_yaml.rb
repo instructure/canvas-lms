@@ -51,15 +51,23 @@ module SafeYAML
   )
 
   module Psych
-    # load defaults to safe
-    def load(*args, safe: true, **kwargs)
-      return super(*args, **kwargs) unless safe
+    if ::Psych::VERSION < "4"
+      # load defaults to safe
+      def load(*args, safe: true, **kwargs)
+        return super(*args, **kwargs) unless safe
 
-      safe_load(*args, **kwargs)
-    end
+        safe_load(*args, **kwargs)
+      end
 
-    def unsafe_load(*args, **kwargs)
-      load(*args, safe: false, **kwargs)
+      def unsafe_load(*args, **kwargs)
+        load(*args, safe: false, **kwargs)
+      end
+    else
+      def load(*args, safe: true, **kwargs)
+        return unsafe_load(*args, **kwargs) unless safe
+
+        super(*args, aliases: true, **kwargs)
+      end
     end
 
     def safe_load(yaml, permitted_classes: [], **kwargs)

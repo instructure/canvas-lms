@@ -317,7 +317,7 @@ end)
 require "i18n_extraction/i18nliner_scope_extensions"
 
 module I18nTemplate
-  def render(view, *args)
+  def render(view, *, **)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
       view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(%r{/_?}, "."))
