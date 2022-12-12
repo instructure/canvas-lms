@@ -38,6 +38,15 @@
 //                   the API for a new value. Defaults to 1/2 the poll interval.
 //       maxTries: how many API failures can occur in a row before we just give
 //                 up entirely and stop updating. Defaults to 5.
+//       pollNowPassback:  an optional function which, if provided, will be called
+//                         once upon the first render. The function is expected to
+//                         accept an argument which is itself a function, and can be
+//                         called by the parent to force an update to the Unread badge.
+//                         If that function is called with a numeric argument, the
+//                         unread count is simply set to that; if it is not provided or
+//                         undefined, it triggers an immediate poll of the dataUrl to
+//                         (upon completion of the API call) update the badge with an
+//                         updated value. Defaults to no action.
 //       useSessionStorage: whether to use local browser session storage for
 //       bool,default true  storing / retrieving unread counts before polling
 //                          the Canvas API.
@@ -69,6 +78,7 @@ UnreadCounts.propTypes = {
   allowedAge: number,
   maxTries: number,
   useSessionStorage: bool,
+  pollNowPassback: func,
 }
 
 UnreadCounts.defaultProps = {
@@ -95,6 +105,7 @@ export default function UnreadCounts(props) {
     allowedAge,
     maxTries,
     useSessionStorage,
+    pollNowPassback,
   } = props
   const syncState = useRef({msUntilFirstPoll: 0, savedChecked: false})
   const [count, setCount] = useState(NaN) // want to be sure to update at least once
@@ -112,6 +123,23 @@ export default function UnreadCounts(props) {
     if (typeof onUpdate === 'function') onUpdate(n)
   }
 
+  // set the unread count state on a change, and also update the saved session
+  // storage if we are using it
+  function setUnreadCount(unreadCount) {
+    setCount(unreadCount)
+    updateParent(unreadCount)
+    if (!useSessionStorage) return
+    try {
+      const savedState = JSON.stringify({
+        updatedAt: +new Date(),
+        unreadCount,
+      })
+      sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
+    } catch (_ex) {
+      // error in setting storage, no biggie, ignore
+    }
+  }
+
   function startPolling() {
     let timerId = null
     let attempts = 0
@@ -123,23 +151,9 @@ export default function UnreadCounts(props) {
     async function getData() {
       try {
         const result = await fetch(dataUrl, defaultFetchOptions)
-        const resp = await result.json()
-        const unreadCount = parseInt(resp.unread_count, 10)
-        if (useSessionStorage) {
-          try {
-            const savedState = JSON.stringify({
-              updatedAt: +new Date(),
-              unreadCount,
-            })
-            sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
-          } catch (_ex) {
-            // error in setting storage, no biggie, ignore
-          }
-        }
-        if (count !== unreadCount) {
-          setCount(unreadCount)
-          updateParent(unreadCount)
-        }
+        const {unread_count: cnt} = await result.json()
+        const unreadCount = typeof cnt === 'number' ? cnt : parseInt(cnt, 10)
+        setUnreadCount(unreadCount)
         attempts = 0
         error = null
       } catch (e) {
@@ -147,9 +161,9 @@ export default function UnreadCounts(props) {
       }
     }
 
-    async function poll() {
+    async function poll(force) {
       // if we get here when the page is hidden, don't actually fetch it now, wait until the page is refocused
-      if (document.hidden) {
+      if (document.hidden && !force) {
         document.addEventListener('visibilitychange', poll, {once: true})
         return
       }
@@ -162,6 +176,17 @@ export default function UnreadCounts(props) {
     }
 
     if (ableToRun()) {
+      // Arrange to tell our parent how to force us to update, if they want
+      if (pollNowPassback)
+        pollNowPassback(function (overrideCount) {
+          if (typeof overrideCount === 'undefined') {
+            poll(true)
+          } else if (typeof overrideCount === 'number') {
+            setUnreadCount(overrideCount)
+          } else {
+            throw new TypeError('Argument to the poll now callback, if present, must be numeric')
+          }
+        })
       const delay = syncState.current.msUntilFirstPoll
       // If polling is disabled, it's also fine to just use the cached value
       if (delay > 0) {
@@ -186,7 +211,7 @@ export default function UnreadCounts(props) {
       const msSinceLastUpdate = new Date() - saved.updatedAt
       if (msSinceLastUpdate < allowedAge) {
         if (count !== saved.unreadCount) {
-          setCount(saved.unreadCount)
+          setUnreadCount(saved.unreadCount)
           updateParent(saved.unreadCount)
           syncState.current.msUntilFirstPoll = allowedAge - msSinceLastUpdate
         }
