@@ -1848,6 +1848,7 @@ describe Canvas::LiveEvents do
           description: @outcome_group.description,
           vendor_guid: @outcome_group.vendor_guid,
           parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          parent_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           workflow_state: @outcome_group.workflow_state
         }.compact).once
 
@@ -1866,6 +1867,7 @@ describe Canvas::LiveEvents do
           description: @global_outcome_group.description,
           vendor_guid: @global_outcome_group.vendor_guid,
           parent_outcome_group_id: nil,
+          parent_outcome_group_context_uuid: nil,
           workflow_state: @global_outcome_group.workflow_state
         }.compact).once
 
@@ -1888,6 +1890,7 @@ describe Canvas::LiveEvents do
           description: @outcome_group.description,
           vendor_guid: @outcome_group.vendor_guid,
           parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          parent_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           updated_at: @outcome_group.updated_at,
           workflow_state: @outcome_group.workflow_state
         }.compact).once
@@ -1909,6 +1912,7 @@ describe Canvas::LiveEvents do
           description: @global_outcome_group.description,
           vendor_guid: @global_outcome_group.vendor_guid,
           parent_outcome_group_id: nil,
+          parent_outcome_group_context_uuid: nil,
           updated_at: @global_outcome_group.updated_at,
           workflow_state: @global_outcome_group.workflow_state
         }.compact).once
@@ -1933,8 +1937,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_created", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state
@@ -1955,8 +1960,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_updated", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,
@@ -1976,8 +1982,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_updated", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,

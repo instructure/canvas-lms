@@ -831,6 +831,11 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_created", get_learning_outcome_data(outcome))
   end
 
+  def self.get_learning_outcome_group_context_uuid(group_id)
+    group = LearningOutcomeGroup.find_by(id: group_id)
+    group&.context&.uuid
+  end
+
   def self.get_learning_outcome_group_data(group)
     {
       learning_outcome_group_id: group.id,
@@ -841,6 +846,7 @@ module Canvas::LiveEvents
       description: group.description,
       vendor_guid: group.vendor_guid,
       parent_outcome_group_id: group.learning_outcome_group_id,
+      parent_outcome_group_context_uuid: get_learning_outcome_group_context_uuid(group.learning_outcome_group_id),
       workflow_state: group.workflow_state
     }
   end
@@ -859,6 +865,7 @@ module Canvas::LiveEvents
       learning_outcome_id: link.content_id,
       learning_outcome_context_uuid: get_learning_outcome_context_uuid(link.content_id),
       learning_outcome_group_id: link.associated_asset_id,
+      learning_outcome_group_context_uuid: get_learning_outcome_group_context_uuid(link.associated_asset_id),
       context_id: link.context_id,
       context_type: link.context_type,
       workflow_state: link.workflow_state
