@@ -73,7 +73,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # we only override it to make sure we can recover if
   # we have stale data available, and to make sure unlocking happens
   # no matter what (even if the block dies)
-  def save_block_result_to_cache(name, **options)
+  def save_block_result_to_cache(name, options)
     super
   rescue => e
     raise unless @safe_redis_internal_options[:stale_entry]
