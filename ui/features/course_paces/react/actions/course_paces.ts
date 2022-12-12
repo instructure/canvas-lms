@@ -21,7 +21,14 @@ import {ThunkAction} from 'redux-thunk'
 import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
+import {
+  CoursePaceItemDueDates,
+  CoursePace,
+  PaceContextTypes,
+  APIPaceContextTypes,
+  Progress,
+  StoreState,
+} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
@@ -29,6 +36,7 @@ import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
 import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
 import {getPaceName, getIsUnpublishedNewPace} from '../reducers/course_paces'
+import {paceContextsActions} from './pace_contexts'
 
 const I18n = useI18nScope('course_paces_actions')
 
@@ -272,9 +280,16 @@ const thunkActions = {
       dispatch(uiActions.clearCategoryError('removePace'))
 
       const paceName = getPaceName(getState())
+      const CONTEXT_TYPE_MAP: {[k in PaceContextTypes]: APIPaceContextTypes} = {
+        Course: 'course',
+        Section: 'section',
+        Enrollment: 'student_enrollment',
+      }
+      const selectedContextType = CONTEXT_TYPE_MAP[getState().ui.selectedContextType]
       return Api.removePace(getState().coursePace)
         .then(() => {
           dispatch(uiActions.hidePaceModal())
+          dispatch(paceContextsActions.fetchPaceContexts(selectedContextType))
           showFlashSuccess(I18n.t('%{paceName} Pace removed', {paceName}))()
         })
         .catch(error => {
