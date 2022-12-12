@@ -51,7 +51,7 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
 
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(
-      mutation_str(opts),
+      mutation_str(**opts),
       context: {
         current_user: current_user,
         domain_root_account: @course.account.root_account,
