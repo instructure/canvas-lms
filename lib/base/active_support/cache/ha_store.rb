@@ -81,7 +81,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
 
   protected
 
-  def delete_entry(key, options)
+  def delete_entry(key, **options)
     # do it locally
     result = super unless options[:skip_local]
     # then if so configured, trigger consul

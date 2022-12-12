@@ -61,7 +61,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
         else
           # someone else is already generating it; wait for them
           sleep 0.1
-          entry = read_entry(key, options)
+          entry = read_entry(key, **options)
           next
         end
       end
