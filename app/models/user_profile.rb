@@ -130,7 +130,7 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
-  def insert_content_shares_tab(tabs, user, **)
+  def insert_content_shares_tab(tabs, user, _opts)
     if user&.can_view_content_shares?
       tabs <<
         {
@@ -182,7 +182,7 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
-  def insert_past_global_announcements(tabs, user, **)
+  def insert_past_global_announcements(tabs, user, _opts)
     if user
       tabs <<
         {
