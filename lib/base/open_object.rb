@@ -21,7 +21,7 @@
 require "ostruct"
 
 class OpenStruct
-  def as_json(**)
+  def as_json(*)
     table
   end
 end

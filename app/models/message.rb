@@ -1010,7 +1010,7 @@ class Message < ActiveRecord::Base
   # flattened appropriately.
   #
   # Returns json hash.
-  def as_json(**)
+  def as_json(*)
     super(only: %i[id created_at sent_at workflow_state from from_name to reply_to subject body html_body])["message"]
   end
 
