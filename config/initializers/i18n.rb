@@ -170,8 +170,8 @@ module I18nUtilities
     [text, options]
   end
 
-  def n(*args)
-    I18n.n(*args)
+  def n(...)
+    I18n.n(...)
   end
 end
 
