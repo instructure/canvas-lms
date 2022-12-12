@@ -238,7 +238,7 @@ class ContentExport < ActiveRecord::Base
     mark_exporting
     begin
       job_progress.try :start!
-      if (attachment = Exporters::ZipExporter.create_zip_export(self, opts))
+      if (attachment = Exporters::ZipExporter.create_zip_export(self, **opts))
         self.attachment = attachment
         self.progress = 100
         mark_exported
