@@ -53,22 +53,22 @@ module Lti
         end
 
         it "sets the JS ENV" do
-          expect(controller).to receive(:js_env).with(
-            deep_link_response: {
-              placement: placement,
-              content_items: content_items,
-              msg: msg,
-              log: log,
-              errormsg: errormsg,
-              errorlog: errorlog,
-              ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
-                [:retrieve, account, :external_tools],
-                host: "test.host"
-              ),
-              reloadpage: false,
-              moduleCreated: false
-            }
-          )
+          expect(controller).to receive(:js_env).with({
+                                                        deep_link_response: {
+                                                          placement: placement,
+                                                          content_items: content_items,
+                                                          msg: msg,
+                                                          log: log,
+                                                          errormsg: errormsg,
+                                                          errorlog: errorlog,
+                                                          ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
+                                                            [:retrieve, account, :external_tools],
+                                                            host: "test.host"
+                                                          ),
+                                                          reloadpage: false,
+                                                          moduleCreated: false
+                                                        }
+                                                      })
 
           subject
         end
@@ -108,13 +108,14 @@ module Lti
           let(:errorlog) { { html: "some error log" } }
 
           it "turns them into strings before calling js_env to prevent HTML injection" do
-            expect(controller).to receive(:js_env).with(deep_link_response:
-              hash_including(
-                msg: '{"html"=>"some message"}',
-                log: '{"html"=>"some log"}',
-                errormsg: '{"html"=>"some error message"}',
-                errorlog: '{"html"=>"some error log"}'
-              ))
+            expect(controller).to receive(:js_env).with({
+                                                          deep_link_response: hash_including(
+                                                            msg: '{"html"=>"some message"}',
+                                                            log: '{"html"=>"some log"}',
+                                                            errormsg: '{"html"=>"some error message"}',
+                                                            errorlog: '{"html"=>"some error log"}'
+                                                          )
+                                                        })
             subject
           end
         end
