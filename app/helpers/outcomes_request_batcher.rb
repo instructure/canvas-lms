@@ -33,7 +33,7 @@ class OutcomesRequestBatcher
     domain, jwt = extract_domain_jwt(
       context.root_account,
       scope,
-      params
+      **params
     )
 
     return requests if domain.nil? || jwt.nil?
