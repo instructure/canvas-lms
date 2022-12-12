@@ -32,6 +32,7 @@ module Lti
         let(:return_url_params) { { placement: placement } }
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
+        let(:course) { course_model(account: account) }
 
         let(:context_external_tool) do
           ContextExternalTool.create!(
@@ -44,7 +45,6 @@ module Lti
             lti_version: "1.3"
           )
         end
-        let(:course) { course_model }
 
         it { is_expected.to be_ok }
 
@@ -402,7 +402,7 @@ module Lti
         end
 
         context "content_item claim message" do
-          let(:course) { course_model }
+          let(:course) { course_model(account: account) }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -645,7 +645,7 @@ module Lti
               end
 
               context "when feature flag is enabled" do
-                before :once do
+                before do
                   course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
                 end
 

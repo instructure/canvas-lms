@@ -42,6 +42,11 @@ lti_multiple_assignment_deep_linking:
   description: |-
     If enabled, allows multiple deep link support for assignments and modules.
   applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_deep_linking_module_index_menu_modal:
   state: hidden
   display_name: LTI Deep Linking for Module Index Menu
