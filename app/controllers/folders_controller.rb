@@ -366,7 +366,7 @@ class FoldersController < ApplicationController
   #   The name of the folder
   #
   # @argument parent_folder_id [String]
-  #   The id of the folder to store the file in. If this and parent_folder_path are sent an error will be returned. If neither is given, a default folder will be used.
+  #   The id of the folder to store the new folder in. An error will be returned if this does not correspond to an existing folder. If this and parent_folder_path are sent an error will be returned. If neither is given, a default folder will be used.
   #
   # @argument parent_folder_path [String]
   #   The path of the folder to store the new folder in. The path separator is the forward slash `/`, never a back slash. The parent folder will be created if it does not already exist. This parameter only applies to new folders in a context that has folders, such as a user, a course, or a group. If this and parent_folder_id are sent an error will be returned. If neither is given, a default folder will be used.
@@ -419,7 +419,12 @@ class FoldersController < ApplicationController
     elsif folder_params[:folder_id]
       folder_params.delete(:folder_id)
     elsif folder_params[:parent_folder_id]
-      parent_folder = @context.folders.find(folder_params.delete(:parent_folder_id))
+      parent_folder = @context.folders.active.find_by(id: folder_params.delete(:parent_folder_id))
+      if parent_folder.nil?
+        return render json: {
+          errors: [{ message: t("The specified resource does not exist.") }]
+        }, status: :not_found
+      end
     elsif @context.respond_to?(:folders) && folder_params[:parent_folder_path].is_a?(String)
       root = Folder.root_folders(@context).first
       if authorized_action(root, @current_user, :create)

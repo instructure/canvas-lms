@@ -465,11 +465,25 @@ describe "Folders API", type: :request do
     end
 
     it "errors with invalid parent id" do
-      api_call(:post, "/api/v1/courses/#{@course.id}/folders",
-               @folders_path_options.merge(course_id: @course.id.to_param),
-               { name: "sub1", locked: "true", parent_folder_id: "0" },
-               {},
-               expected_status: 404)
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/folders",
+                      @folders_path_options.merge(course_id: @course.id.to_param),
+                      { name: "sub1", locked: "true", parent_folder_id: "0" },
+                      {},
+                      expected_status: 404)
+      message = json["errors"][0]["message"]
+      expect(message).to eq "The specified resource does not exist."
+    end
+
+    it "errors with deleted folder id" do
+      root = Folder.root_folders(@course).first
+      sub = root.sub_folders.create!(name: "folder1", context: @course, workflow_state: "deleted")
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/folders",
+                      @folders_path_options.merge(course_id: @course.id.to_param),
+                      { name: "test", parent_folder_id: sub.id },
+                      {},
+                      expected_status: 404)
+      message = json["errors"][0]["message"]
+      expect(message).to eq "The specified resource does not exist."
     end
 
     it "gives error if path and id are passed" do
