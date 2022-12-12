@@ -690,7 +690,7 @@ class SisBatch < ActiveRecord::Base
       count: count, type: type, change_threshold: change_threshold)
   end
 
-  def as_json(**)
+  def as_json(*)
     data = {
       "id" => id,
       "created_at" => created_at,
