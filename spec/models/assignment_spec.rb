@@ -2227,19 +2227,19 @@ describe Assignment do
 
       it "sets grade_posting_in_progress to false when absent" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher)
+          .with(submission, student, nil, { grade: 10, grader: teacher })
         assignment.grade_student(student, grade: 10, grader: teacher)
       end
 
       it "sets grade_posting_in_progress to true when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: true)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: true })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: true)
       end
 
       it "sets grade_posting_in_progress to false when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: false)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: false })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: false)
       end
     end
