@@ -26,11 +26,11 @@ class TestApiInstance
   end
 
   def account_url(account)
-    URI.encode("http://www.example.com/accounts/#{account}")
+    URI::DEFAULT_PARSER.escape("http://www.example.com/accounts/#{account}")
   end
 
   def course_assignment_url(course, assignment)
-    URI.encode("http://www.example.com/courses/#{course}/assignments/#{assignment}")
+    URI::DEFAULT_PARSER.escape("http://www.example.com/courses/#{course}/assignments/#{assignment}")
   end
 end
 

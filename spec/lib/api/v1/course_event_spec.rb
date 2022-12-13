@@ -26,7 +26,7 @@ describe Api::V1::CourseEvent do
   end
 
   def api_v1_course_url(course)
-    URI.encode("#{url_root}/api/v1/courses/#{course}")
+    URI::DEFAULT_PARSER.escape("#{url_root}/api/v1/courses/#{course}")
   end
 
   def feeds_calendar_url(feed_code)

@@ -127,7 +127,7 @@ class AssessmentQuestion < ActiveRecord::Base
       if id
         file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
       elsif path
-        path = URI.unescape(id_or_path)
+        path = URI::DEFAULT_PARSER.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
       if file&.replacement_attachment_id

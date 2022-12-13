@@ -90,7 +90,7 @@ module QuizMathDataFixup
       # look for an equation_images URL in the text and extract the latex
       m = %r{equation_images/([^\s]+)}.match(html.content)
       if m && m[1]
-        code = URI.unescape(URI.unescape(m[1]))
+        code = URI::DEFAULT_PARSER.unescape(URI::DEFAULT_PARSER.unescape(m[1]))
         html =
           "<img class='equation_image' src='/equation_images/#{m[1]}' alt='LaTeX: #{code}' title='#{
             code
@@ -99,7 +99,7 @@ module QuizMathDataFixup
         # look for \(inline latex\) and extract it
         m = html.content.match(/\\\(((?!\\\)).+)\\\)/)
         if m && m[1]
-          code = URI.unescape(URI.unescape(m[1]))
+          code = URI::DEFAULT_PARSER.unescape(URI::DEFAULT_PARSER.unescape(m[1]))
           html =
             "<img class='equation_image' src='/equation_images/#{m[1]}' alt='LaTeX: #{
               code
@@ -130,7 +130,7 @@ module QuizMathDataFixup
             latex.attribute("class").value.sub("math_equation_latex", "").strip
         else
           code = latex.content.gsub(/(^\\\(|\\\)$)/, "")
-          escaped = URI.escape(URI.escape(code))
+          escaped = URI::DEFAULT_PARSER.escape(URI::DEFAULT_PARSER.escape(code))
           latex.replace(
             "<img class='equation_image' src='/equation_images/#{escaped}' alt='LaTeX: #{
               code

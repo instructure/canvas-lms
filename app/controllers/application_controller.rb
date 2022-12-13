@@ -2233,7 +2233,7 @@ class ApplicationController < ActionController::Base
         # routes and stuff), then we'll build an actual named_context_url with the
         # params for show_relative
         res += named_context_url(@context, :context_file_url, attachment)
-        res += "/" + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+        res += "/" + URI::DEFAULT_PARSER.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
         res += "?" + opts.to_query
       else
         # otherwise, just redirect to /files/:id
