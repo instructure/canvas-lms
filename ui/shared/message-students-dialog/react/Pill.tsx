@@ -19,12 +19,12 @@
 import React from 'react'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {TruncateText} from '@instructure/ui-truncate-text'
 
 const themeOverride = {
   [Tag.theme]: {
@@ -35,6 +35,25 @@ const themeOverride = {
 const I18n = useI18nScope('pill')
 const ellipsis = () => I18n.t('…')
 const truncate = text => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)
+
+function renderText(text, truncatedText, textColor) {
+  const isTruncated = text.length > truncatedText.length
+  if (isTruncated) {
+    return (
+      <Tooltip renderTip={text}>
+        <Text as="div" color={textColor}>
+          <TruncateText>{truncatedText}</TruncateText>
+        </Text>
+      </Tooltip>
+    )
+  } else {
+    return (
+      <Text as="div" color={textColor}>
+        <TruncateText>{text}</TruncateText>
+      </Text>
+    )
+  }
+}
 
 function renderIcon(selected) {
   if (selected) {
@@ -48,26 +67,14 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
   const textColor = selected ? 'primary' : 'secondary'
   const truncatedText = truncate(text)
 
-  const contents =
-    text < truncatedText ? (
-      <>
-        <Flex margin="0 small 0 0" justifyItems="space-between">
-          <Flex.Item>
-            <Tooltip as="div" renderTip={text}>
-              <Text color={textColor}>{truncatedText}</Text>
-            </Tooltip>
-          </Flex.Item>
-          <Flex.Item>{renderIcon(selected)}</Flex.Item>
-        </Flex>
-      </>
-    ) : (
-      <>
-        <View margin="0 small 0 0">
-          <Text color={textColor}>{text}</Text>
-        </View>
-        {renderIcon(selected)}
-      </>
-    )
+  const contents = (
+    <Flex as="div" margin="0 xx-small 0 0" justifyItems="space-between">
+      <Flex.Item size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
+        {renderText(text, truncatedText, textColor)}
+      </Flex.Item>
+      <Flex.Item>{renderIcon(selected)}</Flex.Item>
+    </Flex>
+  )
 
   return (
     <ApplyTheme theme={themeOverride}>
