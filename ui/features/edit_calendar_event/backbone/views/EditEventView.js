@@ -72,7 +72,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'important_dates',
         'blackout_date',
         'context_type',
-        'course_pacing_enabled'
+        'course_pacing_enabled',
+        'course_sections'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -128,6 +129,15 @@ export default class EditCalendarEventView extends Backbone.View {
           this.$el
             .find('#calendar_event_blackout_date')
             .prop('checked', picked_params[key] === 'true')
+        }
+        if (key === 'course_sections') {
+          const sections = picked_params[key]
+          sections.forEach(section => {
+            if (section.event) {
+              this.$el.find(`input[name='child_event_data[${section.id}][start_time]']`).change()
+              this.$el.find(`input[name='child_event_data[${section.id}][end_time]']`).change()
+            }
+          })
         }
         return $e.change()
       })
