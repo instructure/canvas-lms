@@ -937,6 +937,103 @@ describe OutcomeResultsController do
           expect(rollups.third["scores"][0]["score"]).to eq 1.0
         end
       end
+
+      context "students enrolled in multiple sections" do
+        before do
+          @section1 = add_section "s1", course: outcome_course
+          @section2 = add_section "s2", course: outcome_course
+
+          student_in_section @section1, user: @student1, allow_multiple_enrollments: true
+          student_in_section @section2, user: @student2, allow_multiple_enrollments: true
+          student_in_section @section1, user: @student2, allow_multiple_enrollments: true
+          student_in_section @section2, user: @student3, allow_multiple_enrollments: true
+        end
+
+        it "returns active students who are in section 1" do
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"], section_id: @section1.id }))
+          # student 3 is only enrolled in section 2
+          rollups = json["rollups"].select { |r| r["links"]["user"] == @student3.id.to_s }
+          expect(rollups.count).to eq(0)
+          # student 1 & student 2 are enrolled in section 1
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+          expect(json["rollups"].second["links"]["user"]).to eq @student2.id.to_s
+        end
+
+        it "returns only active students by default when inactive students are enrolled" do
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).deactivate
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"], section_id: @section1.id }))
+          rollups = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          expect(rollups.count).to eq(0)
+          expect(json["rollups"].count).to eq(1)
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+        end
+
+        it "returns only active students by default when concluded and inactive students are enrolled" do
+          student_in_section @section1, user: @student3, allow_multiple_enrollments: true
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).deactivate
+          StudentEnrollment.find_by(user_id: @student3.id, course_section_id: @section1.id).conclude
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"], section_id: @section1.id }))
+          rollups = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          expect(rollups.count).to eq(0)
+          expect(json["rollups"].count).to eq(1)
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+        end
+
+        it "returns active and concluded students but not inactive" do
+          student_in_section @section1, user: @student3, allow_multiple_enrollments: true
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).deactivate
+          StudentEnrollment.find_by(user_id: @student3.id, course_section_id: @section1.id).conclude
+          json = parse_response(get_rollups({ exclude: ["inactive_enrollments"], section_id: @section1.id }))
+          rollups = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          expect(rollups.count).to eq(0)
+          expect(json["rollups"].count).to eq(2)
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+          expect(json["rollups"].second["links"]["user"]).to eq @student3.id.to_s
+        end
+
+        it "returns active, concluded and inactive students" do
+          student_in_section @section1, user: @student3, allow_multiple_enrollments: true
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).deactivate
+          StudentEnrollment.find_by(user_id: @student3.id, course_section_id: @section1.id).conclude
+          json = parse_response(get_rollups({ section_id: @section1.id }))
+          expect(json["rollups"].count).to eq(3)
+          expect(json["rollups"].first["links"]["user"]).to eq @student1.id.to_s
+          expect(json["rollups"].second["links"]["user"]).to eq @student2.id.to_s
+          expect(json["rollups"].third["links"]["user"]).to eq @student3.id.to_s
+        end
+
+        it "returns active by default for all sections in a course" do
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"] }))
+          rollups_student1 = json["rollups"].select { |r| r["links"]["user"] == @student1.id.to_s }
+          rollups_student2 = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          rollups_student3 = json["rollups"].select { |r| r["links"]["user"] == @student3.id.to_s }
+          expect(rollups_student1.count).to eq(2) # enrolled in 2 sections
+          expect(rollups_student2.count).to eq(3) # enrolled in 3 sections
+          expect(rollups_student3.count).to eq(2) # enrolled in 2 sections
+        end
+
+        it "returns students that are active in 1 section in the course but inactive in another by default" do
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).deactivate
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"] }))
+          rollups_student1 = json["rollups"].select { |r| r["links"]["user"] == @student1.id.to_s }
+          rollups_student2 = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          rollups_student3 = json["rollups"].select { |r| r["links"]["user"] == @student3.id.to_s }
+          expect(rollups_student1.count).to eq(2) # enrolled in 2 sections
+          expect(rollups_student2.count).to eq(3) # enrolled in 3 sections
+          expect(rollups_student3.count).to eq(2) # enrolled in 2 sections
+        end
+
+        it "returns students that are active in 1 section in the course but concluded in another by default" do
+          StudentEnrollment.find_by(user_id: @student2.id, course_section_id: @section1.id).conclude
+          json = parse_response(get_rollups({ exclude: ["concluded_enrollments", "inactive_enrollments"] }))
+          rollups_student1 = json["rollups"].select { |r| r["links"]["user"] == @student1.id.to_s }
+          rollups_student2 = json["rollups"].select { |r| r["links"]["user"] == @student2.id.to_s }
+          rollups_student3 = json["rollups"].select { |r| r["links"]["user"] == @student3.id.to_s }
+          expect(rollups_student1.count).to eq(2) # enrolled in 2 sections
+          expect(rollups_student2.count).to eq(3) # enrolled in 3 sections
+          expect(rollups_student3.count).to eq(2) # enrolled in 2 sections
+        end
+      end
     end
 
     context "sorting" do
