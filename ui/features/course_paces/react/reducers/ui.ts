@@ -65,6 +65,7 @@ export const getSelectedContextType = (state: StoreState) => state.ui.selectedCo
 export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
+export const getOuterResponsiveSize = (state: StoreState) => state.ui.outerResponsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
 export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
@@ -108,6 +109,8 @@ export default (state = initialState, action: UIAction): UIState => {
       }
     case UIConstants.SET_RESPONSIVE_SIZE:
       return {...state, responsiveSize: action.payload}
+    case UIConstants.SET_OUTER_RESPONSIVE_SIZE:
+      return {...state, outerResponsiveSize: action.payload}
     case UIConstants.SHOW_LOADING_OVERLAY:
       return {...state, showLoadingOverlay: true, loadingMessage: action.payload}
     case UIConstants.HIDE_LOADING_OVERLAY:
