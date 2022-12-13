@@ -132,8 +132,7 @@ def create_discussion(course, creator, workflow_state = "published")
     title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
     message: "Discussion topic message",
     assignment: discussion_assignment,
-    workflow_state: workflow_state,
-    todo_date: 1.day.from_now(Time.zone.now)
+    workflow_state: workflow_state
   )
 end
 
