@@ -311,7 +311,7 @@ describe InstFS do
       end
 
       let(:preflight_json) do
-        InstFS.upload_preflight_json(default_args)
+        InstFS.upload_preflight_json(**default_args)
       end
 
       it "includes a static 'file' file_param" do
@@ -410,7 +410,7 @@ describe InstFS do
         let(:access_token) { instance_double("AccessToken", global_developer_key_id: 106) }
 
         def claims_for(options)
-          json = InstFS.upload_preflight_json(default_args.merge(options))
+          json = InstFS.upload_preflight_json(**default_args.merge(options))
           token = json[:upload_url].split("token=").last
           Canvas::Security.decode_jwt(token, [secret])
         end
@@ -447,14 +447,14 @@ describe InstFS do
 
       context "upload via url" do
         it "throw ArgumentError when appropriate" do
-          expect { InstFS.upload_preflight_json(default_args.merge({ target_url: "foo" })) }.to raise_error(ArgumentError)
-          expect { InstFS.upload_preflight_json(default_args.merge({ progress_json: { foo: 1 } })) }.to raise_error(ArgumentError)
+          expect { InstFS.upload_preflight_json(**default_args.merge({ target_url: "foo" })) }.to raise_error(ArgumentError)
+          expect { InstFS.upload_preflight_json(**default_args.merge({ progress_json: { foo: 1 } })) }.to raise_error(ArgumentError)
         end
 
         it "responds properly when passed target_url and progress_json" do
           progress_json = { id: 1 }
           target_url = "http://www.example.com/"
-          preflight_json = InstFS.upload_preflight_json(default_args.merge({ target_url: target_url, progress_json: progress_json }))
+          preflight_json = InstFS.upload_preflight_json(**default_args.merge({ target_url: target_url, progress_json: progress_json }))
 
           token = preflight_json[:upload_url].split("token=").last
           jwt = Canvas::Security.decode_jwt(token, [secret])
