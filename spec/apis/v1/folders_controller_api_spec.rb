@@ -658,7 +658,7 @@ describe "Folders API", type: :request do
           @folder = @course.folders.create! parent_folder: @root_folder, name: "a folder"
           @sub_folder = @course.folders.create! parent_folder: @folder, name: "locked subfolder", locked: true
           @path = [@folder.name, @sub_folder.name].join("/")
-          @request_path += "/#{URI.encode(@path)}"
+          @request_path += "/#{URI::DEFAULT_PARSER.escape(@path)}"
           @params_hash.merge!(full_path: @path)
         end
 
@@ -695,7 +695,7 @@ describe "Folders API", type: :request do
 
       it "accepts a non-empty path" do
         @folder = @group.folders.create! parent_folder: @root_folder, name: "some folder"
-        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI::DEFAULT_PARSER.escape(@folder.name)}", @params_hash.merge(full_path: @folder.name))
         expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id, @folder.id]
       end
     end
@@ -714,7 +714,7 @@ describe "Folders API", type: :request do
 
       it "accepts a non-empty path" do
         @folder = @user.folders.create! parent_folder: @root_folder, name: "some folder"
-        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI.encode(@folder.name)}", @params_hash.merge(full_path: @folder.name))
+        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI::DEFAULT_PARSER.escape(@folder.name)}", @params_hash.merge(full_path: @folder.name))
         expect(json.map { |folder| folder["id"] }).to eql [@root_folder.id, @folder.id]
       end
     end

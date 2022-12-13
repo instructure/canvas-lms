@@ -168,12 +168,12 @@ module CC::Importer::Standard
         attrs.each do |attr|
           next unless node[attr]
 
-          val = URI.unescape(node[attr])
+          val = URI::DEFAULT_PARSER.unescape(node[attr])
           begin
             if FILEBASE_REGEX.match?(val)
               val.gsub!(FILEBASE_REGEX, "")
               if (new_url = get_canvas_att_replacement_url(val, resource_dir))
-                node[attr] = URI.escape(new_url)
+                node[attr] = URI::DEFAULT_PARSER.escape(new_url)
 
                 if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
                   node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
@@ -181,7 +181,7 @@ module CC::Importer::Standard
               end
             elsif ImportedHtmlConverter.relative_url?(val) &&
                   (new_url = get_canvas_att_replacement_url(val))
-              node[attr] = URI.escape(new_url)
+              node[attr] = URI::DEFAULT_PARSER.escape(new_url)
             end
           rescue URI::Error
             Rails.logger.warn "attempting to translate invalid url: #{val}"

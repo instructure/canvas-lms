@@ -1147,7 +1147,7 @@ class Attachment < ActiveRecord::Base
 
     # awesome browsers will use the filename* and get the proper unicode filename,
     # everyone else will get the sanitized ascii version of the filename
-    quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
+    quoted_unicode = "UTF-8''#{URI::DEFAULT_PARSER.escape(display_name, /[^A-Za-z0-9.]/)}"
     %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
   end
   protected :disposition_filename
@@ -1898,7 +1898,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_path?(path)
     f_path = full_path
-    f_path == path || URI.unescape(f_path) == path || f_path.casecmp?(path) || URI.unescape(f_path).casecmp?(path)
+    f_path == path || URI::DEFAULT_PARSER.unescape(f_path) == path || f_path.casecmp?(path) || URI::DEFAULT_PARSER.unescape(f_path).casecmp?(path)
   rescue
     false
   end
@@ -1909,7 +1909,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_display_path?(path)
     fd_path = full_display_path
-    fd_path == path || URI.unescape(fd_path) == path || fd_path.casecmp?(path) || URI.unescape(fd_path).casecmp?(path)
+    fd_path == path || URI::DEFAULT_PARSER.unescape(fd_path) == path || fd_path.casecmp?(path) || URI::DEFAULT_PARSER.unescape(fd_path).casecmp?(path)
   rescue
     false
   end
@@ -1917,7 +1917,7 @@ class Attachment < ActiveRecord::Base
   def self.matches_name?(name, match)
     return false unless name
 
-    name == match || URI.unescape(name) == match || name.casecmp?(match) || URI.unescape(name).casecmp?(match)
+    name == match || URI::DEFAULT_PARSER.unescape(name) == match || name.casecmp?(match) || URI::DEFAULT_PARSER.unescape(name).casecmp?(match)
   rescue
     false
   end
@@ -2172,7 +2172,7 @@ class Attachment < ActiveRecord::Base
                    })
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
-    "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
+    "blob=#{URI::DEFAULT_PARSER.escape blob}&hmac=#{URI::DEFAULT_PARSER.escape hmac}"
   end
   private :preview_params
 

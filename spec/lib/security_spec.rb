@@ -34,8 +34,8 @@ describe "security" do
 
       encrypted_data1 = CanvasSecurity.url_key_encrypt_data(data1)
       encrypted_data2 = CanvasSecurity.url_key_encrypt_data(data2)
-      expect(URI.encode(encrypted_data1)).to eq encrypted_data1
-      expect(URI.encode(encrypted_data2)).to eq encrypted_data2
+      expect(URI::DEFAULT_PARSER.escape(encrypted_data1)).to eq encrypted_data1
+      expect(URI::DEFAULT_PARSER.escape(encrypted_data2)).to eq encrypted_data2
     end
 
     it "decrypts to the same data you sent in" do

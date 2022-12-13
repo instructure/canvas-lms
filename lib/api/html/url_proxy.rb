@@ -165,7 +165,7 @@ module Api
           # transpose IDs in the URL
           transpose_ids(args) if context.shard != target_shard
           if args[:url] && (return_type == "SessionlessLaunchUrl" || (return_type == "Page" && url.include?("titleize=0")))
-            args[:url] = URI.unescape(args[:url])
+            args[:url] = URI::DEFAULT_PARSER.unescape(args[:url])
           end
           api_route.slice(match.captures.size + 2, 1).each { |opts| args.merge!(opts) }
           return { "data-api-endpoint" => proxy.send(helper, args), "data-api-returntype" => return_type }

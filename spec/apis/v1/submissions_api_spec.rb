@@ -4919,7 +4919,7 @@ describe "Submissions API", type: :request do
                       action: "index", controller: "submissions_api", format: "json",
                       include: %w[submission_history] })
 
-    url = URI.parse(URI.decode(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
+    url = URI.parse(URI::DEFAULT_PARSER.unescape(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
     blob = JSON.parse(URI.decode_www_form(url.query).to_h["blob"])
     expect(blob).to include({
                               "enable_annotations" => true,

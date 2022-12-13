@@ -365,7 +365,7 @@ module Turnitin
         params.each do |key, value|
           next if value.nil?
 
-          requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
+          requestParams += "&#{URI::DEFAULT_PARSER.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
         if params[:fcmd] == "1"
           return "https://#{@host}#{@endpoint}?#{requestParams}"
