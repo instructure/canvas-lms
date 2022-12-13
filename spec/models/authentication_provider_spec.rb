@@ -274,19 +274,19 @@ describe AuthenticationProvider do
     end
 
     it "doesn't asplode with nil values" do
-      aac.apply_federated_attributes(@pseudonym, "email" => nil, "surname" => nil, "given_name" => nil)
+      aac.apply_federated_attributes(@pseudonym, { "email" => nil, "surname" => nil, "given_name" => nil })
       expect(@user.name).not_to be_blank
     end
 
     context "admin_roles" do
       it "ignores non-existent roles" do
-        aac.apply_federated_attributes(@pseudonym, "admin_roles" => "garbage")
+        aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "garbage" })
         @user.reload
         expect(@user.account_users).not_to be_exists
       end
 
       it "provisions an admin" do
-        aac.apply_federated_attributes(@pseudonym, "admin_roles" => "AccountAdmin")
+        aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "AccountAdmin" })
         @user.reload
         aus = @user.account_users.to_a
         expect(aus.length).to eq 1
@@ -296,14 +296,14 @@ describe AuthenticationProvider do
 
       it "doesn't provision an existing admin" do
         @user.account_users.create!(account: @pseudonym.account)
-        aac.apply_federated_attributes(@pseudonym, "admin_roles" => "AccountAdmin")
+        aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "AccountAdmin" })
         @user.reload
         expect(@user.account_users.count).to eq 1
       end
 
       it "removes no-longer-extant roles" do
         @user.account_users.create!(account: @pseudonym.account)
-        aac.apply_federated_attributes(@pseudonym, "admin_roles" => "")
+        aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "" })
         @user.reload
         expect(@user.account_users.active).not_to be_exists
       end
@@ -311,7 +311,7 @@ describe AuthenticationProvider do
       it "reactivates previously deleted roles" do
         au = @user.account_users.create!(account: @pseudonym.account)
         au.destroy
-        aac.apply_federated_attributes(@pseudonym, "admin_roles" => "AccountAdmin")
+        aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "AccountAdmin" })
         @user.reload
         expect(au.reload).to be_active
       end
@@ -319,19 +319,19 @@ describe AuthenticationProvider do
 
     context "locale" do
       it "translates _ to -" do
-        aac.apply_federated_attributes(@pseudonym, "locale" => "en_GB")
+        aac.apply_federated_attributes(@pseudonym, { "locale" => "en_GB" })
         @user.reload
         expect(@user.locale).to eq "en-GB"
       end
 
       it "follows fallbacks" do
-        aac.apply_federated_attributes(@pseudonym, "locale" => "en-US")
+        aac.apply_federated_attributes(@pseudonym, { "locale" => "en-US" })
         @user.reload
         expect(@user.locale).to eq "en"
       end
 
       it "is case insensitive" do
-        aac.apply_federated_attributes(@pseudonym, "locale" => "en-gb")
+        aac.apply_federated_attributes(@pseudonym, { "locale" => "en-gb" })
         @user.reload
         expect(@user.locale).to eq "en-GB"
       end
