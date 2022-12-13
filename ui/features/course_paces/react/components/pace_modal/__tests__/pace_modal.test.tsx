@@ -49,6 +49,7 @@ const defaultProps = {
   compression: 0,
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
+  setOuterResponsiveSize: jest.fn(),
 }
 
 afterEach(() => {

@@ -131,7 +131,7 @@ export type CoursePacesState = CoursePace & {
   publishingProgress?: Progress
 }
 export type SectionsState = Sections
-export type ResponsiveSizes = 'small' | 'medium' | 'large'
+export type ResponsiveSizes = 'small' | 'large'
 export type CategoryErrors = {[category: string]: string}
 export type OriginalState = {
   coursePace: CoursePace
@@ -147,6 +147,7 @@ export interface UIState {
   readonly selectedContextId: string
   readonly loadingMessage: string
   readonly responsiveSize: ResponsiveSizes
+  readonly outerResponsiveSize: ResponsiveSizes
   readonly showLoadingOverlay: boolean
   readonly showPaceModal: boolean
   readonly showProjections: boolean
