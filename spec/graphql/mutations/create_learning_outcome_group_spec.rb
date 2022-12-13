@@ -41,7 +41,7 @@ describe Mutations::CreateLearningOutcomeGroup do
       mutation {
         createLearningOutcomeGroup(
             input: {
-              #{gql_arguments("", attrs)}
+              #{gql_arguments("", **attrs)}
             }
           ) {
           learningOutcomeGroup {
