@@ -130,6 +130,7 @@ gem "redcarpet", "3.5.0", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "6.2.0", require: false
+gem "rss", "0.2.9", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "ruby2_keywords", "0.0.3"
 gem "rubycas-client", "2.3.9", require: false
