@@ -7138,7 +7138,7 @@ ca:
         edit_navigation_info_k5: "Si s'habilita, les eines d’LTI sempre apareixeran a sota de la pestanya Recursos en l’ordre que trieu."
         edit_navigation_k5: "Arrossegueu i deixeu anar els elements per reordenar-los a la navegació de la matèria."
       labels: 
-        account_id: "Usuari secundari"
+        account_id: "Compte secundari"
         allow_student_discussion_editing: "Permet que els estudiants editin o suprimeixin les seves respostes als fòrums"
         allow_student_discussion_topics: "Permet que els estudiants creïn temes de debat"
         allow_student_forum_attachments: "Permet que els estudiants adjuntin fitxers als fòrums"
@@ -15287,7 +15287,7 @@ ca:
     announcement_created_by_you_description: |-
         * Anuncis que heu creat
         * Respostes als anuncis que heu creat
-    announcement_created_by_you_display: "Anunci creat per vós"
+    announcement_created_by_you_display: "Anunci creat per tu"
     announcement_description: "Nou anunci a la vostra assignatura"
     announcement_display: Anunci
     appointment_availability_display: "Disponibilitat de cites"
@@ -15396,7 +15396,7 @@ ca:
       account_user_registration: "Registre de l'usuari del compte"
       added_to_conversation: "Afegit a la conversa"
       alert: Avís
-      announcement_created_by_you: "Anunci creat per vós"
+      announcement_created_by_you: "Anunci creat per tu"
       announcement_reply: "Resposta a l'anunci"
       appointment_canceled_by_user: "L'usuari ha cancel·lat la cita"
       appointment_deleted_for_user: "S'ha suprimit la cita per a l'usuari"
@@ -20849,7 +20849,7 @@ ca:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Els estudiants podran veure que les notes d'aquesta activitat estan amagades."
   students_with_no_submissions_title: "Estudiants amb cap entrega"
   students_without_assessments_eb100e60: "Estudiants sense activitats"
-  sub_account_daeadd0: "Usuari secundari"
+  sub_account_daeadd0: "Compte secundari"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "No podeu suprimir un usuari secundari que conté assignatures"
@@ -20879,7 +20879,7 @@ ca:
     sub_accounts_count: 
       one: "1 usuari secundari"
       other: "%{count} comptes secundaris"
-  subaccount_91f4c279: "Usuari secundari"
+  subaccount_91f4c279: "Compte secundari"
   subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Els administradors de comptes secundaris no poden visualitzar la informació del SIS, tret que també se’ls hagi concedit un rol d’instructor en una assignatura."
   subaccount_admins_cannot_view_sis_information_with_15a41444: "Els administradors de comptes secundaris no poden visualitzar la informació del SIS sense l’associació amb l'assignatura, ja que el rol d’instructor té permís per llegir les dades del SIS a nivell de l'usuari."
   subaccount_navigation_account_settings_add9eff9: "Navegació d'usuari secundari (Configuració de l'usuari)"
