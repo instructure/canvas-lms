@@ -2678,4 +2678,13 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/disable_post_to_sis", action: "disable_post_to_sis", as: :disable_post_to_sis_course_assignments
     end
   end
+
+  # New Quizzes Public Api
+  ApiRouteSet.draw(self, "/api/quiz/v1") do
+    scope(module: "new_quizzes") do
+      scope(controller: "quizzes_api") do
+        get "courses/:course_id/quizzes/:id", action: :show
+      end
+    end
+  end
 end
