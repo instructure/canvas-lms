@@ -139,7 +139,7 @@ class CoursePace < ActiveRecord::Base
                            run_at: run_at,
                            singleton: "course_pace_publish:#{global_id}",
                            on_conflict: :overwrite
-                         }, { enrollment_ids: enrollment_ids })
+                         }, enrollment_ids: enrollment_ids)
     progress
   end
 
