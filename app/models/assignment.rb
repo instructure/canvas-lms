@@ -2122,7 +2122,7 @@ class Assignment < ActiveRecord::Base
 
     if opts[:provisional]
       if !(score.present? || submission.excused) && opts[:grade] != ""
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
+        raise GradeError.new(error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE)
       end
 
       submission.find_or_create_provisional_grade!(
