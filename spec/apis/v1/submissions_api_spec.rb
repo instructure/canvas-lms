@@ -4664,48 +4664,48 @@ describe "Submissions API", type: :request do
 
       it "allows a teacher to upload files for a student" do
         @user = @teacher
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "allows any filetype when there are no restrictions on type" do
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "rejects uploading files when file extension is not given" do
         @assignment.update(allowed_extensions: ["jpg"])
-        preflight(name: "name", size: 12_345)
+        preflight({ name: "name", size: 12_345 })
         assert_status(400)
       end
 
       it "rejects uploading files when filetype is not allowed" do
         @assignment.update(allowed_extensions: ["doc"])
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
         @assignment.update(allowed_extensions: ["txt"])
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "falls back to parsing the extension when an unknown type" do
         @assignment.update(allowed_extensions: ["beepboop"])
-        preflight(name: "test.beepboop", size: 12_345)
+        preflight({ name: "test.beepboop", size: 12_345 })
         assert_status(200)
       end
 
       it "uploads to a student's Submissions folder" do
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
       end
 
       context "for url upload using InstFS" do
         let(:json_response) do
-          preflight(url: "http://example.com/test", comment: "my comment")
+          preflight({ url: "http://example.com/test", comment: "my comment" })
           JSON.parse(response.body)
         end
 
@@ -4756,7 +4756,7 @@ describe "Submissions API", type: :request do
 
       context "for url upload using DelayedJob" do
         let(:json_response) do
-          preflight(url: "http://example.com/test", filename: "test.txt", comment: "hello comment")
+          preflight({ url: "http://example.com/test", filename: "test.txt", comment: "hello comment" })
           JSON.parse(response.body)
         end
 
@@ -4780,7 +4780,7 @@ describe "Submissions API", type: :request do
         end
 
         it "enqueues the copy job when the submit_assignment parameter is false" do
-          preflight(url: "http://example.com/test", filename: "test.txt", submit_assignment: false)
+          preflight({ url: "http://example.com/test", filename: "test.txt", submit_assignment: false })
           JSON.parse(response.body)
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::CopyWorker.name
