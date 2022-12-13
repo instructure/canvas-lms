@@ -27,6 +27,7 @@ import {
   IconArrowOpenStartLine,
   IconArrowOpenEndLine,
   IconAddressBookLine,
+  IconSearchLine,
 } from '@instructure/ui-icons'
 import {
   ScreenReaderContent,
@@ -78,6 +79,7 @@ export const AddressBook = ({
   activeCourseFilter,
   addressBookMessages,
   isOnObserverSubmenu,
+  ...props
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -505,6 +507,8 @@ export const AddressBook = ({
     onSelectedIdsChange([...newSelectedMenuItems])
   }
 
+  const searchPlaceholder = props.placeholder || I18n.t('Search...')
+
   return (
     <View as="div" width={width}>
       <div ref={componentViewRef}>
@@ -528,13 +532,17 @@ export const AddressBook = ({
               }}
               renderTrigger={
                 <TextInput
-                  placeholder={
-                    selectedMenuItems.length === 0 ? I18n.t('Insert or Select Names') : null
-                  }
+                  placeholder={selectedMenuItems.length === 0 ? searchPlaceholder : null}
                   renderLabel={
                     <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
                   }
-                  renderBeforeInput={selectedMenuItems.length === 0 ? null : renderedSelectedTags}
+                  renderBeforeInput={
+                    selectedMenuItems.length === 0 ? (
+                      <IconSearchLine inline={false} />
+                    ) : (
+                      renderedSelectedTags
+                    )
+                  }
                   onFocus={() => {
                     if (!isLimitReached) {
                       setIsMenuOpen(true)
@@ -705,6 +713,10 @@ AddressBook.propTypes = {
   activeCourseFilter: PropTypes.object,
   addressBookMessages: PropTypes.array,
   isOnObserverSubmenu: PropTypes.bool,
+  /**
+   * placeholder text for search text input
+   */
+  placeholder: PropTypes.string,
 }
 
 export default AddressBook

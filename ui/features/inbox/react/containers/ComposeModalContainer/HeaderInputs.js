@@ -195,6 +195,7 @@ const HeaderInputs = props => {
                 selectedRecipients={props.selectedRecipients}
                 addressBookMessages={props.addressBookMessages}
                 courseContextCode={props.selectedContext?.contextID || ''}
+                placeholder={I18n.t('Insert or Select Names')}
               />
             }
             shouldGrow={true}

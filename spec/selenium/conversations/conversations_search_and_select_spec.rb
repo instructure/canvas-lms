@@ -45,7 +45,7 @@ describe "conversations index page" do
       get "/conversations"
       list_items = ff("span[data-testid='conversationListItem-Item']")
       expect(list_items.count).to eq 2
-      f("input[placeholder='Insert or Select Names']").send_keys @s2.name
+      f("input[placeholder='Search...']").send_keys @s2.name
       wait_for_ajaximations
       fj("li:contains('#{@s2.name}')").click
       list_items = ff("span[data-testid='conversationListItem-Item']")
