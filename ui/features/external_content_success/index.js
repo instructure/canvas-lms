@@ -36,11 +36,14 @@ const callback = ENV.service
 let parentWindow = window.parent || window.opener
 
 ExternalContentSuccess.dataReady = function (data, service_id) {
-  const e = $.Event('externalContentReady')
-  e.contentItems = data
-  e.service_id = service_id
-
-  parentWindow.$(parentWindow).trigger('externalContentReady', e)
+  parentWindow.postMessage(
+    {
+      subject: 'externalContentReady',
+      contentItems: data,
+      service_id,
+    },
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+  )
 
   if (parentWindow[callback] && parentWindow[callback].ready) {
     parentWindow[callback].ready(data)
