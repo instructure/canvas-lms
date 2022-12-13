@@ -33,7 +33,7 @@ end
 require "pp"
 
 def get_question_hash(dir, name, delete_answer_ids: true, **opts)
-  hash = get_quiz_data(dir, name, opts).first.first
+  hash = get_quiz_data(dir, name, **opts).first.first
   hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end
