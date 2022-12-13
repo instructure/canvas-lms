@@ -95,7 +95,7 @@ class CanvadocSessionsController < ApplicationController
           options[:attempt] = attempt if attempt && attempt != submission.attempt
         end
 
-        user_session_params = Canvadocs.user_session_params(@current_user, options)
+        user_session_params = Canvadocs.user_session_params(@current_user, **options)
       else
         user_session_params = Canvadocs.user_session_params(@current_user, attachment: attachment)
       end
