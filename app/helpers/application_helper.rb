@@ -965,7 +965,7 @@ module ApplicationHelper
     js_env(csp: csp_iframe_attribute) if csp_enforced?
 
     output = []
-    output = @meta_tags.map { |meta_attrs| tag.meta(meta_attrs) } if @meta_tags.present?
+    output = @meta_tags.map { |meta_attrs| tag.meta(**meta_attrs) } if @meta_tags.present?
 
     # set this if you want android users of your site to be prompted to install an android app
     # you can see an example of the one that instructure uses in InfoController#web_app_manifest
