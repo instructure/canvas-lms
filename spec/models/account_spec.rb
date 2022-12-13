@@ -422,7 +422,7 @@ describe Account do
 
       it "orders list by specified parameter" do
         order = "courses.created_at ASC"
-        expect(@account).to receive(:fast_course_base).with(order: order)
+        expect(@account).to receive(:fast_course_base).with({ order: order })
         @account.fast_all_courses(order: order)
       end
     end
