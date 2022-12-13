@@ -263,6 +263,7 @@ export const AddressBookContainer = props => {
       activeCourseFilter={props.activeCourseFilter}
       addressBookMessages={props.addressBookMessages}
       isOnObserverSubmenu={isOnObserverSubmenu()}
+      placeholder={props.placeholder}
     />
   )
 }
@@ -303,6 +304,10 @@ AddressBookContainer.propTypes = {
   hasSelectAllFilterOption: PropTypes.bool,
   addressBookMessages: PropTypes.array,
   courseContextCode: PropTypes.string,
+  /**
+   * placeholder text for AddressBook search text input
+   */
+  placeholder: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {

@@ -78,7 +78,7 @@ describe "conversations new" do
       expect(f("[data-testid='conversation']").text).to include "Course 1 - assignment 1"
 
       f("[data-testid='delete-course-button']").click
-      f("input[placeholder='Insert or Select Names']").send_keys "second student"
+      f("input[placeholder='Search...']").send_keys "second student"
       fj("li:contains('second student')").click
       expect(ff("[data-testid='conversation']").count).to eq 1
       expect(f("[data-testid='conversation']").text).to include "Course 2 - assignment 2"
