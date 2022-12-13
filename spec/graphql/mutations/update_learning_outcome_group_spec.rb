@@ -41,7 +41,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
       mutation {
         updateLearningOutcomeGroup(
             input: {
-              #{gql_arguments("", attrs)}
+              #{gql_arguments("", **attrs)}
             }
           ) {
           learningOutcomeGroup {

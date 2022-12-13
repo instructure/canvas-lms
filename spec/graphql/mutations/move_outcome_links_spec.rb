@@ -52,7 +52,7 @@ describe Mutations::MoveOutcomeLinks do
     <<~GQL
       mutation {
         moveOutcomeLinks(input: {
-          #{gql_arguments("", attrs)}
+          #{gql_arguments("", **attrs)}
         }) {
           movedOutcomeLinks {
             _id
