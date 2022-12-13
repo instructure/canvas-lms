@@ -51,6 +51,7 @@ const SUBJECT_ALLOW_LIST = [
 const SUBJECT_IGNORE_LIST = [
   'A2ExternalContentReady',
   'LtiDeepLinkingResponse',
+  'externalContentReady',
   MENTIONS_NAVIGATION_MESSAGE,
   MENTIONS_INPUT_CHANGE_MESSAGE,
   MENTIONS_SELECTION_MESSAGE,
