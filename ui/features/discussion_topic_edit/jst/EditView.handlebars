@@ -319,10 +319,8 @@
           </label>
           <div class="controls">
             <input type="text" id="discussion_topic_assignment_points_possible" name="assignment[points_possible]"
-              class="input-small" value="{{n assignment.pointsPossible}}"
-              {{#ifAny lockedItems.points cannotEditGrades}}
-                readonly
-              {{/ifAny}} />
+              class="input-small" value="{{n assignment.pointsPossible}}" {{#ifAny lockedItems.points cannotEditGrades}}
+              readonly {{/ifAny}} />
           </div>
           <div id=discussion_point_change_warning class="alert form-column-right">
             {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}
@@ -372,6 +370,11 @@
     {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
   </button>
   {{/if}}
+  {{#if isAnnouncement}}
+  <button type="submit" data-text-while-loading="{{#t " publishing"}}Publishing...{{/t}}" class="btn btn-primary">{{#t
+    "publish"}}Publish{{/t}}</button>
+  {{else}}
   <button type="submit" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
     "save"}}Save{{/t}}</button>
+  {{/if}}
 </div>
