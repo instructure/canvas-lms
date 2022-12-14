@@ -26,10 +26,25 @@ module NewQuizzes
   # not function until the API is enabled.**
   class QuizzesApiController < ApplicationController
     before_action :require_feature_flag
+    before_action :require_context
 
     # @API Get a new quiz
-    # Get details about a single new quiz
+    # Get details about a single new quiz.
+    #
+    # @argument course_id [Required, Integer]
+    #
+    # @argument assignment_id [Required, Integer]
+    #   The id of the assignment associated with the quiz.
+    #
+    # @example_request
+    #   curl 'https://<canvas>/api/quiz/v1/courses/1/quizzes/12' \
+    #         -H 'Authorization: Bearer <token>'
     def show
+      assignment = api_find(@context.active_assignments, params[:assignment_id])
+      return render_unauthorized_action unless assignment.grants_right?(@current_user, :read) && assignment.visible_to_user?(@current_user)
+
+      log_api_asset_access(assignment, "assignments", assignment.assignment_group)
+
       render json: {}
     end
 
