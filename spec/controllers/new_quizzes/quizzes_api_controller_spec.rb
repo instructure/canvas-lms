@@ -21,20 +21,38 @@
 describe NewQuizzes::QuizzesApiController do
   before :once do
     Account.site_admin.enable_feature! :new_quiz_public_api
-    course_with_teacher
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    @assignment = @course.assignments.create!(title: "Assignment 1")
   end
 
   describe "show" do
     it "returns 200 with empty body" do
-      user_session(@user)
-      get :show, params: { course_id: @course.id, id: "0" }
+      user_session(@teacher)
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_successful
+    end
+
+    it "returns 401 if the user can't read the assignment" do
+      @assignment.unpublish!
+      user_session(@student)
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_unauthorized
+    end
+
+    it "returns 401 if the assignment is not assigned to the user" do
+      section2 = @course.course_sections.create!
+      create_section_override_for_assignment(@assignment, course_section: section2)
+      @assignment.update_attribute(:only_visible_to_overrides, true)
+      user_session(@student)
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_unauthorized
     end
 
     it "returns 404 if the new_quiz_public_api flag is disabled" do
       Account.site_admin.disable_feature! :new_quiz_public_api
-      user_session(@user)
-      get :show, params: { course_id: @course.id, id: "0" }
+      user_session(@teacher)
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_not_found
     end
   end

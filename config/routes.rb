@@ -2683,7 +2683,7 @@ CanvasRails::Application.routes.draw do
   ApiRouteSet.draw(self, "/api/quiz/v1") do
     scope(module: "new_quizzes") do
       scope(controller: "quizzes_api") do
-        get "courses/:course_id/quizzes/:id", action: :show
+        get "courses/:course_id/quizzes/:assignment_id", action: :show
       end
     end
   end
