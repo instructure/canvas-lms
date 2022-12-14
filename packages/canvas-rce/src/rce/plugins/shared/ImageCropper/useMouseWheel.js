@@ -20,14 +20,17 @@ import {useEffect, useState} from 'react'
 import {debounce} from '@instructure/debounce'
 import {calculateScaleRatio} from './controls/utils'
 import {WHEEL_SCALE_STEP, WHEEL_EVENT_DELAY} from './constants'
-import {actions} from '../../../reducers/imageCropper'
+import {actions} from './reducers/imageCropper'
 
 export function useMouseWheel(scaleRatio, dispatch) {
   const [tempScaleRatio, setTempScaleRatio] = useState(scaleRatio)
   const [isScaling, setIsScaling] = useState(false)
 
   const onWheelCallback = event => {
-    event.preventDefault()
+    // Couldn't prevent modal body scroll when zoom, when using {passive:false}
+    // the zoom event listener makes zoom look like a bouncing effect.
+    // https://chromestatus.com/feature/6662647093133312
+    // event.preventDefault()
 
     const newScaleRatio = calculateScaleRatio(tempScaleRatio - event.deltaY * WHEEL_SCALE_STEP)
     if (newScaleRatio !== tempScaleRatio) {

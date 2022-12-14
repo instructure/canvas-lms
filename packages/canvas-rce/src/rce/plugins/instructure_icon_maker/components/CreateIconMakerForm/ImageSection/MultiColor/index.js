@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SVGList, {TYPE} from '../SVGList'
 import {actions} from '../../../../reducers/imageSection'
-import {convertFileToBase64} from '../../../../svg/utils'
+import {convertFileToBase64} from '../../../../../shared/fileUtils'
 import {actions as svgActions} from '../../../../reducers/svgSettings'
 
 const MultiColor = ({dispatch, onChange, onLoaded}) => {

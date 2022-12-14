@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {ShapeSection} from '../ShapeSection'
 
-jest.mock('../ImageCropper/imageCropUtils', () => {
+jest.mock('../../../../shared/ImageCropper/imageCropUtils', () => {
   return {
     createCroppedImageSvg: jest
       .fn()
@@ -30,7 +30,7 @@ jest.mock('../ImageCropper/imageCropUtils', () => {
   }
 })
 
-jest.mock('../../../svg/utils', () => {
+jest.mock('../../../../shared/fileUtils', () => {
   return {
     convertFileToBase64: jest
       .fn()

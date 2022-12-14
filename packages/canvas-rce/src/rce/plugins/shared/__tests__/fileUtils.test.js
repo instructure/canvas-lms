@@ -16,19 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
-import {ImageCropperSettingsPropTypes} from '../../../../shared/ImageCropper/propTypes'
+import {convertFileToBase64} from '../fileUtils'
 
-export const ImageSettingsPropTypes = PropTypes.shape({
-  mode: PropTypes.string,
-  image: PropTypes.string,
-  imageName: PropTypes.string,
-  icon: PropTypes.string,
-  iconFillColor: PropTypes.string,
-  collectionOpen: PropTypes.bool,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  cropperOpen: PropTypes.bool,
-  cropperSettings: ImageCropperSettingsPropTypes,
-  compressed: PropTypes.bool,
+describe('convertFileToBase64()', () => {
+  it('executes readAsDataURL with correct arguments', async () => {
+    const blob = new Blob()
+    const readAsDataURLSpy = jest.spyOn(FileReader.prototype, 'readAsDataURL')
+    expect(await convertFileToBase64(blob)).toEqual('data:application/octet-stream;base64,')
+    expect(readAsDataURLSpy).toHaveBeenCalledWith(blob)
+  })
 })

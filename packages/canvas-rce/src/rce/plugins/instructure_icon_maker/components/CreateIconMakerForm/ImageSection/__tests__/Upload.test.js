@@ -33,8 +33,8 @@ jest.mock('../../../../../../../bridge', () => {
   }
 })
 
-jest.mock('../compressionUtils', () => ({
-  ...jest.requireActual('../compressionUtils'),
+jest.mock('../../../../../shared/compressionUtils', () => ({
+  ...jest.requireActual('../../../../../shared/compressionUtils'),
   compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk==')),
 }))
 

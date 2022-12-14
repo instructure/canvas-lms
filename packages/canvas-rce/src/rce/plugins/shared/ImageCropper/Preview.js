@@ -18,15 +18,15 @@
 
 import React, {useEffect, createRef} from 'react'
 import PropTypes from 'prop-types'
-import formatMessage from '../../../../../../format-message'
+import formatMessage from '../../../../format-message'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT, BACKGROUND_SQUARE_SIZE} from './constants'
 import {useMouseWheel} from './useMouseWheel'
 import {useKeyMouseTouchEvents} from './useKeyMouseEvents'
-import checkerboardStyle from '../../../../shared/CheckerboardStyling'
+import checkerboardStyle from '../CheckerboardStyling'
 import {View} from '@instructure/ui-view'
-import {getBrowser} from '../../../../../getBrowser'
+import {getBrowser} from '../../../getBrowser'
 
 /**
  * Remove the node contents and append the svg element.

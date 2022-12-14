@@ -23,13 +23,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
-import formatMessage from '../../../../../../format-message'
-import {cropperSettingsReducer, actions, defaultState} from '../../../reducers/imageCropper'
+import formatMessage from '../../../../format-message'
+import {cropperSettingsReducer, actions, defaultState} from './reducers/imageCropper'
 import {Preview} from './Preview'
 import {Controls} from './controls'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {DirectionRegion} from './DirectionRegion'
-import {instuiPopupMountNode} from '../../../../../../util/fullscreenHelpers'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 const renderBody = (image, settings, dispatch, message, loading) => {
   if (loading) {

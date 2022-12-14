@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
-import {ImageCropperSettingsPropTypes} from '../../../../shared/ImageCropper/propTypes'
-
-export const ImageSettingsPropTypes = PropTypes.shape({
-  mode: PropTypes.string,
-  image: PropTypes.string,
-  imageName: PropTypes.string,
-  icon: PropTypes.string,
-  iconFillColor: PropTypes.string,
-  collectionOpen: PropTypes.bool,
-  loading: PropTypes.bool,
-  error: PropTypes.string,
-  cropperOpen: PropTypes.bool,
-  cropperSettings: ImageCropperSettingsPropTypes,
-  compressed: PropTypes.bool,
-})
+export const convertFileToBase64 = blob =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(blob)
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = error => reject(error)
+  })

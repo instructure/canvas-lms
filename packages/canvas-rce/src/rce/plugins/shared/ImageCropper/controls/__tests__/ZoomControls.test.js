@@ -20,10 +20,10 @@ import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ZoomControls} from '../ZoomControls'
 import {BUTTON_SCALE_STEP} from '../../constants'
-import round from '../../../../../utils/round'
-import {showFlashAlert} from '../../../../../../../../common/FlashAlert'
+import round from '../../../round'
+import {showFlashAlert} from '../../../../../../common/FlashAlert'
 
-jest.mock('../../../../../../../../common/FlashAlert')
+jest.mock('../../../../../../common/FlashAlert')
 jest.mock('@instructure/debounce', () => ({
   debounce: fn => {
     return fn

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from '../../../../utils/round'
+import round from '../../round'
 import {SHAPE_CONTAINER_LENGTH} from '../constants'
 import {createSvgElement} from './utils'
-import {Shape} from '../../../../svg/shape'
+import {Shape} from '../shape'
 
 export function buildShapeMask({shape, size}) {
   const dimensionSize = size || SHAPE_CONTAINER_LENGTH

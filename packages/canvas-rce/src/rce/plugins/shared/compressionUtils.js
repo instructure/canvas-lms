@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PREVIEW_HEIGHT, PREVIEW_WIDTH} from '../ImageCropper/constants'
-
 const DEFAULT_TARGET_QUALITY = 0.75
 export const MAX_IMAGE_SIZE_BYTES = 500 * 1024
 
@@ -29,19 +27,19 @@ function blobToBase64(blob) {
   })
 }
 
-function drawImageOnCanvasElement(image, quality, resolve, reject) {
+function drawImageOnCanvasElement({image, quality, previewWidth, previewHeight, resolve, reject}) {
   const {width, height} = image
   let compressedImageWidth, compressedImageHeight
 
-  if (width > PREVIEW_WIDTH || height > PREVIEW_HEIGHT) {
+  if (width > previewWidth || height > previewHeight) {
     if (width > height) {
-      compressedImageWidth = PREVIEW_WIDTH
+      compressedImageWidth = previewWidth
       compressedImageHeight = compressedImageWidth * (height / width)
     } else if (height > width) {
-      compressedImageHeight = PREVIEW_HEIGHT
+      compressedImageHeight = previewHeight
       compressedImageWidth = compressedImageHeight * (width / height)
     } else {
-      compressedImageWidth = compressedImageHeight = PREVIEW_HEIGHT
+      compressedImageWidth = compressedImageHeight = previewHeight
     }
   }
 
@@ -67,12 +65,19 @@ export function shouldCompressImage({type, size}) {
   )
 }
 
-export function compressImage(encodedImage) {
+export function compressImage(encodedImage, previewWidth, previewHeight) {
   return new Promise((resolve, reject) => {
     const image = new Image()
     image.src = encodedImage
     image.onload = function () {
-      drawImageOnCanvasElement(image, DEFAULT_TARGET_QUALITY, resolve, reject)
+      drawImageOnCanvasElement({
+        image,
+        quality: DEFAULT_TARGET_QUALITY,
+        resolve,
+        previewWidth,
+        previewHeight,
+        reject,
+      })
     }
   }).then(blob => blobToBase64(blob))
 }

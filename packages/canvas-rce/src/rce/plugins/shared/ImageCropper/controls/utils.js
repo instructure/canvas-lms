@@ -17,7 +17,7 @@
  */
 
 import {BUTTON_ROTATION_DEGREES, MAX_SCALE_RATIO, MIN_SCALE_RATIO} from '../constants'
-import round from '../../../../utils/round'
+import round from '../../round'
 
 export const calculateScaleRatio = scaleRatio => {
   let result = round(scaleRatio)

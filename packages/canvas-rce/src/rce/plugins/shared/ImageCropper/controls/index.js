@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {actions} from '../../../../reducers/imageCropper'
+import {actions} from '../reducers/imageCropper'
 import {ZoomControls} from './ZoomControls'
 import {RotationControls} from './RotationControls'
 import {ShapeControls} from './ShapeControls'
