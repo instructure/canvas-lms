@@ -77,7 +77,7 @@ gem "graphql-batch", "0.4.3"
 gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
-gem "i18n", "1.8.5"
+gem "i18n", "1.9.1"
 gem "i18nliner", "0.2.2"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
