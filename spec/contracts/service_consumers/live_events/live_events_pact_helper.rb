@@ -22,6 +22,16 @@ require "pact/messages"
 require_relative "../pact_config"
 require_relative "../../../spec_helper"
 
+Pact::Messages::MessageFinder.class_eval do
+  class << self
+    def pact_contract_uri(provider, consumer)
+      # Monkey patch this method because URI.encode no longer exists in Ruby 3.x
+      path = URI::DEFAULT_PARSER.escape("pacts/provider/#{provider}/consumer/#{consumer}/latest")
+      URI("#{pact_broker_url}/#{path}")
+    end
+  end
+end
+
 Pact::Messages.pact_broker_url = PactConfig.broker_uri
 
 module LiveEvents
