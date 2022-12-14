@@ -68,6 +68,10 @@ module Lti::IMS::Concerns
       content_items.filter { |item| item[:type] == "ltiResourceLink" }
     end
 
+    def for_placement?(placement)
+      return_url_parameters[:placement]&.to_sym == placement
+    end
+
     class DeepLinkingJwt
       include ActiveModel::Validations
 

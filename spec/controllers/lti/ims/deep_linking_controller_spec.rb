@@ -662,6 +662,33 @@ module Lti
                     expect { subject }.to change { course.lti_resource_links.count }.by 1
                   end
 
+                  context "from the assignment_selection placement" do
+                    let(:return_url_params) { super().merge({ placement: "assignment_selection" }) }
+
+                    context "with no line items" do
+                      let(:content_items) do
+                        [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                      end
+
+                      it "does not create a resource link" do
+                        expect { subject }.not_to change { Lti::ResourceLink.count }
+                      end
+                    end
+
+                    context "with line items" do
+                      let(:content_items) do
+                        [
+                          { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
+                          { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
+                        ]
+                      end
+
+                      it "creates resource links and only resource links for the course" do
+                        expect { subject }.not_to change { Lti::ResourceLink.count }
+                      end
+                    end
+                  end
+
                   it "creates a module item" do
                     expect { subject }.to change { ContentTag.where(context: course).count }.by 1
                   end
