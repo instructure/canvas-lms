@@ -136,7 +136,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
 
-      attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
+      attachment.submit_to_canvadocs(1, **opts) unless attachment.canvadoc_available?
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
       # For the purposes of reporting student viewership, we only

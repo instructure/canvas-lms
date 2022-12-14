@@ -1812,7 +1812,7 @@ class Attachment < ActiveRecord::Base
     !!@skip_media_object_creation
   end
 
-  def submit_to_canvadocs(attempt = 1, opts = {})
+  def submit_to_canvadocs(attempt = 1, **opts)
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
@@ -1848,7 +1848,7 @@ class Attachment < ActiveRecord::Base
     if attempt <= Setting.get("max_canvadocs_attempts", "5").to_i
       delay(n_strand: "canvadocs_retries",
             run_at: (5 * attempt).minutes.from_now,
-            priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, opts)
+            priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, **opts)
     end
   end
 

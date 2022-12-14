@@ -317,7 +317,7 @@ describe Assignment do
       it "calls submit_to_canvadocs when a canvadoc is not available and annotatable_attachment is present" do
         @canvadoc.update!(document_id: nil)
         expected_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-        expect(@attachment).to receive(:submit_to_canvadocs).with(1, expected_opts)
+        expect(@attachment).to receive(:submit_to_canvadocs).with(1, **expected_opts)
 
         @course.assignments.create!(
           annotatable_attachment: @attachment,

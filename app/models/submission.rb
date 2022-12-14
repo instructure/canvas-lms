@@ -1404,7 +1404,7 @@ class Submission < ActiveRecord::Base
           n_strand: "canvadocs",
           priority: Delayed::LOW_PRIORITY
         )
-         .submit_to_canvadocs(1, opts)
+         .submit_to_canvadocs(1, **opts)
       end
     end
   end
