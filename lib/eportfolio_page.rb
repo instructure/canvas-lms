@@ -26,7 +26,6 @@ module EportfolioPage
         if @current_user && @current_user == @portfolio.user
           @recent_submissions ||= @current_user.submissions
                                                .in_workflow_state(["submitted", "graded"])
-                                               .limit(20)
                                                .order(created_at: :desc).to_a
         end
         @files ||= @current_user.attachments.to_a
