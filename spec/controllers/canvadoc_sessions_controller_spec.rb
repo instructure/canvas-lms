@@ -252,9 +252,9 @@ describe CanvadocSessionsController do
       Account.default.save!
 
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:preferred_plugins]).to eq [
+        expect(opts[:preferred_plugins]).to eq [
           Canvadocs::RENDER_O365,
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
@@ -270,9 +270,9 @@ describe CanvadocSessionsController do
       Account.default.save!
 
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:preferred_plugins]).to eq [
+        expect(opts[:preferred_plugins]).to eq [
           Canvadocs::RENDER_PDFJS,
           Canvadocs::RENDER_BOX,
           Canvadocs::RENDER_CROCODOC
@@ -284,9 +284,9 @@ describe CanvadocSessionsController do
 
     it "always sends PDFjs as a preferred plugin" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
+        expect(opts[:preferred_plugins]).to eq [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -294,9 +294,9 @@ describe CanvadocSessionsController do
 
     it "sends canvas_base_url when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:canvas_base_url]).to eq @course.root_account.domain
+        expect(opts[:canvas_base_url]).to eq @course.root_account.domain
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -314,10 +314,10 @@ describe CanvadocSessionsController do
       Canvadoc.create!(attachment: group_attachment)
 
       allow(Attachment).to receive(:find).and_return(group_attachment)
-      expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:submission_user_ids].length).to eq 2
-        expect(arg2[:submission_user_ids]).to match_array [@student.id, student2.id]
+        expect(opts[:submission_user_ids].length).to eq 2
+        expect(opts[:submission_user_ids]).to match_array [@student.id, student2.id]
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -325,9 +325,9 @@ describe CanvadocSessionsController do
 
     it "sends user_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:user_id]).to eq @teacher.id
+        expect(opts[:user_id]).to eq @teacher.id
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -335,9 +335,9 @@ describe CanvadocSessionsController do
 
     it "sends submission_user_ids when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:submission_user_ids]).to match_array [@submission.user_id]
+        expect(opts[:submission_user_ids]).to match_array [@submission.user_id]
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -345,9 +345,9 @@ describe CanvadocSessionsController do
 
     it "sends course_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:course_id]).to eq @assignment.context_id
+        expect(opts[:course_id]).to eq @assignment.context_id
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -355,9 +355,9 @@ describe CanvadocSessionsController do
 
     it "sends assignment_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:assignment_id]).to eq @assignment.id
+        expect(opts[:assignment_id]).to eq @assignment.id
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -365,9 +365,9 @@ describe CanvadocSessionsController do
 
     it "sends submission_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:submission_id]).to eq @submission.id
+        expect(opts[:submission_id]).to eq @submission.id
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -375,8 +375,8 @@ describe CanvadocSessionsController do
 
     it "sends disable_annotation_notifications as false by default" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
-        expect(arg2[:disable_annotation_notifications]).to eq false
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, **opts|
+        expect(opts[:disable_annotation_notifications]).to eq false
       end
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
@@ -384,17 +384,17 @@ describe CanvadocSessionsController do
     it "sends disable_annotation_notifications as true" do
       @blob[:disable_annotation_notifications] = true
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
-        expect(arg2[:disable_annotation_notifications]).to eq true
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |_, **opts|
+        expect(opts[:disable_annotation_notifications]).to eq true
       end
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
     it "sends post_manually when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:post_manually]).to eq @assignment.post_manually?
+        expect(opts[:post_manually]).to eq @assignment.post_manually?
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -402,9 +402,9 @@ describe CanvadocSessionsController do
 
     it "sends posted_at when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:posted_at]).to eq @submission.posted_at
+        expect(opts[:posted_at]).to eq @submission.posted_at
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
@@ -412,9 +412,9 @@ describe CanvadocSessionsController do
 
     it "sends assignment_name when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
-      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
+      expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, **opts|
         expect(arg1).to eq 1
-        expect(arg2[:assignment_name]).to eq @assignment.name
+        expect(opts[:assignment_name]).to eq @assignment.name
       end
 
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }

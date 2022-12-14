@@ -770,7 +770,7 @@ class Assignment < ActiveRecord::Base
     return if annotatable_attachment.blank? || annotatable_attachment.canvadoc&.available?
 
     canvadocs_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-    annotatable_attachment.submit_to_canvadocs(1, canvadocs_opts)
+    annotatable_attachment.submit_to_canvadocs(1, **canvadocs_opts)
   end
   private :start_canvadocs_render
 
