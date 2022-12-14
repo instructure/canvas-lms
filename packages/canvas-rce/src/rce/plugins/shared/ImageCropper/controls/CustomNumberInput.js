@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
 import {useDebouncedNumericValue} from './useDebouncedNumericValue'
-import formatMessage from '../../../../../../../format-message'
+import formatMessage from '../../../../../format-message'
 
 export const CustomNumberInput = ({
   value,

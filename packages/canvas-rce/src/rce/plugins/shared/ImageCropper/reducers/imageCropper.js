@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DEFAULT_CROPPER_SETTINGS} from '../components/CreateIconMakerForm/ImageCropper/constants'
+import {DEFAULT_CROPPER_SETTINGS} from '../constants'
 
 export const defaultState = DEFAULT_CROPPER_SETTINGS
 

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {IconResetLine} from '@instructure/ui-icons'
-import formatMessage from '../../../../../../../format-message'
+import formatMessage from '../../../../../format-message'
 
 export const ResetControls = ({onReset}) => {
   return (

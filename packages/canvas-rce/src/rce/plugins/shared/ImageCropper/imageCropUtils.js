@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from '../../../utils/round'
+import round from '../round'
 import {buildShapeMask} from './svg/shape'
 import {createSvgElement} from './svg/utils'
 import {PREVIEW_HEIGHT} from './constants'

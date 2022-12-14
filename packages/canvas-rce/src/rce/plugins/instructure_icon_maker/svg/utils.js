@@ -61,13 +61,5 @@ export function splitTextIntoLines(text, maxChars) {
   return lines
 }
 
-export const convertFileToBase64 = blob =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(blob)
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = error => reject(error)
-  })
-
 export const decode = input =>
   new DOMParser().parseFromString(input, 'text/html').documentElement.textContent

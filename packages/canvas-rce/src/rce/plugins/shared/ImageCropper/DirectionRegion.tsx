@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import formatMessage from '../../../../../../format-message'
+import formatMessage from '../../../../format-message'
 
 export enum Direction {
   LEFT = 37,

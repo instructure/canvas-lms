@@ -22,15 +22,24 @@ import formatMessage from '../../../../../../format-message'
 import {actions} from '../../../reducers/imageSection'
 import {actions as svgActions} from '../../../reducers/svgSettings'
 import {UploadFile} from '../../../../shared/Upload/UploadFile'
-import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+import {
+  canCompressImage,
+  compressImage,
+  shouldCompressImage,
+} from '../../../../shared/compressionUtils'
 import {isAnUnsupportedGifPngImage, MAX_GIF_PNG_SIZE_BYTES} from './utils'
+import {PREVIEW_HEIGHT, PREVIEW_WIDTH} from '../../../../shared/ImageCropper/constants'
 
 function dispatchCompressedImage(theFile, dispatch, onChange) {
   dispatch({...actions.SET_IMAGE, payload: ''})
   onChange({type: svgActions.SET_EMBED_IMAGE, payload: ''})
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
   dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
-  return compressImage(theFile.preview)
+  return compressImage({
+    encodedImage: theFile.preview,
+    previewWidth: PREVIEW_WIDTH,
+    previewHeight: PREVIEW_HEIGHT,
+  })
     .then(blob => {
       dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
       dispatch({...actions.SET_IMAGE, payload: blob})

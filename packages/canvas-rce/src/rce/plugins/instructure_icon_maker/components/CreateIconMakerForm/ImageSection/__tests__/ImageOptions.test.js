@@ -22,7 +22,7 @@ import {ImageOptions} from '../ImageOptions'
 import {actions} from '../../../../reducers/imageSection'
 import {actions as trayActions} from '../../../../reducers/svgSettings'
 
-jest.mock('../../ImageCropper/imageCropUtils', () => ({
+jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn(() =>
     Promise.resolve({
       outerHTML: '<svg />',
@@ -30,7 +30,7 @@ jest.mock('../../ImageCropper/imageCropUtils', () => ({
   ),
 }))
 
-jest.mock('../../../../svg/utils', () => {
+jest.mock('../../../../../shared/fileUtils', () => {
   return {
     convertFileToBase64: jest
       .fn()

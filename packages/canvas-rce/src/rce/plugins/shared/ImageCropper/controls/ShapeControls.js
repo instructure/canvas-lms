@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
-import formatMessage from '../../../../../../../format-message'
+import formatMessage from '../../../../../format-message'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ZoomControls} from './ZoomControls'
-import {Shape} from '../../../../svg/shape'
+import {Shape} from '../shape'
 
 const SHAPE_OPTIONS = [
   {id: Shape.Square, label: formatMessage('Square')},

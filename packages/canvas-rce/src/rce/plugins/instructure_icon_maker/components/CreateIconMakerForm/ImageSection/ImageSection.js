@@ -32,10 +32,10 @@ import {Text} from '@instructure/ui-text'
 import Course from './Course'
 import {ImageOptions} from './ImageOptions'
 import {ColorInput} from '../../../../shared/ColorInput'
-import {convertFileToBase64} from '../../../svg/utils'
+import {convertFileToBase64} from '../../../../shared/fileUtils'
 import {transformForShape} from '../../../svg/image'
 import SingleColorSVG from './SingleColor/svg'
-import {createCroppedImageSvg} from '../ImageCropper/imageCropUtils'
+import {createCroppedImageSvg} from '../../../../shared/ImageCropper/imageCropUtils'
 
 const IMAGE_SECTION_ID = 'icon-maker-tray-image-section'
 const getImageSection = () => document.querySelector(`#${IMAGE_SECTION_ID}`)

@@ -17,7 +17,7 @@
  */
 
 import {createCroppedImageSvg} from '../imageCropUtils'
-import {Shape} from '../../../../svg/shape'
+import {Shape} from '../shape'
 
 describe('createCroppedImageSvg()', () => {
   beforeAll(() => {

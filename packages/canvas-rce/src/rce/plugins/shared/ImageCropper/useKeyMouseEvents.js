@@ -19,7 +19,7 @@
 import {useEffect, useState, useRef, useCallback} from 'react'
 import {debounce} from '@instructure/debounce'
 import {KEY_EVENT_DELAY, KEY_EVENT_ACCELERATION} from './constants'
-import {actions} from '../../../reducers/imageCropper'
+import {actions} from './reducers/imageCropper'
 
 const EVENT_EXCEPTION_ELEMENT_IDS = [
   'imageCropperHeader',

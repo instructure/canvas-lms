@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {CustomNumberInput} from './CustomNumberInput'
 import {calculateRotation, getNearestRectAngle} from './utils'
 import {BUTTON_ROTATION_DEGREES} from '../constants'
-import formatMessage from '../../../../../../../format-message'
+import formatMessage from '../../../../../format-message'
 
 const parseRotationText = value => {
   // Matches a positive/negative integer/decimal followed by "º" symbol

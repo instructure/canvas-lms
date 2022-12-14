@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import svg from '../SingleColor/svg'
 import {Size} from '../../../../svg/constants'
-import {convertFileToBase64} from '../../../../svg/utils'
+import {convertFileToBase64} from '../../../../../shared/fileUtils'
 
 jest.useFakeTimers()
 jest.mock('../../../../../shared/StoreContext', () => {
@@ -105,7 +105,7 @@ jest.mock('../../../../../../../bridge', () => {
   }
 })
 
-jest.mock('../../ImageCropper/imageCropUtils', () => {
+jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => {
   return {
     createCroppedImageSvg: () =>
       Promise.resolve({
@@ -114,7 +114,7 @@ jest.mock('../../ImageCropper/imageCropUtils', () => {
   }
 })
 
-jest.mock('../../../../svg/utils')
+jest.mock('../../../../../shared/fileUtils')
 
 describe('ImageSection', () => {
   let scrollIntoView
@@ -620,7 +620,7 @@ describe('ImageSection', () => {
         })
         fireEvent.click(getByTestId('icon-maker-art'))
         convertFileToBase64.mockImplementation(
-          jest.requireActual('../../../../svg/utils').convertFileToBase64
+          jest.requireActual('../../../../../shared/fileUtils').convertFileToBase64
         )
       })
 
