@@ -25,6 +25,12 @@ module Lti::IMS::Concerns
     ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal assignment_selection link_selection module_menu_modal].freeze
 
     def create_resources_from_content_items?
+      # If we are on the "new assignment" screen, we know that we will be creating
+      # a resource link for the newly-created assignment later, when we actually
+      # create the assignment. The assignment_selection placement, therefore, should
+      # not be creating resource links.
+      return true if for_placement?(:assignment_selection)
+
       add_item_to_existing_module = return_url_parameters[:context_module_id].present?
       create_new_module? || add_item_to_existing_module || add_assignment?
     end

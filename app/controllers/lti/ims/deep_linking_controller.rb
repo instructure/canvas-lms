@@ -143,10 +143,6 @@ module Lti
 
       private
 
-      def for_placement?(placement)
-        return_url_parameters[:placement]&.to_sym == placement
-      end
-
       def render_content_items(items: content_items, reload_page: true, module_created: false)
         js_env({
                  deep_link_response: {
