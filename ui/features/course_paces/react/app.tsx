@@ -127,7 +127,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
                 <CoursePaceEmpty responsiveSize={responsiveSize} />
               ) : (
                 // Make sure changes have finished before updating contexts
-                !isPacePublishing && !isSyncing && <PaceContent />
+                <PaceContent />
               )}
             </FlexItem>
           </Flex>

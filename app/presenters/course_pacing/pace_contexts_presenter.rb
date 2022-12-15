@@ -23,6 +23,7 @@ class CoursePacing::PaceContextsPresenter
       name: display_name_for(pace_context),
       type: pace_context.class_name,
       item_id: pace_context.id,
+      context_id: context_id_for(pace_context),
       associated_section_count: pace_context.try(:course_sections).try(:count),
       associated_student_count: pace_context.try(:student_enrollments).try(:count),
       applied_pace: applied_pace_for(pace_context)
@@ -35,6 +36,15 @@ class CoursePacing::PaceContextsPresenter
       pace_context.name
     when StudentEnrollment
       pace_context.user.name
+    end
+  end
+
+  def self.context_id_for(pace_context)
+    case pace_context
+    when Course, CourseSection
+      pace_context.id
+    when StudentEnrollment
+      pace_context.user_id
     end
   end
 

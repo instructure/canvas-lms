@@ -171,6 +171,8 @@ export interface PaceContextsState {
   readonly searchTerm: string
   readonly sortBy: SortableColumn
   readonly order: OrderType
+  readonly contextsPublishing: string[]
+  readonly synced: boolean
 }
 
 export interface StoreState {
@@ -195,6 +197,7 @@ export interface PaceContext {
   name: string
   type: string
   item_id: string
+  context_id: number
   associated_section_count: number
   associated_student_count: number
   applied_pace: Pace | null

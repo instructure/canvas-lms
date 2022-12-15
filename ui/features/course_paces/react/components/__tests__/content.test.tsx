@@ -29,7 +29,7 @@ import {
 import PaceContent from '../content'
 import fetchMock from 'fetch-mock'
 import {actions as uiActions} from '../../actions/ui'
-import {Pace} from '../../types'
+import {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
 import tz from '@canvas/timezone'
 
 jest.mock('../../actions/ui', () => ({
@@ -38,16 +38,24 @@ jest.mock('../../actions/ui', () => ({
     setSelectedPaceContext: jest
       .fn()
       .mockReturnValue({type: 'UI/SET_SELECTED_PACE_CONTEXT', payload: {newSelectedPace: {}}}),
+    hideLoadingOverlay: jest.fn().mockReturnValue({type: 'UI/HIDE_LOADING_OVERLAY', payload: {}}),
+    setCategoryError: jest
+      .fn()
+      .mockReturnValue({type: 'UI/SET_CATEGORY_ERROR', payload: {category: '', error: ''}}),
   },
 }))
 
 const firstSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0]
+const secondSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[1]
+const firstStudent = PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]
 
 const SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&sort=name&order=asc`
 const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=asc`
 const SECTION_PACE_CREATION_API = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${firstSection.item_id}`
 const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&search_term=A&sort=name&order=asc`
 const STUDENT_CONTEXTS_API_WITH_DESC_SORTING = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=desc`
+const INIT_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?enrollment_id=${firstStudent.context_id}`
+const INIT_SECTION_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${secondSection.context_id}`
 
 const MINUTE = 1000 * 60
 const HOUR = MINUTE * 60
@@ -96,24 +104,20 @@ describe('PaceContextsContent', () => {
   })
 
   it('sets the selected tab based on the selected pace context', async () => {
-    const paceContextsState = {
+    const paceContextsState: PaceContextsState = {
       ...DEFAULT_STORE_STATE.paceContexts,
-      selectedContextType: 'student_enrollment',
+      selectedContextType: 'student_enrollment' as APIPaceContextTypes,
     }
     const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
     const {findByText} = renderConnected(<PaceContent />, state)
-    expect(
-      await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0].name)
-    ).toBeInTheDocument()
+    expect(await findByText(firstStudent.name)).toBeInTheDocument()
   })
 
   it('fetches student contexts when clicking the Students tab', async () => {
     const {findByText, getByRole} = renderConnected(<PaceContent />)
     const studentsTab = getByRole('tab', {name: 'Students'})
     act(() => studentsTab.click())
-    expect(
-      await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0].name)
-    ).toBeInTheDocument()
+    expect(await findByText(firstStudent.name)).toBeInTheDocument()
     expect(
       await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[1].name)
     ).toBeInTheDocument()
@@ -136,7 +140,7 @@ describe('PaceContextsContent', () => {
 
     it('shows custom data for students', async () => {
       const headers = ['Student', 'Assigned Pace', 'Pace Type', 'Last Modified']
-      const studentPaceContext = PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]
+      const studentPaceContext = firstStudent
       const {findByText, getByText, getByRole, getAllByText} = renderConnected(<PaceContent />)
       const studentsTab = getByRole('tab', {name: 'Students'})
       act(() => studentsTab.click())
@@ -182,8 +186,8 @@ describe('PaceContextsContent', () => {
 
     it('provides contextType and contextId to Pace modal', async () => {
       const {findByRole} = renderConnected(<PaceContent />)
-      const studentLink = await findByRole('button', {name: firstSection.name})
-      act(() => studentLink.click())
+      const sectionLink = await findByRole('button', {name: firstSection.name})
+      act(() => sectionLink.click())
       expect(uiActions.setSelectedPaceContext).toHaveBeenCalledWith('Section', firstSection.item_id)
     })
 
@@ -285,6 +289,70 @@ describe('PaceContextsContent', () => {
         sortButton = await getSortButton()
         act(() => sortButton.click())
         expect(fetchMock.lastUrl()).toMatch(STUDENT_CONTEXTS_API)
+      })
+    })
+
+    describe('Paces publishing', () => {
+      beforeEach(() => {
+        fetchMock.get(
+          INIT_PACE_PROGRESS_STATUS_POLL,
+          JSON.stringify({course_pace: {}, progress: {id: 1}})
+        )
+        fetchMock.get(
+          INIT_SECTION_PACE_PROGRESS_STATUS_POLL,
+          JSON.stringify({course_pace: {}, progress: {id: 2}})
+        )
+      })
+
+      it('shows a loading indicator for each pace publishing', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+          contextsPublishing: [
+            `section-${firstSection.context_id}`,
+            `section-${secondSection.context_id}`,
+          ],
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {findByTestId} = renderConnected(<PaceContent />, state)
+        expect(
+          await findByTestId(`publishing-pace-${firstSection.context_id}-indicator`)
+        ).toBeInTheDocument()
+        expect(
+          await findByTestId(`publishing-pace-${secondSection.context_id}-indicator`)
+        ).toBeInTheDocument()
+      })
+
+      it('starts polling for published status updates on mount', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+          contextsPublishing: [`student_enrollment-${firstStudent.context_id}`],
+          synced: false,
+        }
+
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {getByRole, findByTestId} = renderConnected(<PaceContent />, state)
+        const studentsTab = getByRole('tab', {name: 'Students'})
+        act(() => studentsTab.click())
+        expect(
+          await findByTestId(`publishing-pace-${firstStudent.context_id}-indicator`)
+        ).toBeInTheDocument()
+        expect(fetchMock.called(INIT_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(true)
+      })
+
+      it('keeps polling updates but does not start the whole process if the contexts are already synced', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+          contextsPublishing: [`section-${secondSection.context_id}`],
+          synced: true,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {findByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(
+          await findByTestId(`publishing-pace-${secondSection.context_id}-indicator`)
+        ).toBeInTheDocument()
+
+        expect(fetchMock.called(INIT_SECTION_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(false)
       })
     })
   })

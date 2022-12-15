@@ -29,10 +29,10 @@ import {
 } from '../types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
+import {View, ViewTextAlign} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {Spinner} from '@instructure/ui-spinner'
+import {Spinner, SpinnerSize} from '@instructure/ui-spinner'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 import {paceContextsActions} from '../actions/pace_contexts'
@@ -53,6 +53,7 @@ export interface PaceContextsTableProps {
   setPage: (page: number) => void
   setOrderType: typeof paceContextsActions.setOrderType
   handleContextSelect: (paceContext: PaceContext) => void
+  contextsPublishing: string[]
 }
 
 interface Header {
@@ -99,6 +100,7 @@ const PaceContextsTable = ({
   handleContextSelect,
   isLoading,
   responsiveSize,
+  contextsPublishing,
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
   const paceType = contextType === 'student_enrollment' ? 'student' : 'section'
@@ -149,10 +151,25 @@ const PaceContextsTable = ({
       id={generateModalLauncherId(paceContext)}
       isWithinText={false}
       onClick={() => handleContextSelect(paceContext)}
+      margin="xxx-small none"
     >
       <TruncateText>{paceContext.name}</TruncateText>
     </Link>
   )
+
+  const renderLastModified = (contextId?: number, lastModified: string = '') => {
+    const context_code = `${contextType}-${contextId}`
+    if (contextId && contextsPublishing.includes(context_code)) {
+      return loadingView(
+        `publishing-pace-${contextId}-indicator`,
+        I18n.t('Publishing pace...'),
+        'x-small',
+        'start'
+      )
+    }
+
+    return formatDate(lastModified)
+  }
 
   const getValuesByContextType = (paceContext: PaceContext) => {
     let values: string[] = []
@@ -171,7 +188,7 @@ const PaceContextsTable = ({
           renderContextLink(paceContext),
           studentCountText.toString(),
           PACE_TYPES[appliedPaceType] || appliedPaceType,
-          formatDate(appliedPace?.last_modified || ''),
+          renderLastModified(paceContext?.context_id, appliedPace?.last_modified),
         ]
         break
       }
@@ -180,7 +197,7 @@ const PaceContextsTable = ({
           renderContextLink(paceContext),
           appliedPace?.name,
           PACE_TYPES[appliedPaceType] || appliedPaceType,
-          formatDate(appliedPace?.last_modified || ''),
+          renderLastModified(paceContext?.context_id, appliedPace?.last_modified),
         ]
         break
       default:
@@ -238,7 +255,7 @@ const PaceContextsTable = ({
             data-testid="course-pace-item"
             // eslint-disable-next-line react/no-array-index-key
             key={`contexts-table-cell-${index}`}
-            theme={{padding: '0.75rem'}}
+            theme={{padding: '0.7rem'}}
           >
             {cell}
           </TableCell>
@@ -270,9 +287,14 @@ const PaceContextsTable = ({
     )
   }
 
-  const loadingView = () => (
-    <View as="div" textAlign="center">
-      <Spinner size="large" renderTitle={I18n.t('Waiting for results to load')} />
+  const loadingView = (
+    dataTestId: string,
+    title: string,
+    size: SpinnerSize = 'large',
+    align: ViewTextAlign = 'center'
+  ) => (
+    <View data-testid={dataTestId} as="div" textAlign={align}>
+      <Spinner size={size} renderTitle={title} margin="none large" />
     </View>
   )
 
@@ -305,7 +327,7 @@ const PaceContextsTable = ({
         </View>
       )}
       {isLoading
-        ? loadingView()
+        ? loadingView('container-loading-view', I18n.t('Waiting for results to load'), 'large')
         : pageCount > 1 && (
             <Paginator
               data-testid="context-table-paginator"
