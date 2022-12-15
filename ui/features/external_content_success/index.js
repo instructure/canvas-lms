@@ -29,11 +29,8 @@ const I18n = useI18nScope('external_content.success')
 
 const ExternalContentSuccess = {}
 
-const {lti_response_messages} = ENV
-const {service_id} = ENV
-const data = ENV.retrieved_data
-const callback = ENV.service
-let parentWindow = window.parent || window.opener
+const {lti_response_messages, service_id, retrieved_data: data, service} = ENV
+const parentWindow = window.parent || window.opener
 
 ExternalContentSuccess.dataReady = function (data, service_id) {
   parentWindow.postMessage(
@@ -41,29 +38,24 @@ ExternalContentSuccess.dataReady = function (data, service_id) {
       subject: 'externalContentReady',
       contentItems: data,
       service_id,
+      service,
     },
     ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
   )
 
-  if (parentWindow[callback] && parentWindow[callback].ready) {
-    parentWindow[callback].ready(data)
-    setTimeout(() => {
-      if (callback === 'external_tool_dialog') {
-        $('#dialog_message').text(
-          I18n.t('popup_success', 'Success! This popup should close on its own...')
-        )
-      } else {
-        $('#dialog_message').text('')
-      }
-    }, 1000)
-  } else {
-    $('#dialog_message').text(
-      I18n.t(
-        'content_failure',
-        'Content retrieval failed, please try again or notify your system administrator of the error.'
-      )
-    )
+  if (parentWindow[service] && parentWindow[service].ready) {
+    parentWindow[service].ready(data)
   }
+
+  setTimeout(() => {
+    if (service === 'external_tool_dialog') {
+      $('#dialog_message').text(
+        I18n.t('popup_success', 'Success! This popup should close on its own...')
+      )
+    } else {
+      $('#dialog_message').text('')
+    }
+  }, 1000)
 }
 
 // Handles lti 1.0 responses for Assignments 2 which expects a
@@ -123,10 +115,6 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
 }
 
 ExternalContentSuccess.start = async function () {
-  while (parentWindow && parentWindow.parent !== parentWindow && !parentWindow[callback]) {
-    parentWindow = parentWindow.parent
-  }
-
   await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
 
   if (ENV.oembed) {
