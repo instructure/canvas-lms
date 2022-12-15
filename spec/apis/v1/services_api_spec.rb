@@ -111,8 +111,16 @@ describe "Services API", type: :request do
   end
 
   describe "#rce_config" do
+    let(:register_a_tool_to_course) do
+      url = "http://example.com"
+      tool_params = { name: "bob", consumer_key: "test", shared_secret: "secret", url: url, description: "description" }
+      tool = @course.context_external_tools.new(tool_params)
+      tool.editor_button = { url: url, icon_url: url, canvas_icon_class: "icon" }
+      tool.save!
+    end
     let(:rce_config_api_call) do
       course_with_student(active_all: true)
+      register_a_tool_to_course
       api_call_as_user(@student, :get, "/api/v1/services/rce_config",
                        {
                          controller: "services_api",
@@ -158,12 +166,55 @@ describe "Services API", type: :request do
       expect(json[:active_brand_config_json_url]).to starting_with(expected_starting)
     end
 
+    it "test the default values" do
+      expect_any_instance_of(ApplicationController).to receive(:rce_js_env).and_return(nil)
+      expect_any_instance_of(ApplicationController).to receive(:inst_env).and_return(nil)
+
+      json = api_call(:get, "/api/v1/services/rce_config",
+                      controller: "services_api", action: "rce_config", format: "json")
+      expect(json.deep_symbolize_keys).to eq({
+                                               RICH_CONTENT_CAN_UPLOAD_FILES: nil,
+                                               RICH_CONTENT_INST_RECORD_TAB_DISABLED: nil,
+                                               RICH_CONTENT_FILES_TAB_DISABLED: nil,
+                                               RICH_CONTENT_CAN_EDIT_FILES: nil,
+                                               K5_SUBJECT_COURSE: nil,
+                                               K5_HOMEROOM_COURSE: nil,
+                                               context_asset_string: nil,
+                                               DEEP_LINKING_POST_MESSAGE_ORIGIN: nil,
+                                               current_user_id: nil,
+                                               disable_keyboard_shortcuts: nil,
+                                               rce_auto_save_max_age_ms: nil,
+                                               editorButtons: [],
+                                               kalturaSettings: { hide_rte_button: false },
+                                               LOCALES: ["en"],
+                                               LOCALE: "en",
+                                               active_brand_config_json_url: nil,
+                                               url_for_high_contrast_tinymce_editor_css: [],
+                                               url_to_what_gets_loaded_inside_the_tinymce_editor_css: [],
+                                               FEATURES: nil,
+                                             })
+    end
+
     it "test the contract of the RCE configuration" do
       a_bool_value = be_in([true, false])
       a_hash_with_only_bool_values = satisfy { |hash| hash.values.all? { |value| value.in? [true, false] } }
       a_not_empty_string_array = have_at_least(1).items & all(an_instance_of(String))
       an_instance_of_string = an_instance_of(String)
       an_instance_of_integer = an_instance_of(Integer)
+
+      editor_buttons_matcher = have_at_least(1).items &
+                               all(include({
+                                             canvas_icon_class: an_instance_of_string,
+                                             description: an_instance_of_string,
+                                             icon_url: an_instance_of_string,
+                                             url: an_instance_of_string,
+                                             name: an_instance_of_string,
+                                             favorite: a_bool_value,
+                                             use_tray: a_bool_value,
+                                             height: an_instance_of_integer,
+                                             width: an_instance_of_integer,
+                                             id: an_instance_of_integer
+                                           }))
 
       json = rce_config_api_call
 
@@ -185,7 +236,8 @@ describe "Services API", type: :request do
                                 context_asset_string: an_instance_of_string,
                                 DEEP_LINKING_POST_MESSAGE_ORIGIN: an_instance_of_string,
                                 current_user_id: an_instance_of_integer,
-                                disable_keyboard_shortcuts: a_bool_value
+                                disable_keyboard_shortcuts: a_bool_value,
+                                editorButtons: editor_buttons_matcher
                               })
     end
   end
