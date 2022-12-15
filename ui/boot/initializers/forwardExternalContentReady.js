@@ -44,5 +44,12 @@ export function up() {
 
       $(window).trigger('externalContentReady', e)
     }
+
+    if (
+      event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
+      event.data?.subject === 'externalContentCancel'
+    ) {
+      $(window).trigger('externalContentCancel')
+    }
   })
 }

@@ -52,6 +52,7 @@ const SUBJECT_IGNORE_LIST = [
   'A2ExternalContentReady',
   'LtiDeepLinkingResponse',
   'externalContentReady',
+  'externalContentCancel',
   MENTIONS_NAVIGATION_MESSAGE,
   MENTIONS_INPUT_CHANGE_MESSAGE,
   MENTIONS_SELECTION_MESSAGE,
