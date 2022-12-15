@@ -33,6 +33,7 @@ import {
   PROGRESS_RUNNING,
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
+import {paceContextsActions} from '../pace_contexts'
 
 const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
@@ -80,10 +81,9 @@ describe('Course paces actions', () => {
         course_pace: updatedPace,
         progress: PROGRESS_RUNNING,
       })
-
+      const contextType = getState().paceContexts.selectedContextType
       const thunkedAction = coursePaceActions.publishPace()
       await thunkedAction(dispatch, getState)
-
       expect(dispatch.mock.calls[0]).toEqual([uiActions.startSyncing()])
       expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('publish')])
       expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.saveCoursePace(updatedPace)])
@@ -92,7 +92,10 @@ describe('Course paces actions', () => {
       expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
         JSON.stringify([coursePaceActions.pollForPublishStatus()])
       )
-      expect(dispatch.mock.calls[5]).toEqual([uiActions.syncingCompleted()])
+      expect(dispatch.mock.calls[5]).toEqual([
+        paceContextsActions.addPublishingPace(`${contextType}-${updatedPace.context_id}`),
+      ])
+      expect(dispatch.mock.calls[6]).toEqual([uiActions.syncingCompleted()])
       expect(fetchMock.called(UPDATE_API, 'PUT')).toBe(true)
     })
 
@@ -170,7 +173,7 @@ describe('Course paces actions', () => {
       jest.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
 
       await waitFor(() => {
-        expect(dispatch.mock.calls.length).toBe(5)
+        expect(dispatch.mock.calls.length).toBe(6)
         expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
         expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.setProgress(undefined)])
         expect(dispatch.mock.calls[4]).toEqual([

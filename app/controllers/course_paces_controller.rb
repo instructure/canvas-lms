@@ -65,11 +65,29 @@ class CoursePacesController < ApplicationController
              COURSE_PACE_PROGRESS: @progress_json,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
              MASTER_COURSE_DATA: master_course_data,
-             IS_MASQUERADING: @current_user && @real_current_user && @real_current_user != @current_user
+             IS_MASQUERADING: @current_user && @real_current_user && @real_current_user != @current_user,
+             PACES_PUBLISHING: paces_publishing
            })
 
     js_bundle :course_paces
     css_bundle :course_paces
+  end
+
+  def paces_publishing
+    Delayed::Job.where(tag: "CoursePace#publish").map do |job|
+      progress = Progress.find_by(delayed_job_id: job.id)
+      pace = @course.course_paces.find(progress.context_id)
+      {
+        context_code: context_code_for(pace)
+      }
+    end
+  end
+
+  def context_code_for(pace)
+    return "section-#{pace.course_section_id}" if pace.course_section_id
+    return "student_enrollment-#{pace.user_id}" if pace.user_id
+
+    "course-#{pace.course_id}"
   end
 
   def api_show

@@ -62,13 +62,19 @@ export const Search: React.FC<ComponentProps> = ({
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')
-    fetchPaceContexts(contextType, 1, '')
+    fetchPaceContexts({contextType, page: 1, searchTerm: ''})
   }
 
   const handleSearch = e => {
     e.preventDefault()
 
-    fetchPaceContexts(contextType, 1, searchTerm, currentSortBy, currentOrderType)
+    fetchPaceContexts({
+      contextType,
+      page: 1,
+      searchTerm,
+      sortBy: currentSortBy,
+      orderType: currentOrderType,
+    })
   }
 
   const renderClearButton = () => {
