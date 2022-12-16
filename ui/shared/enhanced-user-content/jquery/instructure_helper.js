@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// create a global object "INST" that we will have be Instructure's namespace.
 import $ from 'jquery'
 import 'jqueryui/dialog'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
-window.equella = {
-  ready(data) {
+handleExternalContentMessages({
+  service: 'equella',
+  ready: data => {
     $(document).triggerHandler('equella_ready', data)
   },
-  cancel() {
+  cancel: () => {
     $(document).triggerHandler('equella_cancel')
   },
-}
+})
 $(document)
   .bind('equella_ready', function (event, data) {
     $('#equella_dialog').triggerHandler('equella_ready', data)
