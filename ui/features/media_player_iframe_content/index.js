@@ -25,6 +25,10 @@ import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import {closedCaptionLanguages} from '@instructure/canvas-media'
 
+const isStandalone = () => {
+  return !window.frameElement && window.location === window.top.location
+}
+
 ready(() => {
   // get the media_id from something like
   //  `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu?type=video`
@@ -65,8 +69,8 @@ ready(() => {
   // with scrollbars, even though everything is the right size.
   document.documentElement.setAttribute('style', 'overflow: hidden;')
   const div = document.body.firstElementChild
-  if (!window.frameElement) {
-    // we're standalone
+  if (isStandalone()) {
+    // we're standalone mode
     if (is_video) {
       // CanvasMediaPlayer leaves room for the 16px vertical margin.
       div.setAttribute('style', 'width: 640px; max-width: 100%; margin: 16px auto;')
