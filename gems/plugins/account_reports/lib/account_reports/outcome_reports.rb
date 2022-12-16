@@ -199,73 +199,62 @@ module AccountReports
     def outcomes_new_quiz_scope
       return [] unless account.feature_enabled?(:outcome_service_results_to_canvas)
 
-      students = account.learning_outcome_links.active
-                        .select(<<~SQL.squish)
-                          distinct on (#{outcome_order}, p.id, s.id, a.id)
-                          u.sortable_name                             AS "student name",
-                          u.uuid                                      AS "student uuid",
-                          p.user_id                                   AS "student id",
-                          p.sis_user_id                               AS "student sis id",
-                          a.id                                        AS "assignment id",
-                          a.title                                     AS "assessment title",
-                          a.id                                        AS "assessment id",
-                          subs.submitted_at                           AS "submission date",
-                          subs.score                                  AS "submission score",
-                          learning_outcomes.short_description         AS "learning outcome name",
-                          learning_outcomes.id                        AS "learning outcome id",
-                          learning_outcomes.display_name              AS "learning outcome friendly name",
-                          learning_outcomes.data                      AS "learning outcome data",
-                          c.name                                      AS "course name",
-                          c.id                                        AS "course id",
-                          c.sis_source_id                             AS "course sis id",
-                          'quiz'                                      AS "assessment type",
-                          s.name                                      AS "section name",
-                          s.id                                        AS "section id",
-                          s.sis_source_id                             AS "section sis id",
-                          e.workflow_state                            AS "enrollment state",
-                          acct.id                                     AS "account id",
-                          acct.name                                   AS "account name"
-                        SQL
-                        .joins(<<~SQL.squish)
-                          INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
-                            AND content_tags.content_type = 'LearningOutcome'
-                          INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
-                          INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
-                          INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
-                          INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' AND e.root_account_id = #{account.root_account.id}
-                            AND e.course_id = c.id #{@include_deleted ? "" : "AND e.workflow_state <> 'deleted'"}
-                          INNER JOIN #{User.quoted_table_name} u ON u.id = e.user_id
-                          INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = u.id
-                          INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course'
-                           AND a.submission_types = 'external_tool' AND a.workflow_state <> 'deleted')
-                          LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
-                           AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
-                        SQL
+      nq_assignments = account.learning_outcome_links.active
+                              .select(<<~SQL.squish)
+                                distinct on (learning_outcomes.id, c.id, a.id)
+                                learning_outcomes.short_description         AS "learning outcome name",
+                                learning_outcomes.id                        AS "learning outcome id",
+                                learning_outcomes.display_name              AS "learning outcome friendly name",
+                                learning_outcomes.data                      AS "learning outcome data",
+                                c.name                                      AS "course name",
+                                c.id                                        AS "course id",
+                                c.sis_source_id                             AS "course sis id",
+                                a.id                                        AS "assignment id",
+                                a.title                                     AS "assessment title",
+                                a.id                                        AS "assessment id",
+                                acct.id                                     AS "account id",
+                                acct.name                                   AS "account name"
+                              SQL
+                              .joins(<<~SQL.squish)
+                                INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
+                                  AND content_tags.content_type = 'LearningOutcome'
+                                INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
+                                INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
+                                INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
+                                INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course'
+                                 AND a.submission_types = 'external_tool' AND a.workflow_state <> 'deleted')
+                              SQL
 
       unless @include_deleted
-        students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
+        nq_assignments = nq_assignments.where("c.workflow_state IN ('available', 'completed')")
       end
 
-      students = join_course_sub_account_scope(account, students, "c")
-      students = add_term_scope(students, "c")
-      students.order(outcome_order)
+      nq_assignments = join_course_sub_account_scope(account, nq_assignments, "c")
+      nq_assignments = add_term_scope(nq_assignments, "c")
+      return [] if nq_assignments.empty?
 
       # We need to call the outcomes service once per course to get the authoritative results for each student. This
-      # takes the results from the query above and transform it to a hash of course => (assignments, outcomes, students)
+      # takes the results from the query above and transform it to a hash of course => (assignments, outcomes)
       # This hash will be used to call outcome service and the results from outcome service will be joined with the
       # results from the query.
+      #
+      # The other hashes are used to decorate the results once fetched from OS
       courses = {}
-      students.each do |s|
+      accounts = {}
+      assignments = {}
+      outcomes = {}
+      nq_assignments.each do |s|
         c_id = s["course id"]
         if courses.key?(c_id)
           course_map = courses[c_id]
           course_map[:assignment_ids].add(s["assignment id"])
           course_map[:outcome_ids].add(s["learning outcome id"])
-          course_map[:uuids].add(s["student uuid"])
         else
-          courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]], uuids: Set[s["student uuid"]] }
+          courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]] }
         end
+        accounts[s["account id"]] = s
+        assignments[s["assignment id"].to_s] = s
+        outcomes[s["learning outcome id"].to_s] = s
       end
 
       student_results = {}
@@ -273,39 +262,95 @@ module AccountReports
         # There is no need to check if the feature flag :outcome_service_results_to_canvas is enabled for the
         # course because get_lmgb_results will return nil if it is not enabled
         course = Course.find(c[:course_id])
+        account = accounts[course.account_id]
+
         assignment_ids = c[:assignment_ids].to_a.join(",")
         outcome_ids = c[:outcome_ids].to_a.join(",")
-        uuids = c[:uuids].to_a.join(",")
-        os_results = get_lmgb_results(course, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+        os_results = get_lmgb_results(course, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
         next if os_results.nil?
 
-        os_results.each do |r|
-          composite_key = "#{c[:course_id]}_#{r[:associated_asset_id]}_#{r[:external_outcome_id]}_#{r[:user_uuid]}"
+        os_results.each do |authoritative_result|
+          composite_key = "#{c[:course_id]}_#{authoritative_result[:associated_asset_id]}_#{authoritative_result[:external_outcome_id]}_#{authoritative_result[:user_uuid]}"
+          assignment = assignments[authoritative_result[:associated_asset_id].to_s]
+          outcome = outcomes[authoritative_result[:external_outcome_id].to_s]
           if student_results.key?(composite_key)
             # This should not happen, but if it does we take the result that was submitted last.
-            current_result = student_results[composite_key]
-            if r[:submitted_at] > current_result[:submitted_at]
-              student_results[composite_key] = r
+            current_result = student_results[composite_key].first
+            if current_result && authoritative_result[:submitted_at] > current_result["result submitted at"]
+              student_results[composite_key] = decorate_result(account, course, assignment, outcome, authoritative_result)
             end
           else
-            student_results[composite_key] = r
+            student_results[composite_key] = decorate_result(account, course, assignment, outcome, authoritative_result)
           end
         end
       end
 
-      # If there is not an entry in student_results, the student hasn't taken the quiz yet and does not need to
-      # be in the report.
+      sort_order = map_order_to_columns(outcome_order)
+      student_results.values.flatten.sort do |s1, s2|
+        comparator = 0
+        sort_order.each do |s|
+          comparator = s1[s] <=> s2[s]
+          break unless comparator == 0
+        end
+        comparator
+      end
+    end
+
+    # Only load student, submission, and course section information for students
+    # that have results. This prevents us from loading all this information just to
+    # later discard it because there are no results from outcome service.
+    def decorate_result(account, course, assignment, outcome, os_result)
+      students = User.select(<<~SQL.squish)
+        distinct on (users.id, p.id, s.id)
+        users.sortable_name                         AS "student name",
+        users.uuid                                  AS "student uuid",
+        p.user_id                                   AS "student id",
+        p.sis_user_id                               AS "student sis id",
+        subs.submitted_at                           AS "submission date",
+        subs.score                                  AS "submission score",
+        'quiz'                                      AS "assessment type",
+        s.name                                      AS "section name",
+        s.id                                        AS "section id",
+        s.sis_source_id                             AS "section sis id",
+        e.workflow_state                            AS "enrollment state"
+      SQL
+                     .joins(<<~SQL.squish)
+                       INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' AND e.root_account_id = #{course.root_account.id}
+                         AND e.course_id = #{course.id} AND e.user_id = users.id #{@include_deleted ? "" : "AND e.workflow_state <> 'deleted'"}
+                       INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = users.id #{@include_deleted ? "" : "AND p.workflow_state<>'deleted'"}
+                       INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
+                       LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = #{os_result[:associated_asset_id].to_i}
+                         AND subs.user_id = users.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
+                     SQL
+                     .where(uuid: os_result[:user_uuid])
+
+      # TODO: Is this always going to be a single result?
+      return [] if students.empty?
+
       results = []
       students.each do |s|
-        composite_key = "#{s["course id"]}_#{s["assignment id"]}_#{s["learning outcome id"]}_#{s["student uuid"]}"
-        results.concat(combine_result(s, student_results[composite_key])) if student_results.key?(composite_key)
+        student = s.attributes
+        student["assignment id"] = assignment["assignment id"]
+        student["assessment title"] = assignment["assessment title"]
+        student["assessment id"] = assignment["assessment id"]
+        student["learning outcome name"] = outcome["learning outcome name"]
+        student["learning outcome id"] = outcome["learning outcome id"]
+        student["learning outcome friendly name"] = outcome["learning outcome friendly name"]
+        student["learning outcome data"] = outcome["learning outcome data"]
+        student["course name"] = course.name
+        student["course id"] = course.id
+        student["course sis id"] = course.sis_source_id
+        student["account id"] = account["account id"]
+        student["account name"] = account["account name"]
+
+        results.concat(combine_result(student, os_result))
       end
       results
     end
 
-    def combine_result(student, authoritative_results)
-      learning_outcome_result = convert_to_learning_outcome_result(authoritative_results)
-      base_student = student.attributes.merge(
+    def combine_result(student, authoritative_result)
+      learning_outcome_result = convert_to_learning_outcome_result(authoritative_result)
+      base_student = student.merge(
         {
           "learning outcome mastered" => learning_outcome_result.mastery,
           "learning outcome points hidden" => nil, # TODO: hide_points is a column on AR, but not populated
@@ -316,8 +361,13 @@ module AccountReports
           "learning outcome points possible" => learning_outcome_result.possible,
           "outcome score" => learning_outcome_result.score,
 
+          # This field is used to disambiguate results returned from OS. You can see
+          # where it is used above in outcomes_new_quiz_scope
+          "result submitted at" => authoritative_result[:submitted_at],
+
+          # TODO: We should be getting this off the attempt (attempt number)
           # We only care about the most recent attempt. The attempt column is equal to number of attempts
-          "attempt" => authoritative_results[:attempts]&.length
+          "attempt" => authoritative_result[:attempts]&.length
         }
       )
 
@@ -327,7 +377,7 @@ module AccountReports
       # but if it is missing, we will fallback to created_at. Using the created_at is technically not correct, but
       # is the better than nothing. submitted
       results = []
-      attempt = authoritative_results[:attempts]&.max_by { |a| a[:submitted_at] || a[:created_at] }
+      attempt = authoritative_result[:attempts]&.max_by { |a| a[:submitted_at] || a[:created_at] }
       return results if attempt.nil?
 
       meta_data = attempt[:metadata]
