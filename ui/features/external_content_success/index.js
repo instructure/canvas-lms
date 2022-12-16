@@ -43,18 +43,10 @@ ExternalContentSuccess.dataReady = function (data, service_id) {
     ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
   )
 
-  if (parentWindow[service] && parentWindow[service].ready) {
-    parentWindow[service].ready(data)
-  }
-
   setTimeout(() => {
-    if (service === 'external_tool_dialog') {
-      $('#dialog_message').text(
-        I18n.t('popup_success', 'Success! This popup should close on its own...')
-      )
-    } else {
-      $('#dialog_message').text('')
-    }
+    $('#dialog_message').text(
+      I18n.t('popup_success', 'Success! This popup should close on its own...')
+    )
   }, 1000)
 }
 
