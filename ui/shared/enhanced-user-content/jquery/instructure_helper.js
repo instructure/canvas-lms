@@ -36,17 +36,3 @@ $(document)
   .bind('equella_cancel', function () {
     $('#equella_dialog').dialog('close')
   })
-
-window.external_tool_dialog = {
-  ready(data) {
-    const e = $.Event('selection')
-    e.contentItems = data
-    $('#resource_selection_dialog:visible').triggerHandler(e)
-    $('#homework_selection_dialog:visible').triggerHandler(e)
-  },
-  cancel() {
-    $('#external_tool_button_dialog').dialog('close')
-    $('#resource_selection_dialog').dialog('close')
-    $('#homework_selection_dialog:visible').dialog('close')
-  },
-}
