@@ -21,8 +21,8 @@ import RCEGlobals from '../RCEGlobals'
 describe('RCEGlobals', () => {
   describe('features', () => {
     const initialFeatures = {
-      new_equation_editor: true,
-      new_math_equation_handling: true,
+      feature_1: true,
+      feature_2: true,
     }
 
     const otherFeatures = {some_other_feature: true}

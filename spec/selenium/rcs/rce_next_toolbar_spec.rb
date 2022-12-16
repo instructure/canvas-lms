@@ -359,35 +359,6 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
     end
 
     context "math equations" do
-      it "renders math equation from math modal" do
-        skip "LS-1839 (1/27/2021)"
-        page_title = "math_rendering"
-        create_wiki_page_with_text(page_title)
-        visit_existing_wiki_edit(@course, page_title)
-
-        select_math_equation_from_toolbar
-        select_squareroot_symbol
-        add_squareroot_value
-        click_insert_equation
-
-        # Verify image in rce
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body).to contain_css("img.equation_image")
-        end
-        # Select to re-edit math equation
-        in_frame rce_page_body_ifr_id do
-          select_math_image
-        end
-        click_edit_equation
-        expect(math_dialog_exists?).to eq true
-
-        # Save and look for the image on the saved page
-        click_insert_equation
-        click_page_save_button
-        wait_for_ajaximations
-        expect(math_rendering_exists?).to eq true
-      end
-
       it 'renders math equations for inline math with "\("' do
         title = "Assignment-Title with Math \\(x^2\\)"
         @assignment = @course.assignments.create!(name: title)

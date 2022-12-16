@@ -908,66 +908,6 @@ module RCENextPage
   #=====================================================================================================================
   # Math
 
-  def select_squareroot_symbol
-    math_square_root_button.click
-  end
-
-  def add_squareroot_value
-    editor_sqrt_textarea.send_keys("81")
-  end
-
-  def select_math_equation_from_toolbar
-    math_builder_button.click
-  end
-
-  def click_insert_equation
-    math_builder_insert_equation_button.click
-  end
-
-  def click_page_save_button
-    save_button.click
-  end
-
-  def select_math_image
-    math_image.click
-  end
-
-  def click_edit_equation
-    edit_equation_button.click
-  end
-
-  def math_builder_button
-    possibly_hidden_toolbar_button('button[aria-label="Insert Math Equation"]')
-  end
-
-  def math_square_root_button
-    f(".sqrt-prefix")
-  end
-
-  def editor_sqrt_textarea
-    f("#mathquill-container textarea")
-  end
-
-  def math_builder_insert_equation_button
-    find_button("Insert Equation")
-  end
-
-  def math_image
-    f(".equation_image")
-  end
-
-  def edit_equation_button
-    fxpath('//button[*[.="Edit Equation"]]')
-  end
-
-  def math_dialog_exists?
-    element_exists?(".math-dialog")
-  end
-
-  def math_rendering_exists?
-    element_exists?(".equation_image")
-  end
-
   def mathjax_element_exists_in_title?
     element_exists?(".assignment-title .MathJax_Preview")
   end
