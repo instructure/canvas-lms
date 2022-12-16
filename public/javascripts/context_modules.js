@@ -1575,10 +1575,10 @@ import 'compiled/jquery.rails_flash_notifications'
               modules.updateAssignmentData();
               modules.loadMasterCourseData(data.content_tag.id);
             }), { onComplete: function() {
-              if (ENV['score_threshold'] && ['assignment', 'discussion_topic', 'quiz'].includes(item_data['item[type]'])) {
+              if (ENV['passing_thresholds'][item_data['item[type]'].split('_')[0]] !== undefined && ['assignment'].includes(item_data['item[type]'])) {
                 var score = $item.find('.min_score_requirement .unfulfilled');
                 score.parents().show();
-                score.text(`Score at least ${ENV['score_threshold']}`);
+                score.text(`Score at least ${ENV['passing_thresholds'][item_data['item[type]'].split('_')[0]]}`);
 
                 if (modules.checkForExisting(item_data['item[type]'], item_data['item[id]'])) {
                   score.prepend('<span style="margin-left: -.5rem; padding-right: 1.25rem;">|</span>');
