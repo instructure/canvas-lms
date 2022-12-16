@@ -42,6 +42,11 @@ class AssignmentGroup < ActiveRecord::Base
   after_save :update_student_grades
 
   GROUP_NAMES = [ 'Assignment', 'Checkpoint', 'Close Reading Project', 'Discussion', 'Exam', 'Final Exam', 'Pretest', 'Project', 'Workbook' ].freeze
+
+  def self.passing_threshold_group_names
+    GROUP_NAMES.map{|n| n.downcase.gsub(/\s/, "_")}
+  end
+
   def generate_default_values
     if self.name.blank?
       self.name = t 'default_title', "Assignments"
