@@ -209,6 +209,7 @@ import {
 } from './initialState'
 import {ExportProgressBar} from './components/ExportProgressBar'
 import GradebookExportManager from '../shared/GradebookExportManager'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
 const I18n = useI18nScope('gradebook')
 
@@ -1729,14 +1730,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             returnFocusTo: document.querySelector("[data-component='ActionMenu'] button"),
             baseUrl: lti.data_url,
           })
-          setTimeout(() => postGradesDialog.open())
-          return (
-            (window.external_tool_redirect = {
-              ready: postGradesDialog.close,
-              cancel: postGradesDialog.close,
-            }),
-            10
-          )
+          // 10 ms delay left over from original coffeescript implementation
+          setTimeout(() => postGradesDialog.open(), 10)
+          handleExternalContentMessages({
+            service: 'external_tool_redirect',
+            ready: () => {
+              postGradesDialog.close()
+            },
+            cancel: () => {
+              postGradesDialog.close()
+            },
+          })
         },
       }
     })
