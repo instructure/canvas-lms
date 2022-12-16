@@ -39,7 +39,7 @@ export function toolbarIconHelperFor(editor: Editor, ariaLabel: string) {
   const $svgContainer = editor.$(containerSelector, document)
 
   if ($svgContainer.length === 0) {
-    throw new Error(
+    console.error(
       `Failed to find TinyMCE toolbar button for ariaLabel "${ariaLabel}" using selector: ${containerSelector}`
     )
   }
@@ -49,7 +49,7 @@ export function toolbarIconHelperFor(editor: Editor, ariaLabel: string) {
       const svg = editor.ui.registry.getAll().icons[iconName]
 
       if (!svg) {
-        throw new Error(`Invalid icon name given for button labeled "${ariaLabel}": ${iconName}`)
+        console.error(`Invalid icon name given for button labeled "${ariaLabel}": ${iconName}`)
       }
 
       $svgContainer.html(svg)
