@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import RedirectReturnContainer from './jquery/RedirectReturnContainer'
+import ready from '@instructure/ready'
 
-$(document).ready(() => {
-  window.external_tool_redirect = {ready() {}}
+ready(() => {
   const container = new RedirectReturnContainer()
   container.attachLtiEvents()
 })
