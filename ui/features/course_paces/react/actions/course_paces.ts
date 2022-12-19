@@ -96,9 +96,11 @@ const thunkActions = {
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(
-            paceContextsActions.addPublishingPace(
-              `${getState().paceContexts.selectedContextType}-${updatedPace.context_id}`
-            )
+            paceContextsActions.addPublishingPace({
+              progress_context_id: progress.context_id,
+              pace_context: getState().paceContexts.selectedContext!,
+              polling: true,
+            })
           )
           dispatch(uiActions.syncingCompleted())
         })
@@ -142,9 +144,7 @@ const thunkActions = {
     // Give the thunk function a name so that we can assert on it in tests
     return function pollingThunk(dispatch, getState) {
       const progress = getState().coursePace.publishingProgress
-      const paceName = getPaceName(getState())
-      const contextId = getState().coursePace.context_id
-      const contextCode = `${getState().paceContexts.selectedContextType}-${contextId}`
+
       const isUnpublishedNewPace = getIsUnpublishedNewPace(getState())
       if (!progress || TERMINAL_PROGRESS_STATUSES.includes(progress.workflow_state)) return
 
@@ -152,6 +152,9 @@ const thunkActions = {
         Api.getPublishProgress(progress.id)
           .then(updatedProgress => {
             if (!updatedProgress) throw new Error(I18n.t('Response body was empty'))
+            const paceContext = getState().paceContexts.contextsPublishing.find(
+              ({progress_context_id}) => updatedProgress.context_id === progress_context_id
+            )?.pace_context
             dispatch(
               coursePaceActions.setProgress(
                 updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined
@@ -161,21 +164,21 @@ const thunkActions = {
             if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
                 message: isUnpublishedNewPace
-                  ? I18n.t('%{paceName} Pace created', {paceName})
-                  : I18n.t('%{paceName} Pace updated', {paceName}),
+                  ? I18n.t('%{paceName} Pace created', {paceName: paceContext?.name})
+                  : I18n.t('%{paceName} Pace updated', {paceName: paceContext?.name}),
                 err: null,
                 type: 'success',
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
-              dispatch(paceContextsActions.refreshPublishedContext(contextCode))
+              dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
             } else if (updatedProgress.workflow_state === 'failed') {
               showFlashAlert({
-                message: I18n.t('Error updating %{paceName}', {paceName}),
+                message: I18n.t('Error updating %{paceName}', {paceName: paceContext?.name}),
                 err: null,
                 type: 'error',
               })
               dispatch(uiActions.setCategoryError('publish'))
-              dispatch(paceContextsActions.refreshPublishedContext(contextCode))
+              dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
               console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)

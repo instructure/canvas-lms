@@ -81,7 +81,6 @@ describe('Course paces actions', () => {
         course_pace: updatedPace,
         progress: PROGRESS_RUNNING,
       })
-      const contextType = getState().paceContexts.selectedContextType
       const thunkedAction = coursePaceActions.publishPace()
       await thunkedAction(dispatch, getState)
       expect(dispatch.mock.calls[0]).toEqual([uiActions.startSyncing()])
@@ -93,7 +92,11 @@ describe('Course paces actions', () => {
         JSON.stringify([coursePaceActions.pollForPublishStatus()])
       )
       expect(dispatch.mock.calls[5]).toEqual([
-        paceContextsActions.addPublishingPace(`${contextType}-${updatedPace.context_id}`),
+        paceContextsActions.addPublishingPace({
+          progress_context_id: PROGRESS_RUNNING.context_id,
+          pace_context: getState().paceContexts.selectedContext!,
+          polling: true,
+        }),
       ])
       expect(dispatch.mock.calls[6]).toEqual([uiActions.syncingCompleted()])
       expect(fetchMock.called(UPDATE_API, 'PUT')).toBe(true)
@@ -154,10 +157,19 @@ describe('Course paces actions', () => {
     })
 
     it('sets a timeout that updates progress status and clears when a terminal status is reached', async () => {
+      const contextsPublishing = [
+        {
+          progress_context_id: PROGRESS_RUNNING.context_id,
+          pace_context: DEFAULT_STORE_STATE.paceContexts.defaultPaceContext,
+          polling: false,
+        },
+      ]
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
         coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: {...PROGRESS_RUNNING}},
+        paceContexts: {...DEFAULT_STORE_STATE.paceContexts, contextsPublishing},
       })
+
       const progressUpdated = {...PROGRESS_RUNNING, completion: 60}
       fetchMock.get(PROGRESS_API, progressUpdated)
 
@@ -179,7 +191,9 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
-        expect(screen.getAllByText('Neuromancy 300 Pace updated')[0]).toBeInTheDocument()
+        expect(
+          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0]
+        ).toBeInTheDocument()
       })
     })
 

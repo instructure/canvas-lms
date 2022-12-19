@@ -194,7 +194,6 @@ export const COURSE_PACE_CONTEXT: PaceContext = {
   name: 'Course 1',
   type: 'Course',
   item_id: '78',
-  context_id: 78,
   associated_section_count: 1,
   associated_student_count: 31,
   applied_pace: {
@@ -211,7 +210,6 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
       name: 'A-C',
       type: 'CourseSection',
       item_id: '78',
-      context_id: 78,
       associated_section_count: 1,
       associated_student_count: 21,
       applied_pace: {
@@ -225,7 +223,6 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
       name: 'D-F',
       type: 'CourseSection',
       item_id: '79',
-      context_id: 79,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -239,7 +236,6 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
       name: 'G-K',
       type: 'CourseSection',
       item_id: '80',
-      context_id: 80,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -259,7 +255,6 @@ export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextsApiResponse = {
       name: 'A-C',
       type: 'CourseSection',
       item_id: '78',
-      context_id: 78,
       associated_section_count: 1,
       associated_student_count: 21,
       applied_pace: {
@@ -279,7 +274,6 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
       name: 'Jon',
       type: 'StudentEnrollment',
       item_id: '788',
-      context_id: 788,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -293,7 +287,6 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
       name: 'Peter',
       type: 'StudentEnrollment',
       item_id: '789',
-      context_id: 789,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -307,7 +300,6 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
       name: 'Mike',
       type: 'StudentEnrollment',
       item_id: '790',
-      context_id: 790,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -321,7 +313,6 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
       name: 'Alex',
       type: 'StudentEnrollment',
       item_id: '791',
-      context_id: 791,
       associated_section_count: 1,
       associated_student_count: 1,
       applied_pace: {
@@ -389,12 +380,12 @@ export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
   isLoadingDefault: false,
   defaultPaceContext: COURSE_PACE_CONTEXT,
   contextsPublishing: [],
-  synced: true,
 }
 
 export const PROGRESS_RUNNING = {
   id: '900',
   completion: 25,
+  context_id: '30',
   message: undefined,
   workflow_state: 'running',
   url: '/api/v1/progress/900',
