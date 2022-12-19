@@ -22,6 +22,7 @@ import {
   APIPaceContextTypes,
   OrderType,
   PaceContext,
+  PaceContextProgress,
   PaceContextsAsyncActionPayload,
   SortableColumn,
   StoreState,
@@ -56,9 +57,9 @@ export enum Constants {
   SET_SORT_BY = 'PACE_CONTEXTS/SET_SORT_BY',
   SET_ORDER_TYPE = 'PACE_CONTEXTS/SET_ORDER_TYPE',
   ADD_PUBLISHING_PACE = 'PACE_CONTEXTS/ADD_PUBLISHING_PACE',
-  SET_SYNCED = 'PACE_CONTEXTS/SET_SYNCED',
   REMOVE_PUBLISHING_PACE = 'PACE_CONTEXTS/REMOVE_PUBLISHING_PACE',
   REPLACE_PACE_CONTEXTS = 'PACE_CONTEXTS/REPLACE_PACE_CONTEXTS',
+  UPDATE_PUBLISHING_PACE = 'PACE_CONTEXTS/UPDATE_PUBLISHING_PACE',
 }
 
 const regularActions = {
@@ -71,10 +72,13 @@ const regularActions = {
     createAction(Constants.SET_DEFAULT_PACE_CONTEXT_AS_SELECTED),
   setSearchTerm: (searchTerm: string) => createAction(Constants.SET_SEARCH_TERM, searchTerm),
   setSortBy: (sortBy: SortableColumn) => createAction(Constants.SET_SORT_BY, sortBy),
-  setSynced: (synced: boolean) => createAction(Constants.SET_SYNCED, synced),
   setOrderType: (orderType: OrderType) => createAction(Constants.SET_ORDER_TYPE, orderType),
-  addPublishingPace: (paceId: string) => createAction(Constants.ADD_PUBLISHING_PACE, paceId),
-  removePublishingPace: (paceId: string) => createAction(Constants.REMOVE_PUBLISHING_PACE, paceId),
+  addPublishingPace: (paceContextProgress: PaceContextProgress) =>
+    createAction(Constants.ADD_PUBLISHING_PACE, paceContextProgress),
+  removePublishingPace: (paceContextProgress: PaceContextProgress) =>
+    createAction(Constants.REMOVE_PUBLISHING_PACE, paceContextProgress),
+  updatePublishingPaces: (paceContexts: PaceContextProgress[]) =>
+    createAction(Constants.UPDATE_PUBLISHING_PACE, paceContexts),
   replacePaceContextPaces: (paceContexts: PaceContext[]) =>
     createAction(Constants.REPLACE_PACE_CONTEXTS, paceContexts),
 }
@@ -113,19 +117,26 @@ const thunkActions = {
       )
     }
   },
-  syncPublishingPaces: (): ThunkAction<void, StoreState, void, Action> => {
+  syncPublishingPaces: (restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
-      const paceContextsState = getState().paceContexts
-      if (!paceContextsState.synced) {
-        const contextsPublishing = paceContextsState.contextsPublishing
-        contextsPublishing.forEach(contextCode => {
-          const contextData = contextCode.split('-')
-          const contextId = contextData[1]
-          const contextType = CONTEXT_TYPE_MAP[contextData[0]]
-          dispatch(coursePaceActions.loadLatestPaceByContext(contextType, contextId, null, false))
-        })
-        dispatch(regularActions.setSynced(true))
-      }
+      const {contextsPublishing, entries} = getState().paceContexts
+      const loadedCodes = entries.map(({type, item_id}) => `${type}${item_id}`)
+      const contextsToLoad = contextsPublishing.filter(
+        ({pace_context, polling}) =>
+          (restart || !polling) &&
+          loadedCodes.includes(`${pace_context.type}${pace_context.item_id}`)
+      )
+      const updatedPaceContextsProgress = contextsToLoad.map(context => ({
+        ...context,
+        polling: true,
+      }))
+      contextsToLoad.forEach(({pace_context}) => {
+        const contextType = CONTEXT_TYPE_MAP[pace_context.type]
+        dispatch(
+          coursePaceActions.loadLatestPaceByContext(contextType, pace_context.item_id, null, false)
+        )
+        dispatch(regularActions.updatePublishingPaces(updatedPaceContextsProgress))
+      })
     }
   },
   fetchDefaultPaceContext: (): ThunkAction<void, StoreState, void, Action> => {
@@ -142,23 +153,24 @@ const thunkActions = {
     }
   },
   refreshPublishedContext: (
-    contextCode: string
+    progressContextId: string
   ): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return async (dispatch, getState) => {
-      const {selectedContextType} = getState().paceContexts
+      const {selectedContextType, contextsPublishing} = getState().paceContexts
       const {course_id: courseId} = getState().coursePace
-      const contextData = contextCode.split('-')
       // We only need to refresh the pace context if the user is seeing the affected tab
-      if (contextData[0] === selectedContextType) {
-        const contextId = contextData[1]
+      const contextToRefresh = contextsPublishing.find(
+        context => context.progress_context_id === progressContextId
+      )
+      if (contextToRefresh) {
         const {pace_contexts: updatedPaceContexts} = await Api.getPaceContexts({
           contextType: selectedContextType,
           courseId,
-          contextIds: [contextId],
+          contextIds: [contextToRefresh.pace_context.item_id],
         })
         dispatch(regularActions.replacePaceContextPaces(updatedPaceContexts))
+        dispatch(regularActions.removePublishingPace(contextToRefresh))
       }
-      dispatch(regularActions.removePublishingPace(contextCode))
     }
   },
 }

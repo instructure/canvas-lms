@@ -54,8 +54,8 @@ const STUDENT_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=st
 const SECTION_PACE_CREATION_API = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${firstSection.item_id}`
 const SEARCH_SECTION_CONTEXTS_API = `/api/v1/courses/${COURSE.id}/pace_contexts?type=section&page=1&per_page=10&search_term=A&sort=name&order=asc`
 const STUDENT_CONTEXTS_API_WITH_DESC_SORTING = `/api/v1/courses/${COURSE.id}/pace_contexts?type=student_enrollment&page=1&per_page=10&sort=name&order=desc`
-const INIT_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?enrollment_id=${firstStudent.context_id}`
-const INIT_SECTION_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${secondSection.context_id}`
+const INIT_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?enrollment_id=${firstStudent.item_id}`
+const INIT_SECTION_PACE_PROGRESS_STATUS_POLL = `/api/v1/courses/${COURSE.id}/course_pacing/new?course_section_id=${secondSection.item_id}`
 
 const MINUTE = 1000 * 60
 const HOUR = MINUTE * 60
@@ -308,25 +308,38 @@ describe('PaceContextsContent', () => {
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,
           contextsPublishing: [
-            `section-${firstSection.context_id}`,
-            `section-${secondSection.context_id}`,
+            {
+              progress_context_id: '1',
+              pace_context: firstSection,
+              polling: false,
+            },
+            {
+              progress_context_id: '2',
+              pace_context: secondSection,
+              polling: false,
+            },
           ],
         }
         const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
         const {findByTestId} = renderConnected(<PaceContent />, state)
         expect(
-          await findByTestId(`publishing-pace-${firstSection.context_id}-indicator`)
+          await findByTestId(`publishing-pace-${firstSection.item_id}-indicator`)
         ).toBeInTheDocument()
         expect(
-          await findByTestId(`publishing-pace-${secondSection.context_id}-indicator`)
+          await findByTestId(`publishing-pace-${secondSection.item_id}-indicator`)
         ).toBeInTheDocument()
       })
 
       it('starts polling for published status updates on mount', async () => {
         const paceContextsState: PaceContextsState = {
           ...DEFAULT_STORE_STATE.paceContexts,
-          contextsPublishing: [`student_enrollment-${firstStudent.context_id}`],
-          synced: false,
+          contextsPublishing: [
+            {
+              progress_context_id: '1',
+              pace_context: firstStudent,
+              polling: false,
+            },
+          ],
         }
 
         const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
@@ -334,25 +347,9 @@ describe('PaceContextsContent', () => {
         const studentsTab = getByRole('tab', {name: 'Students'})
         act(() => studentsTab.click())
         expect(
-          await findByTestId(`publishing-pace-${firstStudent.context_id}-indicator`)
+          await findByTestId(`publishing-pace-${firstStudent.item_id}-indicator`)
         ).toBeInTheDocument()
         expect(fetchMock.called(INIT_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(true)
-      })
-
-      it('keeps polling updates but does not start the whole process if the contexts are already synced', async () => {
-        const paceContextsState: PaceContextsState = {
-          ...DEFAULT_STORE_STATE.paceContexts,
-          contextsPublishing: [`section-${secondSection.context_id}`],
-          synced: true,
-        }
-        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
-        const {findByTestId} = renderConnected(<PaceContent />, state)
-
-        expect(
-          await findByTestId(`publishing-pace-${secondSection.context_id}-indicator`)
-        ).toBeInTheDocument()
-
-        expect(fetchMock.called(INIT_SECTION_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(false)
       })
     })
   })
