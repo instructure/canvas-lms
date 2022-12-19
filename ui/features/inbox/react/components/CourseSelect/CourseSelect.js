@@ -255,7 +255,7 @@ export class CourseSelect extends React.Component {
               isHighlighted={option.assetString === highlightedOptionId}
               isSelected={option.assetString === selectedOptionId}
             >
-              {option.contextName}
+              {option.courseNickname || option.contextName}
             </Select.Option>
           ))}
         </Select.Group>
