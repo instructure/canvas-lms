@@ -320,16 +320,10 @@ class CoursePace < ActiveRecord::Base
 
     date = ((is_student_plan || hard_end_dates) && self[:end_date]) || course_section&.end_at || range_end
 
-    if is_student_plan
-      date ||= CoursePaceDueDatesCalculator
-               .new(self)
-               .get_due_dates(course_pace_module_items, start_date: Date.today)[course_pace_module_items.last&.module_item_id]
-    end
-
     date = date&.to_date
 
     if with_context
-      context = if is_student_plan
+      context = if is_student_plan && date
                   "user"
                 elsif course_section&.end_at
                   "section"
@@ -338,6 +332,7 @@ class CoursePace < ActiveRecord::Base
                 else
                   "hypothetical"
                 end
+
       { end_date: date&.in_time_zone(course.time_zone), end_date_context: context }
     else
       date&.in_time_zone(course.time_zone)
