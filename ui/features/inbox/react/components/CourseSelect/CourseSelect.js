@@ -36,8 +36,10 @@ const filterOptions = (value, options) => {
       // if provided, allCourses should always be present
       filteredOptions[key] = options[key]
     } else {
-      filteredOptions[key] = options[key]?.filter(option =>
-        option.contextName.toLowerCase().startsWith(value.toLowerCase())
+      filteredOptions[key] = options[key]?.filter(
+        option =>
+          option.contextName.toLowerCase().includes(value.toLowerCase()) ||
+          option.courseNickname?.toLowerCase().includes(value.toLowerCase())
       )
     }
   })
