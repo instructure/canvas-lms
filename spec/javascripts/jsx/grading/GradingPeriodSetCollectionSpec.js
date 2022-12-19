@@ -642,7 +642,7 @@ test('"onCancel" focuses on the "edit grading period set" button', function () {
     const {editButton} = set.refs['show-grading-period-set-1']._refs
     Simulate.click(editButton)
     set.refs['edit-grading-period-set-1'].props.onCancel()
-    equal(document.activeElement.title, `Edit ${exampleSets[0].title}`)
+    equal(document.activeElement.innerText, `Edit ${exampleSets[0].title}`)
   })
 })
 
