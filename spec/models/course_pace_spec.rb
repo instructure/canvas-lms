@@ -588,16 +588,13 @@ describe CoursePace do
       expect(result[:end_date_context]).to eq("section")
     end
 
-    it "returns an estimate for student pace even if no fixed date is available" do
+    it "returns an hypothetical context-type for student pace when no fixed date is available" do
       @course_pace[:user_id] = @student.id
       @course.restrict_enrollments_to_course_dates = false
       @course.enrollment_term.update start_at: nil, end_at: nil
-
-      due_dates = { @course_pace.course_pace_module_items.last.module_item_id => Date.today }
-      expect(CoursePaceDueDatesCalculator).to receive(:new).and_return(double("DueDateCalculator", get_due_dates: due_dates))
       result = @course_pace.effective_end_date(with_context: true)
-      expect(result[:end_date_context]).to eq("user")
-      expect(result[:end_date]).not_to be_nil
+      expect(result[:end_date_context]).to eq("hypothetical")
+      expect(result[:end_date]).to be_nil
     end
 
     it "returns nil if no fixed date is available" do
