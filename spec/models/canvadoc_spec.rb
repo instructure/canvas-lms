@@ -151,6 +151,8 @@ describe "Canvadoc" do
     before do
       Account.current_domain_root_account = Account.default
       Account.default.external_integration_keys.create!(key_type: "salesforce_billing_country_code", key_value: "US")
+      allow(Shard.current.database_server.config).to receive(:[]).and_call_original
+      allow(Shard.current.database_server.config).to receive(:[]).with(:region).and_return("us-east-1")
     end
 
     after do
