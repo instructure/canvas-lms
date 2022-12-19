@@ -185,6 +185,11 @@ module Types
       scope
     end
 
+    field :course_nickname, String, null: true
+    def course_nickname
+      current_user.course_nickname(course)
+    end
+
     field :enrollments_connection, EnrollmentType.connection_type, null: true do
       argument :filter, EnrollmentFilterInputType, required: false
     end

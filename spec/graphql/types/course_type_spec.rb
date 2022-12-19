@@ -35,6 +35,7 @@ describe Types::CourseType do
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
+    expect(course_type.resolve("courseNickname")).to eq nil
   end
 
   it "works for root_outcome_group" do
