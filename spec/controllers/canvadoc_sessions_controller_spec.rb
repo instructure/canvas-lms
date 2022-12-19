@@ -673,6 +673,16 @@ describe CanvadocSessionsController do
         get :show, params: { blob: blob.to_json, hmac: hmac }
       end
 
+      it "passes send_usage_metrics as true" do
+        Account.default.settings[:enable_usage_metrics] = true
+        Account.default.save!
+        Account.default.enable_feature! :send_usage_metrics
+
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(send_usage_metrics: true))
+
+        get :show, params: { blob: blob.to_json, hmac: hmac }
+      end
+
       it "passes user information based on the submission (if past submission / missing attachment assocation)" do
         @submission.attachment_associations.destroy_all
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))
