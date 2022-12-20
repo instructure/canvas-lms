@@ -28,7 +28,7 @@ import type {
   ModuleMap,
   Section,
   Student,
-  StudentGroupCategory,
+  StudentGroupCategoryMap,
   StudentMap,
   SubmissionType,
   WorkflowState,
@@ -76,7 +76,7 @@ export type PerformanceControlValues = {
   contextModulesPerPage?: number
   customColumnDataPerPage?: number
   customColumnsPerPage?: number
-  studentsCchunkSize?: number
+  studentsChunkSize?: number
   submissionsChunkSize?: number
   submissionsPerPage?: number
 }
@@ -150,7 +150,7 @@ export type GradebookOptions = {
   sis_name: null | string
   sis_name: string
   speed_grader_enabled: boolean
-  student_groups: StudentGroupCategory[]
+  student_groups: StudentGroupCategoryMap
   user_asset_string: string
   teacher_notes: {
     hidden: boolean

@@ -511,9 +511,6 @@ describe "threaded discussions" do
         end
 
         it "replies correctly to fourth reply" do
-          # Should set the parent reply to be the root entry
-          skip("Skip until work on VICE-3239 is done")
-
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations
           wait_for_ajaximations

@@ -19,6 +19,7 @@
 #
 
 require "lti_1_3_spec_helper"
+require_relative "lti/concerns/parent_frame_shared_examples"
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
@@ -697,68 +698,6 @@ describe ExternalToolsController do
     end
   end
 
-  shared_examples_for "an endpoint which uses parent_frame_context to set the CSP header" do
-    before do
-      user_session(@student)
-    end
-
-    let(:pfc_tool) do
-      @course.context_external_tools.create(
-        name: "instructure_tool", consumer_key: "foo", shared_secret: "bar",
-        url: "http://inst-tool.example.com/abc", lti_version: "1.1",
-        developer_key: DeveloperKey.new(
-          root_account: @course.root_account,
-          internal_service: true
-        )
-      )
-    end
-
-    let(:csp_header) { response.headers["Content-Security-Policy"] }
-
-    it "adds the tool URL to the header if the parent_frame_context tool is trusted" do
-      subject
-      expect(response).to be_successful
-      expect(csp_header).to match %r{frame-ancestors [^;]*http://inst-tool.example.com(;| |$)}
-      # Make sure it also has 'self', which is added in application_controller.rb:
-      expect(csp_header).to match(/frame-ancestors [^;]*'self'/)
-    end
-
-    it "doesn't add the URL to the header if the parent_frame_context tool is not trusted" do
-      pfc_tool.developer_key.update! internal_service: false
-      subject
-      expect(response).to be_successful
-      expect(csp_header).to_not include("inst-tool.example.com")
-    end
-
-    it "doesn't add the URL to the header if the parent_frame_context tool is not active" do
-      pfc_tool.update! workflow_state: :deleted
-      subject
-      expect(response).to be_successful
-      expect(csp_header).to_not include("inst-tool.example.com")
-    end
-
-    it "doesn't add the URL to the header if the parent_frame_context tool's URL has unsafe characters" do
-      pfc_tool.update_attribute :url, "http://inst-tool.example.com;default-src"
-      subject
-      expect(response).to be_successful
-      expect(csp_header).to_not include("inst-tool.example.com")
-    end
-
-    it "doesn't add the parent_frame_context tool's URL to the header if it is a data URL" do
-      pfc_tool.update! url: "data:123"
-      subject
-      expect(response).to be_successful
-      expect(csp_header).to_not include("data:abc")
-    end
-
-    it "doesn't add the parent_frame_context tool's URL to the header if the user is not authenticated" do
-      user_session(user_model)
-      subject
-      expect(response.status).to eq(401)
-      expect(csp_header.to_s).to_not include("inst-tool.example.com")
-    end
-  end
-
   describe "GET 'retrieve'" do
     let :account do
       Account.default
@@ -803,9 +742,12 @@ describe ExternalToolsController do
         tool
       end
 
-      let(:launch_hash) do
+      let(:decoded_jwt) do
         lti_launch = assigns[:lti_launch]
-        decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+        Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+      end
+
+      let(:launch_hash) do
         cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
         JSON.parse(cached_launch)
       end
@@ -840,13 +782,15 @@ describe ExternalToolsController do
           )
         end
 
-        let(:get_page) do
-          get "retrieve", params: {
+        let(:get_page_params) do
+          {
             course_id: @course.id,
             url: "http://www.example.com/launch",
             resource_link_lookup_uuid: rl.lookup_uuid
           }
         end
+
+        let(:get_page) { get "retrieve", params: get_page_params }
 
         it "sets the custom parameters in the launch hash" do
           get_page
@@ -915,6 +859,20 @@ describe ExternalToolsController do
           expect(
             launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
           ).to eq({ "abc" => "def", "expans" => @teacher.id })
+        end
+
+        it "if parent_frame_context is not given it does not include it in lti_message_hint" do
+          get_page
+          expect(decoded_jwt).to_not include("parent_frame_context")
+        end
+
+        context "when the parent parent_frame_context is passed" do
+          let(:get_page_params) { super().merge(parent_frame_context: 123) }
+
+          it "sets parent_frame_context in the lti_message_hint" do
+            get_page
+            expect(decoded_jwt["parent_frame_context"]).to eq("123")
+          end
         end
       end
 
@@ -1088,6 +1046,10 @@ describe ExternalToolsController do
           parent_frame_context: pfc_tool.id
         }
       end
+
+      before { user_session(@student) }
+
+      let(:pfc_tool_context) { @course }
     end
 
     context "for Quizzes Next launch" do
@@ -1404,12 +1366,16 @@ describe ExternalToolsController do
 
     it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
       subject do
-        tool = new_valid_tool(@course)
         get "resource_selection", params: {
-          course_id: @course.id, external_tool_id: tool.id,
+          course_id: @course.id,
+          external_tool_id: new_valid_tool(@course).id,
           parent_frame_context: pfc_tool.id
         }
       end
+
+      before { user_session(@student) }
+
+      let(:pfc_tool_context) { @course }
     end
 
     context "with RCE parameters" do
@@ -1487,13 +1453,13 @@ describe ExternalToolsController do
           t.save
           t
         end
+
+        let(:decoded_jwt) do
+          JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+        end
+
         let(:launch_params) do
-          JSON.parse(
-            fetch_and_delete_launch(
-              @course,
-              JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)["verifier"]
-            )
-          )
+          JSON.parse(fetch_and_delete_launch(@course, decoded_jwt["verifier"]))
         end
 
         context "during a basic launch" do
@@ -1513,16 +1479,25 @@ describe ExternalToolsController do
             let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
           end
 
-          it "forwards parent_frame_context to the deep link return url" do
-            tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
-            tool.save!
-            user_session(@teacher)
-            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
-            deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
-            return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
-            jwt = JSON::JWT.decode(return_jwt, :skip_verification)
-            expect(jwt[:parent_frame_context]).to be == tool.id.to_s
-            expect(response).to be_successful
+          context "when the parent_frame_context param is sent" do
+            before do
+              tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+              tool.save!
+              user_session(@teacher)
+              post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
+            end
+
+            it "forwards parent_frame_context to the deep link return url" do
+              deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+              return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
+              jwt = JSON::JWT.decode(return_jwt, :skip_verification)
+              expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+              expect(response).to be_successful
+            end
+
+            it "includes parent_frame_context in the lti_message_hint" do
+              expect(decoded_jwt["parent_frame_context"]).to eq(tool.id.to_s)
+            end
           end
         end
       end

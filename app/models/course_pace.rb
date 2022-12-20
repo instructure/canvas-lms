@@ -194,27 +194,16 @@ class CoursePace < ActiveRecord::Base
 
               # If it exists let's just add the student to it and remove them from the other
               if correct_date_override
-                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
-                correct_date_override.assignment_override_students.create(
-                  user_id: user_id,
-                  no_enrollment: false
-                )
+                create_or_update_assignment_student_override!(correct_date_override, user_id)
               elsif current_override&.assignment_override_students&.size == 1
                 current_override.update(due_at: due_at)
               else
-                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
-                assignment.assignment_overrides.create!(
+                assignment_override = assignment.assignment_overrides.create!(
                   set_type: "ADHOC",
                   due_at_overridden: true,
-                  due_at: due_at,
-                  assignment_override_students: [
-                    AssignmentOverrideStudent.new(
-                      assignment: assignment,
-                      user_id: user_id,
-                      no_enrollment: false
-                    )
-                  ]
+                  due_at: due_at
                 )
+                create_or_update_assignment_student_override!(assignment_override, user_id)
               end
 
               # Remember content to refresh cache
@@ -344,6 +333,31 @@ class CoursePace < ActiveRecord::Base
     else
       date&.in_time_zone(course.time_zone)
     end
+  end
+
+  # This method will attempt to find an existing AssignmentOverrideStudent for the given user and assignment override.
+  # If one exists it will update the workflow_state to active and update the assignment_override_id to the new override.
+  # It also checks to see if the old override is now empty and deletes it if it is.
+  # If no existing AssignmentOverrideStudent is found it will create a new one.
+  #
+  # @param assignment_override [AssignmentOverride] The assignment override to create or update the
+  #   AssignmentOverrideStudent for
+  # @param user_id [Integer] The user_id of the AssignmentOverrideStudent to create or update
+  # @return [AssignmentOverrideStudent] The AssignmentOverrideStudent that was created or updated
+  def create_or_update_assignment_student_override!(assignment_override, user_id)
+    assignment = assignment_override.assignment
+    assignment_override_student = assignment.assignment_override_students.find_by(user_id: user_id)
+    if assignment_override_student
+      original_override = assignment_override_student.assignment_override
+      assignment_override_student.update!(workflow_state: "active", assignment_override: assignment_override)
+      original_override.destroy_if_empty_set
+    else
+      assignment_override_student = assignment_override.assignment_override_students.create!(
+        user_id: user_id,
+        no_enrollment: false
+      )
+    end
+    assignment_override_student
   end
 
   def logging_for_weekends_required?

@@ -384,7 +384,7 @@ module CanvasKaltura
     def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
-        http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
+        http = Net::HTTP.new(@host, @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port)
         http.use_ssl = @use_ssl
 
         if ENV["RAILS_ENV"] == "development"

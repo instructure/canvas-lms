@@ -28,6 +28,12 @@ describe Attachment do
       expect { attachment_model(context: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
 
+    it "raises an error if you create in a deleted folder" do
+      course_factory
+      f1 = @course.folders.create!(name: "f1", workflow_state: "deleted")
+      expect { attachment_model(context: @course, folder: f1) }.to raise_error ActiveRecord::StatementInvalid, /Cannot create attachments in deleted folders/
+    end
+
     describe "category" do
       subject { attachment_model category: category }
 
@@ -73,7 +79,7 @@ describe Attachment do
 
   context "default_values" do
     before :once do
-      @course = course_model
+      course_model
     end
 
     it "sets the display name to the filename if it is nil" do

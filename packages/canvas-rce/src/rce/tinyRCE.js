@@ -38,7 +38,6 @@ import 'tinymce/plugins/wordcount/plugin'
 import 'tinymce/plugins/paste/plugin'
 import 'tinymce/plugins/table/plugin'
 import 'tinymce/plugins/hr/plugin'
-import 'tinymce/plugins/fullscreen/plugin'
 
 // add custom plugins
 import './plugins/instructure-ui-icons/plugin'
@@ -54,6 +53,7 @@ import './plugins/instructure_media_embed/plugin'
 import './plugins/instructure_icon_maker/plugin'
 import './plugins/instructure_wordcount/plugin'
 import './plugins/instructure_paste/plugin'
+import './plugins/instructure_fullscreen/plugin'
 
 import 'tinymce-a11y-checker'
 

@@ -97,6 +97,11 @@ describe Folder do
     end
   end
 
+  it "raises an error if you create in a deleted parent folder" do
+    f1 = @course.folders.create!(name: "f1", workflow_state: "deleted")
+    expect { f1.sub_folders.create!(name: "f2", context: @course) }.to raise_error ActiveRecord::StatementInvalid, /Cannot create sub-folders in deleted folders/
+  end
+
   it "does not allow recursive folder structures" do
     f1 = @course.folders.create!(name: "f1")
     f2 = f1.sub_folders.create!(name: "f2", context: @course)

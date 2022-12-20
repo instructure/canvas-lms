@@ -485,6 +485,10 @@ module RCENextPage
     f('button[title="Fullscreen"]')
   end
 
+  def exit_full_screen_button
+    f('button[title="Exit Fullscreen"]')
+  end
+
   def keyboard_shortcut_modal
     f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
   end
@@ -961,10 +965,6 @@ module RCENextPage
 
   def click_visible_keyboard_shortcut_button
     visible_keyboard_shortcut_button.click
-  end
-
-  def click_full_screen_button
-    full_screen_button.click
   end
 
   def click_decorative_options_checkbox

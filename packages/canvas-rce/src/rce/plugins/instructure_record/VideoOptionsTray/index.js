@@ -42,6 +42,7 @@ import Bridge from '../../../../bridge'
 import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 export default function VideoOptionsTray(props) {
@@ -142,6 +143,7 @@ export default function VideoOptionsTray(props) {
           key="video-options-tray"
           data-mce-component={true}
           label={formatMessage('Video Options Tray')}
+          mountNode={instuiPopupMountNode}
           onDismiss={onRequestClose}
           onEntered={onEntered}
           onExited={onExited}

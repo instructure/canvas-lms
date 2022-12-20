@@ -84,7 +84,7 @@ const PaceModalHeading: React.FC<Props> = ({
   const renderDetails = () => {
     return (
       <>
-        <Text data-testid="pace-type" as="div" size="medium" weight="bold">
+        <Text tabIndex={0} data-testid="pace-type" as="div" size="medium" weight="bold">
           {getPaceTitle()}
         </Text>
         <Text data-testid="section-name" as="div" size="x-large" weight="bold">

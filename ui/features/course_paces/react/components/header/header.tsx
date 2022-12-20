@@ -39,6 +39,7 @@ import {getCoursePace, isNewPace} from '../../reducers/course_paces'
 import {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
 import {paceContextsActions} from '../../actions/pace_contexts'
+import {generateModalLauncherId} from '../../utils/utils'
 
 const I18n = useI18nScope('course_paces_header')
 
@@ -181,6 +182,10 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
               margin={props.responsiveSize === 'large' ? '0' : 'small 0 0'}
             >
               <Link
+                id={generateModalLauncherId({
+                  type: 'Course',
+                  item_id: window.ENV.COURSE_ID,
+                } as PaceContext)}
                 isWithinText={false}
                 data-testid="go-to-default-pace"
                 onClick={() => {

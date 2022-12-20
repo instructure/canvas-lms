@@ -26,6 +26,7 @@ import {setLocale} from './common/natcompare'
 export * from './enhance-user-content/index'
 
 export const defaultConfiguration = defaultTinymceConfig
+export {instuiPopupMountNode} from './util/fullscreenHelpers'
 
 export function renderIntoDiv(editorEl, props, cb) {
   const language = normalizeLocale(props.language)

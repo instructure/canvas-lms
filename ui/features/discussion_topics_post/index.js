@@ -28,7 +28,8 @@ ready(() => {
     $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0]
   )
 })
-if (ENV.SEQUENCE != null) {
+const urlParams = new URLSearchParams(window.location.search)
+if (ENV.SEQUENCE != null && !urlParams.get('embed')) {
   // eslint-disable-next-line promise/catch-or-return
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../../lti_1_3_spec_helper"
+require_relative "../concerns/parent_frame_shared_examples"
 
 describe Lti::IMS::AuthenticationController do
   include Lti::RedisMessageClient
@@ -282,6 +283,26 @@ describe Lti::IMS::AuthenticationController do
           end
         end
       end
+
+      it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+        # The shared examples require `subject` to make the request -- this is
+        # already set up above in the parent rspec context
+        let(:context) { course_model }
+        let(:pfc_tool_context) { context }
+
+        let(:lti_message_hint) do
+          Canvas::Security.create_jwt(
+            {
+              verifier: verifier,
+              canvas_domain: redirect_domain,
+              context_id: context.global_id,
+              context_type: context.class.to_s,
+              parent_frame_context: pfc_tool.id.to_s
+            },
+            1.year.from_now
+          )
+        end
+      end
     end
 
     context "when there are non redirect_uri errors" do
@@ -352,7 +373,7 @@ describe Lti::IMS::AuthenticationController do
       end
     end
 
-    context "when the developer key reidrect uri contains a query string" do
+    context "when the developer key redirect uri contains a query string" do
       let(:redirect_uris) { ["https://redirect.tool.com?must_be_present=true"] }
 
       it_behaves_like "redirect_uri errors" do

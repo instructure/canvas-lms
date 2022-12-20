@@ -154,16 +154,30 @@ describe('PaceContextsContent', () => {
       )
       const searchInput = getByPlaceholderText('Search for sections')
       const searchButton = getByRole('button', {name: 'Search'})
-      act(() => {
-        fireEvent.change(searchInput, {target: {value: 'A'}})
-      })
+      fireEvent.change(searchInput, {target: {value: 'A'}})
       act(() => {
         searchButton.click()
       })
 
       expect(await findByText('A-C')).toBeInTheDocument()
-      expect(await queryByText('D-F')).not.toBeInTheDocument()
-      expect(await queryByText('G-K')).not.toBeInTheDocument()
+      expect(queryByText('D-F')).not.toBeInTheDocument()
+      expect(queryByText('G-K')).not.toBeInTheDocument()
+      expect(queryByText('No results found')).not.toBeInTheDocument()
+    })
+
+    it("shows no results if there's no contexts for the search", async () => {
+      fetchMock.get(
+        SEARCH_SECTION_CONTEXTS_API,
+        JSON.stringify({pace_contexts: [], total_entries: 0}),
+        {overwriteRoutes: true}
+      )
+      const {findByText, getByText, getByPlaceholderText} = renderConnected(<PaceContent />)
+      const searchInput = getByPlaceholderText('Search for sections')
+      const searchButton = getByText('Search', {selector: 'button span'})
+      fireEvent.change(searchInput, {target: {value: 'A'}})
+      act(() => searchButton.click())
+      expect(await findByText('No results found')).toBeInTheDocument()
+      expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 
     it('provides contextType and contextId to Pace modal', async () => {

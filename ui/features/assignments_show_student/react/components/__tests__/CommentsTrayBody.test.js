@@ -762,7 +762,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       const {queryByText} = render(mockContext(<CommentContent {...props} />))
 
-      expect(queryByText('You are now able to submit your peer review')).toBeInTheDocument()
+      expect(queryByText('Your peer review is complete!')).toBeInTheDocument()
     })
 
     it('does not display an alert when peer review mode is disabled', async () => {
@@ -782,7 +782,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = false
       const {queryByText} = render(mockContext(<CommentContent {...props} />))
 
-      expect(queryByText('You are now able to submit your peer review')).not.toBeInTheDocument()
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
 
     it('does not display an alert when there are no comments', async () => {
@@ -792,7 +792,7 @@ describe('CommentsTrayBody', () => {
       props.isPeerReviewEnabled = true
       const {queryByText} = render(mockContext(<CommentContent {...props} />))
 
-      expect(queryByText('You are now able to submit your peer review')).not.toBeInTheDocument()
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
 
     it('renders a message with image if there are no comments', async () => {
@@ -823,7 +823,7 @@ describe('CommentsTrayBody', () => {
 
       const {queryByText} = render(mockContext(<CommentContent {...props} />))
 
-      expect(queryByText('You are now able to submit your peer review')).not.toBeInTheDocument()
+      expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
   })
 })

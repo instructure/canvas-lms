@@ -31,7 +31,8 @@ import formatMessage from '../../../../format-message'
 
 import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
 import {containsAdvancedSyntax} from './advancedOnlySyntax'
-import advancedPreference from './advancedPreference'
+import * as advancedPreference from './advancedPreference'
+import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
 import mathml from './mathml'
@@ -150,7 +151,7 @@ export default class EquationEditorModal extends Component {
 
   toggleAndUpdatePreference = () => {
     this.toggleAdvanced()
-    advancedPreference.isSet() ? advancedPreference.clear() : advancedPreference.set()
+    advancedPreference.isSet() ? advancedPreference.remove() : advancedPreference.set()
   }
 
   registerBasicEditorListener = () => {
@@ -244,17 +245,17 @@ export default class EquationEditorModal extends Component {
   }
 
   render = () => {
-    const {onModalClose, mountNode} = this.props
+    const {onModalClose} = this.props
 
     return (
       <Modal
         data-mce-component={true}
         label={formatMessage('Equation Editor')}
+        mountNode={instuiPopupMountNode}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}
         onOpen={this.handleOpen}
         open={true}
-        mountNode={mountNode}
         transition="fade"
         shouldCloseOnDocumentClick={false}
       >
@@ -321,7 +322,6 @@ EquationEditorModal.propTypes = {
   onModalDismiss: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired,
   onEquationSubmit: PropTypes.func.isRequired,
-  mountNode: PropTypes.string,
   originalLatex: PropTypes.shape({
     latex: PropTypes.string,
     advancedOnly: PropTypes.bool,
@@ -330,8 +330,4 @@ EquationEditorModal.propTypes = {
     rightIndex: PropTypes.number,
   }).isRequired,
   openAdvanced: PropTypes.bool.isRequired,
-}
-
-EquationEditorModal.defaultProps = {
-  mountNode: null,
 }

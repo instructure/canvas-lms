@@ -27,13 +27,13 @@ final SYNC_IMAGES = [
     job: null,
     target: 'starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental',
   ],
-  'selenium/hub:4.1': [
+  'selenium/hub:4.6': [
     job: null,
-    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.1'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.6'
   ],
-  'selenium/node-chrome:101.0': [
+  'selenium/node-chrome:107.0': [
     job: null,
-    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:101.0'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:107.0'
   ]
 ]
 

@@ -146,7 +146,8 @@ module Lti::IMS
           opts: {
             # See #variable_expander for additional constraints on custom param expansion
             claim_group_whitelist: %i[public i18n custom_params],
-            extension_whitelist: [:canvas_user_id, :canvas_user_login_id]
+            extension_whitelist: [:canvas_user_id, :canvas_user_login_id],
+            resource_link: page[:opts][:rlid].present? ? Lti::ResourceLink.find_by(resource_link_uuid: page[:opts][:rlid]) : nil
           }
         ).generate_post_payload_message(validate_launch: false)
       ensure

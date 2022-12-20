@@ -1,0 +1,309 @@
+{
+  "a_great_discussion_6526a6d9": { "message": "Perbincangan yang hebat" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Tugasan yang luar biasa" },
+  "add_to_do_7537af64": { "message": "Tambah Untuk Dilakukan" },
+  "add_to_do_7def3c37": { "message": "Tambah Untuk Dilakukan" },
+  "address_3159962f": { "message": "Alamat:" },
+  "all_day_fb42c4fc": { "message": "Semua Hari" },
+  "all_items_loaded_aa256183": { "message": "Semua item dimuatkan" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Tugasan perbincangan yang menakjubkan"
+  },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Ralat berlaku semasa cuba menolak peluang."
+  },
+  "announcement_fb4cb645": { "message": "Pengumuman" },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Adakah anda pasti anda ingin memadamkan item perancang ini?"
+  },
+  "assignment_976578a8": { "message": "Tugasan" },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title }, sepanjang hari pada { datetime }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, pada { datetime }."
+  },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title }, pada { datetime } hingga { endTime }"
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, tarikh siap { datetime }."
+  },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } mempunyai masa untuk dilakukan pada { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } ditandakan sebagai siap."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } tidak ditandakan sebagai siap."
+  },
+  "assignmenttype_title_posted_datetime_cab69444": {
+    "message": "{ assignmentType } { title } disiarkan pada { datetime }."
+  },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, peringatan { datetime }."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Permulaan Sejarah Senarai Untuk Dilakukan Anda"
+  },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Di bawah ialah contoh jadual yang akan dilihat oleh pelajar"
+  },
+  "calendar_a8563bb2": { "message": "Kalendar:" },
+  "calendar_event_89aadc1c": { "message": "Acara Kalendar" },
+  "canvas_planner_98ed106": { "message": "Perancang Canvas" },
+  "close_d634289d": { "message": "Tutup" },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Tutup tetingkap timbul Pusat Peluang"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# peluang}\n    one {# peluang}\n  other {# peluang}\n}"
+  },
+  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
+    "message": "{ count, plural,\n    one {Sembunyikan # item yang tiada}\n  other {Sembunyikan # item yang tiada}\n}"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Tunjukkan # item yang lengkap}\n  other {Tunjukkan # item yang lengkap}\n}"
+  },
+  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
+    "message": "{ count, plural,\n    one {Tunjukkan # missing item yang tiada}\n  other {Tunjukkan # item yang tiada}\n}"
+  },
+  "course_8a63b4a3": { "message": "Kursus" },
+  "course_to_do_bcbbab54": { "message": "{ course } UNTuK DILAKUKAN" },
+  "date_at_time_dbdb1b99": { "message": "{ date } di { time }" },
+  "date_ee500367": { "message": "Tarikh" },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } bukan tarikh yang sah."
+  },
+  "date_is_required_8660ec22": { "message": "Tarikh diperlukan" },
+  "date_time_d9fbf2d7": { "message": "Tarikh & Masa:" },
+  "delete_a6efa79d": { "message": "Padam" },
+  "details_98a31b68": { "message": "Butiran" },
+  "details_a6f427c3": { "message": "Butiran:" },
+  "discussion_6719c51d": { "message": "Perbincangan" },
+  "dismiss_itemtitle_a9fae1b3": { "message": "Tolak { itemTitle }" },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Tolak { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": { "message": "Ditolak..." },
+  "dismissed_opportunities_f0826640": { "message": "Peluang Ditolak..." },
+  "due_5d7267be": { "message": "Cukup tempoh:" },
+  "due_date_124fdd99": { "message": "Cukup tempoh: { date }" },
+  "edit_c5fbea07": { "message": "Edit" },
+  "edit_title_72e5a21e": { "message": "Edit { title }" },
+  "error_loading_grades_e0b38f4d": { "message": "Ralat memuatkan gred" },
+  "error_loading_items_5218438e": { "message": "Ralat memuatkan item" },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Ralat memuatkan lebih banyak item"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Ralat memuatkan item yang lepas"
+  },
+  "exciting_discussion_9f67bd0a": { "message": "Perbincangan menarik" },
+  "excused_cf8792eb": { "message": "Dimaafkan" },
+  "extended_9a58dcb6": { "message": "Dilanjutkan" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Gagal mendapatkan senarai kursus"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Gagal mendapatkan senarai Untuk Dilakukan"
+  },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Gagal melihat masa depan anda"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Gagal melihat masa lalu anda"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Gagal menyimpan perubahan pada { name }"
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "Gagal untuk memadamkan { name }."
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Gagal memadamkan perkara untuk dilakukan"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Gagal untuk mendapatkan aktiviti baharu"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Gagal untuk memuatkan peluang"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Gagal untuk menyimpan perkara untuk dilakukan"
+  },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Kegagalan memuatkan senarai Untuk Dilakukan"
+  },
+  "feedback_6dcc1991": { "message": "Maklum balas" },
+  "fun_quiz_47ab0b0": { "message": "Kuiz menyeronokkan" },
+  "go_to_card_view_dashboard_9d03970e": {
+    "message": "Terus ke Papan Pemuka Pandangan Kad"
+  },
+  "graded_25cd3fcd": { "message": "Digredkan" },
+  "grades_are_loading_c899652d": { "message": "Gred sedang dimuatkan" },
+  "grades_loaded_5056277c": { "message": "Gred Dimuatkan" },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } { items, plural,\n     =1 {item}\n  other {item}\n} dilengkapkan"
+  },
+  "join_6cafecca": { "message": "Sertai" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "sertai mesyuarat dalam talian yang aktif"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "sertai mesyuarat dalam talian"
+  },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Pintas ke bar alat navigasi"
+  },
+  "jump_to_today_254ccf41": { "message": "Pintas ke Hari Ini" },
+  "language_arts_35b79a8b": { "message": "Seni Bahasa" },
+  "late_2be42b88": { "message": "Lewat" },
+  "load_more_a36f9cf9": { "message": "Muatkan lebih banyak" },
+  "load_prior_dates_f2b0f6f0": { "message": "Muatkan tarikh sebelumnya" },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "{ count, plural,\n     =0 {# item}\n    one {# item}\n  other {# item}\n} dimuatkan"
+  },
+  "loading_25990131": { "message": "Memuatkan..." },
+  "loading_725811ca": { "message": "memuatkan" },
+  "loading_grades_c842c887": { "message": "Memuatkan Gred" },
+  "loading_past_items_ca499e75": { "message": "Memuatkan item yang lepas" },
+  "loading_planner_items_947a813d": { "message": "Memuatkan item perancang" },
+  "location_3b6ff307": { "message": "Lokasi:" },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Nampaknya tidak ada apa-apa di sini"
+  },
+  "math_ede93050": { "message": "Matematik" },
+  "missing_1a256b3b": { "message": "Tiada" },
+  "missing_items_for_title_516511f8": {
+    "message": "Tiada item untuk { title }"
+  },
+  "my_grades_98834476": { "message": "Gred Saya" },
+  "new_13daf639": { "message": "Baharu" },
+  "new_activity_8b84847d": { "message": "Aktiviti Baharu" },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Aktiviti baharu untuk { title }"
+  },
+  "new_opportunities_7d349c4d": { "message": "Peluang Baharu" },
+  "next_month_749b1778": { "message": "Bulan Seterusnya" },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Tiada Tarikh Siap Ditetapkan"
+  },
+  "no_grade_3b4d7f3e": { "message": "Tiada gred" },
+  "nothing_due_this_week_d45c9ef9": {
+    "message": "Tiada Tarikh Siap Minggu Ini"
+  },
+  "nothing_for_now_e3e3ce2a": { "message": "Tiada apa-apa pada masa ini" },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Tiada apa-apa di sini memerlukan perhatian."
+  },
+  "nothing_more_to_do_b665da42": {
+    "message": "Tiada Apa-apa Lagi Untuk Dilakukan"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Tiada apa-apa yang baharu memerlukan perhatian."
+  },
+  "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+    "message": "Belum ada perancangan hari ini. Memilih item terkini."
+  },
+  "nothing_planned_today_selecting_next_item_f6718aa": {
+    "message": "Tiada apa-apa dirancang hari ini. Memilih item seterusnya."
+  },
+  "nothing_planned_yet_8675ffe9": { "message": "Belum Ada Perancangan" },
+  "numpoints_points_8621a43b": { "message": "{ numPoints } mata" },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Hanya tempoh penggredan terkini ditunjukkan."
+  },
+  "opportunities_popup_f6703842": { "message": "tetingkap timbul peluang" },
+  "optional_add_course_ef0d70fc": { "message": "Pilihan: Tambah Kursus" },
+  "page_50c4823d": { "message": "Halaman" },
+  "peer_review_74f26a13": { "message": "Tinjauan Semula Setara" },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Tinjauan Semula Setara untuk { itemTitle }"
+  },
+  "points_bceb5005": { "message": "mata" },
+  "points_points_63e59cce": { "message": "{ points } mata" },
+  "previous_month_bb1e3c84": { "message": "Bulan sebelumnya" },
+  "pts_699bd9aa": { "message": "mata" },
+  "quiz_e0dcce8f": { "message": "Kuiz" },
+  "redo_363c58b7": { "message": "Buat semula" },
+  "reminder_date_4564d12d": { "message": "Peringatan: { date }" },
+  "replies_4a8577c8": { "message": "Balasan" },
+  "save_11a80ec3": { "message": "Simpan" },
+  "schedule_preview_3bcda153": { "message": "Jadualkan Pratonton" },
+  "science_8d92214a": { "message": "Sains" },
+  "scroll_up_to_see_your_history_19b14cad": {
+    "message": "Tatal ke atas untuk melihat sejarah anda!"
+  },
+  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+    "message": "Tatal ke atas kepada item sebelumnya dengan aktiviti baharu."
+  },
+  "show_all_ae37d610": { "message": "Tunjuk Semua" },
+  "show_my_grades_ebd08684": { "message": "Tunjuk Gred Saya" },
+  "social_studies_13fa30c7": { "message": "Pengajian Sosial" },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } kepada { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
+  },
+  "starttime_to_endtime_d7cc249d": {
+    "message": "{ startTime } kepada { endTime }"
+  },
+  "submitted_318fad53": { "message": "Diserahkan" },
+  "success_to_do_created_e34ed395": {
+    "message": "Berjaya: Untuk Dilakukan dicipta"
+  },
+  "task_16b0ef38": { "message": "Tugas" },
+  "the_best_assignment_15e98be1": { "message": "Tugasan terbaik" },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Tarikh dan Masa item untuk dilakukan ini akan cukup tempoh"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Tiada mata yang berkaitan dengan item ini"
+  },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "Tiada perancangan untuk hari ini."
+  },
+  "time_2b5aac58": { "message": "Masa" },
+  "title_ee03d132": { "message": "Tajuk" },
+  "title_is_required_6ddcab69": { "message": "tajuk diperlukan" },
+  "to_do_1d554f36": { "message": "Untuk Dilakukan" },
+  "to_do_date_4b211ad0": { "message": "Untuk Dilakukan: { date }" },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Item Untuk Dilakukan Sedang Dimuatkan"
+  },
+  "today_76e10f9c": { "message": "Hari Ini" },
+  "today_at_date_8ac30d6": { "message": "Hari ini pada { date }" },
+  "tomorrow_9a6c9a00": { "message": "Esok" },
+  "tomorrow_at_date_b53f2cf1": { "message": "Esok pada { date }" },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Tidak dapat ditandakan sebagai lengkap."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Gunakan kekunci anak panah untuk menavigasi pilihan."
+  },
+  "view_next_week_7f61f755": { "message": "Lihat minggu seterusnya" },
+  "view_previous_week_6f83849f": { "message": "Lihat minggu sebelumnya" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Navigasi jadual mingguan"
+  },
+  "yesterday_at_date_1aa6d18e": { "message": "Semalam pada { date }" },
+  "yesterday_c6bd6abf": { "message": "Semalam" },
+  "you_have_media_feedback_f5f9aba8": {
+    "message": "Anda mempunyai maklum balas media."
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Anda mesti memberikan tarikh dan masa."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Anda telah menatal kembali ke item Untuk Dilakukan anda yang pertama!"
+  }
+}

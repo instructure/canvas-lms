@@ -88,7 +88,7 @@ const ImageOptionsForm = ({
   const TYPE_UPPER = isIconMaker ? formatMessage('Icon') : formatMessage('Image')
 
   return (
-    <Flex direction="column">
+    <Flex id={id} direction="column">
       <Flex.Item padding="small">
         <TextArea
           disabled={isDecorativeImage}
@@ -138,6 +138,7 @@ const ImageOptionsForm = ({
                   disabled={displayAs !== 'embed'}
                   renderLabel={formatMessage('Size')}
                   messages={messagesForSize}
+                  mountNode={() => document.getElementById(id)}
                   assistiveText={formatMessage('Use arrow keys to navigate options.')}
                   onChange={handleImageSizeChange}
                   value={imageSize}

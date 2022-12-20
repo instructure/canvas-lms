@@ -32,6 +32,9 @@ import {actions} from '../../reducers/svgSettings'
 
 const SIZES = [Size.ExtraSmall, Size.Small, Size.Medium, Size.Large]
 
+const SHAPE_SECTION_ID = 'icons-tray-shape-section'
+const getShapeSection = () => document.querySelector(`#${SHAPE_SECTION_ID}`)
+
 export const ShapeSection = ({settings, onChange}) => {
   useEffect(() => {
     // if the user has an embedded image, we need to re-crop it so it fits the new shape
@@ -58,11 +61,18 @@ export const ShapeSection = ({settings, onChange}) => {
   }, [settings.shape])
 
   return (
-    <Flex as="section" direction="column" justifyItems="space-between" padding="small small 0">
+    <Flex
+      id={SHAPE_SECTION_ID}
+      as="section"
+      direction="column"
+      justifyItems="space-between"
+      padding="small small 0"
+    >
       <Flex.Item padding="small">
         <SimpleSelect
           assistiveText={formatMessage('Use arrow keys to select a shape.')}
           id="icon-shape"
+          mountNode={getShapeSection}
           onChange={(e, option) => onChange({shape: option.value})}
           renderLabel={formatMessage('Icon Shape')}
           value={settings.shape}
@@ -79,6 +89,7 @@ export const ShapeSection = ({settings, onChange}) => {
         <SimpleSelect
           assistiveText={formatMessage('Use arrow keys to select a size.')}
           id="icon-size"
+          mountNode={getShapeSection}
           onChange={(e, option) => onChange({size: option.value})}
           renderLabel={formatMessage('Icon Size')}
           value={settings.size}
