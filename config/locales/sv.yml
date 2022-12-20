@@ -1175,6 +1175,13 @@ sv:
               parameters: 
                 header: "Inlämnad efter:"
     integer_required: "Ett heltalsvärde krävs"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Villkor (gräns 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2503,6 +2510,7 @@ sv:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gör att hjälplänkar kan taggas som befintliga eller nya och visar tydligt befintliga hjälplänkar i hjälpmenyn."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Gör det möjligt för lärare att tillämpa resultat på ej bedömda inlämningar i bulk."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Gör att lärare kan sätta masspoängsätta ej bedömda inlämningar från menyerna Uppgiftsgrupp och Totalt antal kolumner i omdömesboken."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Tillåt att lärare lämnar in filbilagor för studentens räkning."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gör lärandemål valbara under migrering av kursinnehåll"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillåter modifiering av aviseringsinställningar i kurser på sidan för aviseringsinställningar på kontonivå."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Tillåter att resultatdata lagrad i lärandemålstjänsten visas i Canvas-rapporteringen (LMGB, sLMGB och lärandemålrelaterad administratörsrapportering)."
@@ -6058,6 +6066,7 @@ sv:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Ändringarna kommer att tillämpas även om du lämnar den här sidan."
   changes_you_made_may_not_be_saved_4e8db973: "Ändringar du gjort kan inte sparas."
   changing_course_dates_may_override_term_availabili_d92b10de: "Om du ändrar kursdatumen kan åsidodsätta terminens tillgänglighetsinställningar och placeringar på kurssidan och översikten. Bekräfta terminsdatum innan du ändrar kursdatum."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Om du ändrar antalet dagar för kurstakten kan detta påverka inlämningsdatum."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Om dagarna för kurstakten ändras kan detta även ändra inlämningsdatum."
   changing_section_dates_may_override_course_and_ter_6634950e: "Ändrade sektionsdatum kan skriva över tillgänglighetsinställningar för termin och placering i kurssidan och översikten. Bekräfta termins- och kursdatum innan du modifierar sektionsdatum."
   changing_the_course_participation_will_republish_a_1cc05b7: "Om kursdeltagandet ändras ompubliceras kurstakten med nya datum som använder terminsdeltagande."
@@ -8352,6 +8361,7 @@ sv:
   course_pacing_d3025ecf: "Kurstakt:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Förhandsvisningen av funktionen Kurstakt måste aktiveras för ditt lärosäte."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Kurstakt är en ett automatiseringsverktyg som skapar ett studentschema genom att kombinera föreslagna timmar per kapitel, närvarodagar och totalt antal timmar för att generera en datumberäkning."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Kurstakten är ett automatiserat verktyg som fastställer olika inlämningsdatum för bedömningar och läraktiviteter baserat på varje students registreringsdatum, aktiveringsstruktur och lärande i egen takt i kurser med rullande registrering."
   course_pacing_is_in_active_development_348e33cf: "Kurstakter är i aktiv utveckling."
   course_pacing_redesign_38edfc1c: "Omdesign av kurstakt"
   course_pages_449f1dd4: Kurssidor
@@ -9084,6 +9094,7 @@ sv:
   create_132b3be1: Skapa
   create_14873ed7: skapa
   create_a_64f6f82: "Skapa en"
+  create_a_course_pace_333b0911: "Skapa en kurstakt"
   create_a_default_course_pace_71ba0b9f: "Skapa en standardkurstakt"
   create_a_developer_key_cabaa013: "Skapa en utvecklarnyckel"
   create_a_friendly_display_name_c1036ed: "Skapa ett anpassat visningsnamn"
@@ -9116,6 +9127,7 @@ sv:
                       och quiz. Uppgiftsgrupper kan viktas.
   create_content_for_your_course_500a7032: "Skapa innehåll för din kurs"
   create_course_9a69b32c: "Skapa kurs"
+  create_course_pace_3dff129: "Skapa kurstakt"
   create_course_templates_f5c4e039: "Skapa kursmallar"
   create_criterion_6df4d4ad: "Skapa kriterium"
   create_default_pace_dd21415b: "Skapa en standardtakt"
@@ -9369,6 +9381,7 @@ sv:
   customize_course_details_26fd4afe: "Anpassa kursinformationen"
   customize_help_link_62cd05eb: "Anpassa hjälplänk"
   customize_learning_mastery_ratings_4ace142a: "Anpassa bedömningar för måluppfyllelse"
+  customize_section_and_student_paces_f63f930f: "Anpassa sektion och studenttakter"
   customize_sections_and_individual_student_paces_a16099b: "Anpassa sektioner och individuella studenttakter"
   customize_this_menu_efa72a9: "Anpassa den här menyn"
   cutoff_score_74254c89: "Godkännande gräns"
@@ -9538,6 +9551,7 @@ sv:
     no_date: "Inget datum"
   dates_6e416047: Datum
   dates_shown_in_course_time_zone_da2f77d5: "Datum visas i kurstidszonen"
+  dates_shown_in_course_time_zone_efd32135: "Datum som visas i kurstidszonen"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9603,6 +9617,7 @@ sv:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djup inkapslade svar stöds inte längre. Ditt svar visas på första sidan av den här tråden."
   default_9db103d: Standard
   default_conference_title: "%{course_name} Konferens"
+  default_course_pace_ce0ba0f3: Standardkurstakt
   default_course_pacing_d18b6cda: Standardkurstakt
   default_dates_a0a2ae26: standarddatum
   default_due_time_9d0e9140: Standardinlämningstid
@@ -9730,6 +9745,7 @@ sv:
   deleted_content_referenced_in_this_resource_e42d1998: "Den här resursen har referenser till borttaget innehåll:"
   deleted_deletedtimingdisplay_f4c73003: "Raderad %{deletedTimingDisplay}"
   deleted_topic_notice: "Det ämnet har raderats"
+  deleted_user_59fdcef7: "RADERAD ANVÄNDARE"
   deleting_6421031e: "raderar ..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       En inlämningsfil tas typiskt endast bort när en student publicerar olämpligt eller privat material.
@@ -10698,6 +10714,7 @@ sv:
   edit_criterion_description_5828919: "Redigera beskrivning av kriterium"
   edit_current_message_da650d4c: "Redigera nuvarande meddelande"
   edit_dates_ed31061: "Redigera datum"
+  edit_default_course_pace_e00f1b5b: "Redigera standardkurstakt"
   edit_default_pace_33ba5cdd: "Redigera standardtakt"
   edit_developer_key_53c93ed1: "Redigera utvecklarnyckel"
   edit_developer_key_d8fa33c4: "Redigera utvecklarnyckeln"
@@ -12466,6 +12483,7 @@ sv:
   germany_b02d91c9: Tyskland
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Få hjälp med att använda och konfigurera konferenser i Canvas."
   get_started_b9507525: "Komma igång"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Kom igång genom att skapa en standardkurstakt för alla sektioner och studenter i kursen."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Kom igång och sök efter, importera eller skapa lärandemål i kontot."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Kom igång och sök efter, importera eller skapa lärandemål i kursen."
   get_started_with_configuring_the_course_material_d_fa51d225: "Kom i gång med att konfigurera inlämningsdatum för kursmaterial för den övergripande kursen"
@@ -14948,6 +14966,8 @@ sv:
   instructor_name_36bc0f39: "Lärarens namn"
   instructor_sis_id_899dd697: "Lärarens SIS-ID"
   instructors_4b491a07: lärare
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Lärare är inte bundna vid gränser för antal försök, men en lärares inlämning KOMMER ATT räknas som ett studentförsök."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Lärare kan lämna in för studenters räkning"
   instructors_cdd595d0: Lärare
   instructure: 
     alerts: 
@@ -15813,6 +15833,7 @@ sv:
   loading_missing_assignments_link_d9a0d320: "Läs in saknad uppgiftslänk"
   loading_more_grade_history_results_b235de5: "Laddar mer historik för betygsresultat."
   loading_more_gradebook_history_results_810f6d2e: "Läser in fler resultat från historiken för omdömesboken."
+  loading_more_replies_22e0f13c: "Läser in fler svar"
   loading_more_results_1d437202: "Läser in fler resultat"
   loading_more_results_def6df65: "Läser in fler resultat ..."
   loading_more_sub_accounts_d0a30903: "Läser in fler underkonton ..."
@@ -15824,6 +15845,7 @@ sv:
   loading_permissions_28495bdb: "Inlästa behörigheter/tillstånd"
   loading_permissions_failed_73983eb3: "Det gick inte att läsa in behörigheter/tillstånd"
   loading_release_notes_7deaa2eb: "Läser in versionsinformation"
+  loading_replies_8bdf17bc: "Läser in svar ..."
   loading_results_769c8819: "Läser in resultat"
   loading_results_spinner_73ef739c: "Laddar resultats-spinner"
   loading_section_header_616c8cdd: "Läser in sektionsrubrik"
@@ -18988,6 +19010,7 @@ sv:
   newest_first_87672763: "Nyaste först"
   newest_oldest_d768cf1a: "Nyast - äldst"
   next_40e12421: Nästa
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Justera sedan taktera för individuella sektioner och/eller studenter för att ytterligare anpassa baserat på dina behov (det här steget är valfritt)."
   next_announcement_6e6e0f17: "Nästa meddelande"
   next_announcements_page_3956eb11: "Nästa sida med anslag"
   next_assignment_8ec51175: "Nästa uppgift"
@@ -19720,6 +19743,7 @@ sv:
       \x20             Framtida ändringar av omdömen för publicerade omdömen kommer inte att behöva publiceras manuellt.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "När ett omdöme publicerats manuellt skickas automatiskt en ny avisering till studenten som då kan se omdömet."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "När det här alternativet är aktiverat visas det i omdömesboken för lärare."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "När den här funktionen är aktiverad kommer du inte kunna stänga av den igen. Försäkra dig om att du är redo att aktivera inlämningsmappen innan du fortsätter."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "När du har skickat in ett svar kan du inte ändra det senare. Du kommer inte att kunna se föregående fråga."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "När du påbörjat felsökning samlas all information om nästa inloggningsförsök in. Klicka på \"Uppdatera\" för att se om fler uppgifter har samlats in, eller på ”Slutför felsökning” för att rensa insamlade uppgifter och stoppa det aktuella felsökningsförsöket."
@@ -20109,6 +20133,11 @@ sv:
   pace_plans_is_in_active_development_f6c20046: "Taktplaner är i aktiv utveckling."
   pace_removed_8e625df7: "Takt borttagen"
   pace_type_76cf749: Takttyp
+  pacename_pace_created_75aa4eda: "%{paceName}-takt skapades"
+  pacename_pace_removed_79fb031f: "%{paceName}-takt togs bort"
+  pacename_pace_updated_10c6f95: "%{paceName}-takt uppdaterades"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName}-takten kommer att tas bort. Den här taken kommer att återställas till den föregående tilldelade takten."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName}-takten kommer att tas bort. Den här taken kommer att återställas till standardtakten."
   pacename_updated_2a2c4d77: "%{paceName} har uppdaterats"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} takter: sorterade efter %{sortBy} i %{orderType} ordning"
   package_error: "Fel vid identifiering av pakettyp: %{error}"
@@ -20404,6 +20433,7 @@ sv:
   please_note_fbb62e4c: "Observera:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Observera: Instructure är värd för Canvas Commons i USA. Detta innebär att när du använder Canvas Commons lagras och behandlas dina personliga data i USA. Dessa personliga data inkluderar: namn, e-postadress, Canvas-användar-ID, Canvas-inloggningsnamn, Canvas-avatar, IP-adress, Canvas Commons-resurser som du favoritmärkt och kommentarer du gjort i Canvas Commons-resurser. Du kan läsa mer om Instructures sekretesspraxis [här](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Observera att när en kurstakt har konfigurerats styrs alla befintliga uppgifter, quiz, inlämningsdatum för diskussioner av kurstakten. Du kan läsa mer i *användargruppen Kurstakt*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Observera att när en kurstakt har sparats kontrolleras alla inlämningsdatum för befintliga bedömningar och lärmaterial av kurstakten. Läs mer om kurstakter i *Användargrupp för kurstakt*."
   please_provide_a_field_e5a7d0b3: "Uppge en %{field}"
   please_provide_a_pairing_code_530d1e9d: "Ange en parkopplingskod."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Ange en giltig klientorganisationsdomän. Sök i dina inställningar för Azure Active Directory."
@@ -20419,6 +20449,7 @@ sv:
   please_select_one_f931e883: "Välj ett alternativ"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Ange om du vill aktivera eller inaktivera Microsoft Teams Sync."
   please_try_again_4c3d11b4: "Försök igen"
+  please_try_another_search_term_8f7b5d69: "Försök med en annan sökterm"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Prova en annan sökterm eller filter, eller sök med färre tecken"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Försök med att återetablera anslutningen till verktyget genom att välja om verktyget i uppgiften eller modulobjektet och spara."
   please_upload_files_as_a_zip_5a2c799f: "Ladda upp filer som .zip"
@@ -26150,6 +26181,8 @@ sv:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Studenter kan endast delta i kursen mellan dessa datum"
   students_can_see_originality_score_797fe634: "Studenterna kan se originalitetsvärde"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studenterna kan inte se quizsvaren efter att kursen avslutas"
+  students_enrolled_in_this_course_859fa7a2: "Studenter registrerade i den här kursen."
+  students_enrolled_in_this_section_681ba503: "Studenter registrerade i den här sektionen"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Studenter har redan lämnat in hemarbetet för den här uppgiften. Det går därför inte att ändra inställningarna för plagieringsplatformen."
   students_have_either_already_taken_or_started_taki_a076336: "Studenter har redan tagit eller påbörjat detta quiz, så akta dig när du redigerar den. Om du ändrar en quiz-fråga anmärkningsvärt, bör du överväga att bedöma om studenter som tog den gamla versionen av quizzet."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Studenter har möjlighet att svara anonymt. Vissa namn och profilbilder kan vara dolda."
@@ -26417,6 +26450,7 @@ sv:
   submissions_folder_9db8dadf: Inlämningsmapp
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "Inlämningsmappar måste skapas i användar- eller gruppkontext"
   submissions_graded_status_f689110d: "Inlämningar – bedömningsstatus"
+  submissions_instructor_proxy_2247c633: "Inlämningar – lärarproxy"
   submissions_posted_title_course_43677dba: "Publicerade inlämningar: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Statussida för återuppladdning av inlämningar"
   submissions_view_and_make_comments_cafaf361: "Insändningar – visa och kommentera"
@@ -30575,6 +30609,7 @@ sv:
   your_outcomes_were_successfully_imported_c5de884: "Dina resultat importerades."
   your_password_has_been_changed_df0e72aa: "Ditt lösenord har ändrats."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Återställningsinstruktioner för ditt lösenord kommer att skickas till *%{email_address}*. Detta kan ta upp till 30 minuter. Se till att kontrollera din skräppostmapp."
+  your_peer_review_is_complete_e5fa3e40: "Din kamratrespons är slutförd!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Din profilbild kunde inte uppdateras. Du kan ha överskridit din uppladdningsgräns."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Ditt val av quizmotor har återställts!"
   your_score_a1fc2fcf: "Ditt resultat"
