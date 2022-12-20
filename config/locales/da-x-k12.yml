@@ -1085,6 +1085,13 @@ da-x-k12:
               parameters: 
                 header: "Indsendt efter:"
     integer_required: "Heltalsværdi påkrævet"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Skoleår (grænse 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2329,6 +2336,7 @@ da-x-k12:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Giver instruktører mulighed for at give en score til ikke bedømte afleveringer en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Giver instruktører mulighed for at give resultater for adskillige ikke-bedømte afleveringer fra Opgavegruppe- og I alt-kolonnemenuerne i vurderingsoversigten."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Giver instruktører mulighed for at indsende vedhæftede filer på vegne af en elev."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gør, at læringsudbytter kan vælges, når man overfører fagindhold"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Tillader ændring af meddelelses-indstillinger for ethvert fag fra siden Meddelelses-indstillinger på kontoniveau."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Tillader, at læringsudbyttedata, som gemmes i Outcomes Service, vises i Canvas-rapportering (LMGB, sLMGB og læringsudbytterelateret admin-rapportering)."
@@ -5577,6 +5585,7 @@ da-x-k12:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Ændringerne gælder stadig, hvis du lukker denne side."
   changes_you_made_may_not_be_saved_4e8db973: "Ændringer, du har foretaget, kan ikke blive gemt."
   changing_course_dates_may_override_term_availabili_d92b10de: "Ændring af fagdatoer kan tilsidesætte indstillinger for skoleårstilgængelighed og placering på siden Fag og i Oversigten. Bekræft venligst skoleårsdatoerne, inden du ændrer fagdatoer."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Ændring af fagets tempodage kan ændre afleveringsdatoer"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Ændring af fagets tempodage kan ændre afleveringsdatoer."
   changing_section_dates_may_override_course_and_ter_6634950e: "Ændring af sektionsdatoer kan tilsidesætte indstillinger for skoleårstilgængelighed og placering på siden Fag og i Oversigten. Bekræft venligst skoleårs- og fagdatoer, inden du ændrer sektionsdatoer."
   changing_the_course_participation_will_republish_a_1cc05b7: "Ændring af fagdeltagelsen vil offentliggøre alle fagtempoer igen med eventuelle nye datoer ved brug af skoleårs deltagelse."
@@ -7629,6 +7638,7 @@ da-x-k12:
   course_pacing_d3025ecf: "Fagtempo:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Forhåndsvisningsfunktion for fagtempo skal være aktiveret i din institution."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Fagtempo er et automatiseret værktøj, der opretter en elevplan ved at kombinere foreslåede timer pr. kapitel, skoledage i klassen og samlede timer for at generere en datoestimator."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Fagtempo er et automatiseret værktøj, der angiver differentierede frister for vurderinger og læringsaktiviteter baseret på hver enkelt elevs tilmeldingsdato, hvilket muliggør struktureret læring i eget tempo i fag med rullende tilmelding."
   course_pacing_is_in_active_development_348e33cf: "Fagtempo er i aktiv udvikling."
   course_pacing_redesign_38edfc1c: "Nyt design af fagtempo"
   course_pages_449f1dd4: Fagsider
@@ -8224,6 +8234,7 @@ da-x-k12:
   create_132b3be1: Opret
   create_14873ed7: opret
   create_a_64f6f82: "Opret en/et"
+  create_a_course_pace_333b0911: "Opret et fagtempo"
   create_a_default_course_pace_71ba0b9f: "Opret et standardfagtempo"
   create_a_friendly_display_name_c1036ed: "Opret et brugervenligt visningsnavn"
   create_a_new_account_4cf7c0f9: "Opret ny konto"
@@ -8248,6 +8259,7 @@ da-x-k12:
                       diskussioner og quizzer. Opgavegrupper kan vægtes.
   create_content_for_your_course_500a7032: "Opret indhold til dit fag"
   create_course_9a69b32c: "Opret fag"
+  create_course_pace_3dff129: "Opret fagtempo"
   create_course_templates_f5c4e039: "Opret fagskabeloner"
   create_criterion_6df4d4ad: "Opret kriterie"
   create_default_pace_dd21415b: "Opret standardtempo"
@@ -8467,6 +8479,7 @@ da-x-k12:
   customize_configuration_69c22ef3: "Tilpas konfiguration"
   customize_course_details_26fd4afe: "Tilpas fagoplysninger"
   customize_learning_mastery_ratings_4ace142a: "Tilpas bedømmelse af opfyldelse af læringsmål"
+  customize_section_and_student_paces_f63f930f: "Tilpas tempoer for sektion og elev"
   customize_sections_and_individual_student_paces_a16099b: "Tilpas sektioner og individuelle tempoer for elever"
   customize_this_menu_efa72a9: "Tilpas denne menu"
   cutoff_score_74254c89: minimumsscore
@@ -8634,6 +8647,7 @@ da-x-k12:
     no_date: "Ingen dato"
   dates_6e416047: Datoer
   dates_shown_in_course_time_zone_da2f77d5: "Datoer vist i fagets tidszone"
+  dates_shown_in_course_time_zone_efd32135: "Datoer vist i fagets tidszone"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8698,6 +8712,7 @@ da-x-k12:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Dybt indlejrede svar understøttes ikke længere. Dit svar vises på den første side i denne tråd."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konference"
+  default_course_pace_ce0ba0f3: "Standard fagtempo"
   default_course_pacing_d18b6cda: "Standard fagtempo"
   default_dates_a0a2ae26: standarddatoer
   default_due_time_9d0e9140: "Standard afleveringstidspunkt"
@@ -8818,6 +8833,7 @@ da-x-k12:
   deleted_content_referenced_in_this_resource_e42d1998: "Slettet indhold henvist til i denne ressource:"
   deleted_deletedtimingdisplay_f4c73003: "Slettet %{deletedTimingDisplay}"
   deleted_topic_notice: "Det emne er blevet slettet"
+  deleted_user_59fdcef7: "SLETTET BRUGER"
   deleting_6421031e: "sletter ..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Sletning af en afleveringsfil udføres typisk kun, når en elev slår upassende eller privat materiale op.
@@ -9687,6 +9703,7 @@ da-x-k12:
   edit_criterion_description_5828919: "Rediger kriteriebeskrivelse"
   edit_current_message_da650d4c: "Rediger aktuel besked"
   edit_dates_ed31061: "Rediger datoer"
+  edit_default_course_pace_e00f1b5b: "Rediger standard fagtempo"
   edit_default_pace_33ba5cdd: "Rediger standardtempo"
   edit_developer_key_53c93ed1: "Rediger udvikler-nøgle"
   edit_developer_key_d8fa33c4: "Rediger udvikler-nøgle"
@@ -11226,6 +11243,7 @@ da-x-k12:
   germany_49_fc5b8179: "Tyskland (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Få hjælp til, hvordan du bruger og konfigurerer konferencer i Canvas."
   get_started_b9507525: "Sådan kommer du i gang"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Kom i gang ved at oprette et fagtempo, der vil fungere som standardtempo for alle sektioner og elever i faget."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Kom i gang ved at finde, importere eller oprette din kontos læringsudbytter."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Kom i gang ved at finde, importere eller oprette dit fags læringsudbytter."
   get_started_with_configuring_the_course_material_d_fa51d225: "Kom i gang med at konfigurere fagmaterialets afleveringsdatoer for det samlede fag"
@@ -13126,6 +13144,8 @@ da-x-k12:
   instructor_name_36bc0f39: "Instruktørens navn"
   instructor_sis_id_899dd697: "Instruktør SIS-ID"
   instructors_4b491a07: instruktører
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Instruktører er ikke bundet af forsøgsgrænser, men en instruktørs aflevering VIL tælle som en elevs forsøg."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Instruktører kan aflevere på vegne af elever"
   instructors_cdd595d0: Instruktører
   instructure: 
     alerts: 
@@ -13947,6 +13967,7 @@ da-x-k12:
   loading_microsoft_teams_sync_settings_c2633e46: "Indlæser Microsoft Teams-synkroniseringsindstillinger"
   loading_missing_assignments_link_d9a0d320: "Indlæser link til manglende opgaver"
   loading_more_gradebook_history_results_810f6d2e: "Indlæser flere Vurderingsoversigt-historikresultater."
+  loading_more_replies_22e0f13c: "Indlæser flere svar"
   loading_more_results_1d437202: "Indlæser flere resultater"
   loading_more_results_def6df65: "Indlæser flere resultater ..."
   loading_more_sub_accounts_d0a30903: "Indlæser flere underkonti ..."
@@ -13956,6 +13977,7 @@ da-x-k12:
   loading_options_c823e98b: "Indstillinger indlæses ..."
   loading_outcome_results_96e21ce4: "Indlæser læringsudbytteresultater"
   loading_release_notes_7deaa2eb: "Indlæser frigivelsesnotater"
+  loading_replies_8bdf17bc: "Indlæser svar ..."
   loading_results_769c8819: "Resultater indlæses"
   loading_section_header_616c8cdd: "Indlæser sektionsoverskrift"
   loading_staff_1ce7d803: "Indlæser personale ..."
@@ -16734,6 +16756,7 @@ da-x-k12:
   newest_first_87672763: "Nyeste først"
   newest_oldest_d768cf1a: "Nyeste - ældste"
   next_40e12421: Næste
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Juster derefter tempoet for individuelle sektioner og/eller elever for yderligere tilpasning baseret på dine behov (dette trin er valgfrit)."
   next_announcement_6e6e0f17: "Næste besked"
   next_announcements_page_3956eb11: "Næste besked-side"
   next_assignment_8ec51175: "Næste opgave"
@@ -17418,6 +17441,7 @@ da-x-k12:
       \x20             Fremtidige vurderingsændringer for opslåede vurderinger behøver ikke at blive indsendt manuelt.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Når en vurdering er blevet slået op manuelt, vil den automatisk sende nye meddelelser og være synlig for de elev."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Når aktiveret, er denne mulighed synlig i vurderingsoversigten for instruktører."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har afleveret et svar, vil du ikke kunne ændre det senere. Du vil ikke være i stand til at se det forrige spørgsmål."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Når du begynder fejlfinding, vil alle oplysninger om det næste forsøg på login blive indsamlet. Klik på \"Opdater\" (Refresh) for at se om flere data er blevet indsamlet eller \"Stop fejlfinding\" (Stop debugging) for at rydde de indsamlede data og stoppe det aktuelle fejlfindingsforsøg."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Et eller flere indholdselementer sendt af denne eksterne app kunne ikke behandles korrekt. Disse er ikke blevet gemt af Canvas, og årsagerne til fejl er anført nedenfor."
@@ -17779,6 +17803,11 @@ da-x-k12:
   pace_plans_is_in_active_development_f6c20046: "Tempoplaner er i aktiv udvikling."
   pace_removed_8e625df7: "Tempo fjernet"
   pace_type_76cf749: Tempotype
+  pacename_pace_created_75aa4eda: "%{paceName} Tempo oprettet"
+  pacename_pace_removed_79fb031f: "%{paceName} Tempo fjernet"
+  pacename_pace_updated_10c6f95: "%{paceName} Tempo opdateret"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Tempo bliver fjernet. Dette tempo vil vende tilbage til det tidligere tildelte tempo."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Tempo bliver fjernet. Dette tempo vil vende tilbage til standardtempoet."
   pacename_updated_2a2c4d77: "%{paceName} opdateret"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} tempoer: sorteret efter %{sortBy} i %{orderType} rækkefølge"
   package_error: "Fejl under identificering af pakketype: %{error}"
@@ -18050,6 +18079,7 @@ da-x-k12:
   please_note_fbb62e4c: "Bemærk:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Bemærk: Instructure er vært for Canvas Commons i USA. Det betyder, at når du bruger Canvas Commons, vil dine personlige data blive opbevaret og behandlet i USA. Disse personlige dataelementer inkluderer: navn, e-mailadresse, Canvas-bruger-ID, Canvas-loginnavn, Canvas-avatar, IP-adresse, Canvas Commons-ressourcer, som du har angivet som favorit, og kommentarer, du laver til ressourcer i Canvas Commons. Du kan finde flere oplysninger om Instructures privatlivspolitik [her](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Bemærk, at når et fagtempo er sat op, vil alle eksisterende opgaver, quizzer, afleveringsdatoer for diskussioner blive kontrolleret af fagtempo. Du kan læse mere i *brugergruppen Fagtempo*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Bemærk, at når et fagtempo er gemt, vil alle afleveringsdatoer for eksisterende vurderinger og undervisningsmaterialer blive styret af fagtempo. Lær mere om Fagtempo i *brugergruppen Fagtempo*."
   please_provide_a_field_e5a7d0b3: "Angiv en %{field}"
   please_provide_a_pairing_code_530d1e9d: "Angiv en parringskode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Angiv et gyldigt lejerdomæne. Tjek dine Azure Active Directory-indstillinger for at finde det."
@@ -18064,6 +18094,7 @@ da-x-k12:
   please_select_one_f931e883: "Vælg venligst en"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Du skal angive, om Microsoft Teams-synkronisering skal aktiveres eller deaktiveres"
   please_try_again_4c3d11b4: "Prøv igen."
+  please_try_another_search_term_8f7b5d69: "Prøv et andet søgeord"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Prøv et andet søgeord, filter eller søg med færre tegn"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Prøv at genoprette forbindelsen til værktøjet ved at vælge værktøjet igen i opgave- eller forløbelementgrænsefladen og gem."
   please_upload_files_as_a_zip_5a2c799f: "Upload venligst filer som .zip"
@@ -23102,6 +23133,8 @@ da-x-k12:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Elever kan kun deltage i faget mellem disse datoer"
   students_can_see_originality_score_797fe634: "Elever kan se originalitetsresultat"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Elever kan ikke vise svar på quiz efter afslutning af faget"
+  students_enrolled_in_this_course_859fa7a2: "Elever tilmeldt dette fag"
+  students_enrolled_in_this_section_681ba503: "Elever tilmeldt denne sektion"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Eleverne har allerede afleveret arbejde til denne opgave, så indstillingerne på plagiatplatformen kan ikke ændres."
   students_have_either_already_taken_or_started_taki_a076336: "Eleverne har enten allerede taget eller er ved at tage quizzen, så pas på, når du redigerer den. Hvis du ændrer nogen quizspørgsmål på en betydningsfuld måde, skal du eventuelt overveje, at ombedømme eleverne, der deltog i den forrige version af quizzen."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Eleverne har mulighed for at svare anonymt. Nogle navne og profilbilleder kan være skjulte."
@@ -23346,6 +23379,7 @@ da-x-k12:
   submissions_d30f61af: "# afleveringer"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "afleveringsmapper skal være oprettet i Bruger eller Gruppesammenhæng"
   submissions_graded_status_f689110d: "Afleveringer - bedømmelsesstatus"
+  submissions_instructor_proxy_2247c633: "Afleveringer - instruktør-proxy"
   submissions_posted_title_course_43677dba: "Afleveringer indsendt: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Statusside for genindsendelse af afleveringer"
   submissions_view_and_make_comments_cafaf361: "Afleveringer - vis og kommenter"
@@ -27246,6 +27280,7 @@ da-x-k12:
   your_outcomes_were_successfully_imported_c5de884: "Dine læringsudbytter blev importeret."
   your_password_has_been_changed_df0e72aa: "Dit kodeord er blevet ændret."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Dine instruktioner til gendannelse af adgangskode sendes til *%{email_address}*. Dette kan tage op til 30 minutter. Sørg for at tjekke i din uønskede post."
+  your_peer_review_is_complete_e5fa3e40: "Din elev-elev vurdering er færdigt!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Dit profilbillede kunne ikke uploades. Du har muligvis overskredet grænsen for upload."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Dit valg af quizprogram er nulstillet!"
   your_score_a1fc2fcf: "Dit resultat"
