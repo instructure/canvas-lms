@@ -1178,6 +1178,13 @@ fr:
               parameters: 
                 header: "Soumis après :"
     integer_required: "Un entier doit être fourni."
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Termes (4 maximum)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2506,6 +2513,7 @@ fr:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet aux liens d'aide d’être de bénéficier d'une étiquette « En vedette » ou « Nouveau » et met en avant le Lien d'aide en vedette dans le menu d'aide."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permet aux instructeurs d'appliquer des notes en masse aux soumissions non notées."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet aux instructeurs d'appliquer des notes en masse aux soumissions dénuées de notes provenant de groupes de travail et des menus de colonne Total dans le carnet de note."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Autoriser les instructeurs à soumettre des pièces jointes au nom d'un élève."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet aux résultats d'apprentissage d’être sélectionnables lors des migrations de contenus de cours"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permet de modifier les paramètres de notification pour n’importe quel cours depuis la page de paramètres de notifications au niveau du cours."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permet aux données de résultats stockées dans le service Résultats d'apparaître dans les rapports Canvas (rapports administrateurs liés aux résultats, sLMGB et LMGB)."
@@ -6058,6 +6066,7 @@ fr:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Les modifications s'appliqueront même si vous quittez cette page."
   changes_you_made_may_not_be_saved_4e8db973: "Les changements effectués ne seront peut-être pas sauvegardés."
   changing_course_dates_may_override_term_availabili_d92b10de: "Changer les dates des cours peut remplacer les réglages de leur durée de disponibilité et leur placement dans les pages de cours ou le tableau de bord. Veuillez confirmer les dates d’échéance avant de modifier les dates des cours."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Modifier les jours des allures de cours est susceptible de modifier des dates d'échéance."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "La modification des jours d’un plan d'allure de cours est susceptible de modifier les dates d'échéance."
   changing_section_dates_may_override_course_and_ter_6634950e: "Changer les dates des sections peut remplacer les réglages de durée de disponibilité du cours et son placement dans les pages de cours ou le tableau de bord. Veuillez confirmer la durée et les dates d’échéance avant de modifier les dates des sections."
   changing_the_course_participation_will_republish_a_1cc05b7: "Modifier la participation au cours publiera à nouveau toutes les allures de cours avec toutes les nouvelles dates utilisant la participation au cours."
@@ -7815,7 +7824,7 @@ fr:
     other: "%{count} Jours"
     zero: ""
   count_days_ago_406937d: 
-    one: "Il y a 1 jour"
+    one: "Il y a 1 jour"
     other: "Il y a %{count} jours"
   count_days_de0c6a32: 
     one: "1 jour"
@@ -8351,6 +8360,7 @@ fr:
   course_pacing_d3025ecf: "Allure de cours :"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "La préversion de la fonctionnalité Gestion d’allures de cours doit être activé pour votre établissement"
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "La Gestion d’allures de cours est un outil automatique qui crée un calendrier d'élève à partir des heures suggérées pour chaque chapitre, des jours de cours et du nombre total d'heures pour créer une estimation de date."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "La gestion d'allure de cours est un outil automatisé qui fixe des dates d'échéance différentes pour les travaux et activités d'apprentissage de chaque élève en fonction de sa date d'inscription, ce qui permet un apprentissage autonome et structuré même dans les cours disponibles en continu."
   course_pacing_is_in_active_development_348e33cf: "La gestion d'allure est en plein développement."
   course_pacing_redesign_38edfc1c: "Redesign de l’allure de cours"
   course_pages_449f1dd4: "Pages du cours"
@@ -9083,6 +9093,7 @@ fr:
   create_132b3be1: Créer
   create_14873ed7: créer
   create_a_64f6f82: "Créer un"
+  create_a_course_pace_333b0911: "Créer une allure de cours"
   create_a_default_course_pace_71ba0b9f: "Créer une allure de cours par défaut"
   create_a_developer_key_cabaa013: "Créer une clé de développement"
   create_a_friendly_display_name_c1036ed: "Créer un nom d'affichage convivial"
@@ -9115,6 +9126,7 @@ fr:
                       et Quiz. Vous pouvez attribuer un coefficient aux groupes de devoirs.
   create_content_for_your_course_500a7032: "Créez du contenu pour vos cours"
   create_course_9a69b32c: "Créer un cours"
+  create_course_pace_3dff129: "Créer l’allure de cours"
   create_course_templates_f5c4e039: "Créer des modèles de cours"
   create_criterion_6df4d4ad: "Créer un critère"
   create_default_pace_dd21415b: "Créer une allure par défaut"
@@ -9368,6 +9380,7 @@ fr:
   customize_course_details_26fd4afe: "Personnaliser les détails des cours"
   customize_help_link_62cd05eb: "Personnaliser le lien d'aide"
   customize_learning_mastery_ratings_4ace142a: "Personnaliser les notations de maîtrise de l'apprentissage"
+  customize_section_and_student_paces_f63f930f: "Personnaliser les allures des élèves et des sections"
   customize_sections_and_individual_student_paces_a16099b: "Personnaliser les allures d'élèves individuels et de sections"
   customize_this_menu_efa72a9: "Personnaliser ce menu"
   cutoff_score_74254c89: "note de passage"
@@ -9537,6 +9550,7 @@ fr:
     no_date: "Aucune date"
   dates_6e416047: Dates
   dates_shown_in_course_time_zone_da2f77d5: "Dates affichées conformément au fuseau horaire du cours"
+  dates_shown_in_course_time_zone_efd32135: "Dates affichées selon le fuseau horaire du cours"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9602,6 +9616,7 @@ fr:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Les réponses imbriquées en profondeur ne sont plus prises en charge. Votre réponse apparaîtra en première page de ce fil."
   default_9db103d: "Par défaut"
   default_conference_title: "Conférence %{course_name}"
+  default_course_pace_ce0ba0f3: "Allure de cours par défaut"
   default_course_pacing_d18b6cda: "Allure de cours par défaut"
   default_dates_a0a2ae26: "dates par défaut"
   default_due_time_9d0e9140: "Échéance par défaut"
@@ -9729,6 +9744,7 @@ fr:
   deleted_content_referenced_in_this_resource_e42d1998: "Contenus référencés dans cette ressource supprimés :"
   deleted_deletedtimingdisplay_f4c73003: "Supprimé %{deletedTimingDisplay}"
   deleted_topic_notice: "Ce sujet a été supprimé"
+  deleted_user_59fdcef7: "UTILISATEUR SUPPRIMÉ"
   deleting_6421031e: "suppression en cours..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       En général, on ne supprime pas de fichier de soumission sauf si l'élève a posté du contenu inapproprié ou personnel.
@@ -10699,6 +10715,7 @@ fr:
   edit_criterion_description_5828919: "Modifier la description du critère"
   edit_current_message_da650d4c: "Modifier le message actuel"
   edit_dates_ed31061: "Modifier les dates"
+  edit_default_course_pace_e00f1b5b: "Modifier l’allure de cours par défaut"
   edit_default_pace_33ba5cdd: "Modifier une allure par défaut"
   edit_developer_key_53c93ed1: "Modifier une clé de développeur"
   edit_developer_key_d8fa33c4: "Modifier la clé de développeur"
@@ -12467,6 +12484,7 @@ fr:
   germany_b02d91c9: Allemagne
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Obtenez de l’aide sur la manière d'utiliser et de configurer les conférences dans Canvas"
   get_started_b9507525: Commencer
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Démarrez en créant une allure de cours qui servira d'allure par défaut pour toutes les sections et tous les élèves du cours."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Pour commencer, recherchez, importez ou créez des résultats pour ce compte."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Pour commencer, recherchez, importez ou créez des résultats pour ce cours."
   get_started_with_configuring_the_course_material_d_fa51d225: "Démarrez en configurant les dates d'échéance des documents de cours pour le cours global"
@@ -14939,6 +14957,8 @@ fr:
   instructor_name_36bc0f39: "Nom de l'instructeur"
   instructor_sis_id_899dd697: "Identifiant Sis de l'instructeur"
   instructors_4b491a07: instructeurs
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Les instructeurs ne sont pas limités en nombre de tentatives, mais une soumission par un instructeur sera effectivement comptabilisée comme une tentative de l’élève."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Les instructeurs peuvent soumettre un envoi au nom de l’élève"
   instructors_cdd595d0: Instructeurs
   instructure: 
     alerts: 
@@ -15067,7 +15087,7 @@ fr:
   invalid_authenticity_token_b753558c: "Jeton d’authentification non valide"
   invalid_aws_configuration_e8a6ae0f: "Configuration AWS invalide"
   invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Type d'objet verrouillé de projet de cours %{type} pour l’objet %{id}"
-  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Types de restriction de projet de cours non valide dans le paquet importé ; utilisation des valeurs par défaut."
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Types de restriction de projet de cours non valide dans le paquet importé ; utilisation des valeurs par défaut."
   invalid_blueprint_restrictions_for_item_id_63aae663: "Restrictions de projet de cours non valide pour l’objet %{id}"
   invalid_byday_byday_6e361e78: "BYDAY '%{byday}' non valide"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH '%{bymonth}' non valide"
@@ -15804,6 +15824,7 @@ fr:
   loading_missing_assignments_link_d9a0d320: "Chargement du lien des travaux manquants"
   loading_more_grade_history_results_b235de5: "Charger plus de résultats d'historique scolaire."
   loading_more_gradebook_history_results_810f6d2e: "Chargement de résultats supplémentaires de l’historique du relevé de notes."
+  loading_more_replies_22e0f13c: "Chargement de réponses supplémentaires"
   loading_more_results_1d437202: "Chargement de résultats supplémentaires"
   loading_more_results_def6df65: "Chargement de résultats supplémentaires..."
   loading_more_sub_accounts_d0a30903: "Chargement de sous-comptes supplémentaires..."
@@ -15815,6 +15836,7 @@ fr:
   loading_permissions_28495bdb: "Chargement des autorisations"
   loading_permissions_failed_73983eb3: "Échec des permissions de chargement"
   loading_release_notes_7deaa2eb: "Chargement des notes de mise à jour"
+  loading_replies_8bdf17bc: "Chargement des réponses..."
   loading_results_769c8819: "Charger les résultats"
   loading_results_spinner_73ef739c: "Animation de chargement des résultats"
   loading_section_header_616c8cdd: "Chargement de l’en-tête de section"
@@ -18979,6 +19001,7 @@ fr:
   newest_first_87672763: "Plus récent en premier"
   newest_oldest_d768cf1a: "Du plus récent au plus ancien"
   next_40e12421: Suivant
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Ensuite, ajustez les allures pour chaque section individuelle et/ou par élève pour pousser plus loin la personnalisation selon vos besoins (cette étape est facultative)."
   next_announcement_6e6e0f17: "Annonce suivante"
   next_announcements_page_3956eb11: "Page des prochaines annonces"
   next_assignment_8ec51175: "Devoir suivant"
@@ -19711,6 +19734,7 @@ fr:
       \x20             Il ne sera pas nécessaire de poster manuellement les modifications ultérieures de notes déjà postées.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Une fois une note publiée manuellement, les nouvelles notifications sont automatiquement envoyées et la note devient visible aux élèves."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Une fois activée, cette option est visible dans le carnet de notes des instructeurs."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Une fois que cette fonctionnalité est rendue active, vous ne pourrez plus la désactiver. Assurez-vous d'être prêt à activer le dossier à soumissions avant de continuer.  "
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Lorsque vous aurez soumis une réponse, vous ne pourrez plus la modifier ultérieurement. Vous ne pourrez plus voir la question précédente."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Une fois que vous avez commencé le débogage, toutes les informations sur la prochaine tentative de connexion seront collectées. Cliquez sur « Rafraîchir » pour voir si d'autres données ont été collectées ou sur « Arrêter le débogage » pour effacer les données collectées et arrêter la tentative de débogage en cours."
@@ -20100,8 +20124,13 @@ fr:
   pace_plans_is_in_active_development_f6c20046: "Les plans de gestion d'allure sont en développement actif."
   pace_removed_8e625df7: "Allure supprimée"
   pace_type_76cf749: "Type d'allure"
+  pacename_pace_created_75aa4eda: "Allure %{paceName} créée"
+  pacename_pace_removed_79fb031f: "Allure %{paceName} supprimée"
+  pacename_pace_updated_10c6f95: "Allure %{paceName} mise à jour"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "L'allure %{paceName} sera supprimée. Cette allure reviendra à sa valeur précédemment affectée."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "L'allure %{paceName} sera supprimée. Cette allure reviendra à sa valeur par défaut."
   pacename_updated_2a2c4d77: "%{paceName} mis à jour"
-  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} allures : trié par %{sortBy} dans l’ordre %{orderType}"
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} allures : trié par %{sortBy} dans l’ordre %{orderType}"
   package_error: "Erreur lors de l'identification du type de paquet : %{error}"
   package_export_from_d6e2b073: "Export de paquet depuis"
   page_50c4823d: Page
@@ -20261,7 +20290,7 @@ fr:
   peer_reviews_e3a55964: "Révisions par les pairs"
   peer_service_6b4828b9: "Service homologue"
   peer_services_102357e3: "Services entre pairs"
-  peer_submissions_ready_for_review_availablecount_3ac80091: "Soumission de pairs prêts pour l’évaluation : %{availableCount}"
+  peer_submissions_ready_for_review_availablecount_3ac80091: "Soumission de pairs prêts pour l’évaluation : %{availableCount}"
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: "En attente"
   pending_enforcement_eb32e3d: "En attente de mise en application"
@@ -20395,6 +20424,7 @@ fr:
   please_note_fbb62e4c: "Remarque :"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Remarque : Instructure héberge Canvas Commons aux États-Unis. Cela signifie que lorsque vous utilisez Canvas Commons, vos données personnelles seront stockées et traitées aux États-Unis. Ces éléments de données personnelles comprennent notamment : le nom, l’adresse e-mail, l’identifiant utilisateur Canvas, le nom de connexion Canvas, l’avatar Canvas, l’adresse IP, les ressources Canvas Commons que vous avez mises en favoris, ainsi que les commentaires que vous avez envoyé sur toute ressource Canvas Commons. Vous pouvez trouver plus d’informations sur les pratiques de confidentialité d’Instructure [ici](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Veuillez noter qu'une fois une Allure de cours préparée, toutes les dates de travaux, quiz et discussions existantes seront contrôlées par la Gestion d'allures de cours. Vous pouvez en savoir plus dans le *Groupe d’utilisateurs de la Gestion d’allures de cours*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Veuillez noter qu'une fois une allure de cours enregistrée, toutes les dates d'échéances des travaux et contenus d'apprentissage existants seront contrôlés par cette allure. Pour en savoir plus sur la gestion des allures de cours, consultez le *groupe d'utilisateurs des allures de cours*."
   please_provide_a_field_e5a7d0b3: "Veuillez fournir un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Veuillez fournir un code d'appariement"
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Veuillez fournir un domaine client valide. Vérifiez vos paramètres Azure Active Directory pour le trouver."
@@ -20410,6 +20440,7 @@ fr:
   please_select_one_f931e883: "Veuillez sélectionner une option"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Veuillez indiquer si vous souhaitez activer ou désactiver la synchronisation Microsoft Teams."
   please_try_again_4c3d11b4: "Veuillez réessayer."
+  please_try_another_search_term_8f7b5d69: "Veuillez essayer un autre terme de recherche"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Veuillez essayer un autre filtre ou un autre terme de recherche, ou bien effectuez votre recherche avec moins de caractères."
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Veuillez réessayer d'établir une connexion à l’outil en resélectionnant l’outil dans l’interface de l'élément de module ou de travail, puis en enregistrant."
   please_upload_files_as_a_zip_5a2c799f: "Veuillez télécharger les fichiers sous forme d'un fichier .zip"
@@ -26149,6 +26180,8 @@ fr:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Les élèves peuvent participer au cours uniquement entre ces dates"
   students_can_see_originality_score_797fe634: "Les élèves peuvent voir la note d'originalité"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Les étudiants ne peuvent plus voir les réponses du questionnaire après la fin du cours"
+  students_enrolled_in_this_course_859fa7a2: "Élèves inscrits dans ce cours"
+  students_enrolled_in_this_section_681ba503: "Élèves inscrits dans cette section"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Des élèves ont déjà soumis leur travail, par conséquent les paramètres de plateforme anti-plagiat ne peuvent être modifiés."
   students_have_either_already_taken_or_started_taki_a076336: "Des étudiants ont déjà commencé ou terminé ce questionnaire, soyez donc prudent lorsque vous désirez le modifier. Si vous modifiez l'une des questions d'une manière importante, pensez éventuellement à réévaluer les étudiants qui auraient complété l’ancienne version de ce questionnaire."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Les élèves ont la possibilité de répondre de manière anonyme Certains noms et images de profile peuvent être masqués."
@@ -26416,6 +26449,7 @@ fr:
   submissions_folder_9db8dadf: "Dossier des soumissions"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "les dossiers de soumissions doivent être créés dans un contexte d'utilisateur ou de groupe"
   submissions_graded_status_f689110d: "Soumissions - État de la notation"
+  submissions_instructor_proxy_2247c633: "Soumissions - proxy instructeur"
   submissions_posted_title_course_43677dba: "Soumissions affichées : %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Page d'état des ré-émissions des soumissions"
   submissions_view_and_make_comments_cafaf361: "Soumissions - afficher et faire des commentaires"
@@ -30571,6 +30605,7 @@ fr:
   your_outcomes_were_successfully_imported_c5de884: "Vos résultats ont été importés avec succès."
   your_password_has_been_changed_df0e72aa: "Votre mot de passe a été modifié."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Les instructions de récupération de votre mot de passe seront envoyées à *%{email_address}*. Cela peut prendre jusqu’à 30 minutes. Pensez à bien vérifier votre dossier de spams."
+  your_peer_review_is_complete_e5fa3e40: "Votre évaluation par un pair est terminée !"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Impossible de mettre en ligne la photo de votre profil. Vous avez peut-être dépassé votre quota."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Votre choix de moteur de questionnaire a été réinitialisé !"
   your_score_a1fc2fcf: "Votre score"

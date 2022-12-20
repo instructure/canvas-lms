@@ -871,6 +871,13 @@ vi:
               parameters: 
                 header: "Được Nộp Sau:"
     integer_required: "Yêu cầu phải là giá trị số nguyên"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Điều Khoản (Giới hạn 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1981,6 +1988,7 @@ vi:
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Cho phép công bố các trang khóa học theo lịch trình"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Cho phép các Liên Kết Trợ Giúp được gắn thẻ là Nổi Bật hoặc Mới và hiển thị một cách dễ thấy Liên Kết Trợ Giúp Nổi Bật trong Menu Trợ Giúp."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Cho phép người hướng dẫn áp dụng một loạt điểm số cho các bài nộp chưa chấm điểm từ các menu nhóm bài tập và cột Tổng Số trong Sổ Điểm."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Cho phép người hướng dẫn nộp tệp đính kèm tập tin thay mặt sinh viên."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Cho phép lựa chọn kết quả học tập khi di chuyển nội dung khóa học"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Cho phép sửa đổi cài đặt thông báo cho bất kỳ khóa học nào từ trong trang cài đặt thông báo cấp tài khoản."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Cho phép dữ liệu kết quả được lưu trữ trong Dịch Vụ Kết Quả hiển thị trong báo cáo Canvas (LMGB, sLMGB và báo cáo quản trị viên liên quan đến kết quả)."
@@ -4445,6 +4453,7 @@ vi:
   changed_item_1d16a85f: "Mục Đã Thay Đổi"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Các thay đổi sẽ vẫn áp dụng nếu bạn rời khỏi trang này."
   changes_you_made_may_not_be_saved_4e8db973: "Những thay đổi bạn đã thực hiện có thể không được lưu."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Thay đổi ngày xây dựng nhịp độ khóa học có thể sửa đổi ngày đến hạn"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Thay đổi ngày nhịp độ khóa học có thể sửa đổi ngày đến hạn."
   changing_section_dates_may_override_course_and_ter_6634950e: "Việc thay đổi ngày của phần học có thể ghi đè cài đặt về tính khả dụng khóa học và thời hạn cũng như vị trí trong trang Khóa Học và Bảng Điều Khiển. Vui lòng xác nhận thời hạn và ngày khóa học trước khi sửa đổi ngày của phần."
   changing_the_course_participation_will_republish_a_1cc05b7: "Thay đổi việc tham gia khóa học sẽ tái bản lại tất cả tiến độ khóa học vào bất kỳ ngày mới nào sử dụng thời hạn tham gia."
@@ -6327,6 +6336,7 @@ vi:
   course_pacing_d3025ecf: "Nhịp Độ Khóa Học:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Bản xem trước tính năng Thiết Kế Tiến Độ Khóa Học phải được bật trong tổ chức của bạn."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Thiết Kế Tiến Độ Khóa Học là công cụ tự động tạo lịch học cho sinh viên bằng cách kết hợp số giờ được đề xuất cho mỗi chương, số ngày học trên lớp và tổng số giờ để tạo công cụ ước tính ngày."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Xây Dựng Nhịp Độ Khóa Học là một công cụ tự động đặt ngày đến hạn khác nhau cho các hoạt động đánh giá và học tập dựa trên ngày ghi danh của mỗi sinh viên, cho phép học tập có cấu trúc và tự điều chỉnh nhịp độ trong các khóa học ghi danh luân phiên."
   course_pacing_is_in_active_development_348e33cf: "Hoạt động Thiết Kế Tiến Độ Khóa Học đang trong quá trình phát triển tích cực."
   course_pacing_redesign_38edfc1c: "Thiết Kế Lại Nhịp Độ Khóa Học"
   course_pages_449f1dd4: "Các Trang Khóa Học"
@@ -6801,6 +6811,7 @@ vi:
   coverage_eab3aea2: "Độ bao phủ"
   create_132b3be1: Tạo
   create_a_64f6f82: "Tạo một"
+  create_a_course_pace_333b0911: "Tạo một Nhịp Độ Khóa Học"
   create_a_default_course_pace_71ba0b9f: "Tạo một Thiết Kế Tiến Độ Khóa Học Mặc Định"
   create_a_friendly_display_name_c1036ed: "Tạo một tên hiển thị thân thiện"
   create_a_new_account_4cf7c0f9: "Tạo một Tài Khoản Mới"
@@ -6814,6 +6825,7 @@ vi:
   create_anonymous_discussion_topics_d573e88e: "Tạo đề tài thảo luận ẩn danh"
   create_assignment_68532ceb: "Tạo Bài Tập"
   create_course_9a69b32c: "Tạo Khóa Học"
+  create_course_pace_3dff129: "Tạo Nhịp Độ Khóa Học"
   create_criterion_6df4d4ad: "Tạo Tiêu Chí"
   create_default_pace_dd21415b: "Tạo Thiết Kế Tiến Độ Mặc Định"
   create_delete_edit_157bb1a3: "tạo / xóa / chỉnh sửa"
@@ -7014,6 +7026,7 @@ vi:
   custom_reports_experimental_features_40bbfe7c: "Báo Cáo Tùy Chọn: Tính Năng Thử Nghiệm"
   customize_course_details_26fd4afe: "Tùy chỉnh chi tiết khóa học"
   customize_learning_mastery_ratings_4ace142a: "Tùy Chỉnh Xếp Hạng Học Tập Thành Thạo"
+  customize_section_and_student_paces_f63f930f: "Tùy Chỉnh Nhịp Độ Phần và Sinh Viên"
   customize_sections_and_individual_student_paces_a16099b: "Tùy Chỉnh Các Phần và Thiết Kế Tiến Độ Sinh Viên Cá Nhân"
   customize_this_menu_efa72a9: "Tùy chỉnh menu này"
   cutoff_score_74254c89: "điểm ngưỡng"
@@ -7180,6 +7193,7 @@ vi:
     no_date: "Không Có Ngày"
   dates_6e416047: Ngày
   dates_shown_in_course_time_zone_da2f77d5: "Ngày được hiển thị trong múi giờ của khóa học"
+  dates_shown_in_course_time_zone_efd32135: "Ngày được hiển thị trong Múi Giờ của Khóa Học"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -7241,6 +7255,7 @@ vi:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Các câu trả lời lồng vào nhau không còn được hỗ trợ nữa. Câu trả lời của bạn sẽ xuất hiện trên trang đầu tiên của chủ đề này."
   default_9db103d: "Mặc định"
   default_conference_title: "%{course_name} Hội Nghị"
+  default_course_pace_ce0ba0f3: "Nhịp Độ Khóa Học Mặc Định"
   default_course_pacing_d18b6cda: "Nhịp Độ Khóa Học Mặc Định"
   default_dates_a0a2ae26: "ngày mặc định"
   default_due_time_9d0e9140: "Ngày Đến Hạn Mặc Định"
@@ -7352,6 +7367,7 @@ vi:
   deleted_content_referenced_in_this_resource_e42d1998: "Đã xóa nội dung được tham chiếu trong tài nguyên này:"
   deleted_deletedtimingdisplay_f4c73003: "Đã xóa %{deletedTimingDisplay}"
   deleted_topic_notice: "Đề tài đó đã bị xóa"
+  deleted_user_59fdcef7: "NGƯỜI DÙNG ĐÃ BỊ XÓA"
   deleting_6421031e: "đang xóa..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Việc xóa tập tin bài nộp thường chỉ được thực hiện khi sinh viên đăng tài liệu không phù hợp hoặc riêng tư.
@@ -7982,6 +7998,7 @@ vi:
   edit_criterion_description_5828919: "Chỉnh sửa mô tả tiêu chí"
   edit_current_message_da650d4c: "Chỉnh Sửa Tin Nhắn Hiện Tại"
   edit_dates_ed31061: "Chỉnh Sửa Ngày"
+  edit_default_course_pace_e00f1b5b: "Chỉnh Sửa Nhịp Độ Khóa Học Mặc Định"
   edit_default_pace_33ba5cdd: "Chỉnh Sửa Thiết Kế Tiến Độ Mặc Định"
   edit_developer_key_53c93ed1: "Chỉnh Sửa Mã Khóa của Nhà Phát Triển"
   edit_developer_key_d8fa33c4: "Chỉnh sửa mã ID của nhà phát triển"
@@ -9281,6 +9298,7 @@ vi:
   germany_49_fc5b8179: "Tiếng Đức (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Nhận trợ giúp về cách sử dụng và cấu hình các hội nghị trong canvas."
   get_started_b9507525: "Bắt Đầu"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Bắt đầu bằng việc tạo một nhịp độ khóa học sẽ đóng vai trò nhịp độ mặc định cho tất cả các phần và sinh viên trong khóa học."
   get_started_with_configuring_the_course_material_d_fa51d225: "Bắt đầu với việc định cấu hình ngày đến hạn của tài liệu khóa học cho toàn bộ khóa học"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Nhận những thứ sau đây từ Ứng Dụng Được Kết Nối với Salesforce của bạn"
   get_the_sis_file_for_enrollments_cf308650: "Nhận tập tin SIS cho các ghi danh"
@@ -10748,6 +10766,8 @@ vi:
   instructor_name_36bc0f39: "Tên Người Hướng Dẫn"
   instructor_sis_id_899dd697: "Id Sis của Người Hướng Dẫn"
   instructors_4b491a07: "người hướng dẫn"
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Người hướng dẫn không bị ràng buộc bởi giới hạn số lần thử, nhưng bài nộp của người hướng dẫn SẼ được tính là một lần thử của sinh viên."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Người hướng dẫn có thể nộp thay mặt sinh viên"
   instructors_cdd595d0: "Người Hướng Dẫn"
   instructure: 
     errors: 
@@ -11476,12 +11496,14 @@ vi:
   loading_microsoft_teams_sync_settings_c2633e46: "Đang tải các cài đặt Microsoft Teams Sync"
   loading_missing_assignments_link_d9a0d320: "Đang tải liên kết bài tập bị thiếu"
   loading_more_gradebook_history_results_810f6d2e: "Đang tải thêm các kết quả lịch sử sổ điểm."
+  loading_more_replies_22e0f13c: "Đang tải thêm câu trả lời"
   loading_more_results_1d437202: "Đang tải thêm kết quả"
   loading_more_results_def6df65: "Đang tải thêm kết quả..."
   loading_name_data_c66ea65f: "Đang tải %{name} dữ liệu"
   loading_options_c823e98b: "Đang tải các tùy chọn..."
   loading_outcome_results_96e21ce4: "Đang tải kết quả"
   loading_release_notes_7deaa2eb: "Đang tải các ghi chú phát hành"
+  loading_replies_8bdf17bc: "Đang tải câu trả lời..."
   loading_results_769c8819: "Đang Tải Các Kết Quả"
   loading_section_header_616c8cdd: "Đang tải phần đầu của phần"
   loading_staff_1ce7d803: "Đang tải nhân viên..."
@@ -14043,6 +14065,7 @@ vi:
   new_zealand_64_f126cf2e: "New Zealand (+64)"
   newest_first_87672763: "Mới Nhất Đầu Tiên"
   next_40e12421: "Tiếp theo"
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Tiếp theo, điều chỉnh nhịp độ cho từng phần và/hoặc từng sinh viên để tùy chỉnh thêm dựa trên nhu cầu của bạn (bước này là tùy chọn)."
   next_announcement_6e6e0f17: "Thông báo tiếp theo"
   next_announcements_page_3956eb11: "Trang Thông Báo Tiếp Theo"
   next_assignment_8ec51175: "Bài tập tiếp theo"
@@ -14656,6 +14679,7 @@ vi:
       \x20             Các thay đổi về điểm trong tương lai đối với các điểm đã đăng sẽ không cần được đăng thủ công.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Khi điểm được đăng thủ công, điểm sẽ tự động gửi thông báo mới và sinh viên có thể xem được."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Sau khi được bật, tùy chọn này sẽ hiển thị trong sổ điểm dành cho người hướng dẫn."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Khi bạn nộp câu trả lời, bạn sẽ không thể thay đổi được nữa. Bạn sẽ không thể xem các câu hỏi trước."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Sau khi bạn bắt đầu gỡ lỗi, tất cả thông tin về lần thử đăng nhập tiếp theo sẽ được thu thập. Nhấp vào “Làm Mới” để xem liệu có dữ liệu nào được thu thập nữa không hoặc nhấp vào “Dừng Gỡ Lỗi” để xóa dữ liệu đã được thu thập và dừng lần thử xóa lỗi hiện tại."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Một hoặc nhiều mục nội dung được gửi bởi ứng dụng ngoài này không thể xử lý chính xác. Những phần này chưa được Canvas lưu và các lý do dẫn đến lỗi được liệt kê bên dưới."
@@ -14934,6 +14958,11 @@ vi:
   pace_plans_is_in_active_development_f6c20046: "Kế Hoạch Tốc Độ đang trong quá trình phát triển tích cực."
   pace_removed_8e625df7: "Nhịp độ bị xóa"
   pace_type_76cf749: "Loại Thiết Kế Tiến Độ"
+  pacename_pace_created_75aa4eda: "%{paceName} Nhịp độ đã tạo"
+  pacename_pace_removed_79fb031f: "%{paceName} Nhịp độ đã xóa"
+  pacename_pace_updated_10c6f95: "%{paceName} Nhịp độ đã cập nhật"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Nhịp độ sẽ bị xóa. Nhịp độ này sẽ chuyển lại về nhịp độ được thiết lập trước đó."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Nhịp độ sẽ bị xóa. Nhịp độ này sẽ chuyển lại về nhịp độ mặc định."
   pacename_updated_2a2c4d77: "%{paceName} đã cập nhật"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} tốc độ: sắp xếp theo %{sortBy} theo thứ tự %{orderType}"
   package_error: "Lỗi xác định loại gói: %{error}"
@@ -15183,6 +15212,7 @@ vi:
   please_note_fbb62e4c: "Vui lòng lưu ý:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Vui lòng lưu ý: Instructure đặt máy chủ Canvas Commons ở Hoa Kỳ. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Hoa Kỳ. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Xin lưu ý rằng khi Thiết Kế Tiến Độ Khóa Học được thiết lập, tất cả các bài tập hiện có, các câu hỏi kiểm tra, ngày đến hạn thảo luận sẽ được Thiết Kế Tiến Độ Khóa Học kiểm soát. Bạn có thể đọc thêm chi tiết trong *Nhóm Người Dùng Thiết Kế Tiến Độ Khóa Học*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Xin lưu ý rằng khi một Nhịp Độ Khóa Học được lưu, tất cả các ngày đến hạn cho các tài liệu đánh giá và học tập sẽ được điều khiển bởi Xây Dựng Nhịp Độ Khóa Học. Tìm hiểu thêm về Xây Dựng Nhịp Độ Khóa Học trong *Nhóm Người Dùng Xây Dựng Nhịp Độ Khóa Học*."
   please_provide_a_field_e5a7d0b3: "Vui lòng cung cấp %{field}"
   please_provide_a_pairing_code_530d1e9d: "Vui lòng cung cấp một mã ghép nối."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Vui lòng cung cấp một miền người thuê hợp lệ. Hãy kiểm tra cài đặt Danh Mục Đang Hoạt Động Azure để tìm."
@@ -15196,6 +15226,7 @@ vi:
   please_select_a_user_role_for_this_link_9fb4e655: "Vui lòng chọn một vai trò người dùng cho liên kết này."
   please_select_one_f931e883: "Vui lòng chọn một"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Vui lòng chỉ định bật hoặc tắt đồng bộ hóa Microsoft Teams."
+  please_try_another_search_term_8f7b5d69: "Vui lòng thử thuật ngữ tìm kiếm khác"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Vui lòng thử một thuật ngữ tìm kiếm, bộ lọc khác hoặc tìm với ít ký tự hơn"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Vui lòng thử thiết lập lại kết nối với công cụ bằng cách chọn lại công cụ trong giao diện mục bài tập hoặc mục học phần và lưu."
   please_upload_files_as_a_zip_5a2c799f: "Vui lòng tải lên tập tin dưới dạng .zip"
@@ -19620,6 +19651,8 @@ vi:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Sinh viên chỉ có thể tham gia vào khóa học vào giữa những ngày này"
   students_can_see_originality_score_797fe634: "Sinh viên có thể xem điểm số cho tính nguyên gốc"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Sinh viên không thể xem câu trả lời của kiểm tra sau khi khóa học kết thúc"
+  students_enrolled_in_this_course_859fa7a2: "Sinh viên ghi danh khóa học này"
+  students_enrolled_in_this_section_681ba503: "Sinh viên ghi danh phần này"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Sinh viên đã nộp bài tập về nhà cho bài tập này, vì vậy không thể thay đổi cài đặt nền tảng đạo văn."
   students_have_either_already_taken_or_started_taki_a076336: "Sinh viên đã làm hoặc đã bắt đầu làm kiểm tra này, hãy cẩn thận khi chỉnh sửa câu hỏi. Nếu bạn có thay đổi đáng kể cho bất kỳ kiểm tra nào, bạn có thể cần chấm điểm lại cho sinh viên đã làm phiên bản cũ của kiểm tra đó."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Sinh viên có tùy chọn được trả lời ẩn danh. Một số tên và ảnh hồ sơ có thể bị ẩn."
@@ -19850,6 +19883,7 @@ vi:
   submissions_d30f61af: "# Bài Nộp"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "thư mục bài nộp phải được tạo trong nội dung Người Dùng hoặc Nhóm"
   submissions_graded_status_f689110d: "Bài Nộp - Tình Trạng Được Chấm Điểm"
+  submissions_instructor_proxy_2247c633: "Nộp - ủy quyền người hướng dẫn"
   submissions_posted_title_course_43677dba: "Đã Đăng Bài Nộp: %{title}, %{course}"
   submit_a3cc6859: Nộp
   submit_a_comment_7edbf648: "Gửi một Bình Luận"
@@ -22933,6 +22967,7 @@ vi:
   your_outcomes_were_successfully_imported_c5de884: "Kết quả của bạn đã được nhập thành công."
   your_password_has_been_changed_df0e72aa: "Mật khẩu của bạn đã được thay đổi."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Hướng dẫn khôi phục mật khẩu sẽ được gửi đến *%{email_address}*. Có thể mất tối đa là 30 phút. Hãy nhớ kiểm tra hòm thư rác của bạn."
+  your_peer_review_is_complete_e5fa3e40: "Bình duyệt của bạn đã hoàn tất!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Không thể tải lên ảnh hồ sơ của bạn. Bạn có thể đã vượt quá giới hạn tải lên của mình."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Lựa chọn công cụ kiểm tra của bạn đã được đặt lại!"
   your_score_a1fc2fcf: "Điểm của bạn"

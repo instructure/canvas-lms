@@ -1110,6 +1110,13 @@ en-CA:
               parameters: 
                 header: "Submitted After:"
     integer_required: "An integer value is required"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Terms (Limit 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2363,6 +2370,7 @@ en-CA:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Allows instructors to apply scores to ungraded submissions en masse from assignment group and Total column menus in the Gradebook."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Allows instructors to submit file attachments on behalf of a student."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Allows modifying notification settings for any course from within the account-level notification settings page."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting)."
@@ -5688,6 +5696,7 @@ en-CA:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Changes will still apply if you leave this page."
   changes_you_made_may_not_be_saved_4e8db973: "Changes you made may not be saved."
   changing_course_dates_may_override_term_availabili_d92b10de: "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Changing course pacing days may modify due dates"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Changing course pacing days may modify due dates."
   changing_section_dates_may_override_course_and_ter_6634950e: "Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates."
   changing_the_course_participation_will_republish_a_1cc05b7: "Changing the course participation will republish all course pacing with any new dates using term participation."
@@ -7796,6 +7805,7 @@ en-CA:
   course_pacing_d3025ecf: "Course Pacing:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Course Pacing feature preview must be enabled in your institution."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Course Pacing is an automated tool that creates a student schedule by combining suggested hours per chapter, in-class school days, and total hours to generate a date estimator."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Course Pacing is an automated tool that sets differentiated due dates for assessments and learning activities based on each students' enrollment date, enabling structured, self-paced learning in rolling enrollment courses."
   course_pacing_is_in_active_development_348e33cf: "Course Pacing is in active development."
   course_pacing_redesign_38edfc1c: "Course Pacing Redesign"
   course_pages_449f1dd4: "Course Pages"
@@ -8402,6 +8412,7 @@ en-CA:
   create_132b3be1: Create
   create_14873ed7: create
   create_a_64f6f82: "Create a"
+  create_a_course_pace_333b0911: "Create a Course Pace"
   create_a_default_course_pace_71ba0b9f: "Create a Default Course Pace"
   create_a_developer_key_cabaa013: "Create a developer key"
   create_a_friendly_display_name_c1036ed: "Create a friendly display name"
@@ -8427,6 +8438,7 @@ en-CA:
                       and Quizzes. Assignment groups can be weighted.
   create_content_for_your_course_500a7032: "Create content for your course"
   create_course_9a69b32c: "Create Course"
+  create_course_pace_3dff129: "Create Course Pace"
   create_course_templates_f5c4e039: "Create Course Templates"
   create_criterion_6df4d4ad: "Create Criterion"
   create_default_pace_dd21415b: "Create Default Pace"
@@ -8648,6 +8660,7 @@ en-CA:
   customize_configuration_69c22ef3: "Customize Configuration"
   customize_course_details_26fd4afe: "Customize course details"
   customize_learning_mastery_ratings_4ace142a: "Customize Learning Mastery Ratings"
+  customize_section_and_student_paces_f63f930f: "Customize Section and Student Paces"
   customize_sections_and_individual_student_paces_a16099b: "Customize Sections and Individual Student Paces"
   customize_this_menu_efa72a9: "Customize this menu"
   cutoff_score_74254c89: "cutoff score"
@@ -8817,6 +8830,7 @@ en-CA:
     no_date: "No Date"
   dates_6e416047: Dates
   dates_shown_in_course_time_zone_da2f77d5: "Dates shown in course time zone"
+  dates_shown_in_course_time_zone_efd32135: "Dates shown in Course Time Zone"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8882,6 +8896,7 @@ en-CA:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread."
   default_9db103d: Default
   default_conference_title: "%{course_name} Conference"
+  default_course_pace_ce0ba0f3: "Default Course Pace"
   default_course_pacing_d18b6cda: "Default Course Pacing"
   default_dates_a0a2ae26: "default dates"
   default_due_time_9d0e9140: "Default Due Time"
@@ -9002,6 +9017,7 @@ en-CA:
   deleted_content_referenced_in_this_resource_e42d1998: "Deleted content referenced in this resource:"
   deleted_deletedtimingdisplay_f4c73003: "Deleted %{deletedTimingDisplay}"
   deleted_topic_notice: "That topic has been deleted"
+  deleted_user_59fdcef7: "DELETED USER"
   deleting_6421031e: deleting...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Deleting a submission file is typically done only when a student posts inappropriate or private material.
@@ -9891,6 +9907,7 @@ en-CA:
   edit_criterion_description_5828919: "Edit criterion description"
   edit_current_message_da650d4c: "Edit Current Message"
   edit_dates_ed31061: "Edit Dates"
+  edit_default_course_pace_e00f1b5b: "Edit Default Course Pace"
   edit_default_pace_33ba5cdd: "Edit Default Pace"
   edit_developer_key_53c93ed1: "Edit Developer Key"
   edit_developer_key_d8fa33c4: "Edit developer key"
@@ -11453,6 +11470,7 @@ en-CA:
   germany_49_fc5b8179: "Germany (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Get help on how to use and configure conferences in canvas."
   get_started_b9507525: "Get Started"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Get started by creating a course pace that will serve as the default pace for all sections and students in the course."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Get started by finding, importing or creating your account outcomes."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Get started by finding, importing or creating your course outcomes."
   get_started_with_configuring_the_course_material_d_fa51d225: "Get started with configuring the course material due dates for the overall course"
@@ -13406,6 +13424,8 @@ en-CA:
   instructor_name_36bc0f39: "Instructor Name"
   instructor_sis_id_899dd697: "Instructor Sis Id"
   instructors_4b491a07: instructors
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Instructors can submit on behalf of students"
   instructors_cdd595d0: Instructors
   instructure: 
     alerts: 
@@ -14256,6 +14276,7 @@ en-CA:
   loading_missing_assignments_link_d9a0d320: "Loading missing assignments link"
   loading_more_grade_history_results_b235de5: "Loading more grade history results."
   loading_more_gradebook_history_results_810f6d2e: "Loading more gradebook history results."
+  loading_more_replies_22e0f13c: "Loading more replies"
   loading_more_results_1d437202: "Loading more results"
   loading_more_results_def6df65: "Loading more results..."
   loading_more_sub_accounts_d0a30903: "Loading more sub accounts..."
@@ -14267,6 +14288,7 @@ en-CA:
   loading_permissions_28495bdb: "Loading Permissions"
   loading_permissions_failed_73983eb3: "Loading permissions failed"
   loading_release_notes_7deaa2eb: "Loading release notes"
+  loading_replies_8bdf17bc: "Loading replies..."
   loading_results_769c8819: "Loading Results"
   loading_section_header_616c8cdd: "Loading section header"
   loading_staff_1ce7d803: "Loading staff..."
@@ -17071,6 +17093,7 @@ en-CA:
   newest_first_87672763: "Newest First"
   newest_oldest_d768cf1a: "Newest - Oldest"
   next_40e12421: Next
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional)."
   next_announcement_6e6e0f17: "Next announcement"
   next_announcements_page_3956eb11: "Next Announcements Page"
   next_assignment_8ec51175: "Next assignment"
@@ -17765,6 +17788,7 @@ en-CA:
       \x20             Future grade changes for posted grades will not need to be manually posted.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Once a grade is posted manually, it will automatically send new notifications and be visible to students."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Once enabled, this option is visible in gradebook for instructors."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Once you have submitted an answer, you will not be able to change it later. You will not be able to view the previous question."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Once you start debugging all info about the next attempted login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "One or more content items sent by this external app failed to process correctly. These have not been saved by Canvas, and the reasons for failure are listed below."
@@ -18138,6 +18162,11 @@ en-CA:
   pace_plans_is_in_active_development_f6c20046: "Pace Plans is in active development."
   pace_removed_8e625df7: "Pace removed"
   pace_type_76cf749: "Pace Type"
+  pacename_pace_created_75aa4eda: "%{paceName} Pace created"
+  pacename_pace_removed_79fb031f: "%{paceName} Pace removed"
+  pacename_pace_updated_10c6f95: "%{paceName} Pace updated"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Pace will be removed. This pace will revert back to the previously assigned pace."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Pace will be removed. This pace will revert back to the default pace."
   pacename_updated_2a2c4d77: "%{paceName} updated"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} paces: sorted by %{sortBy} in %{orderType} order"
   package_error: "Error identifying package type: %{error}"
@@ -18421,6 +18450,7 @@ en-CA:
   please_note_fbb62e4c: "Please note:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Please note: Instructure hosts Canvas Commons in the USA. This means that when you use Canvas Commons your personal data will be stored and processed in the USA. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Please note once a Course Pace is set up, all existing assignment, quizzes, discussions due dates will be controlled by Course Pacing. You can read more details in the *Course Pacing User Group*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Please note that once a Course Pace is saved, all due dates for existing assessments and learning materials will be controlled by Course Pacing. Learn more about Course Pacing in the *Course Pacing User Group*."
   please_provide_a_field_e5a7d0b3: "Please provide a %{field}"
   please_provide_a_pairing_code_530d1e9d: "Please provide a pairing code."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Please provide a valid tenant domain. Check your Azure Active Directory settings to find it."
@@ -18436,6 +18466,7 @@ en-CA:
   please_select_one_f931e883: "Please select one"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Please specify whether to enable or disable Microsoft Teams sync."
   please_try_again_4c3d11b4: "Please Try Again"
+  please_try_another_search_term_8f7b5d69: "Please try another search term"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Please try another search term, filter, or search with fewer characters"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving."
   please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
@@ -23578,6 +23609,8 @@ en-CA:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Students can only participate in the course between these dates"
   students_can_see_originality_score_797fe634: "Students can see originality score"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Students cannot view quiz responses after course concludes"
+  students_enrolled_in_this_course_859fa7a2: "Students enrolled in this course"
+  students_enrolled_in_this_section_681ba503: "Students enrolled in this section"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed."
   students_have_either_already_taken_or_started_taki_a076336: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Students have the option to reply anonymously. Some names and profile pictures may be hidden."
@@ -23830,6 +23863,7 @@ en-CA:
   submissions_d30f61af: "# Submissions"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "submissions folders must be created in User or Group context"
   submissions_graded_status_f689110d: "Submissions - Graded Status"
+  submissions_instructor_proxy_2247c633: "Submissions - instructor proxy"
   submissions_posted_title_course_43677dba: "Submissions Posted: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Submissions Re-Upload Status Page"
   submissions_view_and_make_comments_cafaf361: "Submissions - view and make comments"
@@ -27818,6 +27852,7 @@ en-CA:
   your_outcomes_were_successfully_imported_c5de884: "Your outcomes were successfully imported."
   your_password_has_been_changed_df0e72aa: "Your password has been changed."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box."
+  your_peer_review_is_complete_e5fa3e40: "Your peer review is complete!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Your profile photo could not be uploaded. You may have exceeded your upload limit."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Your quiz engine choice has been reset!"
   your_score_a1fc2fcf: "Your score"

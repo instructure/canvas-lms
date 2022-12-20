@@ -457,6 +457,9 @@
             <% end %>
           <% end %>
         <% end %>
+        <% if assignment.special_class && feedback_visibility_enabled %>
+          <span class="possible points_possible"></span>
+        <%end%>
         </td>
       </tr>
       <%# always add row (even if empty) so javascript references work %>

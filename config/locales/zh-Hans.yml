@@ -1178,6 +1178,13 @@ zh-Hans:
               parameters: 
                 header: 开始提交日期：
     integer_required: 必须填整数值
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "条款（限制 4）"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2504,6 +2511,7 @@ zh-Hans:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允许将帮助链接标记为“特色”或“新”，并且在帮助菜单中突出显示特色帮助链接。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 允许讲师一次性对所有未评分的提交项应用分数。
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 允许讲师从评分册的作业组和总计列菜单同时对所有未评分的提交项应用分数。
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: 允许讲师替学生提交文件附件。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: 允许在迁移课程内容时可选择学习结果
   allows_modifying_notification_settings_for_any_cou_5004ac71: 允许从帐户级通知设置页面中修改任何课程的通知设置。
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "允许结果数据存储在结果服务中，以显示在 Canvas 报告（LMGB、sLMGB 和与结果相关的管理员报告）中。"
@@ -6052,6 +6060,7 @@ zh-Hans:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您离开这个页面，更改将仍然适用。
   changes_you_made_may_not_be_saved_4e8db973: 您做出的变更可能无法保存。
   changing_course_dates_may_override_term_availabili_d92b10de: 更改课程日期可能覆盖学期和可用性设置以及在课程页和仪表板的位置在修改课程日期前，请确认学期日期。
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: 更改课程进度天数可能会修改截止日期
   changing_course_pacing_days_may_modify_due_dates_9009aecd: 更改课程进度天数可能会修改截止日期。
   changing_section_dates_may_override_course_and_ter_6634950e: 更改班次日期可能覆盖课程和和可用性设置以及在课程页和仪表板的位置在修改班次日期前，请确认学期和课程日期。
   changing_the_course_participation_will_republish_a_1cc05b7: 更改课程参与会重新发布具有任何使用了“参与”一词的新日期的所有课程节奏。
@@ -8338,6 +8347,7 @@ zh-Hans:
   course_pacing_d3025ecf: 课程进度：
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: 必须在您的机构中启用课程进度功能预览。
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: 课程进度是一个自动工具，它结合每章的建议课时、课堂学习天数和总课时，生成一个日期估算器，从而创建学生日程表。
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Course Pacing 是一个自动化工具，可根据每位学生的注册日期为评估和学习活动设置不同的截止日期，从而在滚动的注册课程中按照个人进度稳步学习。"
   course_pacing_is_in_active_development_348e33cf: 课程进度正在积极开发中。
   course_pacing_redesign_38edfc1c: 课程进度重新设计
   course_pages_449f1dd4: 课程页面
@@ -9070,6 +9080,7 @@ zh-Hans:
   create_132b3be1: 创建
   create_14873ed7: 创建
   create_a_64f6f82: 创建
+  create_a_course_pace_333b0911: 创建课程进度
   create_a_default_course_pace_71ba0b9f: 创建默认课程进度
   create_a_developer_key_cabaa013: 创建开发人员密钥
   create_a_friendly_display_name_c1036ed: 创建友好显示名称
@@ -9097,6 +9108,7 @@ zh-Hans:
       作业组可以加权。
   create_content_for_your_course_500a7032: 为您的课程创建内容
   create_course_9a69b32c: 创建课程
+  create_course_pace_3dff129: 创建课程进度
   create_course_templates_f5c4e039: 创建课程模板
   create_criterion_6df4d4ad: 创建标准
   create_default_pace_dd21415b: 创建默认进度
@@ -9350,6 +9362,7 @@ zh-Hans:
   customize_course_details_26fd4afe: 自定义课程详细信息
   customize_help_link_62cd05eb: 自定义帮助链接
   customize_learning_mastery_ratings_4ace142a: 自定义学习精通等级
+  customize_section_and_student_paces_f63f930f: 自定义班次和学生进度
   customize_sections_and_individual_student_paces_a16099b: 自定义班次和学生个人进度
   customize_this_menu_efa72a9: 自定义此菜单
   cutoff_score_74254c89: 截止分数
@@ -9519,6 +9532,7 @@ zh-Hans:
     no_date: 无日期
   dates_6e416047: 日期
   dates_shown_in_course_time_zone_da2f77d5: 以课程时区显示的日期
+  dates_shown_in_course_time_zone_efd32135: 日期以课程所在的时区显示
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9584,6 +9598,7 @@ zh-Hans:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: 不再支持深度嵌套的回复。您的回复将显示在此会话的第一页。
   default_9db103d: 默认
   default_conference_title: "%{course_name} 会议"
+  default_course_pace_ce0ba0f3: 默认的课程进度
   default_course_pacing_d18b6cda: 默认的课程进度
   default_dates_a0a2ae26: 默认日期
   default_due_time_9d0e9140: 默认截止时间
@@ -9711,6 +9726,7 @@ zh-Hans:
   deleted_content_referenced_in_this_resource_e42d1998: 此资源引用了删除的内容：
   deleted_deletedtimingdisplay_f4c73003: "删除%{deletedTimingDisplay}"
   deleted_topic_notice: 该主题已删除
+  deleted_user_59fdcef7: 删除用户
   deleting_6421031e: 删除...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       删除提交项文件通常仅当学生发布了不恰当或私人材料时执行。
@@ -10679,6 +10695,7 @@ zh-Hans:
   edit_criterion_description_5828919: 编辑标准描述
   edit_current_message_da650d4c: 编辑目前信息
   edit_dates_ed31061: 编辑日期
+  edit_default_course_pace_e00f1b5b: 编辑默认的课程进度
   edit_default_pace_33ba5cdd: 编辑默认进度
   edit_developer_key_53c93ed1: 编辑开发人员密钥
   edit_developer_key_d8fa33c4: 编辑开发人员密钥
@@ -12447,6 +12464,7 @@ zh-Hans:
   germany_b02d91c9: 德国
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "获取关于如何在 Canvas 中使用和配置会议的帮助。"
   get_started_b9507525: 开始
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: 首先创建课程进度。这将是课程中所有班次和学生的默认进度。
   get_started_by_finding_importing_or_creating_your__380b6cfb: 首先查找、导入或创建您的帐户结果。
   get_started_by_finding_importing_or_creating_your__6b62c1d9: 首先查找、导入或创建您的课程结果。
   get_started_with_configuring_the_course_material_d_fa51d225: 开始配置整个课程的课程材料截止日期
@@ -14918,6 +14936,8 @@ zh-Hans:
   instructor_name_36bc0f39: 教师姓名
   instructor_sis_id_899dd697: "教师编号 SIS ID"
   instructors_4b491a07: 导师
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: 讲师不受最大尝试次数的限制，但讲师每提交一次，都将被视为学生尝试一次。
+  instructors_can_submit_on_behalf_of_students_d9de3c83: 讲师可以替学生提交
   instructors_cdd595d0: 讲师
   instructure: 
     alerts: 
@@ -15783,6 +15803,7 @@ zh-Hans:
   loading_missing_assignments_link_d9a0d320: 正在加载缺失的作业链接
   loading_more_grade_history_results_b235de5: 正在加载多个评分历史记录结果。
   loading_more_gradebook_history_results_810f6d2e: 加载更多成绩册历史记录结果。
+  loading_more_replies_22e0f13c: 加载更多回复
   loading_more_results_1d437202: 正在加载其它结果
   loading_more_results_def6df65: 正在载入更多的结果...
   loading_more_sub_accounts_d0a30903: 正在加载更多子账户...
@@ -15794,6 +15815,7 @@ zh-Hans:
   loading_permissions_28495bdb: 正在加载权限
   loading_permissions_failed_73983eb3: 加载权限失败
   loading_release_notes_7deaa2eb: 正在加载发行说明
+  loading_replies_8bdf17bc: 载入回复中...
   loading_results_769c8819: 正在加载结果
   loading_results_spinner_73ef739c: 加载结果微调框
   loading_section_header_616c8cdd: 加载班次标题
@@ -18958,6 +18980,7 @@ zh-Hans:
   newest_first_87672763: 从新到旧
   newest_oldest_d768cf1a: "最新 - 最旧"
   next_40e12421: 下一步
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: 然后根据您的需求，为单个班次和/或学生调整进度，以进一步进行自定义（这是可选步骤）。
   next_announcement_6e6e0f17: 下一个公告
   next_announcements_page_3956eb11: 下一公告页面
   next_assignment_8ec51175: 下一个作业
@@ -19690,6 +19713,7 @@ zh-Hans:
       \x20             如果将来更改已发布的评分，无需手动发布。\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: 评分一旦手动发布，它将自动发送新通知，并可供学生查看。
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: 启用该选项后，该选项将显示在讲师查看的评分册中。
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: 一旦启用此功能，您将无法再次将其关闭。在继续之前，确保您已准备好启用提交文件夹。
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 提交答案后，以后将无法再进行更改。无法查看上一个问题。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "一旦开始调试，将收集关于下一次尝试登录的所有信息。单击“Refresh”（刷新）以查看是否已收集更多数据，或者单击“Stop Debugging”（停止调试）以清除收集的数据并停止当前调试尝试。"
@@ -20076,6 +20100,11 @@ zh-Hans:
   pace_plans_is_in_active_development_f6c20046: 进度计划正在开发中。
   pace_removed_8e625df7: 进度已删除
   pace_type_76cf749: 进度类型
+  pacename_pace_created_75aa4eda: "已创建 %{paceName} 进度"
+  pacename_pace_removed_79fb031f: "已删除 %{paceName} 进度"
+  pacename_pace_updated_10c6f95: "已更新 %{paceName} 进度"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} 进度将被删除。该进度将恢复到之前指定的进度。"
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} 进度将被删除。该进度将恢复到默认进度。"
   pacename_updated_2a2c4d77: "%{paceName} 已更新"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} 进度：排序方式：%{sortBy}，按%{orderType}排序"
   package_error: "错误识别封装的类型：%{error}"
@@ -20371,6 +20400,7 @@ zh-Hans:
   please_note_fbb62e4c: 请注意：
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "请注意：Instructure 在美国托管 Canvas Commons。这意味着当您使用 Canvas Commons 时，您的个人数据将在美国存储和处理。这些个人数据元素包括：姓名、电子邮件地址、Canvas 用户 ID、Canvas 登录名、Canvas 头像、IP 地址、您喜欢的 Canvas Commons 资源，以及您对 Canvas Commons 中任何资源所做的评论。您可以在 [此处](%{url}) 找到有关 Instructure 隐私实践的更多信息。"
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: 请注意，一旦设置了课程进度，所有现有作业、测验和讨论的截止日期将由课程进度控制。您可以在*课程进度用户组*中了解更多详细信息。
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "请注意，保存课程进度后，现有评估和学习材料的所有截止日期将由 Course Pacing 控制。在 *Course Pacing 用户组*中进一步了解 Course Pacing。"
   please_provide_a_field_e5a7d0b3: "请提供%{field}"
   please_provide_a_pairing_code_530d1e9d: 请提供配对码。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "请提供有效的租户域。检查您的 Azure Active Directory 设置以找到它。"
@@ -20386,6 +20416,7 @@ zh-Hans:
   please_select_one_f931e883: 单选
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "请指定是否启用或禁用 Microsoft Teams 同步。"
   please_try_again_4c3d11b4: 请重试
+  please_try_another_search_term_8f7b5d69: 请尝试其他搜索词
   please_try_another_search_term_filter_or_search_wi_d6c4046a: 请尝试其他搜索项、过滤器或字符数较少的搜索
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 请尝试重新建立与该工具的连接，方法是再次选择作业或模块项界面中的工具并保存。
   please_upload_files_as_a_zip_5a2c799f: 请以压缩文件的形式上传文件
@@ -26116,6 +26147,8 @@ zh-Hans:
   students_can_only_participate_in_the_course_betwee_6f8595aa: 学生仅可以在这些日期期间参加课程
   students_can_see_originality_score_797fe634: 学生可以查看原创性得分
   students_cannot_view_quiz_responses_after_course_c_88e929ed: 课程结束后，学生无法查看测验的回应
+  students_enrolled_in_this_course_859fa7a2: 在本课程中注册的学生
+  students_enrolled_in_this_section_681ba503: 在本班次注册的学生
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: 学生已经提交该作业的家庭作业，因此无法更改抄袭检测平台设置。
   students_have_either_already_taken_or_started_taki_a076336: 学生们已经进行或开始进行这个测验，所以要小心编辑。如果您以一个显著的方式改变任何的测验问题，您可能要考虑重新评改使用旧版测验的学生成绩。
   students_have_the_option_to_reply_anonymously_some_503cdf6c: 学生可以选择匿名回复。部分姓名和头像可能被隐藏。
@@ -26383,6 +26416,7 @@ zh-Hans:
   submissions_folder_9db8dadf: 提交文件夹
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: 提交文件夹必须在用户或小组背景下创建
   submissions_graded_status_f689110d: "提交项 - 已评分状态"
+  submissions_instructor_proxy_2247c633: "提交项目 - 讲师代交"
   submissions_posted_title_course_43677dba: "发布的提交项：%{title}，%{course}"
   submissions_re_upload_status_page_6cdbc96d: 提交项重新上传状态页面
   submissions_view_and_make_comments_cafaf361: "提交 - 查看并评论"
@@ -30527,6 +30561,7 @@ zh-Hans:
   your_outcomes_were_successfully_imported_c5de884: 您的结果已成功导入。
   your_password_has_been_changed_df0e72aa: 您的密码已更改。
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "您的密码找回说明将发送到 *%{email_address}*。可能需要最多 30 分钟。请务必查看您的垃圾邮件文件夹。"
+  your_peer_review_is_complete_e5fa3e40: 您的同学互评已完成！
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的个人资料照片无法上传。您可能已超过上传限制。
   your_quiz_engine_choice_has_been_reset_68d268c1: 您的测验引擎选择已重设！
   your_score_a1fc2fcf: 您的评分
