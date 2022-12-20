@@ -30,7 +30,7 @@ end
 gem "bootsnap", "1.13.0", require: false
 gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.3.0"
+gem_override "switchman", "3.3.1"
   gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
   gem "irb", "1.4.1"
@@ -78,7 +78,7 @@ gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
 gem "i18n", "1.9.1"
-gem "i18nliner", "0.2.2"
+gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
