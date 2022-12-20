@@ -77,6 +77,7 @@ class AssignmentsController < ApplicationController
           HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
           QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
+          MODERATED_GRADING_GRADER_LIMIT: Course::MODERATED_GRADING_GRADER_LIMIT,
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
@@ -778,6 +779,7 @@ class AssignmentsController < ApplicationController
       hash[:CAN_CANCEL_TO] = generate_cancel_to_urls
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
+      hash[:MODERATED_GRADING_GRADER_LIMIT] = Course::MODERATED_GRADING_GRADER_LIMIT
       hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH] = try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
