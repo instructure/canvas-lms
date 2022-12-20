@@ -63,7 +63,7 @@
           <%= t('#context_modules.buttons.add_module', 'Module') %>
         </button>
       <% end %>
-      <% if @context.grants_right?(@current_user, session, :manage_content) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
+      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
         <div class="inline-block module_index_tools">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-more" aria-hidden="true"></i>
