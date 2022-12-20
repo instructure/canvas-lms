@@ -1178,6 +1178,13 @@ es:
               parameters: 
                 header: "Entregado después:"
     integer_required: "Valor entero obligatorio"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Períodos (Límite 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2506,6 +2513,7 @@ es:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que los enlaces de ayuda se etiqueten como Destacados o Nuevos y muestra a la vista el enlace de ayuda destacado en el menú Ayuda."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permite a los profesores aplicar puntuaciones a entregas sin calificar en masa."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permite a los profesores puntuar las entregas o calificadas de forma masiva desde los menús de grupo de tareas y columna Total en el Libro de calificaciones."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Permite a los profesores entregar archivos adjuntos en nombre de un estudiante."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que las competencias de aprendizaje puedan seleccionarse durante la migración del contenido del curso"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permite modificar las configuraciones de las notificaciones para cualquier curso desde dentro de la página de configuración de las notificaciones a nivel de la cuenta."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permite que los datos de competencias almacenados en el Servicio de competencias se muestren en los reportes de Canvas (LMGB, sLMGB y reportes administrativos relacionados con las competencias)."
@@ -6058,6 +6066,7 @@ es:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Los cambios seguirán aplicando si deja esta página"
   changes_you_made_may_not_be_saved_4e8db973: "No se guardarán los cambios que realizó."
   changing_course_dates_may_override_term_availabili_d92b10de: "Cambiar las fechas de los cursos puede anular las configuraciones de la disponibilidad de los períodos y la ubicación en la página de Cursos y el Tablero. Confirme las fechas de los períodos antes de modificar las fechas del curso."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Cambiar los días del ritmo del curso puede modificar las fechas de entrega"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Cambiar los días de ritmo del curso puede modificar las fechas de entrega."
   changing_section_dates_may_override_course_and_ter_6634950e: "Cambiar las fechas de la sección puede anular las configuraciones de la disponibilidad de cursos y períodos y la ubicación en la página de Cursos y el Tablero. Confirme el período y las fechas del curso antes de modificar las fechas de la sección."
   changing_the_course_participation_will_republish_a_1cc05b7: "Al cambiar la participación en el curso, se volverá a publicar todo el ritmo del curso con cualquier nueva fecha utilizando la participación del período."
@@ -7815,8 +7824,8 @@ es:
     other: "%{count} días"
     zero: ""
   count_days_ago_406937d: 
-    one: "hace 1 día"
-    other: "hace %{count} días"
+    one: "hace 1 día"
+    other: "hace %{count} días"
   count_days_de0c6a32: 
     one: "1 día"
     other: "%{count} días"
@@ -7855,8 +7864,8 @@ es:
     one: "1 hora"
     other: "%{count} horas"
   count_hours_ago_322dcc79: 
-    one: "hace 1 hora"
-    other: "hace %{count} horas"
+    one: "hace 1 hora"
+    other: "hace %{count} horas"
   count_images_found_for_term_a93635ed: "Se encontraron %{count} imágenes para %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} eliminado correctamente."
@@ -8351,6 +8360,7 @@ es:
   course_pacing_d3025ecf: "Ritmo del curso:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "La vista previa de la funcionalidad Ritmo del curso debe estar habilitada en tu institución."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Ritmo del curso es una herramienta automatizada que crea un programa del estudiante al combinar horas sugeridas por capítulo, días de escuela en clase y horas totales para generar un estimador de fechas."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Ritmo del curso es una herramienta automatizada que establece fechas de entrega diferenciadas para las evaluaciones y las actividades de aprendizaje en función de la fecha de inscripción de cada estudiante, lo que permite un aprendizaje estructurado y a ritmo propio en los cursos de inscripción continua."
   course_pacing_is_in_active_development_348e33cf: "Course pacing está en pleno desarrollo."
   course_pacing_redesign_38edfc1c: "Rediseño del ritmo del curso"
   course_pages_449f1dd4: "Páginas del curso"
@@ -9083,6 +9093,7 @@ es:
   create_132b3be1: Crear
   create_14873ed7: crear
   create_a_64f6f82: "Crear un"
+  create_a_course_pace_333b0911: "Crear un ritmo del curso"
   create_a_default_course_pace_71ba0b9f: "Crear un Ritmo del curso predeterminado"
   create_a_developer_key_cabaa013: "Crear una clave del desarrollador"
   create_a_friendly_display_name_c1036ed: "Crear un nombre amigable para mostrar"
@@ -9115,6 +9126,7 @@ es:
                       y Cuestionarios. Los grupos de tareas pueden ponderarse.
   create_content_for_your_course_500a7032: "Crear contenido para el curso"
   create_course_9a69b32c: "Crear un curso"
+  create_course_pace_3dff129: "Crear ritmo del curso"
   create_course_templates_f5c4e039: "Crear Plantillas de Curso"
   create_criterion_6df4d4ad: "Crear criterio"
   create_default_pace_dd21415b: "Crear Ritmo predeterminado"
@@ -9368,6 +9380,7 @@ es:
   customize_course_details_26fd4afe: "Personalice los detalles del curso"
   customize_help_link_62cd05eb: "Personalizar el enlace de ayuda"
   customize_learning_mastery_ratings_4ace142a: "Personalizar calificaciones del dominio del aprendizaje"
+  customize_section_and_student_paces_f63f930f: "Personalizar el ritmo de la sección y del estudiante"
   customize_sections_and_individual_student_paces_a16099b: "Personalizar secciones y ritmos de estudiantes individuales"
   customize_this_menu_efa72a9: "Personalizar este menú"
   cutoff_score_74254c89: "puntaje mínimo de aprobación"
@@ -9537,6 +9550,7 @@ es:
     no_date: "Sin fecha"
   dates_6e416047: Fechas
   dates_shown_in_course_time_zone_da2f77d5: "Las fechas se muestran en el huso horario del curso"
+  dates_shown_in_course_time_zone_efd32135: "Las fechas se muestran en la zona horaria del curso"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9602,6 +9616,7 @@ es:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Las respuestas muy anidadas ya no son compatibles. Su respuesta aparecerá en la primera página de este hilo de mensajes."
   default_9db103d: Predeterminado
   default_conference_title: "Conferencia de %{course_name}"
+  default_course_pace_ce0ba0f3: "Ritmo predeterminado del curso"
   default_course_pacing_d18b6cda: "Ritmo del curso por defecto"
   default_dates_a0a2ae26: "fechas predeterminadas"
   default_due_time_9d0e9140: "Fecha de vencimiento predeterminada"
@@ -9729,6 +9744,7 @@ es:
   deleted_content_referenced_in_this_resource_e42d1998: "Contenido eliminado que se menciona en este recurso:"
   deleted_deletedtimingdisplay_f4c73003: "Eliminado %{deletedTimingDisplay}"
   deleted_topic_notice: "Se ha eliminado ese tema"
+  deleted_user_59fdcef7: "USUARIO ELIMINADO"
   deleting_6421031e: eliminando...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Por lo general, los archivos de entrega únicamente se eliminan cuando un estudiante publica material privado o inapropiado.
@@ -10696,6 +10712,7 @@ es:
   edit_criterion_description_5828919: "Editar descripción del criterio"
   edit_current_message_da650d4c: "Editar el mensaje actual"
   edit_dates_ed31061: "Editar fechas"
+  edit_default_course_pace_e00f1b5b: "Editar el ritmo predeterminado del curso"
   edit_default_pace_33ba5cdd: "Editar ritmo predeterminado"
   edit_developer_key_53c93ed1: "Editar clave del desarrollador"
   edit_developer_key_d8fa33c4: "Editar clave del desarrollador"
@@ -12460,6 +12477,7 @@ es:
   germany_b02d91c9: Alemania
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Obtenga ayuda sobre cómo usar y configurar conferencias en Canvas."
   get_started_b9507525: Comenzar
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Primero, cree un ritmo del curso que se utilizará como ritmo predeterminado para todas las secciones y los estudiantes del curso."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Comience buscando, importando o creando las competencias de su cuenta."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Comience buscando, importando o creando las competencias de su curso."
   get_started_with_configuring_the_course_material_d_fa51d225: "Comenzar a configurar las fechas de vencimiento del material del curso para el curso general"
@@ -14936,6 +14954,8 @@ es:
   instructor_name_36bc0f39: "Nombre del profesor"
   instructor_sis_id_899dd697: "Identificación de SIS del instructor"
   instructors_4b491a07: profesores
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Los profesores no están sujetos a límites de intentos, pero la entrega de un profesor CONTARÁ como un intento del estudiante."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Los profesores pueden hacer entregas en nombre de los estudiantes"
   instructors_cdd595d0: Profesores
   instructure: 
     alerts: 
@@ -15801,6 +15821,7 @@ es:
   loading_missing_assignments_link_d9a0d320: "Cargando enlace de tareas faltantes"
   loading_more_grade_history_results_b235de5: "Cargando más resultados del historial de calificación."
   loading_more_gradebook_history_results_810f6d2e: "Cargando más resultados del historial del libro de calificaciones."
+  loading_more_replies_22e0f13c: "Cargando más respuestas"
   loading_more_results_1d437202: "Cargando más resultados"
   loading_more_results_def6df65: "Cargando más resultados..."
   loading_more_sub_accounts_d0a30903: "Cargando más subcuentas..."
@@ -15812,6 +15833,7 @@ es:
   loading_permissions_28495bdb: "Cargando permisos"
   loading_permissions_failed_73983eb3: "Falló la carga de permisos"
   loading_release_notes_7deaa2eb: "Cargando notas de la versión"
+  loading_replies_8bdf17bc: "Cargando las respuestas..."
   loading_results_769c8819: "Cargando resultados"
   loading_results_spinner_73ef739c: "Cargando la ruleta de resultados"
   loading_section_header_616c8cdd: "Cargando encabezado de la sección"
@@ -18978,6 +19000,7 @@ es:
   newest_first_87672763: "Primero los más nuevos"
   newest_oldest_d768cf1a: "Más recientes-Más antiguos"
   next_40e12421: Siguiente
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "A continuación, ajuste los ritmos para las secciones o los estudiantes individuales a fin de personalizarlos aún más en función de sus necesidades (este paso es opcional)."
   next_announcement_6e6e0f17: "Próximo anuncio"
   next_announcements_page_3956eb11: "Página de próximos anuncios"
   next_assignment_8ec51175: "Siguiente tarea"
@@ -19710,6 +19733,7 @@ es:
       \x20             No es necesario que los cambios de calificaciones futuros para las calificaciones publicadas se publiquen manualmente.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Una vez que una calificación se publique manualmente, esta enviará nuevas notificaciones de forma automática y será visible para los estudiantes."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Una vez habilitada, esta opción podrá verse en el libro de calificaciones de los profesores."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Una vez que esta característica esté habilitada, usted no podrá apagarla de nuevo. Asegúrese de estar listo para habilitar la Carpeta de presentaciones antes de proceder."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Una vez que ha entregado una respuesta, no podrá modificarla más tarde. No podrá ver la pregunta anterior."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Una vez que comience la depuración, se recopilará toda la información sobre el siguiente intento de inicio de sesión. Haga clic en \"Actualizar\" para ver si se recopiló más información o en \"Detener la depuración\" para eliminar la información recopilada y detener el intento actual de depuración."
@@ -20099,6 +20123,11 @@ es:
   pace_plans_is_in_active_development_f6c20046: "Pace Plans es un desarrollo activo."
   pace_removed_8e625df7: "Se eliminó el ritmo"
   pace_type_76cf749: "Tipo de ritmo"
+  pacename_pace_created_75aa4eda: "Se creó el ritmo %{paceName}"
+  pacename_pace_removed_79fb031f: "Se eliminó el ritmo %{paceName}"
+  pacename_pace_updated_10c6f95: "Se actualizó el ritmo %{paceName}"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "Se eliminará el ritmo %{paceName}. Este ritmo se revertirá al ritmo asignado anteriormente."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "Se eliminará el ritmo %{paceName}. Este ritmo se revertirá al ritmo predeterminado."
   pacename_updated_2a2c4d77: "%{paceName} actualizado"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} pasos: ordenado por %{sortBy} en orden %{orderType}"
   package_error: "Error al identificar el tipo de paquete: %{error}"
@@ -20394,6 +20423,7 @@ es:
   please_note_fbb62e4c: "Importante:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Importante: Instructure aloja Canvas Commons en los Estados Unidos. Esto significa que, cuando usa Canvas Commons, sus datos personales se almacenarán y procesarán en los Estados Unidos. Estos elementos de datos personales incluyen los siguientes: nombre, dirección de correo electrónico, identificación de usuario de Canvas, nombre de usuario de Canvas, avatar de Canvas, dirección IP, recursos de Canvas Commons que usted haya marcado como favoritos y comentarios que haga a cualquier recurso en Canvas Commons. Puede encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Recuerda que una vez que se ha configurado un Ritmo del curso, todas las tareas existentes, evaluaciones, fechas de vencimiento de los debates serán controladas por el Ritmo del curso. Puedes leer más información en el *Grupo de usuarios de ritmo del curso*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Tenga en cuenta que una vez que se guarda el ritmo del curso, la herramienta Ritmo del curso controlará todas las fechas de entrega de las evaluaciones y los materiales de aprendizaje existentes. Obtenga más información sobre la herramienta Ritmo del curso en el *Grupo de usuarios de ritmo del curso*."
   please_provide_a_field_e5a7d0b3: "Suministrar un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Proporcione un código de emparejamiento."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Proporcione un dominio de inquilino válido. Verifique sus configuraciones de Azure Active Directory para encontrarlo."
@@ -20409,6 +20439,7 @@ es:
   please_select_one_f931e883: "Seleccione uno"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Especifique si desea habilitar o deshabilitar la sincronización de Microsoft Teams."
   please_try_again_4c3d11b4: "Inténtelo de nuevo"
+  please_try_another_search_term_8f7b5d69: "Pruebe con otro término de búsqueda"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Pruebe con otro término de búsquedao filtro, o busque con menos caracteres"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Intente volver a establecer la conexión con la herramienta; para ello, vuelva a seleccionar la herramienta en la interfaz del ítem del módulo o la tarea, y guárdelo."
   please_upload_files_as_a_zip_5a2c799f: "Cargar archivos como un .zip"
@@ -26140,6 +26171,8 @@ es:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Los estudiantes solo pueden participar del curso entre estas fechas"
   students_can_see_originality_score_797fe634: "Los estudiantes pueden ver el puntaje de originalidad"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Los estudiantes no pueden ver las respuestas del examen hasta que finalice el curso"
+  students_enrolled_in_this_course_859fa7a2: "Estudiantes inscritos en este curso"
+  students_enrolled_in_this_section_681ba503: "Estudiantes inscritos en esta sección"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Los estudiantes ya han entregado actividades para esta tarea, así que la configuración de la plataforma de plagio no se puede cambiar."
   students_have_either_already_taken_or_started_taki_a076336: "Los estudiantes ya han tomado este examen o la han comenzado, por lo que deberá tener cuidado al editarla. Si cambia cualquier pregunta de forma significativa, quizás deba considerar volver a calificar a los estudiantes que tomaron la versión anterior del examen."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Los estudiantes tienen la opción de responder de forma anónima. Algunos nombres e imágenes de perfil pueden estar ocultos."
@@ -26407,6 +26440,7 @@ es:
   submissions_folder_9db8dadf: "Carpeta de presentaciones"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "Las carpetas de entregas deben ser creadas en el contexto del usuario o grupo"
   submissions_graded_status_f689110d: "Entregas - estado de la calificación"
+  submissions_instructor_proxy_2247c633: "Entregas: representante del profesor"
   submissions_posted_title_course_43677dba: "Entregas publicadas: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Página de estado de la nueva carga de presentaciones"
   submissions_view_and_make_comments_cafaf361: "Presentaciones: ver y hacer comentarios"
@@ -30558,6 +30592,7 @@ es:
   your_outcomes_were_successfully_imported_c5de884: "Sus resultados se importaron con éxito."
   your_password_has_been_changed_df0e72aa: "Su contraseña ha sido cambiada."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Las instrucciones para que recupere su contraseña se enviarán a *%{email_address}*. Esto podría tardar hasta 30 minutos. Asegúrese de verificar su casilla de correo no deseado."
+  your_peer_review_is_complete_e5fa3e40: "¡Su revisión entre pares está completa!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No se pudo cargar su foto de perfil. Es posible que haya superado el límite de carga."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Se restableció su elección de motor de evaluación."
   your_score_a1fc2fcf: "Su puntaje"
