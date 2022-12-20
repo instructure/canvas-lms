@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "Eksisterer"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Avslutt fullskjerm"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Utvid forhåndsvisning som standard"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Vis { title }-beskrivelse"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Vis antall ord og tegn"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Ukentlig tidsplannavigasjon"

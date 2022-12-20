@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "Er til"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Fara úr heilskjá"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Víkka forskoðun sjálfgefið"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Skoða { title } lýsingu"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Skoða orða- og stafatalingu"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Leiðarstýring vikulegrar stundatölfu"

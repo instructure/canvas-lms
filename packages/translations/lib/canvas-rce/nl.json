@@ -242,6 +242,7 @@
   "equivalent_identity_654b3ce5": { "message": "Equivalent (identiteit)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Bestaat" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Volledig scherm sluiten" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Uitvouwvoorbeeld is standaard"
   },
@@ -860,6 +861,9 @@
   "view_keyboard_shortcuts_34d1be0b": { "message": "Sneltoetsen bekijken" },
   "view_title_description_67940918": {
     "message": "{ title } beschrijving bekijken"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Aantal woorden en tekens bekijken"
   },
   "white_87fa64fd": { "message": "Wit" },
   "width_492fec76": { "message": "Breedte" },

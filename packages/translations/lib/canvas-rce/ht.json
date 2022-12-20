@@ -228,6 +228,7 @@
   "equivalent_identity_654b3ce5": { "message": "Ekivalan (Idantite)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Egziste" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Soti nan Plen Ekran" },
   "expand_preview_by_default_2abbf9f8": { "message": "Elaji apèsi pa Defo" },
   "expand_to_see_types_f5d29352": { "message": "Elaji pou w wè { types }" },
   "external_tools_6e77821": { "message": "Zouti Ekstèn" },
@@ -802,6 +803,9 @@
   "view_keyboard_shortcuts_34d1be0b": { "message": "Afiche rakousi klavye" },
   "view_title_description_67940918": {
     "message": "Afiche { title } deskripsyon"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Afiche kantite mo ak karaktè"
   },
   "white_87fa64fd": { "message": "Blan" },
   "width_492fec76": { "message": "Lajè" },
