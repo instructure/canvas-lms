@@ -1178,6 +1178,13 @@ ja:
               parameters: 
                 header: （）後に提出：
     integer_required: 整数の値が必要です
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "条件 (4つまで)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2506,6 +2513,7 @@ ja:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 講師が未採点の提出物に一括してスコアを適用できるようにします。
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 講師が評定表の課題グループや［合計欄］のメニューから、未採点の提出物に一括してスコアを適用できるようになります。
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: 受講者の代わりに教員がファイルを添付して提出することができます。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: コースコンテンツの移行時に学習アウトカムを選択できるようにします
   allows_modifying_notification_settings_for_any_cou_5004ac71: アカウントレベルの通知設定ページ内で、任意のコースの通知設定を変更することができます。
   allows_result_data_stored_in_the_outcomes_service__69c12c18: アウトカムサービスに保存されたアウトカムデータをCanvasレポート（LMGB、sLMGB、アウトカム関連の管理者レポート）に表示できるようにします。
@@ -6061,6 +6069,7 @@ ja:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: このページを終了しても、変更は適用されます。
   changes_you_made_may_not_be_saved_4e8db973: 行われた変更は保存されません。
   changing_course_dates_may_override_term_availabili_d92b10de: コースの日付を変更すると、コースのページやダッシュボード内で有効期間の設定や設置が上書きされることがあります。コースの日付を変更する前には、期間の日付を確認してください。
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: コースペーシングの日数を変更すると、期日が変更される場合があります
   changing_course_pacing_days_may_modify_due_dates_9009aecd: コースペーシングの日数を変更すると、期日が変更される場合があります。
   changing_section_dates_may_override_course_and_ter_6634950e: セクションの日付を変更すると、コースのページやダッシュボード内でコースや期間の利用可能性の設定や配置が上書きされることがあります。セクションの日付を変更する前には、期間とコースの日付を確認してください。
   changing_the_course_participation_will_republish_a_1cc05b7: コース参加を変更すると、すべてのコースのペーシングが、期間参加を使って新しい日付で再公開されます。
@@ -8347,6 +8356,7 @@ ja:
   course_pacing_d3025ecf: コースペーシング
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: コースペーシング機能のプレビューは、貴教育機関で有効にする必要があります。
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: コースペーシングは、章ごとの推奨時間、クラス内の授業日数、および合計時間を組み合わせて日付の推定値を生成することにより、受講者のスケジュールを作成する自動化されたツールです。
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: コースペーシングは、各生徒の登録日に基づいて、アセスメントと学習活動のための差別化された期日を設定する自動ツールで、ローリング登録コースにおいて体系的に自分のペースで学習することができます。
   course_pacing_is_in_active_development_348e33cf: コースペースは現在アクティブに開発中です。
   course_pacing_redesign_38edfc1c: コースペーシングの再設計
   course_pages_449f1dd4: コースページ
@@ -9079,6 +9089,7 @@ ja:
   create_132b3be1: 作成
   create_14873ed7: 作成
   create_a_64f6f82: （）を作成する
+  create_a_course_pace_333b0911: コースペースを作成
   create_a_default_course_pace_71ba0b9f: デフォルトのコースペーシングを作成する
   create_a_developer_key_cabaa013: 開発者鍵を作成する
   create_a_friendly_display_name_c1036ed: なじみやすい表示名を作成する
@@ -9108,6 +9119,7 @@ ja:
                       課題を整理する。課題グループには比重を付けることができます。
   create_content_for_your_course_500a7032: あなたのコースのコンテンツを作成する
   create_course_9a69b32c: コースを作成
+  create_course_pace_3dff129: コースペースを作成
   create_course_templates_f5c4e039: コーステンプレートを作成
   create_criterion_6df4d4ad: 作成基準
   create_default_pace_dd21415b: デフォルトのペースを作成
@@ -9361,6 +9373,7 @@ ja:
   customize_course_details_26fd4afe: コース詳細をカスタマイズする
   customize_help_link_62cd05eb: ヘルプリンクをカスタマイズする
   customize_learning_mastery_ratings_4ace142a: 学習熟達評価をカスタマイズする
+  customize_section_and_student_paces_f63f930f: セクションと受講者のペースをカスタマイズする
   customize_sections_and_individual_student_paces_a16099b: セクションと受講者個人のペースをカスタマイズする
   customize_this_menu_efa72a9: このメニューをカスタマイズする
   cutoff_score_74254c89: "カットオフ スコア"
@@ -9530,6 +9543,7 @@ ja:
     no_date: 日付なし
   dates_6e416047: 日付
   dates_shown_in_course_time_zone_da2f77d5: 日付はコースのタイムゾーンで表示
+  dates_shown_in_course_time_zone_efd32135: コースのタイムゾーンに表示される日付
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9595,6 +9609,7 @@ ja:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: 深いネストのある返信はサポートされなくなりました。あなたの返信は、このスレッドの最初のページに表示されます。
   default_9db103d: デフォルト
   default_conference_title: "%{course_name} 会議"
+  default_course_pace_ce0ba0f3: デフォルトのコースペース
   default_course_pacing_d18b6cda: デフォルトのコースペーシング
   default_dates_a0a2ae26: デフォルトの日付
   default_due_time_9d0e9140: デフォルトの期限
@@ -9722,6 +9737,7 @@ ja:
   deleted_content_referenced_in_this_resource_e42d1998: このリソースで参照されるコンテンツを削除する：
   deleted_deletedtimingdisplay_f4c73003: "%{deletedTimingDisplay}を削除しました"
   deleted_topic_notice: そのトピックは削除されました
+  deleted_user_59fdcef7: 削除されたユーザー
   deleting_6421031e: 削除中・・・
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       提出ファイルの削除は、通常、受講者が不適切または非公開の資料を投稿した場合にのみ行われます。
@@ -10587,7 +10603,7 @@ ja:
     multiple_due_dates: "期限: 複数の期日"
     no_due_date: "期限: 期日なし"
   due_dates_520a6c08: 期日
-  due_dates_are_being_compressed_based_on_your_start_917df12d: 開始日と終了日に基づいて期日を圧縮
+  due_dates_are_being_compressed_based_on_your_start_917df12d: 開始日と終了日に基づいて期日が圧縮されています
   due_dates_are_being_compressed_based_on_your_start_c6db279e: 開始日と終了日に基づいて期日を圧縮。
   due_dates_changed_exceptions_ddb028: 期日が変更された例外：
   due_dates_duedatecount_bbc24d65: "期限 (%{dueDateCount})"
@@ -10690,6 +10706,7 @@ ja:
   edit_criterion_description_5828919: 基準の説明を編集
   edit_current_message_da650d4c: 現在のメッセージの編集
   edit_dates_ed31061: 日付を編集する
+  edit_default_course_pace_e00f1b5b: デフォルトコースペースを編集
   edit_default_pace_33ba5cdd: デフォルトのペースを編集
   edit_developer_key_53c93ed1: 開発者鍵を編集する
   edit_developer_key_d8fa33c4: デベロッパキーを編集する
@@ -12459,6 +12476,7 @@ ja:
   germany_b02d91c9: ドイツ
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Canvas での会議の使用方法や設定方法についてのヘルプをご覧いただけます。"
   get_started_b9507525: 開始する
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: コース内のすべてのセクションと受講者のデフォルトペースとなるコースペースを作成することから始めてください。
   get_started_by_finding_importing_or_creating_your__380b6cfb: アカウントの結果を検索、インポート、または作成することから始めましょう。
   get_started_by_finding_importing_or_creating_your__6b62c1d9: コースの結果を検索、インポート、または作成することから始めましょう。
   get_started_with_configuring_the_course_material_d_fa51d225: コース全体のコース教材期限の設定を始める
@@ -14936,6 +14954,8 @@ ja:
   instructor_name_36bc0f39: 講師名
   instructor_sis_id_899dd697: "教員 Sis ＩＤ"
   instructors_4b491a07: 教員
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: 教員には試行回数制限に縛られませんが、教員が提出した課題は受講者の試行回数としてカウントされます。
+  instructors_can_submit_on_behalf_of_students_d9de3c83: 受講者の代わりに教員が提出することができます。
   instructors_cdd595d0: 教員
   instructure: 
     alerts: 
@@ -15801,6 +15821,7 @@ ja:
   loading_missing_assignments_link_d9a0d320: 不足している課題のリンクを読み込み中
   loading_more_grade_history_results_b235de5: 成績履歴結果をさらに読み込み中。
   loading_more_gradebook_history_results_810f6d2e: 評定表履歴結果をさらに読み込み中。
+  loading_more_replies_22e0f13c: さらに返信を読み込み中
   loading_more_results_1d437202: より多くの結果を読み込んでいます
   loading_more_results_def6df65: より多くの結果を読み込んでいます...
   loading_more_sub_accounts_d0a30903: 追加のサブアカウントを読み込み中...
@@ -15812,6 +15833,7 @@ ja:
   loading_permissions_28495bdb: アクセス権読み込み中
   loading_permissions_failed_73983eb3: 権限読み込みに失敗しました
   loading_release_notes_7deaa2eb: リリースノートを読み込み中
+  loading_replies_8bdf17bc: 返信を読み込んでいます...
   loading_results_769c8819: 結果を読み込み中
   loading_results_spinner_73ef739c: 結果をスピナーに読み込む
   loading_section_header_616c8cdd: セクションヘッダーを読み込み中
@@ -18976,6 +18998,7 @@ ja:
   newest_first_87672763: 最新のものを最初に
   newest_oldest_d768cf1a: "最新 - 最古"
   next_40e12421: 次
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "次に、個々のセクションおよび/または受講者のペースを調整し、ニーズに基づいてさらにカスタマイズします (このステップはオプションです)。"
   next_announcement_6e6e0f17: 次の通知
   next_announcements_page_3956eb11: 次の広告ページ
   next_assignment_8ec51175: 新しい課題
@@ -19708,6 +19731,7 @@ ja:
       \x20             転記済みの評定を将来変更するには、手動で転記する必要はありません。\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: 評定が手動で投稿されると、自動的に新しい通知が送信され、受講者に表示されます。
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: このオプションを有効にすると、教員用の評定表が表示されます。
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: 一旦この機能が有効になると、それを止めることはできません。始める前に必ず提出フォルダを有効にする準備ができているようにしてください。
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 解答を提出後には、変更することはできません。以前の質問は閲覧できなくなります。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "デバッグを開始すると、次に試行されるログイン試行に関するすべての情報が収集されます。[更新]をクリックすると、より多くのデータが収集されているかどうか、[デバッグの停止]は収集されたデータをクリアして現在のデバッグ試行を停止します。"
@@ -20096,6 +20120,11 @@ ja:
   pace_plans_is_in_active_development_f6c20046: ペース計画は現在アクティブに開発中です。
   pace_removed_8e625df7: ペースは削除されました。
   pace_type_76cf749: ペースタイプ
+  pacename_pace_created_75aa4eda: "%{paceName} ペースが作成されました"
+  pacename_pace_removed_79fb031f: "%{paceName} ペースが削除されました"
+  pacename_pace_updated_10c6f95: "%{paceName} ペースが更新されました"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} ペースが削除されますこのペースは以前に割り当てられたペースに戻ります。"
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} ペースが削除されますこのペースはデフォルトペースに戻ります。"
   pacename_updated_2a2c4d77: "%{paceName} が更新されました"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType}ペース: %{sortBy}により%{orderType}順で並べ替えられました"
   package_error: "パッケージタイプを識別するエラー: %{error}"
@@ -20389,6 +20418,7 @@ ja:
   please_note_fbb62e4c: ご注意ください：
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "ご注意ください：Canvas Commons は、Instructure が米国でホストしています。これは、ユーザが Canvas コモンズを利用する際に、ユーザの個人データが米国で保存、処理されるということです。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: 一度コースペースが設定されると、すべての既存の課題、クイズ、ディスカッションの期限はコースペースによって制御されますのでご注意ください。詳細は、*コースペーシングユーザグループ*をご覧ください。
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: コースペースが保存されると、既存のアセスメントと学習教材のすべての提出期限はコースペースによって管理されますのでご注意ください。コースペーシングについては、*コースペーシングユーザーグループ*に詳しい説明があります。
   please_provide_a_field_e5a7d0b3: "～を入力してください%{field}"
   please_provide_a_pairing_code_530d1e9d: ペアリングコードを記入してください。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "有効なメールアドレスを提供してください。Azure Active Directoryの設定を確認すると見つけかります。"
@@ -20404,6 +20434,7 @@ ja:
   please_select_one_f931e883: "1 つ選択してください"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Microsoft Teamsの同期を有​​効にするか無効にするかを指定してください。"
   please_try_again_4c3d11b4: もう一度やり直してください
+  please_try_another_search_term_8f7b5d69: 他の検索語を試してください
   please_try_another_search_term_filter_or_search_wi_d6c4046a: 別の検索語句やフィルターを試すか、文字数を減らして検索してください。
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 課題またはモジュールアイテムインターフェイスでツールを再選択して保存することにより、ツールへの接続を再確立してみてください。
   please_upload_files_as_a_zip_5a2c799f: "ファイルは .zip 形式でアップロードしてください"
@@ -26141,6 +26172,8 @@ ja:
   students_can_only_participate_in_the_course_betwee_6f8595aa: 受講者は、これらの日付の間だけコースに参加することができます
   students_can_see_originality_score_797fe634: 受講者は独創性のスコアを見ることができます
   students_cannot_view_quiz_responses_after_course_c_88e929ed: 受講者は、コース終了後は小テストの回答を表示できません
+  students_enrolled_in_this_course_859fa7a2: このコースに登録している受講者
+  students_enrolled_in_this_section_681ba503: このセクションに登録している受講者
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: この課題は、すでに生徒が宿題を提出しているため、剽窃プラットフォームの設定を変更することはできません。
   students_have_either_already_taken_or_started_taki_a076336: 受講者は既にこの小テストに回答したか、回答を始めています。編集は慎重に行ってください。大幅に変更した小テスト問題がある場合は、古いバージョンの小テストに回答した受講者の採点をやり直すことを検討してください。
   students_have_the_option_to_reply_anonymously_some_503cdf6c: 受講者は匿名で返信することができます。いくつかの名前やプロフィールの写真は非表示となっている場合があります。
@@ -26408,6 +26441,7 @@ ja:
   submissions_folder_9db8dadf: 提出フォルダ
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: 提出フォルダはユーザー、またはグループコンテキストに作成される必要があります
   submissions_graded_status_f689110d: "提出物 - 採点状況"
+  submissions_instructor_proxy_2247c633: "提出物 - 講師が代理で"
   submissions_posted_title_course_43677dba: "投稿された提出物：%{title}さん、%{course}"
   submissions_re_upload_status_page_6cdbc96d: 提出再アップロードステータスページ
   submissions_view_and_make_comments_cafaf361: "提出 - 閲覧してコメントする"
@@ -30565,6 +30599,7 @@ ja:
   your_outcomes_were_successfully_imported_c5de884: アウトカムは正常にインポートされました。
   your_password_has_been_changed_df0e72aa: あなたのパスワードが変更されました。
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "パスワードリカバリ手順が *%{email_address}* に送信されます。これには最大 30 分かかる場合があります。迷惑メールをチェックするようにしてください。"
+  your_peer_review_is_complete_e5fa3e40: あなたのレビューは完了しました!
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: プロフィール写真をアップロードできませんでした。アップロードの制限を超過している可能性があります。
   your_quiz_engine_choice_has_been_reset_68d268c1: 小テストエンジンの選択がリセットされました！
   your_score_a1fc2fcf: あなたのスコア
