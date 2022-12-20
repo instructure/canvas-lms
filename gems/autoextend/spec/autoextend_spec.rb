@@ -28,23 +28,21 @@ ActiveSupport::Dependencies.hook!
 require "autoextend"
 
 # CANVAS_RAILS="6.1" this pattern will need reworking in a rails >= 7.0 world
-if ENV["WITH_ZEITWERK"]
-  require "zeitwerk"
-  require "rails"
-  Rails.application = Class.new do
-    def self.config
-      Class.new do
-        def self.autoloader
-          :zeitwerk
-        end
+require "zeitwerk"
+require "rails"
+Rails.application = Class.new do
+  def self.config
+    Class.new do
+      def self.autoloader
+        :zeitwerk
       end
     end
   end
-  require "active_support/dependencies/zeitwerk_integration"
-  ActiveSupport::Dependencies::ZeitwerkIntegration.take_over(enable_reloading: true)
-  # In an actual rails app this is handled by an initializer through railties
-  Autoextend.inject_into_zetwerk
 end
+require "active_support/dependencies/zeitwerk_integration"
+ActiveSupport::Dependencies::ZeitwerkIntegration.take_over(enable_reloading: true)
+# In an actual rails app this is handled by an initializer through railties
+Autoextend.inject_into_zetwerk
 
 # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration, Lint/EmptyClass
 # these specs needs to work with real constants, because we're testing the hooking
@@ -208,19 +206,11 @@ describe Autoextend do
       Autoextend.hook(:"AutoextendSpec::TestModule::Nested") do
         hooked += 1
       end
-      if ENV["WITH_ZEITWERK"]
-        expect(AutoextendSpec.autoload?(:TestModule)).not_to be_nil
-      else
-        expect(defined?(AutoextendSpec::TestModule)).to be_nil
-      end
+      expect(AutoextendSpec.autoload?(:TestModule)).not_to be_nil
       expect(hooked).to equal(0)
       _x = AutoextendSpec::TestModule
       # this could have only been detected by Rails' autoloading
-      if ENV["WITH_ZEITWERK"]
-        expect(AutoextendSpec.autoload?(:TestModule)).to be_nil
-      else
-        expect(defined?(AutoextendSpec::TestModule)).to eq("constant")
-      end
+      expect(AutoextendSpec.autoload?(:TestModule)).to be_nil
       expect(hooked).to equal(2)
     end
 
