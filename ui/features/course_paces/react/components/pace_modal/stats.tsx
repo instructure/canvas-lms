@@ -34,7 +34,7 @@ import {
   coursePaceDateFormatter,
   coursePaceDateShortFormatter,
 } from '../../shared/api/backend_serializer'
-import {CoursePace, OptionalDate, PaceDuration, ResponsiveSizes} from '../../types'
+import {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
 
 const {Item: FlexItem} = Flex as any
@@ -43,23 +43,17 @@ const I18n = useI18nScope('course_paces_projected_dates')
 const DASH = String.fromCharCode(0x2013)
 
 const START_DATE_CAPTIONS = {
-  user: I18n.t('Student enrollment date'),
+  enrollment: I18n.t('Student enrollment date'),
   course: I18n.t('Determined by course start date'),
-  // always refer to the start and end dates as "course"
-  // because the course does whether it's bounded
-  // by the term or course dates
-  term: I18n.t('Determined by course start date'),
   section: I18n.t('Determined by section start date'),
-  hypothetical: I18n.t("Determined by today's date"),
+  empty: I18n.t("Determined by today's date"),
 }
 
 const END_DATE_CAPTIONS = {
-  hard: I18n.t('Required end date'),
-  user: I18n.t('Determined by course pace'),
+  default: I18n.t('Determined by course pace'),
   course: I18n.t('Determined by course end date'),
-  term: I18n.t('Determined by course end date'),
   section: I18n.t('Determined by section end date'),
-  hypothetical: I18n.t('Determined by course pace'),
+  empty: I18n.t('Determined by course pace'),
 }
 
 interface PassedProps {
@@ -71,6 +65,7 @@ interface PassedProps {
   readonly uncompressDates: typeof coursePaceActions.uncompressDates
   readonly compression: number
   readonly responsiveSize: ResponsiveSizes
+  readonly appliedPace: Pace
 }
 
 export const PaceModalStats: React.FC<PassedProps> = ({
@@ -82,24 +77,52 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   uncompressDates,
   compression,
   responsiveSize,
+  appliedPace,
 }) => {
   const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
   const [shrink, setShrink] = useState(responsiveSize !== 'large')
   const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
-  const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
-  let endDateValue, endHelpText
+  let endDateValue
   if (enrollmentType) {
     if (window.ENV.FEATURES.course_paces_for_students) {
       endDateValue = coursePace.end_date || plannedEndDate
     } else {
       endDateValue = plannedEndDate
     }
-    endHelpText = END_DATE_CAPTIONS.user
   } else {
     endDateValue =
       coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
-    endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
+  }
+
+  const getStartDateCaption = contextType => {
+    if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
+      return START_DATE_CAPTIONS[contextType]
+    }
+    return START_DATE_CAPTIONS.empty
+  }
+  const getEndDateCaption = contextType => {
+    if (endDateValue && coursePace.end_date_context !== 'hypothetical') {
+      return END_DATE_CAPTIONS[contextType]
+    }
+    return END_DATE_CAPTIONS.empty
+  }
+
+  const generateDatesCaptions = () => {
+    const contextType = coursePace.context_type.toLocaleLowerCase()
+    const captions = {startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty}
+    captions.startDate = getStartDateCaption(contextType)
+
+    if (contextType === 'enrollment') {
+      const appliedPaceContextType = appliedPace.type.toLocaleLowerCase()
+      const paceType = ['course', 'section'].includes(appliedPaceContextType)
+        ? appliedPaceContextType
+        : 'default'
+      captions.endDate = getEndDateCaption(paceType)
+      return captions
+    }
+    captions.endDate = getEndDateCaption(contextType)
+    return captions
   }
 
   useEffect(() => {
@@ -155,6 +178,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   }
 
   const renderDates = () => {
+    const captions = generateDatesCaptions()
     return (
       <View
         as="div"
@@ -180,7 +204,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
           {renderColoredDate(
             I18n.t('Start Date'),
             startDateValue,
-            startHelpText,
+            captions.startDate,
             'coursepace-start-date'
           )}
         </FlexItem>
@@ -188,7 +212,12 @@ export const PaceModalStats: React.FC<PassedProps> = ({
           <View margin="none small none none">
             <IconArrowEndLine color="alert" size="x-small" theme={{alertColor: '#66189D'}} />
           </View>
-          {renderColoredDate(I18n.t('End Date'), endDateValue, endHelpText, 'coursepace-end-date')}
+          {renderColoredDate(
+            I18n.t('End Date'),
+            endDateValue,
+            captions.endDate,
+            'coursepace-end-date'
+          )}
         </FlexItem>
       </View>
     )
