@@ -35,7 +35,13 @@ gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xss
 gergich capture i18nliner 'rake i18n:check'
 # purposely don't run under bundler; they shell out and use bundler as necessary
 ruby script/brakeman
-ruby script/tatl_tael
+
+IFS=',' read -ra PRIVATE_PLUGINS_ARR <<< "$PRIVATE_PLUGINS"
+
+if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
+  ruby script/tatl_tael
+fi
+
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
