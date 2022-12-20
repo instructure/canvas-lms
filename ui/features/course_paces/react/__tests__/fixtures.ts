@@ -356,7 +356,7 @@ export const STUDENT_PACE: CoursePace = {
   start_date: '2021-10-01',
   start_date_context: 'user',
   end_date: '2021-12-15',
-  end_date_context: 'course',
+  end_date_context: 'user',
   workflow_state: 'active',
   exclude_weekends: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],

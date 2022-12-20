@@ -42,6 +42,7 @@ import {actions as uiActions} from '../../actions/ui'
 import {
   CoursePace,
   OptionalDate,
+  Pace,
   PaceContext,
   PaceDuration,
   ResponsiveSizes,
@@ -205,6 +206,7 @@ export const PaceModal: React.FC<ResponsiveComponentProps> = ({
               contextName={props.paceName}
             />
             <PaceModalStats
+              appliedPace={props.selectedPaceContext?.applied_pace as Pace}
               coursePace={props.coursePace}
               assignments={props.assignmentsCount}
               paceDuration={props.paceDuration}

@@ -18,7 +18,12 @@
 
 import React from 'react'
 import {within} from '@testing-library/dom'
-import {PRIMARY_PACE, STUDENT_PACE} from '../../../__tests__/fixtures'
+import {
+  PRIMARY_PACE,
+  STUDENT_PACE,
+  PACE_CONTEXTS_DEFAULT_STATE,
+  PACE_CONTEXTS_STUDENTS_RESPONSE,
+} from '../../../__tests__/fixtures'
 
 import PaceModalStats from '../stats'
 import {CoursePace, ResponsiveSizes} from 'features/course_paces/react/types'
@@ -37,6 +42,7 @@ const defaultProps = {
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
   responsiveSize: 'large' as ResponsiveSizes,
+  appliedPace: PACE_CONTEXTS_DEFAULT_STATE.selectedContext?.applied_pace!,
 }
 
 describe('pace modal stats', () => {
@@ -79,13 +85,17 @@ describe('pace modal stats', () => {
 
   it('shows student enrollment dates when given', () => {
     const {getByText, getByTestId} = render(
-      <PaceModalStats {...defaultProps} coursePace={STUDENT_PACE} />
+      <PaceModalStats
+        {...defaultProps}
+        coursePace={STUDENT_PACE}
+        appliedPace={PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]?.applied_pace!}
+      />
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
     expect(getByText('Student enrollment date')).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
-    expect(getByText('Determined by course pace')).toBeInTheDocument()
+    expect(getByText('Student enrollment date')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
       `Assignments${defaultProps.assignments}`
@@ -121,7 +131,7 @@ describe('pace modal stats', () => {
     expect(getByText('End Date')).toBeInTheDocument()
     const end = getByTestId('coursepace-end-date')
     expect(within(end).getByText(/Not Specified/)).toBeInTheDocument()
-    expect(within(end).getByText('Determined by course end date')).toBeInTheDocument()
+    expect(within(end).getByText('Determined by course pace')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
       `Assignments${defaultProps.assignments}`
