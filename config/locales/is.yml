@@ -1154,6 +1154,13 @@ is:
               parameters: 
                 header: "Skilað eftir:"
     integer_required: "Gildi þarf að vera heil tala"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Annir (Hámark 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2411,6 +2418,7 @@ is:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gerir það að verkum að hægt er að merkja hjálpartengla sem aðalatriði eða nýja og sýnir tengla á helstu hjálp í hjálparvalmyndinni."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Leyfir kennurum að virkja einkunnir fyrir ómetin skil allar saman."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Leyfir kennurum að setja einkunnir á skil án einkunnar í massavís úr verkefnahópi og heildardálkavalmyndum í einkunnabókinni."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Leyfir kennurum að senda inn skráaviðhengi fyrir hönd nemanda."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Hægt að velja lærdómsniðurstöður á meðan á flutningi efnis námskeiðs stendur"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Leyfir að breyta tilkynningastillingum fyrir hvaða námskeið sem er innan tilkynningastillingarsíðu reikningsstigs."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Leyfir niðurstöðugögnum sem geymd eru í niðurstöðuþjónustunni að birtast í Canvas skýrslugerð (LMGB, sLMGB og niðurstöðutengd stjórnendaskýrsla)."
@@ -5754,6 +5762,7 @@ is:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Breytingar gilda áfram ef þú ferð af þessari síðu."
   changes_you_made_may_not_be_saved_4e8db973: "Breytingar verða hugsanlega ekki vistaðar."
   changing_course_dates_may_override_term_availabili_d92b10de: "Breyting á dagsetningu námskeiðs gæti hnekkt á tiltækileikastillingum annar og röðun á námskeiðssíðu og stjórnborði. Staðfestu dagsetningar annar áður en þú breytir dagsetningum námskeiðs."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Að breyta námskeiðsáætlunardögum getur breytt skiladögum"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Að breyta námskeiðshröðunardögum getur breytt skiladögum."
   changing_section_dates_may_override_course_and_ter_6634950e: "Breyting á dagsetningu hluta gæti hnekkt á tiltækileikastillingum námskeiðs og annar og röðun á námskeiðssíðu og stjórnborði. Staðfestu dagsetningar annar og námskeiðs áður en þú breytir dagsetningum hluta."
   changing_the_course_participation_will_republish_a_1cc05b7: "Breyting á þátttöku í námskeiðinu mun endurbirta allar námskeiðsáætlanir með nýjum dagsetningum með þátttöku tímabilsins."
@@ -7867,6 +7876,7 @@ is:
   course_pacing_d3025ecf: "Námskeiðshröðun:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Forskoðun á eiginleikum námskeiðshröðunar verður að vera virkjuð í stofnuninni þinni."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Námskeiðshröðun er sjálfvirkt verkfæri sem býr til nemendaáætlun með því að sameina ráðlagða tíma á kafla, skóladaga í bekknum og heildartíma til að búa til dagsetningaáætlun."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Námskeiðsáætlun er sjálfvirkt tól sem setur mismunandi skiladaga fyrir námsmat og námsaðgerðir út frá innritunardegi hvers og eins nemenda, sem gerir skipulagt, sjálfstætt nám í hlaupandi innritunarnámskeiðum kleift."
   course_pacing_is_in_active_development_348e33cf: "Námskeiðshröðun er í virkri þróun."
   course_pacing_redesign_38edfc1c: "Endurhönnun námskeiðsáætlunar"
   course_pages_449f1dd4: "Síður námskeiðs"
@@ -8474,6 +8484,7 @@ is:
   create_132b3be1: Stofna
   create_14873ed7: "búa til"
   create_a_64f6f82: Stofna
+  create_a_course_pace_333b0911: "Stofna námskeiðsáætlun"
   create_a_default_course_pace_71ba0b9f: "Búa til sjálfgefna tímaáætlun námskeiðs"
   create_a_developer_key_cabaa013: "Búa til API lykil"
   create_a_friendly_display_name_c1036ed: "Búa til stutt birtingarnafn"
@@ -8499,6 +8510,7 @@ is:
                       Próf. Verkefnahópa er hægt að vega.
   create_content_for_your_course_500a7032: "Stofna efni fyrir námskeiðið þitt"
   create_course_9a69b32c: "Búa til námskeið"
+  create_course_pace_3dff129: "Stofna námskeiðsáætlun"
   create_course_templates_f5c4e039: "Búa til sniðmát námskeiðs"
   create_criterion_6df4d4ad: "Búa til viðmið"
   create_default_pace_dd21415b: "Búa til sjáfgefna tímaáætlun"
@@ -8720,6 +8732,7 @@ is:
   customize_configuration_69c22ef3: "Sérsníða fínstillingu"
   customize_course_details_26fd4afe: "Sérsníddu námskeiðið"
   customize_learning_mastery_ratings_4ace142a: "Sérsníða lærdómsleiknieinkunnir"
+  customize_section_and_student_paces_f63f930f: "Sérsníða hluta og tímaáætlanir nemenda"
   customize_sections_and_individual_student_paces_a16099b: "Sérsníða hluta og tímaáætlanir einstaks nemanda"
   customize_this_menu_efa72a9: "Sérsníða valmynd"
   cutoff_score_74254c89: lágmarkseinkunn
@@ -8889,6 +8902,7 @@ is:
     no_date: "Engin dagsetning"
   dates_6e416047: Dagsetningar
   dates_shown_in_course_time_zone_da2f77d5: "Dagsetningar sýndar í tímasvæði námskeiðs"
+  dates_shown_in_course_time_zone_efd32135: "Dagsetningar sýndar í tímabelti námskeiðs"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8954,6 +8968,7 @@ is:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djúpt hreiðruð svör eru ekki lengur studd. Svar þitt birtist á fyrstu síðu þessa þráðar."
   default_9db103d: Sjálfgilt
   default_conference_title: "%{course_name} Ráðstefna"
+  default_course_pace_ce0ba0f3: "Sjálfgild námskeiðsáætlun"
   default_course_pacing_d18b6cda: "Sjálfgild tímaáætlun námskeiðs"
   default_dates_a0a2ae26: "sjálfvaldar dagsetningar"
   default_due_time_9d0e9140: "Sjálfgildur skilafrestur"
@@ -9074,6 +9089,7 @@ is:
   deleted_content_referenced_in_this_resource_e42d1998: "Vísað er til óbirts efnis í þessu hjálparefni:"
   deleted_deletedtimingdisplay_f4c73003: "Eytt %{deletedTimingDisplay}"
   deleted_topic_notice: "Umræðuefninu var eytt"
+  deleted_user_59fdcef7: "EYDDUR NOTANDI"
   deleting_6421031e: eyði...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Skilaskrá er venjulega aðeins eytt þegar nemandi birtir óviðeigandi eða persónulegu efni.
@@ -9957,6 +9973,7 @@ is:
   edit_criterion_description_5828919: "Breyta forsendulýsingu"
   edit_current_message_da650d4c: "Breyta núverandi skilaboðum"
   edit_dates_ed31061: "Breyta dagsetningum"
+  edit_default_course_pace_e00f1b5b: "Breyta sjálfgildri námskeiðsáætlun"
   edit_default_pace_33ba5cdd: "Breyta sjálfgefinni tímaáætlun"
   edit_developer_key_53c93ed1: "Breyta lykli framleiðanda"
   edit_developer_key_d8fa33c4: "Breyta API lykli"
@@ -11524,6 +11541,7 @@ is:
   germany_49_fc5b8179: "Þýskaland (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Fáðu aðstoð um hvernig á að nota og stilla ráðstefnur í canvas."
   get_started_b9507525: Byrja
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Byrjaðu með því að búa til námskeiðsáætlun sem mun þjóna sem sjálfgefin tímaáætlun fyrir alla hluta og nemendur í námskeiðinu."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Byrjaðu með því að finna, flytja inn og búa til reikningsniðurstöður."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Byrjaðu með því að finna, flytja inn og búa til námskeiðsniðurstöður."
   get_started_with_configuring_the_course_material_d_fa51d225: "Byrjaðu að stilla eindaga fyrir námsefni fyrir námskeiðið í heild"
@@ -13499,6 +13517,8 @@ is:
   instructor_name_36bc0f39: "Nafn kennara"
   instructor_sis_id_899dd697: "SIS-auðkenni kennara"
   instructors_4b491a07: kennarar
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Kennarar eru ekki bundnir af tilraunamörkum, en skil kennara MUN teljast sem tilraun nemanda."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Kennarar geta skilað fyrir hönd nemenda"
   instructors_cdd595d0: Kennarar
   instructure: 
     alerts: 
@@ -14354,6 +14374,7 @@ is:
   loading_missing_assignments_link_d9a0d320: "Hleður tengli á verkefni sem vantar"
   loading_more_grade_history_results_b235de5: "Hleð fleiri niðurstöðum um einkunnaferil."
   loading_more_gradebook_history_results_810f6d2e: "Hleð inn fleiri niðurstöðum úr einkannasögu"
+  loading_more_replies_22e0f13c: "Sæki fleiri svör"
   loading_more_results_1d437202: "Sæki fleiri niðurstöður"
   loading_more_results_def6df65: "Sæki fleiri niðurstöður..."
   loading_more_sub_accounts_d0a30903: "Hleð inn fleiri undirreikningum..."
@@ -14365,6 +14386,7 @@ is:
   loading_permissions_28495bdb: "Hleð inn leyfum"
   loading_permissions_failed_73983eb3: "Innhleðsla leyfum mistókst"
   loading_release_notes_7deaa2eb: "Hleður inn útgáfuyfirlýsingu"
+  loading_replies_8bdf17bc: "Sæki svör..."
   loading_results_769c8819: "Hleð niðurstöðum"
   loading_section_header_616c8cdd: "Hlaða inn kaflahausum"
   loading_staff_1ce7d803: "Hleður starfsfólki..."
@@ -17174,6 +17196,7 @@ is:
   newest_first_87672763: "Nýjast fyrst"
   newest_oldest_d768cf1a: "Nýjast - elst"
   next_40e12421: Næsti
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Næst skaltu stilla tímaáætlunina fyrir einstaka hluta og/eða nemendur til að aðlaga frekar út frá þínum þörfum (þetta skref er valfrjálst)."
   next_announcement_6e6e0f17: "Næsta tilkynning"
   next_announcements_page_3956eb11: "Næsta tilkynningasíða"
   next_assignment_8ec51175: "Næsta verkefni"
@@ -17869,6 +17892,7 @@ is:
       \x20             Framtíðarbreytingar á einkunnum þarf ekki að birta handvirkt.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Þegar einkunn hefur verið birt handvirkt, er sjálfvirkt send út ný tilkynning og hún verður sýnileg nemendum."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Þegar hann hefur verið virkjaður er þessi valkostur sýnilegur í einkunnabók fyrir kennara."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Þegar þetta er heimilað verður það ekki aftengt. Gættu þess að þú viljir heimila skilamöppu áður en haldið er áfram."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Ekki verður hægt að breyta svari eftir að því hefur verið skilað. Þú munt ekki geta skoðað fyrri spurningu."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Þegar þú byrjar að aflúsa verða allar upplýsingar um næstu reyndu innskráningu safnað. Smelltu á „glæða“ til að sjá hvort fleiri gögnum hefur verið safnað eða „hætta aflúsun“ til að hreinsa söfnuð gögn og hætta núverandi aflúsunar tilraun."
@@ -18245,6 +18269,11 @@ is:
   pace_plans_is_in_active_development_f6c20046: "Stýra áætlunum er í virkri þróun."
   pace_removed_8e625df7: "Tímaáætlun fjarlægð"
   pace_type_76cf749: "Tegund tímaáætlunar"
+  pacename_pace_created_75aa4eda: "%{paceName} Tímaáætlun stofnuð"
+  pacename_pace_removed_79fb031f: "%{paceName} Tímaáætlun fjarlægð"
+  pacename_pace_updated_10c6f95: "%{paceName} Tímaáætlun uppfærð"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Tímaáætlun verður fjarlægð. Þessi tímaáætlun mun snúa aftur í þá tímaáætlun sem áður var úthlutað."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Tímaáætlun verður fjarlægð. Þessi tímaáætlun mun snúa aftur í sjálfgefna tímaáætlun."
   pacename_updated_2a2c4d77: "%{paceName} uppfært"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} skref: raðað eftir %{sortBy} í %{orderType} röð"
   package_error: "Villa við að auðkenna pakkategund: %{error}"
@@ -18530,6 +18559,7 @@ is:
   please_note_fbb62e4c: "Athugið:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Athugið: Instructure hýsir Canvas Commons í Bandaríkjunum. Þetta þýðir að þegar þú notar Canvas Commons verða persónuupplýsingar þínar vistaðar og unnar í Bandaríkjunum. Þessar persónuupplýsingar innihalda meðal annars: nafn, netfang Canvas notandaauðkenni, innskráningarnafn Canvas, Canvas gengill, IP tölu, uppáhalds Canvas Commoms auðlindir og athugasemdir sem þú gerir við hvaða auðlind sem er í Canvas Commons. Frekari upplýsingar varðandi persónuverndarvenjur Instructure má finna [hér](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Vinsamlegast athugið að þegar tímaáætlun námskeiðs hefur verið sett upp, verður öllum fyrirliggjandi verkefnum, prófum og skiladögum fyrir umræður stjórnað af námskeiðshröðun. Nánari upplýsingar er að finna í *Notendahóp námskeiðshröðunar*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Vinsamlega athugið að þegar námskeiðsáætlun hefur verið vistuð, verður öllum skiladögum fyrir núverandi námsmat og námsefni stjórnað af námskeiðsáætluninni. Lærðu meira um námskeiðsáætlun í *notendahópnum Námskeiðsáætlun*."
   please_provide_a_field_e5a7d0b3: "Leggðu fram %{field}"
   please_provide_a_pairing_code_530d1e9d: "Vinsamlegast gefðu upp pörunarkóða."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Vinsamlegast gefðu upp gilt lén fyrir tengdan notanda. Athugaðu stillingar Azure Active Directory til að finna það."
@@ -18545,6 +18575,7 @@ is:
   please_select_one_f931e883: "Veldu einn"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Vinsamlega segðu hvort eigi að virkja eða afvirkja samstillingu Microsoft Teams."
   please_try_again_4c3d11b4: "Vinsamlegast reyndu aftur"
+  please_try_another_search_term_8f7b5d69: "Vinsamlegast prófaðu annað leitarhugtak"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Vinsamlegast reyndu aðra leitartímabil, filter eða leitaðu með færri stöfum"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Prufaðu að endurstilla inn tengingu við verkfærið með því að endurvelja verkfærið notendaviðmóti verkefnisins eða einingahlutarins og vista."
   please_upload_files_as_a_zip_5a2c799f: "Hladdu upp skránum sem .zip"
@@ -23708,6 +23739,8 @@ is:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Nemendur geta aðeins tekið þátt í námskeiðinu milli þessara dagsetninga"
   students_can_see_originality_score_797fe634: "Nemendur geta séð frumleikastig"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Nemendur geta ekki skoðað prófsvör að námskeiði loknu"
+  students_enrolled_in_this_course_859fa7a2: "Nemendur innritaðir í þetta námskeið"
+  students_enrolled_in_this_section_681ba503: "Nemendur innritaðir í þennan hluta"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Nemendur hafa þegar skilað heimavinnu fyrir þetta verkefni og því er ekki hægt að breyta ritstuldarstefnustillingum."
   students_have_either_already_taken_or_started_taki_a076336: "Nemendur hafa annað hvort þegar lokið eða byrjað á þessu prófi og hafðu því varann á við breytingar. Ef þú breytir prófspurningu mikið, skaltu íhuga að endurmeta nemendur sem tóku eldri útgáfu af prófinu."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Nemendur hafa þann valkost að svara nafnlaust. Sum nöfn og upplýsingamyndir geta verið faldar."
@@ -23964,6 +23997,7 @@ is:
   submissions_folder_9db8dadf: Skilamappa
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "skilamöppur verður að stofna fyrir notanda eða hóp"
   submissions_graded_status_f689110d: "Skil - Staða einkunnagjafar"
+  submissions_instructor_proxy_2247c633: "Skil - umboð kennara"
   submissions_posted_title_course_43677dba: "Skil birt: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Endurupphleðsla skila stöðusíða"
   submissions_view_and_make_comments_cafaf361: "Innsendingar - skoða og gera athugasemdir"
@@ -27973,6 +28007,7 @@ is:
   your_outcomes_were_successfully_imported_c5de884: "Innflutningur niðurstaðna þinna heppnaðist."
   your_password_has_been_changed_df0e72aa: "Lykilorði þínu hefur verið breytt."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Leiðbeiningar um endurstillingu aðgangsorðs verða sendar í *%{email_address}*. Það gæti tekið allt að 30 mínútur. Passaðu að athuga í amapósthólfið þitt."
+  your_peer_review_is_complete_e5fa3e40: "Jafningjamati þínu er lokið!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Ekki var hægt að hlaða inn mynd. Kannski hefurðu fullnýtt hleðslumagnið."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Prófavélaval þitt var endurstillt!"
   your_score_a1fc2fcf: "Einkunn þín"
