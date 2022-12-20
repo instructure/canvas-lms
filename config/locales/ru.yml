@@ -1199,6 +1199,13 @@ ru:
               parameters: 
                 header: "Представлено после:"
     integer_required: "Необходимо ввести целое число"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Условия (лимит 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2535,6 +2542,7 @@ ru:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Позволяет отмечать ссылки для вызова справки как выбранные или новые и постоянно отображать ссылку для вызова выбранной функции справки в меню справки"
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Позволяет преподавателям массово применять баллы к неоцененным работам."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Позволяет преподавателям выставлять баллы отправкам без оценок в массовом порядке из меню групп заданий и столбцов Total (Всего) в журнале успеваемости."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Позволяет преподавателям отправлять прикрепленные файлы от имени учащегося."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Позволяет выбирать результаты обучения во время миграции содержимого курса"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Позволяет изменять настройки уведомлений для любого курса со страницы настроек уведомлений на уровне учетной записи."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Позволяет отображать в отчетах Canvas данные о результатах, сохраненные в службе Outcomes Service (отчеты LMGB, sLMGB и отчеты администратора, связанные с результатами)."
@@ -6147,6 +6155,7 @@ ru:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Изменения будут применяться даже, если вы покинете эту страницу"
   changes_you_made_may_not_be_saved_4e8db973: "Внесенные вами изменения не могут быть сохранены."
   changing_course_dates_may_override_term_availabili_d92b10de: "Изменение дат курса может привести к отмене настроек доступности семестра и размещения на странице курсов и панели инструментов. Подтвердите даты семестра, прежде чем изменять даты курса."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Изменение дней прохождения курса может изменить даты сдачи"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Изменение дней прохождения курса может изменить даты сдачи."
   changing_section_dates_may_override_course_and_ter_6634950e: "Изменение дат раздела может привести к отмене настроек доступности семестра и размещения на странице курсов и панели инструментов. Подтвердите даты семестра и курса, прежде чем изменять даты раздела."
   changing_the_course_participation_will_republish_a_1cc05b7: "Изменение участия в курсе приведет к повторной публикации прохождения всего курса с любыми новыми датами, используя участие команды."
@@ -8579,6 +8588,7 @@ ru:
   course_pacing_d3025ecf: "План прохождения курса:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Предварительный просмотр функции Course Pacing должен быть активирован в вашей организации."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Course Pacing — это автоматизированный инструмент, который создает расписание учащегося путем комбинирования предложенных часов по главе, дней нахождения в классе в школе и общего количества часов для генерирования алгоритма расчета даты."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Course Pacing — это автоматизированный инструмент, который устанавливает дифференцированные сроки выполнения для оценки и учебных заданий на основании даты зачисления каждого учащегося, что позволяет проводить структурированное, самостоятельное обучение на курсах с постепенным набором учащихся."
   course_pacing_is_in_active_development_348e33cf: "Планирование прохождения курса находится в активной разработке."
   course_pacing_redesign_38edfc1c: "Перекомпоновка плана прохождения курса"
   course_pages_449f1dd4: "Страницы курса"
@@ -9317,6 +9327,7 @@ ru:
   create_132b3be1: Создать
   create_14873ed7: создать
   create_a_64f6f82: Создать
+  create_a_course_pace_333b0911: "Создать план прохождения курса"
   create_a_default_course_pace_71ba0b9f: "Создать план прохождения курса по умолчанию"
   create_a_developer_key_cabaa013: "Создать ключ программиста"
   create_a_friendly_display_name_c1036ed: "Создать удобное название для отображения"
@@ -9344,6 +9355,7 @@ ru:
                       работы. Группам заданий могут быть присвоены весовые коэффициенты.
   create_content_for_your_course_500a7032: "Создать контент для вашего курса"
   create_course_9a69b32c: "Создать курс"
+  create_course_pace_3dff129: "Создать план прохождения курса"
   create_course_templates_f5c4e039: "Создать шаблоны курсов"
   create_criterion_6df4d4ad: "Создать критерий"
   create_default_pace_dd21415b: "Создать план прохождения по умолчанию"
@@ -9598,6 +9610,7 @@ ru:
   customize_course_details_26fd4afe: "Настройка деталей учебного курса"
   customize_help_link_62cd05eb: "Настроить ссылку справки"
   customize_learning_mastery_ratings_4ace142a: "Настроить оценки усвоения материала"
+  customize_section_and_student_paces_f63f930f: "Кастомизировать разделы и прохождение курсов учащимися"
   customize_sections_and_individual_student_paces_a16099b: "Кастомизировать разделы и индивидуальные курсы прохождения учащихся"
   customize_this_menu_efa72a9: "Настроить это меню"
   cutoff_score_74254c89: "граничный балл"
@@ -9783,6 +9796,7 @@ ru:
     no_date: "Отсутствует дата"
   dates_6e416047: Даты
   dates_shown_in_course_time_zone_da2f77d5: "Даты отображаются с использованием часового пояса курса"
+  dates_shown_in_course_time_zone_efd32135: "Даты, отображаемые в часовом поясе курса"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9870,6 +9884,7 @@ ru:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Глубоко вложенные ответы больше не поддерживаются. Ваш ответ появится на первой странице этой темы."
   default_9db103d: "По умолчанию"
   default_conference_title: "Конференция %{course_name}"
+  default_course_pace_ce0ba0f3: "Прохождение курса по умолчанию"
   default_course_pacing_d18b6cda: "Прохождение курса по умолчанию"
   default_dates_a0a2ae26: "даты по умолчанию"
   default_due_time_9d0e9140: "Время сдачи по умолчанию"
@@ -9997,6 +10012,7 @@ ru:
   deleted_content_referenced_in_this_resource_e42d1998: "Удалено содержимое, на которое задана ссылка в этом ресурсе:"
   deleted_deletedtimingdisplay_f4c73003: "Удаленное %{deletedTimingDisplay}"
   deleted_topic_notice: "Эта тема удалена"
+  deleted_user_59fdcef7: "УДАЛЕННЫЙ ПОЛЬЗОВАТЕЛЬ"
   deleting_6421031e: удаление...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Удаление выбранного файла обычно выполняется только в том случае, если слушатель размещает неподходящий или конфиденциальный материал.
@@ -10981,6 +10997,7 @@ ru:
   edit_criterion_description_5828919: "Редактировать описание критериев"
   edit_current_message_da650d4c: "Редактировать текущее сообщение"
   edit_dates_ed31061: "Редактировать даты"
+  edit_default_course_pace_e00f1b5b: "Редактировать план прохождения курса по умолчанию"
   edit_default_pace_33ba5cdd: "Редактировать план прохождения по умолчанию"
   edit_developer_key_53c93ed1: "Редактировать ключ программиста"
   edit_developer_key_d8fa33c4: "Редактировать ключ программиста"
@@ -12819,6 +12836,7 @@ ru:
   germany_b02d91c9: Германия
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Получить справку о том, как использовать и настраивать конференции в canvas."
   get_started_b9507525: Приступить
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Начните с создания плана прохождения курса, который будет служить в качестве плана прохождения по умолчанию для всех разделов и учащихся курса."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Начните с поиска, импорта или создания результатов по вашей учетной записи."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Начните с поиска, импорта или создания результатов своего курса."
   get_started_with_configuring_the_course_material_d_fa51d225: "Начните конфигурировать даты завершения создания материалов курса для всего курса"
@@ -15340,6 +15358,8 @@ ru:
   instructor_name_36bc0f39: "Имя преподавателя"
   instructor_sis_id_899dd697: "Идентификатор Sis преподавателя"
   instructors_4b491a07: инструкторы
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Преподаватели не связаны ограничениями по числу попыток, но работа преподавателя ДОЛЖНА засчитываться как попытка учащегося."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Преподаватели могут подавать заявки от имени учащихся"
   instructors_cdd595d0: Инструкторы
   instructure: 
     alerts: 
@@ -16231,6 +16251,7 @@ ru:
   loading_missing_assignments_link_d9a0d320: "Загрузка ссылки на отсутствующие задания"
   loading_more_grade_history_results_b235de5: "Загрузка дополнительных результатов истории выставления оценок."
   loading_more_gradebook_history_results_810f6d2e: "Загрузка большего числа результатов истории журнала оценок."
+  loading_more_replies_22e0f13c: "Загрузка дополнительных ответов"
   loading_more_results_1d437202: "Загрузка других результатов"
   loading_more_results_def6df65: "Загрузка большего количества результатов..."
   loading_more_sub_accounts_d0a30903: "Загрузка дополнительных субучетных записей..."
@@ -16242,6 +16263,7 @@ ru:
   loading_permissions_28495bdb: "Загрузка разрешений"
   loading_permissions_failed_73983eb3: "Не удалось загрузить разрешения"
   loading_release_notes_7deaa2eb: "Загрузка примечаний к выпуску"
+  loading_replies_8bdf17bc: "Загрузка ответов..."
   loading_results_769c8819: "Загрузка результатов"
   loading_results_spinner_73ef739c: "Счетчик загрузки результатов"
   loading_section_header_616c8cdd: "Загрузка заголовок раздела"
@@ -19449,6 +19471,7 @@ ru:
   newest_first_87672763: "Сначала самые новые"
   newest_oldest_d768cf1a: "Самые новые - Самые старые"
   next_40e12421: Далее
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Затем настройте планы прохождения для отдельных разделов и/или учащихся, чтобы еще больше адаптировать их в соответствии с вашими потребностями (этот шаг необязателен)."
   next_announcement_6e6e0f17: "Следующее объявление"
   next_announcements_page_3956eb11: "Страница «Следующие объявления»"
   next_assignment_8ec51175: "Следующее задание"
@@ -20187,6 +20210,7 @@ ru:
       \x20             Будущие изменения опубликованных оценок не нужно публиковать вручную.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Если оценки публикуются вручную, автоматически выполняется отправка новых уведомлений и оценки будут видны учащимся."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "После активации эта опция отображается в журнале оценок для преподавателей."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "После того, как эта функция будет активирована, вы не сможете отключить ее снова. Убедитесь, что вы готовы активировать Папки для представленных материалов прежде чем продолжить."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "После того, как ответ будет предоставлен, изменить его будет нельзя. Вы не сможете просмотреть предыдущий вопрос."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Как только вы начинаете отладку всей информации о следующей неудачной попытке входа в систему, эта попытка попадет в данные. Нажмите кнопку \"Обновить\", чтобы увидеть, если большее количество данных было собрано или \"Остановить отладку\", чтобы удалить собранные данные и остановить текущую попытку отладки."
@@ -20582,6 +20606,11 @@ ru:
   pace_plans_is_in_active_development_f6c20046: "Планы темпов находятся в активной разработке."
   pace_removed_8e625df7: "План прохождения удален"
   pace_type_76cf749: "Тип плана прохождения"
+  pacename_pace_created_75aa4eda: "%{paceName} План прохождения создан"
+  pacename_pace_removed_79fb031f: "%{paceName} План прохождения удален"
+  pacename_pace_updated_10c6f95: "%{paceName} План прохождения обновлен"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} План прохождения будет удален. Этот план прохождения будет преобразован обратно в предварительно заданный план прохождения."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} План прохождения будет удален. Этот план прохождения будет преобразован обратно в план прохождения по умолчанию."
   pacename_updated_2a2c4d77: "%{paceName} обновлено"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} прохождения: отсортировано по %{sortBy} в порядке %{orderType}"
   package_error: "Ошибка определения типа пакета: %{error}"
@@ -20877,6 +20906,7 @@ ru:
   please_note_fbb62e4c: "Обратите внимание:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Обратите внимание: Instructure размещает Canvas Commons в США. Это означает, что при использовании вами Canvas Commons ваши персональные данные будут сохраняться и обрабатываться в США. Элементы таких персональных данных включают: имя, адрес электронной почты, идентификатор пользователя Canvas, регистрационное имя пользователя Canvas, аватар Canvas, IP-адрес, выбранные вами в качестве избранных ресурсы Canvas Commons и комментарии, сделанные вами в отношении любых ресурсов в Canvas Commons. Более подробную информацию о принципах обеспечения конфиденциальности в Instructure вы можете найти [здесь](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Обратите внимание на то, что после настройки прохождения плана курса даты выполнения всех существующих заданий, тестов, дискуссий будут контролироваться Course Pacing. Более подробную информацию можно получить в *группе пользователей Course Pacing*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Обратите внимание на то, что после сохранения плана прохождения курса все сроки сдачи для существующих оценок и учебных материалов будут управляться планом прохождения курса. Узнайте подробнее о Course Pacing в *группе пользователей Планирование прохождения курса*."
   please_provide_a_field_e5a7d0b3: "Пожалуйста, предоставьте %{field}"
   please_provide_a_pairing_code_530d1e9d: "Укажите код сопряжения."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Укажите действительный домен клиента. Проверьте настройки Azure Active Directory, чтобы найти его."
@@ -20892,6 +20922,7 @@ ru:
   please_select_one_f931e883: "Пожалуйста, выберите один"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Укажите, следует ли включить или отключить Microsoft Teams Sync."
   please_try_again_4c3d11b4: "Попробуйте еще раз"
+  please_try_another_search_term_8f7b5d69: "Попробуйте изменить критерий поиска"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Используйте другой критерий поиска, фильтр или выполните поиск с меньшим числом символов"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Попробуйте восстановить соединение с инструментом, повторно выбрав инструмент в задании или интерфейсе элемента модуля и сохранив его."
   please_upload_files_as_a_zip_5a2c799f: "Загрузите файлы в качестве ZIP-файла"
@@ -26788,6 +26819,8 @@ ru:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Учащиеся могут участвовать в курсе только в промежутке между этими датами"
   students_can_see_originality_score_797fe634: "Студенты могут видеть исходную оценку"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Студенты не могут просматривать ответы в контрольной работе после завершения курса"
+  students_enrolled_in_this_course_859fa7a2: "Учащиеся, зачисленные на этот курс"
+  students_enrolled_in_this_section_681ba503: "Учащиеся, зачисленные в этот раздел"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Студенты уже отправили домашнюю работу по этому заданию, поэтому настройки проверки платформы проверки на наличие плагиата не могут быть изменены."
   students_have_either_already_taken_or_started_taki_a076336: "Студенты уже выполнили или начали выполнять эту контрольную работу, поэтому будьте осторожны, редактируя ее. Если вы значительно измените какие-либо вопросы в контрольной работе, вы, возможно, захотите повторно оценить студентов, которые выполняли старую версию данной контрольной работы."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Студенты могут отвечать анонимно. Некоторые имена и изображения профиля могут быть скрыты."
@@ -27067,6 +27100,7 @@ ru:
   submissions_folder_9db8dadf: "Папка с предоставленными материалами"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "Папки с предоставленными материалами должны быть созданы в контексте пользователя или группы"
   submissions_graded_status_f689110d: "Сданные работы - Состояние выставленной оценки"
+  submissions_instructor_proxy_2247c633: "Отправки — прокси преподавателя"
   submissions_posted_title_course_43677dba: "Опубликованные отправки: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Страница состояния загрузки повторных отправок"
   submissions_view_and_make_comments_cafaf361: "Предоставленные данные - просмотреть и оставить комментарии"
@@ -31311,6 +31345,7 @@ ru:
   your_outcomes_were_successfully_imported_c5de884: "Ваши результаты были успешно импортированы."
   your_password_has_been_changed_df0e72aa: "Ваш пароль был изменен."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Инструкции по восстановлению вашего пароля будут отправлены на *%{email_address}*. Это может занять до 30 минут. Не забудьте проверить папку для спама."
+  your_peer_review_is_complete_e5fa3e40: "Ваш независимый обзор выполнен!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Не удалось загрузить фото вашего профиля. Возможно, вы превысили лимит на загрузку содержимого."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Ваш выбор механизма тестирования был сброшен!"
   your_score_a1fc2fcf: "Ваша оценка"
