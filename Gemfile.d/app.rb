@@ -60,7 +60,7 @@ gem "barby", "0.6.8", require: false
 gem "bcrypt", "3.1.16"
 gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
-gem "business_time", "0.10.0"
+gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
   gem "adobe_connect", "1.0.11", require: false
 gem "canvas_webex", "0.18.2"
