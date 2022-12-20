@@ -874,6 +874,13 @@ th:
               parameters: 
                 header: "จัดส่งหลังจาก:"
     integer_required: ต้องระบุจำนวนเต็ม
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "เงื่อนไข (ข้อจำกัด 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1985,6 +1992,7 @@ th:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "อนุญาตลิงค์ความช่วยเหลือให้กำกับเป็น นำเสนอ หรือ ใหม่ และจัดแสดงลิงค์ความช่วยเหลือที่นำเสนอไว้อย่างชัดเจนในเมนูความช่วยเหลือ"
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวม
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวมจากกลุ่มภารกิจและเมนูคอลัมน์รวมในสมุดบันทึกเกรด (Gradebook)"
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: ผู้สอนสามารถส่งไฟล์แนบในนามของผู้เรียน
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: อนุญาตผลการเรียนรู้ให้เป็นแบบเลือกได้ขณะโอนย้ายเนื้อหาบทเรียน
   allows_modifying_notification_settings_for_any_cou_5004ac71: สามารถแก้ไขค่าการแจ้งข้อมูลสำหรับบทเรียนจากภายในเพจค่าปรับตั้งการแจ้งข้อมูลระดับบัญชีผู้ใช้
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "อนุญาตข้อมูลผลลัพธ์ที่จัดเก็บใน บริการสำหรับผลลัพธ์ (Outcomes Service) เพื่อจัดแสดงในรายงานของ Canvas (LMGB, sLMGB และรายงานโดยผู้ดูแลที่เกี่ยวกับผลลัพธ์)"
@@ -4455,6 +4463,7 @@ th:
   changed_item_1d16a85f: รายการที่แก้ไข
   changes_will_still_apply_if_you_leave_this_page_935cedc6: การเปลี่ยนแปลงจะยังคงมีผลหากคุณออกจากหน้านี้
   changes_you_made_may_not_be_saved_4e8db973: การเปลี่ยนแปลงที่คุณทำขึ้นอาจไม่ถูกบันทึกไว้
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: การแก้ไขเส้นทางของบทเรียนอาจทำให้วันครบกำหนดเปลี่ยนไป
   changing_course_pacing_days_may_modify_due_dates_9009aecd: การแก้ไขลำดับของบทเรียนอาจทำให้วันครบกำหนดเปลี่ยนไป
   changing_section_dates_may_override_course_and_ter_6634950e: "การเปลี่ยนแปลงวันที่ของกลุ่มย่อยอาจเป็นการบอกล้างค่าปรับตั้งการจัดสรรบทเรียนและเทอม และการจัดวางในหน้าบทเรียนและแผงข้อมูล กรุณายืนยันวันที่ของเทอมและบทเรียนก่อนแก้ไขวันที่ของกลุ่มย่อย"
   changing_the_course_participation_will_republish_a_1cc05b7: การเปลี่ยนรายละเอียดการเข้าร่วมบทเรียนจะเป็นการเผยแพร่ลำดับเส้นทางของบทเรียนใหม่ทั้งหมดเป็นวันที่ใหม่โดยใช้ข้อมูลการเข้าร่วมเทอม
@@ -6340,6 +6349,7 @@ th:
   course_pacing_d3025ecf: "เส้นทางบทเรียน:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "การแสดงตัวอย่างเส้นทางบทเรียน (Course Pacing) จะต้องเปิดใช้งานในสถาบันของคุณ"
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "เส้นทางบทเรียน (Course Pacing) เป็นเครื่องมืออัตโนมัติที่จะจัดทำกำหนดการสำหรับผู้เรียนโดยการผนวกเวลาที่แนะนำต่อบท วันเรียนในชั้นเรียนและเวลาทั้งหมดเพื่อจัดทำระบบประมาณการวันที่"
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "เส้นทางบทเรียนเป็นเครื่องมืออัตโนมัติที่กำหนดวันครบกำหนดต่าง ๆ สำหรับการประเมินและกิจกรรมการเรียนรู้ตามวันที่ลงทะเบียนของผู้เรียนเพื่อให้มีการเรียนรู้ด้วยตัวเองอย่างเป็นระบบสำหรับบทเรียนที่เปิดลงทะเบียนแบบตามลำดับหรือโครงสร้างที่กำหนด"
   course_pacing_is_in_active_development_348e33cf: "Course Pacing อยู่ระหว่างการพัฒนา"
   course_pacing_redesign_38edfc1c: การปรับรูปแบบโครงสร้างศึกษาเนื้อหาบทเรียน
   course_pages_449f1dd4: หน้าบทเรียน
@@ -6816,6 +6826,7 @@ th:
   coverage_eab3aea2: ความครอบคลุม
   create_132b3be1: จัดทำ
   create_a_64f6f82: จัดทำ
+  create_a_course_pace_333b0911: จัดทำเส้นทางบทเรียน
   create_a_default_course_pace_71ba0b9f: จัดทำเส้นทางบทเรียนเริ่มต้น
   create_a_friendly_display_name_c1036ed: จัดทำชื่อจัดแสดงที่เป็นมิตร
   create_a_new_account_4cf7c0f9: จัดทำบัญชีใหม่
@@ -6830,6 +6841,7 @@ th:
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "จัดทำการประเมินพร้อมแบบทดสอบใหม่และโอนย้ายแบบทดสอบ Canvas ที่มีอยู่"
   create_assignment_68532ceb: จัดทำภารกิจ
   create_course_9a69b32c: จัดทำบทเรียน
+  create_course_pace_3dff129: จัดทำเส้นทางบทเรียน
   create_criterion_6df4d4ad: จัดทำเกณฑ์พิจารณา
   create_default_pace_dd21415b: จัดทำเส้นทางเริ่มต้น
   create_delete_edit_157bb1a3: "จัดทำ / ลบ / แก้ไข"
@@ -7030,6 +7042,7 @@ th:
   custom_reports_experimental_features_40bbfe7c: "รายงานกำหนดเอง: คุณสมบัติทดลองใช้"
   customize_course_details_26fd4afe: กำหนดรายละเอียดบทเรียน
   customize_learning_mastery_ratings_4ace142a: กำหนดคะแนนความเชี่ยวชาญด้านการเรียนรู้
+  customize_section_and_student_paces_f63f930f: กำหนดค่ากลุ่มย่อยและเส้นทางการเรียนรู้เรียนรของผู้เรียน
   customize_sections_and_individual_student_paces_a16099b: กำหนดค่ากลุ่มย่อยและเส้นทางการเรียนรู้สำหรับผู้เรียนแต่ละราย
   customize_this_menu_efa72a9: กำหนดค่าเมนูนี้
   cutoff_score_74254c89: คะแนนตามเกณฑ์
@@ -7196,6 +7209,7 @@ th:
     no_date: ไม่มีวันที่
   dates_6e416047: วันที่
   dates_shown_in_course_time_zone_da2f77d5: วันที่ที่ปรากฏในเขตเวลาสำหรับบทเรียน
+  dates_shown_in_course_time_zone_efd32135: วันที่ที่ปรากฏในเขตเวลาสำหรับบทเรียน
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -7258,6 +7272,7 @@ th:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "ไม่รองรับการตอบกลับที่มีข้อมูลซ้อนทับกันมากเกินไปอีกต่อไป การตอบกลับของคุณจะปรากฏขึ้นในหน้าแรกของสายการติดต่อนี้"
   default_9db103d: ค่าเริ่มต้น
   default_conference_title: "%{course_name} การประชุม"
+  default_course_pace_ce0ba0f3: เส้นทางการเรียนรู้เริ่มต้น
   default_course_pacing_d18b6cda: เส้นทางการเรียนรู้เริ่มต้น
   default_dates_a0a2ae26: วันที่เริ่มต้น
   default_due_time_9d0e9140: เวลาครบกำหนดเริ่มต้น
@@ -7369,6 +7384,7 @@ th:
   deleted_content_referenced_in_this_resource_e42d1998: "เนื้อหาที่ลบที่ถูกอ้างอิงในทรัพยากรข้อมูลนี้:"
   deleted_deletedtimingdisplay_f4c73003: "ลบแล้ว %{deletedTimingDisplay}"
   deleted_topic_notice: หัวข้อดังกล่าวถูกลบแล้ว
+  deleted_user_59fdcef7: ผู้ใช้ที่ลบทิ้ง
   deleting_6421031e: กำลังลบ...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       การลบไฟล์จัดส่งโดยปกติจะดำเนินการก็ต่อเมื่อผู้เรียนโพสต์ข้อมูลที่ไม่เหมาะสมหรือข้อมูลส่วนตัว
@@ -7923,7 +7939,7 @@ th:
   due_date_oldest_to_newest_73e62815: "วันครบกำหนด - เก่าสุดไปใหม่สุด"
   due_date_set_1c6364db: กำหนดวันครบกำหนดแล้ว
   due_dates_520a6c08: วันครบกำหนด
-  due_dates_are_being_compressed_based_on_your_start_917df12d: "วันครบกำหนด (Due Dates)) กำลังถูกบีบอัดตามวันที่เริ่มต้นและสิ้นสุดของคุณ"
+  due_dates_are_being_compressed_based_on_your_start_917df12d: วันครบกำหนดกำลังถูกบีบอัดตามวันที่เริ่มต้นและสิ้นสุดของคุณ
   due_dates_are_being_compressed_based_on_your_start_c6db279e: "วันครบกำหนด (Due Dates) กำลังถูกบีบอัดตามวันที่เริ่มต้นและสิ้นสุดของคุณ"
   due_dates_changed_exceptions_ddb028: "ข้อยกเว้นในการแก้ไขวันครบกำหนด:"
   due_dates_duedatecount_bbc24d65: "วันครบกำหนด (%{dueDateCount})"
@@ -7999,6 +8015,7 @@ th:
   edit_criterion_description_5828919: แก้ไขรายละเอียดเกณฑ์
   edit_current_message_da650d4c: แก้ไขข้อความในปัจจุบัน
   edit_dates_ed31061: แก้ไขวันที่
+  edit_default_course_pace_e00f1b5b: แก้ไขเส้นทางบทเรียนเริ่มต้น
   edit_default_pace_33ba5cdd: แก้ไขเส้นทางเริ่มต้น
   edit_developer_key_53c93ed1: แก้ไขคีย์สำหรับผู้พัฒนา
   edit_developer_key_d8fa33c4: แก้ไขคีย์สำหรับผู้พัฒนา
@@ -9315,6 +9332,7 @@ th:
   germany_49_fc5b8179: "เยอรมนี (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "ขอความช่วยเหลือในการใช้และกำหนดค่าการประชุมใน Canvas"
   get_started_b9507525: เริ่มต้น
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: เริ่มต้นโดยการจัดทำเส้นทางบทเรียนที่ใช้เป็นเส้นทางเริ่มต้นสำหรับกลุ่มย่อยและผู้เรียนทั้งหมดในบทเรียน
   get_started_with_configuring_the_course_material_d_fa51d225: เริ่มต้นโดยการกำหนดค่าวันครบกำหนดเนื้อหาบทเรียนสำหรับบทเรียนโดยรวม
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "สืบค้นข้อมูลต่อไปนี้จากแอพ Salesforce Connected ของคุณ"
   get_the_sis_file_for_enrollments_cf308650: "สืบค้นไฟล์ SIS สำหรับการลงทะเบียน"
@@ -10790,6 +10808,8 @@ th:
   instructor_name_36bc0f39: ชื่อผู้สอน
   instructor_sis_id_899dd697: "SID ID ผู้สอน"
   instructors_4b491a07: ผู้สอน
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "ผู้สอนจะไม่ถูกโยงกับเกณฑ์จำนวนการทำรายการ แต่ผลงานจัดส่งโดยผู้สอนจะถูกนับเป็นจำนวนครั้งที่ผู้เรียนดำเนินการ"
+  instructors_can_submit_on_behalf_of_students_d9de3c83: ผู้สอนสามารถส่งในนามของผู้เรียน
   instructors_cdd595d0: ผู้สอน
   instructure: 
     errors: 
@@ -11518,12 +11538,14 @@ th:
   loading_microsoft_teams_sync_settings_c2633e46: "กำลังโหลดค่าปรับตั้ง Microsoft Teams Sync"
   loading_missing_assignments_link_d9a0d320: กำลังโหลดลิงค์ภารกิจที่ขาดหาย
   loading_more_gradebook_history_results_810f6d2e: กำลังโหมดผลลัพธ์ประวัติสมุดบันทึกเกรดเพิ่มเติม
+  loading_more_replies_22e0f13c: กำลังโหลดการตอบกลับเพิ่มเติม
   loading_more_results_1d437202: กำลังโหลดผลลัพธ์เพิ่มเติม
   loading_more_results_def6df65: กำลังโหลดผลลัพธ์เพิ่มเติม...
   loading_name_data_c66ea65f: "กำลังโหลดข้อมูล %{name}"
   loading_options_c823e98b: กำลังโหลดตัวเลือก...
   loading_outcome_results_96e21ce4: กำลังโหลดผลลัพธ์
   loading_release_notes_7deaa2eb: กำลังโหลดหมายเหตุการเผยแพร่
+  loading_replies_8bdf17bc: กำลังโหลดการตอบกลับ...
   loading_results_769c8819: กำลังโหลดผลลัพธ์
   loading_section_header_616c8cdd: กำลังโหลดหัวเรื่องสำหรับกลุ่มย่อย
   loading_staff_1ce7d803: กำลังโหลดบุคลากร...
@@ -14086,6 +14108,7 @@ th:
   new_zealand_64_f126cf2e: "นิวซีแลนด์ (+64)"
   newest_first_87672763: ใหม่สุดก่อน
   next_40e12421: ถัดไป
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "จากนั้นให้ปรับเส้นทางสำหรับกลุ่มย่อยและ/หรือผู้เรียนแต่ละส่วนเพื่อให้ตรงกับความต้องการของคุณ (นี่เป็นขั้นตอนตามสมัครใจ)"
   next_announcement_6e6e0f17: ประกาศถัดไป
   next_announcements_page_3956eb11: เพจประกาศถัดไป
   next_assignment_8ec51175: ภารกิจใหม่
@@ -14700,6 +14723,7 @@ th:
       \x20             การแก้ไขเกรดในอนาคตสำหรับเกรดที่แจ้งจะไม่ต้องแจ้งด้วยตัวเอง\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "หลังจากแจ้งเกรดด้วยตัวเองแล้ว ระบบจะส่งการแจ้งข้อมูลใหม่อัตโนมัติและแสดงให้แก่ผู้เรียน"
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "หลังจากเปิดใช้งานแล้ว ตัวเลือกนี้จะปรากฏขึ้นในสมุดบันทึกเกรดสำหรับผู้สอน"
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "หลังจากคุณส่งคำตอบแล้ว คุณจะไม่สามารถแก้ไขได้อีกในภายหลัง คุณจะไม่สามารถดูคำถามก่อนหน้าได้"
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "หลังจากเริ่มแก้บั๊ก ข้อมูลทั้งหมดเกี่ยวกับการล็อกอินที่พยายามดำเนินการครั้งถัดไปจะถูกรวบรวมไว้ คลิก “รีเฟรช” เพื่อดูว่ามีข้อมูลเก็บไว้เพิ่มเติมหรือไม่หรือ “หยุดแก้บั๊ก” เพื่อล้างข้อมูลที่รวบรวมไว้และหยุดการแก้บั๊กในปัจจุบัน"
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "รายการเนื้อหาบางส่วนที่ส่งจากแอพจากภายนอกนี้ไม่สามารถประมวลผลอย่างถูกต้อง ข้อมูลเหล่านี้ไม่ได้ถูกบันทึกไว้โดย Canva และสาเหตุที่เกิดข้อผิดพลาดมีระบุไว้ด้านล่าง"
@@ -14981,6 +15005,11 @@ th:
   pace_plans_is_in_active_development_f6c20046: "Pace Plans อยู่ระหว่างการพัฒนา"
   pace_removed_8e625df7: ลบลำดับการเรียนรู้แล้ว
   pace_type_76cf749: ประเภทเส้นทาง
+  pacename_pace_created_75aa4eda: "เส้นทาง %{paceName} ถูกจัดทำแล้ว"
+  pacename_pace_removed_79fb031f: "เส้นทาง %{paceName} ถูกลบแล้ว"
+  pacename_pace_updated_10c6f95: "เส้นทาง %{paceName} ได้รับการอัพเดตแล้ว"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "เส้นทาง %{paceName} จะถูกลบทิ้ง เส้นทางนี้จะแปลงกลับเป็นเส้นทางที่กำหนดไว้ก่อนหน้า"
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "เส้นทาง %{paceName} จะถูกลบทิ้ง เส้นทางนี้จะแปลงกลับเป็นเส้นทางเริ่มต้น"
   pacename_updated_2a2c4d77: "อัพเดต %{paceName} แล้ว"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "โครงสร้างเนื้อหา %{paceType}: เรียงจาก %{sortBy} ในลำดับ %{orderType}"
   package_error: "มีข้อผิดพลาดในการระบุประเภทแพคเกจ: %{error}"
@@ -15230,6 +15259,7 @@ th:
   please_note_fbb62e4c: "หมายเหตุ:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "หมายเหตุ: Instructure ให้บริการ Canvas Commons จากในสหรัฐอเมริกา ซึ่งหมายความว่าขณะคุณใช้งาน Canvas Commons ข้อมูลส่วนบุคคลของคุณจะถูกจัดเก็บและประมวลผลในสหรัฐอเมริกา ข้อมูลส่วนบุคคลเหล่านี้อาจได้แก่ ชื่อ อีเมลแอดเดรส ID ผู้ใช้ Canvas ชื่อล็อกอินไปยัง Canvas ภาพประจำตัวใน Canvas ที่อยู่ IP ข้อมูลใน Canvas Commons ที่คุณชื่นชอบ และความเห็นของคุณในแหล่งข้อมูลต่าง ๆ ใน Canvas Commons คุณสามารถตรวจสอบรายละเอียดเพิ่มเติมเกี่ยวกับนโยบายความเป็นส่วนตัวของ Instructure ได้ [ที่นี่](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "หลังจากกกำหนดเส้นทางบทเรียน (Course Pace) วันครบกำหนดทั้งหมดของภารกิจ แบบทดสอบ ส่วนการพูดคุยจะถูกควบคุมตามเส้นทางบทเรียน (Course Pacing) สามารถอ่านรายละเอียดเพิ่มเติมได้ในหัวข้อ *กลุ่มผู้ใช้เส้นทางบทเรียน (Course Pacing User Group)*"
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "หลังจากบันทึกเส้นทางบทเรียนแล้ว วันครบกำหนดทั้งหมดสำหรับการประเมินและสื่อการเรียนรู้ในปัจจุบันจะถูกควบคุมผ่านเส้นทางบทเรียน เรียนรู้เพิ่มเติมเกี่ยวกับเส้นทางบทเรียนได้ใน *กลุ่มผู้ใช้เส้นทางบทเรียน*"
   please_provide_a_field_e5a7d0b3: "กรุณาแจ้ง %{field}"
   please_provide_a_pairing_code_530d1e9d: กรุณาระบุรหัสเข้าคู่
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "กรุณาระบุโดเมน tenant ที่ถูกต้อง ตรวจสอบค่าปรับตั้ง Azure Active Directory ของคุณเพื่อทำการค้นหา"
@@ -15243,6 +15273,7 @@ th:
   please_select_a_user_role_for_this_link_9fb4e655: กรุณาเลือกบทบาทผู้ใช้สำหรับลิงค์นี้
   please_select_one_f931e883: กรุณาเลือกหนึ่งข้อ
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "กรุณาระบุว่าจะเปิดใช้หรือปิดใช้งาน Microsoft Teams Sync"
+  please_try_another_search_term_8f7b5d69: กรุณาลองคำค้นหาอื่น
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "กรุณาลองคำค้นหาหรือตัวกรองอื่น หรือค้นหาโดยใช้ตัวอักษรน้อยกว่านี้"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "กรุณาลองทำการเชื่อมต่อใหม่กับเครื่องมือโดยการเลือกเครื่องมืออีกครั้งในภารกิจหรืออินเทอร์เฟซรายการหน่วยการเรียน แล้วบันทึกข้อมูล"
   please_upload_files_as_a_zip_5a2c799f: "กรุณาอัพโหลดไฟล์เป็น .zip"
@@ -19678,6 +19709,8 @@ th:
   students_can_only_participate_in_the_course_betwee_6f8595aa: ผู้เรียนสามารถเข้าร่วมเฉพาะบทเรียนระหว่างวันที่เหล่านี้
   students_can_see_originality_score_797fe634: ผู้เรียนสามารถดูคะแนนต้นขั้วได้
   students_cannot_view_quiz_responses_after_course_c_88e929ed: ผู้เรียนไม่สามารถดูการตอบกลับของแบบทดสอบหลังจากสรุปบทเรียนแล้ว
+  students_enrolled_in_this_course_859fa7a2: ผู้เรียนลงทะเบียนในบทเรียนนี้แล้ว
+  students_enrolled_in_this_section_681ba503: ผู้เรียนลงทะเบียนในกลุ่มย่อยนี้แล้ว
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "ผู้เรียนจัดส่งการบ้านสำหรับภารกิจนี้แล้ว ไม่สามารถแก้ไขค่าปรับตั้งแพลตฟอร์มตรวจสอบการลอกเลียนเนื้อหาได้"
   students_have_either_already_taken_or_started_taki_a076336: "ผู้เรียนทำหรือเริ่มทำแบบทดสอบนี้ไปแล้ว ระมัดระวังในการแก้ไข หากคุณแก้ไขคำถามสำหรับแบบทดสอบอย่างมีนัยสำคัญ คุณอาจต้องให้เกรดผู้เรียนที่ทำแบบทดสอบเวอร์ชั่นเก่าใหม่อีกครั้ง"
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "ผู้เรียนสามารถเลือกตอบกลับแบบไม่เปิดเผยตัว ชื่อและภาพโพรไฟล์บางส่วนอาจถูกซ่อนไว้"
@@ -19908,6 +19941,7 @@ th:
   submissions_d30f61af: "# ผลงานจัดส่ง"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: โฟลเดอร์จัดส่งจะต้องจัดทำในเนื้อหาของผู้ใช้หรือของกลุ่ม
   submissions_graded_status_f689110d: "ผลงานจัดส่ง - สถานะให้เกรดแล้ว"
+  submissions_instructor_proxy_2247c633: "ผลงานจัดส่ง - ตัวแทนผู้สอน"
   submissions_posted_title_course_43677dba: "โพสต์ผลงานจัดส่งแล้ว: %{title}, %{course}"
   submit_a3cc6859: ส่ง
   submit_a_comment_7edbf648: ส่งความเห็น
@@ -23041,6 +23075,7 @@ th:
   your_outcomes_were_successfully_imported_c5de884: นำเข้าผลลัพธ์ของคุณเสร็จสิ้น
   your_password_has_been_changed_df0e72aa: แก้ไขรหัสผ่านของคุณแล้ว
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "คำแนะนำในการกู้รหัสผ่านของคุณถูกจัดส่งไปยัง *%{email_address}* อาจใช้เวลาสูงสุด 30 นาที อย่าลืมดูในโฟลเดอร์อีเมลขยะด้วย"
+  your_peer_review_is_complete_e5fa3e40: ความคิดเห็นจากผู้เกี่ยวข้องโดยคุณเสร็จสิ้นแล้ว!
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "ไม่สามารถอัพโหลดภาพโพรไฟล์ของคุณ คุณอาจอัพโหลดเกินจำกัดที่กำหนดไว้"
   your_quiz_engine_choice_has_been_reset_68d268c1: รีเซ็ตตัวเลือกเอนจินแบบทดสอบของคุณแล้ว!
   your_score_a1fc2fcf: คะแนนของคุณ

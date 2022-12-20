@@ -1178,6 +1178,13 @@ zh-Hant:
               parameters: 
                 header: 在以下時間後提交：
     integer_required: 需要整數值
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "詞彙（限制 4）"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2506,6 +2513,7 @@ zh-Hant:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允許支援連結標籤為精選或全新，並在支援選單中顯示為精選支援連結。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 允許導師套用分數到全部的未評分提交項目中。
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 允許導師從成績單的作業群組和「總分」欄選單中套用分數到全部的未評分提交項目。
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: 允許導師代表學生提交附件。
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: 遷移課程內容期間允許選取各學習成果
   allows_modifying_notification_settings_for_any_cou_5004ac71: 允許從帳戶級別通知設定頁面中修改任何課程的通知設定。
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "允許儲存在結果服務中的結果資料顯示在 Canvas 報告中（LMGB、sLMGB 和成果相關管理員報告）。"
@@ -6058,6 +6066,7 @@ zh-Hant:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您離開本頁，系統依然會應用改動。
   changes_you_made_may_not_be_saved_4e8db973: 您所做的變更或未能儲存。
   changing_course_dates_may_override_term_availabili_d92b10de: 更改課程日期可能會重寫學期時段設定，以及課程頁面和控制面板的配置。請在修改課程日期前確認學期日期。
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: 變更課程進度天數可能修改截止日期
   changing_course_pacing_days_may_modify_due_dates_9009aecd: 變更中的課程進度天數可能修改截止日期。
   changing_section_dates_may_override_course_and_ter_6634950e: 更改分班日期可能會重寫課程和學期時段設定，以及課程頁面和控制面板的配置。請在修改分班日期前確認學期及課程日期。
   changing_the_course_participation_will_republish_a_1cc05b7: 變更課程參與將使用學期參與重新發佈有任何新日期的所有課程進度。
@@ -8351,6 +8360,7 @@ zh-Hant:
   course_pacing_d3025ecf: 課程進度：
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: 您機構中的「課程進度」功能預覽必須啟用。
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: 「課程進度」是一款自動化的工具，可透過結合建議的每章時數、堂上學校日和總時數來産生日期估算器以建立學生排程。
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: 「課程進度」是一種自動化的工具，可根據每個學生的註冊日期設定評估和學習活的不同截止日期。
   course_pacing_is_in_active_development_348e33cf: 課程進度在啟用的開發中。
   course_pacing_redesign_38edfc1c: 課程進度重新設計
   course_pages_449f1dd4: 課程頁面
@@ -9083,6 +9093,7 @@ zh-Hant:
   create_132b3be1: 創建
   create_14873ed7: 創建
   create_a_64f6f82: 創建
+  create_a_course_pace_333b0911: 建立課程進度
   create_a_default_course_pace_71ba0b9f: 建立預設課程進度
   create_a_developer_key_cabaa013: 創建一個開發人員金鑰
   create_a_friendly_display_name_c1036ed: 建立一個易記的顯示名稱
@@ -9115,6 +9126,7 @@ zh-Hant:
       和測驗。可以加權予作業小組。
   create_content_for_your_course_500a7032: 為您的課程創建內容
   create_course_9a69b32c: 建立課程
+  create_course_pace_3dff129: 建立課程進度
   create_course_templates_f5c4e039: 建立課程範本
   create_criterion_6df4d4ad: 創建標準
   create_default_pace_dd21415b: 建立預設進度
@@ -9368,6 +9380,7 @@ zh-Hant:
   customize_course_details_26fd4afe: 自訂課程詳情
   customize_help_link_62cd05eb: 自訂說明連接
   customize_learning_mastery_ratings_4ace142a: 自訂學習掌握程度評級
+  customize_section_and_student_paces_f63f930f: 自訂分班和學生進度
   customize_sections_and_individual_student_paces_a16099b: 自訂分班和個別學生進度
   customize_this_menu_efa72a9: 自定義此選單
   cutoff_score_74254c89: 合格分數線
@@ -9537,6 +9550,7 @@ zh-Hant:
     no_date: 無日期
   dates_6e416047: 日期
   dates_shown_in_course_time_zone_da2f77d5: 日期顯示在課程時區中
+  dates_shown_in_course_time_zone_efd32135: 日期顯示在課程時區中
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -9602,6 +9616,7 @@ zh-Hant:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: 不再支援深入的巢狀回覆。您的回覆將出現在此討論串的的第一頁。
   default_9db103d: 默認值
   default_conference_title: "%{course_name} 會議"
+  default_course_pace_ce0ba0f3: 預設課程進度
   default_course_pacing_d18b6cda: 預設課程進度
   default_dates_a0a2ae26: 預設日期
   default_due_time_9d0e9140: 預設截止時間
@@ -9729,6 +9744,7 @@ zh-Hant:
   deleted_content_referenced_in_this_resource_e42d1998: 在此資源內參考了已刪除的內容：
   deleted_deletedtimingdisplay_f4c73003: "已刪除 %{deletedTimingDisplay}"
   deleted_topic_notice: 該主題已被刪除
+  deleted_user_59fdcef7: 刪除的使用者
   deleting_6421031e: 正在刪除...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       刪除提交項目檔案一般僅在學生公佈不合適或私密資料時使用。
@@ -10695,6 +10711,7 @@ zh-Hant:
   edit_criterion_description_5828919: 編輯標準描述
   edit_current_message_da650d4c: 編輯當前訊息
   edit_dates_ed31061: 編輯日期
+  edit_default_course_pace_e00f1b5b: 編輯預設課程進度
   edit_default_pace_33ba5cdd: 編輯預設進度
   edit_developer_key_53c93ed1: 編輯開發人員金鑰
   edit_developer_key_d8fa33c4: 編輯開發人員金鑰
@@ -12459,6 +12476,7 @@ zh-Hant:
   germany_b02d91c9: 德國
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "取得如何在 Canvas 中使用和設定會議的協助。"
   get_started_b9507525: 開始使用
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: 開始建立作為課程中所有分班和學生的預設進度的課程進度。
   get_started_by_finding_importing_or_creating_your__380b6cfb: 搜尋、匯入或創建帳戶學習成果以開始。
   get_started_by_finding_importing_or_creating_your__6b62c1d9: 搜尋、匯入或創建課程學習成果以開始。
   get_started_with_configuring_the_course_material_d_fa51d225: 開始配置整體課程的課程資料截止日期
@@ -14932,6 +14950,8 @@ zh-Hant:
   instructor_name_36bc0f39: 導師姓名
   instructor_sis_id_899dd697: "導師 SIS ID"
   instructors_4b491a07: 導師
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: 導師不受嘗試限制約束，但導師的提交項目「將」計入學生的嘗試次數。
+  instructors_can_submit_on_behalf_of_students_d9de3c83: 導師可以代表學生提交
   instructors_cdd595d0: 導師
   instructure: 
     alerts: 
@@ -15797,6 +15817,7 @@ zh-Hant:
   loading_missing_assignments_link_d9a0d320: 載入缺少的作業連結
   loading_more_grade_history_results_b235de5: 載入更多評分紀錄結果。
   loading_more_gradebook_history_results_810f6d2e: 載入更多成績單紀錄結果。
+  loading_more_replies_22e0f13c: 載入更多回覆
   loading_more_results_1d437202: 載入更多結果
   loading_more_results_def6df65: 正在載入更多結果...
   loading_more_sub_accounts_d0a30903: 載入更多子帳戶...
@@ -15808,6 +15829,7 @@ zh-Hant:
   loading_permissions_28495bdb: 正在載入權限
   loading_permissions_failed_73983eb3: 載入權限失敗
   loading_release_notes_7deaa2eb: 載入發佈說明
+  loading_replies_8bdf17bc: 正在載入回覆...
   loading_results_769c8819: 正在載入結果
   loading_results_spinner_73ef739c: 正在載入結果微調項目
   loading_section_header_616c8cdd: 載入分班標題
@@ -18972,6 +18994,7 @@ zh-Hant:
   newest_first_87672763: 最新優先
   newest_oldest_d768cf1a: "最新 - 最舊"
   next_40e12421: 下一個
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: 接著，調整個別分班和/或學生的進度，進一步根據您的需求自訂（這一步是選擇性的）。
   next_announcement_6e6e0f17: 下一個通告
   next_announcements_page_3956eb11: 下一個通告頁
   next_assignment_8ec51175: 下一個作業
@@ -19704,6 +19727,7 @@ zh-Hant:
       \x20             已公佈成績的將來評分變更將不需要手動公佈。\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: 當手動公佈成績後，系統會自動向學生發送新通知，而且學生能夠看到。
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: 一啟用後，導師可在成績單中看到此選項。
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: 啟用該功能之後，您將無法再次將其關閉。因此，確保您在繼續之前，已經準備好啟用『提交文件夾』功能。
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 一旦您提交了回答，您將無法再更改。您將無法查看上一個問題。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: 在開始偵錯後，將收集有關下一次嘗試登入嘗試的所有資訊。按一下「重新整理」以瞭解是否已收集更多的資料，或「停止偵錯」以清除所收集的資料，並停止目前的偵錯嘗試。
@@ -20093,6 +20117,11 @@ zh-Hant:
   pace_plans_is_in_active_development_f6c20046: 進度計畫在啟用的開發中。
   pace_removed_8e625df7: 移除的進度
   pace_type_76cf749: 進度類型
+  pacename_pace_created_75aa4eda: "%{paceName} 已建立進度"
+  pacename_pace_removed_79fb031f: "%{paceName} 已移除進度"
+  pacename_pace_updated_10c6f95: "%{paceName} 已更新進度"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} 將移除進度。此進度將回復為之前指派的進度。"
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} 將移除進度。此進度將回復為預設進度。"
   pacename_updated_2a2c4d77: "已更新 %{paceName}"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} 進度：由 %{sortBy} 按 %{orderType} 順序排序"
   package_error: "正在確認包類型時發生錯誤: %{error}"
@@ -20388,6 +20417,7 @@ zh-Hant:
   please_note_fbb62e4c: 請注意：
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "請注意：Instructure 託管在美國的 Canvas 公用區。這表示當您使用 Canvas 公用區時，您的資料將儲存在美國並進行處理。這些個人資料元素包括：名稱、電郵地址、Canvas 使用者 ID、Canvas 登入名稱、Canvas 頭像、IP 位址、您收藏的 Canvas 公用區資源、以及您對 Canvas 公用區中的任何資源做出的評論。您可以找到更多與 Instructure 的隱私做法 [此處](%{url}) 有關的資訊。"
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: 請注意，一設定「課程進度」時，即由「課程進度」控制所有現有的作業、測驗、討論的截止日期。您可以在*課程進度使用者群組*中閱讀更多詳細資料。
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: 請注意，一儲存「課程進度」後，所有現有評估和學習資料的截止日期將由課程進度掌握。瞭解更多有關*課程進度使用者群組*中的課程進度的資訊。
   please_provide_a_field_e5a7d0b3: "請提供%{field}"
   please_provide_a_pairing_code_530d1e9d: 請提供配對碼。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "請提供有效的租借用戶網域。檢查您的 Azure Active Directory 設定以尋找該網域。"
@@ -20403,6 +20433,7 @@ zh-Hant:
   please_select_one_f931e883: 請選擇一項
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "請指定是否啟用或停用「Microsoft Teams 同步」。"
   please_try_again_4c3d11b4: 請重試。
+  please_try_another_search_term_8f7b5d69:  請嘗試其他搜尋詞彙
   please_try_another_search_term_filter_or_search_wi_d6c4046a: 請嘗試另一個搜尋詞彙，或用較少的字元搜尋
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: 請嘗試重新設置工具連線，在作業或單元項目介面中重新選擇工具然後儲存。
   please_upload_files_as_a_zip_5a2c799f: "請以 .zip 格式上傳檔案"
@@ -26136,6 +26167,8 @@ zh-Hant:
   students_can_only_participate_in_the_course_betwee_6f8595aa: 學生只能在這些日期之間參加課程
   students_can_see_originality_score_797fe634: 學生可以檢視原創檢測分數
   students_cannot_view_quiz_responses_after_course_c_88e929ed: 課程結束後學生不能檢視測驗回應
+  students_enrolled_in_this_course_859fa7a2: 已註冊此課程的學生
+  students_enrolled_in_this_section_681ba503: 已註冊此分班的學生
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: 學生們已經提交了這項任務的作業，所以抄襲平台設定無法更改。
   students_have_either_already_taken_or_started_taki_a076336: 學生已參加或已開始參加此測驗，所以要小心編輯。如果您對任何測驗問題進行了重大更改，您可能要考慮對參加舊版本測驗的學生重新評分。
   students_have_the_option_to_reply_anonymously_some_503cdf6c: 學生有匿名回覆的選項。有些姓名和個人檔案圖片可能隱藏。
@@ -26403,6 +26436,7 @@ zh-Hant:
   submissions_folder_9db8dadf: 提交文件夾
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: 提交文件夾必須透過使用者或群組環境來創建
   submissions_graded_status_f689110d: "昃交項目 - 評分的狀態"
+  submissions_instructor_proxy_2247c633: "提交 - 導師代理"
   submissions_posted_title_course_43677dba: "已發佈的提交項目：%{title}，%{course}"
   submissions_re_upload_status_page_6cdbc96d: 提交項目重新上傳狀態頁面
   submissions_view_and_make_comments_cafaf361: "提交項目 - 查看和評論"
@@ -30559,6 +30593,7 @@ zh-Hant:
   your_outcomes_were_successfully_imported_c5de884: 您的學習成果已經成功匯入。
   your_password_has_been_changed_df0e72aa: 您的密碼已變更。
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "您的重設密碼指示將傳送至 *%{email_address}*。最多可能需要 30 分鐘。請務必檢查您的垃圾郵件箱。"
+  your_peer_review_is_complete_e5fa3e40: 您的同儕檢閱完成！
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的個人資料照片無法上傳。您可能已超過上傳限制。
   your_quiz_engine_choice_has_been_reset_68d268c1: 您的測驗引擎選擇已經重設！
   your_score_a1fc2fcf: 您的分數
