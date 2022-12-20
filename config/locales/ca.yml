@@ -935,6 +935,13 @@ ca:
               parameters: 
                 header: "Entregat després de:"
     integer_required: "Es requereix un valor enter"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Condicions (límit 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2112,6 +2119,7 @@ ca:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet etiquetar enllaços d'ajuda com a Destacats o Nous i mostrar de manera visible l'enllaç d'ajuda destacat al menú Ajuda."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permet que els instructors apliquin massivament puntuacions a les entregues sense qualificar."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet que els instructors apliquin massivament puntuacions a les entregues sense nota des dels menús Grup d'activitats i Total de columnes del Llibre de notes."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Permet que els instructors enviïn fitxers adjunts en nom d’un estudiant."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permet que es puguin seleccionar els resultats d'aprenentatge en migrar el contingut de l'assignatura"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permet modificar la configuració de les notificacions de qualsevol assignatura des de la pàgina de configuració de les notificacions de nivell de l'usuari."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Permet que les dades de resultats emmagatzemades al servei Resultats es mostrin als informes del Canvas (LMGB, sLMGB i informes administratius relacionats amb els resultats)."
@@ -4887,6 +4895,7 @@ ca:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Els canvis s'aplicaran encara que sortiu de la pàgina."
   changes_you_made_may_not_be_saved_4e8db973: "Pot ser que els canvis que heu fet no es desin."
   changing_course_dates_may_override_term_availabili_d92b10de: "En canviar les dates del curs, pot ser que se substitueixi la configuració de la disponibilitat del període acadèmic i la ubicació en la pàgina Cursos i el tauler. Confirmeu les dates del període acadèmic abans de modificar les dates del curs."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Si es canvien els dies del ritme de l'assignatura, és possible que es modifiquin les dates de lliurament"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Si es canvien els dies del ritme de l'assignatura, és possible que es modifiquin les dates de lliurament."
   changing_section_dates_may_override_course_and_ter_6634950e: "En canviar les dates de la secció, pot ser que se substitueixi la configuració de la disponibilitat del període acadèmic i de l'assignatura, i la ubicació en la pàgina Assignatures i el panell de control. Confirmeu les dates del període acadèmic i de l'assignatura abans de modificar les dates de la secció."
   changing_the_course_participation_will_republish_a_1cc05b7: "Si es canvia la participació en l'assignatura, es tornarà a publicar Ritme de l’assignatura amb qualsevol data nova en funció de la participació en el període acadèmic."
@@ -6340,8 +6349,8 @@ ca:
     other: "%{count} dies"
     zero: ""
   count_days_ago_406937d: 
-    one: "Fa 1 dia"
-    other: "Fa %{count} dies"
+    one: "Fa 1 dia"
+    other: "Fa %{count} dies"
   count_days_de0c6a32: 
     one: "1 dia"
     other: "%{count} dies"
@@ -6377,8 +6386,8 @@ ca:
     one: "1 hora"
     other: "%{count} hores"
   count_hours_ago_322dcc79: 
-    one: "Fa 1 hora"
-    other: "Fa %{count} hores"
+    one: "Fa 1 hora"
+    other: "Fa %{count} hores"
   count_images_found_for_term_a93635ed: "S'ha trobat %{count} imatges per a %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} s'ha suprimit correctament."
@@ -6400,7 +6409,7 @@ ca:
     one: "1 minut"
     other: "%{count} minuts"
     zero: "menys d’1 minut"
-  count_minutes_ago_c1b7d7ef: "Fa %{count} minuts"
+  count_minutes_ago_c1b7d7ef: "Fa %{count} minuts"
   count_more_beba6428: "%{count} més"
   count_must_be_0_4abb84b3: "COUNT ha de ser >0"
   count_must_be_greater_than_0_f8f88358: "El RECOMPTE ha de ser superior a 0"
@@ -6545,8 +6554,8 @@ ca:
     one: "1 setmana"
     other: "%{count} setmanes"
   count_weeks_ago_9393928c: 
-    one: "Fa 1 setmana"
-    other: "Fa %{count} setmanes"
+    one: "Fa 1 setmana"
+    other: "Fa %{count} setmanes"
   count_weeks_d03afdd8: 
     one: 1 setmana
     other: "%{count} setmanes"
@@ -6813,6 +6822,7 @@ ca:
   course_pacing_d3025ecf: "Ritme de l’assignatura:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Heu de tenir activada la visualització prèvia de la característica opcional de Ritme de l’assignatura a la vostra institució."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Ritme de l’assignatura és una eina automatitzada que crea un calendari per a l’estudiant en combinar les hores suggerides per capítol, els dies d’assistència presencial a l’escola i el total d’hores per generar un estimador de dates."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Ritme de l’assignatura és una eina automatitzada que estableix dates de lliurament diferenciades per a avaluacions i activitats d’aprenentatge en funció de la data d’inscripció de cada estudiant, la qual cosa permet realitzar un aprenentatge al propi ritme i estructurat en assignatures d’inscripció escalonada."
   course_pacing_is_in_active_development_348e33cf: "Ritme de l'assignatura és un desenvolupament actiu."
   course_pacing_redesign_38edfc1c: "Nou disseny de Ritme de l'assignatura"
   course_pages_449f1dd4: "Pàgines de l'assignatura"
@@ -7381,6 +7391,7 @@ ca:
   coverage_eab3aea2: Cobertura
   create_132b3be1: Crea
   create_a_64f6f82: "Crea un"
+  create_a_course_pace_333b0911: "Creeu un ritme de l’assignatura"
   create_a_default_course_pace_71ba0b9f: "Creeu un Ritme de l’assignatura per defecte"
   create_a_friendly_display_name_c1036ed: "Crea un nom de visualització amigable"
   create_a_new_account_4cf7c0f9: "Crea un usuari nou"
@@ -7395,6 +7406,7 @@ ca:
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "Permet crear avaluacions amb Qüestionaris nous i migrar els qüestionaris existents del Canvas."
   create_assignment_68532ceb: "Crea una activitat"
   create_course_9a69b32c: "Crea una assignatura"
+  create_course_pace_3dff129: "Creeu Ritme de l’assignatura"
   create_course_templates_f5c4e039: "Crea plantilles de curs"
   create_criterion_6df4d4ad: "Crea un criteri"
   create_default_pace_dd21415b: "Creeu un ritme per defecte"
@@ -7609,6 +7621,7 @@ ca:
   custom_reports_experimental_features_40bbfe7c: "Informes personalitzats: Característiques experimentals"
   customize_course_details_26fd4afe: "Personalitzeu els detalls de l'assignatura"
   customize_learning_mastery_ratings_4ace142a: "Personalitza les classificacions de domini de l'aprenentatge"
+  customize_section_and_student_paces_f63f930f: "Personalitzeu els ritmes de les seccions i dels estudiants"
   customize_sections_and_individual_student_paces_a16099b: "Personalitzeu les seccions i els ritmes dels estudiants individuals"
   customize_this_menu_efa72a9: "Personalitza aquest menú"
   cutoff_score_74254c89: "nota de tall"
@@ -7775,6 +7788,7 @@ ca:
     no_date: "Sense data"
   dates_6e416047: Dates
   dates_shown_in_course_time_zone_da2f77d5: "La data es mostra en la zona horària de l’assignatura"
+  dates_shown_in_course_time_zone_efd32135: "Les dates es mostren en la zona horària de l’assignatura"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -7837,6 +7851,7 @@ ca:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Ja no s’admeten les respostes profundament niades. La vostra resposta es mostrarà a la primera pàgina d’aquest fil."
   default_9db103d: "Per defecte"
   default_conference_title: "Conferència de %{course_name}"
+  default_course_pace_ce0ba0f3: "Ritme de l'assignatura per defecte"
   default_course_pacing_d18b6cda: "Ritme de l'assignatura per defecte"
   default_dates_a0a2ae26: "dates per defecte"
   default_due_time_9d0e9140: "Hora de lliurament predeterminada"
@@ -7951,6 +7966,7 @@ ca:
   deleted_content_referenced_in_this_resource_e42d1998: "Contingut suprimit al qual es fa referència en aquest recurs:"
   deleted_deletedtimingdisplay_f4c73003: "S'ha suprimit %{deletedTimingDisplay}"
   deleted_topic_notice: "Aquest tema s'ha suprimit"
+  deleted_user_59fdcef7: "S’HA SUPRIMIT L’USUARI"
   deleting_6421031e: "s'està suprimint..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Un fitxer d’entrega normalment només es suprimeix quan un estudiant publica material privat o inadequat.
@@ -8627,6 +8643,7 @@ ca:
   edit_criterion_description_5828919: "Edita la descripció del criteri"
   edit_current_message_da650d4c: "Edita el missatge actual"
   edit_dates_ed31061: "Edita les dates"
+  edit_default_course_pace_e00f1b5b: "Editeu el ritme de l’assignatura per defecte"
   edit_default_pace_33ba5cdd: "Editeu el ritme per defecte"
   edit_developer_key_53c93ed1: "Edita la clau de desenvolupador"
   edit_developer_key_d8fa33c4: "Edita la clau de desenvolupador"
@@ -10063,6 +10080,7 @@ ca:
   germany_49_fc5b8179: "Alemanya (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Rebeu ajuda sobre com s’han d’utilitzar i configurar les conferències al Canvas."
   get_started_b9507525: Comença
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Per començar, creeu un ritme de l’assignatura que servirà com a ritme per defecte per a totes les seccions i tots els estudiants de l’assignatura."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Per començar, cerqueu, importeu o creeu els vostres resultats del compte."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Per començar, cerqueu, importeu o creeu els vostres resultats del curs."
   get_started_with_configuring_the_course_material_d_fa51d225: "Comenceu a configurar les dates de lliurament del material de l’assignatura per a tota l’assignatura"
@@ -11674,6 +11692,8 @@ ca:
   instructor_name_36bc0f39: "Nom de l’instructor"
   instructor_sis_id_899dd697: "ID del SIS de l’instructor"
   instructors_4b491a07: instructors
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Els instructors no estan subjectes a un límit d’intents, però l’entrega d’un instructor COMPTARÀ com l’intent d’un estudiant."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Els instructors poden fer entregues en nom dels estudiants"
   instructors_cdd595d0: Instructors
   instructure: 
     errors: 
@@ -12430,6 +12450,7 @@ ca:
   loading_microsoft_teams_sync_settings_c2633e46: "S'està carregant la configuració de sincronització de Microsoft Teams"
   loading_missing_assignments_link_d9a0d320: "S'està carregant l’enllaç de les activitats no presentades"
   loading_more_gradebook_history_results_810f6d2e: "S'estan carregant més resultats de l'historial del llibre de notes."
+  loading_more_replies_22e0f13c: "S’estan carregant més respostes"
   loading_more_results_1d437202: "S'estan carregant més resultats"
   loading_more_results_def6df65: "S'estan carregant més resultats..."
   loading_name_data_c66ea65f: "S'estan carregant les dades de %{name}"
@@ -12437,6 +12458,7 @@ ca:
   loading_options_c823e98b: "S'estan carregant les opcions..."
   loading_outcome_results_96e21ce4: "S'estan carregant els resultats"
   loading_release_notes_7deaa2eb: "S’estan carregant les notes sobre el llançament"
+  loading_replies_8bdf17bc: "S'estan carregant les respostes..."
   loading_results_769c8819: "S'estan carregant els resultats"
   loading_section_header_616c8cdd: "S’està carregant la capçalera de la secció"
   loading_staff_1ce7d803: "S'està carregant el personal..."
@@ -15031,6 +15053,7 @@ ca:
   newest_first_87672763: "Primer el més nou"
   newest_oldest_d768cf1a: "Més nou - Més antic"
   next_40e12421: Següent
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "A continuació, ajusteu els ritmes de les seccions o dels estudiants individuals per personalitzar-los encara més en funció de les vostres necessitats (aquest pas és opcional)."
   next_announcement_6e6e0f17: "Anunci següent"
   next_announcements_page_3956eb11: "Pàgina d'anuncis següent"
   next_assignment_8ec51175: "Activitat següent"
@@ -15679,6 +15702,7 @@ ca:
       \x20             Els canvis futurs de les notes publicades no s'hauran de publicar manualment.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Un cop una nota s'ha publicat manualment, s'enviaran les notificacions noves i seran visibles per als estudiants automàticament."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Un cop activada, aquesta opció és visible al Llibre de qualificacions per als instructors."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Un cop hàgiu enviat una resposta, no la podreu canviar més tard. No podreu visualitzar la pregunta anterior."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Quan comenceu a depurar, es recollirà tota la informació sobre el següent intent d'inici de sessió. Feu clic a \"Actualitza\" per veure si s'han recollit més dades, o a \"Atura la depuració\" per suprimir les dades recollides i aturar l'intent actual de depuració."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "No s’han pogut processar correctament un o més elements de contingut que aquesta aplicació externa ha enviat. El Canvas no els ha desat, per les raons que s'indiquen a continuació."
@@ -15977,6 +16001,11 @@ ca:
   pace_plans_is_in_active_development_f6c20046: "Els plans de ritme són un desenvolupament actiu."
   pace_removed_8e625df7: "S’ha suprimit el ritme"
   pace_type_76cf749: "Tipus de ritme"
+  pacename_pace_created_75aa4eda: "S’ha creat el ritme %{paceName}"
+  pacename_pace_removed_79fb031f: "S’ha suprimit el ritme %{paceName}"
+  pacename_pace_updated_10c6f95: "S’ha actualitzat el ritme %{paceName}"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "Se suprimirà el ritme %{paceName}. Aquest ritme tornarà al ritme assignat anteriorment."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "Se suprimirà el ritme %{paceName}. Aquest ritme tornarà al ritme per defecte."
   pacename_updated_2a2c4d77: "S'ha actualitzat %{paceName}"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "Ritmes %{paceType}: ordenats per %{sortBy} en ordre %{orderType}"
   package_error: "Error en identificar el tipus de paquet: %{error}"
@@ -16240,6 +16269,7 @@ ca:
   please_note_fbb62e4c: "Teniu en compte el següent:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Teniu en compte el següent: Instructure allotja el Canvas Commons als EUA. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran als EUA. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Teniu en compte que un cop configurat, Ritme de l’assignatura passarà a controlar les dates de lliurament de totes les activitats, les proves i els fòrums existents. Podeu obtenir més informació al *Grup d’usuaris de Ritme de l'assignatura*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Teniu en compte que, un cop desat un ritme de l'assignatura, Ritme de l'assignatura controlarà totes les dates de lliurament de les avaluacions i dels materials d’aprenentatge existents. Obteniu més informació sobre Ritme de l'assignatura al *Grup d’usuaris de Ritme de l'assignatura*."
   please_provide_a_field_e5a7d0b3: "Proporcioneu un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Proporcioneu un codi d'emparellament."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Proporcioneu un domini d’inquilí vàlid. Comproveu la configuració del vostre Azure Active Directory per cercar-lo."
@@ -16254,6 +16284,7 @@ ca:
   please_select_one_f931e883: "Seleccioneu una opció"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Especifiqueu si voleu habilitar o inhabilitar la sincronització de Microsoft Teams."
   please_try_again_4c3d11b4: "Torneu-ho a provar"
+  please_try_another_search_term_8f7b5d69: "Proveu un altre terme de cerca"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Proveu un altre terme de cerca, filtreu o feu la cerca amb menys caràcters"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Torneu a provar de restablir la connexió amb l'eina seleccionant una altra vegada l'eina a la interfície de l'element del contingut o l'activitat i desant."
   please_upload_files_as_a_zip_5a2c799f: "Pengeu els fitxers com a .zip"
@@ -20818,6 +20849,8 @@ ca:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Els estudiants només poden participar a l'assignatura entre aquestes dates"
   students_can_see_originality_score_797fe634: "Els estudiants poden veure la puntuació d'originalitat"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Els estudiants no poden visualitzar les respostes de la prova un cop hagi finalitzat l'assignatura"
+  students_enrolled_in_this_course_859fa7a2: "Estudiants inscrits en aquesta assignatura"
+  students_enrolled_in_this_section_681ba503: "Estudiants inscrits en aquesta secció"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Els estudiants ja han entregat els deures d'aquesta activitat; per tant, no es pot modificar la configuració de la plataforma de detecció de plagis."
   students_have_either_already_taken_or_started_taki_a076336: "Els estudiants ja han fet o començat a fer aquesta prova, així aneu amb compte a l'hora d'editar-la. Si canvieu qualsevol pregunta de la prova de manera significativa, pot ser que vulgueu considerar requalificar els estudiants que van respondre la versió anterior de la prova."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Els estudiants tenen l’opció de respondre de manera anònima. És possible que algunes imatges de perfil i alguns noms estiguin amagats."
@@ -21051,6 +21084,7 @@ ca:
   submissions_d30f61af: "# entregues"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "les carpetes d'entregues s'han de crear en un context d'Usuari o Grup"
   submissions_graded_status_f689110d: "Entregues: estat qualificat"
+  submissions_instructor_proxy_2247c633: "Entregues: servidor proxy de l’instructor"
   submissions_posted_title_course_43677dba: "Entregues publicades: %{title}, %{course}"
   submit_a3cc6859: Entrega
   submit_a_comment_7edbf648: "Envia un comentari"
@@ -24430,7 +24464,7 @@ ca:
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "Heu anul·lat correctament la publicació del tema de debat."
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "Heu anul·lat correctament la subscripció del tema de debat."
   you_have_successfully_updated_the_discussion_topic_b2910500: "Heu actualitzat correctament el tema de debat."
-  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "Teniu %{totalCount} revisions entre companys per completar"
+  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "Teniu %{totalCount} revisions entre companys per completar"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "Teniu canvis no publicats al ritme de l'assignatura. Si continueu, es descartaran aquests canvis."
   you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "Hi ha canvis no publicats al ritme de l'assignatura. Si continueu, es descartaran aquests canvis."
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: "Teniu canvis no publicats al pla de ritme de l'assignatura. Si continueu, es descartaran aquests canvis."
@@ -24589,6 +24623,7 @@ ca:
   your_outcomes_were_successfully_imported_c5de884: "Els vostres resultats s'han importat correctament."
   your_password_has_been_changed_df0e72aa: "La vostra contrasenya ha canviat."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Les instruccions per recuperar la vostra contrasenya s'enviaran a *%{email_address}*. Pot ser que trigui fins a 30 minuts. Assegureu-vos de comprovar la bústia de correu brossa."
+  your_peer_review_is_complete_e5fa3e40: "S’ha completat la revisió entre companys."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "No s'ha pogut carregar la vostra foto de perfil. Pot ser que hàgiu superat el vostre límit de càrrega."
   your_quiz_engine_choice_has_been_reset_68d268c1: "S'ha restablert la vostra elecció de motor de prova!"
   your_score_a1fc2fcf: "La vostra puntuació"
