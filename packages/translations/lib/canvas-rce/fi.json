@@ -246,6 +246,7 @@
   "equivalent_identity_654b3ce5": { "message": "Vastaava (identiteetti)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "On olemassa" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Poistu koko näytöstä" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Laajenna esikatselu oletuksena"
   },
@@ -852,6 +853,9 @@
   },
   "view_title_description_67940918": {
     "message": "Näytä kohteen { title } kuvaus"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Tarkastele sanamäärää ja merkkien määrää"
   },
   "white_87fa64fd": { "message": "Valkoinen" },
   "width_492fec76": { "message": "Leveys" },

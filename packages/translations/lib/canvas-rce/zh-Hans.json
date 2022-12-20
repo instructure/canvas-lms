@@ -220,6 +220,7 @@
   "equivalent_identity_654b3ce5": { "message": "等效标识" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "存在" },
+  "exit_fullscreen_b7eb0aa4": { "message": "退出全屏" },
   "expand_preview_by_default_2abbf9f8": { "message": "默认展开预览" },
   "expand_to_see_types_f5d29352": { "message": "展开以查看 { types }" },
   "external_tools_6e77821": { "message": "外部工具" },
@@ -743,6 +744,7 @@
   "view_description_30446afc": { "message": "查看说明" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "查看键盘快捷键" },
   "view_title_description_67940918": { "message": "查看{ title }说明" },
+  "view_word_and_character_counts_a743dd0c": { "message": "查看字数和字符数" },
   "white_87fa64fd": { "message": "白色" },
   "width_492fec76": { "message": "宽度" },
   "width_and_height_must_be_numbers_110ab2e3": {

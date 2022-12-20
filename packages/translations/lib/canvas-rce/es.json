@@ -246,6 +246,7 @@
   "equivalent_identity_654b3ce5": { "message": "Equivalente (identidad)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Existe" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Salir de la pantalla completa" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expandir vista previa de forma predeterminada"
   },
@@ -865,6 +866,9 @@
     "message": "Ver los accesos directos de teclado"
   },
   "view_title_description_67940918": { "message": "Ver descripción { title }" },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Ver recuento de palabras y caracteres"
+  },
   "white_87fa64fd": { "message": "Blanco" },
   "width_492fec76": { "message": "Ancho" },
   "width_and_height_must_be_numbers_110ab2e3": {

@@ -238,6 +238,7 @@
   "equivalent_identity_654b3ce5": { "message": "Ekvivalent (identitet)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Existerar" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Avsluta helskärm" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Visa förhandsgranskning som standard"
   },
@@ -838,6 +839,9 @@
   "view_keyboard_shortcuts_34d1be0b": { "message": "Visa kortkommandon" },
   "view_title_description_67940918": {
     "message": "Visa beskrivning för { title }"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Visa ord- och teckenräkning"
   },
   "white_87fa64fd": { "message": "Vit" },
   "width_492fec76": { "message": "Bredd" },

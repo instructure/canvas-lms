@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "存在"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "退出全屏"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "默认展开预览"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "查看{ title }说明"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "查看字数和字符数"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "每周日程规划导航"

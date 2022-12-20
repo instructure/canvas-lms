@@ -234,6 +234,7 @@
   "equivalent_identity_654b3ce5": { "message": "Äquivalent (Identität)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Ist vorhanden" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Vollbildschirm verlassen" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Vorschau standardmäßig erweitern"
   },
@@ -842,6 +843,9 @@
   },
   "view_title_description_67940918": {
     "message": "Beschreibung { title } anzeigen"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Wort- und Zeichenanzahl anzeigen"
   },
   "white_87fa64fd": { "message": "Weiß" },
   "width_492fec76": { "message": "Breite" },

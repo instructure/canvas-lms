@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "Esiste"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Esci da modalità schermo intero"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Espandi anteprima per impostazione predefinita"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Visualizza descrizione { title }"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Visualizza conteggio parole e caratteri"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigazione programma settimanale"

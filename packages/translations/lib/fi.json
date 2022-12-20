@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "On olemassa"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Poistu koko näytöstä"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Laajenna esikatselu oletuksena"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Näytä kohteen { title } kuvaus"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Tarkastele sanamäärää ja merkkien määrää"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Viikkoaikataulun selaus"

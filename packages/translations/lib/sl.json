@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "Obstaja"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Izhod iz celotnega zaslona"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Privzeto razširi predogled"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Prikaz opisa { title }"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Prikaži štetje besed in znakov"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Tedenska navigacija po urniku"

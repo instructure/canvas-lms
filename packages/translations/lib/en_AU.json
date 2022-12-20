@@ -746,6 +746,9 @@
     "exists_2e62bdaa": {
         "message": "Exists"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Exit Fullscreen"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Expand preview by Default"
     },
@@ -2416,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "View { title } description"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "View word and character counts"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Weekly schedule navigation"

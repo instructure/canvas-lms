@@ -236,6 +236,7 @@
   "equivalent_identity_654b3ce5": { "message": "等価 (同一性)" },
   "eta_b8828f99": { "message": "イータ" },
   "exists_2e62bdaa": { "message": "存在する" },
+  "exit_fullscreen_b7eb0aa4": { "message": "全画面表示終了" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "デフォルトによるプレビューの拡大"
   },
@@ -811,6 +812,9 @@
     "message": "キーボードのショートカットを見る"
   },
   "view_title_description_67940918": { "message": "{ title }説明の表示" },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "語数・文字数を表示"
+  },
   "white_87fa64fd": { "message": "ホワイト" },
   "width_492fec76": { "message": "幅" },
   "width_and_height_must_be_numbers_110ab2e3": {

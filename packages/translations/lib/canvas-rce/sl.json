@@ -248,6 +248,7 @@
   "equivalent_identity_654b3ce5": { "message": "Ekvivalent (identiteta)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Obstaja" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Izhod iz celotnega zaslona" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Privzeto razširi predogled"
   },
@@ -853,6 +854,9 @@
     "message": "Prikaži bližnjice na tipkovnici"
   },
   "view_title_description_67940918": { "message": "Prikaz opisa { title }" },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Prikaži štetje besed in znakov"
+  },
   "white_87fa64fd": { "message": "Belo" },
   "width_492fec76": { "message": "Širina" },
   "width_and_height_must_be_numbers_110ab2e3": {

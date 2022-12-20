@@ -220,6 +220,7 @@
   "equivalent_identity_654b3ce5": { "message": "等價（單位）" },
   "eta_b8828f99": { "message": "η" },
   "exists_2e62bdaa": { "message": "存在" },
+  "exit_fullscreen_b7eb0aa4": { "message": "退出全螢幕" },
   "expand_preview_by_default_2abbf9f8": { "message": "預設為展開預覽" },
   "expand_to_see_types_f5d29352": { "message": "展開以查看 { types }" },
   "external_tools_6e77821": { "message": "外部工具" },
@@ -749,6 +750,9 @@
   "view_description_30446afc": { "message": "檢視描述" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "檢視鍵盤快速鍵" },
   "view_title_description_67940918": { "message": "檢視 { title } 描述" },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "檢視文字和字元計數"
+  },
   "white_87fa64fd": { "message": "白色" },
   "width_492fec76": { "message": "寬度" },
   "width_and_height_must_be_numbers_110ab2e3": {
