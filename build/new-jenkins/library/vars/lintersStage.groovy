@@ -49,7 +49,8 @@ def tearDownNode() {
 def codeStage(stages) {
   { ->
     def codeEnvVars = [
-      "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}"
+      "PRIVATE_PLUGINS=${configuration.getString('canvas-lms-private-plugins')}",
+      "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}",
     ]
 
     callableWithDelegate(queueTestStage())(stages,
