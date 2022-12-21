@@ -246,13 +246,13 @@ describe Loaders::OutcomeAlignmentLoader do
     end
   end
 
-  context "when outcome is aligned to a question bank and the bank name is updated" do
+  context "when outcome is aligned to a question bank and the question bank title is updated" do
     before do
-      @bank.title = "Updated bank name"
+      @bank.title = "Updated question bank title"
       @bank.save!
     end
 
-    it "resolves the title of the question bank alignment to the updated bank name" do
+    it "resolves the question bank alignment title to the updated question bank title" do
       GraphQL::Batch.batch do
         Loaders::OutcomeAlignmentLoader.for(
           @course
@@ -260,7 +260,28 @@ describe Loaders::OutcomeAlignmentLoader do
           alignments.each do |alignment|
             next unless alignment[:content_type] == "AssessmentQuestionBank"
 
-            expect(alignment[:title]).to eq "Updated bank name"
+            expect(alignment[:title]).to eq "Updated question bank title"
+          end
+        end
+      end
+    end
+  end
+
+  context "when outcome is aligned to a rubric and the rubric title is updated" do
+    before do
+      @rubric.title = "Updated rubric title"
+      @rubric.save!
+    end
+
+    it "resolves the rubric alignment title to the updated rubric title" do
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment[:content_type] == "Rubric"
+
+            expect(alignment[:title]).to eq "Updated rubric title"
           end
         end
       end
