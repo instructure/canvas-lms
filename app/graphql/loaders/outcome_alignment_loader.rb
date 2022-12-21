@@ -57,13 +57,15 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                          content_tags.id, 'direct' as alignment_type, content_tags.content_id, content_tags.content_type, content_tags.context_id, content_tags.context_type,
                            CASE
                              WHEN content_tags.content_type = 'AssessmentQuestionBank' THEN question_banks.title
+                             WHEN content_tags.content_type = 'Rubric' THEN rubrics.title
                              ELSE content_tags.title
                            END AS title,
                          content_tags.learning_outcome_id, content_tags.created_at, content_tags.updated_at, assignments.assignment_id, assignments.discussion_id, assignments.quiz_id
                        ")
                        .where(context: @context, content_type: %w[Rubric Assignment AssessmentQuestionBank])
                        .joins("LEFT OUTER JOIN (#{assignments_sub.to_sql}) AS assignments ON content_tags.content_id = assignments.assignment_id AND content_tags.content_type = 'Assignment'")
-                       .joins("LEFT OUTER JOIN (#{AssessmentQuestionBank.active.to_sql}) AS question_banks ON content_tags.content_id = question_banks.id AND content_tags.content_type = 'AssessmentQuestionBank'")
+                       .joins("LEFT OUTER JOIN #{AssessmentQuestionBank.quoted_table_name} AS question_banks ON content_tags.content_id = question_banks.id AND content_tags.content_type = 'AssessmentQuestionBank'")
+                       .joins("LEFT OUTER JOIN #{Rubric.quoted_table_name} AS rubrics ON content_tags.content_id = rubrics.id AND content_tags.content_type = 'Rubric'")
 
       direct_alignments = ContentTag
                           .select("alignments.*, modules.module_id, modules.module_name, modules.module_workflow_state")
