@@ -58,6 +58,7 @@ gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
   gem "chunky_png", "1.4.0", require: false
 gem "bcrypt", "3.1.16"
+gem "bigdecimal", "3.1.3"
 gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.13.0"
@@ -105,7 +106,7 @@ gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a8
   gem "ecma-re-validator", "0.2.1"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
-gem "mail", "2.8.0", require: false
+gem "mail", "2.7.1", require: false
   gem "mini_mime", "1.1.2", require: false
 gem "marginalia", "1.9.0", require: false
 gem "mime-types", "3.3.1"
