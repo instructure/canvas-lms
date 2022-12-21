@@ -197,7 +197,7 @@ Rails.application.config.after_initialize do
       Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i)
     end
 
-    def self.send_in_each_region(klass, method, enqueue_args = {}, *args, **kwargs)
+    def self.send_in_each_region(klass, method, enqueue_args, *args, **kwargs)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
 
       return klass.send(method, *args, **kwargs) if DatabaseServer.all.all? { |db| !db.config[:region] }
@@ -219,7 +219,7 @@ Rails.application.config.after_initialize do
       end
     end
 
-    def self.send_in_region(region, klass, method, enqueue_args = {}, *args, **kwargs)
+    def self.send_in_region(region, klass, method, enqueue_args, *args, **kwargs)
       return klass.delay(**enqueue_args).__send__(method, *args, **kwargs) if region.nil?
 
       shard = nil
