@@ -77,10 +77,10 @@ module IncomingMailProcessor
       message = get_processed_message(filename)
 
       text_body = message.body.strip
-      expect(text_body).to eq(get_expected_text(filename).strip)
+      expect(text_body.gsub("\r\n", "\n")).to eq(get_expected_text(filename).strip.gsub("\r\n", "\n"))
 
       html_body = message.html_body.strip
-      expect(html_body).to eq(get_expected_html(filename).strip)
+      expect(html_body.gsub("\r\n", "\n")).to eq(get_expected_html(filename).strip.gsub("\r\n", "\n"))
     end
 
     def get_processed_message(name)

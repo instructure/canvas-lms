@@ -105,7 +105,7 @@ gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a8
   gem "ecma-re-validator", "0.2.1"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
-gem "mail", "2.7.1", require: false
+gem "mail", "2.8.0", require: false
   gem "mini_mime", "1.1.2", require: false
 gem "marginalia", "1.9.0", require: false
 gem "mime-types", "3.3.1"
