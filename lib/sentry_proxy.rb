@@ -20,9 +20,9 @@
 class SentryProxy
   def self.capture(exception, data, level = :error)
     if exception.is_a?(String) || exception.is_a?(Symbol)
-      Sentry.capture_message(exception.to_s, data) if reportable?(exception.to_s, level)
+      Sentry.capture_message(exception.to_s, **data) if reportable?(exception.to_s, level)
     elsif reportable?(exception, level)
-      Sentry.capture_exception(exception, data)
+      Sentry.capture_exception(exception, **data)
     end
   end
 

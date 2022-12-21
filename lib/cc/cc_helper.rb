@@ -257,8 +257,8 @@ module CC
               # for files in exports, turn it into a relative link by path, rather than by file id
               # we retain the file query string parameters
               folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
-              folder = folder.split("/").map { |part| URI.escape(part) }.join("/")
-              path = "#{folder}/#{URI.escape(obj.display_name)}"
+              folder = folder.split("/").map { |part| URI::DEFAULT_PARSER.escape(part) }.join("/")
+              path = "#{folder}/#{URI::DEFAULT_PARSER.escape(obj.display_name)}"
               path = HtmlTextHelper.escape_html(path)
               "#{path}#{CCHelper.file_query_string(match.rest)}"
             end

@@ -241,7 +241,7 @@ describe ContentExportsApiController, type: :request do
                                 version: "1.3" })
       export = t_course.content_exports.find(json["id"])
       run_jobs
-      f = export.reload.attachment.open(need_local_file: true)
+      f = export.reload.attachment.open
       Zip::File.open(f.path) do |zf|
         doc = Nokogiri::XML(zf.read("imsmanifest.xml"))
         expect(doc.at_css("metadata schemaversion").text).to eq "1.3.0"
@@ -786,7 +786,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.settings["errors"]).to be_blank
         expect(export.attachment).to be_present
         expect(export.attachment.display_name).to eql "course_files_export.zip"
-        tf = export.attachment.open need_local_file: true
+        tf = export.attachment.open
         Zip::File.open(tf) do |zf|
           expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w[file1.txt hidden.txt teh_folder/file2.txt]
           expect(zf.entries.select { |entry| entry.ftype == :directory }.map(&:name)).to match_array %w[teh_folder/ teh_folder/empty_folder/]
@@ -803,7 +803,7 @@ describe ContentExportsApiController, type: :request do
         expect(export).to be_present
         expect(export.attachment).to be_present
         expect(export.attachment.display_name).to eql "course_files_export.zip"
-        tf = export.attachment.open need_local_file: true
+        tf = export.attachment.open
         Zip::File.open(tf) do |zf|
           expect(zf.entries.map(&:name)).to match_array %w[teh_folder/ teh_folder/file2.txt teh_folder/empty_folder/ file3.txt]
         end
@@ -824,7 +824,7 @@ describe ContentExportsApiController, type: :request do
         run_jobs
         export = t_course.content_exports.where(id: json["id"]).first
         expect(export.settings["errors"].map(&:first)).to include("Skipped file file1.txt due to error")
-        tf = export.attachment.open need_local_file: true
+        tf = export.attachment.open
         Zip::File.open(tf) do |zf|
           expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w[hidden.txt teh_folder/file2.txt]
         end
@@ -859,7 +859,7 @@ describe ContentExportsApiController, type: :request do
           export = t_course.content_exports.where(id: json["id"]).first
           expect(export).to be_present
           expect(export.attachment).to be_present
-          tf = export.attachment.open need_local_file: true
+          tf = export.attachment.open
           Zip::File.open(tf) do |zf|
             expect(zf.entries.map(&:name)).to match_array %w[file1.txt]
           end
@@ -874,7 +874,7 @@ describe ContentExportsApiController, type: :request do
           export = t_course.content_exports.where(id: json["id"]).first
           expect(export).to be_present
           expect(export.attachment).to be_present
-          tf = export.attachment.open need_local_file: true
+          tf = export.attachment.open
           Zip::File.open(tf) do |zf|
             expect(zf.entries.map(&:name)).to match_array %w[file1.txt]
           end

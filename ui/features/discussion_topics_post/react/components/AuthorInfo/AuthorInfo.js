@@ -44,6 +44,7 @@ export const AuthorInfo = props => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
+  const threadMode = props.threadMode
 
   return (
     <Responsive
@@ -55,18 +56,21 @@ export const AuthorInfo = props => {
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
+          avatarSize: threadMode ? 'small' : 'medium',
         },
         desktop: {
-          authorNameTextSize: 'medium',
-          timestampTextSize: 'small',
+          authorNameTextSize: threadMode ? 'small' : 'medium',
+          timestampTextSize: threadMode ? 'x-small' : 'small',
           nameAndRoleDirection: 'row',
-          badgeMarginLeft: '-24px',
+          badgeMarginLeft: threadMode ? '-16px' : '-24px',
+          avatarSize: threadMode ? 'small' : 'medium',
         },
         mobile: {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
+          avatarSize: 'small',
         },
       }}
       render={responsiveProps => (
@@ -94,6 +98,7 @@ export const AuthorInfo = props => {
             )}
             {hasAuthor && !isAnonymous(props) && (
               <Avatar
+                size={responsiveProps.avatarSize}
                 name={getDisplayName(props)}
                 src={avatarUrl}
                 margin="0"
@@ -101,7 +106,10 @@ export const AuthorInfo = props => {
               />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} />
+              <AnonymousAvatar
+                seedString={props.anonymousAuthor.shortName}
+                size={responsiveProps.avatarSize}
+              />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink={true}>
@@ -216,6 +224,7 @@ AuthorInfo.propTypes = {
    */
   isTopicAuthor: PropTypes.bool,
   discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
+  threadMode: PropTypes.bool,
 }
 
 const Timestamps = props => {

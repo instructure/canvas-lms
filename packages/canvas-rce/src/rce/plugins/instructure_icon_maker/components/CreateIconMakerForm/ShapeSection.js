@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -25,41 +25,12 @@ import formatMessage from '../../../../../format-message'
 import {Shape} from '../../svg/shape'
 import {Size} from '../../svg/constants'
 
-import {createCroppedImageSvg} from './ImageCropper/imageCropUtils'
-import {convertFileToBase64} from '../../svg/utils'
-
-import {actions} from '../../reducers/svgSettings'
-
 const SIZES = [Size.ExtraSmall, Size.Small, Size.Medium, Size.Large]
 
 const SHAPE_SECTION_ID = 'icons-tray-shape-section'
 const getShapeSection = () => document.querySelector(`#${SHAPE_SECTION_ID}`)
 
 export const ShapeSection = ({settings, onChange}) => {
-  useEffect(() => {
-    // if the user has an embedded image, we need to re-crop it so it fits the new shape
-    if (settings.imageSettings?.cropperSettings) {
-      const newCropperSettings = {...settings.imageSettings.cropperSettings, shape: settings.shape}
-      createCroppedImageSvg(newCropperSettings, settings.imageSettings.image)
-        .then(generatedSvg =>
-          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
-        )
-        .then(base64Image => {
-          onChange({
-            type: actions.SET_EMBED_IMAGE,
-            payload: base64Image,
-          })
-          onChange({
-            type: actions.SET_IMAGE_SETTINGS,
-            payload: {...settings.imageSettings, cropperSettings: newCropperSettings},
-          })
-        })
-        // eslint-disable-next-line no-console
-        .catch(error => console.error(error))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.shape])
-
   return (
     <Flex
       id={SHAPE_SECTION_ID}

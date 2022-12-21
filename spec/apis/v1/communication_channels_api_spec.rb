@@ -354,7 +354,7 @@ describe "CommunicationChannels API", type: :request do
       end
 
       it "is able to delete by path, instead of id" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
                  action: "destroy", user_id: someone.to_param, format: "json",
                  type: channel.path_type, address: channel.path)
@@ -362,11 +362,11 @@ describe "CommunicationChannels API", type: :request do
       end
 
       it "404s if already deleted by path" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
                  action: "destroy", user_id: someone.to_param, format: "json",
                  type: channel.path_type, address: channel.path)
-        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                      controller: "communication_channels",
                      action: "destroy", user_id: someone.to_param, format: "json",
                      type: channel.path_type, address: channel.path)

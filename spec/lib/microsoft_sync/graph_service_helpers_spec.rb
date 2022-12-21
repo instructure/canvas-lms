@@ -33,7 +33,7 @@ describe MicrosoftSync::GraphServiceHelpers do
 
   before do
     allow(MicrosoftSync::GraphService).to \
-      receive(:new).with("mytenant123", extra_tag: "abc").and_return(graph_service)
+      receive(:new).with("mytenant123", { extra_tag: "abc" }).and_return(graph_service)
   end
 
   describe "#list_education_classes_for_course" do
@@ -105,12 +105,14 @@ describe MicrosoftSync::GraphServiceHelpers do
 
       it "removes the invalid characters" do
         expect(graph_service.education_classes).to receive(:create).with(
-          description: "great class",
-          displayName: course.name,
-          externalId: course.uuid,
-          externalName: course.name,
-          externalSource: "manual",
-          mailNickname: "Course_math-#{course.uuid.first(13)}"
+          {
+            description: "great class",
+            displayName: course.name,
+            externalId: course.uuid,
+            externalName: course.name,
+            externalSource: "manual",
+            mailNickname: "Course_math-#{course.uuid.first(13)}"
+          }
         ).and_return("foo")
 
         subject.create_education_class(course)
@@ -126,12 +128,14 @@ describe MicrosoftSync::GraphServiceHelpers do
 
       it "removes the whitespace" do
         expect(graph_service.education_classes).to receive(:create).with(
-          description: "great class",
-          displayName: course.name,
-          externalId: course.uuid,
-          externalName: course.name,
-          externalSource: "manual",
-          mailNickname: "Course_math_101-#{course.uuid.first(13)}"
+          {
+            description: "great class",
+            displayName: course.name,
+            externalId: course.uuid,
+            externalName: course.name,
+            externalSource: "manual",
+            mailNickname: "Course_math_101-#{course.uuid.first(13)}"
+          }
         ).and_return("foo")
 
         subject.create_education_class(course)
@@ -145,12 +149,14 @@ describe MicrosoftSync::GraphServiceHelpers do
 
       it "shortens the mailNickname" do
         expect(graph_service.education_classes).to receive(:create).with(
-          description: "great class",
-          displayName: name,
-          externalId: @course.uuid,
-          externalName: name,
-          externalSource: "manual",
-          mailNickname: "Course_#{@course.name.first(43)}-#{@course.uuid.first(13)}"
+          {
+            description: "great class",
+            displayName: name,
+            externalId: @course.uuid,
+            externalName: name,
+            externalSource: "manual",
+            mailNickname: "Course_#{@course.name.first(43)}-#{@course.uuid.first(13)}"
+          }
         ).and_return("foo")
 
         subject.create_education_class(@course)
@@ -305,7 +311,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     it "returns ids of all pages of members" do
       expect(subject.graph_service.groups).to receive(:list_members)
         .once
-        .with("mygroupid", select: ["id"], top: 999)
+        .with("mygroupid", { select: ["id"], top: 999 })
         .and_yield([{ "id" => "a" }, { "id" => "b" }])
         .and_yield([{ "id" => "c" }])
       expect(subject.get_group_users_aad_ids("mygroupid")).to eq(%w[a b c])
@@ -315,7 +321,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       it "returns owners" do
         expect(subject.graph_service.groups).to receive(:list_owners)
           .once
-          .with("mygroupid", select: ["id"], top: 999)
+          .with("mygroupid", { select: ["id"], top: 999 })
           .and_yield([{ "id" => "a" }, { "id" => "b" }])
           .and_yield([{ "id" => "c" }])
         expect(subject.get_group_users_aad_ids("mygroupid", owners: true)).to eq(%w[a b c])

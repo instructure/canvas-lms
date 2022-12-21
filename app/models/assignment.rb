@@ -359,7 +359,7 @@ class Assignment < ActiveRecord::Base
 
     # If this assignment uses an external tool, duplicate that too, and mark
     # the assignment as "duplicating"
-    if external_tool_tag.present?
+    if external_tool? && external_tool_tag.present?
       result.external_tool_tag = external_tool_tag.dup
       result.workflow_state = "duplicating"
       result.duplication_started_at = Time.zone.now
@@ -770,7 +770,7 @@ class Assignment < ActiveRecord::Base
     return if annotatable_attachment.blank? || annotatable_attachment.canvadoc&.available?
 
     canvadocs_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-    annotatable_attachment.submit_to_canvadocs(1, canvadocs_opts)
+    annotatable_attachment.submit_to_canvadocs(1, **canvadocs_opts)
   end
   private :start_canvadocs_render
 
@@ -1379,8 +1379,11 @@ class Assignment < ActiveRecord::Base
   def refresh_course_content_participation_counts
     progress = context.progresses.build(tag: "refresh_content_participation_counts")
     progress.save!
-    progress.process_job(context, :refresh_content_participation_counts,
-                         singleton: "refresh_content_participation_counts:#{context.global_id}")
+    progress.process_job(
+      context,
+      :refresh_content_participation_counts,
+      { singleton: "refresh_content_participation_counts:#{context.global_id}" }
+    )
   end
 
   def time_zone_edited
@@ -2082,12 +2085,20 @@ class Assignment < ActiveRecord::Base
       submission.grader = grader
       submission.grader_id = opts[:grader_id] if opts.key?(:grader_id)
       submission.grade = grade
-      submission.score = score
       submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
-      if opts[:return_if_score_unchanged] && !submission.changed?
+      submission.score = score
+
+      changed_attributes = submission.changed_attributes
+      # only mark excused changed if it was a changed attributes and did not go from nil -> false
+      excused_changed = changed_attributes.key?(:excused) && !(changed_attributes[:excused].nil? && opts[:excused] == false)
+      score_changed = changed_attributes.key?(:score)
+
+      # return submission if excused did not change and score did not change
+      if opts[:return_if_score_unchanged] && !excused_changed && !score_changed
         submission.score_unchanged = true
         return submission
       end
+
       did_grade = true if score.present? || submission.excused?
     end
 
@@ -2111,7 +2122,7 @@ class Assignment < ActiveRecord::Base
 
     if opts[:provisional]
       if !(score.present? || submission.excused) && opts[:grade] != ""
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
+        raise GradeError.new(error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE)
       end
 
       submission.find_or_create_provisional_grade!(
@@ -2600,7 +2611,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def generate_comments_from_files(_, attachment, commenter, progress)
-    file = attachment.open(need_local_file: true)
+    file = attachment.open
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []

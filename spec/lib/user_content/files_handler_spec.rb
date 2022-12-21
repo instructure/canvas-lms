@@ -169,6 +169,44 @@ describe UserContent::FilesHandler do
           end
         end
       end
+
+      context "preloaded attachments" do
+        it "attachment url will be returned" do
+          current_user = user_factory
+          preloaded_attachments = {}
+          preloaded_attachments[attachment.id] = attachment
+
+          processed_url = UserContent::FilesHandler.new(
+            match: uri_match,
+            context: course,
+            user: current_user,
+            preloaded_attachments: preloaded_attachments,
+            is_public: is_public,
+            in_app: in_app
+          ).processed_url
+
+          expect(processed_url).to include "/courses/#{course.id}/files/#{attachment.id}/"
+        end
+
+        it "when replaced the replacement attachment url will be returned" do
+          current_user = user_factory
+          replacement_attachment = attachment_with_context(course, { filename: "hello" })
+          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: DateTime.now)
+          preloaded_attachments = {}
+          preloaded_attachments[attachment.id] = attachment
+
+          processed_url = UserContent::FilesHandler.new(
+            match: uri_match,
+            context: course,
+            user: current_user,
+            preloaded_attachments: preloaded_attachments,
+            is_public: is_public,
+            in_app: in_app
+          ).processed_url
+
+          expect(processed_url).to include "/courses/#{course.id}/files/#{replacement_attachment.id}/"
+        end
+      end
     end
 
     context "user cannot access attachment" do

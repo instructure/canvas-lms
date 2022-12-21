@@ -20,6 +20,7 @@ import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
 
 import {Search} from '../search'
+import {OrderType, SortableColumn} from '../../types'
 
 const fetchPaceContexts = jest.fn()
 const setSearchTerm = jest.fn()
@@ -29,6 +30,8 @@ const defaultProps = {
   fetchPaceContexts,
   setSearchTerm,
   contextType: 'section' as const,
+  currentSortBy: 'name' as SortableColumn,
+  currentOrderType: 'asc' as OrderType,
 }
 
 afterEach(() => {

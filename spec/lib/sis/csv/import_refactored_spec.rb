@@ -429,49 +429,5 @@ describe SIS::CSV::ImportRefactored do
         "T001,Winter13,active"
       )
     end
-
-    it "will attempt re-downloading corrupted csv files from s3" do
-      flakey_attachment_cls = Class.new do
-        attr_reader :read_count
-
-        def initialize(valid_csv_string)
-          @read_count = 0
-          @csv_string = valid_csv_string
-          @bad_string = valid_csv_string.gsub("\"", "\" \n")
-        end
-
-        def display_name
-          "test-file.csv"
-        end
-
-        def open
-          csv_string = @csv_string
-          @read_count += 1
-          if @read_count == 1
-            csv_string = @bad_string
-          end
-          tf = Tempfile.new(["attachment_csv_#{@read_count}", "csv"], Dir.tmpdir)
-          tf.write(csv_string)
-          tf.rewind
-          tf
-        end
-      end
-      csv_string = <<~CSV
-        term_id,name,status
-        "T001","Winter13",active
-      CSV
-      fake_attachment = flakey_attachment_cls.new(csv_string)
-      root_account = account_model
-      user = user_model
-      batch = root_account.sis_batches.create!(user_id: user.id)
-      opts = { batch: batch }
-      sis_importer = SIS::CSV::ImportRefactored.new(root_account, opts)
-      attachment = attachment_model
-      parallel_importer = ParallelImporter.new(sis_batch: batch, index: 0, batch_size: 25, importer_type: "Term", attachment_id: attachment)
-      allow(parallel_importer).to receive(:attachment).and_return(fake_attachment)
-      importer_object = SIS::CSV::TermImporter.new(sis_importer)
-      sis_importer.try_importing_segment(nil, parallel_importer, importer_object, skip_progress: true)
-      expect(fake_attachment.read_count).to eq(2)
-    end
   end
 end

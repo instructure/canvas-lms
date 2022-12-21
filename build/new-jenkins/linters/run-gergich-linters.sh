@@ -24,7 +24,7 @@ fi
 cp ui/shared/apollo/fragmentTypes.json ui/shared/apollo/fragmentTypes.json.old
 
 # always keep the graphQL schema up-to-date
-rake graphql:schema RAILS_ENV=test
+bin/rails graphql:schema RAILS_ENV=test
 
 if ! diff ui/shared/apollo/fragmentTypes.json ui/shared/apollo/fragmentTypes.json.old; then
     message="ui/shared/apollo/fragmentTypes.json needs to be kept up-to-date. Run bundle exec rake graphql:schema and push the changes.\\n"
@@ -32,10 +32,16 @@ if ! diff ui/shared/apollo/fragmentTypes.json ui/shared/apollo/fragmentTypes.jso
   fi
 
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'
-gergich capture i18nliner 'rake i18n:check'
+gergich capture i18nliner 'bin/rails i18n:check'
 # purposely don't run under bundler; they shell out and use bundler as necessary
 ruby script/brakeman
-ruby script/tatl_tael
+
+IFS=',' read -ra PRIVATE_PLUGINS_ARR <<< "$PRIVATE_PLUGINS"
+
+if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
+  ruby script/tatl_tael
+fi
+
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
@@ -43,7 +49,7 @@ ruby script/lint_commit_message
 node script/yarn-validate-workspace-deps.js 2>/dev/null < <(yarn --silent workspaces info --json)
 node ui-build/tools/component-info.mjs -i -v -g
 
-rake css:styleguide doc:api
+bin/rails css:styleguide doc:api
 
 gergich status
 echo "LINTER OK!"

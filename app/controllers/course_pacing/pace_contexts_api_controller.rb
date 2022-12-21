@@ -45,6 +45,9 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   When included, filters the results by the course pace name for the given search term.
   #
+  # @argument contexts [Optional, array]
+  #   When included, filters the results for the given context ids.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/1/pace_contexts?type=course \
   #     -H 'Authorization: Bearer <token>'
@@ -77,6 +80,6 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   end
 
   def filter_params
-    params.permit(:sort, :order, :search_term)
+    params.permit(:sort, :order, :search_term, :contexts)
   end
 end

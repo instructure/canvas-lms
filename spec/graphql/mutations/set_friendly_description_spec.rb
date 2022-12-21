@@ -57,7 +57,7 @@ describe Mutations::SetFriendlyDescription do
                                   context_type: context.class.name,
                                 })
 
-    execute_query(mutation_str(attrs), ctx)
+    execute_query(mutation_str(**attrs), ctx)
   end
 
   let(:ctx) { { current_user: current_user } }

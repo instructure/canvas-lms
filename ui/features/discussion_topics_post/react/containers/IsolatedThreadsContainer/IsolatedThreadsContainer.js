@@ -70,11 +70,12 @@ export const IsolatedThreadsContainer = props => {
     },
   })
 
+  const subEntriesConnection = props.discussionEntry?.discussionSubentriesConnection?.nodes // extracting for safe nav in deps
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionEntry?.discussionSubentriesConnection?.nodes?.filter(
+        const entries = subEntriesConnection.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
         entryIds = entries.map(entry => entry._id)
@@ -96,11 +97,7 @@ export const IsolatedThreadsContainer = props => {
 
       return () => clearInterval(interval)
     }
-  }, [
-    discussionEntriesToUpdate,
-    props.discussionEntry.discussionSubentriesConnection.nodes,
-    updateDiscussionEntriesReadState,
-  ])
+  }, [discussionEntriesToUpdate, subEntriesConnection, updateDiscussionEntriesReadState])
 
   const setToBeMarkedAsRead = entryId => {
     if (!discussionEntriesToUpdate.has(entryId)) {

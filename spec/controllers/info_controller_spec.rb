@@ -101,6 +101,21 @@ describe InfoController do
       expect(json["status"]).to eq 503
     end
 
+    context "when the secondary is not connected" do
+      let(:secondary_connection) { GuardRail.activate(:secondary) { Account.connection } }
+
+      before { secondary_connection.disconnect! }
+
+      after { secondary_connection.reconnect! }
+
+      it "responds with 503" do
+        get "readiness"
+        expect(response.code).to eq "503"
+        json = JSON.parse(response.body)
+        expect(json["status"]).to eq 503
+      end
+    end
+
     it "catchs any exceptions thrown and logs them as errors" do
       allow(MultiCache.cache).to receive(:fetch).with("readiness").and_raise(Redis::TimeoutError)
       expect(Canvas::Errors).to receive(:capture_exception).once

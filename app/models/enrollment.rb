@@ -640,8 +640,10 @@ class Enrollment < ActiveRecord::Base
   STATE_BY_DATE_RANK = ["active", %w[invited creation_pending pending_active pending_invited], "completed", "inactive", "rejected", "deleted"].freeze
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
-    @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, "enrollment_states.state")
-                                .sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index("inactive")}") # pretend restricted access is the same as inactive
+    @state_by_date_rank_sql ||= Arel.sql(
+      rank_sql(STATE_BY_DATE_RANK, "enrollment_states.state")
+        .sub(/^CASE/, "CASE WHEN enrollment_states.restricted_access THEN #{STATE_BY_DATE_RANK.index("inactive")}") # pretend restricted access is the same as inactive
+    )
   end
 
   def state_with_date_sortable
@@ -847,6 +849,10 @@ class Enrollment < ActiveRecord::Base
     if result
       user.try(:update_account_associations)
       scores.update_all(updated_at: Time.zone.now, workflow_state: :deleted)
+      Enrollment.recompute_final_score_in_singleton(
+        user.id,
+        course.id
+      )
 
       Assignment.remove_user_as_final_grader(user_id, course_id) if remove_user_as_final_grader?
     end

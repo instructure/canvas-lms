@@ -21,6 +21,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import AssignmentGradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentGradeInput/index'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput', suiteHooks => {
   let $container
@@ -31,6 +32,9 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   let wrapper
 
   suiteHooks.beforeEach(() => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+    })
     const assignment = {
       pointsPossible: 10,
     }
@@ -82,6 +86,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   suiteHooks.afterEach(() => {
     wrapper.unmount()
     $container.remove()
+    fakeENV.teardown()
   })
 
   function mountComponent() {

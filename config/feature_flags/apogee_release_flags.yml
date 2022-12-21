@@ -120,6 +120,11 @@ peer_reviews_for_a2:
   display_name: Peer Review Support in Assignment Enhancements
   description: Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
+assignment_missing_shortcut:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Keyboard Shortcut for Missing Assignment
+  description: Allows graders to type MI in the Gradebook or SpeedGrader to manually tag an assignment as missing
 originality_reports_for_a2:
   state: hidden
   applies_to: SiteAdmin

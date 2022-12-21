@@ -21,7 +21,7 @@ module ActiveRecord
   describe Base do
     describe ".wildcard" do
       it "produces a useful wildcard sql string" do
-        sql = Base.wildcard("users.name", "users.short_name", "Sinatra, Frank", { delimiter: "," })
+        sql = Base.wildcard("users.name", "users.short_name", "Sinatra, Frank", delimiter: ",")
         expect(sql).to eq "(LOWER(',' || users.name || ',') LIKE '%,sinatra, frank,%' OR LOWER(',' || users.short_name || ',') LIKE '%,sinatra, frank,%')"
       end
     end

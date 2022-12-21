@@ -17,7 +17,6 @@
  */
 
 import {isAnUnsupportedGifPngImage} from '../utils'
-import {shouldCompressImage} from '../compressionUtils'
 
 describe('isAnUnsupportedGifPngImage()', () => {
   it('returns true for a heavy GIF image', () => {

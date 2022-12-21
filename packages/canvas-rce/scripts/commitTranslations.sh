@@ -14,14 +14,14 @@ push() {
   return $?
 }
 
-git checkout -B sync-translations-rce && \
+git checkout -q -B sync-translations-rce && \
   git add -A src && \
   git commit -m "[i18n] Update RCE translations." && \
   push
   
 echo $OUTPUT
 
-git checkout $CURRENT_BRANCH
+git checkout -q $CURRENT_BRANCH
 
 if [ ! -z "$OUTPUT" ]; then
   URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+')

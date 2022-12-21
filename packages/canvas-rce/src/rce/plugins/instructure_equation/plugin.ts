@@ -18,9 +18,8 @@
 
 import htmlEscape from 'escape-html'
 import formatMessage from '../../../format-message'
-import clickCallback, {oldClickCallback} from './clickCallback'
+import clickCallback from './clickCallback'
 import {IconEquationLine} from '@instructure/ui-icons/es/svg'
-import RCEGlobals from '../../RCEGlobals'
 import tinymce from 'tinymce'
 
 function isEquationImage(node: Element) {
@@ -34,11 +33,7 @@ function isEquationImage(node: Element) {
 tinymce.PluginManager.add('instructure_equation', function (ed) {
   ed.ui.registry.addIcon('equation', IconEquationLine.src)
 
-  if (RCEGlobals.getFeatures()?.new_equation_editor) {
-    ed.addCommand('instructureEquation', () => clickCallback(ed, document))
-  } else {
-    ed.addCommand('instructureEquation', () => oldClickCallback(ed, document))
-  }
+  ed.addCommand('instructureEquation', () => clickCallback(ed, document))
 
   ed.ui.registry.addMenuItem('instructure_equation', {
     text: formatMessage('Equation'),

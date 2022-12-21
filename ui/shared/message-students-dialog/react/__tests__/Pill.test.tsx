@@ -63,6 +63,16 @@ describe('Pill', () => {
     })
   })
 
+  it('truncates names with > 14 characters', () => {
+    const props = makeProps({studentId, text: 'LongNameLongName', selected: true})
+    const {findByRole} = render(<Pill {...props} />)
+
+    const button = findByRole('button', {name: 'LongNameLongN...'})
+    waitFor(() => {
+      expect(button).toBeInTheDocument()
+    })
+  })
+
   it('calls onClick when clicked for student', async () => {
     const props = makeProps({studentId, text: 'Betty Ford', selected: true})
     const {findByRole} = render(<Pill {...props} />)

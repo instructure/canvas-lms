@@ -21,7 +21,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 
-jest.mock('../../components/CreateIconMakerForm/ImageCropper/imageCropUtils', () => ({
+jest.mock('../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn().mockReturnValue(
     Promise.resolve({
       outerHTML: null,
@@ -29,7 +29,7 @@ jest.mock('../../components/CreateIconMakerForm/ImageCropper/imageCropUtils', ()
   ),
 }))
 
-jest.mock('../utils', () => {
+jest.mock('../../../shared/fileUtils', () => {
   return {
     convertFileToBase64: jest
       .fn()

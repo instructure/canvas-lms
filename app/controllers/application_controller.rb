@@ -313,8 +313,8 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
-    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
+    featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
+    account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
     course_paces_redesign course_paces_for_students rce_better_paste
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
@@ -799,10 +799,13 @@ class ApplicationController < ActionController::Base
     require_user
   end
 
+  # This can be appended to with << if needed
   def csp_frame_ancestors
-    # Allow iframing on all vanity domains as well as the canonical one
-    unless @domain_root_account.nil?
-      HostUrl.context_hosts(@domain_root_account, request.host)
+    @csp_frame_ancestors ||= [].tap do |list|
+      # Allow iframing on all vanity domains as well as the canonical one
+      unless @domain_root_account.nil?
+        list.concat HostUrl.context_hosts(@domain_root_account, request.host)
+      end
     end
   end
 
@@ -811,7 +814,7 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.join(" ")};")
+      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
@@ -2230,7 +2233,7 @@ class ApplicationController < ActionController::Base
         # routes and stuff), then we'll build an actual named_context_url with the
         # params for show_relative
         res += named_context_url(@context, :context_file_url, attachment)
-        res += "/" + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+        res += "/" + URI::DEFAULT_PARSER.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
         res += "?" + opts.to_query
       else
         # otherwise, just redirect to /files/:id

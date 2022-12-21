@@ -160,13 +160,13 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def index_exists?(table_name, columns, options = {})
+  def index_exists?(table_name, columns, **options)
     # This makes up for a rails bug where column as an option does not work correctly with `if_exists` on `remove_index`
     columns ||= options[:column]
     raise ArgumentError, "if you're identifying an index by name only, you should use index_name_exists?" if columns.is_a?(Hash) && columns[:name]
     raise ArgumentError, "columns should be a string, a symbol, or an array of those " unless columns.nil? || columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
 
-    super(table_name, columns, options)
+    super(table_name, columns, **options)
   end
 
   # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
@@ -271,14 +271,14 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def execute(*)
+  def execute(...)
     super
   rescue AbortExceptionMatcher
     @connection.cancel
     raise
   end
 
-  def exec_query(*)
+  def exec_query(...)
     super
   rescue AbortExceptionMatcher
     @connection.cancel

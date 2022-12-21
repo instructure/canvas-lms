@@ -563,6 +563,21 @@ describe GradebookExporter do
               expect(final_grade).to eq 20
             end
 
+            it "accepts student_order as an array of numbers" do
+              expect(@rows.dig(1, "ID")).to eq @student.id.to_s
+            end
+
+            it "accepts student_order as an array of strings" do
+              csv = exporter(
+                grading_period_id: @last_period.id,
+                current_view: true,
+                assignment_order: @course.assignments.pluck(:id),
+                student_order: @course.student_enrollments.map { |e| e.user_id.to_s }
+              ).to_csv
+              rows = CSV.parse(csv, headers: true)
+              expect(rows.dig(1, "ID")).to eq @student.id.to_s
+            end
+
             it "exports all visible assignments in the gradebook" do
               exporter_options = {
                 grading_period_id: @first_period.id,

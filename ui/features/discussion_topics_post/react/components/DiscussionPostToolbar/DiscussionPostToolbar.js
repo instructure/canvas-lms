@@ -39,6 +39,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
+import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -232,6 +233,11 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
+                {!props.userSplitScreenPreference && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <ExpandCollapseThreadsButton />
+                  </Flex.Item>
+                )}
                 {ENV.split_screen_view && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <SplitScreenButton

@@ -27,9 +27,9 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {responsiveQuerySizes, showErrorWhenMessageTooLong} from '../../utils'
 import {View} from '@instructure/ui-view'
-import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
+import {nanoid} from 'nanoid'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 import positionCursor from './PositionCursorHook'
 import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
@@ -44,7 +44,7 @@ export const DiscussionEdit = props => {
   const [includeReplyPreview, setIncludeReplyPreview] = useState(
     !!props.quotedEntry?.previewMessage
   )
-  const textAreaId = useRef(`message-body-${nanoid()}`)
+  const textAreaId = useRef(`message-body-${nanoid()}`) // for VICE-3279 change `message-body-${nanoid()}` to `message-body-${props.rceIdentifier}`
   const [draftTimeout, setDraftTimeout] = useState(null)
   const [awaitingChanges, setAwaitingChanges] = useState(false)
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
@@ -218,6 +218,9 @@ export const DiscussionEdit = props => {
                         if (showErrorWhenMessageTooLong(rceContent)) {
                           return
                         }
+                        localStorage.removeItem(
+                          `rceautosave:${ENV.current_user_id}${window.location?.href}:${textAreaId.current}`
+                        )
                         props.onSubmit(
                           rceContent,
                           includeReplyPreview,
@@ -298,6 +301,7 @@ export const DiscussionEdit = props => {
 
 DiscussionEdit.propTypes = {
   show: PropTypes.bool,
+  rceIdentifier: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,

@@ -76,7 +76,7 @@ module CanvasSecurity
         end
 
         it "is an empty hash if an unwrapped token" do
-          original_token = ServicesJwt.generate(sub: user_id)
+          original_token = ServicesJwt.generate({ sub: user_id })
           jwt = ServicesJwt.new(original_token, false)
           expect(jwt.wrapper_token).to eq({})
         end
@@ -100,7 +100,7 @@ module CanvasSecurity
       end
 
       describe "initialization" do
-        let(:jwt_string) { ServicesJwt.generate(sub: 1) }
+        let(:jwt_string) { ServicesJwt.generate({ sub: 1 }) }
 
         it "uses SecureRandom for generating the JWT" do
           allow(SecureRandom).to receive_messages(uuid: "some-secure-random-string")
@@ -120,7 +120,7 @@ module CanvasSecurity
             %r{^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$}
           end
 
-          let(:jwt_string) { ServicesJwt.generate(sub: 1) }
+          let(:jwt_string) { ServicesJwt.generate({ sub: 1 }) }
 
           it "builds an encoded token out" do
             expect(jwt_string).to match(base64_regex)
@@ -132,7 +132,7 @@ module CanvasSecurity
           end
 
           it "allows the introduction of arbitrary data" do
-            jwt = ServicesJwt.generate(sub: 2, foo: "bar")
+            jwt = ServicesJwt.generate({ sub: 2, foo: "bar" })
             decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
             decrypted_token_body = CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
             expect(decrypted_token_body[:foo]).to eq("bar")

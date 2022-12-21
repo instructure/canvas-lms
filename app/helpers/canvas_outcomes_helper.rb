@@ -34,7 +34,7 @@ module CanvasOutcomesHelper
     domain, jwt = extract_domain_jwt(
       context.root_account,
       "lmgb_results.show",
-      params
+      **params
     )
     return if domain.nil? || jwt.nil?
 
@@ -123,7 +123,8 @@ module CanvasOutcomesHelper
               # to parse the result returned from outcome service
               next unless attempt[:metadata].is_a? String
 
-              attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
+              attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
+              attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
             end
           end
           all_results.concat(results)

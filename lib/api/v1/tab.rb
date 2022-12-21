@@ -107,7 +107,7 @@ module Api::V1::Tab
       course_subject_tabs: params["include"]&.include?("course_subject_tabs")
     }
 
-    tabs = context.tabs_available(user, opts).select do |tab|
+    tabs = context.tabs_available(user, **opts).select do |tab|
       if !tab[:href] || !tab[:label]
         false
       elsif Api::V1::Tab.tab_is?(tab, context, :TAB_COLLABORATIONS)

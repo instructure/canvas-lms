@@ -33,6 +33,7 @@ import {
   getAutoSaving,
   getShowLoadingOverlay,
   getSyncing,
+  getBlueprintLocked,
 } from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {
@@ -66,6 +67,7 @@ interface StoreProps {
   readonly anyActiveRequests: boolean
   readonly isUnpublishedNewPace: boolean
   readonly paceName: string
+  readonly blueprintLocked: boolean | undefined
 }
 
 interface DispatchProps {
@@ -75,7 +77,6 @@ interface DispatchProps {
 }
 
 interface PassedProps {
-  readonly blueprintLocked: boolean
   readonly handleCancel: () => void
   readonly handleDrawerToggle?: () => void
   readonly responsiveSize: ResponsiveSizes
@@ -97,7 +98,6 @@ export const Footer: React.FC<ComponentProps> = ({
   sectionPace,
   newPace,
   unpublishedChanges,
-  blueprintLocked,
   handleDrawerToggle,
   responsiveSize,
   removePace,
@@ -105,9 +105,11 @@ export const Footer: React.FC<ComponentProps> = ({
   focusOnClose,
   isUnpublishedNewPace,
   paceName,
+  blueprintLocked,
 }) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
+  const userIsMasquerading = window.ENV.IS_MASQUERADING
   const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
 
   const handlePublish = useCallback(() => {
@@ -124,18 +126,13 @@ export const Footer: React.FC<ComponentProps> = ({
   }
 
   const isCoursePace = !sectionPace && !studentPace
-
   const cancelDisabled = useRedesign
     ? anyActiveRequests
     : autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
   const pubDisabled = useRedesign
     ? !newPace &&
-      (!unpublishedChanges ||
-        autoSaving ||
-        isSyncing ||
-        showLoadingOverlay ||
-        (blueprintLocked && isCoursePace))
-    : !newPace && (cancelDisabled || (blueprintLocked && isCoursePace))
+      (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
+    : !newPace && (cancelDisabled || blueprintLocked)
   const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
@@ -215,7 +212,7 @@ export const Footer: React.FC<ComponentProps> = ({
   }
 
   return (
-    <View as="div" width="100%">
+    <View as="div" width="100%" margin={useRedesign && userIsMasquerading ? '0 0 x-large' : '0'}>
       {showCondensedView && (
         <View as="div" textAlign="center" borderWidth="0 0 small 0" padding="xx-small">
           {renderChangesIndicator()}
@@ -276,11 +273,7 @@ export const Footer: React.FC<ComponentProps> = ({
               data-testid="apply-or-create-pace-button"
               color="primary"
               onClick={() => pubDisabled || handlePublishClicked()}
-              interaction={
-                (useRedesign && pubDisabled) || (blueprintLocked && isCoursePace)
-                  ? 'disabled'
-                  : 'enabled'
-              }
+              interaction={(useRedesign && pubDisabled) || blueprintLocked ? 'disabled' : 'enabled'}
             >
               {publishLabel}
             </Button>
@@ -306,6 +299,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     anyActiveRequests: getAnyActiveRequests(state),
     isUnpublishedNewPace: getIsUnpublishedNewPace(state),
     paceName: getPaceName(state),
+    blueprintLocked: getBlueprintLocked(state),
   }
 }
 

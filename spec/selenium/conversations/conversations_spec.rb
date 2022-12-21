@@ -46,6 +46,7 @@ describe "conversations new" do
         @participant = conversation(@teacher, @s[0], @s[1], body: "hi there", workflow_state: "unread")
         @convo = @participant.conversation
         @convo.update_attribute(:subject, "test")
+        @convo.add_message(@teacher, "second Message")
       end
 
       it "forwards conversations via the top bar menu" do
@@ -53,7 +54,7 @@ describe "conversations new" do
         f("div[data-testid='conversation']").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 1
+        expect(messages.count).to eq 2
         expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
         f("span[data-testid='desktop-message-action-header'] button[data-testid='settings']").click
         fj("li:contains('Forward')").click
@@ -64,7 +65,7 @@ describe "conversations new" do
         fj("button:contains('Send')").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 2
+        expect(messages.count).to eq 3
         expect(messages[0].text).to include "#{@teacher.name}, #{@s[2].name}"
         expect(messages[0].text).not_to include @s[0].name.to_s
         expect(messages[0].text).not_to include @s[1].name.to_s
@@ -75,21 +76,37 @@ describe "conversations new" do
         f("div[data-testid='conversation']").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 1
+        expect(messages.count).to eq 2
         expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
         f("button[data-testid='more-options']").click
         fj("li:contains('Forward')").click
+
+        # Verify that the thread is being forwarded
+        expect(fj("span:contains('second Message')")).to be_present
+        expect(fj("span:contains('hi there')")).to be_present
+
         ff("input[aria-label='Address Book']")[1].click
         fj("div[data-testid='address-book-item']:contains('Students')").click
-        fj("div[data-testid='address-book-item']:contains('#{@s[0].name}')").click
+        fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
         f("textarea[data-testid='message-body']").send_keys "forwarding to you"
         fj("button:contains('Send')").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 2
-        expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}"
+        expect(messages.count).to eq 3
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[2].name}"
+        expect(messages[0].text).not_to include @s[0].name.to_s
         expect(messages[0].text).not_to include @s[1].name.to_s
-        expect(messages[0].text).not_to include @s[2].name.to_s
+
+        # Verify that the shown forwarded messages were sent correctly
+        user_session(@s[2])
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 3
+        expect(fj("span:contains('forwarding to you')")).to be_present
+        expect(fj("span:contains('second Message')")).to be_present
+        expect(fj("span:contains('hi there')")).to be_present
       end
 
       it "forwards conversations via the individual message menu" do
@@ -97,21 +114,37 @@ describe "conversations new" do
         f("div[data-testid='conversation']").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 1
+        expect(messages.count).to eq 2
         expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
         f("button[data-testid='message-more-options']").click
         fj("li:contains('Forward')").click
+
+        # Verify that only the selected message is shown as being forwarded
+        expect(fj("span:contains('second Message')")).to be_present
+        expect(f("span[data-testid='compose-modal-desktop']")).not_to contain_jqcss("span:contains('hi there')")
+
         ff("input[aria-label='Address Book']")[1].click
         fj("div[data-testid='address-book-item']:contains('Students')").click
-        fj("div[data-testid='address-book-item']:contains('#{@s[1].name}')").click
+        fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
         f("textarea[data-testid='message-body']").send_keys "forwarding to you"
         fj("button:contains('Send')").click
         wait_for_ajaximations
         messages = ff("span[data-testid='message-detail-item-desktop']")
-        expect(messages.count).to eq 2
-        expect(messages[0].text).to include "#{@teacher.name}, #{@s[1].name}"
+        expect(messages.count).to eq 3
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[2].name}"
         expect(messages[0].text).not_to include @s[0].name.to_s
-        expect(messages[0].text).not_to include @s[2].name.to_s
+        expect(messages[0].text).not_to include @s[1].name.to_s
+
+        # Verify that the shown forwarded messages were sent correctly
+        user_session(@s[2])
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 2
+        expect(fj("span:contains('forwarding to you')")).to be_present
+        expect(fj("span:contains('second Message')")).to be_present
+        expect(f("body")).not_to contain_jqcss("span:contains('hi there')")
       end
 
       it "archives and unarchives a conversation via conversation header menu" do

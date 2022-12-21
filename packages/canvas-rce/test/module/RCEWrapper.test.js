@@ -62,9 +62,6 @@ function createdMountedElement(additionalProps = {}) {
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       canUploadFiles: false,
       ...trayProps(),
-      features: {
-        new_equation_editor: true,
-      },
       ...additionalProps,
     })
   )
@@ -99,9 +96,7 @@ function defaultProps() {
     ltiTools: [],
     editorOptions: {},
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
-    features: {
-      new_equation_editor: true,
-    },
+    features: {},
     canvasOrigin: 'http://canvas.docker',
   }
 }
@@ -781,7 +776,7 @@ describe('RCEWrapper', () => {
   })
 
   describe('is_dirty()', () => {
-    it('is true if not hidden and defaultContent is not equal to getConent()', () => {
+    it('is true if not hidden and defaultContent is not equal to getContent()', () => {
       editor.serializer.serialize.returns(editor.content)
       const c = createBasicElement()
       c.setCode('different')
@@ -789,7 +784,7 @@ describe('RCEWrapper', () => {
       assert(c.is_dirty())
     })
 
-    it('is false if not hidden and defaultContent is equal to getConent()', () => {
+    it('is false if not hidden and defaultContent is equal to getContent()', () => {
       editor.serializer.serialize.returns(editor.content)
       const c = createBasicElement()
       editor.hidden = false

@@ -34,11 +34,11 @@ class GradeChangeEventTestHarness
   end
 
   def api_v1_course_url(course)
-    URI.encode("#{url_root}/api/v1/courses/#{course}")
+    URI::DEFAULT_PARSER.escape("#{url_root}/api/v1/courses/#{course}")
   end
 
   def api_v1_course_assignment_url(course, assignment)
-    URI.encode("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}")
+    URI::DEFAULT_PARSER.escape("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}")
   end
 
   def service_enabled?(_type)
@@ -46,7 +46,7 @@ class GradeChangeEventTestHarness
   end
 
   def course_assignment_submissions_url(course, assignment, _)
-    URI.encode("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}/submissions?zip=0")
+    URI::DEFAULT_PARSER.escape("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}/submissions?zip=0")
   end
 end
 

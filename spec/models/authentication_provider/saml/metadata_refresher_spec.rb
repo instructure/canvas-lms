@@ -83,7 +83,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
     it "passes ETag if we know it" do
       expect(redis).to receive(:get).and_return("MyETag")
-      expect(CanvasHttp).to receive(:get).with("url", "If-None-Match" => "MyETag")
+      expect(CanvasHttp).to receive(:get).with("url", { "If-None-Match" => "MyETag" })
 
       subject.send(:refresh_if_necessary, 1, "url")
     end
@@ -100,7 +100,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
       response = double("response")
       expect(response).to receive(:is_a?).with(Net::HTTPNotModified).and_return(true)
 
-      expect(CanvasHttp).to receive(:get).with("url", "If-None-Match" => "MyETag").and_yield(response)
+      expect(CanvasHttp).to receive(:get).with("url", { "If-None-Match" => "MyETag" }).and_yield(response)
 
       expect(subject.send(:refresh_if_necessary, 1, "url")).to eq false
     end

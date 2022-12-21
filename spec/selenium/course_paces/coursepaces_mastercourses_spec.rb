@@ -164,9 +164,9 @@ describe "blueprinted course pace page" do
           expect(blueprint_container_for_pacing).not_to be_inactive
         end
 
-        it "disables the lock button for section paces" do
+        it "does not render the lock button for section paces" do
           click_context_link(@section_name)
-          expect(blueprint_container_for_pacing).to be_inactive
+          expect { blueprint_container_for_pacing }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
         end
       end
     end
@@ -211,8 +211,7 @@ describe "blueprinted course pace page" do
           visit_course_paces_page course_id_override: @minion.id
           wait_for_ajaximations
           click_edit_default_pace_button
-          # this should be uncommented when the settings button is properly disabled
-          # expect(click_course_pace_settings_button).to be_disabled
+          expect(course_pace_settings_button).to be_disabled
           expect(duration_field[0]).to be_disabled
         end
       end

@@ -419,6 +419,7 @@ export const IsolatedViewContainer = props => {
               margin="none none x-small"
             >
               <DiscussionEdit
+                rceIdentifier={props.replyFromId}
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                 onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {

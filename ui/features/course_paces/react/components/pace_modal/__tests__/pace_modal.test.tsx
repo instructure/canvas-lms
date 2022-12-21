@@ -34,7 +34,6 @@ const onClose = jest.fn(),
 
 const defaultProps = {
   coursePace: PRIMARY_PACE,
-  isBlueprintLocked: false,
   isOpen: true,
   onClose,
   clearCategoryError,
@@ -50,6 +49,7 @@ const defaultProps = {
   compression: 0,
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
+  setOuterResponsiveSize: jest.fn(),
 }
 
 afterEach(() => {

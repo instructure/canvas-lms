@@ -62,7 +62,7 @@ class LoginController < ApplicationController
       auth_discovery_url = @domain_root_account.auth_discovery_url
       if flash[:delegated_message]
         auth_discovery_url << (URI.parse(auth_discovery_url).query ? "&" : "?")
-        auth_discovery_url << "message=#{URI.escape(flash[:delegated_message])}"
+        auth_discovery_url << "message=#{URI::DEFAULT_PARSER.escape(flash[:delegated_message])}"
       end
       return redirect_to auth_discovery_url
     end

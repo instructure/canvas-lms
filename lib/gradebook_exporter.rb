@@ -97,7 +97,8 @@ class GradebookExporter
 
     # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = if @options[:current_view]
-                            student_enrollments.select { |s| @options[:student_order].include?(s[:user_id]) }.uniq(&:user_id)
+                            student_order = @options[:student_order].map(&:to_i)
+                            student_enrollments.select { |s| student_order.include?(s[:user_id]) }.uniq(&:user_id)
                           else
                             student_enrollments.uniq(&:user_id)
                           end

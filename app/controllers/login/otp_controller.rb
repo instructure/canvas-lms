@@ -112,6 +112,7 @@ class Login::OtpController < ApplicationController
           expires: now + 30.days,
           domain: remember_me_cookie_domain,
           httponly: true,
+          same_site: :none,
           secure: CanvasRails::Application.config.session_options[:secure],
           path: "/login"
         }

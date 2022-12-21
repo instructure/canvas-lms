@@ -110,11 +110,14 @@ const buildContentItems = (items: ContentItem[]) =>
   }, [] as ContentItemDisplay[])
 
 type RetrievingContentProps = {
-  environment: {
-    deep_link_response: DeepLinkResponse
-    DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  }
+  environment: Environment
   parentWindow: Window
+}
+
+type Environment = {
+  deep_link_response: DeepLinkResponse
+  DEEP_LINKING_POST_MESSAGE_ORIGIN: string
+  deep_linking_use_window_parent: boolean
 }
 
 export const RetrievingContent = ({environment, parentWindow}: RetrievingContentProps) => {
@@ -201,8 +204,18 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
 }
 
 export default class DeepLinkingResponse {
+  static targetWindow(window: Window) {
+    // Use window.parent instead of window.top to allow
+    // tools within tools to send content items to the tool,
+    // not to Canvas. This assumes that tools are always only
+    // "one level deep" in the frame hierarchy.
+    const environment: Environment = window.ENV
+    const shouldUseParent = environment.deep_linking_use_window_parent
+    return window.opener || (shouldUseParent && window.parent) || window.top
+  }
+
   static mount() {
-    const parentWindow = window.opener || window.top
+    const parentWindow = this.targetWindow(window)
     ReactDOM.render(
       <RetrievingContent environment={window.ENV} parentWindow={parentWindow} />,
       document.getElementById('deepLinkingContent')

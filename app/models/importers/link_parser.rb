@@ -144,7 +144,7 @@ module Importers
         resolved("#{context_path}/#{$1}")
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
-        rel_path = URI.unescape($1)
+        rel_path = URI::DEFAULT_PARSER.unescape($1)
         if (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
            (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
           unresolved(:media_object, rel_path: rel_path)
@@ -171,7 +171,7 @@ module Importers
             url.start_with?("#")
         resolved
       elsif relative_url?(url)
-        unresolved(:file, rel_path: URI.unescape(url))
+        unresolved(:file, rel_path: URI::DEFAULT_PARSER.unescape(url))
       else # rubocop:disable Lint/DuplicateBranch
         resolved
       end

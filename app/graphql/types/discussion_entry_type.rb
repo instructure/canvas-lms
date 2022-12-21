@@ -165,10 +165,6 @@ module Types
       argument :include_relative_entry, Boolean, required: false
     end
     def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
-      # don't try to load subentries UNLESS
-      # we are a legacy discussion entry, or we are a root_entry.
-      return nil unless object.legacy? || object.root_entry_id.nil?
-
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         sort_order: sort_order,
@@ -199,9 +195,8 @@ module Types
 
     field :subentries_count, Integer, null: true
     def subentries_count
-      # don't try to count subentries UNLESS
-      # we are a legacy discussion entry, or we are a root_entry
-      return nil unless object.legacy? || object.root_entry_id.nil?
+      # don't try to count subentries if isolated view is active
+      return nil if Account.site_admin.feature_enabled?(:isolated_view)
 
       Loaders::AssociationCountLoader.for(DiscussionEntry, :discussion_subentries).load(object)
     end

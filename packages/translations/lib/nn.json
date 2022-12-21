@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Juster"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Justering og lister"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Katalansk"
     },
-    "center_align_e68d9997": {
-        "message": "Midtstill"
-    },
     "centered_dot_64d5e378": {
         "message": "Sentrert prikk"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativt { TYPE_UPPER }"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Reduser innrykk"
     },
     "deep_purple_bb3e2907": {
         "message": "Mørk lilla"
@@ -1073,9 +1064,6 @@
     "in_element_of_19ca2f33": {
         "message": "I (Element av)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Auk innrykk"
-    },
     "indefinite_integral_6623307e": {
         "message": "Ubestemt integral"
     },
@@ -1177,9 +1165,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Latvisk"
-    },
-    "left_align_43d95491": {
-        "message": "Venstrejuster"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Venstre vinkelparentes"
@@ -1793,9 +1778,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Rikt tekstområde. Trykk ALT+0 for rik hurtigtastar i teksteditoren"
     },
-    "right_align_39e7a32a": {
-        "message": "Høgrejuster"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Høgre vinkelparentes"
     },
@@ -2032,9 +2014,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Heva skrift"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Hevet skrift og senket skrift"
     },
     "superset_c4db8a7a": {
         "message": "Supersett"

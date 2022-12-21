@@ -32,7 +32,8 @@ class WimbaConference < WebConference
     if (res = send_request("listClass", { "filter00" => "archive_of", "filter00value" => wimba_id, "attribute" => "longname" }))
       res.delete_prefix("100 OK\n").split(/\n=END RECORD\n?/).each do |match|
         data = match.split("\n").each_with_object({}) do |line, hash|
-          key, hash[key.to_sym] = line.split(/=/, 2)
+          key, val = line.split(/=/, 2)
+          hash[key.to_sym] = val
         end
         unless data[:longname] && data[:class_id]
           logger.error "wimba error reading archive list"

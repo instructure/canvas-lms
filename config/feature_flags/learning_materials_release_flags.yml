@@ -1,9 +1,4 @@
 ---
-new_equation_editor:
-  state: hidden
-  display_name: RCE's new and improved equation editor dialog
-  description: Includes the equation editor in the @instructure/canvas-rce package
-  applies_to: SiteAdmin
 buttons_and_icons_root_account:
   state: allowed
   applies_to: RootAccount

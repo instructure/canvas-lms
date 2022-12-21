@@ -30,7 +30,7 @@ end
 gem "bootsnap", "1.13.0", require: false
 gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.2.1"
+gem_override "switchman", "3.3.1"
   gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
   gem "irb", "1.4.1"
@@ -56,13 +56,13 @@ gem "aws-sdk-kms", "1.39.0", require: false
 gem "aws-sigv4", "1.2.2", require: false
 gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
-  gem "chunky_png", "1.3.14", require: false
+  gem "chunky_png", "1.4.0", require: false
 gem "bcrypt", "3.1.16"
 gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
-gem "business_time", "0.10.0"
+gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-  gem "adobe_connect", "1.0.10", require: false
+  gem "adobe_connect", "1.0.11", require: false
 gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "ddtrace", "0.42.0", require: false
@@ -77,8 +77,8 @@ gem "graphql-batch", "0.4.3"
 gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
-gem "i18n", "1.8.5"
-gem "i18nliner", "0.2.2"
+gem "i18n", "1.9.1"
+gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
@@ -105,20 +105,23 @@ gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a8
   gem "ecma-re-validator", "0.2.1"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
-gem "mail", "2.7.1", require: false
+gem "mail", "2.8.0", require: false
   gem "mini_mime", "1.1.2", require: false
 gem "marginalia", "1.9.0", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
 gem "net-ldap", "0.16.3", require: false
-gem "nokogiri", "1.12.5", require: false
+gem "net-imap", "0.2.3", require: false
+gem "net-pop", "0.1.1", require: false
+gem "net-smtp", "0.3.1", require: false
+gem "nokogiri", "1.13.8", require: false
 gem "oauth", "0.5.4", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
-gem "pg_query", "2.1.2"
+gem "pg_query", "2.2.0"
 gem "prawn-rails", "1.3.0"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
@@ -130,13 +133,14 @@ gem "redcarpet", "3.5.0", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "6.2.0", require: false
+gem "rss", "0.2.9", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "ruby2_keywords", "0.0.3"
 gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
-  gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
+  gem "nokogiri-xmlsec-instructure", "0.10.2", require: false
 gem "sanitize", "6.0.0", require: false
 gem "sentry-ruby", "5.1.0"
 gem "sentry-rails", "5.1.0"

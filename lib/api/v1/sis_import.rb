@@ -34,11 +34,12 @@ module Api::V1::SisImport
   def sis_import_json(batch, user, session, includes: [])
     json = api_json(batch, user, session)
     if batch.errors_attachment_id
-      # skip permission checks since the context is a sis_import it will fail permission checks
+      verification = Attachments::Verification.new(batch.errors_attachment)
+      jwt_token = verification.verifier_for_user(user, expires: 1.hour.from_now)
       json[:errors_attachment] = attachment_json(
         batch.errors_attachment,
         user,
-        {},
+        { verifier: jwt_token },
         # skip permission checks since the context is a sis_import it will fail permission checks
         { skip_permission_checks: true }
       )

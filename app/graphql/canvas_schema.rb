@@ -26,6 +26,8 @@ class CanvasSchema < GraphQL::Schema
 
   connections.add(Array, PatchedArrayConnection)
   connections.add(DynamoQuery, DynamoConnection)
+  connections.add(AddressBook::MessageableUser::Collection, CollectionConnection)
+  connections.add(BookmarkedCollection::Proxy, CollectionConnection)
 
   def self.id_from_object(obj, type_def, _ctx)
     case obj

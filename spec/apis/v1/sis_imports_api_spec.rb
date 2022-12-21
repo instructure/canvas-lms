@@ -988,4 +988,17 @@ describe SisImportsApiController, type: :request do
     expect(json).to have_key("errors_attachment")
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
   end
+
+  it "expires the errors_attachment after an hour" do
+    batch = @account.sis_batches.create!
+    batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
+    batch.finish(false)
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                    { controller: "sis_imports_api", action: "show", format: "json",
+                      account_id: @account.id.to_s, id: batch.id.to_s })
+    url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
+    expiration = Time.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
+
+    expect(expiration).to be_within(1.minute).of(1.hour.from_now)
+  end
 end

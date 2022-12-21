@@ -4664,48 +4664,48 @@ describe "Submissions API", type: :request do
 
       it "allows a teacher to upload files for a student" do
         @user = @teacher
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "allows any filetype when there are no restrictions on type" do
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "rejects uploading files when file extension is not given" do
         @assignment.update(allowed_extensions: ["jpg"])
-        preflight(name: "name", size: 12_345)
+        preflight({ name: "name", size: 12_345 })
         assert_status(400)
       end
 
       it "rejects uploading files when filetype is not allowed" do
         @assignment.update(allowed_extensions: ["doc"])
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
         @assignment.update(allowed_extensions: ["txt"])
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         assert_status(200)
       end
 
       it "falls back to parsing the extension when an unknown type" do
         @assignment.update(allowed_extensions: ["beepboop"])
-        preflight(name: "test.beepboop", size: 12_345)
+        preflight({ name: "test.beepboop", size: 12_345 })
         assert_status(200)
       end
 
       it "uploads to a student's Submissions folder" do
-        preflight(name: "test.txt", size: 12_345, content_type: "text/plain")
+        preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
         f = Attachment.last.folder
         expect(f.submission_context_code).to eq @course.asset_string
       end
 
       context "for url upload using InstFS" do
         let(:json_response) do
-          preflight(url: "http://example.com/test", comment: "my comment")
+          preflight({ url: "http://example.com/test", comment: "my comment" })
           JSON.parse(response.body)
         end
 
@@ -4756,7 +4756,7 @@ describe "Submissions API", type: :request do
 
       context "for url upload using DelayedJob" do
         let(:json_response) do
-          preflight(url: "http://example.com/test", filename: "test.txt", comment: "hello comment")
+          preflight({ url: "http://example.com/test", filename: "test.txt", comment: "hello comment" })
           JSON.parse(response.body)
         end
 
@@ -4780,7 +4780,7 @@ describe "Submissions API", type: :request do
         end
 
         it "enqueues the copy job when the submit_assignment parameter is false" do
-          preflight(url: "http://example.com/test", filename: "test.txt", submit_assignment: false)
+          preflight({ url: "http://example.com/test", filename: "test.txt", submit_assignment: false })
           JSON.parse(response.body)
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::CopyWorker.name
@@ -4919,7 +4919,7 @@ describe "Submissions API", type: :request do
                       action: "index", controller: "submissions_api", format: "json",
                       include: %w[submission_history] })
 
-    url = URI.parse(URI.decode(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
+    url = URI.parse(URI::DEFAULT_PARSER.unescape(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
     blob = JSON.parse(URI.decode_www_form(url.query).to_h["blob"])
     expect(blob).to include({
                               "enable_annotations" => true,
@@ -5367,6 +5367,43 @@ describe "Submissions API", type: :request do
       run_jobs
 
       expect(@a1.submission_for_student(@student1)).to be_excused
+    end
+
+    it "unexcuses assignments" do
+      @a1.grade_student @student1, excused: true, grader: @teacher
+      grade_data = {
+        grade_data: { @student1.id => { excuse: "0", posted_grade: nil } }
+      }
+
+      api_call(:post,
+               "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+               { controller: "submissions_api", action: "bulk_update",
+                 format: "json", section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
+      run_jobs
+
+      expect(@a1.submission_for_student(@student1)).to_not be_excused
+    end
+
+    it "posts do not set grader_id for unchanged scores" do
+      grade_data = {
+        grade_data: {
+          @student1.id => { posted_grade: nil },
+          @student2.id => { posted_grade: "-" }
+        }
+      }
+
+      api_call(:post,
+               "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+               { controller: "submissions_api", action: "bulk_update",
+                 format: "json", section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
+      run_jobs
+
+      submission1 = @a1.submission_for_student(@student1)
+      submission2 = @a1.submission_for_student(@student2)
+      expect(submission1.grader_id).to be_nil
+      expect(submission2.grader_id).to be_nil
     end
 
     it "checks user ids for sections" do

@@ -4427,6 +4427,17 @@ describe Submission do
       sub = @assignment.submit_homework(@user, attachments: [f])
       expect(sub.attachments).to eq []
     end
+
+    it "includes attachments in a user group that are not in a section group" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.attachments).to eq [f]
+    end
   end
 
   describe "versioned_attachments" do
@@ -4463,6 +4474,17 @@ describe Submission do
         submission.versioned_attachments
         expect(submission.versioned_attachments).to include user_attachment
       end
+    end
+
+    it "includes attachments uploaded from group by user without matching section id" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.versioned_attachments).to eq [f]
     end
   end
 
@@ -5142,6 +5164,26 @@ describe Submission do
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
       expect(@a1.submission_for_student(@u2).grade).to be_nil
+    end
+
+    it "does not update grader_id if submission is blank or missing with -" do
+      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+                                     {
+                                       @a1.id => {
+                                         @u1.id => { posted_grade: nil }
+                                       },
+                                       @a1.id => {
+                                         @u2.id => { posted_grade: "-" }
+                                       }
+                                     })
+
+      submission1 = @a1.submission_for_student(@u1)
+      submission2 = @a1.submission_for_student(@u2)
+
+      expect(submission1.grade).to be_nil
+      expect(submission2.grade).to be_nil
+      expect(submission1.grader_id).to be_nil
+      expect(submission2.grader_id).to be_nil
     end
 
     describe "submitting comments via bulk update" do
