@@ -31,7 +31,9 @@ class Canvadoc < ActiveRecord::Base
   def upload(opts = {})
     return if document_id.present?
 
-    url = attachment.public_url(expires_in: 7.days)
+    # Internal because canvadocs does not directly serve this URL to users but only
+    # uses it for its internal conversion and then serves the converted result
+    url = attachment.public_url(expires_in: 7.days, internal: true)
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 
