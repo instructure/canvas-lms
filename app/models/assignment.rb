@@ -3767,7 +3767,6 @@ class Assignment < ActiveRecord::Base
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
     delay_if_production.recalculate_module_progressions(submission_ids)
-    context.refresh_content_participation_counts(progress)
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end
@@ -3788,7 +3787,6 @@ class Assignment < ActiveRecord::Base
     hide_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
-    context.refresh_content_participation_counts(progress)
     progress.set_results(assignment_id: id, posted_at: nil, user_ids: user_ids) if progress.present?
   end
 
