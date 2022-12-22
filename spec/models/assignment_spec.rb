@@ -9138,45 +9138,6 @@ describe Assignment do
         assignment.post_submissions(submission_ids: [student1_submission.id])
       end
 
-      describe "refresh unread_count for content participation counts" do
-        context "when posting submissions" do
-          before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-            assignment.ensure_post_policy(post_manually: true)
-          end
-
-          it "updates the unread_count if unread grade when posting" do
-            assignment.grade_student(student1, grade: 10, grader: teacher)
-            assignment.post_submissions
-            expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 1
-          end
-
-          it "updates the unread_count if unread comment when posting" do
-            student1_submission.add_comment(author: teacher, hidden: false, comment: "ok")
-            assignment.post_submissions
-            expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 1
-          end
-
-          it "updates the unread_count if unread rubric assessment when posting" do
-            rubric_association_model(association_object: assignment, purpose: "grading")
-            @rubric_association.assess({
-                                         user: student1,
-                                         assessor: teacher,
-                                         artifact: student1_submission,
-                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
-                                       })
-
-            assignment.post_submissions
-            expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 1
-          end
-
-          it "unread_count is 0 if there is no grade/comment/rubric participation" do
-            assignment.post_submissions
-            expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 0
-          end
-        end
-      end
-
       describe "grade change audit records" do
         context "when assignment posts manually" do
           before(:once) do
@@ -9411,28 +9372,6 @@ describe Assignment do
           progression = context_module.context_module_progressions.find_by(user: student2)
           requirement = { id: tag.id, type: "min_score", min_score: 90.0, score: nil }
           expect(progression.incomplete_requirements).to include requirement
-        end
-      end
-    end
-
-    describe "refresh unread_count when #hide_submissions" do
-      context "when hiding submissions" do
-        before do
-          Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-          assignment.ensure_post_policy(post_manually: true)
-        end
-
-        it "updates the unread_count if unread grade when posting" do
-          assignment.grade_student(student1, grade: 10, grader: teacher)
-          assignment.post_submissions
-          expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 1
-          assignment.hide_submissions
-          expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 0
-        end
-
-        it "unread_count is 0 if there is no grade/comment/rubric participation" do
-          assignment.hide_submissions
-          expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 0
         end
       end
     end
