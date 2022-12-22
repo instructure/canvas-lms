@@ -19,8 +19,9 @@
 import htmlEscape from 'escape-html'
 import formatMessage from '../format-message'
 import {showFlashAlert} from '../common/FlashAlert'
-import {isPreviewable, loadDocPreview, showLoadingImage, removeLoadingImage} from './doc_previews'
+import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
+import {parseUrlOrNull} from '../util/url-util'
 
 const youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
 export function youTubeID(path) {
@@ -149,12 +150,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         $link.setAttribute('aria-expanded', 'true')
 
         if (canvasOrigin && canvadoc_session_url !== null) {
-          try {
-            canvadoc_session_url = (new URL(canvadoc_session_url, canvasOrigin)).toString();
-          }
-          catch(_ex){
-            canvadoc_session_url = null
-          }
+          canvadoc_session_url = parseUrlOrNull(canvadoc_session_url, canvasOrigin)?.toString()
         }
 
         const $div = document.querySelector(`[id="${$link.getAttribute('aria-controls')}"]`)
