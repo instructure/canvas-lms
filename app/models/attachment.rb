@@ -999,7 +999,7 @@ class Attachment < ActiveRecord::Base
     end
 
     validate_hash(enable: integrity_check) do |hash_context|
-      CanvasHttp.get(public_url) do |response|
+      CanvasHttp.get(public_url(internal: true)) do |response|
         raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
         response.read_body do |data|
