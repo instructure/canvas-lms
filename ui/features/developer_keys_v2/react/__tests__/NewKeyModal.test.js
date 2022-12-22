@@ -19,6 +19,9 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from '../NewKeyModal'
+import devKeyActions from '../actions/developerKeysActions'
+import moxios from 'moxios'
+import {successfulLtiKeySaveResponse} from './fixtures/responses'
 import $ from '@canvas/rails-flash-notifications'
 
 let oldEnv
@@ -558,6 +561,78 @@ describe('redirect_uris is too long', () => {
       expect(wrapper.instance().hasInvalidRedirectUris).toBeTruthy()
       expect(flashStub).toHaveBeenCalledWith(expectedMsg)
     })
+  })
+})
+
+describe('receiving an HTTP response', () => {
+  beforeEach(() => {
+    moxios.install()
+  })
+
+  const createModalAndSaveKey = modalProps => {
+    const wrapper = mount(modal(modalProps))
+    wrapper.instance().setState({configurationMethod: 'json'})
+    wrapper.instance().saveLtiToolConfiguration()
+
+    wrapper.unmount()
+  }
+
+  it('shows flash message and closes modal', done => {
+    const handleSuccessfulSave = jest.fn()
+    const closeModal = jest.fn()
+
+    moxios.wait(async () => {
+      const request = moxios.requests.mostRecent()
+      await request.respondWith(successfulLtiKeySaveResponse)
+      // The actual flash alert call happens in App.js after handleSuccessfulSave
+      // is called, so making sure that handleSuccessfulSave is called is the best
+      // we can test for in this component. That is different from errors, where
+      // we call $.flashError in this component.
+      expect(handleSuccessfulSave).toHaveBeenCalled()
+      expect(closeModal).toHaveBeenCalled()
+      done()
+    })
+
+    const modalProps = {
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+      listDeveloperKeyScopesState,
+      actions: {...devKeyActions, developerKeysModalClose: closeModal},
+      handleSuccessfulSave,
+    }
+    createModalAndSaveKey(modalProps)
+  })
+
+  it('shows flash message and leaves modal open', done => {
+    const flashStub = jest.spyOn($, 'flashError')
+    const closeModal = jest.fn()
+
+    moxios.wait(async () => {
+      const request = moxios.requests.mostRecent()
+      await request.respondWith({
+        status: 422,
+        response: {
+          errors: [
+            {
+              field: 'lti_key',
+              message: 'tool configuration must have public jwk or public jwk url',
+              error_code: null,
+            },
+          ],
+        },
+      })
+      expect(flashStub).toHaveBeenCalledWith('Request failed with status code 422')
+      expect(closeModal).not.toHaveBeenCalled()
+      done()
+    })
+
+    const modalProps = {
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+      listDeveloperKeyScopesState,
+      actions: {...devKeyActions, developerKeysModalClose: closeModal},
+    }
+    createModalAndSaveKey(modalProps)
   })
 })
 
