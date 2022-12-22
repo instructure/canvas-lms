@@ -34,6 +34,7 @@ import '@canvas/modules/jquery/prerequisites_lookup'
 import '../../jquery/content_locks'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 
 const I18n = useI18nScope('pages')
 
@@ -203,6 +204,11 @@ export default class WikiPageView extends Backbone.View {
     this.reloadView.on('reload', () => this.render())
     this.reloadView.pollForChanges()
 
+    renderFrontPagePill({
+      margin: 'small',
+      children: this.toJSON().frontPageText,
+    })
+
     return publish('userContent/change')
   }
 
@@ -317,7 +323,7 @@ export default class WikiPageView extends Backbone.View {
     _.each(json.wiki_page_menu_tools, tool => {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
-    json.frontPageText = ENV.K5_SUBJECT_COURSE ? 'Subject Home' : 'Front Page'
+    json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
     return json
   }
 }

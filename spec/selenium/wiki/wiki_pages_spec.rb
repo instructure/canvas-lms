@@ -59,7 +59,7 @@ describe "Wiki Pages" do
       f(".pages").click
       expect(driver.current_url).not_to include("/courses/#{@course.id}/pages")
       expect(driver.current_url).to include("/courses/#{@course.id}/wiki")
-      expect(f("span.front-page.label")).to include_text "Front Page"
+      expect(f("div.front-page")).to include_text "FRONT PAGE"
       get "/courses/#{@course.id}/pages"
       expect(driver.current_url).to include("/courses/#{@course.id}/pages")
       expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
