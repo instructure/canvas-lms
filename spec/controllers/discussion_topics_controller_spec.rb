@@ -561,7 +561,7 @@ describe DiscussionTopicsController do
         subject
 
         expect(discussion).not_to be_for_assignment
-        expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id.to_s
+        expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(user).id.to_s
       end
 
       context "no current user" do
@@ -593,7 +593,7 @@ describe DiscussionTopicsController do
 
           subject
           expect(discussion).to be_for_assignment
-          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq user.submissions_folder(discussion.course).id.to_s
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(user).id.to_s
         end
       end
 
