@@ -179,6 +179,7 @@ tr:
   a_front_page_is_required_fd57b80: "Bir Ön sayfa gerekiyor"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Canvas yönetim panelinin sağdaki kenar çubuğunda görünen tam ölçülü logo. İdeal boyutlar 360 x 140 pikseldir. Kabul edilen dosya formatları: svg, png, jepg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
+  a_json_url_is_required_please_supply_one_ed03101c: "Bir json url gereklidir, lütfen bir tane girin."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Lütfen teni bir ad giriniz."
   a_message_is_required_129e1814: "Bir mesaj gerekli"
   a_name_for_this_set_is_required_222bad23: "Bu set için bir isim gereklidir"
@@ -200,6 +201,7 @@ tr:
   a_z_243c3301: A–Z
   a_z_29d8e67c: A-Z
   about_this_service_b10bc808: "Bu hizmet hakkında"
+  above_max_rating_64b29915: "Maksimun değerlendirmenin üstünde"
   academic_benchmark: 
     api_error: "%{auth} yetkilendirmesi için standartlar güncellenemedi."
     bad_ab_file: "Sağlanan Academic Benchmark dosyasında hata meydana geldi."
@@ -223,6 +225,7 @@ tr:
   accept_course_invitation_b4c04fbb: "Ders davetinin kabul et"
   accept_course_invitation_to_participate_in_this_as_b8342676: "Bu ödeve katılmak için ders davetini kabul et"
   accept_grades_4d56a3dd: "Notları kabul et"
+  accept_grades_by_gradername_7a98b969: " %{graderName} tarafından verilen notları onayla."
   acceptable_use_policy_29a28124: "Uygun Kullanım Koşulları"
   accepted_c9f8ab87: "Kabul edildi"
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "kabul edilebilir formatlar: hex, rgba, rgb, hsl"
@@ -234,6 +237,7 @@ tr:
   access_report_80d28095: "Erişim Raporu"
   access_token_3be22221: "Erişim Anahtarı"
   access_token_count_access_token_count_dfb5463c: "Erişim Anahtarı Sayısı: %{access_token_count}"
+  access_token_created_or_regenerated_4ce9ed1f: "Oluşturulan ya da Yeniden Oluşturulmuş Erişim Anahtarı"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Erişim Anahtarları diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için erişim anahtarları üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
   accessible_sidebar_menu_b30baf97: "Erişilebilir Kenar Çubuğu Menüsü"
@@ -12784,7 +12788,7 @@ tr:
   more_options_e89670cf: "Daha fazla seçenek"
   more_than_999_submissions_need_grading_bc087dd0: "999'dan fazla gönderinin notlandırılması gerek"
   more_than_a19b440: "%{more_than}+"
-  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "En güncel puan yeterlik ağırlığının %{calculation_int} olarak alınır ve diğer tüm sonuçların%{remainder}hesaplanır. Tek bir puan varsa alınan tek puan gösterilir."
+  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "En güncel puan, yeterlik ağırlığının %{calculation_int} olarak alınır ve diğer tüm sonuçların ortalamasının %{remainder} i hesaplanır. Tek bir puan varsa alınan tek puan gösterilir."
   most_recent_score_13a87e8c: "En Güncel Puan"
   move_abf00365: Taşı
   move_assignment_contents_245c61bb: "Ödev İçeriğini Taşı"
