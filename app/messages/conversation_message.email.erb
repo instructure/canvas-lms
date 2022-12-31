@@ -15,13 +15,11 @@
 <% end %>
 
 <% define_content :footer_link do %>
-  <a href="<%= content :link %>">
-    <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-      <%= t "View this message in Conversations" %>
-    <% else %>
-      <%= t "Reply to this message in Canvas" %>
-    <% end %>
-  </a>
+  <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+    <%= t "View this message in Conversations by this link: %{link}.", link: content(:link) %>
+  <% else %>
+    <%= t "Reply to this message by this link: %{link}.", link: content(:link) %>
+  <% end %>
 <% end %>
 
 <% if asset.conversation.subject.present? %>
@@ -36,7 +34,7 @@
   <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.  If you need to include an attachment, please log in to Canvas and reply through the Inbox.", link: content(:link)) %>
 <% else %>
   <%= t"Please do not reply to this email, it will not be delivered." %>
-  <%= t"You can " %><a href="<%= content :link %>"><%= t"reply to this message in Canvas." %></a>
+  <%= t"You can reply to this message by this link: %{link}.", link: content(:link) %>
 <% end %>
 
 <% unless asset.attachments.empty? %>

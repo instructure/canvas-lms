@@ -8,4 +8,4 @@
 
 <%= asset.title %> (<%= asset.readable_size %>)
 
-<p><a href="<%= content :link %>"><%= t 'view', 'You can view it here' %></a></p>
+<%= t 'view', 'You can view it by this link: %{link}.', :link => content(:link) %>

@@ -2,10 +2,8 @@
   <%= polymorphic_url([asset.context, asset]) %>
 <% end %>
 <% define_content :subject do -%>
-  <%= before_label asset.title %> <%= asset.context.name %>
+  <%= t :subject, "You created this Announcement: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
 <% end %>
-
-You created this Announcement:
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
