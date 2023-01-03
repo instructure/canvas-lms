@@ -791,6 +791,38 @@ describe DiscussionTopicsController, type: :request do
         )
       end
 
+      context "when a course has users enrolled in multiple sections" do
+        before(:once) do
+          course_with_teacher(active_course: true)
+          @section1 = @course.course_sections.create!(name: "section1")
+          @section2 = @course.course_sections.create!(name: "section2")
+
+          @student1, @student2 = create_users(2, return_type: :record)
+          @course.enroll_student(@student1, enrollment_state: "active", section: @section1, allow_multiple_enrollments: true)
+          @course.enroll_student(@student1, enrollment_state: "active", section: @section2, allow_multiple_enrollments: true)
+          @course.enroll_student(@student2, enrollment_state: "active", section: @section2)
+
+          @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
+        end
+
+        it "only counts multple-section users once" do
+          json = api_call_as_user(@student1,
+                                  :get, "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+                                  {
+                                    controller: "discussion_topics",
+                                    action: "index",
+                                    format: "json",
+                                    course_id: @course.id.to_s,
+                                    only_announcements: 1,
+                                    include: ["sections", "sections_user_count"]
+                                  })
+
+          expect(json.count).to eq(1)
+          expect(json[0]["id"]).to eq(@announcement.id)
+          expect(json[0]["user_count"]).to eq 3 # had student1 been double counted, this count would be 4
+        end
+      end
+
       describe "section specific announcements" do
         before(:once) do
           course_with_teacher(active_course: true)
