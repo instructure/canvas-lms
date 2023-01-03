@@ -43,8 +43,8 @@ const mockAvailabilities = [
     name: 'section 2',
   },
 ]
-const mockLockAt = '2022-01-19T23:59:59-07:00'
-const mockDelayedPost = '2022-01-12T00:00:00-07:00'
+const mockLockAt = '2023-01-19T23:59:59-07:00'
+const mockDelayedPost = '2023-01-12T00:00:00-07:00'
 
 const setup = props => {
   return render(
