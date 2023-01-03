@@ -18,12 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class Float
-  def near_enough?(other, epsilon = 1e-6)
-    (self - other.to_f).abs < epsilon.to_f
-  end
-end
-
 class ContextModuleProgression < ActiveRecord::Base
   include Workflow
 
@@ -285,7 +279,7 @@ class ContextModuleProgression < ActiveRecord::Base
     subs.any? do |sub|
       score = get_submission_score(sub)
 
-      new_score = score.near_enough?(score.round) ? score.round : score
+      new_score = near_enough?(score, score.round) ? score.round : score if score.present?
       requirement_met = (score.present? && new_score.to_f >= requirement[:min_score].to_f)
       if requirement_met
         remove_incomplete_requirement(requirement[:id])
@@ -354,6 +348,11 @@ class ContextModuleProgression < ActiveRecord::Base
       touch_user
     end
   end
+
+  def near_enough?(test_number, other, epsilon = 1e-6)
+    (test_number.to_f - other.to_f).abs < epsilon.to_f
+  end
+  private :near_enough?
 
   def outdated?
     if current && evaluated_at.present?
