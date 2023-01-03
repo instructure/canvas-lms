@@ -28,19 +28,19 @@ import {getI18nFormats} from '../../../../../../boot/initializers/configureDateT
 const observerEnrollment = {
   id: '1',
   type: 'ObserverEnrollment',
-  lastActivityAt: '2023-07-07T12:00:00-08:00',
+  lastActivityAt: '2022-07-07T12:00:00-08:00',
 }
 
 const studentEnrollment = {
   id: '2',
   type: 'StudentEnrollment',
-  lastActivityAt: '2023-08-08T12:00:00-08:00',
+  lastActivityAt: '2022-08-08T12:00:00-08:00',
 }
 
 const teacherEnrollment = {
   id: '3',
   type: 'TeacherEnrollment',
-  lastActivityAt: '2023-09-09T12:00:00-03:05',
+  lastActivityAt: '2022-09-09T12:00:00-03:05',
 }
 
 const noLastActivityEnrollment = {
@@ -80,16 +80,16 @@ describe('RosterTableLastActivity', () => {
 
   it('should contain the time and date of last activity in the timezone of the user', () => {
     const container = setup(DEFAULT_PROPS)
-    const studentLastActivity = container.getByText('Aug 8 at 4pm') // ENV.TIMEZONE
-    const teacherLastActivity = container.getByText('Sep 9 at 11:05am') // ENV.TIMEZONE
+    const studentLastActivity = container.getByText('Aug 8, 2022 at 4pm') // ENV.TIMEZONE
+    const teacherLastActivity = container.getByText('Sep 9, 2022 at 11:05am') // ENV.TIMEZONE
     expect(studentLastActivity).toBeInTheDocument()
     expect(teacherLastActivity).toBeInTheDocument()
   })
 
   it('should contain a tool tip with time and date of last activity in the context timezone', () => {
     const container = setup(DEFAULT_PROPS)
-    const studentLastActivity = container.getByRole('tooltip', {name: 'Aug 8 at 3pm'}) // ENV.CONTEXT_TIMEZONE
-    const teacherLastActivity = container.getByRole('tooltip', {name: 'Sep 9 at 10:05am'}) // ENV.CONTEXT_TIMEZONE
+    const studentLastActivity = container.getByRole('tooltip', {name: 'Aug 8, 2022 at 3pm'}) // ENV.CONTEXT_TIMEZONE
+    const teacherLastActivity = container.getByRole('tooltip', {name: 'Sep 9, 2022 at 10:05am'}) // ENV.CONTEXT_TIMEZONE
     expect(studentLastActivity).toBeInTheDocument()
     expect(teacherLastActivity).toBeInTheDocument()
   })
