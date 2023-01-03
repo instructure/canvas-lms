@@ -185,6 +185,13 @@ describe ContextModuleProgression do
           requirement = { id: tag.id, type: "min_score", min_score: min_score }
           expect(progression.requirements_met).to include requirement
         end
+
+        it "works if score is nil" do
+          @submission.update!(score: nil, posted_at: 1.second.ago)
+          progression = @module.context_module_progressions.find_by(user: @user)
+          requirement = { id: tag.id, type: "min_score", min_score: min_score }
+          expect(progression.requirements_met).not_to include requirement
+        end
       end
 
       it "doesn't mark students that haven't submitted as in-progress" do
