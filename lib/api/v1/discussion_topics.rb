@@ -68,7 +68,7 @@ module Api::V1::DiscussionTopics
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
     if opts[:include_sections_user_count] && context
-      opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id) }
     end
     ActiveRecord::Associations.preload(topics, %i[user attachment root_topic context])
     topics.each_with_object([]) do |topic, result|
