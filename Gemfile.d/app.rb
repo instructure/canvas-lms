@@ -45,15 +45,15 @@ gem "addressable", "2.7.0", require: false
 gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
-gem "aws-sdk-core", "3.109.2", require: false
-  gem "aws-partitions", "1.393.0", require: false
-gem "aws-sdk-dynamodb", "1.57.0"
-gem "aws-sdk-kinesis", "1.30.0", require: false
-gem "aws-sdk-s3", "1.84.1", require: false
-gem "aws-sdk-sns", "1.36.0", require: false
-gem "aws-sdk-sqs", "1.34.0", require: false
-gem "aws-sdk-kms", "1.39.0", require: false
-gem "aws-sigv4", "1.2.2", require: false
+gem "aws-sdk-core", "3.168.4", require: false
+  gem "aws-partitions", "1.687.0", require: false
+gem "aws-sdk-dynamodb", "1.80.0"
+gem "aws-sdk-kinesis", "1.43.0", require: false
+gem "aws-sdk-s3", "1.117.2", require: false
+gem "aws-sdk-sns", "1.57.0", require: false
+gem "aws-sdk-sqs", "1.52.1", require: false
+gem "aws-sdk-kms", "1.61.0", require: false
+gem "aws-sigv4", "1.5.2", require: false
 gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
   gem "chunky_png", "1.4.0", require: false
@@ -108,7 +108,7 @@ gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
   gem "mini_mime", "1.1.2", require: false
-gem "marginalia", "1.9.0", require: false
+gem "marginalia", "1.11.1", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
@@ -124,6 +124,7 @@ gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.2.0"
 gem "prawn-rails", "1.3.0"
+  gem "matrix", "0.4.2"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
 gem "rack-test", "1.1.0"
