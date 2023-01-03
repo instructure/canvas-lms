@@ -83,13 +83,21 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [threadParentEntryId, setThreadParentEntryId] = useState(
-    ENV.discussions_deep_link?.root_entry_id
+    ENV.isolated_view
+      ? ENV.discussions_deep_link?.root_entry_id
+      : ENV.discussions_deep_link?.parent_id
   )
   const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(
     !!ENV.discussions_deep_link?.root_entry_id
   )
-  const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(false)
+
+  // split screen view
+  const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(
+    !!(ENV.discussions_deep_link?.parent_id
+      ? ENV.discussions_deep_link?.parent_id
+      : ENV.discussions_deep_link?.entry_id)
+  )
   const [isSplitScreenViewOverlayed, setSplitScreenViewOverlayed] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
