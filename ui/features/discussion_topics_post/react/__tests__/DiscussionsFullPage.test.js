@@ -99,17 +99,7 @@ describe('DiscussionFullPage', () => {
     expect(container).toBeTruthy()
   })
 
-  it('should render split screen view if enabled', () => {
-    const {container} = setup(getDiscussionQueryMock())
-    expect(container).toBeTruthy()
-  })
-
   it('should render isolated view if enabled', () => {
-    const {container} = setup(getDiscussionQueryMock())
-    expect(container).toBeTruthy()
-  })
-
-  it('should render isolated view if both isolated view and split screen view are enabled', () => {
     const {container} = setup(getDiscussionQueryMock())
     expect(container).toBeTruthy()
   })
@@ -616,6 +606,38 @@ describe('DiscussionFullPage', () => {
       fireEvent.click(await container.findByTestId('thread-actions-menu'))
       fireEvent.click(await container.findByTestId('toTopic'))
       expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    })
+
+    it('should highlight the deep linked discussion entry', async () => {
+      window.ENV.discussions_deep_link = {
+        entry_id: 'DiscussionEntry-default-mock',
+        root_entry_id: null,
+      }
+      const container = setup(getDiscussionQueryMock())
+
+      // expect the highlight to exist for a while
+      jest.advanceTimersByTime(3000)
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+      // expect the highlight to disappear
+      jest.advanceTimersByTime(3000)
+      await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+    })
+  })
+
+  describe('split screen view', () => {
+    beforeEach(() => {
+      window.ENV.split_screen_view = true
+    })
+
+    it('should render split screen view if enabled', () => {
+      const {container} = setup(getDiscussionQueryMock())
+      expect(container).toBeTruthy()
+    })
+
+    it('should render isolated view if both isolated view and split screen view are enabled', () => {
+      const {container} = setup(getDiscussionQueryMock())
+      expect(container).toBeTruthy()
     })
 
     it('should highlight the deep linked discussion entry', async () => {
