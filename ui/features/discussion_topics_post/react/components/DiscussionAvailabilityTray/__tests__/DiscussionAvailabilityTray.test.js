@@ -43,8 +43,8 @@ const mockAvailabilities = [
     name: 'section 2',
   },
 ]
-const mockLockAt = '2023-01-19T23:59:59-07:00'
-const mockDelayedPost = '2023-01-12T00:00:00-07:00'
+const mockLockAt = '2022-01-19T23:59:59-07:00'
+const mockDelayedPost = '2022-01-12T00:00:00-07:00'
 
 const setup = props => {
   return render(
@@ -70,8 +70,8 @@ describe('DiscussionAvailabilityTray', () => {
       expect(getByText('Availability')).toBeInTheDocument()
       expect(getByText('99')).toBeInTheDocument()
       expect(getByText('section 2')).toBeInTheDocument()
-      expect(getByText('Jan 12 7am')).toBeInTheDocument()
-      expect(getByText('Jan 20 6:59am')).toBeInTheDocument()
+      expect(getByText('Jan 12, 2022 7am')).toBeInTheDocument()
+      expect(getByText('Jan 20, 2022 6:59am')).toBeInTheDocument()
     })
 
     it('correct text is shown when a date is not set', () => {
@@ -96,8 +96,8 @@ describe('DiscussionAvailabilityTray', () => {
       expect(container.getByTestId('availability-table')).toBeInTheDocument()
       expect(container.getByText('99')).toBeInTheDocument()
       expect(container.getByText('section 2')).toBeInTheDocument()
-      expect(container.getByText('Jan 12 7am')).toBeInTheDocument()
-      expect(container.getByText('Jan 20 6:59am')).toBeInTheDocument()
+      expect(container.getByText('Jan 12, 2022 7am')).toBeInTheDocument()
+      expect(container.getByText('Jan 20, 2022 6:59am')).toBeInTheDocument()
     })
 
     it('correct text is shown when a date is not set', () => {

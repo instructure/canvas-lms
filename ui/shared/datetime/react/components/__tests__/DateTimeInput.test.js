@@ -89,10 +89,10 @@ describe('DateTimeInput::', () => {
     const onChange = jest.fn()
     const {getByLabelText, queryAllByText, rerender} = renderInput({onChange})
     const dateInput = getByLabelText('Date')
-    fireEvent.input(dateInput, {target: {value: 'Apr 10'}})
+    fireEvent.input(dateInput, {target: {value: 'Apr 10 2022'}})
     fireEvent.blur(dateInput)
     const callbackParm = onChange.mock.calls[0][0]
-    expect(callbackParm).toBe('2023-04-10T15:00:00.000Z')
+    expect(callbackParm).toBe('2022-04-10T15:00:00.000Z')
     rerender(<DateTimeInput {...props} onChange={onChange} value={callbackParm} />)
     await waitFor(() => expect(queryAllByText('Sat, April 10, 2021, 5:00 AM')).not.toBeNull())
   })
