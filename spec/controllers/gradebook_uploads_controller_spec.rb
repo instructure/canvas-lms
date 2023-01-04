@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 describe GradebookUploadsController do
   def course_with_graded_student
     @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)

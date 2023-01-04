@@ -20,7 +20,6 @@
 
 require_relative "../lti2_api_spec_helper"
 require_dependency "lti/ims/access_token_helper"
-require "json/jwt"
 
 module Lti
   module IMS

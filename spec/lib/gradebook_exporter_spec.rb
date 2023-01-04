@@ -19,7 +19,6 @@
 #
 
 require_relative "../spec_helper"
-require "csv"
 
 describe GradebookExporter do
   before(:once) do

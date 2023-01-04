@@ -20,7 +20,6 @@
 
 require "active_model_serializers"
 require "action_controller"
-require "active_support"
 require "active_record"
 require_dependency "canvas/lock_explanation"
 require_dependency "api"

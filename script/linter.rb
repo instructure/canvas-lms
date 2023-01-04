@@ -20,7 +20,6 @@
 
 $LOAD_PATH.push File.expand_path("../gems/dr_diff/lib", __dir__)
 require "dr_diff"
-require "json"
 
 class Linter
   DEFAULT_OPTIONS = {

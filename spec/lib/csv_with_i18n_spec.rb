@@ -19,7 +19,6 @@
 #
 
 require_relative "../../gems/plugins/account_reports/spec_canvas/report_spec_helper"
-require "csv"
 
 # These tests and a subset of tests in gradebook_exporter_spec collectively cover csv_i18n_settings
 describe CSVWithI18n do

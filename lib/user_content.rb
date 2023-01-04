@@ -19,7 +19,6 @@
 
 require "nokogiri"
 require "ritex"
-require "securerandom"
 
 module UserContent
   def self.escape(

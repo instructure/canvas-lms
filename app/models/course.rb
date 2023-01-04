@@ -19,7 +19,6 @@
 #
 
 require "atom"
-require "csv"
 
 class Course < ActiveRecord::Base
   include Context

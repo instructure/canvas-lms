@@ -30,7 +30,6 @@ unless defined? BASE_FIXTURE_DIR
   D2L_FIXTURE_DIR = BASE_FIXTURE_DIR + "d2l/"
   HTML_SANITIZATION_FIXTURE_DIR = BASE_FIXTURE_DIR + "html_sanitization/"
 end
-require "pp"
 
 def get_question_hash(dir, name, delete_answer_ids: true, **opts)
   hash = get_quiz_data(dir, name, **opts).first.first

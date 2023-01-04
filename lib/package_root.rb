@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "pathname"
-
 class PackageRoot
   # initialize with the root directory of an extracted package
   def initialize(root_path)

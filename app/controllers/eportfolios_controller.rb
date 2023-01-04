@@ -19,7 +19,6 @@
 #
 
 require "atom"
-require "securerandom"
 
 class EportfoliosController < ApplicationController
   include EportfolioPage

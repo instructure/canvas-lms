@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require "builder"
-require "digest"
-require "set"
 require "zip"
 
 # Canvas Common Cartridge

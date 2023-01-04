@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "uri"
-
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked

@@ -19,7 +19,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "erubi"
-require "json"
 require "optparse"
 require_relative "./docker_utils"
 
