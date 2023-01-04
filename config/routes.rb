@@ -1225,6 +1225,7 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read/:item", action: :mark_submission_item_read, as: "#{context}_submission_mark_item_read"
+        put "#{context.pluralize}/:#{context}_id/submissions/bulk_mark_read", action: :mark_bulk_submissions_as_read, as: "#{context}_submissions_bulk_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_assessments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"

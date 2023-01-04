@@ -1317,6 +1317,33 @@ class SubmissionsApiController < ApplicationController
     change_topic_read_state("unread")
   end
 
+  # @API Mark bulk submissions as read
+  #
+  # @argument submissionIds[] [String]
+  #
+  # Accepts a string array of submission ids. Loops through and marks each submission as read
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/submissions/bulk_mark_read.json' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0" \
+  #        -F 'submissionIds=['88']'
+  #
+  def mark_bulk_submissions_as_read
+    submissions = @context.submissions.where(id: params[:submissionIds])
+
+    submissions.each do |submission|
+      if submission&.user_id == @current_user.id
+        submission.change_read_state("read", @current_user)
+      end
+    end
+    head :no_content
+  end
+
   # @API Mark submission item as read
   #
   # No request fields are necessary.

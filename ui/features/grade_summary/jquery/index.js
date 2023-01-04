@@ -45,6 +45,8 @@ import useStore from '../react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
+const SUBMISSION_UNREAD_PREFIX = 'submission_unread_dot_'
+
 const GradeSummary = {
   getSelectedGradingPeriodId() {
     const currentGradingPeriodId = ENV.current_grading_period_id
@@ -584,11 +586,15 @@ function getSelectMenuGroupProps() {
     gradingPeriods: ENV.grading_periods || [],
     saveAssignmentOrder,
     selectedAssignmentSortOrder: ENV.current_assignment_sort_order,
-    selectedCourseID: ENV.context_asset_string.match(/.*_(\d+)$/)[1],
+    selectedCourseID: getCourseId(),
     selectedGradingPeriodID: ENV.current_grading_period_id,
     selectedStudentID: ENV.student_id,
     students: ENV.students,
   }
+}
+
+function getCourseId() {
+  return ENV.context_asset_string.match(/.*_(\d+)$/)[1]
 }
 
 function renderSelectMenuGroup() {
@@ -714,11 +720,16 @@ function setup() {
         }
       })
 
-      if ($('.unread_dot.grade_dot').length) {
-        const fiveSeconds = 5000
-        setTimeout(() => {
-          $('.unread_dot.grade_dot').remove()
-        }, fiveSeconds)
+      if (ENV.assignments_2_student_enabled && $('.unread_dot.grade_dot').length) {
+        const unreadSubmissions = $('.unread_dot.grade_dot').toArray()
+        const unreadSubmissionIds = unreadSubmissions.map(x => {
+          return $(x).attr('id').substring(SUBMISSION_UNREAD_PREFIX.length)
+        })
+        const url = `/api/v1/courses/${getCourseId()}/submissions/bulk_mark_read`
+        const data = {
+          submissionIds: unreadSubmissionIds,
+        }
+        axios.put(url, data)
       }
     }
 

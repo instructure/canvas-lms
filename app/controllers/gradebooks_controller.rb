@@ -1557,13 +1557,4 @@ class GradebooksController < ApplicationController
   def outcome_service_results_to_canvas_enabled?
     @context.feature_enabled?(:outcome_service_results_to_canvas)
   end
-
-  def mark_grades_read_a2
-    return unless @context.feature_enabled?(:assignments_2_student)
-
-    @presenter.submissions.each do |submission|
-      submission.mark_read(@current_user)
-    end
-  end
-  helper_method :mark_grades_read_a2
 end
