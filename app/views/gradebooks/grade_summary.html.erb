@@ -27,7 +27,9 @@
 %>
 <%
   feedback_visibility_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+  assignments_2_student_enabled = @domain_root_account.feature_enabled?(:assignments_2_student)
   js_env visibility_feedback_enabled: feedback_visibility_enabled
+  js_env assignments_2_student_enabled: assignments_2_student_enabled 
 %>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
@@ -249,7 +251,7 @@
                 <% end %>
               <% end %>
               <% if assignment_presenter.graded? && assignment_presenter.item_unread?("grade") %>
-                <span class="unread_dot grade_dot">&nbsp;</span>
+                <span class="unread_dot grade_dot" id="submission_unread_dot_<%= submission.id %>">&nbsp;</span>
               <% end %>
             </span>
             <div style="display: none;">
@@ -671,5 +673,4 @@
   <input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
   <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><i class="icon-reply-2"></i></a>
   <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
-  <% mark_grades_read_a2 %>
 </div>

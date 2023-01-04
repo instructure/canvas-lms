@@ -5109,6 +5109,38 @@ describe "Submissions API", type: :request do
     end
   end
 
+  context "mark bulk submissions as read" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course
+      @assignment1 = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
+      @assignment2 = @course.assignments.create!(title: "some assignment 2", submission_types: "online_url,online_upload")
+      @submission1 = @assignment1.submit_homework(@student)
+      @submission2 = @assignment2.submit_homework(@student)
+      @assignment1.grade_student @student, score: 98, grader: @teacher
+      @assignment2.grade_student @student, score: 90, grader: @teacher
+    end
+
+    let(:endpoint) { "/api/v1/courses/#{@course.id}/submissions/bulk_mark_read" }
+    let(:params) do
+      { course_id: @course.id.to_s, submissionIds: [@submission1.id, @submission2.id], action: "mark_bulk_submissions_as_read",
+        controller: "submissions_api", format: "json" }
+    end
+
+    it "marks submission grades as read" do
+      raw_api_call(:put, endpoint, params)
+      expect(@submission1.reload.read?(@student)).to be_truthy
+      expect(@submission2.reload.read?(@student)).to be_truthy
+    end
+
+    it "does not mark submission grade as read if user is not the student of the submission" do
+      @user = @teacher
+      raw_api_call(:put, endpoint, params)
+      expect(@submission1.reload.read?(@user)).not_to be_truthy
+      expect(@submission2.reload.read?(@user)).not_to be_truthy
+    end
+  end
+
   context "rubric comments read state" do
     before :once do
       course_with_student_and_submitted_homework
