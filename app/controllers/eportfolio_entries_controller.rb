@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "securerandom"
-
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
   before_action :rce_js_env

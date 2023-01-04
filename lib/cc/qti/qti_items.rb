@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "bigdecimal"
 
 # rubocop:disable comments of Style/SymbolProc in this file are because the
 # builder DSL uses method_missing and blocks to define nested XML elements, and

@@ -20,7 +20,6 @@
 
 require "spec_helper"
 require_relative "../graphql_spec_helper"
-require "set"
 
 describe Mutations::UpdateAssignment do
   before(:once) do

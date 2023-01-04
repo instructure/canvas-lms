@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 # DumpHelper.find_dump_error(viewer)
 module DumpHelper
   class << self

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "yaml"
-
 SPEC_THRESHOLD = 40_000
 
 spec_count = YAML.load_file("crystalball_map.yml")[:version].split[0].to_i

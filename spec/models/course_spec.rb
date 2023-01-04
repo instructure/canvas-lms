@@ -21,9 +21,6 @@
 require "lti2_course_spec_helper"
 require_relative "../helpers/k5_common"
 
-require "csv"
-require "socket"
-
 describe Course do
   include K5Common
 

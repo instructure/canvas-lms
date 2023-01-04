@@ -21,7 +21,6 @@
 
 # This doesn't get required if we're not using smtp, and there's some
 # references to SMTP exception classes in the code.
-require "net/smtp"
 
 config = {
   domain: "unknowndomain.example.com",

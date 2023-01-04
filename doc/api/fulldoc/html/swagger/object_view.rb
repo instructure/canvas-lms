@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "json"
 require "hash_view"
 require "object_part_view"
 require "model_view"

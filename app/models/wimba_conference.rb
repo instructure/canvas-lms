@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "net/http"
-require "uri"
-
 class WimbaConference < WebConference
   external_url :archive,
                name: -> { t("external_urls.archive", "Archive") },

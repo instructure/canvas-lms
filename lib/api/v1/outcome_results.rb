@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
   include Outcomes::OutcomeFriendlyDescriptionResolver

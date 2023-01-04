@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "erb"
-
 class DataServicesMarkdownCreator
   CALIPER_EVENT_TEMPLATE = File.read("doc/api/data_services/caliper_event_template.md.erb")
   CALIPER_STRUCTURE_TEMPLATE = File.read("doc/api/data_services/caliper_structure_template.md.erb")

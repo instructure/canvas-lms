@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "bigdecimal"
-
 class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
   class FlexRange
     def initialize(a, b)

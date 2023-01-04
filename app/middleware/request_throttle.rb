@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "set"
 
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes

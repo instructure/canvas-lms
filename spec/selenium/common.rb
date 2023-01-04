@@ -19,8 +19,6 @@
 #
 require "nokogiri"
 require "selenium-webdriver"
-require "socket"
-require "timeout"
 require "sauce_whisk"
 require_relative "test_setup/custom_selenium_rspec_matchers"
 require_relative "test_setup/selenium_driver_setup"
