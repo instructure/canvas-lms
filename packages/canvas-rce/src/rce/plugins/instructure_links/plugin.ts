@@ -208,29 +208,18 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
   })
 
   // Register toolbar button
-  ed.ui.registry.addSplitButton('instructure_links', {
+  ed.ui.registry.addMenuButton('instructure_links', {
     tooltip: formatMessage('Links'),
     icon: 'link',
     fetch: callback =>
       callback(
-        getMenuItems(ed).map(item => {
-          return {
-            type: 'choiceitem',
-            text: item.text,
-            value: item.value,
-          }
-        })
+        getMenuItems(ed).map(item => ({
+          type: 'menuitem',
+          text: item.text,
+          value: item.value,
+          onAction: () => doMenuItem(ed, item.value),
+        }))
       ),
-    onAction(api) {
-      if (!api.isDisabled()) {
-        if (getAnchorElement(ed, ed.selection.getNode())) {
-          doMenuItem(ed, 'instructureTrayToEditLink')
-        } else {
-          doMenuItem(ed, 'instructureLinkCreate')
-        }
-      }
-    },
-    onItemAction: (splitButtonApi, value) => doMenuItem(ed, value),
     onSetup(api) {
       function handleNodeChange(e) {
         if (e?.element) {

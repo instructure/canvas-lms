@@ -138,14 +138,6 @@ describe "new ui" do
       expect(mce_icons.css_value("width")).to eq("16px")
       expect(mce_icons.css_value("height")).to eq("16px")
     end
-
-    it "does not break equation editor css", priority: "2" do
-      get "/courses/#{@course.id}/assignments/new"
-      wait_for_tiny(f("#assignment_description"))
-      select_math_equation_from_toolbar
-      wait_for_ajaximations
-      expect(f(".mathquill-toolbar-panes, .mathquill-tab-bar")).to be_displayed
-    end
   end
 
   context "as student" do

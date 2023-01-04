@@ -142,7 +142,8 @@ class OutcomesController < ApplicationController
                 else
                   @context.available_outcomes
                 end
-    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)) # .for_context_codes(@codes)
+    @results = LearningOutcomeResult.active.for_user(@user).for_outcome_ids(@outcomes.map(&:id)).order(assessed_at: :asc) # .for_context_codes(@codes)
+
     @results_for_outcome = @results.group_by(&:learning_outcome_id)
 
     @page_title = t :outcomes_for, "Outcomes for %{user_name}", user_name: @user.name

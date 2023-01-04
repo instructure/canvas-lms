@@ -367,7 +367,7 @@ module CanvasKaltura
       params.each do |key, value|
         next if value.nil?
 
-        requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
+        requestParams += "&#{URI::DEFAULT_PARSER.escape(key.to_s)}=#{URI::DEFAULT_PARSER.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
       if response.is_a? Net::HTTPServiceUnavailable

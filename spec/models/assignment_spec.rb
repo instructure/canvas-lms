@@ -317,7 +317,7 @@ describe Assignment do
       it "calls submit_to_canvadocs when a canvadoc is not available and annotatable_attachment is present" do
         @canvadoc.update!(document_id: nil)
         expected_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-        expect(@attachment).to receive(:submit_to_canvadocs).with(1, expected_opts)
+        expect(@attachment).to receive(:submit_to_canvadocs).with(1, **expected_opts)
 
         @course.assignments.create!(
           annotatable_attachment: @attachment,
@@ -1580,6 +1580,13 @@ describe Assignment do
         expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
       end
 
+      it "do not duplicates the assignment's external_tool_tag if the submission type was updated" do
+        assignment.update(submission_types: "online_text_entry")
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.external_tool_tag).not_to be_present
+      end
+
       it "sets the assignment's state to 'duplicating'" do
         expect(assignment.duplicate.workflow_state).to eq("duplicating")
       end
@@ -2227,19 +2234,19 @@ describe Assignment do
 
       it "sets grade_posting_in_progress to false when absent" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher)
+          .with(submission, student, nil, { grade: 10, grader: teacher })
         assignment.grade_student(student, grade: 10, grader: teacher)
       end
 
       it "sets grade_posting_in_progress to true when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: true)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: true })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: true)
       end
 
       it "sets grade_posting_in_progress to false when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: false)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: false })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: false)
       end
     end

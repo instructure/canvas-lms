@@ -221,6 +221,22 @@ test('does not include assignment_order if getAssignmentOrder returns no assignm
     })
 })
 
+test('includes stringified student IDs if getStudentOrder returns some students', function () {
+  this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+  this.subject.monitorExport = (resolve, _reject) => {
+    resolve('success')
+  }
+
+  const getAssignmentOrder = () => []
+  const getStudentOrder = () => ['4', '10610000001840127', '12']
+  return this.subject
+    .startExport(undefined, getAssignmentOrder, false, getStudentOrder)
+    .then(() => {
+      const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+      propEqual(postData.student_order, ['4', '10610000001840127', '12'])
+    })
+})
+
 test('returns a rejected promise if the manager has no exportingUrl set', function () {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
   this.subject.exportingUrl = undefined

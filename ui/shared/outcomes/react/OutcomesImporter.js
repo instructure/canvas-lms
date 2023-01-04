@@ -85,6 +85,7 @@ export default class OutcomesImporter extends Component {
 
   pollImportStatus(importId) {
     this.pollStatus = setInterval(() => {
+      // eslint-disable-next-line promise/catch-or-return
       apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
         const workflowState = response.data.workflow_state
         if (workflowState === 'succeeded' || workflowState === 'failed') {
@@ -139,18 +140,12 @@ export default class OutcomesImporter extends Component {
           'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.'
         ),
       })
-    } else if (count > 0) {
-      showFlashAlert({
-        type: 'warning',
-        message: I18n.t(
-          'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
-        ),
-      })
     } else {
       apiClient
         .queryImportCreatedGroupIds(this.props.contextUrlRoot, importId)
         .then(response => {
-          this.successfulUpload(response.data)
+          if (count > 0) this.completedWithErrors(response.data)
+          else this.successfulUpload(response.data)
         })
         .catch(err => {
           throw err
@@ -158,14 +153,27 @@ export default class OutcomesImporter extends Component {
     }
   }
 
-  successfulUpload(createdGroupIds) {
+  getImportedGroups(createdGroupIds) {
     this.props.onSuccessfulOutcomesImport({
       selectedGroupAncestorIds: [...this.props.learningOutcomeGroupAncestorIds, ...createdGroupIds],
     })
+  }
 
+  successfulUpload(createdGroupIds) {
+    this.getImportedGroups(createdGroupIds)
     showFlashAlert({
       type: 'success',
       message: I18n.t('Your outcomes were successfully imported.'),
+    })
+  }
+
+  completedWithErrors(createdGroupIds) {
+    this.getImportedGroups(createdGroupIds)
+    showFlashAlert({
+      type: 'warning',
+      message: I18n.t(
+        'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+      ),
     })
   }
 

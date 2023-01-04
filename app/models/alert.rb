@@ -69,7 +69,7 @@ class Alert < ActiveRecord::Base
     self.repetition = nil if repetition.blank?
   end
 
-  def as_json(**)
+  def as_json(*)
     converted_recipients = recipients.to_a.map do |recipient|
       case recipient
       when String

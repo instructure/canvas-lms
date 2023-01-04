@@ -8,7 +8,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Felirat hozzáadása" },
   "add_image_60b2de07": { "message": "Kép hozzáadása" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Igazítás" },
   "alignment_and_lists_5cebcb69": { "message": "Igazítások és listák" },
   "all_4321c3a1": { "message": "Összes" },
   "all_apps_a50dea49": { "message": "Minden alkalmazás" },
@@ -73,7 +72,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Mégse" },
   "cap_product_3a5265a6": { "message": "Kupak termék" },
-  "center_align_e68d9997": { "message": "Középre igazítás" },
   "centered_dot_64d5e378": { "message": "Középre helyezett pont" },
   "centered_horizontal_dots_451c5815": {
     "message": "Középre helyezett vízszintes pontok"
@@ -159,7 +157,6 @@
   "date_added_ed5ad465": { "message": "Dátum hozzáadva" },
   "decorative_icon_9a7f3fc3": { "message": "Dekoratív ikon" },
   "decorative_type_upper_f2c95e3": { "message": "Dekoratív { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Behúzás csökkentése" },
   "deep_purple_bb3e2907": { "message": "Sötétlila" },
   "definite_integral_fe7ffed1": { "message": "Határozott integrál" },
   "degree_symbol_4a823d5f": { "message": "Fokozat szimbólum" },
@@ -356,7 +353,6 @@
     "message": "Képzelt rész (komplex szám)"
   },
   "in_element_of_19ca2f33": { "message": "Ebben" },
-  "increase_indent_6af90f7c": { "message": "Behúzás növelése" },
   "indefinite_integral_6623307e": { "message": "Határozatlan Integrál" },
   "indigo_2035fc55": { "message": "Indigókék" },
   "inference_fed5c960": { "message": "Következtetés" },
@@ -377,7 +373,6 @@
   "language_arts_icon_a798b0f8": { "message": "Nyelv Művészetek Ikon" },
   "languages_icon_9d20539": { "message": "Nyelvek ikon" },
   "large_9c5e80e7": { "message": "Nagy" },
-  "left_align_43d95491": { "message": "Balra igazítás" },
   "left_angle_bracket_c87a6d07": { "message": "Bal csúcsos zárójel" },
   "left_arrow_4fde1a64": { "message": "Bal nyíl" },
   "left_arrow_with_hook_5bfcad93": { "message": "Balra nyíl Horoggal" },
@@ -584,7 +579,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich Text terület. A Rich Content Editor parancsikonjaihoz nyomja meg az ALT+0 billentyűkombinációt."
   },
-  "right_align_39e7a32a": { "message": "Jobbra igazítás" },
   "right_angle_bracket_d704e2d6": { "message": "Jobb csúcsos zárójel" },
   "right_arrow_35e0eddf": { "message": "Jobb nyíl" },
   "right_arrow_with_hook_29d92d31": { "message": "Jobbra Nyíl Horoggal" },
@@ -668,9 +662,6 @@
   "succeeds_equal_158e8c3a": { "message": "Siker egyenlő" },
   "sum_b0842d31": { "message": "Összeg" },
   "superscript_8cb349a2": { "message": "felső index" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Felső index és alsó index"
-  },
   "superset_c4db8a7a": { "message": "Csoporthalmaz" },
   "superset_strict_c77dd6d2": { "message": "Csoporthalmaz (szigorú)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {

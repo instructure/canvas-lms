@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Allinea"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Allineamento ed elenchi"
     },
@@ -269,9 +266,6 @@
     "catalan_16f6b78f": {
         "message": "Catalano"
     },
-    "center_align_e68d9997": {
-        "message": "Allineamento al centro"
-    },
     "centered_dot_64d5e378": {
         "message": "Punto centrato"
     },
@@ -490,9 +484,6 @@
     },
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } decorativo"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "Riduci rientro"
     },
     "deep_purple_bb3e2907": {
         "message": "Viola scuro"
@@ -754,6 +745,9 @@
     },
     "exists_2e62bdaa": {
         "message": "Esiste"
+    },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Esci da modalità schermo intero"
     },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Espandi anteprima per impostazione predefinita"
@@ -1082,9 +1076,6 @@
     "in_element_of_19ca2f33": {
         "message": "In (elemento di)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Aumenta rientro"
-    },
     "indefinite_integral_6623307e": {
         "message": "Integrale indefinito"
     },
@@ -1186,9 +1177,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Lettone"
-    },
-    "left_align_43d95491": {
-        "message": "Allineamento a sinistra"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Parentesi uncinata aperta"
@@ -1817,9 +1805,6 @@
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Area di testo RTF. Premere ALT+0 per scorciatoie di Editor di contenuti avanzati."
     },
-    "right_align_39e7a32a": {
-        "message": "Allineamento a destra"
-    },
     "right_angle_bracket_d704e2d6": {
         "message": "Parentesi uncinata chiusa"
     },
@@ -2059,9 +2044,6 @@
     },
     "superscript_8cb349a2": {
         "message": "Apice"
-    },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Apice e pedice"
     },
     "superset_c4db8a7a": {
         "message": "Sovrainsieme"
@@ -2437,6 +2419,9 @@
     },
     "view_title_description_67940918": {
         "message": "Visualizza descrizione { title }"
+    },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "Visualizza conteggio parole e caratteri"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigazione programma settimanale"

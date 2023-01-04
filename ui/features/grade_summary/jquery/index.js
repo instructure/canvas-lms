@@ -603,7 +603,10 @@ function handleSubmissionsCommentTray(assignmentId) {
 
   if (submissionTrayAssignmentId === assignmentId && submissionTrayOpen) {
     useStore.setState({submissionTrayOpen: false, submissionTrayAssignmentId: undefined})
+    $(`#comments_thread_${submissionTrayAssignmentId}`).removeClass('comment_thread_show_print')
   } else {
+    $(`#comments_thread_${submissionTrayAssignmentId}`).removeClass('comment_thread_show_print')
+    $(`#comments_thread_${assignmentId}`).addClass('comment_thread_show_print')
     const {attempts, assignmentUrl} = getSubmissionCommentsTrayProps(assignmentId)
     useStore.setState({
       submissionCommentsTray: {attempts},
@@ -637,7 +640,12 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 function renderSubmissionCommentsTray() {
   ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
   ReactDOM.render(
-    <SubmissionCommentsTray />,
+    <SubmissionCommentsTray
+      onDismiss={() => {
+        const {submissionTrayAssignmentId} = useStore.getState()
+        $(`#comments_thread_${submissionTrayAssignmentId}`).removeClass('comment_thread_show_print')
+      }}
+    />,
     document.getElementById('GradeSummarySubmissionCommentsTray')
   )
 }

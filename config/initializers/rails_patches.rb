@@ -17,14 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module UntaintCacheEntries
-  def value
-    @value&.untaint
-    super
-  end
-end
-ActiveSupport::Cache::Entry.prepend(UntaintCacheEntries)
-
 # Extend the query logger to add "SQL" back to the front, like it was in
 # rails2, to make it easier to pull out those log lines for analysis.
 module AddSQLToLogLines

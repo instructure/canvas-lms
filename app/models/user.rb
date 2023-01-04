@@ -2097,6 +2097,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def membership_for_group_id?(group_id)
+    current_group_memberships.active.where(group_id: group_id).exists?
+  end
+
   def has_student_enrollment?
     return @_has_student_enrollment if defined?(@_has_student_enrollment)
 

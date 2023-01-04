@@ -542,6 +542,12 @@
     color: var(--canvasEnabledColor);
   }
 
+  /* place the chevron above the icon for buttons with dropdowns */
+  .tox .tox-tbtn.tox-tbtn--enabled.tox-tbtn--select::after {
+    text-align: left;
+    padding-left: 18px;
+  }
+
   /* the split button is not enabled and the chevron has been clicked to open the popup
    * hide the enabled bar that's under just the chevron
    */
@@ -697,6 +703,13 @@
   .tox .tox-split-button .tox-tbtn.tox-split-button__chevron {
     margin-inline-start: -6px;
     background-color: var(--canvasBackgroundColor);
+
+    /* Increases touch-target width of split-button dropdowns for MAT-602 */
+    width: 30px;
+  }
+
+  .tox .tox-split-button:hover {
+    box-shadow: none;
   }
 
   .tox .tox-split-button:hover .tox-split-button__chevron {

@@ -437,6 +437,23 @@ describe "threaded discussions" do
           get "/courses/#{@course.id}/discussion_topics/#{@threaded_topic.id}"
         end
 
+        it "expands and collapses all correctly" do
+          f("button[data-testid='ExpandCollapseThreads-button']").click
+          wait_for_ajaximations
+
+          expect(fj("div:contains('1st level reply')")).to be_present
+          expect(fj("div:contains('2nd level reply')")).to be_present
+          expect(fj("div:contains('3rd level reply')")).to be_present
+          expect(fj("div:contains('4th level reply')")).to be_present
+
+          f("button[data-testid='ExpandCollapseThreads-button']").click
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("div:contains('2nd level reply')")
+          expect(f("body")).not_to contain_jqcss("div:contains('3rd level reply')")
+          expect(f("body")).not_to contain_jqcss("div:contains('4th level reply')")
+        end
+
         it "replies correctly to discussion topic" do
           f("button[data-testid='discussion-topic-reply']").click
           wait_for_ajaximations

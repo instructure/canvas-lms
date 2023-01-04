@@ -25,6 +25,8 @@ import {
 } from '../types'
 import {Constants as PaceContextsConstants} from '../actions/pace_contexts'
 
+const pacesPublishing = window.ENV.PACES_PUBLISHING || []
+
 export const paceContextsInitialState: PaceContextsState = {
   selectedContextType: 'section',
   selectedContext: null,
@@ -38,6 +40,8 @@ export const paceContextsInitialState: PaceContextsState = {
   searchTerm: '',
   sortBy: 'name',
   order: 'asc',
+  synced: false,
+  contextsPublishing: pacesPublishing?.map(({context_code}) => context_code),
 }
 
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
@@ -116,6 +120,33 @@ export const paceContextsReducer = (
         ...state,
         order: action.payload,
       }
+    case PaceContextsConstants.SET_SYNCED:
+      return {
+        ...state,
+        synced: action.payload,
+      }
+    case PaceContextsConstants.ADD_PUBLISHING_PACE:
+      return {
+        ...state,
+        contextsPublishing: [...state.contextsPublishing, action.payload],
+      }
+    case PaceContextsConstants.REMOVE_PUBLISHING_PACE:
+      return {
+        ...state,
+        contextsPublishing: state.contextsPublishing.filter(cP => cP !== action.payload),
+      }
+    case PaceContextsConstants.REPLACE_PACE_CONTEXTS: {
+      const newPaceContexts = state.entries.map(paceContext => {
+        const newPaceContext = action.payload.find(
+          updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id
+        )
+        return newPaceContext || paceContext
+      })
+      return {
+        ...state,
+        entries: newPaceContexts,
+      }
+    }
     default:
       return state
   }

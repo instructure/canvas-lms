@@ -4349,6 +4349,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
         if (gradeInfo.excused) {
           submissionData.excuse = true
+        } else if (
+          ENV.GRADEBOOK_OPTIONS.assignment_missing_shortcut &&
+          gradeInfo.late_policy_status === 'missing'
+        ) {
+          submissionData.late_policy_status = gradeInfo.late_policy_status
         } else if (gradeInfo.enteredAs === null) {
           submissionData.posted_grade = ''
         } else if (['passFail', 'gradingScheme'].includes(gradeInfo.enteredAs)) {
@@ -4647,9 +4652,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     // custom columns
+    // two scenarios in which to build custom column state:
+    //   1. custom columns finished loading; student data already loaded
+    //   2. student data stopped loading; custom columns already loaded
     if (
-      prevProps.isCustomColumnsLoading !== this.props.isCustomColumnsLoading &&
-      !this.props.isCustomColumnsLoading
+      (prevProps.isCustomColumnsLoading !== this.props.isCustomColumnsLoading &&
+        !this.props.isCustomColumnsLoading &&
+        this.props.isStudentDataLoaded) ||
+      (prevProps.isStudentDataLoaded !== this.props.isStudentDataLoaded &&
+        this.props.isStudentDataLoaded &&
+        !this.props.isCustomColumnsLoading)
     ) {
       this.gotCustomColumns(this.props.customColumns)
       this.dataLoader.loadInitialData().catch(() => {

@@ -920,7 +920,7 @@ class CoursesController < ApplicationController
             progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
             progress.user = @current_user
             progress.reset!
-            progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+            progress.process_job(@course, :sync_homeroom_enrollments, { priority: Delayed::LOW_PRIORITY })
             # Participation sync should be done in the normal request flow, as it only needs to update a couple of
             # specific fields, delegating that to a job will cause the controller to return the old values, which will
             # force the user to refresh the page after the job finishes to see the changes
@@ -3214,7 +3214,7 @@ class CoursesController < ApplicationController
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!
-          progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+          progress.process_job(@course, :sync_homeroom_enrollments, { priority: Delayed::LOW_PRIORITY })
           # Participation sync should be done in the normal request flow, as it only needs to update a couple of
           # specific fields, delegating that to a job will cause the controller to return the old values, which will
           # force the user to refresh the page after the job finishes to see the changes

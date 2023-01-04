@@ -114,8 +114,8 @@ class ServicesApiController < ApplicationController
 
   def rce_config
     @include_js_env = true
-    inst = inst_env
-    env = rce_js_env
+    inst = inst_env || {}
+    env = rce_js_env || {}
 
     should_add_base_url = !Canvas::Cdn.config.host
     base_url = "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"
@@ -126,18 +126,26 @@ class ServicesApiController < ApplicationController
     active_brand_css_url = env[:active_brand_config_json_url]
     locales = env[:LOCALES] || ["en"]
 
-    render json: env.slice(
-      :RICH_CONTENT_CAN_UPLOAD_FILES, :RICH_CONTENT_INST_RECORD_TAB_DISABLED, :RICH_CONTENT_FILES_TAB_DISABLED,
-      :RICH_CONTENT_CAN_EDIT_FILES, :K5_SUBJECT_COURSE, :K5_HOMEROOM_COURSE, :context_asset_string,
-      :DEEP_LINKING_POST_MESSAGE_ORIGIN, :current_user_id, :disable_keyboard_shortcuts, :rce_auto_save_max_age_ms
-    ).merge({
-              kalturaSettings: { hide_rte_button: inst.dig(:kalturaSettings, :hide_rte_button) || false },
-              LOCALES: locales,
-              LOCALE: locales[0],
-              active_brand_config_json_url: active_brand_css_url && add_base_url_if_needed.call(active_brand_css_url),
-              url_for_high_contrast_tinymce_editor_css: high_contrast_css_urls.map(&add_base_url_if_needed),
-              url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css_urls.map(&add_base_url_if_needed),
-              FEATURES: env[:FEATURES]&.transform_values { |v| !!v },
-            })
+    render json: {
+      RICH_CONTENT_CAN_UPLOAD_FILES: env[:RICH_CONTENT_CAN_UPLOAD_FILES],
+      RICH_CONTENT_INST_RECORD_TAB_DISABLED: env[:RICH_CONTENT_INST_RECORD_TAB_DISABLED],
+      RICH_CONTENT_FILES_TAB_DISABLED: env[:RICH_CONTENT_FILES_TAB_DISABLED],
+      RICH_CONTENT_CAN_EDIT_FILES: env[:RICH_CONTENT_CAN_EDIT_FILES],
+      K5_SUBJECT_COURSE: env[:K5_SUBJECT_COURSE],
+      K5_HOMEROOM_COURSE: env[:K5_HOMEROOM_COURSE],
+      context_asset_string: env[:context_asset_string],
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: env[:DEEP_LINKING_POST_MESSAGE_ORIGIN],
+      current_user_id: env[:current_user_id],
+      disable_keyboard_shortcuts: env[:disable_keyboard_shortcuts],
+      rce_auto_save_max_age_ms: env[:rce_auto_save_max_age_ms],
+      editorButtons: inst[:editorButtons] || [],
+      kalturaSettings: { hide_rte_button: inst.dig(:kalturaSettings, :hide_rte_button) || false },
+      LOCALES: locales,
+      LOCALE: locales[0],
+      active_brand_config_json_url: active_brand_css_url && add_base_url_if_needed.call(active_brand_css_url),
+      url_for_high_contrast_tinymce_editor_css: high_contrast_css_urls.map(&add_base_url_if_needed),
+      url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css_urls.map(&add_base_url_if_needed),
+      FEATURES: env[:FEATURES]&.transform_values { |v| !!v },
+    }
   end
 end

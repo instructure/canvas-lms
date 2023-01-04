@@ -27,10 +27,10 @@ end
 
 if RUBY_ENGINE == "truffleruby"
   warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
-elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
+elsif RUBY_VERSION >= "3.0.0"
   warn "Ruby 3.0+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 end
-ruby ">= 2.7.0", "< 3.1"
+ruby ">= 2.7.0"
 
 # Add the version number to the Gemfile.lock as Gemfile.<version>.lock
 Bundler::SharedHelpers.class_eval do

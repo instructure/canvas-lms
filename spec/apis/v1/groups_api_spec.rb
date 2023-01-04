@@ -47,7 +47,7 @@ describe "Groups API", type: :request do
       "created_at" => group.created_at.iso8601
     }
     if opts[:include_users]
-      json["users"] = users_json(group.users, opts)
+      json["users"] = users_json(group.users, **opts)
     end
     if opts[:include_permissions]
       json["permissions"] = {
@@ -86,8 +86,8 @@ describe "Groups API", type: :request do
     json
   end
 
-  def users_json(users, opts)
-    users.map { |user| user_json(user, opts) }
+  def users_json(users, **opts)
+    users.map { |user| user_json(user, **opts) }
   end
 
   def user_json(user, **)

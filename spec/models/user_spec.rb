@@ -3391,6 +3391,21 @@ describe User do
       @course.save!
       expect(User.find(@student.id).cached_current_group_memberships_by_date.map(&:group)).to match_array([ag])
     end
+
+    describe "#has_membership_for_current_group" do
+      it "returns true for active group" do
+        expect(@student.membership_for_group_id?(@group.id)).to be true
+      end
+
+      it "returns false for inactive group" do
+        @group.destroy
+        expect(@student.membership_for_group_id?(@group.id)).to be false
+      end
+
+      it "returns false for non existing group" do
+        expect(@student.membership_for_group_id?("fake_id")).to be false
+      end
+    end
   end
 
   describe "visible_groups" do

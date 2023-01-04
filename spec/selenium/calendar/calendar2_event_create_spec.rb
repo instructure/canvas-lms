@@ -510,6 +510,23 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(event.reload.child_events.length).to be 1
       end
+
+      it "preserves correct time when editing an event in a different DST window" do
+        @user.time_zone = "America/Denver"
+        @user.save!
+        now = DateTime.current.beginning_of_hour
+        # by creating an event at t+3, t+6, and t+9 months, we guarantee that at least 1 of those
+        # events will be in a different DST state than now
+        [now + 3.months, now + 6.months, now + 9.months].each do |start_at|
+          end_at = start_at + 1.hour
+          event = CalendarEvent.create!(context: @course, start_at: start_at, end_at: end_at)
+          child_event = event.child_events.create!(context: @course.default_section, start_at: start_at, end_at: end_at)
+          get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+          wait_for_new_page_load { f("#editCalendarEventFull").submit }
+          expect(child_event.reload.start_at).to eq(start_at)
+          expect(child_event.reload.end_at).to eq(end_at)
+        end
+      end
     end
 
     context "assignment creation" do

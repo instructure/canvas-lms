@@ -60,7 +60,7 @@ class UserList
 
   attr_reader :errors, :addresses, :duplicate_addresses
 
-  def as_json(**)
+  def as_json(*)
     {
       users: addresses.map { |a| a.except(:shard) },
       duplicates: duplicate_addresses,

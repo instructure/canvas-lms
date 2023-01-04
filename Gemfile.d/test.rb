@@ -48,7 +48,7 @@ group :test do
 
   gem "webmock", "3.8.2", require: false
     gem "crack", "0.4.5", require: false
-  gem "timecop", "0.9.1"
+  gem "timecop", "0.9.5"
   gem "jira_ref_parser", "1.0.1"
   gem "headless", "2.3.1", require: false
   gem "escape_code", "0.2", require: false

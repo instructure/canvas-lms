@@ -81,27 +81,23 @@ tinymce.PluginManager.add('instructure_icon_maker', function (ed) {
   })
 
   // Register button
-  ed.ui.registry.addSplitButton('instructure_icon_maker', {
+  ed.ui.registry.addMenuButton('instructure_icon_maker', {
     tooltip: formatMessage('Icon Maker Icons'),
     icon: 'buttons',
     fetch: callback =>
       callback(
         getMenuItems().map(item => ({
-          type: 'choiceitem',
+          type: 'menuitem',
           text: item.text,
           value: item.value,
+          onAction: () => handleOptionSelected(ed, item.value),
         }))
       ),
-    onAction(api) {
-      if (!api.isDisabled()) {
-        handleOptionSelected(ed, 'instructure_create_icon_maker')
-      }
-    },
-    onItemAction: (_splitButtonApi, value) => handleOptionSelected(ed, value),
     onSetup(api) {
       function handleNodeChange(_e) {
         api.setDisabled(!isOKToLink(ed.selection.getContent()))
       }
+
       setTimeout(handleNodeChange)
       ed.on('NodeChange', handleNodeChange)
       return () => {

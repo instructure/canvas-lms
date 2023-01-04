@@ -200,14 +200,13 @@ describe AssignmentGroupsController do
 
       it "filters assignments by the submission_type" do
         user_session(@teacher)
-        get :index, {
-          params: {
-            course_id: @course.id,
-            include: ["assignments"],
-            exclude_assignment_submission_types: ["discussion_topic"]
-          },
-          format: :json
-        }
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              exclude_assignment_submission_types: ["discussion_topic"]
+            },
+            format: :json
         expect(assignments_ids).to include @vanilla_assignment.id
         expect(assignments_ids).not_to include @discussion_assignment.id
       end
@@ -222,28 +221,26 @@ describe AssignmentGroupsController do
 
       it "optionally filters assignments by ID" do
         user_session(@teacher)
-        get :index, {
-          params: {
-            course_id: @course.id,
-            include: ["assignments"],
-            assignment_ids: [@second_assignment.id]
-          },
-          format: :json
-        }
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              assignment_ids: [@second_assignment.id]
+            },
+            format: :json
         expect(assignments_ids).to match_array [@second_assignment.id]
       end
 
       it "optionally filters assignments by ID when passed assignment_ids as a comma separated string" do
         new_assignment = @course.assignments.create!(name: "Assignment 3")
         user_session(@teacher)
-        get :index, {
-          params: {
-            course_id: @course.id,
-            include: ["assignments"],
-            assignment_ids: [@second_assignment.id, new_assignment.id].join(",")
-          },
-          format: :json
-        }
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              assignment_ids: [@second_assignment.id, new_assignment.id].join(",")
+            },
+            format: :json
         expect(assignments_ids).to match_array [@second_assignment.id, new_assignment.id]
       end
 
@@ -252,14 +249,13 @@ describe AssignmentGroupsController do
         new_assignment = new_course.assignments.create!(name: "New Assignment")
 
         user_session(@teacher)
-        get :index, {
-          params: {
-            course_id: @course.id,
-            include: ["assignments"],
-            assignment_ids: [@second_assignment.id, new_assignment.id]
-          },
-          format: :json
-        }
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              assignment_ids: [@second_assignment.id, new_assignment.id]
+            },
+            format: :json
         expect(assignments_ids).to match_array [@second_assignment.id]
       end
     end

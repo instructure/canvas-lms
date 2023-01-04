@@ -37,7 +37,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
         sample_bundles = {
           "bundles/common" => false,
           "../../gems/plugins/analytics/app/stylesheets/analytics" => false, # to test that it works with plugins
-          "jst/tinymce/EquationEditorView" => false, # to test that it works with handlebars-loaded css
+          "jst/FindFlickrImageView" => false, # to test that it works with handlebars-loaded css
           "jst/messageStudentsDialog" => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|

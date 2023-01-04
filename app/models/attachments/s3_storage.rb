@@ -98,18 +98,11 @@ class Attachments::S3Storage
     ["x-amz-signature", signature]
   end
 
-  def open(opts)
-    # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
-    # natively support streaming the response, except when a block is given.
-    # so without Fibers, there's not a great way to return an IO-like object
-    # that streams the response. A separate thread, I guess. Bleck. Need to
-    # investigate other options.
-    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
-      FileUtils.mkdir_p(opts[:temp_folder])
-    end
-    tempfile = attachment.create_tempfile(opts) do |file|
+  def open(temp_folder: nil, integrity_check: false)
+    tempfile = attachment.create_tempfile(temp_folder: temp_folder) do |file|
       attachment.s3object.get(response_target: file)
     end
+    attachment.validate_hash { |hash_context| hash_context.file(tempfile.path) } if integrity_check
 
     if block_given?
       File.open(tempfile.path, "rb") do |file|

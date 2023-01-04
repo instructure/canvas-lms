@@ -24,8 +24,13 @@ import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepli
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {getOptimisticResponse} from './utils'
-import {HIGHLIGHT_TIMEOUT, SearchContext, DiscussionManagerUtilityContext} from './utils/constants'
+import {getOptimisticResponse, responsiveQuerySizes} from './utils'
+import {
+  HIGHLIGHT_TIMEOUT,
+  SearchContext,
+  DiscussionManagerUtilityContext,
+  AllThreadsState,
+} from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -36,6 +41,7 @@ import {useMutation, useQuery} from 'react-apollo'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
+import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussion_topics_post')
@@ -47,6 +53,8 @@ const DiscussionTopicManager = props => {
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
+  const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
+  const [expandedThreads, setExpandedThreads] = useState([])
   const searchContext = {
     searchTerm,
     setSearchTerm,
@@ -58,6 +66,10 @@ const DiscussionTopicManager = props => {
     setPageNumber,
     searchPageNumber,
     setSearchPageNumber,
+    allThreadsStatus,
+    setAllThreadsStatus,
+    expandedThreads,
+    setExpandedThreads,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
     ENV.DISCUSSION?.preferences?.discussions_splitscreen_view || false
@@ -309,128 +321,147 @@ const DiscussionTopicManager = props => {
   return (
     <SearchContext.Provider value={searchContext}>
       <DiscussionManagerUtilityContext.Provider value={discussionManagerUtilities}>
-        <DrawerLayout
-          onOverlayTrayChange={isOverlayed => {
-            setSplitScreenViewOverlayed(isOverlayed)
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({mobile: true, desktop: true})}
+          props={{
+            mobile: {
+              viewPortWidth: '100vw',
+            },
+            desktop: {
+              viewPortWidth: '50vw',
+            },
           }}
-        >
-          {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
-            <Mask onClick={() => setSplitScreenViewOpen(false)} />
-          )}
-          <DrawerLayout.Content label="Splitscreen View Content">
-            <DiscussionTopicToolbarContainer
-              discussionTopic={discussionTopicQuery.data.legacyNode}
-              setUserSplitScreenPreference={setUserSplitScreenPreference}
-              userSplitScreenPreference={userSplitScreenPreference}
-              closeView={closeView}
-            />
-            <DiscussionTopicContainer
-              updateDraftCache={updateDraftCache}
-              discussionTopic={discussionTopicQuery.data.legacyNode}
-              createDiscussionEntry={(message, fileId, isAnonymousAuthor) => {
-                createDiscussionEntry({
-                  variables: {
-                    discussionTopicId: ENV.discussion_topic_id,
-                    message,
-                    fileId,
-                    courseID: ENV.course_id,
-                    isAnonymousAuthor,
-                  },
-                  optimisticResponse: getOptimisticResponse({
-                    message,
-                    isAnonymous:
-                      !!discussionTopicQuery.data.legacyNode.anonymousState &&
-                      discussionTopicQuery.data.legacyNode.canReplyAnonymously,
-                  }),
-                })
-              }}
-              isHighlighted={isTopicHighlighted}
-              onDiscussionReplyPost={() => {
-                // When post requires a reply, check to see if we can refatch after initial post
-                if (
-                  discussionTopicQuery.data.legacyNode.availableForUser &&
-                  discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
-                ) {
-                  discussionTopicQuery.refetch(variables)
-                }
-              }}
-            />
+          render={responsiveProps => {
+            return (
+              <DrawerLayout
+                onOverlayTrayChange={isOverlayed => {
+                  setSplitScreenViewOverlayed(isOverlayed)
+                }}
+              >
+                {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
+                  <Mask onClick={() => setSplitScreenViewOpen(false)} />
+                )}
+                <DrawerLayout.Content label="Splitscreen View Content">
+                  <View display="block" padding="medium medium 0 0">
+                    <DiscussionTopicToolbarContainer
+                      discussionTopic={discussionTopicQuery.data.legacyNode}
+                      setUserSplitScreenPreference={setUserSplitScreenPreference}
+                      userSplitScreenPreference={userSplitScreenPreference}
+                      closeView={closeView}
+                    />
+                    <DiscussionTopicContainer
+                      updateDraftCache={updateDraftCache}
+                      discussionTopic={discussionTopicQuery.data.legacyNode}
+                      createDiscussionEntry={(message, fileId, isAnonymousAuthor) => {
+                        createDiscussionEntry({
+                          variables: {
+                            discussionTopicId: ENV.discussion_topic_id,
+                            message,
+                            fileId,
+                            courseID: ENV.course_id,
+                            isAnonymousAuthor,
+                          },
+                          optimisticResponse: getOptimisticResponse({
+                            message,
+                            isAnonymous:
+                              !!discussionTopicQuery.data.legacyNode.anonymousState &&
+                              discussionTopicQuery.data.legacyNode.canReplyAnonymously,
+                          }),
+                        })
+                      }}
+                      isHighlighted={isTopicHighlighted}
+                      onDiscussionReplyPost={() => {
+                        // When post requires a reply, check to see if we can refatch after initial post
+                        if (
+                          discussionTopicQuery.data.legacyNode.availableForUser &&
+                          discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
+                        ) {
+                          discussionTopicQuery.refetch(variables)
+                        }
+                      }}
+                    />
 
-            {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes.length === 0 &&
-            (searchTerm || filter === 'unread') ? (
-              <NoResultsFound />
-            ) : (
-              discussionTopicQuery.data.legacyNode.availableForUser && (
-                <DiscussionTopicRepliesContainer
-                  discussionTopic={discussionTopicQuery.data.legacyNode}
-                  updateDraftCache={updateDraftCache}
-                  removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-                  onOpenIsolatedView={(
-                    discussionEntryId,
-                    isolatedId,
-                    withRCE,
-                    relativeId,
-                    highlightId
-                  ) => {
-                    setHighlightEntryId(highlightId)
-                    openView(discussionEntryId, isolatedId, withRCE, relativeId)
-                  }}
-                  goToTopic={goToTopic}
-                  highlightEntryId={highlightEntryId}
-                  setHighlightEntryId={setHighlightEntryId}
-                  isSearchResults={!!searchTerm}
-                  userSplitScreenPreference={userSplitScreenPreference}
-                />
-              )
-            )}
-            {ENV.isolated_view && threadParentEntryId && (
-              <IsolatedViewContainer
-                relativeEntryId={relativeEntryId}
-                removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-                updateDraftCache={updateDraftCache}
-                discussionTopic={discussionTopicQuery.data.legacyNode}
-                discussionEntryId={threadParentEntryId}
-                replyFromId={replyFromId}
-                open={isolatedViewOpen}
-                RCEOpen={editorExpanded}
-                setRCEOpen={setEditorExpanded}
-                onClose={closeView}
-                onOpenIsolatedView={openIsolatedView}
-                goToTopic={goToTopic}
-                highlightEntryId={highlightEntryId}
-                setHighlightEntryId={setHighlightEntryId}
-              />
-            )}
-          </DrawerLayout.Content>
-          <DrawerLayout.Tray
-            id="DrawerLayoutTray"
-            label="Splitscreen View Tray"
-            open={isSplitScreenViewOpen}
-            placement="end"
-            onDismiss={() => setSplitScreenViewOpen(false)}
-            data-testid="drawer-layout-tray"
-          >
-            {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
-              <View as="div">
-                <SplitScreenViewContainer
-                  relativeEntryId={relativeEntryId}
-                  removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-                  updateDraftCache={updateDraftCache}
-                  discussionTopic={discussionTopicQuery.data.legacyNode}
-                  discussionEntryId={threadParentEntryId}
+                    {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
+                      .length === 0 &&
+                    (searchTerm || filter === 'unread') ? (
+                      <NoResultsFound />
+                    ) : (
+                      discussionTopicQuery.data.legacyNode.availableForUser && (
+                        <DiscussionTopicRepliesContainer
+                          discussionTopic={discussionTopicQuery.data.legacyNode}
+                          updateDraftCache={updateDraftCache}
+                          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+                          onOpenIsolatedView={(
+                            discussionEntryId,
+                            isolatedId,
+                            withRCE,
+                            relativeId,
+                            highlightId
+                          ) => {
+                            setHighlightEntryId(highlightId)
+                            openView(discussionEntryId, isolatedId, withRCE, relativeId)
+                          }}
+                          goToTopic={goToTopic}
+                          highlightEntryId={highlightEntryId}
+                          setHighlightEntryId={setHighlightEntryId}
+                          isSearchResults={!!searchTerm}
+                          userSplitScreenPreference={userSplitScreenPreference}
+                        />
+                      )
+                    )}
+                    {ENV.isolated_view && threadParentEntryId && (
+                      <IsolatedViewContainer
+                        relativeEntryId={relativeEntryId}
+                        removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+                        updateDraftCache={updateDraftCache}
+                        discussionTopic={discussionTopicQuery.data.legacyNode}
+                        discussionEntryId={threadParentEntryId}
+                        replyFromId={replyFromId}
+                        open={isolatedViewOpen}
+                        RCEOpen={editorExpanded}
+                        setRCEOpen={setEditorExpanded}
+                        onClose={closeView}
+                        onOpenIsolatedView={openIsolatedView}
+                        goToTopic={goToTopic}
+                        highlightEntryId={highlightEntryId}
+                        setHighlightEntryId={setHighlightEntryId}
+                      />
+                    )}
+                  </View>
+                </DrawerLayout.Content>
+                <DrawerLayout.Tray
+                  id="DrawerLayoutTray"
+                  label="Splitscreen View Tray"
                   open={isSplitScreenViewOpen}
-                  RCEOpen={editorExpanded}
-                  setRCEOpen={setEditorExpanded}
-                  onClose={closeView}
-                  onOpenSplitScreenView={openSplitScreenView}
-                  goToTopic={goToTopic}
-                  highlightEntryId={highlightEntryId}
-                  setHighlightEntryId={setHighlightEntryId}
-                />
-              </View>
-            )}
-          </DrawerLayout.Tray>
-        </DrawerLayout>
+                  placement="end"
+                  onDismiss={() => setSplitScreenViewOpen(false)}
+                  data-testid="drawer-layout-tray"
+                >
+                  {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
+                    <View as="div" maxWidth={responsiveProps.viewPortWidth}>
+                      <SplitScreenViewContainer
+                        relativeEntryId={relativeEntryId}
+                        removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+                        updateDraftCache={updateDraftCache}
+                        discussionTopic={discussionTopicQuery.data.legacyNode}
+                        discussionEntryId={threadParentEntryId}
+                        open={isSplitScreenViewOpen}
+                        RCEOpen={editorExpanded}
+                        setRCEOpen={setEditorExpanded}
+                        onClose={closeView}
+                        onOpenSplitScreenView={openSplitScreenView}
+                        goToTopic={goToTopic}
+                        highlightEntryId={highlightEntryId}
+                        setHighlightEntryId={setHighlightEntryId}
+                      />
+                    </View>
+                  )}
+                </DrawerLayout.Tray>
+              </DrawerLayout>
+            )
+          }}
+        />
       </DiscussionManagerUtilityContext.Provider>
     </SearchContext.Provider>
   )

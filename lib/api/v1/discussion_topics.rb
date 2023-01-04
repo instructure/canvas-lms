@@ -149,6 +149,9 @@ module Api::V1::DiscussionTopics
       json[:user_pronouns] = user.pronouns
     end
 
+    # topic can be announcement
+    json[:is_announcement] = topic.is_announcement
+
     json
   end
 

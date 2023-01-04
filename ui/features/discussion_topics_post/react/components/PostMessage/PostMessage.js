@@ -34,6 +34,7 @@ const I18n = useI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
+  const threadMode = props.threadMode
 
   return (
     <Responsive
@@ -47,10 +48,10 @@ export function PostMessage({...props}) {
           messageTextSize: 'fontSizeSmall',
         },
         desktop: {
-          titleMargin: '0 0 small 0',
-          titleTextSize: 'x-large',
-          titleTextWeight: 'normal',
-          messageTextSize: 'fontSizeMedium',
+          titleMargin: threadMode ? '0' : '0 0 small 0',
+          titleTextSize: threadMode ? 'medium' : 'x-large',
+          titleTextWeight: threadMode ? 'bold' : 'normal',
+          messageTextSize: threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
         },
       }}
       render={responsiveProps => (
@@ -77,6 +78,7 @@ export function PostMessage({...props}) {
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
+                rceIdentifier={`${props.discussionEntry._id}-edit`}
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}
@@ -153,6 +155,7 @@ PostMessage.propTypes = {
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,
+  threadMode: PropTypes.bool,
 }
 
 PostMessage.defaultProps = {

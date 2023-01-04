@@ -36,8 +36,10 @@ const filterOptions = (value, options) => {
       // if provided, allCourses should always be present
       filteredOptions[key] = options[key]
     } else {
-      filteredOptions[key] = options[key]?.filter(option =>
-        option.contextName.toLowerCase().startsWith(value.toLowerCase())
+      filteredOptions[key] = options[key]?.filter(
+        option =>
+          option.contextName.toLowerCase().includes(value.toLowerCase()) ||
+          option.courseNickname?.toLowerCase().includes(value.toLowerCase())
       )
     }
   })
@@ -255,7 +257,7 @@ export class CourseSelect extends React.Component {
               isHighlighted={option.assetString === highlightedOptionId}
               isSelected={option.assetString === selectedOptionId}
             >
-              {option.contextName}
+              {option.courseNickname || option.contextName}
             </Select.Option>
           ))}
         </Select.Group>

@@ -104,7 +104,7 @@ class Progress < ActiveRecord::Base
     work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
-        job = Delayed::Job.enqueue(work, enqueue_args)
+        job = Delayed::Job.enqueue(work, **enqueue_args)
         update(delayed_job_id: job.id)
         job
       end

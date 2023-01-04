@@ -176,7 +176,6 @@ describe "course pace page" do
     end
 
     it "does not show a module item that is not an assignment", custom_timeout: 25 do
-      skip("LS-3614 will fix the issue addressed by this test in the redesign")
       page = @course.wiki_pages.create!(title: "New Page Title")
       @course_module.add_item(id: page.id, type: "wiki_page")
       @course_module.add_item(type: "external_url",
@@ -362,8 +361,8 @@ describe "course pace page" do
       click_context_link(@new_section_1.name)
 
       # There's probably a better regex here
-      expect(new_course_pace_start_date.text).to include("Determined by course start date")
-      expect(new_course_pace_end_date.text).to include("Required end date")
+      expect(new_course_pace_start_date.text).to include("Start Date")
+      expect(new_course_pace_end_date.text).to include("End Date")
     end
 
     it "shows the duration based on start and end dates in published course pace" do

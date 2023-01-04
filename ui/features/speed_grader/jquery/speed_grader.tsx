@@ -2775,6 +2775,7 @@ EG = {
         this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
         externalToolLoaded = true
       } else {
+        QuizzesNextSpeedGrading.postChangeSubmissionVersionMessage($iframe_holder, submission)
         $iframe_holder.show()
       }
     } else {
@@ -3534,7 +3535,12 @@ EG = {
       updateSubmissionAndPageEffects()
     }
 
-    if (grade.toUpperCase() === 'EX') {
+    if (ENV.assignment_missing_shortcut && grade.toUpperCase() === 'MI') {
+      if (EG.currentStudent.submission.late_policy_status !== 'missing') {
+        updateSubmissionAndPageEffects({latePolicyStatus: 'missing'})
+      }
+      return
+    } else if (grade.toUpperCase() === 'EX') {
       formData['submission[excuse]'] = true
     } else if (unexcuseSubmission(grade, EG.currentStudent.submission, window.jsonData)) {
       formData['submission[excuse]'] = false

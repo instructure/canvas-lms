@@ -209,8 +209,7 @@ module WikiAndTinyCommon
       @root_folder
       .attachments
       .create!(filename: title, context: @course) { |a| a.content_type = "text/plain" }
-    click_document_toolbar_menu_button
-    click_course_documents
+    click_course_documents_toolbar_menuitem
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
     click_content_tray_close_button
   end

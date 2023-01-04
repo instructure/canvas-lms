@@ -46,7 +46,7 @@ const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur, rcsConfig}
   return (
     <Menu
       mountNode={mountNode}
-      placement="bottom"
+      placement="top"
       ref={ref}
       onFocus={onFocus}
       onBlur={onBlur}

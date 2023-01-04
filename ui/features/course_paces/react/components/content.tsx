@@ -35,16 +35,11 @@ import {
 import PaceContextsTable from './pace_contexts_table'
 import {getResponsiveSize} from '../reducers/ui'
 import Search from './search'
+import {CONTEXT_TYPE_MAP} from '../utils/utils'
 
 const I18n = useI18nScope('course_paces_app')
 
 const {Panel: TabPanel} = Tabs as any
-
-export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = {
-  course: 'Course',
-  section: 'Section',
-  student_enrollment: 'Enrollment',
-}
 
 interface PaceContextsContentProps {
   currentPage: number
@@ -63,6 +58,8 @@ interface PaceContextsContentProps {
   setOrderType: typeof paceContextsActions.setOrderType
   isLoading: boolean
   responsiveSize: ResponsiveSizes
+  contextsPublishing: string[]
+  syncPublishingPaces: typeof paceContextsActions.syncPublishingPaces
 }
 
 export const PaceContent = ({
@@ -82,9 +79,16 @@ export const PaceContent = ({
   setOrderType,
   isLoading,
   responsiveSize,
+  contextsPublishing,
+  syncPublishingPaces,
 }: PaceContextsContentProps) => {
   const selectedTab = `tab-${selectedContextType}`
   const currentTypeRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    syncPublishingPaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     let page = currentPage
@@ -97,7 +101,13 @@ export const PaceContent = ({
       orderType = 'asc'
       currentTypeRef.current = selectedContextType
     }
-    fetchPaceContexts(selectedContextType, page, searchTerm, currentSortBy, orderType)
+    fetchPaceContexts({
+      contextType: selectedContextType,
+      page,
+      searchTerm,
+      sortBy: currentSortBy,
+      orderType,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedContextType, currentPage, currentSortBy, currentOrderType])
 
@@ -143,6 +153,7 @@ export const PaceContent = ({
           setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
+          contextsPublishing={contextsPublishing}
         />
       </TabPanel>
       <TabPanel
@@ -173,6 +184,7 @@ export const PaceContent = ({
           setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
+          contextsPublishing={contextsPublishing}
         />
       </TabPanel>
     </Tabs>
@@ -188,6 +200,7 @@ const mapStateToProps = (state: StoreState) => ({
   currentOrderType: state.paceContexts.order,
   isLoading: state.paceContexts.isLoading,
   selectedContextType: state.paceContexts.selectedContextType,
+  contextsPublishing: state.paceContexts.contextsPublishing,
   responsiveSize: getResponsiveSize(state),
 })
 
@@ -199,4 +212,5 @@ export default connect(mapStateToProps, {
   setSelectedContextType: paceContextsActions.setSelectedContextType,
   setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
+  syncPublishingPaces: paceContextsActions.syncPublishingPaces,
 })(PaceContent)

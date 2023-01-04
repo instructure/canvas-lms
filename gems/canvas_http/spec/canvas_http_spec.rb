@@ -156,6 +156,7 @@ describe "CanvasHttp" do
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
       expect(http).to receive(:read_timeout=).with(30)
+      expect(http).to receive(:max_retries=).with(0)
 
       expect(CanvasHttp.get("https://www.example.com/a/b").body).to eq("Hello SSL")
     end

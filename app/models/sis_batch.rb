@@ -111,10 +111,11 @@ class SisBatch < ActiveRecord::Base
   end
 
   def self.rows_for_parallel(rows)
-    # Try to have 100 jobs but don't have a job that processes less than 25
-    # rows but also not more than 1000 rows.
+    # Try to have N jobs but also bound the minimum and maximum number of rows a job will process.
     # Progress is calculated on the number of jobs remaining.
-    [[(rows / 99.to_f).ceil, 25].max, 1000].min
+    num_jobs, min_rows, max_rows = Setting.get("sis_batch_rows_for_parallel",
+                                               "99,100,1000").split(",").map(&:to_i)
+    [[(rows / num_jobs.to_f).ceil, min_rows].max, max_rows].min
   end
 
   workflow do
@@ -159,7 +160,7 @@ class SisBatch < ActiveRecord::Base
     end
 
     work = SisBatch::Work.new(SisBatch, :process_all_for_account, args: [account])
-    Delayed::Job.enqueue(work, job_args)
+    Delayed::Job.enqueue(work, **job_args)
   end
 
   class Work < Delayed::PerformableMethod
@@ -379,7 +380,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = if self.data[:file_path]
                    File.open(self.data[:file_path], "rb")
                  else
-                   attachment.open(need_local_file: true)
+                   attachment.open(integrity_check: true)
                  end
     @data_file
   end
@@ -690,7 +691,7 @@ class SisBatch < ActiveRecord::Base
       count: count, type: type, change_threshold: change_threshold)
   end
 
-  def as_json(**)
+  def as_json(*)
     data = {
       "id" => id,
       "created_at" => created_at,
@@ -876,7 +877,7 @@ class SisBatch < ActiveRecord::Base
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
       restore_progress.process_job(self, :restore_states_for_batch,
                                    { n_strand: ["restore_states_for_batch", account.global_id] },
-                                   { batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only })
+                                   batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
       restore_progress
     end
   end

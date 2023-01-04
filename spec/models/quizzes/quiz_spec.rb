@@ -1609,7 +1609,7 @@ describe Quizzes::Quiz do
         regrade_option: "current_correct_only"
       )
       expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).with(strand: "quiz:#{quiz.global_id}:regrading").once.and_return(Quizzes::QuizRegrader::Regrader)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with(quiz: quiz, version_number: quiz.version_number)
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with({ quiz: quiz, version_number: quiz.version_number })
       quiz.save!
     end
 

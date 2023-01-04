@@ -72,6 +72,10 @@ export default class LockManager {
     }
   }
 
+  changeItemId(itemId) {
+    this.state.itemId = itemId
+  }
+
   setState(newState) {
     this.state = Object.assign(this.state, newState)
     this.render()
@@ -95,6 +99,7 @@ export default class LockManager {
     ApiClient.toggleLocked({courseId, itemType, itemId, isLocked: !isLocked})
       .then(res => {
         if (res.data.success) {
+          if (this.props.lockCallback) this.props.lockCallback(!isLocked)
           this.setState({
             isLocked: !isLocked,
           })

@@ -1,7 +1,6 @@
 {
   "accessibility_checker_b3af1f6c": { "message": "Перевірка доступності" },
   "add_8523c19b": { "message": "Додати" },
-  "align_11050992": { "message": "Вирівняти" },
   "all_4321c3a1": { "message": "Всі" },
   "alpha_15d59033": { "message": "Альфа" },
   "alphabetical_55b5b4e0": { "message": "Алфавітний" },
@@ -58,7 +57,6 @@
   },
   "custom_6979cd81": { "message": "Звичай" },
   "cyan_c1d5f68a": { "message": "Зелено-синій колір" },
-  "decrease_indent_d9cf469d": { "message": "Зменшити відступ" },
   "deep_purple_bb3e2907": { "message": "Темно-фіолетовий" },
   "delimiters_4db4840d": { "message": "Розділювачі" },
   "details_98a31b68": { "message": "Подробиці" },
@@ -97,7 +95,6 @@
   },
   "image_8ad06": { "message": "Зображення" },
   "images_7ce26570": { "message": "Зображення" },
-  "increase_indent_6af90f7c": { "message": "Збільшити відступ" },
   "indigo_2035fc55": { "message": "Індиго" },
   "insert_593145ef": { "message": "Вставка" },
   "insert_link_6dc23cae": { "message": "Вставити посилання" },

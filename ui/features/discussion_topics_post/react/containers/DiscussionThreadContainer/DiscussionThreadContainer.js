@@ -40,8 +40,12 @@ import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
-import {SearchContext, DiscussionManagerUtilityContext} from '../../utils/constants'
+import {Spinner} from '@instructure/ui-spinner'
+import {
+  SearchContext,
+  DiscussionManagerUtilityContext,
+  AllThreadsState,
+} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
@@ -55,11 +59,13 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('discussion_topics_post')
 
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
+    useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [expandReplies, setExpandReplies] = useState(false)
@@ -330,6 +336,25 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
+  useEffect(() => {
+    if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
+      setExpandReplies(true)
+    }
+    if (allThreadsStatus === AllThreadsState.Collapsed && expandReplies) {
+      setExpandReplies(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allThreadsStatus])
+
+  useEffect(() => {
+    if (expandReplies && !expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads([...expandedThreads, props.discussionEntry._id])
+    } else if (!expandReplies && expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads(expandedThreads.filter(v => v !== props.discussionEntry._id))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandReplies])
+
   const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
     const getParentId = () => {
       switch (props.discussionEntry.depth) {
@@ -522,6 +547,7 @@ export const DiscussionThreadContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
+                  rceIdentifier={props.discussionEntry._id}
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
@@ -607,7 +633,16 @@ const DiscussionSubentries = props => {
   }
 
   if (subentries.loading) {
-    return <LoadingIndicator />
+    return (
+      <Flex justifyItems="start" margin="0 large" padding="0 x-large">
+        <Flex.Item>
+          <Spinner renderTitle={I18n.t('Loading more replies')} size="x-small" />
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <Text>{I18n.t('Loading replies...')}</Text>
+        </Flex.Item>
+      </Flex>
+    )
   }
 
   return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (

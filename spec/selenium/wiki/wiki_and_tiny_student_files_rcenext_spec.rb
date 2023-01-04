@@ -94,8 +94,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
 
     it "shows one image in student image sidebar" do
       get "/courses/#{@course.id}/discussion_topics/new"
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("bar.png")
     end
@@ -105,8 +104,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
       @new_attachment.content_type = "image/png"
       @new_attachment.save!
       get "/courses/#{@course.id}/discussion_topics/new"
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("bar.png")
     end
@@ -139,8 +137,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
 
     it "shows 2 documents when clicking course documents dropdown" do
       visit_front_page_edit(@course)
-      click_document_toolbar_menu_button
-      click_course_documents
+
+      click_course_documents_toolbar_menuitem
 
       expect(course_document_links.count).to eq 2
       expect(tray_container).to include_text("foo.txt")
@@ -148,8 +146,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
 
     it "shows 1 document when clicking user documents dropdown" do
       visit_front_page_edit(@course)
-      click_document_toolbar_menu_button
-      click_user_documents
+
+      click_user_documents_toolbar_menuitem
 
       expect(course_document_links.count).to eq 1
       expect(tray_container).to include_text("bar.txt")
@@ -158,8 +156,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
     it "shows 2 media files when clicking course media dropdown" do
       skip("Media object creation issues - LA-385, LA-386 to fix")
       visit_front_page_edit(@course)
-      click_media_toolbar_button
-      click_course_media
+
+      click_course_media_toolbar_menuitem
 
       expect(course_media_links.count).to eq 2
       expect(tray_container).to include_text("foo.mp4")
@@ -168,8 +166,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", ignore_js_errors: true do
     it "shows 1 media file when clicking my media dropdown" do
       skip("Media object creation issues - LA-385, LA-386 to fix")
       visit_front_page_edit(@course)
-      click_media_toolbar_button
-      click_user_media
+
+      click_user_media_toolbar_menuitem
 
       expect(course_media_links.count).to eq 1
       expect(tray_container).to include_text("bar2.mp4")

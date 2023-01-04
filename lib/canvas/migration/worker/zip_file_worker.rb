@@ -29,10 +29,10 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
 
     begin
       if cm.attachment
-        zipfile = cm.attachment.open(need_local_file: true)
+        zipfile = cm.attachment.open
       elsif cm.migration_settings[:file_url]
         att = Canvas::Migration::Worker.download_attachment(cm, cm.migration_settings[:file_url])
-        zipfile = att.open(need_local_file: true)
+        zipfile = att.open
       elsif !settings[:no_archive_file]
         raise Canvas::Migration::Error, I18n.t(:no_migration_file, "File required for content migration.")
       end

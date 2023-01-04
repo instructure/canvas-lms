@@ -117,7 +117,7 @@ module Types
       argument :unread_before, String, required: false
     end
     def discussion_entries_connection(**args)
-      get_entries(args)
+      get_entries(**args)
     end
 
     field :discussion_entry_drafts_connection, Types::DiscussionEntryDraftType.connection_type, null: true
@@ -280,7 +280,7 @@ module Types
       argument :unread_before, String, required: false
     end
     def entries_total_pages(**args)
-      get_entry_page_count(args)
+      get_entry_page_count(**args)
     end
 
     field :root_entries_total_pages, Integer, null: true do
@@ -291,12 +291,12 @@ module Types
     end
     def root_entries_total_pages(**args)
       args[:root_entries] = true
-      get_entry_page_count(args)
+      get_entry_page_count(**args)
     end
 
     def get_entry_page_count(**args)
       per_page = args.delete(:per_page)
-      get_entries(args).then do |entries|
+      get_entries(**args).then do |entries|
         (entries.count.to_f / per_page).ceil
       end
     end
@@ -306,7 +306,7 @@ module Types
       argument :filter, Types::DiscussionFilterType, required: false
     end
     def search_entry_count(**args)
-      get_entries(args).then(&:count)
+      get_entries(**args).then(&:count)
     end
 
     field :mentionable_users_connection, Types::MessageableUserType.connection_type, null: true do

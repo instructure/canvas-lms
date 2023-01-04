@@ -403,5 +403,44 @@ describe "Pace Contexts API" do
         end
       end
     end
+
+    context "when contexts are specified" do
+      context "sections" do
+        before do
+          @section_a = add_section("Section A", course: course)
+          @section_b = add_section("Section B", course: course)
+          @section_c = add_section("Section C", course: course)
+        end
+
+        it "filters by context ids" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", contexts: "[#{@section_a.id}, #{@section_c.id}]", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+
+          expect(json["pace_contexts"].count).to eq 2
+          expect(json["pace_contexts"].pluck("name")).to eq ["Section A", "Section C"]
+        end
+      end
+
+      context "student enrollments" do
+        before do
+          @student_1 = user_model(name: "Student Foo", sortable_name: "A, Foo")
+          @student_2 = user_model(name: "Student Bar", sortable_name: "B, Foo")
+          @student_3 = user_model(name: "Student Boo", sortable_name: "C, Boo")
+          course.enroll_student(@student_1, enrollment_state: "active")
+          course.enroll_student(@student_2, enrollment_state: "active")
+          course.enroll_student(@student_3, enrollment_state: "active")
+        end
+
+        it "filters by context ids" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", contexts: "[#{@student_1.id}, #{@student_3.id}]", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+
+          expect(json["pace_contexts"].count).to eq 2
+          expect(json["pace_contexts"].pluck("name")).to eq ["Student Foo", "Student Boo"]
+        end
+      end
+    end
   end
 end

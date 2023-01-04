@@ -33,6 +33,30 @@ describe OutcomesController do
     context_outcome(@account)
   end
 
+  def create_learning_outcome_result(user, score, assignment, alignment, rubric_association, submitted_at)
+    title = "#{user.name}, #{assignment.name}"
+    possible = @outcome.points_possible
+    mastery = (score || 0) >= @outcome.mastery_points
+
+    LearningOutcomeResult.create!(
+      learning_outcome: @outcome,
+      user: user,
+      context: @course,
+      alignment: alignment,
+      associated_asset: assignment,
+      association_type: "RubricAssociation",
+      association_id: rubric_association.id,
+      title: title,
+      score: score,
+      possible: possible,
+      mastery: mastery,
+      created_at: submitted_at,
+      updated_at: submitted_at,
+      submitted_at: submitted_at,
+      assessed_at: submitted_at
+    )
+  end
+
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -252,6 +276,38 @@ describe OutcomesController do
       get "user_outcome_results", params: { account_id: @account.id, user_id: @student.id }
       expect(response).to be_successful
       expect(response).to render_template("user_outcome_results")
+    end
+
+    it "lastest score" do
+      course_outcome
+      user_session(@admin)
+      create_outcome
+      rubric = outcome_with_rubric context: @course, outcome: @outcome
+
+      assignment1 = @course.assignments.create!(title: "Assignment 1")
+      assignment2 = @course.assignments.create!(title: "Assignment 2")
+      assignment3 = @course.assignments.create!(title: "Assignment 3")
+
+      alignment1 = @outcome.align(assignment1, @course)
+      alignment2 = @outcome.align(assignment2, @course)
+      alignment3 = @outcome.align(@assignment3, @course)
+
+      rubric_association1 = rubric.associate_with(assignment1, @course, purpose: "grading")
+      rubric_association3 = rubric.associate_with(assignment3, @course, purpose: "grading")
+      rubric_association2 = rubric.associate_with(assignment2, @course, purpose: "grading")
+
+      now = Time.now
+      yesterday = now - 1.day
+      day_before_yesterday = now - 2.days
+
+      create_learning_outcome_result(@student, 1, assignment1, alignment1, rubric_association1, day_before_yesterday)
+      create_learning_outcome_result(@student, 2, assignment2, alignment2, rubric_association2, yesterday)
+      create_learning_outcome_result(@student, 3, assignment3, alignment3, rubric_association3, now)
+
+      get "user_outcome_results", params: { course_id: @course.id, user_id: @student.id }
+
+      expect(assigns[:results].last.assessed_at).to eq(now)
+      expect(assigns[:results].last.score).to eq(3)
     end
 
     context "deleted results" do

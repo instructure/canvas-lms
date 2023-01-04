@@ -16,22 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {APIPaceContextTypes, OrderType, SortableColumn} from '../types'
+import {PaceContextsApiResponse} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {FetchContextsActionParams} from '../actions/pace_contexts'
 
-export const getPaceContexts = (
-  courseId: string,
-  contextType: APIPaceContextTypes,
-  page: number,
-  entriesPerRequest: number,
-  searchTerm: string,
-  sortBy?: SortableColumn,
-  orderType: OrderType = 'asc'
-) => {
+export interface FetchContextsAPIParams extends FetchContextsActionParams {
+  courseId: string
+  entriesPerRequest?: number
+}
+
+export const getPaceContexts = ({
+  courseId,
+  contextType,
+  page,
+  entriesPerRequest,
+  searchTerm,
+  sortBy,
+  orderType = 'asc',
+  contextIds,
+}: FetchContextsAPIParams): PaceContextsApiResponse => {
   const apiParams: Record<string, string | number> = {
     type: contextType.toLocaleLowerCase(),
-    page,
-    per_page: entriesPerRequest,
+  }
+  if (page && entriesPerRequest) {
+    apiParams.page = page
+    apiParams.per_page = entriesPerRequest
   }
   if (searchTerm && searchTerm.length) {
     apiParams.search_term = searchTerm
@@ -39,6 +48,9 @@ export const getPaceContexts = (
   if (sortBy) {
     apiParams.sort = sortBy
     apiParams.order = orderType
+  }
+  if (contextIds) {
+    apiParams.contexts = JSON.stringify(contextIds)
   }
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/pace_contexts`,

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {splitTextIntoLines, convertFileToBase64, decode} from '../utils'
+import {splitTextIntoLines, decode} from '../utils'
+import {convertFileToBase64} from '../../../shared/fileUtils'
 import {MAX_TOTAL_TEXT_CHARS} from '../constants'
 
 describe('splitTextIntoLines()', () => {

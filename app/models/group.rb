@@ -735,7 +735,7 @@ class Group < ActiveRecord::Base
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS,
     TAB_COLLABORATIONS_NEW = *1..20
-  def tabs_available(user = nil, **)
+  def tabs_available(user = nil, *)
     available_tabs = [
       { id: TAB_HOME,          label: t("#group.tabs.home", "Home"), css_class: "home", href: :group_path },
       { id: TAB_ANNOUNCEMENTS, label: t("#tabs.announcements", "Announcements"), css_class: "announcements", href: :group_announcements_path },

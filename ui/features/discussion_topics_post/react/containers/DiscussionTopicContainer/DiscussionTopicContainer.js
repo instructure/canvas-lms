@@ -490,6 +490,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                         >
                           {expandedReply && (
                             <DiscussionEdit
+                              rceIdentifier="root"
                               discussionAnonymousState={props.discussionTopic.anonymousState}
                               canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
                               show={expandedReply}

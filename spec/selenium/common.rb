@@ -65,7 +65,7 @@ end
 module SynchronizeConnection
   %w[cache_sql execute exec_cache exec_no_cache query transaction].each do |method|
     class_eval <<~RUBY, __FILE__, __LINE__ + 1
-      def #{method}(*)                                           # def execute(*)
+      def #{method}(...)                                         # def execute(...)
         SeleniumDriverSetup.request_mutex.synchronize { super }  #   SeleniumDriverSetup.request_mutex.synchronize { super }
       end                                                        # end
     RUBY

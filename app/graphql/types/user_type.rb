@@ -256,28 +256,11 @@ module Types
         base_url: self.context[:request].base_url
       )
 
-      per_page = 100
       contexts_collection = collections.select { |c| c[0] == "contexts" }
-      contexts = []
-      if contexts_collection.count > 0
-        batch = contexts_collection[0][1].paginate(per_page: per_page)
-        contexts += batch
-        while batch.next_page
-          batch = contexts_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
-          contexts += batch
-        end
-      end
-
       users_collection = collections.select { |c| c[0] == "participants" }
-      users = []
-      if users_collection.count > 0
-        batch = users_collection[0][1].paginate(per_page: per_page)
-        users += batch
-        while batch.next_page
-          batch = users_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
-          users += batch
-        end
-      end
+
+      contexts_collection = contexts_collection[0][1] if contexts_collection.count > 0
+      users_collection = users_collection[0][1] if users_collection.count > 0
 
       can_send_all = if search_context.nil?
                        false
@@ -287,10 +270,12 @@ module Types
                        search_context.course.grants_any_right?(object, :send_messages_all)
                      end
 
+      # The contexts_connection and users_connection return types of custom Collections
+      # These special data structures are handled in the collection_connection.rb files
       {
         sendMessagesAll: !!can_send_all,
-        contexts_connection: contexts,
-        users_connection: users
+        contexts_connection: contexts_collection,
+        users_connection: users_collection
       }
     rescue ActiveRecord::RecordNotFound
       nil

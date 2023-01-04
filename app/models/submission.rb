@@ -1288,7 +1288,7 @@ class Submission < ActiveRecord::Base
   # End Plagiarism functions
 
   def external_tool_url
-    URI.encode(url) if url && submission_type == "basic_lti_launch"
+    URI::DEFAULT_PARSER.escape(url) if url && submission_type == "basic_lti_launch"
   end
 
   def clear_user_submissions_cache
@@ -1352,7 +1352,7 @@ class Submission < ActiveRecord::Base
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
       next unless (a.context_type == "User" && a.context_id == user_id) ||
-                  (a.context_type == "Group" && a.context_id == group_id) ||
+                  (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                   (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
                   attachment_fake_belongs_to_group(a)
 
@@ -1404,7 +1404,7 @@ class Submission < ActiveRecord::Base
           n_strand: "canvadocs",
           priority: Delayed::LOW_PRIORITY
         )
-         .submit_to_canvadocs(1, opts)
+         .submit_to_canvadocs(1, **opts)
       end
     end
   end
@@ -1783,7 +1783,7 @@ class Submission < ActiveRecord::Base
   def versioned_attachments=(attachments)
     @versioned_attachments = Array(attachments).compact.select do |a|
       (a.context_type == "User" && (a.context_id == user_id || a.user_id == user_id)) ||
-        (a.context_type == "Group" && a.context_id == group_id) ||
+        (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
         (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
         attachment_fake_belongs_to_group(a)
     end
@@ -3006,7 +3006,7 @@ class Submission < ActiveRecord::Base
     # Adding a comment calls update_provisional_grade, but will not have the
     # grade or score keys included.
     if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present? && pg.scorer_id != assignment.final_grader_id
-      raise Assignment::GradeError, error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+      raise Assignment::GradeError.new(error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED)
     end
 
     pg.scorer = pg.current_user = scorer

@@ -107,7 +107,7 @@ end
 ActionView::StreamingBuffer.prepend(SkipEmptyTemplateConcats)
 
 module ActivateShardsOnRender
-  def render(view, *)
+  def render(view, *, **)
     if (active_shard = view.request&.env&.[]("canvas.active_shard"))
       active_shard.activate do
         super

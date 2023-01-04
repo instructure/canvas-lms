@@ -408,7 +408,7 @@ class ContentMigration < ActiveRecord::Base
           self.workflow_state = :exporting
           save
           self.class.connection.after_transaction_commit do
-            Delayed::Job.enqueue(worker_class.new(id), queue_opts)
+            Delayed::Job.enqueue(worker_class.new(id), **queue_opts)
           end
         rescue NameError
           self.workflow_state = "failed"
@@ -731,6 +731,8 @@ class ContentMigration < ActiveRecord::Base
       item_scope = case klass
                    when "Attachment"
                      context.attachments.not_deleted.where(migration_id: mig_ids)
+                   when "CoursePace"
+                     context.course_paces.where(migration_id: mig_ids)
                    else
                      klass.constantize.where(context_id: context, context_type: "Course", migration_id: mig_ids)
                           .where.not(workflow_state: "deleted")
@@ -800,7 +802,6 @@ class ContentMigration < ActiveRecord::Base
 
     config = ConfigFile.load("external_migration") || {}
     @exported_data_zip = exported_attachment.open(
-      need_local_file: true,
       temp_folder: config[:data_folder]
     )
     @exported_data_zip

@@ -2494,7 +2494,7 @@ RSpec.describe ApplicationController do
       @teacher.save!
       user_session(@teacher)
       @controller.instance_variable_set(:@current_user, @teacher)
-      expect(@controller.send(:k5_user?, { check_disabled: false })).to be_truthy
+      expect(@controller.send(:k5_user?, check_disabled: false)).to be_truthy
     end
 
     it "returns true even if a student has opted-out of the k5 dashboard" do
