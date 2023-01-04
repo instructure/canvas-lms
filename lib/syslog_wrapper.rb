@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "syslog"
+
 class SyslogWrapper
   attr_accessor :level, :datetime_format
 
