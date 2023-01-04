@@ -9924,10 +9924,12 @@ describe Assignment do
           referer_id: 123
         }
       end
+      let(:url) { "https://www.tool.com/deep_link" }
       let(:assignment) do
         @course.assignments.create!(submission_types: "external_tool",
                                     lti_resource_link_custom_params: custom_params.to_json,
-                                    external_tool_tag_attributes: { content: tool },
+                                    lti_resource_link_url: url,
+                                    external_tool_tag_attributes: { content: tool, url: url },
                                     **assignment_valid_attributes)
       end
 
@@ -10018,6 +10020,23 @@ describe Assignment do
           resource_link = assignment.line_items.first.resource_link
 
           expect(resource_link.lookup_uuid).to eq lookup_uuid
+        end
+
+        it "updates the resource link's url when given" do
+          assignment.lti_resource_link_url = nil
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq url
+
+          new_url = "https://www.tool.com/deep_link_2"
+          assignment.lti_resource_link_url = new_url
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq new_url
         end
 
         context "and no resource link or line item exist" do
