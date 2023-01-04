@@ -113,6 +113,10 @@ const DiscussionTopicManager = props => {
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
+    userSplitScreenPreference,
+    setUserSplitScreenPreference,
+    highlightEntryId,
+    setHighlightEntryId,
   }
 
   // Unread filter

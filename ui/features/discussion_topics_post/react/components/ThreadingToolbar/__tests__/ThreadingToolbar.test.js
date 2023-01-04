@@ -260,7 +260,7 @@ describe('PostToolbar', () => {
 
   it('renders provided children', () => {
     const {getByText} = render(
-      <ThreadingToolbar>
+      <ThreadingToolbar filter="all" searchTerm="" isIsolatedView={false}>
         <>First</>
         <>Second</>
       </ThreadingToolbar>

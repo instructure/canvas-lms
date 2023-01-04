@@ -36,6 +36,7 @@ beforeAll(() => {
       removeListener: jest.fn(),
     }
   })
+  window.ENV.split_screen_view = true
 })
 
 const setup = props => {

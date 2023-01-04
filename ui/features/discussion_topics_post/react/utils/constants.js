@@ -32,7 +32,7 @@ export const AllThreadsState = {
 const searchFilter = {
   searchTerm: '',
   setSearchTerm: () => {},
-  filter: '',
+  filter: 'all',
   setFilter: () => {},
   sort: '',
   setSort: () => {},
@@ -48,6 +48,10 @@ export const SearchContext = React.createContext(searchFilter)
 const discussionManagerUtilityContext = {
   replyFromId: '',
   setReplyFromId: () => {},
+  userSplitScreenPreference: true,
+  setUserSplitScreenPreference: () => {},
+  highlightEntryId: '',
+  setHighlightEntryId: () => {},
 }
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

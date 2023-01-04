@@ -291,7 +291,7 @@ export const DiscussionThreadContainer = props => {
             setExpandReplies(!expandReplies)
           }
         }}
-        isExpanded={expandReplies}
+        isExpanded={expandReplies && !!searchTerm}
       />
     )
   }
@@ -588,7 +588,7 @@ export const DiscussionThreadContainer = props => {
               </View>
             )}
           </div>
-          {(expandReplies || props.depth > 0) &&
+          {((expandReplies && !searchTerm) || props.depth > 0) &&
             !(ENV.isolated_view || splitScreenOn) &&
             props.discussionEntry.subentriesCount > 0 && (
               <DiscussionSubentries
