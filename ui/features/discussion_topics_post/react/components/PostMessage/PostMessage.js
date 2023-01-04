@@ -34,7 +34,6 @@ const I18n = useI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
-  const threadMode = props.threadMode
 
   return (
     <Responsive
@@ -48,10 +47,10 @@ export function PostMessage({...props}) {
           messageTextSize: 'fontSizeSmall',
         },
         desktop: {
-          titleMargin: threadMode ? '0' : '0 0 small 0',
-          titleTextSize: threadMode ? 'medium' : 'x-large',
-          titleTextWeight: threadMode ? 'bold' : 'normal',
-          messageTextSize: threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
+          titleMargin: props.threadMode ? '0' : '0 0 small 0',
+          titleTextSize: props.threadMode ? 'medium' : 'x-large',
+          titleTextWeight: props.threadMode ? 'bold' : 'normal',
+          messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
         },
       }}
       render={responsiveProps => (
