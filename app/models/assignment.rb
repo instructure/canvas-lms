@@ -1188,6 +1188,7 @@ class Assignment < ActiveRecord::Base
         end
 
         options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
+        options[:url] = lti_resource_link_url if lti_resource_link_url
 
         return if options.empty?
 
