@@ -152,7 +152,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       end
 
       upload_errors =
-        validate_online_upload(assignment, attachments, { is_proxy: !!input[:student_id] })
+        validate_online_upload(assignment, attachments, is_proxy: !!input[:student_id])
       return upload_errors if upload_errors
 
       submission_params[:attachments] =
