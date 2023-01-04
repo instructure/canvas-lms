@@ -63,12 +63,26 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('discussion_topics_post')
 
+const defaultExpandedReplies = id => {
+  if (
+    (ENV.split_screen_view && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) ||
+    ENV.isolated_view
+  )
+    return false
+  if (id === ENV.discussions_deep_link?.entry_id) return false
+  if (id === ENV.discussions_deep_link?.root_entry_id) return true
+
+  return false
+}
+
 export const DiscussionThreadContainer = props => {
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
-  const [expandReplies, setExpandReplies] = useState(false)
+  const [expandReplies, setExpandReplies] = useState(
+    defaultExpandedReplies(props.discussionEntry._id)
+  )
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
