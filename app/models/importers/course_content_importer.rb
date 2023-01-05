@@ -22,7 +22,6 @@ require_dependency "importers"
 module Importers
   class CourseContentImporter < Importer
     self.item_class = Course
-    Importers.register_content_importer(self)
 
     def self.process_migration_files(data, migration)
       data["all_files_export"] ||= {}
