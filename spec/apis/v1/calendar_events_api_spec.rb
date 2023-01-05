@@ -308,7 +308,33 @@ describe CalendarEventsApiController, type: :request do
                         context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
                       })
 
-      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_present
+      expect(json.detect { |e| e["id"] == event.child_events.first.id && e["hidden"] == false }).to be_present
+    end
+
+    it "allows users without read_roster permission to view section-specific events" do
+      event = @course.calendar_events.build(title: "event", child_event_data: { "0" => { start_at: "2012-01-09 12:00:00", end_at: "2012-01-09 13:00:00", context_code: @course.default_section.asset_string } })
+      event.updating_user = @teacher
+      event.save!
+      account_admin_user(active_all: true)
+
+      student_role = Role.get_built_in_role("StudentEnrollment", root_account_id: @course.account.id)
+      RoleOverride.create!(
+        permission: "read_roster",
+        enabled: false,
+        role: student_role,
+        account: @course.account
+      )
+
+      @student1 = user_factory(active_all: true, active_state: "active")
+      @student1_enrollment = StudentEnrollment.create!(user: @student1, workflow_state: "active", course_section: @course.default_section, course: @course, limit_privileges_to_course_section: true)
+
+      json = api_call_as_user(@student1, :get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+                                controller: "calendar_events_api", action: "index", format: "json",
+                                context_codes: ["course_#{@course.id}"], start_date: "2012-01-07", end_date: "2012-01-19"
+                              })
+
+      expect(@course.grants_right?(@student1, :read_roster)).to be_falsey
+      expect(json.detect { |e| e["id"] == event.child_events.first.id && e["hidden"] == false }).to be_present
     end
 
     it "doesn't allow account admins to view events for courses they don't have access to" do
