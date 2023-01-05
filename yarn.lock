@@ -6267,6 +6267,13 @@
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
 
+"@types/jquery.cookie@^1.4.32":
+  version "1.4.32"
+  resolved "https://registry.yarnpkg.com/@types/jquery.cookie/-/jquery.cookie-1.4.32.tgz#287c960c17d982008a6c0e54c577b75fd82b9bc3"
+  integrity sha512-DnOPaZj8UZ5Kt8ZJuzfOKA+4UK7ihjtOPfbo6U3wr/AA/rWd9Ov0b3zMSD3X+y8yeedTsw/DJ0kkX5sl5oVu1w==
+  dependencies:
+    "@types/jquery" "*"
+
 "@types/jquery@*", "@types/jquery@^3.5.6":
   version "3.5.13"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.13.tgz#5482d3ee325d5862f77a91c09369ae0a5b082bf3"
