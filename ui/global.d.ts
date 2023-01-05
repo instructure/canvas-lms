@@ -23,7 +23,6 @@ declare global {
 
   interface Window {
     readonly ENV?: any
-    external_tool_redirect: any
     webkitSpeechRecognition: any
     jsonData: any
   }

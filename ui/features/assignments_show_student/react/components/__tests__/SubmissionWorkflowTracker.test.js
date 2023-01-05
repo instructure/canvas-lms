@@ -80,6 +80,14 @@ it('renders the time submitted when the student has submitted', async () => {
   expect(getByTestId('submission-workflow-tracker-title')).toHaveTextContent('Jun 1, 2021 7:27pm')
 })
 
+it('renders the proxy submitter name when submission was proxy', async () => {
+  const submission = await mockSubmission({Submission: {...SubmissionMocks.proxySubmitted}})
+  const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+  expect(getByTestId('submission-workflow-tracker-proxy-indicator')).toHaveTextContent(
+    'by Marty McFly'
+  )
+})
+
 it('renders as "In Progress" when the student has not yet submitted', async () => {
   const submission = await mockSubmission({
     Submission: {...SubmissionMocks.onlineUploadReadyToSubmit},

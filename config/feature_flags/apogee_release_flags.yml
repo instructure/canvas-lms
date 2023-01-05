@@ -168,6 +168,16 @@ proxy_file_uploads:
   environments:
     ci:
       state: allowed_on # enable for automated testings builds and local testing
+deprioritize_section_overrides_for_nonactive_enrollments:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Deprioritize Section Overrides for Nonactive Enrollments
+  description: If set, deprioritizes using due dates, lock dates, and unlock dates from
+    section overrides on an assignment that are associated with a deactivated, concluded, or
+    otherwise non-active enrollment for a student.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
     test:

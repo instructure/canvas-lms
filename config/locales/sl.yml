@@ -936,6 +936,13 @@ sl:
               parameters: 
                 header: "Oddano po:"
     integer_required: "Zahtevano je celo število."
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Pogoji (omejitev 4)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -2096,6 +2103,7 @@ sl:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Omogoča označevanje povezav za pomoč s »Poudarjeno« ali »Novo« ter vidno prikazovanje poudarjenih povezav za pomoč v meniju »Pomoč«."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Izvajalcem omogoča, da množično dodeljujejo ocene za neocenjene prispevke."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Izvajalcem omogoča, da v redovalnici množično ocenijo neocenjene oddaje v menijih skupin nalog in stolpcev Skupno."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Izvajalcem omogoča pošiljanje datotečnih prilog v imenu študenta."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Omogoča izbiro učnih ciljev med migracijo vsebine predmeta"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Dovoljuje spreminjanje nastavitev obvestil za kateri koli predmet s strani nastavitev obvestil na ravni računa."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Omogoča prikaz podatkov o rezultatih, shranjenih v storitvi Učni izidi, v poročilih Canvas (LMGB, sLMGB in poročila skrbnika, povezana z učnimi izidi)."
@@ -4983,6 +4991,7 @@ sl:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Če zapustite to stran, spremembe še vedno veljajo."
   changes_you_made_may_not_be_saved_4e8db973: "Spremembe, ki ste jih izvedli, morda ne bodo shranjene."
   changing_course_dates_may_override_term_availabili_d92b10de: "Spreminjanje datumov tečaja lahko preglasi nastavitve razpoložljivosti semestra in umestitve na strani Predmeti v Preglednici. Pred spremembo datumov predmeta potrdite datume semestra."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Če spremenite število dni za hitrost napredovanja pri predmetu, se bodo roki morda spremenili."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Če spremenite število dni za hitrost napredovanja pri predmetu, se bodo roki morda spremenili."
   changing_section_dates_may_override_course_and_ter_6634950e: "Spreminjanje datumov sekcije lahko preglasi nastavitve razpoložljivosti semestra in umestitve na strani Predmeti v Preglednici. Pred spremembo datumov sekcije potrdite datume semestra in predmeta."
   changing_the_course_participation_will_republish_a_1cc05b7: "Če spremenite udeležbo na predmetu, boste ponovno objavili vse hitrosti napredovanja pri predmetu z morebitnimi novimi datumi, ki uporabljajo udeležbo v semestru."
@@ -6930,6 +6939,7 @@ sl:
   course_pacing_d3025ecf: "Hitrost napredovanja pri predmetu"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Predogled funkcije različnih hitrosti napredovanja pri predmetu mora biti omogočen na ravni vaše ustanove."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Funkcija različnih hitrosti napredovanja pri predmetu je avtomatizirano orodje, ki ustvari razpored študentov s kombiniranjem predlaganih ur glede na poglavje, šolske dni v razredu in skupne ure za ustvarjanje ocenjevalca datumov."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Funkcija različnih hitrosti napredovanja pri predmetu je avtomatizirano orodje, ki določa različne roke za ocenjevanje in učne dejavnosti na podlagi datuma vpisa posameznega študenta, kar omogoča strukturirano učenje s samostojnim tempom pri tekočih vpisanih predmetih."
   course_pacing_is_in_active_development_348e33cf: "Hitrost napredovanja pri predmetu je v aktivnem razvoju."
   course_pacing_redesign_38edfc1c: "Preoblikovanje funkcije različnih hitrosti napredovanja pri predmetu"
   course_pages_449f1dd4: "Strani predmeta"
@@ -7499,6 +7509,7 @@ sl:
   create_132b3be1: Ustvari
   create_14873ed7: ustvari
   create_a_64f6f82: Ustvari
+  create_a_course_pace_333b0911: "Ustvari hitrost napredovanja pri predmetu"
   create_a_default_course_pace_71ba0b9f: "Ustvari privzeto hitrosti napredovanja pri predmetu"
   create_a_friendly_display_name_c1036ed: "Ustvarite prijazno prikazno ime"
   create_a_new_account_4cf7c0f9: "Ustvari nov račun"
@@ -7522,6 +7533,7 @@ sl:
                       in »Kvizi«. Skupine nalog je mogoče utežiti.
   create_content_for_your_course_500a7032: "Ustvarite vsebino za svoj predmet."
   create_course_9a69b32c: "Ustvari predmet"
+  create_course_pace_3dff129: "Ustvari hitrost napredovanja pri predmetu"
   create_criterion_6df4d4ad: "Ustvari merilo"
   create_default_pace_dd21415b: "Ustvari privzeto hitrost napredovanja"
   create_delete_edit_157bb1a3: "ustvari / odstrani / uredi"
@@ -7728,6 +7740,7 @@ sl:
   customize_configuration_69c22ef3: "Prilagodi konfiguracijo po meri"
   customize_course_details_26fd4afe: "Prilagodite podrobnosti o predmetu"
   customize_learning_mastery_ratings_4ace142a: "Prilagodi vrednotenja doseganja učnih ciljev"
+  customize_section_and_student_paces_f63f930f: "Prilagodi sekcijo in hitrost napredovanja študenta"
   customize_sections_and_individual_student_paces_a16099b: "Prilagodi hitrosti napredovanja za sekcije in posamezne študente"
   customize_this_menu_efa72a9: "Prilagodi ta meni po meri"
   cutoff_score_74254c89: "spodnja meja za pozitivno oceno"
@@ -7894,6 +7907,7 @@ sl:
     no_date: "Brez datuma"
   dates_6e416047: Datumi
   dates_shown_in_course_time_zone_da2f77d5: "Datumi so prikazani v časovnem pasu predmeta"
+  dates_shown_in_course_time_zone_efd32135: "Datumi, prikazani v časovnem pasu predmeta"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -7956,6 +7970,7 @@ sl:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Globoko ugnezdeni odgovori niso več podprti. Vaš odgovor bo prikazan na prvi strani tega pogovora."
   default_9db103d: Privzeto
   default_conference_title: "%{course_name} Konferenca"
+  default_course_pace_ce0ba0f3: "Privzeta hitrost napredovanja pri predmetu"
   default_course_pacing_d18b6cda: "Privzeta hitrost napredovanja pri predmetu"
   default_dates_a0a2ae26: "privzeti datumi"
   default_due_time_9d0e9140: "Privzeti rok"
@@ -8070,6 +8085,7 @@ sl:
   deleted_content_referenced_in_this_resource_e42d1998: "V tem viru je navedena izbrisana vsebina:"
   deleted_deletedtimingdisplay_f4c73003: "Odstranjeno %{deletedTimingDisplay}"
   deleted_topic_notice: "Ta tema je izbrisana."
+  deleted_user_59fdcef7: "IZBRISANI UPORABNIK"
   deleting_6421031e: "brisanje ..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Datoteko iz oddaje običajno izbrišemo le, če študent objavi neprimerno ali zasebno gradivo.
@@ -8738,6 +8754,7 @@ sl:
   edit_criterion_description_5828919: "Uredi opis merila"
   edit_current_message_da650d4c: "Uredi trenutno sporočilo"
   edit_dates_ed31061: "Urejanje datumov"
+  edit_default_course_pace_e00f1b5b: "Uredi privzeto hitrost napredovanja pri predmetu"
   edit_default_pace_33ba5cdd: "Uredi privzeto hitrost napredovanja"
   edit_developer_key_53c93ed1: "Uredi razvijalski ključ"
   edit_developer_key_d8fa33c4: "Uredi razvijalski ključ"
@@ -10127,6 +10144,7 @@ sl:
   germany_49_fc5b8179: "Nemčija (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Poiščite pomoč pri uporabi in konfiguraciji konferenc v sistemu Canvas."
   get_started_b9507525: Začnite.
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Začnite, tako da ustvarite hitrost napredovanja pri predmetu, ki bo služila kot privzeta hitrost napredovanja za vse sekcije in študente pri predmetu."
   get_started_with_configuring_the_course_material_d_fa51d225: "Začnite s konfiguracijo rokov za gradivo predmeta za celoten predmet"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Iz povezane aplikacije Salesforce pridobite naslednje"
   get_the_sis_file_for_enrollments_cf308650: "Pridobite datoteko SIS za vpise"
@@ -11824,6 +11842,8 @@ sl:
   instructor_name_36bc0f39: "Ime učitelja"
   instructor_sis_id_899dd697: "SIS ID učitelja"
   instructors_4b491a07: učitelji
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Izvajalci niso vezani na omejitve poskusov, bo pa izvajalčeva oddaja štela kot študentov poskus."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Izvajalci lahko izvajajo oddaje v imenu študentov."
   instructors_cdd595d0: Učitelji
   instructure: 
     alerts: 
@@ -12618,6 +12638,7 @@ sl:
   loading_microsoft_teams_sync_settings_c2633e46: "Nalaganje nastavitev Microsoft Teams Sync"
   loading_missing_assignments_link_d9a0d320: "Nalagam manjkajočo povezavo do obvestila"
   loading_more_gradebook_history_results_810f6d2e: "Nalaganje več rezultatov zgodovine redovalnice"
+  loading_more_replies_22e0f13c: "Naloži več odgovorov"
   loading_more_results_1d437202: "Nalaganje več rezultatov"
   loading_more_results_def6df65: "Nalaganje več rezultatov ..."
   loading_more_sub_accounts_d0a30903: "Nalaganje več podračunov ..."
@@ -12626,6 +12647,7 @@ sl:
   loading_options_c823e98b: "Možnosti nalaganja ..."
   loading_outcome_results_96e21ce4: "Nalaganje rezultatov izida"
   loading_release_notes_7deaa2eb: "Nalaganje opomb ob izdaji"
+  loading_replies_8bdf17bc: "Nalaganje odgovorov ..."
   loading_results_769c8819: "Nalaganje rezultatov"
   loading_section_header_616c8cdd: "Nalaganje glave sekcije"
   loading_staff_1ce7d803: "Nalaganje osebja ..."
@@ -15336,6 +15358,7 @@ sl:
   newest_first_87672763: "Najprej najnovejši"
   newest_oldest_d768cf1a: "Najnovejši – najstarejši"
   next_40e12421: Naprej
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Nato prilagodite hitrosti napredovanja za posamezne sekcije in/ali študente, da jih dodatno prilagodite glede na svoje potrebe (ta korak ni obvezen)."
   next_announcement_6e6e0f17: "Naslednje obvestilo"
   next_announcements_page_3956eb11: "Naslednja stran z obvestili"
   next_assignment_8ec51175: "Naslednja naloga"
@@ -15992,6 +16015,7 @@ sl:
       \x20             Prihodnih sprememb objavljenih ocen ne bo treba objavljati ročno.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Ko je ocena enkrat objavljena ročno, bodo samodejno poslana nova obvestila in bo študentom vidna."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Ko je ta možnost omogočena, je izvajalcem vidna v redovalnici."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Ko pošljete odgovor, ga pozneje ne boste mogli več spremeniti. Prejšnjega vprašanja si ne boste mogli ogledati."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Ko začnete odpravljati napake, bodo zbrane vse informacije o naslednjem poskusu prijave. Kliknite »Osveži«, da boste videli, če je bilo zbranih več podatkov, ali »Zaustavi odpravljanje napak«, da počistite zbrane podatke in zaustavite trenutni poskus odpravljanja napak."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Enega ali več elementov vsebine, ki jih je poslala ta zunanja aplikacija, ni bilo mogoče pravilno obdelati. Sistem Canvas jih ni shranil, razlogi za neuspeh pa so navedeni spodaj."
@@ -16317,6 +16341,11 @@ sl:
   pace_plans_is_in_active_development_f6c20046: "Funkcija Različne hitrosti napredovanja je v aktivnem razvoju."
   pace_removed_8e625df7: "Hitrost napredovanje je odstranjena"
   pace_type_76cf749: "Vrsta hitrosti napredovanja"
+  pacename_pace_created_75aa4eda: "Hitrost napredovanja %{paceName} je ustvarjena"
+  pacename_pace_removed_79fb031f: "Hitrost napredovanje %{paceName} je odstranjena"
+  pacename_pace_updated_10c6f95: "Hitrost napredovanja %{paceName} je posodobljena"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "Hitrost napredovanja %{paceName} bo odstranjena. Ta hitrost napredovanja bo povrnjena nazaj na predhodno dodeljeno hitrost napredovanja."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "Hitrost napredovanja %{paceName} bo odstranjena. Ta hitrost napredovanja bo povrnjena nazaj na privzeto hitrost napredovanja."
   pacename_updated_2a2c4d77: "%{paceName} posodobljenih"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} hitrosti napredovanja: razvrstil(a) %{sortBy} v naročilu %{orderType}"
   package_error: "Napaka pri prepoznavanju vrste paketa: %{error}"
@@ -16571,6 +16600,7 @@ sl:
   please_note_fbb62e4c: "Pomnite:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Pomnite: Družba Instructure sistem Canvas Commons gosti v ZDA. To pomeni, da bodo med uporabo sistema Canvas Commons vaši osebni podatki shranjeni in obdelani v ZDA. Elementi teh osebnih podatkov vključujejo: ime, e-poštni naslov, ID uporabnika sistema Canvas, ime za prijavo v sistem Canvas, avatar Canvas, naslov IP, vire Canvas Commons, ki ste jih dodali med priljubljene, in komentarje, ki jih vnesete v kateri koli vir v sistemu Canvas Commons. Več informacij o praksah varstva zasebnosti družbe Instructure boste našli [tukaj](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Upoštevajte, da bodo, ko bo funkcija hitrosti napredovanja pri predmetu nastavljena, vse obstoječe naloge, kvizi in roki razprav nadzorovani s hitrostjo napredovanja pri predmetu. Več informacij si lahko preberite v *uporabniški skupini za hitrost napredovanja pri predmetu*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Upoštevajte, da bo shranjena hitrost napredovanja pri predmetu upravljala z vsemi roki za obstoječa ocenjevanja in učna gradiva. Več o funkciji različnih hitrosti napredovanja pri predmetu preberite v *uporabniški skupini za hitrost napredovanja pri predmetu*."
   please_provide_a_field_e5a7d0b3: "Predložite %{field}"
   please_provide_a_pairing_code_530d1e9d: "Vnesite kodo za povezovanje."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Vnesite veljavno domeno najemnika. Preverite nastavitve Azure Active Directory, da jo najdete."
@@ -16584,6 +16614,7 @@ sl:
   please_select_a_user_role_for_this_link_9fb4e655: "Vnesite vlogo uporabnika za to povezavo."
   please_select_one_f931e883: "Izberite eno"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Določiti je treba, ali želite Microsoft Teams Sync omogočiti ali onemogočiti."
+  please_try_another_search_term_8f7b5d69: "Poskusite z drugim iskalnim izrazom"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Poskusite z drugim iskalnim izrazom, filtrom ali iščite z manj znaki"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Poskusite znova vzpostaviti povezavo z orodjem, tako da ponovno izberete nalogo ali vmesnik elementa modula ter shranite."
   please_upload_files_as_a_zip_5a2c799f: "Naložite datoteke v obliki zapisa .zip."
@@ -21418,6 +21449,8 @@ sl:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Študenti lahko sodelujejo pri predmetu le v obdobju med tema datumoma."
   students_can_see_originality_score_797fe634: "Študenti si lahko ogledajo delež ujemanja."
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Po zaključki kviza si študenti ne morejo ogledati odgovorov pri kvizu."
+  students_enrolled_in_this_course_859fa7a2: "Študenti, ki so vpisani v ta predmet"
+  students_enrolled_in_this_section_681ba503: "Študenti, ki so vpisani v to sekcijo"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Študenti so pri tej nalogi že poslali domačo nalogo, zato nastavitev plagiatorstva na platformi ni mogoče spremeniti."
   students_have_either_already_taken_or_started_taki_a076336: "Študenti ta kviz že opravljajo ali pa so ga začeli opravljati, zato bodite previdni glede urejanja kviza. Če znatno spremenite katero koli vprašanje pri kvizu, boste morali morda razmisliti o ponovnem ocenjevanju študentov, ki so opravili staro različico kviza."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Študenti imajo možnost, da odgovorijo anonimno. Nekatera imena in slike profila so morda skrite."
@@ -21655,6 +21688,7 @@ sl:
   submissions_d30f61af: "# Oddaje"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "mape oddaj je treba ustvariti v kontekstu uporabnika ali skupine."
   submissions_graded_status_f689110d: "Oddaje – status ocene"
+  submissions_instructor_proxy_2247c633: "Oddaje – pooblaščenec izvajalca"
   submissions_posted_title_course_43677dba: "Objava oddaj: %{title}, %{course}"
   submissions_view_and_make_comments_cafaf361: "Oddaje – ogled in komentiranje"
   submit_a3cc6859: Pošlji
@@ -25079,6 +25113,7 @@ sl:
   your_outcomes_were_successfully_imported_c5de884: "Vaši učni izidi so bili uspešno uvoženi."
   your_password_has_been_changed_df0e72aa: "Vaše geslo je spremenjeno."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Navodila za obnovitev vašega gesla bomo poslali na *%{email_address}*. To lahko traja do 30 minuti. Ne pozabite preveriti predala za neželeno pošto."
+  your_peer_review_is_complete_e5fa3e40: "Vaše ocenjevanje kolegov je končano!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Fotografije vašega profila ni bilo mogoče naložiti. Morda ste presegli omejitev nalaganja."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Izbira mehanizma za vaš kviz je bila ponastavljena!"
   your_score_a1fc2fcf: "Vaš rezultat"

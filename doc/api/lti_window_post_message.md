@@ -79,10 +79,10 @@ Returned postMessage includes the following properties:
 ```js
 window.top.postMessage(
   {
-    subject: 'org.ims_global.lti.put_data',
+    subject: 'org.imsglobal.lti.put_data',
     key: 'hello',
     value: 'world',
-    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f'
+    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
   },
   '*'
 )
@@ -117,10 +117,10 @@ Returning postMessage includes the following properties:
 ```js
 window.top.postMessage(
   {
-    subject: 'org.ims_global.lti.put_data',
+    subject: 'org.imsglobal.lti.put_data',
     key: 'hello',
     value: 'world',
-    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f'
+    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
   },
   '*'
 )
@@ -160,9 +160,9 @@ window.top.postMessage(
       launchType: 'new_window',
       launchOptions: {
         width: 1000,
-        height: 800
-      }
-    }
+        height: 800,
+      },
+    },
   },
   '*'
 )
@@ -205,7 +205,7 @@ Tells Canvas to remove the right side nav in the assignments view.
 ```js
 window.top.postMessage(
   {
-    subject: 'lti.hideRightSideWrapper'
+    subject: 'lti.hideRightSideWrapper',
   },
   '*'
 )
@@ -228,7 +228,7 @@ Tells Canvas to change the height of the iframe containing the tool.
 window.top.postMessage(
   {
     subject: 'lti.frameResize',
-    height: 400
+    height: 400,
   },
   '*'
 )
@@ -269,7 +269,7 @@ Toggles the module navigation footer based on the message's content.
 window.top.postMessage(
   {
     subject: 'lti.frameResize',
-    show: true
+    show: true,
   },
   '*'
 )
@@ -301,7 +301,7 @@ Sets a message to be shown in a browser dialog before page closes (ie
 window.top.postMessage(
   {
     subject: 'lti.setUnloadMessage',
-    message: 'Are you sure you want to leave this app?'
+    message: 'Are you sure you want to leave this app?',
   },
   '*'
 )
@@ -332,7 +332,7 @@ Shows an alert for screen readers.
 window.top.postMessage(
   {
     subject: 'lti.screenReaderAlert',
-    body: 'An alert just for screen readers'
+    body: 'An alert just for screen readers',
   },
   '*'
 )
@@ -360,7 +360,7 @@ window.top.postMessage(
     subject: 'lti.showAlert',
     alertType: 'warning',
     body: 'An warning to be shown',
-    title: 'Tool Name'
+    title: 'Tool Name',
   },
   '*'
 )

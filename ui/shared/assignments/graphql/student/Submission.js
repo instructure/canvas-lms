@@ -98,6 +98,15 @@ export const SubmissionMocks = {
     submittedAt: new Date().toISOString(),
   },
 
+  proxySubmitted: {
+    attempt: 1,
+    gradingStatus: 'needs_grading',
+    state: 'submitted',
+    submissionStatus: 'submitted',
+    submittedAt: new Date().toISOString(),
+    proxySubmitter: 'Marty McFly',
+  },
+
   excused: {
     gradingStatus: 'excused',
     state: 'graded',

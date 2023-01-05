@@ -125,6 +125,16 @@ export default function SubmissionWorkflowTracker({submission}) {
           >
             {renderStateText(submission, state.title)}
           </Text>
+          {submission.proxySubmitter && (
+            <Text
+              as="div"
+              color="success"
+              data-testid="submission-workflow-tracker-proxy-indicator"
+              weight="bold"
+            >
+              {I18n.t('by %{name}', {name: submission.proxySubmitter})}
+            </Text>
+          )}
           {subtitle && (
             <Text as="div" data-testid="submission-workflow-tracker-subtitle">
               {subtitle}

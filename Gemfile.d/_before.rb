@@ -27,8 +27,8 @@ end
 
 if RUBY_ENGINE == "truffleruby"
   warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
-elsif RUBY_VERSION >= "3.0.0"
-  warn "Ruby 3.0+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
+elsif RUBY_VERSION >= "3.2.0"
+  warn "Ruby 3.2+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 end
 ruby ">= 2.7.0"
 

@@ -38,9 +38,6 @@
 # to the given url with a query param of `url=` and the website to snapshot, and a header
 # X-API-Key with the given key.
 
-require "resolv"
-require "ipaddr"
-
 class CutyCapt
   CUTYCAPT_DEFAULTS = {
     delay: 3000,

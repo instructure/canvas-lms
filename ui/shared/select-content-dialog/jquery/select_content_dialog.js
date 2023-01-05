@@ -53,63 +53,95 @@ const SelectContentDialog = {}
 let fileSelectBox
 let upload_form
 
-SelectContentDialog.deepLinkingListener = event => {
-  if (
-    event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
-    event.data &&
-    event.data.subject === 'LtiDeepLinkingResponse'
-  ) {
-    if (event.data.content_items.length > 1) {
-      return processMultipleContentItems(event)
-        .then(result => {
-          const $dialog = $('#resource_selection_dialog')
-          $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-          $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+SelectContentDialog.externalContentReadyHandler = (event, tool) => {
+  const item = event.data.contentItems[0]
+  if (item['@type'] === 'LtiLinkItem' && item.url) {
+    SelectContentDialog.handleContentItemResult(item, tool)
+  } else {
+    // eslint-disable-next-line no-alert
+    window.alert(SelectContent.errorForUrlItem(item))
 
-          if (result.every(item => item.type !== 'ltiResourceLink')) {
-            $.flashError(I18n.t('Selected content contains non-LTI links.'))
-            return
-          }
+    SelectContentDialog.resetExternalToolFields()
+  }
+  $('#resource_selection_dialog #resource_selection_iframe').attr('src', 'about:blank')
+  const $dialog = $('#resource_selection_dialog')
+  $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+  $dialog.dialog('close')
 
-          if (event.data.reloadpage) {
-            window.location.reload()
-          }
-        })
-        .catch(e => {
-          $.flashError(I18n.t('Error retrieving content'))
-          // eslint-disable-next-line no-console
-          console.error(e)
-        })
-        .finally(() => {
-          const $dialog = $('#resource_selection_dialog')
-          $dialog.dialog('close')
-        })
-    } else if (event.data.content_items.length === 1) {
-      return processSingleContentItem(event)
-        .then(result => {
-          const $dialog = $('#resource_selection_dialog')
-          $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-          $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+  if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
+    document.querySelector('#external_tool_create_new_tab').checked = true
+  }
+}
 
-          if (result.type !== 'ltiResourceLink') {
-            $.flashError(I18n.t('Selected content is not an LTI link.'))
-            return
-          }
+SelectContentDialog.deepLinkingResponseHandler = async event => {
+  if (event.data.content_items.length > 1) {
+    return processMultipleContentItems(event)
+      .then(result => {
+        const $dialog = $('#resource_selection_dialog')
+        $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+        $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
 
-          const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
-          SelectContentDialog.handleContentItemResult(result, tool)
-        })
-        .catch(e => {
-          $.flashError(I18n.t('Error retrieving content'))
-          // eslint-disable-next-line no-console
-          console.error(e)
-        })
-        .finally(() => {
-          const $dialog = $('#resource_selection_dialog')
-          $dialog.dialog('close')
-        })
-    } else if (event.data.content_items.length === 0) {
-      SelectContentDialog.closeAll()
+        if (result.every(item => item.type !== 'ltiResourceLink')) {
+          $.flashError(I18n.t('Selected content contains non-LTI links.'))
+          return
+        }
+
+        if (event.data.reloadpage) {
+          window.location.reload()
+        }
+      })
+      .catch(e => {
+        $.flashError(I18n.t('Error retrieving content'))
+        // eslint-disable-next-line no-console
+        console.error(e)
+      })
+      .finally(() => {
+        const $dialog = $('#resource_selection_dialog')
+        $dialog.dialog('close')
+      })
+  } else if (event.data.content_items.length === 1) {
+    return processSingleContentItem(event)
+      .then(result => {
+        const $dialog = $('#resource_selection_dialog')
+        $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+        $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+        if (result.type !== 'ltiResourceLink') {
+          $.flashError(I18n.t('Selected content is not an LTI link.'))
+          return
+        }
+
+        const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
+        SelectContentDialog.handleContentItemResult(result, tool)
+      })
+      .catch(e => {
+        $.flashError(I18n.t('Error retrieving content'))
+        // eslint-disable-next-line no-console
+        console.error(e)
+      })
+      .finally(() => {
+        const $dialog = $('#resource_selection_dialog')
+        $dialog.dialog('close')
+      })
+  } else if (event.data.content_items.length === 0) {
+    SelectContentDialog.closeAll()
+  }
+}
+
+/**
+ * Handles both LTI 1.1 (externalContentReady) and 1.3
+ * (LtiDeepLinkingResponse) postMessages that contain
+ * content items
+ * @param {MessageEvent} event
+ */
+SelectContentDialog.ltiPostMessageHandler = function (tool, event) {
+  if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN && event.data) {
+    if (event.data.subject === 'LtiDeepLinkingResponse') {
+      SelectContentDialog.deepLinkingResponseHandler(event)
+    } else if (event.data.subject === 'externalContentReady') {
+      SelectContentDialog.externalContentReadyHandler(event, tool)
+    } else if (event.data.subject === 'externalContentCancel') {
+      $('#resource_selection_dialog').dialog('close')
     }
   }
 }
@@ -125,12 +157,15 @@ SelectContentDialog.closeAll = function () {
   $selectContextContentDialog.dialog('close')
 }
 
-SelectContentDialog.attachDeepLinkingListner = function () {
-  window.addEventListener('message', this.deepLinkingListener)
-}
-
-SelectContentDialog.detachDeepLinkingListener = function () {
-  window.removeEventListener('message', this.deepLinkingListener)
+/**
+ * Returns a named handler function that already has the tool
+ * so that the add/RemoveEventListener can properly reference
+ * the same function object.
+ * @param {object} tool
+ * @returns MessageEvent handler function with `tool` paramter bound to it
+ */
+SelectContentDialog.buildLtiPostMessageHandler = function (tool) {
+  return SelectContentDialog.ltiPostMessageHandler.bind(SelectContentDialog, tool)
 }
 
 SelectContentDialog.dialogCancelHandler = function (event) {
@@ -285,20 +320,21 @@ SelectContentDialog.Events = {
 
         $('body').append($dialog.hide())
         $dialog.on('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+        const ltiPostMessageHandler = SelectContentDialog.buildLtiPostMessageHandler()
         $dialog
           .dialog({
             autoOpen: false,
             width: 'auto',
             resizable: true,
             close() {
-              SelectContentDialog.detachDeepLinkingListener()
+              window.removeEventListener('message', ltiPostMessageHandler)
               $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
               $dialog
                 .find('#resource_selection_iframe')
                 .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
-              SelectContentDialog.attachDeepLinkingListner()
+              window.addEventListener('message', ltiPostMessageHandler)
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
           })
@@ -327,24 +363,6 @@ SelectContentDialog.Events = {
                   .css($(this).offset())
                   .appendTo('body')
               })
-          })
-          .bind('selection', event => {
-            const item = event.contentItems[0]
-            if (item['@type'] === 'LtiLinkItem' && item.url) {
-              SelectContentDialog.handleContentItemResult(item, tool)
-            } else {
-              // eslint-disable-next-line no-alert
-              window.alert(SelectContent.errorForUrlItem(item))
-
-              SelectContentDialog.resetExternalToolFields()
-            }
-            $('#resource_selection_dialog #resource_selection_iframe').attr('src', 'about:blank')
-            $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-            $('#resource_selection_dialog').dialog('close')
-
-            if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
-              document.querySelector('#external_tool_create_new_tab').checked = true
-            }
           })
       }
       $dialog

@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "pathname"
-require "yaml"
-require "open3"
-
 module BrandableCSS
   APP_ROOT = (defined?(Rails) && Rails.root) || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join("config/brandable_css.yml")).freeze

@@ -74,20 +74,26 @@ class CoursePacesController < ApplicationController
   end
 
   def paces_publishing
-    Delayed::Job.where(tag: "CoursePace#publish").map do |job|
+    jobs_progress = Delayed::Job.where(tag: "CoursePace#publish").map do |job|
       progress = Progress.find_by(delayed_job_id: job.id)
-      pace = @course.course_paces.find(progress.context_id)
-      {
-        context_code: context_code_for(pace)
-      }
+      pace = progress.context
+      if pace&.workflow_state == "active"
+        {
+          pace_context: CoursePacing::PaceContextsPresenter.as_json(context_for(pace)),
+          progress_context_id: progress.context_id
+        }
+      else
+        nil
+      end
     end
+    jobs_progress.compact
   end
 
-  def context_code_for(pace)
-    return "section-#{pace.course_section_id}" if pace.course_section_id
-    return "student_enrollment-#{pace.user_id}" if pace.user_id
+  def context_for(pace)
+    return pace.course_section if pace.course_section_id
+    return pace.user.student_enrollments.where(course: @course).where.not(workflow_state: "deleted").take if pace.user_id
 
-    "course-#{pace.course_id}"
+    pace.course
   end
 
   def api_show

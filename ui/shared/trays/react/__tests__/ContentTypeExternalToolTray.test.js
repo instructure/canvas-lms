@@ -17,12 +17,14 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolTray from '../ContentTypeExternalToolTray'
 
 describe('ContentTypeExternalToolTray', () => {
   const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
   const onDismiss = jest.fn()
+  const onExternalContentReady = jest.fn()
 
   function renderTray(props) {
     return render(
@@ -30,6 +32,7 @@ describe('ContentTypeExternalToolTray', () => {
         tool={tool}
         placement="wiki_index_menu"
         onDismiss={onDismiss}
+        onExternalContentReady={onExternalContentReady}
         acceptedResourceTypes={['page', 'module']}
         targetResourceType="page"
         allowItemSelection={true}
@@ -49,6 +52,12 @@ describe('ContentTypeExternalToolTray', () => {
     const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
     expect(onDismiss.mock.calls.length).toBe(1)
+  })
+
+  it('calls onExternalContentReady when it receives an externalContentReady event', () => {
+    renderTray()
+    $(window).trigger('externalContentReady')
+    expect(onExternalContentReady).toHaveBeenCalledTimes(1)
   })
 
   describe('constructs iframe src url', () => {

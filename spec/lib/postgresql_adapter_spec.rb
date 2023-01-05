@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "irb"
-
 require_relative "../spec_helper"
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do

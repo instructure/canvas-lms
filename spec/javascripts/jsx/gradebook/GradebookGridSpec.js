@@ -20,6 +20,7 @@ import {
   createGradebook,
   setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import fakeENV from 'helpers/fakeENV'
 import qs from 'qs'
 import _ from 'underscore'
 import {
@@ -1150,6 +1151,10 @@ test('includes the "student" column id when updating column headers', function (
 
 QUnit.module('Gradebook#onGridBlur', {
   setup() {
+    fakeENV.setup()
+    ENV.GRADEBOOK_OPTIONS = {
+      proxy_submissions_allowed: false,
+    }
     setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook()

@@ -29,6 +29,7 @@ class AssignmentOverride < ActiveRecord::Base
   simply_versioned keep: 10
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
+  attr_writer :for_nonactive_enrollment
 
   belongs_to :root_account, class_name: "Account"
   belongs_to :assignment, inverse_of: :assignment_overrides
@@ -266,6 +267,24 @@ class AssignmentOverride < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def for_nonactive_enrollment?
+    !!@for_nonactive_enrollment
+  end
+
+  def self.preload_for_nonactive_enrollment(section_overrides, course, user)
+    return section_overrides if user.blank? || section_overrides.empty?
+
+    enrollment_state_by_section_id = course.enrollments.where(user: user).pluck(:course_section_id, :workflow_state).to_h
+    section_overrides.each do |override|
+      next unless override.set_type == "CourseSection"
+
+      state = enrollment_state_by_section_id[override.set_id]
+      override.for_nonactive_enrollment = state.present? && state != "active"
+    end
+
+    section_overrides
   end
 
   def self.override(field)

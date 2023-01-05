@@ -131,6 +131,7 @@ export type CamelizedSubmission = {
   missing: boolean
   pointsDeducted: null | number
   postedAt: null | Date
+  proxySubmitter?: string
   rawGrade: string | null
   redoRequest: boolean
   score: null | number
@@ -180,6 +181,11 @@ export type CamelizedAssignment = {
   postManually: boolean
   published: boolean
   submissionTypes: string
+  groupSet?: {
+    currentGroup: {
+      _id: string
+    }
+  }
 }
 
 export type PlagiarismData = {

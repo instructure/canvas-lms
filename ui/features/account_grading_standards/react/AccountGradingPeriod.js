@@ -19,7 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
@@ -81,20 +82,19 @@ export default class AccountGradingPeriod extends React.Component {
   renderEditButton() {
     if (this.props.permissions.update && !this.props.readOnly) {
       return (
-        <Button
+        <IconButton
           elementRef={ref => {
             this._refs.editButton = ref
           }}
-          variant="icon"
           disabled={this.props.actionsDisabled}
           onClick={this.onEdit}
+          withBackground={false}
+          withBorder={false}
           title={I18n.t('Edit %{title}', {title: this.props.period.title})}
+          screenReaderLabel={I18n.t('Edit %{title}', {title: this.props.period.title})}
         >
-          <span className="screenreader-only">
-            {I18n.t('Edit %{title}', {title: this.props.period.title})}
-          </span>
-          <i className="icon-edit" role="presentation" />
-        </Button>
+          <IconEditLine />
+        </IconButton>
       )
     }
   }
@@ -102,20 +102,19 @@ export default class AccountGradingPeriod extends React.Component {
   renderDeleteButton() {
     if (this.props.permissions.delete && !this.props.readOnly) {
       return (
-        <Button
+        <IconButton
           elementRef={ref => {
             this._refs.deleteButton = ref
           }}
-          variant="icon"
           disabled={this.props.actionsDisabled}
           onClick={this.promptDeleteGradingPeriod}
+          withBackground={false}
+          withBorder={false}
           title={I18n.t('Delete %{title}', {title: this.props.period.title})}
+          screenReaderLabel={I18n.t('Delete %{title}', {title: this.props.period.title})}
         >
-          <span className="screenreader-only">
-            {I18n.t('Delete %{title}', {title: this.props.period.title})}
-          </span>
-          <i className="icon-trash" role="presentation" />
-        </Button>
+          <IconTrashLine />
+        </IconButton>
       )
     }
   }

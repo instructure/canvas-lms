@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "set"
-
 module SIS
   class EnrollmentImporter < BaseImporter
     def process(messages)

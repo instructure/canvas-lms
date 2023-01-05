@@ -377,8 +377,6 @@ ActiveRecord::Base.class_eval do
   end
 end
 
-require "active_support/core_ext/array/conversions"
-
 module ToSentenceWithSimpleOr
   def to_sentence(options = {})
     if options == :or

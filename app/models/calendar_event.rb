@@ -19,7 +19,6 @@
 #
 
 require "atom"
-require "date"
 require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc

@@ -2597,7 +2597,6 @@ EG = {
         if (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown)) {
           grade = GradeFormatHelper.formatGrade(s.grade)
         }
-
         return {
           value: i,
           late_policy_status: EG.currentStudent.submission.late_policy_status,
@@ -2605,11 +2604,11 @@ EG = {
           missing: s.missing,
           excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
+          proxy_submitter: s.proxy_submitter ? ` (${s.proxy_submitter})` : null,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade,
         }
       })
-
       innerHTML = submissionsDropdownTemplate({
         showSubmissionStatus: !window.jsonData.anonymize_students || isAdmin,
         singleSubmission: submissionHistory.length === 1,

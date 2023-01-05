@@ -43,10 +43,13 @@ describe "submissions/show" do
       @group_category = @course.group_categories.create!(name: "Test Group Set")
       @group = @course.groups.create!(name: "a group", group_category: @group_category)
       add_user_to_group(@user, @group, true)
-      @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
-                                                  group_category: @group_category,
-                                                  grade_group_students_individually: true
-                                                ))
+      @assignment =
+        @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: @group_category,
+            grade_group_students_individually: true
+          )
+        )
       @submission = @assignment.submit_homework(@user)
     end
 
@@ -78,7 +81,12 @@ describe "submissions/show" do
       @assignment.update!(grade_group_students_individually: false, peer_reviews: true)
       peer = @course.enroll_student(User.create, enrollment_state: "active").user
       peer_submission = @assignment.submissions.find_by(user: peer)
-      AssessmentRequest.create!(assessor: peer, assessor_asset: peer_submission, asset: @submission, user: @user)
+      AssessmentRequest.create!(
+        assessor: peer,
+        assessor_asset: peer_submission,
+        asset: @submission,
+        user: @user
+      )
       view_context(@course, peer)
       assign(:assignment, @assignment)
       assign(:submission, @submission)
@@ -99,10 +107,35 @@ describe "submissions/show" do
     end
   end
 
+  context "when submission is proxied" do
+    it "renders the proxy submitter's name" do
+      view_context(@course, @user)
+      a =
+        @course.assignments.create!(
+          title: "some assignment",
+          points_possible: 10,
+          grading_type: "points"
+        )
+      assign(:assignment, a)
+      @submission = a.submit_homework(@user)
+      @submission.update!(proxy_submitter: @teacher)
+      assign(:submission, @submission)
+      render "submissions/show"
+      html = Nokogiri::HTML5.fragment(response.body)
+
+      expect(html.css(".submission-details-header__info").text).to include @teacher.short_name
+    end
+  end
+
   context "when assignment has deducted points" do
     it 'shows the deduction and "grade" as final grade when current_user is teacher' do
       view_context(@course, @teacher)
-      a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: "points")
+      a =
+        @course.assignments.create!(
+          title: "some assignment",
+          points_possible: 10,
+          grading_type: "points"
+        )
       assign(:assignment, a)
       @submission = a.submit_homework(@user)
       @submission.update(grade: 7, points_deducted: 2)
@@ -116,7 +149,12 @@ describe "submissions/show" do
 
     it 'shows the deduction and "published_grade" as final grade when current_user is submission user' do
       view_context(@course, @user)
-      a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: "points")
+      a =
+        @course.assignments.create!(
+          title: "some assignment",
+          points_possible: 10,
+          grading_type: "points"
+        )
       assign(:assignment, a)
       @submission = a.submit_homework(@user)
       @submission.update(grade: "7", points_deducted: 2, published_grade: "6")
@@ -131,7 +169,12 @@ describe "submissions/show" do
     context "and is excused" do
       it "hides the deduction" do
         view_context(@course, @teacher)
-        a = @course.assignments.create!(title: "some assignment", points_possible: 10, grading_type: "points")
+        a =
+          @course.assignments.create!(
+            title: "some assignment",
+            points_possible: 10,
+            grading_type: "points"
+          )
         assign(:assignment, a)
         @submission = a.submit_homework(@user)
         @submission.update(grade: 7, points_deducted: 2, excused: true)
@@ -162,12 +205,17 @@ describe "submissions/show" do
     end
 
     before :once do
-      @assignment = @course.assignments.create!(
-        assignment_valid_attributes.merge(submission_types: "online_upload,online_text_entry")
-      )
+      @assignment =
+        @course.assignments.create!(
+          assignment_valid_attributes.merge(submission_types: "online_upload,online_text_entry")
+        )
       @assignment.unmute!
 
-      @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: "online_text_entry" })
+      @submission =
+        @assignment.submit_homework(
+          @user,
+          { body: "hello there", submission_type: "online_text_entry" }
+        )
       @submission.turnitin_data = {
         "submission_#{@submission.id}" => {
           web_overlap: 92,
@@ -189,9 +237,7 @@ describe "submissions/show" do
     end
 
     context "with new similarity icons enabled" do
-      before do
-        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
-      end
+      before { @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator) }
 
       let(:icon_css_query) { "i.icon-empty" }
 
@@ -228,9 +274,7 @@ describe "submissions/show" do
       end
 
       context "for vericite" do
-        before do
-          @submission.turnitin_data[:provider] = "vericite"
-        end
+        before { @submission.turnitin_data[:provider] = "vericite" }
 
         it "is present when the plagiarism report is from vericite" do
           expect(html.css(".vericite_score_container_caret").size).to eq 1
@@ -268,21 +312,23 @@ describe "submissions/show" do
     end
 
     context "when assignment posts automatically" do
-      before do
-        @assignment.ensure_post_policy(post_manually: false)
-      end
+      before { @assignment.ensure_post_policy(post_manually: false) }
 
       it "does not display a message when submission is unposted and assignment posts automatically" do
         render "submissions/show"
         summary = html.css(".submission-details-header__grade-summary p").text
-        expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        expect(
+          summary
+        ).not_to include "Grades are unavailable because the instructor is working on them."
       end
 
       it "does not display a message when submission is posted and assignment posts automatically" do
         @submission.update!(posted_at: Time.zone.now)
         render "submissions/show"
         summary = html.css(".submission-details-header__grade-summary p").text
-        expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        expect(
+          summary
+        ).not_to include "Grades are unavailable because the instructor is working on them."
       end
 
       it "displays the grade when submission is posted and user can :read_grade" do
@@ -294,9 +340,7 @@ describe "submissions/show" do
     end
 
     context "when assignment posts manually" do
-      before do
-        @assignment.ensure_post_policy(post_manually: true)
-      end
+      before { @assignment.ensure_post_policy(post_manually: true) }
 
       it "displays a message when submission is unposted" do
         render "submissions/show"
@@ -308,7 +352,9 @@ describe "submissions/show" do
         @submission.update!(posted_at: Time.zone.now)
         render "submissions/show"
         summary = html.css(".submission-details-header__grade-summary p").text
-        expect(summary).not_to include "Grades are unavailable because the instructor is working on them."
+        expect(
+          summary
+        ).not_to include "Grades are unavailable because the instructor is working on them."
       end
 
       it "does not display the grade when submission is unposted" do
@@ -325,9 +371,7 @@ describe "submissions/show" do
       context "when the viewing user is a teacher" do
         let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
 
-        before do
-          assign(:current_user, teacher)
-        end
+        before { assign(:current_user, teacher) }
 
         it "displays the current grade even when the submission is not posted" do
           render "submissions/show"
@@ -388,9 +432,7 @@ describe "submissions/show" do
       end
 
       context "when a teacher is viewing" do
-        before do
-          assign(:current_user, teacher)
-        end
+        before { assign(:current_user, teacher) }
 
         it "shows all comments when a teacher is viewing" do
           assign(:assignment, muted_assignment)
@@ -423,9 +465,7 @@ describe "submissions/show" do
       end
 
       context "when a student is viewing" do
-        before do
-          assign(:current_user, student)
-        end
+        before { assign(:current_user, student) }
 
         it "shows all comments if the submission is posted" do
           unmuted_submission.update!(posted_at: Time.zone.now)
@@ -459,14 +499,33 @@ describe "submissions/show" do
           end
           let(:moderated_submission) { moderated_assignment.submission_for_student(student) }
           let(:first_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
-          let(:second_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
+          let(:second_ta) do
+            course_with_user("TaEnrollment", course: course, active_all: true).user
+          end
 
           before do
             moderated_submission.add_comment(author: student, comment: "I did a great job!")
-            moderated_submission.add_comment(author: teacher, comment: "No, you did not.", provisional: true)
-            moderated_submission.add_comment(author: first_ta, comment: "Maybe they did?", provisional: true)
-            moderated_submission.add_comment(author: second_ta, comment: "Who cares?", provisional: true)
-            moderated_assignment.grade_student(student, grade: 1, grader: second_ta, provisional: true)
+            moderated_submission.add_comment(
+              author: teacher,
+              comment: "No, you did not.",
+              provisional: true
+            )
+            moderated_submission.add_comment(
+              author: first_ta,
+              comment: "Maybe they did?",
+              provisional: true
+            )
+            moderated_submission.add_comment(
+              author: second_ta,
+              comment: "Who cares?",
+              provisional: true
+            )
+            moderated_assignment.grade_student(
+              student,
+              grade: 1,
+              grader: second_ta,
+              provisional: true
+            )
             assign(:assignment, moderated_assignment)
             assign(:submission, moderated_submission)
           end
@@ -477,17 +536,18 @@ describe "submissions/show" do
           end
 
           it "shows the student's, chosen grader's, and final grader's comments when unmuted" do
-            ModeratedGrading::ProvisionalGrade.find_by(submission: moderated_submission, scorer: second_ta).publish!
+            ModeratedGrading::ProvisionalGrade.find_by(
+              submission: moderated_submission,
+              scorer: second_ta
+            ).publish!
             moderated_assignment.update!(grades_published_at: Time.zone.now)
             moderated_assignment.unmute!
             moderated_submission.reload
 
             render "submissions/show"
-            expect(comment_contents).to match_array([
-                                                      "I did a great job!",
-                                                      "No, you did not.",
-                                                      "Who cares?"
-                                                    ])
+            expect(comment_contents).to match_array(
+              ["I did a great job!", "No, you did not.", "Who cares?"]
+            )
           end
         end
       end
@@ -523,7 +583,7 @@ describe "submissions/show" do
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render "submissions/show"
-          expect(response.body).to include %(<span class="rubric_comment unread_indicator")
+          expect(response.body).to include '<span class="rubric_comment unread_indicator"'
         end
 
         it "does not show the indicator if unread comments aren't present" do
@@ -532,7 +592,7 @@ describe "submissions/show" do
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render "submissions/show"
-          expect(response.body).not_to include %(<span class="rubric_comment unread_indicator")
+          expect(response.body).not_to include '<span class="rubric_comment unread_indicator"'
         end
       end
     end
@@ -570,11 +630,12 @@ describe "submissions/show" do
         student_in_course(active_all: true)
         @course.workflow_state = "available"
         @course.save!
-        @assessment_request = @submission.assessment_requests.create!(
-          assessor: @student,
-          assessor_asset: @submission,
-          user: @submission.user
-        )
+        @assessment_request =
+          @submission.assessment_requests.create!(
+            assessor: @student,
+            assessor_asset: @submission,
+            user: @submission.user
+          )
       end
 
       it 'shows the "Show Rubric" link after request is complete' do
@@ -620,7 +681,9 @@ describe "submissions/show" do
 
   context "when an assignment is peer-reviewed" do
     let(:assignment) { @course.assignments.create!(peer_reviews: true) }
-    let(:student_to_assess) { @course.enroll_student(User.create!, enrollment_state: "active").user }
+    let(:student_to_assess) do
+      @course.enroll_student(User.create!, enrollment_state: "active").user
+    end
     let(:submission) { assignment.submission_for_student(student_to_assess) }
 
     let(:assessment_request) do
@@ -647,7 +710,8 @@ describe "submissions/show" do
     end
 
     it "does not show assessment instructions when the assignment has a rubric" do
-      rubric_association = rubric_association_model(association_object: assignment, purpose: "grading")
+      rubric_association =
+        rubric_association_model(association_object: assignment, purpose: "grading")
       assessment_request.update!(rubric_association: rubric_association)
 
       render "submissions/show"
@@ -659,12 +723,22 @@ describe "submissions/show" do
 
   describe "media comments" do
     let_once(:assignment) { @course.assignments.create! }
-    let_once(:student) { course_with_user("StudentEnrollment", course: @course, name: "Stu", active_all: true).user }
+    let_once(:student) do
+      course_with_user("StudentEnrollment", course: @course, name: "Stu", active_all: true).user
+    end
     let_once(:sub) { assignment.submit_homework(student, body: "i did a thing") }
-    let_once(:teacher) { course_with_user("TeacherEnrollment", course: @course, name: "Tom", active_all: true).user }
+    let_once(:teacher) do
+      course_with_user("TeacherEnrollment", course: @course, name: "Tom", active_all: true).user
+    end
 
     before(:once) do
-      @comment = sub.add_comment(author: teacher, comment: "good job!", media_comment_id: 1, media_comment_type: "video")
+      @comment =
+        sub.add_comment(
+          author: teacher,
+          comment: "good job!",
+          media_comment_id: 1,
+          media_comment_type: "video"
+        )
     end
 
     before do

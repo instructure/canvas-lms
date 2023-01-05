@@ -386,6 +386,9 @@ module InstFS
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
+      if options[:internal]
+        claims[:internal] = true
+      end
       amend_claims_for_access_token(claims, options[:access_token], options[:root_account])
       service_jwt(claims, Time.zone.at(iat) + expires_in)
     end

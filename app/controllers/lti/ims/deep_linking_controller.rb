@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "json/jwt"
-
 module Lti
   module IMS
     class DeepLinkingController < ApplicationController
@@ -142,10 +140,6 @@ module Lti
       end
 
       private
-
-      def for_placement?(placement)
-        return_url_parameters[:placement]&.to_sym == placement
-      end
 
       def render_content_items(items: content_items, reload_page: true, module_created: false)
         js_env({

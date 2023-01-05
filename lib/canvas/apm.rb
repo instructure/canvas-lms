@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "ddtrace"
-require "digest/sha1"
 
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace

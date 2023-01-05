@@ -33,6 +33,29 @@ describe ExternalContentController do
     end
   end
 
+  describe "GET success/:id" do
+    context "no lti_version is passed" do
+      let(:course) { course_factory }
+      let(:params) do
+        {
+          service: "external_tool_dialog",
+          course_id: course.id,
+          id: 123
+        }
+      end
+
+      before do
+        course_with_teacher
+        user_session(@teacher)
+      end
+
+      it "returns a 401 rather than a 500" do
+        get(:success, params: params)
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "POST success/external_tool_dialog" do
     describe "js_env setting" do
       let(:params) do

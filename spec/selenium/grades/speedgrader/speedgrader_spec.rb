@@ -27,7 +27,6 @@ require_relative "../pages/student_grades_page"
 require_relative "../pages/gradebook_page"
 require_relative "../../assignments/page_objects/assignment_page"
 require_relative "../../assignments/page_objects/submission_detail_page"
-require "benchmark"
 
 describe "Speedgrader" do
   include_context "in-process server selenium tests"

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "securerandom"
-
 def ping
   $stdout.sync = true
   print "."

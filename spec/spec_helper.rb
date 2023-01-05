@@ -30,8 +30,6 @@ rescue LoadError
   nil
 end
 
-require "securerandom"
-require "tmpdir"
 require "crystalball"
 
 ENV["RAILS_ENV"] = "test"

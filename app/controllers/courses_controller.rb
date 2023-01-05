@@ -19,8 +19,6 @@
 #
 
 require "atom"
-require "set"
-require "securerandom"
 
 # @API Courses
 # API for accessing course information.

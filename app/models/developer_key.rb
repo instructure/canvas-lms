@@ -127,6 +127,8 @@ class DeveloperKey < ActiveRecord::Base
       value
     end
 
+    errors.add :redirect_uris, "a redirect_uri is too long" if uris.any? { |uri| uri.length > 4096 }
+
     self.redirect_uris = uris unless uris == redirect_uris
   rescue URI::Error, ArgumentError
     errors.add :redirect_uris, "is not a valid URI"

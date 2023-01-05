@@ -87,6 +87,7 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   alias_method :student, :user
   belongs_to :grader, class_name: "User"
+  belongs_to :proxy_submitter, class_name: "User", optional: true
   belongs_to :grading_period, inverse_of: :submissions
   belongs_to :group
   belongs_to :media_object
@@ -141,7 +142,7 @@ class Submission < ActiveRecord::Base
   validates :cached_tardiness, inclusion: ["missing", "late"], allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
-  validate :ensure_attempts_are_in_range
+  validate :ensure_attempts_are_in_range, unless: :proxy_submission?
   validate :submission_type_is_valid, if: :require_submission_type_is_valid
   attr_accessor :require_submission_type_is_valid
 
@@ -302,6 +303,10 @@ class Submission < ActiveRecord::Base
         (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
        )
       )
+  end
+
+  def proxy_submission?
+    proxy_submitter.present?
   end
 
   def resubmitted?

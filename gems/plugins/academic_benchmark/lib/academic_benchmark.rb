@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "net/http"
-
-require "cgi"
-
 require "academic_benchmark/engine"
 
 require "academic_benchmark/ab_gem_extensions/authority"
