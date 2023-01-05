@@ -110,8 +110,8 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
             <Text size="small">{I18n.t('%{comment}', {comment: comment.comment})}</Text>
           </View>
           <View as="div" textAlign="end" margin="0 medium 0 0">
-            <Text weight="bold" size="small">
-              - {I18n.t('%{display_name}', {display_name: comment?.author?.display_name})}
+            <Text weight="bold" size="small" data-testid="submission-comment-author">
+              - {I18n.t('%{display_name}', {display_name: comment?.author_name})}
             </Text>
           </View>
         </Flex>

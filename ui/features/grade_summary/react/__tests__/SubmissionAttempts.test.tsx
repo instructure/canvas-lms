@@ -30,12 +30,7 @@ describe('SubmissionAttempts', () => {
           edited_at: Date(),
           updated_at: Date(),
           is_read: false,
-          author: {
-            display_name: 'user 123',
-            avatar_image_url: '',
-            html_url: '',
-            id: '123',
-          },
+          author_name: 'user 123',
           display_updated_at: 'Saturday December 1st',
         },
       ],
@@ -47,12 +42,7 @@ describe('SubmissionAttempts', () => {
           created_at: Date(),
           edited_at: Date(),
           updated_at: Date(),
-          author: {
-            display_name: 'user 123',
-            avatar_image_url: '',
-            html_url: '',
-            id: '123',
-          },
+          author_name: 'user 123',
           display_updated_at: 'Friday December 2nd',
         },
         {
@@ -62,12 +52,7 @@ describe('SubmissionAttempts', () => {
           created_at: Date(),
           edited_at: Date(),
           updated_at: Date(),
-          author: {
-            display_name: 'user 222',
-            avatar_image_url: '',
-            html_url: '',
-            id: '222',
-          },
+          author_name: 'user 222',
           display_updated_at: 'Thursday December 11th',
         },
       ],
@@ -79,12 +64,7 @@ describe('SubmissionAttempts', () => {
           created_at: Date(),
           edited_at: Date(),
           updated_at: Date(),
-          author: {
-            display_name: 'user 333',
-            avatar_image_url: '',
-            html_url: '',
-            id: '333',
-          },
+          author_name: 'user 333',
           display_updated_at: 'Saturday December 1st',
         },
       ],
@@ -101,5 +81,10 @@ describe('SubmissionAttempts', () => {
     expect(queryAllByTestId('submission-comment')).toHaveLength(4)
     expect(queryAllByTestId('submission-comment-unread')).toHaveLength(4)
     expect(queryAllByTestId('submission-comment-unread')).toHaveLength(4)
+    const submissionCommentAuthors = queryAllByTestId('submission-comment-author')
+    expect(submissionCommentAuthors).toHaveLength(4)
+    expect(submissionCommentAuthors[0]).toHaveTextContent('- user 123')
+    expect(submissionCommentAuthors[1]).toHaveTextContent('- user 222')
+    expect(submissionCommentAuthors[2]).toHaveTextContent('- user 333')
   })
 })
