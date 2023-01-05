@@ -346,6 +346,7 @@ export type SubmissionComment = {
   updated_at: string
   display_updated_at?: string
   is_read?: boolean
+  author_name?: string
   author?: {
     id: string
     display_name: string
