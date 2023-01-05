@@ -22,7 +22,6 @@ require_dependency "importers"
 module Importers
   class AccountContentImporter < Importer
     self.item_class = Account
-    Importers.register_content_importer(self)
 
     def self.import_content(account, data, _params, migration)
       Importers::ContentImporterHelper.add_assessment_id_prepend(account, data, migration)
