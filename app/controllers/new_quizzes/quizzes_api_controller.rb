@@ -55,9 +55,12 @@ module NewQuizzes
     #   curl 'https://<canvas>/api/quiz/v1/courses/1/quizzes' \
     #        -H 'Authorization Bearer <token>'
     def index
+      return render_unauthorized_action unless @context.grants_right?(@current_user, :read)
+
+      quizzes = Assignments::ScopedToUser.new(@context, @current_user).scope.type_quiz_lti
       log_api_asset_access(["assignments", @context], "assignments", "other")
 
-      render json: {}
+      render json: quizzes.pluck(:id)
     end
 
     private

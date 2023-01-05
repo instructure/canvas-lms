@@ -64,6 +64,32 @@ describe NewQuizzes::QuizzesApiController do
       expect(response).to be_successful
     end
 
+    it "returns ids for quizzes" do
+      quiz = new_quizzes_assignment(course: @course)
+      unpublished_quiz = new_quizzes_assignment(course: @course, workflow_state: "unpublished")
+      assignment_model(course: @course)
+      user_session(@teacher)
+      get :index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(json_parse).to contain_exactly(quiz.id, unpublished_quiz.id)
+    end
+
+    it "returns ids for quizzes the user can see" do
+      quiz = new_quizzes_assignment(course: @course)
+      new_quizzes_assignment(course: @course, workflow_state: "unpublished")
+      user_session(@student)
+      get :index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(json_parse).to contain_exactly(quiz.id)
+    end
+
+    it "returns 401 if the user can't read the course" do
+      @student.enrollments.where(course: @course).destroy_all
+      user_session(@student)
+      get :index, params: { course_id: @course.id }
+      expect(response).to be_unauthorized
+    end
+
     it "returns 404 with the feature disabled" do
       Account.site_admin.disable_feature! :new_quiz_public_api
       user_session(@teacher)
