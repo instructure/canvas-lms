@@ -48,6 +48,18 @@ module NewQuizzes
       render json: {}
     end
 
+    # @API List quizzes
+    # Get a list of quizzes.
+    #
+    # @example_request
+    #   curl 'https://<canvas>/api/quiz/v1/courses/1/quizzes' \
+    #        -H 'Authorization Bearer <token>'
+    def index
+      log_api_asset_access(["assignments", @context], "assignments", "other")
+
+      render json: {}
+    end
+
     private
 
     def require_feature_flag

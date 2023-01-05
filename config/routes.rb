@@ -2684,6 +2684,7 @@ CanvasRails::Application.routes.draw do
     scope(module: "new_quizzes") do
       scope(controller: "quizzes_api") do
         get "courses/:course_id/quizzes/:assignment_id", action: :show
+        get "courses/:course_id/quizzes", action: :index
       end
     end
   end
