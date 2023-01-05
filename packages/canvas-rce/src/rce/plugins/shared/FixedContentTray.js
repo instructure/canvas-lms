@@ -22,7 +22,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {getTrayHeight} from './trayUtils'
-import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
 
 // Need these styles for drawing over <ColorInput /> popup.
 const topElementStyles = {zIndex: 10000}
@@ -49,6 +48,7 @@ export const FixedContentTray = ({
   isOpen,
   onDismiss,
   onUnmount,
+  mountNode,
   renderHeader,
   renderBody,
   renderFooter,
@@ -59,7 +59,7 @@ export const FixedContentTray = ({
     <Tray
       data-mce-component={true}
       label={title}
-      mountNode={instuiPopupMountNode}
+      mountNode={mountNode}
       onDismiss={onDismiss}
       onExited={onUnmount}
       open={isOpen}
@@ -102,6 +102,7 @@ FixedContentTray.propTypes = {
   isOpen: PropTypes.bool,
   onDismiss: PropTypes.func,
   onUnmount: PropTypes.func,
+  mountNode: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
   bodyAs: PropTypes.string,
   shouldJoinBodyAndFooter: PropTypes.bool,
 }
