@@ -38,6 +38,7 @@ class DiscussionEntry < ActiveRecord::Base
   has_many :discussion_entry_participants
   has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   belongs_to :discussion_topic, inverse_of: :discussion_entries
+  belongs_to :quoted_entry, class_name: "DiscussionEntry"
   # null if a root entry
   belongs_to :parent_entry, class_name: "DiscussionEntry", foreign_key: :parent_id
   # also null if a root entry
