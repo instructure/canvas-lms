@@ -29,7 +29,6 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Add CC/Subtitles" },
   "add_image_60b2de07": { "message": "Add Image" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Align" },
   "alignment_and_lists_5cebcb69": { "message": "Alignment and Lists" },
   "all_4321c3a1": { "message": "All" },
   "all_apps_a50dea49": { "message": "All Apps" },
@@ -92,7 +91,6 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel" },
   "cap_product_3a5265a6": { "message": "Cap Product" },
-  "center_align_e68d9997": { "message": "Centre Align" },
   "centered_dot_64d5e378": { "message": "Centred Dot" },
   "centered_horizontal_dots_451c5815": { "message": "Centred Horizontal Dots" },
   "chi_54a32644": { "message": "Chi" },
@@ -157,12 +155,10 @@ const locale = {
   "course_files_62deb8f8": { "message": "Course Files" },
   "course_files_a31f97fc": { "message": "Course files" },
   "course_images_f8511d04": { "message": "Course Images" },
-  "course_link_b369426": { "message": "Course Link" },
   "course_links_b56959b9": { "message": "Course Links" },
   "course_media_ec759ad": { "message": "Course Media" },
   "course_navigation_dd035109": { "message": "Course Navigation" },
   "create_icon_110d6463": { "message": "Create Icon" },
-  "create_icon_maker_icon_c716bffe": { "message": "Create Icon Maker Icon" },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"
   },
@@ -176,7 +172,6 @@ const locale = {
   "date_added_ed5ad465": { "message": "Date Added" },
   "decorative_icon_9a7f3fc3": { "message": "Decorative Icon" },
   "decorative_type_upper_f2c95e3": { "message": "Decorative { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Decrease Indent" },
   "deep_purple_bb3e2907": { "message": "Deep Purple" },
   "definite_integral_fe7ffed1": { "message": "Definite Integral" },
   "degree_symbol_4a823d5f": { "message": "Degree Symbol" },
@@ -203,7 +198,6 @@ const locale = {
     "message": "Display Text Link (Opens in a new tab)"
   },
   "division_sign_72190870": { "message": "Division Sign" },
-  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documents" },
   "done_54e3d4b6": { "message": "Done" },
   "double_dagger_faf78681": { "message": "Double Dagger" },
@@ -232,7 +226,6 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Edit" },
   "edit_course_link_5a5c3c59": { "message": "Edit Course Link" },
-  "edit_equation_f5279959": { "message": "Edit Equation" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Existing Icon Maker Icon"
   },
@@ -257,17 +250,16 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variant)" },
   "equals_sign_c51bdc58": { "message": "Equals Sign" },
-  "equation_1c5ac93c": { "message": "Equation" },
   "equation_editor_39fbc3f1": { "message": "Equation Editor" },
   "equivalence_class_7b0f11c0": { "message": "Equivalence Class" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (Identity)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Exists" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Exit Fullscreen" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expand preview by Default"
   },
   "expand_to_see_types_f5d29352": { "message": "Expand to see { types }" },
-  "external_link_d3f9e62a": { "message": "External Link" },
   "external_tools_6e77821": { "message": "External Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra Large" },
   "extra_small_9ae33252": { "message": "Extra Small" },
@@ -326,7 +318,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Group files" },
   "group_images_98e0ac17": { "message": "Group Images" },
   "group_isomorphism_45b1458c": { "message": "Group Isomorphism" },
-  "group_link_63e626b3": { "message": "Group Link" },
   "group_links_9493129e": { "message": "Group Links" },
   "group_media_2f3d128a": { "message": "Group Media" },
   "group_navigation_99f191a": { "message": "Group Navigation" },
@@ -345,7 +336,6 @@ const locale = {
   },
   "home_351838cd": { "message": "Home" },
   "html_code_editor_fd967a44": { "message": "html code editor" },
-  "html_editor_fb2ab713": { "message": "HTML Editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "I have obtained permission to use this file."
   },
@@ -375,15 +365,12 @@ const locale = {
     "message": "Imaginary Portion (of Complex Number)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element Of)" },
-  "increase_indent_6af90f7c": { "message": "Increase Indent" },
   "indefinite_integral_6623307e": { "message": "Indefinite Integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inference" },
   "infinity_7a10f206": { "message": "Infinity" },
   "insert_593145ef": { "message": "Insert" },
-  "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
   "insert_link_6dc23cae": { "message": "Insert Link" },
-  "insert_math_equation_57c6e767": { "message": "Insert Maths Equation" },
   "integers_336344e1": { "message": "Integers" },
   "intersection_cd4590e4": { "message": "Intersection" },
   "invalid_entry_f7d2a0f5": { "message": "Invalid entry." },
@@ -398,7 +385,6 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Language Arts Icon" },
   "languages_icon_9d20539": { "message": "Languages Icon" },
   "large_9c5e80e7": { "message": "Large" },
-  "left_align_43d95491": { "message": "Left Align" },
   "left_angle_bracket_c87a6d07": { "message": "Left Angle Bracket" },
   "left_arrow_4fde1a64": { "message": "Left Arrow" },
   "left_arrow_with_hook_5bfcad93": { "message": "Left Arrow With Hook" },
@@ -541,6 +527,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Paragraph" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partial (Derivative)" },
+  "paste_5963d1c1": { "message": "Paste" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "People" },
   "percentage_34ab7c2c": { "message": "Percentage" },
@@ -591,11 +578,9 @@ const locale = {
     "message": "Real Portion (of Complex Number)"
   },
   "record_7c9448b": { "message": "Record" },
-  "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
   "red_8258edf3": { "message": "Red" },
   "relationships_6602af70": { "message": "Relationships" },
   "religion_icon_246e0be1": { "message": "Religion Icon" },
-  "remove_link_d1f2f4d0": { "message": "Remove Link" },
   "replace_e61834a7": { "message": "Replace" },
   "reset_95a81614": { "message": "Reset" },
   "resize_ec83d538": { "message": "Resize" },
@@ -609,7 +594,6 @@ const locale = {
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
   },
-  "right_align_39e7a32a": { "message": "Right Align" },
   "right_angle_bracket_d704e2d6": { "message": "Right Angle Bracket" },
   "right_arrow_35e0eddf": { "message": "Right Arrow" },
   "right_arrow_with_hook_29d92d31": { "message": "Right Arrow With Hook" },
@@ -634,7 +618,6 @@ const locale = {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
   "save_11a80ec3": { "message": "Save" },
-  "saved_icon_maker_icons_df86e2a1": { "message": "Saved Icon Maker Icons" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },
@@ -647,10 +630,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O to open the pretty html editor."
   },
-  "show_audio_options_b489926b": { "message": "Show audio options" },
-  "show_image_options_1e2ecc6b": { "message": "Show image options" },
-  "show_link_options_545338fd": { "message": "Show link options" },
-  "show_video_options_6ed3721a": { "message": "Show video options" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variant)" },
   "single_color_image_4e5d4dbc": { "message": "Single Colour Image" },
@@ -693,9 +672,6 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Succeeds Equal" },
   "sum_b0842d31": { "message": "Sum" },
   "superscript_8cb349a2": { "message": "Superscript" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superscript and Subscript"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -790,11 +766,9 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
-  "upload_document_253f0478": { "message": "Upload Document" },
   "upload_file_fd2361b8": { "message": "Upload File" },
   "upload_image_6120b609": { "message": "Upload Image" },
   "upload_media_ce31135a": { "message": "Upload Media" },
-  "upload_record_media_e4207d72": { "message": "Upload/Record Media" },
   "uploading_19e8a4e7": { "message": "Uploading" },
   "uppercase_delta_d4f4bc41": { "message": "Uppercase Delta" },
   "uppercase_gamma_86f492e9": { "message": "Uppercase Gamma" },
@@ -868,6 +842,9 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": { "message": "View keyboard shortcuts" },
   "view_title_description_67940918": {
     "message": "View { title } description"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "View word and character counts"
   },
   "white_87fa64fd": { "message": "White" },
   "width_492fec76": { "message": "Width" },
