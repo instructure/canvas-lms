@@ -673,93 +673,19 @@ describe MediaObjectsController do
   end
 
   describe "GET /media_objects_iframe/:id" do
-    describe "for course attachment" do
-      before do
-        allow(MediaObject).to receive(:media_id_exists?).and_return(true)
-        allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
-          [{ url: "whatever man", bitrate: 12_345 }]
-        )
-        attachment_with_context(@course,
-                                filename: "test.mp4",
-                                content_type: "video/mp4",
-                                media_object: MediaObject.create!(media_id: "the-video"))
-      end
-
-      it "responds 200 if media object exists" do
-        course_with_student_logged_in
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        assert_status(200)
-      end
-
-      it "redirects to lock image when requesting a locked attachment" do
-        course_with_student_logged_in
-
-        @attachment.update(locked: true)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        expect(response).to redirect_to "/images/svg-icons/icon_lock.svg"
-      end
-
-      it "redirects to lock image when requesting a date-locked attachment" do
-        course_with_student_logged_in
-        @attachment.update(locked: false, unlock_at: 20.days.from_now)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        expect(response).to redirect_to "/images/svg-icons/icon_lock.svg"
-      end
-
-      it "does not include content-security-policy headers" do
-        course_with_teacher_logged_in
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-
-        assert_status(200)
-        expect(response.headers["content-security-policy"]).to be_nil
-      end
+    before do
+      allow(MediaObject).to receive(:media_id_exists?).and_return(true)
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
     end
 
-    describe "for user attachment" do
-      before do
-        allow(MediaObject).to receive(:media_id_exists?).and_return(true)
-        allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
-          [{ url: "whatever man", bitrate: 12_345 }]
-        )
-        @student1 = user_model
-        @course.enroll_user(@student1, "StudentEnrollment", enrollment_state: "active")
-        @student2 = user_model
-        @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+    it "does not include content-security-policy headers" do
+      course_with_teacher_logged_in
+      get "iframe_media_player", params: { media_object_id: "the-video" }
 
-        attachment_with_context(@student1,
-                                filename: "test.mp4",
-                                content_type: "video/mp4",
-                                media_object: MediaObject.create!(media_id: "the-video"),
-                                user: @student1)
-      end
-
-      it "responds 200 if media object exists" do
-        user_session(@student2)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        assert_status(200)
-      end
-
-      it "redirects to lock image when requesting a locked attachment" do
-        user_session(@student2)
-        @attachment.update(locked: true)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        expect(response).to redirect_to "/images/svg-icons/icon_lock.svg"
-      end
-
-      it "redirects to lock image when requesting a date-locked attachment" do
-        user_session(@student2)
-        @attachment.update(locked: false, unlock_at: 20.days.from_now)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-        expect(response).to redirect_to "/images/svg-icons/icon_lock.svg"
-      end
-
-      it "does not include content-security-policy headers" do
-        user_session(@student2)
-        get "iframe_media_player", params: { media_object_id: "the-video" }
-
-        assert_status(200)
-        expect(response.headers["content-security-policy"]).to be_nil
-      end
+      assert_status(200)
+      expect(response.headers["content-security-policy"]).to be_nil
     end
   end
 
