@@ -15,9 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {LtiMessageHandler} from '../lti_message_handler'
 import {ltiState} from '../messages'
+import {hasKey} from '../util'
 
-const parseData = data => {
+const parseData = (
+  data:
+    | {
+        url?: string
+        display?: string
+        launchType?: string
+        launchOptions?: {
+          width?: number
+          height?: number
+        }
+        placement?: string
+      }
+    | string
+): {
+  url: string
+  display: string
+  launchType: string
+  launchOptions: {
+    width?: number
+    height?: number
+  }
+  placement?: string
+} => {
   const defaults = {
     display: 'borderless',
     launchType: 'same_window',
@@ -28,20 +52,24 @@ const parseData = data => {
       url: data,
       ...defaults,
     }
-  } else if (typeof data === 'object' && !(data instanceof Array)) {
-    if (!data.url) {
-      throw new Error('message must contain a `url` property')
+  } else if (typeof data === 'object' && !(data instanceof Array) && data !== null) {
+    if (hasKey('url', data)) {
+      const url = data.url
+      if (typeof url === 'string') {
+        return {
+          ...defaults,
+          ...data,
+          url,
+        }
+      }
     }
-    return {
-      ...defaults,
-      ...data,
-    }
+    throw new Error('message must contain a `url` property')
   } else {
     throw new Error('message contents must either be a string or an object')
   }
 }
 
-const buildLaunchUrl = (messageUrl, placement, display) => {
+const buildLaunchUrl = (messageUrl: string, placement: string | undefined, display: string) => {
   let context = ENV.context_asset_string.replace('_', 's/')
   if (!(context.startsWith('account') || context.startsWith('course'))) {
     context = 'accounts/' + ENV.DOMAIN_ROOT_ACCOUNT_ID
@@ -57,18 +85,29 @@ const buildLaunchUrl = (messageUrl, placement, display) => {
   const assignmentParam = assignmentId ? `&assignment_id=${assignmentId}` : ''
 
   // xsslint safeString.property window.location
-  toolLaunchUrl.searchParams.append('platform_redirect_url', window.location)
+  toolLaunchUrl.searchParams.append('platform_redirect_url', window.location.toString())
   toolLaunchUrl.searchParams.append('full_win_launch_requested', '1')
   const encodedToolLaunchUrl = encodeURIComponent(toolLaunchUrl.toString())
 
   return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}${assignmentParam}`
 }
 
-const handler = ({message}) => {
+const handler: LtiMessageHandler<{
+  data: {
+    url: string
+    launchType: string
+    launchOptions: {
+      width?: number
+      height?: number
+    }
+    placement: string
+    display: string
+  }
+}> = ({message}) => {
   const {url, launchType, launchOptions, placement, display} = parseData(message.data)
   const launchUrl = buildLaunchUrl(url, placement, display)
 
-  let proxy
+  let proxy: Window | null = null
   switch (launchType) {
     case 'popup': {
       const width = launchOptions.width || 800
@@ -95,6 +134,7 @@ const handler = ({message}) => {
 
   // keep a reference to close later
   ltiState.fullWindowProxy = proxy
+  return false
 }
 
 export default handler

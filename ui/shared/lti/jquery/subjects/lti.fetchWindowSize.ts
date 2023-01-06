@@ -16,8 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {removeUnloadMessage} from '../util'
+import $ from 'jquery'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function remove() {
-  removeUnloadMessage()
+const fetchWindowSize: LtiMessageHandler = ({responseMessages}) => {
+  responseMessages.sendResponse({
+    height: window.innerHeight,
+    width: window.innerWidth,
+    offset: $('.tool_content_wrapper').offset(),
+    footer: $('#fixed_bottom').height() || 0,
+    scrollY: window.scrollY,
+  })
+  return true
 }
+
+export default fetchWindowSize

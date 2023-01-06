@@ -16,10 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getData} from '../platform_storage'
+import {clearData, putData} from '../platform_storage'
+import {LtiMessageHandler} from '../lti_message_handler'
+import {getKey} from '../util'
 
-export default function handler({message, responseMessages, event}) {
-  const {key, message_id} = message
+const handler: LtiMessageHandler<{
+  key: string
+  value: string
+  message_id: string
+}> = ({message, responseMessages, event}) => {
+  const {key, value, message_id} = message
 
   if (!key) {
     responseMessages.sendBadRequestError("Missing required 'key' field")
@@ -31,7 +37,23 @@ export default function handler({message, responseMessages, event}) {
     return true
   }
 
-  const value = getData(event.origin, key)
-  responseMessages.sendResponse({key, value})
+  if (value) {
+    try {
+      putData(event.origin, key, value)
+      responseMessages.sendResponse({key, value})
+    } catch (e: unknown) {
+      const code = getKey('code', e)
+      const message = getKey('message', e)
+      responseMessages.sendError(
+        typeof code === 'string' ? code : '',
+        typeof message === 'string' ? message : undefined
+      )
+    }
+  } else {
+    clearData(event.origin, key)
+    responseMessages.sendResponse({key})
+  }
   return true
 }
+
+export default handler

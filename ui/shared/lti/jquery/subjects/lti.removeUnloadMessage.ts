@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ltiState} from '../messages'
+import {removeUnloadMessage} from '../util'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-const handler = () => {
-  if (!ltiState.tray) {
-    ltiState.tray = {}
-  }
-  ltiState.tray.refreshOnClose = true
+const remove: LtiMessageHandler = () => {
+  removeUnloadMessage()
+  return false
 }
 
-export default handler
+export default remove

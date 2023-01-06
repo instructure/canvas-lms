@@ -16,9 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'html-escape'
-import {setUnloadMessage} from '../util'
+import {toggleCourseNav} from '@canvas/courses/jquery/toggleCourseNav'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function set({message}) {
-  setUnloadMessage(htmlEscape(message.message))
+const handler: LtiMessageHandler = () => {
+  toggleCourseNav()
+  return false
 }
+
+export default handler

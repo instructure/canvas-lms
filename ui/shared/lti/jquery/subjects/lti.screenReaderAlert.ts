@@ -16,31 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {clearData, putData} from '../platform_storage'
+import $ from '@canvas/rails-flash-notifications'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function handler({message, responseMessages, event}) {
-  const {key, value, message_id} = message
-
-  if (!key) {
-    responseMessages.sendBadRequestError("Missing required 'key' field")
-    return true
-  }
-
-  if (!message_id) {
-    responseMessages.sendBadRequestError("Missing required 'message_id' field")
-    return true
-  }
-
-  if (value) {
-    try {
-      putData(event.origin, key, value)
-      responseMessages.sendResponse({key, value})
-    } catch (e) {
-      responseMessages.sendError(e.code, e.message)
-    }
-  } else {
-    clearData(event.origin, key)
-    responseMessages.sendResponse({key})
-  }
-  return true
+const screenReaderAlert: LtiMessageHandler<{
+  body: string | unknown
+}> = ({message}) => {
+  $.screenReaderFlashMessageExclusive(
+    typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
+  )
+  return false
 }
+
+export default screenReaderAlert

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from '@canvas/rails-flash-notifications'
+import {ResponseMessages} from './response_messages'
 
-export default function screenReaderAlert({message}) {
-  $.screenReaderFlashMessageExclusive(
-    typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
-  )
+export interface LtiMessageHandler<T = unknown> {
+  /**
+   *   /**
+   * A handler for a single type of LTI postMessage message
+   * @param params includes the message
+   * @returns true if the handler has already sent a response
+   */
+  (params: {message: T; event: MessageEvent<unknown>; responseMessages: ResponseMessages}): boolean
 }

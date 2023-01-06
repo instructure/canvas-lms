@@ -16,8 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import htmlEscape from 'html-escape'
+import {setUnloadMessage} from '../util'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function hideRightSideWrapper() {
-  $('#right-side-wrapper').hide()
+const set: LtiMessageHandler<{message: string}> = ({message}) => {
+  setUnloadMessage(htmlEscape(message.message))
+  return false
 }
+
+export default set

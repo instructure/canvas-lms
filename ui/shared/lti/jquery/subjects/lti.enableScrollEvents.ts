@@ -16,8 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {toggleCourseNav} from '@canvas/courses/jquery/toggleCourseNav'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-const handler = () => toggleCourseNav()
+const enableScrollEvents: LtiMessageHandler = ({responseMessages}) => {
+  let timeout
+  window.addEventListener(
+    'scroll',
+    () => {
+      // requesting animation frames effectively debounces the scroll messages being sent
+      if (timeout) {
+        window.cancelAnimationFrame(timeout)
+      }
 
-export default handler
+      timeout = window.requestAnimationFrame(() => {
+        responseMessages.sendResponse({
+          subject: 'lti.scroll',
+          scrollY: window.scrollY,
+        })
+      })
+    },
+    false
+  )
+  return true
+}
+
+export default enableScrollEvents

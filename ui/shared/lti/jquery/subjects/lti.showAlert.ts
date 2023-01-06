@@ -18,10 +18,15 @@
 
 import $ from '@canvas/rails-flash-notifications'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {LtiMessageHandler} from '../lti_message_handler'
 
 const I18n = useI18nScope('ltiMessages')
 
-export default function showAlert({message, responseMessages}) {
+const showAlert: LtiMessageHandler<{
+  body: unknown
+  title?: string
+  alertType?: string
+}> = ({message, responseMessages}) => {
   if (!message.body) {
     responseMessages.sendBadRequestError("Missing required 'body' field")
     return true
@@ -49,3 +54,5 @@ export default function showAlert({message, responseMessages}) {
   responseMessages.sendSuccess()
   return true
 }
+
+export default showAlert

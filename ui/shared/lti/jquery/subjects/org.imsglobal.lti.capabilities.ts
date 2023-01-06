@@ -16,31 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let beforeUnloadHandler
-function setUnloadMessage(msg) {
-  removeUnloadMessage()
+import {LtiMessageHandler} from '../lti_message_handler'
+import {SUBJECT_ALLOW_LIST} from '../messages'
 
-  beforeUnloadHandler = function (e) {
-    return (e.returnValue = msg || '')
-  }
-  window.addEventListener('beforeunload', beforeUnloadHandler)
-}
-
-function removeUnloadMessage() {
-  if (beforeUnloadHandler) {
-    window.removeEventListener('beforeunload', beforeUnloadHandler)
-    beforeUnloadHandler = null
-  }
-}
-
-function findDomForWindow(sourceWindow) {
-  const iframes = document.getElementsByTagName('IFRAME')
-  for (let i = 0; i < iframes.length; i += 1) {
-    if (iframes[i].contentWindow === sourceWindow) {
-      return iframes[i]
+const handler: LtiMessageHandler<unknown> = ({responseMessages}) => {
+  const useFrame = ENV?.FEATURES?.lti_platform_storage
+  const imsSubjects = ['org.imsglobal.lti.get_data', 'org.imsglobal.lti.put_data']
+  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
+    if (imsSubjects.includes(subject) && useFrame) {
+      return {
+        subject,
+        frame: 'post_message_forwarding',
+      }
     }
-  }
-  return null
+
+    return {subject}
+  })
+  responseMessages.sendResponse({supported_messages})
+  return true
 }
 
-export {setUnloadMessage, removeUnloadMessage, findDomForWindow}
+export default handler

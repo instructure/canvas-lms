@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SUBJECT_ALLOW_LIST} from '../messages'
+import {LtiMessageHandler} from '../lti_message_handler'
+import {ltiState} from '../messages'
 
-export default ({responseMessages}) => {
-  const useFrame = ENV?.FEATURES?.lti_platform_storage
-  const imsSubjects = ['org.imsglobal.lti.get_data', 'org.imsglobal.lti.put_data']
-  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
-    if (imsSubjects.includes(subject) && useFrame) {
-      return {
-        subject,
-        frame: 'post_message_forwarding',
-      }
-    }
-
-    return {subject}
-  })
-  responseMessages.sendResponse({supported_messages})
-  return true
+const handler: LtiMessageHandler = () => {
+  if (!ltiState.tray) {
+    ltiState.tray = {}
+  }
+  ltiState.tray.refreshOnClose = true
+  return false
 }
+
+export default handler

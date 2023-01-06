@@ -16,10 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import {getData} from '../platform_storage'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function showModuleNavigation({message}) {
-  if (message.show === true || message.show === false) {
-    $('.module-sequence-footer').toggle(message.show)
+const handler: LtiMessageHandler<{
+  key: string
+  message_id: string
+}> = ({message, responseMessages, event}) => {
+  const {key, message_id} = message
+
+  if (!key) {
+    responseMessages.sendBadRequestError("Missing required 'key' field")
+    return true
   }
+
+  if (!message_id) {
+    responseMessages.sendBadRequestError("Missing required 'message_id' field")
+    return true
+  }
+
+  const value = getData(event.origin, key)
+  responseMessages.sendResponse({key, value})
+  return true
 }
+
+export default handler
