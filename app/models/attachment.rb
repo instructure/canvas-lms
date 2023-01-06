@@ -894,6 +894,8 @@ class Attachment < ActiveRecord::Base
     if instfs_hosted?
       InstFS.authenticated_url(self, options.merge(user: nil))
     else
+      # s3 can't handle unknown options :sigh:
+      options.delete(:internal)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -999,7 +1001,7 @@ class Attachment < ActiveRecord::Base
     end
 
     validate_hash(enable: integrity_check) do |hash_context|
-      CanvasHttp.get(public_url) do |response|
+      CanvasHttp.get(public_url(internal: true)) do |response|
         raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
         response.read_body do |data|
