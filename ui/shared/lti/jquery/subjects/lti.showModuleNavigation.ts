@@ -17,12 +17,15 @@
  */
 
 import $ from 'jquery'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function scrollToTop() {
-  $('html,body').animate(
-    {
-      scrollTop: $('.tool_content_wrapper').offset().top,
-    },
-    'fast'
-  )
+const showModuleNavigation: LtiMessageHandler<{
+  show?: boolean
+}> = ({message}) => {
+  if (message.show === true || message.show === false) {
+    $('.module-sequence-footer').toggle(message.show)
+  }
+  return false
 }
+
+export default showModuleNavigation

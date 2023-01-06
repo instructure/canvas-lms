@@ -18,10 +18,14 @@
 
 import ToolLaunchResizer from '../tool_launch_resizer'
 import {findDomForWindow} from '../util'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-export default function frameResize({message, event}) {
+const frameResize: LtiMessageHandler<{height: number | string; token: string}> = ({
+  message,
+  event,
+}) => {
   const toolResizer = new ToolLaunchResizer()
-  let height = message.height
+  let height: number | string = message.height as number | string
   if (height <= 0) height = 1
 
   const container = toolResizer
@@ -34,11 +38,12 @@ export default function frameResize({message, event}) {
     // Attempt to find an embedded iframe that matches the event source.
     const iframe = findDomForWindow(event.source)
     if (iframe) {
-      if (typeof height === 'number') {
-        height += 'px'
-      }
-      iframe.height = height
-      iframe.style.height = height
+      const strHeight = typeof height === 'number' ? `${height}px` : height
+      iframe.height = strHeight
+      iframe.style.height = strHeight
     }
   }
+  return false
 }
+
+export default frameResize

@@ -19,15 +19,17 @@
 import $ from 'jquery'
 
 export default class ToolLaunchResizer {
-  constructor(minToolHeight) {
+  minToolHeight: number
+
+  constructor(minToolHeight?: number) {
     this.minToolHeight = minToolHeight || 450
   }
 
-  sanitizedWrapperId(wrapperId) {
+  sanitizedWrapperId(wrapperId?: string) {
     return wrapperId?.toString()?.replace(/[^a-zA-Z0-9_-]/g, '')
   }
 
-  tool_content_wrapper(wrapperId) {
+  tool_content_wrapper(wrapperId?: string) {
     let container = $(`div[data-tool-wrapper-id*='${this.sanitizedWrapperId(wrapperId)}']`)
     const tool_content_wrapper = $('.tool_content_wrapper')
     if (container.length <= 0 && tool_content_wrapper.length === 1) {
@@ -36,7 +38,15 @@ export default class ToolLaunchResizer {
     return container
   }
 
-  resize_tool_content_wrapper(height, container, force_height = false) {
+  resize_tool_content_wrapper(
+    height: number | string,
+
+    // disabling b/c eslint fails, saying 'MessageEventSource' is not defined, but it's
+    // defined in lib.dom.d.ts
+    // eslint-disable-next-line no-undef
+    container: JQuery<HTMLElement>,
+    force_height = false
+  ) {
     let setHeight = height
     if (typeof setHeight !== 'number') {
       setHeight = this.minToolHeight

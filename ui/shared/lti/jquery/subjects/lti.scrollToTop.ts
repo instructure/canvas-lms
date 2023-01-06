@@ -16,24 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function enableScrollEvents({responseMessages}) {
-  let timeout
-  window.addEventListener(
-    'scroll',
-    () => {
-      // requesting animation frames effectively debounces the scroll messages being sent
-      if (timeout) {
-        window.cancelAnimationFrame(timeout)
-      }
+import $ from 'jquery'
+import {LtiMessageHandler} from '../lti_message_handler'
 
-      timeout = window.requestAnimationFrame(() => {
-        responseMessages.sendResponse({
-          subject: 'lti.scroll',
-          scrollY: window.scrollY,
-        })
-      })
+const scrollToTop: LtiMessageHandler = () => {
+  $('html,body').animate(
+    {
+      scrollTop: $('.tool_content_wrapper').offset()?.top,
     },
-    false
+    'fast'
   )
-  return true
+  return false
 }
+
+export default scrollToTop

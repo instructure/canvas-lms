@@ -32,22 +32,22 @@ const getLimit = tool_id => {
   return limits[tool_id]
 }
 
-const clearLimit = tool_id => {
+const clearLimit = (tool_id: string) => {
   delete limits[tool_id]
 }
 
-const addToLimit = (tool_id, key, value) => {
+const addToLimit = (tool_id: string, key: string, value: string) => {
   createLimit(tool_id)
   const length = key.length + value.length
 
   if (limits[tool_id].keyCount >= STORAGE_KEY_LIMIT) {
-    const e = new Error('Reached key limit for tool')
+    const e: Error & {code?: string} = new Error('Reached key limit for tool')
     e.code = 'storage_exhaustion'
     throw e
   }
 
   if (limits[tool_id].charCount + length > STORAGE_CHAR_LIMIT) {
-    const e = new Error('Reached byte limit for tool')
+    const e: Error & {code?: string} = new Error('Reached byte limit for tool')
     e.code = 'storage_exhaustion'
     throw e
   }
@@ -56,7 +56,7 @@ const addToLimit = (tool_id, key, value) => {
   limits[tool_id].charCount += length
 }
 
-const removeFromLimit = (tool_id, key, value) => {
+const removeFromLimit = (tool_id: string, key: string, value: string) => {
   limits[tool_id].keyCount--
   limits[tool_id].charCount -= key.length + value.length
 
@@ -68,16 +68,16 @@ const removeFromLimit = (tool_id, key, value) => {
   }
 }
 
-const getKey = (tool_id, key) => `lti|platform_storage|${tool_id}|${key}`
+const getKey = (tool_id: string, key: string) => `lti|platform_storage|${tool_id}|${key}`
 
-const putData = (tool_id, key, value) => {
+const putData = (tool_id: string, key: string, value: string) => {
   addToLimit(tool_id, key, value)
   window.localStorage.setItem(getKey(tool_id, key), value)
 }
 
-const getData = (tool_id, key) => window.localStorage.getItem(getKey(tool_id, key))
+const getData = (tool_id: string, key: string) => window.localStorage.getItem(getKey(tool_id, key))
 
-const clearData = (tool_id, key) => {
+const clearData = (tool_id: string, key: string) => {
   const value = getData(tool_id, key)
   if (value) {
     removeFromLimit(tool_id, key, value)
