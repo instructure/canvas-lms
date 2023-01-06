@@ -3,5 +3,5 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./jquery/index.js"
+  "main": "./jquery/index.ts"
 }
