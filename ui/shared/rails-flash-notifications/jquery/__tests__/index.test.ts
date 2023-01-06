@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {initFlashContainer} from '../index'
 
 describe('FlashNotifications', () => {
-  let holder = null
+  let holder: HTMLDivElement | null = null
   beforeEach(() => {
     holder = document.createElement('div')
     document.body.appendChild(holder)
@@ -29,7 +29,9 @@ describe('FlashNotifications', () => {
     initFlashContainer()
   })
   afterEach(() => {
-    holder.remove()
+    if (holder !== null) {
+      holder.remove()
+    }
   })
 
   test('text notification', () => {

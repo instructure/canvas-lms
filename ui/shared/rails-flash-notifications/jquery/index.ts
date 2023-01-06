@@ -19,6 +19,82 @@
 import $ from 'jquery'
 import NotificationsHelper from './helper'
 
+declare global {
+  type MessageContent = string | {html: string}
+
+  interface Env {
+    notices: ReadonlyArray<FlashNotice>
+  }
+
+  /**
+   * Types of flash notifcations,
+   * pulled from: app/controllers/application_controller.rb
+   */
+  type FlashNotificationType = 'warning' | 'error' | 'info' | 'success'
+
+  /**
+   * Types of icons for flash notifcations,
+   * pulled from: app/controllers/application_controller.rb
+   */
+  type FlashNotificationIcon = 'warning' | 'error' | 'info' | 'check'
+
+  type FlashNotice = {
+    type: FlashNotificationType
+    icon?: FlashNotificationIcon
+    classes?: string
+    content: {
+      html?: string
+      timeout?: number
+    }
+  }
+
+  interface JQueryStatic {
+    /**
+     * Pops up a small notification box at the top of the screen.
+     */
+    flashMessage: (message: MessageContent, timeout?: number) => void
+
+    /**
+     * Like flashMessage, but escapes html even if 'html' field given
+     * To be used when the input comes from an external source (e.g. an LTI tool)
+     */
+    flashMessageSafe: (message: MessageContent, timeout?: number) => void
+
+    /**
+     *  Pops up a small error box at the top of the screen.
+     */
+    flashError: (message: MessageContent, timeout?: number) => void
+
+    /**
+     * Like flashError, but escapes html even if 'html' field given
+     * To be used when the input comes from an external source (e.g. an LTI tool)
+     */
+    flashErrorSafe: (message: MessageContent, timeout?: number) => void
+
+    /**
+     * Pops up a small warning box at the top of the screen.
+     */
+    flashWarning: (message: MessageContent, timeout?: number) => void
+
+    /**
+     * Like flashWarning, but escapes html even if 'html' field given
+     * To be used when the input comes from an external source (e.g. an LTI tool)
+     */
+    flashWarningSafe: (message: MessageContent, timeout?: number) => void
+
+    screenReaderFlashMessage: (message: MessageContent) => void
+
+    screenReaderFlashError: (message: MessageContent) => void
+
+    /**
+     * This is for when you want to clear the flash message content prior to
+     * updating it with new content.  Makes it so the SR only reads this one
+     * message.
+     */
+    screenReaderFlashMessageExclusive: (message: MessageContent, polite?: boolean) => void
+  }
+}
+
 const helper = new NotificationsHelper()
 
 export function initFlashContainer() {
@@ -92,6 +168,11 @@ export function renderServerNotifications() {
   }
 }
 
+/**
+ *
+ * @param {MessageContent} content
+ * @param {boolean} closable
+ */
 function createScreenreaderNodeWithDelay(content, closable = true) {
   setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }

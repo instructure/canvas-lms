@@ -23,7 +23,7 @@ import 'jquery.cookie'
 
 const I18n = useI18nScope('shared.flash_notices')
 
-function updateAriaLive({polite} = {polite: false}) {
+function updateAriaLive(this: RailsFlashNotificationsHelper, {polite} = {polite: false}) {
   if (this.screenreaderHolderReady()) {
     const value = polite ? 'polite' : 'assertive'
     // instui FocusRegionManager throws aria-hidden on everything outside a Dialog when opened
@@ -35,6 +35,10 @@ function updateAriaLive({polite} = {polite: false}) {
 }
 
 class RailsFlashNotificationsHelper {
+  holder: HTMLElement | null
+
+  screenreader_holder: HTMLElement | null
+
   constructor() {
     this.holder = null
     this.screenreader_holder = null
@@ -66,7 +70,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
-  holderReady() {
+  holderReady(): this is {holder: HTMLElement} {
     return this.holder != null
   }
 
@@ -126,7 +130,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
-  screenreaderHolderReady() {
+  screenreaderHolderReady(): this is {screenreader_holder: HTMLElement} {
     return this.screenreader_holder != null
   }
 
@@ -157,7 +161,7 @@ class RailsFlashNotificationsHelper {
       $(this.screenreader_holder).attr('aria-live', 'assertive')
       $(this.screenreader_holder).attr('aria-relevant', 'additions')
       $(this.screenreader_holder).attr('class', 'screenreader-only')
-      $(this.screenreader_holder).attr('aria-atomic', true)
+      $(this.screenreader_holder).attr('aria-atomic', true as any)
     }
   }
 
