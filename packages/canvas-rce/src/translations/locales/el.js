@@ -60,7 +60,6 @@ const locale = {
   "course_navigation_dd035109": { "message": "Πλοήγηση στο μάθημα" },
   "creative_commons_license_725584ae": { "message": "Άδεια Creative Commons:" },
   "cyan_c1d5f68a": { "message": "Κυανό" },
-  "decrease_indent_d9cf469d": { "message": "Μείωση Εσοχής Κειμένου" },
   "deep_purple_bb3e2907": { "message": "Βαθύ μοβ" },
   "delimiters_4db4840d": { "message": "Οριοθέτες" },
   "details_98a31b68": { "message": "Λεπτομέρειες" },
@@ -84,7 +83,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Αρχεία ομάδας" },
   "group_navigation_99f191a": { "message": "Πλοήγηση στην Ομάδα" },
   "home_351838cd": { "message": "Αρχική Σελίδα" },
-  "html_editor_fb2ab713": { "message": "Επεξεργαστής HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
   },
@@ -94,16 +92,9 @@ const locale = {
   "icon_215a1dc6": { "message": "Εικονίδιο" },
   "image_8ad06": { "message": "Εικόνα" },
   "images_7ce26570": { "message": "Εικόνες" },
-  "increase_indent_6af90f7c": { "message": "Αύξηση Εσοχής Κειμένου" },
   "indigo_2035fc55": { "message": "Λουλακί" },
   "insert_593145ef": { "message": "Εισαγωγή" },
-  "insert_equella_links_49a8dacd": {
-    "message": "Εισαγωγή Συνδέσμων τύπου Equella"
-  },
   "insert_link_6dc23cae": { "message": "Εισαγωγή Συνδέσμου" },
-  "insert_math_equation_57c6e767": {
-    "message": "Εισαγωγή Μαθηματικής Εξίσωσης"
-  },
   "invalid_file_type_881cc9b2": { "message": "Μη έγκυρος τύπος αρχείου" },
   "invalid_url_cbde79f": { "message": "Μη έγκυρο URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Συντομεύσεις πληκτρολογίου" },

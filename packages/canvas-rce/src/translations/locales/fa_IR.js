@@ -69,7 +69,6 @@ const locale = {
   "creative_commons_license_725584ae": { "message": "مجوز کریتیو کامنز:" },
   "custom_6979cd81": { "message": "سفارشی" },
   "cyan_c1d5f68a": { "message": "آبی تیره" },
-  "decrease_indent_d9cf469d": { "message": "کاهش تورفتگی" },
   "deep_purple_bb3e2907": { "message": "ارغوانی پر رنگ" },
   "delimiters_4db4840d": { "message": "جداکننده ها" },
   "details_98a31b68": { "message": "اطلاعات" },
@@ -97,7 +96,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "فایل های گروه" },
   "group_navigation_99f191a": { "message": "پیمایش گروه" },
   "home_351838cd": { "message": "صفحه اصلی" },
-  "html_editor_fb2ab713": { "message": "ویرایشگر HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "مجوز استفاده از این فایل را به دست آورده ام."
   },
@@ -107,12 +105,9 @@ const locale = {
   "image_8ad06": { "message": "تصویر" },
   "image_c1c98202": { "message": "تصویر" },
   "images_7ce26570": { "message": "تصاویر" },
-  "increase_indent_6af90f7c": { "message": "افزایش تورفتگی" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "درج" },
-  "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
   "insert_link_6dc23cae": { "message": "درج پیوند" },
-  "insert_math_equation_57c6e767": { "message": "درج معادله ریاضی" },
   "invalid_file_type_881cc9b2": { "message": "نوع فایل معتبر نیست" },
   "invalid_url_cbde79f": { "message": "نشانی اینترنتی معتبر نیست" },
   "keyboard_shortcuts_ed1844bd": { "message": "میانبرهای صفحه کلید" },

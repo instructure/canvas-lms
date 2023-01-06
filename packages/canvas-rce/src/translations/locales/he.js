@@ -63,7 +63,6 @@ const locale = {
   },
   "custom_6979cd81": { "message": "ידני" },
   "cyan_c1d5f68a": { "message": "ירקרק-כחול" },
-  "decrease_indent_d9cf469d": { "message": "צמצום עימוד" },
   "deep_purple_bb3e2907": { "message": "סגול כהה" },
   "delimiters_4db4840d": { "message": "מפסקים" },
   "details_98a31b68": { "message": "פרטים" },
@@ -85,7 +84,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "קבצי קבוצה" },
   "group_navigation_99f191a": { "message": "ניווט בקבוצה" },
   "home_351838cd": { "message": "דף הבית" },
-  "html_editor_fb2ab713": { "message": "עורך HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "קיבלתי הרשאות להשתמש בקובץ זה"
   },
@@ -96,12 +94,9 @@ const locale = {
   },
   "image_8ad06": { "message": "תמונה" },
   "images_7ce26570": { "message": "תמונות" },
-  "increase_indent_6af90f7c": { "message": "הרחבת עימוד" },
   "indigo_2035fc55": { "message": "אינדיגו" },
   "insert_593145ef": { "message": "הוספה" },
-  "insert_equella_links_49a8dacd": { "message": "הוספת קישורי Equella " },
   "insert_link_6dc23cae": { "message": "הוספת קישור" },
-  "insert_math_equation_57c6e767": { "message": "הוספת נוסחה מתימטית" },
   "invalid_file_type_881cc9b2": { "message": "סוג קובץ לא חוקי" },
   "invalid_url_cbde79f": { "message": "כתובת דף אינטרנט לא תקינה" },
   "keyboard_shortcuts_ed1844bd": { "message": "קיצורי מקלדת" },
