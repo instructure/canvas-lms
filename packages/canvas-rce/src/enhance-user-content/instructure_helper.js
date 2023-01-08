@@ -148,7 +148,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
       ) {
         $link.setAttribute('aria-expanded', 'true')
 
-        if (canvasOrigin) {
+        if (canvasOrigin && canvadoc_session_url !== null) {
           canvadoc_session_url = canvasOrigin + canvadoc_session_url
         }
 
