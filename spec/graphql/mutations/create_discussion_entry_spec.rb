@@ -33,7 +33,8 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     parent_entry_id: nil,
     file_id: nil,
     include_reply_preview: nil,
-    is_anonymous_author: nil
+    is_anonymous_author: nil,
+    quoted_entry_id: nil
   )
     <<~GQL
       mutation {
@@ -43,6 +44,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
           #{"parentEntryId: #{parent_entry_id}" unless parent_entry_id.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
+          #{"quotedEntryId: #{quoted_entry_id}" unless quoted_entry_id.nil?}
           #{"isAnonymousAuthor: #{is_anonymous_author}" unless is_anonymous_author.nil?}
           }) {
           discussionEntry {
@@ -188,7 +190,29 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     end
   end
 
+  context "quoted entry Id" do
+    it "correctly sets the quoted_entry" do
+      parent_entry = @topic.discussion_entries.create!(message: "parent entry", user: @teacher, discussion_topic: @topic)
+      entry = @topic.discussion_entries.create!(message: "different", user: @teacher, discussion_topic: @topic)
+
+      result = run_mutation(discussion_topic_id: @topic.id, message: "Howdy Hey", quoted_entry_id: entry.id, parent_entry_id: parent_entry.id)
+
+      expect(result["errors"]).to be nil
+      expect(result.dig("data", "createDiscussionEntry", "errors")).to be nil
+
+      new_entry = @topic.discussion_entries.last
+      expect(new_entry.quoted_entry_id).to eq entry.id
+      expect(new_entry.parent_id).to eq parent_entry.id
+    end
+  end
+
   context "errors" do
+    it "if given a bad quoted_entry_id" do
+      result = run_mutation(discussion_topic_id: @topic.id, message: "This should fail", quoted_entry_id: 0)
+      expect(result.dig("data", "createDiscussionEntry")).to be nil
+      expect(result.dig("errors", 0, "message")).to eq "not found"
+    end
+
     it "if given a bad discussion topic id" do
       result = run_mutation(discussion_topic_id: @topic.id + 1337, message: "this should fail")
       expect(result.dig("data", "createDiscussionEntry")).to be nil
