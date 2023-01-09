@@ -97,4 +97,19 @@ describe NewQuizzes::QuizzesApiController do
       expect(response).to be_not_found
     end
   end
+
+  describe "create" do
+    it "returns 200 with empty body" do
+      user_session(@teacher)
+      post :create, params: { course_id: @course.id }
+      expect(response).to be_successful
+    end
+
+    it "returns 404 with the feature disabled" do
+      Account.site_admin.disable_feature! :new_quiz_public_api
+      user_session(@teacher)
+      post :create, params: { course_id: @course.id }
+      expect(response).to be_not_found
+    end
+  end
 end

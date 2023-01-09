@@ -63,6 +63,19 @@ module NewQuizzes
       render json: quizzes.pluck(:id)
     end
 
+    # @API Post a new quiz
+    # Create a new quiz for the course
+    #
+    # @argument course_id [Required, Integer]
+    #
+    # @example_request
+    #   curl 'https://<canvas>/api/quiz/v1/courses/1/quizzes' \
+    #        -X POST \
+    #        -H 'Authorization Bearer <token>'
+    def create
+      render json: {}
+    end
+
     private
 
     def require_feature_flag
