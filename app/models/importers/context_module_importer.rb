@@ -204,7 +204,7 @@ module Importers
       return false unless @account_level_thresholds.any?
       case item_class
       when 'Assignment'
-        if ASSIGNMENT_GROUP_NAMES.include?(item.content.assignment_group_name) && !item.content.submission_types.include?('external_tool')
+        if AssignmentGroup::GROUP_NAMES.include?(item.content.assignment_group_name)
           return true
         else
           return false
@@ -215,8 +215,6 @@ module Importers
         else
           return false
         end
-      else
-        return false
       end
     end
 
