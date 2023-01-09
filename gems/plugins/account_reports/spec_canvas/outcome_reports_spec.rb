@@ -696,16 +696,21 @@ describe "Outcome Reports" do
           expect(results[0]["student uuid"]).to eq @user1.uuid
           expect(results[0]["learning outcome points possible"]).to eq 5.0
           expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
         end
 
-        it "filters out users that do not have attempts" do
+        it "includes users that do not have attempts" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
           expect(outcome_reports).to receive(:get_lmgb_results)
             .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", []))
           results = outcome_reports.send(:outcomes_new_quiz_scope)
 
-          expect(results.length).to eq(0)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
         end
 
         it "keeps the result with the latest submission date" do
@@ -745,6 +750,7 @@ describe "Outcome Reports" do
           expect(results.length).to eq(1)
           expect(results[0]["student uuid"]).to eq @user1.uuid
           expect(results[0]["assessment question"]).to eq "Newer Submission"
+          expect(results[0]["attempt"]).to eq 1
         end
 
         it "returns points on authoritative result if missing metadata" do
