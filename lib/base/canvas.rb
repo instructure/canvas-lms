@@ -58,11 +58,6 @@ module Canvas
 
   def self.lookup_cache_store(config, cluster)
     config = { "cache_store" => "nil_store" }.merge(config)
-    if config["cache_store"] == "redis_store"
-      ActiveSupport::Deprecation.warn("`redis_store` is no longer supported. Please change to `redis_cache_store`, and change `servers` to `url`.")
-      config["cache_store"] = "redis_cache_store"
-      config["url"] = config["servers"] if config["servers"]
-    end
 
     case config.delete("cache_store")
     when "redis_cache_store"
@@ -74,8 +69,6 @@ module Canvas
         # merge in redis.yml, but give precedence to cache_store.yml
         redis_config = (ConfigFile.load("redis", cluster) || {})
         config = redis_config.merge(config) if redis_config.is_a?(Hash)
-        # back compat
-        config[:url] = config[:servers] if config[:servers]
         # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
@@ -105,21 +98,6 @@ module Canvas
         # memory.
         `ps -o rss= -p #{Process.pid}`.to_i
       end
-    end
-  end
-
-  # can be called by plugins to allow reloading of that plugin in dev mode
-  # pass in the path to the plugin directory
-  # e.g., in the vendor/plugins/<plugin_name>/init.rb or
-  # gems/plugins/<plugin_name>/lib/<plugin_name>/engine.rb:
-  #     Canvas.reloadable_plugin(File.dirname(__FILE__))
-  def self.reloadable_plugin(dirname)
-    return unless Rails.env.development?
-
-    base_path = File.expand_path(dirname)
-    base_path.gsub(%r{/lib/[^/]*$}, "")
-    ActiveSupport::Dependencies.autoload_once_paths.reject! do |p|
-      p[0, base_path.length] == base_path
     end
   end
 
