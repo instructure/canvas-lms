@@ -365,25 +365,28 @@ module AccountReports
           # where it is used above in outcomes_new_quiz_scope
           "result submitted at" => authoritative_result[:submitted_at],
 
-          # TODO: We should be getting this off the attempt (attempt number)
+          # TODO: OUT-5460 We should be getting this off the attempt (attempt number)
           # We only care about the most recent attempt. The attempt column is equal to number of attempts
           "attempt" => authoritative_result[:attempts]&.length
         }
       )
 
-      # If there are no attempts, do not include the result in the report. If there are multiple attempts, we only
-      # include the most recent one in the report. To determine the most recent attempt, we use the submitted_At
-      # attribute, but historically, that field was not populated in outcome service. We will use it if we have it,
-      # but if it is missing, we will fallback to created_at. Using the created_at is technically not correct, but
-      # is the better than nothing. submitted
+      # If there are no attempts, we still include the result in the report. This is likely older submission from before
+      # we were capturing attempt info. If there are multiple attempts, we only include the most recent one in the
+      # report. To determine the most recent attempt, we use the submitted_At attribute, but historically, that field
+      # was not populated in outcome service. We will use it if we have it, but if it is missing, we will fallback
+      # to created_at. Using the created_at is technically not correct, but is the better than nothing. We should be
+      # using the attempt number though because that is 100% accurate.
+      # TODO: OUT-5460 We should use the attempt number if present to determine what attempt to use
       results = []
       attempt = authoritative_result[:attempts]&.max_by { |a| a[:submitted_at] || a[:created_at] }
-      return results if attempt.nil?
 
-      meta_data = attempt[:metadata]
-      if meta_data.nil?
+      if attempt.nil? || attempt[:metadata].nil?
+        # If we do not have an attempt but we do have a result, ensure that attempt number is at least 1
+        base_student["attempt"] = 1 unless base_student["attempt"] > 0
         results.push(base_student)
       else
+        meta_data = attempt[:metadata]
         question_metadata = meta_data[:question_metadata]
 
         # Assessment title and id are populated from the canvas Assignment record. In the future, we can get this from
