@@ -155,6 +155,11 @@
     select {
       width: 280px;
     }
+    &.small-select{
+      select {
+        width: 60px;
+      }
+    }
     input.same-width-as-select {
       width: 265px;
     }
