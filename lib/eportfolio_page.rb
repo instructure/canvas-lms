@@ -24,9 +24,11 @@ module EportfolioPage
       @categories = @portfolio.eportfolio_categories
       if @portfolio.grants_right?(@current_user, session, :manage)
         if @current_user && @current_user == @portfolio.user
-          @recent_submissions ||= @current_user.submissions
-                                               .in_workflow_state(["submitted", "graded"])
-                                               .order(created_at: :desc).to_a
+          @recent_submissions ||= Submission.joins(:course).joins(:assignment)
+                                            .where(user_id: @current_user, workflow_state: %w[submitted graded])
+                                            .where.not(course: { workflow_state: %w[created claimed deleted] })
+                                            .where.not(assignment: { workflow_state: %w[unpublished deleted] })
+                                            .order(created_at: :desc).to_a
         end
         @files ||= @current_user.attachments.to_a
         @folders ||= @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
