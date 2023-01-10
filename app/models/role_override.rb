@@ -1523,7 +1523,7 @@ class RoleOverride < ActiveRecord::Base
       },
       proxy_assignment_submission: {
         label: -> { t("Instructors can submit on behalf of students") },
-        label_v2: -> { t("Submissions - instructor proxy") },
+        label_v2: -> { t("Submission - Submit on behalf of student") },
         available_to: %w[
           TaEnrollment
           TeacherEnrollment
