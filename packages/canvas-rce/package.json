@@ -149,13 +149,16 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^4.1.2"
+    "tinymce-a11y-checker": "^4.1.2",
+    "text-field-edit": "^3.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7",
     "@babel/core": "^7",
     "@babel/preset-typescript": "^7",
     "@babel/register": "7",
+    "@babel/plugin-proposal-optional-chaining": "^7.20.7",
+    "@babel/plugin-syntax-nullish-coalescing-operator": "^7.8.3",
     "@instructure/babel-plugin-themeable-styles": "7.19.0-canvas",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/translations": ">=1",
@@ -166,7 +169,7 @@
     "@testing-library/react-hooks": "^5",
     "@testing-library/user-event": "^12",
     "axe-testcafe": "^3",
-    "babel-loader": "^8.0.0",
+    "babel-loader": "^8.2.5",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-inline-json-import": "^0.2.0",
     "babel-plugin-minify-constant-folding": "^0.5.0",
