@@ -41,8 +41,8 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
           size="x-small"
         />
       </Table.RowHeader>
-      <Table.Cell>{user.email}</Table.Cell>
-      <Table.Cell>{user.sis_user_id}</Table.Cell>
+      <Table.Cell data-heap-redact-text="">{user.email}</Table.Cell>
+      <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell>
         {permissions.can_masquerade && (
@@ -66,6 +66,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
             renderTip={I18n.t('Send message to %{name}', {name: user.name})}
           >
             <IconButton
+              data-heap-redact-attributes="href"
               withBorder={false}
               withBackground={false}
               size="small"
