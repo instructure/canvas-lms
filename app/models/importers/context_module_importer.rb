@@ -24,7 +24,7 @@ module Importers
 
     MAX_URL_LENGTH = 2000
 
-    ASSIGNMENT_GROUP_NAMES = AssignmentGroup::GROUP_NAMES.map{|n| n.downcase.gsub(/\s/, "_")}
+    ASSIGNMENT_GROUP_NAMES = AssignmentGroup.passing_threshold_group_names
 
 
     def self.linked_resource_type_class(type)
@@ -73,6 +73,8 @@ module Importers
     def self.process_migration(data, migration)
       modules = data['modules'] ? data['modules'] : []
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
+
+      @account_level_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
 
       modules.each do |mod|
         self.process_module(mod, migration)
@@ -169,33 +171,51 @@ module Importers
       item.content_tags.where.not(:migration_id => nil).
         where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
-      account_level_thresholds = get_default_course_thresholds(ASSIGNMENT_GROUP_NAMES)
-
-      unless account_level_thresholds.any?
-        if hash[:completion_requirements]
-          c_reqs = []
-          hash[:completion_requirements].each do |req|
-            if item_ref = item_map[req[:item_migration_id]]
-              req[:id] = item_ref.id
-              req.delete :item_migration_id
-              c_reqs << req
-            end
+      if hash[:completion_requirements]
+        c_reqs = []
+        hash[:completion_requirements].each do |req|
+          if item_ref = item_map[req[:item_migration_id]]
+            next if skip_completion_requirement?(item_ref)
+            req[:id] = item_ref.id
+            req.delete :item_migration_id
+            c_reqs << req
           end
-          if c_reqs.length > 0
-            item.completion_requirements = c_reqs
-            item.save
-          end
+        end
+        if c_reqs.length > 0
+          item.completion_requirements = c_reqs
+          item.save
         end
       end
 
       item
     end
+    
     def self.get_default_course_thresholds(assignment_group_names)
       thresholds = {}
       assignment_group_names.each do |group_name|
         thresholds[group_name] = RequirementsService.get_passing_threshold(type: 'school', assignment_group_name: group_name)
       end
       thresholds
+    end
+
+    def self.skip_completion_requirement?(item)
+      item_class = item.content_type
+      return false unless item_class == 'Assignment' || item_class == 'DiscussionTopic'
+      return false unless @account_level_thresholds.any?
+      case item_class
+      when 'Assignment'
+        if AssignmentGroup::GROUP_NAMES.include?(item.content.assignment_group_name)
+          return true
+        else
+          return false
+        end
+      when 'DiscussionTopic'
+        if item.content.assignment.present?
+          return true
+        else
+          return false
+        end
+      end
     end
 
     def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
