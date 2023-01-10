@@ -72,6 +72,9 @@ module Canvas
         # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
+    when "zonal_redis_cache_store"
+      CanvasCache::Redis.patch
+      ActiveSupport::Cache.lookup_store(:zonal_redis_cache_store, config.to_h.symbolize_keys)
     when "memory_store"
       ActiveSupport::Cache.lookup_store(:memory_store, { coder: Marshal })
     when "nil_store", "null_store"
@@ -292,6 +295,10 @@ module Canvas
   end
 
   def self.region_code
+    nil
+  end
+
+  def self.availability_zone
     nil
   end
 
