@@ -1591,6 +1591,55 @@ describe "RCE next tests", ignore_js_errors: true do
     end
     # rubocop:enable Specs/NoSeleniumWebDriverWait
 
+    describe "CanvasContentTray" do
+      it "displays all its dropdowns" do
+        visit_front_page_edit(@course)
+
+        document_toolbar_menubutton.click
+        course_documents_toolbar_menuitem.click
+        expect(tray_container).to be_displayed
+
+        content_tray_content_type.click
+        expect(content_tray_content_type_links).to be_displayed
+        content_tray_content_type.click # close the dropdown
+
+        content_tray_content_subtype.click
+        expect(content_tray_content_subtype_images).to be_displayed
+        content_tray_content_subtype.click
+
+        content_tray_sort_by.click
+        expect(content_tray_sort_by_date_added).to be_displayed
+        content_tray_sort_by.click
+
+        exit_full_screen_menu_item.click
+      end
+
+      it "displays all its dropdowns in fullscreen" do
+        visit_front_page_edit(@course)
+
+        document_toolbar_menubutton.click
+        course_documents_toolbar_menuitem.click
+        expect(tray_container).to be_displayed
+        full_screen_button.click
+        wait_for_animations
+        expect(tray_container).to be_displayed
+
+        content_tray_content_type.click
+        expect(content_tray_content_type_links).to be_displayed
+        content_tray_content_type.click # close the dropdown
+
+        content_tray_content_subtype.click
+        expect(content_tray_content_subtype_images).to be_displayed
+        content_tray_content_subtype.click
+
+        content_tray_sort_by.click
+        expect(content_tray_sort_by_date_added).to be_displayed
+        content_tray_sort_by.click
+
+        exit_full_screen_menu_item.click
+      end
+    end
+
     describe "selection management" do
       it "restores selection on focus after being reset while blurred" do
         visit_front_page_edit(@course)

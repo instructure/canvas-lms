@@ -50,6 +50,16 @@ module RCENextPage
     f('button[title="Exit Fullscreen"]')
   end
 
+  def full_screen_menu_item
+    menubar_open_menu("View")
+    menu_item_by_name("Fullscreen")
+  end
+
+  def exit_full_screen_menu_item
+    menubar_open_menu("View")
+    menu_item_by_name("Exit Fullscreen")
+  end
+
   def keyboard_shortcut_modal
     f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
   end
@@ -262,6 +272,30 @@ module RCENextPage
   #=====================================================================================================================
   # Content tray
 
+  def content_tray_content_type
+    f('[data-testid="filter-content-type"]')
+  end
+
+  def content_tray_content_type_links
+    f("#links")
+  end
+
+  def content_tray_content_subtype
+    f('[data-testid="filter-content-subtype"]')
+  end
+
+  def content_tray_content_subtype_images
+    f("#images")
+  end
+
+  def content_tray_sort_by
+    f('[data-testid="filter-sort-by"]')
+  end
+
+  def content_tray_sort_by_date_added
+    f("#date_added")
+  end
+
   def change_content_tray_content_type(which)
     content_type = content_tray_content_type
     content_type.click
@@ -269,10 +303,6 @@ module RCENextPage
     options = f("##{options_id}")
     option = fj(":contains(#{which})", options)
     option.click
-  end
-
-  def content_tray_content_subtype
-    fxpath('//input[ancestor::span[. = "Content Subtype"]]')
   end
 
   def change_content_tray_content_subtype(subtype)
@@ -291,10 +321,6 @@ module RCENextPage
   def click_content_tray_close_button
     content_tray_close_button.click
     wait_for_animations
-  end
-
-  def content_tray_content_type
-    f('input[aria-haspopup="listbox"]', fj(':contains("Content Type")'))
   end
 
   #=====================================================================================================================
