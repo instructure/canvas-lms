@@ -18,6 +18,11 @@ development:
 #    data:
 #      google_docs_creds:
 #        secret_key: so-secret
+#      immersive_reader:
+#        tenant_id: ""
+#        client_id: ""
+#        client_secret: ""
+#        subdomain: "canvasir"
 #      inst_access_signature:
 #        private_key: <signing private key in base 64>
 #        encryption_public_key: <encryption public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
