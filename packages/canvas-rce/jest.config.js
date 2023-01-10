@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Used to enable babel transformations for node_modules that use ecmascript module syntax directly
+// From https://github.com/nrwl/nx/issues/812
+const esModules = ['text-field-edit'].join('|')
+
 module.exports = {
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   reporters: [
@@ -36,6 +40,7 @@ module.exports = {
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/lib', '<rootDir>/canvas'],
+  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
   moduleNameMapper: {
     // jest can't import the icons
