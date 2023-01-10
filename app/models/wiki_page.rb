@@ -117,6 +117,18 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  # This method has two uses:
+  # 1) add the "-<suffix>" modifier to the end of the title (truncating if necessary)
+  #    - used to create a new title when we have a title collision
+  # 2) remove the last two characters and add a hyphen (i.e., "-")
+  #    - used to build the condition to look for prior full length title collisions
+  def modify_title(suffix = nil)
+    modifier = "-#{suffix}"
+    truncate_length = suffix.nil? ? 2 : modifier.length
+    # only truncates if title actually exceeds the allowed length
+    title[0...(TITLE_LENGTH - truncate_length)] + modifier
+  end
+
   def ensure_unique_title
     return if deleted?
 
@@ -131,18 +143,25 @@ class WikiPage < ActiveRecord::Base
         p.save_without_broadcasting!
       end
     end
-    if context.wiki_pages.not_deleted.where(title: self.title).where.not(id: id).first
-      real_title = self.title.gsub(/-(\d*)\z/, "") # remove any "-#" at the end
-      n = $1 ? $1.to_i + 1 : 2
-      new_title = nil
-      loop do
-        mod = "-#{n}"
-        new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
-        n = n.succ
-        break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id: id).exists?
-      end
 
-      self.title = new_title
+    return if self.title.empty?
+
+    similarity_conditions = [wildcard("title", self.title, type: :right, case_sensitive: true)]
+    if self.title.length == TITLE_LENGTH
+      # If title is full length, we need to also look for truncated titles in the form of:
+      # <first 253 chars of entered title>-<some number suffix>
+      # Only supports a single digit suffix (e.g. -2, -3, -4, ..., -8, -9) the moment.
+      # More copies than that is deemed out of scope
+      similarity_conditions << wildcard("title", modify_title, type: :right, case_sensitive: true)
+    end
+
+    similar_titles = context.wiki_pages.not_deleted.where(similarity_conditions.join(" OR ")).where.not(id: self).pluck(:title)
+    unless similar_titles.empty?
+      n = 2
+      while similar_titles.detect { |t| t == modify_title(n) }
+        n = n.succ
+      end
+      self.title = modify_title(n)
     end
   end
 
