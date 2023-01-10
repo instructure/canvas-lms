@@ -111,5 +111,12 @@ describe NewQuizzes::QuizzesApiController do
       post :create, params: { course_id: @course.id }
       expect(response).to be_not_found
     end
+
+    it "returns 401 if the user can't create assignments on the course" do
+      @student.enrollments.where(course: @course).destroy_all
+      user_session(@student)
+      post :create, params: { course_id: @course.id }
+      expect(response).to be_unauthorized
+    end
   end
 end

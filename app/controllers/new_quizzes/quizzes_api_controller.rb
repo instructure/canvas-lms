@@ -73,6 +73,9 @@ module NewQuizzes
     #        -X POST \
     #        -H 'Authorization Bearer <token>'
     def create
+      assignment = @context.assignments.build
+      return unless authorized_action(assignment, @current_user, :create)
+
       render json: {}
     end
 
