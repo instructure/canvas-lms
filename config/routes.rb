@@ -1296,6 +1296,7 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/content_migrations/:id", action: :update, as: "#{context}_content_migration_update"
         get "#{context.pluralize}/:#{context}_id/content_migrations/:id/selective_data", action: :content_list, as: "#{context}_content_migration_selective_data"
       end
+      get "courses/:course_id/content_migrations/:id/asset_id_mapping", action: :asset_id_mapping
     end
 
     scope(controller: :migration_issues) do

@@ -1090,6 +1090,56 @@ class ContentMigration < ActiveRecord::Base
     "!/blueprint/blueprint_subscriptions/#{child_subscription_id}/#{id}"
   end
 
+  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
+
+  def asset_id_mapping
+    mapping = {}
+    master_template = migration_type == "master_course_import" &&
+                      master_course_subscription&.master_template
+    global_ids = master_template.present? || use_global_identifiers?
+
+    ASSET_ID_MAP_TYPES.each do |asset_type|
+      klass = asset_type.constantize
+      next unless klass.column_names.include? "migration_id"
+
+      key = Context.api_type_name(klass)
+      mig_id_to_dest_id = context.shard.activate do
+        scope = klass.where(context: context).where.not(migration_id: nil)
+        scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
+        scope.pluck(:migration_id, :id).to_h
+      end
+      next if mig_id_to_dest_id.empty?
+
+      mapping[key] ||= {}
+      if master_template
+        # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
+        # between source id and migration_id in the MasterContentTags
+        master_template.master_content_tags
+                       .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
+                              migration_id: mig_id_to_dest_id.keys)
+                       .pluck(:content_id, :migration_id)
+                       .each do |src_id, mig_id|
+          dest_id = mig_id_to_dest_id[mig_id]
+          mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+        end
+      else
+        # with course copy, there is no stored mapping between source id and migration_id,
+        # so we will need to recompute migration_ids to discover the mapping
+        source_course.shard.activate do
+          src_ids = klass.where(context: source_course).pluck(:id)
+          src_ids.each do |src_id|
+            asset_string = klass.asset_string(src_id)
+            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        end
+      end
+    end
+
+    mapping
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :blueprint_content_added
     p.to { context.participating_admins }
