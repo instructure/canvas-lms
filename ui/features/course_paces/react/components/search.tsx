@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {getSearchTerm} from '../reducers/course_paces'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('course_paces_search')
 
@@ -74,6 +75,19 @@ export const Search: React.FC<ComponentProps> = ({
       searchTerm,
       sortBy: currentSortBy,
       orderType: currentOrderType,
+      afterFetch: contexts =>
+        showFlashAlert({
+          message: I18n.t(
+            {
+              zero: 'No results found',
+              one: 'Showing 1 result below',
+              other: 'Showing %{count} results below',
+            },
+            {count: contexts.length}
+          ),
+          srOnly: true,
+          err: null,
+        }),
     })
   }
 
