@@ -49,10 +49,10 @@ describe('ProxyUploadModal', () => {
     expect(getByText('Upload File')).toBeInTheDocument()
   })
   it('indicates files are being uploaded once added to input', async () => {
-    const {getByTestId, getByText} = renderComponent()
+    const {getByTestId, getAllByText} = renderComponent()
     const input = await waitFor(() => getByTestId('proxyInputFileDrop'))
     const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
     userEvent.upload(input, file)
-    expect(getByText('Uploading files')).toBeInTheDocument()
+    expect(getAllByText('Uploading files')[0]).toBeInTheDocument()
   })
 })

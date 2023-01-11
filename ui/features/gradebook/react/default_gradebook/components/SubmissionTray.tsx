@@ -262,6 +262,7 @@ export default class SubmissionTray extends React.Component<
           <Button
             variant="link"
             onClick={this.toggleUploadModal}
+            aria-label={I18n.t('Submit for Student %{name}', {name: this.props.student.name})}
             data-testid="submit-for-student-button"
           >
             {I18n.t('Submit for Student')}
