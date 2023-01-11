@@ -394,7 +394,7 @@
                     url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, submission.asset_string)
                   elsif assignment_presenter.originality_report? && turnitin
                     asset_string = assignment_presenter.file&.asset_string || assignment_presenter.submission&.asset_string
-                    url = polymorphic_url([ @context, assignment, submission, :originality_report], asset_string: asset_string, attempt: submission.attempt)
+                    url = polymorphic_url([ @context, assignment, submission, :originality_report], asset_string: asset_string, attempt: submission.attempt, only_path: true)
                     anchor_title = turnitin[:error_message] ? turnitin[:error_message] : t('Originality Report')
                     alt_text = turnitin[:error_message] ? turnitin[:error_message] : t('Originality Report')
                   elsif assignment_presenter.is_online_upload? && assignment_presenter.file
@@ -562,7 +562,7 @@
                           <title><%= graph.title %></title>
                           <line class="zero" x1="0" y1="3" x2="0" y2="27" stroke="#556572" />
                           <line class="possible" x1="<%= graph.max_pos %>" y1="3" x2="<%= graph.max_pos %>" y2="27" stroke="#556572" />
-                          
+
                           <line class="min" x1="<%= graph.low_pos %>" y1="6" x2="<%= graph.low_pos %>" y2="24" stroke="#556572" stroke-width="2" />
                           <line class="bottomQ" x1="<%= graph.low_pos %>" y1="15" x2="<%= graph.lq_pos %>" y2="15" stroke="#556572" stroke-width="2" />
                           <line class="topQ" x1="<%= graph.uq_pos %>" y1="15" x2="<%= graph.high_pos %>" y2="15" stroke="#556572" stroke-width="2" />
@@ -570,7 +570,7 @@
 
                           <rect class="mid50" x="<%= graph.lq_pos %>" y="3" width="<%= graph.uq_pos - graph.lq_pos %>" height="24" stroke="#556572" stroke-width="2" rx="3" fill="none" />
                           <line class="median" x1="<%= graph.median_pos %>" y1="3" x2="<%= graph.median_pos %>" y2="27" stroke="#556572" stroke-width="2" />
-                          
+
                           <% if submission && submission.score %>
                           <rect class="myScore" x="<%= graph.score_pos - 7 %>" y="8" width="14" height="14" stroke="#224488" stroke-width="2" rx="3" fill="#aabbdd">
                             <title><%= before_label(:your_score, "Your Score") %> <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => n(submission.score), :possible => n(round_if_whole(assignment.points_possible))) %></title>
