@@ -555,6 +555,23 @@ describe CoursePacesController, type: :controller do
         expect(m2["items"].second["duration"]).to eq(4)
         expect(m2["items"].second["published"]).to eq(true)
       end
+
+      context "when the user is on another shard" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @student2 = user_factory(active_all: true)
+          end
+        end
+
+        it "still creates the individual pace" do
+          @course_pace.update!(hard_end_dates: false)
+          enrollment = course_with_student(course: @course, user: @student2, active_all: true)
+          get :new, params: { course_id: @course.id, enrollment_id: enrollment.id }
+          expect(response).to be_successful
+        end
+      end
     end
   end
 

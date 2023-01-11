@@ -231,7 +231,7 @@ class CoursePace < ActiveRecord::Base
     raise "Course pace is not deleted" unless deleted?
 
     grouped_paces_and_enrollments = student_enrollments.group_by do |enrollment|
-      student_section_ids = enrollment.user.student_enrollments.where(course: course).where.not(workflow_state: "deleted").pluck(:course_section_id)
+      student_section_ids = enrollment.user.student_enrollments.shard(shard).where(course: course).active.pluck(:course_section_id)
       pace = course.course_paces.published.where(course_section_id: student_section_ids).last
       pace || course.course_paces.published.primary.take
     end
@@ -276,7 +276,7 @@ class CoursePace < ActiveRecord::Base
           .where
           .not(course_section_id: course_section_course_pace_section_ids)
       end
-    @student_enrollments.where.not(workflow_state: "deleted")
+    @student_enrollments.active
   end
 
   def start_date(with_context: false)
@@ -306,7 +306,7 @@ class CoursePace < ActiveRecord::Base
   end
 
   def individual_pace_end_date
-    student_enrollment = user.student_enrollments.where(course: course).where.not(workflow_state: "deleted").order(created_at: :desc).take
+    student_enrollment = user.student_enrollments.shard(shard).where(course: course).active.order(created_at: :desc).take
     course_section_paces = course.course_paces.not_deleted.section_paces.preload(:course_section)
     applied_section_pace = course_section_paces.find_by(course_section_id: student_enrollment.course_section_id)
     return student_enrollment.course_section.end_at if applied_section_pace&.course_section_id
