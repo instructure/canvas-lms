@@ -128,7 +128,7 @@ const ProxyUploadModal = ({
   }
 
   const handleSuccess = sub => {
-    setAlert({text: I18n.t('Submission uploaded!'), variant: 'success'})
+    setAlert({text: I18n.t('Submission uploaded successfully!'), variant: 'success'})
     setUploadSuccess(true)
     setTimeout(() => reload(sub), 3000)
   }
@@ -423,7 +423,7 @@ const ProxyUploadModal = ({
         renderLabel={
           <View as="div" padding="xx-large large" background="primary">
             <Img src={UploadFileSVG} width="160px" margin="small" />
-            <Heading>{I18n.t('Drag a file here, or')}</Heading>
+            <Heading aria-hidden="true">{I18n.t('Drag a file here, or')}</Heading>
             <Text color="brand">{I18n.t('Choose a file to upload')}</Text>
           </View>
         }
@@ -451,16 +451,21 @@ const ProxyUploadModal = ({
         </Modal.Header>
         <Modal.Body>
           {alert && (
-            <Alert
-              open={true}
-              variant={alert.variant}
-              renderCloseButtonLabel={I18n.t('Close')}
-              onDismiss={() => setAlert(null)}
-              margin="small"
-              timeout={3000}
-            >
-              {I18n.t('%{text}', {text: alert.text})}
-            </Alert>
+            <>
+              <Alert
+                open={true}
+                variant={alert.variant}
+                renderCloseButtonLabel={I18n.t('Close')}
+                onDismiss={() => setAlert(null)}
+                margin="small"
+                timeout={3000}
+              >
+                {I18n.t('%{text}', {text: alert.text})}
+              </Alert>
+              <p role="alert" className="screenreader-only">
+                {I18n.t('%{text}', {text: alert.text})}
+              </p>
+            </>
           )}
           <div ref={containerRef}>
             {renderFilesTable()}
