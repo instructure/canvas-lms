@@ -325,8 +325,13 @@ module Lti::IMS
       return if ignore_score?
 
       if params.key?(:scoreMaximum)
-        return if params[:scoreMaximum].to_f >= 0
-
+        if params[:scoreMaximum].to_f >= 0
+          if params[:scoreMaximum].to_f.zero? && line_item&.score_maximum != 0
+            return render_error("cannot be zero if line item's maximum is not zero", :unprocessable_entity)
+          else
+            return
+          end
+        end
         render_error("ScoreMaximum must be greater than or equal to 0", :unprocessable_entity)
       else
         render_error("ScoreMaximum not supplied when ScoreGiven present.", :unprocessable_entity)
