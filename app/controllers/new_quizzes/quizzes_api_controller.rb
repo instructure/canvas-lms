@@ -43,7 +43,7 @@ module NewQuizzes
       assignment = api_find(@context.active_assignments, params[:assignment_id])
       return render_unauthorized_action unless assignment.grants_right?(@current_user, :read) && assignment.visible_to_user?(@current_user)
 
-      log_api_asset_access(assignment, "assignments", assignment.assignment_group)
+      log_api_asset_access(assignment, "quizzes", assignment.assignment_group)
 
       render json: {}
     end
@@ -58,7 +58,7 @@ module NewQuizzes
       return render_unauthorized_action unless @context.grants_right?(@current_user, :read)
 
       quizzes = Assignments::ScopedToUser.new(@context, @current_user).scope.type_quiz_lti
-      log_api_asset_access(["assignments", @context], "assignments", "other")
+      log_api_asset_access(["new_quizzes", @context], "quizzes", "other")
 
       render json: quizzes.pluck(:id)
     end
