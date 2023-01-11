@@ -1910,7 +1910,7 @@ class CoursesController < ApplicationController
 
       @pending_enrollment = enrollment
 
-      if @context.root_account.allow_invitation_previews? || enrollment.admin?
+      if @context.root_account.allow_invitation_previews?
         flash[:notice] = t("notices.preview_course", "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
         # directly call the next action; it's just going to redirect anyway, so no need to have
