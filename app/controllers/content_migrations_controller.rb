@@ -518,6 +518,36 @@ class ContentMigrationsController < ApplicationController
     render json: formatter.get_content_list(params[:type])
   end
 
+  # @API Get asset id mapping
+  #
+  # Given a complete course copy or blueprint import content migration, return a mapping of asset ids
+  # from the source course to the destination course that were copied in this migration or an earlier one
+  # with the same course pair and migration_type (course copy or blueprint).
+  #
+  # The returned object's keys are asset types as they appear in API URLs (+announcements+, +assignments+,
+  # +discussion_topics+, +files+, +modules+, +pages+, and +quizzes+). The values are a mapping from id in
+  # source course to id in destination course for objects of this type.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/content_migrations/<id>/asset_id_mapping \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #    {
+  #      "assignments": {"13": "740", "14": "741"},
+  #      "discussion_topics": {"15": "743", "16": "744"}
+  #    }
+  #
+  def asset_id_mapping
+    content_migration = @context.content_migrations.find(params[:id])
+    return render json: { message: "Migration is incomplete" }, status: :bad_request unless content_migration.imported?
+    return render json: { message: "Migration is not course copy or blueprint" }, status: :bad_request unless content_migration.source_course_id.present?
+
+    render json: content_migration.asset_id_mapping
+  end
+
   protected
 
   def authorize_action
@@ -530,7 +560,8 @@ class ContentMigrationsController < ApplicationController
         available_migrators: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
         content_list: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
         create: [:manage_course_content_add],
-        update: [:manage_course_content_edit]
+        update: [:manage_course_content_edit],
+        asset_id_mapping: [:manage_content]
       }
     )
   end
