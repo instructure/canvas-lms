@@ -1404,12 +1404,12 @@ describe CoursesController do
         expect(@enrollment).to be_active
       end
 
-      it "does not error when previewing an unpublished course as an invited admin" do
-        @account = Account.create!
-        @account.settings[:allow_invitation_previews] = false
-        @account.save!
+      it "does not error when navigating to unpublished course after admin enrollment invitation" do
+        account = Account.create!
+        account.settings[:allow_invitation_previews] = false
+        account.save!
 
-        course_factory(account: @account)
+        course_factory(account: account)
         user_factory(active_all: true)
         enrollment = @course.enroll_teacher(@user, enrollment_state: "invited")
         user_session(@user)
@@ -1419,8 +1419,7 @@ describe CoursesController do
         expect(response).to be_successful
         expect(response).to render_template("show")
         expect(assigns[:context_enrollment]).to eq enrollment
-        enrollment.reload
-        expect(enrollment).to be_invited
+        expect(enrollment.reload).to be_active
       end
 
       it "ignores invitations that have been accepted (not logged in)" do
