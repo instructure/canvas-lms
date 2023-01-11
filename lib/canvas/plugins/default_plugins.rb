@@ -398,15 +398,6 @@ module Canvas::Plugins::DefaultPlugins
                               settings_partial: "plugins/inst_fs_settings",
                               validator: "InstFsValidator"
                             })
-    Canvas::Plugin.register("unsplash", nil, {
-                              name: -> { t :name, "Unsplash" },
-                              description: -> { t :description, "Unsplash image search service" },
-                              author: "Unsplash",
-                              author_website: "https://unsplash.com/documentation",
-                              version: "1.0.0",
-                              settings: { access_key: nil },
-                              settings_partial: "plugins/unsplash_settings"
-                            })
     Canvas::Plugin.register("asset_user_access_logs", nil, {
                               name: -> { t :name, "AUA Logger" },
                               description: -> { t :description, "Minimize AUA write pressure" },

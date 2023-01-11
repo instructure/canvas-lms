@@ -1741,11 +1741,6 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/developer_keys", action: :create
     end
 
-    scope(controller: :internet_image) do
-      get "image_search", action: :image_search
-      post "image_selection/:id", action: :image_selection
-    end
-
     scope(controller: :immersive_reader) do
       get "immersive_reader/authenticate", action: :authenticate
     end

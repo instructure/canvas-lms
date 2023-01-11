@@ -18,7 +18,7 @@
 
 import bridge from '../../../../bridge'
 import clickCallback from '../clickCallback'
-import {getAllByLabelText, queryByRole, getByRole} from '@testing-library/react'
+import {getAllByLabelText} from '@testing-library/react'
 
 describe('Instructure Image Plugin: clickCallback', () => {
   let trayProps
@@ -63,21 +63,5 @@ describe('Instructure Image Plugin: clickCallback', () => {
         selector: 'form',
       })[0]
     ).toBeVisible()
-  })
-
-  it('does not display Unsplash Panel when disabled', async () => {
-    editor.getParam = () => {
-      return false
-    }
-    await clickCallback(editor, document, trayProps)
-    expect(queryByRole(document, 'tab', {name: /unsplash/i})).not.toBeInTheDocument()
-  })
-
-  it('does display Unsplash Panel when enabled', async () => {
-    editor.getParam = () => {
-      return true
-    }
-    await clickCallback(editor, document, trayProps)
-    expect(getByRole(document, 'tab', {name: /unsplash/i})).toBeInTheDocument()
   })
 })

@@ -1524,7 +1524,6 @@ class CoursesController < ApplicationController
                COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
                PUBLISHING_ENABLED: @publishing_enabled,
                COURSE_COLORS_ENABLED: @context.elementary_enabled?,
-               use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig("access_key")&.present?,
                COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
                STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect { |term| term[:enrollment_type] == "StudentEnrollment" }&.slice(:start_at, :end_at),
                DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at, :end_at),
