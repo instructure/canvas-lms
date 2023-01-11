@@ -91,7 +91,9 @@ class CoursePacesController < ApplicationController
 
   def context_for(pace)
     return pace.course_section if pace.course_section_id
-    return pace.user.student_enrollments.where(course: @course).where.not(workflow_state: "deleted").take if pace.user_id
+    # search the pace's shard for the student enrollment since the enrollment associated with the pace's course
+    # will always be on the pace's shard (not necessarily the user's shard though)
+    return pace.user.student_enrollments.shard(pace.shard).where(course: @course).active.take if pace.user_id
 
     pace.course
   end
