@@ -23,6 +23,7 @@ BrowserSupport = Struct.new(:browser, :version) do
   class << self
     def supported?(user_agent)
       browser = Browser.new(user_agent)
+      return true if respondus? browser
       return false if minimum_browsers.any? { |min| browser.send("#{min.browser}?", "<#{min.version}") }
 
       true # if we don't recognize it (e.g. Android), be nice
@@ -35,6 +36,19 @@ BrowserSupport = Struct.new(:browser, :version) do
     def minimum_browsers
       @minimum_browsers ||= (configuration["minimums"] || [])
                             .map { |browser, version| new(browser, version.to_s) }
+    end
+
+    private
+
+    #
+    # Respondus lockdown browser includes a telltale in the User-Agent string which
+    # is platform-dependent. Hopefully this never needs to be modified.
+    #
+    def respondus?(browser)
+      return true if browser.platform.mac? && browser.ua.match(/ CMAC \d[.\d]+;/)
+      return true if browser.platform.windows? && browser.ua.match(/ CLDB \d[.\d]+;/)
+
+      false
     end
   end
 end
