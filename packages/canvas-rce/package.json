@@ -151,7 +151,8 @@
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
     "tinymce-a11y-checker": "^4.1.4",
-    "text-field-edit": "^3.2.0"
+    "text-field-edit": "^3.2.0",
+    "uri-js": "^4.2.2"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -209,7 +210,8 @@
     "webpack-merge": "^5",
     "webpack-nano": "^1",
     "webpack-plugin-serve": "^1",
-    "source-map-support": "0.5.21"
+    "source-map-support": "0.5.21",
+    "jest-mock-proxy": "3.1.2"
   },
   "resolutions": {
     "format-message-estree-util": "./packages/format-message-estree-util"

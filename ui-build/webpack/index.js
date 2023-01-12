@@ -285,7 +285,7 @@ module.exports = {
             configFile: false,
             cacheDirectory: process.env.NODE_ENV !== 'production',
             assumptions: {
-              setPublicClassFields: true,
+              setPublicClassFields: true
             },
             env: {
               development: {
