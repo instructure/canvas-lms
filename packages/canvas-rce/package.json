@@ -74,6 +74,7 @@
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "~8.0.1-rc.11",
     "@instructure/ui-a11y-content": "7",
+    "@instructure/ui-a11y-utils": "7",
     "@instructure/ui-alerts": "7",
     "@instructure/ui-avatar": "7",
     "@instructure/ui-badge": "7",
