@@ -54,7 +54,10 @@ export const AddressBookContainer = props => {
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
-      context: filterHistory[filterHistory.length - 1]?.context?.contextID,
+      context:
+        filterHistory[filterHistory.length - 1]?.context?.contextID ||
+        props.courseContextCode ||
+        null,
       search: searchTerm,
       userID,
       courseContextCode: props.courseContextCode,
