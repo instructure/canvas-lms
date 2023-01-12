@@ -1588,6 +1588,18 @@ describe "RCE next tests", ignore_js_errors: true do
           expect((orig_height - new_height).abs).to be < 3
         end
       end
+
+      it "stil shows tinymce menus when in fullscreen" do
+        # ideally we'd do this test with multiple RCEs on the page
+        # but the setup effort isn't worth it.
+        visit_front_page_edit(@course)
+        full_screen_button.click
+        doc_btn = document_toolbar_menubutton
+        doc_btn.click
+        menu_id = doc_btn.attribute("aria-owns")
+        expect(f("##{menu_id}")).to be_displayed
+        exit_full_screen_button.click
+      end
     end
     # rubocop:enable Specs/NoSeleniumWebDriverWait
 

@@ -27,6 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
+import {uid} from '@instructure/uid'
 import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
@@ -337,7 +338,7 @@ class RCEWrapper extends React.Component {
       announcement: null,
       confirmAutoSave: false,
       autoSavedContent: '',
-      id: this.props.id || this.props.textareaId || `${Date.now()}`,
+      id: this.props.id || this.props.textareaId || `${uid('rce', 2)}`,
       height: ht,
       fullscreenState: {
         prevHeight: ht,
@@ -381,6 +382,27 @@ class RCEWrapper extends React.Component {
     this.resizeObserver = new ResizeObserver(_entries => {
       this._handleFullscreenResize()
     })
+  }
+
+  // when the RCE is put into fullscreen we need to move the div
+  // tinymce mounts popup menus into from the body to the rce-wrapper
+  // or the menus wind up behind the RCE. I can't find a way to
+  // configure tinymce to say where that div is mounted, do this
+  // is a bit of a hack to tag the div that is this RCE's
+  _tagTinymceAuxDiv() {
+    const tinyauxlist = document.querySelectorAll('.tox-tinymce-aux')
+    if (tinyauxlist.length) {
+      const myaux = tinyauxlist[tinyauxlist.length - 1]
+      if (myaux.id) {
+        // eslint-disable-next-line no-console
+        console.error('Unexpected ID on my tox-tinymce-aux element')
+      }
+      myaux.id = `tinyaux-${this.id}`
+    }
+  }
+
+  _myTinymceAuxDiv() {
+    return document.getElementById(`tinyaux-${this.id}`)
   }
 
   getRequiredFeatureStatuses() {
@@ -772,9 +794,11 @@ class RCEWrapper extends React.Component {
     // at the bottom of the body. When we're fullscreen the menus need to be mounted
     // in the fullscreen element or they won't show up. Let's move tinymce's mount point
     // when we go into fullscreen, then put it back when we're finished.
-    const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
-    tinymenuhost.remove()
-    this._elementRef.current.appendChild(tinymenuhost)
+    const tinymenuhost = this._myTinymceAuxDiv()
+    if (tinymenuhost) {
+      tinymenuhost.remove()
+      this._elementRef.current.appendChild(tinymenuhost)
+    }
 
     this._elementRef.current.addEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
     this.setState({
@@ -787,9 +811,11 @@ class RCEWrapper extends React.Component {
 
   _exitFullscreen() {
     if (document[FS_ELEMENT]) {
-      const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
-      tinymenuhost.remove()
-      document.body.appendChild(tinymenuhost)
+      const tinymenuhost = this._myTinymceAuxDiv()
+      if (tinymenuhost) {
+        tinymenuhost.remove()
+        document.body.appendChild(tinymenuhost)
+      }
       document[FS_EXIT]()
     }
   }
@@ -1812,6 +1838,7 @@ class RCEWrapper extends React.Component {
     this.pendingEventHandlers.forEach(e => {
       myTiny.on(e.name, e.handler)
     })
+    this._tagTinymceAuxDiv()
     this.registerTextareaChange()
     this._elementRef.current.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
