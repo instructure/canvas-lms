@@ -18,6 +18,7 @@
 
 /* eslint no-console: 0 */
 
+import uuid from 'uuid'
 import {
   NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
   INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
@@ -168,6 +169,27 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
       })
       if (!hasSentResponse) {
         responseMessages.sendSuccess()
+      }
+      if (
+        window.ENV.DATA_COLLECTION_ENDPOINT &&
+        typeof window.ENV.DATA_COLLECTION_ENDPOINT === 'string'
+      ) {
+        fetch(window.ENV.DATA_COLLECTION_ENDPOINT, {
+          method: 'PUT',
+          mode: 'cors',
+          credentials: 'omit',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([
+            {
+              id: uuid.v4(),
+              type: 'postmessage_usage',
+              subject,
+              origin: e.origin,
+            },
+          ]),
+        })
       }
       return true
     } catch (error) {
