@@ -19,9 +19,10 @@
 import htmlEscape from 'escape-html'
 import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 import formatMessage from '../format-message'
-import {closest, show, hide, insertAfter, getData, setData} from './jqueryish_funcs'
-import {youTubeID, isExternalLink, getTld, showFilePreview} from './instructure_helper'
+import {closest, getData, hide, insertAfter, setData, show} from './jqueryish_funcs'
+import {getTld, isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
+import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -147,6 +148,11 @@ export function enhanceUserContent(container = document, opts = {}) {
     kalturaSettings,
     disableGooglePreviews,
     canvasLinksTarget,
+
+    /**
+     * When used inside of an LTI tool, this contains the canvas global id of the tool.
+     */
+    containingCanvasLtiToolId,
   } = opts
 
   const content =
@@ -203,6 +209,17 @@ export function enhanceUserContent(container = document, opts = {}) {
           }
         } catch (_ignore) {
           // canvasOrigin probably isn't a valid base url
+        }
+      })
+    }
+
+    // add parent_frame_context to canvas iframes to allow them loading inside another LTI tool
+    if (containingCanvasLtiToolId != null) {
+      unenhanced_elem.querySelectorAll('iframe[src]').forEach(iframeElem => {
+        const src = iframeElem.getAttribute('src')
+
+        if (src.startsWith(canvasOrigin)) {
+          iframeElem.setAttribute('src', addParentFrameContextToUrl(src, containingCanvasLtiToolId))
         }
       })
     }

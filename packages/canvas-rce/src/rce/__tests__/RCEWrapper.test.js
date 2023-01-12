@@ -24,12 +24,13 @@ import * as indicateModule from '../../common/indicate'
 import * as contentInsertion from '../contentInsertion'
 
 import RCEWrapper, {
-  mergeMenuItems,
   mergeMenu,
-  mergeToolbar,
+  mergeMenuItems,
   mergePlugins,
+  mergeToolbar,
   parsePluginsToExclude,
 } from '../RCEWrapper'
+import RCEGlobals from '../RCEGlobals'
 
 const textareaId = 'myUniqId'
 const canvasOrigin = 'https://canvas:3000'
@@ -850,6 +851,38 @@ describe('RCEWrapper', () => {
       const wrapper = createBasicElement({instRecordDisabled: true})
       const options = wrapper.wrapOptions({})
       expect(options.plugins.indexOf('instructure_record')).toEqual(-1)
+    })
+
+    it('instructure_rce_external_tools if enabled and rcs available', () => {
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures')
+
+      try {
+        for (const rcsAvailable in [true, false]) {
+          for (const flagEnabled in [true, false]) {
+            for (const onCanvasDomain in [true, false]) {
+              getFeaturesSpy.mockImplementation(() => ({
+                rce_new_external_tool_dialog_in_canvas: flagEnabled,
+              }))
+
+              const enabledPlugins = createBasicElement({
+                canvasOrigin: onCanvasDomain ? window.location.origin : 'https://nq.com',
+                trayProps: {
+                  ...trayProps().trayProps,
+                  ...(rcsAvailable ? {} : {jwt: null}),
+                },
+              }).wrapOptions().plugins
+
+              if (rcsAvailable && (flagEnabled || !onCanvasDomain)) {
+                expect(enabledPlugins).toContain('instructure_rce_external_tools')
+              } else {
+                expect(enabledPlugins).not.toContain('instructure_rce_external_tools')
+              }
+            }
+          }
+        }
+      } finally {
+        getFeaturesSpy.mockClear()
+      }
     })
   })
 

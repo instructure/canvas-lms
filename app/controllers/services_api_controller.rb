@@ -146,6 +146,7 @@ class ServicesApiController < ApplicationController
       url_for_high_contrast_tinymce_editor_css: high_contrast_css_urls.map(&add_base_url_if_needed),
       url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css_urls.map(&add_base_url_if_needed),
       FEATURES: env[:FEATURES]&.transform_values { |v| !!v },
+      LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
     }
   end
 end

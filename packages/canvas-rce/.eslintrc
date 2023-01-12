@@ -25,11 +25,19 @@
   "ignorePatterns": ["scripts/installTranslations.js", "**/translations/**/*.js"],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": ["*.ts*"],
       "rules": {
         // no-undef is not useful for typescript.
         // See discussion: https://stackoverflow.com/questions/60743389/eslint-defined-global-extensions-still-not-defined-no-undef
-        "no-undef": "off"
+        "no-undef": "off",
+
+        // Prefer @typescript-eslint/no-useless-constructor over no-useless-constructor
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-useless-constructor": "error",
+
+        // Prefer @typescript-eslint/no-empty-function over no-empty-function
+        "no-empty-function": "off",
+        "@typescript-eslint/no-empty-function": "error"
       }
     }
   ]
