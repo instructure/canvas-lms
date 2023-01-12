@@ -182,7 +182,6 @@ module Api::V1::OutcomeResults
     serialized_rollup_pairs = rollups.map do |rollup|
       [rollup, serialize_rollup(rollup, :user)]
     end
-
     duplicate_rollup_rows_for_sections(serialized_rollup_pairs)
   end
 
@@ -198,15 +197,16 @@ module Api::V1::OutcomeResults
     # we're mostly assuming that there is one section enrollment per user. if a user
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
-    section_ids_func = if @section
-                         ->(_user) { [@section.id] }
-                       else
-                         enrollments = @context.all_accepted_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair[0].context.id }).to_a
-                         ->(user) { enrollments.select { |e| e.user_id == user.id }.map(&:course_section_id) }
-                       end
+    section_func = if @section
+                     ->(user) { [[@section.id, @context.all_accepted_student_enrollments.where(user_id: user.id, course_section_id: @section.id).first.workflow_state]] }
+                   else
+                     enrollments = @context.all_accepted_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair.first.context.id }).to_a
+                     ->(user) { enrollments.select { |e| e.user_id == user.id }.map { |e| [e&.course_section_id, e.workflow_state] } }
+                   end
+
     serialized_rollup_pairs.flat_map do |rollup, serialized_rollup|
-      section_ids_func.call(rollup.context).map do |section_id|
-        serialized_rollup.deep_merge(links: { section: section_id.to_s })
+      section_func.call(rollup.context).map do |section_id, workflow_state|
+        serialized_rollup.deep_merge(links: { section: section_id.to_s, status: workflow_state })
       end
     end
   end

@@ -161,6 +161,13 @@ describe "Outcome Results API", type: :request do
     api_v1_course_outcome_results_url(context, params)
   end
 
+  def student_enrollment_status(course, student, section = nil)
+    student_enrollments = course.all_accepted_student_enrollments.where(user_id: student.id)
+    return student_enrollments.where(course_section_id: section.id).first.workflow_state unless section.nil?
+
+    student_enrollments.first.workflow_state
+  end
+
   before do
     @user = @teacher # api calls as teacher, by default
   end
@@ -243,8 +250,9 @@ describe "Outcome Results API", type: :request do
         expect(json["rollups"].size).to eq 1
         json["rollups"].each do |rollup|
           expect(rollup.keys.sort).to eq %w[links scores]
-          expect(rollup["links"].keys.sort).to eq %w[section user]
+          expect(rollup["links"].keys.sort).to eq %w[section status user]
           expect(rollup["links"]["section"]).to eq @course.course_sections.first.id.to_s
+          expect(rollup["links"]["status"]).to eq student_enrollment_status(@course, outcome_student, @course.course_sections.first)
           expect(rollup["links"]["user"]).to eq outcome_student.id.to_s
           expect(rollup["scores"].size).to eq 1
           rollup["scores"].each do |score|
@@ -500,8 +508,9 @@ describe "Outcome Results API", type: :request do
           expect(json["rollups"].size).to eq 2
           json["rollups"].each do |rollup|
             expect(rollup.keys.sort).to eq %w[links scores]
-            expect(rollup["links"].keys.sort).to eq %w[section user]
+            expect(rollup["links"].keys.sort).to eq %w[section status user]
             expect(rollup["links"]["section"]).to eq @course.course_sections.first.id.to_s
+            expect(rollup["links"]["status"]).to eq student_enrollment_status(@course, outcome_student, @course.course_sections.first)
             expect(student_ids).to be_include(rollup["links"]["user"])
             expect(rollup["scores"].size).to eq 1
             rollup["scores"].each do |score|
@@ -559,8 +568,9 @@ describe "Outcome Results API", type: :request do
           expect(json["rollups"].size).to eq 2
           json["rollups"].each do |rollup|
             expect(rollup.keys.sort).to eq %w[links scores]
-            expect(rollup["links"].keys.sort).to eq %w[section user]
+            expect(rollup["links"].keys.sort).to eq %w[section status user]
             expect(rollup["links"]["section"]).to eq outcome_course_sections[0].id.to_s
+            expect(rollup["links"]["status"]).to eq student_enrollment_status(outcome_course, outcome_course_sections.first.students.first, outcome_course_sections.first)
             expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup["links"]["user"])
             expect(rollup["scores"].size).to eq 1
             rollup["scores"].each do |score|
@@ -847,7 +857,7 @@ describe "Outcome Results API", type: :request do
       json["rollups"].each do |rollup|
         expect(rollup.keys.sort).to eq %w[links scores]
         expect(rollup["scores"].size).to eq 1
-        expect(rollup["links"].keys.sort).to eq %w[section user]
+        expect(rollup["links"].keys.sort).to eq %w[section status user]
       end
     end
   end
