@@ -20,9 +20,18 @@ be Canvas. However, if the tool is launched in a new tab, window, or popup, then
 should be directed to `window.opener`. The examples will use `window.top`, but in practice it's best
 to use `window.top || window.opener`.
 
+# Receiving Responses
+
 Most message handlers will respond with a postMessage with a subject that matches the intial subject,
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
+
+Sample code for receiving the response messages:
+```js
+window.addEventListener('message', function(event) {
+    // Process response
+});
+```
 
 # Message Types
 
