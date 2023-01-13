@@ -3739,7 +3739,7 @@ class Assignment < ActiveRecord::Base
     !!effective_post_policy&.post_manually?
   end
 
-  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false)
+  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3773,11 +3773,21 @@ class Assignment < ActiveRecord::Base
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
     delay_if_production.recalculate_module_progressions(submission_ids)
+
+    unless skip_content_participation_refresh
+      submission_ids.each_slice(1000) do |submission_id_slice|
+        ContentParticipation
+          .where(content_type: "Submission", content_id: submission_id_slice, content_item: "grade", workflow_state: "read")
+          .update_all(workflow_state: "unread")
+      end
+      course.refresh_content_participation_counts_for_users(user_ids)
+    end
+
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end
 
-  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, skip_muted_changed: false)
+  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3790,6 +3800,7 @@ class Assignment < ActiveRecord::Base
     User.clear_cache_keys(user_ids, :submissions)
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
+    course.refresh_content_participation_counts_for_users(user_ids) unless skip_content_participation_refresh
     hide_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
