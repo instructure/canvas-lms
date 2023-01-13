@@ -69,20 +69,4 @@ describe Attachments::Storage do
       expect(Attachments::Storage.detect_filename(@file)).to eq("a.png")
     end
   end
-
-  describe "detect_mimetype" do
-    it "prioritizes content_type first" do
-      allow(@file).to receive(:content_type).and_return("yep")
-      expect(Attachments::Storage.detect_mimetype(@file)).to eq("yep")
-    end
-
-    it "uses File if content_type is blank" do
-      allow(@file).to receive(:content_type).and_return("")
-      expect(Attachments::Storage.detect_mimetype(@file)).to eq("image/png")
-    end
-
-    it "unknown if there is no content_type" do
-      expect(Attachments::Storage.detect_mimetype(@file)).to eq("unknown/unknown")
-    end
-  end
 end

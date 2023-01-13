@@ -2528,14 +2528,11 @@ describe Attachment do
 
     it "detects the content_type from the body" do
       url = "http://example.com/test.png"
-      expect(CanvasHttp).to receive(:get).with(url).and_yield(FakeHttpResponse.new("200", "this is a jpeg", "content-type" => "image/jpeg"))
+      expect(CanvasHttp).to receive(:get).with(url).and_yield(FakeHttpResponse.new("200", file_fixture("cn_image.jpg").read, "content-type" => "image/jpeg"))
       att = Attachment.clone_url_as_attachment(url)
       expect(att).to be_present
       expect(att).to be_new_record
       expect(att.content_type).to eq "image/jpeg"
-      att.context = Account.default
-      att.save!
-      expect(att.open.read).to eq "this is a jpeg"
     end
 
     context "with non-200 responses" do
