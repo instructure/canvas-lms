@@ -148,8 +148,13 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
       ) {
         $link.setAttribute('aria-expanded', 'true')
 
-        if (canvasOrigin) {
-          canvadoc_session_url = canvasOrigin + canvadoc_session_url
+        if (canvasOrigin && canvadoc_session_url !== null) {
+          try {
+            canvadoc_session_url = (new URL(canvadoc_session_url, canvasOrigin)).toString();
+          }
+          catch(_ex){
+            canvadoc_session_url = null
+          }
         }
 
         const $div = document.querySelector(`[id="${$link.getAttribute('aria-controls')}"]`)
