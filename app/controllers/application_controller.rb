@@ -1047,7 +1047,7 @@ class ApplicationController < ActionController::Base
   # to.  So /courses/5/assignments would have a @context=Course.find(5).
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
-  def get_context(include_deleted: false)
+  def get_context(user_scope: nil)
     GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id] || (request.url.include?("/graphql") && params[:operationName] == "CreateSubmission")
@@ -1076,8 +1076,7 @@ class ApplicationController < ActionController::Base
           @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
           @context_membership = @context_enrollment
         elsif params[:user_id] || (is_a?(UsersController) && (params[:user_id] = params[:id]))
-          scope = include_deleted ? User : User.active
-          @context = api_find(scope, params[:user_id])
+          @context = api_find(user_scope || User.active, params[:user_id])
           params[:context_id] = params[:user_id]
           params[:context_type] = "User"
           @context_membership = @context if @context == @current_user

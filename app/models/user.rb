@@ -267,7 +267,7 @@ class User < ActiveRecord::Base
     scopes.map!(&:to_sql)
     from("(#{scopes.join("\nUNION\n")}) users")
   }
-  scope :active, -> { where("users.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
 
   scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
 

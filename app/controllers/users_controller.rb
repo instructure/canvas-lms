@@ -1319,7 +1319,7 @@ class UsersController < ApplicationController
     GuardRail.activate(:secondary) do
       # we _don't_ want to get context if the user is the context
       # so that for missing user context we can 401, but for others we can 404
-      get_context(include_deleted: true) if params[:account_id] || params[:course_id] || params[:group_id]
+      get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = api_find_all(@context&.all_users || User, [params[:id]]).first
