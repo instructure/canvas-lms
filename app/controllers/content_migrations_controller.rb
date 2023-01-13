@@ -561,7 +561,7 @@ class ContentMigrationsController < ApplicationController
         content_list: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
         create: [:manage_course_content_add],
         update: [:manage_course_content_edit],
-        asset_id_mapping: [:manage_content]
+        asset_id_mapping: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
       }
     )
   end
