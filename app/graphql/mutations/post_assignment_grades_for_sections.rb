@@ -67,7 +67,8 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
         { preserve_method_args: true },
         progress: progress,
         submission_ids: submissions_scope.pluck(:id),
-        posting_params: posting_params
+        posting_params: posting_params,
+        skip_content_participation_refresh: false
       )
       { assignment: assignment, progress: progress, sections: sections }
     else

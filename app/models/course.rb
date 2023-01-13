@@ -3888,6 +3888,10 @@ class Course < ActiveRecord::Base
     content_participation_counts.each(&:refresh_unread_count)
   end
 
+  def refresh_content_participation_counts_for_users(user_ids)
+    content_participation_counts.where(user: user_ids).find_each(&:refresh_unread_count)
+  end
+
   attr_accessor :preloaded_nickname, :preloaded_favorite
 
   def favorite_for_user?(user)

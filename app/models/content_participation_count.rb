@@ -38,10 +38,14 @@ class ContentParticipationCount < ActiveRecord::Base
       unique_constraint_retry do
         participant = context.content_participation_counts.where(user_id: user, content_type: type).lock.first
         if participant.blank?
+          unread_count = unread_count_for(type, context, user)
+          if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+            opts["unread_count"] = unread_count
+          end
           participant ||= context.content_participation_counts.build({
                                                                        user: user,
                                                                        content_type: type,
-                                                                       unread_count: unread_count_for(type, context, user),
+                                                                       unread_count: unread_count,
                                                                      })
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
@@ -89,9 +93,14 @@ class ContentParticipationCount < ActiveRecord::Base
           assignments.context_type = ? AND
           assignments.context_id = ? AND
           assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
-          assignments.submission_types != 'not_graded' AND
-          (assignments.muted IS NULL OR NOT assignments.muted)
+          assignments.submission_types != 'not_graded'
         SQL
+
+        muted_condition = " AND (assignments.muted IS NULL OR NOT assignments.muted)"
+        posted_at_condition = " AND submissions.posted_at IS NOT NULL"
+        visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+        submission_conditions << (visibility_feedback_enabled ? posted_at_condition : muted_condition)
+
         subs_with_grades = Submission.active.graded
                                      .joins(:assignment)
                                      .where(submission_conditions)
