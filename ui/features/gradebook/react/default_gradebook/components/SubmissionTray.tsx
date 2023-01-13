@@ -288,6 +288,10 @@ export default class SubmissionTray extends React.Component<
     }
   }
 
+  closeUploadModal = () => {
+    this.setState({proxyUploadModalOpen: false})
+  }
+
   toggleUploadModal = () => {
     this.setState(prevState => {
       return {proxyUploadModalOpen: !prevState.proxyUploadModalOpen}
@@ -323,7 +327,7 @@ export default class SubmissionTray extends React.Component<
     return (
       <ProxyUploadModal
         open={this.state.proxyUploadModalOpen}
-        onClose={this.toggleUploadModal}
+        onClose={this.closeUploadModal}
         assignment={this.props.assignment}
         student={this.props.student}
         submission={this.props.submission}
