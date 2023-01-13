@@ -416,6 +416,7 @@ const ProxyUploadModal = ({
         id="proxyInputFileDrop"
         data-testid="proxyInputFileDrop"
         accept=""
+        shouldAllowMultiple={true}
         onDropAccepted={files => handleDropAccept(files)}
         onDropRejected={_files => {
           setAlert({text: I18n.t('Error uploading files'), variant: 'error'})
