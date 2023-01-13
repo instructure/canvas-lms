@@ -767,13 +767,15 @@ class Conversation < ActiveRecord::Base
 
     course = context.is_a?(Course) ? context : context.context
 
-    if course.is_a?(Course) && (course.workflow_state == "completed" || course.soft_concluded?)
-      visible_sections = course.sections_visible_to user
-      has_non_concluded_section = visible_sections.map(&:concluded?).include? false
+    if course.is_a?(Course)
+      return true if course.workflow_state == "completed"
 
-      unless has_non_concluded_section
-        return true
-      end
+      user_course_roles = course.all_current_enrollments.where(user_id: user.id).pluck(:type)
+
+      has_non_concluded_enrollment = !user_course_roles.empty? && user_course_roles.any? { |ucr| !course.soft_concluded?(ucr) }
+      has_non_concluded_section = course.sections_visible_to(user).any? { |vs| !vs.concluded? }
+
+      return true unless has_non_concluded_enrollment || has_non_concluded_section
     end
 
     # can still reply if a teacher is involved
