@@ -1030,7 +1030,7 @@ describe MediaObjectsController do
         )
         user_session(@teacher)
         expect(@attachment.grants_right?(@teacher, :update)).to be(false)
-        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(false)
 
         user_session(@teacher)
         media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)

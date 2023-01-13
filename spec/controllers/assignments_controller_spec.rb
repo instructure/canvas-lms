@@ -318,7 +318,7 @@ describe AssignmentsController do
 
       it "separates manage_assignments and manage_grades permissions" do
         user_session(@teacher)
-        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments", enabled: false
+        @course.account.role_overrides.create! role: teacher_role, permission: "manage_assignments_edit", enabled: false
         get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
@@ -646,9 +646,9 @@ describe AssignmentsController do
         expect(assigns[:can_direct_share]).to be true
       end
 
-      describe "with manage_content permission disabled" do
+      describe "with manage_course_content_add permission disabled" do
         before do
-          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
         end
 
         it "does not show direct share options if the course is active" do

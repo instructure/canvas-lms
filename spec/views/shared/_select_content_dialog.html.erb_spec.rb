@@ -174,7 +174,7 @@ describe "shared/_select_content_dialog" do
     course_with_ta account: @account, active_all: true
     existing_quiz = @course.quizzes.create! title: "existing quiz"
     assign(:combined_active_quizzes, [[existing_quiz.id, "existing quiz", "quiz"]])
-    @account.role_overrides.create! role: ta_role, permission: "manage_assignments", enabled: false
+    @account.role_overrides.create! role: ta_role, permission: "manage_assignments_add", enabled: false
     view_context
     render partial: "shared/select_content_dialog"
     page = Nokogiri(response.body)

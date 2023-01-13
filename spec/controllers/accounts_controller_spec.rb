@@ -2038,7 +2038,7 @@ describe AccountsController do
 
         # sub account admin with explicit lack of creation rights
         Account.create!(name: "Strange Account", parent_account: Account.default)
-        Account.last.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses", enabled: false }]
+        Account.last.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses_admin", enabled: false }]
         Account.last.account_users.create!(user: @user)
 
         @shard2.activate do
@@ -2078,7 +2078,7 @@ describe AccountsController do
 
       it "does not mix up an admin's student creation rights with actual admin rights" do
         Account.default.update(settings: { students_can_create_courses: true })
-        Account.default.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses", enabled: false }]
+        Account.default.role_overrides.create! [{ role: admin_role, permission: "manage_courses_add", enabled: false }, { role: admin_role, permission: "manage_courses_admin", enabled: false }]
         Account.default.account_users.create!(user: @user)
         course_with_student(user: @user, active_all: true, account: Account.default)
         Account.create!(name: "Sub Account (shouldn't show up)", parent_account: Account.default)

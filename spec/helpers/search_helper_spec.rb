@@ -29,8 +29,8 @@ describe SearchHelper do
       load_all_contexts
       expect(@contexts[:courses][@course.id][:permissions]).to be_empty
 
-      load_all_contexts(permissions: [:manage_assignments])
-      expect(@contexts[:courses][@course.id][:permissions][:manage_assignments]).to be_truthy
+      load_all_contexts(permissions: [:manage_assignments_edit])
+      expect(@contexts[:courses][@course.id][:permissions][:manage_assignments_edit]).to be_truthy
     end
 
     it "only loads the section and its course when given a section context" do

@@ -897,7 +897,7 @@ describe "people" do
 
     expect(f("#courses")).to contain_css(".unenroll_link")
 
-    Account.default.role_overrides.create!(permission: "manage_students", enabled: false, role: admin_role)
+    Account.default.role_overrides.create!(permission: "remove_student_from_course", enabled: false, role: admin_role)
     refresh_page
 
     expect(f("#courses")).to_not contain_css(".unenroll_link")

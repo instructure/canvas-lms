@@ -97,7 +97,7 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def authorize_action
-    authorized_action(course, @current_user, :manage_content)
+    authorized_action(course, @current_user, [:manage_content, :manage_course_content_edit])
   end
 
   def load_contexts

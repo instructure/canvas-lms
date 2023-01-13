@@ -53,29 +53,31 @@ module Assignments
       end
 
       it "returns unpublished assignments if user can :manage_assignments" do
-        expect(@course.grants_right?(@teacher, :manage_assignments)).to be_truthy,
-                                                                        "precondition"
+        expect(@course.grants_right?(@teacher, :manage_assignments_add)).to be_truthy,
+                                                                            "precondition"
         expect(unpublished.workflow_state).to eq("unpublished"), "precondition"
         scope_filter = Assignments::ScopedToUser.new(@course, @teacher)
         expect(scope_filter.scope).to include(unpublished)
       end
 
       it "does not return unpublished assignments if user cannot :manage_assignments" do
-        expect(@course.grants_right?(@student, :manage_assignments)).to be_falsey,
-                                                                        "precondition"
+        expect(@course.grants_right?(@student, :manage_assignments_add)).to be_falsey,
+                                                                            "precondition"
         expect(unpublished.workflow_state).to eq("unpublished"), "precondition"
         scope_filter = Assignments::ScopedToUser.new(@course, @student)
         expect(scope_filter.scope).not_to include(unpublished)
       end
 
       it "returns unpublished assignments if user can :read_as_admin" do
-        @course.account.role_overrides.create!({
-                                                 role: teacher_role,
-                                                 permission: "manage_assignments",
-                                                 enabled: false
-                                               })
-        expect(@course.grants_right?(@teacher, :manage_assignments)).to be_falsey,
-                                                                        "precondition"
+        RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!({
+                                                   role: teacher_role,
+                                                   permission:,
+                                                   enabled: false
+                                                 })
+        end
+        expect(@course.grants_right?(@teacher, :manage_assignments_add)).to be_falsey,
+                                                                            "precondition"
         expect(@course.grants_right?(@teacher, :read_as_admin)).to be_truthy,
                                                                    "precondition"
         scope_filter = Assignments::ScopedToUser.new(@course, @teacher)

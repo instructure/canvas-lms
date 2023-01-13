@@ -221,10 +221,10 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
-        describe "with manage_content permission disabled" do
+        describe "with manage_course_content_add permission disabled" do
           before do
             course_with_teacher(active_all: true, user: @teacher)
-            RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+            RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
           end
 
           it "sets the env var to false if the course is active" do

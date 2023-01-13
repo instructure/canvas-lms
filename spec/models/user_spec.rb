@@ -4238,7 +4238,7 @@ describe User do
     end
 
     it "returns nil for AccountUsers without :manage_courses" do
-      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses: false })
+      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_add: false })
       expect(@user.create_courses_right(@account)).to be_nil
     end
 

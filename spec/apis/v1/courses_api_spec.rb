@@ -2111,8 +2111,10 @@ describe CoursesController, type: :request do
           @course.enroll_teacher(@user, role: @role).accept!
         end
 
-        it "cannot update the course without :manage_content" do
-          Account.default.role_overrides.create!(role: @role, permission: :manage_content, enabled: false)
+        it "cannot update the course without any manage_content permissions" do
+          RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS.each do |permission|
+            Account.default.role_overrides.create!(role: @role, permission:, enabled: false)
+          end
           raw_api_call(:put, @path, @params, @new_values)
           @course.reload
 
