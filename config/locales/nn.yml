@@ -17044,7 +17044,7 @@ nn:
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har levert eit svar, kan du ikkje endre på det seinare. Du kan ikkje lenger sjå førre spørsmål."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Når du byrjar å feilsøke blir all informasjon om neste SAML-påloggingsforsøk samla inn. Klikk på \"Oppdater\" for å sjå om det er samla inn fleire data, eller klikk på \"Stopp feilsøking\" for å fjerne innsamla data og stoppe gjeldande feilsøkingsforsøk."
-  one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Eitt eller fleire innhaldselement sende av denne eksterne appen vart ikkje behandlast på riktig måte. Desse har ikkje vorte lagra av Canvas, og årsakene til feilen er oppført nedanfor."
+  one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Eitt eller fleire innhaldselement sende av denne eksterne appen vart ikkje behandla på riktig måte. Desse har ikkje vorte lagra av Canvas, og årsakene til feilen er oppført nedanfor."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Éin eller fleire vurderingar som vart valde vart gitt av ein faglærar med inaktiv påmelding. Oppdater vala dine til dei som er gitt av noverande faglærarar."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Eit eller fleire element blir importerte akkurat no. Dei blir synlege i emnet nedanfor når dei er tilgjengelege."
   one_per_line_format_name_value_79647700: "Ein per linje. Format: namn=verdi"
@@ -17085,7 +17085,7 @@ nn:
   oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "Det skjedde ein feil under opplastning av oppgåvene. Sjekk zip fila for feil og prøv på ny."
   open_address_book_41ce8576: "Opne adressebok"
   open_color_picker_f117df0a: "Opne fargeveljar"
-  open_comment_library_9debe2: "Opne bibliotek av kommentarar"
+  open_comment_library_9debe2: "Opne kommentarbibliotek"
   open_complete_incomplete_menu_cfe2033b: "Opne fullført/ikkje fullført-meny"
   open_conversation_a6590865: "Opne Samtale"
   open_discussion_title_for_comments_6baa3fa: "Opne diskusjon %{title} for kommentarar"
@@ -17123,7 +17123,7 @@ nn:
   option_selected_49a37af2: "{alternativ} valt"
   option_selected_737b6f72: "Alternativ valt:"
   option_selected_list_collapsed_70a356b4: "%{option} er valt. Liste er skjult."
-  optional_filters_9dc03f5e: "Valgfrie filter"
+  optional_filters_9dc03f5e: "Valfrie filter"
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Vel å inkludere byte-order mark i kompatible reknearkeksportar sånn at dei kan importerast til Excel for språkvariantane som krev ein sånn koding.  "
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Vel å inkludere byte-order mark i vurderingseksportfiler sånn at dei kan importerast til Excel for språkvariantane som krev ein sånn koding.  "
   options: 
@@ -17421,7 +17421,7 @@ nn:
   page_views_csv_9835a9f9: "Sidevisningar csv"
   page_views_eb64cf53: Sidevisingar
   page_views_only_312b7577: "Kun sidevisingar"
-  page_views_service_is_temporarily_unavailable_2eb4818: "Sidevisningstenesta er utilgjengeleg for augeblinken"
+  page_views_service_is_temporarily_unavailable_2eb4818: "Sidevisningstenesta er foreløpig utilgjengeleg"
   pages: 
     cancel_button: Avbryt
     cannot_unpublish_front_page: "Kan ikkje avslutte publisering av startsida"
@@ -17499,7 +17499,7 @@ nn:
   parents_sign_up_here_f0aa8f4f: "Foreldre kan registrere seg på her"
   partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Delvis: studentar kan velje å vise namn og profilbilde"
   partially_anonymous_483a892d: "Delvis anonym"
-  partially_anonymous_discussion_13ceb585: "Delvis anonym diskusjon i"
+  partially_anonymous_discussion_13ceb585: "Delvis anonym diskusjon | "
   partially_anonymous_discussion_e821cf85: "Delvis anonym diskusjon"
   partially_enabled_and_locked_9a39d38a: "Delvis slått på og låst"
   partially_enabled_cd506819: "Delvis skrudd på"
@@ -17643,7 +17643,7 @@ nn:
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Ver sikker på at iingen kan kopiere bildet på skjermen, anten ved å vere fysisk nær, eller ved skjerm-deling."
   please_note_fbb62e4c: "Legg merke til:"
   please_provide_a_field_e5a7d0b3: "Legg til %{field}"
-  please_provide_a_pairing_code_530d1e9d: "Oppgi ein paringskode."
+  please_provide_a_pairing_code_530d1e9d: "Ver venleg og oppgi ein paringskode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Oppgi gyldig tenant-domene. Se Azure Active Directory innstillingane dine for å finne det."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Gi beskjed på Slack i #canvas-sre dersom dette skjer igjen."
   please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Gi beskjed på Slack i #canvas-sre. Kundens Canvas-instans støttar ikkje SFTP."
@@ -17657,8 +17657,8 @@ nn:
   please_upload_files_as_a_zip_5a2c799f: "Last opp filene som ZIP-filer"
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Vent til vi har lasta opp og handsama fila."
   please_wait_e6355980: Vent...
-  please_wait_while_we_upload_attachments_59544216: "Vennlegst vent mens vedlegga blir lasta opp."
-  please_wait_while_we_upload_attachments_and_media_c7e7221c: "Vennlegst vent mens vedlegg og media blir lasta opp"
+  please_wait_while_we_upload_attachments_59544216: "Ver venleg og vent mens vedlegga blir lasta opp."
+  please_wait_while_we_upload_attachments_and_media_c7e7221c: "Ver vennleg og vent mens vedlegg og media blir lasta opp"
   plugins: 
     academic_benchmark_importer: 
       description: "Dette aktiverer import av Academic Benchmark-standardar inn i Canvas."
@@ -18030,7 +18030,7 @@ nn:
       name: Arbeidsøkter
     sessions_timeout: 
       labels: 
-        mobile_timeout: "Tid etter innlogging før sesjonen utløpar om minutt (2880 [2 dagar] minimum) for mobile applikasjonar"
+        mobile_timeout: "Tid etter innlogging før sesjonen endar om minutt (2880 [2 dagar] minimum) for mobile applikasjonar"
         session_timeout: "Tid før arbeidsøkter går ut i minutt (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "Dette endrar innstillingane for ALLE KONTOANE."
@@ -18152,7 +18152,7 @@ nn:
   points_n_e0b20623: "Poeng %{n}"
   points_out_of_total_24f61148: "*%{points}* av **%{total}**"
   points_points_b6b422e2: "Poeng: %{points}"
-  points_points_d70ced4f: "%{points}poeng"
+  points_points_d70ced4f: "%{points} poeng"
   points_possible_1c0b3445: "Moglege poeng"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -18251,7 +18251,7 @@ nn:
   preview_unavailable_aacd459a: "Førehandsvising er utilgjengeleg"
   preview_website_url_eb5b8a5f: "Førehandsvising av nettstad-URL"
   preview_your_changes_373557d8: "Førehandsvis endringane"
-  preview_your_submission_and_view_teacher_feedback__28e5c3b4: "Førehandsvis innleveringa og sjå tilbakemeldinga frå faglærar. Det fins uleste kommentarar."
+  preview_your_submission_and_view_teacher_feedback__28e5c3b4: "Førehandsvis innleveringa di og sjå tilbakemeldinga frå faglærar. Det fins uleste kommentarar."
   preview_your_submission_and_view_teacher_feedback__81a45279: "Førehandsvis innleveringa og sjå tilbakemeldinga frå faglærar, om tilgjengeleg"
   previous_445ca243: førre
   previous_announcement_7efc02d9: "Førre kunngjering"
@@ -18707,7 +18707,7 @@ nn:
       publishing: Publiserer...
       unpublish: "Opphev publisering"
       unpublishing: "Opphevar publisering..."
-  publish_courses_8c1a0038: "Publiser emne"
+  publish_courses_8c1a0038: "Publiser emner"
   publish_grades_to_sis_51402d46: "Send karakterar til SIS"
   publish_icon_component: 
     publish: Publiser
@@ -19812,7 +19812,7 @@ nn:
           time_elapsed: "Tid som har gått"
           time_running: "Tid som går"
         links: 
-          hide_time_running: "Gøym tid"
+          hide_time_running: "Skjul tid"
           keep_editing_quiz: "Hald fram med å redigere quizen"
           keep_editing_survey: "Hald fram med å redigere undersøkinga"
     retrieving_filters: "Hentar filter..."
@@ -19862,7 +19862,7 @@ nn:
       errors: 
         connection_lost: "Tilkopling til %{host} er tapt.  Kontroller om du er tilkopla Internett før du held fram."
         only_numerical_values: "berre numeriske verdiar er godkjende"
-      hide_time_link: "Gøym tid"
+      hide_time_link: "Skjul tid"
       hours_count: 
         one: "1 time"
         other: "%{count} timar"
