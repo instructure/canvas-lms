@@ -299,9 +299,9 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
       end
 
-      describe "with manage_content permission disabled" do
+      describe "with manage_course_content_add permission disabled" do
         before do
-          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_add", role: teacher_role, enabled: false)
         end
 
         it "does not set DIRECT_SHARE_ENABLED if the course is active" do

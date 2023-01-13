@@ -179,7 +179,7 @@ describe "External Tools" do
       @member_tool.global_navigation = { url: "http://www.example.com", text: "Example URL 2" }
       @member_tool.save!
       @permissiony_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @permissiony_tool.global_navigation = { required_permissions: "manage_assignments,manage_calendar",
+      @permissiony_tool.global_navigation = { required_permissions: "manage_assignments_add,manage_calendar",
                                               url: "http://www.example.com",
                                               text: "Example URL 3" }
       @permissiony_tool.save!

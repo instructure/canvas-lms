@@ -1709,7 +1709,7 @@ describe DiscussionTopicsController, type: :request do
         @assignment = @topic.context.assignments.build(points_possible: 50)
         @topic.assignment = @assignment
         @topic.save!
-        account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
+        account_admin_user_with_role_changes(role_changes: RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS.index_with(false))
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },

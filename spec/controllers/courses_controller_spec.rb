@@ -855,7 +855,7 @@ describe CoursesController do
     it "sets tool creation permissions true for roles that are granted rights" do
       user_session(@teacher)
       get "settings", params: { course_id: @course.id }
-      expect(controller.js_env[:PERMISSIONS][:create_tool_manually]).to be(true)
+      expect(controller.js_env[:PERMISSIONS][:add_tool_manually]).to be(true)
     end
 
     it "does not set tool creation permissions for roles not granted rights" do

@@ -27,8 +27,8 @@ describe "assignment group that can't manage assignments" do
   it "does not display the manage cog menu" do
     @domain_root_account = Account.default
     course_factory
-    account_admin_user_with_role_changes(role_changes: { manage_course: true,
-                                                         manage_assignments: false })
+    account_admin_user_with_role_changes(role_changes: { manage_courses_admin: true,
+                                                         manage_assignments_edit: false })
     user_session(@user)
     @course.require_assignment_group
     @assignment_group = @course.assignment_groups.first
