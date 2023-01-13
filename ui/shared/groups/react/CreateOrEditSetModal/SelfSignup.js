@@ -33,9 +33,9 @@ const I18n = useI18nScope('groups')
 const HelpText = () => (
   <div style={{maxWidth: '300px'}}>
     <p>
-      {I18n.t(`You can create sets of groups where students can sign up on their own. Students are still limited\
-              to being in only one group in the set, but this way students can organize themselves into groups\
-              instead of needing the teacher to do the work.`)}
+      {I18n.t(
+        'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work.'
+      )}
     </p>
     <p>
       {I18n.t(
