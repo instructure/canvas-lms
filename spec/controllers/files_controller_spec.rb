@@ -727,7 +727,7 @@ describe FilesController do
       it "is included in newly uploaded files" do
         user_session(@teacher)
 
-        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "test.txt")
+        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "doc.doc")
         attachment.uploaded_data = io
         attachment.save!
 

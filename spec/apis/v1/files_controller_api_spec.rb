@@ -669,7 +669,6 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        attachment_model display_name: "thing.txt", content_type: "text/plain", context: @course, folder: @f1
         attachment_model display_name: "thing.png", content_type: "image/png", context: @course, folder: @f1
         attachment_model display_name: "thing.gif", content_type: "image/gif", context: @course, folder: @f1
       end
@@ -684,7 +683,7 @@ describe "Files API", type: :request do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
         res = json.map { |f| f["display_name"] }
-        expect(res).to eq %w[thing.gif thing.txt]
+        expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
       end
     end
 
@@ -945,7 +944,6 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        attachment_model display_name: "thing.txt", content_type: "text/plain", context: @course, folder: @f1
         attachment_model display_name: "thing.png", content_type: "image/png", context: @course, folder: @f1
         attachment_model display_name: "thing.gif", content_type: "image/gif", context: @course, folder: @f1
       end
@@ -960,7 +958,7 @@ describe "Files API", type: :request do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(content_types: ["text", "image/gif"]))
         res = json.map { |f| f["display_name"] }
-        expect(res).to eq %w[thing.gif thing.txt]
+        expect(res).to eq %w[atest3.txt mtest2.txt thing.gif ztest.txt]
       end
     end
 

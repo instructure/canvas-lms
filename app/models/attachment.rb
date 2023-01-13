@@ -2335,42 +2335,32 @@ class Attachment < ActiveRecord::Base
         match = to_attachments.detect { |a| attachment.matches_full_display_path?(a.full_display_path) }
         next if match && (match.md5&.== attachment.md5)
 
-        if from_context.shard == to_context.shard
-          og_attachment = attachment
-          og_attachment.context = to_context
-          og_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
-          og_attachment.user_id = to_context.id if to_context.is_a? User
-          og_attachment.save_without_broadcasting!
-          if match
-            og_attachment.folder.reload
-            og_attachment.handle_duplicates(:rename)
-          end
-        else
-          if to_context.is_a? User
-            attachment.user_id = to_context.id
-            attachment.save_without_broadcasting!
-          end
-          new_attachment = Attachment.new
-          new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES))
+        if to_context.is_a? User
+          attachment.user_id = to_context.id
+          attachment.save_without_broadcasting!
+        end
 
-          new_attachment.user_id = to_context.id if to_context.is_a? User
-          new_attachment.context = to_context
-          new_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
-          new_attachment.namespace = new_attachment.infer_namespace
-          if (existing_attachment = new_attachment.find_existing_attachment_for_md5)
-            new_attachment.root_attachment = existing_attachment
-          else
-            new_attachment.write_attribute(:filename, attachment.filename)
-            Attachments::Storage.store_for_attachment(new_attachment, attachment.open)
-          end
-
-          new_attachment.content_type = attachment.content_type
-
-          new_attachment.save_without_broadcasting!
-          if match
-            new_attachment.folder.reload
-            new_attachment.handle_duplicates(:rename)
-          end
+        change_attachment = if from_context.shard == to_context.shard
+                              attachment.context = to_context
+                              attachment
+                            else
+                              new_attachment = Attachment.new
+                              new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES))
+                              new_attachment.context = to_context
+                              new_attachment.namespace = new_attachment.infer_namespace
+                              if (existing_attachment = new_attachment.find_existing_attachment_for_md5)
+                                new_attachment.root_attachment = existing_attachment
+                              else
+                                new_attachment.filename = attachment.filename
+                                Attachments::Storage.store_for_attachment(new_attachment, attachment.open)
+                              end
+                              new_attachment
+                            end
+        change_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
+        change_attachment.save_without_broadcasting!
+        if match
+          change_attachment.folder.reload
+          change_attachment.handle_duplicates(:rename)
         end
       end
     end
