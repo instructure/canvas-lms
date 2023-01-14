@@ -252,6 +252,7 @@ da-x-k12:
         partner_key: Partner-nøgle
   academic_engagement_capella_74946a80: "Akademisk engagement (Capella)"
   academic_engagement_strayer_8c7832b9: "Akademisk engagement (Strayer)"
+  academic_success_reporting_2585c499: "Rapportering af akademisk succes"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High Grade-rapport"
   accept_2fdd362e: Acceptér
   accept_course_invitation_b4c04fbb: "Accepter faginvitation"
@@ -1091,7 +1092,7 @@ da-x-k12:
           account_reports: 
             default: 
               parameters: 
-                header: "Skoleår (grænse 4)"
+                header: "Skoleår (grænse 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1752,6 +1753,15 @@ da-x-k12:
             excelsior: 
               outcome: 
                 text: "SIS-ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Skoleår
+          student_assignment_grade: 
+            login_ids: 
+              field: Login-ID'er
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2333,6 +2343,7 @@ da-x-k12:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Gør det muligt at sortere svar på diskussioner efter oprettelsestidsstempler
       . Standardrækkefølgen er nyeste til ældste for svar på rodniveau.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Tillader vurderingsgivere at skrive MI i vurderingsoversigten eller SpeedGrader for manuelt at markere en opgave som manglende"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Giver instruktører mulighed for at give en score til ikke bedømte afleveringer en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Giver instruktører mulighed for at give resultater for adskillige ikke-bedømte afleveringer fra Opgavegruppe- og I alt-kolonnemenuerne i vurderingsoversigten."
@@ -4926,6 +4937,7 @@ da-x-k12:
   by_default_students_can_always_create_groups_in_a__af000dd: "Elever kan som standard altid oprette grupper i et fag. For at begrænse elever i at oprette grupper skal Administrer fag: Admin - administrer / opdater være aktiveret, og afkrydsningsfeltet Lad eleverne organisere deres egne grupper i Fagindstillinger skal være fravalgt."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Elever kan som standard altid oprette grupper i et fag. For at begrænse at elever opretter grupper skal Fag - administrer / opdater være aktiveret, og afkrydsningsfeltet Lad eleverne organisere deres egne grupper i Fagindstillinger skal ikke være markeret."
   by_lti_2_registration_url_e421e523: "Fra LTI 2 Registration URL"
+  by_name_54daec42: "af %{name}"
   by_url_a163275e: "Efter URL"
   c4e_analytics_66e0fc46: C4E-analyse
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5895,6 +5907,7 @@ da-x-k12:
   collapse_replies_20f2faf7: "Skjul svar"
   collapse_replies_ef4fc36b: "Skjul svar"
   collapse_subdiscussion_89af1f5c: "Skjul underdiskussion"
+  collapse_threads_ef7ca000: "Skjul tråde"
   collapse_tutorial_tray_66ee7dc1: "Skjul selvstudiumområde"
   collapsed_510aa02a: Skjult
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Samling af responsive forbedringer i Canvas"
@@ -7354,6 +7367,9 @@ da-x-k12:
   count_unread_messages_e312aa7b: 
     one: "En ulæst besked."
     other: "%{count} ulæste beskeder."
+  count_unread_release_notes_3be26022: 
+    one: "En ulæst udgivelsesnote."
+    other: "%{count} ulæste udgivelsesnoter."
   count_unread_replies_86976ab: "%{count} ulæste svar"
   count_unread_shares_ff9e91a5: 
     one: "En ulæst deling."
@@ -8929,6 +8945,7 @@ da-x-k12:
   deployment_id_for_toolname_app_e54a7364: "Installations-ID for %{toolName}-app"
   deprecate_sms_be6b00a: "Udfas SMS"
   deprecated_59e99d2a: Forældet
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Fraprioriter sektionstilsidesættelser for ikke-aktive tilmeldinger"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Faldende
   description_436c48d7: Beskrivelse
@@ -9210,6 +9227,7 @@ da-x-k12:
       page_header_title: "Ny diskussion"
       points_possible: "Mulige point"
       post_at: "Læg ud kl."
+      publish: Offentliggør
       save: Gem
       saving: "Gemmer ..."
       sort_by_likes: "Sorter efter 'synes godt om'"
@@ -9928,6 +9946,7 @@ da-x-k12:
   enabled_unlocked_8d3a5df7: "Aktiveret (ulåst)"
   enabled_web_services_f620b2be: "Aktiverede webtjenester"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer en nydesignet dialogboks med besked til elever, der giver mulighed for også at sende beskeder til observatører."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Giver adgang til New Quizzes Public API via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer visning af plagieringsrapporter og lighedsresultater i den nye afleveringsbakke i vurderingsoversigten."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Gør det muligt at anvende vigtige datoer til opgaver, kalenderbegivenheder og andet."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gør det muligt for modal at advare brugeren, når et kommentarudkast ikke bliver indsendt i SpeedGrader."
@@ -10394,6 +10413,7 @@ da-x-k12:
   error_98e81528: Fejl
   error_adding_canvas_file_to_submission_draft_de258021: "Fejl ved tilføjelse af Canvas-fil til afleveringsudkast"
   error_adding_file_to_discussion_message_16feef3f: "Fejl ved tilføjelse af fil til diskussionens besked"
+  error_adding_files_2cd4d45: "Fejl ved tilføjelse af filer"
   error_adding_files_97ba198e: "Fejl ved tilføjelse af filer."
   error_adding_files_to_conversation_message_58e83876: "Fejl ved tilføjelse af filer til diskussionens besked"
   error_adding_files_to_discussion_message_8bb819e4: "Fejl ved tilføjelse af filer til diskussionens besked"
@@ -10649,6 +10669,7 @@ da-x-k12:
   expand_permission_b45bf097: "Udvid %{permission}"
   expand_permission_c61d5958: "Udvid tilladelse"
   expand_subdiscussion_cd226ed4: "Udvid underdiskussion"
+  expand_threads_634fe7a1: "Vis tråde"
   expand_tutorial_tray_22630c49: "Udvid selvstudiumområde"
   expanded_f4493860: Udvidet
   expected_array_of_objects_b09ead01: "Forventet objektmatrix"
@@ -12729,6 +12750,11 @@ da-x-k12:
       I stedet for at give en generisk 404 - Ikke fundet, giver API'en i stedet fejlbeskeden 422
       sammen med en nyttig besked, som angiver, at værktøjet ikke kan få adgang til afsluttede
       fag.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Hvis aktiveret, vil deep linking-svaret JS sende postMessages
+      til window.parent i stedet for window.top. Dette gør det muligt for deep linking-svaret
+      at sende indholdselementer korrekt til New Quizzes, når et værktøj
+      lanceres fra NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Hvis aktiveret, vil OAuth 2.0 nu returnere 4xx-statuskoder korrekt til
       klienten, der anmoder, i stedet for at omdirigere dem til sig selv
@@ -12764,6 +12790,7 @@ da-x-k12:
       Hvis RCE-forbedringer også er aktiveret,
       gemmer RCE automatisk dit arbejde hen ad vejen
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Hvis indstillet, kan indsendelsesstatus ændres i Speedgrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Hvis indstillet, nedprioriteres brugen af forfaldsdatoer, låsningsdatoer og oplåsningsdatoer fra sektionstilsidesættelser på en opgave, der er knyttet til en deaktiveret, afsluttet eller på anden måde ikke-aktiv tilmelding for en elev."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Hvis indstillet, vises originalitetsrapporter med opgaveforbedringer slået til"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Hvis indstillet, vises det opdaterede mastery connect-ikon"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Hvis indstillet, vil Quizzes.Next fungere ved hjælp af en enkelt startsession i SpeedGrader"
@@ -13529,6 +13556,7 @@ da-x-k12:
   key_state_for_the_current_account_d16b1cd5: "Nøglestatus for den aktuelle konto"
   keyboard_nav_dialog: 
     esc_key_notification: "Tryk på tasten Esc, inden du bruger genvejstaster, når du navigerer i vurderingsoversigtens gitter."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Tastaturgenvej til manglende opgave"
   keyboard_shortcuts_ed1844bd: Genvejstaster
   kind_7f0a88c4: Type
   know_your_users_5c1323be: "Kend dine brugere"
@@ -16724,6 +16752,7 @@ da-x-k12:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes-overførsel aktiveret som standard"
   new_quizzes_migration_required_7854aa1a: "New Quizzes-overførsel påkrævet"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på siden Quizzer"
+  new_quizzes_public_api_18d95321: "New Quizzes Public API"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes-tjeneste JWT opdatering"
   new_quizzes_site_admin_service_user_a331233a: "Site admin servicebruger i New Quizzes"
   new_quizzes_submission_274b5c57: "New Quizzes-aflevering"
@@ -17444,6 +17473,7 @@ da-x-k12:
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Når aktiveret, er denne mulighed synlig i vurderingsoversigten for instruktører."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har afleveret et svar, vil du ikke kunne ændre det senere. Du vil ikke være i stand til at se det forrige spørgsmål."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Når du begynder fejlfinding, vil alle oplysninger om det næste forsøg på login blive indsamlet. Klik på \"Opdater\" (Refresh) for at se om flere data er blevet indsamlet eller \"Stop fejlfinding\" (Stop debugging) for at rydde de indsamlede data og stoppe det aktuelle fejlfindingsforsøg."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "En af de medfølgende redirect_uris er for lang. Sørg for, at du har indtastet den eller de korrekte værdier for din redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Et eller flere indholdselementer sendt af denne eksterne app kunne ikke behandles korrekt. Disse er ikke blevet gemt af Canvas, og årsagerne til fejl er anført nedenfor."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "En eller flere valgte vurderinger blev leveret af en vurderingsgiver med inaktive tilmeldinger. Opdater dine valg til dem, der tilbydes af nuværende vurderingsgivere."
   one_or_more_items_are_currently_being_imported_the_186fe069: "En eller flere elementer importeres i øjeblikket. De bliver vist i faget nedenfor, når de er tilgængelige."
@@ -18709,6 +18739,7 @@ da-x-k12:
   private_3883d133: Privat
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Fortsæt
+  proceed_with_caution_aa9b3285: "Fortsæt med forsigtighed"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandl flere indholdselementer fra siden med fagforløb"
   processed_4725b02: Forarbejdet
   processing_2fcc9739: Behandler
@@ -20891,6 +20922,7 @@ da-x-k12:
   reset_all_6e5e040a: "Nulstil alle"
   reset_all_unpublished_changes_243f179f: "Vil du nulstille alle ikke offentliggjorte ændringer?"
   reset_courses_fe29ddf9: "Nulstil fag"
+  reset_lti_provision_6d8e287f: "Nulstil LTI-tildeling"
   reset_multi_factor_authentication_2b63a558: "Nulstil multi-faktor-autentifikation"
   reset_name_6a0aa0f: "Nulstil \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Nulstil valg af quizprogram"
@@ -23281,6 +23313,7 @@ da-x-k12:
   submission_type_lti_placement_b448d5d0: "Afleveringsform LTI-placering"
   submission_type_selection_72ce19f: "Valg af afleveringsform"
   submission_updated_8897f3b7: "Aflevering opdateret"
+  submission_uploaded_542c9ac6: "Aflevering uploadet!"
   submission_user_name_assignment_title_2cf5e3e9: "Aflevering: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Opgaven blev afleveret."
@@ -23416,6 +23449,8 @@ da-x-k12:
   submit_ticket_5515ffd: "Opret supportsag"
   submitted_318fad53: Afleveret
   submitted_at_4d5ea3aa: Afleveret
+  submitted_by_name_dab6d5e1: "Afleveret af: %{name}"
+  submitted_by_submitter_1dcd07a1: "Afleveret af %{submitter}"
   submitted_d5ba370a: "Afleveret:"
   submitted_date_ba55b0ae: "Afleveret %{date}"
   submitted_datetime_fa2e9287: "Afleveret: %{dateTime}"
@@ -23715,6 +23750,7 @@ da-x-k12:
   test_cluster_only_70e61c19: "Test kun klynge"
   test_feature_flag_980151e0: Testfunktionsflag
   testing_state_effd4a82: "Tester status"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Tekst
   text_df773ce4: tekst
   text_document_eacbcdb7: Tekstdokument
@@ -24008,6 +24044,7 @@ da-x-k12:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Genvejsikonet for iOS/Android-enheder. 180x180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Den angivne opgave kunne ikke findes"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "Den angivne opgave (%{id}) kunne ikke findes"
+  the_specified_resource_does_not_exist_71d8b751: "Den angivne ressource findes ikke."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den specificerede bruger (%{id}) er ikke en elev i dette fag"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den specificerede bruger er ikke en elev i dette fag"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Startdatoen for tempoplanen skal være efter slutdatoen."
@@ -24558,6 +24595,7 @@ da-x-k12:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette vil opdatere alle vurderingskriterier, der bruger dette læringsudbytte, der endnu ikke er vurderet"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Dette opdaterer alle elevernes resultater for opfyldelse af læringsmål, der er knyttet til beregningen på kontoniveau."
   this_will_update_all_student_mastery_results_withi_934580d1: "Dette opdaterer alle elevernes resultater for opfyldelse af læringsmål inden for dette fag."
+  thread_addd9799: Tråd
   threshold_in_hours_to_notify_students_within_f33820aa: "Tærskel (i timer) til at underrette eleverne"
   threshold_pts_45f0e5d8: "tærskel: %{pts}"
   throttle_jobs_f61be56: "Begræns job"
@@ -25952,6 +25990,7 @@ da-x-k12:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Brug dette panel til at søge efter deltagere, du ønsker at tilføje til dette fag."
   use_this_photo_3a594830: "Brug dette billede"
   use_webcam_1ed0bf6b: "Brug webcam"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Brug window.parent i Deep Linking Response"
   used_by_permission_314a78dd: "Brugt i henhold til tilladelse"
   user: 
     default_user_name: Bruger
