@@ -252,6 +252,7 @@ sv-x-k12:
         partner_key: "Partner nyckel"
   academic_engagement_capella_74946a80: "Studieengagemang (Capella)"
   academic_engagement_strayer_8c7832b9: "Studieengagemang (Strayer)"
+  academic_success_reporting_2585c499: "Rapportering om akademiska framgångar"
   acalanes_union_high_grade_report_ae9bce11: "Bedömningsrapport för Acalanes Union High"
   accept_2fdd362e: Acceptera
   accept_course_invitation_b4c04fbb: "Acceptera kursinbjudan"
@@ -1088,7 +1089,7 @@ sv-x-k12:
           account_reports: 
             default: 
               parameters: 
-                header: "Villkor (gräns 4)"
+                header: "Villkor (gräns 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1749,6 +1750,15 @@ sv-x-k12:
             excelsior: 
               outcome: 
                 text: "SIS-ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Termin
+          student_assignment_grade: 
+            login_ids: 
+              field: "Inloggnings-ID:er"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2330,6 +2340,7 @@ sv-x-k12:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Tillåter sortering av diskussionssvar efter
       tidsstämplar. Standardordning är senaste till äldsta för svar på rotnivå.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Bedömare kan ange MI i bedömningsboken eller SpeedGrader tagga en uppgift manuellt som saknad"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gör att hjälplänkar kan taggas som befintliga eller nya och visar tydligt befintliga hjälplänkar i hjälpmenyn."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Gör det möjligt för lärare att tillämpa resultat på ej bedömda inlämningar i bulk."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Gör att lärare kan sätta masspoängsätta ej bedömda inlämningar från menyerna Uppgiftsgrupp och Totalt antal kolumner i bedömningsboken."
@@ -4923,6 +4934,7 @@ sv-x-k12:
   by_default_students_can_always_create_groups_in_a__af000dd: "Elever kan alltid som standard skapa grupper i en kurs. För att hindra elever från att skapa grupper, måste Hantera kurser: Administratör – hantera/uppdatera vara aktiverad och kryssrutan Låt användare ordna sina egna grupper i kursinställningarna måste vara omarkerad."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Elever kan alltid som standard skapa grupper i en kurs. För att hindra att elever skapar grupper måste även Kurser – hantera/uppdatera vara aktiverad och kryssrutan Låt elever ordna sina egna grupper i kursinställningarna måste vara inaktiverad."
   by_lti_2_registration_url_e421e523: "Efter registrerings-URL för LTI 2"
+  by_name_54daec42: "av %{name}"
   by_url_a163275e: "Efter URL"
   c4e_analytics_66e0fc46: C4E-analyser
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5892,6 +5904,7 @@ sv-x-k12:
   collapse_replies_20f2faf7: "Dölj svar"
   collapse_replies_ef4fc36b: "Dölj svar"
   collapse_subdiscussion_89af1f5c: "Stäng underdiskussion"
+  collapse_threads_ef7ca000: "Dölj trådar"
   collapse_tutorial_tray_66ee7dc1: "Stäng självstudiefack"
   collapsed_510aa02a: Förminskad
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Sammanfattning av åtgärder i Canvas"
@@ -7351,6 +7364,9 @@ sv-x-k12:
   count_unread_messages_e312aa7b: 
     one: "Ett oläst meddelande."
     other: "%{count} olästa meddelanden."
+  count_unread_release_notes_3be26022: 
+    one: "En oläst versionsinformation"
+    other: "%{count} olästa versionsmeddelanden."
   count_unread_replies_86976ab: "%{count} olästa svar"
   count_unread_shares_ff9e91a5: 
     one: "En oläst delning"
@@ -8926,6 +8942,7 @@ sv-x-k12:
   deployment_id_for_toolname_app_e54a7364: "Distributions-ID för %{toolName} app"
   deprecate_sms_be6b00a: "Fasa ut SMS"
   deprecated_59e99d2a: Utfasad
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Nedprioritera sektionsåsidosättningar för ej aktiva registreringar"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Fallande
   description_436c48d7: Beskrivning
@@ -9207,6 +9224,7 @@ sv-x-k12:
       page_header_title: "Ny diskussion"
       points_possible: "Möjliga poäng"
       post_at: "Lägg upp kl."
+      publish: Publicera
       save: Spara
       saving: "Sparar ..."
       sort_by_likes: "Sortera efter antal ”gilla”"
@@ -9925,6 +9943,7 @@ sv-x-k12:
   enabled_unlocked_8d3a5df7: "Aktiverad (olåst)"
   enabled_web_services_f620b2be: "Aktiverade webbtjänster"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverar en omdesignad dialog för ”Meddela elever som ...” som möjliggör meddelanden till observatörer utöver elever."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Ger åtkomst till offentlig API för New Quizzes via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Gör att plagiatrapporter och likhetsresultat kan visas i inlämningsfacket för nya omdömesboken."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Gör att viktiga datum kan tillämpas i uppgifter, kalenderhändelser och annat."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Gör att modalen kan varna användaren när en utkastkommentar har lämnats opublicerad i SpeedGrader."
@@ -10391,6 +10410,7 @@ sv-x-k12:
   error_98e81528: Fel
   error_adding_canvas_file_to_submission_draft_de258021: "Det gick inte att lägga till Canvas-filen till inlämningsutkastet"
   error_adding_file_to_discussion_message_16feef3f: "Ett fel inträffade när filen skulle läggas till i diskussionsmeddelandet"
+  error_adding_files_2cd4d45: "Ett fel inträffade när filer skulle läggas till"
   error_adding_files_97ba198e: "Ett fel inträffade när filer skulle läggas till."
   error_adding_files_to_conversation_message_58e83876: "Ett fel inträffade när filer skulle läggas till i konversationsmeddelandet"
   error_adding_files_to_discussion_message_8bb819e4: "Ett fel inträffade vid när filer skulle läggas till i diskussionsmeddelande"
@@ -10646,6 +10666,7 @@ sv-x-k12:
   expand_permission_b45bf097: "Expandera %{permission}"
   expand_permission_c61d5958: "Ta fram behörighet"
   expand_subdiscussion_cd226ed4: "Ta fram underdiskussion"
+  expand_threads_634fe7a1: "Visa trådar"
   expand_tutorial_tray_22630c49: "Ta fram självstudiefack"
   expanded_f4493860: Förstorad
   expected_array_of_objects_b09ead01: "Förväntad objektmatris"
@@ -12726,6 +12747,11 @@ sv-x-k12:
       Hellre än att returnera en generisk 404-Hittades inte-sida, kommer API:t istället att returnera en 422
       tillsammans med ett användbart meddelande som indikerar att verktyget inte kan nås när kursen är
       slutförd.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Om denna funktion är aktiverad skickar den djuplänkade svars-JS postMessages
+      till window.parent istället för window.top. Detta aktiverar djuplänkningssvaret
+      som skickar innehållsobjekt direkt till New Quizzes när ett verktyg
+      lanseras från NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Om OAuth 2.0 aktiveras kommer 4xx-statuskoder att returneras korrekt till den
       begärande klienten istället för att omdirigera till sig själva
@@ -12761,6 +12787,7 @@ sv-x-k12:
       Om även RCE-förbättring har aktiverats,
       kommer RCE att spara ditt arbete automatiskt under tiden du arbetar
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Om inställningen anges kan inlämningsstatusen ändras inifrån SpeedGrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Om denna funktion har konfigurerats, nedprioriteras användning av inlämningsdatum, låsdatum och upplåsningsdatum från sektionsåsidosättningar för en uppgift som är kopplade till en avaktiverad, slutförd eller på annan sätt ej aktiv registrering för en elev."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Om denna inställning ställs in, visas ursprungsrapporter i funktionen Uppgiftsförbättring"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Om angiven visar den en uppdaterad ikon för Mastery Connnect"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Om angiven, kommer Quizzes.Next att använda en enkel startsession i SpeedGrader"
@@ -13526,6 +13553,7 @@ sv-x-k12:
   key_state_for_the_current_account_d16b1cd5: "Nyckeltillstånd för det aktuella kontot"
   keyboard_nav_dialog: 
     esc_key_notification: "Tryck på esc-knappen innan du använder tangentbordsgenvägar i när du navigerar i bedömningsöversikten."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Tangentbordsgenväg för saknad uppgift"
   keyboard_shortcuts_ed1844bd: Kortkommandon
   kind_7f0a88c4: Sort
   know_your_users_5c1323be: "Få överblick över dina deltagare"
@@ -13974,7 +14002,7 @@ sv-x-k12:
   loading_options_c823e98b: "Läser in alternativ..."
   loading_outcome_results_96e21ce4: "Läser in lärandemålsresultat"
   loading_release_notes_7deaa2eb: "Läser in versionsinformation"
-  loading_replies_8bdf17bc: "Laddar svar ..."
+  loading_replies_8bdf17bc: "Laddar svar ..."
   loading_results_769c8819: "Läser in resultat"
   loading_section_header_616c8cdd: "Läser in sektionsrubrik"
   loading_staff_1ce7d803: "Läser in personal ..."
@@ -16721,6 +16749,7 @@ sv-x-k12:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migrering av New Quizzes är aktiverat som standard"
   new_quizzes_migration_required_7854aa1a: "Migrering av New Quizzes krävs"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på sidan Quiz"
+  new_quizzes_public_api_18d95321: "Offentlig API för New Quizzes"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uppdatering av New Quizzes Service JWT"
   new_quizzes_site_admin_service_user_a331233a: "Webbplatsadministratör för användare av New Quizzes-tjänst"
   new_quizzes_submission_274b5c57: "Inlämning för New Quizzes"
@@ -17441,6 +17470,7 @@ sv-x-k12:
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "När det här alternativet är aktiverat visas det i bedömningsboken för lärare."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "När du har skickat in ett svar kan du inte ändra det senare. Du kommer inte att kunna se föregående fråga."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "När du påbörjat felsökning samlas all information om nästa inloggningsförsök in. Klicka på \"Uppdatera\" för att se om fler uppgifter har samlats in, eller på ”Slutför felsökning” för att rensa insamlade uppgifter och stoppa det aktuella felsökningsförsöket."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "En av de tillhandahållna redirect_uris är för lång. Se till att du har angett korrekta värden för din redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Ett eller fler innehållsobjekt som skickats av den här externa appen behandlades inte korrekt. Dessa har inte sparats av Canvas och anledningarna till felet är listat nedan."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "En eller flera av de valda bedömningar tillhandahölls av en bedömare med inaktiva registreringar. Uppdatera dina val till att endast innehålla aktuella bedömare."
   one_or_more_items_are_currently_being_imported_the_186fe069: "En eller fler objekt importeras för närvarande. De visas i kursen nedan när de blir tillgängliga."
@@ -18706,6 +18736,7 @@ sv-x-k12:
   private_3883d133: Privat
   pro_tip_30e41fa3: PROFFSTIPS!
   proceed_f3d33864: Fortsätt
+  proceed_with_caution_aa9b3285: "Fortsätt med försiktighet"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandla flera innehållsobjekt från kursmodulsidan"
   processed_4725b02: Bearbetad
   processing_2fcc9739: Bearbetar
@@ -20881,6 +20912,7 @@ sv-x-k12:
   reset_all_6e5e040a: "Återställ alla"
   reset_all_unpublished_changes_243f179f: "Vill du återställa alla opublicerade ändringar?"
   reset_courses_fe29ddf9: "Återställ kurser"
+  reset_lti_provision_6d8e287f: "Återställ LTI-etablering"
   reset_multi_factor_authentication_2b63a558: "Återställ multifaktorautentisering"
   reset_name_6a0aa0f: "Återställ ”%{name}”\""
   reset_quiz_engine_choice_323a40e6: "Återställ val av quizmotor"
@@ -23275,6 +23307,7 @@ sv-x-k12:
   submission_type_lti_placement_b448d5d0: "LTI-placering för inlämningstyp"
   submission_type_selection_72ce19f: "Urval för inlämningstyp"
   submission_updated_8897f3b7: "Inlämningen har uppdaterats"
+  submission_uploaded_542c9ac6: "Inlämningen laddades upp!"
   submission_user_name_assignment_title_2cf5e3e9: "Inlämning: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Uppgiften har lämnats in."
@@ -23410,6 +23443,8 @@ sv-x-k12:
   submit_ticket_5515ffd: "Skicka ärende"
   submitted_318fad53: Inskickad
   submitted_at_4d5ea3aa: Inlämnad
+  submitted_by_name_dab6d5e1: "Inlämnad av: %{name}"
+  submitted_by_submitter_1dcd07a1: "Inlämnad av %{submitter}"
   submitted_d5ba370a: "Skickad:"
   submitted_date_ba55b0ae: "Skickad %{date}"
   submitted_datetime_fa2e9287: "Skickad: %{dateTime}"
@@ -23709,6 +23744,7 @@ sv-x-k12:
   test_cluster_only_70e61c19: "Endast testkluster"
   test_feature_flag_980151e0: Testfunktionsflagga
   testing_state_effd4a82: Testningsstatus
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Text
   text_df773ce4: text
   text_document_eacbcdb7: Textdokument
@@ -24000,6 +24036,7 @@ sv-x-k12:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Genvägsikonen för iOS/Android-enheter. 180x180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Det gick inte att hitta den angivna uppgiften"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "Det gick inte att hitta den angivna uppgiften (%{id})"
+  the_specified_resource_does_not_exist_71d8b751: "Den angivna resursen finns inte."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den angivna användaren (%{id}) är inte en elev i den här kursen"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den angivna användaren är inte en elev i den här kursen"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Taktplanens startdatum måste infalla efter slutdatumet."
@@ -24549,6 +24586,7 @@ sv-x-k12:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla matriser som använder detta lärandemål som ännu inte har utvärderats"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Detta uppdaterar alla måluppfyllelseresultat som är kopplade till måluppfyllelseberäkningen på kontonivå."
   this_will_update_all_student_mastery_results_withi_934580d1: "Detta uppdaterar alla måluppfyllelseresultat för eleven i den här kursen."
+  thread_addd9799: Tråd
   threshold_in_hours_to_notify_students_within_f33820aa: "Tröskelvärde (i timmar) som elever ska aviseras inom"
   threshold_pts_45f0e5d8: "tröskel: %{pts}"
   throttle_jobs_f61be56: "Begränsa jobb"
@@ -25941,6 +25979,7 @@ sv-x-k12:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Använd den här panelen för att söka efter personer som du vill lägga till den här kursen."
   use_this_photo_3a594830: "Använd det här fotot"
   use_webcam_1ed0bf6b: "Använd webbkameran"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Använd window.parent i djuplänkningssvar"
   used_by_permission_314a78dd: "Används med tillstånd"
   user: 
     default_user_name: Användare
