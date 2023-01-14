@@ -270,6 +270,7 @@ zh-Hans:
         partner_key: 合作伙伴密钥
   academic_engagement_capella_74946a80: 学业投入（卡佩拉大学）
   academic_engagement_strayer_8c7832b9: 学业投入（斯特雷耶大学）
+  academic_success_reporting_2585c499: 学术成绩报告
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union 高分报告"
   accept_2fdd362e: 接受
   accept_course_invitation_b4c04fbb: 接受课程邀请
@@ -1184,7 +1185,7 @@ zh-Hans:
           account_reports: 
             default: 
               parameters: 
-                header: "条款（限制 4）"
+                header: 条款（限制5）
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1907,6 +1908,15 @@ zh-Hans:
             excelsior: 
               outcome: 
                 text: 课程号：
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: 学期
+          student_assignment_grade: 
+            login_ids: 
+              field: 登录ID
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2508,6 +2518,7 @@ zh-Hans:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       允许根据创建时间戳
       给讨论回复排序。根级别回复的默认顺序为从新到旧。
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: 允许评分人在成绩册或SpeedGrader中输入MI以将作业手动标记为“未交”
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允许将帮助链接标记为“特色”或“新”，并且在帮助菜单中突出显示特色帮助链接。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 允许讲师一次性对所有未评分的提交项应用分数。
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 允许讲师从评分册的作业组和总计列菜单同时对所有未评分的提交项应用分数。
@@ -5352,6 +5363,7 @@ zh-Hans:
   by_default_students_can_always_create_groups_in_a__af000dd: "默认情况下，学生可以随时在课程中创建组。要限制学生创建组，必须启用“管理课程：管理员 - 管理/更新”，并且取消选中“课程设置”中的“允许学生整理自己的组”复选框。"
   by_default_students_can_always_create_groups_in_a__dac761d3: "默认情况下，学生可以随时在课程中创建组。要限制学生创建组，必须启用“课程 - 管理/更新”，且不能选中课程设置中的“让学生自行整理组”复选框。"
   by_lti_2_registration_url_e421e523: "按照 LTI 2 注册 URL"
+  by_name_54daec42: "由%{name}提供"
   by_url_a163275e: "通过 URL"
   c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -6410,6 +6422,7 @@ zh-Hans:
   collapse_replies_20f2faf7: 折叠回复
   collapse_replies_ef4fc36b: 隐藏回复
   collapse_subdiscussion_89af1f5c: 折叠班次讨论
+  collapse_threads_ef7ca000: 折叠会话
   collapse_tutorial_tray_66ee7dc1: 折叠教程托盘
   collapsed_510aa02a: 折叠
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "整个 Canvas 的响应性改进集合"
@@ -8023,6 +8036,9 @@ zh-Hans:
   count_unread_messages_e312aa7b: 
     one: "%{count}条未读消息。"
     other: "%{count}条未读消息。"
+  count_unread_release_notes_3be26022: 
+    one: "%{count}条未读发行说明。"
+    other: "%{count}条未读发行说明。"
   count_unread_replies_86976ab: "%{count}未读回复"
   count_unread_shares_ff9e91a5: 
     one: "%{count}个未读的共享。"
@@ -9824,6 +9840,7 @@ zh-Hans:
   deployment_id_for_toolname_app_e54a7364: "%{toolName}应用程序的部署id"
   deprecate_sms_be6b00a: "弃用 SMS"
   deprecated_59e99d2a: 已弃用
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: 降低“班次覆盖不活跃的注册”的优先级
   desc_12ad2869: "%{desc}"
   descending_b7828162: 降序
   description_436c48d7: 描述
@@ -10143,6 +10160,7 @@ zh-Hans:
       page_header_title: 新讨论
       points_possible: 满分值
       post_at: 发布时间
+      publish: 发布
       save: 保存
       saving: 正在保存...
       sort_by_likes: 按赞数排序
@@ -10948,6 +10966,7 @@ zh-Hans:
   enabled_unlocked_8d3a5df7: 已启用（未锁定）
   enabled_web_services_f620b2be: 已启用Web服务
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 启用重新设计的“给...的学生发送消息”对话框，以便除了学生之外，还能给观察员发送消息。
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: 启用“通过Canvas访问新测验公开API”。
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 允许在新评分册提交项托盘中显示抄袭报告和相似度评分。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 启用对作业、日历事件和其他应用重要日期。
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "SpeedGrader 中有未发布的草稿评论时启用警告用户的模态。"
@@ -11438,6 +11457,7 @@ zh-Hans:
   error_98e81528: 错误
   error_adding_canvas_file_to_submission_draft_de258021: 向提交项草稿添加canvas文件出错
   error_adding_file_to_discussion_message_16feef3f: 在讨论消息中添加文件时出错
+  error_adding_files_2cd4d45: 添加文件时出错
   error_adding_files_97ba198e: 添加文件时出错。
   error_adding_files_to_conversation_message_58e83876: 将文件添加到会话消息时发生错误
   error_adding_files_to_discussion_message_8bb819e4: 向讨论消息添加文件时发生错误
@@ -11701,6 +11721,7 @@ zh-Hans:
   expand_permission_b45bf097: "展开 %{permission}"
   expand_permission_c61d5958: 扩展权限
   expand_subdiscussion_cd226ed4: 扩展班次讨论
+  expand_threads_634fe7a1: 展开会话
   expand_tutorial_tray_22630c49: 展开教程托盘
   expanded_f4493860: 已扩展
   expected_array_of_objects_b09ead01: 预期的对象数组
@@ -14487,6 +14508,11 @@ zh-Hans:
       API将不会返回更加普遍的404 Not Found，而是返回422
       以及更加有用的消息，说明工具无法访问已结束的
       课程。
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      如果启用，深层链接响应JS将发送postMessages
+      到window.parent而非window.top。从NQ启动工具时，
+      深层链接响应会正确发送内容项目到
+      新测验。
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       如果启用，OAuth 2.0 会将 4xx 状态代码正确返回到
       发出请求的客户端，而不是重定向到它们自己
@@ -14521,6 +14547,7 @@ zh-Hans:
       如果也启用 RCE 增强，
       RCE 将在您离开时自动保存您的工作
   if_set_allows_submission_status_to_be_changed_from_156f57f: "如果设置，则允许在 Speedgrader 中更改提交状态"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: 如果进行此设置，降低“使用来自班次的截止日期、锁定日期和解锁日期覆盖与停用、结束或不活跃的学生注册相关的作业”的优先级。
   if_set_displays_originality_reports_with_assignmen_c5d0276f: 如果设置，则显示启用了作业增强功能的原创性报告
   if_set_displays_updated_mastery_connect_icon_b6a93002: 如果设置，则显示更新的掌握程度连接图标
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "如果已设置，Quizzes.Next 将使用 SpeedGrader 中的单个启动会话进行操作"
@@ -15336,6 +15363,7 @@ zh-Hans:
   keyboard_instructions_e032939f: 键盘指令
   keyboard_nav_dialog: 
     esc_key_notification: 当导航评分册的表格时，在使用键盘捷径前，按esc键。
+  keyboard_shortcut_for_missing_assignment_848aa9cd: 未交作业的键盘快捷键
   keyboard_shortcuts_ed1844bd: 键盘捷径
   kind_7f0a88c4: 类型、种类
   know_your_users_5c1323be: 了解您的用户
@@ -18945,6 +18973,7 @@ zh-Hans:
   new_quizzes_migration_enabled_by_default_5f9bcc81: 默认启用新测验迁移
   new_quizzes_migration_required_7854aa1a: 要求新测验迁移
   new_quizzes_on_the_quizzes_page_b21f338d: 测验(Quizzes)页面上的新测验
+  new_quizzes_public_api_18d95321: 新测验公开API
   new_quizzes_service_jwt_refresh_ca28ca8: 新测验服务JWT刷新
   new_quizzes_site_admin_service_user_a331233a: 新测验站点管理员服务用户
   new_quizzes_submission_274b5c57: 新测验提交
@@ -19718,6 +19747,7 @@ zh-Hans:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 提交答案后，以后将无法再进行更改。无法查看上一个问题。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "一旦开始调试，将收集关于下一次尝试登录的所有信息。单击“Refresh”（刷新）以查看是否已收集更多数据，或者单击“Stop Debugging”（停止调试）以清除收集的数据并停止当前调试尝试。"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 您更改答案之后，在更新问题前需要选择一个选项。
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: 提供的其中一个redirect_uris过长。请确保为redirect_uris输入正确的值。
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "无法正确处理该外部 app 发送的一个或多个内容项。Canvas 已保存这些项目，下面列出了失败的原因。"
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: 一个或多个所选评分是由具有非活动状态注册学生的评分人提供的。请将您的选择项更新至当前评分人提供的选择项。
   one_or_more_items_are_currently_being_imported_the_186fe069: 正在导入一个或多个项目。可用项目将显示在下面的课程中。
@@ -21077,6 +21107,7 @@ zh-Hans:
   private_3883d133: 私人
   pro_tip_30e41fa3: 专业意见！
   proceed_f3d33864: 继续
+  proceed_with_caution_aa9b3285: 谨慎考虑后再继续
   process_multiple_content_items_from_course_modules_6de90fd8: 从课程模块页面处理多个内容项
   processed_4725b02: 已处理
   processing_2fcc9739: 正在处理
@@ -23590,6 +23621,7 @@ zh-Hans:
   reset_all_6e5e040a: 全部重置
   reset_all_unpublished_changes_243f179f: 重置所有未发布的更改？
   reset_courses_fe29ddf9: 重置课程
+  reset_lti_provision_6d8e287f: 重置LTI规定
   reset_multi_factor_authentication_2b63a558: 重置多因素验证
   reset_name_6a0aa0f: "重置 %{name}"
   reset_quiz_engine_choice_323a40e6: 重设测验引擎选项
@@ -26303,6 +26335,7 @@ zh-Hans:
   submission_type_lti_placement_b448d5d0: "提交类型 LTI 位置"
   submission_type_selection_72ce19f: 提交类型选择
   submission_updated_8897f3b7: 已更新提交项
+  submission_uploaded_542c9ac6: 提交项已上传！
   submission_user_name_assignment_title_2cf5e3e9: "提交项：%{user_name}，%{assignment_title}"
   submissions: 
     assignment_submit_success: 作业已成功提交。
@@ -26453,6 +26486,8 @@ zh-Hans:
   submit_ticket_5515ffd: 提交任务单
   submitted_318fad53: 已提交
   submitted_at_4d5ea3aa: 提交在
+  submitted_by_name_dab6d5e1: "提交人：%{name}"
+  submitted_by_submitter_1dcd07a1: "提交人：%{submitter}"
   submitted_d5ba370a: 已提交：
   submitted_date_ba55b0ae: "已提交%{date}"
   submitted_datetime_fa2e9287: "已提交：%{dateTime}"
@@ -26772,6 +26807,7 @@ zh-Hans:
   test_cluster_only_70e61c19: 仅测试群集
   test_feature_flag_980151e0: 测试功能标记
   testing_state_effd4a82: 测试状态
+  text_7b9bd49c: "%{text}"
   text_7f4593da: 文本
   text_df773ce4: 文本
   text_document_eacbcdb7: 文本文档
@@ -27073,6 +27109,7 @@ zh-Hans:
   the_specified_assignment_could_not_be_found_c5dc34ab: 无法找到指定作业
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "无法找到指定作业(%{id})"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: 具有file_id的指定文件已经存在原创性报告
+  the_specified_resource_does_not_exist_71d8b751: 该指定资源不存在。
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "具体用户 (%{id}) 不是此课程的学生"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: 具体用户不是此课程的学生
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: 进度计划的开始日期必须在结束日期之后。
@@ -27666,6 +27703,7 @@ zh-Hans:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: 这将使用此结果更新所有未评估的评价量规
   this_will_update_all_student_mastery_results_tied__a52301e5: 这将更新与帐户级掌握程度计算关联的所有学生掌握程度结果。
   this_will_update_all_student_mastery_results_withi_934580d1: 这将更新课程内的所有学生掌握程度结果。
+  thread_addd9799: 会话
   threshold_in_hours_to_notify_students_within_f33820aa: 向学生发出通知的时限（小时）
   threshold_pts_45f0e5d8: "阈值：%{pts}"
   throttle_jobs_f61be56: 调节作业
@@ -29128,6 +29166,7 @@ zh-Hans:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: 使用此面板搜索您要添加到此课程的人。
   use_this_photo_3a594830: 使用此照片
   use_webcam_1ed0bf6b: 使用网络摄像头
+  use_window_parent_in_deep_linking_response_8fe5f845: 在深层链接响应中使用window.parent
   used_by_permission_314a78dd: 按权限使用
   user: 
     default_user_name: 用户
