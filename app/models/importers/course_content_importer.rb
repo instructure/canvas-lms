@@ -100,6 +100,7 @@ module Importers
         ActiveRecord::Base.skip_touch_context
 
         unless migration.for_course_copy?
+          migration.find_source_course_for_import if migration.canvas_import?
           Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
           Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
           # These only need to be processed once

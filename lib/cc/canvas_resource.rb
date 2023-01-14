@@ -50,6 +50,7 @@ module CC
       resources << run_and_set_progress(:files_meta_path, nil, I18n.t("course_exports.errors.file_meta", "Failed to export file meta data"))
       resources << run_and_set_progress(:create_events, 25, I18n.t("course_exports.errors.events", "Failed to export calendar events"))
       resources << run_and_set_progress(:add_late_policy, nil, I18n.t("course_exports.errors.late_policy", "Failed to export late policy")) if export_symbol?(:all_course_settings)
+      resources << run_and_set_progress(:create_context_info, nil, I18n.t("Failed to export context info")) unless @content_export&.for_course_copy?
 
       if export_media_objects?
         File.write(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), "") # just in case an error happens later
@@ -100,6 +101,33 @@ module CC
         A: This is un-BEAR-able
       TEXT
       canvas_export_file.close
+    end
+
+    # This is used to identify the source course of a content export
+    def create_context_info(document = nil)
+      unless document
+        rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::CONTEXT_INFO)
+        path = File.join(@canvas_resource_dir, CCHelper::CONTEXT_INFO)
+        file = File.open(path, "w")
+        document = Builder::XmlMarkup.new(target: file, indent: 2)
+      end
+
+      document.instruct!
+      document.context_info("xmlns" => CCHelper::CANVAS_NAMESPACE,
+                            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                            "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}") do |ci|
+        ci.course_id @course.id
+        ci.course_name @course.name
+        @course.root_account.tap do |a|
+          ci.root_account_id a.global_id
+          ci.root_account_name a.name
+          ci.root_account_uuid a.uuid
+          ci.canvas_domain a.primary_domain&.host if a.respond_to?(:primary_domain)
+        end
+      end
+
+      file&.close
+      rel_path
     end
 
     def create_syllabus(io_object = nil)

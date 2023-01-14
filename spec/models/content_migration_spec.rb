@@ -1122,4 +1122,73 @@ describe ContentMigration do
       expect(ContentMigration.import_class_name("content_tags")).to eq "ContentTag"
     end
   end
+
+  describe "find_source_course_for_import" do
+    specs_require_sharding
+
+    before :once do
+      @shard1.activate do
+        @other_account = Account.create! name: "Source Account"
+        @other_account.account_domains.create! host: "pineapple.127.0.0.1.xip.io"
+        @other_course = course_factory(account: @other_account)
+      end
+
+      @course = course_factory
+    end
+
+    it "finds a course when root account global id lines up" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: @other_account.global_id,
+          root_account_uuid: @other_account.uuid
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "finds root account by domain when context account id doesn't exist" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: -1,
+          root_account_uuid: @other_account.uuid,
+          canvas_domain: "pineapple.127.0.0.1.xip.io"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "finds root account by domain when context global account uuid doesn't match" do
+      decoy_account = @shard1.activate { Account.create! }
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: decoy_account.global_id,
+          root_account_uuid: @other_account.uuid,
+          canvas_domain: "pineapple.127.0.0.1.xip.io"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "doesn't find a course when the account uuid doesn't match" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: @other_account.global_id,
+          root_account_uuid: "nope"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to be_nil
+    end
+  end
 end

@@ -770,6 +770,32 @@ class ContentMigration < ActiveRecord::Base
     @cross_institution
   end
 
+  def find_source_course_for_import
+    return unless context.is_a?(Course)
+
+    data = context.full_migration_hash[:context_info]
+    return unless data.is_a?(Hash)
+
+    course_id = data[:course_id]
+    account_global_id = data[:root_account_id]
+    account_uuid = data[:root_account_uuid]
+    return unless course_id && account_global_id && account_uuid
+
+    possible_root_account = Account.find_by(id: account_global_id)
+    real_root_account = possible_root_account if possible_root_account&.uuid == account_uuid
+    if Object.const_defined?(:AccountDomain) && !real_root_account
+      domain = data[:canvas_domain]
+      possible_root_account = domain && AccountDomain.find_cached(domain)&.account
+      real_root_account = possible_root_account if possible_root_account&.uuid == account_uuid
+    end
+
+    if real_root_account
+      self.source_course_id = Shard.global_id_for(course_id, real_root_account.shard)
+    end
+
+    source_course_id
+  end
+
   def set_date_shift_options(opts)
     if opts && (Canvas::Plugin.value_to_boolean(opts[:shift_dates]) || Canvas::Plugin.value_to_boolean(opts[:remove_dates]))
       migration_settings[:date_shift_options] = opts.slice(:shift_dates, :remove_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
@@ -1093,6 +1119,8 @@ class ContentMigration < ActiveRecord::Base
   ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   def asset_id_mapping
+    return {} unless source_course
+
     mapping = {}
     master_template = migration_type == "master_course_import" &&
                       master_course_subscription&.master_template
