@@ -237,6 +237,7 @@ ca:
         partner_key: "Clau de soci"
   academic_engagement_capella_74946a80: "Participació acadèmica (Capella)"
   academic_engagement_strayer_8c7832b9: "Participació acadèmica (Strayer)"
+  academic_success_reporting_2585c499: "Informe sobre èxit acadèmic"
   acalanes_union_high_grade_report_ae9bce11: "Informe de notes altes d’Acalanes Union"
   accept_2fdd362e: Accepta
   accept_course_invitation_b4c04fbb: "Accepta la invitació de l'assignatura"
@@ -941,7 +942,7 @@ ca:
           account_reports: 
             default: 
               parameters: 
-                header: "Condicions (límit 4)"
+                header: "Condicions (límit 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1587,6 +1588,15 @@ ca:
             excelsior: 
               outcome: 
                 text: "ID del SIS:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: "Període acadèmic"
+          student_assignment_grade: 
+            login_ids: 
+              field: "ID d’inici de sessió"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2116,6 +2126,7 @@ ca:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Permet ordenar les respostes al debat segons les dates i hores
       de creació. L’ordre per defecte és de més nova a més antiga per a les respostes de nivell d’arrel.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Permet que els qualificadors anotin MI al Llibre de qualificacions o a SpeedGrader per etiquetar manualment una tasca com a no presentada"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet etiquetar enllaços d'ajuda com a Destacats o Nous i mostrar de manera visible l'enllaç d'ajuda destacat al menú Ajuda."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permet que els instructors apliquin massivament puntuacions a les entregues sense qualificar."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet que els instructors apliquin massivament puntuacions a les entregues sense nota des dels menús Grup d'activitats i Total de columnes del Llibre de notes."
@@ -4285,6 +4296,7 @@ ca:
   by_default_students_can_always_create_groups_in_a__af000dd: "Per defecte, els estudiants sempre poden crear grups en un curs. Per restringir la capacitat dels estudiants de crear grups, cal habilitar Administra els cursos: Administrador - administra / actualitza i, a la Configuració del curs, desmarcar la casella Permet que els estudiants organitzin els seus propis grups."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Per defecte, els estudiants sempre poden crear grups en un curs. Per restringir la capacitat dels estudiants de crear grups, Cursos - administra/actualitza ha d'estar habilitat i la casella de selecció Permet que els estudiants organitzin els seus propis grups no ha d'estar seleccionada a Configuració del curs."
   by_lti_2_registration_url_e421e523: "Per URL de registre d'LTI 2"
+  by_name_54daec42: "per %{name}"
   by_url_a163275e: "Per URL"
   c4e_analytics_66e0fc46: "Analítica C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5201,6 +5213,7 @@ ca:
   collapse_replies_20f2faf7: "Redueix les respostes"
   collapse_replies_ef4fc36b: "Redueix les respostes"
   collapse_subdiscussion_89af1f5c: "Redueix el subfòrum"
+  collapse_threads_ef7ca000: "Contrau els fils"
   collapse_tutorial_tray_66ee7dc1: "Redueix la safata de tutorial"
   collapsed_510aa02a: Reduït
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Recopilació de millores adaptatives realitzades al Canvas"
@@ -6544,6 +6557,9 @@ ca:
   count_unread_messages_e312aa7b: 
     one: "Un missatge sense llegir."
     other: "%{count} missatges sense llegir."
+  count_unread_release_notes_3be26022: 
+    one: "Una nota sobre el llançament sense llegir."
+    other: "%{count} notes sobre el llançament sense llegir."
   count_unread_replies_86976ab: "%{count} respostes no llegides"
   count_unread_shares_ff9e91a5: 
     one: "Un contingut compartit sense llegir."
@@ -7983,6 +7999,7 @@ ca:
   deployment_id_for_toolname_app_e54a7364: "ID d'implementació de l'aplicació %{toolName}"
   deprecate_sms_be6b00a: "Desestima l’SMS"
   deprecated_59e99d2a: Obsolet
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Cancel·leu la prioritat de les substitucions de secció d’inscripcions no actives"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Descendent
   description_436c48d7: Descripció
@@ -8212,6 +8229,7 @@ ca:
       options: Opcions
       points_possible: "Punts possibles"
       post_at: "Publica el"
+      publish: Publica
       save: Desa
       saving: "S'està desant…"
       sort_by_likes: "Ordena per número de M'agrada"
@@ -8837,6 +8855,7 @@ ca:
   enabled_unlocked_8d3a5df7: "Habilitat (desbloquejat)"
   enabled_web_services_f620b2be: "Serveis web habilitats"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Activa una nova presentació del missatge “Estudiants que…” que permet enviar missatges als observadors i també als estudiants."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Activa l'accés a l’API pública de Proves noves a través del Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita la visualització d'informes de plagi i puntuacions de similitud a la safata d'entrega de Llibre de notes nou."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet que s’apliquin dates importants a activitats, esdeveniments del calendari i altres activitats."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Habilita la funció que la configuració modal adverteixi l’usuari quan es deixa sense publicar un esborrany de comentari a SpeedGrader."
@@ -9294,6 +9313,7 @@ ca:
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: "Error en afegir el fitxer del Canvas a l'esborrany de l'entrega"
   error_adding_file_to_discussion_message_16feef3f: "S’ha produït un error en afegir el fitxer al missatge del fòrum"
+  error_adding_files_2cd4d45: "S’ha produït un error en afegir els fitxers"
   error_adding_files_97ba198e: "S’ha produït un error en afegir fitxers."
   error_adding_files_to_conversation_message_58e83876: "Error en afegir els fitxers al missatge de conversa"
   error_adding_files_to_discussion_message_8bb819e4: "Error en afegir els fitxers al missatge del fòrum"
@@ -9547,6 +9567,7 @@ ca:
   expand_permission_b45bf097: "Desplega %{permission}"
   expand_permission_c61d5958: "Desplega el permís"
   expand_subdiscussion_cd226ed4: "Desplega el fòrum secundari"
+  expand_threads_634fe7a1: "Desplega els fils"
   expand_tutorial_tray_22630c49: "Desplega la safata de tutorial"
   expanded_f4493860: Desplegat
   expected_array_of_objects_b09ead01: "Matriu prevista d’objectes"
@@ -11321,6 +11342,11 @@ ca:
       En comptes de tornar un error genèric 404 No s’ha trobat la pàgina, l’API tornarà un 422
       juntament amb un missatge útil en què s’indica que l’eina no pot accedir a les assignatures
       finalitzades.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Si l’opció està activada, l’objecte de resposta a enllaç profund de JS enviarà postMessages
+      a window.parent en lloc de window.top. D'aquesta manera, la resposta a
+      enllaç profund envia correctament elements a Proves noves quan es llança una
+      eina des d’NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Si s’habilita, OAuth 2.0 tornarà ara correctament els codis d'estat al
       client sol·licitant en lloc de redirigir-los a ell mateix
@@ -11353,6 +11379,7 @@ ca:
       Si les millores de l'editor de contingut enriquit (RCE) també estan habilitades,
       l'RCE desarà automàticament la vostra feina a mesura que avanceu
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Aquesta configuració permet canviar l’estat d’entrega des de l’SpeedGrader."
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Si s'estableix l’opció, es cancel·la la prioritat mitjançant les dates de venciment, de bloqueig i de desbloqueig de les substitucions de secció d’una tasca que estan associades a una inscripció desactivada, finalitzada o, d’altra manera, no activa d’un estudiant."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Si s’ha establert, es mostren els informes d'originalitat amb l’opció Millores de l’activitat activada"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Si es configura, es mostra la icona de connexió del domini actualitzada"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Si s’ha establert, Quizzes.Next funcionarà amb una sola sessió de llançament a SpeedGrader"
@@ -12024,6 +12051,7 @@ ca:
   key_state_for_the_current_account_d16b1cd5: "Estat de la clau de l'usuari actual"
   keyboard_nav_dialog: 
     esc_key_notification: "Premeu la tecla Esc abans d'utilitzar les dreceres del teclat quan navegueu per la quadrícula del llibre de notes."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Drecera del teclat per a una tasca no presentada"
   keyboard_shortcuts_ed1844bd: "Dreceres del teclat"
   kind_7f0a88c4: Tipus
   know_your_users_5c1323be: "Coneixeu els vostres usuaris"
@@ -15021,6 +15049,7 @@ ca:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migració a Proves noves habilitada per defecte"
   new_quizzes_migration_required_7854aa1a: "La migració de Proves noves és obligatòria"
   new_quizzes_on_the_quizzes_page_b21f338d: "Proves noves a la pàgina Proves"
+  new_quizzes_public_api_18d95321: "API pública de Proves noves"
   new_quizzes_service_jwt_refresh_ca28ca8: "Actualització de JWT de servei de Proves noves"
   new_quizzes_site_admin_service_user_a331233a: "Usuari del servei d’administració del lloc web de Proves noves"
   new_quizzes_submission_274b5c57: "Entrega de proves noves"
@@ -15705,6 +15734,7 @@ ca:
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Un cop activada, aquesta opció és visible al Llibre de qualificacions per als instructors."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Un cop hàgiu enviat una resposta, no la podreu canviar més tard. No podreu visualitzar la pregunta anterior."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Quan comenceu a depurar, es recollirà tota la informació sobre el següent intent d'inici de sessió. Feu clic a \"Actualitza\" per veure si s'han recollit més dades, o a \"Atura la depuració\" per suprimir les dades recollides i aturar l'intent actual de depuració."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "Un dels redirect_uris proporcionats és massa llarg. Assegureu-vos d’haver introduït els valors correctes del vostre redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "No s’han pogut processar correctament un o més elements de contingut que aquesta aplicació externa ha enviat. El Canvas no els ha desat, per les raons que s'indiquen a continuació."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Un qualificador amb inscripcions inactives ha proporcionat una de les notes seleccionades, o més d’una. Actualitzeu les vostres seleccions amb les que proporcionen els qualificadors actuals."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Actualment s'estan important un o més elements. Quan estiguin disponibles es mostraran a l'assignatura a sota."
@@ -16875,6 +16905,7 @@ ca:
   private_3883d133: Privat
   pro_tip_30e41fa3: "CONSELL PROFESSIONAL!"
   proceed_f3d33864: Continua
+  proceed_with_caution_aa9b3285: "Aneu amb compte"
   process_multiple_content_items_from_course_modules_6de90fd8: "Processa diversos elements del contingut des de les pàgines del mòduls del curs"
   processed_4725b02: "S’ha processat"
   processing_2fcc9739: "S'està processant"
@@ -18871,6 +18902,7 @@ ca:
   reset_all_6e5e040a: "Restableix-ho tot"
   reset_all_unpublished_changes_243f179f: "Voleu restablir tots els canvis no publicats?"
   reset_courses_fe29ddf9: "Restableix les assignatures"
+  reset_lti_provision_6d8e287f: "Restableix la provisió d’LTI, interoperabilitat d'eines d'aprenentatge"
   reset_multi_factor_authentication_2b63a558: "Restableix l'autenticació multifactorial"
   reset_name_6a0aa0f: "Restableix “%{name}”"
   reset_quiz_engine_choice_323a40e6: "Restableix l'elecció de motor de prova"
@@ -20994,6 +21026,7 @@ ca:
   submission_type_lti_placement_b448d5d0: "Tipus d'entrega d'ubicació LTI"
   submission_type_selection_72ce19f: "Selecció del tipus d'entrega"
   submission_updated_8897f3b7: "S'ha actualitzat l'entrega"
+  submission_uploaded_542c9ac6: "S’ha penjat l’entrega!"
   submission_user_name_assignment_title_2cf5e3e9: "Entrega: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "L'activitat s'ha entregat correctament."
@@ -21119,6 +21152,8 @@ ca:
   submit_ticket_5515ffd: "Envia la sol·licitud"
   submitted_318fad53: Entregat
   submitted_at_4d5ea3aa: "S’ha entregat a"
+  submitted_by_name_dab6d5e1: "Entregat per: %{name}"
+  submitted_by_submitter_1dcd07a1: "Entregat per %{submitter}"
   submitted_d5ba370a: "Entregat:"
   submitted_date_ba55b0ae: "Entregat el %{date}"
   submitted_datetime_fa2e9287: "S’ha entregat el: %{dateTime}"
@@ -21411,6 +21446,7 @@ ca:
   test_cluster_only_70e61c19: "Només clúster de prova"
   test_feature_flag_980151e0: "Marca de característica opcional de la prova"
   testing_state_effd4a82: "Estat de prova"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Text
   text_df773ce4: text
   text_document_eacbcdb7: "Document de text"
@@ -21679,6 +21715,7 @@ ca:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "La icona de drecera per a dispositius iOS/Android. 180x180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "No s'ha trobat l'activitat especificada"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "No s'ha trobat l'activitat especificada (%{id})"
+  the_specified_resource_does_not_exist_71d8b751: "El recurs especificat no existeix."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "L'usuari especificat (%{id}) no és un estudiant d'aquesta assignatura"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "L'usuari especificat no és un estudiant d'aquesta assignatura"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "La data d’inici de la planificació del ritme ha de ser posterior a la data de finalització."
@@ -22193,6 +22230,7 @@ ca:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Això actualitzarà totes les rúbriques amb aquest resultat que encara no s'hagin avaluat"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Això actualitzarà els resultats de domini de tots els estudiants vinculats al càlcul de domini a nivell de l'usuari."
   this_will_update_all_student_mastery_results_withi_934580d1: "Això actualitzarà els resultats de domini de tots els estudiants en aquesta assignatura."
+  thread_addd9799: Fil
   threshold_pts_45f0e5d8: "llindar: %{pts}"
   throttle_jobs_f61be56: "Limita els treballs"
   throttle_tag_tag_ba5b9b50: "Limita l’etiqueta \"%{tag}\""
@@ -23373,6 +23411,7 @@ ca:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utilitzeu aquesta subfinestra per cercar persones que vulgueu afegir a aquesta assignatura."
   use_this_photo_3a594830: "Fes servir aquesta foto"
   use_webcam_1ed0bf6b: "Utilitza la càmera web"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Utilitzeu window.parent a la resposta a enllaç profund"
   used_by_permission_314a78dd: "Permís Utilitzat per"
   user: 
     default_user_name: Usuari
