@@ -262,6 +262,7 @@ fr-CA:
         partner_key: "Clé du partenaire"
   academic_engagement_capella_74946a80: "Engagement académique (Capella)"
   academic_engagement_strayer_8c7832b9: "Engagement académique (Strayer)"
+  academic_success_reporting_2585c499: "Rapport de réussite scolaire"
   acalanes_union_high_grade_report_ae9bce11: "Rapport d'évaluation d’Acalanes Union High"
   accept_2fdd362e: Accepter
   accept_course_invitation_b4c04fbb: "Accepter l'invitation du cours"
@@ -1170,7 +1171,7 @@ fr-CA:
           account_reports: 
             default: 
               parameters: 
-                header: "Trimestre (limite 4)"
+                header: "Trimestre (limite 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1846,6 +1847,15 @@ fr-CA:
             excelsior: 
               outcome: 
                 text: "ID SIS :"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Trimestre
+          student_assignment_grade: 
+            login_ids: 
+              field: "Identifiants de connexion"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2437,6 +2447,7 @@ fr-CA:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Permet de trier les réponses de discussion en fonction des horodatages
       de création. L’ordre par défaut est du plus récent au plus ancien pour les réponses de niveau racine.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Permet aux correcteurs de saisir MI dans le Carnet de notes ou SpeedGrader pour marquer manuellement une tâche comme manquante"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permet de marquer les liens d’aide comme « Principaux » ou « Nouveau » et affiche bien en évidence le lien d’aide principal dans le menu d’aide."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permet aux instructeurs d’appliquer des scores à des envois non notés en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permet aux instructeurs d’appliquer des scores à des envois non notés en masse à partir du groupe de tâches et des menus de colonne Total dans le carnet de notes."
@@ -5133,6 +5144,7 @@ fr-CA:
   by_default_students_can_always_create_groups_in_a__af000dd: "Par défaut, les étudiants peuvent toujours créer des groupes dans un cours. Pour restreindre les étudiants de créer des groupes, Gérer les cours : « Administrateur - gérer/mettre à jour » doit être activé et la case à cocher « Laisser les étudiants organiser leurs propres groupes » dans les paramètres du cours doit être désélectionnée."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Par défaut, les étudiants peuvent toujours créer des groupes dans un cours. Pour restreindre des étudiants de créer des groupes, « Cours - gérer/mettre à jour » doit être activé, et la case à cocher « Laisser les étudiants organiser leurs propres groupes » ne doit pas être sélectionnée."
   by_lti_2_registration_url_e421e523: "Par URL d’inscription LTI 2"
+  by_name_54daec42: "par %{name}"
   by_url_a163275e: "Par URL"
   c4e_analytics_66e0fc46: "Analyses C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -6157,6 +6169,7 @@ fr-CA:
   collapse_replies_20f2faf7: "Réduire les réponses"
   collapse_replies_ef4fc36b: "Réduire les réponses"
   collapse_subdiscussion_89af1f5c: "Réduire la sous-discussion"
+  collapse_threads_ef7ca000: "Réduire les fils de discussion"
   collapse_tutorial_tray_66ee7dc1: "Réduire le tutoriel volant"
   collapsed_510aa02a: Réduit(e)
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Collection d’améliorations réactives sur Canvas"
@@ -7685,6 +7698,9 @@ fr-CA:
   count_unread_messages_e312aa7b: 
     one: "Un message non lu."
     other: "%{count} messages non lus."
+  count_unread_release_notes_3be26022: 
+    one: "Une note de version non lue."
+    other: "%{count} notes de version non lues."
   count_unread_replies_86976ab: "%{count} réponses non lues"
   count_unread_shares_ff9e91a5: 
     one: "Un partage non lu."
@@ -9386,6 +9402,7 @@ fr-CA:
   deployment_id_for_toolname_app_e54a7364: "ID de déploiement pour l'application %{toolName}"
   deprecate_sms_be6b00a: "Dépréciation des SMS"
   deprecated_59e99d2a: Obsolète
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Déprioriser les surclassements de section pour les inscriptions non actives"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Descendant
   description_436c48d7: Description
@@ -9683,6 +9700,7 @@ fr-CA:
       page_header_title: "Nouvelle discussion"
       points_possible: "Points possibles"
       post_at: "Publié à"
+      publish: Publier
       save: Enregistrer
       saving: "Enregistrement en cours..."
       sort_by_likes: "Classer par nombre de rétroactions de type « J'aime »"
@@ -10435,6 +10453,7 @@ fr-CA:
   enabled_unlocked_8d3a5df7: "Activé (déverrouillé)"
   enabled_web_services_f620b2be: "Services Web activés"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Active une nouvelle boîte de dialogue « Envoyer un message aux étudiants qui... » afin de permettre d'envoyer des messages aux observateurs en plus des étudiants."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permet l’accès à l’API publique des nouveaux questionnaires par le biais de Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Permet d'afficher les rapports de plagiat et les scores de similarité dans le bac d’envoi du nouveau carnet de notes."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet d’appliquer des dates importantes aux affectations, aux événements du calendrier et autres."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Permet au modal d’avertir l’utilisateur lorsqu’une ébauche de commentaire n’est pas publiée dans SpeedGrader."
@@ -10913,6 +10932,7 @@ fr-CA:
   error_98e81528: Erreur
   error_adding_canvas_file_to_submission_draft_de258021: "Une erreur est survenue lors de l'ajout du fichier Canvas à l'ébauche de l’envoi"
   error_adding_file_to_discussion_message_16feef3f: "Une erreur est survenue lors de l’ajout de fichiers au message de discussion"
+  error_adding_files_2cd4d45: "Erreur lors de l’ajout de fichiers"
   error_adding_files_97ba198e: "Une erreur est survenue lors de l’ajout de fichiers."
   error_adding_files_to_conversation_message_58e83876: "Une erreur est survenue lors de l’ajout de fichiers au message de conversation"
   error_adding_files_to_discussion_message_8bb819e4: "Une erreur est survenue lors de l’ajout de fichiers au message de discussion"
@@ -11172,6 +11192,7 @@ fr-CA:
   expand_permission_b45bf097: "Développer %{permission}"
   expand_permission_c61d5958: "Développer autorisation"
   expand_subdiscussion_cd226ed4: "Développer la sous-discussion"
+  expand_threads_634fe7a1: "Agrandir les fils de discussion"
   expand_tutorial_tray_22630c49: "Développez le tutoriel volant"
   expanded_f4493860: Développé(e)
   expected_array_of_objects_b09ead01: "Tableau d’objets attendu"
@@ -13647,6 +13668,11 @@ fr-CA:
       Au lieu de renvoyer une page générique 404 Non trouvé, l’API renverra une page 422
       accompagné d’un message utile indiquant que l’outil ne peut pas accéder aux cours
       conclus.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      S’il est activé, le JS de réponse de « Deep Linking » enverra des postMessages
+      à window.parent au lieu de window.top. Cela permet à la réponse de « Deep Linking »
+      d’envoyer correctement les éléments de contenu aux nouveaux questionnaires, lorsqu’un outil est
+      lancé depuis NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Si cette option est activée, OAuth 2.0 renvoie désormais correctement les codes d’état 4xx au client demandeur de
       au lieu de les rediriger vers lui-même
@@ -13682,6 +13708,7 @@ fr-CA:
       Si les améliorations RCE sont également activées,
       le RCE enregistrera automatiquement votre travail au fur et à mesure
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Si cette option est activée, permet de modifier l’état de la soumission à partir de l’intérieur de Speedgrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "S’il est défini, dépriorise l’utilisation des dates d’échéance, des dates de verrouillage et des dates de déverrouillage à partir des surclassements de section sur une tâche qui sont associés à une inscription désactivée, achevée ou autrement non active pour un étudiant."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "S’il est défini, il affiche les rapports d’originalité avec les améliorations des tâches activées"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Si elle est définie, elle affiche l’icône « Connexion de maîtrise » mise à jour"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Si cette option est choisie, Quizzes.Next fonctionnera en utilisant une seule session de lancement dans SpeedGrader"
@@ -14473,6 +14500,7 @@ fr-CA:
   keyboard_instructions_e032939f: "Instructions clavier"
   keyboard_nav_dialog: 
     esc_key_notification: "Appuyer sur la touche ESC avant d'utiliser des raccourcis clavier lorsque vous naviguez la grille du relevé de notes."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Raccourci clavier pour la tâche manquante"
   keyboard_shortcuts_ed1844bd: "Raccourcis clavier"
   kind_7f0a88c4: Type
   know_your_users_5c1323be: "Connaissez vos utilisateurs"
@@ -17740,6 +17768,7 @@ fr-CA:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migration des nouveaux questionnaires activée par défaut"
   new_quizzes_migration_required_7854aa1a: "Migration des nouveaux questionnaires requise"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nouveaux questionnaires sur la page des questionnaires"
+  new_quizzes_public_api_18d95321: "API publique des nouveaux questionnaires"
   new_quizzes_service_jwt_refresh_ca28ca8: "Actualisation des nouveaux questionnaires de JWT de service"
   new_quizzes_site_admin_service_user_a331233a: "Nouveaux questionnaires — Utilisateurs du service de gestionnaire de site"
   new_quizzes_submission_274b5c57: "Envoi de nouveaux questionnaires"
@@ -18487,6 +18516,7 @@ fr-CA:
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Une fois que cette fonctionnalité est rendue active, vous ne pourrez plus la désactiver. Assurez-vous d'être prêt à activer le dossier à envois avant de continuer."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Dès que vous avez soumis une réponse, vous ne serez pas en mesure de la modifier ultérieurement. Vous ne serez pas en mesure de voir la question précédente."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Dès que vous commencez à déboguer, toutes les informations concernant la prochaine tentative de connexion seront collectées. Cliquez sur « Actualiser » (Refresh) pour voir si d'autres données ont été collectées ou sur « Arrêter le débogage » (Stop Debugging) pour effacer les données collectées et arrêter la tentative de débogage en cours."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "L’un des redirect_uris fournis est trop long. Veuillez vous assurer que vous avez entré la ou les bonnes valeurs pour votre redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Un ou plusieurs éléments de contenu envoyés par cette application externe n’ont pas réussi à être traités correctement. Ceux-ci n’ont pas été enregistrés par Canvas, et les raisons de l’échec sont répertoriées ci-dessous."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Une ou plusieurs notes sélectionnées ont été fournies par un correcteur avec inscriptions inactives. Veuillez mettre à jour vos sélections à celles fournies par les correcteurs actuels."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Un ou plusieurs articles sont actuellement en cours d'importation. Ils seront présentés dans le cours ci-dessous une fois qu'ils seront disponibles."
@@ -19827,6 +19857,7 @@ fr-CA:
   private_3883d133: Privé
   pro_tip_30e41fa3: "CONSEIL DE PRO!"
   proceed_f3d33864: Continuer
+  proceed_with_caution_aa9b3285: "Procéder avec prudence"
   process_multiple_content_items_from_course_modules_6de90fd8: "Traiter plusieurs éléments de contenu de la page des modules de cours"
   processed_4725b02: Traité
   processing_2fcc9739: "Traitement en cours..."
@@ -22054,6 +22085,7 @@ fr-CA:
   reset_all_6e5e040a: "Tout réinitialiser"
   reset_all_unpublished_changes_243f179f: "Réinitialiser toutes les modifications non publiées?"
   reset_courses_fe29ddf9: "Réinitialiser les cours"
+  reset_lti_provision_6d8e287f: "Réinitialiser la disposition LTI"
   reset_multi_factor_authentication_2b63a558: "Réinitialiser l’authentification multifacteur"
   reset_name_6a0aa0f: "Réinitialiser « %{name} »\""
   reset_quiz_engine_choice_323a40e6: "Réinitialiser le choix de l’engin du questionnaire"
@@ -24598,6 +24630,7 @@ fr-CA:
   submission_type_lti_placement_b448d5d0: "Type d'envoi de Placement LTI"
   submission_type_selection_72ce19f: "Sélection de type d'envoi"
   submission_updated_8897f3b7: "Envoi mis à jour"
+  submission_uploaded_542c9ac6: "Envoi téléversé!"
   submission_user_name_assignment_title_2cf5e3e9: "Envoi : %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "La tâche a été envoyée."
@@ -24742,6 +24775,8 @@ fr-CA:
   submit_ticket_5515ffd: "Soumettre le billet"
   submitted_318fad53: Envoyé
   submitted_at_4d5ea3aa: "Envoyé à"
+  submitted_by_name_dab6d5e1: "Envoyé par : %{name}"
+  submitted_by_submitter_1dcd07a1: "Envoyé par %{submitter}"
   submitted_d5ba370a: "Soumis :"
   submitted_date_ba55b0ae: "Envoyé le %{date}"
   submitted_datetime_fa2e9287: "Soumis : %{dateTime}"
@@ -25050,6 +25085,7 @@ fr-CA:
   test_cluster_only_70e61c19: "Test de grappes uniquement"
   test_feature_flag_980151e0: "Fanion de fonction de test"
   testing_state_effd4a82: "État du test"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Texte
   text_df773ce4: texte
   text_document_eacbcdb7: "Document de texte"
@@ -25343,6 +25379,7 @@ fr-CA:
   the_specified_assignment_could_not_be_found_c5dc34ab: "Impossible de trouver la tâche indiquée"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "La tâche indiquée (%{id}) n’a pas pu être trouvée"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "le fichier spécifié avec file_id a déjà un rapport d'originalité"
+  the_specified_resource_does_not_exist_71d8b751: "La ressource spécifiée n’existe pas."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "L'utilisateur spécifié (%{id}) n'est pas un étudiant de ce cours"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "L’utilisateur spécifié n’est pas un étudiant de ce cours"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "La date de début du plan Pace doit être postérieure à la date de fin."
@@ -25924,6 +25961,7 @@ fr-CA:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Cela permettra de mettre à jour toutes les rubriques utilisant ce résultat qui n'ont pas encore été évaluées."
   this_will_update_all_student_mastery_results_tied__a52301e5: "Cela permettra de mettre à jour tous les résultats de maîtrise d’étudiant liés au calcul de maîtrise de niveau de compte."
   this_will_update_all_student_mastery_results_withi_934580d1: "Cela permettra de mettre à jour tous les résultats de maîtrise des étudiants au sein de ce cours."
+  thread_addd9799: "Fils de discussion"
   threshold_in_hours_to_notify_students_within_f33820aa: "Seuil (en heures) pour avertir les étudiants au sein de"
   threshold_pts_45f0e5d8: "seuil : %{pts}"
   throttle_jobs_f61be56: "Tâches d’accélération"
@@ -27369,6 +27407,7 @@ fr-CA:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utiliser ce panneau pour rechercher des personnes que vous souhaitez ajouter à ce cours."
   use_this_photo_3a594830: "Utiliser cette photo"
   use_webcam_1ed0bf6b: "Utiliser la webcam"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Utiliser window.parent dans la réponse de « Deep Linking »"
   used_by_permission_314a78dd: "Utilisé avec autorisation"
   user: 
     default_user_name: Utilisateur
