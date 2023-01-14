@@ -931,4 +931,17 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:element name="context_info">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="course_id" type="xs:string" minOccurs="1"/>
+        <xs:element name="course_name" type="xs:string" minOccurs="0"/>
+        <xs:element name="root_account_id" type="xs:string" minOccurs="1"/>
+        <xs:element name="root_account_uuid" type="xs:string" minOccurs="1"/>
+        <xs:element name="root_account_name" type="xs:string" minOccurs="0"/>
+        <xs:element name="canvas_domain" type="xs:string" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
 </xs:schema>
