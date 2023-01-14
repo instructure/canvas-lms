@@ -225,6 +225,7 @@ es-ES:
         partner_key: "Clave de socio"
   academic_engagement_capella_74946a80: "Participación académica (Capella)"
   academic_engagement_strayer_8c7832b9: "Participación académica (Strayer)"
+  academic_success_reporting_2585c499: "Informes sobre el éxito académico"
   acalanes_union_high_grade_report_ae9bce11: "Informe de notas de Acalanes Union High"
   accept_2fdd362e: Aceptar
   accept_course_invitation_b4c04fbb: "Aceptar la invitación a la asignatura"
@@ -880,7 +881,7 @@ es-ES:
           account_reports: 
             default: 
               parameters: 
-                header: "Términos (límite 4)"
+                header: "Términos (límite 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1515,6 +1516,15 @@ es-ES:
             excelsior: 
               outcome: 
                 text: "Identificación de SIS"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Período
+          student_assignment_grade: 
+            login_ids: 
+              field: "Identificación del nombre de usuario"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -1991,6 +2001,7 @@ es-ES:
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Permite que la configuración de la asignatura Blueprint se pueda exportar y copiar en otra asignatura Blueprint"
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Permite a Canvas enviar archivos iWork a docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permitir que las páginas de la asignatura se publiquen en el programa"
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Permite a los evaluadores escribir MI o SpeedGrader en el libro de notas para etiquetar de forma manual una actividad como faltante"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que los enlaces de ayuda se etiqueten como destacados o nuevos y muestra a la vista el enlace de ayuda destacado en el menú de ayuda."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permite a los profesores aplicar puntuaciones a las entregas no evaluadas en masa."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permite a los profesores aplicar puntuaciones a las entregas no evaluadas en masa desde los menús Grupo de actividades y Columna total en el Libro de notas."
@@ -3936,6 +3947,7 @@ es-ES:
   by_default_students_can_always_create_groups_in_a__5727f4cf: "Por defecto, los estudiantes siempre pueden crear grupos en una asignatura. Para restringir la creación de grupos por parte de los estudiantes debe habilitarse la opción de Asignaturas: administrar debe estar habilitado, y no debe seleccionarse la casilla de verificación Permitir que los estudiantes organicen sus propios grupos en la Configuración de la Asignatura."
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "Por defecto, los alumnos siempre pueden crear grupos en un curso."
   by_lti_2_registration_url_e421e523: "A través de la URL de registro LTI 2"
+  by_name_54daec42: "por %{name}"
   by_url_a163275e: "Por URL"
   c4e_analytics_66e0fc46: "Analíticas de C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -4803,6 +4815,7 @@ es-ES:
   collapse_outcome_description_de471564: "Colapsar la descripción de la competencia"
   collapse_replies_ef4fc36b: "Colapsar respuestas"
   collapse_subdiscussion_89af1f5c: "Colapsar subforo"
+  collapse_threads_ef7ca000: "Colapsar hilos"
   collapse_tutorial_tray_66ee7dc1: "Colapsar bandeja de tutoriales"
   collapsed_510aa02a: Colapsado
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Recopilación de las mejoras de respuesta en todo Canvas"
@@ -6124,6 +6137,9 @@ es-ES:
   count_unread_messages_e312aa7b: 
     one: "Un mensaje sin leer"
     other: "%{count} mensajes sin leer."
+  count_unread_release_notes_3be26022: 
+    one: "Una nota de la versión no leída."
+    other: "%{count} notas de la versión no leídas."
   count_unread_replies_86976ab: "%{count} respuestas no leídas"
   count_unread_shares_ff9e91a5: 
     one: "Un archivo compartido sin leer."
@@ -7466,6 +7482,7 @@ es-ES:
   deployment_id_for_tool_app_cb59335: "Identificación de implementación para la aplicación %{tool}"
   deployment_id_for_toolname_app_e54a7364: "Identificación de implementación para la aplicación %{toolName}"
   deprecate_sms_be6b00a: "Dejar de usar SMS"
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Eliminar la prioridad de las anulaciones de secciones para inscripciones inactivas"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Descendente
   description_436c48d7: Descripción
@@ -7667,6 +7684,7 @@ es-ES:
       options: Opciones
       points_possible: "Puntos posibles"
       post_at: "Publicar en"
+      publish: Publicar
       save: Guardar
       saving: Guardando...
       sort_by_likes: "Ordenar por Me gusta"
@@ -8266,6 +8284,7 @@ es-ES:
   enabled_links_be110215: "Enlaces habilitados"
   enabled_web_services_f620b2be: "Servicios web activados"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Habilita un mensaje rediseñado de estudiantes que... diálogo que permite enviar mensajes a los observadores, además de a los estudiantes."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permite el acceso a la API pública de nuevos exámenes mediante Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Habilita que se muestren los informes de plagio y las puntuaciones de similitud en la bandeja de entregas del nuevo libro de notas."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Habilita que se apliquen fechas importantes a las actividades, eventos de calendario y otros."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Habilita al modal avisar al usuario cuando un comentario del borrador se ha dejado sin publicar en SpeedGrader."
@@ -8655,6 +8674,7 @@ es-ES:
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: "Ha habido un error al añadir el archivo de Canvas al borrador de entrega"
   error_adding_file_to_discussion_message_16feef3f: "Ha habido un error al añadir el archivo al foro de discusión"
+  error_adding_files_2cd4d45: "Ha habido un error al añadir archivos"
   error_adding_files_97ba198e: "Ha habido un error al añadir archivos."
   error_adding_files_to_conversation_message_58e83876: "Ha habido un error al añadir archivos al mensaje de la conversación"
   error_adding_files_to_discussion_message_8bb819e4: "Ha habido un error al añadir archivos al mensaje del foro de discusión"
@@ -8902,6 +8922,7 @@ es-ES:
   expand_permission_b45bf097: "Expandir %{permission}"
   expand_permission_c61d5958: "Expandir permiso"
   expand_subdiscussion_cd226ed4: "Expandir subforo de discusión"
+  expand_threads_634fe7a1: "Expandir hilos"
   expand_tutorial_tray_22630c49: "Bandeja de tutoriales: expandir"
   expanded_f4493860: Expandido
   expected_array_of_objects_b09ead01: "Matriz esperada de objetos"
@@ -10594,6 +10615,11 @@ es-ES:
       En lugar de mostrar el mensaje genérico «Error 404: página no encontrada», la API mostrará el código 422
       junto con un mensaje útil indicando que la herramienta no puede acceder a las
       asignaturas que ya han terminado.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Si se habilita esta opción, el JavaScript de respuesta mediante vínculo profundo enviará los postMessages
+      a «window.parent» en vez de «window.top». Esta opción permite que a la
+      respuesta mediante vínculo profundo enviar elementos de contenido correctamente a Nuevos exámenes cuando se
+      inicia una herramienta desde NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Si se habilita esta opción, OAuth 2.0 enviará desde este momento correctamente los códigos de estado 4xx al
       cliente que realice la solicitud, en lugar de redirigirlos a sí mismos
@@ -10619,6 +10645,7 @@ es-ES:
       Si las mejoras del RCE también están habilitadas,
       este guardará automáticamente el trabajo a medida que usted lo realiza
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Si se establece, permite cambiar el estado del envío desde dentro de SpeedGrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Si se establece esta opción, se elimina la prioridad del uso de fechas de entrega, fechas de bloqueo y fechas de desbloqueo desde las anulaciones de la sección para una actividad que esté asociada con una inscripción de un estudiante desactivada, terminada o no activa."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Si se establece esta opción, se muestran los informes de originalidad con las mejoras para la actividad."
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Si se configura esta opción, muestra el icono de conexión de dominio"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Si se configura esta opción, Quizzes.Next funcionará mediante una sesión de lanzamiento individual en SpeedGrader"
@@ -11207,6 +11234,7 @@ es-ES:
   key_state_for_the_current_account_d16b1cd5: "Estado clave de la cuenta actual"
   keyboard_nav_dialog: 
     esc_key_notification: "Pulsa la tecla de escape antes de métodos abreviados de teclado al navegar por la red del Libro de notas."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Acceso directo del teclado para actividades faltantes"
   keyboard_shortcuts_ed1844bd: "Métodos abreviados de teclado"
   kind_7f0a88c4: Tipo
   know_your_users_5c1323be: "Conoce a los usuarios"
@@ -14161,6 +14189,7 @@ es-ES:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migración de nuevas pruebas habilitada de forma predeterminada"
   new_quizzes_migration_required_7854aa1a: "Se requiere la migración de nuevas pruebas"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nuevas pruebas en la página Pruebas"
+  new_quizzes_public_api_18d95321: "API pública de nuevos exámenes"
   new_quizzes_service_jwt_refresh_ca28ca8: "Actualizar JWT del servicio de nuevas evaluaciones"
   new_quizzes_site_admin_service_user_a331233a: "Nuevo usuario de servicio de administración en nuevas pruebas"
   new_quizzes_submission_274b5c57: "Entrega de nuevas pruebas"
@@ -14810,6 +14839,7 @@ es-ES:
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Una vez habilitada esta opción, los profesores pueden visualizarla en el libro de notas."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Una vez que has entregado una respuesta, no podrás modificarla más tarde. No podrás ver la pregunta anterior."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Una vez que comience la depuración, se recopilará toda la información sobre el siguiente intento de inicio de sesión. Haz clic en “Actualizar” para ver si se recopiló más información o en “Detener la depuración” para eliminar la información recopilada y detener el intento actual de depuración."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "Uno de los redirect_uris proporcionados es demasiado largo. Asegúrate de introducir el valor(es) correcto(s) para tu redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Uno o más ítems de contenido enviados por esta aplicación externa no se han podido procesar correctamente. Estos ítems no los ha guardado Canvas, los motivos de los errores se enumeran a continuación."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Una o más notas seleccionadas las ha proporcionado un evaluador con inscripciones inactivas. Actualiza tus selecciones a las proporcionadas por evaluadores actuales."
   one_or_more_items_are_currently_being_imported_the_186fe069: "En este momento se están importando uno o más ítems. Se mostrarán en la asignatura a continuación una vez estén disponibles."
@@ -15938,6 +15968,7 @@ es-ES:
   private_3883d133: Privado
   pro_tip_30e41fa3: "¡CONSEJO PROFESIONAL!"
   proceed_f3d33864: Proceder
+  proceed_with_caution_aa9b3285: "Procesado con precaución"
   processed_4725b02: Procesado
   processing_2fcc9739: Procesando
   product_name: Canvas
@@ -17889,6 +17920,7 @@ es-ES:
   reset_all_6e5e040a: "Restablecer todo"
   reset_all_unpublished_changes_243f179f: "¿Deseas restablecer todos los cambios no publicados?"
   reset_courses_fe29ddf9: "Restablecer asignaturas"
+  reset_lti_provision_6d8e287f: "Restablecer provisión de LTI"
   reset_multi_factor_authentication_2b63a558: "Restablecer la autentificación multifactor"
   reset_name_6a0aa0f: "Restablecer \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Restablecer mi elección de motor de preguntas"
@@ -19946,6 +19978,7 @@ es-ES:
   submission_type_displayname_currently_selected_3f8aa9f8: "Tipo de entrega %{displayName}, seleccionado actualmente"
   submission_type_selection_72ce19f: "Selección del tipo de entrega"
   submission_updated_8897f3b7: "Se ha actualizado una entrega"
+  submission_uploaded_542c9ac6: "¡Entrega cargada!"
   submission_user_name_assignment_title_2cf5e3e9: "Entrega: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Se ha entregado la actividad."
@@ -20066,6 +20099,8 @@ es-ES:
   submit_ticket_5515ffd: "Entregar ticket"
   submitted_318fad53: Entregado
   submitted_at_4d5ea3aa: "Entregado a"
+  submitted_by_name_dab6d5e1: "Entregado por: %{name}"
+  submitted_by_submitter_1dcd07a1: "Entregado por %{submitter}"
   submitted_date_ba55b0ae: "Entregado %{date}"
   submitted_datetime_fa2e9287: "Entregado: %{dateTime}"
   submitted_files_82dd3009: "Archivos entregados"
@@ -20336,6 +20371,7 @@ es-ES:
   test_cluster_only_70e61c19: "Solamente grupos de pruebas"
   test_feature_flag_980151e0: "Marca de funcionalidad de prueba"
   testing_state_effd4a82: "Estado de prueba"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Texto
   text_df773ce4: texto
   text_document_eacbcdb7: "Documento de texto"
@@ -20573,6 +20609,7 @@ es-ES:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "El icono de acceso directo a los dispositivos iOS/Android. 180×180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "La actividad especificada no se ha podido encontrar"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "La actividad especificada no se ha podido encontrar (%{id})"
+  the_specified_resource_does_not_exist_71d8b751: "El recurso especificado no existe."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "El usuario especificado (%{id}) no es un estudiante en esta asignatura"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "El usuario especificado no es un estudiante en esta asignatura"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "La fecha de inicio del Pace Plan debe ser posterior a la fecha de finalización."
@@ -21034,6 +21071,7 @@ es-ES:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Esta acción actualizará todas las rúbricas que usan esta competencia y que aún no han sido evaluadas"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Esta acción actualizará todos los resultados de dominio del estudiante vinculados al cálculo de dominio a nivel de la cuenta."
   this_will_update_all_student_mastery_results_withi_934580d1: "Esta acción actualizará todos los resultados de dominio del estudiante dentro de esta asignatura."
+  thread_addd9799: Hilo
   threshold_pts_45f0e5d8: "umbral: %{pts}"
   throttle_jobs_f61be56: "Acelerar trabajos"
   throttle_tag_tag_ba5b9b50: "Acelerar etiquetas \"%{tag}\""
@@ -22068,6 +22106,7 @@ es-ES:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utilizar este panel para buscar personas que quieras añadir a esta asignatura."
   use_this_photo_3a594830: "Usar esta foto"
   use_webcam_1ed0bf6b: "Usar cámara web"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Utilizar «window.parent» en la respuesta mediante vínculo profundo"
   used_by_permission_314a78dd: "Utilizado con autorización"
   user: 
     default_user_name: Usuario
