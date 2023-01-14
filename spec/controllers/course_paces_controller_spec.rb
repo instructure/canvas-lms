@@ -118,7 +118,8 @@ describe CoursePacesController, type: :controller do
                                                                 blackout_date: true
                                                               })]
       @section = @course.course_sections.first
-      @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @first_student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @last_student_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: @another_section, allow_multiple_enrollments: true)
       @progress = @course_pace.create_publish_progress
       get :index, params: { course_id: @course.id }
 
@@ -134,13 +135,16 @@ describe CoursePacesController, type: :controller do
                                                         end_at: @course.end_at
                                                       }))
       expect(js_env[:ENROLLMENTS].length).to be(1)
-      expect(js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
-                                                                                     id: @student_enrollment.id,
-                                                                                     user_id: @student.id,
-                                                                                     course_id: @course.id,
-                                                                                     full_name: @student.name,
-                                                                                     sortable_name: @student.sortable_name
-                                                                                   }))
+      # only includes the most recent enrollment of each student
+      expect(js_env[:ENROLLMENTS]).not_to include(@first_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS]).to include(@last_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS][@last_student_enrollment.id]).to match(hash_including({
+                                                                                          id: @last_student_enrollment.id,
+                                                                                          user_id: @student.id,
+                                                                                          course_id: @course.id,
+                                                                                          full_name: @student.name,
+                                                                                          sortable_name: @student.sortable_name
+                                                                                        }))
       expect(js_env[:SECTIONS].length).to be(2)
       expect(js_env[:SECTIONS][@section.id]).to match(hash_including({
                                                                        id: @section.id,

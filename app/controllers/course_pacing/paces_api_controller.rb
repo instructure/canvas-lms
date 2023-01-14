@@ -26,6 +26,8 @@ class CoursePacing::PacesApiController < ApplicationController
 
   def show
     pace = pacing_service.pace_for(context, should_duplicate: true)
+    return not_found if pace.nil?
+
     render json: {
       pace: pacing_presenter.new(pace).as_json,
       progress: pace.id ? progress_json(pacing_service.progress(pace, publish: false), @current_user, session) : nil
@@ -34,6 +36,8 @@ class CoursePacing::PacesApiController < ApplicationController
 
   def create
     pace = pacing_service.create_in_context(context)
+    return not_found if pace.nil?
+
     render json: {
       pace: pacing_presenter.new(pace).as_json,
       progress: progress_json(pacing_service.progress(pace), @current_user, session)
@@ -42,6 +46,8 @@ class CoursePacing::PacesApiController < ApplicationController
 
   def update
     pace = pacing_service.pace_in_context(context)
+    return not_found if pace.nil?
+
     if pacing_service.update_pace(pace, update_params)
       render json: {
         pace: pacing_presenter.new(pace).as_json,
@@ -53,6 +59,10 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def delete
+    # make sure the pace exists and it is valid
+    pace = pacing_service.pace_in_context(context)
+    return not_found if pace.nil?
+
     pacing_service.delete_in_context(context)
     head :no_content
   end

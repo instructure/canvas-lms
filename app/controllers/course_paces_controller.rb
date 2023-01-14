@@ -269,7 +269,8 @@ class CoursePacesController < ApplicationController
   end
 
   def enrollments_json(course)
-    json = course.all_real_student_enrollments.map do |enrollment|
+    # Only the most recent enrollment of each student is considered
+    json = course.all_real_student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*").map do |enrollment|
       {
         id: enrollment.id,
         user_id: enrollment.user_id,
