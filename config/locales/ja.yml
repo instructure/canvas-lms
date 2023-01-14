@@ -270,6 +270,7 @@ ja:
         partner_key: パートナーキー
   academic_engagement_capella_74946a80: "アカデミックな予定 (Capella)"
   academic_engagement_strayer_8c7832b9: "アカデミックな予定 (Strayer)"
+  academic_success_reporting_2585c499: 学術的成功の報告
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union ハイスクール評定表"
   accept_2fdd362e: 受諾
   accept_course_invitation_b4c04fbb: コースへの招待を受け入れる
@@ -1184,7 +1185,7 @@ ja:
           account_reports: 
             default: 
               parameters: 
-                header: "条件 (4つまで)"
+                header: "条件 (5つまで)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1907,6 +1908,15 @@ ja:
             excelsior: 
               outcome: 
                 text: "SIS ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: 期間
+          student_assignment_grade: 
+            login_ids: 
+              field: "ログイン ID"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2510,6 +2520,7 @@ ja:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       ディスカッションの返信を作成
       タイムスタンプに従って並べ替えることができます。ルートレベルの応答のデフォルトの順序は、新しいものから古いもの順になります。
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: 採点者が成績表にMIを入力したり、SpeedGrader課題を未提出と手動でタグ付けしたりできるようにする
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 講師が未採点の提出物に一括してスコアを適用できるようにします。
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: 講師が評定表の課題グループや［合計欄］のメニューから、未採点の提出物に一括してスコアを適用できるようになります。
@@ -5361,6 +5372,7 @@ ja:
   by_default_students_can_always_create_groups_in_a__af000dd: "デフォルトでは、学生はグループを作成できます。学生によるグループの作成を制限するには、[コース管理：管理者-管理/更新]が有効にされていなければなりません。また、コース設定で「受講生が自分のグループを整理する」チェックボックスがオフになっていなければなりません。"
   by_default_students_can_always_create_groups_in_a__dac761d3: "デフォルトでは、受講者はグループを作成できます。受講生がグループを作成するのを制限するには、[コース - 管理/更新]も有効にされていなければならず、コース設定で[受講生が自分のグループを整理する]チェックボックスがオフにされていなければなりません。"
   by_lti_2_registration_url_e421e523: "LTI 2 登録 URL"
+  by_name_54daec42: "%{name}が担当"
   by_url_a163275e: "URL ごと"
   c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -6419,6 +6431,7 @@ ja:
   collapse_replies_20f2faf7: 返信を折りたたむ
   collapse_replies_ef4fc36b: 返信を折りたたむ
   collapse_subdiscussion_89af1f5c: サブディスカッションを折りたたむ
+  collapse_threads_ef7ca000: スレッドを折りたたむ
   collapse_tutorial_tray_66ee7dc1: チュートリアルトレイを折りたたむ
   collapsed_510aa02a: 折りたたまれました
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Canvas 全体におけるレスポンス改善のコレクションです"
@@ -8032,6 +8045,9 @@ ja:
   count_unread_messages_e312aa7b: 
     one: "%{count}の未読メッセージ"
     other: "%{count}の未読メッセージ"
+  count_unread_release_notes_3be26022: 
+    one: "%{count}の未読のリリースノート。"
+    other: "%{count}の未読のリリースノート。"
   count_unread_replies_86976ab: "%{count}未読の返信"
   count_unread_shares_ff9e91a5: 
     one: "%{count}の未読の共有"
@@ -9835,6 +9851,7 @@ ja:
   deployment_id_for_toolname_app_e54a7364: "%{toolName} アプリ用デプロイメント id"
   deprecate_sms_be6b00a: SMSを廃止
   deprecated_59e99d2a: 非推奨
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: 非アクティブな登録者のセクション上書きの優先順位を下げる
   desc_12ad2869: "%{desc}"
   descending_b7828162: 降順
   description_436c48d7: 説明
@@ -10154,6 +10171,7 @@ ja:
       page_header_title: 新しいディスカッション
       points_possible: 配点
       post_at: 投稿日時
+      publish: 公開
       save: 保存
       saving: 保存しています…
       sort_by_likes: いいね順
@@ -10959,6 +10977,7 @@ ja:
   enabled_unlocked_8d3a5df7: 有効（ロック解除）
   enabled_web_services_f620b2be: "使用可能になっている Web サービス"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 再設計された「次のような受講者にメッセージを送信する...」ダイアログを有効にして、受講者に加えてオブザーバーにもメッセージを送信することができるようになりました。
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: Canvasから新規小テストパブリックAPIにアクセスできるようにします。
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 新しい評定表提出トレイで、盗作レポートと類似性スコアの表示を有効にします。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 重要な日付を割り当てて、カレンダーイベントなどに適用できるようにします。
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: SpeedGrader　でドラフトコメントが未投稿のままになっている場合、ユーザーに警告するモーダルを有効にします。
@@ -11451,6 +11470,7 @@ ja:
   error_98e81528: エラー
   error_adding_canvas_file_to_submission_draft_de258021: キャンバスファイルを提出起案に追加する際のエラー
   error_adding_file_to_discussion_message_16feef3f: ディスカッションメッセージへのファイルの追加中にエラーが発生しました
+  error_adding_files_2cd4d45: ファイル追加中にエラー
   error_adding_files_97ba198e: ファイル追加中にエラー。
   error_adding_files_to_conversation_message_58e83876: ファイルを会話メッセージへ追加中にエラーが発生しました
   error_adding_files_to_discussion_message_8bb819e4: ディスカッションメッセージへのファイルの追加中にエラーが発生しました
@@ -11714,6 +11734,7 @@ ja:
   expand_permission_b45bf097: "展開する%{permission}"
   expand_permission_c61d5958: 許可を拡大する
   expand_subdiscussion_cd226ed4: サブディスカッションを展開する
+  expand_threads_634fe7a1: スレッドを展開する
   expand_tutorial_tray_22630c49: チュートリアルトレイを展開する
   expanded_f4493860: 展開済み
   expected_array_of_objects_b09ead01: 期待されるオブジェクトの配列
@@ -14500,6 +14521,10 @@ ja:
       一般的な404 Not Foundを返すのではなく、代わりに422を返し、
       ツールが終了したコースにアクセスできないことを示す役立
       つメッセージを返します。
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      有効にすると、ディープリンクレスポンスJSは、postMessagesを
+      window.topではなくwindow.parentに送信するようになります。これにより、NQから
+      ツールを起動したときに、ディープリンクレスポンスから新規小テストにコンテンツアイテムが正しく送信されるようになります。
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       有効にすると、OAuth 2.0は、自分自身にリダイレクトする代わりに、
       要求してきたクライアントに4xxステータスコードを正しく返します
@@ -14536,6 +14561,7 @@ ja:
       RCE 機能強化も有効になっている場合、
       RCE が作業を自動で保存します
   if_set_allows_submission_status_to_be_changed_from_156f57f: "設定されている場合、Speedgrader 内から送信ステータスを変更できます"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: 設定された場合、無効化された、締結された、またはその他の非アクティブな登録に関連付けられている課題のセクション上書きから、日、ロック日、およびロック解除日の使用が優先されなくなります。
   if_set_displays_originality_reports_with_assignmen_c5d0276f: 設定されている場合、割り当て強化がオンになっているオリジナリティレポートを表示します
   if_set_displays_updated_mastery_connect_icon_b6a93002: 設定されている場合、更新された習熟度コネクトアイコンが表示されます
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: 設定されている場合、Quizzes.NextはSpeedGraderの1つの起動セッションを使用して動作します。
@@ -15354,6 +15380,7 @@ ja:
   keyboard_instructions_e032939f: キーボードのインストラクション
   keyboard_nav_dialog: 
     esc_key_notification: 評定表のグリッドをナビゲートする場合、キーボードショートカットを使用する前に、エスケープキーを押してください。
+  keyboard_shortcut_for_missing_assignment_848aa9cd: 課題未提出時のキーボードショートカット
   keyboard_shortcuts_ed1844bd: "キーボード ショートカット"
   kind_7f0a88c4: 種類
   know_your_users_5c1323be: ユーザーを理解する
@@ -18963,6 +18990,7 @@ ja:
   new_quizzes_migration_enabled_by_default_5f9bcc81: デフォルトで有効になっている新しい小テストの移行
   new_quizzes_migration_required_7854aa1a: 新しい小テストの移行が必要です
   new_quizzes_on_the_quizzes_page_b21f338d: 小テストページの新しい小テスト
+  new_quizzes_public_api_18d95321: 新規小テストパブリックAPI
   new_quizzes_service_jwt_refresh_ca28ca8: 新しいクイズサービスJWTの更新
   new_quizzes_site_admin_service_user_a331233a: "新規小テスト サイト管理者サービスユーザー"
   new_quizzes_submission_274b5c57: 新規小テスト提出
@@ -19736,6 +19764,7 @@ ja:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 解答を提出後には、変更することはできません。以前の質問は閲覧できなくなります。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "デバッグを開始すると、次に試行されるログイン試行に関するすべての情報が収集されます。[更新]をクリックすると、より多くのデータが収集されているかどうか、[デバッグの停止]は収集されたデータをクリアして現在のデバッグ試行を停止します。"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 解答を変更したら、問題を更新する前にオプションを選択する必要があります。
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: 提供された課題の1つがredirect_uris長すぎます。入力したredirect_uris値が正しいことを確認してください。
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: この外部アプリから送信された1つまたは複数のコンテンツ項目が正しく処理されませんでした。これらは　Canvas　によって保存されておらず、失敗の理由は以下のとおりです。
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: 選択された1つ以上の評定が、非アクティブな登録を持つ採点者によって提供されています。選択内容を現在の採点者が提供するものに更新してください。
   one_or_more_items_are_currently_being_imported_the_186fe069: 1つ以上のアイテムが現在インポート中です。利用可能になると、以下のコースに表示されます。
@@ -21095,6 +21124,7 @@ ja:
   private_3883d133: 個人
   pro_tip_30e41fa3: プロのヒント！
   proceed_f3d33864: 続行する
+  proceed_with_caution_aa9b3285: 慎重に進めてください
   process_multiple_content_items_from_course_modules_6de90fd8: コースモジュールページの複数のコンテンツアイテムを処理します
   processed_4725b02: 処理済み
   processing_2fcc9739: 処理中
@@ -23610,6 +23640,7 @@ ja:
   reset_all_6e5e040a: すべてをリセットする
   reset_all_unpublished_changes_243f179f: 未公開の変更内容をすべてリセットしますか?
   reset_courses_fe29ddf9: コースリセット
+  reset_lti_provision_6d8e287f: LTI条項をリセット
   reset_multi_factor_authentication_2b63a558: マルチファクタ認証をリセットしてください
   reset_name_6a0aa0f: "\"%{name}\"をリセット："
   reset_quiz_engine_choice_323a40e6: 小テストエンジンの選択をリセットする
@@ -26328,6 +26359,7 @@ ja:
   submission_type_lti_placement_b448d5d0: 提出タイプLTI配置
   submission_type_selection_72ce19f: 提出タイプ選択
   submission_updated_8897f3b7: 提出物が更新されました
+  submission_uploaded_542c9ac6: 提出がアップロードされました！
   submission_user_name_assignment_title_2cf5e3e9: "提出%{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: 課題は正常に提出されました。
@@ -26478,6 +26510,8 @@ ja:
   submit_ticket_5515ffd: チケットの提出
   submitted_318fad53: タスクの評定を送信
   submitted_at_4d5ea3aa: 提出
+  submitted_by_name_dab6d5e1: "提出者：%{name}"
+  submitted_by_submitter_1dcd07a1: "提出者%{submitter}"
   submitted_d5ba370a: 提出済み：
   submitted_date_ba55b0ae: "%{date}提出しました"
   submitted_datetime_fa2e9287: "提出済み：%{dateTime}"
@@ -26800,6 +26834,7 @@ ja:
   test_cluster_only_70e61c19: クラスタのみをテストする
   test_feature_flag_980151e0: テスト機能フラグ
   testing_state_effd4a82: テストの状態
+  text_7b9bd49c: "%{text}"
   text_7f4593da: テキスト
   text_df773ce4: text
   text_document_eacbcdb7: テキスト文書
@@ -27101,6 +27136,7 @@ ja:
   the_specified_assignment_could_not_be_found_c5dc34ab: 指定された課題が見つかりませんでした
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "指定された課題 (%{id}) が見つかりませんでした"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: " file_id の指定されたファイルにはすでに独創性レポートがあります"
+  the_specified_resource_does_not_exist_71d8b751: 指定されたリソースは存在しません。
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "指定されたユーザ (%{id}) は、このコースの受講者ではありません"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: 指定されたユーザは、このコースの受講者ではありません
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: ペースプランの開始日は、終了日より後でなければなりません。
@@ -27694,6 +27730,7 @@ ja:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: これにより、まだ評価されていないこのアウトカムを使用して、すべてのルーブリックが更新されます
   this_will_update_all_student_mastery_results_tied__a52301e5: これにより、アカウントレベルの達成度の計算に関連付けられているすべての受講者の達成度の成果が更新されます。
   this_will_update_all_student_mastery_results_withi_934580d1: これにより、このコース内のすべての受講者の達成度の成果が更新されます。
+  thread_addd9799: スレッド
   threshold_in_hours_to_notify_students_within_f33820aa: 受講生に通知するしきい値（時間単位）
   threshold_pts_45f0e5d8: "域値：%{pts}"
   throttle_jobs_f61be56: ジョブをスロットル
@@ -29162,6 +29199,7 @@ ja:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: このパネルを使用して、このコースに追加するユーザーを検索します。
   use_this_photo_3a594830: これを写真を使用する
   use_webcam_1ed0bf6b: ウェブカメラを使用する
+  use_window_parent_in_deep_linking_response_8fe5f845: ディープリンクレスポンスでwindow.parentを使用する
   used_by_permission_314a78dd: 許諾により使用
   user: 
     default_user_name: ユーザ
