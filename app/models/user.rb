@@ -1354,18 +1354,13 @@ class User < ActiveRecord::Base
   end
 
   def self.all_course_admin_type_permissions_for(user)
-    enrollments = user.enrollments.active.of_admin_type
+    enrollments = Enrollment.for_user(user).of_admin_type.active_by_date.distinct_on(:role_id).to_a
     result = {}
 
     RoleOverride.permissions.each_key do |permission|
-      # initialize all permissions
-      result[permission] ||= []
-
-      enrollments.find_each do |enrollment|
-        # if available, iterate and set permissions that are enabled
-        # through the user's active course admin enrollments
-        enrollment.has_permission_to?(permission) == false ? next : result[permission] << true
-      end
+      # iterate and set permissions
+      # we want the highest level permission set the user is authorized for
+      result[permission] = true if enrollments.any? { |e| e.has_permission_to?(permission) }
     end
     result
   end
