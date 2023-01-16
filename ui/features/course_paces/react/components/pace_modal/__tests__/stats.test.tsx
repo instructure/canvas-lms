@@ -58,7 +58,7 @@ describe('pace modal stats', () => {
       `Assignments${defaultProps.assignments}`
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Duration${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
     )
   })
 
@@ -79,7 +79,7 @@ describe('pace modal stats', () => {
       `Assignments${defaultProps.assignments}`
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Duration${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
     )
   })
 
@@ -101,7 +101,7 @@ describe('pace modal stats', () => {
       `Assignments${defaultProps.assignments}`
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Duration${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
     )
   })
 
@@ -118,7 +118,7 @@ describe('pace modal stats', () => {
       `Assignments${defaultProps.assignments}`
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Duration${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
     )
   })
 
@@ -137,7 +137,7 @@ describe('pace modal stats', () => {
       `Assignments${defaultProps.assignments}`
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Duration${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
     )
   })
 

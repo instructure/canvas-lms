@@ -303,7 +303,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
           display="inline-block"
           margin="small none none none"
         >
-          {getColoredText('#30203A', I18n.t('Duration'))}
+          {getColoredText('#30203A', I18n.t('Time to complete'))}
           {getColoredText('#068447', duration, {as: 'div', weight: 'bold'})}
         </View>
       </View>
