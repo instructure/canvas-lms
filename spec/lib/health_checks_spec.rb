@@ -137,4 +137,36 @@ describe HealthChecks do
       expect(described_class.process_deep_checks[:secondary][:incoming_mail][:status]).to eq true
     end
   end
+
+  it "reports metrics to statsd" do
+    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:timing)
+
+    allow(HealthChecks).to receive(:process_readiness_checks).and_return(
+      {
+        readiness_check_name_error: { time: 1, status: false },
+        readiness_check_name_success: { time: 2, status: true },
+      }
+    )
+
+    allow(HealthChecks).to receive(:process_deep_checks).and_return(
+      {
+        deep: {
+          deep_check_name_error: { time: 3, status: false },
+          deep_check_name_success: { time: 4, status: true },
+        }
+      }
+    )
+
+    HealthChecks.send_to_statsd
+
+    expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.health_checks.status.error", tags: { type: :deep, key: :deep_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.health_checks.status.error", tags: { type: :readiness, key: :readiness_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.health_checks.status.ok", tags: { type: :deep, key: :deep_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.health_checks.status.ok", tags: { type: :readiness, key: :readiness_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 1, tags: { type: :readiness, key: :readiness_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 2, tags: { type: :readiness, key: :readiness_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 3, tags: { type: :deep, key: :deep_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 4, tags: { type: :deep, key: :deep_check_name_success })
+  end
 end
