@@ -1223,7 +1223,7 @@ class AccountsController < ApplicationController
       @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
       @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
 
-      @announcements = @account.announcements.order(created_at: "desc").paginate(page: params[:page], per_page: 50)
+      @announcements = @account.announcements.order(created_at: "desc").paginate(page: params[:page], per_page: 10)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       course_creation_settings = {}
