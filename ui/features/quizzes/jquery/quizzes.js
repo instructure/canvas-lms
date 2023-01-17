@@ -21,7 +21,7 @@
 /* eslint-disable eqeqeq,@typescript-eslint/no-redeclare,@typescript-eslint/no-shadow */
 /* eslint-disable block-scoped-var,no-var,prefer-const,no-restricted-globals,vars-on-top */
 /* eslint-disable promise/catch-or-return,@typescript-eslint/no-unused-vars,no-empty */
-/* eslint-disable no-loop-func,no-constant-condition,no-alert,no-console */
+/* eslint-disable no-loop-func,no-constant-condition,no-alert */
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
@@ -2761,8 +2761,6 @@ ready(function () {
 
   // attach HTML answers but only when they click the button
   $('#questions').delegate('.edit_html', 'click', function (event) {
-    console.log('HERE!!')
-
     event.preventDefault()
     const $this = $(this)
     let toggler = $this.data('editorToggle')
