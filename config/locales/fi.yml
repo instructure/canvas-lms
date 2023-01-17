@@ -249,6 +249,7 @@ fi:
         partner_key: "Kumppanin avain"
   academic_engagement_capella_74946a80: "Akateeminen sitoutuminen (Capella)"
   academic_engagement_strayer_8c7832b9: "Akateeminen sitoutuminen (Strayer)"
+  academic_success_reporting_2585c499: "Akateemisen menestyksen raportointi"
   acalanes_union_high_grade_report_ae9bce11: "Acalanen liiton korkean arvosanan raportti"
   accept_2fdd362e: Hyväksy
   accept_course_invitation_b4c04fbb: "Hyväksy kurssikutsu"
@@ -956,7 +957,7 @@ fi:
           account_reports: 
             default: 
               parameters: 
-                header: "Ehdot (Raja 4)"
+                header: "Ehdot (Raja 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1613,6 +1614,15 @@ fi:
             excelsior: 
               outcome: 
                 text: "SIS ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Lukukausi
+          student_assignment_grade: 
+            login_ids: 
+              field: Käyttäjätunnukset
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2161,6 +2171,7 @@ fi:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Sallii keskustelun vastauksien lajittelun
       aikaleimojen perusteella. Oletusjärjestely on uusimmasta vanhimpaan juuritason vastauksille.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Salli arvosanojen antajan kirjoittavan MI arvosanojen antokirjaan tai SpeedGrader merkitä tehtävä manuaalisesti puuttuvaksi"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Salli ohjelinkit merkittäviksi esiteltyinä tai uutena ja näyttää huomattavasti  esitelty ohjelinkki ohjevalikossa"
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Mahdollistaa opettajan käyttävän pistemääriä massana sellaisiin palautuksiin, joille ei ole annettu arvosanaa."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Mahdollista ohjaajien soveltavan arvosanoja arvostelemattomiin massapalautuksiin tehtäväryhmästä ja Yhteensä-sarakevalikoista arvosanakirjassa."
@@ -4670,6 +4681,7 @@ fi:
   by_default_students_can_always_create_groups_in_a__af000dd: "Opiskelijat voivat aina oletuksena luoda ryhmiä kurssilla. Rajoittaaksesi opiskelijoita luomasta ryhmiä, Hallitse kursseja: Pääkäyttäjä - hallitse/päivitä täytyy olla käytössä ja Anna opiskelijoiden organisoida omat ryhmänsä -valintaruutu kurssiasetuksissa täytyy olla valitsematta."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Opiskelijat voivat aina oletuksena luoda ryhmiä kurssilla. Rajoittaaksesi opiskelijoita luomasta ryhmiä, Kurssit - hallitse/päivitä täytyy olla käytössä ja Anna opiskelijoiden organisoida omat ryhmänsä -valintaruutu kurssiasetuksissa täytyy olla valitsematta."
   by_lti_2_registration_url_e421e523: "LTI 2:n rekisteröinti-URL:n avulla"
+  by_name_54daec42: "tekijä %{name}"
   by_url_a163275e: "URL:n mukaan"
   c4e_analytics_66e0fc46: C4E-analyysi
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5604,6 +5616,7 @@ fi:
   collapse_replies_20f2faf7: "Kutista vastaukset"
   collapse_replies_ef4fc36b: "Kutista vastaukset"
   collapse_subdiscussion_89af1f5c: "Kutista alakeskustelu"
+  collapse_threads_ef7ca000: "Kutista ketjut"
   collapse_tutorial_tray_66ee7dc1: "Kutista ohjetietopaneelia"
   collapsed_510aa02a: Kutistettu
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Reagoivuuden parannusten kokoelma Canvasissa"
@@ -7006,6 +7019,9 @@ fi:
   count_unread_messages_e312aa7b: 
     one: "1 lukematon viesti."
     other: "%{count} lukematonta viestiä."
+  count_unread_release_notes_3be26022: 
+    one: "Yksi lukematon julkaisuilmoitus."
+    other: "%{count} lukematonta julkaisuilmoitusta."
   count_unread_replies_86976ab: "%{count} lukematonta vastausta"
   count_unread_shares_ff9e91a5: 
     one: "Yksi lukematon jako."
@@ -8479,6 +8495,7 @@ fi:
   deployment_id_for_toolname_app_e54a7364: "Käyttöönoton tunnus sovellukselle %{toolName}"
   deprecate_sms_be6b00a: "Vanhennuta SMS: "
   deprecated_59e99d2a: Vanhentunut
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Alenna osioiden ohitusten arvojärjestystä passiivisille ilmoittautumisille"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Laskeva
   description_436c48d7: Kuvaus
@@ -8735,6 +8752,7 @@ fi:
       options: Asetukset
       points_possible: "Maksimi pisteet"
       post_at: Lähetä
+      publish: Julkaise
       save: Tallenna
       saving: Tallennetaan...
       sort_by_likes: "Lajittele tykkäysten perusteella"
@@ -9399,6 +9417,7 @@ fi:
   enabled_unlocked_8d3a5df7: "Käytössä (lukitus avattu)"
   enabled_web_services_f620b2be: "Käytössä olevat verkkopalvelut"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Ottaa käyttöön uudelleen osoitetun viestin opiskelijoille, jotka....valintaruutu, jonka avulla havainnoitsijoille voidaan lähettää viestejä opiskelijoiden lisäksi."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Mahdollistaa käyttöoikeuden uusien kyselyiden julkiseen sovellusliittymään Canvasin kautta."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ottaa käyttöön plagiointiraportit ja samankaltaisuuden pisteet uuden arvosanakirjan tehtäväpalautuspaneelissa."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Mahdollistaa tärkeiden päivämäärien soveltamisen tehtäviin, kalenteritapahtumiin ja muihin."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Ottaa käyttöön modaalin, jolla varoitetaan käyttäjää, kun luonnoskommentti jätetään lähettämättä SpeeGraderissä."
@@ -9861,6 +9880,7 @@ fi:
   error_98e81528: Virhe
   error_adding_canvas_file_to_submission_draft_de258021: "Virhe lisättäessä Canvas-tiedostoa tehtäväpalautuksen luonnokseen"
   error_adding_file_to_discussion_message_16feef3f: "Virhe lisättäessä tiedosto keskusteluviestiin"
+  error_adding_files_2cd4d45: "Virhe lisätessä tiedostoja"
   error_adding_files_97ba198e: "Virhe lisätessä tiedostoja."
   error_adding_files_to_conversation_message_58e83876: "Virhe lisättäessä tiedostoja keskusteluviestiin"
   error_adding_files_to_discussion_message_8bb819e4: "Virhe lisättäessä tiedostoja keskusteluviestiin"
@@ -10115,6 +10135,7 @@ fi:
   expand_permission_b45bf097: "Laajenna %{permission}"
   expand_permission_c61d5958: "Laajenna käyttöoikeutta"
   expand_subdiscussion_cd226ed4: "Laajenna alakeskustelua"
+  expand_threads_634fe7a1: "Laajenna ketjuja"
   expand_tutorial_tray_22630c49: "Laajenna ohjetietopaneelia"
   expanded_f4493860: Laajennettu
   expected_array_of_objects_b09ead01: "Kohteiden odotettu joukko"
@@ -12120,6 +12141,11 @@ fi:
       Sen sijasta, että API palauttaisi viestin "Yleinen 404 ei löytynyt", API palauttaa koodin 422
       ja sen kanssa hyödyllisen viestin, joka ilmaisee, että työkalu ei voi siirtyä päätettyihin
       kursseihin.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Jos toiminto on käytössä, syvälinkityksen vastauksen JP lähettää postMessages-viestit
+      kohteeseen window.parent kohteen window.top sijasta. Tämä mahdollistaa syvälinkityksen
+      vastauksen lähettävän oikein sisältöä uusiin kyselyihin, kun työkalu
+      käynnistetään NQ:sta.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Jos OAuth 2.0 on käytössä, se palauttaa nyt oikein 4xx-tilakoodit
       pyytämällä asiakkaalta sen sijaan, että uudelleenohjaisivat ne itselleen
@@ -12154,6 +12180,7 @@ fi:
       Jos sisältöeditorin laajennukset on myös otettu käyttöön,
       editori tallentaa tekemäsi muutokset automaattisesti.
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Jos määritetty, lähetystila om mahdollista vaihtaa Speedgraderin sisällä"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Jos tämä on määritetty, se alentaa määräpäivien, lukituspäivien ja lukituksen poistopäivien käyttämisen tärkeysjärjestyksen osioiden ohittamisesta tehtäville, jotka liitetään opiskelijan passiivisiin, suoritettuihin tai muuten passiivisiin ilmoittautumisiin."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Jos tämä on määritetty, esiin tulevat alkuperäisyysraportit, joissa tehtävien tehostus on päällä"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Jos määritetty, näyttää päivitetyn hallinnan kytkemiskuvakkeen"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Jos Quizzes.Next on määritetty, se käyttää yksittäistä istunnon aloittamista SpeedGraderissa"
@@ -12915,6 +12942,7 @@ fi:
   key_state_for_the_current_account_d16b1cd5: "Nykyisen tilin avaimen tila"
   keyboard_nav_dialog: 
     esc_key_notification: "Paina escape-painiketta ennen kuin käytät pikanäppäimiä, kun siirryt arvosanakirjan ruudukossa."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Pikanäppäinyhdistelmä puuttuvalle tehtävälle"
   keyboard_shortcuts_ed1844bd: Pikanäppäimet
   kind_7f0a88c4: Tyyppi
   know_your_users_5c1323be: "Tunne käyttäjäsi"
@@ -16003,6 +16031,7 @@ fi:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Uusien testien siirto otettu käyttöön oletuksena"
   new_quizzes_migration_required_7854aa1a: "Uusien testien tuonti vaaditaan"
   new_quizzes_on_the_quizzes_page_b21f338d: "Uudet testit Testit-sivulla"
+  new_quizzes_public_api_18d95321: "Uusien kyselyiden julkinen sovellusliittymä"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uusien testitulosten JWT-virkistys"
   new_quizzes_site_admin_service_user_a331233a: "Uuden testisivuston järjestelmäkäyttäjän palvelukäyttäjä"
   new_quizzes_submission_274b5c57: "Uusien testien lähetys"
@@ -16719,6 +16748,7 @@ fi:
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Kun tämä vaihtoehto on käytössä, se näkyy ohjaajien arvosanojen antokirjassa."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Kun olet lähettänyt vastauksesi, et pysty muuttamaan sitä myöhemmin. Et voi tarkastella edellistä kysymystä."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Kun aloitat virheen korjauksen, kaikki tiedot seuraavasta sisäänkirjautumisyrityksestä kerätään talteen. Napsauta ”Päivitä” nähdäksesi, onko muita tietoja kerätty tai ”Lopeta virheenkorjaus\" tyhjentääksesi kerätyt tiedot ja keskeyttääksesi nykyisen virheenkorjausyrityksen."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "Yksi toimitetuista redirect_uris on liian pitkä. Varmista, että olet syöttänyt oikean arvon kohteelle redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Yhtä tai useampaa tämän ulkoisen sovelluksen lähettämää sisältökohdetta ei onnistuttu käsittelemään oikein. Canvas ei ole tallentanut näitä, ja syyt epäonnistumiseen on mainittu alla."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Vähintään yksi valituista arvosanoista oli sellaisen arvostelijan antama, jolla oli passiivisia ilmoittautumisia. Päivitä valintasi nykyisten arvosanojen antajien antamiksi."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Yhtä tai useampaa kohdetta tuodaan parhaillaan. Ne näkyvät kurssissa alimpana, kun ne on tuotu."
@@ -17952,6 +17982,7 @@ fi:
   private_3883d133: Yksityinen
   pro_tip_30e41fa3: AMMATTILAISVINKKI!
   proceed_f3d33864: Jatka
+  proceed_with_caution_aa9b3285: "Etene varoen"
   process_multiple_content_items_from_course_modules_6de90fd8: "Käsittele useita sisältökohteita kurssimoduulien sivulta"
   processed_4725b02: Käsitelty
   processing_2fcc9739: Käsitellään
@@ -20113,6 +20144,7 @@ fi:
   reset_all_6e5e040a: "Nollaa kaikki"
   reset_all_unpublished_changes_243f179f: "Nollataanko kaikki julkaisemattomat muutokset?"
   reset_courses_fe29ddf9: "Palauta kursseja"
+  reset_lti_provision_6d8e287f: "Nollaa LTI-ehto"
   reset_multi_factor_authentication_2b63a558: "Palauta monimenetelmäinen todentaminen"
   reset_name_6a0aa0f: "Nollaa \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Nollaa testien laatimisen työkalun valinta"
@@ -22415,6 +22447,7 @@ fi:
   submission_type_lti_placement_b448d5d0: "Lähetystyypin LTI-paikka"
   submission_type_selection_72ce19f: "Lähetystyypin valitseminen"
   submission_updated_8897f3b7: "Tehtäväpalautus päivitetty"
+  submission_uploaded_542c9ac6: "Tehtäväpalautus ladattu!"
   submission_user_name_assignment_title_2cf5e3e9: "Tehtäväpalautus: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Tehtävän lähetys onnistui."
@@ -22544,6 +22577,8 @@ fi:
   submit_ticket_5515ffd: "Lähetä palvelupyyntö"
   submitted_318fad53: Lähetetty
   submitted_at_4d5ea3aa: "Palautettu kohteessa"
+  submitted_by_name_dab6d5e1: "Lähettäjä: %{name}"
+  submitted_by_submitter_1dcd07a1: "Lähettäjä %{submitter}"
   submitted_d5ba370a: "Lähetetty:"
   submitted_date_ba55b0ae: "Lähetetty %{date}"
   submitted_datetime_fa2e9287: "Palautettu: %{dateTime}"
@@ -22839,6 +22874,7 @@ fi:
   test_cluster_only_70e61c19: "Vain testiklusteri (testiympäristössä)"
   test_feature_flag_980151e0: "Testin epäonnistumisen merkki"
   testing_state_effd4a82: "Tilaa testataan"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Teksti
   text_df773ce4: text
   text_document_eacbcdb7: Tekstiasiakirja
@@ -23127,6 +23163,7 @@ fi:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Pikakuvake iOS-/Android-laitteille. 180x180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Kyseistä tehtävää ei löytynyt"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "Kyseistä tehtävää (%{id}) ei löytynyt"
+  the_specified_resource_does_not_exist_71d8b751: "Määriteltyä resurssia ei ole olemassa."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Kyseinen käyttäjä (%{id}) ei ole opiskelija tällä kurssilla"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Kyseinen käyttäjä ei ole opiskelija tällä kurssilla"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Toteutustahtisuunnitelman alkamispäivän täytyy olla päättymispäivän jälkeen."
@@ -23670,6 +23707,7 @@ fi:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Tämä päivittää kaikki tätä osaamistulosta käyttävät arviointitaulukot, joita ei vielä ole arvioitu"
   this_will_update_all_student_mastery_results_tied__a52301e5: "Tämä päivittää kaikki opiskelijan hallinnan tulokset, jotka on sidottu tilitason hallinnan laskentaan."
   this_will_update_all_student_mastery_results_withi_934580d1: "Tämä päivittää kaikki opiskelijan hallinnan tulokset tällä kurssilla."
+  thread_addd9799: Langat
   threshold_in_hours_to_notify_students_within_f33820aa: "Kynnys (tunneissa), jonka sisällä opiskelijoille ilmoitetaan"
   threshold_pts_45f0e5d8: "kynnys: %{pts}"
   throttle_jobs_f61be56: "Rajoitetut työtehtävät"
@@ -25047,6 +25085,7 @@ fi:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Hae tämän paneelin avulla henkilöitä, jotka haluat lisätä tälle kurssille."
   use_this_photo_3a594830: "Käytä tätä valokuvaa"
   use_webcam_1ed0bf6b: "Käytä verkkokameraa"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Käy osoitteessa window.parent tarkistamassa syvälinkitysvastaus."
   used_by_permission_314a78dd: "Käytetään luvalla"
   user: 
     default_user_name: Käyttäjä
