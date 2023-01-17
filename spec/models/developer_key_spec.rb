@@ -520,6 +520,22 @@ describe DeveloperKey do
       end
     end
 
+    it "de-duplicates the scope list" do
+      key = DeveloperKey.create!(
+        scopes: [
+          "url:GET|/api/v1/courses/:course_id/quizzes",
+          "url:GET|/api/v1/courses/:course_id/users",
+          "url:GET|/api/v1/courses/:course_id/quizzes",
+          "url:GET|/api/v1/courses/:course_id/users",
+        ]
+      )
+
+      expect(key.scopes.sort).to eq [
+        "url:GET|/api/v1/courses/:course_id/quizzes",
+        "url:GET|/api/v1/courses/:course_id/users",
+      ]
+    end
+
     it "does validate scopes" do
       expect do
         DeveloperKey.create!(
