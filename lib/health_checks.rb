@@ -38,6 +38,24 @@ module HealthChecks
       { critical: critical, secondary: secondary }
     end
 
+    def send_to_statsd
+      result = process_deep_checks.merge({ readiness: process_readiness_checks(true) })
+
+      result.each do |check_type, check_values|
+        check_values.each do |check_name, check_results|
+          tags = { type: check_type, key: check_name }
+
+          InstStatsd::Statsd.timing("canvas.health_checks.response_time_ms", check_results[:time], tags: tags)
+
+          if check_results[:status]
+            InstStatsd::Statsd.increment("canvas.health_checks.status.ok", tags: tags)
+          else
+            InstStatsd::Statsd.increment("canvas.health_checks.status.error", tags: tags)
+          end
+        end
+      end
+    end
+
     private
 
     def readiness_checks
