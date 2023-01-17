@@ -51,17 +51,17 @@ describe "Screenreader Gradebook grading" do
       login_to_srgb
     end
 
-    it "displays correct Grade for: label on assignments", prority: "1" do
+    it "displays correct Grade for label on assignments", prority: "1" do
       srgb_page.select_assignment(assignment_1)
 
-      expect(srgb_page.grade_for_label).to include_text("Grade for: Points Assignment")
+      expect(srgb_page.grade_for_label).to include_text("Grade for User - Points Assignment")
     end
 
     it "displays correct Grade for: label on next assignment", prority: "1" do
       srgb_page.select_assignment(assignment_1)
       srgb_page.next_assignment_button.click
 
-      expect(srgb_page.grade_for_label).to include_text("Grade for: Percent Assignment")
+      expect(srgb_page.grade_for_label).to include_text("Grade for User - Percent Assignment")
     end
 
     it "displays correct points for graded by Points", priority: "1" do
