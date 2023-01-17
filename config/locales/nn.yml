@@ -20118,7 +20118,7 @@ nn:
     updated_at: "Dato endra"
     updated_at_short: Endra
   reactivate_user_e058db8b: "Reaktiver brukar"
-  reactivation_will_allow_all_logins_for_name_to_log_455df70: "Reaktivering vil tillate alle innloggingar for %{name} å logge på Canvas og få tilbake tilgang til tidlegare autoriserte API-integrasjonar."
+  reactivation_will_allow_all_logins_for_name_to_log_455df70: "Reaktivering vil tillate alle innloggingar for %{name} å logge inn i Canvas og få tilbake tilgang til tidlegare autoriserte API-integrasjonar."
   read_7cabda44: les
   read_comments_3fcc7590: "Les kommentarar"
   read_dc99757a: Les
@@ -20168,7 +20168,7 @@ nn:
       other: "%{count} seksjonar"
   recipients_a69b5e55: "Mottakarar:"
   recipients_restricted_by_role_22c4c843: "Mottakarar avgrensa av rolle "
-  recipients_students_who_have_not_joined_a_group_a0c6a3c: "Mottakara: Studentar som enno ikkje har blitt med i ei gruppe"
+  recipients_students_who_have_not_joined_a_group_a0c6a3c: "Mottakarar: Studentar som enno ikkje har blitt med i ei gruppe"
   record_7c9448b: "Spel inn"
   record_an_audio_or_video_comment_88425add: "Spel inn ein lyd- eller videokommentar"
   record_audio_14666880: "Spel inn lyd"
@@ -20332,10 +20332,10 @@ nn:
   remove_selected_attachment_61f81ee4: "Fjern det valgte vedlegget"
   remove_student_from_recipients_4b206e35: "Fjern %{student} frå mottakarar"
   remove_studentname_16ba8c3a: "Fjern %{studentName}"
-  remove_students_from_courses_a8e024fd: "Fjern studentar frå emne"
+  remove_students_from_courses_a8e024fd: "Fjern studentar frå emner"
   remove_submission_draft_f5c7f58b: "Fjern innleveringsutkast."
   remove_tas_from_courses_13ade851: "Fjern undervisingassistentar frå emne"
-  remove_teachers_from_courses_353d5217: "Fjern lærarar i emne"
+  remove_teachers_from_courses_353d5217: "Fjern lærarar i emner"
   remove_text_8e485c41: "Fjern %{text}"
   remove_these_dates_48453a81: "Fjern desse datoane"
   remove_this_item_from_the_module_4b2ceab7: "Fjern elementet frå modulen"
@@ -20431,7 +20431,7 @@ nn:
   require_signed_token_for_oembed_64883303: "Krev signert token for oEmbed"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
   required_access_code_592902d7: "Obligatorisk tilgangskode"
-  required_by_course_end_date_d87a4772: "Påkrevd ved emne sitt sin sluttdato"
+  required_by_course_end_date_d87a4772: "Påkrevd ved emnet sin sluttdato"
   required_by_specified_end_date_22dd6b49: "Påkrevd ved spesifikk sluttdato"
   required_by_term_end_date_403dff38: "Påkrevd ved semesteret sin sluttdato"
   required_email_address_379b2392: "Obligatorisk e-postadresse"
@@ -20785,9 +20785,9 @@ nn:
   save_successful_b2f64da4: Lagra
   save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
-  save_these_conditions_as_a_filter_a31bbbf8: "Lagre disse krava som eit filter"
+  save_these_conditions_as_a_filter_a31bbbf8: "Lagre desse krava som eit filter"
   save_this_comment_for_reuse_5eda0b70: "Lagre denne kommentarer for seinare bruk"
-  save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Spar tid ved å legge til læringsmål som er spesifikke for ditt emneinnhald"
+  save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Spar tid ved å berre legge til læringsmål som er spesifikke for ditt emneinnhald"
   saved_3cd67a7c: Lagra
   saved_comments_2f6ba95: "Lagra kommentarar"
   saved_discussion_settings_successfully_ebd46a57: "Innstillingar for diskusjonar er lagra"
@@ -20814,7 +20814,7 @@ nn:
   scheduler_must_be_enabled_for_your_account_e6e53972: "Planleggar må vere slått på for kontoen."
   scheduler_shown_df77ca6f: "Planleggar vist"
   scheduling_5a3327e7: Planlegging
-  scheduling_sync_3f4a7cac: "Planleggar synkronisering"
+  scheduling_sync_3f4a7cac: "Planlegg synkronisering"
   school_of_rock_4b7b1fd0: "School of Rock"
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: "Varsel om resultatendring"
@@ -21232,7 +21232,7 @@ nn:
   select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Vel filene du ynskjer å kople til, eller legg til filer ved å velje \"Ny fil(er)\"."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Vel filene du ynskjer å kople til, eller legg til filer ved å velje \"Ny fil(er)\"."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Vel filene du vil legge til *modulen* eller legg til filer ved å velje \"Nye fil(er)\"."
-  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Vel filene du vil legge til *modulen* eller legg til filer ved å velje \"Nye fil(er)\"."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Vel filene du vil legge til *modulen* eller legg til filer ved å velje \"Ny fil(er)\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Vel sida du vil knyte til, eller legg til ei ny side ved å velje \"Ny side\"."
   select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Vel sida du vil knyte til, eller legg til ei ny side ved å velje \"Ny side\"."
   select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Vel sida du vil knyte til denne *modulen*, eller legg til ei ny side ved å velje \"Ny side\"."
@@ -21249,7 +21249,7 @@ nn:
   selected_274ce24f: Valt
   selected_all_courses_9cfef57f: "Valt alle emne"
   selected_answer: "Du valde dette svaret."
-  selected_calendars_cc7f325b: "Vel kalendrar"
+  selected_calendars_cc7f325b: "Valgte kalendrar"
   selected_content_contains_non_lti_links_f9dfd762: "Vald innhald inneheld ikkje-LTI-lenker."
   selected_content_is_not_an_lti_link_11780d96: "Valt innhald er ikkje ei LTI-lenke."
   selected_course_course_a581f834: "Valt emne %{course}"
@@ -21306,7 +21306,7 @@ nn:
         go_to_dashboard: "Gå til dashbord"
       not_available_yet: "Vi sender deg ein e-post rett før emnet startar."
   self_registration_156392d6: Sjølvregistrering
-  self_service_user_merge_d66f3903: "Sjølbetjent sammenslåing av brukarar"
+  self_service_user_merge_d66f3903: "Sjølvbetjent samanslåing av brukarar"
   self_signup_15b23092: self_signup
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: "Send ein kommentar til undervisar om denne oppgåva"
   send_a_message_4600821d: "Send ei melding"
@@ -21350,7 +21350,7 @@ nn:
   sent_f4ee89ec: Send.
   sent_fe0a1eb4: Sendt
   separate_columns_for_first_last_names_in_gradebook_419126c3: "Adskilde kolonnar for fornamn/etternamn i Vurderingsoversikt"
-  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Skill ut løyve for å legga til og slette for oppgåver og quizar i det eksisterande løyve som kontrollerar alle tre"
+  separate_out_granular_add_and_delete_permissions_f_c63d37b6: "Skil ut løyve for å legga til og slette for oppgåver og quizar i det eksisterande løyvet som kontrollerar alle tre"
   sequence_footer: 
     next_module: "Neste modul:"
     next_module_desc: "Neste modul: *modul*"
@@ -21367,8 +21367,8 @@ nn:
   services_must_be_supported_by_the_tool_in_order_to_1f194a36: "Tenestene må ha støtte i verktøyet for å virke. Sjekk med leverandør om dei har tilstrekkeleg tenestekapasitet."
   session_expired_12aaf414: "Økt er gått ut"
   set_as_default_email_address_bd3b9b8f: "Vel som standard e-postadresse"
-  set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Vel ein emnefarge blandt dei tilpassa hexadesimale kodane"
-  set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Vel ein emnefarge blandt dei forhånsvalde hexadesimale fargekodane. Bruk ventre og høgre piltast for å velje. "
+  set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Vel ein emnefarge blant dei tilpassa hexadesimale kodane"
+  set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Vel ein emnefarge blant dei forhånsvalde hexadesimale fargekodane. Bruk ventre og høgre piltast for å velje. "
   set_created_createdat_895e2243: "Sett oppretta %{createdAt}"
   set_default_email_address_400f70dc: "Vel standard e-postadresse"
   set_default_grade_a202ebc1: "Bruk standardverdi for vurdering"
@@ -21396,8 +21396,8 @@ nn:
       Importer eksisterande konto-, status- og felles kjernestandardresultat til emnet ditt. Du kan også justere utfalla i emnevurderingsskjema.
   set_up_outcomes_in_your_course_as_measured_by_peda_78eb842e: |-
       Sett opp læringsmål i emnet ditt etter pedagogiske mål eller ønska mål.
-      Hjelp studentane til å lære ferdigheiter og aktiviteter, i staden for å bare fokusere på vurderingar som eit mål på deira suksess.
-      Vurder studentens framgang gjennom berekningsmetoder og mål framdriften direkte i Læringsmeistring Vurderingsoversikt.
+      Hjelp studentane til å lære ferdigheiter og aktiviteter, i staden for å berre fokusere på vurderingar som eit mål på deira suksess.
+      Vurder studentens framgang gjennom berekningsmetoder og mål framdrifta direkte i Læringsmeistring Vurderingsoversikt.
       Importer eksisterande konto-, status- og felles kjernestandardresultat til emnet ditt. Du kan også justere utfalla i emnevurderingsskjema.
   set_up_video_conferencing_and_other_tools_1a94a350: "Sett opp videomøter og andre verktøy"
   set_up_video_conferencing_c0049abe: "Sett opp videokonferanse"
@@ -21449,14 +21449,14 @@ nn:
   setup_checklist_eb8b00b8: "Sjekkliste for oppsett"
   sftp_key_added_to_user_it_can_take_up_to_four_hour_8791e3c3: |-
       SFTP nøkkel er lagt til brukar. Det kan ta opp til
-      fire timar før den fungerar.
-  sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP nøkkel er ikkje gyldig. Se til at den er utforma korrekt."
+      fire timar før den fungerer.
+  sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP nøkkel er ikkje gyldig. Se til at den er korrekt formatert."
   sftp_key_removed_from_user_42318725: "SFTP nøkkel er fjerna frå brukar."
   sftp_region_invalid_216caa40: "SFTP region ugyldig"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
-      SFTP brukar finnast allereie eller er deaktivert.
+      SFTP brukar eksisterer allereie eller er deaktivert.
       Meld det gjerne inn i #canvas-sre i Slack
-  sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP brukar har blitt laga. Det kan ta opp til fire timar før det fungerar."
+  sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP brukar har blitt laga. Det kan ta opp til fire timar før denne brukaren fungerer."
   sftp_user_management_19868cb3: "SFTP Brukar Administrer"
   shard_5d340495: fragment
   share_important_information_about_your_course_with_dceacbf9: |-
@@ -21950,21 +21950,21 @@ nn:
       add_to_module: "Legg %{item} til *modul*"
       assignment_item: Oppgåve
       assignment_item_select_label: "Vel oppgåva du vil knyte til, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
-      assignment_item_select_label_create: "Vel oppgåva du vil knyte til, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
+      assignment_item_select_label_create: "Vel oppgåva du vil knyte til, eller legg til ei oppgåve ved å velje \"Opprett oppgåve\"."
       assignment_item_select_label_new: "Vel oppgåva du vil knyte til, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
       assignment_notice: "Vel oppgåva du vil ha knyte til *modulen*, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
       classic_quiz_identifier: (klassisk)
       content_page_item: Side
-      create_assignment_notice: "Vel oppgåva du vil ha knytt til *modulen*, eller legg til ei oppgåve ved å velje \"Ny oppgåve\"."
+      create_assignment_notice: "Vel oppgåva du vil ha knytt til *modulen*, eller legg til ei oppgåve ved å velje \"Opprett oppgåve\"."
       create_assignment_option: "[Opprett Oppgåve]"
       create_page_option: "[Opprett Side]"
-      create_quiz_notice: "Vel quizen du vil knyte til denne *modulen*, eller legg til ein ny quiz ved å velje \"Ny quiz\"."
+      create_quiz_notice: "Vel quizen du vil knyte til denne *modulen*, eller legg til ein ny quiz ved å velje \"Opprett quiz\"."
       create_quiz_option: "[Opprett Quiz]"
-      create_topic_notice: "Vel det tema som du ønsker å assosiera med denne *modulen*, eller legg til eit tema ved å velje \"Lag Tema\""
-      create_topic_option: "[Lag Tema]"
+      create_topic_notice: "Vel det tema som du ønsker å assosiera med denne *modulen*, eller legg til eit tema ved å velje \"OpprettTema\""
+      create_topic_option: "[Opprett Tema]"
       discussion_item: Diskusjon
       discussion_topic_select_label: "Vel emnet du vil kople til, eller legg til eit emne ved å velje \"Nytt emne\"."
-      discussion_topic_select_label_create: "Vel det tema som du ønsker å knytte til, eller legg til eit tema ved å velje \"Lag Tema\""
+      discussion_topic_select_label_create: "Vel det tema som du ønsker å knytte til, eller legg til eit tema ved å velje \"Opprett Tema\""
       discussion_topic_select_label_new: "Vel emnet du vil kople til, eller legg til eit emne ved å velje \"Nytt emne\"."
       domain_match_notice: "om du vil bruke dette verktøyet må domenet matche %{domain}"
       external_tool_item: "Eksternt verktøy"
@@ -22183,7 +22183,7 @@ nn:
   show_all_sections_190203e8: "Vis alle seksjonar"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul emnemeny"
   show_attendance_columns_4d160e16: "Vis kolonnar for frammøte"
-  show_badges_for_new_release_notes_b2035bbb: "Vis knappar for nye releasenotater"
+  show_badges_for_new_release_notes_b2035bbb: "Vis knappar for nye releasenotat"
   show_by_709f525b: "Vis etter"
   show_by_date_e3967761: "Vis etter dato"
   show_by_type_c5d61732: "Vis etter type"
@@ -22202,7 +22202,7 @@ nn:
   show_due_dates_duedatecount_5e0b056c: "Vis fristar (%{dueDateCount})"
   show_e0cb4667: (vis)
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: "Vis innebygd dokumentasjon i LTI-verktøyet for \"Live Events\"."
-  show_event_on_homeroom_sidebar_c618275d: "Vis hendelse på heimesidas sidemeny"
+  show_event_on_homeroom_sidebar_c618275d: "Vis hendelse på sidemenyen til heimesida"
   show_exceptions_270ea1c5: "Vis unntak"
   show_final_grade_a95e14dc: "Vis sluttkarakter"
   show_final_grade_overrides_only_c3017aaa: "Vis kun overstyrt sluttvurdering"
@@ -22242,7 +22242,7 @@ nn:
   show_saved_what_if_scores_358bfe5f: "Vis lagra \"Kva-skjer-dersom\"-resultat"
   show_student_names_dcb40934: "Vis studentnamn"
   show_sub_accounts_for_account_name_fa71a658: "Vis underkonto for %{account_name}"
-  show_suggestions_when_typing_b72545de: "Vis forslag medan det skrivast"
+  show_suggestions_when_typing_b72545de: "Vis forslag medan ein skriv"
   show_to_d57767f: "Vis til"
   show_to_everyone_94d66d01: "Vis til alle"
   show_welcome_tour_a105aa2e: "Vis velkomsttur"
@@ -22252,7 +22252,7 @@ nn:
   showing_all_sets_of_grading_periods_6c160874: "Viser alle sett med karaktersetjingsperiodar."
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Visar %{count} læringsmål for %{groupTitle}."
-    other: "Visar %{count}læringsmål for %{groupTitle}."
+    other: "Viser %{count}læringsmål for %{groupTitle}."
   shrink_permission_74b01aed: "Krymp %{permission}"
   shuffle_answers_edb602b7: "Stokk svar"
   sign_up_dafdee18: "Meld deg på"
@@ -22389,8 +22389,8 @@ nn:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Nokre av konferansane på denne sida er skjulte på grunn av feil under korrigering av status"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Nokre eigendefinerte kolonnar er ikkje endra fordi dei berre er lesbare; endringar i desse konlonnane er ignorert."
   some_module_items_could_not_be_published_e4be3c0: "Nokre modulelement kunne ikkje publiserast"
-  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i denne kontoen. Ønskje du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
-  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i dette emnet. Ønskje du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i denne kontoen. Ønsker du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Nokre av læringsmåla du har valt kan ikkje fjernast fordi dei er knytt til anna innhold i dette emnet. Ønsker du å fjerna dei læringsmåla som ikkje har slik tilknytting?"
   some_settings_have_been_administratively_locked_9e3ee880: "Nokre innstillingar er låste administrativt."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Nokre innstillingar er deaktivert fordi oppgåva er i ein lukka karaktersetjingsperiode."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Nokre innleveringar er ikke mogleg å vurdere; endring av vurdering for desse innleveringane er ignorert. "
@@ -22437,7 +22437,7 @@ nn:
   sorted_ascending_3138603c: "sortert i stigande rekkefølge."
   sorted_ascending_b6d61547: "sortert i stigande rekkefølge"
   sorted_by_ascending_af61f8ca: "Sortert i stigande rekkefølge"
-  sorted_by_descending_824c4300: "Sortert i fallande rekkefølge"
+  sorted_by_descending_824c4300: "Sortert i synkande rekkefølge"
   sorted_descending_1e30f0d5: "sortert i fallande rekkefølge"
   sorted_descending_7fcec1ff: "Sortert i fallande rekkefølge"
   sorted_descending_84ec84c8: "sortert i fallande rekkefølge."
@@ -22446,7 +22446,7 @@ nn:
   source_code_2395ca74: Kjeldekode
   source_context_does_not_match_group_context_4b55cee4: "Kildekonteksten passar ikkje med gruppekonteksten"
   sourcecontextid_required_if_sourcecontexttype_prov_473c67b1: "sourceContextId påkrevd dersom sourceContextType oppgjeve"
-  sourcecontexttype_required_if_sourcecontextid_prov_b702e0c9: "sourceContextType påkrevd derdom sourceContextId oppgjeve"
+  sourcecontexttype_required_if_sourcecontextid_prov_b702e0c9: "sourceContextType påkrevd dersom sourceContextId oppgjeve"
   south_africa_27_d5e0f1e1: "Sør-Afrika (+27)"
   south_korea_82_10618967: "Sør-Korea (+82)"
   space_ec476863: Mellomrom
@@ -22677,8 +22677,8 @@ nn:
   student_enrollment_date_71424bea: "Dato for studentpåmelding"
   student_enrollment_report_798b715e: Studentpåmeldingsrapport
   student_extensions_d35a907: "Utvidingar for studentar"
-  student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Tilbakemelding til student krevjast i kommentarfelt over for å tildele på ny."
-  student_first_name_aaa42cbc: "Studentens fornamn"
+  student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Tilbakemelding til student krevst i kommentarfelt over for å tildele på ny."
+  student_first_name_aaa42cbc: "Student fornamn"
   student_grades_4cbc59a1: "Vurderingar for student"
   student_group_75b86a9f: Studentgruppe
   student_group_filter_185fb085: "Filter for studentgrupper"
@@ -22695,7 +22695,7 @@ nn:
   student_interactions_report_7717b685: "Rapport studentsamhandlingar"
   student_ip_addresses_d99fbd06: Student-IP-adresser
   student_is_required_to_do_all_submission_types_c594d40b: "Student må fullføre alle innleveringstypar"
-  student_last_name_9839801c: "Studentens etternamn"
+  student_last_name_9839801c: "Student etternamn"
   student_last_name_options_a07764dd: "Alternativ for student etternamn"
   student_messages_b0a242d: Studentbeskjeder
   student_module_completion_c113d05f: "Fullføring av studentmodul"
@@ -22751,7 +22751,7 @@ nn:
   students_are_not_allowed_to_access_test_installati_11b9078: "Studentar har ikkje løyve til å logge inn i testinstallasjonar. "
   students_being_observed_4de3e520: "Studentar blir observerte"
   students_can_edit_and_view_page_history_if_allowed_39a47edc: "Studentar kan endre og sjå sidehistorikk dersom dei er gitt løyve til det på kvar enkelt side."
-  students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Studentar kan endre og sjå sidehistorikk dersom dei er gitt løyve til det på ei enkelt side."
+  students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Studentar kan endre og sjå sidehistorikk dersom dei er gitt løyve til det på ei individuell side."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Studentar kan berre delta på emnet mellom desse datoane"
   students_can_see_originality_score_797fe634: "Studentar kan sjå det opphavlege resultatet"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studentane kan ikkje sjå quizrespons etter at emnet er fullført"
@@ -22829,9 +22829,9 @@ nn:
   subject_114b2e98: Tittel
   subject_1bc03dea: "Meldingstittel:"
   subject_details_12405b1: Emnedetaljar
-  subject_home_page_41226803: "Emnets heimeside"
+  subject_home_page_41226803: "Emnet si heimeside"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Tittel må innehalde færre enn 255 teikn"
-  subject_name_a1ac4da4: "Emnets namn"
+  subject_name_a1ac4da4: "Emnet sitt namn"
   subject_reply_to: "Ang.: %{subject}"
   subject_subject_9e1057f7: "Emne: %{subject}"
   subjects_14c0c4de: Emne
