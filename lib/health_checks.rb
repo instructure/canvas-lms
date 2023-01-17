@@ -46,12 +46,7 @@ module HealthChecks
           tags = { type: check_type, key: check_name }
 
           InstStatsd::Statsd.timing("canvas.health_checks.response_time_ms", check_results[:time], tags: tags)
-
-          if check_results[:status]
-            InstStatsd::Statsd.increment("canvas.health_checks.status.ok", tags: tags)
-          else
-            InstStatsd::Statsd.increment("canvas.health_checks.status.error", tags: tags)
-          end
+          InstStatsd::Statsd.gauge("canvas.health_checks.status", check_results[:status] ? 1 : 0, tags: tags)
         end
       end
     end
