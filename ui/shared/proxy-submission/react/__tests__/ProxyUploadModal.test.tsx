@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ProxyUploadModal, {ProxyUploadModalProps} from '../components/ProxyUploadModal'
+import ProxyUploadModal, {ProxyUploadModalProps} from '../ProxyUploadModal'
 
 const defaultProps: ProxyUploadModalProps = {
   student: {

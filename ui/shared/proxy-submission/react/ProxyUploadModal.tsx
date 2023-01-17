@@ -39,7 +39,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import UploadFileSVG from '../../../../assignments_show_student/images/UploadFile.svg'
+import UploadFileSVG from '../../../features/assignments_show_student/images/UploadFile.svg'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -218,9 +218,10 @@ const ProxyUploadModal = ({
     // This is taken almost verbatim from the uploadFiles method in the
     // upload-file module.  Rather than calling that method, we call uploadFile
     // for each file to track progress for the individual uploads.
+    const assignmentCourseId = assignment.courseId || assignment.course_id
     const uploadUrl =
       assignment.groupSet?.currentGroup == null
-        ? `/api/v1/courses/${assignment.courseId}/assignments/${assignment.id}/submissions/${student.id}/files`
+        ? `/api/v1/courses/${assignmentCourseId}/assignments/${assignment.id}/submissions/${student.id}/files`
         : `/api/v1/groups/${assignment.groupSet.currentGroup._id}/files`
 
     const uploadPromises: any[] = []
