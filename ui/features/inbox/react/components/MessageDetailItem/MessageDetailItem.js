@@ -31,6 +31,7 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
+import {formatMessage} from '@canvas/util/TextHelper'
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
@@ -106,7 +107,10 @@ export const MessageDetailItem = ({...props}) => {
               </Flex.Item>
             )}
           </Flex>
-          <Text size={responsiveProps.messageBody}>{props.conversationMessage.body}</Text>
+          <Text
+            size={responsiveProps.messageBody}
+            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage.body)}}
+          />
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">
               {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
