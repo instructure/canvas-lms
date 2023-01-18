@@ -21,10 +21,12 @@ require_relative "../pages/gradebook_page"
 require_relative "../pages/gradebook_cells_page"
 require_relative "../pages/gradebook_grade_detail_tray_page"
 require_relative "../../helpers/gradebook_common"
+require_relative "../../helpers/files_common"
 
 describe "Grade Detail Tray:" do
   include_context "in-process server selenium tests"
   include GradebookCommon
+  include FilesCommon
   include_context "late_policy_course_setup"
 
   before(:once) do
@@ -290,6 +292,49 @@ describe "Grade Detail Tray:" do
 
       # comment text is in a paragraph element and there is only one comment seeded
       expect(Gradebook::GradeDetailTray.all_comments).not_to contain_css("p")
+    end
+  end
+
+  context "submit for student" do
+    before do
+      Account.site_admin.enable_feature!(:proxy_file_uploads)
+      teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      @a1.update!(submission_types: "online_upload,online_text_entry")
+      file_attachment = attachment_model(content_type: "application/pdf", context: @students.first)
+      @submission = @a1.submit_homework(@students.first, submission_type: "online_upload", attachments: [file_attachment])
+      @teacher.update!(short_name: "Test Teacher")
+      @submission.update!(proxy_submitter: @teacher)
+      user_session(@teacher)
+      Gradebook.visit(@course)
+    end
+
+    it "button is availible for assignments with online uploads" do
+      Gradebook::Cells.open_tray(@course.students.first, @a1)
+      expect(Gradebook::GradeDetailTray.submit_for_student_button).to be_displayed
+    end
+
+    it "modal allows multiple files to be uploaded via the file upload drop" do
+      filename1, fullpath1 = get_file("testfile1.txt")
+      filename2, fullpath2 = get_file("testfile2.txt")
+      Gradebook::Cells.open_tray(@course.students.first, @a1)
+      Gradebook::GradeDetailTray.submit_for_student_button.click
+      Gradebook::GradeDetailTray.proxy_file_drop.send_keys(fullpath1)
+      Gradebook::GradeDetailTray.proxy_file_drop.send_keys(fullpath2)
+      expect(f("table[data-testid='proxy_uploaded_files_table']")).to include_text(filename1)
+      expect(f("table[data-testid='proxy_uploaded_files_table']")).to include_text(filename2)
+      expect(Gradebook::GradeDetailTray.proxy_submit_button).to be_displayed
+    end
+
+    it "allows a file to be uploaded via the file upload drop" do
+      Gradebook::Cells.open_tray(@course.students.first, @a1)
+      expect(Gradebook::GradeDetailTray.proxy_submitter_name.text).to include("Submitted by " + @teacher.short_name)
+      expect(Gradebook::GradeDetailTray.proxy_date_time).to be_displayed
     end
   end
 end

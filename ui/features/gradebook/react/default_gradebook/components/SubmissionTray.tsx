@@ -277,7 +277,9 @@ export default class SubmissionTray extends React.Component<
     if (submission.proxySubmitter) {
       return (
         <View as="div" textAlign="center">
-          <Text>{I18n.t('Submitted by %{submitter}', {submitter: submission.proxySubmitter})}</Text>
+          <Text data-testid="proxy_submitter_name">
+            {I18n.t('Submitted by %{submitter}', {submitter: submission.proxySubmitter})}
+          </Text>
           <br />
           <FriendlyDatetime
             format={I18n.t('#date.formats.date_at_time')}

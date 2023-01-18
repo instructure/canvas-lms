@@ -332,6 +332,36 @@ describe "as a student" do
       end
     end
 
+    context "proxy submitted assignment" do
+      before do
+        @assignment = @course.assignments.create!(
+          name: "proxy upload assignment",
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: "online_upload"
+        )
+        Account.site_admin.enable_feature!(:proxy_file_uploads)
+        teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+        RoleOverride.create!(
+          permission: "proxy_assignment_submission",
+          enabled: true,
+          role: teacher_role,
+          account: @course.root_account
+        )
+        file_attachment = attachment_model(content_type: "application/pdf", context: @student)
+        @submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [file_attachment])
+        @teacher.update!(short_name: "Test Teacher")
+        @submission.update!(proxy_submitter: @teacher)
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it "submission workflow tracker identifies the proxy submitter" do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("by " + @teacher.short_name)
+      end
+    end
+
     context "mark as done" do
       before(:once) do
         @assignment = @course.assignments.create!(
