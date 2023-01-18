@@ -41,6 +41,7 @@ export default class IndexMenu extends React.Component {
     postToSisDefault: PropTypes.bool.isRequired,
     hasAssignments: PropTypes.bool.isRequired,
     assignmentGroupsCollection: PropTypes.object,
+    currentWindow: PropTypes.object,
   }
 
   state = this.props.store.getState()
@@ -182,6 +183,7 @@ export default class IndexMenu extends React.Component {
         allowItemSelection={true}
         selectableItems={groupData}
         onDismiss={handleDismiss}
+        onExternalContentReady={() => (this.props.currentWindow || window).location.reload()}
         open={tool !== null}
       />,
       document.getElementById('external-tool-mount-point')

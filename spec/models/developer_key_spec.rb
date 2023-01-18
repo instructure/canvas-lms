@@ -1005,6 +1005,11 @@ describe DeveloperKey do
     expect(developer_key_not_saved).to be_valid
   end
 
+  it "doesn't allow redirect_uris over 4096 characters" do
+    developer_key_not_saved.redirect_uris = ["https://test.example.com/" + ("a" * 4097), "https://example.com"]
+    expect(developer_key_not_saved).not_to be_valid
+  end
+
   it "returns the correct count of access_tokens" do
     expect(developer_key_saved.access_token_count).to eq 0
 

@@ -19,7 +19,6 @@
 #
 
 require "atom"
-require "securerandom"
 
 # @API ePortfolios
 #

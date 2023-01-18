@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from './Tray'
 import $ from 'jquery'
@@ -54,6 +54,7 @@ ContentTypeExternalToolTray.propTypes = {
   allowItemSelection: bool.isRequired,
   selectableItems: arrayOf(moduleShape).isRequired,
   onDismiss: func,
+  onExternalContentReady: func,
   open: bool,
 }
 
@@ -65,6 +66,7 @@ export default function ContentTypeExternalToolTray({
   allowItemSelection,
   selectableItems,
   onDismiss,
+  onExternalContentReady,
   open,
 }) {
   const queryParams = {
@@ -78,6 +80,20 @@ export default function ContentTypeExternalToolTray({
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
+
+  useEffect(() => {
+    function handleLtiPostMessage(e) {
+      if (onExternalContentReady) {
+        onExternalContentReady(e)
+      }
+    }
+    $(window).on('externalContentReady', handleLtiPostMessage)
+
+    return () => {
+      $(window).off('externalContentReady', handleLtiPostMessage)
+    }
+  }, [onExternalContentReady])
+
   return (
     <CanvasTray
       open={open}

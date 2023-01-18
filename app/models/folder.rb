@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "set"
-
 class Folder < ActiveRecord::Base
   self.ignored_columns = %i[last_lock_at last_unlock_at]
 

@@ -20,27 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('external_content.cancel')
 
-let parentWindow
-window.parentWindow = window.parent
-window.callback = ENV.service
-while (parentWindow && !parentWindow[window.callback]) {
-  parentWindow = parentWindow.parent
-}
-parentWindow.$(parentWindow).trigger('externalContentCancel')
-if (parentWindow[window.callback] && parentWindow[window.callback].cancel) {
-  parentWindow[window.callback].cancel()
-  setTimeout(
-    () =>
-      $('#dialog_message').text(
-        I18n.t('popup_success', 'Canceled. This popup should close on its own...')
-      ),
-    1000
-  )
-} else {
-  $('#dialog_message').text(
-    I18n.t(
-      'popup_failure',
-      "Cannot find the parent window, you'll need to close this popup manually."
-    )
-  )
-}
+const parentWindow = window.opener || window.parent
+parentWindow.postMessage({subject: 'externalContentCancel'}, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+setTimeout(
+  () =>
+    $('#dialog_message').text(
+      I18n.t('popup_success', 'Canceled. This popup should close on its own...')
+    ),
+  1000
+)

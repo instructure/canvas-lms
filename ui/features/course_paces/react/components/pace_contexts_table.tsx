@@ -26,6 +26,7 @@ import {
   ResponsiveSizes,
   OrderType,
   SortableColumn,
+  PaceContextProgress,
 } from '../types'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -53,7 +54,7 @@ export interface PaceContextsTableProps {
   setPage: (page: number) => void
   setOrderType: typeof paceContextsActions.setOrderType
   handleContextSelect: (paceContext: PaceContext) => void
-  contextsPublishing: string[]
+  contextsPublishing: PaceContextProgress[]
 }
 
 interface Header {
@@ -157,9 +158,12 @@ const PaceContextsTable = ({
     </Link>
   )
 
-  const renderLastModified = (contextId?: number, lastModified: string = '') => {
-    const context_code = `${contextType}-${contextId}`
-    if (contextId && contextsPublishing.includes(context_code)) {
+  const renderLastModified = (type: string, contextId?: string, lastModified: string = '') => {
+    const publishingContextCodes = contextsPublishing.map(
+      ({pace_context}) => `${pace_context.type}${pace_context.item_id}`
+    )
+    const contextCode = `${type}${contextId}`
+    if (contextId && publishingContextCodes.includes(contextCode)) {
       return loadingView(
         `publishing-pace-${contextId}-indicator`,
         I18n.t('Publishing pace...'),
@@ -188,7 +192,7 @@ const PaceContextsTable = ({
           renderContextLink(paceContext),
           studentCountText.toString(),
           PACE_TYPES[appliedPaceType] || appliedPaceType,
-          renderLastModified(paceContext?.context_id, appliedPace?.last_modified),
+          renderLastModified(paceContext.type, paceContext?.item_id, appliedPace?.last_modified),
         ]
         break
       }
@@ -197,7 +201,7 @@ const PaceContextsTable = ({
           renderContextLink(paceContext),
           appliedPace?.name,
           PACE_TYPES[appliedPaceType] || appliedPaceType,
-          renderLastModified(paceContext?.context_id, appliedPace?.last_modified),
+          renderLastModified(paceContext.type, paceContext?.item_id, appliedPace?.last_modified),
         ]
         break
       default:
@@ -294,7 +298,7 @@ const PaceContextsTable = ({
     align: ViewTextAlign = 'center'
   ) => (
     <View data-testid={dataTestId} as="div" textAlign={align}>
-      <Spinner size={size} renderTitle={title} margin="none large" />
+      <Spinner size={size} renderTitle={title} margin="none" />
     </View>
   )
 

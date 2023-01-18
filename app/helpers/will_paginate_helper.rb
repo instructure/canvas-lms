@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "i18n"
-require "cgi"
 require "will_paginate/core_ext"
 require "will_paginate/view_helpers"
 require "will_paginate/view_helpers/link_renderer_base"

@@ -62,6 +62,7 @@ export const submissionsParams = {
     'missing',
     'points_deducted',
     'posted_at',
+    'proxy_submitter',
     'redo_request',
     'score',
     'seconds_late',

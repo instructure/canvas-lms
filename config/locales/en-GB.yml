@@ -271,6 +271,7 @@ en-GB:
         partner_key: "Partner key"
   academic_engagement_capella_74946a80: "Academic Engagement (Capella)"
   academic_engagement_strayer_8c7832b9: "Academic Engagement (Strayer)"
+  academic_success_reporting_2585c499: "Academic Success Reporting"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High Grade Report"
   accept_2fdd362e: Accept
   accept_course_invitation_b4c04fbb: "Accept course invitation"
@@ -1187,7 +1188,7 @@ en-GB:
           account_reports: 
             default: 
               parameters: 
-                header: "Terms (Limit 4)"
+                header: "Terms (Limit 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1910,6 +1911,15 @@ en-GB:
             excelsior: 
               outcome: 
                 text: "SIS ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Term
+          student_assignment_grade: 
+            login_ids: 
+              field: "Login IDs"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2513,6 +2523,7 @@ en-GB:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Allows for discussion replies to be sorted according to creation
       timestamps. Default order is newest to oldest for root level replies.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Allows graders to type MI in the Gradebook or SpeedGrader to manually tag an assignment as missing"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Allows instructors to apply scores to ungraded submissions en masse from assignment group and Total column menus in the Gradebook."
@@ -5369,6 +5380,7 @@ en-GB:
   by_default_students_can_always_create_groups_in_a__af000dd: "By default, students can always create groups in a course. To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled and the Let students organise their own groups checkbox in Course Settings must be deselected."
   by_default_students_can_always_create_groups_in_a__dac761d3: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organise their own groups checkbox in Course Settings must not be selected."
   by_lti_2_registration_url_e421e523: "By LTI 2 Registration URL"
+  by_name_54daec42: "by %{name}"
   by_url_a163275e: "By URL"
   c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -6428,6 +6440,7 @@ en-GB:
   collapse_replies_20f2faf7: "Collapse Replies"
   collapse_replies_ef4fc36b: "Collapse replies"
   collapse_subdiscussion_89af1f5c: "Collapse Sub discussion"
+  collapse_threads_ef7ca000: "Collapse Threads"
   collapse_tutorial_tray_66ee7dc1: "Collapse tutorial tray"
   collapsed_510aa02a: Collapsed
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Collection of responsive improvements throughout Canvas"
@@ -8049,6 +8062,9 @@ en-GB:
   count_unread_messages_e312aa7b: 
     one: "One unread message."
     other: "%{count} unread messages."
+  count_unread_release_notes_3be26022: 
+    one: "One unread release note."
+    other: "%{count} unread release notes."
   count_unread_replies_86976ab: "%{count} unread replies"
   count_unread_shares_ff9e91a5: 
     one: "One unread share."
@@ -9856,6 +9872,7 @@ en-GB:
   deployment_id_for_toolname_app_e54a7364: "Deployment ID for %{toolName} App"
   deprecate_sms_be6b00a: "Deprecate SMS"
   deprecated_59e99d2a: Deprecated
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "De-prioritise Section Overrides for Non-active Enrolments"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Descending
   description_436c48d7: Description
@@ -10177,6 +10194,7 @@ en-GB:
       page_header_title: "New discussion"
       points_possible: "Points possible"
       post_at: "Post At"
+      publish: Publish
       save: Save
       saving: Saving...
       sort_by_likes: "Sort by 'likes'"
@@ -10982,6 +11000,7 @@ en-GB:
   enabled_unlocked_8d3a5df7: "Enabled (unlocked)"
   enabled_web_services_f620b2be: "Enabled web services"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Enables a redesigned Message Students Who... dialogue that allows for messaging observers in addition to students."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Enables access to the New Quizzes Public API through Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Enables important dates to be applied to assignments, calendar events, and others."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Enables modal to warn user when a draft comment is left unposted in SpeedGrader."
@@ -11472,6 +11491,7 @@ en-GB:
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: "Error adding canvas file to submission draft"
   error_adding_file_to_discussion_message_16feef3f: "Error adding file to discussion message"
+  error_adding_files_2cd4d45: "Error adding files"
   error_adding_files_97ba198e: "Error adding files."
   error_adding_files_to_conversation_message_58e83876: "Error adding files to conversation message"
   error_adding_files_to_discussion_message_8bb819e4: "Error adding files to discussion message"
@@ -11735,6 +11755,7 @@ en-GB:
   expand_permission_b45bf097: "Expand %{permission}"
   expand_permission_c61d5958: "Expand permission"
   expand_subdiscussion_cd226ed4: "Expand Sub discussion"
+  expand_threads_634fe7a1: "Expand Threads"
   expand_tutorial_tray_22630c49: "Expand tutorial tray"
   expanded_f4493860: Expanded
   expected_array_of_objects_b09ead01: "Expected array of objects"
@@ -14530,6 +14551,11 @@ en-GB:
       Rather than returning a generic 404 Not Found, the API will instead return a 422
       along with a helpful message indicating that the tool cannot access concluded
       courses.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      If enabled, the deep linking response JS will send postMessages
+      to window.parent instead of window.top. This enables the deep linking
+      response to correctly send content items to New Quizzes, when a tool is
+      launched from NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
       requesting client instead of redirecting them to themselves
@@ -14566,6 +14592,7 @@ en-GB:
       If RCE Enhancements are also enabled,
       the RCE will auto-save your work as you go
   if_set_allows_submission_status_to_be_changed_from_156f57f: "If set, allows submission status to be changed from inside of Speedgrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "If set, de-prioritises using due dates, lock dates, and unlock dates from section overrides on an assignment that are associated with a deactivated, concluded, or otherwise non-active enrolment for a student."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "If set, displays originality reports with Assignment Enhancements turned on"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "If set, displays updated mastery connect icon"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "If set, Quizzes.Next will operate using a single launch session in SpeedGrader"
@@ -15402,6 +15429,7 @@ en-GB:
   keyboard_instructions_e032939f: "Keyboard instructions"
   keyboard_nav_dialog: 
     esc_key_notification: "When navigating the gradebook grid, press the escape key before using keyboard shortcuts."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Keyboard Shortcut for Missing Assignment"
   keyboard_shortcuts_ed1844bd: "Keyboard shortcuts"
   kind_7f0a88c4: Kind
   know_your_users_5c1323be: "Know your users"
@@ -19011,6 +19039,7 @@ en-GB:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes migration enabled by default"
   new_quizzes_migration_required_7854aa1a: "New Quizzes migration required"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes on the Quizzes page"
+  new_quizzes_public_api_18d95321: "New Quizzes Public API"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes Service JWT Refresh"
   new_quizzes_site_admin_service_user_a331233a: "New Quizzes Site Admin Service User"
   new_quizzes_submission_274b5c57: "New Quizzes Submission"
@@ -19784,6 +19813,7 @@ en-GB:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Once you have submitted an answer, you will not be able to change it. You will not be able to view the previous question."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Once you start debugging all info about the next attempted login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Once you’ve changed an answer you’ll need to choose an option before updating the question."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "One or more content items sent by this external app failed to process correctly. These have not been saved by Canvas, and the reasons for failure are listed below."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "One or more grade selected was provided by a grader with inactive enrolments. Please update your selections to those provided by current graders."
   one_or_more_items_are_currently_being_imported_the_186fe069: "One or more items are currently being imported. They will be shown in the course below once they are available."
@@ -21150,6 +21180,7 @@ en-GB:
   private_3883d133: Private
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Proceed
+  proceed_with_caution_aa9b3285: "Proceed with Caution"
   process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
   processed_4725b02: Processed
   processing_2fcc9739: Processing
@@ -23672,6 +23703,7 @@ en-GB:
   reset_all_6e5e040a: "Reset all"
   reset_all_unpublished_changes_243f179f: "Reset all unpublished changes?"
   reset_courses_fe29ddf9: "Reset courses"
+  reset_lti_provision_6d8e287f: "Reset LTI Provision"
   reset_multi_factor_authentication_2b63a558: "Reset multi-factor authentication"
   reset_name_6a0aa0f: "Reset \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Reset quiz engine choice"
@@ -26403,6 +26435,7 @@ en-GB:
   submission_type_lti_placement_b448d5d0: "Submission Type LTI Placement"
   submission_type_selection_72ce19f: "Submission Type Selection"
   submission_updated_8897f3b7: "Submission updated"
+  submission_uploaded_542c9ac6: "Submission uploaded!"
   submission_user_name_assignment_title_2cf5e3e9: "Submission: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -26553,6 +26586,8 @@ en-GB:
   submit_ticket_5515ffd: "Submit ticket"
   submitted_318fad53: Submitted
   submitted_at_4d5ea3aa: "Submitted at"
+  submitted_by_name_dab6d5e1: "Submitted by: %{name}"
+  submitted_by_submitter_1dcd07a1: "Submitted by %{submitter}"
   submitted_d5ba370a: "Submitted:"
   submitted_date_ba55b0ae: "Submitted %{date}"
   submitted_datetime_fa2e9287: "Submitted: %{dateTime}"
@@ -26873,6 +26908,7 @@ en-GB:
   test_cluster_only_70e61c19: "Test cluster only"
   test_feature_flag_980151e0: "Test Feature Flag"
   testing_state_effd4a82: "Testing state"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Text
   text_df773ce4: text
   text_document_eacbcdb7: "Text document"
@@ -27175,6 +27211,7 @@ en-GB:
   the_specified_assignment_could_not_be_found_c5dc34ab: "The specified assignment could not be found"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "The specified assignment (%{id}) could not be found"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "The specified file with file_id already has an originality report"
+  the_specified_resource_does_not_exist_71d8b751: "The specified resource does not exist."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "The start date for the pace plan must be after the end date."
@@ -27768,6 +27805,7 @@ en-GB:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "This will update all rubrics using this outcome that have not yet been assessed"
   this_will_update_all_student_mastery_results_tied__a52301e5: "This will update all student mastery results tied to the account level mastery calculation."
   this_will_update_all_student_mastery_results_withi_934580d1: "This will update all student mastery results within this course."
+  thread_addd9799: Thread
   threshold_in_hours_to_notify_students_within_f33820aa: "Threshold (in hours) to notify students within"
   threshold_pts_45f0e5d8: "threshold: %{pts}"
   throttle_jobs_f61be56: "Throttle Jobs"
@@ -29237,6 +29275,7 @@ en-GB:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Use this panel to search for people you wish to add to this course."
   use_this_photo_3a594830: "Use This Photo"
   use_webcam_1ed0bf6b: "Use Webcam"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Use window.parent in Deep Linking Response"
   used_by_permission_314a78dd: "Used by permission"
   user: 
     default_user_name: User

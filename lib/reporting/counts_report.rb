@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "date"
-
 module Reporting
   class CountsReport
     MONTHS_TO_KEEP = 24

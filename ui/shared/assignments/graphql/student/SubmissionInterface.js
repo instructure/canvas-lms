@@ -46,6 +46,7 @@ export const SubmissionInterface = {
         ...MediaObject
       }
       originalityData
+      proxySubmitter
       resourceLinkLookupUuid
       state
       submissionDraft {

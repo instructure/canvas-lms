@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "securerandom"
-
 # @API Files
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.

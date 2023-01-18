@@ -47,6 +47,12 @@ export default class DeveloperKeyModal extends React.Component {
     return `/api/v1/accounts/${this.props.ctx.params.contextId}/developer_keys`
   }
 
+  get keySavedSuccessfully() {
+    const {developerKeyCreateOrEditSuccessful, developerKeyCreateOrEditPending} =
+      this.props.createOrEditDeveloperKeyState
+    return developerKeyCreateOrEditSuccessful && !developerKeyCreateOrEditPending
+  }
+
   get developerKey() {
     return {...this.props.createOrEditDeveloperKeyState.developerKey, ...this.state.developerKey}
   }
@@ -98,6 +104,22 @@ export default class DeveloperKeyModal extends React.Component {
     return Boolean(redirect_uris && redirect_uris.trim().length !== 0)
   }
 
+  get hasInvalidRedirectUris() {
+    if (!this.hasRedirectUris) {
+      return false
+    }
+
+    return this.developerKey.redirect_uris.split('\n').some(val => val.length > 4096)
+  }
+
+  alertAboutInvalidRedirectUris() {
+    $.flashError(
+      I18n.t(
+        "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
+      )
+    )
+  }
+
   updateConfigurationMethod = configurationMethod => this.setState({configurationMethod})
 
   submitForm = () => {
@@ -122,10 +144,17 @@ export default class DeveloperKeyModal extends React.Component {
       }
       toSubmit.scopes = this.props.selectedScopes
     }
+    if (this.hasInvalidRedirectUris) {
+      this.alertAboutInvalidRedirectUris()
+      return
+    }
 
     return dispatch(
       createOrEditDeveloperKey({developer_key: toSubmit}, this.developerKeyUrl(), method)
     ).then(() => {
+      if (this.keySavedSuccessfully) {
+        this.props.handleSuccessfulSave()
+      }
       this.closeModal()
     })
   }
@@ -161,6 +190,9 @@ export default class DeveloperKeyModal extends React.Component {
     if (!this.hasRedirectUris && !this.isUrlConfig) {
       $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
       this.setState({submitted: true})
+      return
+    } else if (this.hasInvalidRedirectUris) {
+      this.alertAboutInvalidRedirectUris()
       return
     }
     let settings = {}
@@ -203,6 +235,7 @@ export default class DeveloperKeyModal extends React.Component {
         .then(
           () => {
             this.setState({isSaving: false})
+            this.props.handleSuccessfulSave()
             this.closeModal()
           },
           () => this.setState({isSaving: false})

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "duration"
-require "net/http"
-require "securerandom"
 
 module Lti
   class AnalyticsService

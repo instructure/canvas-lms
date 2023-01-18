@@ -25,11 +25,9 @@
   </label>
   <select id="submission_to_view" class="ic-Input">
     {{#eachWithIndex submissions startingValue="1"}}
-      <option value="{{value}}"
-              {{#if late}}class=late{{/if}}
-              {{#if selected}}selected{{/if}}>
+      <option value="{{value}}" {{#if late}}class=late{{/if}} {{#if selected}}selected{{/if}}>
         {{#if ../showSubmissionStatus}}
-          {{submittedAt}}
+          {{submittedAt}}{{proxy_submitter}}
         {{else}}
           {{#t}}Submission {{_index}}{{/t}}
         {{/if}}

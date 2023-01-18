@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe "RequestThrottle" do
+describe RequestThrottle do
   let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
@@ -93,6 +93,23 @@ describe "RequestThrottle" do
       request_grade_passback = base_req.merge("REQUEST_METHOD" => "GET", "PATH_INFO" => "/api/lti/v1/tools/#{tool.id}/grade_passback")
       expect(ContextExternalTool).not_to receive(:find_by)
       expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+    end
+
+    it "uses client_id+cluster for LTI Advantage endpoints" do
+      request = req(
+        base_req.merge(
+          "canvas.domain_root_account" => Account.default,
+          "PATH_INFO" => "/api/lti/courses/2/line_items/327/results"
+        )
+      )
+
+      mock_token = instance_double(Lti::IMS::AdvantageAccessToken, client_id: "10000000000007")
+      expect(Lti::IMS::AdvantageAccessTokenRequestHelper).to \
+        receive(:token).with(request).and_return(mock_token)
+      expect(Account.default.shard).to receive(:database_server_id).and_return "cluster123"
+
+      result = throttler.client_identifier(request)
+      expect(result).to eq "lti_advantage:10000000000007-cluster123"
     end
   end
 

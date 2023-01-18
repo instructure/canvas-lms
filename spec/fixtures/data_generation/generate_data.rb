@@ -29,7 +29,7 @@ require_relative "../../factories/course_factory"
 require_relative "../../factories/user_factory"
 require_relative "../../factories/quiz_factory"
 require_relative "../../factories/outcome_factory"
-require "securerandom"
+
 require "optparse"
 
 # rubocop:disable Specs/ScopeIncludes

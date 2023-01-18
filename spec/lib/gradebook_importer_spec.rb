@@ -20,8 +20,6 @@
 
 require_relative "../spec_helper"
 
-require "csv"
-
 describe GradebookImporter do
   let(:gradebook_user) do
     teacher = User.create!

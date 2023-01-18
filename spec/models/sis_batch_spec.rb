@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "tmpdir"
-
 describe SisBatch do
   before :once do
     account_model

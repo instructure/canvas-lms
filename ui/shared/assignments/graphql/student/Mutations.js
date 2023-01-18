@@ -40,6 +40,7 @@ export const CREATE_SUBMISSION = gql`
     $mediaId: ID
     $resourceLinkLookupUuid: String
     $url: String
+    $studentId: ID
   ) {
     createSubmission(
       input: {
@@ -50,6 +51,7 @@ export const CREATE_SUBMISSION = gql`
         mediaId: $mediaId
         resourceLinkLookupUuid: $resourceLinkLookupUuid
         url: $url
+        studentId: $studentId
       }
     ) {
       submission {

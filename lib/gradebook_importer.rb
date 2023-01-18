@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 class GradebookImporter
   ASSIGNMENT_PRELOADED_FIELDS = %i[
     id title points_possible grading_type updated_at context_id context_type group_category_id

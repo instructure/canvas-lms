@@ -23,6 +23,7 @@ import IndexMenu from 'ui/features/assignment_index/react/IndexMenu'
 import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions'
 import createFakeStore from './createFakeStore'
 import {handleDeepLinking} from '@canvas/deep-linking/DeepLinking'
+import $ from 'jquery'
 
 QUnit.module('AssignmentsIndexMenu')
 
@@ -224,4 +225,30 @@ testCase('reloads the page when receiving a deep linking message', async () => {
   ok(reloadPage.calledOnce)
   component.closeModal()
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
+})
+
+testCase('reloads the page when assignment_index_menu receives externalContentReady', async () => {
+  ENV.assignment_index_menu_tools = [
+    {id: '1', title: 'test', base_url: 'https://example.com/launch'},
+  ]
+  $('#fixtures').append("<div id='external-tool-mount-point'></div>")
+
+  const mockWindow = {
+    location: {
+      reload: sinon.stub(),
+    },
+  }
+  const component = renderComponent(generateProps({currentWindow: mockWindow}))
+  const links = TestUtils.scryRenderedDOMComponentsWithTag(component, 'a')
+
+  // open tray
+  TestUtils.Simulate.click(links[links.length - 1])
+
+  // trigger event
+  $(window).trigger('externalContentReady')
+
+  ok(mockWindow.location.reload.calledOnce)
+
+  ReactDOM.unmountComponentAtNode(component.node.parentElement)
+  $('#fixtures').empty()
 })

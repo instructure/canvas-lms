@@ -20,7 +20,6 @@
 require_relative "../cc_spec_helper"
 
 require "nokogiri"
-require "tmpdir"
 
 describe "Canvas Cartridge importing" do
   before do

@@ -201,9 +201,15 @@
       <div class="ic-Action-header__Primary">
         <h2 class="submission-details-header__heading h3"><%= @assignment.title %></h2>
         <div class="submission-details-header__info">
+        <div>
           <span class="submission-details-header__time <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
             <%= submission_author_name_for @assessment_request %> <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
           </span>
+          <% if @submission.proxy_submitter %>
+            <br/>
+            <span><%= I18n.t("Submitted by: %{name}", name: @submission.proxy_submitter.short_name) %></span>
+          <% end %>
+          </div>
           <% if @submission.late? %>
             <span class="submission-late-pill"></span>
           <% elsif @submission.missing? %>

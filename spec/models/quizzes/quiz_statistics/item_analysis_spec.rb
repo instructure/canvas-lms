@@ -20,8 +20,6 @@
 require_relative "item_analysis/common"
 require_relative "common"
 
-require "csv"
-
 describe Quizzes::QuizStatistics::ItemAnalysis do
   let(:report_type) { "item_analysis" }
 

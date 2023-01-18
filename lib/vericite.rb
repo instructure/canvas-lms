@@ -19,8 +19,6 @@
 #
 
 require "vericite_client"
-require "digest/sha1"
-require "date"
 
 module VeriCite
   def self.state_from_similarity_score(similarity_score)

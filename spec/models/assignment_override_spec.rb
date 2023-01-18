@@ -20,7 +20,7 @@
 
 describe AssignmentOverride do
   before :once do
-    student_in_course
+    @active_student = student_in_course(active_all: true).user
   end
 
   it "soft-deletes" do
@@ -108,6 +108,51 @@ describe AssignmentOverride do
     expect { @override_student2.save! }.not_to raise_error
     @override2.reload
     expect(@override2.set).to eq [@student]
+  end
+
+  describe "#for_nonactive_enrollment?" do
+    before(:once) do
+      @override = assignment_override_model(course: @course, set: @course.default_section)
+    end
+
+    it "returns false by default" do
+      expect(@override).not_to be_for_nonactive_enrollment
+    end
+
+    context "when nonactive enrollment state has been preloaded" do
+      it "returns true for section overrides associated with deactivated enrollments" do
+        @course.enrollments.find_by(user: @student).deactivate
+        AssignmentOverride.preload_for_nonactive_enrollment([@override], @course, @student)
+        expect(@override).to be_for_nonactive_enrollment
+      end
+
+      it "returns true for section overrides associated with concluded enrollments" do
+        @course.enrollments.find_by(user: @student).conclude
+        AssignmentOverride.preload_for_nonactive_enrollment([@override], @course, @student)
+        expect(@override).to be_for_nonactive_enrollment
+      end
+
+      it "returns false for section overrides associated with active enrollments" do
+        AssignmentOverride.preload_for_nonactive_enrollment([@override], @course, @student)
+        expect(@override).not_to be_for_nonactive_enrollment
+      end
+
+      it "returns false for individual overrides" do
+        @override.update!(set_type: "ADHOC", set: nil)
+        @override.assignment_override_students.create(user: @student)
+        AssignmentOverride.preload_for_nonactive_enrollment([@override], @course, @student)
+        expect(@override).not_to be_for_nonactive_enrollment
+      end
+
+      it "returns false for group overrides" do
+        category = group_category
+        @override.assignment.update!(group_category: category)
+        group = category.groups.create!(context: @override.assignment.context)
+        @override.update!(set: group)
+        AssignmentOverride.preload_for_nonactive_enrollment([@override], @course, @student)
+        expect(@override).not_to be_for_nonactive_enrollment
+      end
+    end
   end
 
   describe "#notify_change?" do
@@ -966,11 +1011,12 @@ describe AssignmentOverride do
       @override.set = @course.default_section
       @override.save!
 
-      expect(@override.applies_to_students).to eq []
+      expect(@override.applies_to_students).to include(@active_student)
+      expect(@override.applies_to_students).not_to include(@student)
 
       @course.enroll_student(@student, enrollment_state: "active", section: @override.set)
 
-      expect(@override.applies_to_students).to eq [@student]
+      expect(@override.applies_to_students).to include(@active_student, @student)
     end
   end
 

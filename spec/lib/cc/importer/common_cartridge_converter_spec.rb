@@ -20,7 +20,6 @@
 require_relative "../cc_spec_helper"
 
 require "nokogiri"
-require "tmpdir"
 
 describe "Standard Common Cartridge importing" do
   before(:once) do

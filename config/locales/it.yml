@@ -257,6 +257,7 @@ it:
         partner_key: "Chiave partner"
   academic_engagement_capella_74946a80: "Academic Engagement (Capella)"
   academic_engagement_strayer_8c7832b9: "Academic Engagement (Strayer)"
+  academic_success_reporting_2585c499: "Risultato dei successi accademici"
   acalanes_union_high_grade_report_ae9bce11: "Report su voti Acalanes Union High"
   accept_2fdd362e: Accetta
   accept_course_invitation_b4c04fbb: "Accetta l'invito al corso"
@@ -1108,6 +1109,13 @@ it:
               parameters: 
                 header: "Inviato dopo:"
     integer_required: "È richiesto un valore intero"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Termini (Limite 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1768,6 +1776,15 @@ it:
             excelsior: 
               outcome: 
                 text: "ID SIS:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Trimestre
+          student_assignment_grade: 
+            login_ids: 
+              field: "ID accesso"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2354,9 +2371,11 @@ it:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Consente di ordinare le risposte discussione in base ai
       timestamp di creazione. L’ordine predefinito è dal più recente al meno recente per le risposte di livello principale.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Consente ai valutatori di digitare MI nel Registro dei voti o SpeedGrader per taggare manualmente un compito come mancante"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Consente di taggare i link alla pagina di assistenza come Presentati o Nuovi e mette in mostra il Link alla pagina di assistenza presentato nel menu Guida."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Consenti agli istruttori di applicare i punteggi alle consegne non valutate in massa."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Permette ai docenti di assegnare punteggi en masse nel Registro dei voti per le consegne non valutate del gruppo di compiti e dei menu della colonna Totale."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Consente agli istruttori di inviare gli allegati file per conto di uno studente."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Consente di selezionare i risultati dell'apprendimento quando si migra il contenuto del corso"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Consente di modificare le impostazioni di notifica per il corso dalla pagina delle impostazioni di notifica a livello di account."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Consente la visualizzazione dei dati sui risultati memorizzati nel Servizio Risultati nei report Canvas (report amministratore relativo a LMGB, sLMGB e risultati)."
@@ -4999,6 +5018,7 @@ it:
   by_default_students_can_always_create_groups_in_a__af000dd: "Per impostazione predefinita, gli studenti possono sempre creare gruppi in un corso. Per limitare la creazione di gruppi da parte degli studenti, Gestisci corsi: Amministratore - Gestici/Aggiorna deve essere abilitato e la casella di controllo Lascia che gli studenti organizzino i loro gruppi in Impostazioni corso deve essere deselezionata."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Per impostazione predefinita, gli studenti possono sempre creare gruppi in un corso. Per impedire agli studenti di creare dei gruppi, è necessario abilitare Corsi - Gestisci/Aggiorna e deselezionare la casella di controllo Consenti agli studenti di organizzare gruppi personalizzati in Impostazioni corso."
   by_lti_2_registration_url_e421e523: "Per URL di registrazione LTI 2"
+  by_name_54daec42: "da %{name}"
   by_url_a163275e: "Per URL"
   c4e_analytics_66e0fc46: "Analisi C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5673,6 +5693,7 @@ it:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Se lasci questa pagina, le modifiche verranno comunque applicate."
   changes_you_made_may_not_be_saved_4e8db973: "Le modifiche effettuate potrebbero non essere salvate."
   changing_course_dates_may_override_term_availabili_d92b10de: "La modifica delle date del corso può sostituire le impostazioni della disponibilità dei termini e il posizionamento nella pagina e nella  dashboard dei corsi. Confermare le date di termine prima di modificare le date del corso."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "La modifica dei giorni di ritmo corso può modificare le date di scadenza"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "La modifica dei giorni di ritmo corso può modificare le date di scadenza."
   changing_section_dates_may_override_course_and_ter_6634950e: "La modifica delle date della sezione può sostituire le impostazioni della disponibilità dei termini e del corso e il posizionamento nella pagina e nella dashboard dei corsi. Confermare le date di termine e del corso prima di modificare le date della sezione."
   changing_the_course_participation_will_republish_a_1cc05b7: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data usando la partecipazione trimestrale."
@@ -5993,6 +6014,7 @@ it:
   collapse_replies_20f2faf7: "Comprimi risposte"
   collapse_replies_ef4fc36b: "Comprimi risposte"
   collapse_subdiscussion_89af1f5c: "Comprimi discussione secondaria"
+  collapse_threads_ef7ca000: "Comprimi thread"
   collapse_tutorial_tray_66ee7dc1: "Comprimi riquadro tutorial"
   collapsed_510aa02a: Compresso
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Raccolta di miglioramenti reattivi tramite Canvas"
@@ -7491,6 +7513,9 @@ it:
   count_unread_messages_e312aa7b: 
     one: "Un messaggio non letto."
     other: "%{count} messaggi non letti."
+  count_unread_release_notes_3be26022: 
+    one: "Una nota di rilascio non letta."
+    other: "%{count} note di rilascio non lette."
   count_unread_replies_86976ab: "%{count} risposte non lette"
   count_unread_shares_ff9e91a5: 
     one: "Una condivisione non letta."
@@ -7775,6 +7800,7 @@ it:
   course_pacing_d3025ecf: "Ritmo corso:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "L’anteprima della funzione Ritmo corso deve essere abilitata presso l’istituto."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Il Ritmo corso è uno strumento automatizzato che crea un programma per gli studenti combinando ore suggerite per capitolo, giorni di scuola in presenza e ore totali per generare un estimatore di date."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Il Ritmo corso è uno strumento automatizzato che imposta date di scadenza differenziate per le valutazioni e le attività di apprendimento in base alla data di iscrizione di ciascuno studente, abilitando l’apprendimento personalizzato strutturato nell’iscrizione graduale ai corsi."
   course_pacing_is_in_active_development_348e33cf: "Il ritmo del corso è in fase di sviluppo attivo."
   course_pacing_redesign_38edfc1c: "Riprogettazione ritmo corso"
   course_pages_449f1dd4: "Pagine corso"
@@ -8381,6 +8407,7 @@ it:
   create_132b3be1: Crea
   create_14873ed7: crea
   create_a_64f6f82: "Crea un"
+  create_a_course_pace_333b0911: "Crea un ritmo corso"
   create_a_default_course_pace_71ba0b9f: "Crea un ritmo corso predefinito"
   create_a_developer_key_cabaa013: "Crea una chiave sviluppatore"
   create_a_friendly_display_name_c1036ed: "Crea un nome visualizzato descrittivo"
@@ -8406,6 +8433,7 @@ it:
                       e quiz. I gruppi di compiti possono essere ponderati.
   create_content_for_your_course_500a7032: "Crea contenuto per il tuo corso"
   create_course_9a69b32c: "Crea corso"
+  create_course_pace_3dff129: "Crea ritmo corso"
   create_course_templates_f5c4e039: "Crea Modelli corsi"
   create_criterion_6df4d4ad: "Crea criterio"
   create_default_pace_dd21415b: "Crea ritmo predefinito"
@@ -8626,6 +8654,7 @@ it:
   customize_configuration_69c22ef3: "Personalizza configurazione"
   customize_course_details_26fd4afe: "Personalizza dettagli corso"
   customize_learning_mastery_ratings_4ace142a: "Personalizza valutazioni livello di padronanza apprendimento"
+  customize_section_and_student_paces_f63f930f: "Personalizza la sezione e i ritmi studente"
   customize_sections_and_individual_student_paces_a16099b: "Personalizza le sezioni e i singoli ritmi studente"
   customize_this_menu_efa72a9: "Personalizza questo menu"
   cutoff_score_74254c89: "punteggio limite minimo"
@@ -8795,6 +8824,7 @@ it:
     no_date: "Nessuna data"
   dates_6e416047: Date
   dates_shown_in_course_time_zone_da2f77d5: "Date mostrate nel fuso orario del corso"
+  dates_shown_in_course_time_zone_efd32135: "Date mostrate nel fuso orario del corso"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8860,6 +8890,7 @@ it:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Le risposte con nidificazione eccessiva non vengono più supportate. La tua risposta apparirà sulla prima pagina di questa conversazione."
   default_9db103d: "Impostazione predefinita"
   default_conference_title: "%{course_name} Conferenza"
+  default_course_pace_ce0ba0f3: "Ritmo corso predefinito"
   default_course_pacing_d18b6cda: "Ritmo corso predefinito"
   default_dates_a0a2ae26: "date predefinite"
   default_due_time_9d0e9140: "Scadenza predefinita"
@@ -8980,6 +9011,7 @@ it:
   deleted_content_referenced_in_this_resource_e42d1998: "Eliminato contenuto che fa riferimento a questa risorsa:"
   deleted_deletedtimingdisplay_f4c73003: "%{deletedTimingDisplay} eliminato"
   deleted_topic_notice: "L'argomento è stato eliminato"
+  deleted_user_59fdcef7: "UTENTE ELIMINATO"
   deleting_6421031e: "eliminazione in corso..."
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       L’eliminazione di un file di invio di solito avviene quando uno studente posta del materiale inappropriato o privato.
@@ -9075,6 +9107,7 @@ it:
   deployment_id_for_toolname_app_e54a7364: "ID implementazione per app %{toolName}"
   deprecate_sms_be6b00a: "Ritira SMS"
   deprecated_59e99d2a: Obsoleto
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Rimuovi priorità dalle sostituzioni di sezione per le iscrizioni non attive"
   desc_12ad2869: "%{desc}"
   descending_b7828162: "In ordine decrescente"
   description_436c48d7: Descrizione
@@ -9367,6 +9400,7 @@ it:
       page_header_title: "Nuova discussione"
       points_possible: "Punti possibili"
       post_at: "Pubblica alle"
+      publish: Pubblica
       save: Salva
       saving: "Salvataggio in corso..."
       sort_by_likes: "Ordina per Mi piace"
@@ -9865,6 +9899,7 @@ it:
   edit_criterion_description_5828919: "Modifica descrizione criterio"
   edit_current_message_da650d4c: "Modifica messaggio attuale"
   edit_dates_ed31061: "Modifica date"
+  edit_default_course_pace_e00f1b5b: "Modifica ritmo corso predefinito"
   edit_default_pace_33ba5cdd: "Modifica ritmo predefinito"
   edit_developer_key_53c93ed1: "Modifica chiave sviluppatore"
   edit_developer_key_d8fa33c4: "Modifica chiave sviluppatore"
@@ -10098,6 +10133,7 @@ it:
   enabled_unlocked_8d3a5df7: "Abilitato (sbloccato)"
   enabled_web_services_f620b2be: "Servizi web abilitati"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Abilita una finestra di dialogo riprogettata Invia messaggio agli studenti che... che consente di inviare i messaggi agli osservatori oltre agli studenti."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Abilita l'accesso all’API pubblica Nuovi quiz tramite Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Consente di visualizzare i rapporti di plagio e i punteggi di somiglianza nel riquadro di presentazione del nuovo registro dei voti."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Abilita date importanti da applicare ai compiti, eventi di calendario e altro."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Abilita un modale per avvertire l'utente quando una bozza di commento non viene pubblicata in SpeedGrader."
@@ -10565,6 +10601,7 @@ it:
   error_98e81528: Errore
   error_adding_canvas_file_to_submission_draft_de258021: "Errore di aggiunta di un file canvas alla bozza di presentazione"
   error_adding_file_to_discussion_message_16feef3f: "Errore di aggiunta file al messaggio di discussione"
+  error_adding_files_2cd4d45: "Errore di aggiunta file"
   error_adding_files_97ba198e: "Errore durante l’aggiunta di file."
   error_adding_files_to_conversation_message_58e83876: "Errore di aggiunta file a messaggio conversazione"
   error_adding_files_to_discussion_message_8bb819e4: "Errore di aggiunta file al messaggio di discussione"
@@ -10822,6 +10859,7 @@ it:
   expand_permission_b45bf097: "Espandi %{permission}"
   expand_permission_c61d5958: "Espandi autorizzazione"
   expand_subdiscussion_cd226ed4: "Espandi discussione secondaria"
+  expand_threads_634fe7a1: "Espandi thread"
   expand_tutorial_tray_22630c49: "Espandi riquadro tutorial"
   expanded_f4493860: Esteso
   expected_array_of_objects_b09ead01: "Matrice di oggetti prevista"
@@ -11425,6 +11463,7 @@ it:
   germany_49_fc5b8179: "Germania (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Chiedi aiuto su come usare e configurare le conferenze in Canvas."
   get_started_b9507525: Inizia
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Inizia creando un ritmo corso che fungerà da ritmo predefinito per tutte le sezioni e gli studenti nel corso."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Inizia a trovare, importare o creare i tuoi risultati account."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Inizia a trovare, importare o creare i tuoi risultati corso."
   get_started_with_configuring_the_course_material_d_fa51d225: "Inizia a configurare le date di scadenza del materiale del corso per il corso globale"
@@ -12954,6 +12993,11 @@ it:
       Anziché riportare un errore generico 404 Non trovato, l’API riporterà invece 422
       insieme a un messaggio utile che indica che lo strumento non può accedere ai corsi
       conclusi.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      Se abilitato, il JS di risposta di deep linking invierà postMessages
+      a window.parent anziché a window.top. Ciò abilita la risposta di
+      deep linking per inviare correttamente gli elementi contenuto ai Nuovi quiz quando viene lanciato uno strumento
+      da NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Se abilitato, OAuth 2.0 ora riporterà correttamente i codici stato 4xx al
       cliente richiedente anziché reindirizzarli a se stessi
@@ -12989,6 +13033,7 @@ it:
       Se è abilitato anche Miglioramenti RCE,
       RCE eseguirà il salvataggio automatico durante la sessione
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Se impostata, consente di cambiare lo stato dell’invio da dentro Speedgrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "Se impostato, rimuove la priorità usando date di scadenza, date di blocco e data di sblocco dalle sostituzioni di sezione su un compito che sono associate ad un’iscrizione disattivata, conclusa o diversamente non attiva per uno studente."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Se impostato, visualizza i rapporti di originalità con i miglioramenti di assegnazione attivati"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Se impostato, visualizza l’icona di connessione padronanza aggiornata"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "Se impostato, Quizzes.Next funzionerà utilizzando una singola sessione di avvio in SpeedGrader"
@@ -13373,6 +13418,8 @@ it:
   instructor_name_36bc0f39: "Nome istruttore"
   instructor_sis_id_899dd697: "ID SIS istruttore"
   instructors_4b491a07: istruttori
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Gli istruttori non sono vincolati da limiti di tentativi, ma la consegna di un istruttore VARRÀ come tentativo di uno studente."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Gli istruttori possono inviare per conto degli studenti"
   instructors_cdd595d0: Istruttori
   instructure: 
     alerts: 
@@ -13760,6 +13807,7 @@ it:
   key_state_for_the_current_account_d16b1cd5: "Stato della chiave per l'account attuale"
   keyboard_nav_dialog: 
     esc_key_notification: "Premi il tasto ESC prima di utilizzare le scelte rapide da tastiera durante la navigazione nella griglia del registro dei voti."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Tasti di scelta rapida da tastiera per compito mancante"
   keyboard_shortcuts_ed1844bd: "Scelte rapide da tastiera"
   kind_7f0a88c4: Tipo
   know_your_users_5c1323be: "Conosci i tuoi utenti"
@@ -14205,6 +14253,7 @@ it:
   loading_missing_assignments_link_d9a0d320: "Collegamento compiti mancanti in corso"
   loading_more_grade_history_results_b235de5: "Caricamento di ulteriori risultati della cronologia dei voti."
   loading_more_gradebook_history_results_810f6d2e: "Caricamento di ulteriori risultati della cronologia del registro dei voti."
+  loading_more_replies_22e0f13c: "Caricamento di altre risposte"
   loading_more_results_1d437202: "Caricamento di ulteriori risultati"
   loading_more_results_def6df65: "Caricamento di ulteriori risultati in corso..."
   loading_more_sub_accounts_d0a30903: "Caricamento di altri subaccount in corso..."
@@ -14216,6 +14265,7 @@ it:
   loading_permissions_28495bdb: "Caricamento autorizzazioni"
   loading_permissions_failed_73983eb3: "Caricamento autorizzazioni non riuscito"
   loading_release_notes_7deaa2eb: "Caricamento note di rilascio"
+  loading_replies_8bdf17bc: "Caricamento risposte in corso..."
   loading_results_769c8819: "Caricamento dei risultati"
   loading_section_header_616c8cdd: "Caricamento intestazione sezione"
   loading_staff_1ce7d803: "Caricamento personale in corso..."
@@ -16986,6 +17036,7 @@ it:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migrazione nuovi quiz abilitata per impostazione predefinita"
   new_quizzes_migration_required_7854aa1a: "Migrazione nuovi quiz necessaria"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nuovi quiz nella pagina dei quiz"
+  new_quizzes_public_api_18d95321: "API pubblica Nuovi quiz"
   new_quizzes_service_jwt_refresh_ca28ca8: "Aggiornamento JWT servizio per nuovi quiz"
   new_quizzes_site_admin_service_user_a331233a: "Utente del servizio amministratore sito nuovi quiz"
   new_quizzes_submission_274b5c57: "Invio nuovi quiz"
@@ -17019,6 +17070,7 @@ it:
   newest_first_87672763: "A partire dal più recente"
   newest_oldest_d768cf1a: "Più recente - Meno recente"
   next_40e12421: Successivo
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Dopodiché, regolare i ritmi per le singole sezioni e/o i singoli studenti per personalizzare ulteriormente in base alle tue esigenze (questa fase è facoltativa)."
   next_announcement_6e6e0f17: "Annuncio successivo"
   next_announcements_page_3956eb11: "Pagina di annunci successiva"
   next_assignment_8ec51175: "Compito successivo"
@@ -17712,8 +17764,10 @@ it:
       \x20             Modifiche future ad un voto già pubblicato non dovranno essere pubblicate manualmente.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Una volta che un voto viene pubblicato manualmente, verranno inviate automaticamente nuove notifiche, quindi sarà visibile agli studenti."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Una volta abilitata, questa opzione è visibile nel registro dei voti per gli istruttori."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Una volta inviata una risposta, non potrai modificarla in seguito. Non potrai visualizzare la domanda precedente."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Una volta avviato il debug, saranno raccolte tutte le informazioni sul prossimo tentativo di accesso. Fai clic su \"Aggiorna\" per verificare se sono stati raccolti altri dati o su \"Arresta debug\" per cancellare i dati raccolti e interrompere il tentativo di debug corrente."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "Uno dei redirect_uris forniti è troppo lungo. Verificare di aver inserito i valori corretti per il proprio redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Uno o più elementi di contenuto inviati da questa applicazione esterna non sono stati elaborati correttamente. Questi dati non sono stati salvati in Canvas e le ragioni del fallimento sono elencate di seguito."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Uno o più voti selezionati sono stati forniti da un valutatore con iscrizioni inattive. Aggiorna le selezioni con quelle fornite dai valutatori attuali."
   one_or_more_items_are_currently_being_imported_the_186fe069: "È in corso l'importazione di uno o più elementi. Quando disponibili, verranno mostrati nel corso sottostante."
@@ -18082,6 +18136,11 @@ it:
   pace_plans_is_in_active_development_f6c20046: "I programmi di velocità sono in continua evoluzione."
   pace_removed_8e625df7: "Ritmo rimosso"
   pace_type_76cf749: "Tipo di ritmo"
+  pacename_pace_created_75aa4eda: "Ritmo %{paceName} creato"
+  pacename_pace_removed_79fb031f: "Ritmo %{paceName} rimosso"
+  pacename_pace_updated_10c6f95: "Ritmo %{paceName} aggiornato"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "Il ritmo %{paceName} sarà rimosso. Questo ritmo tornerà al ritmo precedentemente assegnato."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "Il ritmo %{paceName} sarà rimosso. Questo ritmo tornerà al ritmo predefinito."
   pacename_updated_2a2c4d77: "%{paceName} aggiornato"
   pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "Ritmi %{paceType}: ordinati per %{sortBy} in ordine %{orderType}"
   package_error: "Errore durante l'identificazione del tipo di pacchetto: %{error}"
@@ -18364,6 +18423,7 @@ it:
   please_note_fbb62e4c: "Nota:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Nota: Instructure ospita Canvas Commons negli Stati Uniti. Ciò significa che se usi Canvas Commons, i tuoi dati personali saranno conservati ed elaborati negli Stati Uniti. Questi dati personali includono: nome, indirizzo e-mail, ID utente Canvas, nome d’accesso a Canvas, Avatar Canvas, indirizzo IP, risorse Canvas Commons preferite dall'utente e commenti fatti dall’utente a qualsiasi risorsa di Canvas Commons. Per maggiori informazioni sulle pratiche di Instructure, fai click [qui](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Nota: una volta impostato un Ritmo corso, tutti i compiti assegnati, i quiz, le scadenze delle discussioni saranno controllati da Ritmo corso. Puoi leggere maggiori informazioni nel *gruppo di utenti di ritmo corso*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Nota: una volta salvato un ritmo del corso, tutte le date di scadenza per le valutazioni esistenti e i materiali di apprendimento saranno controllate dal Ritmo corso. Scopri maggiori informazioni su Ritmo corso nel *Gruppo di utenti per il ritmo corso*."
   please_provide_a_field_e5a7d0b3: "Fornisci un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Fornire un codice accoppiamento."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Fornisci un dominio tenant valido. Controlla le tue impostazioni Azure Active Directory per trovarlo."
@@ -18378,6 +18438,7 @@ it:
   please_select_one_f931e883: "Seleziona un'opzione"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Specificare se abilitare o disabilitare la sincronizzazione di Microsoft Teams."
   please_try_again_4c3d11b4: Riprova
+  please_try_another_search_term_8f7b5d69: "Prova con un altro termine di ricerca"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Prova un altro termine di ricerca, filtra oppure cerca con alcuni caratteri"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Prova a ristabilire la connessione con lo strumento riselezionando lo strumento nel compito o nell’interfaccia dell’elemento modulo e salvando."
   please_upload_files_as_a_zip_5a2c799f: "Carica i file come .zip"
@@ -19000,6 +19061,7 @@ it:
   private_3883d133: Privato
   pro_tip_30e41fa3: "CONSIGLIO UTILE!"
   proceed_f3d33864: Continua
+  proceed_with_caution_aa9b3285: "Procedere con attenzione"
   process_multiple_content_items_from_course_modules_6de90fd8: "Elabora elementi di contenuto multipli da una pagina moduli corso"
   processed_4725b02: Elaborato
   processing_2fcc9739: "Elaborazione in corso"
@@ -21201,6 +21263,7 @@ it:
   reset_all_6e5e040a: "Ripristina tutto"
   reset_all_unpublished_changes_243f179f: "Ripristinare tutte le modifiche non pubblicate?"
   reset_courses_fe29ddf9: "Ripristina corsi"
+  reset_lti_provision_6d8e287f: "Ripristina provisioning LTI"
   reset_multi_factor_authentication_2b63a558: "Reimposta autenticazione a più fattori"
   reset_name_6a0aa0f: "Reimposta \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Reimposta la scelta del motore del quiz"
@@ -23503,6 +23566,8 @@ it:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Gli studenti possono partecipare al corso solo nel periodo compreso tra queste date"
   students_can_see_originality_score_797fe634: "Gli studenti possono visualizzare il punteggio di originalità"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Gli studenti non possono visualizzare le risposte dei quiz dopo la conclusione del corso"
+  students_enrolled_in_this_course_859fa7a2: "Studenti iscritti a questo corso"
+  students_enrolled_in_this_section_681ba503: "Studenti iscritti a questa sezione"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Gli studenti hanno già consegnato l'elaborato per questo compito, quindi le impostazioni della piattaforma plagio non possono essere modificate."
   students_have_either_already_taken_or_started_taki_a076336: "Gli studenti hanno già eseguito o hanno iniziato a eseguire questo quiz, quindi fai attenzione se apporti modifiche. Se apporti modifiche significative alle domande del quiz, considera la possibilità di rivalutare gli studenti che hanno eseguito la versione precedente del quiz."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Gli studenti possono rispondere in modo anonimo. Alcuni nominativi e immagini profilo possono essere nascosti."
@@ -23652,6 +23717,7 @@ it:
   submission_type_lti_placement_b448d5d0: "Posizionamento LTI tipo di consegna"
   submission_type_selection_72ce19f: "Selezione tipo di consegna"
   submission_updated_8897f3b7: "Consegna aggiornata"
+  submission_uploaded_542c9ac6: "Consegna caricata!"
   submission_user_name_assignment_title_2cf5e3e9: "Consegna: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Compito consegnato correttamente."
@@ -23751,6 +23817,7 @@ it:
   submissions_d30f61af: "# Consegne"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "le cartelle delle consegne devono essere create nel contesto Utente o Gruppo"
   submissions_graded_status_f689110d: "Stato Invii - Valutati"
+  submissions_instructor_proxy_2247c633: "Consegne - Proxy istruttore"
   submissions_posted_title_course_43677dba: "Invii pubblicati: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Pagina stato ricarica consegne"
   submissions_view_and_make_comments_cafaf361: "Compiti - visualizza e crea commenti"
@@ -23787,6 +23854,8 @@ it:
   submit_ticket_5515ffd: "Invia ticket"
   submitted_318fad53: Inviato
   submitted_at_4d5ea3aa: "Inviato alle"
+  submitted_by_name_dab6d5e1: "Inviato da: %{name}"
+  submitted_by_submitter_1dcd07a1: "Inviato da %{submitter}"
   submitted_d5ba370a: "Inviato:"
   submitted_date_ba55b0ae: "Consegnato %{date}"
   submitted_datetime_fa2e9287: "Inviato: %{dateTime}"
@@ -24087,6 +24156,7 @@ it:
   test_cluster_only_70e61c19: "Solo cluster di test"
   test_feature_flag_980151e0: "Flag funzionalità test"
   testing_state_effd4a82: "Test dello stato"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Testo
   text_df773ce4: testo
   text_document_eacbcdb7: "Documento di testo"
@@ -24381,6 +24451,7 @@ it:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "L'icona di scelta rapida per i dispositivi iOS/Android. 180 x 180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Impossibile trovare il compito specificato"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "Impossibile trovare il compito specificato (%{id})"
+  the_specified_resource_does_not_exist_71d8b751: "La risorsa specificata non esiste."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "L'utente specificato (%{id}) non è uno studente di questo corso"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "L'utente specificato non è uno studente di questo corso"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "La data di inizio per il programma di velocità deve essere successiva alla data di fine."
@@ -24959,6 +25030,7 @@ it:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "L'operazione aggiornerà tutte le rubriche che utilizzano questo esito e che non sono state ancora valutate."
   this_will_update_all_student_mastery_results_tied__a52301e5: "Tale operazione aggiornerà tutti i risultati padronanza studente legati al calcolo padronanza a livello dell’account."
   this_will_update_all_student_mastery_results_withi_934580d1: "Tale operazione aggiornerà tutti i risultati padronanza studente all’interno del corso."
+  thread_addd9799: Thread
   threshold_in_hours_to_notify_students_within_f33820aa: "Soglia (in ore) entro cui inviare notifica agli studenti"
   threshold_pts_45f0e5d8: "soglia: %{pts}"
   throttle_jobs_f61be56: "Limita lavori"
@@ -26381,6 +26453,7 @@ it:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Usa questo pannello per cercare le persone che desideri aggiungere a questo corso."
   use_this_photo_3a594830: "Usa questa foto"
   use_webcam_1ed0bf6b: "Usa webcam"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Usare window.parent nella risposta di deep linking"
   used_by_permission_314a78dd: "Utilizzato con autorizzazione"
   user: 
     default_user_name: Utente
@@ -27722,6 +27795,7 @@ it:
   your_outcomes_were_successfully_imported_c5de884: "I tuoi esiti sono stati importati."
   your_password_has_been_changed_df0e72aa: "La tua password è stata modificata."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Le istruzioni per il recupero della tua password saranno inviate a *%{email_address}*. Questo processo potrebbe richiedere fino a 30 minuti. Assicurati di controllare la cartella dello spam."
+  your_peer_review_is_complete_e5fa3e40: "La tua revisione paritaria è stata completata!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Impossibile caricare la tua immagine del profilo. Puoi aver superato il limite di caricamento."
   your_quiz_engine_choice_has_been_reset_68d268c1: "La scelta del motore del quiz è stata azzerata!"
   your_score_a1fc2fcf: "Il tuo punteggio"

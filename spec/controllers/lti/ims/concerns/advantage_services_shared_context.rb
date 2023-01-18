@@ -19,59 +19,12 @@
 #
 
 require "lti_1_3_tool_configuration_spec_helper"
+require "lib/lti/ims/advantage_access_token_shared_context"
 
 shared_context "advantage services context" do
   include_context "lti_1_3_tool_configuration_spec_helper"
+  include_context "advantage access token context"
 
-  let_once(:root_account) do
-    Account.default
-  end
-  let_once(:developer_key) do
-    dk = DeveloperKey.create!(account: root_account)
-    dk.developer_key_account_bindings.first.update! workflow_state: "on"
-    dk
-  end
-  let(:access_token_scopes) do
-    %w[
-      https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
-      https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
-      https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-      https://canvas.instructure.com/lti/public_jwk/scope/update
-      https://canvas.instructure.com/lti/data_services/scope/create
-      https://canvas.instructure.com/lti/data_services/scope/show
-      https://canvas.instructure.com/lti/data_services/scope/update
-      https://canvas.instructure.com/lti/data_services/scope/list
-      https://canvas.instructure.com/lti/data_services/scope/destroy
-      https://canvas.instructure.com/lti/data_services/scope/list_event_types
-      https://canvas.instructure.com/lti/account_lookup/scope/show
-      https://canvas.instructure.com/lti/feature_flags/scope/show
-      https://canvas.instructure.com/lti/account_external_tools/scope/create
-      https://canvas.instructure.com/lti/account_external_tools/scope/update
-      https://canvas.instructure.com/lti/account_external_tools/scope/list
-      https://canvas.instructure.com/lti/account_external_tools/scope/show
-      https://canvas.instructure.com/lti/account_external_tools/scope/destroy
-    ].join(" ")
-  end
-  let(:access_token_signing_key) { Canvas::Security.encryption_key }
-  let(:test_request_host) { "test.host" }
-  let(:access_token_jwt_hash) do
-    timestamp = Time.zone.now.to_i
-    {
-      iss: "https://canvas.instructure.com",
-      sub: developer_key.global_id,
-      aud: "http://#{test_request_host}/login/oauth2/token",
-      iat: timestamp,
-      exp: (timestamp + 1.hour.to_i),
-      nbf: (timestamp - 30),
-      jti: SecureRandom.uuid,
-      scopes: access_token_scopes
-    }
-  end
-  let(:access_token_jwt) do
-    return nil if access_token_jwt_hash.blank?
-
-    JSON::JWT.new(access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
-  end
   let(:tool_context) { root_account }
   let!(:tool) do
     ContextExternalTool.create!(

@@ -677,11 +677,28 @@ describe Assignment do
       expect(visible_assignments).not_to include assignment
     end
 
-    it "includes assignments assigned to a concluded enrollment for the given user" do
-      assignment = @course.assignments.create!(only_visible_to_overrides: true)
-      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
+    it "includes assignments assigned to a concluded enrollment for the given user if due date in past" do
+      one_week_prev = 1.week.ago
+      assignment = @course.assignments.create!(only_visible_to_overrides: true, due_at: one_week_prev)
+      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section, due_at: one_week_prev)
       student_enrollment.conclude
       expect(visible_assignments).to include assignment
+    end
+
+    it "excludes assignments assigned to a concluded enrollment for the given user if due date is future" do
+      one_week_prev = 1.week.ago
+      one_week_later = 1.week.from_now
+      assignment1 = @course.assignments.create!(only_visible_to_overrides: true)
+      assignment2 = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment1, course_section: student_enrollment.course_section, due_at: one_week_prev)
+      create_section_override_for_assignment(assignment2, course_section: student_enrollment.course_section, due_at: one_week_later)
+      assignment3 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_prev)
+      assignment4 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_later)
+      student_enrollment.conclude
+      expect(visible_assignments).to include assignment1
+      expect(visible_assignments).to include assignment3
+      expect(visible_assignments).not_to include assignment2
+      expect(visible_assignments).not_to include assignment4
     end
 
     it "includes assignments assigned to an active enrollment for the given user" do
@@ -9907,10 +9924,12 @@ describe Assignment do
           referer_id: 123
         }
       end
+      let(:url) { "https://www.tool.com/deep_link" }
       let(:assignment) do
         @course.assignments.create!(submission_types: "external_tool",
                                     lti_resource_link_custom_params: custom_params.to_json,
-                                    external_tool_tag_attributes: { content: tool },
+                                    lti_resource_link_url: url,
+                                    external_tool_tag_attributes: { content: tool, url: url },
                                     **assignment_valid_attributes)
       end
 
@@ -10001,6 +10020,23 @@ describe Assignment do
           resource_link = assignment.line_items.first.resource_link
 
           expect(resource_link.lookup_uuid).to eq lookup_uuid
+        end
+
+        it "updates the resource link's url when given" do
+          assignment.lti_resource_link_url = nil
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq url
+
+          new_url = "https://www.tool.com/deep_link_2"
+          assignment.lti_resource_link_url = new_url
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq new_url
         end
 
         context "and no resource link or line item exist" do
@@ -10525,7 +10561,7 @@ describe Assignment do
 
         it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
           course_section = course.course_sections.create!(name: "section")
-          course.enroll_student(User.create!, active_all: true, section: course_section)
+          course.enroll_student(User.create!, enrollment_state: "active", section: course_section)
           assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
           assignment.assignment_overrides.create!(
             due_at: 10.minutes.before(newly_closed_grading_period.end_date),

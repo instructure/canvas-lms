@@ -17,11 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "cgi"
-require "net/http"
-require "net/https"
-require "json"
-
 require_dependency "canvadocs/session"
 module Canvadocs
   extend CanvadocsHelper

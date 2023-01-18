@@ -43,6 +43,10 @@
     </div>
   <% end %>
   <div class="content">
+    <% if @current_user_submission.proxy_submitter %>
+      <%= t "by %{name}", name: @current_user_submission.proxy_submitter.short_name %>
+      <br />
+    <% end %>
     <span class="<%= "late" if @current_user_submission.late? %>">
       <% if @current_user_submission.late? %>
         <%= t 'messages.submission_late_timestamp', "%{submitted_at} (late)", :submitted_at => datetime_string(@current_user_submission.submitted_at) %>
