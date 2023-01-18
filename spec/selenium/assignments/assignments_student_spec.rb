@@ -376,6 +376,31 @@ describe "assignments" do
       end
     end
 
+    context "proxy submitted assignment" do
+      before do
+        @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
+        @assignment.update!(submission_types: "online_upload,online_text_entry")
+        Account.site_admin.enable_feature!(:proxy_file_uploads)
+        teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+        RoleOverride.create!(
+          permission: "proxy_assignment_submission",
+          enabled: true,
+          role: teacher_role,
+          account: @course.root_account
+        )
+        file_attachment = attachment_model(content_type: "application/pdf", context: @student)
+        submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [file_attachment])
+        @teacher.update!(short_name: "Test Teacher")
+        submission.update!(proxy_submitter: @teacher)
+        user_session(@student)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      end
+
+      it "identifies the proxy submitter in the submission details" do
+        expect(f(".details").text).to include("by " + @teacher.short_name)
+      end
+    end
+
     context "with more than one page of assignment groups" do
       before do
         ApplicationController::ASSIGNMENT_GROUPS_TO_FETCH_PER_PAGE_ON_ASSIGNMENTS_INDEX = 10

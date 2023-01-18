@@ -173,6 +173,10 @@ class Speedgrader
       f("#submission_to_view")
     end
 
+    def submitter_info
+      f("#multiple_submissions")
+    end
+
     def submission_file_download
       f(".submission-file-download")
     end
