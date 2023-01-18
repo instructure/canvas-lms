@@ -148,6 +148,28 @@ module Lti
             expect(parsed_response_body).to eq expected_response
           end
 
+          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+            it "uses the Account#domain in the line item id" do
+              course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+              allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+              send_request
+              expect(parsed_response_body["id"]).to start_with(
+                "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
+              )
+            end
+          end
+
+          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+            it "uses the host domain in the line item id" do
+              course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+              allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+              send_request
+              expect(parsed_response_body["id"]).to start_with(
+                "http://test.host/api/lti/courses/#{course.id}/line_items/"
+              )
+            end
+          end
+
           it "associates the line item with the correct assignment" do
             send_request
             body = parsed_response_body

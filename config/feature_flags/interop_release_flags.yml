@@ -135,3 +135,12 @@ deep_linking_use_window_parent:
       state: allowed_on
     ci:
       state: on
+consistent_ags_ids_based_on_account_principal_domain:
+  state: hidden
+  display_name: Consistent LTI AGS IDs based on Account's principal domain
+  description: |-
+    If enabled, AGS will use the Account's principal domain for Line Items IDs
+    throughout the AGS API and LTI Launches, regardless of which domain the LTI
+    launch happens on or the API is accessed through. For schools with multiple
+    domains, this ensures consistency in Line Item IDs.
+  applies_to: RootAccount
