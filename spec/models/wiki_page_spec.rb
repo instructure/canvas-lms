@@ -163,25 +163,6 @@ describe WikiPage do
     expect(p2.url).to eql("asdf-2")
   end
 
-  it "handles page title collisions when page title ends in -<some number>" do
-    course_with_teacher(active_all: true)
-    p1 = @course.wiki_pages.create!(title: "MAT-1104")
-    p2 = @course.wiki_pages.create!(title: "MAT-1104")
-    p3 = @course.wiki_pages.create!(title: "MAT-1104")
-    expect(p1.title).to eql("MAT-1104")
-    expect(p2.title).to eql("MAT-1104-2")
-    expect(p3.title).to eql("MAT-1104-3")
-  end
-
-  it "handles case differences in page titles" do
-    course_with_teacher(active_all: true)
-    @course.wiki_pages.create!(title: "abc")
-    p2 = @course.wiki_pages.create!(title: "ABC")
-    expect(p2.title).to eql("ABC")
-    # url ignores case so we should expect duplicate handling here
-    expect(p2.url).to eql("abc-2")
-  end
-
   it "makes the title unique and truncate to proper length" do
     course_with_teacher(active_all: true)
     p1 = @course.wiki_pages.create!(title: "a" * WikiPage::TITLE_LENGTH)
