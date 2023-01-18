@@ -122,7 +122,7 @@ module CC
           ci.root_account_id a.global_id
           ci.root_account_name a.name
           ci.root_account_uuid a.uuid
-          ci.canvas_domain a.primary_domain&.host if a.respond_to?(:primary_domain)
+          ci.canvas_domain a.domain
         end
       end
 

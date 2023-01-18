@@ -1191,4 +1191,33 @@ describe ContentMigration do
       expect(migration.source_course).to be_nil
     end
   end
+
+  describe "asset_map_url" do
+    before :once do
+      # not actually doing a course copy here, just simulating a finished one
+      @src = course_factory
+      @dst = course_factory
+      @old = @src.assignments.create! title: "foo"
+      @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+      @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+      @cm.workflow_state = "imported"
+      @cm.source_course = @src
+      @cm.save!
+    end
+
+    it "returns a url to a file containing the asset map" do
+      expect_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
+      url = @cm.asset_map_url(generate_if_needed: true)
+      @cm.reload
+      expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+      expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+      expect(@cm.asset_map_attachment.context).to eq @cm
+      json = JSON.parse(@cm.asset_map_attachment.open.read)
+      expect(json).to eq({ "source_course" => @src.id.to_s,
+                           "source_host" => "pineapple.edu",
+                           "resource_mapping" => {
+                             "assignments" => { @old.id.to_s => @new.id.to_s }
+                           } })
+    end
+  end
 end

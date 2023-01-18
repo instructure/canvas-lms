@@ -93,7 +93,7 @@ describe QuizzesNext::ExportService do
   describe ".send_imported_content" do
     let(:new_course) { course_model }
     let(:root_account) { double("account") }
-    let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "some_type") }
+    let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "some_type", asset_map_url: "http://example.com/resource_map.json") }
     let(:new_assignment1) { assignment_model(id: 1) }
     let(:new_assignment2) { assignment_model(id: 2) }
     let(:old_assignment1) { assignment_model(id: 3) }
@@ -127,7 +127,8 @@ describe QuizzesNext::ExportService do
         new_course_resource_link_id: "ctx-1234",
         domain: "canvas.instructure.com",
         new_course_name: "Course Name",
-        created_on_blueprint_sync: false
+        created_on_blueprint_sync: false,
+        resource_map_url: "http://example.com/resource_map.json"
       }
 
       basic_import_content[:assignments] << {
@@ -191,7 +192,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when the assignment is created as part of a blueprint sync" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "master_course_import") }
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "master_course_import", asset_map_url: "http://example.com/resource_map.json") }
 
       before do
         course = course_model
@@ -216,7 +217,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when an assignment is imported into a blueprint child course" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer") }
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
 
       before do
         course = course_model
@@ -241,7 +242,7 @@ describe QuizzesNext::ExportService do
     end
 
     context "when an assignment is imported into a non-blueprint course" do
-      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer") }
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer", asset_map_url: "http://example.com/resource_map.json") }
 
       it "emits a live event with the field created_on_blueprint_sync set as false" do
         basic_import_content[:assignments] << {

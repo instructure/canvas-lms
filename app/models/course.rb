@@ -3978,6 +3978,10 @@ class Course < ActiveRecord::Base
       root_account.context_external_tools.active.quiz_lti.first
   end
 
+  def has_new_quizzes?
+    assignments.active.quiz_lti.exists?
+  end
+
   def find_or_create_progressions_for_user(user)
     @progressions ||= {}
     @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
