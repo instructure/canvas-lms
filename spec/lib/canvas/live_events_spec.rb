@@ -1208,12 +1208,19 @@ describe Canvas::LiveEvents do
   describe ".content_migration_completed" do
     let(:course) { course_factory }
     let(:source_course) { course_factory }
-    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: "some_type") }
+    let(:migration) do
+      ContentMigration.create(context: course,
+                              source_course: source_course,
+                              migration_type: "some_type",
+                              workflow_state: "imported")
+    end
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
       course.lti_context_id = "abc"
       source_course.lti_context_id = "def"
+      expect(source_course).to receive(:has_new_quizzes?).and_return(true)
+      expect(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
     end
 
     it "sent events with expected payload" do
@@ -1229,7 +1236,8 @@ describe Canvas::LiveEvents do
           source_course_lti_id: source_course.lti_context_id,
           source_course_uuid: source_course&.uuid,
           destination_course_lti_id: course.lti_context_id,
-          migration_type: migration.migration_type
+          migration_type: migration.migration_type,
+          resource_map_url: "http://example.com/resource_map.json"
         ),
         hash_including(
           context_type: course.class.to_s,

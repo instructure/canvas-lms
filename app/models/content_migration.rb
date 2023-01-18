@@ -21,12 +21,15 @@
 class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include Rails.application.routes.url_helpers
+
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, class_name: "Attachment"
   belongs_to :exported_attachment, class_name: "Attachment"
+  belongs_to :asset_map_attachment, class_name: "Attachment", optional: true
   belongs_to :source_course, class_name: "Course"
   belongs_to :root_account, class_name: "Account"
   has_one :content_export
@@ -1119,7 +1122,7 @@ class ContentMigration < ActiveRecord::Base
   ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   def asset_id_mapping
-    return {} unless source_course
+    return nil unless (imported? || importing?) && source_course
 
     mapping = {}
     master_template = migration_type == "master_course_import" &&
@@ -1177,6 +1180,30 @@ class ContentMigration < ActiveRecord::Base
     end
 
     mapping
+  end
+
+  def asset_map_url(generate_if_needed: false)
+    generate_asset_map if !asset_map_attachment && generate_if_needed
+    asset_map_attachment && file_download_url(asset_map_attachment, { verifier: asset_map_attachment.uuid,
+                                                                      download: "1",
+                                                                      download_frd: "1",
+                                                                      host: HostUrl.context_host(context) })
+  end
+
+  def generate_asset_map
+    data = asset_id_mapping
+    return if data.nil?
+
+    payload = {
+      "source_host" => source_course.root_account.domain,
+      "source_course" => source_course_id.to_s,
+      "resource_mapping" => data
+    }
+
+    self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
+    Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
+    asset_map_attachment.save!
+    save!
   end
 
   set_broadcast_policy do |p|
