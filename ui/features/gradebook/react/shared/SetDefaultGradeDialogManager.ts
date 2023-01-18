@@ -31,6 +31,8 @@ class SetDefaultGradeDialogManager {
 
   contextId: string
 
+  missingShortcutEnabled: boolean
+
   submissionsLoaded: boolean
 
   selectedSection: string | null
@@ -39,6 +41,7 @@ class SetDefaultGradeDialogManager {
     assignment: Assignment,
     students,
     contextId: string,
+    missingShortcutEnabled: boolean,
     selectedSection: string | null,
     isAdmin = false,
     submissionsLoaded = false
@@ -46,6 +49,7 @@ class SetDefaultGradeDialogManager {
     this.assignment = assignment
     this.students = students
     this.contextId = contextId
+    this.missingShortcutEnabled = missingShortcutEnabled
     this.selectedSection = selectedSection
     this.isAdmin = isAdmin
     this.submissionsLoaded = submissionsLoaded
@@ -58,6 +62,7 @@ class SetDefaultGradeDialogManager {
       assignment: this.assignment,
       students: this.students,
       context_id: this.contextId,
+      missing_shortcut_enabled: this.missingShortcutEnabled,
       selected_section: this.selectedSection,
     }
   }

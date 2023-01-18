@@ -2506,6 +2506,9 @@ class Submission < ActiveRecord::Base
     includes = { quiz_submission: {} }
     methods = %i[submission_history attachments entered_score entered_grade word_count]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
+    if additional_parameters[:methods]
+      methods.concat(Array(additional_parameters.delete(:methods)))
+    end
     excepts = additional_parameters.delete :except
 
     res = { methods: methods, include: includes }.merge(additional_parameters)

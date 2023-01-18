@@ -36,7 +36,7 @@ noop = ->
 alertProxy = (message) -> alert(message)
 
 export default class SetDefaultGradeDialog
-  constructor: ({@assignment, @students, @context_id, @selected_section, @onClose = noop, @page_size = 50, @alert = alertProxy}) ->
+  constructor: ({@assignment, @students, @context_id, @missing_shortcut_enabled, @selected_section, @onClose = noop, @page_size = 50, @alert = alertProxy}) ->
 
   show: (onClose = @onClose) =>
     templateLocals =
@@ -78,12 +78,18 @@ export default class SetDefaultGradeDialog
           responses = [responses] if postDfds.length == 1
           submissions = getSubmissions(responses)
           $.publish 'submissions_updated', [submissions]
-          @alert(I18n.t 'alerts.scores_updated'
-          ,
-            one: '1 Student score updated'
-            other: '%{count} Student scores updated'
-          ,
-            count: submissions.length)
+          if @gradeIsMissingShortcut(formData.default_grade)
+            @alert(I18n.t
+              one: '1 student marked as missing'
+              other: '%{count} students marked as missing'
+            ,
+              count: submissions.length)
+          else
+            @alert(I18n.t
+              one: '1 student score updated'
+              other: '%{count} student scores updated'
+            ,
+              count: submissions.length)
           submittingDfd.resolve()
           @$dialog.dialog('close')
 
@@ -98,10 +104,17 @@ export default class SetDefaultGradeDialog
       _.chain(page)
         .map (s) =>
           prefix = "submissions[submission_#{s.id}]"
-          [["#{prefix}[assignment_id]", @assignment.id],
-          ["#{prefix}[user_id]", s.id],
-          ["#{prefix}[grade]", grade],
-          ["#{prefix}[set_by_default_grade]", true]]
+          params = [
+            ["#{prefix}[assignment_id]", @assignment.id],
+            ["#{prefix}[user_id]", s.id],
+            ["#{prefix}[set_by_default_grade]", true]
+          ]
+          if @gradeIsMissingShortcut(grade)
+            params.push(["#{prefix}[late_policy_status]", 'missing'])
+          else
+            params.push(["#{prefix}[grade]", grade])
+
+          params
         .flatten(true)
         .object()
         .value()
@@ -118,3 +131,6 @@ export default class SetDefaultGradeDialog
 
   gradeIsExcused: (grade) ->
     _.isString(grade) && grade.toUpperCase() == 'EX'
+
+  gradeIsMissingShortcut: (grade) ->
+    @missing_shortcut_enabled && grade?.toUpperCase() == 'MI'

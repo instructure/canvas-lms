@@ -86,6 +86,7 @@ export type GradebookOptions = {
   allow_apply_score_to_ungraded: boolean
   allow_separate_first_last_names: boolean
   allow_view_ungraded_as_zero: boolean
+  assignment_missing_shortcut: boolean
   attachment_url: null | string
   attachment: null | AttachmentData
   change_gradebook_version_url: string
