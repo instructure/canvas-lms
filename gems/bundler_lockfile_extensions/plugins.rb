@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,11 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem "bundler", "~> 2.2"
+require_relative "lib/bundler_lockfile_extensions"
 
-if RUBY_ENGINE == "truffleruby"
-  warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
-elsif RUBY_VERSION >= "3.2.0"
-  warn "Ruby 3.2+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
+Bundler::Plugin.add_hook(Bundler::Plugin::Events::GEM_AFTER_INSTALL_ALL) do |_|
+  BundlerLockfileExtensions.write_all_lockfiles unless BundlerLockfileExtensions.lockfile_defs.nil?
 end
-ruby ">= 2.7.0"

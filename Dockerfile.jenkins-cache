@@ -15,6 +15,7 @@ RUN --mount=target=/tmp/src \
     gems/**/*.gemspec \
     gems/**/gem_version.rb \
     gems/**/version.rb \
+    gems/bundler_lockfile_extensions \
     gems/plugins/**/Gemfile.d \
     engines/**/Gemfile \
     engines/**/*.gemspec \

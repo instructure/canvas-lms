@@ -17,11 +17,48 @@
 
 source "https://rubygems.org/"
 
+plugin "bundler_lockfile_extensions", path: "gems/bundler_lockfile_extensions"
+
+require File.expand_path("config/canvas_rails_switcher", __dir__)
+
+if Plugin.installed?('bundler_lockfile_extensions')
+  Plugin.send(:load_plugin, 'bundler_lockfile_extensions') if !defined?(BundlerLockfileExtensions)
+
+  # Specifically exclude private plugins + private sources so that we can share a Gemfile.lock
+  # with OSS users without needing to encrypt / put it in a different repo. In order to actually
+  # pin any plugin-specific dependencies, the following constraints are introduced:
+  #
+  # 1. All dependencies under a private source must be pinned in the private plugin gemspec
+  # 2. All sub-dependencies of (1) must be pinned in plugins.rb
+  # 3. All additional public dependencies of private plugins must be pinned in plugins.rb
+  #
+  install_filter = lambda do |lockfile, source|
+    return false if (
+      source.to_s.match(/plugins\/(?!academic_benchmark|account_reports|moodle_importer|qti_exporter|respondus_soap_endpoint|simply_versioned)/)
+    ) || ::Digest::MD5.hexdigest(source.to_s) == "252f6aa6a56f69f01f8a19275e91f0d8"
+
+    true
+  end
+
+  lockfile_defs = SUPPORTED_VERSIONS.map do |x|
+    prepare_environment = lambda do
+      Object.send(:remove_const, :CANVAS_RAILS)
+      ::CANVAS_RAILS = x
+    end
+
+    ["Gemfile.rails#{x.delete(".")}.lock", {
+      default: x == CANVAS_RAILS,
+      install_filter: install_filter,
+      prepare_environment: prepare_environment,
+    }]
+  end.to_h
+
+  BundlerLockfileExtensions.enable(lockfile_defs)
+end
+
 Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
 end
-
-require File.expand_path("config/canvas_rails_switcher", __dir__)
 
 Dir.glob(File.join(File.dirname(__FILE__), "Gemfile.d", "*.rb")).sort.each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
