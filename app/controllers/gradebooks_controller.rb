@@ -710,7 +710,8 @@ class GradebooksController < ApplicationController
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
                                        :graded_anonymously, :provisional, :final, :set_by_default_grade,
-                                       :comment, :media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
+                                       :comment, :media_comment_id, :media_comment_type, :group_comment,
+                                       :late_policy_status).to_unsafe_h
         is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record.missing? && submission_record.late_policy_status.nil?
 
         submission[:grader] = @current_user unless is_default_grade_for_missing
@@ -726,6 +727,7 @@ class GradebooksController < ApplicationController
           end
         end
         begin
+          dont_overwrite_grade = value_to_boolean(params[:dont_overwrite_grades])
           if %i[grade score excuse excused].any? { |k| submission.key? k }
             # if it's a percentage graded assignment, we need to ensure there's a
             # percent sign on the end. eventually this will probably be done in
@@ -734,7 +736,7 @@ class GradebooksController < ApplicationController
               submission[:grade] = "#{submission[:grade]}%"
             end
 
-            submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
+            submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
@@ -747,6 +749,13 @@ class GradebooksController < ApplicationController
             subs = @assignment.update_submission(@user, submission)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
+          end
+
+          if submission.key?(:late_policy_status) && submission_record.present? && (!dont_overwrite_grade || (submission_record.grade.blank? && !submission_record.excused?))
+            submission_record.update(late_policy_status: submission[:late_policy_status])
+            if submission_record.saved_change_to_late_policy_status?
+              @submissions << submission_record
+            end
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
@@ -799,12 +808,11 @@ class GradebooksController < ApplicationController
     submissions.map do |submission|
       assignment = assignments[submission[:assignment_id].to_i]
       omitted_field = assignment.anonymize_students? ? :user_id : :anonymous_id
-      json_params = {
-        include: { submission_history: { methods: %i[late missing], except: omitted_field } },
+      json_params = Submission.json_serialization_full_parameters(methods: [:late, :missing]).merge(
+        include: { submission_history: { methods: %i[late missing word_count], except: omitted_field } },
         except: [omitted_field, :submission_comments]
-      }
-      json_params[:include][:submission_history][:methods] << :word_count
-      json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
+      )
+      json = submission.as_json(json_params)
 
       json[:submission].tap do |submission_json|
         submission_json[:assignment_visible] = submission.assignment_visible_to_user?(submission.user)

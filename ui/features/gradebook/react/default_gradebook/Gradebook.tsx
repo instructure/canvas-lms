@@ -4216,6 +4216,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       assignment,
       this.visibleStudentsThatCanSeeAssignment(assignmentId),
       this.options.context_id,
+      this.options.assignment_missing_shortcut,
       this.getFilterRowsBySetting('sectionId'),
       isAdmin(),
       this.contentLoadStates.submissionsLoaded
