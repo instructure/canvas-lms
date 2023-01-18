@@ -2274,5 +2274,5 @@ class ApplicationController < ActionController::Base
                             }
                           }
   end
-  before_action :launch_darkly_user
+  before_action :launch_darkly_user, if: Proc.new { @current_user.present? }
 end
