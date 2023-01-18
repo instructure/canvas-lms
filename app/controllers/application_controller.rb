@@ -2265,13 +2265,14 @@ class ApplicationController < ActionController::Base
 
   def launch_darkly_user
     domain = ENV['SETTINGS_TABLE_PREFIX']
-    {
-      key: "#{domain.split('.')[0]}-#{@current_user.id}",
-      name: @current_user.name,
-      custom: {
-        canvas_id: @current_user.id,
-        canvas_domain: domain,
-      }
-    }
+    @launch_darkly_user = {
+                            key: "#{domain.split('.')[0]}-#{@current_user.id}",
+                            name: @current_user.name,
+                            custom: {
+                              canvas_id: @current_user.id,
+                              canvas_domain: domain,
+                            }
+                          }
   end
+  before_action :launch_darkly_user, if: Proc.new { @current_user.present? }
 end
