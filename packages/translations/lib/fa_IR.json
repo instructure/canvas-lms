@@ -482,9 +482,6 @@
     "next_month_749b1778": {
         "message": "ماه بعد"
     },
-    "next_page_d2a39853": {
-        "message": "صفحه بعد"
-    },
     "no_e16d9132": {
         "message": "خیر"
     },
@@ -563,9 +560,6 @@
     "previous_month_bb1e3c84": {
         "message": "ماه قبل"
     },
-    "previous_page_928fc112": {
-        "message": "صفحه قبل"
-    },
     "pts_699bd9aa": {
         "message": "امتیاز"
     },
@@ -616,9 +610,6 @@
     },
     "select_language_7c93a900": {
         "message": "انتخاب زبان"
-    },
-    "selected_274ce24f": {
-        "message": "انتخاب شده"
     },
     "serbian_7187f1f2": {
         "message": "صربی"

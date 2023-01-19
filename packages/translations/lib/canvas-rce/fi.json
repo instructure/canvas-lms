@@ -476,7 +476,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "on suurempi kuin" },
   "nested_less_than_27d17e58": { "message": "on pienempi kuin" },
-  "next_page_d2a39853": { "message": "Seuraava sivu" },
   "no_changes_to_save_d29f6e91": { "message": "Ei tallennettavia muutoksia." },
   "no_e16d9132": { "message": "Ei" },
   "no_file_chosen_9a880793": { "message": "Ei valittua tiedostoa" },
@@ -486,9 +485,6 @@
   "no_results_940393cf": { "message": "Ei tuloksia." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Tuloksia ei löytynyt kohteelle { term }."
   },
   "none_3b5e34d2": { "message": "Ei mitään" },
   "none_selected_b93d56d2": { "message": "Ei valintoja" },
@@ -560,7 +556,6 @@
   "preview_53003fd2": { "message": "Esikatsele" },
   "preview_in_overlay_ed772c46": { "message": "Esikatselu asettelussa" },
   "preview_inline_9787330": { "message": "Esikatselu inline-tilassa" },
-  "previous_page_928fc112": { "message": "Edellinen sivu" },
   "prime_917ea60e": { "message": "Alku" },
   "prime_numbers_13464f61": { "message": "Alkuluvut" },
   "product_39cf144f": { "message": "Tuote" },
@@ -625,10 +620,8 @@
   "save_11a80ec3": { "message": "Tallenna" },
   "script_l_42a7b254": { "message": "Merkkijono L" },
   "search_280d00bd": { "message": "Hae" },
-  "search_term_b2d2235": { "message": "Hakutermi" },
   "select_crop_shape_d441feeb": { "message": "Valitse rajauksen muoto" },
   "select_language_7c93a900": { "message": "Valitse kieli" },
-  "selected_274ce24f": { "message": "Valittu" },
   "selected_linkfilename_c093b1f2": { "message": "Valittu { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Aseta miinus" },
   "sharp_music_ab956814": { "message": "Terävä (musiikki)" },
@@ -751,9 +744,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "Vaihtele työkaluvihjettä" },
   "tools_2fcf772e": { "message": "Työkalut" },
   "top_66e0adb6": { "message": "Yläosa" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } Tulosta löytyi, { numDisplayed } tulosta näkyy parhaillaan"
-  },
   "tray_839df38a": { "message": "Alusta" },
   "triangle_6072304e": { "message": "Kolmio" },
   "turnstile_yields_f9e76df1": { "message": "Kääntöportti (tuotto)" },

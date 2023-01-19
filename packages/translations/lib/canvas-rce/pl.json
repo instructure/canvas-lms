@@ -460,7 +460,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "Zagnieżdżone większe niż" },
   "nested_less_than_27d17e58": { "message": "Zagnieżdżone mniejsze niż" },
-  "next_page_d2a39853": { "message": "Następna strona" },
   "no_changes_to_save_d29f6e91": { "message": "Brak zmian do zapisania" },
   "no_e16d9132": { "message": "Nie" },
   "no_file_chosen_9a880793": { "message": "Nie wybrano pliku" },
@@ -470,9 +469,6 @@
   "no_results_940393cf": { "message": "Brak wyników." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Nie znaleziono wyników dla { term }."
   },
   "none_3b5e34d2": { "message": "Brak" },
   "none_selected_b93d56d2": { "message": "Nie wybrano żadnego" },
@@ -550,7 +546,6 @@
   "preview_53003fd2": { "message": "Podgląd" },
   "preview_in_overlay_ed772c46": { "message": "Podgląd w nakładce" },
   "preview_inline_9787330": { "message": "Wbudowany pogląd" },
-  "previous_page_928fc112": { "message": "Poprzednia strona" },
   "prime_917ea60e": { "message": "Liczba pierwsza" },
   "prime_numbers_13464f61": { "message": "Liczby pierwsze" },
   "product_39cf144f": { "message": "Produkt" },
@@ -617,10 +612,8 @@
   "save_11a80ec3": { "message": "Zapisz" },
   "script_l_42a7b254": { "message": "L ręczne" },
   "search_280d00bd": { "message": "Wyszukaj" },
-  "search_term_b2d2235": { "message": "Wyszukiwany termin" },
   "select_crop_shape_d441feeb": { "message": "Wybierz przycięty fragment" },
   "select_language_7c93a900": { "message": "Wybierz język" },
-  "selected_274ce24f": { "message": "Wybrano" },
   "selected_linkfilename_c093b1f2": { "message": "Wybrano { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Różnica zbiorów" },
   "sharp_music_ab956814": { "message": "Krzyżyk (muzyka)" },
@@ -749,9 +742,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "Etykieta przełącznika" },
   "tools_2fcf772e": { "message": "Narzędzia" },
   "top_66e0adb6": { "message": "Góra" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } wyników odnaleziono, { numDisplayed } wyników obecnie wyświetlanych"
-  },
   "tray_839df38a": { "message": "Zasobnik" },
   "triangle_6072304e": { "message": "Trójkąt" },
   "turnstile_yields_f9e76df1": { "message": "Kołowrót (spełnia)" },

@@ -1439,9 +1439,6 @@
     "next_month_749b1778": {
         "message": "Ensi kuussa"
     },
-    "next_page_d2a39853": {
-        "message": "Seuraava sivu"
-    },
     "no_changes_to_save_d29f6e91": {
         "message": "Ei tallennettavia muutoksia."
     },
@@ -1465,9 +1462,6 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
-    },
-    "no_results_found_for_term_1564c08e": {
-        "message": "Tuloksia ei löytynyt kohteelle { term }."
     },
     "none_3b5e34d2": {
         "message": "Ei mitään"
@@ -1703,9 +1697,6 @@
     "previous_month_bb1e3c84": {
         "message": "Edellinen kuukausi"
     },
-    "previous_page_928fc112": {
-        "message": "Edellinen sivu"
-    },
     "prime_917ea60e": {
         "message": "Alku"
     },
@@ -1877,17 +1868,11 @@
     "search_280d00bd": {
         "message": "Hae"
     },
-    "search_term_b2d2235": {
-        "message": "Hakutermi"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Valitse rajauksen muoto"
     },
     "select_language_7c93a900": {
         "message": "Valitse kieli"
-    },
-    "selected_274ce24f": {
-        "message": "Valittu"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Valittu { linkFileName }"
@@ -2224,9 +2209,6 @@
     },
     "top_66e0adb6": {
         "message": "Yläosa"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } Tulosta löytyi, { numDisplayed } tulosta näkyy parhaillaan"
     },
     "tray_839df38a": {
         "message": "Alusta"
