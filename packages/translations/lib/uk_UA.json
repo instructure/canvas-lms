@@ -509,9 +509,6 @@
     "next_month_749b1778": {
         "message": "Наступний місяць"
     },
-    "next_page_d2a39853": {
-        "message": "Наступна Сторінка"
-    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Термін виконання не призначено"
     },
@@ -602,9 +599,6 @@
     "previous_month_bb1e3c84": {
         "message": "Попередній місяць"
     },
-    "previous_page_928fc112": {
-        "message": "Попередня сторінка"
-    },
     "pts_699bd9aa": {
         "message": "бали"
     },
@@ -655,9 +649,6 @@
     },
     "search_280d00bd": {
         "message": "Пошук"
-    },
-    "selected_274ce24f": {
-        "message": "Обраний"
     },
     "show_all_ae37d610": {
         "message": "Показати все"
