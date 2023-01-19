@@ -435,6 +435,7 @@ send_usage_metrics:
   description: Send usage metrics
   applies_to: RootAccount
   visible_on: usage_metrics_allowed_hook
+  shadow: true
 new_quiz_public_api:
   applies_to: SiteAdmin
   state: hidden

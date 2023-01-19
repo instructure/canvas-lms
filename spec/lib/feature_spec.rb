@@ -127,6 +127,34 @@ describe Feature do
     end
   end
 
+  describe "Shadow features" do
+    it "is not shadow? by default" do
+      expect(Feature.definitions["SA"].shadow?).to be_falsey
+      expect(Feature.definitions["RA"].shadow?).to be_falsey
+      expect(Feature.definitions["A"].shadow?).to be_falsey
+      expect(Feature.definitions["C"].shadow?).to be_falsey
+      expect(Feature.definitions["U"].shadow?).to be_falsey
+    end
+
+    context "when shadowed" do
+      before do
+        Feature.definitions["SA"].instance_variable_set(:@shadow, true)
+        Feature.definitions["RA"].instance_variable_set(:@shadow, true)
+        Feature.definitions["A"].instance_variable_set(:@shadow, true)
+        Feature.definitions["C"].instance_variable_set(:@shadow, true)
+        Feature.definitions["U"].instance_variable_set(:@shadow, true)
+      end
+
+      it "is shadow?" do
+        expect(Feature.definitions["SA"].shadow?).to be_truthy
+        expect(Feature.definitions["RA"].shadow?).to be_truthy
+        expect(Feature.definitions["A"].shadow?).to be_truthy
+        expect(Feature.definitions["C"].shadow?).to be_truthy
+        expect(Feature.definitions["U"].shadow?).to be_truthy
+      end
+    end
+  end
+
   describe "RootAccount feature" do
     it "implies root_opt_in" do
       expect(Feature.definitions["RA"].root_opt_in).to be_truthy
