@@ -146,6 +146,15 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(json["message"]).to include("invalid courses")
     end
 
+    it "does not allow for disassociations during sync" do
+      existing_child = course_factory
+      @template.add_child_course!(existing_child)
+      mig = @template.master_migrations.create!(workflow_state: "queued")
+      @template.update_attribute(:active_migration_id, mig.id)
+      json = api_call(:put, @url, @params, { course_ids_to_remove: [existing_child.id] }, {}, { expected_status: 400 })
+      expect(json["message"]).to include("cannot remove courses while a sync is ongoing")
+    end
+
     it "does not try to add other blueprint-associated courses" do
       other_master_course = course_factory
       other_template = MasterCourses::MasterTemplate.set_as_master_course(other_master_course)
