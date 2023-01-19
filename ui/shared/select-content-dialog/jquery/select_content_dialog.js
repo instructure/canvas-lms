@@ -320,7 +320,7 @@ SelectContentDialog.Events = {
 
         $('body').append($dialog.hide())
         $dialog.on('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-        const ltiPostMessageHandler = SelectContentDialog.buildLtiPostMessageHandler()
+        const ltiPostMessageHandler = SelectContentDialog.buildLtiPostMessageHandler(tool)
         $dialog
           .dialog({
             autoOpen: false,
