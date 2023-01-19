@@ -18064,6 +18064,7 @@ nn:
       description: "Søketeneste for Unsplash-bilde"
       name: Unsplash
     unsplash_settings: 
+      description: "[Følg stega] (%{unsplash_wiki_url}) for å setje opp ein ny applikasjon på Unsplash."
       labels: 
         access_key: Tilgangsnøkkel
         application_name: Applikasjonsnamn
@@ -23109,7 +23110,7 @@ nn:
   supported_file_types_vtt_srt_8cb75c13: "Støtta filtypar: .vtt, .srt"
   suspend_db764978: Suspender
   suspend_user_e19fa489: "Suspender brukar"
-  suspending_name_from_this_account_will_remove_all__a5aabff3: "Å suspendera %{name}frå denne konto vil fjerne all tilgang til systemet frå alle innloggingsmåtar"
+  suspending_name_from_this_account_will_remove_all__a5aabff3: "Å suspendera %{name} frå denne kontoen vil fjerne all tilgang til systemet frå alle innloggingsmetodar"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sverige
@@ -23228,8 +23229,8 @@ nn:
   target_course_course_id_is_not_a_child_of_current__185cb2f6: "Emnet %{course_id} tilhøyrer ikke gjeldande konto (%{name})"
   target_link_uri_bbed67d1: "* Mållenke-URI"
   target_link_uri_d166858: Mållenke-URL
-  targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId krevst dersom targetContextType oppgjeve"
-  targetcontexttype_required_if_targetcontextid_prov_2f6e77ad: "targetContextType krevst dersom targetContextId oppgjeve"
+  targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId krevst dersom targetContextType er oppgjeve"
+  targetcontexttype_required_if_targetcontextid_prov_2f6e77ad: "targetContextType krevst dersom targetContextId er oppgjeve"
   tas_add_ccec2573: "Undervisningsassistentar - Legg til"
   tas_add_f4a16393: "Undervisningsassistentar - Legg til"
   tas_observers_designers_b705118a: "Undervisningsassistentar / Observatørar / Designarar"
