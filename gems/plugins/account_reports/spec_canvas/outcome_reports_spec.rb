@@ -483,12 +483,10 @@ describe "Outcome Reports" do
         it "when assignment is deleted" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
           @new_quiz.destroy
-          # OS will still be called, but the list of assignment ids should be empty
-          expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, "", "canvas.assignment.quizzes", outcome_ids, uuids)
-            .and_return([])
-          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          # OS will not be called because there are no new quizzes
+          expect(outcome_reports).not_to receive(:get_lmgb_results)
 
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
           expect(results.length).to eq(0)
         end
       end
@@ -562,10 +560,12 @@ describe "Outcome Reports" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
         end
 
-        def json_string_null_metadata
+        def json_string_null_metadata(asset_id)
           {
             results: [
               {
+                associated_asset_id: asset_id,
+                associated_asset_type: "canvas.assignment.quizzes",
                 attempts: [
                   {
                     points: 1,
@@ -579,7 +579,7 @@ describe "Outcome Reports" do
 
         it "can handle null metadata" do
           response = Net::HTTPSuccess.new(1.1, 200, "OK")
-          expect(response).to receive(:body).and_return(json_string_null_metadata)
+          expect(response).to receive(:body).and_return(json_string_null_metadata(@new_quiz.id))
           expect(response).to receive(:header).and_return({ "Per-Page" => "200", "Total" => 1 }).twice
           expect(CanvasHttp).to receive(:get).with(any_args).and_return(response).once
 
@@ -660,7 +660,7 @@ describe "Outcome Reports" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
 
           expect(outcome_reports).not_to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
           expect(results).to be_empty
@@ -673,7 +673,7 @@ describe "Outcome Reports" do
           # get_lmgb_results is still called, but the first line checks is the FF is enabled and returns nil if OFF
           # In that case, get_lmgb_results returns nil
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
           expect(results).to be_empty
@@ -685,7 +685,7 @@ describe "Outcome Reports" do
           # uuids contains both @user1 and @user2. The mock result only contains data for @user1, so @user2
           # will not show up in the report.
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z"))
           results = outcome_reports.send(:outcomes_new_quiz_scope)
 
@@ -696,16 +696,21 @@ describe "Outcome Reports" do
           expect(results[0]["student uuid"]).to eq @user1.uuid
           expect(results[0]["learning outcome points possible"]).to eq 5.0
           expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
         end
 
-        it "filters out users that do not have attempts" do
+        it "includes users that do not have attempts" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", []))
           results = outcome_reports.send(:outcomes_new_quiz_scope)
 
-          expect(results.length).to eq(0)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
         end
 
         it "keeps the result with the latest submission date" do
@@ -738,13 +743,14 @@ describe "Outcome Reports" do
                                                                      } }
                                                                  ]))
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
           expect(results.length).to eq(1)
           expect(results[0]["student uuid"]).to eq @user1.uuid
           expect(results[0]["assessment question"]).to eq "Newer Submission"
+          expect(results[0]["attempt"]).to eq 1
         end
 
         it "returns points on authoritative result if missing metadata" do
@@ -756,7 +762,7 @@ describe "Outcome Reports" do
                                             points_possible: 21.0, }
                                         ])
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
@@ -815,7 +821,7 @@ describe "Outcome Reports" do
                                             } }
                                         ])
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
@@ -907,7 +913,7 @@ describe "Outcome Reports" do
                                             } }
                                         ])
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
@@ -998,7 +1004,7 @@ describe "Outcome Reports" do
                                             } }
                                         ])
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
@@ -1047,7 +1053,7 @@ describe "Outcome Reports" do
           mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z")
                          .concat(mock_os_result(@user2, @outcome, @new_quiz, "2022-08-19T12:00:00.0Z"))
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
@@ -1082,7 +1088,7 @@ describe "Outcome Reports" do
                                                     } }
                                                 ]))
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           outcome_reports.outcome_results
@@ -1197,7 +1203,7 @@ describe "Outcome Reports" do
           LearningOutcomeQuestionResult.delete_all
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return([])
 
           outcome_reports.outcome_results
@@ -1215,7 +1221,7 @@ describe "Outcome Reports" do
 
           mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z")
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
             .and_return(mock_results)
 
           outcome_reports.outcome_results

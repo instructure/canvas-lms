@@ -20,9 +20,6 @@
 
 require "atom"
 
-# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
-require_dependency "assignment_student_visibility"
-
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by

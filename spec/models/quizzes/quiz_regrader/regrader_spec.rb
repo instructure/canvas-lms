@@ -29,7 +29,7 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   let(:submissions) do
-    1.upto(4).map { |i| double(id: i, completed?: true) }
+    1.upto(4).map { |i| double(id: i, completed?: true, latest_submitted_attempt: 1) }
   end
 
   let(:current_quiz_question_regrades) do
@@ -85,20 +85,20 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   describe "#submissions" do
-    it "skips submissions that are not completed and not untaken" do
+    it "skips submissions that are in progress with no prior attempts" do
       questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
 
-      uncompleted_submission = double(id: 5, completed?: false, untaken?: false)
+      uncompleted_submission = double(id: 5, completed?: false, latest_submitted_attempt: nil)
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 4
       expect(quiz_regrader.submissions.detect { |s| s.id == 5 }).to be_nil
     end
 
-    it "skips submissions that are in progress except untaken" do
+    it "does not skip submissions that are in progress that have prior attempts" do
       questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
 
-      uncompleted_submission = double(id: 5, completed?: false, untaken?: true)
+      uncompleted_submission = double(id: 5, completed?: false, latest_submitted_attempt: 1)
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 5

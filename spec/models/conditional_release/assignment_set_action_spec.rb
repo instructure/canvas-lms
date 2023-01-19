@@ -19,7 +19,6 @@
 #
 
 require_relative "../../conditional_release_spec_helper"
-require_dependency "conditional_release/assignment_set_action"
 
 module ConditionalRelease
   describe AssignmentSetAction, type: :model do

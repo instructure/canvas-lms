@@ -17,9 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "canvas/cdn/s3_uploader"
-require_dependency "canvas/cdn/registry"
-require_dependency "config_file"
+require "canvas/cdn/registry"
 
 module Canvas
   module Cdn
@@ -34,7 +32,7 @@ module Canvas
         end
       end
 
-      # Provides an instance of Registry for the current Rails environment.
+      # Provides an instance of Cdn::Registry for the current Rails environment.
       #
       # Set ENV['USE_OPTIMIZED_JS'] to a truthy value to load the optimized
       # version of the JavaScripts even if you're running a development Rails
@@ -47,12 +45,12 @@ module Canvas
                           Rails.env
                         end
 
-          Registry.new(
+          Cdn::Registry.new(
             environment: environment,
             cache: if ActionController::Base.perform_caching
-                     Registry::ProcessCache.new
+                     Cdn::Registry::ProcessCache.new
                    else
-                     Registry::RequestCache.new
+                     Cdn::Registry::RequestCache.new
                    end
           )
         end

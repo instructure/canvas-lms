@@ -20,7 +20,6 @@
 
 require_relative "../api_spec_helper"
 require_relative "../../lti_spec_helper"
-require_dependency "lti/tool_proxy_controller"
 
 module Lti
   describe ToolProxyController, type: :request do

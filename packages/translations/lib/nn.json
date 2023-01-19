@@ -1421,9 +1421,6 @@
     "next_month_749b1778": {
         "message": "Neste månad"
     },
-    "next_page_d2a39853": {
-        "message": "Neste side"
-    },
     "no_changes_to_save_d29f6e91": {
         "message": "Ingen endringar å lagre."
     },
@@ -1679,9 +1676,6 @@
     "previous_month_bb1e3c84": {
         "message": "Førre månad"
     },
-    "previous_page_928fc112": {
-        "message": "Førre side"
-    },
     "prime_917ea60e": {
         "message": "Primtal"
     },
@@ -1850,17 +1844,11 @@
     "search_280d00bd": {
         "message": "Søk"
     },
-    "search_term_b2d2235": {
-        "message": "Søkeord"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Vel skjæringsform"
     },
     "select_language_7c93a900": {
         "message": "Vel språk"
-    },
-    "selected_274ce24f": {
-        "message": "Valt"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Vald { linkFileName }"
@@ -2194,9 +2182,6 @@
     },
     "top_66e0adb6": {
         "message": "Topp"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } resultat funne, { numDisplayed } resultat viser akkurat no."
     },
     "tray_839df38a": {
         "message": "Sidemeny"

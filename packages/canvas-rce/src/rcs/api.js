@@ -416,20 +416,6 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
-  searchUnsplash(term, page) {
-    const headers = headerFor(this.jwt)
-    const base = this.baseUri('unsplash/search')
-    const uri = `${base}?term=${encodeURIComponent(term)}&page=${page}&per_page=12`
-    return this.apiFetch(uri, headers)
-  }
-
-  pingbackUnsplash(id) {
-    const headers = headerFor(this.jwt)
-    const base = this.baseUri('unsplash/pingback')
-    const uri = `${base}?id=${id}`
-    return this.apiFetch(uri, headers, {skipParse: true})
-  }
-
   getFile(id, options = {}) {
     const headers = headerFor(this.jwt)
     const base = this.baseUri('file')

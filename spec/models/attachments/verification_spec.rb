@@ -94,6 +94,11 @@ describe Attachments::Verification do
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_invalid")
     end
 
+    it "returns false on a verifier that is not of type String" do
+      unsupported_verifier = 1
+      expect(v.valid_verifier_for_permission?(unsupported_verifier, :read)).to eq(false)
+    end
+
     it "returns false on token id mismatch" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
                                                                                 id: attachment.global_id + 1

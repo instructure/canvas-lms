@@ -936,6 +936,8 @@ export default class EditView extends ValidatedFormView
       errors.grader_count = [{ message: I18n.t('Grader count is required') }]
     else if data.grader_count == '0'
       errors.grader_count = [{ message: I18n.t('Grader count cannot be 0') }]
+    else if parseInt(data.grader_count, 10) > ENV.MODERATED_GRADING_GRADER_LIMIT
+      errors.grader_count = [{ message: I18n.t('Only a maximum of %{max} graders can be assigned', {max: ENV.MODERATED_GRADING_GRADER_LIMIT}) }]
 
     errors
 

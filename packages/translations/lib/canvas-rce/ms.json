@@ -462,7 +462,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "Lebih Daripada Tersarang" },
   "nested_less_than_27d17e58": { "message": "Kurang Daripada Tersarang" },
-  "next_page_d2a39853": { "message": "Halaman Seterusnya" },
   "no_changes_to_save_d29f6e91": { "message": "Tiada perubahan disimpan." },
   "no_e16d9132": { "message": "Tidak" },
   "no_file_chosen_9a880793": { "message": "Tiada fail dipilih" },
@@ -472,9 +471,6 @@
   "no_results_940393cf": { "message": "Tiada hasil." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tiada hasil ditemui untuk { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Tiada hasil ditemui untuk { term }."
   },
   "none_3b5e34d2": { "message": "Tiada" },
   "none_selected_b93d56d2": { "message": "Tiada Yang Dipilih" },
@@ -544,7 +540,6 @@
   "preview_53003fd2": { "message": "Pratonton" },
   "preview_in_overlay_ed772c46": { "message": "Pratonton dalam tindihan" },
   "preview_inline_9787330": { "message": "Pratonton dalam sebaris" },
-  "previous_page_928fc112": { "message": "Halaman Sebelumnya" },
   "prime_917ea60e": { "message": "Perdana" },
   "prime_numbers_13464f61": { "message": "Nombor Perdana" },
   "product_39cf144f": { "message": "Produk" },
@@ -609,10 +604,8 @@
   "save_11a80ec3": { "message": "Simpan" },
   "script_l_42a7b254": { "message": "Skrip L" },
   "search_280d00bd": { "message": "Cari" },
-  "search_term_b2d2235": { "message": "Kata Kunci Carian" },
   "select_crop_shape_d441feeb": { "message": "Pilih bentuk pangkasan" },
   "select_language_7c93a900": { "message": "Pilih Bahasa" },
-  "selected_274ce24f": { "message": "Dipilih" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } dipilih" },
   "set_minus_b46e9b88": { "message": "Tetapkan Tolak" },
   "sharp_music_ab956814": { "message": "Tajam (Muzik)" },
@@ -731,9 +724,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "Togol petua alat" },
   "tools_2fcf772e": { "message": "Alat" },
   "top_66e0adb6": { "message": "Atas" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } hasil ditemui, { numDisplayed } hasil dipaparkan pada masa ini"
-  },
   "tray_839df38a": { "message": "Dulang " },
   "triangle_6072304e": { "message": "Segi Tiga" },
   "turnstile_yields_f9e76df1": { "message": "Paku (Keluaran)" },

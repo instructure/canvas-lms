@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "sis/enrollment_importer"
-
 module SIS
   describe EnrollmentImporter do
     let(:user_id) { "5235536377654" }

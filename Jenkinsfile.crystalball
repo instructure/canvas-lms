@@ -186,6 +186,12 @@ pipeline {
             extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
               def rspecqStages = [:]
 
+              // Pull docker images before running Reporter
+              // sometimes it takes longer than usual to pull from starlord causing Reporter to timeout
+              credentials.withStarlordCredentials { ->
+                sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+              }
+
               extendedStage('RSpecQ Reporter').timeout(30).queue(rspecqStages) {
                 try {
                   sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \

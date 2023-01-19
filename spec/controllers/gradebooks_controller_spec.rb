@@ -77,25 +77,26 @@ describe GradebooksController do
 
       it "includes submission_comments of posted submissions when visibility_feedback_student_grades_page flag on" do
         Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+        @assignment.anonymous_peer_reviews = true
+        @assignment.save!
+        other_student = @course.enroll_user(User.create!(name: "some other user")).user
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher)
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher)
+        comment_3 = submission_to_comment.add_comment(comment: "an anonymous comment", author: other_student)
         comment_1.mark_read!(@student)
 
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments].length).to eql 2
+          expect(submission[:submission_comments].length).to eql 3
 
           submission_comment_1 = submission[:submission_comments].first
           expect(submission_comment_1).to include({
                                                     "comment" => comment_1["comment"],
                                                     "attempt" => comment_1["attempt"],
-                                                    "author" => {
-                                                      "id" => comment_1["author_id"],
-                                                      "display_name" => comment_1["author_name"]
-                                                    },
+                                                    "author_name" => comment_1["author_name"],
                                                     "display_updated_at" => datetime_string(comment_1["updated_at"]),
                                                     "is_read" => true
                                                   })
@@ -104,11 +105,16 @@ describe GradebooksController do
           expect(submission_comment_2).to include({
                                                     "comment" => comment_2["comment"],
                                                     "attempt" => comment_2["attempt"],
-                                                    "author" => {
-                                                      "id" => comment_2["author_id"],
-                                                      "display_name" => comment_2["author_name"]
-                                                    },
+                                                    "author_name" => comment_2["author_name"],
                                                     "display_updated_at" => datetime_string(comment_2["updated_at"]),
+                                                    "is_read" => false
+                                                  })
+          submission_comment_3 = submission[:submission_comments].third
+          expect(submission_comment_3).to include({
+                                                    "comment" => comment_3["comment"],
+                                                    "attempt" => comment_3["attempt"],
+                                                    "author_name" => "Anonymous User",
+                                                    "display_updated_at" => datetime_string(comment_3["updated_at"]),
                                                     "is_read" => false
                                                   })
         end

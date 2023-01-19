@@ -26,6 +26,7 @@ import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {responsiveQuerySizes} from '../../utils'
+import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
 import {useMutation} from 'react-apollo'
@@ -41,6 +42,7 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionEntryContainer = props => {
   const [draftSaved, setDraftSaved] = useState(true)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {searchTerm} = useContext(SearchContext)
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
     update: props.updateDraftCache,
@@ -79,7 +81,7 @@ export const DiscussionEntryContainer = props => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
 
-  const threadMode = props.discussionEntry?.depth > 1
+  const threadMode = props.discussionEntry?.depth > 1 && !searchTerm
 
   return (
     <Responsive
@@ -160,7 +162,7 @@ export const DiscussionEntryContainer = props => {
                     discussionEntryVersions={
                       props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
                     }
-                    threadMode={threadMode}
+                    threadMode={threadMode && !searchTerm}
                   />
                 </Flex.Item>
               )}
@@ -188,7 +190,7 @@ export const DiscussionEntryContainer = props => {
           >
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
-              threadMode={threadMode}
+              threadMode={threadMode && !searchTerm}
               discussionEntry={props.discussionEntry}
               discussionAnonymousState={props.discussionTopic?.anonymousState}
               canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}

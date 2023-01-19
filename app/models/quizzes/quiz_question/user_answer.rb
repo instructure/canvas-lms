@@ -78,5 +78,3 @@ Quizzes::QuizQuestion::UserAnswer = Struct.new(:question_id, :points_possible, :
     end
   end
 end
-
-(Dir[Rails.root.join("app/models/quizzes/quiz_question/*_answer.rb")] - [__FILE__]).each { |f| require_dependency f }

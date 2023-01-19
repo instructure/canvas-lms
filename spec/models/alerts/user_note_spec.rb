@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "alerts/user_note"
-
 module Alerts
   describe UserNote do
     # course_with_teacher(:active_all => 1)

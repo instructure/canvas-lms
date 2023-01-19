@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "importers"
-
 module Importers
   class ContentImporterHelper
     # do the id prepending right before import so we can only make an id unique if it's necessary

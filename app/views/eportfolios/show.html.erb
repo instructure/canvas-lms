@@ -137,7 +137,6 @@
   <% end %>
   <ul class="submission_list" id="recent_submissions" style="max-height: 200px; overflow: auto;">
     <% @recent_submissions.each do |submission| %>
-      <% next unless submission.assignment.published? && submission.context.published? %>
       <% already_used = (@used_submission_ids.include?(submission.id) rescue false) %>
       <li class="clearfix submission <%= 'already_used' if already_used %>" title="<%= t('titles.already_used', "This submission is already included in your portfolio") if already_used %>" id="recent_submission_<%= submission.id %>" tabindex="0">
         <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>"

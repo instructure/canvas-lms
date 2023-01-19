@@ -21,6 +21,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include SubmissionCommentsHelper
   include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Group
@@ -122,10 +123,7 @@ class GradebooksController < ApplicationController
           {
             id: comment.id,
             attempt: comment.attempt,
-            author: {
-              id: comment.author_id,
-              display_name: comment.author_name
-            },
+            author_name: comment_author_name_for(comment),
             created_at: comment.created_at,
             edited_at: comment.edited_at,
             updated_at: comment.updated_at,
@@ -1557,13 +1555,4 @@ class GradebooksController < ApplicationController
   def outcome_service_results_to_canvas_enabled?
     @context.feature_enabled?(:outcome_service_results_to_canvas)
   end
-
-  def mark_grades_read_a2
-    return unless @context.feature_enabled?(:assignments_2_student)
-
-    @presenter.submissions.each do |submission|
-      submission.mark_read(@current_user)
-    end
-  end
-  helper_method :mark_grades_read_a2
 end

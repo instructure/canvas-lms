@@ -60,14 +60,14 @@ test('renders all sections if no sections are given', () => {
   const tree = mount(<SectionTooltip {...props} />)
   const node = tree.find('Text')
   expect(node.at(0).text()).toBe('All Sections')
-  expect(node.at(1).text()).toBe('(5 Students)')
+  expect(node.at(1).text()).toBe('(5 Users)')
 })
 
 test('renders tooltip text correcly with sections', () => {
   const tree = shallow(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Tooltip')
   expect(mount(node.prop('renderTip')[0]).find('View Text').text()).toBe(
-    'sections name (4 Students)'
+    'sections name (4 Users)'
   )
 })
 
@@ -78,7 +78,7 @@ test('renders multiple sections into tooltip', () => {
   const node = tree.find('Tooltip')
   expect(node.prop('renderTip')).toHaveLength(2)
   expect(mount(node.prop('renderTip')[1]).find('View Text').text()).toBe(
-    'section other name (8 Students)'
+    'section other name (8 Users)'
   )
 })
 

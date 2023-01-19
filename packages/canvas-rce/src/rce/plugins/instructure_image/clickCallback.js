@@ -19,11 +19,8 @@
 import doFileUpload from '../shared/Upload/doFileUpload'
 
 export default function (ed, document) {
-  const unsplashEnabled = ed.getParam('unsplash_enabled')
-  const panels = unsplashEnabled ? ['COMPUTER', 'UNSPLASH', 'URL'] : ['COMPUTER', 'URL']
-
   return doFileUpload(ed, document, {
     accept: 'image/*',
-    panels,
+    panels: ['COMPUTER', 'URL'],
   })
 }

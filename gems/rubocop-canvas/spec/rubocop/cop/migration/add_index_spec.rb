@@ -145,7 +145,6 @@ describe RuboCop::Cop::Migration::AddIndex do
     it "doesn't complain if not indexed" do
       inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
-          disable_ddl_transaction!
           def up
             add_reference :users, :organizations, index: false
           end

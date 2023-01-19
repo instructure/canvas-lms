@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/membership_service/membership_collator_factory"
-
 module Lti::MembershipService
   describe MembershipCollatorFactory do
     before do

@@ -21,8 +21,6 @@
 require_relative "lti2_api_spec_helper"
 require_relative "../api_spec_helper"
 
-require_dependency "lti/ims/access_token_helper"
-require_dependency "lti/plagiarism_assignments_api_controller"
 module Lti
   describe PlagiarismAssignmentsApiController, type: :request do
     include_context "lti2_api_spec_helper"

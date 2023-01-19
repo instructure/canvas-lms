@@ -23,9 +23,7 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
   },
-  "decrease_indent_d9cf469d": { "message": "Уменьшить отступ" },
   "icon_215a1dc6": { "message": "Значок" },
-  "increase_indent_6af90f7c": { "message": "Увеличить отступ" },
   "links_to_an_external_site_de74145d": {
     "message": "Ссылки на внешний сайт."
   },

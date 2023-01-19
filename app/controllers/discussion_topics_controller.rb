@@ -713,6 +713,7 @@ class DiscussionTopicsController < ApplicationController
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
           root_entry_id: entry.root_entry_id,
+          parent_id: entry.parent_id,
           entry_id: entry.id
         }
         if entry.root_entry_id.nil?

@@ -83,13 +83,23 @@ const DiscussionTopicManager = props => {
 
   // Isolated View State
   const [threadParentEntryId, setThreadParentEntryId] = useState(
-    ENV.discussions_deep_link?.root_entry_id
+    ENV.isolated_view
+      ? ENV.discussions_deep_link?.root_entry_id
+      : ENV.discussions_deep_link?.parent_id
   )
   const [replyFromId, setReplyFromId] = useState(null)
   const [isolatedViewOpen, setIsolatedViewOpen] = useState(
-    !!ENV.discussions_deep_link?.root_entry_id
+    !ENV.split_screen_view && !!ENV.discussions_deep_link?.root_entry_id
   )
-  const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(false)
+
+  // split screen view
+  const [isSplitScreenViewOpen, setSplitScreenViewOpen] = useState(
+    ENV.split_screen_view &&
+      ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
+      !!(ENV.discussions_deep_link?.parent_id
+        ? ENV.discussions_deep_link?.parent_id
+        : ENV.discussions_deep_link?.entry_id)
+  )
   const [isSplitScreenViewOverlayed, setSplitScreenViewOverlayed] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
 
@@ -103,6 +113,10 @@ const DiscussionTopicManager = props => {
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
+    userSplitScreenPreference,
+    setUserSplitScreenPreference,
+    highlightEntryId,
+    setHighlightEntryId,
   }
 
   // Unread filter
@@ -343,7 +357,7 @@ const DiscussionTopicManager = props => {
                   <Mask onClick={() => setSplitScreenViewOpen(false)} />
                 )}
                 <DrawerLayout.Content label="Splitscreen View Content">
-                  <View display="block" padding="medium medium 0 0">
+                  <View display="block" padding="medium medium 0 xx-small">
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}

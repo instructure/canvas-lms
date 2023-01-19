@@ -22,7 +22,6 @@ import '../tinymce/uk_UA'
 const locale = {
   "accessibility_checker_b3af1f6c": { "message": "Перевірка доступності" },
   "add_8523c19b": { "message": "Додати" },
-  "align_11050992": { "message": "Вирівняти" },
   "all_4321c3a1": { "message": "Всі" },
   "alpha_15d59033": { "message": "Альфа" },
   "alphabetical_55b5b4e0": { "message": "Алфавітний" },
@@ -79,7 +78,6 @@ const locale = {
   },
   "custom_6979cd81": { "message": "Звичай" },
   "cyan_c1d5f68a": { "message": "Зелено-синій колір" },
-  "decrease_indent_d9cf469d": { "message": "Зменшити відступ" },
   "deep_purple_bb3e2907": { "message": "Темно-фіолетовий" },
   "delimiters_4db4840d": { "message": "Розділювачі" },
   "details_98a31b68": { "message": "Подробиці" },
@@ -108,7 +106,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Файли групи" },
   "group_navigation_99f191a": { "message": "Навігація групи" },
   "home_351838cd": { "message": "На домашню сторінку" },
-  "html_editor_fb2ab713": { "message": "HTML-редактор" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Я отримав дозвіл на використання цього файлу."
   },
@@ -119,14 +116,9 @@ const locale = {
   },
   "image_8ad06": { "message": "Зображення" },
   "images_7ce26570": { "message": "Зображення" },
-  "increase_indent_6af90f7c": { "message": "Збільшити відступ" },
   "indigo_2035fc55": { "message": "Індиго" },
   "insert_593145ef": { "message": "Вставка" },
-  "insert_equella_links_49a8dacd": { "message": "Вставити посилання Equella" },
   "insert_link_6dc23cae": { "message": "Вставити посилання" },
-  "insert_math_equation_57c6e767": {
-    "message": "Вставити математичну формулу"
-  },
   "invalid_file_type_881cc9b2": { "message": "Недійсний тип файлу" },
   "invalid_url_cbde79f": { "message": "Невірний URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Гарячі клавіши" },
@@ -171,7 +163,6 @@ const locale = {
   "purple_7678a9fc": { "message": "Фіолетовий" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
   "record_7c9448b": { "message": "Записати" },
-  "record_upload_media_5fdce166": { "message": "Запис/завантаження медіа" },
   "red_8258edf3": { "message": "Червоний" },
   "relationships_6602af70": { "message": "Зв''язки" },
   "replace_e61834a7": { "message": "Замінити" },

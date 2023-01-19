@@ -46,7 +46,11 @@ module TatlTael
 
       DEFAULT_CONFIG_PATH = File.join(File.dirname(__FILE__), "../../config/default.yml")
       def config
-        @config ||= YAML.load_file(DEFAULT_CONFIG_PATH)
+        @config ||= if YAML::VERSION < "4.0"
+                      YAML.load_file(DEFAULT_CONFIG_PATH)
+                    else
+                      YAML.load_file(DEFAULT_CONFIG_PATH, permitted_classes: [Symbol, Regexp])
+                    end
       end
 
       def config_for_linter(linter_class)

@@ -934,7 +934,7 @@ describe ConversationsController do
       expect(response).not_to be_successful
     end
 
-    context "soft-concluded course" do
+    context "soft-concluded course with past term overrides" do
       before do
         course_with_student_logged_in(active_all: true)
         @course.enrollment_term.start_at = 2.days.ago
@@ -965,13 +965,16 @@ describe ConversationsController do
       end
     end
 
-    context "soft concluded course with non-concluded section override" do
+    context "soft concluded course" do
       before do
         course_with_student_logged_in(active_all: true)
         @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
-        @course.restrict_enrollments_to_course_dates = true
         @course.save!
+      end
+
+      it "course restricted dates - allows students to reply to teachers as long as their section is not concluded" do
+        @course.restrict_enrollments_to_course_dates = true
 
         @my_section = @course.course_sections.create!(name: "test section")
         @my_section.start_at = 1.day.ago
@@ -984,11 +987,39 @@ describe ConversationsController do
 
         @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
                                          enrollment_state: "active", section: @my_section)
-      end
-
-      it "allows students to reply to teachers as long as their section is not concluded" do
         teacher_convo = @teacher.initiate_conversation([@student])
         teacher_convo.add_message("test")
+        teacher_convo.conversation.update_attribute(:context, @course)
+        teacher_convo.save!
+
+        user_session(@student)
+        post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+        expect(response).to be_successful
+      end
+
+      it "only section date restriction - allows students to reply to teachers as long as they have a role that is not concluded" do
+        term = @course.enrollment_term
+        term.enrollment_dates_overrides.create!(
+          enrollment_type: "StudentEnrollment", start_at: 10.days.ago, end_at: 10.days.from_now, context: term.root_account
+        )
+        @course.restrict_enrollments_to_course_dates = false
+
+        @my_section = @course.course_sections.create!(name: "test section")
+
+        @course.enroll_student(@student, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: @my_section)
+
+        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: @my_section)
+        teacher_convo = @teacher.initiate_conversation([@student])
+        teacher_convo.add_message("test")
+
+        # test the OR case by concluding the section
+        @my_section.start_at = 5.days.ago
+        @my_section.end_at = 4.days.ago
+        @my_section.restrict_enrollments_to_section_dates = true
+        @my_section.save!
+
         teacher_convo.conversation.update_attribute(:context, @course)
         teacher_convo.save!
 

@@ -64,10 +64,7 @@ describe "settings tabs" do
       f("#account_notification_icon_#{notification.id} .warning").click
       textarea_selector = "textarea#account_notification_message_#{notification.id}"
       type_in_tiny(textarea_selector, "edited message", clear: true)
-
-      cb = f(".account_notification_role_cbx")
-      f("label[for=#{cb["id"]}]").click
-
+      force_click("label:contains('Student')")
       ff(".edit_notification_form .ui-datepicker-trigger")[0].click
       fln("2").click
       ff(".edit_notification_form .ui-datepicker-trigger")[1].click
@@ -101,8 +98,9 @@ describe "settings tabs" do
     end
 
     it "edits an announcement" do
-      skip_if_chrome("issue with edit_announcement method")
       notification = account_notification(user: @user)
+      initial_notification_start = notification.start_at
+      initial_notification_end = notification.end_at
       get "/accounts/#{Account.default.id}/settings"
       f("#tab-announcements-link").click
       edit_announcement(notification)
@@ -111,8 +109,8 @@ describe "settings tabs" do
       expect(notification.message).to eq "<p>edited message</p>"
       expect(notification.icon).to eq "warning"
       expect(notification.account_notification_roles.count).to eq 1
-      expect(notification.start_at.day).to eq 2
-      expect(notification.end_at.day).to eq 16
+      expect(notification.start_at).not_to eq initial_notification_start
+      expect(notification.end_at).not_to eq initial_notification_end
     end
 
     context "messages" do

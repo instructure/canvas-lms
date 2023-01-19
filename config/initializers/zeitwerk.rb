@@ -65,3 +65,8 @@ Rails.autoloaders.each do |autoloader|
     "xml_helper" => "XMLHelper"
   )
 end
+
+Rails.application.config.after_initialize do
+  Rails.autoloaders.main.eager_load_namespace(Quizzes::QuizQuestion)
+  Rails.autoloaders.main.eager_load_namespace(AuthenticationProvider::SAML)
+end

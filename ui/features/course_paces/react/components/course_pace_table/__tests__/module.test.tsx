@@ -85,7 +85,7 @@ describe('Module', () => {
     )
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
     expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual(
-      'Due Date: Tue, Mar 22, 2022'
+      'Due DateToggle tooltip: Tue, Mar 22, 2022'
     )
     expect(queryAllByTestId('pp-status-cell')[0].textContent).toEqual('Status: Published')
   })

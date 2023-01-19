@@ -595,6 +595,26 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry("course_settings/canvas_export.txt")).not_to be_nil
     end
 
+    it "exports context.xml" do
+      fake_canvas_host = "pineapple.127.0.0.1.xip.io" # something AccountDomain won't try to look up :P
+      if @course.root_account.respond_to?(:account_domains)
+        @course.root_account.account_domains.create!(host: fake_canvas_host)
+      else
+        # this is incompatible with MRA prepend, unfortunately, or I'd just use it all the time
+        allow_any_instance_of(Account).to receive(:primary_domain).and_return(OpenStruct.new(host: fake_canvas_host))
+      end
+      run_export
+      expect(@manifest_doc.at_css('file[href="course_settings/context.xml"]')).not_to be_nil
+      context_info = Nokogiri::XML(@zip_file.read("course_settings/context.xml"))
+      expect(context_info.at_css("course_id").text).to eq @course.id.to_s
+      expect(context_info.at_css("course_name").text).to eq @course.name.to_s
+      expect(context_info.at_css("root_account_id").text).to eq @course.root_account.global_id.to_s
+      expect(context_info.at_css("root_account_uuid").text).to eq @course.root_account.uuid.to_s
+      expect(context_info.at_css("root_account_name").text).to eq @course.root_account.name.to_s
+      expect(context_info.at_css("canvas_domain").text).to eq fake_canvas_host
+      expect(ccc_schema.validate(context_info)).to be_empty
+    end
+
     it "does not error if the course name is too long" do
       @course.name = "a" * Course.maximum_string_length
 

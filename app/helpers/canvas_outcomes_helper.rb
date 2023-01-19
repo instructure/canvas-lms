@@ -53,15 +53,15 @@ module CanvasOutcomesHelper
     end
   end
 
-  def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids)
-    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || user_uuids.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
+  def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids = "")
+    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
 
     params = {
       associated_asset_id_list: assignment_ids,
       associated_asset_type: assignment_type,
       external_outcome_id_list: outcome_ids,
-      user_uuid_list: user_uuids
     }
+    params[:user_uuid_list] = user_uuids unless user_uuids.blank?
 
     threaded_request(context, "lmgb_results.show", "api/authoritative_results", params)
   end

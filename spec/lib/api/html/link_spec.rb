@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../../../spec_helper"
-require_dependency "api/html/link"
 
 module Api
   module Html

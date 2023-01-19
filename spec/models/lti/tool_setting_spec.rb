@@ -19,7 +19,6 @@
 #
 
 require_relative "../../lti2_spec_helper"
-require_dependency "lti/tool_setting"
 
 module Lti
   describe ToolSetting do

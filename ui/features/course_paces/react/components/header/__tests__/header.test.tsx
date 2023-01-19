@@ -131,5 +131,14 @@ describe('Course paces header', () => {
       const getStartedButton = getByRole('button', {name: 'Create Course Pace'})
       expect(getStartedButton).toBeInTheDocument()
     })
+
+    it('renders an info tooltip for durations stat', () => {
+      const {getAllByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      expect(
+        getAllByRole('tooltip', {
+          name: 'This duration does not take into account weekends and blackout days.',
+        })[0]
+      ).toBeInTheDocument()
+    })
   })
 })
