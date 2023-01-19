@@ -168,13 +168,16 @@ describe WikiPage do
     p1 = @course.wiki_pages.create!(title: "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki_pages.create!(title: p1.title)
     p3 = @course.wiki_pages.create!(title: p1.title)
-    p4 = @course.wiki_pages.create!(title: ("a" * (WikiPage::TITLE_LENGTH - 2)) + "-2")
     expect(p2.title.length).to eq WikiPage::TITLE_LENGTH
     expect(p2.title.end_with?("-2")).to be_truthy
     expect(p3.title.length).to eq WikiPage::TITLE_LENGTH
     expect(p3.title.end_with?("-3")).to be_truthy
-    expect(p4.title.length).to eq WikiPage::TITLE_LENGTH
-    expect(p4.title.end_with?("-4")).to be_truthy
+  end
+
+  it "won't allow you to create a duplicate title that ends in -<number>" do
+    course_with_teacher(active_all: true)
+    @course.wiki_pages.create!(title: "MAT-1104")
+    expect { @course.wiki_pages.create!(title: "MAT-1104") }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "lets you reuse the title/url of a deleted page" do
