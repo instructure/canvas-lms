@@ -23,6 +23,8 @@ class CoursePacing::PaceServiceInterface
   end
 
   def self.pace_for(context, should_duplicate: false)
+    return nil unless valid_context?(context)
+
     pace_in_context(context)
   rescue ActiveRecord::RecordNotFound
     template = template_pace_for(context) || raise(ActiveRecord::RecordNotFound)
@@ -37,7 +39,13 @@ class CoursePacing::PaceServiceInterface
     raise NotImplementedError
   end
 
+  def self.valid_context?(_context)
+    true
+  end
+
   def self.create_in_context(context)
+    return nil unless valid_context?(context)
+
     pace = context.course_paces.not_deleted.take
     if pace.nil?
       course = course_for(context)

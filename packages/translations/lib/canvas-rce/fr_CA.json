@@ -480,7 +480,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "Supérieur à (groupé)" },
   "nested_less_than_27d17e58": { "message": "Inférieur à (groupé)" },
-  "next_page_d2a39853": { "message": "Page suivante" },
   "no_changes_to_save_d29f6e91": {
     "message": "Aucun changement à enregister."
   },
@@ -492,9 +491,6 @@
   "no_results_940393cf": { "message": "Pas de résultats" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Aucun résultat trouvé pour { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Aucun résultat trouvé pour { term }."
   },
   "none_3b5e34d2": { "message": "Aucun" },
   "none_selected_b93d56d2": { "message": "Aucun sélectionné" },
@@ -568,7 +564,6 @@
   "preview_53003fd2": { "message": "Aperçu" },
   "preview_in_overlay_ed772c46": { "message": "Aperçu en superposition" },
   "preview_inline_9787330": { "message": "Aperçu « inline »" },
-  "previous_page_928fc112": { "message": "Page précédente" },
   "prime_917ea60e": { "message": "Premier" },
   "prime_numbers_13464f61": { "message": "Nombres premiers" },
   "product_39cf144f": { "message": "Produit" },
@@ -637,12 +632,10 @@
   "save_11a80ec3": { "message": "Enregistrer" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Rechercher" },
-  "search_term_b2d2235": { "message": "Mots clés de recherche" },
   "select_crop_shape_d441feeb": {
     "message": "Sélectionner la forme du recadrage"
   },
   "select_language_7c93a900": { "message": "sélectionnez la langue" },
-  "selected_274ce24f": { "message": "Sélectionné" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } sélectionné"
   },
@@ -775,9 +768,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "Basculer l’infobulle" },
   "tools_2fcf772e": { "message": "Outils" },
   "top_66e0adb6": { "message": "Supérieur" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } résultats trouvés, { numDisplayed } résultats actuellement affichés"
-  },
   "tray_839df38a": { "message": "Plateau" },
   "triangle_6072304e": { "message": "Triangle" },
   "turnstile_yields_f9e76df1": { "message": "Tourniquet (céder)" },

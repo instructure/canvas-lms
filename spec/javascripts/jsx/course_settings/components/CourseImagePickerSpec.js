@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import {getByText} from '@testing-library/dom'
 import CourseImagePicker from 'ui/features/course_settings/react/components/CourseImagePicker'
 
 const wrapper = document.getElementById('fixtures')
@@ -65,18 +64,4 @@ test('calls the handleFileUpload prop when drop occurs', function (assert) {
     ok(called, 'handleFileUpload was called')
     done()
   }, 0)
-})
-
-test('Unsplash tab can be selected', function () {
-  window.ENV.use_unsplash_image_search = true
-  const component = this.renderComponent({courseId: '101'})
-  const imageSearchTab = getByText(wrapper, 'Unsplash')
-
-  TestUtils.Simulate.click(imageSearchTab)
-
-  strictEqual(
-    TestUtils.scryRenderedDOMComponentsWithClass(component, 'Unsplash__logo').length,
-    1,
-    'the Unsplash tab content should appear'
-  )
 })

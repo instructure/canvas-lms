@@ -21,8 +21,6 @@
 require_relative "lti2_api_spec_helper"
 require_relative "../api_spec_helper"
 
-require_dependency "lti/ims/access_token_helper"
-require_dependency "lti/submissions_api_controller"
 module Lti
   describe SubmissionsApiController, type: :request do
     specs_require_sharding

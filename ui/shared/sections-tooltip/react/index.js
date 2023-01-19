@@ -43,7 +43,7 @@ export default function SectionsTooltip({sections, totalUserCount, prefix, textC
     tipContent = sections.map(sec => (
       <View key={sec.id} as="div" margin="xx-small">
         <Text size="small">
-          {I18n.t('%{name} (%{count} Students)', {name: sec.name, count: sec.user_count})}
+          {I18n.t('%{name} (%{count} Users)', {name: sec.name, count: sec.user_count})}
         </Text>
       </View>
     ))
@@ -57,7 +57,7 @@ export default function SectionsTooltip({sections, totalUserCount, prefix, textC
   } else {
     tipContent = (
       <View as="div" margin="xx-small">
-        <Text size="small">{I18n.t('(%{count} Students)', {count: totalUserCount})}</Text>
+        <Text size="small">{I18n.t('(%{count} Users)', {count: totalUserCount})}</Text>
       </View>
     )
     sectionsCountText = I18n.t('All Sections')

@@ -17,12 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "importers"
-
 module Importers
   class AccountContentImporter < Importer
     self.item_class = Account
-    Importers.register_content_importer(self)
 
     def self.import_content(account, data, _params, migration)
       Importers::ContentImporterHelper.add_assessment_id_prepend(account, data, migration)

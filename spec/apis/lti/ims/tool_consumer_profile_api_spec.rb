@@ -19,7 +19,6 @@
 #
 
 require_relative "../../api_spec_helper"
-require_dependency "lti/ims/tool_consumer_profile_controller"
 
 module Lti
   module IMS

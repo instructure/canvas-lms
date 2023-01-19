@@ -29,7 +29,6 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "CC / Untertitel hinzufügen" },
   "add_image_60b2de07": { "message": "Bild hinzufügen" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Ausrichten" },
   "alignment_and_lists_5cebcb69": { "message": "Ausrichtung und Listen" },
   "all_4321c3a1": { "message": "Alle" },
   "all_apps_a50dea49": { "message": "Alle Apps" },
@@ -92,7 +91,6 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "© 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Abbrechen" },
   "cap_product_3a5265a6": { "message": "Cap-Produkt" },
-  "center_align_e68d9997": { "message": "Mittig ausrichten" },
   "centered_dot_64d5e378": { "message": "Zentrierter Punkt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Zentrierte horizontale Punkte"
@@ -157,14 +155,10 @@ const locale = {
   "course_files_62deb8f8": { "message": "Kursdateien" },
   "course_files_a31f97fc": { "message": "Kursdateien" },
   "course_images_f8511d04": { "message": "Kursbilder" },
-  "course_link_b369426": { "message": "Link zum Kurs" },
   "course_links_b56959b9": { "message": "Kurs-Links" },
   "course_media_ec759ad": { "message": "Kursmedien" },
   "course_navigation_dd035109": { "message": "Kursnavigation" },
   "create_icon_110d6463": { "message": "Symbol „Erstellen“" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Icon Maker erstellen-Symbol"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
   },
@@ -178,7 +172,6 @@ const locale = {
   "date_added_ed5ad465": { "message": "Datum hinzugefügt" },
   "decorative_icon_9a7f3fc3": { "message": "Dekoratives Symbol" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativer { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Einzug verkleinern" },
   "deep_purple_bb3e2907": { "message": "Dunkelviolett" },
   "definite_integral_fe7ffed1": { "message": "Bestimmtes Integral" },
   "degree_symbol_4a823d5f": { "message": "Gradsymbol" },
@@ -205,7 +198,6 @@ const locale = {
     "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
   },
   "division_sign_72190870": { "message": "Divisionszeichen" },
-  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumente" },
   "done_54e3d4b6": { "message": "Fertig" },
   "double_dagger_faf78681": { "message": "Doppelkreuz" },
@@ -234,7 +226,6 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Ändern" },
   "edit_course_link_5a5c3c59": { "message": "Link zum Bearbeiten des Kurses" },
-  "edit_equation_f5279959": { "message": "Gleichung bearbeiten" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Vorhandenes Icon Maker-Symbol bearbeiten"
   },
@@ -259,17 +250,16 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Gleichheitszeichen" },
-  "equation_1c5ac93c": { "message": "Gleichung" },
   "equation_editor_39fbc3f1": { "message": "Formel-Editor" },
   "equivalence_class_7b0f11c0": { "message": "Äquivalenzklasse" },
   "equivalent_identity_654b3ce5": { "message": "Äquivalent (Identität)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Ist vorhanden" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Vollbildschirm verlassen" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Vorschau standardmäßig erweitern"
   },
   "expand_to_see_types_f5d29352": { "message": "{ types } erweitern" },
-  "external_link_d3f9e62a": { "message": "Externer Link" },
   "external_tools_6e77821": { "message": "Externe Tools" },
   "extra_large_b6cdf1ff": { "message": "Extra groß" },
   "extra_small_9ae33252": { "message": "Extra klein" },
@@ -330,7 +320,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Gruppendateien" },
   "group_images_98e0ac17": { "message": "Gruppenbilder" },
   "group_isomorphism_45b1458c": { "message": "Gruppenisomorphismus" },
-  "group_link_63e626b3": { "message": "Gruppenverknüpfung" },
   "group_links_9493129e": { "message": "Gruppen-Links" },
   "group_media_2f3d128a": { "message": "Gruppenmedien" },
   "group_navigation_99f191a": { "message": "Gruppennavigation" },
@@ -349,7 +338,6 @@ const locale = {
   },
   "home_351838cd": { "message": "Start" },
   "html_code_editor_fd967a44": { "message": "HTML-Code-Editor" },
-  "html_editor_fb2ab713": { "message": "HTML-Editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ich habe die Berechtigung zur Nutzung dieser Datei erhalten."
   },
@@ -381,15 +369,12 @@ const locale = {
     "message": "Imaginärer Teil (einer komplexen Zahl)"
   },
   "in_element_of_19ca2f33": { "message": "In (Element von)" },
-  "increase_indent_6af90f7c": { "message": "Einzug vergrößern" },
   "indefinite_integral_6623307e": { "message": "Unbestimmtes Integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Schlussfolgerung" },
   "infinity_7a10f206": { "message": "Unendlichkeit" },
   "insert_593145ef": { "message": "Einfügen" },
-  "insert_equella_links_49a8dacd": { "message": "Equella-Links einfügen" },
   "insert_link_6dc23cae": { "message": "Link einfügen" },
-  "insert_math_equation_57c6e767": { "message": "Math. Gleichung einfügen" },
   "integers_336344e1": { "message": "Ganze Zahlen" },
   "intersection_cd4590e4": { "message": "Schnittfläche" },
   "invalid_entry_f7d2a0f5": { "message": "Ungültiger Eintrag." },
@@ -404,7 +389,6 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Symbol für „Sprachkunst“" },
   "languages_icon_9d20539": { "message": "Sprachen-Symbol" },
   "large_9c5e80e7": { "message": "Groß" },
-  "left_align_43d95491": { "message": "Linksbündig" },
   "left_angle_bracket_c87a6d07": { "message": "Spitze Klammer links" },
   "left_arrow_4fde1a64": { "message": "Pfeil nach links" },
   "left_arrow_with_hook_5bfcad93": { "message": "Pfeil nach links mit Haken" },
@@ -549,6 +533,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Absatz" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Teilweise (abgeleitet)" },
+  "paste_5963d1c1": { "message": "Einfügen" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Teilnehmer*innen" },
   "percentage_34ab7c2c": { "message": "Prozentsatz" },
@@ -603,11 +588,9 @@ const locale = {
     "message": "Reeller Teil (einer komplexen Zahl)"
   },
   "record_7c9448b": { "message": "Aufnehmen" },
-  "record_upload_media_5fdce166": { "message": "Medien aufzeichnen/hochladen" },
   "red_8258edf3": { "message": "Rot" },
   "relationships_6602af70": { "message": "Beziehungen" },
   "religion_icon_246e0be1": { "message": "Religionssymbol" },
-  "remove_link_d1f2f4d0": { "message": "Link entfernen" },
   "replace_e61834a7": { "message": "Ersetzen" },
   "reset_95a81614": { "message": "Zurücksetzen" },
   "resize_ec83d538": { "message": "Größe ändern" },
@@ -623,7 +606,6 @@ const locale = {
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Rich-Text-Bereich. Drücken Sie <Alt>+0, um Tastaturkürzel im Rich-Content-Editor anzuzeigen."
   },
-  "right_align_39e7a32a": { "message": "Rechtsbündig" },
   "right_angle_bracket_d704e2d6": { "message": "Eckige Klammer links" },
   "right_arrow_35e0eddf": { "message": "Pfeil nach rechts" },
   "right_arrow_with_hook_29d92d31": {
@@ -650,9 +632,6 @@ const locale = {
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."
   },
   "save_11a80ec3": { "message": "Speichern" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Icon Maker-Symbole gespeichert"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Suchen" },
   "search_term_b2d2235": { "message": "Suchbegriff" },
@@ -667,10 +646,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O, um den Pretty HTML-Editor zu öffnen."
   },
-  "show_audio_options_b489926b": { "message": "Audiooptionen anzeigen" },
-  "show_image_options_1e2ecc6b": { "message": "Bildoptionen anzeigen" },
-  "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
-  "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Einfarbiges Bild" },
@@ -715,9 +690,6 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Folgt Gleich" },
   "sum_b0842d31": { "message": "Summe" },
   "superscript_8cb349a2": { "message": "Hochgestellt" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Hochgestellt und Tiefgestellt"
-  },
   "superset_c4db8a7a": { "message": "Obermenge" },
   "superset_strict_c77dd6d2": { "message": "Obermenge (Streng)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -814,11 +786,9 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Diagonaler Pfeil nach oben rechts"
   },
-  "upload_document_253f0478": { "message": "Dokument hochladen" },
   "upload_file_fd2361b8": { "message": "Datei hochladen" },
   "upload_image_6120b609": { "message": "Bild hochladen" },
   "upload_media_ce31135a": { "message": "Medien hochladen" },
-  "upload_record_media_e4207d72": { "message": "Medien hochladen/aufzeichnen" },
   "uploading_19e8a4e7": { "message": "Wird hochgeladen" },
   "uppercase_delta_d4f4bc41": { "message": "Delta In Großbuchstaben" },
   "uppercase_gamma_86f492e9": { "message": "Gamma großgeschrieben" },
@@ -894,6 +864,9 @@ const locale = {
   },
   "view_title_description_67940918": {
     "message": "Beschreibung { title } anzeigen"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Wort- und Zeichenanzahl anzeigen"
   },
   "white_87fa64fd": { "message": "Weiß" },
   "width_492fec76": { "message": "Breite" },

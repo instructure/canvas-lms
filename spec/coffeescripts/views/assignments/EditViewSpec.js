@@ -1754,6 +1754,7 @@ QUnit.module('EditView#validateGraderCount', hooks => {
       LOCALE: 'en',
       MODERATED_GRADING_ENABLED: true,
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
+      MODERATED_GRADING_GRADER_LIMIT: 10,
       VALID_DATE_RANGE: {},
       COURSE_ID: 1,
     })
@@ -1790,6 +1791,11 @@ QUnit.module('EditView#validateGraderCount', hooks => {
 
   test('returns an error if moderated grading is turned on and grader count is 0', () => {
     const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '0'})
+    deepEqual(Object.keys(errors), ['grader_count'])
+  })
+
+  test('returns an error if moderated grading is turned on and grader count exceeds max', () => {
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '15'})
     deepEqual(Object.keys(errors), ['grader_count'])
   })
 })

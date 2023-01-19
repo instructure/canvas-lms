@@ -461,6 +461,29 @@ describe "Canvas Cartridge importing" do
     expect(rubric2_2.title).to eq rubric2.title
   end
 
+  it "imports context info" do
+    doc = Nokogiri::XML(<<~XML)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <context_info xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 https://canvas.instructure.com/xsd/cccv1p0.xsd">
+        <course_id>207</course_id>
+        <course_name>Basketweaving 101</course_name>
+        <root_account_id>120000000000304</root_account_id>
+        <root_account_name>Pineapple U</root_account_name>
+        <root_account_uuid>R7y0TggqECOtPTeVSqo5qF0amXcr5pygWsq9Kh8O</root_account_uuid>
+        <canvas_domain>pineapple.edu</canvas_domain>
+      </context_info>
+    XML
+    json = @converter.convert_context_info(doc)
+    expect(json).to eq({
+                         "course_id" => "207",
+                         "course_name" => "Basketweaving 101",
+                         "root_account_id" => "120000000000304",
+                         "root_account_name" => "Pineapple U",
+                         "root_account_uuid" => "R7y0TggqECOtPTeVSqo5qF0amXcr5pygWsq9Kh8O",
+                         "canvas_domain" => "pineapple.edu"
+                       })
+  end
+
   context "importing modules" do
     it "can import all info from a basic module structure" do
       mod1 = @copy_from.context_modules.create!(name: "some module", unlock_at: 1.week.from_now, require_sequential_progress: true)

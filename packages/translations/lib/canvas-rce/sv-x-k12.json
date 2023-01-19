@@ -464,7 +464,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
-  "next_page_d2a39853": { "message": "Nästa sida" },
   "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
@@ -474,9 +473,6 @@
   "no_results_940393cf": { "message": "Inga resultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Inga resultat hittades för { term }."
   },
   "none_3b5e34d2": { "message": "Inga" },
   "none_selected_b93d56d2": { "message": "Inga valda" },
@@ -550,7 +546,6 @@
   "preview_53003fd2": { "message": "Förhandsgranska" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
-  "previous_page_928fc112": { "message": "Föregående sida" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -615,10 +610,8 @@
   "save_11a80ec3": { "message": "Spara" },
   "script_l_42a7b254": { "message": "Skript-L" },
   "search_280d00bd": { "message": "Sök" },
-  "search_term_b2d2235": { "message": "Sökterm" },
   "select_crop_shape_d441feeb": { "message": "Välj beskärningsform" },
   "select_language_7c93a900": { "message": "Välj språk" },
-  "selected_274ce24f": { "message": "Markerade" },
   "selected_linkfilename_c093b1f2": { "message": "Markerade { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Uppsättning av minus" },
   "sharp_music_ab956814": { "message": "Korsförtecken (musik)" },
@@ -739,9 +732,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "Växla verktygstips" },
   "tools_2fcf772e": { "message": "Verktyg" },
   "top_66e0adb6": { "message": "Överst" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultat hittades, { numDisplayed } resultat visas nu"
-  },
   "tray_839df38a": { "message": "Fack" },
   "triangle_6072304e": { "message": "Triangel" },
   "turnstile_yields_f9e76df1": { "message": "Vändkors (Släpper igenom)" },

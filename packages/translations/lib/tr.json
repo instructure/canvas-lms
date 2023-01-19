@@ -533,9 +533,6 @@
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
     },
-    "next_page_d2a39853": {
-        "message": "Sonraki Sayfa"
-    },
     "no_e16d9132": {
         "message": "Hayır"
     },
@@ -589,9 +586,6 @@
     },
     "previous_month_bb1e3c84": {
         "message": "Önceki Hafta"
-    },
-    "previous_page_928fc112": {
-        "message": "Önceki Sayfa"
     },
     "pts_699bd9aa": {
         "message": "not"
@@ -697,9 +691,6 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Yarın { date }"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
     },
     "tray_839df38a": {
         "message": "Yan menü"

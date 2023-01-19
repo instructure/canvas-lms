@@ -91,7 +91,9 @@ class CoursePacesController < ApplicationController
 
   def context_for(pace)
     return pace.course_section if pace.course_section_id
-    return pace.user.student_enrollments.where(course: @course).where.not(workflow_state: "deleted").take if pace.user_id
+    # search the pace's shard for the student enrollment since the enrollment associated with the pace's course
+    # will always be on the pace's shard (not necessarily the user's shard though)
+    return pace.user.student_enrollments.shard(pace.shard).where(course: @course).active.take if pace.user_id
 
     pace.course
   end
@@ -267,7 +269,8 @@ class CoursePacesController < ApplicationController
   end
 
   def enrollments_json(course)
-    json = course.all_real_student_enrollments.map do |enrollment|
+    # Only the most recent enrollment of each student is considered
+    json = course.all_real_student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*").map do |enrollment|
       {
         id: enrollment.id,
         user_id: enrollment.user_id,

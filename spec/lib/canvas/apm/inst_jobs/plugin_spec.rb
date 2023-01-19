@@ -19,7 +19,6 @@
 #
 
 require "delayed/testing"
-require_dependency "canvas/apm/inst_jobs/plugin"
 require_relative "../../apm_common"
 
 describe Canvas::Apm::InstJobs::Plugin do

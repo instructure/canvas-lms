@@ -1421,9 +1421,6 @@
     "next_month_749b1778": {
         "message": "Következő hónap"
     },
-    "next_page_d2a39853": {
-        "message": "Következő oldal"
-    },
     "no_changes_to_save_d29f6e91": {
         "message": "Nincs mentendő módosítás."
     },
@@ -1447,9 +1444,6 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Nincs találat a követezőre: { filterTerm }"
-    },
-    "no_results_found_for_term_1564c08e": {
-        "message": "Nincs találat a követezőre: { term }."
     },
     "none_3b5e34d2": {
         "message": "Nincs"
@@ -1682,9 +1676,6 @@
     "previous_month_bb1e3c84": {
         "message": "Előző hónap"
     },
-    "previous_page_928fc112": {
-        "message": "Előző oldal"
-    },
     "prime_917ea60e": {
         "message": "Prím"
     },
@@ -1856,17 +1847,11 @@
     "search_280d00bd": {
         "message": "Keresés"
     },
-    "search_term_b2d2235": {
-        "message": "Kifejezés keresése"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Válassza ki a kivágás alakját"
     },
     "select_language_7c93a900": {
         "message": "Válasszon nyelvet"
-    },
-    "selected_274ce24f": {
-        "message": "Kiválasztva"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Kijelölve: { linkFileName }"
@@ -2197,9 +2182,6 @@
     },
     "top_66e0adb6": {
         "message": "Top"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } találat, ebből { numDisplayed } megjelenítve"
     },
     "tray_839df38a": {
         "message": "Tálca"

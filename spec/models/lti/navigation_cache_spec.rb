@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/navigation_cache"
-
 module Lti
   describe NavigationCache do
     subject { NavigationCache.new(account) }

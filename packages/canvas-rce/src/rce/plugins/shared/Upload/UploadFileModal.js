@@ -34,21 +34,14 @@ import {View} from '@instructure/ui-view'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const UrlPanel = React.lazy(() => import('./UrlPanel'))
-const UnsplashPanel = React.lazy(() => import('./UnsplashPanel'))
 
-function shouldBeDisabled(
-  {fileUrl, theFile, unsplashData, error},
-  selectedPanel,
-  usageRightNotSet
-) {
+function shouldBeDisabled({fileUrl, theFile, error}, selectedPanel, usageRightNotSet) {
   if (error || (usageRightNotSet && selectedPanel === 'COMPUTER')) {
     return true
   }
   switch (selectedPanel) {
     case 'COMPUTER':
       return !theFile || theFile.error
-    case 'UNSPLASH':
-      return !unsplashData.id || !unsplashData.url
     case 'URL':
       return !fileUrl
     default:
@@ -79,7 +72,6 @@ const UploadFileModal = React.forwardRef(
     const [error, setError] = useState(null)
     const [fileUrl, setFileUrl] = useState('')
     const [selectedPanel, setSelectedPanel] = useState(panels[0])
-    const [unsplashData, setUnsplashData] = useState({id: null, url: null})
 
     const [usageRightsState, setUsageRightsState] = React.useState({
       usageRight: 'choose',
@@ -109,7 +101,7 @@ const UploadFileModal = React.forwardRef(
     }
 
     const submitDisabled = shouldBeDisabled(
-      {fileUrl, theFile, unsplashData, error},
+      {fileUrl, theFile, error},
       selectedPanel,
       requiresUsageRights && usageRightsState.usageRight === 'choose'
     )
@@ -150,7 +142,6 @@ const UploadFileModal = React.forwardRef(
             {
               fileUrl,
               theFile,
-              unsplashData,
               imageOptions: {altText, isDecorativeImage, displayAs},
               usageRights: usageRightsState,
             },
@@ -196,28 +187,6 @@ const UploadFileModal = React.forwardRef(
                           label={label}
                           accept={accept}
                           bounds={{width: modalBodyWidth, height: modalBodyHeight}}
-                        />
-                      </Suspense>
-                    </Tabs.Panel>
-                  )
-                case 'UNSPLASH':
-                  return (
-                    <Tabs.Panel
-                      key={panel}
-                      renderTitle={function () {
-                        return 'Unsplash'
-                      }}
-                      isSelected={selectedPanel === 'UNSPLASH'}
-                    >
-                      <Suspense
-                        fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
-                      >
-                        <UnsplashPanel
-                          editor={editor}
-                          setUnsplashData={setUnsplashData}
-                          source={source}
-                          brandColor={trayProps.brandColor}
-                          liveRegion={trayProps.liveRegion}
                         />
                       </Suspense>
                     </Tabs.Panel>
@@ -317,7 +286,7 @@ UploadFileModal.propTypes = {
   canvasOrigin: string,
   onSubmit: func,
   onDismiss: func.isRequired,
-  panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
+  panels: arrayOf(oneOf(['COMPUTER', 'URL'])),
   label: string.isRequired,
   accept: oneOfType([arrayOf(string), string]),
   modalBodyWidth: number,

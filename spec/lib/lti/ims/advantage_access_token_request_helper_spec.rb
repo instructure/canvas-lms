@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "lti/ims/advantage_access_token_request_helper"
-
 describe Lti::IMS::AdvantageAccessTokenRequestHelper do
   let(:token) { double(Lti::IMS::AdvantageAccessToken) }
   let(:request) { ActionDispatch::Request.new(Rack::MockRequest.env_for("http://test.host/")) }

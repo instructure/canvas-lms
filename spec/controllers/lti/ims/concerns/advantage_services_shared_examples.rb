@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/ims/concerns/advantage_services"
-
 shared_examples_for "advantage services" do
   let(:extra_tool_context) { raise "Override in spec" }
 

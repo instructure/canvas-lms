@@ -19,7 +19,6 @@
 #
 
 require_relative "../../conditional_release_spec_helper"
-require_dependency "conditional_release/override_handler"
 
 module ConditionalRelease
   describe OverrideHandler do

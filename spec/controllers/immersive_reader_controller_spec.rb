@@ -45,10 +45,10 @@ describe ImmersiveReaderController do
     stub_request(:post, "https://login.windows.net")
     allow(controller).to receive(:ir_config).and_return(
       {
-        ir_tenant_id: "faketenantid",
-        ir_client_id: "fakeclientid",
-        ir_client_secret: "fakesecret",
-        ir_subdomain: "fakesub"
+        tenant_id: "faketenantid",
+        client_id: "fakeclientid",
+        client_secret: "fakesecret",
+        subdomain: "fakesub"
       }
     )
     get "authenticate"
@@ -80,10 +80,10 @@ describe ImmersiveReaderController do
 
       allow(controller).to receive(:ir_config).and_return(
         {
-          ir_tenant_id: "faketenantid",
-          ir_client_id: "fakeclientid",
-          ir_client_secret: "fakesecret",
-          ir_subdomain: "fakesub"
+          tenant_id: "faketenantid",
+          client_id: "fakeclientid",
+          client_secret: "fakesecret",
+          subdomain: "fakesub"
         }
       )
     end

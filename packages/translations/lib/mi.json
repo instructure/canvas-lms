@@ -1439,9 +1439,6 @@
     "next_month_749b1778": {
         "message": "Tērā marama"
     },
-    "next_page_d2a39853": {
-        "message": "Whārangi haere ake nei"
-    },
     "no_changes_to_save_d29f6e91": {
         "message": "Kaore he huringa hei tiaki."
     },
@@ -1465,9 +1462,6 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Kaore i kitea he hua mo { filterTerm }"
-    },
-    "no_results_found_for_term_1564c08e": {
-        "message": "Kaore i kitea he hua mo { term }."
     },
     "none_3b5e34d2": {
         "message": "Kaore"
@@ -1703,9 +1697,6 @@
     "previous_month_bb1e3c84": {
         "message": "Te marama o muri nei"
     },
-    "previous_page_928fc112": {
-        "message": "Te whārangi o muri nei"
-    },
     "prime_917ea60e": {
         "message": "Pirimia"
     },
@@ -1877,17 +1868,11 @@
     "search_280d00bd": {
         "message": "Rapu"
     },
-    "search_term_b2d2235": {
-        "message": "Rapu tau"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Tīpako tapahi āhua"
     },
     "select_language_7c93a900": {
         "message": "Tīpako Reo"
-    },
-    "selected_274ce24f": {
-        "message": "Kua tīpakohia"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Tīpakohia { linkFileName }"
@@ -2224,9 +2209,6 @@
     },
     "top_66e0adb6": {
         "message": "Runga"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } ngā hua kitea { numDisplayed } ngā hua e whakātutia ana"
     },
     "tray_839df38a": {
         "message": "Pereki"

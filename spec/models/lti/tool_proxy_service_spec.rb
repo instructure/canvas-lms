@@ -20,8 +20,6 @@
 
 require "lti2_spec_helper"
 
-require_dependency "lti/tool_proxy_service"
-
 module Lti
   describe ToolProxyService do
     include_context "lti2_spec_helper"

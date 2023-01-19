@@ -412,7 +412,21 @@ class OutcomeResultsController < ApplicationController
     filters << "inactive" if exclude_inactive
 
     ActiveRecord::Associations.preload(@users, :enrollments)
-    @users = @users.reject { |u| u.enrollments.all? { |e| filters.include? e.workflow_state } }
+    # Only pull enrollment records for students included in the current course
+    # If a user is enrolled more than once in a course - i.e. the student could be in multiple
+    # sections of the course. Then we will need to one of two things:
+    # 1. If the section parameter is available - filter only by the user's enrollment status in
+    #    the section
+    # 2. If the section parameter is not available - filter by the user's enrollment status(es) in the course.
+    #    If there are multiple enrollments available for the user, `.all?` will return false if the user is
+    #    active in one of the sections.
+    # NOTE: If viewing all sections and a user is concluded or inactive in one section and not another,
+    # the student should always be visible
+    @users = if params[:section_id]
+               @users.reject { |u| u.enrollments.where(course_id: @context.id, course_section_id: params[:section_id]).all? { |e| filters.include? e.workflow_state } }
+             else
+               @users.reject { |u| u.enrollments.where(course_id: @context.id).all? { |e| filters.include? e.workflow_state } }
+             end
   end
 
   # used in LMGB

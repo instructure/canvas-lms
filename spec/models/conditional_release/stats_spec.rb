@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../../conditional_release_spec_helper"
-require_dependency "conditional_release/stats"
 
 module ConditionalRelease
   describe Stats do

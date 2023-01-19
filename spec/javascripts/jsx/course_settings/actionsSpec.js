@@ -142,20 +142,6 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
   })
 })
 
-test('uploadImageSearchUrl without a confirmationId should not call confirmImageSelection', () => {
-  sinon.spy(Actions, 'confirmImageSelection')
-  Actions.uploadImageSearchUrl('http://imageUrl', 1, 'image')(() => {})
-  notOk(Actions.confirmImageSelection.called)
-  Actions.confirmImageSelection.restore()
-})
-
-test('uploadImageSearchUrl with a confirmationId calls confirmImageSelection', () => {
-  sinon.spy(Actions, 'confirmImageSelection')
-  Actions.uploadImageSearchUrl('http://imageUrl', 1, 'image', 'id')(() => {})
-  ok(Actions.confirmImageSelection.called)
-  Actions.confirmImageSelection.restore()
-})
-
 test('uploadFile returns false when image is not valid', assert => {
   const done = assert.async()
   const fakeDragonDropEvent = {

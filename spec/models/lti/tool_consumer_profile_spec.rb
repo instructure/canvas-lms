@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/tool_consumer_profile"
-
 module Lti
   describe ToolConsumerProfile do
     describe ".cached_find_by_developer_key" do

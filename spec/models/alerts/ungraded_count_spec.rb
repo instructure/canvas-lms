@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "alerts/ungraded_count"
-
 module Alerts
   describe UngradedCount do
     describe "#should_not_receive_message?" do

@@ -22,13 +22,18 @@ import {Link} from '@instructure/ui-link'
 
 export default function UserLink({size, avatar_url, name, avatarName, ...propsToPassOnToLink}) {
   return (
-    <Link theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}} {...propsToPassOnToLink}>
+    <Link
+      theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
+      data-heap-redact-text=""
+      {...propsToPassOnToLink}
+    >
       <Avatar
         size={size}
         name={avatarName}
         src={avatar_url}
         margin="0 x-small xxx-small 0"
         data-fs-exclude={true}
+        data-heap-redact-attributes="name"
       />
       {name}
     </Link>

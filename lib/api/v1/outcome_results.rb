@@ -204,7 +204,6 @@ module Api::V1::OutcomeResults
                          enrollments = @context.all_accepted_student_enrollments.where(user_id: serialized_rollup_pairs.map { |pair| pair[0].context.id }).to_a
                          ->(user) { enrollments.select { |e| e.user_id == user.id }.map(&:course_section_id) }
                        end
-
     serialized_rollup_pairs.flat_map do |rollup, serialized_rollup|
       section_ids_func.call(rollup.context).map do |section_id|
         serialized_rollup.deep_merge(links: { section: section_id.to_s })

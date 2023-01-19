@@ -21,7 +21,6 @@ require "apis/api_spec_helper"
 require_relative "./concerns/advantage_services_shared_context"
 require_relative "./concerns/advantage_services_shared_examples"
 require_relative "./concerns/lti_services_shared_examples"
-require_dependency "lti/ims/scores_controller"
 
 module Lti::IMS
   RSpec.describe ScoresController do
@@ -967,6 +966,22 @@ module Lti::IMS
               send_request
               expect(response.status.to_i).to eq(422)
               expect(response.body).to include("cannot be zero if line item's maximum is not zero")
+            end
+          end
+
+          context "when an assignment previously had a max score of zero AND the student was graded at that time" do
+            let(:params_overrides) do
+              super().merge(scoreGiven: 0, scoreMaximum: 1)
+            end
+
+            before do
+              line_item.update score_maximum: 0
+            end
+
+            it "assignment now has a max score of non-zero" do
+              lti_result_model line_item: line_item, user: user, score_given: 0, score_maximum: 0
+              send_request
+              expect(response.status.to_i).to eq(200)
             end
           end
         end

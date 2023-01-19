@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/ims/concerns/lti_services"
-
 shared_examples "mime_type check" do
   it "does not return ims mime_type" do
     expect(response.headers["Content-Type"]).not_to include expected_mime_type

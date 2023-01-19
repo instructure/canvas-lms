@@ -150,7 +150,6 @@ $(document).ready(function () {
     addHiddenInput: true,
   })
 
-  globalAnnouncements.augmentView()
   globalAnnouncements.bindDomEvents()
 
   $('#account_settings_tabs').on('tabsactivate', (event, ui) => {

@@ -20,7 +20,6 @@
 require_relative "concerns/advantage_services_shared_context"
 require_relative "concerns/advantage_services_shared_examples"
 require_relative "concerns/lti_services_shared_examples"
-require_dependency "lti/ims/results_controller"
 
 describe Lti::IMS::ResultsController do
   include_context "advantage services context"

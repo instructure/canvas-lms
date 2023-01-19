@@ -870,4 +870,82 @@ describe ContentMigrationsController, type: :request do
       expect(json.first["property"]).to include key
     end
   end
+
+  describe "asset_id_mapping" do
+    before :once do
+      @src = course_factory active_all: true
+      @ann = @src.announcements.create! title: "ann", message: "ohai"
+      @assign = @src.assignments.create! name: "assign"
+      @mod = @src.context_modules.create! name: "mod"
+      @page = @src.wiki_pages.create! title: "der page"
+      @topic = @src.discussion_topics.create! message: "some topic"
+      @quiz = @src.quizzes.create! title: "a quiz", quiz_type: "assignment"
+      @file = @src.attachments.create! filename: "teh_file", uploaded_data: StringIO.new("data")
+
+      @dst = course_factory active_all: true
+      @user = @dst.teachers.first
+    end
+
+    def test_asset_id_mapping(json)
+      expect(@dst.announcements.find(json["announcements"][@ann.id.to_s]).title).to eq "ann"
+      expect(@dst.assignments.find(json["assignments"][@assign.id.to_s]).name).to eq "assign"
+      expect(@dst.context_modules.find(json["modules"][@mod.id.to_s]).name).to eq "mod"
+      expect(@dst.wiki_pages.find(json["pages"][@page.id.to_s]).title).to eq "der page"
+      expect(@dst.discussion_topics.find(json["discussion_topics"][@topic.id.to_s]).message).to eq "some topic"
+      expect(@dst.quizzes.find(json["quizzes"][@quiz.id.to_s]).title).to eq "a quiz"
+      expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file"
+    end
+
+    describe "course copy" do
+      before :once do
+        @migration = @dst.content_migrations.create!(source_course: @src, migration_type: "course_copy_importer")
+        @migration.queue_migration
+        run_jobs
+      end
+
+      it "requires permission" do
+        user_factory
+        api_call(:get, "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                 { controller: "content_migrations", action: "asset_id_mapping", format: "json", course_id: @dst.to_param,
+                   id: @migration.to_param }, {}, {}, { expected_status: 401 })
+      end
+
+      it "maps ids" do
+        json = api_call(:get, "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations", action: "asset_id_mapping", format: "json", course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_id_mapping(json)
+      end
+    end
+
+    describe "blueprint course" do
+      before :once do
+        @template = MasterCourses::MasterTemplate.set_as_master_course(@src)
+        @template.add_child_course!(@dst)
+        @mm = MasterCourses::MasterMigration.start_new_migration!(@template, nil)
+        run_jobs
+        @mm.reload
+        @migration = @mm.migration_results.first.content_migration
+      end
+
+      it "maps ids" do
+        json = api_call(:get, "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations", action: "asset_id_mapping", format: "json", course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_id_mapping(json)
+      end
+
+      it "includes assets from previous syncs" do
+        new_assignment = @src.assignments.create! name: "booga"
+        mm = MasterCourses::MasterMigration.start_new_migration!(@template, nil)
+        run_jobs
+        migration = mm.reload.migration_results.first.content_migration
+        json = api_call(:get, "/api/v1/courses/#{@dst.to_param}/content_migrations/#{migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations", action: "asset_id_mapping", format: "json", course_id: @dst.to_param,
+                          id: migration.to_param })
+        test_asset_id_mapping(json)
+        expect(@dst.assignments.find(json["assignments"][new_assignment.id.to_s]).name).to eq "booga"
+      end
+    end
+  end
 end

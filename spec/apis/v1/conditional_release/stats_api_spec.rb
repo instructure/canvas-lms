@@ -20,7 +20,6 @@
 
 require_relative "../../../conditional_release_spec_helper"
 require_relative "../../api_spec_helper"
-require_dependency "conditional_release/stats_controller"
 
 module ConditionalRelease
   describe StatsController, type: :request do

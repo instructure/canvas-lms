@@ -31,7 +31,6 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Afegeix CC/subtítols" },
   "add_image_60b2de07": { "message": "Afegeix la imatge" },
   "aleph_f4ffd155": { "message": "Àlef" },
-  "align_11050992": { "message": "Alinea" },
   "alignment_and_lists_5cebcb69": { "message": "Alineació i llistes" },
   "all_4321c3a1": { "message": "Tot" },
   "all_apps_a50dea49": { "message": "Totes les aplicacions" },
@@ -96,7 +95,6 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel·la" },
   "cap_product_3a5265a6": { "message": "Producte amb tapa" },
-  "center_align_e68d9997": { "message": "Alineació centrada" },
   "centered_dot_64d5e378": { "message": "Punt centrat" },
   "centered_horizontal_dots_451c5815": {
     "message": "Punts horitzontals centrats"
@@ -169,16 +167,12 @@ const locale = {
   "course_files_62deb8f8": { "message": "Fitxers de l''assignatura" },
   "course_files_a31f97fc": { "message": "Fitxers de l''assignatura" },
   "course_images_f8511d04": { "message": "Imatges de l''assignatura" },
-  "course_link_b369426": { "message": "Enllaç a l’assignatura" },
   "course_links_b56959b9": { "message": "Enllaços de l''assignatura" },
   "course_media_ec759ad": {
     "message": "Elements multimèdia de l''assignatura"
   },
   "course_navigation_dd035109": { "message": "Navegació de l''assignatura" },
   "create_icon_110d6463": { "message": "Crea una icona" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Crea una icona de l’eina de creació d’icones"
-  },
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
   },
@@ -192,7 +186,6 @@ const locale = {
   "date_added_ed5ad465": { "message": "Data afegida" },
   "decorative_icon_9a7f3fc3": { "message": "Icona decorativa" },
   "decorative_type_upper_f2c95e3": { "message": "{ TYPE_UPPER } decoratiu" },
-  "decrease_indent_d9cf469d": { "message": "Redueix la sagnia" },
   "deep_purple_bb3e2907": { "message": "Porpra fosc" },
   "definite_integral_fe7ffed1": { "message": "Integral definida" },
   "degree_symbol_4a823d5f": { "message": "Símbol de grau" },
@@ -221,7 +214,6 @@ const locale = {
     "message": "Mostra l''enllaç al text (s''obre en una pestanya nova)"
   },
   "division_sign_72190870": { "message": "Signe de la divisió" },
-  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documents" },
   "done_54e3d4b6": { "message": "Fet" },
   "double_dagger_faf78681": { "message": "Daga doble" },
@@ -252,7 +244,6 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Edita" },
   "edit_course_link_5a5c3c59": { "message": "Edita l’enllaç a l’assignatura" },
-  "edit_equation_f5279959": { "message": "Edita l''equació" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edita la icona de l’eina de creació d’icones existent"
   },
@@ -277,17 +268,16 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Èpsilon" },
   "epsilon_variant_d31f1e77": { "message": "Èpsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Signe igual" },
-  "equation_1c5ac93c": { "message": "Equació" },
   "equation_editor_39fbc3f1": { "message": "Editor d’equacions" },
   "equivalence_class_7b0f11c0": { "message": "Classe d''equivalència" },
   "equivalent_identity_654b3ce5": { "message": "Equivalent (identitat)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Existeix" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Surt de la pantalla completa" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Desplega la visualització prèvia per defecte"
   },
   "expand_to_see_types_f5d29352": { "message": "Desplega per veure { types }" },
-  "external_link_d3f9e62a": { "message": "Enllaç extern" },
   "external_tools_6e77821": { "message": "Eines externes" },
   "extra_large_b6cdf1ff": { "message": "Extragran" },
   "extra_small_9ae33252": { "message": "Molt petit" },
@@ -350,7 +340,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Fitxers del grup" },
   "group_images_98e0ac17": { "message": "Agrupa les imatges" },
   "group_isomorphism_45b1458c": { "message": "Isomorfisme de grup" },
-  "group_link_63e626b3": { "message": "Enllaç de grup" },
   "group_links_9493129e": { "message": "Enllaços de grup" },
   "group_media_2f3d128a": { "message": "Agrupa els elements multimèdia" },
   "group_navigation_99f191a": { "message": "Navegació del grup" },
@@ -369,7 +358,6 @@ const locale = {
   },
   "home_351838cd": { "message": "Inici" },
   "html_code_editor_fd967a44": { "message": "Editor de codi HTML" },
-  "html_editor_fb2ab713": { "message": "Editor d''HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "He obtingut permís per utilitzar aquest fitxer."
   },
@@ -403,17 +391,12 @@ const locale = {
     "message": "Porció imaginària (d’un número complex)"
   },
   "in_element_of_19ca2f33": { "message": "A (un element de)" },
-  "increase_indent_6af90f7c": { "message": "Augmenta la sagnia" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
   "indigo_2035fc55": { "message": "Indi" },
   "inference_fed5c960": { "message": "Inferència" },
   "infinity_7a10f206": { "message": "Infinitat" },
   "insert_593145ef": { "message": "Insereix" },
-  "insert_equella_links_49a8dacd": { "message": "Insereix enllaços a Equella" },
   "insert_link_6dc23cae": { "message": "Insereix un enllaç" },
-  "insert_math_equation_57c6e767": {
-    "message": "Insereix una equació matemàtica"
-  },
   "integers_336344e1": { "message": "Números enters" },
   "intersection_cd4590e4": { "message": "Intersecció" },
   "invalid_entry_f7d2a0f5": { "message": "Entrada no vàlida." },
@@ -428,7 +411,6 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Icona d''arts lingüístiques" },
   "languages_icon_9d20539": { "message": "Icona d’idiomes" },
   "large_9c5e80e7": { "message": "Gran" },
-  "left_align_43d95491": { "message": "Alineació esquerra" },
   "left_angle_bracket_c87a6d07": { "message": "Parèntesi angular esquerre" },
   "left_arrow_4fde1a64": { "message": "Fletxa esquerra" },
   "left_arrow_with_hook_5bfcad93": { "message": "Fletxa esquerra amb ganxo" },
@@ -579,6 +561,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Paràgraf" },
   "parallel_d55d6e38": { "message": "Paral·lel" },
   "partial_derivative_4a9159df": { "message": "Parcial (derivat)" },
+  "paste_5963d1c1": { "message": "Enganxa" },
   "pentagon_17d82ea3": { "message": "Pentàgon" },
   "people_b4ebb13c": { "message": "Persones" },
   "percentage_34ab7c2c": { "message": "Percentatge" },
@@ -635,13 +618,9 @@ const locale = {
     "message": "Porció real (d’un número complex)"
   },
   "record_7c9448b": { "message": "Enregistra" },
-  "record_upload_media_5fdce166": {
-    "message": "Enregistra o penja l''element multimèdia"
-  },
   "red_8258edf3": { "message": "Vermell" },
   "relationships_6602af70": { "message": "Relacions" },
   "religion_icon_246e0be1": { "message": "Icona de religió" },
-  "remove_link_d1f2f4d0": { "message": "Elimina l''enllaç" },
   "replace_e61834a7": { "message": "Substitueix" },
   "reset_95a81614": { "message": "Restableix" },
   "resize_ec83d538": { "message": "Canvia la mida" },
@@ -657,7 +636,6 @@ const locale = {
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Àrea de text enriquit. Premeu ALT+0 per accedir a les dreceres de l’editor de contingut enriquit."
   },
-  "right_align_39e7a32a": { "message": "Alineació dreta" },
   "right_angle_bracket_d704e2d6": { "message": "Parèntesi angular dret" },
   "right_arrow_35e0eddf": { "message": "Fletxa dreta" },
   "right_arrow_with_hook_29d92d31": { "message": "Fletxa dreta amb ganxo" },
@@ -682,9 +660,6 @@ const locale = {
     "message": "Malauradament, no es pot accedir a l’editor de dades HTML processades amb el teclat. Accediu a l’editor de dades HTML sense processar aquí."
   },
   "save_11a80ec3": { "message": "Desa" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Icones de l’eina de creació d’icones desades"
-  },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Terme de cerca" },
@@ -701,10 +676,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Premeu Maj+O per obrir l''editor de dades HTML processades."
   },
-  "show_audio_options_b489926b": { "message": "Mostra les opcions de so" },
-  "show_image_options_1e2ecc6b": { "message": "Mostra les opcions d''imatge" },
-  "show_link_options_545338fd": { "message": "Mostra les opcions d''enllaç" },
-  "show_video_options_6ed3721a": { "message": "Mostra les opcions de vídeo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Imatge d’un sol color" },
@@ -751,7 +722,6 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "El succeïdor és igual que" },
   "sum_b0842d31": { "message": "Suma" },
   "superscript_8cb349a2": { "message": "Superíndex" },
-  "superscript_and_subscript_37f94a50": { "message": "Superíndex i subíndex" },
   "superset_c4db8a7a": { "message": "Superconjunt" },
   "superset_strict_c77dd6d2": { "message": "Superconjunt (estricte)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -846,13 +816,9 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Fletxa ascendent dreta en diagonal"
   },
-  "upload_document_253f0478": { "message": "Penja un document" },
   "upload_file_fd2361b8": { "message": "Penja el fitxer" },
   "upload_image_6120b609": { "message": "Penja una imatge" },
   "upload_media_ce31135a": { "message": "Penja l''element multimèdia" },
-  "upload_record_media_e4207d72": {
-    "message": "Penja o enregistra l''element multimèdia"
-  },
   "uploading_19e8a4e7": { "message": "S''està penjant" },
   "uppercase_delta_d4f4bc41": { "message": "Delta majúscula" },
   "uppercase_gamma_86f492e9": { "message": "Gamma majúscula" },
@@ -928,6 +894,9 @@ const locale = {
   },
   "view_title_description_67940918": {
     "message": "Mostra la descripció de { title }"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Mostra els recomptes de paraules i caràcters"
   },
   "white_87fa64fd": { "message": "Blanc" },
   "width_492fec76": { "message": "Amplada" },

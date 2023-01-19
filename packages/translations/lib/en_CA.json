@@ -1439,9 +1439,6 @@
     "next_month_749b1778": {
         "message": "Next Month"
     },
-    "next_page_d2a39853": {
-        "message": "Next Page"
-    },
     "no_changes_to_save_d29f6e91": {
         "message": "No changes to save."
     },
@@ -1465,9 +1462,6 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "No results found for { filterTerm }"
-    },
-    "no_results_found_for_term_1564c08e": {
-        "message": "No results found for { term }."
     },
     "none_3b5e34d2": {
         "message": "None"
@@ -1703,9 +1697,6 @@
     "previous_month_bb1e3c84": {
         "message": "Previous Month"
     },
-    "previous_page_928fc112": {
-        "message": "Previous Page"
-    },
     "prime_917ea60e": {
         "message": "Prime"
     },
@@ -1877,17 +1868,11 @@
     "search_280d00bd": {
         "message": "Search"
     },
-    "search_term_b2d2235": {
-        "message": "Search Term"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Select crop shape"
     },
     "select_language_7c93a900": {
         "message": "Select Language"
-    },
-    "selected_274ce24f": {
-        "message": "Selected"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Selected { linkFileName }"
@@ -2224,9 +2209,6 @@
     },
     "top_66e0adb6": {
         "message": "Top"
-    },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } results found, { numDisplayed } results currently displayed"
     },
     "tray_839df38a": {
         "message": "Tray"

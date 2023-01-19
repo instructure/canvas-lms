@@ -180,6 +180,7 @@ export default function UnreadCounts(props) {
       if (pollNowPassback)
         pollNowPassback(function (overrideCount) {
           if (typeof overrideCount === 'undefined') {
+            cleanup()
             poll(true)
           } else if (typeof overrideCount === 'number') {
             setUnreadCount(overrideCount)

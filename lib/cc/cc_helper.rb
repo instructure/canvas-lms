@@ -101,6 +101,7 @@ module CC
     EXTERNAL_CONTENT_FOLDER = "external_content"
     RESOURCE_LINK_FOLDER = "lti_resource_links"
     BLUEPRINT_SETTINGS = "blueprint.xml"
+    CONTEXT_INFO = "context.xml"
 
     def ims_date(date = nil, default = Time.now)
       CCHelper.ims_date(date, default)

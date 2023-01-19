@@ -25,13 +25,13 @@ module.exports = {
       {
         suiteName: 'Canvas RCE Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
-        outputName: 'canvas-rce-jest.xml'
-      }
-    ]
+        outputName: 'canvas-rce-jest.xml',
+      },
+    ],
   ],
   setupFilesAfterEnv: [
     '<rootDir>/jest/jest-setup-framework.js',
-    '<rootDir>/../../jest/stubInstUi.js'
+    '<rootDir>/../../jest/stubInstUi.js',
   ],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
@@ -43,7 +43,7 @@ module.exports = {
     // jest can't import css
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',
     // mock the tinymce-react Editor component
-    '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.js'
+    '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.js',
   },
 
   transform: {
@@ -54,7 +54,7 @@ module.exports = {
         presets: [
           ['@babel/preset-env'],
           ['@babel/preset-react', {}],
-          ['@babel/preset-typescript', {}]
+          ['@babel/preset-typescript', {}],
         ],
         plugins: [
           ['@babel/plugin-proposal-decorators', {legacy: true}],
@@ -62,11 +62,11 @@ module.exports = {
             '@instructure/babel-plugin-themeable-styles',
             {
               postcssrc: require('@instructure/ui-postcss-config')()(),
-              themeablerc: {}
-            }
-          ]
-        ]
-      }
-    ]
-  }
+              themeablerc: {},
+            },
+          ],
+        ],
+      },
+    ],
+  },
 }
