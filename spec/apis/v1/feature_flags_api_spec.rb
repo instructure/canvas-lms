@@ -206,6 +206,26 @@ describe "Feature Flags API", type: :request do
       end
     end
 
+    describe "shadow" do
+      before do
+        allow(Feature).to receive(:definitions).and_return({ "shadow_feature" => Feature.new(feature: "shadow_feature", applies_to: "Account", state: "allowed", shadow: true), })
+      end
+
+      it "shows shadow flag to a site admin user" do
+        json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_root_account.id}/features",
+                                { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param })
+        feature = json.find { |f| f["feature"] == "shadow_feature" }
+        expect(feature).to have_key("shadow")
+        expect(feature["shadow"]).to eq true
+      end
+
+      it "does not show shadow feature at all to a non-site-admin user" do
+        json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
+                                { controller: "feature_flags", action: "index", format: "json", account_id: t_root_account.to_param })
+        expect(json.find { |f| f["feature"] == "shadow_feature" }).to be_nil
+      end
+    end
+
     it "operates on a course" do
       allow(Feature).to receive(:definitions).and_return({
                                                            "granular_permissions_manage_courses" => granular_permissions_feature,

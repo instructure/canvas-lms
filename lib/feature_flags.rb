@@ -131,11 +131,12 @@ module FeatureFlags
 
   # find the feature flag setting that applies to this object
   # it may be defined on the object or inherited
-  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false)
+  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false, include_shadowed: true)
     feature = feature.to_s
     feature_def = Feature.definitions[feature]
     raise "no such feature - #{feature}" unless feature_def
     return nil unless feature_def.applies_to_object(self)
+    return nil if feature_def.shadow? && !include_shadowed
 
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
     return return_flag(feature_def, hide_inherited_enabled) unless feature_def.can_override? || feature_def.hidden?
