@@ -206,7 +206,7 @@ module InstFS
       s3_url = s3_client.config.endpoint.dup
       if s3_client.config.region == "us-east-1" &&
          s3_client.config.s3_us_east_1_regional_endpoint == "legacy"
-        s3_url.host = Aws::S3::Plugins::IADRegionalEndpoint.legacy_host(s3_url.host)
+        s3_url.host = s3_url.host.sub(".us-east-1", "")
       end
 
       body = {
