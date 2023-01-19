@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "api/html/track_tag"
+
 module Api
   module Html
     describe TrackTag do

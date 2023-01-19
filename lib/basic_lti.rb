@@ -19,3 +19,5 @@
 #
 module BasicLTI
 end
+
+require_dependency "basic_lti/basic_outcomes"

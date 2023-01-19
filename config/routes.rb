@@ -1225,7 +1225,6 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read/:item", action: :mark_submission_item_read, as: "#{context}_submission_mark_item_read"
-        put "#{context.pluralize}/:#{context}_id/submissions/bulk_mark_read", action: :mark_bulk_submissions_as_read, as: "#{context}_submissions_bulk_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_assessments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
@@ -1296,7 +1295,6 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/content_migrations/:id", action: :update, as: "#{context}_content_migration_update"
         get "#{context.pluralize}/:#{context}_id/content_migrations/:id/selective_data", action: :content_list, as: "#{context}_content_migration_selective_data"
       end
-      get "courses/:course_id/content_migrations/:id/asset_id_mapping", action: :asset_id_mapping
     end
 
     scope(controller: :migration_issues) do
@@ -1739,6 +1737,11 @@ CanvasRails::Application.routes.draw do
 
       get "accounts/:account_id/developer_keys", action: :index, as: "account_developer_keys"
       post "accounts/:account_id/developer_keys", action: :create
+    end
+
+    scope(controller: :internet_image) do
+      get "image_search", action: :image_search
+      post "image_selection/:id", action: :image_selection
     end
 
     scope(controller: :immersive_reader) do
@@ -2673,6 +2676,15 @@ CanvasRails::Application.routes.draw do
     end
     scope(controller: :disable_post_to_sis_api) do
       put "courses/:course_id/disable_post_to_sis", action: "disable_post_to_sis", as: :disable_post_to_sis_course_assignments
+    end
+  end
+
+  # New Quizzes Public Api
+  ApiRouteSet.draw(self, "/api/quiz/v1") do
+    scope(module: "new_quizzes") do
+      scope(controller: "quizzes_api") do
+        get "courses/:course_id/quizzes/:assignment_id", action: :show
+      end
     end
   end
 end

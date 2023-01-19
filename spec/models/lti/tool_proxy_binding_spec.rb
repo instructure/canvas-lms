@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "lti/tool_proxy_binding"
+
 module Lti
   describe ToolProxyBinding do
     let(:account) { Account.new }

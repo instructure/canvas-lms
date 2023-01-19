@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "sis"
+
 module SIS
   module CSV
     class CSVBaseImporter

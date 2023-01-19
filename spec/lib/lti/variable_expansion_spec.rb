@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "lti/variable_expansion"
+
 module Lti
   describe VariableExpansion do
     let(:klass) do

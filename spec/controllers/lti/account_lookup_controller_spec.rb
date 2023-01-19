@@ -20,6 +20,7 @@
 
 require_relative "ims/concerns/advantage_services_shared_context"
 require_relative "ims/concerns/lti_services_shared_examples"
+require_dependency "lti/public_jwk_controller"
 
 describe Lti::AccountLookupController do
   include WebMock::API

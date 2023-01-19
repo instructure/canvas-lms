@@ -19,6 +19,7 @@
 #
 
 require_relative "../../lti2_spec_helper"
+require_dependency "lti/message_controller"
 
 module Lti
   describe MessageController do

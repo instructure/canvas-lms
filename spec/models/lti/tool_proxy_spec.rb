@@ -19,6 +19,7 @@
 #
 
 require "lti2_spec_helper"
+require_dependency "lti/tool_proxy"
 
 module Lti
   describe ToolProxy do

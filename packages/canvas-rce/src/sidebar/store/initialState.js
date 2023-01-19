@@ -58,13 +58,8 @@ export default function (props = {}) {
     sortBy,
     all_files,
     canvasOrigin,
-    canvasUrl,
   } = props
   /* eslint-enable prefer-const */
-
-  if (!canvasOrigin) {
-    canvasOrigin = canvasUrl
-  }
 
   // normalize contextType (including in props)
   contextType = normalizeContextType(contextType)

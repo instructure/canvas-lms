@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require "spec_helper"
+require_dependency "services/submit_homework_service"
 
 module Services
   describe SubmitHomeworkService do

@@ -195,15 +195,7 @@ module AccountReports
 
       if InstFS.enabled?
         attachment = account_report.account.attachments.new
-        begin
-          retries ||= 0
-          Attachments::Storage.store_for_attachment(attachment, data)
-        rescue Timeout::Error
-          retries += 1
-          sleep 3 * retries
-          retry if retries < 3
-          raise
-        end
+        Attachments::Storage.store_for_attachment(attachment, data)
         attachment.display_name = filename
         attachment.filename = filename
         attachment.user = account_report.user

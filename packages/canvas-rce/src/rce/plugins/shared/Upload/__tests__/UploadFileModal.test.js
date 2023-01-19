@@ -36,7 +36,7 @@ describe('UploadFileModal', () => {
       },
       onSubmit: () => {},
       onDismiss: () => {},
-      panels: ['COMPUTER', 'URL'],
+      panels: ['COMPUTER', 'UNSPLASH', 'URL'],
       label: 'Upload Stuff',
       accept: '*/*',
     }
@@ -50,6 +50,7 @@ describe('UploadFileModal', () => {
 
     expect(getByText('Upload Stuff')).toBeInTheDocument()
     expect(getByText('Computer')).toBeInTheDocument()
+    expect(getByText('Unsplash')).toBeInTheDocument()
     expect(getByText('URL')).toBeInTheDocument()
   })
 
@@ -92,6 +93,10 @@ describe('UploadFileModal', () => {
       fireEvent.change(urlinput, {target: {value: 'http://example.com/'}})
       await waitFor(() => expect(getByText('Submit').closest('button').disabled).toBe(false))
     })
+
+    // IMO, testing the Unsplash panel is more effort than the value of the test,
+    // since it requires mocking the unsplash api + multiple interactions with
+    // the UI. If the Computer and URL panels behave OK, the Unsplash one will too.
   })
 
   describe('Image Attributes', () => {

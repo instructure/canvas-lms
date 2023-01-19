@@ -19,6 +19,7 @@
 #
 
 require_relative "../../api_spec_helper"
+require_dependency "lti/ims/authorization_controller"
 
 module Lti
   module IMS

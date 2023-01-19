@@ -19,6 +19,7 @@
 #
 require_relative "../lti2_api_spec_helper"
 require_relative "../../api_spec_helper"
+require_dependency "lti/ims/tool_proxy_controller"
 
 module Lti
   module IMS

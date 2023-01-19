@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "lti/membership_service_controller"
+
 module Lti
   describe MembershipServiceController do
     context "lti tool access", type: :request do

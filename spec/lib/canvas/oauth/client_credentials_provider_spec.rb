@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency "canvas/oauth/client_credentials_provider"
+
 module Canvas::OAuth
   describe ClientCredentialsProvider do
     let(:dev_key) { DeveloperKey.create! }

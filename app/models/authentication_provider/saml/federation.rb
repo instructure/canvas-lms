@@ -93,3 +93,8 @@ class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::M
     end
   end
 end
+
+# make sure to force these to eager load, otherwise we may try to iterate
+# all federations, but there won't be any
+require_dependency "authentication_provider/saml/in_common"
+require_dependency "authentication_provider/saml/uk_federation"

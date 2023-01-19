@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency "canvas/oauth/invalid_scope_error"
+
 describe Canvas::OAuth::InvalidScopeError do
   it "never localizes 'and'" do
     I18n.with_locale(:de) do

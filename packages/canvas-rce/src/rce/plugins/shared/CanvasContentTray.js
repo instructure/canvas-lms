@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
-import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
+import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -34,6 +34,7 @@ import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
 import {getIcon} from './linkUtils'
 import {LinkDisplay} from './LinkDisplay'
+import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
 
 /**
  * Returns the translated tray label
@@ -257,7 +258,7 @@ export default function CanvasContentTray(props) {
   const [placeholderText, setPlaceholderText] = useState(null)
   const Icon = getIcon(link?.type)
 
-  const {bridge, editor, mountNode, onTrayClosing} = {...props}
+  const {bridge, editor, onTrayClosing} = {...props}
 
   const handleDismissTray = useCallback(() => {
     // return focus to the RCE if focus was on this tray
@@ -452,7 +453,7 @@ export default function CanvasContentTray(props) {
             filterSettings.contentSubtype,
             contentProps.contextType
           )}
-          mountNode={mountNode}
+          mountNode={instuiPopupMountNode}
           open={isOpen}
           placement="end"
           size="regular"
@@ -501,7 +502,6 @@ export default function CanvasContentTray(props) {
                 )}
                 <Filter
                   {...filterSettings}
-                  mountNode={props.mountNode}
                   userContextType={props.contextType}
                   containingContextType={props.containingContext.contextType}
                   onChange={newFilter => {
@@ -587,7 +587,6 @@ export const trayPropTypes = shape(trayPropsMap)
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
   editor: shape({id: string}).isRequired,
-  mountNode: oneOfType([element, func]),
   onTrayClosing: func, // called with true when the tray starts closing, false once closed
   onEditClick: func,
   ...trayPropsMap,

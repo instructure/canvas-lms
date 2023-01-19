@@ -167,3 +167,5 @@ class UserObservationLink < ActiveRecord::Base
     end
   end
 end
+
+require_dependency "user_observer"

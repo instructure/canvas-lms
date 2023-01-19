@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "importers/attachment_importer"
+
 module Importers
   describe AttachmentImporter do
     describe "#process_migration", no_retry: true do

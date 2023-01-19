@@ -42,7 +42,6 @@ export interface FetchContextsActionParams {
   sortBy?: SortableColumn
   orderType?: OrderType
   contextIds?: string[]
-  afterFetch?: (contexts) => void
 }
 
 export enum Constants {
@@ -92,7 +91,6 @@ const thunkActions = {
     sortBy,
     orderType,
     contextIds,
-    afterFetch,
   }: FetchContextsActionParams): ThunkAction<void, StoreState, void, Action> => {
     return async function fetchPaceContextsThunk(dispatch, getState) {
       dispatch(createAction(Constants.SET_LOADING, true))
@@ -117,9 +115,6 @@ const thunkActions = {
           orderType,
         })
       )
-      if (afterFetch) {
-        afterFetch(response.pace_contexts)
-      }
     }
   },
   syncPublishingPaces: (restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {

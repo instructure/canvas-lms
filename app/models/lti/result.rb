@@ -32,8 +32,13 @@ class Lti::Result < ApplicationRecord
   validates :line_item, :user, presence: true
   validates :result_maximum, presence: true, unless: proc { |r| r.read_attribute(:result_score).blank? }
   validates :result_score, numericality: true, allow_nil: true
-  validates :result_maximum, numericality: true, allow_nil: true
-
+  validates :result_maximum, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validate do |result|
+    if result.result_maximum == 0 && line_item&.score_maximum != 0
+      result.errors.add :result_maximum, :invalid, message:
+        "cannot be zero if line item's maximum is not zero"
+    end
+  end
   validates :activity_progress,
             inclusion: { in: ACTIVITY_PROGRESS_TYPES },
             allow_nil: true
@@ -55,7 +60,7 @@ class Lti::Result < ApplicationRecord
   #
   # In the future it may be worthwhile to persist
   # the scaled score on the result in an after_save
-  # callback on submission. Doing so would require
+  # callback on submission. Doing so would reuquire
   # working out some performance issues.
   def scaled_result_score
     raw_result_score = read_attribute(:result_score)

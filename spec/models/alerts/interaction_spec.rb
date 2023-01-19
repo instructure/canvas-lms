@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "alerts/interaction"
+
 module Alerts
   describe Interaction do
     before :once do

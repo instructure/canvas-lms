@@ -44,6 +44,7 @@ export const AuthorInfo = props => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
+  const threadMode = props.threadMode
 
   return (
     <Responsive
@@ -55,14 +56,14 @@ export const AuthorInfo = props => {
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
-          avatarSize: props.threadMode ? 'small' : 'medium',
+          avatarSize: threadMode ? 'small' : 'medium',
         },
         desktop: {
-          authorNameTextSize: props.threadMode ? 'small' : 'medium',
-          timestampTextSize: props.threadMode ? 'x-small' : 'small',
+          authorNameTextSize: threadMode ? 'small' : 'medium',
+          timestampTextSize: threadMode ? 'x-small' : 'small',
           nameAndRoleDirection: 'row',
-          badgeMarginLeft: props.threadMode ? '-16px' : '-24px',
-          avatarSize: props.threadMode ? 'small' : 'medium',
+          badgeMarginLeft: threadMode ? '-16px' : '-24px',
+          avatarSize: threadMode ? 'small' : 'medium',
         },
         mobile: {
           authorNameTextSize: 'small',

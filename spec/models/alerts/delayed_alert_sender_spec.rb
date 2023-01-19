@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "alerts/delayed_alert_sender"
+
 module Alerts
   describe DelayedAlertSender do
     describe "scoped to unit" do

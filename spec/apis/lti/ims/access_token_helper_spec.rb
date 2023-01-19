@@ -19,6 +19,7 @@
 #
 
 require_relative "../lti2_api_spec_helper"
+require_dependency "lti/ims/access_token_helper"
 
 module Lti
   module IMS

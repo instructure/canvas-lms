@@ -20,13 +20,13 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
   IconMiniArrowDownLine,
   IconMiniArrowEndLine,
-  IconWarningBorderlessLine,
+  IconWarningLine,
   IconInfoLine,
 } from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
@@ -82,13 +82,6 @@ export const Module: React.FC<ComponentProps> = props => {
     )
   }
 
-  const compressionTipText = I18n.t(
-    'Due Dates are being compressed based on your start and end dates'
-  )
-  const timezoneTipText = I18n.t('Dates shown in Course Time Zone')
-  const daysTipText = I18n.t('Changing course pacing days may modify due dates')
-  const tipEvents = ['click', 'hover', 'focus']
-
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
@@ -100,35 +93,36 @@ export const Module: React.FC<ComponentProps> = props => {
         <Flex
           as="div"
           aria-labelledby="due-date-column-title"
-          alignItems="center"
+          alignItems="end"
           justifyItems="center"
           padding={headerPadding}
         >
+          <Tooltip
+            renderTip={I18n.t('Dates shown in Course Time Zone')}
+            placement="top"
+            on={['click', 'hover', 'focus']}
+          >
+            <View id="due-date-column-title" as="span" tabIndex="0">
+              {I18n.t('Due Date')}
+            </View>
+          </Tooltip>
           {props.compression > 0 && (
-            <Tooltip renderTip={compressionTipText} placement="top" on={tipEvents}>
-              <IconButton
-                withBorder={false}
-                withBackground={false}
-                size="small"
-                screenReaderLabel={I18n.t('Toggle due date compression tooltip')}
+            <Tooltip
+              renderTip={I18n.t('Due Dates are being compressed based on your start and end dates')}
+              placement="top"
+              on={['click', 'hover', 'focus']}
+            >
+              <View
+                data-testid="duedate-tooltip"
+                as="div"
+                margin="0 0 0 x-small"
+                tabIndex="0"
+                role="button"
               >
-                <IconWarningBorderlessLine color="error" title={I18n.t('warning')} />
-              </IconButton>
+                <IconWarningLine color="error" title={I18n.t('warning')} />
+              </View>
             </Tooltip>
           )}
-          <View id="due-date-column-title" as="span">
-            {I18n.t('Due Date')}
-          </View>
-          <Tooltip renderTip={timezoneTipText} placement="top" on={tipEvents}>
-            <IconButton
-              withBorder={false}
-              withBackground={false}
-              size="small"
-              screenReaderLabel={I18n.t('Toggle tooltip')}
-            >
-              <IconInfoLine />
-            </IconButton>
-          </Tooltip>
         </Flex>
       </ColHeader>
     )
@@ -219,22 +213,18 @@ export const Module: React.FC<ComponentProps> = props => {
                     <Flex
                       as="div"
                       aria-labelledby="days-column-title"
-                      alignItems="center"
+                      alignItems="end"
                       justifyItems="center"
                       padding={headerPadding}
                     >
-                      <View id="days-column-title" as="span">
-                        {I18n.t('Days')}
-                      </View>
-                      <Tooltip renderTip={daysTipText} placement="top" on={tipEvents}>
-                        <IconButton
-                          withBorder={false}
-                          withBackground={false}
-                          size="small"
-                          screenReaderLabel={I18n.t('Toggle tooltip')}
-                        >
-                          <IconInfoLine />
-                        </IconButton>
+                      <Tooltip
+                        renderTip={I18n.t('Changing course pacing days may modify due dates')}
+                        placement="top"
+                        on={['click', 'hover', 'focus']}
+                      >
+                        <View id="days-column-title" as="span" tabIndex="0">
+                          {I18n.t('Days')}
+                        </View>
                       </Tooltip>
                     </Flex>
                   </ColHeader>

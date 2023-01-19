@@ -222,6 +222,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         select_all_in_tiny(f("#wiki_page_body"))
 
+        f("##{rce_page_body_ifr_id}").click
         f("##{rce_page_body_ifr_id}").send_keys(:backspace)
 
         in_frame rce_page_body_ifr_id do
@@ -1588,124 +1589,8 @@ describe "RCE next tests", ignore_js_errors: true do
           expect((orig_height - new_height).abs).to be < 3
         end
       end
-
-      it "stil shows tinymce menus when in fullscreen" do
-        # ideally we'd do this test with multiple RCEs on the page
-        # but the setup effort isn't worth it.
-        visit_front_page_edit(@course)
-        full_screen_button.click
-        doc_btn = document_toolbar_menubutton
-        doc_btn.click
-        menu_id = doc_btn.attribute("aria-owns")
-        expect(f("##{menu_id}")).to be_displayed
-        exit_full_screen_button.click
-      end
     end
     # rubocop:enable Specs/NoSeleniumWebDriverWait
-
-    describe "CanvasContentTray" do
-      it "displays all its dropdowns" do
-        visit_front_page_edit(@course)
-
-        document_toolbar_menubutton.click
-        course_documents_toolbar_menuitem.click
-        expect(tray_container).to be_displayed
-
-        content_tray_content_type.click
-        expect(content_tray_content_type_links).to be_displayed
-        content_tray_content_type.click # close the dropdown
-
-        content_tray_content_subtype.click
-        expect(content_tray_content_subtype_images).to be_displayed
-        content_tray_content_subtype.click
-
-        content_tray_sort_by.click
-        expect(content_tray_sort_by_date_added).to be_displayed
-        content_tray_sort_by.click
-
-        exit_full_screen_menu_item.click
-      end
-
-      it "displays all its dropdowns in fullscreen" do
-        visit_front_page_edit(@course)
-
-        document_toolbar_menubutton.click
-        course_documents_toolbar_menuitem.click
-        expect(tray_container).to be_displayed
-        full_screen_button.click
-        wait_for_animations
-        expect(tray_container).to be_displayed
-
-        content_tray_content_type.click
-        expect(content_tray_content_type_links).to be_displayed
-        content_tray_content_type.click # close the dropdown
-
-        content_tray_content_subtype.click
-        expect(content_tray_content_subtype_images).to be_displayed
-        content_tray_content_subtype.click
-
-        content_tray_sort_by.click
-        expect(content_tray_sort_by_date_added).to be_displayed
-        content_tray_sort_by.click
-
-        exit_full_screen_menu_item.click
-      end
-    end
-
-    describe "selection management" do
-      it "restores selection on focus after being reset while blurred" do
-        visit_front_page_edit(@course)
-        insert_tiny_text("select me")
-
-        select_all_in_tiny(f("#wiki_page_body"))
-
-        expect(rce_selection_focus_offset).to be > 0
-
-        # Click outside the RCE and clear selection (simulate Cmd+F)
-        f("#wiki_page_body_statusbar").click
-        clear_rce_selection
-        expect(rce_selection_focus_offset).to be 0
-
-        # Click back into the iframe
-        f("#wiki_page_body_ifr").click
-
-        # Ensure the selection has been restored
-        expect(rce_selection_focus_offset).to be > 0
-      end
-
-      it "restores selection before creating a link", ignore_js_errors: true do
-        title = "test_page"
-        unpublished = false
-        edit_roles = "public"
-
-        create_wiki_page(title, unpublished, edit_roles)
-
-        visit_front_page_edit(@course)
-        insert_tiny_text("select me")
-
-        select_all_in_tiny(f("#wiki_page_body"))
-
-        expect(rce_selection_focus_offset).to be > 0
-
-        external_link_toolbar_menuitem.click
-        expect(insert_link_modal).to be_displayed
-
-        clear_rce_selection
-        expect(rce_selection_focus_offset).to be 0
-
-        f('input[name="linklink"]').send_keys("http://example.com/")
-        fj('[role="dialog"] button:contains("Done")').click
-
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body_anchor.attribute("href")).to eq "http://example.com/"
-          expect(wiki_body_anchor.text).to eq "select me"
-
-          # If the selection was restored, there will only be one paragraph
-          # If the selection wasn't restored, an additional paragraph will have been created.
-          expect(ff("#tinymce p").size).to be 1
-        end
-      end
-    end
   end
 end
 

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tinymce, {Editor} from 'tinymce'
 import bridge from '../../../bridge'
 import configureStore from '../../../sidebar/store/configureStore'
 import {get as getSession} from '../../../sidebar/actions/session'
@@ -25,13 +24,8 @@ import doFileUpload from '../shared/Upload/doFileUpload'
 import formatMessage from '../../../format-message'
 import {isAudioOrVideo, isImage} from '../shared/fileTypeUtils'
 import {showFlashAlert} from '../../../common/FlashAlert'
+import tinymce from 'tinymce'
 import {TsMigrationAny} from '../../../types/ts-migration'
-import {
-  TinyClipboardEvent,
-  TinyDragEvent,
-  RCEClipOrDragEvent,
-  isMicrosoftWordContentInEvent,
-} from '../shared/EventUtils'
 
 // assume that if there are multiple RCEs on the page,
 // they all talk to the same canvas
@@ -75,7 +69,7 @@ function initStore(initProps) {
 
 // if the context requires usage rights to publish a file
 // open the UI for that instead of automatically uploading
-function getUsageRights(ed: Editor, document: Document, theFile: File) {
+function getUsageRights(ed, document, theFile) {
   return doFileUpload(ed, document, {
     accept: theFile.type,
     panels: ['COMPUTER'],
@@ -90,37 +84,22 @@ function handleMultiFilePaste(_files) {
   } as TsMigrationAny)
 }
 
-function delegateToTiny(ed: Editor, event: RCEClipOrDragEvent) {
-  // delegate to tinymce and prevent infinite recursion
-  event.instructure_handled_already = true
-  ed.fire('paste', event as TinyClipboardEvent)
-}
-
-tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
+tinymce.PluginManager.add('instructure_paste', function (ed) {
   const store = initStore(bridge.trayProps.get(ed))
 
-  function handlePasteOrDrop(event: RCEClipOrDragEvent) {
+  function handlePasteOrDrop(event) {
     if (event.instructure_handled_already) return
-    const cbdata =
-      event.type === 'paste'
-        ? (event as TinyClipboardEvent).clipboardData
-        : (event as TinyDragEvent).dataTransfer
-    const files = cbdata?.files || []
-    const types = cbdata?.types || []
+    const cbdata = event.clipboardData || event.dataTransfer // paste || drop
+    const files = cbdata.files
+    const types = cbdata.types
 
     if (types.includes('Files')) {
+      event.preventDefault()
       if (files.length > 1) {
         handleMultiFilePaste(files)
         return
       }
-
-      if (isMicrosoftWordContentInEvent(event)) {
-        delegateToTiny(ed, event)
-        return
-      }
-
       // we're pasting a file
-      event.preventDefault()
       const file = files[0]
       if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
         return
@@ -165,7 +144,9 @@ tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
         })
       }
     } else {
-      delegateToTiny(ed, event)
+      // delegate to tinymce and prevent infinite recursion
+      event.instructure_handled_already = true
+      ed.fire('paste', event)
     }
   }
   ed.on('paste', handlePasteOrDrop)

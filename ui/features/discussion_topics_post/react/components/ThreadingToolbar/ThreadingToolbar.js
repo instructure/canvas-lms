@@ -48,7 +48,9 @@ export function ThreadingToolbar({...props}) {
         },
       }}
       render={(responsiveProps, matches) =>
-        (props.searchTerm || props.filter !== 'all') && !props.isIsolatedView ? (
+        (props.searchTerm || props.filter !== 'all') &&
+        (ENV.isolated_view || ENV.split_screen_view) &&
+        !props.isIsolatedView ? (
           <Link
             as="button"
             isWithinText={false}
@@ -61,13 +63,22 @@ export function ThreadingToolbar({...props}) {
                 ? props.discussionEntry._id
                 : null
 
-              props.onOpenIsolatedView(
-                props.filter === 'drafts' ? props.discussionEntry.isolatedEntryId : isolatedId,
-                props.discussionEntry.isolatedEntryId,
-                props.filter === 'drafts',
-                props.filter === 'drafts' ? null : relativeId,
-                props.filter === 'drafts' ? undefined : props.discussionEntry._id
-              )
+              if (props.filter === 'drafts') {
+                props.onOpenIsolatedView(
+                  props.discussionEntry.isolatedEntryId,
+                  props.discussionEntry.isolatedEntryId,
+                  props.filter === 'drafts',
+                  null
+                )
+              } else {
+                props.onOpenIsolatedView(
+                  isolatedId,
+                  props.discussionEntry.isolatedEntryId,
+                  props.filter === 'drafts',
+                  relativeId,
+                  props.discussionEntry._id
+                )
+              }
             }}
           >
             {props.filter === 'drafts' ? (

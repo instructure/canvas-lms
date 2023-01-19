@@ -153,7 +153,7 @@ describe('PaceContextsContent', () => {
     })
 
     it('filters results by search term', async () => {
-      const {findByText, queryByText, getByRole, getByPlaceholderText, getByText} = renderConnected(
+      const {findByText, queryByText, getByRole, getByPlaceholderText} = renderConnected(
         <PaceContent />
       )
       const searchInput = getByPlaceholderText('Search for sections')
@@ -167,7 +167,6 @@ describe('PaceContextsContent', () => {
       expect(queryByText('D-F')).not.toBeInTheDocument()
       expect(queryByText('G-K')).not.toBeInTheDocument()
       expect(queryByText('No results found')).not.toBeInTheDocument()
-      expect(getByText('Showing 1 result below')).toBeInTheDocument()
     })
 
     it("shows no results if there's no contexts for the search", async () => {
@@ -176,13 +175,12 @@ describe('PaceContextsContent', () => {
         JSON.stringify({pace_contexts: [], total_entries: 0}),
         {overwriteRoutes: true}
       )
-      const {findAllByText, getByText, getByPlaceholderText} = renderConnected(<PaceContent />)
+      const {findByText, getByText, getByPlaceholderText} = renderConnected(<PaceContent />)
       const searchInput = getByPlaceholderText('Search for sections')
       const searchButton = getByText('Search', {selector: 'button span'})
       fireEvent.change(searchInput, {target: {value: 'A'}})
       act(() => searchButton.click())
-      const noResults = await findAllByText('No results found')
-      expect(noResults.length).toBe(2) // no results label, SR-only alert
+      expect(await findByText('No results found')).toBeInTheDocument()
       expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 

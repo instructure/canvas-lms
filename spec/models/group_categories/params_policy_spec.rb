@@ -19,6 +19,7 @@
 
 require_relative "../../spec_helper"
 require_relative "../../support/boolean_translator"
+require_dependency "group_categories/params_policy"
 
 module GroupCategories
   MockGroupCategory = Struct.new(:name, :self_signup, :auto_leader,

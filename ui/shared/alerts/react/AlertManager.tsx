@@ -111,7 +111,7 @@ export default class AlertManager extends React.Component<
           <div
             key={this.state.key}
             style={{
-              left: '26%',
+              left: '300px',
               maxWidth: '1125px',
               position: 'fixed',
               right: '120px',

@@ -67,6 +67,26 @@ export const handleSubmit = (
       storeProps.startMediaUpload(tabContext, fileMetaData)
       break
     }
+    case 'UNSPLASH': {
+      const {unsplashData} = uploadData
+      source.pingbackUnsplash(unsplashData.id)
+      let editorHtml
+      if (displayAs !== 'link' && /image/.test(accept)) {
+        editorHtml = editor.dom.createHTML('img', {
+          src: unsplashData.url,
+          alt: altText || unsplashData.alt,
+          role: isDecorativeImage ? 'presentation' : undefined,
+        })
+      } else {
+        editorHtml = editor.dom.createHTML(
+          'a',
+          {href: unsplashData.url},
+          altText || unsplashData.url
+        )
+      }
+      editor.insertContent(editorHtml)
+      break
+    }
     case 'URL': {
       const {fileUrl} = uploadData
       let editorHtml
@@ -154,7 +174,7 @@ UploadFile.propTypes = {
   accept: oneOfType([arrayOf(string), string]),
   editor: object.isRequired,
   label: string.isRequired,
-  panels: arrayOf(oneOf(['COMPUTER', 'URL'])),
+  panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
   requireA11yAttributes: bool,
   trayProps: object,
   canvasOrigin: string,

@@ -19,6 +19,7 @@
 #
 
 require_relative "../../lti_1_3_spec_helper"
+require_dependency "lti/tool_configuration"
 
 module Lti
   describe ToolConfiguration do

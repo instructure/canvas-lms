@@ -19,6 +19,7 @@
 #
 
 require_relative "../../spec_helper"
+require_dependency "conditional_release/bounds_validations"
 
 module ConditionalRelease
   describe BoundsValidations do

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency "users/creation_notify_policy"
+
 module Users
   describe CreationNotifyPolicy do
     describe "#is_self_registration?" do

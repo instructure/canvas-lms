@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency "courses/teacher_student_mapper"
+
 module Courses
   describe TeacherStudentMapper do
     let(:teacher_id) { 1 }

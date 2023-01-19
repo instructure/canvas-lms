@@ -87,6 +87,8 @@ class ReportSnapshot < ActiveRecord::Base
     collection_type = Setting.get("usage_statistics_collection", "opt_out")
     return if collection_type == "opt_out"
 
+    require "lib/ssl_common"
+
     data = {
       "collection_type" => collection_type,
       "installation_uuid" => Canvas.installation_uuid,

@@ -22,15 +22,5 @@
   "rules": {
     "import/order": "off"
   },
-  "ignorePatterns": ["scripts/installTranslations.js", "**/translations/**/*.js"],
-  "overrides": [
-    {
-      "files": ["*.ts"],
-      "rules": {
-        // no-undef is not useful for typescript.
-        // See discussion: https://stackoverflow.com/questions/60743389/eslint-defined-global-extensions-still-not-defined-no-undef
-        "no-undef": "off"
-      }
-    }
-  ]
+  "ignorePatterns": ["scripts/installTranslations.js", "**/translations/**/*.js"]
 }

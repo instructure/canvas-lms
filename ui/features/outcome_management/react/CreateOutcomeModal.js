@@ -300,7 +300,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 onChangeMasteryPoints={setMasteryPoints}
                 canManage={true}
                 masteryInputRef={setMasteryPointsRef}
-                clearRatingsFocus={clearRatingsFocus}
               />
               <View as="div" minHeight="14rem">
                 <hr

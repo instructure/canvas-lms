@@ -307,23 +307,6 @@ module Context
     nil
   end
 
-  def self.api_type_name(klass)
-    case klass.to_s
-    when "Announcement"
-      "announcements"
-    when "Attachment"
-      "files"
-    when "ContextModule"
-      "modules"
-    when "ContentTag"
-      "module_items"
-    when "WikiPage"
-      "pages"
-    else
-      klass.table_name
-    end
-  end
-
   def self.asset_name(asset)
     name = asset.display_name.presence if asset.respond_to?(:display_name)
     name ||= asset.title.presence if asset.respond_to?(:title)

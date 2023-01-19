@@ -122,6 +122,26 @@ describe('UploadFile', () => {
   })
 
   describe('tab navigation', () => {
+    it('shows the Unsplash panel when the tab is clicked', async () => {
+      const {getByText, getByLabelText} = render(
+        <UploadFile
+          label="Test"
+          editor={fakeEditor}
+          trayProps={trayProps}
+          onDismiss={() => {}}
+          onSubmit={() => {}}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
+        />
+      )
+
+      const unsplashTab = getByText('Unsplash')
+      act(() => {
+        userEvent.click(unsplashTab)
+      })
+      const searchInput = await waitFor(() => getByLabelText('Search Term'))
+      expect(searchInput).toBeVisible()
+    })
+
     it('shows the URL panel when the tab is clicked', async () => {
       const {getByText, getByLabelText} = render(
         <UploadFile
@@ -130,7 +150,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           onSubmit={() => {}}
-          panels={['COMPUTER', 'URL']}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
         />
       )
 
@@ -150,7 +170,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           onSubmit={() => {}}
-          panels={['COMPUTER', 'URL']}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
         />
       )
 
@@ -170,7 +190,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           onSubmit={() => {}}
-          panels={['COMPUTER', 'URL']}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
         />
       )
 
@@ -180,14 +200,12 @@ describe('UploadFile', () => {
       })
       await waitFor(() => getByLabelText('URL'))
 
-      const computerTab = getByText('Computer')
+      const unsplashTab = getByText('Unsplash')
       act(() => {
-        userEvent.click(computerTab)
+        userEvent.click(unsplashTab)
       })
-      const fileDrop = await waitFor(() =>
-        getByText('Drag and drop, or click to browse your computer')
-      )
-      expect(fileDrop).toBeVisible()
+      const searchBox = await waitFor(() => getByLabelText('Search Term'))
+      expect(searchBox).toBeVisible()
     })
   })
 
@@ -353,6 +371,43 @@ describe('UploadFile', () => {
         })
       })
     })
+
+    describe('Unsplash Panel Selected', () => {
+      const fakeUnsplashData = {
+        id: '123abc',
+        url: 'http://instructure.com/img',
+        alt: 'fake',
+      }
+      it('calls source.pingbackUnsplash', () => {
+        const fakeSource = {
+          pingbackUnsplash: jest.fn(),
+        }
+        handleSubmit(
+          fakeEditor,
+          'images/*',
+          'UNSPLASH',
+          {unsplashData: fakeUnsplashData},
+          {},
+          fakeSource
+        )
+        expect(fakeSource.pingbackUnsplash).toHaveBeenCalledWith('123abc')
+      })
+
+      it('inserts an image tag with the proper URL and alt attributes', () => {
+        const fakeSource = {
+          pingbackUnsplash: () => {},
+        }
+        handleSubmit(
+          fakeEditor,
+          'images/*',
+          'UNSPLASH',
+          {unsplashData: fakeUnsplashData},
+          {},
+          fakeSource
+        )
+        expect(fakeEditor.content).toEqual('<img src="http://instructure.com/img" alt="fake" />')
+      })
+    })
   })
 
   describe('Disabled Submit', () => {
@@ -367,7 +422,7 @@ describe('UploadFile', () => {
           trayProps={trayProps}
           onDismiss={() => {}}
           onSubmit={fakeOnSubmit}
-          panels={['COMPUTER', 'URL']}
+          panels={['COMPUTER', 'URL', 'UNSPLASH']}
         />
       )
     })
@@ -394,6 +449,18 @@ describe('UploadFile', () => {
           fireEvent.keyDown(form, {keyCode: 13})
         })
         expect(fakeOnSubmit).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('Unsplash Panel', () => {
+      it('disables the submit button when there is no unsplash image chosen', () => {
+        const {getByText, getByLabelText} = renderReturnOptions
+        const unsplashTab = getByLabelText('Unsplash')
+        act(() => {
+          userEvent.click(unsplashTab)
+        })
+        const submitBtn = getByText('Submit').closest('button')
+        expect(submitBtn).toBeDisabled()
       })
     })
 

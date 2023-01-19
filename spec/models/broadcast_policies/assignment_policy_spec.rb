@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency "broadcast_policies/assignment_policy"
+
 module BroadcastPolicies
   describe AssignmentPolicy do
     let(:context) do

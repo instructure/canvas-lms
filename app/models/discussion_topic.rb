@@ -19,6 +19,9 @@
 
 require "atom"
 
+# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
+require_dependency "assignment_student_visibility"
+
 class DiscussionTopic < ActiveRecord::Base
   include Workflow
   include SendToStream

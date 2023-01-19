@@ -354,13 +354,4 @@ Rails.configuration.after_initialize do
         singleton: "Canvas::LiveEvents#heartbeat" }
     )
   end
-
-  Delayed::Periodic.cron "HealthChecks.send_to_statsd", "* * * * *" do
-    DatabaseServer.send_in_each_region(
-      HealthChecks,
-      :send_to_statsd,
-      { run_current_region_asynchronously: true,
-        singleton: "HealthChecks#send_to_statsd" }
-    )
-  end
 end

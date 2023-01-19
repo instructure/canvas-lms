@@ -231,7 +231,7 @@ class CoursePace < ActiveRecord::Base
     raise "Course pace is not deleted" unless deleted?
 
     grouped_paces_and_enrollments = student_enrollments.group_by do |enrollment|
-      student_section_ids = enrollment.user.student_enrollments.shard(shard).where(course: course).active.pluck(:course_section_id)
+      student_section_ids = enrollment.user.student_enrollments.where(course: course).where.not(workflow_state: "deleted").pluck(:course_section_id)
       pace = course.course_paces.published.where(course_section_id: student_section_ids).last
       pace || course.course_paces.published.primary.take
     end
@@ -276,7 +276,7 @@ class CoursePace < ActiveRecord::Base
           .where
           .not(course_section_id: course_section_course_pace_section_ids)
       end
-    @student_enrollments.active
+    @student_enrollments.where.not(workflow_state: "deleted")
   end
 
   def start_date(with_context: false)
@@ -305,15 +305,6 @@ class CoursePace < ActiveRecord::Base
     self[:end_date]&.in_time_zone(course.time_zone)
   end
 
-  def individual_pace_end_date
-    student_enrollment = user.student_enrollments.shard(shard).where(course: course).active.order(created_at: :desc).take
-    course_section_paces = course.course_paces.not_deleted.section_paces.preload(:course_section)
-    applied_section_pace = course_section_paces.find_by(course_section_id: student_enrollment.course_section_id)
-    return student_enrollment.course_section.end_at if applied_section_pace&.course_section_id
-
-    nil
-  end
-
   def effective_end_date(with_context: false)
     valid_date_range = CourseDateRange.new(course)
     range_end = valid_date_range.end_at[:date]
@@ -327,15 +318,8 @@ class CoursePace < ActiveRecord::Base
 
     is_student_plan = course.student_enrollments.find_by(user_id: user_id).present? if user_id
 
-    date = if hard_end_dates
-             self[:end_date]
-           elsif is_student_plan
-             individual_pace_end_date
-           else
-             course_section&.end_at
-           end
+    date = ((is_student_plan || hard_end_dates) && self[:end_date]) || course_section&.end_at || range_end
 
-    date ||= range_end
     date = date&.to_date
 
     if with_context

@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_dependency "importers"
+
 module Importers
   class CourseContentImporter < Importer
     self.item_class = Course
+    Importers.register_content_importer(self)
 
     def self.process_migration_files(data, migration)
       data["all_files_export"] ||= {}
@@ -100,7 +103,6 @@ module Importers
         ActiveRecord::Base.skip_touch_context
 
         unless migration.for_course_copy?
-          migration.find_source_course_for_import if migration.canvas_import?
           Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
           Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
           # These only need to be processed once

@@ -19,6 +19,7 @@
 #
 
 require_relative "../../conditional_release_spec_helper"
+require_dependency "conditional_release/assignment_set"
 
 module ConditionalRelease
   describe AssignmentSet, type: :model do
