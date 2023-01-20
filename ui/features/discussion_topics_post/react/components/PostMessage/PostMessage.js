@@ -42,13 +42,13 @@ export function PostMessage({...props}) {
       props={{
         mobile: {
           titleMargin: '0',
-          titleTextSize: 'medium',
+          titleTextSize: 'small',
           titleTextWeight: 'bold',
           messageTextSize: 'fontSizeSmall',
         },
         desktop: {
           titleMargin: props.threadMode ? '0' : '0 0 small 0',
-          titleTextSize: props.threadMode ? 'medium' : 'x-large',
+          titleTextSize: 'medium',
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
         },

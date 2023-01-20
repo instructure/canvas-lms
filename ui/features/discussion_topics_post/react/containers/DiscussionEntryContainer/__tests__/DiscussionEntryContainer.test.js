@@ -122,7 +122,7 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the reply info', () => {
       const container = setup(defaultProps())
-      expect(container.getAllByText('24 replies, 4 unread').length).toBe(2)
+      expect(container.getAllByText('24 Replies, 4 Unread').length).toBe(2)
     })
 
     it('should render the created timestamp', () => {
