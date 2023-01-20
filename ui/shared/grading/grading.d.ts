@@ -158,13 +158,15 @@ export type CamelizedGradingPeriod = {
 }
 
 export type CamelizedGradingPeriodSet = {
-  id: string
-  gradingPeriods: CamelizedGradingPeriod[]
-  displayTotalsForAllGradingPeriods: boolean
-  weighted: boolean
-  title: string
-  enrollmentTermIDs?: string[]
   createdAt: Date
+  displayTotalsForAllGradingPeriods: boolean
+  enrollmentTermIDs?: string[]
+  gradingPeriods: CamelizedGradingPeriod[]
+  id: string
+  isClosed?: boolean
+  permissions: unknown
+  title: string
+  weighted: boolean
 }
 
 export type CamelizedAssignment = {
