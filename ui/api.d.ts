@@ -392,11 +392,17 @@ export type GradingPeriodSet = Readonly<{
   course_id: null | string
   created_at: string
   display_totals_for_all_grading_periods: boolean
+  enrollment_term_ids: string[]
   grading_periods: GradingPeriod[]
   id: string
+  permissions: unknown
   root_account_id: string
   title: string
   updated_at: string
   weighted: boolean
   workflow_state: WorkflowState
 }>
+
+export type GradingPeriodSetGroup = {
+  grading_period_sets: GradingPeriodSet[]
+}
