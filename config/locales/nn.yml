@@ -12584,6 +12584,7 @@ nn:
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Dersom ingen er vald, vis til alle i heile underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Dersom ingen er markert viser du til alle som høyrer til kontoen)"
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: "Dersom eit eller alle løyve er skrudd av, kan brukarar framleis sjå og laste ned filer til ei zip-fil."
+  if_provided_this_name_will_be_used_in_preference_t_4079100a: "Dersom satt, vil dette namnet bli brukt i staden for emnets opprinnelege namn på dashbordet og i varsel."
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Dersom forbetringane av den nye teksteditoren òg er aktivert,
       vil editoren autolagre innhaldet ditt mens du arbeider
@@ -12639,6 +12640,8 @@ nn:
       Dersom dette løyvet er slått på, er det ikkje naudsynt å slå på 'SIS-data - les'. Løyvet på kontonivå overstyrer løyvet på emnenivå. For å hindre at brukarar kan administrere SIS-ID-ar på emnenivå, må både 'SIS-data - administrer' og SIS-data - les' vere slått av.
       For å legge til brukarar på emne via SIS-ID, må 'Brukarar - legg til / fjern studentar frå emne' og/eller 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emne' òg vere slått på.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Dersom dette løyvet er skrudd på, treng ikkje brukarar at SIS Data - les løyvet er aktivert. Kontoløyvet overstyrer emneløyvet,"
+  if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Dersom dette løyvet ikkje er skrudd på kan brukarar sjå deira eigne spørsmålsbankar, samt spørsmålsbankar delt av ein annan brukar eller som kjem frå eit emne dei er faglærar i."
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Dersom denne innstillingen og Diskusjonar - sjå er skrudd på, kan brukaren framleis justere låseinnstillingane for Blueprint-innhald på individuelle diskusjonar i eit Blueprint-masteremne."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Hvis sant, nyttast den serialiserte innsendinga for submitted_at-dato"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Dersom 'Brukarar - administrer innloggingsdetaljar' eller 'Statistikk - vis' er slått på, vil ein brukar kunne generere inn-/utloggingsaktivitet i administrasjonsverktøy. For å skjule valet for inn-/utloggingsaktivitet i administrasjonsverktøy, må begge løyva vere slått av."
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "Dersom «Brukarar - administrer innloggingsdetaljer» eller «Statistikk - vis» er aktiverte vil brukaren kunne generere inn-/utloggingsaktivitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse løyva være skrudd av."
@@ -13081,8 +13084,13 @@ nn:
   isolated_entry_post_error_page_2a447d08: "Isolert Entry Post feilside"
   isolated_entry_query_error_f0bfae18: "Isolert Entry spørringsfeil"
   israel_972_e671df75: "Israel (+972)"
+  it_divides_students_into_three_groups_based_on_the_1a107f5b: "\n\
+      \x20       Det deler studenter inn i tre grupper basert på resultatet dei fekk på heile\n\
+      \x20       quizen og viser desse gruppene avhengig av kven som svarte korrekt på spørsmålet.\n\
+      \x20     "
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Det ser ut som om du har ei ugyldig e-postadresse: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som innhaldet ditt ikkje lastar. Du kan bruke denne knappen og prøve å sende det til ei ny fane."
+  it_may_take_some_time_for_placement_availability_t_9ee07437: "Det kan ta litt tid før endringane av plasseringstilgjengeligheit kjem til syne. Du kan også tømme hurtigminne og ta ein \"hard refresh\" på sider kor du forventer plasseringer å forandre seg."
   it_s_not_allowed_to_redirect_to_html_files_that_ca_1dbdfb9d: "Det er ikkje lov å vidaresende HTML-filer som ikkje kan mellomlagrast medan kontroll av innhaldstryggleik er i gang"
   it_s_ok_to_leave_this_page_we_ll_email_you_when_th_2dbed7fa: "Det er greit å forlate denne sida, vi sender en epost når importeringa er ferdig."
   it_took_too_long_to_login_please_try_again_c1ed2e28: "Det tok for lang tid å logge inn. Prøv på nytt seinare"
@@ -13616,6 +13624,7 @@ nn:
   loading_collaborations_e6c5f262: "Lastar samarbeid"
   loading_comment_library_3131e5c6: "Lastar bibliotek av kommentarar"
   loading_comments_32366acf: "Lastar kommentarar"
+  loading_compose_modal_f6da0e8b: "Lastar skrivemodal"
   loading_conversation_messages_71e9050e: "Lastar samtalemeldingar"
   loading_courses_409a3641: "Lastar emne"
   loading_courses_bd1bffe: "Lastar emne... "
@@ -16350,6 +16359,7 @@ nn:
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes Konto og Spørsmålsbank på emnenivå"
   new_quizzes_assignment_build_button_72b6531a: "Nye quizar-oppgåver bygg-knapp"
   new_quizzes_banks_migrations_9ab4de4a: "Nye quizar migrering av bankar"
+  new_quizzes_build_button_on_list_views_62c7c0e8: "Lag New Quizzes -knapp på listevisningar"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes importerer"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av nye quizar under import/kopiering av emne"
@@ -23426,7 +23436,7 @@ nn:
   the_course_to_report_on_91a9721d: "Emnet som rapporten gjeld for"
   the_course_to_report_on_b72d0409: "Emnet det skal rapporterast om"
   the_course_to_report_on_defaults_to_canvas_id_unle_9e1d8f79: "Emnet som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i course_id_type"
-  the_courses_delete_permission_affects_viewing_the__b8744b4c: "Løyve for Emne - slett påverkar om ein ser knappen for Slett dette emnet permanent, som kun visast for emne som er oppretta manuelt"
+  the_courses_delete_permission_affects_viewing_the__b8744b4c: "Løyve for Emne - slett påverkar om ein ser knappen for Slett dette emnet permanent, som berre vert vist for emne som er oppretta manuelt"
   the_courses_publish_permission_allows_the_user_to__30694e34: "Løyve for Emne - pubiser lar brukaren publisere emne som ikkje inneheld modular. For å publisere/avpublisere modulinnhald så må løyve for Emne Innhald - legg til/rediger/slett være slått på"
   the_courses_reset_permission_resets_course_content_921321c3: "Løyve for Emne - Tilbakestill tilbakestiller innhald i emne både for manuelt oppretta emne og emne som har SIS (for emne som har SIS så gjeld ikkje løyve for SIS Data - administrer)"
   the_date_entered_is_invalid_4503a477: "Ugyldig dato"
@@ -23434,7 +23444,7 @@ nn:
   the_date_is_not_valid_b6285fb5: "Datoen er ikkje gyldig."
   the_default_report_only_includes_course_section_da_729092f0: "Standardrapporten inkluderer kun emne-/seksjons-datoar dersom ein avgrensa påmeldingsperiode finst. "
   the_discussion_entry_was_successfully_created_7cddf67b: "Diskusjonsinnlegget vart laga"
-  the_discussion_topic_was_successfully_deleted_d8b93b70: "Diskusjonsemne vart sletta."
+  the_discussion_topic_was_successfully_deleted_d8b93b70: "Diskusjonsemnet vart sletta."
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       Nedlastingsprosessen har starta. Dette
       kan ta litt tid for store emne. Du kan forlate
@@ -23501,7 +23511,7 @@ nn:
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Det oppstarta verktøyet returnerte ein ugyldig ressurs for denne oppgåva"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Lenka du har brukt er utgått. Klikk \"Gløymd passord?\" for å få ei ny lenke for å tilbakestille passord."
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "Lista nedanfor viser innhald som er delt med deg. Du kan førehandsvise innhald, importere det til emnet ditt, eller fjerne det frå lista. "
-  the_login_login_is_currently_suspended_and_will_no_472b19e9: "Innlogginga %{login} vart suspendert og vill ikkje gje tilgang til Canvas"
+  the_login_login_is_currently_suspended_and_will_no_472b19e9: "Innlogginga %{login} er for tida suspendert og vil ikkje gi tilgang til Canvas"
   the_lti_tool_was_deleted_on_3727da23: "LTI-verktøyet vart sletta"
   the_lti_user_was_deleted_2a3b796f: "LTI brukaren vart sletta"
   the_material_is_in_the_public_domain_279c39a3: "Materialet er ikkje opphavsrettbeskytta"
@@ -23512,7 +23522,7 @@ nn:
   the_media_id_does_not_correspond_to_an_existing_me_eab16c08: "%{media_id} er ikkje i samsvar med eksisterande mediaobjekt"
   the_media_object_id_must_match_an_existing_media_o_62195fef: "media_object_id må være lik eit eksisterande meidaobjekt"
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      Meldinga med tittelen "%{subject}" kan ikkje leverast fordi diskusjonsemnet er sletta. Om du vil prøve å kontakte nokon gjennom Canvas, kan du logge deg på kontoen din og sende ei melding ved å bruke Innboksen.
+      Meldinga med tittelen "%{subject}" kan ikkje leverast fordi diskusjonsemnet er sletta. Om du prøver å kontakte nokon gjennom Canvas, kan du logge deg på kontoen din og sende ei melding ved å bruke Innboksen.
       
       Takk,
       Canvas brukarstøtte
