@@ -81,7 +81,7 @@ export const DiscussionEntryContainer = props => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
 
-  const threadMode = props.discussionEntry?.depth > 1 && !searchTerm
+  const threadMode = (props.discussionEntry?.depth > 1 && !searchTerm) || props.threadParent
 
   return (
     <Responsive
@@ -250,6 +250,7 @@ DiscussionEntryContainer.propTypes = {
   lastReplyAtDisplay: PropTypes.string,
   deleted: PropTypes.bool,
   isTopicAuthor: PropTypes.bool,
+  threadParent: PropTypes.bool,
   updateDraftCache: PropTypes.func,
   quotedEntry: PropTypes.object,
   attachment: Attachment.shape,
@@ -257,4 +258,5 @@ DiscussionEntryContainer.propTypes = {
 
 DiscussionEntryContainer.defaultProps = {
   deleted: false,
+  threadParent: false,
 }

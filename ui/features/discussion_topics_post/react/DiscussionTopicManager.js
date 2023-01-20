@@ -343,7 +343,7 @@ const DiscussionTopicManager = props => {
               viewPortWidth: '100vw',
             },
             desktop: {
-              viewPortWidth: '50vw',
+              viewPortWidth: '480px',
             },
           }}
           render={responsiveProps => {

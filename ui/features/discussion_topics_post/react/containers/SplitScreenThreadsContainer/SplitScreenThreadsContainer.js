@@ -111,7 +111,7 @@ export const SplitScreenThreadsContainer = props => {
   }
 
   return (
-    <View data-testid="split-screen-view-children">
+    <View data-testid="split-screen-view-children" padding="small small 0 small">
       {props.hasMoreOlderReplies && (
         <View as="div" padding="0 0 small medium">
           <ShowMoreRepliesButton
@@ -320,7 +320,7 @@ const SplitScreenThreadContainer = props => {
           padding: 'x-small',
         },
         desktop: {
-          padding: 'x-small medium',
+          padding: 'x-small',
         },
       }}
       render={responsiveProps => (
