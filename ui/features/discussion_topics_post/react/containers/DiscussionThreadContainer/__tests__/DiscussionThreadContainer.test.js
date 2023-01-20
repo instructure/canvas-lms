@@ -342,7 +342,7 @@ describe('DiscussionThreadContainer', () => {
           },
         })
       )
-      expect(getAllByText('1 reply, 1 unread').length).toBe(2)
+      expect(getAllByText('1 Reply, 1 Unread').length).toBe(2)
     })
 
     it('pluralizes replies message correctly when there are multiple replies', () => {
@@ -351,7 +351,7 @@ describe('DiscussionThreadContainer', () => {
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}},
         })
       )
-      expect(getAllByText('2 replies, 1 unread')).toBeTruthy()
+      expect(getAllByText('2 Replies, 1 Unread')).toBeTruthy()
     })
 
     it('does not display unread count if it is 0', () => {
@@ -360,8 +360,8 @@ describe('DiscussionThreadContainer', () => {
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}},
         })
       )
-      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
-      expect(queryAllByText('2 replies').length).toBe(2)
+      expect(queryAllByText('2 Replies, 0 Unread').length).toBe(0)
+      expect(queryAllByText('2 Replies').length).toBe(2)
     })
   })
 

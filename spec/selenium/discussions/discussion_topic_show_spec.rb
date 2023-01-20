@@ -153,7 +153,7 @@ describe "Discussion Topic Show" do
         end
 
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        fj("button:contains('6 replies')").click
+        fj("button:contains('6 Replies')").click
         wait_for_ajaximations
         fj("button:contains('Show older replies')").click
         wait_for_ajaximations
