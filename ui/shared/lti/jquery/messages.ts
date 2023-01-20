@@ -46,9 +46,12 @@ const SUBJECT_ALLOW_LIST = [
   'lti.setUnloadMessage',
   'lti.showAlert',
   'lti.showModuleNavigation',
-  'org.imsglobal.lti.capabilities',
-  'org.imsglobal.lti.get_data',
-  'org.imsglobal.lti.put_data',
+  'org.imsglobal.lti.capabilities', // not part of the final LTI Platform Storage spec
+  'org.imsglobal.lti.get_data', // not part of the final LTI Platform Storage spec
+  'org.imsglobal.lti.put_data', // not part of the final LTI Platform Storage spec
+  'lti.capabilities',
+  'lti.get_data',
+  'lti.put_data',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu',
 ] as const
@@ -112,9 +115,12 @@ const handlers: Record<
   'lti.setUnloadMessage': () => import(`./subjects/lti.setUnloadMessage`),
   'lti.showAlert': () => import(`./subjects/lti.showAlert`),
   'lti.showModuleNavigation': () => import(`./subjects/lti.showModuleNavigation`),
-  'org.imsglobal.lti.capabilities': () => import(`./subjects/org.imsglobal.lti.capabilities`),
-  'org.imsglobal.lti.get_data': () => import(`./subjects/org.imsglobal.lti.get_data`),
-  'org.imsglobal.lti.put_data': () => import(`./subjects/org.imsglobal.lti.put_data`),
+  'org.imsglobal.lti.capabilities': () => import(`./subjects/lti.capabilities`),
+  'org.imsglobal.lti.get_data': () => import(`./subjects/lti.get_data`),
+  'org.imsglobal.lti.put_data': () => import(`./subjects/lti.put_data`),
+  'lti.capabilities': () => import(`./subjects/lti.capabilities`),
+  'lti.get_data': () => import(`./subjects/lti.get_data`),
+  'lti.put_data': () => import(`./subjects/lti.put_data`),
   requestFullWindowLaunch: () => import(`./subjects/requestFullWindowLaunch`),
   toggleCourseNavigationMenu: () => import(`./subjects/toggleCourseNavigationMenu`),
 }
@@ -124,7 +130,10 @@ const handlers: Record<
  * @param e
  * @returns
  */
-async function ltiMessageHandler(e: MessageEvent<unknown>) {
+async function ltiMessageHandler(
+  e: MessageEvent<unknown>,
+  platformStorageFeatureFlag: boolean = false
+) {
   if (isDevtoolMessageData(e.data)) {
     return false
   }
@@ -158,6 +167,9 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
     // These messages are handled elsewhere
     return false
   } else if (!isAllowedSubject(subject)) {
+    responseMessages.sendUnsupportedSubjectError()
+    return false
+  } else if (platformStorageFeatureFlag && subject.includes('org.imsglobal.')) {
     responseMessages.sendUnsupportedSubjectError()
     return false
   } else {
@@ -209,8 +221,9 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
 let hasListener = false
 
 function monitorLtiMessages() {
+  const platformStorageFeatureFlag: boolean = ENV?.FEATURES?.lti_platform_storage || false
   const cb = (e: MessageEvent<unknown>) => {
-    if (e.data !== '') ltiMessageHandler(e)
+    if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
   }
   if (!hasListener) {
     window.addEventListener('message', cb)

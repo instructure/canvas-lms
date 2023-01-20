@@ -21,9 +21,9 @@ import {SUBJECT_ALLOW_LIST} from '../messages'
 
 const handler: LtiMessageHandler<unknown> = ({responseMessages}) => {
   const useFrame = ENV?.FEATURES?.lti_platform_storage
-  const imsSubjects = ['org.imsglobal.lti.get_data', 'org.imsglobal.lti.put_data']
+
   const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
-    if (imsSubjects.includes(subject) && useFrame) {
+    if (['lti.get_data', 'lti.put_data'].includes(subject) && useFrame) {
       return {
         subject,
         frame: 'post_message_forwarding',
