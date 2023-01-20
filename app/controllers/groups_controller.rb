@@ -897,7 +897,7 @@ class GroupsController < ApplicationController
   def activity_stream_summary
     get_context
     if authorized_action(@context, @current_user, :read)
-      api_render_stream_summary([@context])
+      api_render_stream_summary(contexts: [@context])
     end
   end
 

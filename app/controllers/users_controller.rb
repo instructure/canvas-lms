@@ -821,6 +821,8 @@ class UsersController < ApplicationController
 
   # @API Activity stream summary
   # Returns a summary of the current user's global activity stream.
+  # @argument only_active_courses [Boolean]
+  #   If true, will only return objects for courses the user is actively participating in
   #
   # @example_response
   #   [
@@ -837,7 +839,9 @@ class UsersController < ApplicationController
   #   ]
   def activity_stream_summary
     if @current_user
-      api_render_stream_summary
+      opts = {}
+      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
+      api_render_stream_summary(opts)
     else
       render_unauthorize_action
     end
