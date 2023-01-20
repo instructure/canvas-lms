@@ -71,6 +71,7 @@ const SUBJECT_IGNORE_LIST = [
   MENTIONS_INPUT_CHANGE_MESSAGE,
   MENTIONS_SELECTION_MESSAGE,
   'betterchat.is_mini_chat',
+  'defaultToolContentReady',
 ] as const
 
 const isObject = (u: unknown): u is object => {
