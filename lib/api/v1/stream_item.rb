@@ -171,12 +171,12 @@ module Api::V1::StreamItem
     filtered_ids
   end
 
-  def api_render_stream_summary(contexts = nil)
+  def api_render_stream_summary(opts)
     items = []
 
     GuardRail.activate(:secondary) do
       @current_user.shard.activate do
-        base_scope = @current_user.visible_stream_item_instances(contexts: contexts).joins(:stream_item)
+        base_scope = @current_user.visible_stream_item_instances(opts).joins(:stream_item)
 
         full_counts = base_scope.except(:order).group("stream_items.asset_type", "stream_items.notification_category",
                                                       "stream_item_instances.workflow_state").count
@@ -205,7 +205,7 @@ module Api::V1::StreamItem
           total_counts[new_key] += count
         end
 
-        cross_shard_totals, cross_shard_unreads = cross_shard_stream_item_counts(contexts)
+        cross_shard_totals, cross_shard_unreads = cross_shard_stream_item_counts(opts)
         cross_shard_totals.each do |k, v|
           total_counts[k] ||= 0
           total_counts[k] += v
@@ -226,14 +226,14 @@ module Api::V1::StreamItem
     render json: items
   end
 
-  def cross_shard_stream_item_counts(contexts)
+  def cross_shard_stream_item_counts(opts)
     total_counts = {}
     unread_counts = {}
     # handle cross-shard stream items -________-
-    stream_item_ids = @current_user.visible_stream_item_instances(contexts: contexts)
+    stream_item_ids = @current_user.visible_stream_item_instances(opts)
                                    .where("stream_item_id > ?", Shard::IDS_PER_SHARD).pluck(:stream_item_id)
     if stream_item_ids.any?
-      unread_stream_item_ids = @current_user.visible_stream_item_instances(contexts: contexts)
+      unread_stream_item_ids = @current_user.visible_stream_item_instances(opts)
                                             .where("stream_item_id > ?", Shard::IDS_PER_SHARD)
                                             .where(workflow_state: "unread").pluck(:stream_item_id)
 
