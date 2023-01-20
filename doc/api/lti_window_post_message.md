@@ -13,6 +13,8 @@ Some of these message handlers require the presence of a `token`, which identifi
 This token is present in the launch as a custom variable, `$com.instructure.PostMessageToken`, and
 should be passed in postMessage calls if it's present.
 
+### Message Recipient
+
 If the LTI tool is launched in a iframe, as is most common, then postMessages should be sent to
 `window.top`. Usually `window.parent` should suffice, but there are some situations where that may
 not refer to the Canvas window. `window.top` refers to the topmost parent window, which should always
@@ -20,43 +22,59 @@ be Canvas. However, if the tool is launched in a new tab, window, or popup, then
 should be directed to `window.opener`. The examples will use `window.top`, but in practice it's best
 to use `window.top || window.opener`.
 
+The LTI Platform Storage messages (`lti.get_data` and `lti.put_data`) should be sent to either the
+direct parent frame, or to a named frame that will be present in `window.parent.frames`. If this
+named frame is present, it will be returned in the `lti.capabilities.response` message and
+also present in the `lti_storage_target` body parameter in the LTI 1.3 Login and Launch requests.
+This is also defined in the [Platform Storage spec](https://www.imsglobal.org/spec/lti-cs-pm/v0p1#target-frame).
+
+### Message Responses
+
 Most message handlers will respond with a postMessage with a subject that matches the intial subject,
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
 
 # Message Types
 
-## org.imsglobal.lti.capabilities
+## lti.capabilities
 
 **Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of August 2022, and so the specifics of this message are subject to change.**
+**as of January 2023, and so the specifics of this message are subject to change.**
+
+**At one point, this message type was named 'org.imsglobal.lti.capabilities', but the prefix**
+**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
 
 Responds with a list of subjects that Canvas will respond to, and if necessary the named
-frame to address each subject to. Part of the LTI Platform Storage spec.
+frame to address each subject to. Part of the LTI Platform Storage spec, defined
+[here](https://www.imsglobal.org/spec/lti-cs-pm/v0p1#capabilities-request-postmessage).
 
 **Required properties:**
 
-- subject: "org.imsglobal.lti.capabilities"
+- subject: "lti.capabilities"
 
 Returning postMessage includes the following properties:
 
-- subject: "org.imsglobal.lti.capabilities"
+- subject: "lti.capabilities"
 - supported_messages: array of supported message types with these properties:
   - subject: the string name of each message type
   - frame: (optional) the named frame on the parent window to which postMessages should be sent
 
 ```js
-window.top.postMessage({subject: 'org.imsglobal.lti.capabilities'}, '*')
+window.top.postMessage({subject: 'lti.capabilities'}, '*')
 ```
 
-## org.imsglobal.lti.put_data
+## lti.put_data
 
 **Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of August 2022, and so the specifics of this message are subject to change.**
+**as of January 2023, and so the specifics of this message are subject to change.**
+
+**At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
+**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
 
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
-only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec.
+only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec,
+defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
 (which for Canvas means the `iss`, `canvas.instructure.com`). Currently, Canvas does not yet
@@ -64,7 +82,7 @@ support this use case, and the wildcard origin `*` should still be used.
 
 **Required properties:**
 
-- subject: "org.imsglobal.lti.put_data"
+- subject: "lti.put_data"
 - key: the string key to store `value` at
 - value: the string to store at `key`, or `null` to remove an existing value
 - message_id: any random string value. a UUID is easiest
@@ -77,9 +95,9 @@ Returned postMessage includes the following properties:
 - message_id: the same message_id provided in the initial message
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
-    subject: 'org.imsglobal.lti.put_data',
+    subject: 'lti.put_data',
     key: 'hello',
     value: 'world',
     message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
@@ -88,14 +106,18 @@ window.top.postMessage(
 )
 ```
 
-## org.imsglobal.lti.get_data
+## lti.get_data
 
 **Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of August 2022, and so the specifics of this message are subject to change.**
+**as of January 2023, and so the specifics of this message are subject to change.**
+
+**At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
+**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
 
 Fetches the value stored at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
-only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec.
+only stored in the user's browser, and is short-lived. Part of the LTI Platform Storage spec,
+defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
 (which for Canvas means the `iss`, `canvas.instructure.com`). Currently, Canvas does not yet
@@ -103,23 +125,22 @@ support this use case, and the wildcard origin `*` should still be used.
 
 **Required properties:**
 
-- subject: "org.imsglobal.lti.get_data"
+- subject: "lti.get_data"
 - key: the string key for the retrieved value
 - message_id: any random string value. a UUID is easiest
 
 Returning postMessage includes the following properties:
 
-- subject: "org.imsglobal.lti.get_data"
+- subject: "lti.get_data"
 - key: the same key provided in the initial message
 - value: the value, if any, stored at that key in Canvas's localstorage. `null` will be sent if the key/value pair doesn't exist.
 - message_id: the same message_id provided in the initial message
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
-    subject: 'org.imsglobal.lti.put_data',
+    subject: 'lti.get_data',
     key: 'hello',
-    value: 'world',
     message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
   },
   '*'
@@ -129,7 +150,6 @@ window.top.postMessage(
 ## requestFullWindowLaunch
 
 Launches the tool that sent the event in a full-window context (ie not inside a Canvas iframe).
-Mainly used for Safari launches, since Safari disables setting cookies inside iframes.
 
 **Required properties:**
 
