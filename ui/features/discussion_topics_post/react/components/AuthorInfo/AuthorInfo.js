@@ -45,6 +45,10 @@ export const AuthorInfo = props => {
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
+  const getUnreadBadgeOffset = avatarSize => {
+    return avatarSize === 'medium' ? '11px' : '7px'
+  }
+
   return (
     <Responsive
       match="media"
@@ -62,7 +66,7 @@ export const AuthorInfo = props => {
           timestampTextSize: props.threadMode ? 'x-small' : 'small',
           nameAndRoleDirection: 'row',
           badgeMarginLeft: props.threadMode ? '-16px' : '-24px',
-          avatarSize: props.threadMode ? 'small' : 'medium',
+          avatarSize: 'medium',
         },
         mobile: {
           authorNameTextSize: 'small',
@@ -80,7 +84,7 @@ export const AuthorInfo = props => {
                 style={{
                   float: 'left',
                   marginLeft: responsiveProps.badgeMarginLeft,
-                  marginTop: hasAuthor ? '11px' : '2px',
+                  marginTop: hasAuthor ? getUnreadBadgeOffset(responsiveProps.avatarSize) : '2px',
                 }}
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}
