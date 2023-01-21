@@ -1,7 +1,7 @@
 {{#if singleSubmission}}
   {{#each submissions}}
     {{#if ../showSubmissionStatus}}
-      {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
+      {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{proxy_submitter_label_text}}{{/t}}
     {{/if}}
     {{#if late_policy_status}}
       <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
@@ -27,7 +27,7 @@
     {{#eachWithIndex submissions startingValue="1"}}
       <option value="{{value}}" {{#if late}}class=late{{/if}} {{#if selected}}selected{{/if}}>
         {{#if ../showSubmissionStatus}}
-          {{submittedAt}}{{proxy_submitter}}
+          {{submittedAt}}{{#if proxy_submitter}}({{proxy_submitter}}){{/if}}
         {{else}}
           {{#t}}Submission {{_index}}{{/t}}
         {{/if}}

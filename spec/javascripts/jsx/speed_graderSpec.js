@@ -429,6 +429,29 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.teardown()
   })
 
+  test('displays proxy submitter when one is present on the submission (multiple submissions)', () => {
+    SpeedGrader.setup()
+    const history = SpeedGrader.EG.currentStudent.submission.submission_history.map(h => {
+      return {...h, proxy_submitter: 'George Washington'}
+    })
+    SpeedGrader.EG.currentStudent.submission.submission_history = history
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    ok(submissionDropdown.innerHTML.includes('(George Washington)'))
+    SpeedGrader.teardown()
+  })
+
+  test('displays proxy submitter when one is present on the submission (single submission)', () => {
+    SpeedGrader.setup()
+    const firstHistory = SpeedGrader.EG.currentStudent.submission.submission_history[0]
+    firstHistory.proxy_submitter = 'Mike Tyson'
+    SpeedGrader.EG.currentStudent.submission.submission_history = [firstHistory]
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    ok(submissionDropdown.innerHTML.includes('by Mike Tyson'))
+    SpeedGrader.teardown()
+  })
+
   test('sets submission history container content to empty when submission history is blank', () => {
     SpeedGrader.setup()
     SpeedGrader.EG.refreshSubmissionsToView()
@@ -5643,8 +5666,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
-            assessment_type: 'grading'},
+            RUBRIC_ASSESSMENT: {assessment_user_id: '123', assessment_type: 'grading'},
             assignment_missing_shortcut: true,
           })
           setupFixtures(`
