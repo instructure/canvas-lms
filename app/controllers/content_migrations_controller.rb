@@ -525,8 +525,8 @@ class ContentMigrationsController < ApplicationController
   # with the same course pair and migration_type (course copy or blueprint).
   #
   # The returned object's keys are asset types as they appear in API URLs (+announcements+, +assignments+,
-  # +discussion_topics+, +files+, +modules+, +pages+, and +quizzes+). The values are a mapping from id in
-  # source course to id in destination course for objects of this type.
+  # +discussion_topics+, +files+, +module_items+, +modules+, +pages+, and +quizzes+). The values are a mapping
+  # from id in source course to id in destination course for objects of this type.
   #
   # @example_request
   #
