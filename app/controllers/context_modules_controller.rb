@@ -79,6 +79,9 @@ class ContextModulesController < ApplicationController
       if @context && @current_user && enrollment = StudentEnrollment.find_by(course_id: @context.id, user_id: @current_user.id)
         settings = SettingsService.get_enrollment_settings(id: enrollment.id)
         sequence_control = false if !settings["sequence_control"].nil? && settings["sequence_control"] == false
+        if Account.first.name == 'Primavera Online High School'
+          sequence_control = false
+        end
       end
 
 
