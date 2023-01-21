@@ -1116,7 +1116,7 @@ class ContentMigration < ActiveRecord::Base
     "!/blueprint/blueprint_subscriptions/#{child_subscription_id}/#{id}"
   end
 
-  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
+  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   def asset_id_mapping
     return {} unless source_course
@@ -1141,14 +1141,25 @@ class ContentMigration < ActiveRecord::Base
       mapping[key] ||= {}
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
-        # between source id and migration_id in the MasterContentTags
-        master_template.master_content_tags
-                       .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
-                              migration_id: mig_id_to_dest_id.keys)
-                       .pluck(:content_id, :migration_id)
-                       .each do |src_id, mig_id|
-          dest_id = mig_id_to_dest_id[mig_id]
-          mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+        # between source id and migration_id in the MasterContentTags (except for ContentTags, which
+        # fortunately _aren't_ complicated)
+        if asset_type == "ContentTag"
+          src_ids = source_course.context_module_tags.pluck(:id)
+          src_ids.each do |src_id|
+            global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
+            mig_id = master_template.migration_id_for(global_asset_string)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        else
+          master_template.master_content_tags
+                         .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
+                                migration_id: mig_id_to_dest_id.keys)
+                         .pluck(:content_id, :migration_id)
+                         .each do |src_id, mig_id|
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
         end
       else
         # with course copy, there is no stored mapping between source id and migration_id,
