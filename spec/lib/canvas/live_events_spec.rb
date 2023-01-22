@@ -1226,7 +1226,8 @@ describe Canvas::LiveEvents do
           context_uuid: course.uuid,
           import_quizzes_next: true,
           domain: course.root_account.domain,
-          source_course_lti_id: migration.source_course.lti_context_id,
+          source_course_lti_id: source_course.lti_context_id,
+          source_course_uuid: source_course&.uuid,
           destination_course_lti_id: course.lti_context_id,
           migration_type: migration.migration_type
         ),
