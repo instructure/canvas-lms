@@ -670,6 +670,7 @@ module Canvas::LiveEvents
       context_uuid: context.uuid,
       import_quizzes_next: import_quizzes_next,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
+      source_course_uuid: content_migration.source_course&.uuid,
       destination_course_lti_id: context.lti_context_id,
       migration_type: content_migration.migration_type
     }
