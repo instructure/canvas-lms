@@ -472,7 +472,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
-  "next_page_d2a39853": { "message": "Next page" },
   "no_changes_to_save_d29f6e91": { "message": "No changes to save." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No file chosen" },
@@ -482,9 +481,6 @@ const locale = {
   "no_results_940393cf": { "message": "No results." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "No results found for { term }."
   },
   "none_3b5e34d2": { "message": "None" },
   "none_selected_b93d56d2": { "message": "None Selected" },
@@ -556,7 +552,6 @@ const locale = {
   "preview_53003fd2": { "message": "Preview" },
   "preview_in_overlay_ed772c46": { "message": "Preview in overlay" },
   "preview_inline_9787330": { "message": "Preview inline" },
-  "previous_page_928fc112": { "message": "Previous page" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "Product" },
@@ -619,10 +614,8 @@ const locale = {
   "save_11a80ec3": { "message": "Save" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Search" },
-  "search_term_b2d2235": { "message": "Search Term" },
   "select_crop_shape_d441feeb": { "message": "Select crop shape" },
   "select_language_7c93a900": { "message": "Select Language" },
-  "selected_274ce24f": { "message": "Selected" },
   "selected_linkfilename_c093b1f2": { "message": "Selected { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Set Minus" },
   "sharp_music_ab956814": { "message": "Sharp (Music)" },
@@ -741,9 +734,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Toggle tooltip" },
   "tools_2fcf772e": { "message": "Tools" },
   "top_66e0adb6": { "message": "Top" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } results found, { numDisplayed } results currently displayed"
-  },
   "tray_839df38a": { "message": "Tray" },
   "triangle_6072304e": { "message": "Triangle" },
   "turnstile_yields_f9e76df1": { "message": "Turnstile (Yields)" },
