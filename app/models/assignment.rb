@@ -601,6 +601,7 @@ class Assignment < ActiveRecord::Base
   after_save  :start_canvadocs_render, if: :saved_change_to_annotatable_attachment_id?
   after_save  :update_due_date_smart_alerts, if: :update_cached_due_dates?
   after_save  :mark_module_progressions_outdated, if: :update_cached_due_dates?
+  after_save  :workflow_change_refresh_content_partication_counts, if: :saved_change_to_workflow_state?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
@@ -1373,6 +1374,11 @@ class Assignment < ActiveRecord::Base
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
   end
 
+  def workflow_change_refresh_content_partication_counts
+    trigger_workflow_states = %w[published unpublished]
+    refresh_course_content_participation_counts if trigger_workflow_states.include?(workflow_state)
+  end
+
   def refresh_course_content_participation_counts
     progress = context.progresses.build(tag: "refresh_content_participation_counts")
     progress.save!
@@ -1393,7 +1399,6 @@ class Assignment < ActiveRecord::Base
     each_submission_type do |submission, _, short_type|
       submission.restore(:assignment) if from != short_type && submission
     end
-    refresh_course_content_participation_counts
   end
 
   def participants_with_overridden_due_at

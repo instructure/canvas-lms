@@ -87,7 +87,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
     GuardRail.activate(:secondary) do
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
-                                                          batch_object: user, batched_keys: :submissions) do
+                                                          batch_object: user, batched_keys: [:submissions, :potential_unread_submission_ids]) do
         submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
