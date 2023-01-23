@@ -58,9 +58,18 @@ module Lti
       end
 
       def expected_audience(request)
-        [request.host_with_port, UNIVERSAL_GRANT_HOST].map do |h|
+        [
+          request.host_with_port,
+          *extra_expected_audience_hosts(request),
+          UNIVERSAL_GRANT_HOST
+        ].uniq.map do |h|
           Rails.application.routes.url_helpers.oauth2_token_url(host: h, protocol: request.protocol)
         end
+      end
+
+      # Overridden in MRA
+      def extra_expected_audience_hosts(_request)
+        []
       end
 
       # Checks that the route uses a controller that includes LtiServices
