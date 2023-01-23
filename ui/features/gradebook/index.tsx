@@ -26,7 +26,6 @@ import('@canvas/context-cards/react/StudentContextCardTrigger')
 
 ready(() => {
   const mountPoint = document.querySelector('#gradebook_app') as HTMLElement
-  const filterNavNode = document.querySelector('#gradebook-filter-nav') as HTMLDivElement
   const gradebookMenuNode = document.querySelector(
     '[data-component="GradebookMenu"]'
   ) as HTMLSpanElement
@@ -50,7 +49,6 @@ ready(() => {
     <GradebookData
       applyScoreToUngradedModalNode={applyScoreToUngradedModalNode}
       currentUserId={ENV.current_user_id as string}
-      filterNavNode={filterNavNode}
       flashMessageContainer={flashMessageContainer}
       gradebookEnv={ENV.GRADEBOOK_OPTIONS as GradebookOptions}
       gradebookGridNode={gradebookGridNode}
