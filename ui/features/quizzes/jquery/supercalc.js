@@ -137,11 +137,14 @@ $.fn.superCalc = function (options, more_options) {
         let res = null
         try {
           const val = calcCmd.computeValue(formula_text)
-          const decimals = finds.round.val() || 0
+          // we'll round using decimals but because of javascript imprecision
+          // let's truncate with 2 extra decimals
+          const decimals = parseInt(finds.round.val() || 0, 10)
           const preresult = val.toFixed(decimals + 2)
+          // then replace the last decimal with number 1
           res =
             '= ' +
-            I18n.n(parseFloat(preresult.substr(0, preresult.length - 1)).toFixed(decimals), {
+            I18n.n(parseFloat(preresult.substr(0, preresult.length - 1) + '1').toFixed(decimals), {
               precision: 5,
               strip_insignificant_zeros: true,
             })
@@ -173,7 +176,7 @@ $.fn.superCalc = function (options, more_options) {
     })
     $displayBox.bind('keypress', (event, enter) => {
       $entryBox.val($displayBox.val())
-      if (event.keyCode == 13 || (enter && $displayBox.val())) {
+      if (event.keyCode === 13 || (enter && $displayBox.val())) {
         event.preventDefault()
         event.stopPropagation()
         const $tr = $(
