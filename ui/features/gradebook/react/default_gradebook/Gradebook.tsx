@@ -240,7 +240,6 @@ export type GradebookProps = {
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
   loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
-  filterNavNode: HTMLElement
   finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
@@ -807,13 +806,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     } else {
       this.gradebookGrid?.render()
     }
-
-    const searchFilterStudents = this.courseContent.students.listStudents({
-      includePlaceholders: false,
-    })
-    if (this._gridHasRendered() && searchFilterStudents.length > 0) {
-      this.renderStudentSearchFilter(searchFilterStudents)
-    }
   }
 
   // # Post-Data Load Initialization
@@ -870,11 +862,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  updateAssignmentEffectiveDueDates = (assignment: Assignment) => {
+  updateAssignmentEffectiveDueDates = (assignment: Assignment): void => {
     assignment.effectiveDueDates = this.effectiveDueDates[assignment.id] || {}
-    return (assignment.inClosedGradingPeriod = _.some(assignment.effectiveDueDates, date => {
-      return date.in_closed_grading_period
-    }))
+    assignment.inClosedGradingPeriod = _.some(
+      assignment.effectiveDueDates,
+      date => date.in_closed_grading_period
+    )
   }
 
   // Student Data & Lifecycle Methods
@@ -1176,7 +1169,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!date) {
       return true
     }
-    return Object.values(assignment.effectiveDueDates).some(
+    return Object.values(assignment.effectiveDueDates || {}).some(
       (effectiveDueDateObject: DueDate) => tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date)
     )
   }
@@ -1186,8 +1179,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!date) {
       return true
     }
-    return Object.keys(assignment.effectiveDueDates).some(
+    return Object.keys(assignment.effectiveDueDates || {}).some(
       (assignmentId: string) =>
+        assignment.effectiveDueDates &&
         tz.parse(assignment.effectiveDueDates[assignmentId].due_at) <= tz.parse(date)
     )
   }
@@ -2012,14 +2006,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!this.props.isModulesLoading) {
       this.updateModulesFilterVisibility()
     }
-    this.renderSearchFilters()
-  }
-
-  renderSearchFilters = () => {
-    this.renderStudentSearchFilter(
-      this.courseContent.students.listStudents({includePlaceholders: false})
-    )
-    this.renderAssignmentSearchFilter(this.assignments)
   }
 
   renderGradebookSettingsModal = () => {
@@ -2340,40 +2326,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     const {sis_user_id: sisId} = this.courseContent.students.student(option.id)
     return !!sisId && sisId.toLowerCase() === term
-  }
-
-  renderStudentSearchFilter = (students: Student[]) => {
-    const props = {
-      id: 'student-names-filter',
-      disabled: students.length === 0 || !this._gridHasRendered(),
-      label: I18n.t('Student Names'),
-      customMatcher: this.studentSearchMatcher,
-      onChange: this.onFilterToStudents,
-      options: students.map(student => ({id: student.id, text: student.displayName})),
-      placeholder: I18n.t('Search Students'),
-    }
-
-    const mountPoint = document.getElementById('gradebook-student-search')
-    renderComponent(MultiSelectSearchInput, mountPoint, props)
-  }
-
-  renderAssignmentSearchFilter = (assignmentsById: AssignmentMap) => {
-    const assignments = Object.values(assignmentsById)
-    const props = {
-      id: 'assignments-filter',
-      disabled: assignments.length === 0 || !this._gridHasRendered(),
-      label: I18n.t('Assignment Names'),
-      customMatcher: assignmentSearchMatcher,
-      onChange: this.onFilterToAssignments,
-      options: assignments.map((assignment: Assignment) => ({
-        id: assignment.id,
-        text: assignment.name,
-      })),
-      placeholder: I18n.t('Search Assignments'),
-    }
-
-    const mountPoint = document.getElementById('gradebook-assignment-search')
-    renderComponent(MultiSelectSearchInput, mountPoint, props)
   }
 
   setVisibleGridColumns = () => {
@@ -3363,8 +3315,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       courseId: this.options.context_id,
       currentUserId: this.props.currentUserId,
       enterGradesAs: this.getEnterGradesAsSetting(assignmentId),
-      gradingDisabled:
-        !!(submissionState != null ? submissionState.locked : undefined) || student.isConcluded,
+      gradingDisabled: Boolean(
+        !!(submissionState != null ? submissionState.locked : undefined) || student.isConcluded
+      ),
       gradingScheme: this.getAssignmentGradingScheme(assignmentId)?.data || null,
       isFirstAssignment,
       isInOtherGradingPeriod: !!(submissionState != null
@@ -3405,7 +3358,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         name: htmlDecode(student.name),
         avatarUrl: htmlDecode(student.avatar_url),
         gradesUrl: `${student.enrollments[0].grades.html_url}#tab-assignments`,
-        isConcluded: student.isConcluded,
+        isConcluded: Boolean(student.isConcluded),
       },
       submission: camelize(submission),
       submissionUpdating: this.submissionIsUpdating({
@@ -4772,11 +4725,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       AsyncComponents.loadGradeDetailTray()
       this.renderViewOptionsMenu()
       this.renderGradebookSettingsModal()
-      this.renderSearchFilters()
     })
   }
 
   render() {
+    const students = this.courseContent.students.listStudents({includePlaceholders: false})
+    const assignments = Object.values(this.assignments)
+
     return (
       <>
         <Portal node={this.props.flashMessageContainer}>
@@ -4792,6 +4747,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             </div>
           ))}
         </Portal>
+
         {this.state.isStatusesModalOpen && (
           <StatusesModal
             onClose={() => {
@@ -4849,10 +4805,46 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
-        {this.options.enhanced_gradebook_filters &&
-          !this.props.isFiltersLoading &&
-          this.state.isEssentialDataLoaded && (
-            <Portal node={this.props.filterNavNode}>
+
+        <div style={{display: 'flex'}}>
+          <div
+            id="gradebook-student-search"
+            style={{
+              flex: 1,
+              paddingRight: '12px',
+            }}
+          >
+            <MultiSelectSearchInput
+              id="student-names-filter"
+              data-test-id="students-filter-select"
+              disabled={students.length === 0 || !this._gridHasRendered()}
+              label={I18n.t('Student Names')}
+              customMatcher={this.studentSearchMatcher}
+              onChange={this.onFilterToStudents}
+              options={students.map(student => ({id: student.id, text: student.displayName}))}
+              placeholder={I18n.t('Search Students')}
+            />
+          </div>
+          <div id="gradebook-assignment-search" style={{flex: 1}}>
+            <MultiSelectSearchInput
+              id="assignments-filter"
+              data-test-id="assignments-filter-select"
+              disabled={assignments.length === 0 || !this._gridHasRendered()}
+              label={I18n.t('Assignment Names')}
+              customMatcher={assignmentSearchMatcher}
+              onChange={this.onFilterToAssignments}
+              options={assignments.map((assignment: Assignment) => ({
+                id: assignment.id,
+                text: assignment.name,
+              }))}
+              placeholder={I18n.t('Search Assignments')}
+            />
+          </div>
+        </div>
+        <div>
+          {this.options.enhanced_gradebook_filters &&
+            !this.props.isFiltersLoading &&
+            this.state.isEssentialDataLoaded && (
               <FilterNav
                 gradingPeriods={this.gradingPeriodSet?.gradingPeriods || []}
                 modules={this.state.modules}
@@ -4860,8 +4852,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                 sections={this.state.sections}
                 studentGroupCategories={this.options.student_groups}
               />
-            </Portal>
-          )}
+            )}
+        </div>
       </>
     )
   }

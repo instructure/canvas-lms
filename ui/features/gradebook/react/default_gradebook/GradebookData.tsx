@@ -29,7 +29,6 @@ import useStore from './stores/index'
 type Props = {
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
-  filterNavNode: HTMLElement
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
@@ -192,6 +191,7 @@ export default function GradebookData(props: Props) {
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
+      finalGradeOverrides={finalGradeOverrides}
       flashAlerts={flashMessages}
       gradingPeriodAssignments={gradingPeriodAssignments}
       hideGrid={false}
@@ -199,10 +199,9 @@ export default function GradebookData(props: Props) {
       isFiltersLoading={isFiltersLoading}
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isModulesLoading={isModulesLoading}
-      isStudentIdsLoading={isStudentIdsLoading}
       isStudentDataLoaded={isStudentDataLoaded}
+      isStudentIdsLoading={isStudentIdsLoading}
       isSubmissionDataLoaded={isSubmissionDataLoaded}
-      finalGradeOverrides={finalGradeOverrides}
       modules={modules}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
       sisOverrides={sisOverrides}

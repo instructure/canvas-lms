@@ -107,7 +107,6 @@ export const defaultGradebookProps: GradebookProps = {
   dispatch: new RequestDispatch(),
   fetchGradingPeriodAssignments: () => Promise.resolve({}),
   fetchStudentIds: () => Promise.resolve([]),
-  filterNavNode: document.createElement('div'),
   flashAlerts: [],
   flashMessageContainer: document.createElement('div'),
   gradebookEnv: defaultGradebookEnv,
@@ -217,8 +216,6 @@ export function setFixtureHtml($fixture) {
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>
         <div id="gradebook_grid"></div>
-        <div id="gradebook-student-search"></div>
-        <div id="gradebook-assignment-search"></div>
       </div>
     </div>
   `)

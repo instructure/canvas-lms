@@ -21,33 +21,73 @@ export type Course = Readonly<{
 }>
 
 export type Enrollment = Readonly<{
+  associated_user_id: null | string
+  course_id: string
+  course_integration_id: null | string
   course_section_id: string
-  type: string
+  created_at: string
+  end_at: null | string
+  enrollment_state: 'active'
+  html_url: string
+  id: string
+  last_activity_at: null | string
+  last_attended_at: null | string
+  limit_privileges_to_course_section: boolean
+  role_id: string
+  root_account_id: string
+  section_integration_id: null | string
+  sis_account_id: null | string
+  sis_course_id: null | string
+  sis_import_id: null | string
+  sis_section_id: null | string
+  sis_user_id: null | string
+  start_at: null | string
+  total_activity_time: number
+  type: 'StudentEnrollment' | 'StudentViewEnrollment'
+  updated_at: string
+  user_id: string
   grades: {
     html_url: string
+    current_grade: null | number
+    current_score: null | number
+    final_grade: null | number
+    final_score: null | number
+    unposted_current_score: null | number
+    unposted_current_grade: null | number
+    unposted_final_score: null | number
+    unposted_final_grade: null | number
   }
 }>
 
 export type Student = Readonly<{
+  avatar_url?: string
+  created_at: string
+  email: null | string
+  first_name: string
+  group_ids: string[]
   id: string
+  integration_id: null | string
+  last_name: string
+  login_id: string
   name: string
-  avatar_url: string
+  short_name: string
+  sis_import_id: null | string
+  sis_user_id: null | string
 }> & {
-  displayName: string
-  sortable_name: string
   enrollments: Enrollment[]
-  loaded: boolean
-  initialized: boolean
-  isConcluded: boolean
-  total_grade: number
-} & {
-  // computed values
-  computed_current_score: number
-  computed_final_score: number
-  isInactive: boolean
-  cssClass: string
-  sections: string[]
-}
+} & Partial<{
+    computed_current_score: number
+    computed_final_score: number
+    cssClass: string
+    displayName: string
+    initialized: boolean
+    isConcluded: boolean
+    isInactive: boolean
+    loaded: boolean
+    sections: string[]
+    sortable_name: string
+    total_grade: number
+  }>
 
 export type StudentMap = {
   [id: string]: Student
@@ -126,7 +166,7 @@ export type Override = Readonly<{
 }>
 
 export type Assignment = Readonly<{
-  allowed_attmpts: number
+  allowed_attempts: number
   created_at: string
   id: string
   html_url: string
@@ -136,9 +176,8 @@ export type Assignment = Readonly<{
   anonymous_grading: boolean
   anonymous_instructor_annotations: boolean
   anonymous_peer_reviews: boolean
-  assessment_requests: AssessmentRequest[]
+  assessment_requests?: AssessmentRequest[]
   assignment_group_id: string
-  assignment_id: string
   automatic_peer_reviews: boolean
   can_duplicate: boolean
   course_id: string
@@ -157,10 +196,10 @@ export type Assignment = Readonly<{
   has_overrides: boolean
   has_submitted_submissions: boolean
   important_dates: boolean
-  in_quiz_assignment: boolean
   integration_data: any
-  integration_id: string
+  integration_id: null | string
   intra_group_peer_reviews: boolean
+  is_quiz_assignment: boolean
   lock_at: null | string
   locked_for_user: boolean
   lti_context_id: string
@@ -191,16 +230,16 @@ export type Assignment = Readonly<{
   unlock_at: null | string
   unpublishable: boolean
   updated_at: string
-  user_id: string
   workflow_state: WorkflowState
 }> & {
-  assignment_group: AssignmentGroup // assigned after fetch?
   assignment_visibility: string[]
-  due_at: string | null
-  effectiveDueDates: UserDueDateMap
-  inClosedGradingPeriod: boolean
-  overrides: Override[]
-}
+} & Partial<{
+    assignment_group: AssignmentGroup
+    due_at: string | null
+    effectiveDueDates: UserDueDateMap
+    inClosedGradingPeriod: boolean
+    overrides: Override[]
+  }>
 
 export type AssignmentMap = {
   [id: string]: Assignment
@@ -296,6 +335,7 @@ export type WorkflowState =
   | 'deleted'
   | 'graded'
   | 'not_graded'
+  | 'published'
   | 'settings_only'
   | 'pending_review'
   | 'submitted'
