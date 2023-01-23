@@ -170,7 +170,7 @@ export default class CreateAssignmentView extends DialogFormView
               newDate = tz.parse(tz.format(newDate, "%F #{ENV.DEFAULT_DUE_TIME}"))
             else
               newDate = tz.changeToTheSecondBeforeMidnight(newDate)
-          dateStr = $.dateString(newDate)
+          dateStr = $.dateString(newDate, {format: 'medium'})
           timeStr = $.timeString(newDate)
           timeField.data('inputdate', newDate).val("#{dateStr} #{timeStr}")
 
