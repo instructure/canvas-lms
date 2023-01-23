@@ -489,7 +489,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Nythu’n Fwy Na" },
   "nested_less_than_27d17e58": { "message": "Nythu’n Llai Na" },
-  "next_page_d2a39853": { "message": "Tudalen Nesaf" },
   "no_changes_to_save_d29f6e91": { "message": "Dim newidiadau i’w cadw." },
   "no_e16d9132": { "message": "Na" },
   "no_file_chosen_9a880793": { "message": "Dim ffeil wedi’i dewis" },
@@ -499,9 +498,6 @@ const locale = {
   "no_results_940393cf": { "message": "Dim canlyniadau." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Heb ddod o hyd i ganlyniadau ar gyfer { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Heb ddod o hyd i ganlyniadau ar gyfer { term }."
   },
   "none_3b5e34d2": { "message": "Dim" },
   "none_selected_b93d56d2": { "message": "Dim un wedi’i ddewis" },
@@ -573,7 +569,6 @@ const locale = {
   "preview_53003fd2": { "message": "Rhagolwg" },
   "preview_in_overlay_ed772c46": { "message": "Rhagolwg mewn troshaen" },
   "preview_inline_9787330": { "message": "Rhagolwg mewn llinell" },
-  "previous_page_928fc112": { "message": "Tudalen Flaenorol" },
   "prime_917ea60e": { "message": "Cysefin" },
   "prime_numbers_13464f61": { "message": "Rhifau Cysefin" },
   "product_39cf144f": { "message": "Cynnyrch" },
@@ -636,10 +631,8 @@ const locale = {
   "save_11a80ec3": { "message": "Cadw" },
   "script_l_42a7b254": { "message": "Sgript L" },
   "search_280d00bd": { "message": "Chwilio" },
-  "search_term_b2d2235": { "message": "Term Chwilio" },
   "select_crop_shape_d441feeb": { "message": "Dewis siâp tocio" },
   "select_language_7c93a900": { "message": "Dewis Iaith" },
-  "selected_274ce24f": { "message": "Wedi dewis" },
   "selected_linkfilename_c093b1f2": {
     "message": "Wedi dewis { linkFileName }"
   },
@@ -758,9 +751,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Toglo tooltip" },
   "tools_2fcf772e": { "message": "Adnoddau" },
   "top_66e0adb6": { "message": "Y Brig" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "Wedi dod o hyd i { totalResults } canlyniad, { numDisplayed } canlyniad yn cael ei arddangos ar hyn o bryd"
-  },
   "tray_839df38a": { "message": "Ardal" },
   "triangle_6072304e": { "message": "Triongl" },
   "turnstile_yields_f9e76df1": { "message": "Giât Dro (Yn Rhoi)" },

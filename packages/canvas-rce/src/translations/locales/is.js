@@ -472,7 +472,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Faldað stærra en" },
   "nested_less_than_27d17e58": { "message": "Faldað minna en" },
-  "next_page_d2a39853": { "message": "Næsta síða" },
   "no_changes_to_save_d29f6e91": {
     "message": "Engar breytingar til að vista."
   },
@@ -484,9 +483,6 @@ const locale = {
   "no_results_940393cf": { "message": "Engar niðurstöður." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Engar niðurstöður fundust fyrir { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Engar niðurstöður fundust fyrir { term }."
   },
   "none_3b5e34d2": { "message": "Ekkert" },
   "none_selected_b93d56d2": { "message": "Ekkert valið" },
@@ -554,7 +550,6 @@ const locale = {
   "preview_53003fd2": { "message": "Forskoðun" },
   "preview_in_overlay_ed772c46": { "message": "Forskoðun með yfirlagningu" },
   "preview_inline_9787330": { "message": "Forskoðun í línu" },
-  "previous_page_928fc112": { "message": "Fyrri síða" },
   "prime_917ea60e": { "message": "Frum" },
   "prime_numbers_13464f61": { "message": "Frumtölur" },
   "product_39cf144f": { "message": "Feldi" },
@@ -617,10 +612,8 @@ const locale = {
   "save_11a80ec3": { "message": "Vista" },
   "script_l_42a7b254": { "message": "Forskrift L" },
   "search_280d00bd": { "message": "Leita" },
-  "search_term_b2d2235": { "message": "Leitarhugtak" },
   "select_crop_shape_d441feeb": { "message": "Veldu klippiform" },
   "select_language_7c93a900": { "message": "Velja tungumál" },
-  "selected_274ce24f": { "message": "Valið" },
   "selected_linkfilename_c093b1f2": { "message": "Valið { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Mínusmengi" },
   "sharp_music_ab956814": { "message": "Skarpt (tónlist)" },
@@ -737,9 +730,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Víxla verkfæraábendingu" },
   "tools_2fcf772e": { "message": "Verkfæri" },
   "top_66e0adb6": { "message": "Efst" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } niðurstöður fundust, { numDisplayed } niðurstöður sýndar"
-  },
   "tray_839df38a": { "message": "Bakki" },
   "triangle_6072304e": { "message": "Þríhyrningur" },
   "turnstile_yields_f9e76df1": { "message": "Kross (afrakstur)" },

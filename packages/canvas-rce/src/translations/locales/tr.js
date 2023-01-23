@@ -170,7 +170,6 @@ const locale = {
   "modules_c4325335": { "message": "Modüller" },
   "my_files_2f621040": { "message": "Dosyalarım" },
   "name_1aed4a1b": { "message": "İsim" },
-  "next_page_d2a39853": { "message": "Sonraki Sayfa" },
   "no_e16d9132": { "message": "Hayır" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
@@ -184,7 +183,6 @@ const locale = {
   "percentage_34ab7c2c": { "message": "Yüzde" },
   "pink_68ad45cb": { "message": "Pembe" },
   "preview_53003fd2": { "message": "Önizleme" },
-  "previous_page_928fc112": { "message": "Önceki Sayfa" },
   "published_c944a23d": { "message": "yayınlandı" },
   "purple_7678a9fc": { "message": "Mor" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
@@ -219,9 +217,6 @@ const locale = {
   },
   "title_ee03d132": { "message": "Başlık" },
   "to_be_posted_when_d24bf7dc": { "message": "Gönderileceği zaman: { when }" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
-  },
   "tray_839df38a": { "message": "Yan menü" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "görsel seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"

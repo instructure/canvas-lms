@@ -144,7 +144,6 @@ const locale = {
   "rich_content_editor_2708ef21": { "message": "עורך תוכן עשיר" },
   "save_11a80ec3": { "message": "שמירה " },
   "search_280d00bd": { "message": "חיפוש" },
-  "selected_274ce24f": { "message": "נבחר" },
   "size_b30e1077": { "message": "גודל" },
   "star_8d156e09": { "message": "הוספת כוכבית" },
   "submit_a3cc6859": { "message": "הגשה" },

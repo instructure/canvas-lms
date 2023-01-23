@@ -456,7 +456,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Siperyè Enbrike" },
   "nested_less_than_27d17e58": { "message": "Enferyè Enbrike" },
-  "next_page_d2a39853": { "message": "Pwochen Paj" },
   "no_changes_to_save_d29f6e91": { "message": "Pa gen chanjman pou sovgade." },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Pa gen fichye chwazi" },
@@ -466,9 +465,6 @@ const locale = {
   "no_results_940393cf": { "message": "Okenn rezilta." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nou pa jwenn rezilta pou { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Nou pa jwenn rezilta pou { term }."
   },
   "none_3b5e34d2": { "message": "Okenn" },
   "none_selected_b93d56d2": { "message": "Anyen Seleksyone" },
@@ -540,7 +536,6 @@ const locale = {
   "preview_53003fd2": { "message": "Apèsi" },
   "preview_in_overlay_ed772c46": { "message": "Apèsi an sipèpozisyon" },
   "preview_inline_9787330": { "message": "Apèsi an liy" },
-  "previous_page_928fc112": { "message": "Paj Anvan" },
   "prime_917ea60e": { "message": "Premye" },
   "prime_numbers_13464f61": { "message": "Nonm Premye" },
   "product_39cf144f": { "message": "Pwodwi" },
@@ -603,10 +598,8 @@ const locale = {
   "save_11a80ec3": { "message": "Anrejistre" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Chèche" },
-  "search_term_b2d2235": { "message": "Tèm Rechèch" },
   "select_crop_shape_d441feeb": { "message": "Seleksyone koupe fòm" },
   "select_language_7c93a900": { "message": "Seleksyone Lang" },
-  "selected_274ce24f": { "message": "Chwazi" },
   "selected_linkfilename_c093b1f2": {
     "message": "Seleksyone { linkFileName }"
   },
@@ -723,9 +716,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Deplase ti boul enffòmasyon an" },
   "tools_2fcf772e": { "message": "Zouti" },
   "top_66e0adb6": { "message": "Anlè" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "Nou jwenn{ totalResults } rezilta, { numDisplayed } rezilta ki afiche kounye a"
-  },
   "tray_839df38a": { "message": "Plato" },
   "triangle_6072304e": { "message": "Triyang" },
   "turnstile_yields_f9e76df1": { "message": "Tounikè (Rannman)" },
