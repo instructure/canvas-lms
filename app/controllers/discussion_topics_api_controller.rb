@@ -106,7 +106,8 @@ class DiscussionTopicsApiController < ApplicationController
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
       :include_new_entries => value_to_boolean(params[:include_new_entries]),
-      :include_mobile_overrides => !!mobile_brand_config
+      :include_mobile_overrides => !!mobile_brand_config,
+      :user_id => @current_user.id
     }
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(opts)
 
