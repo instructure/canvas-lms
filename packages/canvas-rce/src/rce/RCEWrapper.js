@@ -376,9 +376,10 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('./initA11yChecker')
-      .then(initA11yChecker => {
-        initA11yChecker.default(this.language)
+    this.a11yCheckerReady = import('tinymce-a11y-checker')
+      .then(a11yChecker => {
+        const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
+        a11yChecker.setLocale(locale)
         this.checkAccessibility()
       })
       .catch(err => {
