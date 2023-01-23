@@ -3886,6 +3886,8 @@ class Course < ActiveRecord::Base
   end
 
   def refresh_content_participation_counts(_progress)
+    user_ids = content_participation_counts.pluck(:user_id)
+    User.clear_cache_keys(user_ids, :potential_unread_submission_ids)
     content_participation_counts.each(&:refresh_unread_count)
   end
 
