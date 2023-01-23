@@ -131,8 +131,8 @@ Handlebars.registerHelper name, fn for name, fn of {
   # stored elsewhere).
 
   # expects: anything that $.datetimeString can handle
-  datetimeFormatted : (datetime) ->
-    $.datetimeString(datetime)
+  datetimeFormatted : (datetime, options) ->
+    $.datetimeString(datetime, options?.hash)
 
   datetimeFormattedWithTz: (datetime) ->
     date = tz.parse(datetime)
