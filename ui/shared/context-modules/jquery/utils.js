@@ -157,6 +157,7 @@ export function initPublishButton($el, data) {
     publishable: data.publishable,
     unpublishable: data.unpublishable,
     publish_at: data.publishAt,
+    quiz_lti: data.quizLti,
   })
 
   const viewOptions = {
@@ -307,13 +308,33 @@ export function itemContentKey(model) {
       content_id = attrs.id
     }
 
-    return content_type + '_' + content_id
+    let result = content_type + '_' + content_id
+    // moduleItems has differing keys for lti-quiz items depending on whether the module has been recently added
+    // to the DOM or whether it was there on page load. Here we add both keys to the list of keys to check for each
+    // iteration.
+    if (attrs.quiz_lti) {
+      result = [result, 'lti-quiz_' + content_id]
+    }
+    return result
   }
 }
 
 export function updateModuleItem(moduleItems, attrs, model) {
   let i, item, parsedAttrs
-  const items = moduleItems[itemContentKey(attrs) || itemContentKey(model)]
+  const itemContentKeys = itemContentKey(attrs) || itemContentKey(model)
+  let items = []
+  // If the itemContentKeys is an array, we need to iterate over each key and concat the items together. This is because
+  // moduleItems has multiple keys for lti-quiz items depending on whether the module has been recently added to the DOM
+  // or whether it was there on page load.
+  if (Array.isArray(itemContentKeys)) {
+    items = itemContentKeys
+      .map(key => moduleItems[key])
+      .filter(item => item !== undefined)
+      .flat(1)
+  } else {
+    items = moduleItems[itemContentKeys]
+  }
+
   if (items) {
     for (i = 0; i < items.length; i++) {
       item = items[i]
