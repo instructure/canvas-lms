@@ -20,118 +20,180 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import App from '../App'
 
-describe('DeveloperKeys App', () => {
-  const makeKey = ({id, name, inherited_from = 'global', account_owns_binding = true}) => ({
-    id,
-    name,
-    created_at: '2012-06-07T20:36:50Z',
-    inherited_from,
-    access_token_count: 0,
-    developer_key_account_binding: {
-      account_owns_binding,
-      workflow_state: 'on',
+const makeKey = ({id, name, inherited_from = 'global', account_owns_binding = true}) => ({
+  id,
+  name,
+  created_at: '2012-06-07T20:36:50Z',
+  inherited_from,
+  access_token_count: 0,
+  developer_key_account_binding: {
+    account_owns_binding,
+    workflow_state: 'on',
+  },
+})
+
+const siteAdminKeys = [
+  makeKey({id: '1', name: 'Site Admin 1'}),
+  makeKey({id: '2', name: 'Site Admin 2'}),
+]
+const parentKeys = [
+  makeKey({
+    id: '3',
+    name: 'Parent 1',
+    inherited_from: 'federated_parent',
+    account_owns_binding: false,
+  }),
+  makeKey({
+    id: '4',
+    name: 'Parent 2',
+    inherited_from: 'federated_parent',
+    account_owns_binding: false,
+  }),
+]
+
+const initialApplicationState = inheritedList => {
+  return {
+    createOrEditDeveloperKey: {
+      isLtiKey: false,
+      developerKeyCreateOrEditFailed: false,
+      developerKeyCreateOrEditSuccessful: true,
+      developerKeyCreateOrEditPending: false,
+      developerKeyModalOpen: false,
+      developerKey: {},
+      editing: false,
     },
+    listDeveloperKeyScopes: {
+      availableScopes: {},
+      listDeveloperKeyScopesPending: false,
+      selectedScopes: [],
+    },
+    listDeveloperKeys: {
+      listDeveloperKeysPending: false,
+      listDeveloperKeysSuccessful: false,
+      inheritedList,
+      list: [],
+      nextPage: 'http://...',
+      inheritedNextPage: 'http://...',
+      listInheritedDeveloperKeysPending: false,
+      listInheritedDeveloperKeysSuccessful: false,
+    },
+  }
+}
+
+const renderApp = ({ENV, inheritedList, ...overrides}) => {
+  const props = {
+    applicationState: initialApplicationState(inheritedList),
+    actions: {
+      developerKeysModalOpen: () => {},
+      createOrEditDeveloperKey: () => {},
+      developerKeysModalClose: () => {},
+      getRemainingDeveloperKeys: () => {},
+      getRemainingInheritedDeveloperKeys: () => {},
+      editDeveloperKey: () => {},
+      listDeveloperKeyScopesSet: () => {},
+      saveLtiToolConfiguration: () => {},
+      ltiKeysSetLtiKey: () => {},
+      resetLtiState: () => {},
+      updateLtiKey: () => {},
+      listDeveloperKeysReplace: () => {},
+      makeVisibleDeveloperKey: () => {},
+      setBindingWorkflowState: () => {},
+      makeInvisibleDeveloperKey: () => {},
+      activateDeveloperKey: () => {},
+      deactivateDeveloperKey: () => {},
+      deleteDeveloperKey: () => {},
+    },
+    store: {dispatch: () => {}},
+    ctx: {
+      params: {
+        contextId: '',
+      },
+    },
+    ...overrides,
+  }
+
+  return render(<App {...props} />)
+}
+describe('DeveloperKeys App', () => {
+  let getByText
+  let queryByText
+  let getAllByRole
+  let queryByTestId
+
+  const setup = (ENV, inheritedList) => {
+    const wrapper = renderApp({ENV, inheritedList})
+    getByText = wrapper.getByText
+    queryByText = wrapper.queryByText
+    getAllByRole = wrapper.getAllByRole
+    queryByTestId = wrapper.queryByTestId
+    // switch to inherited tab
+    act(() => getByText('Inherited').click())
+  }
+
+  describe('OIDC auth change alert box', () => {
+    describe('preFlip', () => {
+      beforeEach(() => {
+        jest
+          .useFakeTimers()
+          .setSystemTime(new Date('May 31 2023'));
+        ENV = {FEATURES: {dev_key_oidc_alert: true}}
+        setup(ENV, [...parentKeys, ...siteAdminKeys])
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+        ENV = {}
+      })
+
+      it('renders a pre OIDC change warning when the feature flag is on and today date is before changeDate', () => {
+        const alertBox = queryByTestId('OIDC_warning')
+        const preFlipText = queryByTestId('preFlipText')
+        expect(alertBox).toBeInTheDocument()
+        expect(preFlipText).toBeInTheDocument()
+      })
+    })
+
+    describe('postFlip', () => {
+      beforeEach(() => {
+        jest
+          .useFakeTimers()
+          .setSystemTime(new Date('July 2 2023'));
+        ENV = {FEATURES: {dev_key_oidc_alert: true}}
+        setup(ENV, [...parentKeys, ...siteAdminKeys])
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+        ENV = {}
+      })
+
+      it('renders a post OIDC change warning when the feature flag is on and today date is after changeDate', () => {
+        const alertBox = queryByTestId('OIDC_warning')
+        const postFlipText = queryByTestId('postFlipText')
+        expect(alertBox).toBeInTheDocument()
+        expect(postFlipText).toBeInTheDocument()
+      })
+    })
+
+    describe('no OIDC change warning shown when the feature flag is off', () => {
+      beforeEach(() => {
+        ENV = {FEATURES: {dev_key_oidc_alert: false}}
+        setup(ENV, [...parentKeys, ...siteAdminKeys])
+      })
+
+      afterEach(() => (ENV = {}))
+
+      it('does not render the warning', () => {
+        const alertBox = queryByTestId('OIDC_warning')
+        expect(alertBox).not.toBeInTheDocument()
+      })
+    })
   })
 
-  const siteAdminKeys = [
-    makeKey({id: '1', name: 'Site Admin 1'}),
-    makeKey({id: '2', name: 'Site Admin 2'}),
-  ]
-  const parentKeys = [
-    makeKey({
-      id: '3',
-      name: 'Parent 1',
-      inherited_from: 'federated_parent',
-      account_owns_binding: false,
-    }),
-    makeKey({
-      id: '4',
-      name: 'Parent 2',
-      inherited_from: 'federated_parent',
-      account_owns_binding: false,
-    }),
-  ]
-
-  const initialApplicationState = inheritedList => {
-    return {
-      createOrEditDeveloperKey: {
-        isLtiKey: false,
-        developerKeyCreateOrEditFailed: false,
-        developerKeyCreateOrEditSuccessful: true,
-        developerKeyCreateOrEditPending: false,
-        developerKeyModalOpen: false,
-        developerKey: {},
-        editing: false,
-      },
-      listDeveloperKeyScopes: {
-        availableScopes: {},
-        listDeveloperKeyScopesPending: false,
-        selectedScopes: [],
-      },
-      listDeveloperKeys: {
-        listDeveloperKeysPending: false,
-        listDeveloperKeysSuccessful: false,
-        inheritedList,
-        list: [],
-        nextPage: 'http://...',
-        inheritedNextPage: 'http://...',
-        listInheritedDeveloperKeysPending: false,
-        listInheritedDeveloperKeysSuccessful: false,
-      },
-    }
-  }
-
-  const renderApp = ({inheritedList, ...overrides}) => {
-    const props = {
-      applicationState: initialApplicationState(inheritedList),
-      actions: {
-        developerKeysModalOpen: () => {},
-        createOrEditDeveloperKey: () => {},
-        developerKeysModalClose: () => {},
-        getRemainingDeveloperKeys: () => {},
-        getRemainingInheritedDeveloperKeys: () => {},
-        editDeveloperKey: () => {},
-        listDeveloperKeyScopesSet: () => {},
-        saveLtiToolConfiguration: () => {},
-        ltiKeysSetLtiKey: () => {},
-        resetLtiState: () => {},
-        updateLtiKey: () => {},
-        listDeveloperKeysReplace: () => {},
-        makeVisibleDeveloperKey: () => {},
-        setBindingWorkflowState: () => {},
-        makeInvisibleDeveloperKey: () => {},
-        activateDeveloperKey: () => {},
-        deactivateDeveloperKey: () => {},
-        deleteDeveloperKey: () => {},
-      },
-      store: {dispatch: () => {}},
-      ctx: {
-        params: {
-          contextId: '',
-        },
-      },
-      ...overrides,
-    }
-    return render(<App {...props} />)
-  }
-
   describe('inherited tab', () => {
-    let getByText
-    let queryByText
-    let getAllByRole
-
-    const setup = inheritedList => {
-      const wrapper = renderApp({inheritedList})
-      getByText = wrapper.getByText
-      queryByText = wrapper.queryByText
-      getAllByRole = wrapper.getAllByRole
-      // switch to inherited tab
-      act(() => getByText('Inherited').click())
-    }
-
     describe('when parent keys are present', () => {
       beforeEach(() => {
-        setup([...parentKeys, ...siteAdminKeys])
+        setup({}, [...parentKeys, ...siteAdminKeys])
       })
 
       it('renders Parent Keys heading', () => {
@@ -160,7 +222,7 @@ describe('DeveloperKeys App', () => {
 
     describe('when parent keys are not present', () => {
       beforeEach(() => {
-        setup(siteAdminKeys)
+        setup({}, siteAdminKeys)
       })
 
       it('does not render Parent Keys heading', () => {
