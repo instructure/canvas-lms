@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../apis/api_spec_helper"
+
 describe OutcomeResultsController do
   def context_outcome(context)
     @outcome_group = context.root_outcome_group
@@ -156,6 +158,25 @@ describe OutcomeResultsController do
 
   def parse_response(response)
     JSON.parse(response.body)
+  end
+
+  def mock_os_api_results(user_uuid, outcome_id, associated_asset_id, score, points, points_possible, submitted_at)
+    {
+      user_uuid: user_uuid,
+      percent_score: score, points: points, points_possible: points_possible,
+      external_outcome_id: outcome_id, submitted_at: submitted_at,
+      attempts: [{ id: 1, authoritative_result_id: 1, points: points,
+                   points_possible: points_possible, event_created_at: Time.zone.now,
+                   event_updated_at: Time.zone.now, deleted_at: nil,
+                   created_at: Time.zone.now, updated_at: Time.zone.now,
+                   metadata: { quiz_metadata: { title: "Quiz Title", points: points, quiz_id: "1",
+                                                points_possible: points_possible } },
+                   submitted_at: submitted_at,
+                   attempt_number: 1 }],
+      associated_asset_type: "canvas.assignment.quizzes",
+      associated_asset_id: associated_asset_id, artifact_type: "quizzes.quiz", artifact_id: "1",
+      mastery: nil
+    }
   end
 
   def mock_os_lor_results(user, outcome, assignment, score, args = {})
@@ -405,7 +426,7 @@ describe OutcomeResultsController do
           user_session(user)
           @course.disable_feature!(:outcome_service_results_to_canvas)
           create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
-          expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+          expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
           json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
           expect(json["outcome_results"].length).to be 1
           expect(json["linked"]["assignments"].length).to be 1
@@ -419,7 +440,7 @@ describe OutcomeResultsController do
 
           it "no OS results found - display canvas results only" do
             create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
             json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
             expect(json["outcome_results"].length).to be 1
             expect(json["linked"]["assignments"].length).to be 1
@@ -427,7 +448,7 @@ describe OutcomeResultsController do
 
           it "OS results found - no Canvas results - displays only OS results" do
             mocked_results = mock_os_lor_results(student, @outcome, @assignment2, 2)
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results]
             )
             json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
@@ -440,7 +461,7 @@ describe OutcomeResultsController do
           it "OS results found - display both Canvas and OS results" do
             create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
             mocked_results = mock_os_lor_results(student, @outcome, @assignment2, 2)
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results]
             )
             json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
@@ -455,7 +476,7 @@ describe OutcomeResultsController do
             create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
             mocked_results_1 = mock_os_lor_results(student, @outcome, @assignment2, 2)
             mocked_results_2 = mock_os_lor_results(student, outcome2, @assignment2, 2)
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results_1, mocked_results_2]
             )
             json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
@@ -502,6 +523,10 @@ describe OutcomeResultsController do
                      format: "json"
     end
 
+    def outcome_rollups_url(context, params = {})
+      api_v1_course_outcome_rollups_url(context, params)
+    end
+
     it "includes rating percents" do
       json = parse_response(get_rollups(rating_percents: true, include: ["outcomes"]))
       expect(json["linked"]["outcomes"][0]["ratings"].map { |r| r["percent"] }).to eq [50, 50]
@@ -509,12 +534,138 @@ describe OutcomeResultsController do
 
     context "with outcome_service_results_to_canvas FF" do
       context "user_rollups" do
-        it "disabled - only display rollups for canvas" do
-          @course.disable_feature!(:outcome_service_results_to_canvas)
-          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-          expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
-          json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
-          expect(json["rollups"].length).to be 1
+        context "disabled FF" do
+          before do
+            @course.disable_feature!(:outcome_service_results_to_canvas)
+          end
+
+          it "only display rollups for canvas" do
+            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
+            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
+            expect(json["rollups"].length).to be 1
+          end
+
+          context "caching - calling os/canvas api/db for outcome results only once and pulling subsequent from rails cache store" do
+            before do
+              controller.instance_variable_set(:@domain_root_account, @account)
+            end
+
+            it "caches lgmb rollup request per opts, course, user, and user shard id" do
+              # creating a student result in @course aka outcome_course
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
+
+              enable_cache do
+                user_session @teacher
+                teacher_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
+                                                          exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
+                                                          sort_by: "student",
+                                                          sort_order: "desc",
+                                                          per_page: 1,
+                                                          page: 1))
+                # validating the data returned is correct.  Should have 1 rollup.
+                expect(teacher_json["rollups"].length).to be 1
+                # should have one key in the cache for OS
+                expect(Rails.cache.exist?(["lmgb_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+              end
+            end
+
+            it "caches lmgb rollup requests separately per user session enrolled in the same course" do
+              # creating a student result in @course aka outcome_course
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).twice.and_return(nil)
+
+              enable_cache do
+                user_session @teacher
+                teacher1_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
+                                                           exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
+                                                           sort_by: "student",
+                                                           sort_order: "desc",
+                                                           per_page: 1,
+                                                           page: 1))
+                expect(Rails.cache.exist?(["lmgb_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb/i).count).to eq 1
+
+                # creating and enrolling teacher 2 in @course aka outcomes_course
+                teacher2 = teacher_in_course(course: @course, active_all: true).user
+                teacher2.save!
+                user_session teacher2
+                teacher2_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
+                                                           exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
+                                                           sort_by: "student",
+                                                           sort_order: "desc",
+                                                           per_page: 1,
+                                                           page: 1))
+                expect(Rails.cache.exist?(["lmgb_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", teacher2.uuid, "account_uuid", @account.uuid])).to be_truthy
+
+                # validating the rollups returned is the same for Teacher 1 and Teacher 2
+                expect(teacher2_json["rollups"]).to eq teacher1_json["rollups"]
+                # validating that there are 2 keys for lmgb
+                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb_/i).count).to eq 2
+              end
+            end
+
+            it "manually created course and user to test caching with different course than outcome_course" do
+              manually_created_course = Course.create!(name: "Advanced Strength & Speed", account: @account)
+              super_teacher = User.create(name: "Black Panther")
+              super_teacher.pseudonyms.create(unique_id: "black@panther.com")
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
+
+              @course = manually_created_course
+              @user = super_teacher
+              @course.enroll_teacher(@user, enrollment_state: :active)
+
+              enable_cache do
+                user_session @user
+
+                super_teacher_json = parse_response(get_rollups(include: %w[outcomes users outcome_paths],
+                                                                exclude: %w[concluded_enrollments inactive_enrollments missing_user_rollups],
+                                                                sort_by: "student",
+                                                                sort_order: "desc",
+                                                                per_page: 1,
+                                                                page: 1))
+                # validating the data returned is correct. Should not have any rollups
+                expect(super_teacher_json["rollups"].length).to be 0
+                # should have one key in the cache for OS
+                expect(Rails.cache.exist?(["lmgb_{:all_users=>false}", "context_uuid", manually_created_course.uuid, "current_user_uuid", super_teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/lmgb_/i).count).to eq 1
+              end
+            end
+
+            it "caches slgmb rollup request per opts, user_ids param, course, user, and user shard id" do
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
+
+              enable_cache do
+                user_session @teacher
+                get_rollups({ user_ids: [@student.id], per_page: 100 })
+                user_id_cache_key = "slmgb_user_ids_#{@student.id}"
+                expect(Rails.cache.exist?(["#{user_id_cache_key}_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/#{user_id_cache_key}/i).count).to eq 1
+              end
+            end
+
+            it "caches lmgb section rollup request per opts, section_id param, course, user, and user shard id" do
+              section1 = add_section "s1", course: @course
+              student_in_section section1, user: @student2, allow_multiple_enrollments: true
+              create_result(@student2.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).once.and_return(nil)
+
+              enable_cache do
+                user_session @teacher
+                get_rollups({ include: %w[outcomes users outcome_paths],
+                              section_id: section1.id,
+                              sort_by: "student",
+                              sort_order: "desc",
+                              per_page: 1,
+                              page: 1 })
+                section_id_cache_key = "lmgb_section_id_#{section1.id}"
+                expect(Rails.cache.exist?(["#{section_id_cache_key}_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+                expect(Rails.cache.instance_variable_get(:@data).keys.grep(/#{section_id_cache_key}/i).count).to eq 1
+              end
+            end
+          end
         end
 
         context "enabled" do
@@ -524,9 +675,37 @@ describe OutcomeResultsController do
 
           it "no OS results found - display canvas rollups only" do
             create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
             json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
             expect(json["rollups"].length).to be 1
+          end
+
+          it "OS results found - stores only the minimum parameters needed in cache" do
+            # removing LearningOutcomeResults for those users that have results
+            # creating in the first before do after the rollups context
+            LearningOutcomeResult.where(user_id: @student.id).update(workflow_state: "deleted")
+            LearningOutcomeResult.where(user_id: @student1.id).update(workflow_state: "deleted")
+            LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
+            student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+            submitted_at = Time.zone.now
+            mocked_results = mock_os_api_results(student4.uuid, @outcome.id, outcome_assignment.id, "2.0", "2.0", "2.0", submitted_at)
+            expect(controller).to receive(:find_outcomes_service_outcome_results).with(any_args).and_return(
+              [mocked_results]
+            )
+
+            enable_cache do
+              user_session @teacher
+              parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 5, page: 1))
+              # should have one key in the cache for OS
+              expect(Rails.cache.exist?(["lmgb_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])).to be_truthy
+              bare_min = Rails.cache.fetch(["lmgb_{:all_users=>false}", "context_uuid", @course.uuid, "current_user_uuid", @teacher.uuid, "account_uuid", @account.uuid])
+              expect(bare_min).to eq [{ associated_asset_id: outcome_assignment.id,
+                                        external_outcome_id: @outcome.id,
+                                        points: "2.0",
+                                        points_possible: "2.0",
+                                        submitted_at: submitted_at,
+                                        user_uuid: student4.uuid }]
+            end
           end
 
           it "OS results found - no Canvas results - displays only OS rollups" do
@@ -537,7 +716,7 @@ describe OutcomeResultsController do
             LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
             student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
             mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results]
             )
             json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 5, page: 1))
@@ -559,7 +738,7 @@ describe OutcomeResultsController do
             # results are already created for @student2 in Canvas
             student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
             mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
               [mocked_results]
             )
             json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 5, page: 1))
@@ -573,7 +752,7 @@ describe OutcomeResultsController do
             # already existing results for @student1 & @student2
             # creating result for @student
             create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
             json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
             expect(json["rollups"].length).to be 1
             expect(json["rollups"][0]["scores"][0]["count"]).to be 3
@@ -588,7 +767,7 @@ describe OutcomeResultsController do
               # already existing results for @student1 & @student2
               # creating result for @student
               create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(nil)
               json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
               expect(json["rollups"].length).to be 1
               expect(json["rollups"][0]["scores"][0]["count"]).to be 3
@@ -602,7 +781,7 @@ describe OutcomeResultsController do
               LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
                 [mocked_results]
               )
               json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
@@ -617,7 +796,7 @@ describe OutcomeResultsController do
               # results are already created for @student2 in Canvas
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
                 [mocked_results]
               )
               json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
@@ -633,7 +812,7 @@ describe OutcomeResultsController do
             # already existing results for @student1 & @student2
             # creating result for @student
             create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-            expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(nil)
+            expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(nil)
             json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
                                               exclude: ["missing_user_rollups"],
                                               per_page: 5, page: 1))
@@ -649,7 +828,7 @@ describe OutcomeResultsController do
               # already existing results for @student1 & @student2
               # creating result for @student
               create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(nil)
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(nil)
               json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
                                                 exclude: ["missing_user_rollups"],
                                                 per_page: 5, page: 1))
@@ -664,7 +843,7 @@ describe OutcomeResultsController do
               LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -681,7 +860,7 @@ describe OutcomeResultsController do
               # results are already created for @student2 in Canvas
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -701,7 +880,7 @@ describe OutcomeResultsController do
               # and will not create results for this student
               student_in_course(active_all: true, course: outcome_course)
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).twice.and_return(
                 [mocked_results]
               )
               # per_page is the number of students to display on 1 page of results
@@ -719,7 +898,7 @@ describe OutcomeResultsController do
               # creating and enrolling student 4 in the course
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
                 [mocked_results]
               )
               # concluding student 3 in the course which will remove the student from the results
@@ -737,7 +916,7 @@ describe OutcomeResultsController do
               # creating and enrolling student 4 in the course
               student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
               mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
-              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              expect(controller).to receive(:fetch_and_convert_os_results).with(any_args).and_return(
                 [mocked_results]
               )
               # deactivating student 3 in the course which will remove the student from the results
