@@ -5800,7 +5800,7 @@ it:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Fai clic sul pulsante di navigazione account per accedere alle preferenze di notifica."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Fai clic sul pulsante di navigazione amministratore per accedere alle impostazioni account."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Fai clic sul pulsante di navigazione corsi per accedere ai corsi."
-  click_proceed_to_continue_b6eeffc6: "Fai clic su \"Procedi\" per continuare."
+  click_proceed_to_continue_b6eeffc6: "Fai clic su \"Continua\" per continuare."
   click_the_admin_navigation_button_to_access_accoun_38d881bf: "Fare clic sul pulsante di navigazione amministratore per accedere alle impostazioni account."
   click_the_button_above_to_add_content_4c7024a: "Clicca sul pulsante qui sopra per aggiungere contenuti"
   click_the_icon_to_add_a_calendar_b9ab4f7f: "Fai clic sull’icona \"+\" per aggiungere un calendario"
@@ -22929,7 +22929,7 @@ it:
   shared_brand_configs_e5d319d7: "Configurazioni brand condivise"
   shared_content_803ac37b: "Contenuto condiviso"
   shared_secret_892c88f2: "Segreto condiviso"
-  sharing_a_qr_code_can_give_others_immediate_access_79575158: "La condivisione di un codice QR può fornisce alle altre persone un accesso immediato al tuo account attraverso le applicazioni per dispositivi mobile %{canvas}."
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "La condivisione di un codice QR fornisce alle altre persone un accesso immediato al tuo account attraverso le applicazioni per dispositivi mobile %{canvas}."
   she_her_3f459cc2: Lei
   she_her_c8b5e3be: "Lei/a lei"
   shift_dates_b5a7b7a1: "Sposta date"
