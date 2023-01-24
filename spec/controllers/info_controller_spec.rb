@@ -181,6 +181,16 @@ describe InfoController do
       expect(json["readiness"]["components"].count).to be > 0
     end
 
+    it "reports to statsd upon loading the deep endpoint" do
+      allow(InstStatsd::Statsd).to receive(:gauge)
+      allow(InstStatsd::Statsd).to receive(:timing)
+      allow(Shard.current).to receive(:database_server_id).and_return("C1")
+
+      get "deep"
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 1, tags: { type: :readiness, key: :common_css, cluster: "C1" })
+    end
+
     it "responds with 503 if a readiness system component is considered down" do
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get "deep"

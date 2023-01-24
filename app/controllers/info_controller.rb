@@ -173,14 +173,13 @@ class InfoController < ApplicationController
     }
   end
 
-  def readiness(is_deep_check: false)
+  def readiness
     # This action provides a clear signal for assessing system components that are "owned"
     # by Canvas and are ultimately responsible for being alive and able to serve consumer traffic
 
-    components = HealthChecks.process_readiness_checks(is_deep_check)
+    components = HealthChecks.process_readiness_checks(false)
 
-    failed = components.reject { |_k, v| v[:status] }.map(&:first)
-    render_readiness_json(components, failed.any? ? 503 : 200, is_deep_check)
+    render_readiness_json(components, false)
   end
 
   def deep
@@ -198,7 +197,10 @@ class InfoController < ApplicationController
 
   private
 
-  def render_readiness_json(components, status_code, is_deep_check)
+  def render_readiness_json(components, is_deep_check)
+    failed = components.reject { |_k, v| v[:status] }.map(&:first)
+    status_code = failed.any? ? 503 : 200
+
     readiness_json = { status: status_code, components: components_to_hash(components) }
     return readiness_json if is_deep_check
 
@@ -206,14 +208,24 @@ class InfoController < ApplicationController
   end
 
   def render_deep_json(critical, secondary, status_code)
-    readiness_response = readiness(is_deep_check: true)
+    components = HealthChecks.process_readiness_checks(true)
+    readiness_response = render_readiness_json(components, true)
+
     status = readiness_response[:status] == 503 ? readiness_response[:status] : status_code
+
+    response = {
+      readiness: components,
+      critical: critical,
+      secondary: secondary,
+    }
+
+    HealthChecks.send_to_statsd(response, { cluster: Shard.current.database_server_id })
 
     render json: {
       status: status,
       readiness: readiness_response,
       critical: components_to_hash(critical),
-      secondary: components_to_hash(secondary)
+      secondary: components_to_hash(secondary),
     }, status: status
   end
 
