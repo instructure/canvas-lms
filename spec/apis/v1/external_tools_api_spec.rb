@@ -189,28 +189,14 @@ describe ExternalToolsController, type: :request do
             tag.content_type = "ContextExternalTool"
             tag.save!
             params = { id: tool.id.to_s, launch_type: "assessment", assignment_id: @assignment.id }
-            json = get_sessionless_launch_url(@course, params)
-            expect(json).to include("url")
-
-            # remove the user session (it's supposed to be sessionless, after all), and make the request
-            remove_user_session
-
-            # request/verify the lti launch page
-            get json["url"]
+            sessionless_launch(@course, params)
             expect(response.code).to eq "200"
           end
 
           it "returns sessionless launch URL when default URL is not set and placement URL is" do
             tool.update!(url: nil)
             params = { id: tool.id.to_s, launch_type: "course_navigation" }
-            json = get_sessionless_launch_url(@course, params)
-            expect(json).to include("url")
-
-            # remove the user session (it's supposed to be sessionless, after all), and make the request
-            remove_user_session
-
-            # request/verify the lti launch page
-            get json["url"]
+            sessionless_launch(@course, params)
             expect(response.code).to eq "200"
           end
 
@@ -769,6 +755,9 @@ describe ExternalToolsController, type: :request do
 
     # request/verify the lti launch page
     get json["url"]
+
+    # sessionless launches now may include a session_token which logs in and then launches tool
+    get response.location if response.location && response.code.to_i == 302
     response
   end
 
