@@ -12640,7 +12640,7 @@ nn:
       Dersom dette løyvet er slått på, er det ikkje naudsynt å slå på 'SIS-data - les'. Løyvet på kontonivå overstyrer løyvet på emnenivå. For å hindre at brukarar kan administrere SIS-ID-ar på emnenivå, må både 'SIS-data - administrer' og SIS-data - les' vere slått av.
       For å legge til brukarar på emne via SIS-ID, må 'Brukarar - legg til / fjern studentar frå emne' og/eller 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emne' òg vere slått på.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Dersom dette løyvet er skrudd på, treng ikkje brukarar at SIS Data - les løyvet er aktivert. Kontoløyvet overstyrer emneløyvet,"
-  if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Dersom dette løyvet ikkje er skrudd på kan brukarar sjå deira eigne spørsmålsbankar, samt spørsmålsbankar delt av ein annan brukar eller som kjem frå eit emne dei er faglærar i."
+  if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Dersom dette løyvet ikkje er skrudd på kan brukarar sjå deira eigne spørsmålsbankar, samt spørsmålsbankar delt av ein annan brukar eller delt indirekte via eit emne dei er faglærar i."
   if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Dersom denne innstillingen og Diskusjonar - sjå er skrudd på, kan brukaren framleis justere låseinnstillingane for Blueprint-innhald på individuelle diskusjonar i eit Blueprint-masteremne."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Hvis sant, nyttast den serialiserte innsendinga for submitted_at-dato"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Dersom 'Brukarar - administrer innloggingsdetaljar' eller 'Statistikk - vis' er slått på, vil ein brukar kunne generere inn-/utloggingsaktivitet i administrasjonsverktøy. For å skjule valet for inn-/utloggingsaktivitet i administrasjonsverktøy, må begge løyva vere slått av."
@@ -23548,10 +23548,10 @@ nn:
   the_outcome_to_report_on_7d30886d: "Resultat å rapportere på"
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
     one: "Læringsmålet som du har valt kan ikkje fjernast fordi det er knytta til innhald i denne kontoen"
-    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytta til innhald i denne kontoen"
+    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytt til innhald i denne kontoen"
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: "Læringsmålet du har valt kan ikkje fjernast fordi det er knytta til innhald i dette emnet."
-    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytta til innhald i dette emnet"
+    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytt til innhald i dette emnet"
   the_preceding_content_is_partner_provided_d753928c: "Det føregåande innhaldet er lagt til av partnar"
   the_previous_sis_batch_was_aborted_d7d89955: "Førre SIS-jobb vart avbroten"
   the_profile_picture_has_been_removed_74d50047: "Profilbildet er fjerna."
@@ -23573,13 +23573,13 @@ nn:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet gjer at du kan opprette tidsluker som studentane (eller studentgruppene) kan melde seg på. Når du skal starte, klikkar du på knappen nedanfor."
   the_search_returned_no_results_c2e4d13c: "Søket ga ingen treff."
   the_section_to_report_on_11e3757b: "Seksjonen som rapporten gjeld for"
-  the_selected_date_is_on_a_blackout_day_bedcc1b8: "Den valte datoen er på ein markert dag"
-  the_selected_date_is_on_a_weekend_and_this_course__66d43756: "Den valte datoen er på ein helgedag, og dette emne har ikkje aktivitet i helgane."
-  the_selected_date_is_too_early_6173fe43: "Den valte dagen er for tidleg."
-  the_selected_date_is_too_late_cbe184a1: "Den valte dagen er for sein."
+  the_selected_date_is_on_a_blackout_day_bedcc1b8: "Den valde datoen er på ein markert dag"
+  the_selected_date_is_on_a_weekend_and_this_course__66d43756: "Den valde datoen er på ein helgedag, og dette emnet har ikkje aktivitet i helgene."
+  the_selected_date_is_too_early_6173fe43: "Den valde dagen er for tidleg."
+  the_selected_date_is_too_late_cbe184a1: "Den valde dagen er for sein."
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valde gruppa vart nulla ut fordi studenten du søkte fram ikkje er medlem av ei gruppe. Du kan velje ny gruppe i vurderingsoversikta."
   the_settings_for_this_plugin_will_be_automatically_6069ba88: "Innstillingane for dette eksterne verktøyet vil automatisk bli del av ikkje-produksjonsmiljøet med mindre det vert overstyrt av dei spesifikke innstillingane. Ikkje-prod innstillingar vil trå i kraft ved neste oppdatering av det mijøet"
-  the_settings_for_this_plugin_will_not_be_inherited_a16e6119: "Innstillingane for dette eksterne verktøyet vil IKKJE bli del av ikkje-produksjonsmiljøet. For å gjera dei tilgjengelege i ikkje-prod miljøet må spesifikke innstillingar være definerte. Ikkje-prod innstillingar vil trå i kraft ved neste oppdatering av det mijøet"
+  the_settings_for_this_plugin_will_not_be_inherited_a16e6119: "Innstillingane for dette eksterne verktøyet vil IKKJE bli del av ikkje-produksjonsmiljøet. For å gjera dei tilgjengelege i ikkje-prod miljøet må spesifikke ikkje-prod innstillingar være definerte. Ikkje-prod innstillingar vil trå i kraft ved neste oppdatering av det mijøet"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Alvorsgrada til problemet, som brukaren har valt frå rullegardinmenyen."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvegikonet for iOS- og Android-einingar. 180 x 180 .png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Oppgåva vart ikkje funne"
@@ -23590,7 +23590,7 @@ nn:
   the_start_date_was_set_to_1_month_ago_778e3d7f: "Startdato satt til 1 månad sidan."
   the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "Startdato vart satt til byrjinga på førre veke."
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
-  the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fana for studentmerknader inkluderer dokumentet for oppgåva. Fanar for fleire typar innlevering kan også være tilgjengelege"
+  the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fana for studentmerknader inkluderer dokumentet for oppgåva. Faner for fleire innleveringstypar kan også være tilgjengelege"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Emneoversikta lar deg ynskje studentane velkomne til
