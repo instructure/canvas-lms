@@ -470,13 +470,17 @@ class RoleOverridesController < ApplicationController
   #
   # @returns Role
   def activate_role
-    if authorized_action(@context, @current_user, :manage_role_overrides)
-      if @role.inactive?
-        @role.activate!
-        render json: role_json(@context, @role, @current_user, session)
-      else
-        render json: { message: t("no_role_found", "Role not found") }, status: :bad_request
-      end
+    return unless authorized_action(@context, @current_user, :manage_role_overrides)
+
+    if Role.where(account: @context, name: @role.name, workflow_state: "active").exists?
+      return render json: { message: t("An active role already exists with that name") }, status: :bad_request
+    end
+
+    if @role.inactive?
+      @role.activate!
+      render json: role_json(@context, @role, @current_user, session)
+    else
+      render json: { message: t("no_role_found", "Role not found") }, status: :bad_request
     end
   end
 
