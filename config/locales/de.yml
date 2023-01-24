@@ -6726,7 +6726,7 @@ de:
       delete: Löschen
       edit: Ändern
       end_it_now: Beenden
-      in_progress: "Wird ausgeführt"
+      in_progress: "In Bearbeitung"
       join: Beitreten
       recording: "1 Aufzeichnung"
       recordings: "%{recordingCount} Aufzeichnungen"
@@ -7378,7 +7378,7 @@ de:
     index: 
       titles: 
         course_modules: Kursmodule
-    module_complete: Abschließen
+    module_complete: Abgeschlossen
     module_empty: "Modul „%{module}“ enthält keine Elemente."
     module_item_next: 
       drag_to_reorder: "Element durch Ziehen neu anordnen oder in anderes Modul verschieben"
@@ -7424,8 +7424,8 @@ de:
         unfulfilled: "muss die Seite anzeigen"
       settings: Einstellungen
     module_locked: Gesperrt
-    module_started: "Wird ausgeführt"
-    module_unlocked: "Sperre aufgehoben"
+    module_started: "In Bearbeitung"
+    module_unlocked: Freigegeben
     optgroup: 
       assignments: Aufgaben
       discussion_topics: Diskussionen
