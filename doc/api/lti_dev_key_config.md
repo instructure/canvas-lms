@@ -77,6 +77,15 @@ Other LTI Platform Storage spec docs:
 - [Client-side postMessages](https://www.imsglobal.org/spec/lti-cs-pm/v0p1)
 - [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
 
+Support for this API is determined by either:
+
+1. the presence of the `lti_storage_target` as an extra body parameter in both the login (Step 1) and launch (Step 3) requests, or
+2. a response postMessage to the `lti.capabilities` postMessage that contains the `lti.get_data` and `lti.put_data` subjects.
+
+**Note** that `lti_storage_target` is currently present in all launches, including from the Canvas mobile apps. Support for this API in the Canvas mobile apps is not yet implemented, and
+the requirements for supporting it are currently under review. Tools should confirm using the `lti.capabilities` postMessage if the current launch supports this API. If tools do not get a
+response to that or any message in this API, they should assume that this API is not supported and try to set a cookie instead.
+
 <a name="config-in-tool"></a>
 Configuring Canvas in the Tool
 =======================================

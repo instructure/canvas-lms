@@ -5,6 +5,8 @@ API (docs <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postM
 from LTI tools and other children rendered in iframes or opened in new tabs/windows. Tools
 can send various types of events to resize windows, launch in new windows, or other
 functionality. Note that this is not part of the LTI specification, and is Canvas-specific.
+In addition, these messages are not currently supported by any of the Canvas mobile apps, only
+the web version of Canvas.
 
 The data sent to `window.postMessage` can be of any type, and each message type looks for different
 data. Most data is sent as an object with a `subject` property.
@@ -33,6 +35,8 @@ This is also defined in the [Platform Storage spec](https://www.imsglobal.org/sp
 Most message handlers will respond with a postMessage with a subject that matches the intial subject,
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
+
+Messages sent by a tool that has been launched from a Canvas mobile app will not receive any response messages.
 
 # Message Types
 
