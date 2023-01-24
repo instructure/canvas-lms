@@ -48,7 +48,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 0
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 0
     end
 
     it "if a rubric result exists for multiple students for the same assignment and outcome" do
@@ -67,7 +67,7 @@ describe OutcomeResultResolverHelper do
       create_learning_outcome_result_from_rubric @students[0], 1.0
       create_learning_outcome_result_from_rubric @students[1], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 0
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 0
     end
 
     it "for just one student if a rubric result exists for their assignment and outcome" do
@@ -83,7 +83,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
 
     it "for an assignment with multiple outcomes aligned, where one outcome has a rubric result for a student" do
@@ -102,7 +102,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
   end
 
@@ -112,7 +112,7 @@ describe OutcomeResultResolverHelper do
       create_alignment
       create_learning_outcome_result @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
 
     it "if there is no rubric result for that student" do
@@ -123,7 +123,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[1], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
 
     it "if there is no rubric result for that assignment" do
@@ -134,7 +134,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric
       create_learning_outcome_result_from_rubric @students[2], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
 
     it "if there is no rubric result for that outcome" do
@@ -146,7 +146,7 @@ describe OutcomeResultResolverHelper do
       create_alignment_with_rubric
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
     end
   end
 end
