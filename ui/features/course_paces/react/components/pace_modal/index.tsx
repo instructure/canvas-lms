@@ -167,6 +167,7 @@ export const PaceModal: React.FC<ResponsiveComponentProps> = ({
       label={modalTitle()}
       shouldCloseOnDocumentClick={true}
       overflow="fit"
+      aria-modal={true}
     >
       <Modal.Header>
         <Flex>
