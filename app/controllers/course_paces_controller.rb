@@ -16,6 +16,267 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+# @API Course Pace
+# API for accessing and building Course Paces.
+#
+# @model CoursePace
+#     {
+#       "id": "CoursePace",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the course pace",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "course_id": {
+#           "description": "the ID of the course",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "the ID of the user for this course pace",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "the state of the course pace",
+#           "example": "active",
+#           "type": "string"
+#         },
+#         "exclude_weekends": {
+#           "description": "boolean value depending on exclude weekends setting",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "hard_end_dates": {
+#           "description": "set if the end date is set from course",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "created_at": {
+#           "description": "date when course pace is created",
+#           "example": "2013-01-23T23:59:00-07:00",
+#           "type": "datetime"
+#         },
+#         "end_date": {
+#           "description": "course end date",
+#           "example": "2013-01-23T23:59:00-07:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "date when course pace is updated",
+#           "example": "2013-01-23T23:59:00-07:00",
+#           "type": "datetime"
+#         },
+#         "published_at": {
+#           "description": "date when course pace is published",
+#           "example": "2013-01-23T23:59:00-07:00",
+#           "type": "datetime"
+#         },
+#         "root_account_id": {
+#           "description": "the root account ID for this course pace",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "start_date": {
+#           "description": "course start date",
+#           "example": "2013-01-23T23:59:00-07:00",
+#           "type": "datetime"
+#         },
+#         "modules": {
+#           "description": "list of modules and items for this course pace",
+#           "type": "array",
+#           "modules": { "$ref": "Module" }
+#         },
+#         "progress": {
+#           "description": "progress of pace publishing",
+#           "$ref": "Progress"
+#         }
+#       }
+#     }
+# @model Module
+#     {
+#       "id": "Module",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the module",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "the name of the module",
+#           "example": "Module 1",
+#           "type": "string"
+#         },
+#         "position": {
+#           "description": "the position of the module",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "items" : {
+#           "description": "list of module items",
+#           "type": "array",
+#           "items": { "$ref": "ModuleItem" }
+#         },
+#         "context_id": {
+#           "description": "the ID of the context for this course pace",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The given context for the course pace",
+#           "enum":
+#           [
+#             "Course",
+#             "Section",
+#             "User"
+#           ],
+#           "example": "Course",
+#           "type": "string"
+#         }
+#       }
+#     }
+# @model ModuleItem
+#     {
+#       "id": "ModuleItem",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "duration": {
+#           "description": "the duration of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "course_pace_id": {
+#           "description": "the course pace id of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "root_account_id": {
+#           "description": "the root account id of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "module_item_id": {
+#           "description": "the module item id of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "assignment_title": {
+#           "description": "The title of the item assignment",
+#           "example": "Assignment 9",
+#           "type": "string"
+#         },
+#         "points_possible": {
+#           "description": "The points of the item",
+#           "example": 10.0,
+#           "type": "number"
+#         },
+#         "assignment_link": {
+#           "description": "The link of the item assignment",
+#           "example": "/courses/105/modules/items/264",
+#           "type": "string"
+#         },
+#         "position": {
+#           "description": "the current position of the module item",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "module_item_type": {
+#           "description": "The module item type of the item assignment",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "published": {
+#           "description": "published boolean value for course pace",
+#           "example": true,
+#           "type": "boolean"
+#         }
+#       }
+#     }
+#
+# @model Progress
+#     {
+#       "id": "Progress",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the Progress object",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "context_id": {
+#           "description": "the context owning the job.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "example": "Account",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "the id of the user who started the job",
+#           "example": 123,
+#           "type": "integer"
+#         },
+#         "tag": {
+#           "description": "the type of operation",
+#           "example": "course_batch_update",
+#           "type": "string"
+#         },
+#         "completion": {
+#           "description": "percent completed",
+#           "example": 100,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "the state of the job one of 'queued', 'running', 'completed', 'failed'",
+#           "example": "completed",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "queued",
+#               "running",
+#               "completed",
+#               "failed"
+#             ]
+#           }
+#         },
+#         "created_at": {
+#           "description": "the time the job was created",
+#           "example": "2013-01-15T15:00:00Z",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "the time the job was last updated",
+#           "example": "2013-01-15T15:04:00Z",
+#           "type": "datetime"
+#         },
+#         "message": {
+#           "description": "optional details about the job",
+#           "example": "17 courses processed",
+#           "type": "string"
+#         },
+#         "results": {
+#           "description": "optional results of the job. omitted when job is still pending",
+#           "example": { "id": "123" },
+#           "type": "object"
+#         },
+#         "url": {
+#           "description": "url where a progress update can be retrieved",
+#           "example": "https://canvas.example.edu/api/v1/progress/1",
+#           "type": "string"
+#         }
+#       }
+#     }
 
 class CoursePacesController < ApplicationController
   before_action :load_context
@@ -98,6 +359,21 @@ class CoursePacesController < ApplicationController
     pace.course
   end
 
+  # @API Show a Course pace
+  # Returns a course pace for the course and pace id provided
+  #
+  # @argument course_id [Required, Integer]
+  #   The id of the course
+  #
+  # @argument course_pace_id [Required, Integer]
+  #   The id of the course_pace
+  #
+  # @returns CoursePace
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/course_pacing/1 \
+  #     -H 'Authorization: Bearer <token>'
+
   def api_show
     load_and_run_progress
     render json: {
@@ -154,6 +430,48 @@ class CoursePacesController < ApplicationController
     render json: progress_json(@progress, @current_user, session)
   end
 
+  # @API Create a Course pace
+  #
+  # @argument course_id [Required, Integer]
+  #   The id of the course
+  #
+  # @argument end_date [Datetime]
+  #   End date of the course pace
+  #
+  # @argument end_date_context [String]
+  #   End date context (course, section, hupothetical)
+  #
+  # @argument start_date [Datetime]
+  #   Start date of the course pace
+  #
+  # @argument start_date_context [String]
+  #   Start date context (course, section, hupothetical)
+  #
+  # @argument exclude_weekends [Boolean]
+  #   Course pace dates excludes weekends if true
+  #
+  # @argument hard_end_dates [Boolean]
+  #   Course pace uess hard end dates if true
+  #
+  # @argument workflow_state [String]
+  #   The state of the course pace
+  #
+  # @argument course_pace_module_item_attributes[] [String]
+  #   Module Items attributes
+  #
+  # @argument context_id [Integer]
+  #   Pace Context ID
+  #
+  # @argument context_type [String]
+  #   Pace Context Type (Course, Section, User)
+  #
+  # @returns CoursePace
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/course_pacing \
+  #     -X POST \
+  #     -H 'Authorization: Bearer <token>'
+
   def create
     @course_pace = @context.course_paces.new(create_params)
 
@@ -167,6 +485,37 @@ class CoursePacesController < ApplicationController
       render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
     end
   end
+
+  # @API Update a Course pace
+  # Returns the updated course pace
+  #
+  # @argument course_id [Required, Integer]
+  #   The id of the course
+  #
+  # @argument course_pace_id [Required, Integer]
+  #   The id of the course pace
+  #
+  # @argument end_date [Datetime]
+  #   End date of the course pace
+  #
+  # @argument exclude_weekends [Boolean]
+  #   Course pace dates excludes weekends if true
+  #
+  # @argument hard_end_dates [Boolean]
+  #   Course pace uess hard end dates if true
+  #
+  # @argument workflow_state [String]
+  #   The state of the course pace
+  #
+  # @argument course_pace_module_item_attributes[] [String]
+  #   Module Items attributes
+  #
+  # @returns CoursePace
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/course_pacing/1 \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>'
 
   def update
     if @course_pace.update(update_params)
@@ -214,6 +563,22 @@ class CoursePacesController < ApplicationController
 
     render json: compressed_dates.to_json
   end
+
+  # @API Delete a Course pace
+  # Returns the updated course pace
+  #
+  # @argument course_id [Required, Integer]
+  #   The id of the course
+  #
+  # @argument course_pace_id [Required, Integer]
+  #   The id of the course_pace
+  #
+  # @returns CoursePace
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/course_pacing/1 \
+  #     -X DELETE \
+  #     -H 'Authorization: Bearer <token>'
 
   def destroy
     return not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
