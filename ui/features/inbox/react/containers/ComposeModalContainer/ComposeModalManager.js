@@ -339,6 +339,7 @@ const ComposeModalManager = props => {
       setSendingMessage={setSendingMessage}
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
+      maxGroupRecipientsMet={props.maxGroupRecipientsMet}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
       isPrivateConversation={!!props?.conversation?.isPrivate}
@@ -357,6 +358,7 @@ ComposeModalManager.propTypes = {
   conversationsQueryOption: PropTypes.object,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  maxGroupRecipientsMet: PropTypes.bool,
 }
 
 export default ComposeModalManager
