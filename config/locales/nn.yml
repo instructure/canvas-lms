@@ -23599,7 +23599,7 @@ nn:
       i emnet.
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Synkroniseringa støtte på ein feil og vart ikkje ferdig."
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Synkroniser til SIS innstillinga kunne ikkje skrus på for denne oppgåva \"%{assignment_name}\" utan innleveringsfrist."
-  the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Teamet kunne ikkje bli oppretta fordi Microsoftgruppa ikkje har noken eigarar. Det kan vere ein midlertidig feil: prøv å synkronisera igjen, og hvis problemet vedvarer må du kontakte brukarstøtte."
+  the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Teamet kunne ikkje bli oppretta fordi Microsoftgruppa ikkje har nokon eigarar. Det kan vere ein midlertidig feil: prøv å synkronisera att, og om problemet held fram må du kontakte brukarstøtte."
   the_term_for_export_data_5aad7a0a: "Semester for eksport av data"
   the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
   the_term_id_to_report_on_4479d2fc: "ID for terminen rapporten er for."
