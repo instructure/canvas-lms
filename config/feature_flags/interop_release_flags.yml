@@ -33,8 +33,9 @@ lti_platform_storage:
   state: hidden
   display_name: LTI Platform Storage
   description: |-
-    If enabled, allows new window.postMessage subjects for the LTI Platform
-    Storage spec, and sends response messages to all postMessage.
+    Controls the final changes needed to fully conform to the LTI Platform Storage
+    spec, including receiving messages addressed to the correct OIDC Auth
+    URI origin, and the postMessage forwarding proxy frame.
   applies_to: SiteAdmin
 lti_multiple_assignment_deep_linking:
   state: hidden

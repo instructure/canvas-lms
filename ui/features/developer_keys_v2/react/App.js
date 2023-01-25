@@ -138,9 +138,9 @@ class DeveloperKeysApp extends React.Component {
 
   buildDevKeyOIDCText(_features) {
     const today = new Date()
-    const changeDate = new Date(1688212799000) // July 1, 2023 at 11:59:59 UTC
+    const changeDate = new Date(1692460800000) // August 19, 2023 at 16:00:00 UTC
     const formattedDate = DateHelper.formatDateForDisplay(changeDate)
-    const linkMarkup = `<a href="https://community.canvaslms.com/t5/The-Product-Blog/The-LTI-1-3-OIDC-Auth-Endpoint-is-Changing-You-Won-t-Believe-the/ba-p/551677">$1</a>`
+    const linkMarkup = `<a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677">$1</a>`
     const secondParagraph = I18n.t(
       '*For LTI 1.3 Tool Developers:* Follow the directions in the "What exactly will you need to change?" section of the Community article.',
       {wrappers: [`<strong>$1</strong>`]}

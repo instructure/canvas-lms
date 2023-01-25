@@ -270,7 +270,7 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
 
 <ul>
  <li> the value of the sub claim should match the client_id of the developer key in Canvas.</li>
- <li> the value of the aud claim should contain the domain of the Canvas account where the desired data resides.</li>
+ <li> the value of the aud claim should contain either the domain of the Canvas account where the desired data resides, or the domain of the LTI 1.3 OIDC Auth endpoint, as described <a href="/doc/api/file.lti_dev_key_config.html#step-2" target="_blank">here</a>.</li>
 </ul>
 
 
