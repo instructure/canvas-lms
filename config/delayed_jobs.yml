@@ -4,6 +4,7 @@ development:
     workers: 1
 
 production:
+  work_queue: parent_process
   workers:
   - queue: canvas_queue
     workers: 2
