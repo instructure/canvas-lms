@@ -123,12 +123,10 @@
         </table>
       {{/if}}
     {{/if}}
-    {{#unless fetchedLast}}
-      <div class="loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}">
+      <div class="paginatedLoadingIndicator loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}">
         <img src="/images/ajax-reload-animated.gif">
         {{#unless fetched}}{{#t 'loading'}}Loading ...{{/t}}{{else}}{{#t 'loading_more'}}Loading more ...{{/t}}{{/unless}}
       </div>
-    {{/unless}}
     {{#if fetched}}
       {{#unless collection.length}}
         <div style="text-align: center">{{#t 'no_pages'}}No pages created yet.{{/t}}{{#if CAN.CREATE}} <a class="new_page" href="#">{{#t 'add_page'}}Add one!{{/t}}</a>{{/if}}</div>
