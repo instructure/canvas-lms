@@ -29,18 +29,25 @@ class Login::Oauth2Controller < Login::OauthBaseController
     return unless validate_request
 
     @aac = AccountAuthorizationConfig.find(jwt['aac_id'])
+    Rails.logger.info("AAC: #{@aac.inspect}")
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth2)
 
     unique_id = nil
     provider_attributes = {}
     return unless timeout_protection do
       token = @aac.get_token(params[:code], oauth2_login_callback_url)
+      Rails.logger.info("Token: #{token.inspect}")
+
       unique_id = @aac.unique_id(token)
+      Rails.logger.info("Unique_ID 42: #{unique_id.inspect}")
+
       provider_attributes = @aac.provider_attributes(token)
+      Rails.logger.info("Provider Attributes: #{provider_attributes.inspect}")
 
       if identity_v2_applicable? && @aac&.admin_role?(token)
         unless unique_id && Pseudonym.exists?(integration_id: unique_id)
           unique_id = @aac.identity_email_address(token)
+          Rails.logger.info("Unique_ID 49: #{unique_id.inspect}")
         end
         provider_attributes["is_admin"] = true
       end

@@ -62,6 +62,8 @@ class Login::OauthBaseController < ApplicationController
   end
 
   def find_pseudonym(unique_ids, provider_attributes = {})
+    Rails.logger.info "Received OAuth2 login with unique_id: #{unique_ids.inspect}"
+    Rails.logger.info "Received OAuth2 login with provider_attributes: #{provider_attributes.inspect}"
     if unique_ids.nil?
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login with no unique_id"
@@ -77,6 +79,8 @@ class Login::OauthBaseController < ApplicationController
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
 
+    Rails.logger.info "Received OAuth2 login with pseudonym 82: #{pseudonym.inspect}"
+    Rails.logger.info "Received OAuth2 login with unique_ids 83: #{unique_ids.inspect}"
     if unique_ids.first && identity_v2_applicable?
       pseudonym = Pseudonym.active.find_by(integration_id: unique_ids.first)
       HTTParty.post(
