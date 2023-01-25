@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'timeout'
 require 'atom'
 
 class DiscussionEntry < ActiveRecord::Base
@@ -347,7 +346,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def context_module_action
     if self.discussion_topic && self.user
-      Timeout.timeout(7.minutes.to_i, Timeout::Error) { self.discussion_topic.context_module_action(user, :contributed) }
+      self.discussion_topic.context_module_action(user, :contributed)
     end
   end
 
