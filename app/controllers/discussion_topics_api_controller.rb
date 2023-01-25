@@ -107,7 +107,8 @@ class DiscussionTopicsApiController < ApplicationController
     opts = {
       :include_new_entries => value_to_boolean(params[:include_new_entries]),
       :include_mobile_overrides => !!mobile_brand_config,
-      :user_id => @current_user.id
+      :user_id => @current_user.id, 
+      :launch_darkly_user => @launch_darkly_user
     }
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(opts)
 
