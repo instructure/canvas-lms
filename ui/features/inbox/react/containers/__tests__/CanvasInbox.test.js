@@ -41,11 +41,15 @@ describe('CanvasInbox App Container', () => {
     server.close()
     // eslint-disable-next-line no-undef
     fetchMock.enableMocks()
+    window.ENV = {}
   })
 
   beforeEach(() => {
     window.ENV = {
       current_user_id: 1,
+      CONVERSATIONS: {
+        MAX_GROUP_CONVERSATION_SIZE: 100,
+      },
     }
   })
 

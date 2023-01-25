@@ -64,6 +64,7 @@ const CanvasInbox = () => {
   const userID = ENV.current_user_id?.toString()
   const [urlUserRecipient, setUrlUserRecepient] = useState()
   const [selectedIds, setSelectedIds] = useState([])
+  const [maxGroupRecipientsMet, setMaxGroupRecipientsMet] = useState(false)
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -159,9 +160,16 @@ const CanvasInbox = () => {
     setSelectedConversationMessage(null)
   }
 
-  const onSelectedIdsChange = ids => {
-    setSelectedIds(ids)
-  }
+  // when selected Ids change, determine is maxGroupRecipients have been met,
+  // so that we can programatically check and disable the
+  // individual message checkbox
+  useEffect(() => {
+    let totalRecipients = 0
+    selectedIds?.forEach(recipient => {
+      totalRecipients += recipient.totalRecipients
+    })
+    setMaxGroupRecipientsMet(totalRecipients > ENV.CONVERSATIONS.MAX_GROUP_CONVERSATION_SIZE)
+  }, [selectedIds])
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
@@ -726,8 +734,9 @@ const CanvasInbox = () => {
             }}
             open={composeModal}
             conversationsQueryOption={conversationsQueryOption}
-            onSelectedIdsChange={onSelectedIdsChange}
+            onSelectedIdsChange={setSelectedIds}
             selectedIds={selectedIds}
+            maxGroupRecipientsMet={maxGroupRecipientsMet}
           />
         </ConversationContext.Provider>
       )}
