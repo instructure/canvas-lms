@@ -47,7 +47,6 @@ class Login::Oauth2Controller < Login::OauthBaseController
       if identity_v2_applicable? && @aac&.admin_role?(token)
         unless unique_id && Pseudonym.exists?(integration_id: unique_id)
           unique_id = @aac.identity_email_address(token)
-          Rails.logger.info("Unique_ID 49: #{unique_id.inspect}")
         end
         provider_attributes["is_admin"] = true
       end

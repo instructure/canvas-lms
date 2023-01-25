@@ -35,7 +35,7 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    login_attributes
+    (login_attributes + %w[first_name last_name]).freeze
   end
 
   # Rename db field
@@ -63,8 +63,21 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
 
   protected
 
+  # def me(token)
+  #   token.options[:me] ||= token.get("/me").parsed['data']
+  # end
   def me(token)
-    token.options[:me] ||= token.get("/me").parsed['data']
+    token.options[:me] ||= begin
+                             raw_data = token.get("/v2.1/me").parsed
+                             data = raw_data["data"].dup
+                             data = data.merge(token.get("/v2.1/#{raw_data["type"]}s/#{data["id"]}").parsed["data"])
+                             data["first_name"] = data.dig("name", "first")
+                             data["last_name"] = data.dig("name", "last")
+                             data["district_username"] = data.dig("credentials", "district_username")
+                             data.slice!(*(self.class.recognized_federated_attributes + ["district"]))
+                             Rails.logger.info "Clever data123: #{data}"
+                             data
+                           end
   end
 
   def client_options
