@@ -1061,7 +1061,7 @@ class RCEWrapper extends React.Component {
       event.stopPropagation()
       this.setFocusAbilityForHeader(true)
       focusToolbar(this._elementRef.current)
-    } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
+    } else if (event.code === 'F8' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
       this.openKBShortcutModal()

@@ -19,14 +19,15 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import {Heading} from '@instructure/ui-heading'
-import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
+import {Table} from '@instructure/ui-table'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import formatMessage from '../format-message'
 import {determineOSDependentKey} from './userOS'
 import {instuiPopupMountNode} from '../util/fullscreenHelpers'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default function KeyboardShortcutModal(props) {
   const OSKey = determineOSDependentKey()
@@ -56,33 +57,60 @@ export default function KeyboardShortcutModal(props) {
         <Heading>{formatMessage('Keyboard Shortcuts')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <View as="div" margin="small">
-          <List isUnstyled={true}>
-            <List.Item>
-              <Text weight="bold">
-                {OSKey}+F8/{OSKey}+0
-              </Text>{' '}
-              {formatMessage('Open this keyboard shortcuts dialog')}
-            </List.Item>
-            <List.Item>
-              <Text weight="bold">CTRL+F9</Text> {formatMessage('Focus element options toolbar')}
-            </List.Item>
-            <List.Item>
-              <Text weight="bold">{OSKey}+F9</Text> {formatMessage("Go to the editor's menubar")}
-            </List.Item>
-            <List.Item>
-              <Text weight="bold">{OSKey}+F10</Text> {formatMessage("Go to the editor's toolbar")}
-            </List.Item>
-            <List.Item>
-              <Text weight="bold">ESC</Text>{' '}
-              {formatMessage('Close a menu or dialog. Also returns you to the editor area')}
-            </List.Item>
-            <List.Item>
-              <Text weight="bold">{formatMessage('TAB/Arrows')}</Text>{' '}
-              {formatMessage('Navigate through the menu or toolbar')}
-            </List.Item>
-          </List>
-          <View as="p">
+        <View as="div" padding="x-small xx-large large x-large">
+          <Table margin="small" caption={formatMessage('Keyboard Shortcuts')}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="shortcut_header">
+                  <ScreenReaderContent>{formatMessage('Shortcut')}</ScreenReaderContent>
+                </Table.ColHeader>
+                <Table.ColHeader id="description_header">
+                  <ScreenReaderContent>{formatMessage('Description')}</ScreenReaderContent>
+                </Table.ColHeader>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">{OSKey}+F8</Text>
+                </Table.Cell>
+                <Table.Cell>{formatMessage('Open this keyboard shortcuts dialog')}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">CTRL+F9</Text>
+                </Table.Cell>
+                <Table.Cell>{formatMessage('Focus element options toolbar')}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">{OSKey}+F9</Text>
+                </Table.Cell>
+                <Table.Cell>{formatMessage("Go to the editor's menubar")}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">{OSKey}+F10</Text>
+                </Table.Cell>
+                <Table.Cell>{formatMessage("Go to the editor's toolbar")}</Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">ESC</Text>
+                </Table.Cell>
+                <Table.Cell>
+                  {formatMessage('Close a menu or dialog. Also returns you to the editor area')}
+                </Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
+                  <Text weight="bold">{formatMessage('TAB/Arrows')}</Text>
+                </Table.Cell>
+                <Table.Cell>{formatMessage('Navigate through the menu or toolbar')}</Table.Cell>
+              </Table.Row>
+            </Table.Body>
+          </Table>
+          <View as="p" padding="large 0 0 0" margin="0 0 0 small">
             {formatMessage('Other editor shortcuts may be found at')}{' '}
             <a
               href="https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/"
