@@ -35,7 +35,14 @@ if Plugin.installed?('bundler_lockfile_extensions')
   install_filter = lambda do |lockfile, source|
     return false if (
       source.to_s.match(/plugins\/(?!academic_benchmark|account_reports|moodle_importer|qti_exporter|respondus_soap_endpoint|simply_versioned)/)
-    ) || ::Digest::MD5.hexdigest(source.to_s) == "252f6aa6a56f69f01f8a19275e91f0d8"
+    )
+
+    source_md5 = ::Digest::MD5.hexdigest(source.to_s)
+
+    return false if (
+      source_md5 == "52288aac483aed012b58e6707e1660a5" || # rubygems repository <redacted>
+      source_md5 == "252f6aa6a56f69f01f8a19275e91f0d8" # rubygems repository <redacted> or installed locally
+    )
 
     true
   end

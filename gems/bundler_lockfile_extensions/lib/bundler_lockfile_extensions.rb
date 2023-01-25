@@ -58,7 +58,10 @@ module BundlerLockfileExtensions
       BundlerLockfileExtensions.lockfile_defs = lockfile_defs
 
       BundlerLockfileExtensions.lockfile_path =
-        if defined?(Bundler::CLI::Install) || defined?(Bundler::CLI::Update)
+        if defined?(Bundler::CLI::Cache) || defined?(Bundler::CLI::Lock)
+          @lockfile_writes_enabled = true
+          lockfile_default
+        elsif defined?(Bundler::CLI::Install) || defined?(Bundler::CLI::Update)
           # Sadly, this is the only place where the lockfile_path can be set correctly for the installation-like paths.
           # Ideally, it would go into before-install-all, but that is called after the lockfile is already loaded.
           BundlerLockfileExtensions.install_filter_lockfile_name(lockfile_default)
@@ -76,7 +79,7 @@ module BundlerLockfileExtensions
       Bundler::SharedHelpers.class_eval do
         class << self
           def default_lockfile
-            Pathname.new(BundlerLockfileExtensions.lockfile_path)
+            Pathname.new(BundlerLockfileExtensions.lockfile_path).expand_path
           end
         end
       end

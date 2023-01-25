@@ -21,5 +21,5 @@
 require_relative "lib/bundler_lockfile_extensions"
 
 Bundler::Plugin.add_hook(Bundler::Plugin::Events::GEM_AFTER_INSTALL_ALL) do |_|
-  BundlerLockfileExtensions.write_all_lockfiles unless BundlerLockfileExtensions.lockfile_defs.nil?
+  BundlerLockfileExtensions.write_all_lockfiles unless BundlerLockfileExtensions.lockfile_defs.nil? || defined?(Bundler::CLI::Cache) || defined?(Bundler::CLI::Lock)
 end
