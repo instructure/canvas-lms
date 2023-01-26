@@ -376,24 +376,18 @@ const DiscussionTopicManager = props => {
                             courseID: ENV.course_id,
                             isAnonymousAuthor,
                           },
-                          optimisticResponse: getOptimisticResponse({
-                            message,
-                            isAnonymous:
-                              !!discussionTopicQuery.data.legacyNode.anonymousState &&
-                              discussionTopicQuery.data.legacyNode.canReplyAnonymously,
+                          ...(!discussionTopicQuery.data.legacyNode
+                            .initialPostRequiredForCurrentUser && {
+                            optimisticResponse: getOptimisticResponse({
+                              message,
+                              isAnonymous:
+                                !!discussionTopicQuery.data.legacyNode.anonymousState &&
+                                discussionTopicQuery.data.legacyNode.canReplyAnonymously,
+                            }),
                           }),
                         })
                       }}
                       isHighlighted={isTopicHighlighted}
-                      onDiscussionReplyPost={() => {
-                        // When post requires a reply, check to see if we can refatch after initial post
-                        if (
-                          discussionTopicQuery.data.legacyNode.availableForUser &&
-                          discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
-                        ) {
-                          discussionTopicQuery.refetch(variables)
-                        }
-                      }}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
