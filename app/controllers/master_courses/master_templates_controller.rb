@@ -320,7 +320,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         return render json: { message: "cannot add and remove a course at the same time" }, status: :bad_request
       end
 
-      if ids_to_remove.any? && @template.active_migration && !%w[completed exports_failed imports_failed].include?(@template.active_migration.workflow_state)
+      if ids_to_remove.any? && @template.active_migration_running?
         return render json: { message: "cannot remove courses while a sync is ongoing" }, status: :bad_request
       end
 
