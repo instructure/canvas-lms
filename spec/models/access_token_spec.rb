@@ -595,4 +595,33 @@ describe AccessToken do
       expect(at.update(purpose: lorem_ipsum)).to be false
     end
   end
+
+  describe ".site_admin?" do
+    specs_require_sharding
+    let(:account) { account_model }
+    let(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.create!(account: account)) }
+
+    it "authenticates access token and calls #site_admin?" do
+      expect(AccessToken).to receive(:authenticate).and_return(access_token)
+      expect(access_token).to receive(:site_admin?)
+
+      AccessToken.site_admin?("token-string")
+    end
+
+    describe "#site_admin?" do
+      it "returns false" do
+        @shard2.activate do
+          expect(access_token.site_admin?).to be false
+        end
+      end
+
+      context "access token is for site admin" do
+        let(:account) { Account.site_admin }
+
+        it "returns true" do
+          expect(access_token.site_admin?).to be true
+        end
+      end
+    end
+  end
 end
