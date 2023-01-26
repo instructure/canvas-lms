@@ -119,6 +119,14 @@ export const handlers = [
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =
         [ConversationMessage.mock({body: 'Course scoped conversation message'})]
+    } else if (req.variables.scope === 'null_nodes') {
+      data.legacyNode.conversationsConnection.nodes[0].conversation = Conversation.mock({
+        contextId: null,
+        contextType: null,
+        contextName: null,
+        subject: null,
+        conversationMessagesConnection: {nodes: []},
+      })
     } else {
       data.legacyNode.conversationsConnection.nodes = [
         {

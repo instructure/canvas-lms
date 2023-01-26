@@ -72,8 +72,8 @@ export const MessageDetailItem = ({...props}) => {
               <Avatar
                 size={responsiveProps.avatar}
                 margin="small small small none"
-                name={props.conversationMessage.author.name}
-                src={props.conversationMessage.author.avatarUrl}
+                name={props.conversationMessage?.author?.name}
+                src={props.conversationMessage?.author?.avatarUrl}
               />
             </Flex.Item>
             <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -109,7 +109,7 @@ export const MessageDetailItem = ({...props}) => {
           </Flex>
           <Text
             size={responsiveProps.messageBody}
-            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage.body)}}
+            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body)}}
           />
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">
