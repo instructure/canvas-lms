@@ -65,6 +65,8 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
 
   def me(token)
     token.options[:me] ||= token.get("/v2.1/me").parsed['data']
+    raw_data = token.get("/v2.1/me").parsed
+    Rails.logger.info "Clever data123: #{raw_data}"
   end
   # def me(token)
   #   token.options[:me] ||= begin
