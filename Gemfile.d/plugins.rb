@@ -33,7 +33,7 @@ gem "xml-simple", "1.1.5"
 gem "zendesk_api", "1.28.0"
 
 group :test do
-  gem "vcr"
+  gem "vcr", "6.1.0"
 end
 
 # Private Dependency Sub-Dependencies
