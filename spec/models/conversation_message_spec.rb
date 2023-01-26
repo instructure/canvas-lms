@@ -394,7 +394,7 @@ describe ConversationMessage do
   end
 
   describe "reply_from" do
-    before :once do
+    before do
       course_with_teacher
     end
 
@@ -417,21 +417,126 @@ describe ConversationMessage do
       end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
+    it "ignores replies to conversations in hard concluded courses" do
+      student_in_course
+      convo = @teacher.initiate_conversation([@user])
+      convo.add_message("you cannot reply to this because it is concluded")
+      convo.conversation.update_attribute(:context, @course)
+      @course.update!(workflow_state: "completed")
+
+      last_message = convo.conversation.conversation_messages.last
+      expect do
+        last_message.reply_from({
+                                  purpose: "general",
+                                  user: @user,
+                                  subject: "this reply should return an error",
+                                  html: "body",
+                                  text: "body"
+                                })
+      end.to raise_error(IncomingMail::Errors::InvalidParticipant)
+    end
+
+    context "soft concluded course" do
+      before do
+        student_in_course
+        @course.start_at = 2.days.ago
+        @course.conclude_at = 1.day.ago
+        @course.save!
+
+        @convo = @teacher.initiate_conversation([@user])
+        @convo.add_message("you cannot reply to this because it is concluded")
+        @convo.conversation.update_attribute(:context, @course)
+        @last_message = @convo.conversation.conversation_messages.last
+      end
+
+      it "ignores replies from students in soft concluded courses with date restrictions" do
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        expect do
+          @last_message.reply_from({
+                                     purpose: "general",
+                                     user: @user,
+                                     subject: "this reply should return an error",
+                                     html: "body",
+                                     text: "body"
+                                   })
+        end.to raise_error(IncomingMail::Errors::InvalidParticipant)
+      end
+
+      it "allows replies from students with ongoing section overrides" do
+        my_section = @course.course_sections.create!(name: "test section")
+        my_section.start_at = 1.day.ago
+        my_section.end_at = 5.days.from_now
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+        @course.save!
+
+        @course.enroll_student(@user, allow_multiple_enrollments: true,
+                                      enrollment_state: "active", section: my_section)
+
+        email_reply = @last_message.reply_from({
+                                                 purpose: "general",
+                                                 user: @user,
+                                                 subject: "this reply should return an error",
+                                                 html: "body",
+                                                 text: "body"
+                                               })
+
+        expect(email_reply.body).to eq "body"
+      end
+
+      it "only section date restriction - allows replies from students with term role overrides" do
+        term = @course.enrollment_term
+        term.enrollment_dates_overrides.create!(
+          enrollment_type: "StudentEnrollment", start_at: 10.days.ago, end_at: 10.days.from_now, context: term.root_account
+        )
+        @course.restrict_enrollments_to_course_dates = false
+
+        my_section = @course.course_sections.create!(name: "test section")
+
+        @course.enroll_student(@student, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: my_section)
+
+        @course.enroll_teacher(@teacher, allow_multiple_enrollments: true,
+                                         enrollment_state: "active", section: my_section)
+
+        # test the OR case by concluding the section
+        my_section.start_at = 5.days.ago
+        my_section.end_at = 4.days.ago
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+
+        email_reply = @last_message.reply_from({
+                                                 purpose: "general",
+                                                 user: @user,
+                                                 subject: "this reply should return an error",
+                                                 html: "body",
+                                                 text: "body"
+                                               })
+
+        expect(email_reply.body).to eq "body"
+      end
+    end
+
     it "replies only to the message author on conversations2 conversations" do
-      users = Array.new(3) { course_with_student(course: @course).user }
-      conversation = Conversation.initiate(users, false, context_type: "Course", context_id: @course.id)
-      conversation.add_message(users[0], "initial message", root_account_id: Account.default.id)
-      cm2 = conversation.add_message(users[1], "subsequent message", root_account_id: Account.default.id)
+      student1 = student_in_course.user
+      student2 = student_in_course.user
+      student3 = student_in_course.user
+
+      cp = student1.initiate_conversation([student1, student2, student3])
+      cp.add_message("initial message", root_account_id: Account.default.id, recipients: [student1])
+      cm2 = cp.add_message("subsequent message", root_account_id: Account.default.id, recipients: [student2])
       expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({
                              purpose: "general",
-                             user: users[2],
+                             user: student2,
                              subject: "an email reply",
                              html: "body",
                              text: "body"
                            })
       expect(cm3.conversation_message_participants.size).to eq 2
-      expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [student1.id, student2.id].sort
     end
 
     it "marks conversations as read for the replying author" do
