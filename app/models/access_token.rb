@@ -117,6 +117,10 @@ class AccessToken < ActiveRecord::Base
     tokens.reject { |token| token.developer_key&.internal_service }
   end
 
+  def self.site_admin?(token_string)
+    !!authenticate(token_string)&.site_admin?
+  end
+
   def usable?(token_key = :crypted_token)
     return false if expired?
 
@@ -135,6 +139,12 @@ class AccessToken < ActiveRecord::Base
     return true unless developer_key
 
     developer_key.authorized_for_account?(target_account)
+  end
+
+  def site_admin?
+    return false unless global_developer_key_id.present?
+
+    Shard.shard_for(global_developer_key_id).default?
   end
 
   def record_last_used_threshold
