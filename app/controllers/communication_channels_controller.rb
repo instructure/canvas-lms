@@ -158,6 +158,8 @@ class CommunicationChannelsController < ApplicationController
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
                         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
+    InstStatsd::Statsd.increment("communication_channels.create.skip_confirmation") if skip_confirmation
+
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
       unless @access_token
         return render json: { errors: { type: "Push is only supported when using an access token" } }, status: :bad_request
@@ -210,6 +212,10 @@ class CommunicationChannelsController < ApplicationController
     # Save channel and return response
     if @cc.save
       @cc.send_confirmation!(@domain_root_account) unless skip_confirmation
+
+      # need to change them from pre-registered to registered them as well
+      # so that they can get notifications
+      @user.register if skip_confirmation
 
       flash[:notice] = t("profile.notices.contact_registered", "Contact method registered!")
       render json: communication_channel_json(@cc, @current_user, session)

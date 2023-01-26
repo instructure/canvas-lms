@@ -76,7 +76,8 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
         { preserve_method_args: true },
         progress: progress,
         submission_ids: submission_ids,
-        posting_params: posting_params
+        posting_params: posting_params,
+        skip_content_participation_refresh: false
       )
       { assignment: assignment, progress: progress, sections: sections }
     else

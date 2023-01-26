@@ -215,7 +215,8 @@ module ErrorContext
     end
 
     def spec_path
-      @spec_path ||= RerunArgument.for(example).sub(%r{\A[./]+}, "")
+      ex_name = example.exception ? example.exception.class.name : "none"
+      @spec_path ||= RerunArgument.for(example).sub(%r{\A[./]+}, "") + "/#{ex_name}"
     end
 
     def errors_path

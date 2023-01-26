@@ -33,7 +33,7 @@
 # do that since Rails transactions must happen in a block.
 
 module QueryPgTimeout
-  def run_queries(schema, queries, *args)
+  def run_queries(schema, queries, **kwargs)
     # we don't multiplex queries in Canvas right now, but if we start to do
     # that someday, this code will need to be adjusted
     # (it should fail if queries and mutations are mixed)

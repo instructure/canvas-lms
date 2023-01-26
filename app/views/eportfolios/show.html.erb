@@ -132,12 +132,11 @@
 
   <h3><%= t('headers.recent_submissions', "Recent Submissions") %></h3>
   <p><%= t(:recent_submissions, "Click any submission to add it to a new page in your ePortfolio.") %></p>
-  <% if @portfolio.user.submissions.empty? %>
+  <% if @recent_submissions.empty? %>
     <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
   <% end %>
   <ul class="submission_list" id="recent_submissions" style="max-height: 200px; overflow: auto;">
     <% @recent_submissions.each do |submission| %>
-      <% next unless submission.assignment.published? && submission.context.published? %>
       <% already_used = (@used_submission_ids.include?(submission.id) rescue false) %>
       <li class="clearfix submission <%= 'already_used' if already_used %>" title="<%= t('titles.already_used', "This submission is already included in your portfolio") if already_used %>" id="recent_submission_<%= submission.id %>" tabindex="0">
         <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>"
@@ -162,7 +161,7 @@
     <% end %>
   </ul>
   <ul id="eportfolio_structure" style="display: none;">
-    <% @portfolio.eportfolio_categories.each do |category| %>
+    <% @categories.each do |category| %>
       <li id="structure_category_<%= category.id %>" class="category">
         <ul class="entry_list">
           <% category.eportfolio_entries.each do |entry| %>
@@ -199,7 +198,7 @@
         <td><%= before_label(:section, "Section") %></td>
         <td>
           <select id="category_select" name="eportfolio_entry[eportfolio_category_id]">
-            <% @portfolio.eportfolio_categories.each do |category| %>
+            <% @categories.each do |category| %>
               <option value="<%= category.id %>" id="category_select_<%= category.id %>"><%= category.name %></option>
             <% end %>
           </select>
@@ -328,7 +327,7 @@
     </div>
     <div class="edit_submission_content form_content" style="display: none;">
       <%= before_label(:choose_submission, "Select an assignment submission to embed in this page") %><br/>
-      <% submissions = @portfolio.user.submissions.except(:preload).preload(:assignment).to_a %>
+      <% submissions = @recent_submissions %>
       <% if submissions.empty? %>
         <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
       <% end %>

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "lti/concerns/parent_frame_shared_examples"
+
 describe ExternalContentController do
   describe "GET success" do
     it "doesn't require a context" do
@@ -28,6 +30,29 @@ describe ExternalContentController do
       c = course_factory
       get :success, params: { service: "external_tool_dialog", course_id: c.id }
       expect(assigns[:context]).to_not be_nil
+    end
+  end
+
+  describe "GET success/:id" do
+    context "no lti_version is passed" do
+      let(:course) { course_factory }
+      let(:params) do
+        {
+          service: "external_tool_dialog",
+          course_id: course.id,
+          id: 123
+        }
+      end
+
+      before do
+        course_with_teacher
+        user_session(@teacher)
+      end
+
+      it "returns a 401 rather than a 500" do
+        get(:success, params: params)
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 
@@ -100,6 +125,97 @@ describe ExternalContentController do
           lti_errormsg: '{"html"=>"errormsg somehtml"}',
           lti_errorlog: '{"html"=>"errorlog somehtml"}'
         )
+      end
+
+      it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+        subject do
+          user_session(account_admin_user(account: Account.site_admin))
+          post(
+            :success,
+            params: {
+              service: "external_tool_dialog",
+              course_id: c.id,
+              parent_frame_context: pfc_tool.id
+            }
+          )
+        end
+
+        let(:pfc_tool_context) { c }
+      end
+
+      describe "DEEP_LINKING_POST_MESSAGE_ORIGIN" do
+        subject do
+          post(
+            :success,
+            params: {
+              service: "external_tool_dialog",
+              course_id: c.id,
+              parent_frame_context: tool.id
+            }
+          )
+        end
+
+        let(:tool) do
+          c.context_external_tools.create!(
+            {
+              name: "test tool",
+              domain: "test.com",
+              consumer_key: "fake_oauth_consumer_key",
+              shared_secret: "secret",
+              developer_key: developer_key,
+              url: "http://test.com/login",
+            }
+          )
+        end
+        let(:developer_key) do
+          key = DeveloperKey.new
+          key.generate_rsa_keypair!
+          key.save!
+          key.developer_key_account_bindings.first.update!(
+            workflow_state: "on"
+          )
+          key
+        end
+
+        context "when returning from a non-internal service" do
+          it "does not set the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            expect(controller).not_to receive(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+            subject
+          end
+        end
+
+        context "when returning from an internal service" do
+          before do
+            user_session(account_admin_user(account: Account.site_admin))
+            developer_key.update!(internal_service: true)
+          end
+
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            allow(controller).to receive(:js_env)
+            subject
+            expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "http://test.com" }, true)
+          end
+
+          context "when the tool has a domain and not a url" do
+            let(:tool) do
+              c.context_external_tools.create!(
+                {
+                  name: "test tool",
+                  domain: "test.com",
+                  consumer_key: "fake_oauth_consumer_key",
+                  shared_secret: "secret",
+                  developer_key: developer_key,
+                }
+              )
+            end
+
+            it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+              allow(controller).to receive(:js_env)
+              subject
+              expect(controller).to have_received(:js_env).with({ DEEP_LINKING_POST_MESSAGE_ORIGIN: "https://test.com" }, true)
+            end
+          end
+        end
       end
     end
 

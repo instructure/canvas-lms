@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "bigdecimal"
-
 class GradeCalculator
   attr_reader :gradable_assignments
   attr_accessor :assignments, :groups

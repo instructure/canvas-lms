@@ -30,8 +30,6 @@ rescue LoadError
   nil
 end
 
-require "securerandom"
-require "tmpdir"
 require "crystalball"
 
 ENV["RAILS_ENV"] = "test"
@@ -943,8 +941,6 @@ RSpec.configure do |config|
     skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
   end
 end
-
-require_dependency "lazy_presumptuous_i18n_backend"
 
 module I18nStubs
   def stub(translations)

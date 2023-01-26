@@ -52,13 +52,13 @@ describe "course pace landing page" do
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
-      expect(create_default_pace_button.text).to eq("Create Default Pace")
+      expect(create_default_pace_button.text).to eq("Create Course Pace")
     end
 
     it "lands on the getting started course pace landing page when visited the first time" do
       visit_course_paces_page
 
-      expect(create_default_pace_button.text).to eq("Create Default Pace")
+      expect(create_default_pace_button.text).to eq("Create Course Pace")
       expect(get_started_button).to be_displayed
       expect(course_paces_panda).to be_displayed
     end
@@ -87,13 +87,13 @@ describe "course pace landing page" do
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
-      expect(create_default_pace_button.text).to eq("Edit Default Pace")
+      expect(create_default_pace_button.text).to eq("Edit Default Course Pace")
     end
 
     it "lands on the editing course pace landing page when visited" do
       visit_course_paces_page
 
-      expect(create_default_pace_button.text).to eq("Edit Default Pace")
+      expect(create_default_pace_button.text).to eq("Edit Default Course Pace")
       expect(element_exists?(get_started_button_selector)).to be_falsey
     end
 
@@ -150,43 +150,6 @@ describe "course pace landing page" do
       click_context_table_page(2)
 
       expect(course_pace_table_rows.count).to eq(9)
-    end
-
-    it "searches for a section by name" do
-      15.times do |x|
-        @course.course_sections.create!(name: "Sections to Paginate #{x}")
-      end
-
-      visit_course_paces_page
-
-      expect(course_pace_table_rows.count).to eq(10)
-      expect(context_table_pagination).to be_displayed
-
-      search_input.send_keys("Sections to Paginate 1")
-      click_search_button
-
-      expect(course_pace_table_rows.count).to eq(6)
-    end
-  end
-
-  context "course pace table for student enrollments" do
-    before :once do
-      create_published_course_pace("Course Pace 1", "Module Assignment 1")
-    end
-
-    it "searches for a student by name" do
-      n_students_in_course(15, course: @course)
-
-      visit_course_paces_page
-      click_student_tab
-
-      expect(course_pace_table_rows.count).to eq(10)
-      expect(context_table_pagination).to be_displayed
-
-      search_input.send_keys("user 1")
-      click_search_button
-
-      expect(course_pace_table_rows.count).to eq(7)
     end
   end
 

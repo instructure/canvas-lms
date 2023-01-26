@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {connect} from 'react-redux'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
@@ -25,30 +25,30 @@ import {paceContextsActions} from '../actions/pace_contexts'
 import {actions as uiActions} from '../actions/ui'
 import {
   APIPaceContextTypes,
+  OrderType,
   PaceContext,
+  PaceContextProgress,
   PaceContextTypes,
   ResponsiveSizes,
+  SortableColumn,
   StoreState,
 } from '../types'
 import PaceContextsTable from './pace_contexts_table'
 import {getResponsiveSize} from '../reducers/ui'
 import Search from './search'
+import {API_CONTEXT_TYPE_MAP} from '../utils/utils'
 
 const I18n = useI18nScope('course_paces_app')
 
 const {Panel: TabPanel} = Tabs as any
 
-export const CONTEXT_TYPE_MAP: {[k in APIPaceContextTypes]: PaceContextTypes} = {
-  course: 'Course',
-  section: 'Section',
-  student_enrollment: 'Enrollment',
-}
-
 interface PaceContextsContentProps {
   currentPage: number
   currentSearchTerm: string
+  currentSortBy: SortableColumn
+  currentOrderType: OrderType
   paceContexts: PaceContext[]
-  fetchPaceContexts: (contextType: APIPaceContextTypes, page?: number, searchTerm?: string) => void
+  fetchPaceContexts: typeof paceContextsActions.fetchPaceContexts
   selectedContextType: APIPaceContextTypes
   setSelectedContextType: (selectedContextType: APIPaceContextTypes) => void
   setSelectedContext: (selectedPaceContext: PaceContext) => void
@@ -56,13 +56,18 @@ interface PaceContextsContentProps {
   pageCount: number
   setPage: (page: number) => void
   setSearchTerm: typeof paceContextsActions.setSearchTerm
+  setOrderType: typeof paceContextsActions.setOrderType
   isLoading: boolean
   responsiveSize: ResponsiveSizes
+  contextsPublishing: PaceContextProgress[]
+  syncPublishingPaces: typeof paceContextsActions.syncPublishingPaces
 }
 
 export const PaceContent = ({
   currentPage,
   currentSearchTerm,
+  currentSortBy,
+  currentOrderType,
   paceContexts,
   fetchPaceContexts,
   selectedContextType,
@@ -72,36 +77,58 @@ export const PaceContent = ({
   pageCount,
   setPage,
   setSearchTerm,
+  setOrderType,
   isLoading,
   responsiveSize,
+  contextsPublishing,
+  syncPublishingPaces,
 }: PaceContextsContentProps) => {
-  const [tab, setTab] = useState('tab-section')
+  const selectedTab = `tab-${selectedContextType}`
   const currentTypeRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (paceContexts.length > 0) {
+      if (currentTypeRef.current !== selectedContextType) {
+        // force syncing when switching tabs
+        syncPublishingPaces(true)
+      } else {
+        syncPublishingPaces()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paceContexts, selectedContextType])
 
   useEffect(() => {
     let page = currentPage
     let searchTerm = currentSearchTerm
+    let orderType = currentOrderType
     // if switching tabs set page to 1 and reset search term
     if (currentTypeRef.current !== selectedContextType) {
       page = 1
       searchTerm = ''
+      orderType = 'asc'
       currentTypeRef.current = selectedContextType
-      setSearchTerm(searchTerm)
     }
-    fetchPaceContexts(selectedContextType, page, searchTerm)
+    fetchPaceContexts({
+      contextType: selectedContextType,
+      page,
+      searchTerm,
+      sortBy: currentSortBy,
+      orderType,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedContextType, currentPage])
+  }, [selectedContextType, currentPage, currentSortBy, currentOrderType])
 
   const changeTab = (_ev, {id}) => {
-    setTab(id)
     const type = id.split('-')
     setSelectedContextType(type[1])
     setSearchTerm('')
+    setOrderType('asc')
   }
 
   const handleContextSelect = (paceContext: PaceContext) => {
     setSelectedContext(paceContext)
-    setSelectedModalContext(CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
+    setSelectedModalContext(API_CONTEXT_TYPE_MAP[selectedContextType], paceContext.item_id)
   }
 
   return (
@@ -110,7 +137,7 @@ export const PaceContent = ({
         key="tab-section"
         renderTitle={I18n.t('Sections')}
         id="tab-section"
-        isSelected={tab === 'tab-section'}
+        isSelected={selectedTab === 'tab-section'}
         padding="none"
       >
         <View
@@ -118,7 +145,7 @@ export const PaceContent = ({
           padding="small"
           background="secondary"
           margin="large none none none"
-          borderWidth="small small none small"
+          borderWidth="small"
         >
           <Search contextType="section" />
         </View>
@@ -126,18 +153,22 @@ export const PaceContent = ({
           contextType="section"
           handleContextSelect={handleContextSelect}
           currentPage={currentPage}
+          currentOrderType={currentOrderType}
+          currentSortBy={currentSortBy}
           paceContexts={paceContexts}
           pageCount={pageCount}
           setPage={setPage}
+          setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
+          contextsPublishing={contextsPublishing}
         />
       </TabPanel>
       <TabPanel
         key="tab-student_enrollment"
         renderTitle={I18n.t('Students')}
         id="tab-student_enrollment"
-        isSelected={tab === 'tab-student_enrollment'}
+        isSelected={selectedTab === 'tab-student_enrollment'}
         padding="none"
       >
         <View
@@ -145,7 +176,7 @@ export const PaceContent = ({
           padding="small"
           background="secondary"
           margin="large none none none"
-          borderWidth="small small none small"
+          borderWidth="small"
         >
           <Search contextType="student_enrollment" />
         </View>
@@ -153,11 +184,15 @@ export const PaceContent = ({
           contextType="student_enrollment"
           handleContextSelect={handleContextSelect}
           currentPage={currentPage}
+          currentOrderType={currentOrderType}
+          currentSortBy={currentSortBy}
           paceContexts={paceContexts}
           pageCount={pageCount}
           setPage={setPage}
+          setOrderType={setOrderType}
           isLoading={isLoading}
           responsiveSize={responsiveSize}
+          contextsPublishing={contextsPublishing}
         />
       </TabPanel>
     </Tabs>
@@ -169,16 +204,21 @@ const mapStateToProps = (state: StoreState) => ({
   pageCount: state.paceContexts.pageCount,
   currentPage: state.paceContexts.page,
   currentSearchTerm: state.paceContexts.searchTerm,
+  currentSortBy: state.paceContexts.sortBy,
+  currentOrderType: state.paceContexts.order,
   isLoading: state.paceContexts.isLoading,
   selectedContextType: state.paceContexts.selectedContextType,
+  contextsPublishing: state.paceContexts.contextsPublishing,
   responsiveSize: getResponsiveSize(state),
 })
 
 export default connect(mapStateToProps, {
   setPage: paceContextsActions.setPage,
   setSearchTerm: paceContextsActions.setSearchTerm,
+  setOrderType: paceContextsActions.setOrderType,
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSelectedContextType: paceContextsActions.setSelectedContextType,
   setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
+  syncPublishingPaces: paceContextsActions.syncPublishingPaces,
 })(PaceContent)

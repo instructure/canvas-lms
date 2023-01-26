@@ -181,7 +181,7 @@ module Lti
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
         canvas_region: @context.shard.database_server.config[:region] || "not_configured",
-        lti_storage_target: Account.site_admin.feature_enabled?(:lti_platform_storage) ? "post_message_forwarding" : "_parent"
+        lti_storage_target: Lti::PlatformStorage.lti_storage_target
       )
       req.as_json
     end
@@ -194,8 +194,9 @@ module Lti
           canvas_domain: @opts[:domain],
           context_type: @context.class,
           context_id: @context.global_id,
-          canvas_locale: I18n.locale || I18n.default_locale.to_s
-        },
+          canvas_locale: I18n.locale || I18n.default_locale.to_s,
+          parent_frame_context: @opts[:parent_frame_context]
+        }.compact,
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
       )
     end

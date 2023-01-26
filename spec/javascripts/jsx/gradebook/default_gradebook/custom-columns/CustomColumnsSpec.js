@@ -57,23 +57,10 @@ QUnit.module('Gradebook > Custom Columns', suiteHooks => {
       )
     })
 
-    test('sets the custom columns loaded status to true', () => {
-      gradebook.gotCustomColumns(customColumns)
-      strictEqual(gradebook.contentLoadStates.customColumnsLoaded, true)
-    })
-
     test('updates essential data load status', () => {
       sinon.spy(gradebook, '_updateEssentialDataLoaded')
       gradebook.gotCustomColumns(customColumns)
       strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
-    })
-
-    test('updates essential data load status after updating the custom columns loaded status', () => {
-      sinon.spy(gradebook, 'updateColumnHeaders')
-      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.customColumnsLoaded, true)
-      })
-      gradebook.gotCustomColumns(customColumns)
     })
   })
 })

@@ -21,6 +21,7 @@
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
+  include SubmissionCommentsHelper
   include KalturaHelper
   include Api::V1::AssignmentGroup
   include Api::V1::Group
@@ -122,10 +123,7 @@ class GradebooksController < ApplicationController
           {
             id: comment.id,
             attempt: comment.attempt,
-            author: {
-              id: comment.author_id,
-              display_name: comment.author_name
-            },
+            author_name: comment_author_name_for(comment),
             created_at: comment.created_at,
             edited_at: comment.edited_at,
             updated_at: comment.updated_at,
@@ -470,7 +468,7 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       post_grades_ltis: post_grades_ltis,
       post_manually: @context.post_manually?,
-
+      proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
       publish_to_sis_enabled: (
         !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
       ),
@@ -492,7 +490,8 @@ class GradebooksController < ApplicationController
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, { include: ["groups"] }),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
-      version: params.fetch(:version, nil)
+      version: params.fetch(:version, nil),
+      assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
     }
 
     js_env({
@@ -711,7 +710,8 @@ class GradebooksController < ApplicationController
 
         submission = submission.permit(:grade, :score, :excuse, :excused,
                                        :graded_anonymously, :provisional, :final, :set_by_default_grade,
-                                       :comment, :media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
+                                       :comment, :media_comment_id, :media_comment_type, :group_comment,
+                                       :late_policy_status).to_unsafe_h
         is_default_grade_for_missing = value_to_boolean(submission.delete(:set_by_default_grade)) && submission_record.missing? && submission_record.late_policy_status.nil?
 
         submission[:grader] = @current_user unless is_default_grade_for_missing
@@ -727,6 +727,7 @@ class GradebooksController < ApplicationController
           end
         end
         begin
+          dont_overwrite_grade = value_to_boolean(params[:dont_overwrite_grades])
           if %i[grade score excuse excused].any? { |k| submission.key? k }
             # if it's a percentage graded assignment, we need to ensure there's a
             # percent sign on the end. eventually this will probably be done in
@@ -735,7 +736,7 @@ class GradebooksController < ApplicationController
               submission[:grade] = "#{submission[:grade]}%"
             end
 
-            submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
+            submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
@@ -748,6 +749,13 @@ class GradebooksController < ApplicationController
             subs = @assignment.update_submission(@user, submission)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
             @submissions += subs
+          end
+
+          if submission.key?(:late_policy_status) && submission_record.present? && (!dont_overwrite_grade || (submission_record.grade.blank? && !submission_record.excused?))
+            submission_record.update(late_policy_status: submission[:late_policy_status])
+            if submission_record.saved_change_to_late_policy_status?
+              @submissions << submission_record
+            end
           end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
@@ -800,12 +808,11 @@ class GradebooksController < ApplicationController
     submissions.map do |submission|
       assignment = assignments[submission[:assignment_id].to_i]
       omitted_field = assignment.anonymize_students? ? :user_id : :anonymous_id
-      json_params = {
-        include: { submission_history: { methods: %i[late missing], except: omitted_field } },
+      json_params = Submission.json_serialization_full_parameters(methods: [:late, :missing]).merge(
+        include: { submission_history: { methods: %i[late missing word_count], except: omitted_field } },
         except: [omitted_field, :submission_comments]
-      }
-      json_params[:include][:submission_history][:methods] << :word_count
-      json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
+      )
+      json = submission.as_json(json_params)
 
       json[:submission].tap do |submission_json|
         submission_json[:assignment_visible] = submission.assignment_visible_to_user?(submission.user)
@@ -896,6 +903,8 @@ class GradebooksController < ApplicationController
         log_asset_access(["speed_grader", @context], "grades", "other")
         env = {
           SINGLE_NQ_SESSION_ENABLED: Account.site_admin.feature_enabled?(:single_new_quiz_session_in_speedgrader),
+          NQ_GRADE_BY_QUESTION_ENABLED: Account.site_admin.feature_enabled?(:new_quizzes_grade_by_question_in_speedgrader),
+          GRADE_BY_QUESTION: !!@current_user.preferences[:enable_speedgrader_grade_by_question],
           EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
           EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
           MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
@@ -927,7 +936,8 @@ class GradebooksController < ApplicationController
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string,
           late_policy: @context.late_policy&.as_json(include_root: false),
-          speedgrader_grade_sync_max_attempts: Setting.get("speedgrader.grade_sync_max_attempts", "20").to_i
+          speedgrader_grade_sync_max_attempts: Setting.get("speedgrader.grade_sync_max_attempts", "20").to_i,
+          assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1553,15 +1563,4 @@ class GradebooksController < ApplicationController
   def outcome_service_results_to_canvas_enabled?
     @context.feature_enabled?(:outcome_service_results_to_canvas)
   end
-
-  def mark_grades_read_a2
-    if @context.feature_enabled?(:assignments_2_student)
-      set_badge_counts_for(@context, @current_user)
-      course_submissions = @context.submissions.where(user_id: @current_user.id).except(:order).preload(:content_participations, :visible_submission_comments)
-      course_submissions.find_each do |submission|
-        submission.mark_read(@current_user)
-      end
-    end
-  end
-  helper_method :mark_grades_read_a2
 end

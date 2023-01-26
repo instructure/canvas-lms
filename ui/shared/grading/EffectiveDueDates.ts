@@ -19,13 +19,8 @@
 import _ from 'lodash'
 import timezone from '@canvas/timezone'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
-import type {
-  GradingPeriod,
-  Submission,
-  DueDate,
-  UserDueDateMap,
-  AssignmentUserDueDateMap,
-} from '../../api.d'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
+import type {Submission, DueDate, UserDueDateMap, AssignmentUserDueDateMap} from '../../api.d'
 
 export function scopeToUser(
   dueDateDataByAssignmentId: AssignmentUserDueDateMap,
@@ -48,16 +43,19 @@ export function scopeToUser(
 export function updateWithSubmissions(
   effectiveDueDates: AssignmentUserDueDateMap,
   submissions: Submission[],
-  gradingPeriods: GradingPeriod[] = []
+  gradingPeriods: CamelizedGradingPeriod[] = []
 ): void {
   const helper = new GradingPeriodsHelper(gradingPeriods)
-  const sortedPeriods: GradingPeriod[] = _.sortBy(gradingPeriods, 'startDate')
+  const sortedPeriods: CamelizedGradingPeriod[] = _.sortBy<CamelizedGradingPeriod>(
+    gradingPeriods,
+    'startDate'
+  )
 
   submissions.forEach(submission => {
-    const dueDate = timezone.parse(submission.cached_due_date)
+    const dueDate: Date | null = timezone.parse(submission.cached_due_date)
 
-    let gradingPeriod: null | GradingPeriod = null
-    if (gradingPeriods.length) {
+    let gradingPeriod: null | CamelizedGradingPeriod = null
+    if (gradingPeriods.length > 0) {
       if (dueDate) {
         gradingPeriod = helper.gradingPeriodForDueAt(dueDate)
       } else {

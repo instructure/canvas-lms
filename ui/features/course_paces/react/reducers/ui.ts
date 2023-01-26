@@ -22,6 +22,7 @@ import {StoreState, UIState} from '../types'
 import {Constants as UIConstants, UIAction} from '../actions/ui'
 import {getCoursePaceType, getPacePublishing} from './course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
+import {Constants as CoursePaceConstants} from '../actions/course_paces'
 
 export const initialState: UIState = {
   autoSaving: false,
@@ -36,6 +37,7 @@ export const initialState: UIState = {
   showPaceModal: false,
   responsiveSize: 'large',
   showProjections: true,
+  blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
 }
 
 /* Selectors */
@@ -63,10 +65,12 @@ export const getSelectedContextType = (state: StoreState) => state.ui.selectedCo
 export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
+export const getOuterResponsiveSize = (state: StoreState) => state.ui.outerResponsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
 export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
+export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -105,6 +109,8 @@ export default (state = initialState, action: UIAction): UIState => {
       }
     case UIConstants.SET_RESPONSIVE_SIZE:
       return {...state, responsiveSize: action.payload}
+    case UIConstants.SET_OUTER_RESPONSIVE_SIZE:
+      return {...state, outerResponsiveSize: action.payload}
     case UIConstants.SHOW_LOADING_OVERLAY:
       return {...state, showLoadingOverlay: true, loadingMessage: action.payload}
     case UIConstants.HIDE_LOADING_OVERLAY:
@@ -115,6 +121,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, showPaceModal: true}
     case UIConstants.SET_SELECTED_PACE_CONTEXT_TYPE:
       return {...state, selectedContextType: action.payload}
+    case UIConstants.SET_BLUEPRINT_LOCK:
+      return {...state, blueprintLocked: action.payload}
     default:
       return state
   }

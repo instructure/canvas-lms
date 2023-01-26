@@ -28,7 +28,7 @@ require_relative "../helpers/wiki_and_tiny_common"
 require_relative "pages/rce_next_page"
 require_relative "pages/rcs_sidebar_page"
 
-# rubocop:disable Specs/NoNoSuchElementError
+# rubocop:disable Specs/NoNoSuchElementError, Specs/NoExecuteScript
 
 # while there's a mix of instui 6 and 7 in canvas we're getting
 # "Warning: [themeable] A theme registry has already been initialized." js errors
@@ -103,8 +103,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
 
       click_pages_accordion
       click_course_item_link(title)
@@ -128,8 +127,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         select_all_in_tiny(f("#wiki_page_body"))
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_pages_accordion
         click_course_item_link(title)
@@ -221,8 +219,10 @@ describe "RCE next tests", ignore_js_errors: true do
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
         )
         visit_existing_wiki_edit(@course, "title")
-        f("##{rce_page_body_ifr_id}").click
-        f("##{rce_page_body_ifr_id}").send_keys([:control, "a"], :backspace)
+
+        select_all_in_tiny(f("#wiki_page_body"))
+
+        f("##{rce_page_body_ifr_id}").send_keys(:backspace)
 
         in_frame rce_page_body_ifr_id do
           expect(f("#tinymce").text).to eql ""
@@ -244,8 +244,7 @@ describe "RCE next tests", ignore_js_errors: true do
           f("#lnk").send_keys(%i[end return])
         end
 
-        click_document_toolbar_menu_button
-        click_course_documents
+        click_course_documents_toolbar_menuitem
         wait_for_ajaximations
 
         click_document_link(title)
@@ -305,8 +304,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -325,8 +323,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_quizzes_accordion
         click_course_item_link(title)
@@ -343,8 +340,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_announcements_accordion
         click_course_item_link(title)
@@ -363,8 +359,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_discussions_accordion
         click_course_item_link(title)
@@ -383,8 +378,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_modules_accordion
         click_course_item_link(title)
@@ -399,8 +393,7 @@ describe "RCE next tests", ignore_js_errors: true do
         title = "Files"
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_navigation_accordion
         click_course_item_link(title)
@@ -417,8 +410,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_announcement_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -438,8 +430,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_assignment_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_modules_accordion
         click_course_item_link(title)
@@ -455,8 +446,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_discussion_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
         click_course_item_link(title)
 
@@ -475,8 +465,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_new_quiz_page(@course, @quiz)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -496,8 +485,7 @@ describe "RCE next tests", ignore_js_errors: true do
         visit_syllabus(@course)
         click_edit_syllabus
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_assignments_accordion
         click_course_item_link(title)
@@ -520,8 +508,7 @@ describe "RCE next tests", ignore_js_errors: true do
         switch_to_editor_view
 
         def switch_trays
-          click_links_toolbar_menu_button
-          click_course_links
+          click_course_links_toolbar_menuitem
           wait_for_ajaximations
           expect(course_links_tray).to be_displayed
 
@@ -551,8 +538,8 @@ describe "RCE next tests", ignore_js_errors: true do
         @assignment = @course.assignments.create!(name: title, workflow_state: "published")
 
         visit_new_announcement_page(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
 
         expect(assignment_published_status).to be_displayed
@@ -561,8 +548,7 @@ describe "RCE next tests", ignore_js_errors: true do
         @assignment.save!
         visit_new_announcement_page(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         expect(assignment_unpublished_status).to be_displayed
       end
@@ -574,8 +560,8 @@ describe "RCE next tests", ignore_js_errors: true do
           @course.assignments.create!(name: title, workflow_state: "published", due_at: due_at)
 
         visit_new_announcement_page(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         click_assignments_accordion
         wait_for_ajaximations
         expect(assignment_due_date_exists?(due_at)).to eq true
@@ -597,8 +583,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
           visit_front_page_edit(@course)
 
-          click_links_toolbar_menu_button
-          click_course_links
+          click_course_links_toolbar_menuitem
 
           click_discussions_accordion
           click_course_item_link(title)
@@ -625,8 +610,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
 
         click_pages_accordion
 
@@ -651,8 +635,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_document_toolbar_menu_button
-        click_course_documents
+        click_course_documents_toolbar_menuitem
 
         expect(course_document_links.count).to eq(2)
 
@@ -675,9 +658,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         visit_front_page_edit(@course)
 
-        click_images_toolbar_menu_button
-        click_course_images
-        wait_for_ajaximations
+        click_course_images_toolbar_menuitem
         expect(image_links.count).to eq(2)
 
         enter_search_data("ico")
@@ -713,8 +694,8 @@ describe "RCE next tests", ignore_js_errors: true do
         add_embedded_image(title2)
 
         visit_front_page_edit(@course)
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         enter_search_data("ico")
         click_pages_accordion
         expect(course_item_links_list.count).to eq(1)
@@ -731,8 +712,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
     it "clicks on sidebar images tab" do
       visit_front_page_edit(@course)
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       expect(course_images_tray).to be_displayed
     end
@@ -747,8 +727,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       click_image_link(title)
 
@@ -771,8 +750,7 @@ describe "RCE next tests", ignore_js_errors: true do
       f("##{rce_page_body_ifr_id}").click
       select_text_of_element_by_id("para")
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
 
       click_image_link(title)
 
@@ -810,8 +788,7 @@ describe "RCE next tests", ignore_js_errors: true do
       visit_existing_wiki_edit(@course, page_title)
 
       def switch_trays
-        click_links_toolbar_menu_button
-        click_course_links
+        click_course_links_toolbar_menuitem
         wait_for_ajaximations
         expect(course_links_tray).to be_displayed
 
@@ -911,8 +888,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_document_toolbar_menu_button
-      click_course_documents
+      click_course_documents_toolbar_menuitem
 
       click_document_link(title)
 
@@ -968,21 +944,20 @@ describe "RCE next tests", ignore_js_errors: true do
       it "opens rce in full screen with button in status bar" do
         visit_front_page_edit(@course)
 
-        click_full_screen_button
+        full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
 
-        expect(rce_page_body_ifr_style).to eq("height: 100%; width: 100%;")
-
-        driver.action.send_keys(:escape).perform
-
-        expect(rce_page_body_ifr_style).to_not eq("height: 100%; width: 100%;")
+        exit_full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq nil
       end
     end
 
     it "closes the course links tray when pressing esc", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
 
       expect(tray_container_exists?).to eq true
 
@@ -999,8 +974,7 @@ describe "RCE next tests", ignore_js_errors: true do
     it "closes the course images tray when pressing esc", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_course_images
+      click_course_images_toolbar_menuitem
       expect(tray_container_exists?).to eq true
 
       driver.action.send_keys(:escape).perform
@@ -1013,8 +987,7 @@ describe "RCE next tests", ignore_js_errors: true do
     it "opens upload image modal when clicking upload option" do
       visit_front_page_edit(@course)
 
-      click_images_toolbar_menu_button
-      click_upload_image
+      click_upload_image_toolbar_menuitem
 
       expect(upload_image_modal).to be_displayed
     end
@@ -1024,8 +997,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Upload/Record Media")).to be_displayed
@@ -1038,8 +1011,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
@@ -1051,8 +1024,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({ "hide_rte_button" => true })
         visit_front_page_edit(@course)
-        media_button = media_toolbar_button
-        media_toolbar_menu_button.click
+        media_button = media_toolbar_menubutton
+        media_toolbar_menubutton.click
         wait_for_animations
         menu_id = media_button.attribute("aria-owns")
         expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
@@ -1064,8 +1037,8 @@ describe "RCE next tests", ignore_js_errors: true do
         double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
-        click_document_toolbar_menu_button
-        click_upload_document
+
+        click_upload_document_toolbar_menuitem
 
         expect(upload_document_modal).to be_displayed
       end
@@ -1075,8 +1048,7 @@ describe "RCE next tests", ignore_js_errors: true do
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
 
-        click_media_toolbar_menu_button
-        click_upload_media
+        click_upload_media_toolbar_menuitem
 
         expect(upload_media_modal).to be_displayed
       end
@@ -1089,8 +1061,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+      click_course_links_toolbar_menuitem
       click_assignments_accordion
 
       source = course_item_link(title)
@@ -1126,15 +1097,13 @@ describe "RCE next tests", ignore_js_errors: true do
 
       visit_new_assignment_page(@course)
 
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
 
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("myimage")
 
       click_close_button
-      click_images_toolbar_menu_button
-      click_user_images
+      click_user_images_toolbar_menuitem
 
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("myimage")
@@ -1296,6 +1265,27 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(lti_favorite_modal).to be_displayed
       end
 
+      describe "Paste", ignore_js_errors: true do
+        it "edit menubar menu shows tinymce flash alert on selecting 'Paste'" do
+          rce_wysiwyg_state_setup(@course)
+          menubar_open_menu("Edit")
+          menubar_menu_item("Paste").click
+          alert = f('.tox-notification--error[role="alert"]')
+          expect(alert).to be_displayed
+          expect(alert.text).to include "Your browser doesn't support direct access to the clipboard."
+        end
+
+        it "does not load the instructure_paste plugin when RCS is unavailable" do
+          allow(DynamicSettings).to receive(:find)
+            .with("rich-content-service", default_ttl: 5.minutes)
+            .and_return(DynamicSettings::FallbackProxy.new)
+          rce_wysiwyg_state_setup(@course)
+          plugins = driver.execute_script("return Object.keys(tinymce.activeEditor.plugins)") # rubocop:disable Specs/NoExecuteScript
+          expect(plugins.include?("instructure_paste")).to eql(false)
+          expect(plugins.include?("paste")).to eql(true)
+        end
+      end
+
       describe "Tools menubar menu", ignore_js_errors: true do
         it "includes Apps menu item in" do
           rce_wysiwyg_state_setup(@course)
@@ -1384,30 +1374,6 @@ describe "RCE next tests", ignore_js_errors: true do
       end
     end
 
-    describe "Insert content toolbar button default actions" do
-      it "does the right thing when clicking the toolbar button" do
-        double("CanvasKaltura::ClientV3")
-        allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
-        rce_wysiwyg_state_setup(@course)
-
-        click_links_toolbar_button
-        expect(insert_link_modal).to be_displayed
-        f("body").send_keys :escape # close the modal
-
-        click_images_toolbar_button
-        expect(upload_image_modal).to be_displayed
-        f("body").send_keys :escape
-
-        click_media_toolbar_button
-        expect(upload_media_modal).to be_displayed
-        f("body").send_keys :escape
-
-        click_document_toolbar_button
-        expect(upload_file_modal).to be_displayed
-        f("body").send_keys :escape
-      end
-    end
-
     describe "the content tray" do
       after { driver.local_storage.clear }
 
@@ -1418,15 +1384,15 @@ describe "RCE next tests", ignore_js_errors: true do
         rce_wysiwyg_state_setup(@course)
 
         driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
-        click_links_toolbar_menu_button
-        click_course_links
+
+        click_course_links_toolbar_menuitem
         wait_for_ajaximations
         expect(fj("li:contains('#{title}')")).to be_displayed
 
         click_content_tray_close_button
         wait_for_animations
-        click_document_toolbar_menu_button
-        click_user_documents
+
+        click_user_documents_toolbar_menuitem
         wait_for_ajaximations
 
         change_content_tray_content_type("Links")
@@ -1529,7 +1495,229 @@ describe "RCE next tests", ignore_js_errors: true do
         end
       end
     end
+
+    context "Icon Maker Tray" do
+      before do
+        Account.site_admin.enable_feature!(:buttons_and_icons_root_account)
+      end
+
+      it "can add image" do
+        skip("Works IRL but fails in selenium. Fix with MAT-1127")
+        rce_wysiwyg_state_setup(@course)
+        create_icon_toolbar_menuitem.click
+        iconmaker_addimage_menu.click
+        iconmaker_singlecolor_option.click
+        iconmaker_singlecolor_articon.click
+        expect(iconmaker_image_preview).to be_displayed
+      end
+    end
+
+    # rubocop:disable Specs/NoSeleniumWebDriverWait
+    describe "fullscreen" do
+      it "restores the rce to its original size on exiting fullscreen" do
+        visit_front_page_edit(@course)
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height")
+
+        full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        exit_full_screen_button.click
+        rce_wrapper = f(".rce-wrapper")
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect(orig_height).to eql(rce_wrapper.css_value("height"))
+        end
+      end
+
+      it "restores the rce to its original size after switching to pretty html view" do
+        visit_front_page_edit(@course)
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        switch_to_html_view
+        exit_full_screen_button.click
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+
+      it "restores the rce to its original while in pretty html view" do
+        visit_front_page_edit(@course)
+        switch_to_html_view
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        exit_full_screen_button.click
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+
+      it "restores the rce to its original size after switching from pretty html view" do
+        visit_front_page_edit(@course)
+        switch_to_html_view
+
+        rce_wrapper = f(".rce-wrapper")
+        orig_height = rce_wrapper.css_value("height").to_i
+
+        full_screen_button.click
+        fs_elem = driver.execute_script("return document.fullscreenElement")
+        expect(fs_elem).to eq f(".rce-wrapper")
+
+        switch_to_editor_view
+        exit_full_screen_button.click
+        rce_wrapper = f(".rce-wrapper")
+        new_height = rce_wrapper.css_value("height").to_i
+        Selenium::WebDriver::Wait.new(timeout: 1.0).until do
+          expect((orig_height - new_height).abs).to be < 3
+        end
+      end
+
+      it "stil shows tinymce menus when in fullscreen" do
+        # ideally we'd do this test with multiple RCEs on the page
+        # but the setup effort isn't worth it.
+        visit_front_page_edit(@course)
+        full_screen_button.click
+        doc_btn = document_toolbar_menubutton
+        doc_btn.click
+        menu_id = doc_btn.attribute("aria-owns")
+        expect(f("##{menu_id}")).to be_displayed
+      end
+
+      it "traps focus in fullscreen" do
+        visit_front_page_edit(@course)
+        full_screen_button.click
+        active_elem = driver.execute_script("return document.activeElement") # content area
+        active_elem.send_keys(:tab)
+        driver.execute_script("return document.activeElement").send_keys(:tab) # status bar button
+        driver.execute_script("return document.activeElement").send_keys(:tab) # kb shortcut button
+        new_active_elem = driver.execute_script("return document.activeElement") # content area
+        expect(new_active_elem).to eq(active_elem)
+        exit_full_screen_button.click
+      end
+    end
+    # rubocop:enable Specs/NoSeleniumWebDriverWait
+
+    describe "CanvasContentTray" do
+      it "displays all its dropdowns" do
+        visit_front_page_edit(@course)
+
+        document_toolbar_menubutton.click
+        course_documents_toolbar_menuitem.click
+        expect(tray_container).to be_displayed
+
+        content_tray_content_type.click
+        expect(content_tray_content_type_links).to be_displayed
+        content_tray_content_type.click # close the dropdown
+
+        content_tray_content_subtype.click
+        expect(content_tray_content_subtype_images).to be_displayed
+        content_tray_content_subtype.click
+
+        content_tray_sort_by.click
+        expect(content_tray_sort_by_date_added).to be_displayed
+        content_tray_sort_by.click
+
+        exit_full_screen_menu_item.click
+      end
+
+      it "displays all its dropdowns in fullscreen" do
+        visit_front_page_edit(@course)
+
+        document_toolbar_menubutton.click
+        course_documents_toolbar_menuitem.click
+        expect(tray_container).to be_displayed
+        full_screen_button.click
+        wait_for_animations
+        expect(tray_container).to be_displayed
+
+        content_tray_content_type.click
+        expect(content_tray_content_type_links).to be_displayed
+        content_tray_content_type.click # close the dropdown
+
+        content_tray_content_subtype.click
+        expect(content_tray_content_subtype_images).to be_displayed
+        content_tray_content_subtype.click
+
+        content_tray_sort_by.click
+        expect(content_tray_sort_by_date_added).to be_displayed
+        content_tray_sort_by.click
+
+        exit_full_screen_menu_item.click
+      end
+    end
+
+    describe "selection management" do
+      it "restores selection on focus after being reset while blurred" do
+        visit_front_page_edit(@course)
+        insert_tiny_text("select me")
+
+        select_all_in_tiny(f("#wiki_page_body"))
+
+        expect(rce_selection_focus_offset).to be > 0
+
+        # Click outside the RCE and clear selection (simulate Cmd+F)
+        f("#wiki_page_body_statusbar").click
+        clear_rce_selection
+        expect(rce_selection_focus_offset).to be 0
+
+        # Click back into the iframe
+        f("#wiki_page_body_ifr").click
+
+        # Ensure the selection has been restored
+        expect(rce_selection_focus_offset).to be > 0
+      end
+
+      it "restores selection before creating a link", ignore_js_errors: true do
+        title = "test_page"
+        unpublished = false
+        edit_roles = "public"
+
+        create_wiki_page(title, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        insert_tiny_text("select me")
+
+        select_all_in_tiny(f("#wiki_page_body"))
+
+        expect(rce_selection_focus_offset).to be > 0
+
+        external_link_toolbar_menuitem.click
+        expect(insert_link_modal).to be_displayed
+
+        clear_rce_selection
+        expect(rce_selection_focus_offset).to be 0
+
+        f('input[name="linklink"]').send_keys("http://example.com/")
+        fj('[role="dialog"] button:contains("Done")').click
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute("href")).to eq "http://example.com/"
+          expect(wiki_body_anchor.text).to eq "select me"
+
+          # If the selection was restored, there will only be one paragraph
+          # If the selection wasn't restored, an additional paragraph will have been created.
+          expect(ff("#tinymce p").size).to be 1
+        end
+      end
+    end
   end
 end
 
-# rubocop:enable Specs/NoNoSuchElementError
+# rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

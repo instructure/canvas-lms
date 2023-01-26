@@ -515,7 +515,6 @@ class Attachment < ActiveRecord::Base
     self.file_state ||= "available"
     assert_file_extension
     self.folder_id = nil if !folder || folder.context != context
-    self.folder_id = nil if folder&.deleted? && !deleted?
     self.folder_id ||= Folder.unfiled_folder(context).id rescue nil
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if root_attachment && new_record?
@@ -857,7 +856,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.destroy_files(ids)
-    Attachment.where(id: ids).each(&:destroy)
+    Attachment.batch_destroy(Attachment.active.where(id: ids))
   end
 
   before_save :assign_uuid
@@ -895,6 +894,8 @@ class Attachment < ActiveRecord::Base
     if instfs_hosted?
       InstFS.authenticated_url(self, options.merge(user: nil))
     else
+      # s3 can't handle unknown options :sigh:
+      options.delete(:internal)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -948,61 +949,112 @@ class Attachment < ActiveRecord::Base
   # collected (for instance, using the Tempfile class). Calling close on the
   # object may clean up things faster.
   #
-  # By default, this method will stream the file as it is read, if it's stored
-  # remotely and streaming is possible.  If opts[:need_local_file] is true,
-  # then a local Tempfile will be created if necessary and the IO object
-  # returned will always respond_to :path and :rewind, and have the right file
-  # extension.
+  # This method will return a local file object supporting #path, #rewind, etc.
+  # unless a block is given, in which case chunked data will be streamed to it.
   #
   # Be warned! If local storage is used, a File handle to the actual file will
   # be returned, not a Tempfile handle. So don't rm the file's .path or
   # anything crazy like that. If you need to test whether you can move the file
-  # at .path, or if you need to copy it, check if the file is_a?(Tempfile) (and
-  # pass :need_local_file => true of course).
+  # at .path, or if you need to copy it, check if the file is_a?(Tempfile).
   #
-  # If opts[:temp_folder] is given, and a local temporary file is created, this
+  # If +temp_folder+ is given, and a local temporary file is created, this
   # path will be used instead of the default system temporary path. It'll be
   # created if necessary.
-  def open(opts = {}, &block)
+  #
+  # If +integrity_check+ is set, the file's MD5 or SHA512 hash will be
+  # computed (during the download if possible) and a CorruptedDownload error
+  # will be raised if it doesn't match the stored value.
+  def open(temp_folder: nil, integrity_check: false, &block)
     if instfs_hosted?
       if block
-        streaming_download(&block)
+        streaming_download(integrity_check: integrity_check, &block)
       else
-        create_tempfile(opts) do |tempfile|
-          streaming_download(tempfile)
+        create_tempfile(temp_folder: temp_folder) do |tempfile|
+          streaming_download(tempfile, integrity_check: integrity_check)
         end
       end
     else
-      store.open(opts, &block)
+      store.open(temp_folder: temp_folder, integrity_check: integrity_check, &block)
     end
   end
 
   class FailedResponse < StandardError; end
+
+  class CorruptedDownload < StandardError; end
+
   # GETs this attachment's public_url and streams the response to the
   # passed block; this is a helper function for #open
   # (you should call #open instead of this)
-  private def streaming_download(dest = nil, &block)
+  private def streaming_download(dest = nil, integrity_check: false, &block)
     retries ||= 0
-    CanvasHttp.get(public_url) do |response|
-      raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
+    corrupt_retries ||= 0
+    bytes_read ||= 0
 
-      response.read_body(dest, &block)
+    # avoid corrupting the output stream if we retry after data has been received
+    can_retry = -> { bytes_read == 0 || (!block && dest.respond_to?(:rewind) && dest.respond_to?(:truncate)) }
+    prep_retry = lambda do
+      if bytes_read > 0
+        dest.rewind
+        dest.truncate(0)
+        bytes_read = 0
+      end
     end
-  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
-    if (retries += 1) < Setting.get(:streaming_download_retries, "5").to_i
+
+    validate_hash(enable: integrity_check) do |hash_context|
+      CanvasHttp.get(public_url(internal: true)) do |response|
+        raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
+
+        response.read_body do |data|
+          bytes_read += data.size
+          dest << data if dest
+          yield(data) if block
+          hash_context.update(data) if hash_context
+        end
+      end
+    end
+  rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout, IOError, Errno::ECONNRESET, Errno::ECONNABORTED, Errno::ETIMEDOUT => e
+    if can_retry.call && (retries += 1) < Setting.get(:streaming_download_retries, "5").to_i
       Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
+      retry
+    else
+      raise e
+    end
+  rescue CorruptedDownload => e
+    if can_retry.call && (corrupt_retries += 1) < Setting.get(:corrupt_download_retries, "2").to_i
+      Canvas::Errors.capture_exception(:attachment, e, :info)
+      prep_retry.call
       retry
     else
       raise e
     end
   end
 
-  def create_tempfile(opts)
-    if opts[:temp_folder].present? && !File.exist?(opts[:temp_folder])
-      FileUtils.mkdir_p(opts[:temp_folder])
+  # used by #open or its dependencies with integrity_check: true
+  def validate_hash(enable: true)
+    # the md5 column is probably actually a SHA512 unless this file is old, in which case it
+    # could be MD5 or missing. if we're not using Inst-FS, it's MD5.
+    hash_context = if enable && md5
+                     if md5.size == 32
+                       Digest::MD5.new
+                     elsif md5.size == 128
+                       Digest::SHA512.new
+                     end
+                   end
+
+    yield hash_context
+
+    if hash_context && (digest = hash_context.hexdigest) != md5
+      raise CorruptedDownload, "incorrect hash on downloaded file: #{digest}"
+    end
+  end
+
+  def create_tempfile(temp_folder: nil)
+    if temp_folder.present? && !File.exist?(temp_folder)
+      FileUtils.mkdir_p(temp_folder)
     end
     tempfile = Tempfile.new(["attachment_#{id}", extension],
-                            opts[:temp_folder].presence || Dir.tmpdir)
+                            temp_folder.presence || Dir.tmpdir)
     tempfile.binmode
     yield tempfile
     tempfile.rewind
@@ -1152,7 +1204,7 @@ class Attachment < ActiveRecord::Base
 
     # awesome browsers will use the filename* and get the proper unicode filename,
     # everyone else will get the sanitized ascii version of the filename
-    quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
+    quoted_unicode = "UTF-8''#{URI::DEFAULT_PARSER.escape(display_name, /[^A-Za-z0-9.]/)}"
     %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
   end
   protected :disposition_filename
@@ -1520,18 +1572,48 @@ class Attachment < ActiveRecord::Base
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy
-    return if new_record?
+    shard.activate do
+      return if new_record?
 
-    self.file_state = "deleted" # destroy
-    self.deleted_at = Time.now.utc
-    ContentTag.delete_for(self)
-    MediaObject.where(attachment_id: id).update_all(attachment_id: nil, updated_at: Time.now.utc)
-    save!
+      Attachment.batch_destroy([self])
+      touch_context_if_appropriate
+    end
+    reload
+  end
+
+  def self.batch_destroy(attachments)
+    ContentTag.active.where(content_type: "Attachment", content_id: attachments)
+              .union(ContentTag.active.where(context_type: "Attachment", context_id: attachments))
+              .find_each(&:destroy)
+    while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
-    context.clear_avatar_image_url_with_uuid(self.uuid) if context_type == "User" && self.uuid.present?
-    remove_attachments_from_drafts
-    true
+    User.joins("INNER JOIN #{Attachment.quoted_table_name} ON attachments.context_id = users.id
+                                                          AND users.avatar_image_url like '%' || attachments.uuid || '%'")
+        .where(attachments: { id: attachments, context_type: "User" })
+        .where.not(attachments: { uuid: nil })
+        .in_batches do |batch|
+      batch_ids = batch.pluck(:id)
+      batch.update_all(avatar_image_url: nil)
+      Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
+    end
+    while SubmissionDraftAttachment.where(attachment_id: attachments).limit(1000).destroy_all.count > 0 do end
+
+    delete_time = Time.now.utc
+    loop do
+      if attachments.is_a? ActiveRecord::Relation
+        batch = attachments.limit(1000)
+        array_batch = batch.to_a
+      else
+        batch = Attachment.where(id: attachments)
+        array_batch = attachments
+      end
+      batch.update_all(file_state: "deleted", deleted_at: delete_time, updated_at: delete_time, modified_at: delete_time)
+      array_batch.each { |attach| attach.mark_downstream_changes(%w[manually_deleted deleted_at updated_at modified_at]) }
+      Canvas::LiveEvents.delay_if_production.attachments_bulk_deleted(array_batch.map(&:id))
+      break if array_batch.length < 1000
+    end
+    attachments
   end
 
   # this will delete the content of the attachment but not delete the attachment
@@ -1787,7 +1869,7 @@ class Attachment < ActiveRecord::Base
     !!@skip_media_object_creation
   end
 
-  def submit_to_canvadocs(attempt = 1, opts = {})
+  def submit_to_canvadocs(attempt = 1, **opts)
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
@@ -1823,7 +1905,7 @@ class Attachment < ActiveRecord::Base
     if attempt <= Setting.get("max_canvadocs_attempts", "5").to_i
       delay(n_strand: "canvadocs_retries",
             run_at: (5 * attempt).minutes.from_now,
-            priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, opts)
+            priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, **opts)
     end
   end
 
@@ -1873,7 +1955,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_path?(path)
     f_path = full_path
-    f_path == path || URI.unescape(f_path) == path || f_path.casecmp?(path) || URI.unescape(f_path).casecmp?(path)
+    f_path == path || URI::DEFAULT_PARSER.unescape(f_path) == path || f_path.casecmp?(path) || URI::DEFAULT_PARSER.unescape(f_path).casecmp?(path)
   rescue
     false
   end
@@ -1884,7 +1966,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_display_path?(path)
     fd_path = full_display_path
-    fd_path == path || URI.unescape(fd_path) == path || fd_path.casecmp?(path) || URI.unescape(fd_path).casecmp?(path)
+    fd_path == path || URI::DEFAULT_PARSER.unescape(fd_path) == path || fd_path.casecmp?(path) || URI::DEFAULT_PARSER.unescape(fd_path).casecmp?(path)
   rescue
     false
   end
@@ -1892,7 +1974,7 @@ class Attachment < ActiveRecord::Base
   def self.matches_name?(name, match)
     return false unless name
 
-    name == match || URI.unescape(name) == match || name.casecmp?(match) || URI.unescape(name).casecmp?(match)
+    name == match || URI::DEFAULT_PARSER.unescape(name) == match || name.casecmp?(match) || URI::DEFAULT_PARSER.unescape(name).casecmp?(match)
   rescue
     false
   end
@@ -2147,7 +2229,7 @@ class Attachment < ActiveRecord::Base
                    })
     blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
-    "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
+    "blob=#{URI::DEFAULT_PARSER.escape blob}&hmac=#{URI::DEFAULT_PARSER.escape hmac}"
   end
   private :preview_params
 

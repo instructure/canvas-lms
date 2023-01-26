@@ -33,13 +33,14 @@ module Lti
                   :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment,
                   :collaboration, :variable_whitelist, :variable_blacklist
 
-    def self.register_expansion(name, permission_groups, expansion_proc, *guards)
+    def self.register_expansion(name, permission_groups, expansion_proc, *guards, **kwargs)
       @expansions ||= {}
       @expansions["$#{name}".to_sym] = VariableExpansion.new(
         name,
         permission_groups,
         expansion_proc,
-        *([-> { Lti::AppUtil.allowed?(name, @variable_whitelist, @variable_blacklist) }] + guards)
+        *([-> { Lti::AppUtil.allowed?(name, @variable_whitelist, @variable_blacklist) }] + guards),
+        **kwargs
       )
     end
 
@@ -1689,6 +1690,11 @@ module Lti
                            end
                          end
                          val&.to_json
+                       }
+
+    register_expansion "com.instructure.Account.usage_metrics_enabled", [],
+                       lambda {
+                         @root_account.feature_enabled?(:send_usage_metrics)
                        }
 
     private

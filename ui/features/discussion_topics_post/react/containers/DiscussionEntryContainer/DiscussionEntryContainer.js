@@ -26,6 +26,7 @@ import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {responsiveQuerySizes} from '../../utils'
+import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
 import {useMutation} from 'react-apollo'
@@ -41,6 +42,7 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionEntryContainer = props => {
   const [draftSaved, setDraftSaved] = useState(true)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {searchTerm} = useContext(SearchContext)
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
     update: props.updateDraftCache,
@@ -79,6 +81,8 @@ export const DiscussionEntryContainer = props => {
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
 
+  const threadMode = props.discussionEntry?.depth > 1 && !searchTerm
+
   return (
     <Responsive
       match="media"
@@ -103,15 +107,15 @@ export const DiscussionEntryContainer = props => {
         desktop: {
           direction: 'row',
           authorInfo: {
-            padding: 'xx-small 0 0 0',
+            padding: threadMode ? '0' : 'xx-small 0 0 0',
           },
           postUtilities: {
-            align: 'start',
-            margin: '0',
+            align: threadMode ? 'stretch' : 'start',
+            margin: threadMode ? '0 0 x-small 0' : '0',
             padding: 'xx-small',
           },
           postMessage: {
-            padding: 'x-small 0 small xx-large',
+            padding: threadMode ? '0 xx-small xx-small' : 'x-small 0 small xx-large',
             paddingNoAuthor: '0 0 xx-small xx-small',
             margin: '0',
           },
@@ -158,6 +162,7 @@ export const DiscussionEntryContainer = props => {
                     discussionEntryVersions={
                       props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
                     }
+                    threadMode={threadMode && !searchTerm}
                   />
                 </Flex.Item>
               )}
@@ -185,6 +190,7 @@ export const DiscussionEntryContainer = props => {
           >
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
+              threadMode={threadMode && !searchTerm}
               discussionEntry={props.discussionEntry}
               discussionAnonymousState={props.discussionTopic?.anonymousState}
               canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}

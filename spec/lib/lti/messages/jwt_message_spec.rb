@@ -616,8 +616,23 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :names_and_roles_service }
 
     shared_examples "names and roles claim check" do
-      it "sets the NRPS url" do
-        expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+        it "sets the NRPS url using the Account#domain" do
+          context.root_account.enable_feature! :consistent_ags_ids_based_on_account_principal_domain
+          allow_any_instance_of(Account).to receive(:domain).and_return("account_host")
+          expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
+          expect(controller).to have_received(:polymorphic_url).with(
+            [anything, :names_and_roles], host: "account_host"
+          )
+        end
+      end
+
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+        it "sets the NRPS url using the request host" do
+          context.root_account.disable_feature! :consistent_ags_ids_based_on_account_principal_domain
+          expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
+          expect(controller).to have_received(:polymorphic_url).with([anything, :names_and_roles])
+        end
       end
 
       it "sets the NRPS version" do
@@ -653,12 +668,20 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :assignment_and_grade_service }
 
     before do
-      allow(controller).to receive(:lti_line_item_index_url).and_return("lti_line_item_index_url")
+      course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+      allow_any_instance_of(Account).to \
+        receive(:domain).and_return("canonical_domain")
+      allow(controller).to \
+        receive(:lti_line_item_index_url)
+        .with({ host: "canonical_domain", course_id: course.id })
+        .and_return("lti_line_item_index_url")
     end
 
     shared_examples "assignment and grade service claim check" do
-      it "sets the AGS lineitems url" do
-        expect(lti_advantage_service_claim["lineitems"]).to eq "lti_line_item_index_url"
+      describe "AGS line items url" do
+        it "sets the AGS lineitems url" do
+          expect(lti_advantage_service_claim["lineitems"]).to eq "lti_line_item_index_url"
+        end
       end
 
       it "sets scopes from token" do

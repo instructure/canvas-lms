@@ -206,7 +206,7 @@ module InstFS
       s3_url = s3_client.config.endpoint.dup
       if s3_client.config.region == "us-east-1" &&
          s3_client.config.s3_us_east_1_regional_endpoint == "legacy"
-        s3_url.host = Aws::S3::Plugins::IADRegionalEndpoint.legacy_host(s3_url.host)
+        s3_url.host = s3_url.host.sub(".us-east-1", "")
       end
 
       body = {
@@ -385,6 +385,9 @@ module InstFS
       claims[:original_url] = original_url if original_url.present?
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
+      end
+      if options[:internal]
+        claims[:internal] = true
       end
       amend_claims_for_access_token(claims, options[:access_token], options[:root_account])
       service_jwt(claims, Time.zone.at(iat) + expires_in)

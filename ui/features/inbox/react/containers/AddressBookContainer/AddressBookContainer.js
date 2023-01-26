@@ -54,7 +54,10 @@ export const AddressBookContainer = props => {
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
-      context: filterHistory[filterHistory.length - 1]?.context?.contextID,
+      context:
+        filterHistory[filterHistory.length - 1]?.context?.contextID ||
+        props.courseContextCode ||
+        null,
       search: searchTerm,
       userID,
       courseContextCode: props.courseContextCode,
@@ -263,6 +266,7 @@ export const AddressBookContainer = props => {
       activeCourseFilter={props.activeCourseFilter}
       addressBookMessages={props.addressBookMessages}
       isOnObserverSubmenu={isOnObserverSubmenu()}
+      placeholder={props.placeholder}
     />
   )
 }
@@ -303,6 +307,10 @@ AddressBookContainer.propTypes = {
   hasSelectAllFilterOption: PropTypes.bool,
   addressBookMessages: PropTypes.array,
   courseContextCode: PropTypes.string,
+  /**
+   * placeholder text for AddressBook search text input
+   */
+  placeholder: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {

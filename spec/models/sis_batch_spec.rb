@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "tmpdir"
-
 describe SisBatch do
   before :once do
     account_model
@@ -290,6 +288,9 @@ describe SisBatch do
     end
 
     it "sets rows_for_parallel" do
+      expect(SisBatch.rows_for_parallel(5150)).to eq 100
+
+      Setting.set("sis_batch_rows_for_parallel", "99,25,1000")
       expect(SisBatch.rows_for_parallel(10)).to eq 25
       expect(SisBatch.rows_for_parallel(4_001)).to eq 41
       expect(SisBatch.rows_for_parallel(400_000)).to eq 1_000

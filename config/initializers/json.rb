@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "json/jwt"
-
 Oj.optimize_rails
 
 Oj.default_options = { mode: :rails, escape_mode: :xss_safe, bigdecimal_as_decimal: true }
@@ -32,7 +30,7 @@ ActiveSupport::JSON::Encoding.time_precision = 0
 class BigDecimal
   remove_method :as_json
 
-  def as_json(**) # :nodoc:
+  def as_json(*) # :nodoc:
     if finite?
       CanvasRails::Application.instance.config.active_support.encode_big_decimal_as_string ? to_s : to_f
     else

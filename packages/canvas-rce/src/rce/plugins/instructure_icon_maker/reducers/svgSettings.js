@@ -21,10 +21,8 @@ import {DEFAULT_SETTINGS} from '../svg/constants'
 export const defaultState = DEFAULT_SETTINGS
 
 export const actions = {
-  SET_ENCODED_IMAGE: 'SetEncodedImage',
-  SET_ENCODED_IMAGE_TYPE: 'SetEncodedImageType',
-  SET_ENCODED_IMAGE_NAME: 'SetEncodedImageName',
   SET_IMAGE_SETTINGS: 'SetImageSettings',
+  SET_EMBED_IMAGE: 'SetEmbedImage',
   SET_X: 'SetX',
   SET_Y: 'SetY',
   SET_TRANSLATE_X: 'SetTranslateX',
@@ -52,14 +50,10 @@ const nextStateForTransform = (currentState, transformProp, value) => {
 
 export const svgSettings = (state, action) => {
   switch (action.type) {
-    case actions.SET_ENCODED_IMAGE:
-      return {...state, encodedImage: action.payload}
-    case actions.SET_ENCODED_IMAGE_TYPE:
-      return {...state, encodedImageType: action.payload}
-    case actions.SET_ENCODED_IMAGE_NAME:
-      return {...state, encodedImageName: action.payload}
     case actions.SET_IMAGE_SETTINGS:
       return {...state, imageSettings: action.payload}
+    case actions.SET_EMBED_IMAGE:
+      return {...state, embedImage: action.payload}
     case actions.SET_X:
       return {...state, x: action.payload}
     case actions.SET_Y:

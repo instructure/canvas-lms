@@ -317,7 +317,7 @@ describe Assignment do
       it "calls submit_to_canvadocs when a canvadoc is not available and annotatable_attachment is present" do
         @canvadoc.update!(document_id: nil)
         expected_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-        expect(@attachment).to receive(:submit_to_canvadocs).with(1, expected_opts)
+        expect(@attachment).to receive(:submit_to_canvadocs).with(1, **expected_opts)
 
         @course.assignments.create!(
           annotatable_attachment: @attachment,
@@ -677,11 +677,28 @@ describe Assignment do
       expect(visible_assignments).not_to include assignment
     end
 
-    it "includes assignments assigned to a concluded enrollment for the given user" do
-      assignment = @course.assignments.create!(only_visible_to_overrides: true)
-      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
+    it "includes assignments assigned to a concluded enrollment for the given user if due date in past" do
+      one_week_prev = 1.week.ago
+      assignment = @course.assignments.create!(only_visible_to_overrides: true, due_at: one_week_prev)
+      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section, due_at: one_week_prev)
       student_enrollment.conclude
       expect(visible_assignments).to include assignment
+    end
+
+    it "excludes assignments assigned to a concluded enrollment for the given user if due date is future" do
+      one_week_prev = 1.week.ago
+      one_week_later = 1.week.from_now
+      assignment1 = @course.assignments.create!(only_visible_to_overrides: true)
+      assignment2 = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment1, course_section: student_enrollment.course_section, due_at: one_week_prev)
+      create_section_override_for_assignment(assignment2, course_section: student_enrollment.course_section, due_at: one_week_later)
+      assignment3 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_prev)
+      assignment4 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_later)
+      student_enrollment.conclude
+      expect(visible_assignments).to include assignment1
+      expect(visible_assignments).to include assignment3
+      expect(visible_assignments).not_to include assignment2
+      expect(visible_assignments).not_to include assignment4
     end
 
     it "includes assignments assigned to an active enrollment for the given user" do
@@ -1580,6 +1597,13 @@ describe Assignment do
         expect(new_assignment.external_tool_tag.content).to eq(assignment.external_tool_tag.content)
       end
 
+      it "do not duplicates the assignment's external_tool_tag if the submission type was updated" do
+        assignment.update(submission_types: "online_text_entry")
+        new_assignment = assignment.duplicate
+        new_assignment.save!
+        expect(new_assignment.external_tool_tag).not_to be_present
+      end
+
       it "sets the assignment's state to 'duplicating'" do
         expect(assignment.duplicate.workflow_state).to eq("duplicating")
       end
@@ -2227,19 +2251,19 @@ describe Assignment do
 
       it "sets grade_posting_in_progress to false when absent" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher)
+          .with(submission, student, nil, { grade: 10, grader: teacher })
         assignment.grade_student(student, grade: 10, grader: teacher)
       end
 
       it "sets grade_posting_in_progress to true when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: true)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: true })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: true)
       end
 
       it "sets grade_posting_in_progress to false when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: false)
+          .with(submission, student, nil, { grade: 10, grader: teacher, grade_posting_in_progress: false })
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: false)
       end
     end
@@ -9063,17 +9087,20 @@ describe Assignment do
   describe "posting and unposting submissions" do
     let(:assignment) { @course.assignments.create!(title: "hi") }
 
-    let(:student1) { @course.enroll_student(User.create!, active_all: true).user }
-    let(:student2) { @course.enroll_student(User.create!, active_all: true).user }
+    let!(:student1) do
+      user = user_factory(active_all: true, active_state: "active", name: "Student 1")
+      @course.enroll_student(user, enrollment_state: "active")
+      user
+    end
+    let!(:student2) do
+      user = user_factory(active_all: true, active_state: "active", name: "Student 2")
+      @course.enroll_student(user, enrollment_state: "active")
+      user
+    end
+
     let(:student1_submission) { assignment.submission_for_student(student1) }
     let(:student2_submission) { assignment.submission_for_student(student2) }
-
     let(:teacher) { @course.enroll_teacher(User.create!, active_all: true).user }
-
-    before do
-      student1
-      student2
-    end
 
     describe "#post_submissions" do
       it "updates the posted_at field of the specified submissions" do
@@ -9109,6 +9136,113 @@ describe Assignment do
       it "calls broadcast_notifications for submissions" do
         expect(Submission.broadcast_policy_list).to receive(:broadcast).with(student1_submission)
         assignment.post_submissions(submission_ids: [student1_submission.id])
+      end
+
+      describe "refresh unread_count for content participation counts" do
+        def student_unread_count_counts
+          @course.reload.content_participation_counts.where(user_id: student1.id, content_type: "Submission").take&.unread_count
+        end
+
+        context "when posting submissions" do
+          before do
+            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+            assignment.ensure_post_policy(post_manually: true)
+          end
+
+          it "updates the unread_count if unread grade when posting" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "updates the unread_count for previously read grade when posting" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            ContentParticipation.where(user_id: student1).update_all(workflow_state: "read")
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "updates the unread_count if unread comment when posting" do
+            student1_submission.add_comment(author: teacher, hidden: false, comment: "ok")
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "updates the unread_count if unread rubric assessment when posting" do
+            rubric_association_model(association_object: assignment, purpose: "grading")
+            @rubric_association.assess({
+                                         user: student1,
+                                         assessor: teacher,
+                                         artifact: student1_submission,
+                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                       })
+
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "unread_count is nil if there is no grade/comment/rubric participation" do
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to be_nil
+          end
+
+          it "does not update unread_count if skip_content_participation_refresh is not passed in" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            assignment.post_submissions
+            expect(student_unread_count_counts).to eq 0
+          end
+        end
+
+        context "when hiding submissions" do
+          before do
+            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+            assignment.ensure_post_policy(post_manually: true)
+          end
+
+          it "updates the unread_count if unread grade when hiding" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            assignment.hide_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 0
+          end
+
+          it "updates the unread_count if unread comment when hiding" do
+            student1_submission.add_comment(author: teacher, hidden: false, comment: "ok")
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            assignment.hide_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 0
+          end
+
+          it "updates the unread_count if unread rubric when hiding" do
+            rubric_association_model(association_object: assignment, purpose: "grading")
+            @rubric_association.assess({
+                                         user: student1,
+                                         assessor: teacher,
+                                         artifact: student1_submission,
+                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                       })
+
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            assignment.hide_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 0
+          end
+
+          it "unread_count is 0 if there is no grade/comment/rubric participation" do
+            assignment.hide_submissions
+            expect(ContentParticipationCount.unread_submission_count_for(@course, student1)).to eq 0
+          end
+
+          it "does not update unread_count if skip_content_participation_refresh is not passed in" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            assignment.hide_submissions
+            expect(student_unread_count_counts).to eq 1
+          end
+        end
       end
 
       describe "grade change audit records" do
@@ -9897,10 +10031,12 @@ describe Assignment do
           referer_id: 123
         }
       end
+      let(:url) { "https://www.tool.com/deep_link" }
       let(:assignment) do
         @course.assignments.create!(submission_types: "external_tool",
                                     lti_resource_link_custom_params: custom_params.to_json,
-                                    external_tool_tag_attributes: { content: tool },
+                                    lti_resource_link_url: url,
+                                    external_tool_tag_attributes: { content: tool, url: url },
                                     **assignment_valid_attributes)
       end
 
@@ -9991,6 +10127,23 @@ describe Assignment do
           resource_link = assignment.line_items.first.resource_link
 
           expect(resource_link.lookup_uuid).to eq lookup_uuid
+        end
+
+        it "updates the resource link's url when given" do
+          assignment.lti_resource_link_url = nil
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq url
+
+          new_url = "https://www.tool.com/deep_link_2"
+          assignment.lti_resource_link_url = new_url
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+          expect(resource_link.url).to eq new_url
         end
 
         context "and no resource link or line item exist" do
@@ -10515,7 +10668,7 @@ describe Assignment do
 
         it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
           course_section = course.course_sections.create!(name: "section")
-          course.enroll_student(User.create!, active_all: true, section: course_section)
+          course.enroll_student(User.create!, enrollment_state: "active", section: course_section)
           assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
           assignment.assignment_overrides.create!(
             due_at: 10.minutes.before(newly_closed_grading_period.end_date),

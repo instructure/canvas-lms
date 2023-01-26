@@ -21,7 +21,6 @@ require "apis/api_spec_helper"
 require_relative "./concerns/advantage_services_shared_context"
 require_relative "./concerns/advantage_services_shared_examples"
 require_relative "./concerns/lti_services_shared_examples"
-require_dependency "lti/ims/scores_controller"
 
 module Lti::IMS
   RSpec.describe ScoresController do
@@ -88,6 +87,28 @@ module Lti::IMS
         it "returns a valid resultUrl in the body" do
           send_request
           expect(json["resultUrl"]).to include "results"
+        end
+
+        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+          it "uses the Account#domain in the resultUrl" do
+            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            send_request
+            expect(json["resultUrl"]).to start_with(
+              "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
+            )
+          end
+        end
+
+        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+          it "uses the host domain in the resultUrl" do
+            course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            send_request
+            expect(json["resultUrl"]).to start_with(
+              "http://test.host/api/lti/courses/#{course.id}/line_items/"
+            )
+          end
         end
 
         context "with no existing result" do
@@ -533,11 +554,28 @@ module Lti::IMS
                 expect(result.submission.attachments).to include attachment
               end
 
-              it "returns a progress url" do
-                send_request
-                progress_url =
-                  json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
-                expect(progress_url).to include expected_progress_url
+              let(:actual_progress_url) do
+                json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
+              end
+
+              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+                it "returns a progress URL with the Account#domain" do
+                  course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  send_request
+                  expect(actual_progress_url).to \
+                    start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
+                end
+              end
+
+              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+                it "returns a progress URL with the Account#domain" do
+                  course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  send_request
+                  expect(actual_progress_url).to \
+                    start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
+                end
               end
 
               it "calculates content_type from extension" do
@@ -967,6 +1005,22 @@ module Lti::IMS
               send_request
               expect(response.status.to_i).to eq(422)
               expect(response.body).to include("cannot be zero if line item's maximum is not zero")
+            end
+          end
+
+          context "when an assignment previously had a max score of zero AND the student was graded at that time" do
+            let(:params_overrides) do
+              super().merge(scoreGiven: 0, scoreMaximum: 1)
+            end
+
+            before do
+              line_item.update score_maximum: 0
+            end
+
+            it "assignment now has a max score of non-zero" do
+              lti_result_model line_item: line_item, user: user, score_given: 0, score_maximum: 0
+              send_request
+              expect(response.status.to_i).to eq(200)
             end
           end
         end

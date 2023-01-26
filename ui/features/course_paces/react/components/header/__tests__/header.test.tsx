@@ -28,8 +28,6 @@ const defaultProps = {
   context_type: 'Course',
   context_id: '17',
   newPace: false,
-  isBlueprintLocked: false,
-  setIsBlueprintLocked: () => {},
   fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 }
 
@@ -122,7 +120,7 @@ describe('Course paces header', () => {
 
     it('renders the proper button for preexisting pace', () => {
       const {getByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
-      const getStartedButton = getByRole('button', {name: 'Edit Default Pace'})
+      const getStartedButton = getByRole('button', {name: 'Edit Default Course Pace'})
       expect(getStartedButton).toBeInTheDocument()
     })
 
@@ -130,8 +128,17 @@ describe('Course paces header', () => {
       const {getByRole} = renderConnected(
         <Header {...defaultProps} coursePace={{id: undefined, context_type: 'Course'}} />
       )
-      const getStartedButton = getByRole('button', {name: 'Create Default Pace'})
+      const getStartedButton = getByRole('button', {name: 'Create Course Pace'})
       expect(getStartedButton).toBeInTheDocument()
+    })
+
+    it('renders an info tooltip for durations stat', () => {
+      const {getAllByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      expect(
+        getAllByRole('tooltip', {
+          name: 'This duration does not take into account weekends and blackout days.',
+        })[0]
+      ).toBeInTheDocument()
     })
   })
 })

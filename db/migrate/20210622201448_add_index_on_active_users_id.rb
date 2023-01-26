@@ -21,11 +21,9 @@ class AddIndexOnActiveUsersId < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def change
-    add_index :users, :id, {
-      where: "workflow_state <> 'deleted'",
-      algorithm: :concurrently,
-      if_not_exists: true,
-      name: "index_active_users_on_id"
-    }
+    add_index :users, :id, where: "workflow_state <> 'deleted'",
+                           algorithm: :concurrently,
+                           if_not_exists: true,
+                           name: "index_active_users_on_id"
   end
 end

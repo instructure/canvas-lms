@@ -351,6 +351,18 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.folder_id).to eq sub.id
   end
 
+  it "rejects for deleted parent folder id" do
+    root = Folder.root_folders(context).first
+    sub = root.sub_folders.create!(name: "folder1", context: context, workflow_state: "deleted")
+    json = preflight({ name: "test1.txt", parent_folder_id: sub.id.to_param }, expected_status: 404)
+    expect(json["message"]).to eq "The specified resource does not exist."
+  end
+
+  it "rejects for nonexistent parent folder id" do
+    json = preflight({ name: "test2.txt", parent_folder_id: 12_345_678_910_111_213.to_param }, expected_status: 404)
+    expect(json["message"]).to eq "The specified resource does not exist."
+  end
+
   it "uploads to an existing folder" do
     @folder = Folder.assert_path("/files/a/b/c/mypath", context)
     expect(@folder).to be_present

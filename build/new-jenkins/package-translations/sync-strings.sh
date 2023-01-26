@@ -25,7 +25,7 @@ for file in packages/translations/lib/*.json; do
 done
 
 # If there are no changes to commit, bail out
-GIT_STATUS=$(git status --porcelain)
+GIT_STATUS=$(git status --porcelain packages/translations/lib)
 if [[ -z $(echo $GIT_STATUS | grep 'packages/translations/lib') ]]; then
   echo "No new translations to commit"
   exit 0
@@ -48,11 +48,11 @@ if [ ! -z "${SSH_USERNAME-}" ]; then
   gitdir=$(git rev-parse --git-dir); scp -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -p -P 29418 "${SSH_USERNAME}@gerrit.instructure.com:hooks/commit-msg" "${gitdir}/hooks/"
   # Commit any changes into a temp branch then push to gerrit
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  git checkout -B sync-translations-tmp && \
+  git checkout -q -B sync-translations-tmp && \
     git add -A packages/translations/lib && \
     git commit -m "[i18n] Update package translations" && \
     git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
-    git checkout "$CURRENT_BRANCH"
+    git checkout -q "$CURRENT_BRANCH"
 
   yarn wsrun --exclude-missing commitTranslations
 fi

@@ -20,7 +20,7 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
-import React, {useState} from 'react'
+import React from 'react'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {RubricAssociation} from '@canvas/assignments/graphql/student/RubricAssociation'
@@ -28,6 +28,7 @@ import RubricComponent from '@canvas/rubrics/react/Rubric'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
+import useStore from './stores/index'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -47,12 +48,24 @@ function formatAssessor(assessor) {
 }
 
 export default function RubricTab(props) {
-  const [displayedAssessmentId, setDisplayedAssessmentId] = useState(props.assessments?.[0]?._id)
+  const displayedAssessment = useStore(state => state.displayedAssessment)
 
-  // This will always be undefined if there are no assessments, or the displayed
-  // assessments if any assessments are present
-  const displayedAssessment = props.assessments?.find(
-    assessment => assessment._id === displayedAssessmentId
+  const findAssessmentById = id => {
+    return props.assessments?.find(assessment => assessment._id === id)
+  }
+
+  const onAssessmentChange = updatedAssessment => {
+    useStore.setState({displayedAssessment: updatedAssessment})
+  }
+
+  const assessmentSelectorChanged = assessmentId => {
+    const assessment = findAssessmentById(assessmentId)
+    const filledAssessment = fillAssessment(props.rubric, assessment || {})
+    useStore.setState({displayedAssessment: filledAssessment})
+  }
+
+  const hasSubmittedAssessment = props.assessments?.some(
+    assessment => assessment.assessor?._id === ENV.current_user.id
   )
 
   return (
@@ -67,12 +80,12 @@ export default function RubricTab(props) {
             </Text>
           }
         >
-          {!!props.assessments?.length && (
+          {!props.peerReviewModeEnabled && !!props.assessments?.length && (
             <div style={{marginBottom: '22px', width: '325px'}}>
               <CanvasSelect
                 label={I18n.t('Select Grader')}
-                value={displayedAssessment._id}
-                onChange={(e, optionValue) => setDisplayedAssessmentId(optionValue)}
+                value={displayedAssessment?._id}
+                onChange={(e, optionValue) => assessmentSelectorChanged(optionValue)}
               >
                 {props.assessments.map(assessment => (
                   <CanvasSelect.Option
@@ -87,12 +100,17 @@ export default function RubricTab(props) {
             </div>
           )}
 
-          <RubricComponent
-            customRatings={props.proficiencyRatings}
-            rubric={props.rubric}
-            rubricAssessment={fillAssessment(props.rubric, displayedAssessment || {})}
-            rubricAssociation={props.rubricAssociation}
-          />
+          {displayedAssessment !== null && (
+            <RubricComponent
+              customRatings={props.proficiencyRatings}
+              rubric={props.rubric}
+              rubricAssessment={displayedAssessment}
+              rubricAssociation={props.rubricAssociation}
+              onAssessmentChange={
+                props.peerReviewModeEnabled && !hasSubmittedAssessment ? onAssessmentChange : null
+              }
+            />
+          )}
         </ToggleDetails>
       </View>
     </div>
@@ -105,4 +123,8 @@ RubricTab.propTypes = {
   rubric: Rubric.shape,
   rubricAssociation: RubricAssociation.shape,
   peerReviewModeEnabled: bool,
+}
+
+RubricTab.defaultProps = {
+  peerReviewModeEnabled: false,
 }

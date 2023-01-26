@@ -365,12 +365,56 @@ describe Types::DiscussionEntryType do
     end
   end
 
-  it "does not query for discussion subentries on non legacy entries" do
-    discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-    DiscussionEntry.where(id: parent).update_all(legacy: false)
+  context "isolated view" do
+    it "Allows querying for discussion subentries" do
+      Account.site_admin.enable_feature!(:isolated_view)
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
 
-    result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-    expect(result).to be_nil
+      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
+      expect(result).to match_array([])
+    end
+
+    it "returns nil for subentries count on non root entries" do
+      Account.site_admin.enable_feature!(:isolated_view)
+      sub_entry
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
+      expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be_nil
+    end
+  end
+
+  context "split screen view" do
+    it "allows querying for discussion subentries" do
+      Account.site_admin.enable_feature!(:split_screen_view)
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
+
+      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
+      expect(result).to match_array([])
+    end
+
+    it "returns count for subentries count on non root entries" do
+      Account.site_admin.enable_feature!(:split_screen_view)
+      sub_entry
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
+      expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be 1
+    end
+  end
+
+  context "inline view" do
+    it "allows querying for discussion subentries" do
+      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
+
+      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
+      expect(result).to match_array([])
+    end
+
+    it "returns count for subentries count on non root entries" do
+      sub_entry
+      DiscussionEntry.where(id: parent).update_all(legacy: false)
+      expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be 1
+    end
   end
 
   it "allows querying for discussion subentries on legacy parents" do
@@ -423,12 +467,6 @@ describe Types::DiscussionEntryType do
   it "returns a null message when entry is marked as deleted" do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil
-  end
-
-  it "returns nil for subentries count on non legacy non root entries" do
-    sub_entry
-    DiscussionEntry.where(id: parent).update_all(legacy: false)
-    expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be_nil
   end
 
   it "returns subentries count" do

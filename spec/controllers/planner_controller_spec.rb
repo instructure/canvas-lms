@@ -264,15 +264,24 @@ describe PlannerController do
         before :once do
           @u = User.create!
 
+          # No conclusions
           @c1 = course_with_student(active_all: true, user: @u).course
           @a1 = course_assignment
           @pn1 = planner_note_model(todo_date: 1.day.from_now, course: @c1)
 
+          # Concluded enrollment
           @e2 = course_with_student(active_all: true, user: @u)
           @c2 = @e2.course
           @a2 = course_assignment
-          @pn2 = planner_note_model(todo_date: 1.day.from_now, course: @c2)
           @e2.conclude
+
+          # Soft-concluded course
+          @c3 = course_with_student(active_all: true, user: @u).course
+          @a3 = course_assignment
+          @pn3 = planner_note_model(todo_date: 1.day.from_now, course: @c3)
+          @c3.conclude_at = 2.days.ago
+          @c3.restrict_enrollments_to_course_dates = true
+          @c3.save!
         end
 
         before do
@@ -286,17 +295,19 @@ describe PlannerController do
           expect(items).to include ["assignment", @a1.id]
           expect(items).to include ["planner_note", @pn1.id]
           expect(items).not_to include ["assignment", @a2.id]
-          expect(items).not_to include ["planner_note", @pn2.id]
+          expect(items).not_to include ["assignment", @a3.id]
+          expect(items).not_to include ["planner_note", @pn3.id]
         end
 
-        it "includes objects from concluded courses if specified" do
+        it "includes objects from concluded courses if specified, but never from concluded enrollments" do
           get :index, params: { include: %w[concluded] }
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
           expect(items).to include ["assignment", @a1.id]
           expect(items).to include ["planner_note", @pn1.id]
-          expect(items).to include ["assignment", @a2.id]
-          expect(items).to include ["planner_note", @pn2.id]
+          expect(items).not_to include ["assignment", @a2.id]
+          expect(items).to include ["assignment", @a3.id]
+          expect(items).to include ["planner_note", @pn3.id]
         end
       end
 

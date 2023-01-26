@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "json/jwt"
-
 module Lti
   module IMS
     class DeepLinkingController < ApplicationController
@@ -26,12 +24,15 @@ module Lti
 
       include Lti::IMS::Concerns::DeepLinkingServices
       include Lti::IMS::Concerns::DeepLinkingModules
+      include Lti::Concerns::ParentFrame
 
       before_action :require_context
       before_action :validate_jwt
       before_action :validate_return_url_data
       before_action :require_context_update_rights
       before_action :require_tool
+      before_action :set_extra_csp_frame_ancestor!
+      before_action :set_feature_flag
 
       def deep_linking_response
         # one single non-line item content item for an existing module using
@@ -133,11 +134,12 @@ module Lti
         raise e
       end
 
-      private
-
-      def for_placement?(placement)
-        return_url_parameters[:placement]&.to_sym == placement
+      # Overrides method in Lti::Concerns::ParentFrame
+      def parent_frame_context
+        return_url_parameters[:parent_frame_context]
       end
+
+      private
 
       def render_content_items(items: content_items, reload_page: true, module_created: false)
         js_env({
@@ -150,11 +152,20 @@ module Lti
                    errorlog: messaging_value("errorlog"),
                    ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
                    reloadpage: reload_page,
-                   moduleCreated: module_created
+                   moduleCreated: module_created,
                  }.compact
                })
+        if parent_frame_origin
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+        end
 
         render layout: "bare"
+      end
+
+      def set_feature_flag
+        js_env({
+                 deep_linking_use_window_parent: Account.site_admin.feature_enabled?(:deep_linking_use_window_parent)
+               })
       end
 
       def require_context_update_rights

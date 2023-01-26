@@ -20,8 +20,6 @@
 
 require_relative "../../lti2_spec_helper"
 
-require_dependency "lti/message_handler"
-
 module Lti
   describe MessageHandler do
     let(:account) { Account.create }

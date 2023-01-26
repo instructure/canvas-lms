@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "net/https"
-
 class SSLCommon
   SSL_CA_PATH = "/etc/ssl/certs/"
 
@@ -38,7 +36,7 @@ class SSLCommon
       url = URI.parse(url)
       http = get_http_conn(url.host, url.port, url.scheme.casecmp?("https"))
       req = Net::HTTP::Post.new(url.request_uri, headers)
-      req.basic_auth URI.unescape(url.user || ""), URI.unescape(url.password || "") if url.user
+      req.basic_auth URI::DEFAULT_PARSER.unescape(url.user || ""), URI::DEFAULT_PARSER.unescape(url.password || "") if url.user
       req.form_data = form_data if form_data
       http.start { |conn| conn.request(req, payload) }
     end

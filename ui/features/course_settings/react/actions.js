@@ -170,21 +170,6 @@ const Actions = {
     }
   },
 
-  uploadImageSearchUrl(imageUrl, courseId, settingName, confirmationId = null, ajaxLib = axios) {
-    return dispatch => {
-      dispatch(this.uploadingImage())
-      dispatch(this.putImageData(courseId, imageUrl, settingName, null, ajaxLib))
-      if (confirmationId != null) {
-        this.confirmImageSelection(confirmationId, ajaxLib)
-      }
-    }
-  },
-
-  confirmImageSelection(confirmationId, ajaxLib = axios) {
-    // We don't need to wait for this response to come back.  This is best effort for Unsplash's benefit.
-    return ajaxLib.post(`/api/v1/image_selection/${confirmationId}`)
-  },
-
   uploadFile(event, courseId, settingName, ajaxLib = axios) {
     event.preventDefault()
     return dispatch => {

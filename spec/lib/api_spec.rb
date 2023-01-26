@@ -26,11 +26,11 @@ class TestApiInstance
   end
 
   def account_url(account)
-    URI.encode("http://www.example.com/accounts/#{account}")
+    URI::DEFAULT_PARSER.escape("http://www.example.com/accounts/#{account}")
   end
 
   def course_assignment_url(course, assignment)
-    URI.encode("http://www.example.com/courses/#{course}/assignments/#{assignment}")
+    URI::DEFAULT_PARSER.escape("http://www.example.com/courses/#{course}/assignments/#{assignment}")
   end
 end
 
@@ -219,6 +219,12 @@ describe Api do
       lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, "key")
       lti_course.save!
       expect(@api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}")).to eq lti_course
+    end
+
+    it "finds group by lti_context_id" do
+      lti_group = Group.create!(context: course_factory)
+      Lti::Asset.opaque_identifier_for(lti_group)
+      expect(@api.api_find(Group, "lti_context_id:#{lti_group.lti_context_id}")).to eq lti_group
     end
 
     it "finds account by lti_context_id" do

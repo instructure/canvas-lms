@@ -152,7 +152,7 @@ module CoursePacesCommonPageObject
 
   def teacher_setup
     feature_setup
-    @course_name = "Course Paces Course"
+    @course_name = "course paces course"
     course_with_teacher(
       account: @account,
       active_course: 1,

@@ -34,12 +34,13 @@ RichContentEditor.preloadRemoteModule()
 export default {
   bindDomEvents() {
     $('.add_notification_toggle_focus').on('click', () => {
-      const aria_expanded = $('add_notification_form').attr('aria-expanded') === 'true'
+      const aria_expanded = $('#add_notification_form').attr('aria-expanded') === 'true'
       if (!aria_expanded) {
         setTimeout(() => {
           $('#account_notification_subject').focus()
         }, 100)
       }
+      RichContentEditor.loadNewEditor($(`#add_notification_form textarea`))
     })
 
     $('.edit_notification_toggle_focus').on('click', function () {
@@ -51,6 +52,7 @@ export default {
           $('#account_notification_subject_' + id).focus()
         }, 100)
       }
+      RichContentEditor.loadNewEditor($(`${form_id} textarea`))
     })
 
     $('.add_notification_cancel_focus').on('click', () => {
@@ -117,12 +119,6 @@ export default {
           })
         },
       })
-    })
-  },
-
-  augmentView() {
-    $('textarea.edit_notification_form, #add_notification_form textarea').each(function (_i) {
-      RichContentEditor.loadNewEditor($(this))
     })
   },
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -25,39 +25,25 @@ import formatMessage from '../../../../../format-message'
 import {Shape} from '../../svg/shape'
 import {Size} from '../../svg/constants'
 
-import {createCroppedImageSvg} from './ImageCropper/imageCropUtils'
-import {convertFileToBase64} from '../../svg/utils'
-
-import {actions} from '../../reducers/svgSettings'
-
 const SIZES = [Size.ExtraSmall, Size.Small, Size.Medium, Size.Large]
 
-export const ShapeSection = ({settings, onChange}) => {
-  useEffect(() => {
-    // if the user has an embedded image, we need to re-crop it so it fits the new shape
-    if (settings.imageSettings?.cropperSettings) {
-      createCroppedImageSvg({...settings.imageSettings.cropperSettings, shape: settings.shape})
-        .then(generatedSvg =>
-          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
-        )
-        .then(base64Image => {
-          onChange({
-            type: actions.SET_ENCODED_IMAGE,
-            payload: base64Image,
-          })
-        })
-        // eslint-disable-next-line no-console
-        .catch(error => console.error(error))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.shape])
+const SHAPE_SECTION_ID = 'icons-tray-shape-section'
+const getShapeSection = () => document.querySelector(`#${SHAPE_SECTION_ID}`)
 
+export const ShapeSection = ({settings, onChange}) => {
   return (
-    <Flex as="section" direction="column" justifyItems="space-between" padding="small small 0">
+    <Flex
+      id={SHAPE_SECTION_ID}
+      as="section"
+      direction="column"
+      justifyItems="space-between"
+      padding="small small 0"
+    >
       <Flex.Item padding="small">
         <SimpleSelect
           assistiveText={formatMessage('Use arrow keys to select a shape.')}
           id="icon-shape"
+          mountNode={getShapeSection}
           onChange={(e, option) => onChange({shape: option.value})}
           renderLabel={formatMessage('Icon Shape')}
           value={settings.shape}
@@ -74,6 +60,7 @@ export const ShapeSection = ({settings, onChange}) => {
         <SimpleSelect
           assistiveText={formatMessage('Use arrow keys to select a size.')}
           id="icon-size"
+          mountNode={getShapeSection}
           onChange={(e, option) => onChange({size: option.value})}
           renderLabel={formatMessage('Icon Size')}
           value={settings.size}

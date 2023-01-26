@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "./concerns/deep_linking_spec_helper"
+require_relative "../concerns/parent_frame_shared_examples"
 
 module Lti
   module IMS
@@ -31,28 +32,81 @@ module Lti
         let(:return_url_params) { { placement: placement } }
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
+        let(:course) { course_model(account: account) }
+
+        let(:context_external_tool) do
+          ContextExternalTool.create!(
+            context: course.account,
+            url: "http://tool.url/login",
+            name: "test tool",
+            shared_secret: "secret",
+            consumer_key: "key",
+            developer_key: developer_key,
+            lti_version: "1.3"
+          )
+        end
 
         it { is_expected.to be_ok }
 
+        it "renders the page" do
+          expect(subject).to render_template("lti/ims/deep_linking/deep_linking_response")
+        end
+
         it "sets the JS ENV" do
-          expect(controller).to receive(:js_env).with(
-            deep_link_response: {
-              placement: placement,
-              content_items: content_items,
-              msg: msg,
-              log: log,
-              errormsg: errormsg,
-              errorlog: errorlog,
-              ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
-                [:retrieve, account, :external_tools],
-                host: "test.host"
-              ),
-              reloadpage: false,
-              moduleCreated: false
-            }
-          )
+          expect(controller).to receive(:js_env).with({ deep_linking_use_window_parent: true })
+          expect(controller).to receive(:js_env).with({
+                                                        deep_link_response: {
+                                                          placement: placement,
+                                                          content_items: content_items,
+                                                          msg: msg,
+                                                          log: log,
+                                                          errormsg: errormsg,
+                                                          errorlog: errorlog,
+                                                          ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
+                                                            [:retrieve, account, :external_tools],
+                                                            host: "test.host"
+                                                          ),
+                                                          reloadpage: false,
+                                                          moduleCreated: false
+                                                        }
+                                                      })
 
           subject
+        end
+
+        context "when returning from a non-internal service" do
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "does not change the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
+            subject
+            # base_url is the default
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq(@controller.request.base_url)
+          end
+        end
+
+        context "when returning from an internal service" do
+          before do
+            developer_key.update!(internal_service: true)
+            u = course_with_teacher(course: course, user: user_model, active_all: true).user
+            user_session(u)
+          end
+
+          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+
+          it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in js_env" do
+            subject
+            expect(assigns(:js_env)[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq("http://tool.url")
+          end
+        end
+
+        it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+          let(:return_url_params) { { placement: placement, parent_frame_context: pfc_tool.id } }
+          let(:pfc_tool_context) do
+            # Need to enroll user to make sure user can access pfc tool
+            enrollment = course_with_teacher(course: course, user: user_model, active_all: true)
+            user_session(enrollment.user)
+            enrollment.course
+          end
         end
 
         context "when the messages/logs passed in are not strings" do
@@ -62,13 +116,15 @@ module Lti
           let(:errorlog) { { html: "some error log" } }
 
           it "turns them into strings before calling js_env to prevent HTML injection" do
-            expect(controller).to receive(:js_env).with(deep_link_response:
-              hash_including(
-                msg: '{"html"=>"some message"}',
-                log: '{"html"=>"some log"}',
-                errormsg: '{"html"=>"some error message"}',
-                errorlog: '{"html"=>"some error log"}'
-              ))
+            expect(controller).to receive(:js_env).with({ deep_linking_use_window_parent: true })
+            expect(controller).to receive(:js_env).with({
+                                                          deep_link_response: hash_including(
+                                                            msg: '{"html"=>"some message"}',
+                                                            log: '{"html"=>"some log"}',
+                                                            errormsg: '{"html"=>"some error message"}',
+                                                            errorlog: '{"html"=>"some error log"}'
+                                                          )
+                                                        })
             subject
           end
         end
@@ -346,7 +402,7 @@ module Lti
         end
 
         context "content_item claim message" do
-          let(:course) { course_model }
+          let(:course) { course_model(account: account) }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -589,7 +645,7 @@ module Lti
               end
 
               context "when feature flag is enabled" do
-                before :once do
+                before do
                   course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
                 end
 
@@ -604,6 +660,33 @@ module Lti
 
                   it "creates a resource link" do
                     expect { subject }.to change { course.lti_resource_links.count }.by 1
+                  end
+
+                  context "from the assignment_selection placement" do
+                    let(:return_url_params) { super().merge({ placement: "assignment_selection" }) }
+
+                    context "with no line items" do
+                      let(:content_items) do
+                        [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                      end
+
+                      it "does not create a resource link" do
+                        expect { subject }.not_to change { Lti::ResourceLink.count }
+                      end
+                    end
+
+                    context "with line items" do
+                      let(:content_items) do
+                        [
+                          { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
+                          { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
+                        ]
+                      end
+
+                      it "creates resource links and only resource links for the course" do
+                        expect { subject }.not_to change { Lti::ResourceLink.count }
+                      end
+                    end
                   end
 
                   it "creates a module item" do

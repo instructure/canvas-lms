@@ -28,7 +28,7 @@ import type {
   ModuleMap,
   Section,
   Student,
-  StudentGroupCategory,
+  StudentGroupCategoryMap,
   StudentMap,
   SubmissionType,
   WorkflowState,
@@ -76,7 +76,7 @@ export type PerformanceControlValues = {
   contextModulesPerPage?: number
   customColumnDataPerPage?: number
   customColumnsPerPage?: number
-  studentsCchunkSize?: number
+  studentsChunkSize?: number
   submissionsChunkSize?: number
   submissionsPerPage?: number
 }
@@ -86,6 +86,7 @@ export type GradebookOptions = {
   allow_apply_score_to_ungraded: boolean
   allow_separate_first_last_names: boolean
   allow_view_ungraded_as_zero: boolean
+  assignment_missing_shortcut: boolean
   attachment_url: null | string
   attachment: null | AttachmentData
   change_gradebook_version_url: string
@@ -150,7 +151,7 @@ export type GradebookOptions = {
   sis_name: null | string
   sis_name: string
   speed_grader_enabled: boolean
-  student_groups: StudentGroupCategory[]
+  student_groups: StudentGroupCategoryMap
   user_asset_string: string
   teacher_notes: {
     hidden: boolean
@@ -404,6 +405,11 @@ export type CustomColumn = {
   read_only: boolean
   teacher_notes: boolean
   title: string
+}
+
+export type CustomColumnData = {
+  user_id: string
+  content: unknown
 }
 
 export type SerializedComment = {

@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
 import axios from '@canvas/axios'
 
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -25,7 +24,7 @@ import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
 import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
-import type {GradingPeriodSet} from 'api.d'
+import type {GradingPeriodSet, GradingPeriodSetGroup} from 'api.d'
 
 const I18n = useI18nScope('gradingPeriodSetsApi')
 
@@ -53,7 +52,7 @@ const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet =>
   weighted: !!set.weighted,
   displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods,
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
-  permissions: set.permissions, // TODO: investigate if this is needed
+  permissions: set.permissions,
   createdAt: new Date(set.created_at),
   enrollmentTermIDs: undefined,
 })
@@ -69,14 +68,12 @@ const gradingPeriodSetTitle = set => {
 
 const deserializeSet = function (set: GradingPeriodSet): CamelizedGradingPeriodSet {
   const newSet = baseDeserializeSet(set)
-  newSet.enrollmentTermIDs = set.enrollment_term_ids // TODO: investigate if this is needed
+  newSet.enrollmentTermIDs = set.enrollment_term_ids
   return newSet
 }
 
-const deserializeSets = setGroups =>
-  _.flatten(
-    _.map(setGroups, group => _.map(group.grading_period_sets, set => baseDeserializeSet(set)))
-  )
+const deserializeSets = (setGroups: GradingPeriodSetGroup[]): CamelizedGradingPeriodSet[] =>
+  setGroups.flatMap(group => group.grading_period_sets.map(set => baseDeserializeSet(set)))
 
 export default {
   deserializeSet,

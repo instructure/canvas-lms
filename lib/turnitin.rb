@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "turnitin/response"
-
 module Turnitin
   def self.state_from_similarity_score(similarity_score)
     return "none" if similarity_score == 0
@@ -365,7 +363,7 @@ module Turnitin
         params.each do |key, value|
           next if value.nil?
 
-          requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
+          requestParams += "&#{URI::DEFAULT_PARSER.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
         if params[:fcmd] == "1"
           return "https://#{@host}#{@endpoint}?#{requestParams}"

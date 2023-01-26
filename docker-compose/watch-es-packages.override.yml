@@ -1,0 +1,9 @@
+#
+# Override the webpack container to also watch all ES packages
+# see script/webpack_watch_es_packages.sh for implementation details
+#
+
+version: '2.3'
+services:
+  webpack:
+    command: script/webpack_watch_es_packages.sh

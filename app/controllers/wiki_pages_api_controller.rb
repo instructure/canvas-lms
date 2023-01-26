@@ -690,7 +690,7 @@ class WikiPagesApiController < ApplicationController
     # check for a valid front page
     valid_front_page = true
     if change_front_page || workflow_state
-      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
+      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page? && request.put?
       new_workflow_state = workflow_state || @page.workflow_state
       valid_front_page = false if new_front_page && new_workflow_state != "active"
       if new_front_page && new_workflow_state != "active"

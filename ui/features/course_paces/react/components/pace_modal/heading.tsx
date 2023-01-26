@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
+import {connect} from 'react-redux'
 
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {CoursePace, PaceContext, Section} from '../../types'
+import {CoursePace, PaceContext, Section, StoreState} from '../../types'
 import {Text} from '@instructure/ui-text'
 import {IconUserSolid} from '@instructure/ui-icons'
+import {getBlueprintLocked} from '../../reducers/ui'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
 
@@ -33,26 +35,31 @@ interface Props {
   readonly coursePace: CoursePace
   readonly contextName: string
   readonly enrolledSection: Section
-  readonly isBlueprintLocked: boolean
   readonly paceContext: PaceContext
-  readonly setIsBlueprintLocked: (newValue: boolean) => void
+}
+
+interface StoreProps {
+  readonly blueprintLocked: boolean | undefined
 }
 
 const {Item: FlexItem} = Flex as any
 
-const PaceModalHeading: React.FC<Props> = ({
+const PaceModalHeading: React.FC<Props & StoreProps> = ({
   coursePace,
   contextName,
-  isBlueprintLocked,
   paceContext,
-  setIsBlueprintLocked,
   enrolledSection,
+  blueprintLocked,
 }) => {
   const renderPaceInfo = () => {
     if (['Section', 'Course'].includes(coursePace.context_type)) {
       return (
         <>
-          <Text>{I18n.t('Students')}</Text>
+          <Text>
+            {coursePace.context_type === 'Course'
+              ? I18n.t('Students enrolled in this course')
+              : I18n.t('Students enrolled in this section')}
+          </Text>
           <Text as="div" weight="bold">
             {paceContext?.associated_student_count}
           </Text>
@@ -73,18 +80,18 @@ const PaceModalHeading: React.FC<Props> = ({
   const getPaceTitle = () => {
     switch (coursePace.context_type) {
       case 'Section':
-        return I18n.t('Section Course Pacing')
+        return I18n.t('Section Pace')
       case 'Enrollment':
         return I18n.t('Student Pace')
       default:
-        return I18n.t('Default Course Pacing')
+        return I18n.t('Default Course Pace')
     }
   }
 
   const renderDetails = () => {
     return (
       <>
-        <Text data-testid="pace-type" as="div" size="medium" weight="bold">
+        <Text tabIndex={0} data-testid="pace-type" as="div" size="medium" weight="bold">
           {getPaceTitle()}
         </Text>
         <Text data-testid="section-name" as="div" size="x-large" weight="bold">
@@ -104,17 +111,17 @@ const PaceModalHeading: React.FC<Props> = ({
     <Flex as="section" justifyItems="space-between">
       <FlexItem>{renderDetails()}</FlexItem>
       <FlexItem margin="none none auto none">
-        <Settings
-          isBlueprintLocked={isBlueprintLocked && coursePace.context_type === 'Course'}
-          margin="0 0 0 small"
-        />
-        <BlueprintLock
-          newPace={!coursePace.id}
-          contextIsCoursePace={coursePace.context_type === 'Course'}
-          setIsBlueprintLocked={setIsBlueprintLocked}
-        />
+        <Settings isBlueprintLocked={blueprintLocked} margin="0 0 0 small" />
+        <BlueprintLock newPace={!coursePace.id} bannerSelector=".pace-redesign-inner-modal" />
       </FlexItem>
     </Flex>
   )
 }
-export default PaceModalHeading
+
+const mapStateToProps = (state: StoreState): StoreProps => {
+  return {
+    blueprintLocked: getBlueprintLocked(state),
+  }
+}
+
+export default connect(mapStateToProps)(PaceModalHeading)

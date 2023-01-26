@@ -21,8 +21,11 @@ import $ from 'jquery'
 import _ from 'underscore'
 import preventDefault from 'prevent-default'
 import ReactModal from '@canvas/react-modal'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalContent from './content'
 import ModalButtons from './buttons'
+
+const I18n = useI18nScope('modal')
 
 const modalOverrides = {
   overlay: {
@@ -140,6 +143,7 @@ export default class Modal extends React.Component {
             }}
             className="ReactModal__Layout"
             style={this.props.style}
+            data-testid="canvas-modal"
           >
             <div className="ReactModal__Header">
               <div className="ReactModal__Header-Title">
@@ -155,7 +159,7 @@ export default class Modal extends React.Component {
                   onClick={this.closeWithX}
                 >
                   <i className="icon-x" />
-                  <span className="screenreader-only">Close</span>
+                  <span className="screenreader-only">{I18n.t('Close')}</span>
                 </button>
               </div>
             </div>

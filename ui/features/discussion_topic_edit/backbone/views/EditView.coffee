@@ -364,7 +364,6 @@ export default class EditView extends ValidatedFormView
     data.discussion_type = if data.threaded is '1' then 'threaded' else 'side_comment'
     data.podcast_has_student_posts = false unless data.podcast_enabled is '1'
     data.only_graders_can_rate = false unless data.allow_rating is '1'
-    data.sort_by_rating = false unless data.allow_rating is '1'
     data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
     data.todo_date = @studentTodoAtDateValue
     data.todo_date = null unless data.allow_todo_date is '1'

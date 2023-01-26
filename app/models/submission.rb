@@ -87,6 +87,7 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   alias_method :student, :user
   belongs_to :grader, class_name: "User"
+  belongs_to :proxy_submitter, class_name: "User", optional: true
   belongs_to :grading_period, inverse_of: :submissions
   belongs_to :group
   belongs_to :media_object
@@ -141,7 +142,7 @@ class Submission < ActiveRecord::Base
   validates :cached_tardiness, inclusion: ["missing", "late"], allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
-  validate :ensure_attempts_are_in_range
+  validate :ensure_attempts_are_in_range, unless: :proxy_submission?
   validate :submission_type_is_valid, if: :require_submission_type_is_valid
   attr_accessor :require_submission_type_is_valid
 
@@ -302,6 +303,10 @@ class Submission < ActiveRecord::Base
         (send("score#{suffix}").nil? || !send("grade_matches_current_submission#{suffix}"))
        )
       )
+  end
+
+  def proxy_submission?
+    proxy_submitter.present?
   end
 
   def resubmitted?
@@ -1288,7 +1293,7 @@ class Submission < ActiveRecord::Base
   # End Plagiarism functions
 
   def external_tool_url
-    URI.encode(url) if url && submission_type == "basic_lti_launch"
+    URI::DEFAULT_PARSER.escape(url) if url && submission_type == "basic_lti_launch"
   end
 
   def clear_user_submissions_cache
@@ -1352,7 +1357,7 @@ class Submission < ActiveRecord::Base
     attachments = Attachment.where(id: unassociated_ids)
     attachments.each do |a|
       next unless (a.context_type == "User" && a.context_id == user_id) ||
-                  (a.context_type == "Group" && a.context_id == group_id) ||
+                  (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                   (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
                   attachment_fake_belongs_to_group(a)
 
@@ -1404,7 +1409,7 @@ class Submission < ActiveRecord::Base
           n_strand: "canvadocs",
           priority: Delayed::LOW_PRIORITY
         )
-         .submit_to_canvadocs(1, opts)
+         .submit_to_canvadocs(1, **opts)
       end
     end
   end
@@ -1783,7 +1788,7 @@ class Submission < ActiveRecord::Base
   def versioned_attachments=(attachments)
     @versioned_attachments = Array(attachments).compact.select do |a|
       (a.context_type == "User" && (a.context_id == user_id || a.user_id == user_id)) ||
-        (a.context_type == "Group" && a.context_id == group_id) ||
+        (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
         (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
         attachment_fake_belongs_to_group(a)
     end
@@ -2501,6 +2506,9 @@ class Submission < ActiveRecord::Base
     includes = { quiz_submission: {} }
     methods = %i[submission_history attachments entered_score entered_grade word_count]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
+    if additional_parameters[:methods]
+      methods.concat(Array(additional_parameters.delete(:methods)))
+    end
     excepts = additional_parameters.delete :except
 
     res = { methods: methods, include: includes }.merge(additional_parameters)
@@ -2786,6 +2794,15 @@ class Submission < ActiveRecord::Base
       a.grants_right?(viewing_user, :read) &&
         a.rubric_association == assignment.rubric_association
     end
+
+    if assignment.anonymous_peer_reviews?
+      filtered_assessments.each do |a|
+        if a.assessment_type == "peer_review"
+          a.assessor = nil # hide peer reviewer's identity
+        end
+      end
+    end
+
     filtered_assessments.sort_by do |a|
       [
         a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last,
@@ -2997,7 +3014,7 @@ class Submission < ActiveRecord::Base
     # Adding a comment calls update_provisional_grade, but will not have the
     # grade or score keys included.
     if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present? && pg.scorer_id != assignment.final_grader_id
-      raise Assignment::GradeError, error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+      raise Assignment::GradeError.new(error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED)
     end
 
     pg.scorer = pg.current_user = scorer

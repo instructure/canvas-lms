@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
-import {bool, func, instanceOf, shape, string} from 'prop-types'
+import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -257,7 +257,7 @@ export default function CanvasContentTray(props) {
   const [placeholderText, setPlaceholderText] = useState(null)
   const Icon = getIcon(link?.type)
 
-  const {bridge, editor, onTrayClosing} = {...props}
+  const {bridge, editor, mountNode, onTrayClosing} = {...props}
 
   const handleDismissTray = useCallback(() => {
     // return focus to the RCE if focus was on this tray
@@ -452,6 +452,7 @@ export default function CanvasContentTray(props) {
             filterSettings.contentSubtype,
             contentProps.contextType
           )}
+          mountNode={mountNode}
           open={isOpen}
           placement="end"
           size="regular"
@@ -500,6 +501,7 @@ export default function CanvasContentTray(props) {
                 )}
                 <Filter
                   {...filterSettings}
+                  mountNode={props.mountNode}
                   userContextType={props.contextType}
                   containingContextType={props.containingContext.contextType}
                   onChange={newFilter => {
@@ -585,6 +587,7 @@ export const trayPropTypes = shape(trayPropsMap)
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
   editor: shape({id: string}).isRequired,
+  mountNode: oneOfType([element, func]),
   onTrayClosing: func, // called with true when the tray starts closing, false once closed
   onEditClick: func,
   ...trayPropsMap,

@@ -245,6 +245,10 @@ module CanvasHttp
     http.use_ssl = (uri.scheme == "https")
     http.ssl_timeout = http.open_timeout = open_timeout
     http.read_timeout = read_timeout
+    # Don't rely on net/http's internal retries, since they swallow errors in a
+    # way that can't be detected when streaming responses, leading to duplicate
+    # data
+    http.max_retries = 0
     http
   end
 

@@ -21,7 +21,6 @@
 require_relative "../api_spec_helper"
 require_relative "../../lti_spec_helper"
 require_relative "../../lti_1_3_spec_helper"
-require_dependency "lti/lti_apps_controller"
 
 module Lti
   describe LtiAppsController, type: :request do

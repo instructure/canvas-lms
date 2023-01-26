@@ -19,8 +19,6 @@
 #
 
 require "atom"
-require "set"
-require "securerandom"
 
 # @API Courses
 # API for accessing course information.
@@ -920,7 +918,7 @@ class CoursesController < ApplicationController
             progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
             progress.user = @current_user
             progress.reset!
-            progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+            progress.process_job(@course, :sync_homeroom_enrollments, { priority: Delayed::LOW_PRIORITY })
             # Participation sync should be done in the normal request flow, as it only needs to update a couple of
             # specific fields, delegating that to a job will cause the controller to return the old values, which will
             # force the user to refresh the page after the job finishes to see the changes
@@ -1307,7 +1305,7 @@ class CoursesController < ApplicationController
   def activity_stream_summary
     get_context
     if authorized_action(@context, @current_user, :read)
-      api_render_stream_summary([@context])
+      api_render_stream_summary(contexts: [@context])
     end
   end
 
@@ -1526,7 +1524,6 @@ class CoursesController < ApplicationController
                COURSE_COLOR: @context.elementary_enabled? && @context.course_color,
                PUBLISHING_ENABLED: @publishing_enabled,
                COURSE_COLORS_ENABLED: @context.elementary_enabled?,
-               use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig("access_key")&.present?,
                COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
                STUDENTS_ENROLLMENT_DATES: @context.enrollment_term&.enrollment_dates_overrides&.detect { |term| term[:enrollment_type] == "StudentEnrollment" }&.slice(:start_at, :end_at),
                DEFAULT_TERM_DATES: @context.enrollment_term&.slice(:start_at, :end_at),
@@ -1912,7 +1909,7 @@ class CoursesController < ApplicationController
 
       @pending_enrollment = enrollment
 
-      if @context.root_account.allow_invitation_previews? || enrollment.admin?
+      if @context.root_account.allow_invitation_previews?
         flash[:notice] = t("notices.preview_course", "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
         # directly call the next action; it's just going to redirect anyway, so no need to have
@@ -2257,7 +2254,9 @@ class CoursesController < ApplicationController
               !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
               @context.quiz_lti_tool.present?,
             FLAGS: {
-              newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+              newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
+              new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
+              new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             }
           )
           js_env(COURSE_HOME: true)
@@ -2715,6 +2714,9 @@ class CoursesController < ApplicationController
   # If a user has content management rights, but not full course editing rights, the only attribute
   # editable through this endpoint will be "syllabus_body"
   #
+  # If an account has set prevent_course_availability_editing_by_teachers, a teacher cannot include
+  # course[start_at], course[conclude_at], or course[restrict_enrollments_to_course_dates] here.
+  #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to move the course to.
   #
@@ -2967,6 +2969,10 @@ class CoursesController < ApplicationController
     if authorized_action(@course, @current_user, %i[update manage_content manage_course_content_edit])
       return render_update_success if params[:for_reload]
 
+      return render_unauthorized_action if (%w[start_at end_at restrict_enrollments_to_course_dates] & params_for_update.keys).present? &&
+                                           @course.root_account.settings[:prevent_course_availability_editing_by_teachers] &&
+                                           !@course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+
       unless @course.grants_right?(@current_user, :update)
         # let users with :manage_couse_content_edit only update the body
         params_for_update = params_for_update.slice(:syllabus_body)
@@ -3214,7 +3220,7 @@ class CoursesController < ApplicationController
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!
-          progress.process_job(@course, :sync_homeroom_enrollments, priority: Delayed::LOW_PRIORITY)
+          progress.process_job(@course, :sync_homeroom_enrollments, { priority: Delayed::LOW_PRIORITY })
           # Participation sync should be done in the normal request flow, as it only needs to update a couple of
           # specific fields, delegating that to a job will cause the controller to return the old values, which will
           # force the user to refresh the page after the job finishes to see the changes

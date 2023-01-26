@@ -53,7 +53,7 @@ describe EportfolioCategoriesController do
       expect(assigns[:category]).to eql(@category)
     end
 
-    it "responsds to named category request" do
+    it "responds to named category request" do
       user_session(@user)
       get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
       expect(response).to be_successful
@@ -61,6 +61,37 @@ describe EportfolioCategoriesController do
       expect(assigns[:portfolio]).to eql(@portfolio)
       expect(assigns[:category]).not_to be_nil
       expect(assigns[:category]).to eql(@category)
+    end
+
+    context "with active submissions by owner" do
+      before(:once) do
+        course = course_model
+        att = attachment_model(filename: "submission.doc", context: @portfolio.user)
+        @assignment = course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+        @submission = @assignment.submit_homework(@portfolio.user, submission_type: "online_upload", attachments: [att])
+      end
+
+      before { user_session(@portfolio.user) }
+
+      it "renders the category without error" do
+        get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
+        expect(response).to be_successful
+        expect(assigns[:recent_submissions]).not_to be_nil
+      end
+
+      it "does not show submissions for unpublished assignments" do
+        @assignment.unpublish
+        get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
+        expect(response).to be_successful
+        expect(assigns[:recent_submissions]).to be_empty
+      end
+
+      it "does not show submissions for unpublished courses" do
+        @course.update!(workflow_state: "claimed")
+        get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug }
+        expect(response).to be_successful
+        expect(assigns[:recent_submissions]).to be_empty
+      end
     end
 
     describe "js_env" do

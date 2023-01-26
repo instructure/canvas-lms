@@ -20,7 +20,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import _ from 'lodash'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriod from './AccountGradingPeriod'
@@ -296,20 +298,19 @@ export default class GradingPeriodSet extends React.Component {
     if (!this.props.readOnly && this.props.permissions.update) {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
-        <Button
+        <IconButton
           elementRef={ref => {
             this._refs.editButton = ref
           }}
-          variant="icon"
           disabled={disabled}
+          withBackground={false}
+          withBorder={false}
           onClick={this.editSet}
           title={I18n.t('Edit %{title}', {title: this.props.set.title})}
+          screenReaderLabel={I18n.t('Edit %{title}', {title: this.props.set.title})}
         >
-          <span className="screenreader-only">
-            {I18n.t('Edit %{title}', {title: this.props.set.title})}
-          </span>
-          <i className="icon-edit" />
-        </Button>
+          <IconEditLine />
+        </IconButton>
       )
     }
   }
@@ -318,20 +319,19 @@ export default class GradingPeriodSet extends React.Component {
     if (!this.props.readOnly && this.props.permissions.delete) {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
-        <Button
+        <IconButton
           elementRef={ref => {
             this._refs.deleteButton = ref
           }}
-          variant="icon"
           disabled={disabled}
           onClick={this.promptDeleteSet}
+          withBackground={false}
+          withBorder={false}
           title={I18n.t('Delete %{title}', {title: this.props.set.title})}
+          screenReaderLabel={I18n.t('Delete %{title}', {title: this.props.set.title})}
         >
-          <span className="screenreader-only">
-            {I18n.t('Delete %{title}', {title: this.props.set.title})}
-          </span>
-          <i className="icon-trash" />
-        </Button>
+          <IconTrashLine />
+        </IconButton>
       )
     }
   }
@@ -422,19 +422,18 @@ export default class GradingPeriodSet extends React.Component {
     const disabled = isActionsDisabled(this.state, this.props)
     return (
       <div className="GradingPeriodList__new-period center-xs border-rbl border-round-b">
-        <Button
-          variant="link"
+        <Link
+          as="button"
           elementRef={ref => {
             this._refs.addPeriodButton = ref
           }}
           disabled={disabled}
           aria-label={I18n.t('Add Grading Period')}
           onClick={this.showNewPeriodForm}
+          renderIcon={IconPlusLine}
         >
-          <i className="icon-plus GradingPeriodList__new-period__add-icon" />
-          &nbsp;
           {I18n.t('Grading Period')}
-        </Button>
+        </Link>
       </div>
     )
   }

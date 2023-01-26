@@ -48,6 +48,7 @@ export const FixedContentTray = ({
   isOpen,
   onDismiss,
   onUnmount,
+  mountNode,
   renderHeader,
   renderBody,
   renderFooter,
@@ -58,10 +59,12 @@ export const FixedContentTray = ({
     <Tray
       data-mce-component={true}
       label={title}
+      mountNode={mountNode}
       onDismiss={onDismiss}
       onExited={onUnmount}
       open={isOpen}
       placement="end"
+      shouldCloseOnDocumentClick={true}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       size="regular"
@@ -99,6 +102,7 @@ FixedContentTray.propTypes = {
   isOpen: PropTypes.bool,
   onDismiss: PropTypes.func,
   onUnmount: PropTypes.func,
+  mountNode: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
   bodyAs: PropTypes.string,
   shouldJoinBodyAndFooter: PropTypes.bool,
 }

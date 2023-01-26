@@ -32,9 +32,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Hizala"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Eşleştirme ve Listeler"
     },
@@ -179,9 +176,6 @@
     "choose_usage_rights_33683854": {
         "message": "Kullanıcı haklarını seçin..."
     },
-    "circle_unordered_list_9e3a0763": {
-        "message": "sıralanmamış listeyi yuvarlak içine al"
-    },
     "clear_2084585f": {
         "message": "Temizle"
     },
@@ -271,9 +265,6 @@
     },
     "date_ee500367": {
         "message": "Tarih"
-    },
-    "decrease_indent_d9cf469d": {
-        "message": "İçerden başlatma sınırını azalt"
     },
     "deep_purple_bb3e2907": {
         "message": "Koyu Mor"
@@ -413,9 +404,6 @@
     "home_351838cd": {
         "message": "Ana Sayfa"
     },
-    "html_editor_fb2ab713": {
-        "message": "HTML Düzenleyici"
-    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Bu dosyayı kullanmak için iznim var."
     },
@@ -437,23 +425,14 @@
     "images_7ce26570": {
         "message": "Görseller"
     },
-    "increase_indent_6af90f7c": {
-        "message": "İçerden başlat"
-    },
     "indigo_2035fc55": {
         "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Ekle"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Equella Bağlantısı Ekle"
-    },
     "insert_link_6dc23cae": {
         "message": "Bağlantı Ekle"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "Matematik Denklemi Ekle"
     },
     "invalid_file_c11ba11": {
         "message": "Geçersiz Dosya"
@@ -554,9 +533,6 @@
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
     },
-    "next_page_d2a39853": {
-        "message": "Sonraki Sayfa"
-    },
     "no_e16d9132": {
         "message": "Hayır"
     },
@@ -610,9 +586,6 @@
     },
     "previous_month_bb1e3c84": {
         "message": "Önceki Hafta"
-    },
-    "previous_page_928fc112": {
-        "message": "Önceki Sayfa"
     },
     "pts_699bd9aa": {
         "message": "not"
@@ -719,9 +692,6 @@
     "tomorrow_at_date_b53f2cf1": {
         "message": "Yarın { date }"
     },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
-    },
     "tray_839df38a": {
         "message": "Yan menü"
     },
@@ -737,9 +707,6 @@
     "unpublished_dfd8801": {
         "message": "yayınlanmadı"
     },
-    "upload_document_253f0478": {
-        "message": "Belge Yükle"
-    },
     "upload_file_fd2361b8": {
         "message": "Dosya Yükle"
     },
@@ -751,9 +718,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Yükleniyor"
-    },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "Büyük harf alfabetik sıralı liste"
     },
     "url_22a5f3b8": {
         "message": "URL"

@@ -5,7 +5,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Alt yazı ekle" },
   "add_image_60b2de07": { "message": "Görsel Ekle" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Hizala" },
   "alignment_and_lists_5cebcb69": { "message": "Eşleştirme ve Listeler" },
   "all_4321c3a1": { "message": "Tümü" },
   "all_apps_a50dea49": { "message": "Tüm Uygulamalar" },
@@ -42,9 +41,6 @@
   "cancel_caeb1e68": { "message": "İptal" },
   "choose_caption_file_9c45bc4e": { "message": "Alt yazı dosyasını seçin" },
   "choose_usage_rights_33683854": { "message": "Kullanıcı haklarını seçin..." },
-  "circle_unordered_list_9e3a0763": {
-    "message": "sıralanmamış listeyi yuvarlak içine al"
-  },
   "clear_2084585f": { "message": "Temizle" },
   "clear_selected_file_82388e50": { "message": "Seçili dosyayı temizle" },
   "click_to_embed_imagename_c41ea8df": {
@@ -82,7 +78,6 @@
   "custom_6979cd81": { "message": "Özelleştir" },
   "cyan_c1d5f68a": { "message": "Cam göbeği" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
-  "decrease_indent_d9cf469d": { "message": "İçerden başlatma sınırını azalt" },
   "deep_purple_bb3e2907": { "message": "Koyu Mor" },
   "delimiters_4db4840d": { "message": "Ayıraçlar" },
   "details_98a31b68": { "message": "Ayrıntılar" },
@@ -97,6 +92,7 @@
     "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Teslim Tarihi: Birden Çok Gün" },
+  "edit_c5fbea07": { "message": "Düzenle" },
   "edit_link_7f53bebb": { "message": "Bağlantıyı Düzenle" },
   "embed_828fac4a": { "message": "Göm" },
   "embed_image_1080badc": { "message": "Görsel Ekle" },
@@ -117,7 +113,6 @@
   "heading_4_b2e74be7": { "message": "Başlık 4" },
   "height_69b03e15": { "message": "Yükseklik" },
   "home_351838cd": { "message": "Ana Sayfa" },
-  "html_editor_fb2ab713": { "message": "HTML Düzenleyici" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Bu dosyayı kullanmak için iznim var."
   },
@@ -127,12 +122,9 @@
   "image_options_5412d02c": { "message": "Görsel Seçenekleri" },
   "image_options_tray_90a46006": { "message": "Görsel Seçenekleri Yan Menüsü" },
   "images_7ce26570": { "message": "Görseller" },
-  "increase_indent_6af90f7c": { "message": "İçerden başlat" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Ekle" },
-  "insert_equella_links_49a8dacd": { "message": "Equella Bağlantısı Ekle" },
   "insert_link_6dc23cae": { "message": "Bağlantı Ekle" },
-  "insert_math_equation_57c6e767": { "message": "Matematik Denklemi Ekle" },
   "invalid_file_c11ba11": { "message": "Geçersiz Dosya" },
   "invalid_file_type_881cc9b2": { "message": "Geçersiz dosya türü" },
   "invalid_url_cbde79f": { "message": "Geçersiz bağlantı" },
@@ -157,7 +149,6 @@
   "modules_c4325335": { "message": "Modüller" },
   "my_files_2f621040": { "message": "Dosyalarım" },
   "name_1aed4a1b": { "message": "İsim" },
-  "next_page_d2a39853": { "message": "Sonraki Sayfa" },
   "no_e16d9132": { "message": "Hayır" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
@@ -171,7 +162,6 @@
   "percentage_34ab7c2c": { "message": "Yüzde" },
   "pink_68ad45cb": { "message": "Pembe" },
   "preview_53003fd2": { "message": "Önizleme" },
-  "previous_page_928fc112": { "message": "Önceki Sayfa" },
   "published_c944a23d": { "message": "yayınlandı" },
   "purple_7678a9fc": { "message": "Mor" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
@@ -206,9 +196,6 @@
   },
   "title_ee03d132": { "message": "Başlık" },
   "to_be_posted_when_d24bf7dc": { "message": "Gönderileceği zaman: { when }" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
-  },
   "tray_839df38a": { "message": "Yan menü" },
   "type_control_f9_to_access_image_options_text_a47e319f": {
     "message": "görsel seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
@@ -220,14 +207,10 @@
     "message": "Erişim tablosu seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
   },
   "unpublished_dfd8801": { "message": "yayınlanmadı" },
-  "upload_document_253f0478": { "message": "Belge Yükle" },
   "upload_file_fd2361b8": { "message": "Dosya Yükle" },
   "upload_image_6120b609": { "message": "Görsel Yükle" },
   "upload_media_ce31135a": { "message": "Medya Dosyası Yükle" },
   "uploading_19e8a4e7": { "message": "Yükleniyor" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "Büyük harf alfabetik sıralı liste"
-  },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Kullanım Şartları:" },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {

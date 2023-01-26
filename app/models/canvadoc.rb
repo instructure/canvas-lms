@@ -31,7 +31,9 @@ class Canvadoc < ActiveRecord::Base
   def upload(opts = {})
     return if document_id.present?
 
-    url = attachment.public_url(expires_in: 7.days)
+    # Internal because canvadocs does not directly serve this URL to users but only
+    # uses it for its internal conversion and then serves the converted result
+    url = attachment.public_url(expires_in: 7.days, internal: true)
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 
@@ -70,6 +72,44 @@ class Canvadoc < ActiveRecord::Base
     Base64.decode64(secret) if secret
   end
 
+  IWORK_MIME_TYPES = %w[
+    application/vnd.apple.pages
+    application/vnd.apple.keynote
+    application/vnd.apple.numbers
+  ].freeze
+
+  DEFAULT_MIME_TYPES = %w[
+    application/excel
+    application/msword
+    application/pdf
+    application/vnd.ms-excel
+    application/vnd.ms-powerpoint
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.oasis.opendocument.graphics
+    application/vnd.oasis.opendocument.formula
+  ].freeze
+
+  DEFAULT_SUBMISSION_MIME_TYPES = %w[
+    application/excel
+    application/msword
+    application/pdf
+    application/vnd.ms-excel
+    application/vnd.ms-powerpoint
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.oasis.opendocument.graphics
+    application/vnd.oasis.opendocument.formula
+    image/bmp
+    image/jpeg
+    image/jpg
+    image/png
+    image/tif
+    image/tiff
+  ].freeze
+
   # NOTE: the Setting.get('canvadoc_mime_types', ...) and the
   # Setting.get('canvadoc_submission_mime_types', ...) will
   # pull from the database first. the second parameter is there
@@ -81,41 +121,20 @@ class Canvadoc < ActiveRecord::Base
   # to the Setting.get(...,...) calls and if not, then remove
   # them entirely from the codebase (since intructure prod
   # does not need them)
-
   def self.mime_types
-    JSON.parse Setting.get("canvadoc_mime_types", %w[
-      application/excel
-      application/msword
-      application/pdf
-      application/vnd.ms-excel
-      application/vnd.ms-powerpoint
-      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-      application/vnd.openxmlformats-officedocument.presentationml.presentation
-      application/vnd.openxmlformats-officedocument.wordprocessingml.document
-      application/vnd.oasis.opendocument.graphics
-      application/vnd.oasis.opendocument.formula
-    ].to_json)
+    types = JSON.parse Setting.get("canvadoc_mime_types", DEFAULT_MIME_TYPES.to_json)
+
+    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+
+    types
   end
 
   def self.submission_mime_types
-    JSON.parse Setting.get("canvadoc_submission_mime_types", %w[
-      application/excel
-      application/msword
-      application/pdf
-      application/vnd.ms-excel
-      application/vnd.ms-powerpoint
-      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-      application/vnd.openxmlformats-officedocument.presentationml.presentation
-      application/vnd.openxmlformats-officedocument.wordprocessingml.document
-      application/vnd.oasis.opendocument.graphics
-      application/vnd.oasis.opendocument.formula
-      image/bmp
-      image/jpeg
-      image/jpg
-      image/png
-      image/tif
-      image/tiff
-    ].to_json)
+    types = JSON.parse Setting.get("canvadoc_submission_mime_types", DEFAULT_SUBMISSION_MIME_TYPES.to_json)
+
+    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+
+    types
   end
 
   def self.canvadocs_api

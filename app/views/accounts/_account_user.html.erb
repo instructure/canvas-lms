@@ -17,7 +17,7 @@
 %>
 
 <% account_user ||= nil %>
-<li class="user" id="enrollment_<%= account_user ? account_user.id : 'blank' %>"<%= ' style="display: none;"' unless account_user %>>
+<li data-heap-redact-text class="user" id="enrollment_<%= account_user ? account_user.id : 'blank' %>"<%= ' style="display: none;"' unless account_user %>>
   <a href="<%= user_url(account_user ? account_user.user_id : '{{ user_id }}') %>" class="user_name name"><%= account_user.try(:user).try(:name) %></a>
   <% if !account_user || @account_user_permissions_cache[[account_user.account_id, account_user.role_id]][:destroy] %>
     <a

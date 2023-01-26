@@ -40,8 +40,12 @@ import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
-import {SearchContext, DiscussionManagerUtilityContext} from '../../utils/constants'
+import {Spinner} from '@instructure/ui-spinner'
+import {
+  SearchContext,
+  DiscussionManagerUtilityContext,
+  AllThreadsState,
+} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
@@ -55,14 +59,30 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('discussion_topics_post')
 
+const defaultExpandedReplies = id => {
+  if (
+    (ENV.split_screen_view && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) ||
+    ENV.isolated_view
+  )
+    return false
+  if (id === ENV.discussions_deep_link?.entry_id) return false
+  if (id === ENV.discussions_deep_link?.root_entry_id) return true
+
+  return false
+}
+
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, filter} = useContext(SearchContext)
+  const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
+    useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
-  const [expandReplies, setExpandReplies] = useState(false)
+  const [expandReplies, setExpandReplies] = useState(
+    defaultExpandedReplies(props.discussionEntry._id)
+  )
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
@@ -205,6 +225,9 @@ export const DiscussionThreadContainer = props => {
     return rootEntryDraftMessage
   }
 
+  // Condense SplitScreen to one variable & link with the SplitScreenButton
+  const splitScreenOn = ENV.split_screen_view && props.userSplitScreenPreference
+
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -217,7 +240,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -258,7 +281,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view || ENV.split_screen_view) {
+          if (ENV.isolated_view || splitScreenOn) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -268,7 +291,7 @@ export const DiscussionThreadContainer = props => {
             setExpandReplies(!expandReplies)
           }
         }}
-        isExpanded={expandReplies}
+        isExpanded={expandReplies && !!searchTerm}
       />
     )
   }
@@ -327,12 +350,37 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
+  useEffect(() => {
+    if (allThreadsStatus === AllThreadsState.Expanded && !expandReplies) {
+      setExpandReplies(true)
+    }
+    if (allThreadsStatus === AllThreadsState.Collapsed && expandReplies) {
+      setExpandReplies(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allThreadsStatus])
+
+  useEffect(() => {
+    if (expandReplies && !expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads([...expandedThreads, props.discussionEntry._id])
+    } else if (!expandReplies && expandedThreads.includes(props.discussionEntry._id)) {
+      setExpandedThreads(expandedThreads.filter(v => v !== props.discussionEntry._id))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandReplies])
+
   const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
     const getParentId = () => {
-      return props.discussionEntry.rootEntryId &&
-        props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
-        ? props.discussionEntry.parentId
-        : props.discussionEntry._id
+      switch (props.discussionEntry.depth) {
+        case 1:
+          return props.discussionEntry._id
+        case 2:
+          return props.discussionEntry._id
+        case 3:
+          return props.discussionEntry.parentId
+        default:
+          return props.discussionEntry.rootEntryId
+      }
     }
     createDiscussionEntry({
       variables: {
@@ -423,7 +471,7 @@ export const DiscussionThreadContainer = props => {
                             !ENV.isolated_view
                               ? () => {
                                   setReplyFromId(props.discussionEntry._id)
-                                  if (ENV.split_screen_view) {
+                                  if (ENV.isolated_view || splitScreenOn) {
                                     props.onOpenIsolatedView(
                                       props.discussionEntry._id,
                                       props.discussionEntry.isolatedEntryId,
@@ -505,7 +553,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: replyMarginDepth}}>
-            {editorExpanded && !(ENV.isolated_view || ENV.split_screen_view) && (
+            {editorExpanded && !(ENV.isolated_view || splitScreenOn) && (
               <View
                 display="block"
                 background="primary"
@@ -513,6 +561,7 @@ export const DiscussionThreadContainer = props => {
                 margin="none none x-small none"
               >
                 <DiscussionEdit
+                  rceIdentifier={props.discussionEntry._id}
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
                   onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
@@ -527,8 +576,7 @@ export const DiscussionThreadContainer = props => {
                   onCancel={() => setEditorExpanded(false)}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
-                    props.discussionEntry.rootEntryId &&
-                    props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+                    props.discussionEntry.depth > 2
                       ? ReactDOMServer.renderToString(
                           <span className="mceNonEditable mention" data-mention="1">
                             @{getDisplayName(props.discussionEntry)}
@@ -540,17 +588,19 @@ export const DiscussionThreadContainer = props => {
               </View>
             )}
           </div>
-          {(expandReplies || props.depth > 0) && props.discussionEntry.subentriesCount > 0 && (
-            <DiscussionSubentries
-              discussionTopic={props.discussionTopic}
-              discussionEntryId={props.discussionEntry._id}
-              depth={props.depth + 1}
-              markAsRead={props.markAsRead}
-              parentRefCurrent={threadRefCurrent}
-              highlightEntryId={props.highlightEntryId}
-              setHighlightEntryId={props.setHighlightEntryId}
-            />
-          )}
+          {((expandReplies && !searchTerm) || props.depth > 0) &&
+            !(ENV.isolated_view || splitScreenOn) &&
+            props.discussionEntry.subentriesCount > 0 && (
+              <DiscussionSubentries
+                discussionTopic={props.discussionTopic}
+                discussionEntryId={props.discussionEntry._id}
+                depth={props.depth + 1}
+                markAsRead={props.markAsRead}
+                parentRefCurrent={threadRefCurrent}
+                highlightEntryId={props.highlightEntryId}
+                setHighlightEntryId={props.setHighlightEntryId}
+              />
+            )}
         </>
       )}
     />
@@ -570,6 +620,7 @@ DiscussionThreadContainer.propTypes = {
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
+  userSplitScreenPreference: PropTypes.bool,
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -596,7 +647,16 @@ const DiscussionSubentries = props => {
   }
 
   if (subentries.loading) {
-    return <LoadingIndicator />
+    return (
+      <Flex justifyItems="start" margin="0 large" padding="0 x-large">
+        <Flex.Item>
+          <Spinner renderTitle={I18n.t('Loading more replies')} size="x-small" />
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <Text>{I18n.t('Loading replies...')}</Text>
+        </Flex.Item>
+      </Flex>
+    )
   }
 
   return subentries.data.legacyNode.discussionSubentriesConnection?.nodes.map(entry => (

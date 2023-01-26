@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {connect} from 'react-redux'
 
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
@@ -36,9 +37,12 @@ import UnpublishedChangesTrayContents from '../unpublished_changes_tray_contents
 import UnpublishedWarningModal from '../header/unpublished_warning_modal'
 
 import {coursePaceActions} from '../../actions/course_paces'
+import {actions as uiActions} from '../../actions/ui'
+
 import {
   CoursePace,
   OptionalDate,
+  Pace,
   PaceContext,
   PaceDuration,
   ResponsiveSizes,
@@ -60,6 +64,7 @@ import PaceModalHeading from './heading'
 import {getSelectedPaceContext} from '../../reducers/pace_contexts'
 import {getEnrolledSection} from '../../reducers/enrollments'
 import PaceModalStats from './stats'
+import {generateModalLauncherId} from '../../utils/utils'
 
 const I18n = useI18nScope('course_paces_modal')
 
@@ -79,23 +84,36 @@ interface StoreProps {
 
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace
+  clearCategoryError: typeof uiActions.clearCategoryError
+  readonly setOuterResponsiveSize: typeof uiActions.setOuterResponsiveSize
 }
 
 interface PassedProps {
   readonly changes?: SummarizedChange[]
-  readonly isBlueprintLocked: boolean
-  readonly responsiveSize: ResponsiveSizes
   readonly isOpen: boolean
   readonly onClose: () => void
 }
 
 const {Item: FlexItem} = Flex as any
 
-export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = props => {
-  const [isBlueprintLocked, setIsBlueprintLocked] = useState(props.isBlueprintLocked)
+type ComponentProps = PassedProps & DispatchProps & StoreProps
+
+type ResponsiveComponentProps = ComponentProps & {
+  readonly outerResponsiveSize: ResponsiveSizes
+}
+
+export const PaceModal: React.FC<ResponsiveComponentProps> = ({
+  outerResponsiveSize,
+  setOuterResponsiveSize,
+  ...props
+}) => {
   const [pendingContext, setPendingContext] = useState('')
   const [trayOpen, setTrayOpen] = useState(false)
   const closeButtonRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    setOuterResponsiveSize(outerResponsiveSize)
+  }, [outerResponsiveSize, setOuterResponsiveSize])
 
   const modalTitle = () => {
     let title
@@ -113,11 +131,18 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
     return `${title}: ${props.paceName}`
   }
 
+  const restoreFocus = () => {
+    const launcherId = generateModalLauncherId(props.selectedPaceContext)
+    document.getElementById(launcherId)?.focus()
+  }
+
   const handleClose = () => {
     if (props.unappliedChangesExist) {
       setPendingContext(props.coursePace.context_type)
     } else {
+      props.clearCategoryError('publish')
       props.onClose()
+      restoreFocus()
     }
   }
 
@@ -142,6 +167,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
       label={modalTitle()}
       shouldCloseOnDocumentClick={true}
       overflow="fit"
+      aria-modal={true}
     >
       <Modal.Header>
         <Flex>
@@ -166,6 +192,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
       <Modal.Body padding={props.responsiveSize === 'small' ? 'none small' : 'none large'}>
         <View
           as="div"
+          className="pace-redesign-inner-modal"
           maxWidth={props.responsiveSize === 'small' ? '100%' : '80%'}
           margin="none auto"
         >
@@ -175,13 +202,12 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
             </View>
             <PaceModalHeading
               enrolledSection={props.enrolledSection}
-              isBlueprintLocked={props.isBlueprintLocked}
               coursePace={props.coursePace}
               paceContext={props.selectedPaceContext}
               contextName={props.paceName}
-              setIsBlueprintLocked={setIsBlueprintLocked}
             />
             <PaceModalStats
+              appliedPace={props.selectedPaceContext?.applied_pace as Pace}
               coursePace={props.coursePace}
               assignments={props.assignmentsCount}
               paceDuration={props.paceDuration}
@@ -189,14 +215,14 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
               compressDates={props.compressDates}
               uncompressDates={props.uncompressDates}
               compression={props.compression}
-              responsiveSize={props.responsiveSize}
+              responsiveSize={outerResponsiveSize}
             />
-            <Body blueprintLocked={isBlueprintLocked} />
+            <Body />
             <Tray
               label={I18n.t('Unpublished Changes tray')}
               open={trayOpen}
               onDismiss={handleTrayDismiss}
-              placement={props.responsiveSize === 'small' ? 'bottom' : 'end'}
+              placement={outerResponsiveSize === 'small' ? 'bottom' : 'end'}
               shouldContainFocus={true}
               shouldReturnFocus={true}
               shouldCloseOnDocumentClick={true}
@@ -216,23 +242,40 @@ export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = pro
           onConfirm={() => {
             setPendingContext('')
             props.onResetPace()
+            props.clearCategoryError('publish')
             props.onClose()
+            restoreFocus()
           }}
           contextType={props.coursePace.context_type}
         />
       </Modal.Body>
       <Modal.Footer theme={{padding: '0'}}>
         <Footer
-          blueprintLocked={isBlueprintLocked}
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}
-          responsiveSize={props.responsiveSize}
+          responsiveSize={outerResponsiveSize}
           focusOnClose={focusOnCloseButton}
         />
       </Modal.Footer>
     </Modal>
   )
 }
+
+export const ResponsivePaceModal: React.FC<ComponentProps> = props => (
+  <Responsive
+    match="media"
+    query={{
+      small: {maxWidth: '80rem'},
+      large: {minWidth: '80rem'},
+    }}
+    props={{
+      small: {responsiveSize: 'small'},
+      large: {responsiveSize: 'large'},
+    }}
+  >
+    {({responsiveSize}) => <PaceModal outerResponsiveSize={responsiveSize} {...props} />}
+  </Responsive>
+)
 
 const mapStateToProps = (state: StoreState) => {
   return {
@@ -256,4 +299,6 @@ export default connect(mapStateToProps, {
   onResetPace: coursePaceActions.onResetPace,
   compressDates: coursePaceActions.compressDates,
   uncompressDates: coursePaceActions.uncompressDates,
-})(PaceModal)
+  clearCategoryError: uiActions.clearCategoryError,
+  setOuterResponsiveSize: uiActions.setOuterResponsiveSize,
+})(ResponsivePaceModal)

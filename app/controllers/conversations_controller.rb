@@ -457,7 +457,7 @@ class ConversationsController < ApplicationController
         InstStatsd::Statsd.increment("inbox.message.sent.legacy")
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
         if message.has_media_objects || params[:media_comment_id]
-          InstStatsd::Statsd.count("inbox.message.sent.media.legacy", batch.recipient_count)
+          InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
         end
         if !message[:attachment_ids].nil? && params[:attachment_ids] != ""
           InstStatsd::Statsd.increment("inbox.message.sent.attachment.legacy")

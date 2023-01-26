@@ -163,7 +163,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     # Find all LearningOutcomeResults for a user for a specific learning_outcome_id
     out_results = LearningOutcomeResult.active.preload(:alignment).where(learning_outcome_id: alignment.learning_outcome_id, user_id: user.id).to_a
     # Check if there is a LearningOutcomeResult for the alignment
-    out_results.select! { |res| res.alignment.content_id == alignment.content_id }
+    out_results.select! { |res| res.alignment.content_type == "AssessmentQuestionBank" ? res.associated_asset_id == associated_asset_id : res.alignment.content_id == alignment.content_id }
     unless out_results.empty?
       # Delete current LearningOutcomeResult
       self.workflow_state = "deleted"

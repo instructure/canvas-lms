@@ -19,6 +19,7 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
+import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -156,6 +157,7 @@ function setPageHtmlFixture() {
                 <span class="what_if_score"></span>
                 <span class="assignment_id">202</span>
               </span>
+              <span class="unread_dot grade_dot" id="submission_unread_dot_123">&nbsp;</span>
             </div>
           </td>
         </tr>
@@ -176,6 +178,7 @@ function setPageHtmlFixture() {
                 <span class="what_if_score"></span>
                 <span class="assignment_id">203</span>
               </span>
+              <span class="unread_dot grade_dot" id="submission_unread_dot_456">&nbsp;</span>
             </div>
           </td>
         </tr>
@@ -687,6 +690,32 @@ QUnit.module('GradeSummary.setup', {
   teardown() {
     commonTeardown()
   },
+})
+
+test('sends an axios request to mark unread submissions as read', function () {
+  ENV.visibility_feedback_enabled = true
+  ENV.assignments_2_student_enabled = true
+  const axiosSpy = sandbox.spy(axios, 'put')
+  GradeSummary.setup()
+  const expectedUrl = `/api/v1/courses/1/submissions/bulk_mark_read`
+  equal(axiosSpy.callCount, 1)
+  deepEqual(axiosSpy.getCall(0).args, [expectedUrl, {submissionIds: ['123', '456']}])
+})
+
+test('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', function () {
+  ENV.visibility_feedback_enabled = true
+  ENV.assignments_2_student_enabled = false
+  const axiosSpy = sandbox.spy(axios, 'put')
+  GradeSummary.setup()
+  equal(axiosSpy.callCount, 0)
+})
+
+test('does not mark unread submissions as read if visibility_feedback_enabled feature flag off', function () {
+  ENV.visibility_feedback_enabled = false
+  ENV.assignments_2_student_enabled = true
+  const axiosSpy = sandbox.spy(axios, 'put')
+  GradeSummary.setup()
+  equal(axiosSpy.callCount, 0)
 })
 
 test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function () {
@@ -1594,6 +1623,8 @@ QUnit.module('GradeSummary', () => {
     QUnit.module('handleSubmissionsCommentTray', () => {
       test('should open tray with no prior assignmentId', () => {
         sandbox.spy(useStore, 'setState')
+        sandbox.spy($.fn, 'addClass')
+        sandbox.spy($.fn, 'removeClass')
         GradeSummary.handleSubmissionsCommentTray('17')
         equal(useStore.setState.callCount, 1)
         const [value] = useStore.setState.getCall(0).args
@@ -1605,6 +1636,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
+        equal($.fn.addClass.callCount, 1)
+        equal($.fn.removeClass.callCount, 1)
       })
       test('should open tray with different prior assignmentId', () => {
         sandbox.stub(useStore, 'getState').returns({
@@ -1613,6 +1646,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'testUr',
         })
         sandbox.spy(useStore, 'setState')
+        sandbox.spy($.fn, 'addClass')
+        sandbox.spy($.fn, 'removeClass')
         GradeSummary.handleSubmissionsCommentTray('17')
 
         equal(useStore.setState.callCount, 1)
@@ -1625,6 +1660,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
+        equal($.fn.addClass.callCount, 1)
+        equal($.fn.removeClass.callCount, 1)
       })
       test('should close tray if same assignmentId and trey is open', () => {
         sandbox.stub(useStore, 'getState').returns({
@@ -1633,6 +1670,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'testUr',
         })
         sandbox.spy(useStore, 'setState')
+        sandbox.spy($.fn, 'addClass')
+        sandbox.spy($.fn, 'removeClass')
         GradeSummary.handleSubmissionsCommentTray('17')
 
         equal(useStore.setState.callCount, 1)
@@ -1642,6 +1681,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentId: undefined,
         }
         deepEqual(value, expectedState)
+        equal($.fn.addClass.callCount, 0)
+        equal($.fn.removeClass.callCount, 1)
       })
       test('should keep tray open and switch assignmentId for different assignment and tray open', () => {
         sandbox.stub(useStore, 'getState').returns({
@@ -1650,6 +1691,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'testUr',
         })
         sandbox.spy(useStore, 'setState')
+        sandbox.spy($.fn, 'addClass')
+        sandbox.spy($.fn, 'removeClass')
         GradeSummary.handleSubmissionsCommentTray('17')
 
         equal(useStore.setState.callCount, 1)
@@ -1662,6 +1705,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
+        equal($.fn.addClass.callCount, 1)
+        equal($.fn.removeClass.callCount, 1)
       })
     })
   })

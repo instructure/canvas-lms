@@ -1273,7 +1273,7 @@ describe GradeCalculator do
 
         it "does not update score statistics when calculating non-course scores" do
           calculator_options = { grading_period: @first_period, update_course_score: false }
-          calculator = GradeCalculator.new(@student.id, @course, calculator_options)
+          calculator = GradeCalculator.new(@student.id, @course, **calculator_options)
           expect(ScoreStatisticsGenerator).not_to receive(:update_score_statistics_in_singleton).with(@course)
           calculator.compute_and_save_scores
         end
@@ -1287,7 +1287,7 @@ describe GradeCalculator do
 
         it "does not update the overall course score if update_course_score is false" do
           calculator_options = { grading_period: @first_period, update_course_score: false }
-          calculator = GradeCalculator.new(@student.id, @course, calculator_options)
+          calculator = GradeCalculator.new(@student.id, @course, **calculator_options)
 
           expect { calculator.compute_and_save_scores }.not_to change {
             @student.enrollments.first.scores.find_by!(course_score: true)

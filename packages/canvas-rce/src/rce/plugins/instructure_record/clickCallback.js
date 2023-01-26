@@ -22,6 +22,7 @@ import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
 import {headerFor, originFromHost} from '../../../rcs/api'
+import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
 
 export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
   let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
@@ -89,6 +90,7 @@ export default function (ed, document) {
               headers: headerFor(contentProps.jwt),
             }}
             userLocale={Bridge.userLocale}
+            mountNode={instuiPopupMountNode}
             open={true}
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}

@@ -29,7 +29,6 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Lägg till CC/undertext" },
   "add_image_60b2de07": { "message": "Lägg till bild" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Justera" },
   "alignment_and_lists_5cebcb69": { "message": "Justering och listor" },
   "all_4321c3a1": { "message": "Alla" },
   "all_apps_a50dea49": { "message": "Alla appar" },
@@ -92,7 +91,6 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Avbryt" },
   "cap_product_3a5265a6": { "message": "Takprodukt" },
-  "center_align_e68d9997": { "message": "Centrera" },
   "centered_dot_64d5e378": { "message": "Centrerad punkt" },
   "centered_horizontal_dots_451c5815": {
     "message": "Centrerade horisontella punkter"
@@ -103,9 +101,6 @@ const locale = {
     "message": "Välj användningsrättigheter ..."
   },
   "circle_484abe63": { "message": "Cirkel" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "cirkelmarkera oordnad lista"
-  },
   "clear_2084585f": { "message": "Rensa" },
   "clear_image_3213fe62": { "message": "Rensa bild" },
   "clear_selected_file_82388e50": { "message": "Rensa vald fil" },
@@ -166,14 +161,10 @@ const locale = {
   "course_files_62deb8f8": { "message": "Kursfiler" },
   "course_files_a31f97fc": { "message": "Kursfiler" },
   "course_images_f8511d04": { "message": "Kursbilder" },
-  "course_link_b369426": { "message": "Kurslänk" },
   "course_links_b56959b9": { "message": "Kurslänkar" },
   "course_media_ec759ad": { "message": "Kursmedia" },
   "course_navigation_dd035109": { "message": "Kursnavigering" },
   "create_icon_110d6463": { "message": "Skapa ikon" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Skapa ikon för ikonverktyget"
-  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licens:"
   },
@@ -187,14 +178,7 @@ const locale = {
   "date_added_ed5ad465": { "message": "Tillagt datum" },
   "decorative_icon_9a7f3fc3": { "message": "Dekorativ ikon" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativ { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Minska indrag" },
   "deep_purple_bb3e2907": { "message": "Mörklila" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "punktmarkera oordnad lista som standard"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "numrera ordnad lista som standard"
-  },
   "definite_integral_fe7ffed1": { "message": "Bestämd integral" },
   "degree_symbol_4a823d5f": { "message": "Gradersymbol" },
   "delimiters_4db4840d": { "message": "Avgränsare" },
@@ -220,7 +204,6 @@ const locale = {
     "message": "Visa textlänk (öppnas i en ny flik)"
   },
   "division_sign_72190870": { "message": "Divisionstecken" },
-  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokument" },
   "done_54e3d4b6": { "message": "Klar" },
   "double_dagger_faf78681": { "message": "Dubbeldolk" },
@@ -245,8 +228,8 @@ const locale = {
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Redigera alternativ text för den här ikoninstansen"
   },
+  "edit_c5fbea07": { "message": "Redigera" },
   "edit_course_link_5a5c3c59": { "message": "Redigera kurslänk" },
-  "edit_equation_f5279959": { "message": "Redigera ekvation" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Redigera befintlig ikon för Ikonbyggaren"
   },
@@ -271,19 +254,18 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Lika med-tecken" },
-  "equation_1c5ac93c": { "message": "Ekvation" },
   "equation_editor_39fbc3f1": { "message": "Ekvationsredigeraren" },
   "equivalence_class_7b0f11c0": { "message": "Ekvivalensklass" },
   "equivalent_identity_654b3ce5": { "message": "Ekvivalent (identitet)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Existerar" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Avsluta helskärm" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Visa förhandsgranskning som standard"
   },
   "expand_to_see_types_f5d29352": {
     "message": "Expandera för att visa { types }"
   },
-  "external_link_d3f9e62a": { "message": "Extern länk" },
   "external_tools_6e77821": { "message": "Externa verktyg" },
   "extra_large_b6cdf1ff": { "message": "Extra stor" },
   "extra_small_9ae33252": { "message": "Extra liten" },
@@ -344,7 +326,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Gruppfiler" },
   "group_images_98e0ac17": { "message": "Gruppera bilder" },
   "group_isomorphism_45b1458c": { "message": "Gruppautomorfi" },
-  "group_link_63e626b3": { "message": "Grupplänk" },
   "group_links_9493129e": { "message": "Grupplänkar" },
   "group_media_2f3d128a": { "message": "Gruppera mediefiler" },
   "group_navigation_99f191a": { "message": "Gruppnavigering" },
@@ -363,7 +344,6 @@ const locale = {
   },
   "home_351838cd": { "message": "Startsida" },
   "html_code_editor_fd967a44": { "message": "Redigerare för HTML-kod" },
-  "html_editor_fb2ab713": { "message": "HTML-redigerare" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Jag har fått tillåtelse att använda den här filen."
   },
@@ -376,6 +356,7 @@ const locale = {
   "icon_maker_icons_cc560f7e": { "message": "Ikoner för ikonverktyget" },
   "icon_options_7e32746e": { "message": "Ikonalternativ" },
   "icon_options_tray_2b407977": { "message": "Fack för ikonalternativ" },
+  "icon_preview_1782a1d9": { "message": "Förhandvisning av ikon" },
   "icon_shape_30b61e7": { "message": "Ikonform" },
   "icon_size_9353edea": { "message": "Ikonstorlek" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -394,17 +375,12 @@ const locale = {
     "message": "Imaginärdel (av komplexa nummer)"
   },
   "in_element_of_19ca2f33": { "message": "I (element av)" },
-  "increase_indent_6af90f7c": { "message": "Öka indrag" },
   "indefinite_integral_6623307e": { "message": "Obestämd integral" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Slutsats" },
   "infinity_7a10f206": { "message": "Oändlighet" },
   "insert_593145ef": { "message": "Infoga" },
-  "insert_equella_links_49a8dacd": { "message": "Infoga Equella-länkar" },
   "insert_link_6dc23cae": { "message": "Infoga länk" },
-  "insert_math_equation_57c6e767": {
-    "message": "Infoga en matematisk ekvation"
-  },
   "integers_336344e1": { "message": "Heltal" },
   "intersection_cd4590e4": { "message": "Genomskärning" },
   "invalid_entry_f7d2a0f5": { "message": "Ogiltig inmatning." },
@@ -419,7 +395,6 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Språkvetenskapsikon" },
   "languages_icon_9d20539": { "message": "Språkikon" },
   "large_9c5e80e7": { "message": "Stor" },
-  "left_align_43d95491": { "message": "Vänsterjustera" },
   "left_angle_bracket_c87a6d07": { "message": "Vänster hakparentes" },
   "left_arrow_4fde1a64": { "message": "Vänster pil" },
   "left_arrow_with_hook_5bfcad93": { "message": "Vänsterpil med krok" },
@@ -510,7 +485,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
-  "next_page_d2a39853": { "message": "Nästa sida" },
   "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
@@ -520,9 +494,6 @@ const locale = {
   "no_results_940393cf": { "message": "Inga resultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Inga resultat hittades för { term }."
   },
   "none_3b5e34d2": { "message": "Inga" },
   "none_selected_b93d56d2": { "message": "Inga valda" },
@@ -552,9 +523,6 @@ const locale = {
   "operators_a2ef9a93": { "message": "Operatörer" },
   "or_9b70ccaa": { "message": "Eller" },
   "orange_81386a62": { "message": "Orange" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Ordnade och oordnade listor"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Andra genvägar till redigeraren kan hittas på"
   },
@@ -567,6 +535,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiell (derivat)" },
+  "paste_5963d1c1": { "message": "Klistra in" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personer" },
   "percentage_34ab7c2c": { "message": "Procent" },
@@ -598,7 +567,6 @@ const locale = {
   "preview_53003fd2": { "message": "Förhandsgranska" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
-  "previous_page_928fc112": { "message": "Föregående sida" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -619,11 +587,9 @@ const locale = {
     "message": "Imaginärdel (av komplexa nummer)"
   },
   "record_7c9448b": { "message": "Spela in" },
-  "record_upload_media_5fdce166": { "message": "Spela in/ladda upp media" },
   "red_8258edf3": { "message": "Röd" },
   "relationships_6602af70": { "message": "Relationer" },
   "religion_icon_246e0be1": { "message": "Religiös ikon" },
-  "remove_link_d1f2f4d0": { "message": "Ta bort länk" },
   "replace_e61834a7": { "message": "Ersätt" },
   "reset_95a81614": { "message": "Återställ" },
   "resize_ec83d538": { "message": "Ändra storlek" },
@@ -639,7 +605,6 @@ const locale = {
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
   },
-  "right_align_39e7a32a": { "message": "Högerjustera" },
   "right_angle_bracket_d704e2d6": { "message": "Höger hakparentes" },
   "right_arrow_35e0eddf": { "message": "Högerpil" },
   "right_arrow_with_hook_29d92d31": { "message": "Högerpil med krok" },
@@ -664,25 +629,16 @@ const locale = {
     "message": "Tyvärr fungerar inte tangentbordet i den nätta HTML-redigeraren. Öppna den råa HTML-redigeraren här."
   },
   "save_11a80ec3": { "message": "Spara" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Sparade ikoner för ikonverktyget"
-  },
   "script_l_42a7b254": { "message": "Skript-L" },
   "search_280d00bd": { "message": "Sök" },
-  "search_term_b2d2235": { "message": "Sökterm" },
   "select_crop_shape_d441feeb": { "message": "Välj beskärningsform" },
   "select_language_7c93a900": { "message": "Välj språk" },
-  "selected_274ce24f": { "message": "Markerade" },
   "selected_linkfilename_c093b1f2": { "message": "Markerade { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Uppsättning av minus" },
   "sharp_music_ab956814": { "message": "Korsförtecken (musik)" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Tryck på Skift+O för att öppna den nätta HTML-redigeraren."
   },
-  "show_audio_options_b489926b": { "message": "Visa ljudalternativ" },
-  "show_image_options_1e2ecc6b": { "message": "Visa bildalternativ" },
-  "show_link_options_545338fd": { "message": "Visa länkalternativ" },
-  "show_video_options_6ed3721a": { "message": "Visa videoalternativ" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enfärgsbild" },
@@ -716,9 +672,6 @@ const locale = {
   "square_superset_strict_fa4262e4": {
     "message": "Kvadratisk super set (strikt)"
   },
-  "square_unordered_list_b15ce93b": {
-    "message": "fyrkantsmarkera oordnad lista"
-  },
   "star_8d156e09": { "message": "Favoritmarkera" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stilar" },
@@ -730,9 +683,6 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Efterträder lika med" },
   "sum_b0842d31": { "message": "Summa" },
   "superscript_8cb349a2": { "message": "Upphöjd" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Upphöjd och nedsänkt text"
-  },
   "superset_c4db8a7a": { "message": "Superset" },
   "superset_strict_c77dd6d2": { "message": "Superset (strikt)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -803,9 +753,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Växla verktygstips" },
   "tools_2fcf772e": { "message": "Verktyg" },
   "top_66e0adb6": { "message": "Överst" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultat hittades, { numDisplayed } resultat visas nu"
-  },
   "tray_839df38a": { "message": "Fack" },
   "triangle_6072304e": { "message": "Triangel" },
   "turnstile_yields_f9e76df1": { "message": "Vändkors (Släpper igenom)" },
@@ -827,15 +774,10 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Diagonal pil, uppåt och till höger"
   },
-  "upload_document_253f0478": { "message": "Ladda upp dokument" },
   "upload_file_fd2361b8": { "message": "Ladda upp fil" },
   "upload_image_6120b609": { "message": "Ladda upp bild" },
   "upload_media_ce31135a": { "message": "Ladda upp media" },
-  "upload_record_media_e4207d72": { "message": "Ladda upp/spela in media" },
   "uploading_19e8a4e7": { "message": "Laddar upp" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "markera alfabetisk ordnad lista med versaler"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Versal Delta" },
   "uppercase_gamma_86f492e9": { "message": "Versal Gamma" },
   "uppercase_lambda_c78d8ed4": { "message": "Versal Lambda" },
@@ -843,9 +785,6 @@ const locale = {
   "uppercase_phi_caa36724": { "message": "Versal Phi" },
   "uppercase_pi_fcc70f5e": { "message": "Versal Pi" },
   "uppercase_psi_6395acbe": { "message": "Versal Psi" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "markera ordnad lista med romerska siffror"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Versal Sigma" },
   "uppercase_theta_49afc891": { "message": "Versal Theta" },
   "uppercase_upsilon_8c1e623e": { "message": "Versal Ypsilon" },
@@ -911,6 +850,9 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": { "message": "Visa kortkommandon" },
   "view_title_description_67940918": {
     "message": "Visa beskrivning för { title }"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Visa ord- och teckenräkning"
   },
   "white_87fa64fd": { "message": "Vit" },
   "width_492fec76": { "message": "Bredd" },

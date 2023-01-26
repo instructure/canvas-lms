@@ -34,7 +34,7 @@ module CanvasOutcomesHelper
     domain, jwt = extract_domain_jwt(
       context.root_account,
       "lmgb_results.show",
-      params
+      **params
     )
     return if domain.nil? || jwt.nil?
 
@@ -53,15 +53,15 @@ module CanvasOutcomesHelper
     end
   end
 
-  def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids)
-    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || user_uuids.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
+  def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids = "")
+    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
 
     params = {
       associated_asset_id_list: assignment_ids,
       associated_asset_type: assignment_type,
       external_outcome_id_list: outcome_ids,
-      user_uuid_list: user_uuids
     }
+    params[:user_uuid_list] = user_uuids unless user_uuids.blank?
 
     threaded_request(context, "lmgb_results.show", "api/authoritative_results", params)
   end
@@ -119,7 +119,12 @@ module CanvasOutcomesHelper
             next if result[:attempts].nil?
 
             result[:attempts].each do |attempt|
-              attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
+              # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
+              # to parse the result returned from outcome service
+              next unless attempt[:metadata].is_a? String
+
+              attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
+              attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
             end
           end
           all_results.concat(results)

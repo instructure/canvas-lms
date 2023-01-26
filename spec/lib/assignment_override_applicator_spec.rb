@@ -62,8 +62,152 @@ describe AssignmentOverrideApplicator do
 
   describe "assignment_overridden_for" do
     before do
-      student_in_course
+      student_in_course(active_all: true)
       @assignment = create_assignment(course: @course)
+    end
+
+    context "when a student has multiple enrollments in a course" do
+      before do
+        @now = Time.zone.now
+        @assignment.update!(due_at: 10.days.from_now(@now))
+        @section2 = @course.course_sections.create!(name: "Summer session")
+        @section2_enrollment = @course.enroll_student(
+          @student,
+          section: @section2,
+          allow_multiple_enrollments: true,
+          enrollment_state: "active"
+        )
+
+        @section2_override = create_section_override_for_assignment(
+          @assignment,
+          course_section: @section2,
+          due_at: 20.days.from_now(@now)
+        )
+      end
+
+      context "with a concluded enrollment in an assigned section" do
+        before { @section2_enrollment.conclude }
+
+        it "uses the 'Everyone' due date over the due date for the override associated with the concluded enrollment" do
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq @assignment.due_at
+        end
+
+        it "uses the due date for the override associated with the concluded enrollment when the feature flag is disabled" do
+          Account.site_admin.disable_feature!(:deprioritize_section_overrides_for_nonactive_enrollments)
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq @section2_override.due_at
+        end
+
+        it "uses the due date for any override associated with an active enrollment over the override associated with the concluded enrollment" do
+          active_enrollment_section_override = create_section_override_for_assignment(
+            @assignment,
+            course_section: @course.default_section,
+            due_at: 5.days.from_now(@now)
+          )
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq active_enrollment_section_override.due_at
+        end
+
+        it "uses the due date for the override associated with the concluded enrollment if it's the only option (no other overrides, and no 'Everyone' date)" do
+          expect do
+            @assignment.update!(only_visible_to_overrides: true)
+          end.to change {
+            AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          }.from(@assignment.due_at).to(@section2_override.due_at)
+        end
+
+        it "uses the most lenient due date (giving most time to submit) if there are multiple overrides associated with concluded students" do
+          @assignment.update!(only_visible_to_overrides: true)
+          @course.enrollments.find_by(user: @student, course_section: @course.default_section).conclude
+          default_section_override = create_section_override_for_assignment(
+            @assignment,
+            course_section: @course.default_section,
+            due_at: 5.days.from_now(@now)
+          )
+
+          new_due_at = 25.days.from_now(@now)
+          expect do
+            default_section_override.update!(due_at: new_due_at)
+          end.to change {
+            AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          }.from(@section2_override.due_at).to(new_due_at)
+        end
+      end
+
+      context "with a deactivated enrollment in an assigned section" do
+        before { @section2_enrollment.deactivate }
+
+        it "uses the 'Everyone' due date over the due date for the override associated with the deactivated enrollment" do
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq @assignment.due_at
+        end
+
+        it "uses the due date for the override associated with the deactivated enrollment when the feature flag is disabled" do
+          Account.site_admin.disable_feature!(:deprioritize_section_overrides_for_nonactive_enrollments)
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq @section2_override.due_at
+        end
+
+        it "uses the due date for any override associated with an active enrollment over the override associated with the deactivated enrollment" do
+          active_enrollment_section_override = create_section_override_for_assignment(
+            @assignment,
+            course_section: @course.default_section,
+            due_at: 5.days.from_now(@now)
+          )
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq active_enrollment_section_override.due_at
+        end
+
+        it "uses the due date for the override associated with the deactivated enrollment if it's the only option (no other overrides, and no 'Everyone' date)" do
+          expect do
+            @assignment.update!(only_visible_to_overrides: true)
+          end.to change {
+            AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          }.from(@assignment.due_at).to(@section2_override.due_at)
+        end
+
+        it "uses the most lenient due date (giving most time to submit) if there are multiple overrides associated with deactivated students" do
+          @assignment.update!(only_visible_to_overrides: true)
+          @course.enrollments.find_by(user: @student, course_section: @course.default_section).deactivate
+          default_section_override = create_section_override_for_assignment(
+            @assignment,
+            course_section: @course.default_section,
+            due_at: 5.days.from_now(@now)
+          )
+
+          new_due_at = 25.days.from_now(@now)
+          expect do
+            default_section_override.update!(due_at: new_due_at)
+          end.to change {
+            AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          }.from(@section2_override.due_at).to(new_due_at)
+        end
+      end
+
+      context "with an active enrollment in an assigned section" do
+        it "uses the override's due date over the 'Everyone' due date" do
+          @assignment.update!(due_at: 25.days.from_now(@now))
+          due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          expect(due_at).to eq @section2_override.due_at
+        end
+
+        it "uses the most lenient due date (giving most time to submit) if there are multiple applicable overrides" do
+          @assignment.update!(only_visible_to_overrides: true)
+          default_section_override = create_section_override_for_assignment(
+            @assignment,
+            course_section: @course.default_section,
+            due_at: 5.days.from_now(@now)
+          )
+
+          new_due_at = 25.days.from_now(@now)
+          expect do
+            default_section_override.update!(due_at: new_due_at)
+          end.to change {
+            AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
+          }.from(@section2_override.due_at).to(new_due_at)
+        end
+      end
     end
 
     it "notes the user id for whom overrides were applied" do
@@ -1233,7 +1377,7 @@ describe AssignmentOverrideApplicator do
   end
 
   it "uses the full stack" do
-    student_in_course
+    student_in_course(active_all: true)
     original_due_at = 3.days.from_now
     @assignment = create_assignment(course: @course)
     @assignment.due_at = original_due_at

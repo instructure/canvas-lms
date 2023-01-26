@@ -25,6 +25,7 @@ module Lti
     # Launch: The authentication request
     class AuthenticationController < ApplicationController
       include Lti::RedisMessageClient
+      include Lti::Concerns::ParentFrame
 
       REQUIRED_PARAMS = %w[
         client_id
@@ -75,6 +76,7 @@ module Lti
         validate_current_user!
         validate_client_id!
         validate_launch_eligibility!
+        set_extra_csp_frame_ancestor! unless @oidc_error
 
         render(
           "lti/ims/authentication/authorize",
@@ -82,7 +84,7 @@ module Lti
           layout: "borderless_lti",
           locals: {
             redirect_uri: redirect_uri,
-            parameters: @oidc_error || id_token
+            parameters: @oidc_error || launch_parameters
           }
         )
       end
@@ -143,6 +145,11 @@ module Lti
         decoded_jwt["canvas_domain"]
       end
 
+      # Overrides method in Lti::Concerns::ParentFrame; used by set_extra_csp_frame_ancestor!
+      def parent_frame_context
+        decoded_jwt["parent_frame_context"]
+      end
+
       def context
         @context ||= begin
           model = decoded_jwt["context_type"].constantize
@@ -159,10 +166,15 @@ module Lti
         end
       end
 
+      def launch_parameters
+        @launch_parameters ||= id_token.merge({
+                                                state: oidc_params[:state],
+                                                lti_storage_target: Lti::PlatformStorage.lti_storage_target
+                                              })
+      end
+
       def id_token
-        @id_token ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
-                                                                                                    state: oidc_params[:state]
-                                                                                                  })
+        @id_token ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce)
       end
 
       def authorize_redirect_url

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, cleanup, fireEvent} from '@testing-library/react'
-import {RetrievingContent} from '../DeepLinkingResponse'
+import DeepLinkingResponse, {RetrievingContent} from '../DeepLinkingResponse'
 
 describe('RetrievingContent', () => {
   let component
@@ -125,6 +125,46 @@ describe('RetrievingContent', () => {
 
     it('sends the correct subject', () => {
       expect(messageData().subject).toEqual('LtiDeepLinkingResponse')
+    })
+  })
+})
+
+describe('DeepLinkingResponse', () => {
+  describe('targetWindow', () => {
+    let windowMock
+
+    beforeEach(() => {
+      windowMock = {
+        ENV: {},
+        parent: 'parent',
+        top: 'top',
+      }
+    })
+
+    describe('when flag is disabled', () => {
+      it('uses window.top', () => {
+        expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.top)
+      })
+    })
+
+    describe('when flag is enabled', () => {
+      beforeEach(() => {
+        windowMock.ENV.deep_linking_use_window_parent = true
+      })
+
+      it('uses window.parent', () => {
+        expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.parent)
+      })
+    })
+
+    describe('when tool is opened in new tab', () => {
+      beforeEach(() => {
+        windowMock.opener = 'opener'
+      })
+
+      it('uses window.opener', () => {
+        expect(DeepLinkingResponse.targetWindow(windowMock)).toBe(windowMock.opener)
+      })
     })
   })
 })

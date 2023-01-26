@@ -10,7 +10,6 @@
   "add_cc_subtitles_55f0394e": { "message": "Añadir CC/subtítulos" },
   "add_image_60b2de07": { "message": "Añadir imagen" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Alinear" },
   "alignment_and_lists_5cebcb69": { "message": "Alineación y listas" },
   "all_4321c3a1": { "message": "Todo" },
   "all_apps_a50dea49": { "message": "Todas las aplicaciones" },
@@ -75,7 +74,6 @@
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancelar" },
   "cap_product_3a5265a6": { "message": "Producto cap" },
-  "center_align_e68d9997": { "message": "Centrar" },
   "centered_dot_64d5e378": { "message": "Punto centrado" },
   "centered_horizontal_dots_451c5815": {
     "message": "Puntos horizontales centrados"
@@ -88,9 +86,6 @@
     "message": "Seleccionar los derechos de uso..."
   },
   "circle_484abe63": { "message": "Círculo" },
-  "circle_unordered_list_9e3a0763": {
-    "message": "marca con un círculo la lista no ordenada"
-  },
   "clear_2084585f": { "message": "Borrar" },
   "clear_image_3213fe62": { "message": "Eliminar imagen" },
   "clear_selected_file_82388e50": { "message": "Borrar archivo seleccionado" },
@@ -155,14 +150,10 @@
   "course_files_62deb8f8": { "message": "Archivos de la asignatura" },
   "course_files_a31f97fc": { "message": "Archivos de la asignatura" },
   "course_images_f8511d04": { "message": "Imágenes de la asignatura" },
-  "course_link_b369426": { "message": "Enlace del curso" },
   "course_links_b56959b9": { "message": "Enlaces de la asignatura" },
   "course_media_ec759ad": { "message": "Multimedia de la asignatura" },
   "course_navigation_dd035109": { "message": "Navegación de la asignatura" },
   "create_icon_110d6463": { "message": "Crear icono" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Crear iconos del creador de iconos"
-  },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
   },
@@ -176,14 +167,7 @@
   "date_added_ed5ad465": { "message": "Fecha en la que se añadió" },
   "decorative_icon_9a7f3fc3": { "message": "Icono decorativo" },
   "decorative_type_upper_f2c95e3": { "message": "Decorativo { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Reducir sangría" },
   "deep_purple_bb3e2907": { "message": "Morado oscuro" },
-  "default_bulleted_unordered_list_47079da8": {
-    "message": "lista no ordenada con viñetas predeterminada"
-  },
-  "default_numerical_ordered_list_48dd3548": {
-    "message": "lista numérica ordenada predeterminada"
-  },
   "definite_integral_fe7ffed1": { "message": "Integral definida" },
   "degree_symbol_4a823d5f": { "message": "Símbolo de grados" },
   "delimiters_4db4840d": { "message": "Delimitadores" },
@@ -209,7 +193,6 @@
     "message": "Mostrar enlace de texto (se abre en una nueva pestaña)"
   },
   "division_sign_72190870": { "message": "Signo de división" },
-  "document_678cd7bf": { "message": "Documento" },
   "documents_81393201": { "message": "Documentos" },
   "done_54e3d4b6": { "message": "Hecho" },
   "double_dagger_faf78681": { "message": "Doble involución" },
@@ -236,8 +219,8 @@
   "edit_alt_text_for_this_icon_instance_9c6fc5fd": {
     "message": "Editar todo el texto para esta instancia de icono"
   },
+  "edit_c5fbea07": { "message": "Editar" },
   "edit_course_link_5a5c3c59": { "message": "Editar enlace de la asignatura" },
-  "edit_equation_f5279959": { "message": "Editar ecuación" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Editar icono actual del creador de iconos"
   },
@@ -264,17 +247,16 @@
   "epsilon_54bb8afa": { "message": "Épsilon" },
   "epsilon_variant_d31f1e77": { "message": "Épsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Signo igual" },
-  "equation_1c5ac93c": { "message": "Ecuación" },
   "equation_editor_39fbc3f1": { "message": "Editor de ecuaciones" },
   "equivalence_class_7b0f11c0": { "message": "Clase de equivalencia" },
   "equivalent_identity_654b3ce5": { "message": "Equivalente (identidad)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Existe" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Salir de pantalla completa" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Expandir vista previa de forma predeterminada"
   },
   "expand_to_see_types_f5d29352": { "message": "Expandir para ver { types }" },
-  "external_link_d3f9e62a": { "message": "Enlace externo" },
   "external_tools_6e77821": { "message": "Herramientas externas" },
   "extra_large_b6cdf1ff": { "message": "Extra grande" },
   "extra_small_9ae33252": { "message": "Extra pequeño" },
@@ -335,7 +317,6 @@
   "group_files_82e5dcdb": { "message": "Archivos del grupo" },
   "group_images_98e0ac17": { "message": "Imágenes del grupo" },
   "group_isomorphism_45b1458c": { "message": "Isomorfismo de grupos" },
-  "group_link_63e626b3": { "message": "Enlace del grupo" },
   "group_links_9493129e": { "message": "Enlaces del grupo" },
   "group_media_2f3d128a": { "message": "Ítems multimedia del grupo" },
   "group_navigation_99f191a": { "message": "Navegación del grupo" },
@@ -354,7 +335,6 @@
   },
   "home_351838cd": { "message": "Página de inicio" },
   "html_code_editor_fd967a44": { "message": "editor de código html" },
-  "html_editor_fb2ab713": { "message": "Editor HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "He obtenido permiso para utilizar este archivo."
   },
@@ -367,6 +347,7 @@
   "icon_maker_icons_cc560f7e": { "message": "Iconos del creador de iconos" },
   "icon_options_7e32746e": { "message": "Opciones de icono" },
   "icon_options_tray_2b407977": { "message": "Bandeja de opciones de icono" },
+  "icon_preview_1782a1d9": { "message": "Icono vista previa" },
   "icon_shape_30b61e7": { "message": "Forma del icono" },
   "icon_size_9353edea": { "message": "Tamaño del icono" },
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
@@ -385,17 +366,12 @@
     "message": "Porción imaginaria (de un número complejo)"
   },
   "in_element_of_19ca2f33": { "message": "En (Elemento de)" },
-  "increase_indent_6af90f7c": { "message": "Aumentar sangría" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
   "indigo_2035fc55": { "message": "Índigo" },
   "inference_fed5c960": { "message": "Inferencia" },
   "infinity_7a10f206": { "message": "Infinito" },
   "insert_593145ef": { "message": "Insertar" },
-  "insert_equella_links_49a8dacd": { "message": "Insertar enlaces de Equella" },
   "insert_link_6dc23cae": { "message": "Insertar enlace" },
-  "insert_math_equation_57c6e767": {
-    "message": "Insertar la ecuación matemática"
-  },
   "integers_336344e1": { "message": "Enteros" },
   "intersection_cd4590e4": { "message": "Intersección" },
   "invalid_entry_f7d2a0f5": { "message": "Entrada incorrecta" },
@@ -410,7 +386,6 @@
   "language_arts_icon_a798b0f8": { "message": "Icono plástica e idiomas" },
   "languages_icon_9d20539": { "message": "Icono idiomas" },
   "large_9c5e80e7": { "message": "Grande" },
-  "left_align_43d95491": { "message": "Alineación a la izquierda" },
   "left_angle_bracket_c87a6d07": { "message": "Paréntesis angular izquierdo" },
   "left_arrow_4fde1a64": { "message": "Flecha hacia la izquierda" },
   "left_arrow_with_hook_5bfcad93": {
@@ -505,7 +480,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "Agrupado mayor que" },
   "nested_less_than_27d17e58": { "message": "Agrupado menor que" },
-  "next_page_d2a39853": { "message": "Siguiente página" },
   "no_changes_to_save_d29f6e91": {
     "message": "No se han guardado los cambios."
   },
@@ -519,9 +493,6 @@
   "no_results_940393cf": { "message": "No hay resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No se han encontrado resultados para { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "No se han encontrado resultados para { term }."
   },
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Ninguna seleccionada" },
@@ -553,9 +524,6 @@
   "operators_a2ef9a93": { "message": "Operadores" },
   "or_9b70ccaa": { "message": "O" },
   "orange_81386a62": { "message": "Naranja" },
-  "ordered_and_unordered_lists_cfadfc38": {
-    "message": "Listas ordenadas y no ordenadas"
-  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Puedes encontrar otros métodos abreviados del editor en"
   },
@@ -568,6 +536,7 @@
   "paragraph_5e5ad8eb": { "message": "Párrafo" },
   "parallel_d55d6e38": { "message": "Paralelo" },
   "partial_derivative_4a9159df": { "message": "Parcial (Derivado)" },
+  "paste_5963d1c1": { "message": "Pegar" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personas" },
   "percentage_34ab7c2c": { "message": "Porcentaje" },
@@ -599,7 +568,6 @@
   "preview_53003fd2": { "message": "Vista previa" },
   "preview_in_overlay_ed772c46": { "message": "Vista previa en superposición" },
   "preview_inline_9787330": { "message": "Vista previa online" },
-  "previous_page_928fc112": { "message": "Página anterior" },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primo" },
   "product_39cf144f": { "message": "Producto" },
@@ -620,11 +588,9 @@
     "message": "Porción real (de un número complejo)"
   },
   "record_7c9448b": { "message": "Grabar" },
-  "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
   "red_8258edf3": { "message": "Rojo" },
   "relationships_6602af70": { "message": "Relaciones" },
   "religion_icon_246e0be1": { "message": "Icono religión" },
-  "remove_link_d1f2f4d0": { "message": "Eliminar enlace" },
   "replace_e61834a7": { "message": "Sustituir" },
   "reset_95a81614": { "message": "Restablecer" },
   "resize_ec83d538": { "message": "Redimensionar" },
@@ -642,7 +608,6 @@
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Área del texto enriquecido. Pulsa Alt+0 para ver los atajos del teclado del editor de contenido enriquecido."
   },
-  "right_align_39e7a32a": { "message": "Alineación a la derecha" },
   "right_angle_bracket_d704e2d6": { "message": "Paréntesis angular derecho" },
   "right_arrow_35e0eddf": { "message": "Flecha hacia la derecha" },
   "right_arrow_with_hook_29d92d31": {
@@ -669,17 +634,12 @@
     "message": "Lamentablemente, no se puede acceder al Editor HTML agradable desde el teclado. Accede al Editor de HTML sin formato aquí."
   },
   "save_11a80ec3": { "message": "Guardar" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Guardar iconos del creador de iconos"
-  },
   "script_l_42a7b254": { "message": "L cursiva" },
   "search_280d00bd": { "message": "Buscar" },
-  "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": {
     "message": "Seleccionar la forma de recorte"
   },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
-  "selected_274ce24f": { "message": "Seleccionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionado"
   },
@@ -688,10 +648,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Mayús-O para abrir el editor html agradable."
   },
-  "show_audio_options_b489926b": { "message": "Mostrar opciones de audio" },
-  "show_image_options_1e2ecc6b": { "message": "Mostrar opciones de imágenes" },
-  "show_link_options_545338fd": { "message": "Mostrar opciones de enlace" },
-  "show_video_options_6ed3721a": { "message": "Mostrar opciones de vídeo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Imagen unicolor" },
@@ -725,7 +681,6 @@
   "square_superset_strict_fa4262e4": {
     "message": "Superconjunto cuadrado (Estricto)"
   },
-  "square_unordered_list_b15ce93b": { "message": "lista cuadrada no ordenada" },
   "star_8d156e09": { "message": "Destacar" },
   "steel_blue_14296f08": { "message": "Azul acero" },
   "styles_2aa721ef": { "message": "Estilos" },
@@ -737,9 +692,6 @@
   "succeeds_equal_158e8c3a": { "message": "Sucede o es igual a" },
   "sum_b0842d31": { "message": "Suma" },
   "superscript_8cb349a2": { "message": "Superíndice" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Superíndice y subíndice"
-  },
   "superset_c4db8a7a": { "message": "Superconjunto" },
   "superset_strict_c77dd6d2": { "message": "Superconjunto (Estricto)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -816,9 +768,6 @@
   },
   "tools_2fcf772e": { "message": "Herramientas" },
   "top_66e0adb6": { "message": "Arriba" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultados encontrados, { numDisplayed } resultados que se muestran actualmente"
-  },
   "tray_839df38a": { "message": "Bandeja" },
   "triangle_6072304e": { "message": "Triángulo" },
   "turnstile_yields_f9e76df1": { "message": "Trinquete (Satisface)" },
@@ -840,15 +789,10 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Flecha diagonal hacia arriba y hacia la derecha"
   },
-  "upload_document_253f0478": { "message": "Cargar documento" },
   "upload_file_fd2361b8": { "message": "Cargar archivo" },
   "upload_image_6120b609": { "message": "Cargar imagen" },
   "upload_media_ce31135a": { "message": "Cargar multimedia" },
-  "upload_record_media_e4207d72": { "message": "Cargar/grabar multimedia" },
   "uploading_19e8a4e7": { "message": "Cargando" },
-  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-    "message": "lista ordenada alfabéticamente en mayúsculas"
-  },
   "uppercase_delta_d4f4bc41": { "message": "Delta mayúscula" },
   "uppercase_gamma_86f492e9": { "message": "Gama mayúscula" },
   "uppercase_lambda_c78d8ed4": { "message": "Lambda mayúscula" },
@@ -856,9 +800,6 @@
   "uppercase_phi_caa36724": { "message": "Fi mayúscula" },
   "uppercase_pi_fcc70f5e": { "message": "Pi mayúscula" },
   "uppercase_psi_6395acbe": { "message": "Psi mayúscula" },
-  "uppercase_roman_numeral_ordered_list_853f292b": {
-    "message": "lista ordenada de números romanos en mayúsculas"
-  },
   "uppercase_sigma_dbb70e92": { "message": "Sigma mayúscula" },
   "uppercase_theta_49afc891": { "message": "Zeta mayúscula" },
   "uppercase_upsilon_8c1e623e": { "message": "Ípsilon mayúscula" },
@@ -925,6 +866,9 @@
     "message": "Ver los accesos directos de teclado"
   },
   "view_title_description_67940918": { "message": "Ver descripción { title }" },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Ver el recuento de palabras y caracteres"
+  },
   "white_87fa64fd": { "message": "Blanco" },
   "width_492fec76": { "message": "Ancho" },
   "width_and_height_must_be_numbers_110ab2e3": {

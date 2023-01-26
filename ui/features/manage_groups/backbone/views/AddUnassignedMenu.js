@@ -17,7 +17,7 @@
 
 import PopoverMenuView from './PopoverMenuView'
 import AddUnassignedUsersView from './AddUnassignedUsersView'
-import InputFilterView from 'backbone-input-filter-view'
+import InputFilterView from '@canvas/backbone-input-filter-view'
 import template from '../../jst/addUnassignedMenu.handlebars'
 import $ from 'jquery'
 import '../../jquery/outerclick'

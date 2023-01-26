@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
   def generatable?
     !quiz.survey?

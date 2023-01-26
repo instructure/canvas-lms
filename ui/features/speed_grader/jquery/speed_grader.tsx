@@ -33,7 +33,7 @@ import * as Alerts from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
-import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
+import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import StatusPill from '@canvas/grading-status-pill'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -697,7 +697,12 @@ function setupHeader() {
         this.elements.settings.form.dialog('close')
       }
 
-      const gradeByQuestion = $('#enable_speedgrader_grade_by_question').prop('checked')
+      const gradeByQuestion = !!$('#enable_speedgrader_grade_by_question').prop('checked')
+      if (gradeByQuestion !== ENV.GRADE_BY_QUESTION) {
+        ENV.GRADE_BY_QUESTION = gradeByQuestion
+        QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage($iframe_holder, gradeByQuestion)
+      }
+
       // eslint-disable-next-line promise/catch-or-return
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion,
@@ -2592,7 +2597,6 @@ EG = {
         if (s.grade && (s.grade_matches_current_submission || s.show_grade_in_dropdown)) {
           grade = GradeFormatHelper.formatGrade(s.grade)
         }
-
         return {
           value: i,
           late_policy_status: EG.currentStudent.submission.late_policy_status,
@@ -2600,11 +2604,12 @@ EG = {
           missing: s.missing,
           excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
+          proxy_submitter: s.proxy_submitter,
+          proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade,
         }
       })
-
       innerHTML = submissionsDropdownTemplate({
         showSubmissionStatus: !window.jsonData.anonymize_students || isAdmin,
         singleSubmission: submissionHistory.length === 1,
@@ -2770,6 +2775,7 @@ EG = {
         this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
         externalToolLoaded = true
       } else {
+        QuizzesNextSpeedGrading.postChangeSubmissionVersionMessage($iframe_holder, submission)
         $iframe_holder.show()
       }
     } else {
@@ -2809,7 +2815,13 @@ EG = {
   },
 
   renderLtiLaunch($div, urlBase, submission) {
-    const externalToolUrl = submission.external_tool_url || submission.url
+    let externalToolUrl = submission.external_tool_url || submission.url
+
+    if (ENV.NQ_GRADE_BY_QUESTION_ENABLED && window.jsonData.quiz_lti && externalToolUrl) {
+      const quizToolUrl = new URL(externalToolUrl)
+      quizToolUrl.searchParams.set('grade_by_question_enabled', String(ENV.GRADE_BY_QUESTION))
+      externalToolUrl = quizToolUrl.href
+    }
 
     urlBase += SpeedgraderHelpers.resourceLinkLookupUuidParam(submission)
 
@@ -3523,7 +3535,12 @@ EG = {
       updateSubmissionAndPageEffects()
     }
 
-    if (grade.toUpperCase() === 'EX') {
+    if (ENV.assignment_missing_shortcut && grade.toUpperCase() === 'MI') {
+      if (EG.currentStudent.submission.late_policy_status !== 'missing') {
+        updateSubmissionAndPageEffects({latePolicyStatus: 'missing'})
+      }
+      return
+    } else if (grade.toUpperCase() === 'EX') {
       formData['submission[excuse]'] = true
     } else if (unexcuseSubmission(grade, EG.currentStudent.submission, window.jsonData)) {
       formData['submission[excuse]'] = false
@@ -4297,7 +4314,7 @@ export default {
         externalToolLaunchOptions = launchOptions
       }
     }
-    quizzesNextSpeedGrading(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
+    QuizzesNextSpeedGrading.setup(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
 
     // fire off the request to get the jsonData
     window.jsonData = {}

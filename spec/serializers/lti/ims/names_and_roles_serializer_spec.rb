@@ -146,8 +146,17 @@ describe Lti::IMS::NamesAndRolesSerializer do
       tool.save!
       tool
     end
+    let(:resource_link) do
+      Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "https://www.example.com/launch/resource_link",
+        custom: custom_params
+      )
+    end
+    let(:custom_params) { { foo: "bar" } }
     let(:page) do
-      super().merge(opts: { rlid: "rlid-value" })
+      super().merge(opts: { rlid: resource_link.resource_link_uuid })
     end
     let(:message_matcher) do
       {
@@ -156,7 +165,7 @@ describe Lti::IMS::NamesAndRolesSerializer do
           "canvas_user_id" => user.id,
           "unsupported_param_1" => "$unsupported.param.1",
           "unsupported_param_2" => "$unsupported.param.2"
-        }
+        }.merge(custom_params)
       }
     end
 

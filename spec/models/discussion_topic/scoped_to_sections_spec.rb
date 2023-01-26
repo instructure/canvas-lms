@@ -19,7 +19,6 @@
 #
 #
 require_relative "../../spec_helper"
-require_dependency "discussion_topic/scoped_to_sections"
 
 describe DiscussionTopic::ScopedToSections do
   let_once(:context) { course_with_teacher.course }

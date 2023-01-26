@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "fileutils"
 require "webdrivers/chromedriver"
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative "common_helper_methods/custom_screen_actions"
@@ -56,11 +55,6 @@ module SeleniumDriverSetup
 
   def app_url
     "http://#{app_host_and_port}"
-  end
-
-  # prevents subsequent specs from failing because tooltips are showing etc.
-  def move_mouse_to_known_position
-    driver.action.move_to_location(0, 0).perform if driver.ready_for_interaction
   end
 
   class ServerStartupError < RuntimeError; end

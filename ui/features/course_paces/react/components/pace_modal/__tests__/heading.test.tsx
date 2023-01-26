@@ -36,11 +36,9 @@ const studentPaceContext = PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]
 
 const defaultProps = {
   coursePace: PRIMARY_PACE,
-  isBlueprintLocked: false,
   contextName: '',
   paceContext: coursePaceContext,
   enrolledSection: SECTION_1,
-  setIsBlueprintLocked: jest.fn(),
 }
 
 describe('PaceModalHeading', () => {
@@ -48,10 +46,10 @@ describe('PaceModalHeading', () => {
     const {getByTestId} = renderConnected(
       <PaceModalHeading {...defaultProps} contextName={PRIMARY_PACE.name || ''} />
     )
-    expect(getByTestId('pace-type').textContent).toBe('Default Course Pacing')
+    expect(getByTestId('pace-type').textContent).toBe('Default Course Pace')
     expect(getByTestId('section-name').textContent).toBe(PRIMARY_PACE.name)
     expect(getByTestId('pace-info').textContent).toBe(
-      `Students${coursePaceContext.associated_student_count}`
+      `Students enrolled in this course${coursePaceContext.associated_student_count}`
     )
   })
   it('renders section variant', () => {
@@ -63,10 +61,10 @@ describe('PaceModalHeading', () => {
         paceContext={sectionPaceContext}
       />
     )
-    expect(getByTestId('pace-type').textContent).toBe('Section Course Pacing')
+    expect(getByTestId('pace-type').textContent).toBe('Section Pace')
     expect(getByTestId('section-name').textContent).toBe('My custom section pace')
     expect(getByTestId('pace-info').textContent).toBe(
-      `Students${sectionPaceContext.associated_student_count}`
+      `Students enrolled in this section${sectionPaceContext.associated_student_count}`
     )
   })
   it('renders student variant', () => {

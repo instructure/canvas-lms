@@ -1104,27 +1104,35 @@ describe User do
         expect(course_admin.can_masquerade?(restricted_admin, @account)).to be_falsey
       end
 
-      describe "all_course_admin_type_permissions_for" do
+      describe ".all_course_admin_type_permissions_for" do
         let(:user) { user_factory }
         let(:role1) { custom_teacher_role("Custom Teacher Role", account: @account) }
         let(:role2) { custom_designer_role("Custom Designer Role", account: @account) }
 
-        it "includes granted permissions from multiple course admin type roles" do
-          course_with_user("TeacherEnrollment", user: user)
-          course_with_user("TeacherEnrollment", user: user, role: role1)
-          course_with_user("DesignerEnrollment", user: user, role: role2)
+        it "handles multiple course admin type roles" do
+          course_with_user("TeacherEnrollment", user: user, active_all: true)
+          course_with_user("TeacherEnrollment", user: user, role: role1, active_all: true)
+          course_with_user("DesignerEnrollment", user: user, role: role2, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
+
           # Teacher roles
-          expect(permissions[:view_all_grades].count).to eq 2
-          expect(permissions[:read_sis].count).to eq 2
+          expect(permissions[:view_all_grades]).to be_truthy
+          expect(permissions[:read_sis]).to be_truthy
           # Teacher + Designer roles
-          expect(permissions[:manage_wiki_create].count).to eq 3
-          expect(permissions[:manage_wiki_delete].count).to eq 3
+          expect(permissions[:manage_wiki_create]).to be_truthy
+          expect(permissions[:manage_wiki_delete]).to be_truthy
+        end
+
+        it "excludes course admin enrollments that are not active" do
+          course_with_user("TeacherEnrollment", user: user)
+
+          permissions = User.all_course_admin_type_permissions_for(user)
+          expect(permissions.values.all?(&:empty?)).to be_truthy
         end
 
         it "excludes non course admin type roles" do
-          course_with_user("StudentEnrollment", user: user)
+          course_with_user("StudentEnrollment", user: user, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
           expect(permissions.values.all?(&:empty?)).to be_truthy
@@ -3390,6 +3398,21 @@ describe User do
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       expect(User.find(@student.id).cached_current_group_memberships_by_date.map(&:group)).to match_array([ag])
+    end
+
+    describe "#has_membership_for_current_group" do
+      it "returns true for active group" do
+        expect(@student.membership_for_group_id?(@group.id)).to be true
+      end
+
+      it "returns false for inactive group" do
+        @group.destroy
+        expect(@student.membership_for_group_id?(@group.id)).to be false
+      end
+
+      it "returns false for non existing group" do
+        expect(@student.membership_for_group_id?("fake_id")).to be false
+      end
     end
   end
 

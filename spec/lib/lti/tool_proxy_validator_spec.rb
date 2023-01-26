@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/tool_proxy_validator.rb"
-
 module Lti
   describe ToolProxyValidator do
     subject(:tool_proxy_validator) { ToolProxyValidator.new(tool_proxy: tool_proxy, tool_consumer_profile: nil) }

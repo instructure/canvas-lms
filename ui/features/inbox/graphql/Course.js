@@ -23,6 +23,7 @@ export const Course = {
   fragment: gql`
     fragment Course on Course {
       _id
+      courseNickname
       contextName: name
       assetString
     }
@@ -30,12 +31,19 @@ export const Course = {
 
   shape: shape({
     _id: string,
+    courseNickname: string,
     contextName: string,
     assetString: string,
   }),
 
-  mock: ({_id = '195', contextName = 'XavierSchool', assetString = 'course_195'} = {}) => ({
+  mock: ({
+    _id = '195',
+    courseNickname = 'Ipsum',
+    contextName = 'XavierSchool',
+    assetString = 'course_195',
+  } = {}) => ({
     _id,
+    courseNickname,
     contextName,
     assetString,
     __typename: 'Course',

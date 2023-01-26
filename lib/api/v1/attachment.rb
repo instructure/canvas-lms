@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "uri"
-
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
@@ -231,7 +229,7 @@ module Api::V1::Attachment
     if !context.respond_to?(:folders)
       nil
     elsif params[:parent_folder_id]
-      context.folders.active.where(id: params[:parent_folder_id]).first
+      context.folders.active.find_by(id: params[:parent_folder_id])
     elsif params[:parent_folder_path].is_a?(String)
       Folder.assert_path(params[:parent_folder_path], context)
     end
@@ -313,6 +311,13 @@ module Api::V1::Attachment
     # than the "preferred" folder (that specified by the caller).
     folder = infer_upload_folder(context, params)
     return if folder && !authorized_action(folder, current_user, :manage_contents)
+
+    # given parent folder id doesn't exist or has been deleted
+    if folder.nil? && params[:parent_folder_id]
+      return render status: :not_found, json: {
+        message: I18n.t("The specified resource does not exist.")
+      }
+    end
 
     # no permission check required to use the preferred folder
 

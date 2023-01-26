@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "lazy_presumptuous_i18n_backend"
-
 module CanvasI18nFallbacks
   # see BCP-47 "Tags for Identifying Languages" for the grammar
   # definition that led to this pattern match. It is not 100%
@@ -170,8 +168,8 @@ module I18nUtilities
     [text, options]
   end
 
-  def n(*args)
-    I18n.n(*args)
+  def n(...)
+    I18n.n(...)
   end
 end
 
@@ -317,7 +315,7 @@ end)
 require "i18n_extraction/i18nliner_scope_extensions"
 
 module I18nTemplate
-  def render(view, *args)
+  def render(view, *, **)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
       view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(%r{/_?}, "."))
@@ -376,8 +374,6 @@ ActiveRecord::Base.class_eval do
     end
   end
 end
-
-require "active_support/core_ext/array/conversions"
 
 module ToSentenceWithSimpleOr
   def to_sentence(options = {})

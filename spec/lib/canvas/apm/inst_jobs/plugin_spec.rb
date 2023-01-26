@@ -19,7 +19,6 @@
 #
 
 require "delayed/testing"
-require_dependency "canvas/apm/inst_jobs/plugin"
 require_relative "../../apm_common"
 
 describe Canvas::Apm::InstJobs::Plugin do
@@ -53,7 +52,7 @@ describe Canvas::Apm::InstJobs::Plugin do
 
     it "has resource name equal to job name" do
       expect(Canvas::Apm::InstJobs::Plugin.tracer).to eq(tracer)
-      job = Delayed::Job.enqueue(sample_job_object.new, {})
+      job = Delayed::Job.enqueue(sample_job_object.new)
       job.account_id = 12_345
       Delayed::Testing.run_job(job)
       expect(span.resource).to eq("SampleJob")

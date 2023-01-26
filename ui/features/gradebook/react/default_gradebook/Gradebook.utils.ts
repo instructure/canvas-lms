@@ -46,6 +46,7 @@ import type {
   Section,
   StudentGroup,
   StudentGroupCategory,
+  StudentGroupCategoryMap,
   StudentMap,
   Submission,
   SubmissionType,
@@ -271,7 +272,7 @@ export const getLabelForFilter = (
   gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
-  studentGroupCategories: StudentGroupCategory[]
+  studentGroupCategories: StudentGroupCategoryMap
 ) => {
   if (!filter.type) throw new Error('missing condition type')
 
@@ -485,4 +486,26 @@ export function maxAssignmentCount(
   const assignmentParam = encodeURIComponent(`${'0'.repeat(globalIdLength)},`)
 
   return Math.floor(charsAvailable / assignmentParam.length)
+}
+
+// mutative
+export function escapeStudentContent(student) {
+  const unescapedName = student.name
+  const unescapedSortableName = student.sortable_name
+  const unescapedFirstName = student.first_name
+  const unescapedLastName = student.last_name
+
+  // TODO: selectively escape fields
+  const escapedStudent = htmlEscape(student)
+  escapedStudent.name = unescapedName
+  escapedStudent.sortable_name = unescapedSortableName
+  escapedStudent.first_name = unescapedFirstName
+  escapedStudent.last_name = unescapedLastName
+
+  escapedStudent?.enrollments.forEach(enrollment => {
+    const gradesUrl = enrollment?.grades?.html_url
+    if (gradesUrl) {
+      enrollment.grades.html_url = htmlEscape.unescape(gradesUrl)
+    }
+  })
 }

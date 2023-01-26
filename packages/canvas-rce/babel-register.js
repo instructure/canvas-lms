@@ -19,20 +19,23 @@ const path = require('path')
 
 require('@babel/register')({
   configFile: false,
-  presets: [
-    ['@babel/preset-env'],
-    ['@babel/preset-react', {}],
-  ],
+  presets: [['@babel/preset-env'], ['@babel/preset-react', {}]],
   plugins: [
     ['@babel/plugin-proposal-decorators', {legacy: true}],
-    ['@instructure/babel-plugin-themeable-styles', {
-      postcssrc: require('@instructure/ui-postcss-config')()(),
-      themeablerc: {},
-    }]
+    [
+      '@instructure/babel-plugin-themeable-styles',
+      {
+        postcssrc: require('@instructure/ui-postcss-config')()(),
+        themeablerc: {},
+      },
+    ],
   ],
   targets: {
-    node: 'current'
+    node: 'current',
   },
+
+  sourceMaps: 'inline',
+
   only: [
     path.resolve(__dirname, 'src'),
     path.resolve(__dirname, 'test'),

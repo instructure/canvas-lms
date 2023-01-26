@@ -17471,6 +17471,7 @@ fa:
       description: "سرویس جستجو تصویر اناسپلش"
       name: اناسپلش
     unsplash_settings: 
+      description: "لطفا برای راه اندازی یک برنامه جدید در اناسپلش  (%{unsplash_wiki_url}) [مراحل را دنبال کنید] ."
       labels: 
         access_key: "کلید دسترسی"
         application_name: "نام برنامه"

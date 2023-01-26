@@ -41,9 +41,6 @@
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
-    "align_11050992": {
-        "message": "Juster"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Justering og lister"
     },
@@ -263,11 +260,11 @@
     "canvas_planner_98ed106": {
         "message": "Canvas-planleggar"
     },
+    "cap_product_3a5265a6": {
+        "message": "Cap-produkt"
+    },
     "catalan_16f6b78f": {
         "message": "Katalansk"
-    },
-    "center_align_e68d9997": {
-        "message": "Midtstill"
     },
     "centered_dot_64d5e378": {
         "message": "Sentrert prikk"
@@ -295,9 +292,6 @@
     },
     "circle_484abe63": {
         "message": "Sirkel"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "sirkulær uordna liste"
     },
     "clear_2084585f": {
         "message": "Fjern"
@@ -419,9 +413,6 @@
     "course_images_f8511d04": {
         "message": "Hent bilde frå emnefiler"
     },
-    "course_link_b369426": {
-        "message": "Emnelenke"
-    },
     "course_links_b56959b9": {
         "message": "Emnelenker"
     },
@@ -436,9 +427,6 @@
     },
     "create_icon_110d6463": {
         "message": "Lag ikon"
-    },
-    "create_icon_maker_icon_c716bffe": {
-        "message": "Lag ikondesignar-ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-lisens:"
@@ -497,17 +485,8 @@
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativt { TYPE_UPPER }"
     },
-    "decrease_indent_d9cf469d": {
-        "message": "Reduser innrykk"
-    },
     "deep_purple_bb3e2907": {
         "message": "Mørk lilla"
-    },
-    "default_bulleted_unordered_list_47079da8": {
-        "message": "standard uordna liste med kulepunkt"
-    },
-    "default_numerical_ordered_list_48dd3548": {
-        "message": "standard numerisk ordna liste"
     },
     "definite_integral_fe7ffed1": {
         "message": "Bestemt integral"
@@ -599,9 +578,6 @@
     "division_sign_72190870": {
         "message": "Divisjonssymbol"
     },
-    "document_678cd7bf": {
-        "message": "Dokument"
-    },
     "documents_81393201": {
         "message": "Dokument"
     },
@@ -616,6 +592,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Diagonal pil ned til høyre"
+    },
+    "download_filename_2baae924": {
+        "message": "Last ned { filename }"
     },
     "downward_arrow_cca52012": {
         "message": "Pil nedover"
@@ -655,9 +634,6 @@
     },
     "edit_course_link_5a5c3c59": {
         "message": "Rediger emnelenke"
-    },
-    "edit_equation_f5279959": {
-        "message": "Endre likning"
     },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Rediger eksisterande ikondesignar-ikon"
@@ -734,9 +710,6 @@
     "equals_sign_c51bdc58": {
         "message": "Likskapsteikn"
     },
-    "equation_1c5ac93c": {
-        "message": "Likning"
-    },
     "equation_editor_39fbc3f1": {
         "message": "Likningseditor"
     },
@@ -782,9 +755,6 @@
     "extended_9a58dcb6": {
         "message": "Utvida"
     },
-    "external_link_d3f9e62a": {
-        "message": "Ekstern lenke"
-    },
     "external_tools_6e77821": {
         "message": "Eksterne verktøy"
     },
@@ -802,6 +772,9 @@
     },
     "failed_getting_course_list_49846a93": {
         "message": "Henting av emnelista mislukkast"
+    },
+    "failed_getting_file_contents_e9ea19f4": {
+        "message": "Henting av filinnhald mislukkast"
     },
     "failed_getting_to_do_list_10ce2833": {
         "message": "Henting av gjerelista mislukkast"
@@ -968,9 +941,6 @@
     "group_isomorphism_45b1458c": {
         "message": "Gruppeisomorfi"
     },
-    "group_link_63e626b3": {
-        "message": "Gruppelenke"
-    },
     "group_links_9493129e": {
         "message": "Grupper lenker"
     },
@@ -1028,9 +998,6 @@
     "html_code_editor_fd967a44": {
         "message": "HTML-editor"
     },
-    "html_editor_fb2ab713": {
-        "message": "HTML-editor"
-    },
     "hungarian_fc7d30c9": {
         "message": "Ungarsk"
     },
@@ -1060,6 +1027,9 @@
     },
     "icon_options_tray_2b407977": {
         "message": "Menyalternativ for ikon"
+    },
+    "icon_preview_1782a1d9": {
+        "message": "Ikon-førehandsvisning"
     },
     "icon_shape_30b61e7": {
         "message": "Ikonform"
@@ -1094,9 +1064,6 @@
     "in_element_of_19ca2f33": {
         "message": "I (Element av)"
     },
-    "increase_indent_6af90f7c": {
-        "message": "Auk innrykk"
-    },
     "indefinite_integral_6623307e": {
         "message": "Ubestemt integral"
     },
@@ -1115,14 +1082,8 @@
     "insert_593145ef": {
         "message": "Set inn"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Sett inn Equella-lenker"
-    },
     "insert_link_6dc23cae": {
         "message": "Sett inn lenke"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "Sett inn matematikklikning"
     },
     "integers_336344e1": {
         "message": "Heiltal"
@@ -1204,9 +1165,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Latvisk"
-    },
-    "left_align_43d95491": {
-        "message": "Venstrejuster"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Venstre vinkelparentes"
@@ -1442,6 +1400,12 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinja"
     },
+    "nested_greater_than_d852e60d": {
+        "message": "Nøsta større enn"
+    },
+    "nested_less_than_27d17e58": {
+        "message": "Nøsta mindre enn"
+    },
     "new_13daf639": {
         "message": "Ny"
     },
@@ -1457,8 +1421,8 @@
     "next_month_749b1778": {
         "message": "Neste månad"
     },
-    "next_page_d2a39853": {
-        "message": "Neste side"
+    "no_changes_to_save_d29f6e91": {
+        "message": "Ingen endringar å lagre."
     },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen innleveringsfristar er sett opp"
@@ -1586,9 +1550,6 @@
     "orange_81386a62": {
         "message": "Oransje"
     },
-    "ordered_and_unordered_lists_cfadfc38": {
-        "message": "Ordna og uordna lister"
-    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andre hurtigtastar for redigering kan ein finne i"
     },
@@ -1615,6 +1576,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Partiell (Derivert)"
+    },
+    "paste_5963d1c1": {
+        "message": "Lim inn"
     },
     "peer_review_74f26a13": {
         "message": "Fagfellevurdering"
@@ -1712,9 +1676,6 @@
     "previous_month_bb1e3c84": {
         "message": "Førre månad"
     },
-    "previous_page_928fc112": {
-        "message": "Førre side"
-    },
     "prime_917ea60e": {
         "message": "Primtal"
     },
@@ -1769,9 +1730,6 @@
     "record_7c9448b": {
         "message": "Spel inn"
     },
-    "record_upload_media_5fdce166": {
-        "message": "Ta opp / last opp media"
-    },
     "red_8258edf3": {
         "message": "Raud"
     },
@@ -1786,9 +1744,6 @@
     },
     "reminder_date_4564d12d": {
         "message": "Påminning: { date }"
-    },
-    "remove_link_d1f2f4d0": {
-        "message": "Fjern lenke"
     },
     "replace_e61834a7": {
         "message": "Erstatt"
@@ -1816,9 +1771,6 @@
     },
     "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
         "message": "Rikt tekstområde. Trykk ALT+0 for rik hurtigtastar i teksteditoren"
-    },
-    "right_align_39e7a32a": {
-        "message": "Høgrejuster"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Høgre vinkelparentes"
@@ -1874,9 +1826,6 @@
     "save_11a80ec3": {
         "message": "Lagre"
     },
-    "saved_icon_maker_icons_df86e2a1": {
-        "message": "Lagra ikondesignar-ikon"
-    },
     "schedule_preview_3bcda153": {
         "message": "Førehandsvising av timeplan"
     },
@@ -1895,17 +1844,11 @@
     "search_280d00bd": {
         "message": "Søk"
     },
-    "search_term_b2d2235": {
-        "message": "Søkeord"
-    },
     "select_crop_shape_d441feeb": {
         "message": "Vel skjæringsform"
     },
     "select_language_7c93a900": {
         "message": "Vel språk"
-    },
-    "selected_274ce24f": {
-        "message": "Valt"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Vald { linkFileName }"
@@ -1922,20 +1865,8 @@
     "show_all_ae37d610": {
         "message": "Vis alt"
     },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativ"
-    },
-    "show_image_options_1e2ecc6b": {
-        "message": "Vis alternativ for bilde"
-    },
-    "show_link_options_545338fd": {
-        "message": "Vis lenkealternativ"
-    },
     "show_my_grades_ebd08684": {
         "message": "Vis vurderingsresultata mine"
-    },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videoalternativ"
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -1994,6 +1925,12 @@
     "square_511eb3b3": {
         "message": "Kvadrat"
     },
+    "square_cap_9ec88646": {
+        "message": "Kvadratisk cap"
+    },
+    "square_cup_b0665113": {
+        "message": "Kvadratisk cup"
+    },
     "square_root_e8bcbc60": {
         "message": "Kvadratrot"
     },
@@ -2011,9 +1948,6 @@
     },
     "square_superset_strict_fa4262e4": {
         "message": "Kvadratisk Supersett (Streng)"
-    },
-    "square_unordered_list_b15ce93b": {
-        "message": "firkanta uordna liste"
     },
     "star_8d156e09": {
         "message": "Merk med stjerne"
@@ -2069,9 +2003,6 @@
     "superscript_8cb349a2": {
         "message": "Heva skrift"
     },
-    "superscript_and_subscript_37f94a50": {
-        "message": "Hevet skrift og senket skrift"
-    },
     "superset_c4db8a7a": {
         "message": "Supersett"
     },
@@ -2086,6 +2017,12 @@
     },
     "swedish_59a593ca": {
         "message": "Svensk"
+    },
+    "switch_to_pretty_html_editor_a3cee15f": {
+        "message": "Byt til pen HTML-editor"
+    },
+    "switch_to_raw_html_editor_f970ae1a": {
+        "message": "Byt til rå HTML-editor"
     },
     "switch_to_the_html_editor_146dfffd": {
         "message": "Byt til HTML-editor"
@@ -2246,9 +2183,6 @@
     "top_66e0adb6": {
         "message": "Topp"
     },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } resultat funne, { numDisplayed } resultat viser akkurat no."
-    },
     "tray_839df38a": {
         "message": "Sidemeny"
     },
@@ -2288,9 +2222,6 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Diagonal pil opp til høgre"
     },
-    "upload_document_253f0478": {
-        "message": "Last opp dokument"
-    },
     "upload_file_fd2361b8": {
         "message": "Last opp fil"
     },
@@ -2300,14 +2231,8 @@
     "upload_media_ce31135a": {
         "message": "Last opp media"
     },
-    "upload_record_media_e4207d72": {
-        "message": "Last opp/Ta opp media"
-    },
     "uploading_19e8a4e7": {
         "message": "Lastar opp"
-    },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "alfabetisk ordna liste i store bokstavar"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Stor Delta"
@@ -2329,9 +2254,6 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Stor Psi"
-    },
-    "uppercase_roman_numeral_ordered_list_853f292b": {
-        "message": "numerisk ordna liste med romertal"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Stor Sigma"

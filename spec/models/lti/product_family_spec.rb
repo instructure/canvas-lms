@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/product_family"
-
 module Lti
   describe ProductFamily do
     let(:account) { Account.new }

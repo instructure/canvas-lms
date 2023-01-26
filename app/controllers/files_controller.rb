@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "securerandom"
-
 # @API Files
 # An API for managing files and folders
 # See the File Upload Documentation for details on the file upload workflow.
@@ -622,7 +620,7 @@ class FilesController < ApplicationController
             rescue => e
               @headers = false if params[:ts] && params[:verifier]
               @not_found_message = t "errors.not_found", "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
-              logger.error "Error downloading a file: #{e} - #{e.backtrace}"
+              Canvas::Errors.capture_exception(self.class.name, e)
               render "shared/errors/404_message",
                      status: :bad_request,
                      formats: [:html]

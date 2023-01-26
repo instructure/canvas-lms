@@ -182,6 +182,14 @@ const Grid = {
       const section_list = _.map(rollup, function (rollup2) {
         return rollup2.links.section
       })
+      const section_enrollment_status = () => {
+        const enrollment_status = rollup.map(r => r.links.status)
+        return enrollment_status.every(e => e === 'completed')
+          ? I18n.t('concluded')
+          : enrollment_status.every(e => e === 'inactive')
+          ? I18n.t('inactive')
+          : ''
+      }
       if (_.isEmpty(section_list)) {
         return null
       }
@@ -194,6 +202,7 @@ const Grid = {
           {
             grades_html_url: `/courses/${courseID}/grades/${user}#tab-outcomes`,
             section_name: _.keys(Grid.sections).length > 1 ? section_name : null,
+            enrollment_status: section_enrollment_status(),
           },
           student
         ),

@@ -18,6 +18,7 @@
 
 import React, {useReducer, useEffect, useRef, Suspense} from 'react'
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
@@ -31,9 +32,10 @@ import {Text} from '@instructure/ui-text'
 import Course from './Course'
 import {ImageOptions} from './ImageOptions'
 import {ColorInput} from '../../../../shared/ColorInput'
-import {convertFileToBase64} from '../../../svg/utils'
+import {convertFileToBase64} from '../../../../shared/fileUtils'
 import {transformForShape} from '../../../svg/image'
 import SingleColorSVG from './SingleColor/svg'
+import {createCroppedImageSvg} from '../../../../shared/ImageCropper/imageCropUtils'
 
 const IMAGE_SECTION_ID = 'icon-maker-tray-image-section'
 const getImageSection = () => document.querySelector(`#${IMAGE_SECTION_ID}`)
@@ -50,7 +52,7 @@ const filterSectionStateMetadata = state => {
   return {mode, image, imageName, icon, iconFillColor, cropperSettings}
 }
 
-export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, canvasOrigin}) => {
+export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigin}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const Upload = React.lazy(() => import('./Upload'))
   const SingleColor = React.lazy(() => import('./SingleColor'))
@@ -71,14 +73,6 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
   const metadata = filterSectionStateMetadata(state)
 
   const isMetadataLoaded = useRef(false)
-
-  useEffect(() => {
-    dispatch({
-      type: actions.SET_CROPPER_SETTINGS.type,
-      payload: {...state.cropperSettings, shape: settings.shape},
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.shape])
 
   useEffect(() => {
     const transform = transformForShape(settings.shape, settings.size)
@@ -117,49 +111,6 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
   }, [onChange, settings.shape, settings.size])
 
   useEffect(() => {
-    if (
-      (editing && !!settings.encodedImage) ||
-      (!!settings.encodedImage && settings.encodedImage !== state.image)
-    ) {
-      dispatch({
-        type: actions.SET_IMAGE.type,
-        payload: settings.encodedImage,
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing, settings.encodedImage])
-
-  useEffect(() => {
-    if (editing && !!settings.encodedImageName) {
-      dispatch({
-        type: actions.SET_IMAGE_NAME.type,
-        payload: settings.encodedImageName,
-      })
-    }
-  }, [editing, settings.encodedImageName])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE,
-      payload: state.image,
-    })
-  }, [onChange, state.image])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE_TYPE,
-      payload: state.mode,
-    })
-  }, [onChange, state.mode])
-
-  useEffect(() => {
-    onChange({
-      type: svgActions.SET_ENCODED_IMAGE_NAME,
-      payload: state.imageName,
-    })
-  }, [onChange, state.imageName])
-
-  useEffect(() => {
     if (state.icon && state.icon in SingleColorSVG) {
       dispatch({...actions.START_LOADING})
       // eslint-disable-next-line promise/catch-or-return
@@ -170,9 +121,34 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
       ).then(base64Image => {
         dispatch({...actions.SET_IMAGE, payload: base64Image})
         dispatch({...actions.STOP_LOADING})
+        onChange({type: svgActions.SET_EMBED_IMAGE, payload: base64Image})
       })
     }
-  }, [state.icon, state.iconFillColor])
+  }, [onChange, state.icon, state.iconFillColor])
+
+  // After a new shape is selected in shape section a new embedded image should be generated
+  useEffect(() => {
+    if (state.cropperSettings && settings.shape !== state.cropperSettings.shape) {
+      const newCropperSettings = {...state.cropperSettings, shape: settings.shape}
+      dispatch({
+        type: actions.SET_CROPPER_SETTINGS.type,
+        payload: newCropperSettings,
+      })
+      createCroppedImageSvg(newCropperSettings, settings.imageSettings.image)
+        .then(generatedSvg =>
+          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+        )
+        .then(base64Image => {
+          onChange({
+            type: svgActions.SET_EMBED_IMAGE,
+            payload: base64Image,
+          })
+        })
+        // eslint-disable-next-line no-console
+        .catch(error => console.error(error))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.shape])
 
   useEffect(() => {
     if (
@@ -213,7 +189,9 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
             <Flex.Item>
               <ImageOptions
                 state={state}
+                settings={settings}
                 dispatch={dispatch}
+                mountNode={getImageSection}
                 rcsConfig={rcsConfig}
                 trayDispatch={onChange}
               />
@@ -258,4 +236,16 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig, ca
       </Flex>
     </Group>
   )
+}
+
+ImageSection.propTypes = {
+  settings: PropTypes.object.isRequired,
+  editor: PropTypes.object.isRequired,
+  rcsConfig: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  canvasOrigin: PropTypes.string,
+}
+
+ImageSection.defaultProps = {
+  onChange: () => {},
 }

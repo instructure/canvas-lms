@@ -71,7 +71,7 @@ $.fn.disableWhileLoading = function (deferred, options) {
           .find('*')
           .andSelf()
           .filter(':input')
-          .not(':disabled,[type=file]')
+          .not(':disabled,[type=file],[name="authenticity_token"]')
         $inputsToDisable.prop('disabled', true)
 
         if (opts.noSpinner) {

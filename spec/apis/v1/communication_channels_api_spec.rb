@@ -106,6 +106,18 @@ describe "CommunicationChannels API", type: :request do
       } }
     end
 
+    it "registers user if skip_confirmation is truthy" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      json = api_call(:post, @path, @path_options, @post_params)
+      channel = CommunicationChannel.find(json["id"])
+      channel.update(workflow_state: "retired")
+      api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
+      expect(InstStatsd::Statsd).to have_received(:increment).once.with("communication_channels.create.skip_confirmation")
+
+      expect(channel.reload.workflow_state).to eq "active"
+      expect(@someone.reload.registered?).to be_truthy
+    end
+
     it "does not create a login on restore of login that was set to build login" do
       json = api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
       channel = CommunicationChannel.find(json["id"])
@@ -354,7 +366,7 @@ describe "CommunicationChannels API", type: :request do
       end
 
       it "is able to delete by path, instead of id" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
                  action: "destroy", user_id: someone.to_param, format: "json",
                  type: channel.path_type, address: channel.path)
@@ -362,11 +374,11 @@ describe "CommunicationChannels API", type: :request do
       end
 
       it "404s if already deleted by path" do
-        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                  controller: "communication_channels",
                  action: "destroy", user_id: someone.to_param, format: "json",
                  type: channel.path_type, address: channel.path)
-        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
+        raw_api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI::DEFAULT_PARSER.escape(channel.path)}",
                      controller: "communication_channels",
                      action: "destroy", user_id: someone.to_param, format: "json",
                      type: channel.path_type, address: channel.path)

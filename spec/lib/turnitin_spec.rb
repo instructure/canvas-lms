@@ -271,7 +271,7 @@ describe Turnitin::Client do
         it "generates the md5 before escaping parameters" do
           md5_params = {}
           processed_params.each do |key, value|
-            md5_params[key] = URI.unescape(value) unless key == :md5
+            md5_params[key] = URI::DEFAULT_PARSER.unescape(value) unless key == :md5
           end
 
           expect(@turnitin_api.request_md5(md5_params)).to eql(processed_md5)

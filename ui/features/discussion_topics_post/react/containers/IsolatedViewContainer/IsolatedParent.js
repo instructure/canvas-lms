@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -46,6 +47,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 const I18n = useI18nScope('discussion_posts')
 
 export const IsolatedParent = props => {
+  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
     UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
   )
@@ -90,7 +92,10 @@ export const IsolatedParent = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
-        onClick={() => props.setRCEOpen(true)}
+        onClick={() => {
+          setReplyFromId(null)
+          props.setRCEOpen(true)
+        }}
         isReadOnly={props.RCEOpen}
       />
     )

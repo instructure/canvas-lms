@@ -19,8 +19,6 @@
 #
 require "nokogiri"
 require "selenium-webdriver"
-require "socket"
-require "timeout"
 require "sauce_whisk"
 require_relative "test_setup/custom_selenium_rspec_matchers"
 require_relative "test_setup/selenium_driver_setup"
@@ -65,7 +63,7 @@ end
 module SynchronizeConnection
   %w[cache_sql execute exec_cache exec_no_cache query transaction].each do |method|
     class_eval <<~RUBY, __FILE__, __LINE__ + 1
-      def #{method}(*)                                           # def execute(*)
+      def #{method}(...)                                         # def execute(...)
         SeleniumDriverSetup.request_mutex.synchronize { super }  #   SeleniumDriverSetup.request_mutex.synchronize { super }
       end                                                        # end
     RUBY
@@ -132,7 +130,6 @@ shared_context "in-process server selenium tests" do
       # while disallow_requests! would generally get these, there's a small window
       # between the ajax request starting up and the middleware actually processing it
       wait_for_ajax_requests
-      move_mouse_to_known_position
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     ensure
@@ -233,7 +230,9 @@ shared_context "in-process server selenium tests" do
         "Uncaught Error: Loading chunk", # probably happens when the test ends when the browser is still loading some JS
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
         "Access to XMLHttpRequest at 'http://www.example.com/' from origin",
-        "The user aborted a request" # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.
+        "The user aborted a request", # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.
+        # Is fixed in Chrome 109, remove this once upgraded to or above Chrome 109 https://bugs.chromium.org/p/chromium/issues/detail?id=1307772
+        "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features."
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

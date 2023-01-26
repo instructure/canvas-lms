@@ -24,6 +24,7 @@ import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
 import template from '../../jst/WikiPageIndexItem.handlebars'
 import '../../jquery/redirectClickTo'
+import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 
 const I18n = useI18nScope('pages')
 
@@ -95,7 +96,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     })
     json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
-    json.frontPageText = ENV.K5_SUBJECT_COURSE ? 'Subject Home' : 'Front Page'
+    json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
     return json
   }
 
@@ -140,6 +141,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   afterRender() {
+    renderFrontPagePill({children: this.toJSON().frontPageText})
     return this.$el.find("td:not('.not_clickable'):first").redirectClickTo(this.$wikiPageLink)
   }
 

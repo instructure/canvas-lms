@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/membership_service/course_group_collator"
-
 module Lti::MembershipService
   describe CourseGroupCollator do
     context "course with lots of groups" do

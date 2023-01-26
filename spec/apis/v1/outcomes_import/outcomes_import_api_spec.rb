@@ -400,7 +400,9 @@ describe "Outcomes Import API", type: :request do
                              attachment: nil,
                              for_course_copy?: false,
                              job_progress: nil,
-                             migration_type: nil
+                             migration_type: nil,
+                             source_course: nil,
+                             migration_settings: {}
                            })
           allow(cm_mock).to receive(:migration_issues).and_return([])
           allow(ContentMigration).to receive(:find).with("2").and_return(cm_mock)

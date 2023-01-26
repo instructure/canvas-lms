@@ -19,7 +19,6 @@
 #
 
 require_relative "../../spec_helper"
-require_dependency "services/screencap_service"
 
 module Services
   describe ScreencapService do

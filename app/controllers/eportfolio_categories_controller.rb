@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "securerandom"
-
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
   before_action :rce_js_env
@@ -71,7 +69,14 @@ class EportfolioCategoriesController < ApplicationController
         @category = @portfolio.eportfolio_categories.where(slug: params[:category_name]).first!
       end
       @page = @category.eportfolio_entries.first
-      @page ||= @portfolio.eportfolio_entries.create(eportfolio_category: @category, allow_comments: true, show_comments: true, name: t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
+      if @portfolio.grants_right?(@current_user, session, :update)
+        @page ||= @portfolio.eportfolio_entries.create(
+          eportfolio_category: @category,
+          allow_comments: true,
+          show_comments: true,
+          name: t(:default_name, "New Page")
+        )
+      end
       raise ActiveRecord::RecordNotFound unless @page
 
       eportfolio_page_attributes

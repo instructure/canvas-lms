@@ -1037,6 +1037,115 @@ describe Course do
           expect(result).to eq expected
         end
 
+        it "deprioritizes due dates from section overrides for nonactive enrollments" do
+          # section
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          @assignment2.assignment_overrides.create!(
+            due_at: 6.days.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          # group
+          group_with_user(user: @student1, active_all: true)
+          group_override = @assignment2.assignment_overrides.create!(
+            due_at: 3.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          # everyone else
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
+
+          @test_course.enrollments.find_by(user: @student1, course_section: section).deactivate
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: group_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: group_override.id,
+                override_source: "Group"
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
+        it "does not deprioritize due dates from section overrides for nonactive enrollments when the flag is disabled" do
+          Account.site_admin.disable_feature!(:deprioritize_section_overrides_for_nonactive_enrollments)
+          # section
+          section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+          student_in_section(section, user: @student1)
+          section_override = @assignment2.assignment_overrides.create!(
+            due_at: 6.days.from_now(@now),
+            due_at_overridden: true,
+            set: section
+          )
+
+          # group
+          group_with_user(user: @student1, active_all: true)
+          @assignment2.assignment_overrides.create!(
+            due_at: 3.days.from_now(@now),
+            due_at_overridden: true,
+            set: @group
+          )
+
+          # everyone else
+          @assignment2.due_at = 4.days.from_now(@now)
+          @assignment2.save!
+
+          @test_course.enrollments.find_by(user: @student1, course_section: section).deactivate
+
+          edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+          result = edd.to_hash
+          expected = {
+            @assignment2.id => {
+              @student1.id => {
+                due_at: section_override.due_at,
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: section_override.id,
+                override_source: "CourseSection"
+              },
+              @student2.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              },
+              @student3.id => {
+                due_at: 4.days.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: nil,
+                override_source: "Everyone Else"
+              }
+            }
+          }
+          expect(result).to eq expected
+        end
+
         it "treats null due dates as the most permissive due date for a student" do
           # section
           section = CourseSection.create!(name: "My Awesome Section", course: @test_course)

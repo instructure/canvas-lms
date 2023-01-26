@@ -21,7 +21,6 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
 import mathml from '../mathml'
 import advancedPreference from '../advancedPreference'
-import RCEGlobals from '../../../../RCEGlobals'
 import {MathfieldElement} from 'mathlive'
 
 jest.useFakeTimers()
@@ -74,16 +73,12 @@ jest.mock('../advancedPreference', () => {
   return {
     isSet: jest.fn(),
     set: jest.fn(),
-    clear: jest.fn(),
+    remove: jest.fn(),
   }
 })
 
 describe('EquationEditorModal', () => {
   let mockFn
-
-  beforeAll(() => {
-    RCEGlobals.setFeatures({new_equation_editor: true})
-  })
 
   afterAll(() => {
     jest.resetAllMocks()
@@ -338,7 +333,7 @@ describe('EquationEditorModal', () => {
       advancedPreference.isSet.mockReturnValueOnce(true)
       renderModal()
       toggleMode()
-      expect(advancedPreference.clear).toHaveBeenCalled()
+      expect(advancedPreference.remove).toHaveBeenCalled()
     })
 
     it('is set when the user toggles from basic to advanced mode', () => {

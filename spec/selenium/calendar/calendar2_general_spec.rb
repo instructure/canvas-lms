@@ -327,6 +327,7 @@ describe "calendar2" do
     end
 
     it "quiz appears on all calendars", priority: "1" do
+      skip("LS-3626 -- flaky about 20% of the time -- probably related to the others above")
       create_quiz
 
       assert_views(@quiz.title, @quiz.due_at)

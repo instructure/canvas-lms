@@ -62,7 +62,7 @@ describe "content exports" do
 
       expect(@export.export_type).to eq "qti"
 
-      file_handle = @export.attachment.open need_local_file: true
+      file_handle = @export.attachment.open
       zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 

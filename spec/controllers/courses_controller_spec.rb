@@ -1404,12 +1404,12 @@ describe CoursesController do
         expect(@enrollment).to be_active
       end
 
-      it "does not error when previewing an unpublished course as an invited admin" do
-        @account = Account.create!
-        @account.settings[:allow_invitation_previews] = false
-        @account.save!
+      it "does not error when navigating to unpublished course after admin enrollment invitation" do
+        account = Account.create!
+        account.settings[:allow_invitation_previews] = false
+        account.save!
 
-        course_factory(account: @account)
+        course_factory(account: account)
         user_factory(active_all: true)
         enrollment = @course.enroll_teacher(@user, enrollment_state: "invited")
         user_session(@user)
@@ -1419,8 +1419,7 @@ describe CoursesController do
         expect(response).to be_successful
         expect(response).to render_template("show")
         expect(assigns[:context_enrollment]).to eq enrollment
-        enrollment.reload
-        expect(enrollment).to be_invited
+        expect(enrollment.reload).to be_active
       end
 
       it "ignores invitations that have been accepted (not logged in)" do
@@ -1524,6 +1523,14 @@ describe CoursesController do
       @course.save!
       get "show", params: { id: @course.id }
       expect(assigns(:js_env)[:COURSE_ID]).to eq @course.id.to_s
+    end
+
+    it "sets new_quizzes flags for assignments view" do
+      course_with_teacher_logged_in(active_all: true)
+      @course.default_view = "assignments"
+      @course.save!
+      get "show", params: { id: @course.id }
+      expect(assigns(:js_env)[:FLAGS].keys).to eq %i[newquizzes_on_quiz_page new_quizzes_modules_support new_quizzes_skip_to_build_module_button]
     end
 
     it "redirects html to settings page when user can :read_as_admin, but not :read" do
@@ -3175,6 +3182,55 @@ describe CoursesController do
 
       @course.reload
       expect(@course.name).to eq init_course_name
+    end
+
+    context "course availability options" do
+      before :once do
+        @account = Account.default
+      end
+
+      it "updates a course's availability options" do
+        user_session(@teacher)
+        start_at = 5.weeks.ago.beginning_of_day
+        conclude_at = 10.weeks.from_now.beginning_of_day
+        put "update", params: { id: @course.id, course: { start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true } }
+        @course.reload
+        expect(@course.start_at).to eq start_at
+        expect(@course.conclude_at).to eq conclude_at
+        expect(@course.restrict_enrollments_to_course_dates).to eq true
+      end
+
+      it "returns 401 if the user is a teacher and prevent_course_availability_editing_by_teachers is enabled" do
+        @account.settings[:prevent_course_availability_editing_by_teachers] = true
+        @account.save!
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { restrict_enrollments_to_course_dates: true } }
+        expect(response).to be_unauthorized
+        put "update", params: { id: @course.id, course: { start_at: 1.day.ago, restrict_enrollments_to_course_dates: true } }
+        expect(response).to be_unauthorized
+        put "update", params: { id: @course.id, course: { conclude_at: 1.day.from_now, restrict_enrollments_to_course_dates: true } }
+        expect(response).to be_unauthorized
+      end
+
+      it "allows admins to update course availability options even if prevent_course_availability_editing_by_teachers is enabled" do
+        @account.settings[:prevent_course_availability_editing_by_teachers] = true
+        @account.save!
+        account_admin_user(active_all: true)
+        user_session(@admin)
+        start_at = 6.weeks.ago.beginning_of_day
+        put "update", params: { id: @course.id, course: { start_at: start_at, restrict_enrollments_to_course_dates: true } }
+        @course.reload
+        expect(@course.start_at).to eq start_at
+        expect(@course.restrict_enrollments_to_course_dates).to eq true
+      end
+
+      it "allows teachers to update other course settings even if prevent_course_availability_editing_by_teachers is enabled" do
+        @account.settings[:prevent_course_availability_editing_by_teachers] = true
+        @account.save!
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "cool new course" } }
+        expect(@course.reload.name).to eq "cool new course"
+      end
     end
   end
 

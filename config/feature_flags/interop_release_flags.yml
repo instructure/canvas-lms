@@ -42,6 +42,11 @@ lti_multiple_assignment_deep_linking:
   description: |-
     If enabled, allows multiple deep link support for assignments and modules.
   applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_deep_linking_module_index_menu_modal:
   state: hidden
   display_name: LTI Deep Linking for Module Index Menu
@@ -115,4 +120,27 @@ ags_improved_course_concluded_response_codes:
     Rather than returning a generic 404 Not Found, the API will instead return a 422
     along with a helpful message indicating that the tool cannot access concluded
     courses.
+  applies_to: RootAccount
+deep_linking_use_window_parent:
+  state: hidden
+  display_name: Use window.parent in Deep Linking Response
+  description: |-
+    If enabled, the deep linking response JS will send postMessages
+    to window.parent instead of window.top. This enables the deep linking
+    response to correctly send content items to New Quizzes, when a tool is
+    launched from NQ.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: on
+consistent_ags_ids_based_on_account_principal_domain:
+  state: hidden
+  display_name: Consistent LTI AGS IDs based on Account's principal domain
+  description: |-
+    If enabled, AGS will use the Account's principal domain for Line Items IDs
+    throughout the AGS API and LTI Launches, regardless of which domain the LTI
+    launch happens on or the API is accessed through. For schools with multiple
+    domains, this ensures consistency in Line Item IDs.
   applies_to: RootAccount

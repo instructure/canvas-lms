@@ -120,6 +120,11 @@ peer_reviews_for_a2:
   display_name: Peer Review Support in Assignment Enhancements
   description: Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
+assignment_missing_shortcut:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Keyboard Shortcut for Missing Assignment
+  description: Allows graders to type MI in the Gradebook or SpeedGrader to manually tag an assignment as missing
 originality_reports_for_a2:
   state: hidden
   applies_to: SiteAdmin
@@ -154,3 +159,26 @@ new_quizzes_grade_by_question_in_speedgrader:
       state: allowed_on
     development:
       state: allowed_on
+proxy_file_uploads:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Submit on Behalf of Student
+  description: Allows teachers with the proper permissions to submit file upload assignments
+    on behalf of their students.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+deprioritize_section_overrides_for_nonactive_enrollments:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Deprioritize Section Overrides for Nonactive Enrollments
+  description: If set, deprioritizes using due dates, lock dates, and unlock dates from
+    section overrides on an assignment that are associated with a deactivated, concluded, or
+    otherwise non-active enrollment for a student.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment

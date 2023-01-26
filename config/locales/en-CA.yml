@@ -208,6 +208,7 @@ en-CA:
   a_name_for_this_set_is_required_222bad23: "A name for this set is required"
   a_name_is_required_b5df38a9: "A name is required"
   a_new_assignment_has_been_created_for_your_course__12b72639: "A new assignment has been created for your course, %{course_name}"
+  a_new_module_has_been_created_with_the_content_ret_b01468b2: "A new module has been created with the content returned from the tool. If you would like to see it, please visit the Modules page."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "A partner ID is required to use Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "A partner key is required to use Academic Benchmarks"
   a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "A premium version of BigBlueButton is available that offers concurrent conferences based on purchased amount (each with 1 host and up to 99 attendees), no recorded storage limitations, and dedicated infrastructure for better performance."
@@ -258,6 +259,7 @@ en-CA:
         partner_key: "Partner Key"
   academic_engagement_capella_74946a80: "Academic Engagement (Capella)"
   academic_engagement_strayer_8c7832b9: "Academic Engagement (Strayer)"
+  academic_success_reporting_2585c499: "Academic Success Reporting"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High Grade Report"
   accept_2fdd362e: Accept
   accept_course_invitation_b4c04fbb: "Accept course invitation"
@@ -1109,6 +1111,13 @@ en-CA:
               parameters: 
                 header: "Submitted After:"
     integer_required: "An integer value is required"
+    ivy_tech: 
+      rubric_detail_score_report: 
+        parameters: 
+          account_reports: 
+            default: 
+              parameters: 
+                header: "Terms (Limit 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1427,7 +1436,9 @@ en-CA:
         turnitin_host: "Turnitin Host"
         turnitin_pledge: "Similarity Pledge"
         turnitin_shared_secret: "Turnitin Shared Secret"
+        users_can_edit_comm_channels: "Users can edit their communication channels"
         users_can_edit_name: "Users can edit their name"
+        users_can_edit_profile: "Users can edit their profile"
         value: "Disable comments on announcements"
       links: 
         add_admins: "Account Admins"
@@ -1644,6 +1655,60 @@ en-CA:
         one: "%{file_size} *from one file*"
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
+    strategic_education: 
+      all_versions_submissions: 
+        parameters: 
+          account_reports: 
+            proserv: 
+              use_serialized_submission: 
+                check_box: "Use serialized submission timestamp"
+      provisioning: 
+        parameters: 
+          account_reports: 
+            default: 
+              accounts: 
+                check_box: "Accounts CSV"
+              courses: 
+                check_box: "Courses CSV"
+              enrollments: 
+                check_box: "Enrollments CSV"
+              group_categories: 
+                login: 
+                  check_box: "Group Categories CSV"
+              group_membership: 
+                login: 
+                  check_box: "Group Membership CSV"
+              groups: 
+                check_box: "Groups CSV"
+              pseudonyms: 
+                check_box: "Pseudonyms CSV"
+              question_bank_questions: 
+                check_box: "Question Bank Questions"
+              question_banks: 
+                check_box: "Question Banks"
+              sections: 
+                check_box: "Sections CSV"
+              terms: 
+                check_box: "Terms CSV"
+              users: 
+                check_box: "Users CSV"
+              xlist: 
+                check_box: "X list CSV"
+            sis_default: 
+              parameters: 
+                note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
+      user_course_access_log: 
+        parameters: 
+          account_reports: 
+            usu: 
+              enrollment_type: 
+                header: "Enrollment Type"
+          all: "All Enrollments"
+          designer: "Designer Enrollments"
+          observer: "Observer Enrollments"
+          students: "Student Enrollments"
+          ta: "Ta Enrollments"
+          teachers: "Teacher Enrollments"
     student_assessment_scores_csv_parameters: 
       account_reports: 
         orbis: 
@@ -1716,6 +1781,15 @@ en-CA:
             excelsior: 
               outcome: 
                 text: "SIS ID:"
+    university_of_tennessee: 
+      student_academic_success_report_csv_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Term
+          student_assignment_grade: 
+            login_ids: 
+              field: "Login IDs"
     unpublished_courses_csv_description: 
       account_reports: 
         default: 
@@ -2030,12 +2104,13 @@ en-CA:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adds analytics to a student’s context card."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Adds comment bank for assignment comments within speedgrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions"
+  adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Adds the option to grade by question in SpeedGrader for Quizzes.Next Quizzes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Adds visual indicators to the submission details page to tell students that unread
       document annotations or rubric comments exist
   adjusting_due_dates_a5918b9c: "Adjusting due dates..."
   admin_4d3ba42f: Admin
-  admin_analytics_description: "Enabling displays Admin Analytics to show overviews of courses and students. Once turned on, it may take data may take 24 hours to appear. Learn more and give feedback by joining the *New Analytics user group* in the Canvas community."
+  admin_analytics_description: "Enabling displays Admin Analytics to show overviews of courses and students. Learn more and give feedback by joining the *New Analytics user group* in the Canvas community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Admin Export for Multiple Grading Periods"
@@ -2078,6 +2153,7 @@ en-CA:
   after_the_assignment_is_graded_53754607: "After the assignment is graded"
   after_the_due_date_eee89c9c: "After the due date"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "After the first attempt, you cannot leave comments until you submit the assignment."
+  after_throttling_the_selected_jobs_the_newly_creat_44952b37: "After throttling the selected jobs, the newly created strand will be selected."
   ahead_21f22939: Ahead
   ajax_errors: 
     error_heading: "Ajax Error: %{status_code}"
@@ -2277,6 +2353,8 @@ en-CA:
   allowed_for_subaccounts_courses_default_on_e485ec7f: "Allowed for subaccounts/courses, default on"
   allows_a_grader_to_grade_discussions_as_they_read_e5af3b34: "Allows a grader to grade discussions as they read"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Allows a user to access the Act as User link on student context cards"
+  allows_a_user_to_view_and_manage_all_item_banks_in_9368284f: "Allows a user to view and manage all item banks in an account directly from within a course and account."
+  allows_a_user_to_view_and_manage_all_item_banks_in_ae99d718: "Allows a user to view and manage all item banks in an account from directly within a course."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Allows a user to view the SIS ID in a user’s login details."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Allows a user to view user SIS IDs in a course People page."
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: "Allows Account & Course Level mastery scales and calculation, replacing per-outcome criterion ratings & calculation methods"
@@ -2290,6 +2368,7 @@ en-CA:
       GraphQL mutations
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Allows aligning outcomes to non-scoring content"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Allows assessors to view the assessment audit tray in SpeedGrader for anonymous or moderated assignments."
+  allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Allows Blueprint Course settings to be exported and copied to another Blueprint Course"
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Allows Canvas to send iWork files to docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Allows course pages to be published on a schedule"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Allows course student groups to be created by csv upload"
@@ -2298,9 +2377,11 @@ en-CA:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Allows for discussion replies to be sorted according to creation
       timestamps. Default order is newest to oldest for root level replies.
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Allows graders to type MI in the Gradebook or SpeedGrader to manually tag an assignment as missing"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Allows instructors to apply scores to ungraded submissions en masse from assignment group and Total column menus in the Gradebook."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Allows instructors to submit file attachments on behalf of a student."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Allows modifying notification settings for any course from within the account-level notification settings page."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting)."
@@ -2320,6 +2401,7 @@ en-CA:
   allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
       Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
       posted and hidden manually.
+  allows_teachers_with_the_proper_permissions_to_sub_6dc94b17: "Allows teachers with the proper permissions to submit file upload assignments on behalf of their students."
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Allows teacherTA-based roles to access the Attendance tool."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Allows the duplicating of modules in Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Allows the duplication of Calendar Events"
@@ -3679,6 +3761,8 @@ en-CA:
   assignment_group: 
     default_name: Assignments
     default_title: Assignments
+    drop_rules_must_be_positive: "Drop rules must be a positive number"
+    drop_rules_too_high: "Drop rules cannot be higher than the number of assignments"
   assignment_group_1a781505: "Assignment Group"
   assignment_group_export_fd77c394: "Assignment Group Export"
   assignment_group_filter_c03f8a1d: "Assignment Group Filter"
@@ -4640,7 +4724,7 @@ en-CA:
   batch_edit_6d41d0d7: "Batch Edit"
   batch_edit_dates_f1ec3df2: "Batch Edit Dates"
   bb_display: "Blackboard Learn"
-  bb_file_description: "Blackboard 6/7/8/9 export .zip file"
+  bb_file_description: "Blackboard 6/7/8/9/Ultra export .zip file"
   bb_name: "Blackboard Converter"
   bbb_modal_update_e27b10e: "BBB Modal Update"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Be a hero and ask your instructor to fix this link."
@@ -4677,6 +4761,7 @@ en-CA:
     create_time: "Create Time"
     recording_setting: Recording
     recording_setting_enabled_description: "Enable recording for this conference"
+  billing_country_code_as_reported_by_salesforce_625bbb4e: "Billing Country Code as Reported by Salesforce"
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   blackout_date_5fc44c2b: "Blackout Date"
@@ -4948,6 +5033,7 @@ en-CA:
   by_default_students_can_always_create_groups_in_a__af000dd: "By default, students can always create groups in a course. To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled and the Let students organize their own groups checkbox in Course Settings must be deselected."
   by_default_students_can_always_create_groups_in_a__dac761d3: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected."
   by_lti_2_registration_url_e421e523: "By LTI 2 Registration URL"
+  by_name_54daec42: "by %{name}"
   by_url_a163275e: "By URL"
   c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -5296,6 +5382,7 @@ en-CA:
     ics_description_user: "Calendar events for the user, %{user_name}"
     ics_title: "%{course_or_group_name} Calendar (Canvas)"
     invalid_date_or_time: "Invalid date or invalid datetime for %{attr}"
+  calendar_feed_url_b7b91e7b: "Calendar Feed Url"
   calendar_removed_1c841af4: "Calendar removed"
   calendar_series_e1b7a4bc: "Calendar Series"
   calendars: 
@@ -5621,6 +5708,7 @@ en-CA:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Changes will still apply if you leave this page."
   changes_you_made_may_not_be_saved_4e8db973: "Changes you made may not be saved."
   changing_course_dates_may_override_term_availabili_d92b10de: "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates."
+  changing_course_pacing_days_may_modify_due_dates_3de835f6: "Changing course pacing days may modify due dates"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Changing course pacing days may modify due dates."
   changing_section_dates_may_override_course_and_ter_6634950e: "Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates."
   changing_the_course_participation_will_republish_a_1cc05b7: "Changing the course participation will republish all course pacing with any new dates using term participation."
@@ -5930,6 +6018,7 @@ en-CA:
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app."
   collaborations_tutorial_tray_9219d9d: "Collaborations Tutorial Tray"
   collapse_all_50275533: "Collapse All"
+  collapse_all_686a13d3: "Collapse all"
   collapse_all_modules_e092807c: "Collapse All Modules"
   collapse_description_for_outcome_title_bcd9b8c9: "Collapse description for outcome %{title}"
   collapse_discussion_thread_52bab65a: "Collapse discussion thread"
@@ -5940,6 +6029,7 @@ en-CA:
   collapse_replies_20f2faf7: "Collapse Replies"
   collapse_replies_ef4fc36b: "Collapse replies"
   collapse_subdiscussion_89af1f5c: "Collapse Subdiscussion"
+  collapse_threads_ef7ca000: "Collapse Threads"
   collapse_tutorial_tray_66ee7dc1: "Collapse tutorial tray"
   collapsed_510aa02a: Collapsed
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Collection of responsive improvements throughout Canvas"
@@ -6549,6 +6639,8 @@ en-CA:
       folder_picker: 
         default_select_folder: "Select Folder"
         upload_to: "Upload to"
+      import_blueprint_settings: 
+        checkbox_label: "Import Blueprint Course settings"
       import_quizzes_next_view: 
         import_new_quizzes: "Import existing quizzes as *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes is the new assessment engine for Canvas.%{p_p}To learn more, please contact your system administrator or visit"
@@ -7127,6 +7219,7 @@ en-CA:
   conversations_send_messages_to_individual_course_m_733620b: "Conversations - send messages to individual course members"
   copy_9748f9f: Copy
   copy_assignment_name_to_another_course_b62d0a54: "Copy Assignment %{name} to another course"
+  copy_blueprint_course_settings_31a97e96: "Copy Blueprint Course settings"
   copy_list_of_shard_ids_d51cd846: "Copy list of shard ids"
   copy_operation_started_successfully_b2f236a1: "Copy operation started successfully"
   copy_page_to_another_course_405cc07c: "Copy page to another course"
@@ -7138,6 +7231,7 @@ en-CA:
   copy_title_to_course_ac71981a: "Copy {%title} to course"
   copy_to_64f8456b: "Copy To..."
   copy_to_a5396a6f: "Copy to..."
+  copy_to_clipboard_493be1b: "Copy to clipboard"
   copy_to_folder_32ecc3c3: "Copy to Folder"
   copying_628a9607: Copying...
   copyright_and_license_information_must_be_provided_5feffaf: "Copyright and license information must be provided for files before they are published."
@@ -7231,9 +7325,13 @@ en-CA:
     one: "1 Day"
     other: "%{count} Days"
     zero: ""
+  count_days_ago_406937d: 
+    one: "1 day ago"
+    other: "%{count} days ago"
   count_days_de0c6a32: 
     one: "1 day"
     other: "%{count} days"
+    zero: ""
   count_discussions_found_fc326362: "%{count} discussions found."
   count_errors_5cde7fdc: 
     one: "1 error"
@@ -7267,6 +7365,9 @@ en-CA:
   count_hours_1bd03883: 
     one: "1 hour"
     other: "%{count} hours"
+  count_hours_ago_322dcc79: 
+    one: "1 hour ago"
+    other: "%{count} hours ago"
   count_images_found_for_term_a93635ed: "%{count} images found for %{term}"
   count_items_deleted_successfully_a287aa53: 
     one: "%{name} deleted successfully."
@@ -7289,6 +7390,7 @@ en-CA:
     one: "1 minute"
     other: "%{count} minutes"
     zero: "less than 1 minute"
+  count_minutes_ago_c1b7d7ef: "%{count} minutes ago"
   count_more_beba6428: "%{count} more"
   count_must_be_0_4abb84b3: "COUNT must be > 0"
   count_must_be_greater_than_0_f8f88358: "COUNT must be greater than 0"
@@ -7432,6 +7534,9 @@ en-CA:
   count_unread_messages_e312aa7b: 
     one: "One unread message."
     other: "%{count} unread messages."
+  count_unread_release_notes_3be26022: 
+    one: "One unread release note."
+    other: "%{count} unread release notes."
   count_unread_replies_86976ab: "%{count} unread replies"
   count_unread_shares_ff9e91a5: 
     one: "One unread share."
@@ -7441,6 +7546,9 @@ en-CA:
   count_weeks_11fbd2dc: 
     one: "1 week"
     other: "%{count} weeks"
+  count_weeks_ago_9393928c: 
+    one: "1 week ago"
+    other: "%{count} weeks ago"
   count_weeks_d03afdd8: 
     one: "1 Week"
     other: "%{count} Weeks"
@@ -7605,6 +7713,7 @@ en-CA:
   course_image_settings_eba3ec55: "Course image settings"
   course_implemented_apps_fa658f5a: "Course Implemented Apps"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Course is already associated with a blueprint"
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Course is ineligible to be set as a blueprint"
   course_landing_page_49a53ade: "Course landing page"
   course_level_notification_preferences_require_a_co_2f0a618: "Course level notification preferences require a course_id to update"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level."
@@ -7712,6 +7821,7 @@ en-CA:
   course_pacing_d3025ecf: "Course Pacing:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Course Pacing feature preview must be enabled in your institution."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Course Pacing is an automated tool that creates a student schedule by combining suggested hours per chapter, in-class school days, and total hours to generate a date estimator."
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Course Pacing is an automated tool that sets differentiated due dates for assessments and learning activities based on each students' enrollment date, enabling structured, self-paced learning in rolling enrollment courses."
   course_pacing_is_in_active_development_348e33cf: "Course Pacing is in active development."
   course_pacing_redesign_38edfc1c: "Course Pacing Redesign"
   course_pages_449f1dd4: "Course Pages"
@@ -8318,6 +8428,7 @@ en-CA:
   create_132b3be1: Create
   create_14873ed7: create
   create_a_64f6f82: "Create a"
+  create_a_course_pace_333b0911: "Create a Course Pace"
   create_a_default_course_pace_71ba0b9f: "Create a Default Course Pace"
   create_a_developer_key_cabaa013: "Create a developer key"
   create_a_friendly_display_name_c1036ed: "Create a friendly display name"
@@ -8343,6 +8454,7 @@ en-CA:
                       and Quizzes. Assignment groups can be weighted.
   create_content_for_your_course_500a7032: "Create content for your course"
   create_course_9a69b32c: "Create Course"
+  create_course_pace_3dff129: "Create Course Pace"
   create_course_templates_f5c4e039: "Create Course Templates"
   create_criterion_6df4d4ad: "Create Criterion"
   create_default_pace_dd21415b: "Create Default Pace"
@@ -8564,6 +8676,7 @@ en-CA:
   customize_configuration_69c22ef3: "Customize Configuration"
   customize_course_details_26fd4afe: "Customize course details"
   customize_learning_mastery_ratings_4ace142a: "Customize Learning Mastery Ratings"
+  customize_section_and_student_paces_f63f930f: "Customize Section and Student Paces"
   customize_sections_and_individual_student_paces_a16099b: "Customize Sections and Individual Student Paces"
   customize_this_menu_efa72a9: "Customize this menu"
   cutoff_score_74254c89: "cutoff score"
@@ -8733,6 +8846,7 @@ en-CA:
     no_date: "No Date"
   dates_6e416047: Dates
   dates_shown_in_course_time_zone_da2f77d5: "Dates shown in course time zone"
+  dates_shown_in_course_time_zone_efd32135: "Dates shown in Course Time Zone"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8794,9 +8908,12 @@ en-CA:
   deduction_interval_e18bd51: "Deduction interval"
   deep_orange_4c7eea99: "Deep Orange"
   deep_purple_bb3e2907: "Deep Purple"
+  deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread."
   default_9db103d: Default
   default_conference_title: "%{course_name} Conference"
+  default_course_pace_ce0ba0f3: "Default Course Pace"
+  default_course_pacing_d18b6cda: "Default Course Pacing"
   default_dates_a0a2ae26: "default dates"
   default_due_time_9d0e9140: "Default Due Time"
   default_email_5cb9fa04: "Default Email:"
@@ -8916,6 +9033,7 @@ en-CA:
   deleted_content_referenced_in_this_resource_e42d1998: "Deleted content referenced in this resource:"
   deleted_deletedtimingdisplay_f4c73003: "Deleted %{deletedTimingDisplay}"
   deleted_topic_notice: "That topic has been deleted"
+  deleted_user_59fdcef7: "DELETED USER"
   deleting_6421031e: deleting...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Deleting a submission file is typically done only when a student posts inappropriate or private material.
@@ -9011,6 +9129,7 @@ en-CA:
   deployment_id_for_toolname_app_e54a7364: "Deployment id for %{toolName} App"
   deprecate_sms_be6b00a: "Deprecate SMS"
   deprecated_59e99d2a: Deprecated
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Deprioritize Section Overrides for Nonactive Enrollments"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Descending
   description_436c48d7: Description
@@ -9230,6 +9349,7 @@ en-CA:
   discussion_post_count_report_2da4c6c: "Discussion Post Count Report"
   discussion_posts_c998c9ad: "Discussion Posts"
   discussion_redesign_description: "This feature enhances the Canvas experience within Discussions and Announcements. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Discussions/Announcements Redesign user group* in the Canvas Community"
+  discussion_redesign_discussion_entry_version_histo_f1878f4f: "Discussion Redesign - Discussion Entry Version History"
   discussion_redesign_grading_view_467bf307: "Discussion Redesign Grading View"
   discussion_reply_sorting_6a14676e: "Discussion reply sorting"
   discussion_settings_2fbf0b95: "Discussion Settings"
@@ -9288,6 +9408,8 @@ en-CA:
       student_settings: "Student Settings"
     edit_crumb: Edit
     edit_view: 
+      ? " publishing"
+      : Publishing...
       ? " saving"
       : Saving...
       ? " topic_title"
@@ -9306,6 +9428,7 @@ en-CA:
       page_header_title: "New Discussion"
       points_possible: "Points Possible"
       post_at: "Post At"
+      publish: Publish
       save: Save
       saving: Saving...
       sort_by_likes: "Sort by likes"
@@ -9804,6 +9927,7 @@ en-CA:
   edit_criterion_description_5828919: "Edit criterion description"
   edit_current_message_da650d4c: "Edit Current Message"
   edit_dates_ed31061: "Edit Dates"
+  edit_default_course_pace_e00f1b5b: "Edit Default Course Pace"
   edit_default_pace_33ba5cdd: "Edit Default Pace"
   edit_developer_key_53c93ed1: "Edit Developer Key"
   edit_developer_key_d8fa33c4: "Edit developer key"
@@ -9812,6 +9936,7 @@ en-CA:
   edit_grading_scheme_53091236: "Edit Grading Scheme"
   edit_grading_scheme_title_ff41d916: "Edit Grading Scheme %{title}"
   edit_group_c8679dba: "Edit Group"
+  edit_history_917c1e08: "Edit History"
   edit_home_page_ee907de9: "Edit home page"
   edit_important_info_for_coursename_bdb3eb6c: "Edit important info for %{courseName}"
   edit_item_details_c9a7b9c5: "Edit item details"
@@ -10036,6 +10161,7 @@ en-CA:
   enabled_unlocked_8d3a5df7: "Enabled (unlocked)"
   enabled_web_services_f620b2be: "Enabled Web Services"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Enables a redesigned Message Students Who... dialog that allows for messaging observers in addition to students."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Enables access to the New Quizzes Public API through Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Enables important dates to be applied to assignments, calendar events, and others."
   enables_modal_to_warn_user_when_a_draft_comment_is_c5e9464b: "Enables modal to warn user when a draft comment is left unposted in SpeedGrader."
@@ -10084,6 +10210,7 @@ en-CA:
   enhanced_grade_change_auditing_2b155dfa: "Enhanced grade change auditing"
   enhanced_gradebook_filters_a3be5e7d: "Enhanced Gradebook Filters"
   enhanced_gradebook_filters_description: "This feature provides enhanced filtering options in the Canvas gradebook. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Gradebook Filters User Group* in the Canvas Community."
+  enhanced_rce_paste_from_clipboard_30ddb011: "Enhanced RCE paste from clipboard"
   enhances_the_canvas_experience_within_the_learning_8031b650: "Enhances the Canvas experience within the Learning Mastery Gradebook."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Enhances the color contrast of text, buttons, etc."
   enroll_in_subject_9c1f1c18: "Enroll in Subject"
@@ -10501,6 +10628,8 @@ en-CA:
   error_59293a2c: error
   error_98e81528: Error
   error_adding_canvas_file_to_submission_draft_de258021: "Error adding canvas file to submission draft"
+  error_adding_file_to_discussion_message_16feef3f: "Error adding file to discussion message"
+  error_adding_files_2cd4d45: "Error adding files"
   error_adding_files_97ba198e: "Error adding files."
   error_adding_files_to_conversation_message_58e83876: "Error adding files to conversation message"
   error_adding_files_to_discussion_message_8bb819e4: "Error adding files to discussion message"
@@ -10522,6 +10651,7 @@ en-CA:
   error_embedding_content_from_tool_49bb698e: "Error embedding content from tool"
   error_exporting_gradebook_msg_6ea31e2f: "Error exporting gradebook: %{msg}"
   error_fetching_access_token_1445a9e3: "Error fetching access token"
+  error_fetching_rubric_data_66432f54: "Error fetching rubric data"
   error_fetching_user_details_7c85d23: "Error fetching user details"
   error_importing_outcomes_59a4fe81: "Error importing outcomes"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
@@ -10554,6 +10684,7 @@ en-CA:
   error_sending_submission_d32dc075: "Error sending submission"
   error_starting_content_share_18fb1532: "Error starting content share"
   error_starting_save_operation_81bcb99: "Error starting save operation:"
+  error_submitting_rubric_83daca8b: "Error submitting rubric"
   error_submitting_to_plagiarism_service_9b0748cb: "Error submitting to plagiarism service"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Error submitting to plagiarism service. You may resubmit from SpeedGrader."
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Error: The tool did not return a URL to Canvas"
@@ -10563,6 +10694,7 @@ en-CA:
   error_updating_pacename_ad07f9df: "Error updating %{paceName}"
   error_updating_status_of_module_item_80336274: "Error updating status of module item"
   error_updating_submission_draft_1d40ade7: "Error updating submission draft"
+  error_uploading_file_73235601: "Error uploading file"
   error_uploading_file_e2d31b56: "Error uploading file."
   error_uploading_files_db354fa9: "Error uploading files."
   error_uploading_files_f709361f: "Error uploading files"
@@ -10739,6 +10871,7 @@ en-CA:
   excused_cf8792eb: Excused
   exit_d0c7b013: Exit
   expand_2f2fadbd: Expand
+  expand_all_8329940a: "Expand all"
   expand_all_bb64d2ea: "Expand All"
   expand_all_modules_a7d79134: "Expand All Modules"
   expand_closed_caption_languages_2642db5b: "Expand Closed Caption Languages"
@@ -10754,6 +10887,7 @@ en-CA:
   expand_permission_b45bf097: "Expand %{permission}"
   expand_permission_c61d5958: "Expand permission"
   expand_subdiscussion_cd226ed4: "Expand Subdiscussion"
+  expand_threads_634fe7a1: "Expand Threads"
   expand_tutorial_tray_22630c49: "Expand tutorial tray"
   expanded_f4493860: Expanded
   expected_array_of_objects_b09ead01: "Expected array of objects"
@@ -10908,6 +11042,7 @@ en-CA:
   failed_to_delete_internal_setting_b85d397c: "Failed to delete internal setting"
   failed_to_delete_role_label_27959de3: "Failed to delete role %{label}"
   failed_to_delete_selected_pages_26fa87db: "Failed to delete selected pages"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Failed to export blueprint course settings"
   failed_to_export_course_paces_e17583ba: "Failed to export course paces"
   failed_to_export_pace_plans_9832daac: "Failed to export pace plans"
   failed_to_export_some_tool_settings_c992fc56: "Failed to export some tool settings"
@@ -10958,6 +11093,7 @@ en-CA:
   failed_to_save_selected_calendars_210b5e8f: "Failed to save selected calendars"
   failed_to_split_users_d9759007: "Failed to split users."
   failed_to_submit_draft_comment_1de83451: "Failed to submit draft comment"
+  failed_to_throttle_tag_error_356b24eb: "Failed to throttle tag: %{error}"
   failed_to_unblock_strand_singleton_b33324c1: "Failed to unblock strand/singleton"
   failed_to_unpin_discussion_503eab82: "Failed to unpin discussion"
   failed_to_update_account_notification_settings_194c1cd4: "Failed to update account notification settings"
@@ -11228,6 +11364,7 @@ en-CA:
   find_training_resources_and_more_help_f148612c: "Find Training Resources and More Help"
   find_your_canvas_institution_45af99af: "Find your %{canvas} institution"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Find your classes or subjects in the Dashboard..."
+  finding_matched_jobs_f7cd0e6d: "Finding matched jobs"
   finish_bc343002: Finish
   finished_19aaf6f5: Finished
   finished_publishing_pace_597ffc4f: "Finished publishing pace"
@@ -11356,6 +11493,7 @@ en-CA:
   germany_49_fc5b8179: "Germany (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Get help on how to use and configure conferences in canvas."
   get_started_b9507525: "Get Started"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Get started by creating a course pace that will serve as the default pace for all sections and students in the course."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Get started by finding, importing or creating your account outcomes."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Get started by finding, importing or creating your course outcomes."
   get_started_with_configuring_the_course_material_d_fa51d225: "Get started with configuring the course material due dates for the overall course"
@@ -11367,6 +11505,7 @@ en-CA:
   get_your_content_online_quickly_41fd925b: "Get Your Content Online Quickly"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Get your users error reports posted to Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Get your users error reports posted to Salesforce"
+  getting_recipients_observers_52d47cad: "Getting recipients observers"
   getting_started_with_collaborations_794240ba: "Getting started with Collaborations"
   gif_74e4a622: GIF
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Give all students the same grade for *%{assignment.name}* by entering and submitting a grade value below:"
@@ -11430,6 +11569,7 @@ en-CA:
   grade_a91e433e: "Grade:"
   grade_anonymously_6c37133a: "Grade anonymously"
   grade_assignment_7c1abc11: "Grade %{assignment}"
+  grade_by_question_9d9b8a71: "Grade by question"
   grade_calculator_performance_improvements_564af0de: "Grade Calculator Performance Improvements"
   grade_change_activity_75fb525: "Grade Change Activity"
   grade_change_log_231f90e4: "Grade Change Log"
@@ -12410,6 +12550,7 @@ en-CA:
   grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" was successfully updated."
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: "Haitian Creole"
+  handle_pasting_of_files_especially_images_7c19b19c: "Handle pasting of files, especially images."
   handlebars_helpers: 
     time: 
       event: "%{date} at %{time}"
@@ -12735,7 +12876,9 @@ en-CA:
   html_editor_fb2ab713: "HTML Editor"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_73849691: http
   http_response_code_832d6baa: "HTTP Response: %{code}"
+  https_3a02e3fb: https
   hungarian_fc7d30c9: Hungarian
   hungary_36_cd3e515b: "Hungary (+36)"
   hypothetical_end_date_117d81cf: "Hypothetical end date"
@@ -12884,6 +13027,11 @@ en-CA:
       Rather than returning a generic 404 Not Found, the API will instead return a 422
       along with a helpful message indicating that the tool cannot access concluded
       courses.
+  if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
+      If enabled, the deep linking response JS will send postMessages
+      to window.parent instead of window.top. This enables the deep linking
+      response to correctly send content items to New Quizzes, when a tool is
+      launched from NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
       requesting client instead of redirecting them to themselves
@@ -12919,6 +13067,7 @@ en-CA:
       If RCE Enhancements are also enabled,
       the RCE will auto-save your work as you go
   if_set_allows_submission_status_to_be_changed_from_156f57f: "If set, allows submission status to be changed from inside of Speedgrader"
+  if_set_deprioritizes_using_due_dates_lock_dates_an_b7303ae9: "If set, deprioritizes using due dates, lock dates, and unlock dates from section overrides on an assignment that are associated with a deactivated, concluded, or otherwise non-active enrollment for a student."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "If set, displays originality reports with Assignment Enhancements turned on"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "If set, displays updated mastery connect icon"
   if_set_quizzes_next_will_operate_using_a_single_la_1adc9c47: "If set, Quizzes.Next will operate using a single launch session in SpeedGrader"
@@ -13200,6 +13349,7 @@ en-CA:
   include_last_activity_dates_4eb97ed5: "Include Last Activity Dates;"
   include_last_activity_dates_ee2d3de0: "Include Last Activity Dates"
   include_needs_grading_count_b8106ff7: "Include Needs Grading Count"
+  include_observers_fd1af75f: "Include Observers"
   include_quoted_reply_in_message_d0c8af8a: "Include quoted reply in message"
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Include scores when alerting about grades.
@@ -13303,6 +13453,8 @@ en-CA:
   instructor_name_36bc0f39: "Instructor Name"
   instructor_sis_id_899dd697: "Instructor Sis Id"
   instructors_4b491a07: instructors
+  instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+  instructors_can_submit_on_behalf_of_students_d9de3c83: "Instructors can submit on behalf of students"
   instructors_cdd595d0: Instructors
   instructure: 
     alerts: 
@@ -13443,6 +13595,9 @@ en-CA:
   invalid_address_book_strategy_904a7ada: "Invalid address book strategy."
   invalid_authenticity_token_b753558c: "Invalid Authenticity Token"
   invalid_aws_configuration_e8a6ae0f: "Invalid AWS Configuration"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Invalid blueprint locked item type %{type} for item %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Invalid blueprint restriction types in imported package; using defaults"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Invalid blueprint restrictions for item %{id}"
   invalid_byday_byday_6e361e78: "Invalid BYDAY '%{byday}'"
   invalid_bymonth_bymonth_91f621b3: "Invalid BYMONTH '%{bymonth}'"
   invalid_bymonthday_bymonthday_87791c1b: "Invalid BYMONTHDAY '%{bymonthday}'"
@@ -13678,6 +13833,7 @@ en-CA:
   june_a58d8523: June
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "Just a casual question, comment, idea, or suggestion"
   just_in_time_provisioning_382a0354: "Just in Time Provisioning"
+  just_now_526a643c: "Just Now"
   jwk_method_6d5d0c84: "* JWK Method"
   jwts_4f397c85: JWTs
   k12_description: "Update the icons in the Global Navigation Menu that make more sense specifically in a K-12 environment."
@@ -13703,6 +13859,7 @@ en-CA:
   key_state_for_the_current_account_d16b1cd5: "Key state for the current account"
   keyboard_nav_dialog: 
     esc_key_notification: "Press the escape key before using keyboard shortcuts when navigating the gradebook grid."
+  keyboard_shortcut_for_missing_assignment_848aa9cd: "Keyboard Shortcut for Missing Assignment"
   keyboard_shortcuts_ed1844bd: "Keyboard Shortcuts"
   kind_7f0a88c4: Kind
   know_your_users_5c1323be: "Know your users"
@@ -13792,6 +13949,7 @@ en-CA:
   latest_f604a75: Latest
   latest_outcome_import_context_is_not_self_300d5795: "latest_outcome_import context is not self"
   latest_score_905aa87b: "Latest Score"
+  latest_version_updatedat_510b6035: "Latest Version %{updatedAt}"
   latex_equations_are_currently_migrated_as_images_a_1206c659: "LaTex equations are currently migrated as images, and the questions should not be edited."
   latvian_2bbb6aab: Latvian
   launch_external_tool_672c0409: "Launch External Tool"
@@ -14148,6 +14306,7 @@ en-CA:
   loading_missing_assignments_link_d9a0d320: "Loading missing assignments link"
   loading_more_grade_history_results_b235de5: "Loading more grade history results."
   loading_more_gradebook_history_results_810f6d2e: "Loading more gradebook history results."
+  loading_more_replies_22e0f13c: "Loading more replies"
   loading_more_results_1d437202: "Loading more results"
   loading_more_results_def6df65: "Loading more results..."
   loading_more_sub_accounts_d0a30903: "Loading more sub accounts..."
@@ -14159,6 +14318,7 @@ en-CA:
   loading_permissions_28495bdb: "Loading Permissions"
   loading_permissions_failed_73983eb3: "Loading permissions failed"
   loading_release_notes_7deaa2eb: "Loading release notes"
+  loading_replies_8bdf17bc: "Loading replies..."
   loading_results_769c8819: "Loading Results"
   loading_section_header_616c8cdd: "Loading section header"
   loading_staff_1ce7d803: "Loading staff..."
@@ -14519,6 +14679,7 @@ en-CA:
   mastery_scale_saved_34c64b6b: "Mastery scale saved"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mastery score reflects the highest score of a graded assignment or quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Mastery score reflects the most recent graded assignment or quiz."
+  matched_jobs_jobs_with_tags_tags_1d1fddb6: "Matched %{jobs} jobs with %{tags} tags"
   matching_left_side_900f860b: "Matching left side"
   matching_right_side_920e71b2: "Matching right side"
   math_scale_equation_images_5555a954: "Math: Scale equation images"
@@ -16879,6 +17040,7 @@ en-CA:
   new_comment_discussion_topic_by_user_name_666ccfa: "New comment: %{discussion_topic} by %{user_name}"
   new_comment_for_discussion_topic_course_38febf3b: "New Comment for %{discussion_topic}, %{course}"
   new_comment_on_announcement_discussion_topic_cours_7905b782: "New Comment on Announcement %{discussion_topic}, %{course}"
+  new_concurrency_34882b5b: "New Concurrency"
   new_conference_8b483024: "New Conference"
   new_conferences_a020a8a9: "New Conferences"
   new_content_from_app_9e6e8757: "New Content From App"
@@ -16928,6 +17090,7 @@ en-CA:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes migration enabled by default"
   new_quizzes_migration_required_7854aa1a: "New Quizzes migration required"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes on the Quizzes page"
+  new_quizzes_public_api_18d95321: "New Quizzes Public API"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes Service JWT Refresh"
   new_quizzes_site_admin_service_user_a331233a: "New Quizzes Site Admin Service User"
   new_quizzes_submission_274b5c57: "New Quizzes Submission"
@@ -16961,6 +17124,7 @@ en-CA:
   newest_first_87672763: "Newest First"
   newest_oldest_d768cf1a: "Newest - Oldest"
   next_40e12421: Next
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional)."
   next_announcement_6e6e0f17: "Next announcement"
   next_announcements_page_3956eb11: "Next Announcements Page"
   next_assignment_8ec51175: "Next assignment"
@@ -17061,6 +17225,7 @@ en-CA:
   no_longer_available_1557d25d: "No longer available"
   no_longer_observing_user_efa5298a: "No longer observing %{user}"
   no_marks_5e7d2b59: "No Marks"
+  no_matched_jobs_c1fc8222: "No matched jobs"
   no_matches_found_please_insert_a_valid_recipient_4cef9d47: "No matches found. Please insert a valid recipient."
   no_matches_to_your_search_16d3d3b1: "No matches to your search"
   no_matching_external_tool_found_ffc3abc3: "no matching external tool found"
@@ -17604,8 +17769,11 @@ en-CA:
   observers_course_83850091: "Observers (Course)"
   observers_remove_aafc8a88: "Observers - Remove"
   observers_remove_ad508fbe: "Observers - remove"
+  observers_were_not_included_please_try_again_2580461d: "Observers were not included. Please try again."
   observing_f3c5e759: Observing
+  observing_nobody_71c0a2ba: "Observing: nobody"
   observing_observee_d31d5fa2: "Observing: %{observee}"
+  observing_observees_ffb58017: "Observing: %{observees}"
   observing_student_name_to_select_a_different_stude_e0466126: "Observing %{student_name}. To select a different student, return to the dashboard."
   observing_user_name_1a64e47b: "Observing: %{user_name}"
   october_6b2bf82: October
@@ -17651,8 +17819,10 @@ en-CA:
       \x20             Future grade changes for posted grades will not need to be manually posted.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Once a grade is posted manually, it will automatically send new notifications and be visible to students."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Once enabled, this option is visible in gradebook for instructors."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Once you have submitted an answer, you will not be able to change it later. You will not be able to view the previous question."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Once you start debugging all info about the next attempted login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
+  one_of_the_supplied_redirect_uris_is_too_long_plea_18ec42c0: "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "One or more content items sent by this external app failed to process correctly. These have not been saved by Canvas, and the reasons for failure are listed below."
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "One or more grade selected was provided by a grader with inactive enrollments. Please update your selections to those provided by current graders."
   one_or_more_items_are_currently_being_imported_the_186fe069: "One or more items are currently being imported. They will be shown in the course below once they are available."
@@ -18024,7 +18194,13 @@ en-CA:
   pace_plans_is_in_active_development_f6c20046: "Pace Plans is in active development."
   pace_removed_8e625df7: "Pace removed"
   pace_type_76cf749: "Pace Type"
+  pacename_pace_created_75aa4eda: "%{paceName} Pace created"
+  pacename_pace_removed_79fb031f: "%{paceName} Pace removed"
+  pacename_pace_updated_10c6f95: "%{paceName} Pace updated"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Pace will be removed. This pace will revert back to the previously assigned pace."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Pace will be removed. This pace will revert back to the default pace."
   pacename_updated_2a2c4d77: "%{paceName} updated"
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} paces: sorted by %{sortBy} in %{orderType} order"
   package_error: "Error identifying package type: %{error}"
   package_export_from_d6e2b073: "Package export from"
   page_50c4823d: Page
@@ -18181,6 +18357,7 @@ en-CA:
   peer_reviews_e3a55964: "Peer Reviews"
   peer_service_6b4828b9: "Peer Service"
   peer_services_102357e3: "Peer Services"
+  peer_submissions_ready_for_review_availablecount_3ac80091: "Peer submissions ready for review: %{availableCount}"
   pending_3e506a5b: Pending
   pending_enforcement_eb32e3d: "Pending Enforcement"
   pending_f1ed53c7: pending
@@ -18218,6 +18395,7 @@ en-CA:
   permanent_num_strands_setting_141e8a0c: "Permanent num_strands setting"
   permission_must_be_enabled_for_someone_397e1ce3: "Permission must be enabled for someone"
   permission_not_found_620b80d1: "Permission not found"
+  permission_role_filter_8a9a3e68: "Permission role filter"
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Permission to change this mastery calculation at the course level is enabled for:"
   permission_to_change_this_mastery_calculation_at_t_f292da7a: "Permission to change this mastery calculation at the account level is enabled for:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "Permission to change this mastery calculation is enabled at the account level for:"
@@ -18304,6 +18482,7 @@ en-CA:
   please_note_fbb62e4c: "Please note:"
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Please note: Instructure hosts Canvas Commons in the USA. This means that when you use Canvas Commons your personal data will be stored and processed in the USA. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Please note once a Course Pace is set up, all existing assignment, quizzes, discussions due dates will be controlled by Course Pacing. You can read more details in the *Course Pacing User Group*."
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Please note that once a Course Pace is saved, all due dates for existing assessments and learning materials will be controlled by Course Pacing. Learn more about Course Pacing in the *Course Pacing User Group*."
   please_provide_a_field_e5a7d0b3: "Please provide a %{field}"
   please_provide_a_pairing_code_530d1e9d: "Please provide a pairing code."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Please provide a valid tenant domain. Check your Azure Active Directory settings to find it."
@@ -18319,6 +18498,7 @@ en-CA:
   please_select_one_f931e883: "Please select one"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Please specify whether to enable or disable Microsoft Teams sync."
   please_try_again_4c3d11b4: "Please Try Again"
+  please_try_another_search_term_8f7b5d69: "Please try another search term"
   please_try_another_search_term_filter_or_search_wi_d6c4046a: "Please try another search term, filter, or search with fewer characters"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Please try re-establishing the connection to the tool by re-selecting the tool in the assignment or module item interface and saving."
   please_upload_files_as_a_zip_5a2c799f: "Please upload files as a .zip"
@@ -18602,6 +18782,7 @@ en-CA:
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: "Partner ID"
         player_ui_conf: "Player UI Conf ID"
+        protocol: Protocol
         resource_domain: "Resource Domain"
         rtmp_domain: "RTMP Domain"
         secret_key: "Administrator Secret"
@@ -18942,6 +19123,7 @@ en-CA:
   private_3883d133: Private
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Proceed
+  proceed_with_caution_aa9b3285: "Proceed with Caution"
   process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
   processed_4725b02: Processed
   processing_2fcc9739: Processing
@@ -20570,6 +20752,7 @@ en-CA:
     toggle_message: "toggle quiz visibility"
   quizzes_index_menu_1ce11b54: "Quizzes Index Menu"
   quizzes_next_27c59ce3: Quizzes.Next
+  quizzes_next_grade_by_question_in_speedgrader_c565bb5f: "Quizzes.Next Grade by Question in SpeedGrader"
   quizzes_next_importing_75e63f67: "Quizzes.Next Importing"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next submission history"
   quizzes_public: 
@@ -20683,6 +20866,7 @@ en-CA:
   quizzes_view_submission_log_ec105e3e: "Quizzes - view submission log"
   quotas_account_settings_22c12b8d: "Quotas (Account Settings)"
   quote_ae4462ad: Quote
+  quote_reply_e56ad360: "Quote Reply"
   radio_button_option_1_a8ec51f9: "Radio button option 1"
   radio_button_option_2_31e50043: "Radio button option 2"
   range_56b2f310: Range
@@ -21147,6 +21331,7 @@ en-CA:
   reset_all_6e5e040a: "Reset all"
   reset_all_unpublished_changes_243f179f: "Reset all unpublished changes?"
   reset_courses_fe29ddf9: "Reset courses"
+  reset_lti_provision_6d8e287f: "Reset LTI Provision"
   reset_multi_factor_authentication_2b63a558: "Reset Multi-Factor Authentication"
   reset_name_6a0aa0f: "Reset \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Reset quiz engine choice"
@@ -21409,6 +21594,7 @@ en-CA:
   rubric_deleted_3d9efc18: "Rubric deleted"
   rubric_fc39da76: Rubric
   rubric_updated_103e24dc: "Rubric updated"
+  rubric_was_successfully_submitted_b0766474: "Rubric was successfully submitted"
   rubrics: 
     index: 
       account_rubrics: "Account Rubrics"
@@ -21713,6 +21899,8 @@ en-CA:
   search_flickr_6f28b02e: "Search flickr"
   search_for_a_deleted_course_by_id_f553398d: "Search for a deleted course by ID"
   search_for_files_7541fb28: "Search for files"
+  search_for_sections_62e90cf4: "Search for sections"
+  search_for_students_ed16c2de: "Search for students"
   search_for_your_school_or_institution_1eb2eeaf: "Search for your school or institution"
   search_form_fcaa38f7: "Search Form"
   search_grading_periods_e947a3e9: "Search grading periods..."
@@ -21764,6 +21952,7 @@ en-CA:
   section_added_83879254: "%{section} added"
   section_c7f66a0d: Section
   section_count_sections_42196f3f: "%{section_count} Sections"
+  section_course_pacing_8fb7efac: "Section Course Pacing"
   section_does_not_belong_to_course_for_this_discuss_39fd6808: "Section does not belong to course for this discussion topic"
   section_ends_at_bb9df3c0: "Section ends at"
   section_filter_cde54d0a: "Section Filter"
@@ -21987,6 +22176,7 @@ en-CA:
   selected_grade_942f40ba: "Selected Grade"
   selected_item_35bed33a: "selected item"
   selected_pages_have_been_deleted_82a7f965: "Selected pages have been deleted"
+  selected_recipient_s_do_not_have_assigned_observer_69acfb83: "Selected recipient(s) do not have assigned Observers"
   selected_subtree_a7693937: "Selected %{subtree}"
   selection_end_date_10fcc8c6: "Selection end date"
   selection_height_9d57ec24: "Selection Height"
@@ -22072,6 +22262,7 @@ en-CA:
   send_to_a879095e: "Send to:"
   send_to_b940900a: "Send To..."
   send_to_ce05b460: "Send to"
+  send_usage_metrics_cecc7a7d: "Send usage metrics"
   sending_bf324366: Sending...
   sending_message_75923692: "Sending message"
   sending_message_8ac5bc90: "Sending Message..."
@@ -22196,6 +22387,7 @@ en-CA:
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP user has been created. It can take up to four hours for this user to start working."
   sftp_user_management_19868cb3: "SFTP User Management"
   shard_5d340495: Shard
+  shard_id_optional_382e5dda: "Shard ID (optional)"
   shard_shard_95c57736: "Shard: %{shard}"
   share_important_information_about_your_course_with_dceacbf9: |-
       Share important information about your course with all users.
@@ -22819,6 +23011,7 @@ en-CA:
   she_her_c8b5e3be: she/her
   shift_dates_b5a7b7a1: "Shift Dates"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Shift due dates and assignment availability dates forward by a number of days."
+  shipping_country_code_as_reported_by_salesforce_631961fe: "Shipping Country Code as Reported by Salesforce"
   short_name_42f454a1: "Short Name"
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "should be self-evident, the canvas ID of the reporting user"
@@ -23108,6 +23301,7 @@ en-CA:
   sorted_ascending_b6d61547: "sorted ascending"
   sorted_by_ascending_af61f8ca: "Sorted by Ascending"
   sorted_by_descending_824c4300: "Sorted by Descending"
+  sorted_by_sortby_in_ordertype_order_55c8cf9a: "Sorted by %{sortBy} in %{orderType} order"
   sorted_descending_1e30f0d5: "sorted descending"
   sorted_descending_84ec84c8: "sorted descending."
   sorted_direction_by_columnname_d049ac44: "Sorted %{direction} by %{columnName}"
@@ -23449,6 +23643,8 @@ en-CA:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Students can only participate in the course between these dates"
   students_can_see_originality_score_797fe634: "Students can see originality score"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Students cannot view quiz responses after course concludes"
+  students_enrolled_in_this_course_859fa7a2: "Students enrolled in this course"
+  students_enrolled_in_this_section_681ba503: "Students enrolled in this section"
   students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed."
   students_have_either_already_taken_or_started_taki_a076336: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Students have the option to reply anonymously. Some names and profile pictures may be hidden."
@@ -23602,6 +23798,7 @@ en-CA:
   submission_type_lti_placement_b448d5d0: "Submission Type LTI Placement"
   submission_type_selection_72ce19f: "Submission Type Selection"
   submission_updated_8897f3b7: "Submission updated"
+  submission_uploaded_542c9ac6: "Submission uploaded!"
   submission_user_name_assignment_title_2cf5e3e9: "Submission: %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -23701,6 +23898,7 @@ en-CA:
   submissions_d30f61af: "# Submissions"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "submissions folders must be created in User or Group context"
   submissions_graded_status_f689110d: "Submissions - Graded Status"
+  submissions_instructor_proxy_2247c633: "Submissions - instructor proxy"
   submissions_posted_title_course_43677dba: "Submissions Posted: %{title}, %{course}"
   submissions_re_upload_status_page_6cdbc96d: "Submissions Re-Upload Status Page"
   submissions_view_and_make_comments_cafaf361: "Submissions - view and make comments"
@@ -23733,9 +23931,12 @@ en-CA:
   submit_file_using_name_bc8d7b71: "Submit file using %{name}"
   submit_for_student_d90838e8: "Submit for Student"
   submit_media_file_f334c1ba: "Submit Media File"
+  submit_on_behalf_of_student_af674b95: "Submit on Behalf of Student"
   submit_ticket_5515ffd: "Submit Ticket"
   submitted_318fad53: Submitted
   submitted_at_4d5ea3aa: "Submitted At"
+  submitted_by_name_dab6d5e1: "Submitted by: %{name}"
+  submitted_by_submitter_1dcd07a1: "Submitted by %{submitter}"
   submitted_d5ba370a: "Submitted:"
   submitted_date_ba55b0ae: "Submitted %{date}"
   submitted_datetime_fa2e9287: "Submitted: %{dateTime}"
@@ -23912,6 +24113,7 @@ en-CA:
     trophy_case: "Trophy Case"
   tabs_5605547e: Tabs
   tag_7bb005ff: Tag
+  tag_starts_with_9d5646eb: "Tag starts with"
   tagalog_74906db7: Tagalog
   tags_2b72a03b: Tags
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -24036,6 +24238,7 @@ en-CA:
   test_cluster_only_70e61c19: "Test Cluster Only"
   test_feature_flag_980151e0: "Test Feature Flag"
   testing_state_effd4a82: "Testing state"
+  text_7b9bd49c: "%{text}"
   text_7f4593da: Text
   text_df773ce4: text
   text_document_eacbcdb7: "Text document"
@@ -24253,6 +24456,7 @@ en-CA:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: "The maximum number of graders has been reached for this assignment."
   the_media_id_does_not_correspond_to_an_existing_me_eab16c08: "The %{media_id} does not correspond to an existing media object"
   the_media_object_id_must_match_an_existing_media_o_62195fef: "the media_object_id must match an existing media object"
+  the_message_size_has_exceeded_the_maximum_text_len_9e86b291: "The message size has exceeded the maximum text length."
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
       
@@ -24329,6 +24533,7 @@ en-CA:
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "The shortcut icon for iOS/Android devices. 180x180 png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "The specified assignment could not be found"
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "The specified assignment (%{id}) could not be found"
+  the_specified_resource_does_not_exist_71d8b751: "The specified resource does not exist."
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "The start date for the pace plan must be after the end date."
@@ -24788,6 +24993,7 @@ en-CA:
               This permission is not available at the subaccount level.
   this_permission_is_deprecated_please_reference_use_8ce8eb30: "This permission is deprecated. Please reference Users - Students and Users - Observers."
   this_permission_is_only_supported_when_canvas_insi_85cc2938: "This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details."
+  this_permission_must_be_disabled_for_users_to_only_451cfcc5: "This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor."
   this_permission_only_affects_course_announcements__6bc2b0a5: "This permission only affects course announcements; to manage global announcements, Global Announcements - add / edit / delete​ must be enabled."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "This permission only controls adding users at the account level. To add users to a course, Users - add/remove students from courses or Users - add/remove teachers, course designers, or TAs from courses to the course must be enabled."
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
@@ -24875,11 +25081,11 @@ en-CA:
   this_topic_is_used_for_grading_efc6ca89: "This topic is used for grading"
   this_topic_will_be_available_delayedpostat_6b47c4c3: "This topic will be available %{delayedPostAt}."
   this_update_offers_enhanced_feature_functionality__c3c4ea51: |-
-      This update offers enhanced feature functionality for 
-      Big Blue Button Conferences. Users will now be able to enable 
-      the Waiting Room in their conference settings, they'll be able 
-      to add a scheduled conference to their calendar from within a conference, 
-      and they'll be able to update/sync conference attendees as new attendees are 
+      This update offers enhanced feature functionality for
+      Big Blue Button Conferences. Users will now be able to enable
+      the Waiting Room in their conference settings, they'll be able
+      to add a scheduled conference to their calendar from within a conference,
+      and they'll be able to update/sync conference attendees as new attendees are
       added or removed.
   this_update_will_allow_more_options_for_bbb_confer_3d7d1d08: "This update will allow more options for BBB conferences"
   this_user_has_been_deleted_77e6c04b: "This user has been deleted"
@@ -24906,8 +25112,12 @@ en-CA:
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "This will update all rubrics using this outcome that have not yet been assessed"
   this_will_update_all_student_mastery_results_tied__a52301e5: "This will update all student mastery results tied to the account level mastery calculation."
   this_will_update_all_student_mastery_results_withi_934580d1: "This will update all student mastery results within this course."
+  thread_addd9799: Thread
   threshold_in_hours_to_notify_students_within_f33820aa: "Threshold (in hours) to notify students within"
   threshold_pts_45f0e5d8: "threshold: %{pts}"
+  throttle_jobs_f61be56: "Throttle Jobs"
+  throttle_tag_tag_ba5b9b50: "Throttle tag \"%{tag}\""
+  throttling_jobs_4a90578c: "Throttling jobs"
   thu_59cbcffe: Thu
   ticket_successfully_submitted_f6254460: "Ticket successfully submitted."
   ticketing_system_52205bff: "Ticketing System"
@@ -25987,6 +26197,7 @@ en-CA:
   unable_to_toggle_placement_833db6ff: "Unable to toggle placement"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support."
+  unable_to_update_splitscreen_preference_4d449fa5: "Unable to update splitscreen preference."
   unaccepted_students_aa68ea98: "Unaccepted Students"
   unarchive_f245e2d6: Unarchive
   unarchive_operation_failed_22c42032: "Unarchive operation failed"
@@ -26249,6 +26460,8 @@ en-CA:
   uploaded_over_time_d59abb68: "uploaded over time"
   uploading_19e8a4e7: Uploading
   uploading_ee585874: Uploading...
+  uploading_file_5c7e14fd: "Uploading file"
+  uploading_file_in_progress_5c09e0c9: "Uploading file in progress"
   uploading_files_5ff8f4fd: "Uploading files"
   uploading_files_9e39dbf9: "Uploading Files"
   uploading_media_progress_c23a953b: "Uploading media Progress"
@@ -26323,6 +26536,7 @@ en-CA:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Use this panel to search for people you wish to add to this course."
   use_this_photo_3a594830: "Use This Photo"
   use_webcam_1ed0bf6b: "Use Webcam"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Use window.parent in Deep Linking Response"
   used_by_permission_314a78dd: "Used by Permission"
   user: 
     default_user_name: User
@@ -26818,6 +27032,7 @@ en-CA:
       resubmit_to_vericite: "Resubmit to VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite similarity score -- more information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
+  version_versionnumber_updatedat_9f5b7a5b: "Version %{versionNumber} %{updatedAt}"
   video_78335c71: video
   video_b9f27375: Video
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video Conferencing Guides for Remote Classrooms"
@@ -26862,7 +27077,9 @@ en-CA:
   view_grades_for_name_45aeb2f2: "View grades for %{name}"
   view_grading_history_e64bb8fe: "View Grading History"
   view_groups_47b5f60c: "View Groups"
+  view_history_2dfb048: "View History"
   view_important_dates_173c7e1b: "View Important Dates"
+  view_inline_ffb3928b: "View Inline"
   view_learning_analytics_beta_1c98a397: "View Learning Analytics (Beta)"
   view_login_ids_for_users_142bbe7a: "View login ids for users"
   view_longer_description_6b762087: "view longer description"
@@ -26881,6 +27098,7 @@ en-CA:
   view_range_student_details_8116d68a: "View range student details"
   view_replies_8565a729: "View Replies"
   view_rubric_d71cce10: "View Rubric"
+  view_split_screen_ca35b78a: "View Split Screen"
   view_submission_ff3da5d: "View Submission"
   view_the_assignment_e61ca4fc: "View the assignment"
   view_the_discussion_link_c4dbdef: "View the discussion: %{link}."
@@ -26912,6 +27130,7 @@ en-CA:
   violation_log_tray_d4eff9f4: "Violation Log Tray"
   virtual_lectures_in_real_time_a1778dea: "Virtual lectures in real-time"
   visibility_3ad7b08d: "Visibility:"
+  visibility_selector_866f70df: "Visibility selector"
   visible_assignments_scope_change_dbb84ebb: "Visible Assignments Scope Change"
   visit_864b4060: Visit
   visit_canvas_guides_to_learn_more_8c7361ad: "Visit *Canvas Guides* to learn more."
@@ -27261,6 +27480,7 @@ en-CA:
       Will allow for saving drafts as students type their replies to a discussion topic
       in the discussions redesign
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?"
+  will_display_the_version_history_for_edited_discus_bbb7dfa: "Will display the version history for edited discussion entries within the Redesign UI"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Will keep the average of all your scores"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Will keep the highest of all your scores"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Will keep the latest of all your scores"
@@ -27512,6 +27732,7 @@ en-CA:
   you_have_successfully_unpublished_the_discussion_t_7d3e12d8: "You have successfully unpublished the discussion topic."
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "You have successfully unsubscribed from the discussion topic."
   you_have_successfully_updated_the_discussion_topic_b2910500: "You have successfully updated the discussion topic."
+  you_have_totalcount_peer_reviews_to_complete_6d01cb11: "You have %{totalCount} Peer Reviews to complete"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "You have unpublished changes to your Course Pace. Continuing will discard these changes."
   you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "You have unpublished changes to your course pace. Continuing will discard these changes."
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: "You have unpublished changes to your Course Pace Plan. Continuing will discard these changes."
@@ -27543,12 +27764,15 @@ en-CA:
   you_must_allow_at_least_one_group_to_attend_68531eab: "You must allow at least one group to attend"
   you_must_attach_a_file_b6041092: "You must attach a file"
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "You must attach at least one file to this assignment"
+  you_must_be_authorized_to_manage_sis_in_order_to_r_a218ceb7: "You must be authorized to manage SIS in order to reactivate logins with an associated SIS ID."
+  you_must_be_authorized_to_manage_sis_in_order_to_s_bb867901: "You must be authorized to manage SIS in order to suspend logins with an associated SIS ID."
   you_must_choose_a_recipient_3171112f: "You must choose a recipient"
   you_must_enter_a_date_f8eabfb1: "You must enter a date"
   you_must_have_a_student_or_section_selected_a99e45df: "You must have a student or section selected"
   you_must_input_a_section_b8d370fe: "You must input a section"
   you_must_log_in_to_view_replies_9ccd4da0: "You must log in to view replies"
   you_must_post_before_seeing_replies_24f8bcd4: "You must post before seeing replies."
+  you_must_post_before_seeing_replies_edit_history_w_187aa561: "You must post before seeing replies. Edit history will be available to instructors."
   you_must_provide_a_date_with_a_time_ec369ff4: "You must provide a date with a time."
   you_must_provide_a_name_for_the_group_set_9e4cc97a: "You must provide a name for the Group Set"
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "You must provide a tenant and login attribute to enabled Microsoft Teams sync"
@@ -27566,6 +27790,7 @@ en-CA:
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "You must specify whether to enable or disable Microsoft Teams sync"
   you_must_use_a_number_912ce4bd: "You must use a number"
   you_must_use_a_positive_number_203b86fe: "You must use a positive number"
+  you_must_use_an_integer_78d2530f: "You must use an integer"
   you_need_to_preview_changes_before_saving_85e60232: "You need to \"Preview Changes\" before saving"
   you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "You need to \"Preview Changes\" before you can apply this to your account"
   you_need_to_save_before_applying_to_this_account_7436a5ae: "You need to \"Save\" before applying to this account"
@@ -27668,6 +27893,7 @@ en-CA:
   your_outcomes_were_successfully_imported_c5de884: "Your outcomes were successfully imported."
   your_password_has_been_changed_df0e72aa: "Your password has been changed."
   your_password_recovery_instructions_will_be_sent_t_1b7991f5: "Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box."
+  your_peer_review_is_complete_e5fa3e40: "Your peer review is complete!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Your profile photo could not be uploaded. You may have exceeded your upload limit."
   your_quiz_engine_choice_has_been_reset_68d268c1: "Your quiz engine choice has been reset!"
   your_score_a1fc2fcf: "Your score"

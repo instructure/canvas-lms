@@ -27,6 +27,8 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
+import {uid} from '@instructure/uid'
+import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
@@ -37,11 +39,19 @@ import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import RCEGlobals from './RCEGlobals'
 import defaultTinymceConfig from '../defaultTinymceConfig'
+import {
+  FS_CHANGEEVENT,
+  FS_ELEMENT,
+  FS_ENABLED,
+  FS_EXIT,
+  FS_REQUEST,
+  instuiPopupMountNode,
+} from '../util/fullscreenHelpers'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
 import CanvasContentTray, {trayPropTypes} from './plugins/shared/CanvasContentTray'
-import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from './StatusBar'
+import StatusBar, {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 import {VIEW_CHANGE} from './customEvents'
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
@@ -51,8 +61,8 @@ import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 import {
-  VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE,
+  VIDEO_SIZE_DEFAULT,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
@@ -60,6 +70,7 @@ import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
+import {transformRceContentForEditing} from './transformContent'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -129,7 +140,7 @@ const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
 const contentCSS = contentCSSBinding.template().replace(/tinymce__oxide--/g, '')
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
-// we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
+// we can move this to plugins/instructure-ui-icons/plugin.ts like the rest.
 function addKebabIcon(editor) {
   editor.ui.registry.addIcon(
     'more-drawer',
@@ -222,12 +233,6 @@ function renderLoading() {
   return formatMessage('Loading')
 }
 
-// safari implements only the webkit prefixed version of the fullscreen api
-const FS_ELEMENT =
-  document.fullscreenElement === undefined ? 'webkitFullscreenElement' : 'fullscreenElement'
-const FS_REQUEST = document.body.requestFullscreen ? 'requestFullscreen' : 'webkitRequestFullscreen'
-const FS_EXIT = document.exitFullscreen ? 'exitFullscreen' : 'webkitExitFullscreen'
-
 let alertIdValue = 0
 
 @themeable(theme, styles)
@@ -263,7 +268,6 @@ class RCEWrapper extends React.Component {
     trayProps: trayPropTypes,
     toolbar: toolbarPropType,
     menu: menuPropType,
-    plugins: PropTypes.arrayOf(PropTypes.string),
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
@@ -311,8 +315,15 @@ class RCEWrapper extends React.Component {
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
 
+    // Processed initial content
+    this.initialContent = transformRceContentForEditing(this.props.defaultContent, {
+      origin: this.props.canvasOrigin || window?.location?.origin,
+    })
+
     injectTinySkin()
 
+    // FWIW, for historic reaasons, the height does not include the
+    // height of the status bar (which used to be tinymce's)
     let ht = props.editorOptions?.height || DEFAULT_RCE_HEIGHT
     if (!Number.isNaN(ht)) {
       ht = `${ht}px`
@@ -334,18 +345,20 @@ class RCEWrapper extends React.Component {
       announcement: null,
       confirmAutoSave: false,
       autoSavedContent: '',
-      id: this.props.id || this.props.textareaId || `${Date.now()}`,
+      id: this.props.id || this.props.textareaId || `${uid('rce', 2)}`,
       height: ht,
       fullscreenState: {
-        headerDisp: 'static',
-        isTinyFullscreen: false,
+        prevHeight: ht,
       },
       a11yErrorsCount: 0,
       shouldShowEditor:
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
+      popupMountNode: instuiPopupMountNode(),
     }
+    this._statusBarId = `${this.state.id}_statusbar`
+
     this.pendingEventHandlers = []
 
     // Get top 2 favorited LTI Tools
@@ -354,6 +367,8 @@ class RCEWrapper extends React.Component {
         .filter(e => e.favorite)
         .map(e => `instructure_external_button_${e.id}`)
         .slice(0, 2) || []
+
+    this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
 
     this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
 
@@ -370,15 +385,40 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
+
+    this.resizeObserver = new ResizeObserver(_entries => {
+      this._handleFullscreenResize()
+    })
+  }
+
+  // when the RCE is put into fullscreen we need to move the div
+  // tinymce mounts popup menus into from the body to the rce-wrapper
+  // or the menus wind up behind the RCE. I can't find a way to
+  // configure tinymce to say where that div is mounted, do this
+  // is a bit of a hack to tag the div that is this RCE's
+  _tagTinymceAuxDiv() {
+    const tinyauxlist = document.querySelectorAll('.tox-tinymce-aux')
+    if (tinyauxlist.length) {
+      const myaux = tinyauxlist[tinyauxlist.length - 1]
+      if (myaux.id) {
+        // eslint-disable-next-line no-console
+        console.error('Unexpected ID on my tox-tinymce-aux element')
+      }
+      myaux.id = `tinyaux-${this.id}`
+    }
+  }
+
+  _myTinymceAuxDiv() {
+    return document.getElementById(`tinyaux-${this.id}`)
   }
 
   getRequiredFeatureStatuses() {
     const {
-      new_equation_editor = false,
       new_math_equation_handling = false,
       rce_ux_improvements = false,
+      rce_better_paste = false,
     } = this.props.features
-    return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
+    return {new_math_equation_handling, rce_ux_improvements, rce_better_paste}
   }
 
   getRequiredConfigValues() {
@@ -555,56 +595,78 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
   insertImagePlaceholder(fileMetaProps) {
-    let width, height
-    let align = 'middle'
-    if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
-      const image = new Image()
-      image.src = fileMetaProps.domObject.preview
-      width = image.width
-      height = image.height
-      // we constrain the <img> to max-width: 100%, so scale the size down if necessary
-      const maxWidth = this.iframe.contentDocument.body.clientWidth
-      if (width > maxWidth) {
-        height = Math.round((maxWidth / width) * height)
-        width = maxWidth
-      }
-      width = `${width}px`
-      height = `${height}px`
-    } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
-      width = VIDEO_SIZE_DEFAULT.width
-      height = VIDEO_SIZE_DEFAULT.height
-      align = 'bottom'
-    } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
-      width = AUDIO_PLAYER_SIZE.width
-      height = AUDIO_PLAYER_SIZE.height
-      align = 'bottom'
-    } else {
-      width = `${fileMetaProps.name.length}rem`
-      height = '1rem'
-    }
-    // if you're wondering, the &nbsp; scatter about in the svg
-    // is because tinymce will strip empty elements
-    const markup = `
-    <span
-      aria-label="${formatMessage('Loading')}"
-      data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
-      style="width: ${width}; height: ${height}; vertical-align: ${align};"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
-        <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
-          <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-          <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-          &nbsp;
-        </g>
-        &nbsp;
-      </svg>
-    </span>`
+    const prom = new Promise((resolve, reject) => {
+      let width, height
+      let align = 'middle'
+      if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
+        const image = new Image()
+        image.onload = () => {
+          width = image.width
+          height = image.height
 
-    const editor = this.mceInstance()
-    editor.undoManager.ignore(() => {
-      editor.execCommand('mceInsertContent', false, markup)
+          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
+
+          // we constrain the <img> to max-width: 100%, so scale the size down if necessary
+          const maxWidth = this.iframe.contentDocument.body.clientWidth
+          if (width > maxWidth) {
+            height = Math.round((maxWidth / width) * height)
+            width = maxWidth
+          }
+          width = `${width}px`
+          height = `${height}px`
+
+          insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
+          resolve()
+        }
+        image.onerror = () => {
+          if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
+          reject()
+        }
+        image.src = fileMetaProps.domObject.preview || URL.createObjectURL(fileMetaProps.domObject)
+      } else {
+        if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
+          width = VIDEO_SIZE_DEFAULT.width
+          height = VIDEO_SIZE_DEFAULT.height
+          align = 'bottom'
+        } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
+          width = AUDIO_PLAYER_SIZE.width
+          height = AUDIO_PLAYER_SIZE.height
+          align = 'bottom'
+        } else {
+          width = `${fileMetaProps.name.length}rem`
+          height = '1rem'
+        }
+        insertImagePlaceholderFRD(this.mceInstance(), fileMetaProps.name, width, height, align)
+        resolve()
+      }
+
+      function insertImagePlaceholderFRD(editor, imgName, imgWidth, imgHeight, imgAlign) {
+        // if you're wondering, the &nbsp; scatter about in the svg
+        // is because tinymce will strip empty elements
+        const markup = `
+<span
+  aria-label="${formatMessage('Loading')}"
+  data-placeholder-for="${encodeURIComponent(imgName)}"
+  style="width: ${imgWidth}; height: ${imgHeight}; vertical-align: ${imgAlign};"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
+    <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
+      <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      &nbsp;
+    </g>
+    &nbsp;
+  </svg>
+</span>`
+
+        editor.undoManager.ignore(() => {
+          editor.execCommand('mceInsertContent', false, markup)
+        })
+      }
     })
+    return prom
   }
 
   insertVideo(video) {
@@ -705,8 +767,6 @@ class RCEWrapper extends React.Component {
   toggleView = newView => {
     // coming from the menubar, we don't have a newView,
 
-    const wasFullscreen = this._isFullscreen()
-    if (wasFullscreen) this._exitFullscreen()
     let newState
     switch (this.state.editorView) {
       case WYSIWYG_VIEW:
@@ -718,13 +778,7 @@ class RCEWrapper extends React.Component {
       case RAW_HTML_EDITOR_VIEW:
         newState = {editorView: newView || WYSIWYG_VIEW}
     }
-    this.setState(newState, () => {
-      if (wasFullscreen) {
-        window.setTimeout(() => {
-          this._enterFullscreen()
-        }, 200) // due to the animation it takes some time for fullscreen to complete
-      }
-    })
+    this.setState(newState)
     this.checkAccessibility()
     if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
       document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
@@ -734,43 +788,87 @@ class RCEWrapper extends React.Component {
     this.mceInstance().fire(VIEW_CHANGE, {target: this.editor, newView: newState.editorView})
   }
 
+  toggleFullscreen = () => {
+    this.handleClickFullscreen()
+  }
+
   _isFullscreen() {
-    return this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT]
+    return !!(this.state.fullscreenState.isTinyFullscreen || document[FS_ELEMENT])
   }
 
   _enterFullscreen() {
-    switch (this.state.editorView) {
-      case PRETTY_HTML_EDITOR_VIEW:
-        this._prettyHtmlEditorRef.current.addEventListener(
-          'fullscreenchange',
-          this._toggleFullscreen
-        )
-        this._prettyHtmlEditorRef.current.addEventListener(
-          'webkitfullscreenchange',
-          this._toggleFullscreen
-        )
-        // if I don't focus first, FF complains that the element
-        // is not in the active browser tab and requestFullscreen fails
-        this._prettyHtmlEditorRef.current.focus()
-        this._prettyHtmlEditorRef.current[FS_REQUEST]()
-        break
-      case RAW_HTML_EDITOR_VIEW:
-        this.getTextarea().addEventListener('fullscreenchange', this._toggleFullscreen)
-        this.getTextarea().addEventListener('webkitfullscreenchange', this._toggleFullscreen)
-        this.getTextarea()[FS_REQUEST]()
-        break
-      case WYSIWYG_VIEW:
-        this.mceInstance().execCommand('mceFullScreen')
-        break
+    // tinymce mounts its menus and toolbars in this element, which is in the DOM
+    // at the bottom of the body. When we're fullscreen the menus need to be mounted
+    // in the fullscreen element or they won't show up. Let's move tinymce's mount point
+    // when we go into fullscreen, then put it back when we're finished.
+    const tinymenuhost = this._myTinymceAuxDiv()
+    if (tinymenuhost) {
+      tinymenuhost.remove()
+      this._elementRef.current.appendChild(tinymenuhost)
     }
+
+    this._elementRef.current.addEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
+    this.setState({
+      fullscreenState: {
+        prevHeight: this._elementRef.current.offsetHeight - this._getStatusBarHeight(),
+      },
+    })
+    this._elementRef.current[FS_REQUEST]()
   }
 
   _exitFullscreen() {
-    if (this.state.fullscreenState.isTinyFullscreen) {
-      this.mceInstance().execCommand('mceFullScreen')
-    } else if (document[FS_ELEMENT]) {
-      document[FS_ELEMENT][FS_EXIT]()
+    if (document[FS_ELEMENT]) {
+      const tinymenuhost = this._myTinymceAuxDiv()
+      if (tinymenuhost) {
+        tinymenuhost.remove()
+        document.body.appendChild(tinymenuhost)
+      }
+      document[FS_EXIT]()
     }
+  }
+
+  _onFullscreenChange = event => {
+    if (document[FS_ELEMENT]) {
+      this.resizeObserver.observe(document[FS_ELEMENT])
+      window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
+      this._handleFullscreenResize()
+      this._focusRegion = FocusRegionManager.activateRegion(document[FS_ELEMENT], {
+        shouldContainFocus: true,
+      })
+    } else {
+      event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
+      this.resizeObserver.unobserve(event.target)
+      window.visualViewport?.removeEventListener('resize', this._handleFullscreenResize)
+      this._setHeight(this.state.fullscreenState.prevHeight)
+      if (this._focusRegion) {
+        FocusRegionManager.blurRegion(event.target, this._focusRegion.id)
+      }
+    }
+    this.setState({popupMountNode: instuiPopupMountNode()})
+    this.focusCurrentView()
+  }
+
+  _handleFullscreenResize = () => {
+    const ht = window.visualViewport?.height || document[FS_ELEMENT]?.offsetHeight
+    this._setHeight(ht - this._getStatusBarHeight())
+  }
+
+  _getStatusBarHeight() {
+    // the height prop is the height of the editor and does not include
+    // the status bar. we'll need this later.
+    return document.getElementById(this._statusBarId).offsetHeight
+  }
+
+  _setHeight(newHeight) {
+    const cssHeight = `${newHeight}px`
+    const ed = this.mceInstance()
+    const container = ed.getContainer()
+    if (container) {
+      container.style.height = cssHeight
+      ed.fire('ResizeEditor')
+    }
+    this.getTextarea().style.height = cssHeight
+    this.setState({height: cssHeight})
   }
 
   focus() {
@@ -806,18 +904,21 @@ class RCEWrapper extends React.Component {
     if (this.mceInstance().isDirty()) {
       return true
     }
-    const content = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
-    return content !== this.cleanInitialContent()
+    const currentHtml = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
+    return currentHtml !== this._mceSerializedInitialHtml
   }
 
-  cleanInitialContent() {
-    if (!this._cleanInitialContent) {
+  /**
+   * Holds a copy of the initial content of the editor as serialized by tinyMCE to normalize it.
+   */
+  get _mceSerializedInitialHtml() {
+    if (!this._mceSerializedInitialHtmlCached) {
       const el = window.document.createElement('div')
-      el.innerHTML = this.props.defaultContent
+      el.innerHTML = this.initialContent
       const serializer = this.mceInstance().serializer
-      this._cleanInitialContent = serializer.serialize(el, {getInner: true})
+      this._mceSerializedInitialHtmlCached = serializer.serialize(el, {getInner: true})
     }
-    return this._cleanInitialContent
+    return this._mceSerializedInitialHtmlCached
   }
 
   isHtmlView() {
@@ -965,11 +1066,7 @@ class RCEWrapper extends React.Component {
       this.openKBShortcutModal()
     } else if (event.code === 'Escape') {
       this._forceCloseFloatingToolbar()
-      if (this.state.fullscreenState.isTinyFullscreen) {
-        this.mceInstance().execCommand('mceFullScreen') // turn it off
-      } else {
-        bridge.hideTrays()
-      }
+      bridge.hideTrays()
     } else if (['n', 'N', 'd', 'D'].indexOf(event.key) !== -1) {
       // Prevent key events from bubbling up on touch screen device
       event.stopPropagation()
@@ -1038,12 +1135,12 @@ class RCEWrapper extends React.Component {
     textarea.style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
-    editor.on('FullscreenStateChanged', this._toggleFullscreen)
+    editor.on('FullscreenStateChanged', this._onFullscreenChange)
     // This propagates click events on the editor out of the iframe to the parent
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.document.body.click(), true)
-    editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
+    editor.on('Cut Change input Undo Redo', debounce(this.handleInputChange, 1000))
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
@@ -1066,57 +1163,86 @@ class RCEWrapper extends React.Component {
       )
     }
 
+    this._setupSelectionSaving(editor)
+
     this.props.onInitted?.(editor)
   }
 
-  _toggleFullscreen = event => {
-    const isTinyFullscreen = event.state
+  /**
+   * Sets up selection saving and restoration logic.
+   *
+   * There are certain actions a user can take when the RCE is not focused that clear the selection inside the
+   * editor, such as invoking the Find feature of the browser. If the user then tries to insert content without
+   * going back to the editor, the content would be inserted at the top of the RCE, instead of where their cursor
+   * was.
+   *
+   * This method adds logic that saves and restores the selection to work around the issue.
+   *
+   * @private
+   */
+  _setupSelectionSaving = editor => {
+    let savedSelection = null
+    let selectionWasReset = false
+    let editorHasFocus = false
 
-    const fullscreenState = {isTinyFullscreen}
-
-    const header = document.getElementById('header')
-    if (header) {
-      if (isTinyFullscreen) {
-        fullscreenState.headerDisp = header.style.display
-        header.style.display = 'none'
-      } else {
-        header.style.display = this.state.fullscreenState.headerDisp
+    const restoreSelectionIfNecessary = () => {
+      if (savedSelection && selectionWasReset) {
+        this.editor.selection.setRng(savedSelection.range, savedSelection.isForward)
+        selectionWasReset = false
       }
     }
 
-    this.setState({fullscreenState})
-
-    // if we're leaving fullscreen, remove event listeners on the fullscreen element
-    if (!document[FS_ELEMENT] && this.state.fullscreenElem) {
-      this.state.fullscreenElem.removeEventListener('fullscreenchange', this._toggleFullscreen)
-      this.state.fullscreenElem.removeEventListener(
-        'webkitfullscreenchange',
-        this._toggleFullscreen
-      )
-      this.setState({
-        fullscreenState: {
-          fullscreenElem: null,
-        },
-      })
-    }
-
-    // if we don't defer setState, the pretty editor's height isn't correct
-    // when entering fullscreen
-    window.setTimeout(() => {
-      if (document[FS_ELEMENT]) {
-        this.setState(state => {
-          return {
-            fullscreenState: {
-              ...state.fullscreenState,
-              fullscreenElem: document[FS_ELEMENT],
-            },
-          }
-        })
-      } else {
-        this.forceUpdate()
+    editor.on('blur', () => {
+      editorHasFocus = false
+      selectionWasReset = false
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
       }
-      this.focusCurrentView()
-    }, 0)
+    })
+
+    editor.on('focus', () => {
+      // We need to restore the selection when the editor regains focus because sometimes the editor regains
+      // focus without the user setting the selection themselves (such as when they interact with the toolbar)
+      // and if we didn't, we would end up saving the reset selection before a user managed to actually insert
+      // content.
+      restoreSelectionIfNecessary()
+
+      editorHasFocus = true
+      selectionWasReset = false
+    })
+
+    editor.on('SelectionChange', () => {
+      if (editorHasFocus) {
+        // We don't care if a selection reset occurs when the editor has focus, the user probably intended that
+        // At least they will see the effect
+        return
+      }
+
+      const selection = this.editor.selection.normalize()
+
+      // Detect a browser-reset selection (e.g. From invoking the Find command)
+      if (
+        selection.startContainer?.nodeName === 'BODY' &&
+        selection.startContainer === selection.endContainer &&
+        selection.startOffset === 0 &&
+        selection.endOffset === 0
+      ) {
+        selectionWasReset = true
+      }
+    })
+
+    editor.on('BeforeExecCommand', () => {
+      restoreSelectionIfNecessary()
+    })
+
+    editor.on('ExecCommand', (/* event */) => {
+      // Commands may have modified the selection, we need to recapture it
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
+      }
+    })
   }
 
   _forceCloseFloatingToolbar = () => {
@@ -1366,7 +1492,17 @@ class RCEWrapper extends React.Component {
   onA11yChecker = () => {
     // eslint-disable-next-line promise/catch-or-return
     this.a11yCheckerReady.then(() => {
-      this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
+      const editor = this.mceInstance()
+      editor.execCommand(
+        'openAccessibilityChecker',
+        false,
+        {
+          mountNode: instuiPopupMountNode,
+        },
+        {
+          skip_focus: true,
+        }
+      )
     })
   }
 
@@ -1441,12 +1577,15 @@ class RCEWrapper extends React.Component {
           'instructure_documents',
           'instructure_equation',
           'instructure_external_tools',
-          'instructure_wordcount',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
+    const pastePlugins =
+      rcsExists && RCEGlobals.getFeatures().rce_better_paste
+        ? ['instructure_paste', 'paste']
+        : ['paste']
 
     if (
       rcsExists &&
@@ -1454,6 +1593,10 @@ class RCEWrapper extends React.Component {
       this.props.trayProps?.contextType === 'course'
     ) {
       canvasPlugins.push('instructure_icon_maker')
+    }
+
+    if (document[FS_ENABLED]) {
+      canvasPlugins.push('instructure_fullscreen')
     }
 
     const possibleNewMenubarItems = this.props.editorOptions.menu
@@ -1507,12 +1650,19 @@ class RCEWrapper extends React.Component {
       content_style: contentCSS,
 
       menubar: mergeMenuItems('edit view insert format tools table', possibleNewMenubarItems),
+
       // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
       // tinymce's default edit and table menus are fine
+      // note: the tinymce paste command is used here instead of instructure_paste
+      // since we currently can't effectively paste using the clipboard api anyway.
       // we include all the canvas specific items in the menu and toolbar
       // and rely on tinymce only showing them if the plugin is provided.
       menu: mergeMenu(
         {
+          edit: {
+            title: formatMessage('Edit'),
+            items: `undo redo | cut copy paste | selectall`,
+          },
           format: {
             title: formatMessage('Format'),
             items:
@@ -1524,7 +1674,10 @@ class RCEWrapper extends React.Component {
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
           tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem'},
-          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'},
+          view: {
+            title: formatMessage('View'),
+            items: 'instructure_fullscreen instructure_exit_fullscreen instructure_html_view',
+          },
         },
         options.menu
       ),
@@ -1578,18 +1731,23 @@ class RCEWrapper extends React.Component {
       toolbar_mode: 'floating',
       toolbar_sticky: true,
 
+      // In regards to the ability to disable plugins:
+      // we only have to explicitly manage the removal of plugins
+      // here, i.e., we don't have to explicitly remove them from the
+      // menu and toolbar merging. At this time, tinymce itself
+      // handles all of that complexity. It that ever changes in the
+      // future in an upgraded version, we will have to update the
+      // logic in those other places as well.
       plugins: mergePlugins(
         [
           'autolink',
           'media',
-          'paste',
           'table',
           'link',
           'directionality',
           'lists',
           'textpattern',
           'hr',
-          'fullscreen',
           'instructure-ui-icons',
           'instructure_condensed_buttons',
           'instructure_links',
@@ -1598,9 +1756,13 @@ class RCEWrapper extends React.Component {
           'instructure_external_tools',
           'a11y_checker',
           'wordcount',
+          'instructure_wordcount',
+          ...pastePlugins,
           ...canvasPlugins,
         ],
-        sanitizePlugins(options.plugins)
+        // filter out the plugins designated for removal
+        sanitizePlugins(options.plugins)?.filter(p => p.length > 0 && p[0] !== '-'),
+        this.pluginsToExclude
       ),
       textpattern_patterns: [
         {start: '* ', cmd: 'InsertUnorderedList'},
@@ -1692,6 +1854,7 @@ class RCEWrapper extends React.Component {
     this.pendingEventHandlers.forEach(e => {
       myTiny.on(e.name, e.handler)
     })
+    this._tagTinymceAuxDiv()
     this.registerTextareaChange()
     this._elementRef.current.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
@@ -1790,7 +1953,7 @@ class RCEWrapper extends React.Component {
         <View as="div" borderRadius="medium" borderWidth="small">
           <RceHtmlEditor
             ref={this._prettyHtmlEditorRef}
-            height={document[FS_ELEMENT] ? `${window.screen.height}px` : this.state.height}
+            height={this.state.height}
             code={this.getCode()}
             onChange={value => {
               this.getTextarea().value = value
@@ -1848,7 +2011,7 @@ class RCEWrapper extends React.Component {
             id={mceProps.textareaId}
             textareaName={mceProps.name}
             init={this.tinymceInitOptions}
-            initialValue={mceProps.defaultContent}
+            initialValue={this.initialContent}
             onInit={this.onInit}
             onClick={this.handleFocusEditor}
             onKeypress={this.handleFocusEditor}
@@ -1861,6 +2024,8 @@ class RCEWrapper extends React.Component {
           />
         </div>
         <StatusBar
+          id={this._statusBarId}
+          rceIsFullscreen={this._isFullscreen()}
           readOnly={this.props.readOnly}
           onChangeView={newView => this.toggleView(newView)}
           path={this.state.path}
@@ -1874,9 +2039,11 @@ class RCEWrapper extends React.Component {
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
           onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
+          disabledPlugins={this.pluginsToExclude}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
+            mountNode={this.state.popupMountNode}
             key={this.id}
             canvasOrigin={this.getCanvasUrl()}
             bridge={bridge}
@@ -1967,15 +2134,29 @@ function mergeToolbar(standard, custom) {
 
 // standard: incoming array of plugin names
 // custom: array of plugin names to merge
-// returns: the merged result, duplicates removed
-function mergePlugins(standard, custom) {
-  if (!custom) return standard
-
+// exclusions: array of plugins to remove
+// returns: the merged result, duplicates and exclusions removed
+function mergePlugins(standard, custom = [], exclusions = []) {
   const union = new Set(standard)
-  for (const p of custom) {
-    union.add(p)
+
+  for (const c of custom) {
+    union.add(c)
   }
+
+  for (const e of exclusions) {
+    union.delete(e)
+  }
+
   return [...union]
+}
+
+// plugins is an array of strings
+// the convention is that plugins starting with '-',
+// i.e. a hyphen, are to be disabled in the RCE instance
+function parsePluginsToExclude(plugins) {
+  return plugins
+    .filter(plugin => plugin.length > 0 && plugin[0] === '-')
+    .map(pluginToIgnore => pluginToIgnore.slice(1))
 }
 
 export default RCEWrapper
@@ -1987,4 +2168,5 @@ export {
   mergeMenu,
   mergeToolbar,
   mergePlugins,
+  parsePluginsToExclude,
 }

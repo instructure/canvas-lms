@@ -30,6 +30,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import formatMessage from '../../../../../format-message'
 import LtiTool from './LtiTool'
+import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
 
 // TODO: we really need a way for the client to pass this to the RCE
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -58,6 +59,7 @@ export function LtiToolsModal(props) {
       size="medium"
       theme={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
+      mountNode={instuiPopupMountNode}
       onDismiss={props.onDismiss}
       open={true}
       shouldCloseOnDocumentClick={false}

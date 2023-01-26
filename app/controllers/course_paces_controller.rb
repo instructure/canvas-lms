@@ -64,11 +64,38 @@ class CoursePacesController < ApplicationController
              COURSE_PACE: CoursePacePresenter.new(@course_pace).as_json,
              COURSE_PACE_PROGRESS: @progress_json,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
-             MASTER_COURSE_DATA: master_course_data
+             MASTER_COURSE_DATA: master_course_data,
+             IS_MASQUERADING: @current_user && @real_current_user && @real_current_user != @current_user,
+             PACES_PUBLISHING: paces_publishing
            })
 
     js_bundle :course_paces
     css_bundle :course_paces
+  end
+
+  def paces_publishing
+    jobs_progress = Delayed::Job.where(tag: "CoursePace#publish").map do |job|
+      progress = Progress.find_by(delayed_job_id: job.id)
+      pace = progress.context
+      if pace&.workflow_state == "active"
+        {
+          pace_context: CoursePacing::PaceContextsPresenter.as_json(context_for(pace)),
+          progress_context_id: progress.context_id
+        }
+      else
+        nil
+      end
+    end
+    jobs_progress.compact
+  end
+
+  def context_for(pace)
+    return pace.course_section if pace.course_section_id
+    # search the pace's shard for the student enrollment since the enrollment associated with the pace's course
+    # will always be on the pace's shard (not necessarily the user's shard though)
+    return pace.user.student_enrollments.shard(pace.shard).where(course: @course).active.take if pace.user_id
+
+    pace.course
   end
 
   def api_show
@@ -82,10 +109,13 @@ class CoursePacesController < ApplicationController
   def new
     @course_pace = case @context
                    when Course
+                     @context.course_paces.primary.published.take ||
                      @context.course_paces.primary.not_deleted.take
                    when CourseSection
+                     @course.course_paces.for_section(@context).published.take ||
                      @course.course_paces.for_section(@context).not_deleted.take
                    when Enrollment
+                     @course.course_paces.for_user(@context.user).published.take ||
                      @course.course_paces.for_user(@context.user).not_deleted.take
                    end
     load_and_run_progress
@@ -107,6 +137,8 @@ class CoursePacesController < ApplicationController
       else
         @course_pace = @course.course_paces.new(pace_params)
         @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+          next unless module_item.assignment
+
           @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
         end
       end
@@ -237,7 +269,8 @@ class CoursePacesController < ApplicationController
   end
 
   def enrollments_json(course)
-    json = course.all_real_student_enrollments.map do |enrollment|
+    # Only the most recent enrollment of each student is considered
+    json = course.all_real_student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*").map do |enrollment|
       {
         id: enrollment.id,
         user_id: enrollment.user_id,

@@ -41,11 +41,11 @@ const defaultProps = {
   removePace,
   blackoutDatesUnsynced: false,
   blackoutDatesSyncing: false,
-  blueprintLocked: false,
   handleCancel,
   responsiveSize: 'large' as const,
   anyActiveRequests: false,
   isUnpublishedNewPace: false,
+  paceName: 'Cool Class',
 }
 
 afterEach(() => {
@@ -301,7 +301,7 @@ describe('Footer', () => {
         expect(getByText('Remove this Section Pace?')).toBeInTheDocument()
         expect(
           getByText(
-            'This section pace will be removed and the pace will revert back to the default pace.'
+            'Cool Class Pace will be removed. This pace will revert back to the default pace.'
           )
         ).toBeInTheDocument()
       })

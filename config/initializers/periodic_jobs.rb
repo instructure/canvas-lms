@@ -251,7 +251,7 @@ Rails.configuration.after_initialize do
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,
-                                           singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
+                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" })
       end
     end
   end
@@ -352,6 +352,15 @@ Rails.configuration.after_initialize do
       :heartbeat,
       { run_current_region_asynchronously: true,
         singleton: "Canvas::LiveEvents#heartbeat" }
+    )
+  end
+
+  Delayed::Periodic.cron "HealthChecks.send_to_statsd", "* * * * *" do
+    DatabaseServer.send_in_each_region(
+      HealthChecks,
+      :send_to_statsd,
+      { run_current_region_asynchronously: true,
+        singleton: "HealthChecks#send_to_statsd" }
     )
   end
 end

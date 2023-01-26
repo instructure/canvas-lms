@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
-require_dependency "lti/oauth2/access_token"
-require "json/jwt"
 
 module Lti
   module OAuth2

@@ -19,7 +19,6 @@
 #
 
 require_relative "../../../spec_helper"
-require_dependency "api/html/media_tag"
 
 module Api
   module Html

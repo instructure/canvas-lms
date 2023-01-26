@@ -123,7 +123,16 @@ describe Loaders::DiscussionEntryLoader do
       Loaders::DiscussionEntryLoader.for(
         current_user: @teacher
       ).load(@de2).then do |discussion_entries|
-        expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id]
+        expect(discussion_entries.map(&:id)).to match_array [@de4.id]
+      end
+    end
+
+    Account.site_admin.enable_feature!(:isolated_view)
+    GraphQL::Batch.batch do
+      Loaders::DiscussionEntryLoader.for(
+        current_user: @teacher
+      ).load(@de2).then do |discussion_entries|
+        expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id, de6.id]
       end
     end
   end

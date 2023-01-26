@@ -17,13 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "json"
-require "time"
-require "set"
 require "zip"
-require "net/http"
-require "uri"
-require "cgi"
 require "nokogiri"
 
 module Canvas::Migration
@@ -35,8 +29,3 @@ module Canvas::Migration
     Rails.logger
   end
 end
-
-require_dependency "canvas/migration/migrator"
-require_dependency "canvas/migration/migrator_helper"
-require_dependency "canvas/migration/worker"
-require_dependency "canvas/migration/xml_helper"

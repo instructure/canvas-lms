@@ -16,24 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type Course = {
+export type Course = Readonly<{
   id: string
-}
+}>
 
-export type Enrollment = {
+export type Enrollment = Readonly<{
   course_section_id: string
   type: string
   grades: {
     html_url: string
   }
-}
+}>
 
-export type Student = {
+export type Student = Readonly<{
   id: string
   name: string
+  avatar_url: string
+}> & {
   displayName: string
   sortable_name: string
-  avatar_url: string
   enrollments: Enrollment[]
   loaded: boolean
   initialized: boolean
@@ -77,7 +78,7 @@ export type StudentGroup = Partial<
   'id' | 'name'
 >
 
-export type StudentGroupCategory = {
+export type StudentGroupCategory = Readonly<{
   allows_multiple_memberships: boolean
   auto_leader: null | string
   context_type: string
@@ -93,7 +94,7 @@ export type StudentGroupCategory = {
   self_signup: null | string
   sis_group_category_id: null | string
   sis_import_id: null | string
-}
+}>
 
 export type StudentGroupMap = {
   [id: string]: StudentGroup
@@ -103,11 +104,11 @@ export type StudentGroupCategoryMap = {
   [id: string]: StudentGroupCategory
 }
 
-export type DueDate = {
+export type DueDate = Readonly<{
   due_at: string | null
   grading_period_id: string | null
   in_closed_grading_period: boolean
-}
+}>
 
 export type UserDueDateMap = {
   [user_id: string]: DueDate
@@ -117,15 +118,18 @@ export type AssignmentUserDueDateMap = {
   [assignment_id: string]: UserDueDateMap
 }
 
-export type Override = {
+export type Override = Readonly<{
   title: string
   id: string
   due_at: string | null
   course_section_id: string | null
-}
+}>
 
-export type Assignment = {
+export type Assignment = Readonly<{
   allowed_attmpts: number
+  created_at: string
+  id: string
+  html_url: string
   allowed_extensions: string[]
   annotatable_attachment_id: null | string
   anonymize_students: boolean
@@ -134,16 +138,11 @@ export type Assignment = {
   anonymous_peer_reviews: boolean
   assessment_requests: AssessmentRequest[]
   assignment_group_id: string
-  assignment_group: AssignmentGroup // assigned after fetch?
   assignment_id: string
-  assignment_visibility: string[]
   automatic_peer_reviews: boolean
   can_duplicate: boolean
   course_id: string
-  created_at: string
-  due_at: string | null
   due_date_required: boolean
-  effectiveDueDates: UserDueDateMap
   final_grader_id: null | string
   grade_group_students_individually: boolean
   graded_submissions_exist: boolean
@@ -157,11 +156,8 @@ export type Assignment = {
   group_category_id: string | null
   has_overrides: boolean
   has_submitted_submissions: boolean
-  html_url: string
-  id: string
   important_dates: boolean
   in_quiz_assignment: boolean
-  inClosedGradingPeriod: boolean
   integration_data: any
   integration_id: string
   intra_group_peer_reviews: boolean
@@ -181,7 +177,6 @@ export type Assignment = {
   original_course_id: null | string
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
-  overrides: Override[]
   peer_reviews: boolean
   points_possible: number
   position: number
@@ -198,37 +193,45 @@ export type Assignment = {
   updated_at: string
   user_id: string
   workflow_state: WorkflowState
+}> & {
+  assignment_group: AssignmentGroup // assigned after fetch?
+  assignment_visibility: string[]
+  due_at: string | null
+  effectiveDueDates: UserDueDateMap
+  inClosedGradingPeriod: boolean
+  overrides: Override[]
 }
 
 export type AssignmentMap = {
   [id: string]: Assignment
 }
 
-export type AssignmentGroup = {
-  assignments: Assignment[]
+export type AssignmentGroup = Readonly<{
   group_weight: number
   id: string
-  integration_data: any
+  integration_data: unknown
   name: string
   position: number
-  rules: any
+  rules: unknown
   sis_source_id: null | string
+}> & {
+  assignments: Assignment[]
 }
 
 export type AssignmentGroupMap = {
   [id: string]: AssignmentGroup
 }
 
-export type AssessmentRequest = {
+export type AssessmentRequest = Readonly<{
   anonymous_id?: string
   user_id?: string
   user_name?: string
   available: boolean
-}
+}>
 
-export type AttachmentData = {
+export type AttachmentData = Readonly<{
   attachment: Attachment
-}
+}>
 
 export type Attachment = {
   id: string
@@ -236,23 +239,22 @@ export type Attachment = {
   created_at: string
 }
 
-export type Module = {
+export type Module = Readonly<{
   id: string
   name: string
   position: number
-}
+}>
 
 export type ModuleMap = {
   [id: string]: Module
 }
 
-export type Section = {
+export type Section = Readonly<{
   course_id: string
   created_at: string
   end_at: null | string
   id: string
   integration_id: null | string
-  name: string
   name: string
   nonxlist_course_id: null | string
   restrict_enrollments_to_section_dates: null | boolean
@@ -260,7 +262,7 @@ export type Section = {
   sis_import_id: null | string
   sis_section_id: null | string
   start_at: null | string
-}
+}>
 
 export type SectionMap = {
   [id: string]: Section
@@ -299,7 +301,7 @@ export type WorkflowState =
   | 'unsubmitted'
   | 'untaken'
 
-export type Submission = {
+export type Submission = Readonly<{
   anonymous_id: string
   assignment_id: string
   assignment_visible?: boolean
@@ -308,30 +310,31 @@ export type Submission = {
   drop?: boolean
   entered_grade: null | string
   entered_score: null | number
-  excused: boolean
   grade_matches_current_submission: boolean
-  grade: string | null
   gradeLocked: boolean
   grading_period_id: string
-  gradingType: GradingType
   has_postable_comments: boolean
   has_originality_report: boolean
-  hidden: boolean
   id: string
   late_policy_status: null | string
   late: boolean
   missing: boolean
   points_deducted: null | number
-  posted_at: null | Date
-  rawGrade: string | null
   redo_request: boolean
   score: null | number
   seconds_late: number
   submission_type: SubmissionType
-  submitted_at: null | Date
   url: null | string
   user_id: string
   workflow_state: WorkflowState
+}> & {
+  excused: boolean
+  grade: string | null
+  gradingType: GradingType
+  hidden: boolean
+  posted_at: null | Date
+  rawGrade: string | null
+  submitted_at: null | Date
 }
 
 export type UserSubmissionGroup = {
@@ -339,7 +342,7 @@ export type UserSubmissionGroup = {
   submissions: Submission[]
 }
 
-export type SubmissionComment = {
+export type SubmissionComment = Readonly<{
   id: string
   created_at: string
   comment: string
@@ -347,13 +350,14 @@ export type SubmissionComment = {
   updated_at: string
   display_updated_at?: string
   is_read?: boolean
+  author_name?: string
   author?: {
     id: string
     display_name: string
     avatar_image_url: string
     html_url: string
   }
-}
+}>
 
 export type SubmissionCommentData = {
   group_comment: 1 | 0
@@ -361,7 +365,7 @@ export type SubmissionCommentData = {
   attempt?: number
 }
 
-export type GradingPeriod = {
+export type GradingPeriod = Readonly<{
   close_date: string
   end_date: string
   id: string
@@ -376,7 +380,7 @@ export type GradingPeriod = {
   start_date: string
   title: string
   weight: null | number
-}
+}>
 
 export type SubmissionAttemptsComments = {
   attempts: {
@@ -384,16 +388,22 @@ export type SubmissionAttemptsComments = {
   }
 }
 
-export type GradingPeriodSet = {
+export type GradingPeriodSet = Readonly<{
   account_id: string
   course_id: null | string
   created_at: string
   display_totals_for_all_grading_periods: boolean
+  enrollment_term_ids: string[]
   grading_periods: GradingPeriod[]
   id: string
+  permissions: unknown
   root_account_id: string
   title: string
   updated_at: string
   weighted: boolean
   workflow_state: WorkflowState
+}>
+
+export type GradingPeriodSetGroup = {
+  grading_period_sets: GradingPeriodSet[]
 }

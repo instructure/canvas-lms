@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)

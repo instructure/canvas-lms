@@ -85,7 +85,7 @@ describe('Module', () => {
     )
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
     expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual(
-      'Due Date: Tue, Mar 22, 2022'
+      'Due DateToggle tooltip: Tue, Mar 22, 2022'
     )
     expect(queryAllByTestId('pp-status-cell')[0].textContent).toEqual('Status: Published')
   })
@@ -94,16 +94,25 @@ describe('Module', () => {
     const {getByRole} = renderConnected(<Module {...defaultProps} compression={1000} />)
     expect(
       getByRole('tooltip', {
-        name: 'Due Dates are being compressed based on your start and end dates.',
+        name: 'Due Dates are being compressed based on your start and end dates',
       })
     ).toBeInTheDocument()
   })
 
-  it('includes an info tooltip for days change', () => {
+  it('includes a tooltip for days change', () => {
     const {getByRole} = renderConnected(<Module {...defaultProps} />)
     expect(
       getByRole('tooltip', {
-        name: 'Changing course pacing days may modify due dates.',
+        name: 'Changing course pacing days may modify due dates',
+      })
+    ).toBeInTheDocument()
+  })
+
+  it('renders a tooltip about date time zone', () => {
+    const {getByRole} = renderConnected(<Module {...defaultProps} />)
+    expect(
+      getByRole('tooltip', {
+        name: 'Dates shown in Course Time Zone',
       })
     ).toBeInTheDocument()
   })

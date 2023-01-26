@@ -81,6 +81,7 @@ export const TextSection = ({settings, onChange}) => {
           <SimpleSelect
             assistiveText={formatMessage('Use arrow keys to select a text size.')}
             id="icon-text-size"
+            mountNode={getTextSection}
             onChange={(e, option) => onChange({textSize: option.value})}
             renderLabel={formatMessage('Text Size')}
             value={settings.textSize}
@@ -116,6 +117,7 @@ export const TextSection = ({settings, onChange}) => {
 
         <Flex.Item padding="small">
           <SimpleSelect
+            mountNode={getTextSection}
             assistiveText={formatMessage('Use arrow keys to select a text position.')}
             id="icon-text-position"
             onChange={(e, option) => onChange({textPosition: option.value})}

@@ -61,6 +61,13 @@ describe "context modules" do
       }] # will replace with the modules on the variable expansion
     end
 
+    it "is able to work with granular permisions properly" do
+      @teacher.account.enable_feature!(:granular_permissions_manage_course_content)
+      visit_modules_index_page(@course.id)
+      modules_index_settings_button.click
+      expect(module_index_settings_menu).to include_text("Import Stuff")
+    end
+
     it "is able to launch the individual module menu tool via the tray", custom_timeout: 60 do
       visit_modules_index_page(@course.id)
       manage_module_button(@module2).click

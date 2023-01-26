@@ -35,7 +35,7 @@ The request also includes a `login_hint` that is passed in the next step. Last, 
 
 <a name="step-2"></a>
 ###Step 2: Authentication Request
-To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
+To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST, however, this request needs to be a redirect in the user’s browser and not made server to server as we need to validate the current user's session data. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
 
 - `https://canvas.instructure.com/api/lti/authorize_redirect` (if launched from a **production** environment)
 - `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
@@ -59,20 +59,32 @@ The tool then validates the `state` parameter matches the one sent in Step 2 and
 <a name="cookie-less"></a>
 ###Launching without Cookies
 
-Safari blocking cookies inside 3rd-party iframes made it necessary to create a workaround for storing the `state` property between the login and launch requests, to prevent MITM attacks. The (almost public final) LTI Platform Storage spec provides a way for tools that are launching in Safari
+Safari blocking cookies inside 3rd-party iframes made it necessary to create a workaround for storing the `state` property between the login and launch requests, to prevent MITM attacks. The (under final review) LTI Platform Storage spec provides a way for tools that are launching in Safari
 or another situation where cookies can't get set to still store data across requests in a secure fashion. Tools can send `window.postMessage`s to
 Canvas asking it to store and retrieve arbitrary data, which acts as a cookie-like proxy.
 
-More details about this workflow will be provided once the Platform Storage spec is finalized and released to the public. Tool developers who work
-with the LTI working group most likely have access to [these private docs](https://github.com/IMSGlobal/lti-proposals/tree/main/proposals/browser-storage-proposals/lti-platform-storage), which details the postMessages used and the cookie-less launch flow. Tool developers who don't have
-access to these docs can request some implementation help via the partner team or the LTI working group, though a brief usage overview is included below:
+The LTI Platform Storage spec includes an [implementation guide](https://www.imsglobal.org/spec/lti-cs-oidc/v0p1)
+which should function as the primary resource for implementing this, though a brief usage overview is included below:
 
-In Step 2, instead of storing the `state` parameter in a cookie, the tool should store it in Canvas's LTI Platform Storage using the `org.imsglobal.lti.put_data` postMessage. It's recommended that the key include the value (eg key: "state-1234", value: "1234) to avoid any collisions during
-multiple launches, and to make recovering the value easy.
+In Step 2, instead of storing the `state` parameter in a cookie, the tool should store it in Canvas's LTI Platform Storage using the `lti.put_data` postMessage. It's recommended that the key include the value (eg key: "state-1234", value: "1234) to avoid any collisions during multiple launches, and to make recovering the value easy.
 
-In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `org.imsglobal.lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
+In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
 
 **Note** that Canvas supports most of the spec, including all message types, but does not currently support using the OIDC Auth URI as the target origin. Tools that want to use these postMessages to set and get data for launches or for other uses must currently direct all messages to the parent Canvas window, using the `*` wildcard origin.
+
+Other LTI Platform Storage spec docs:
+
+- [Client-side postMessages](https://www.imsglobal.org/spec/lti-cs-pm/v0p1)
+- [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
+
+Support for this API is determined by either:
+
+1. the presence of the `lti_storage_target` as an extra body parameter in both the login (Step 1) and launch (Step 3) requests, or
+2. a response postMessage to the `lti.capabilities` postMessage that contains the `lti.get_data` and `lti.put_data` subjects.
+
+**Note** that `lti_storage_target` is currently present in all launches, including from the Canvas mobile apps. Support for this API in the Canvas mobile apps is not yet implemented, and
+the requirements for supporting it are currently under review. Tools should confirm using the `lti.capabilities` postMessage if the current launch supports this API. If tools do not get a
+response to that or any message in this API, they should assume that this API is not supported and try to set a cookie instead.
 
 <a name="config-in-tool"></a>
 Configuring Canvas in the Tool

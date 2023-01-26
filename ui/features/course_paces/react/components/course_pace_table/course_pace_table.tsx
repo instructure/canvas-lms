@@ -36,17 +36,12 @@ interface StoreProps {
   readonly modulesWithItemsWithDates: ModuleWithDueDates[]
 }
 
-interface PassedProps {
-  readonly blueprintLocked: boolean
-}
-
-export const CoursePaceTable: React.FC<StoreProps & PassedProps> = ({
+export const CoursePaceTable: React.FC<StoreProps> = ({
   coursePace,
   responsiveSize,
   showProjections,
   compression,
   modulesWithItemsWithDates,
-  blueprintLocked,
 }) => {
   return (
     <>
@@ -58,7 +53,6 @@ export const CoursePaceTable: React.FC<StoreProps & PassedProps> = ({
           coursePace={coursePace}
           responsiveSize={responsiveSize}
           showProjections={showProjections}
-          blueprintLocked={blueprintLocked}
           compression={compression}
         />
       ))}

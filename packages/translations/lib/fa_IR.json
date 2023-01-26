@@ -188,9 +188,6 @@
     "date_ee500367": {
         "message": "تاریخ"
     },
-    "decrease_indent_d9cf469d": {
-        "message": "کاهش تورفتگی"
-    },
     "deep_purple_bb3e2907": {
         "message": "ارغوانی پر رنگ"
     },
@@ -332,9 +329,6 @@
     "home_351838cd": {
         "message": "صفحه اصلی"
     },
-    "html_editor_fb2ab713": {
-        "message": "ویرایشگر HTML"
-    },
     "hungarian_fc7d30c9": {
         "message": "مجارستانی"
     },
@@ -362,9 +356,6 @@
     "images_7ce26570": {
         "message": "تصاویر"
     },
-    "increase_indent_6af90f7c": {
-        "message": "افزایش تورفتگی"
-    },
     "indigo_2035fc55": {
         "message": "Indigo"
     },
@@ -374,14 +365,8 @@
     "insert_593145ef": {
         "message": "درج"
     },
-    "insert_equella_links_49a8dacd": {
-        "message": "Insert Equella Links"
-    },
     "insert_link_6dc23cae": {
         "message": "درج پیوند"
-    },
-    "insert_math_equation_57c6e767": {
-        "message": "درج معادله ریاضی"
     },
     "invalid_file_type_881cc9b2": {
         "message": "نوع فایل معتبر نیست"
@@ -497,9 +482,6 @@
     "next_month_749b1778": {
         "message": "ماه بعد"
     },
-    "next_page_d2a39853": {
-        "message": "صفحه بعد"
-    },
     "no_e16d9132": {
         "message": "خیر"
     },
@@ -578,9 +560,6 @@
     "previous_month_bb1e3c84": {
         "message": "ماه قبل"
     },
-    "previous_page_928fc112": {
-        "message": "صفحه قبل"
-    },
     "pts_699bd9aa": {
         "message": "امتیاز"
     },
@@ -631,9 +610,6 @@
     },
     "select_language_7c93a900": {
         "message": "انتخاب زبان"
-    },
-    "selected_274ce24f": {
-        "message": "انتخاب شده"
     },
     "serbian_7187f1f2": {
         "message": "صربی"

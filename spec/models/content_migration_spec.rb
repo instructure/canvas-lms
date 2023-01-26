@@ -812,6 +812,9 @@ describe ContentMigration do
     expect(cm).to be_failed
     expect(cm.migration_issues).not_to be_empty
     expect(cm.migration_issues.last.error_report.message).to include "job expired"
+
+    cm.queue_migration
+    expect(cm.migration_issues).to be_empty
   end
 
   it "expires import jobs after 48 hours" do
@@ -1117,6 +1120,104 @@ describe ContentMigration do
       expect(ContentMigration.import_class_name("module_items")).to eq "ContentTag"
       expect(ContentMigration.import_class_name("content_tag")).to eq "ContentTag"
       expect(ContentMigration.import_class_name("content_tags")).to eq "ContentTag"
+    end
+  end
+
+  describe "find_source_course_for_import" do
+    specs_require_sharding
+
+    before :once do
+      @shard1.activate do
+        @other_account = Account.create! name: "Source Account"
+        @other_account.account_domains.create! host: "pineapple.127.0.0.1.xip.io"
+        @other_course = course_factory(account: @other_account)
+      end
+
+      @course = course_factory
+    end
+
+    it "finds a course when root account global id lines up" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: @other_account.global_id,
+          root_account_uuid: @other_account.uuid
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "finds root account by domain when context account id doesn't exist" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: -1,
+          root_account_uuid: @other_account.uuid,
+          canvas_domain: "pineapple.127.0.0.1.xip.io"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "finds root account by domain when context global account uuid doesn't match" do
+      decoy_account = @shard1.activate { Account.create! }
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: decoy_account.global_id,
+          root_account_uuid: @other_account.uuid,
+          canvas_domain: "pineapple.127.0.0.1.xip.io"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to eq @other_course
+    end
+
+    it "doesn't find a course when the account uuid doesn't match" do
+      @course.full_migration_hash = {
+        context_info: {
+          course_id: @other_course.local_id,
+          root_account_id: @other_account.global_id,
+          root_account_uuid: "nope"
+        }
+      }
+      migration = @course.content_migrations.create!
+      migration.find_source_course_for_import
+      expect(migration.source_course).to be_nil
+    end
+  end
+
+  describe "asset_map_url" do
+    before :once do
+      # not actually doing a course copy here, just simulating a finished one
+      @src = course_factory
+      @dst = course_factory
+      @old = @src.assignments.create! title: "foo"
+      @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+      @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+      @cm.workflow_state = "imported"
+      @cm.source_course = @src
+      @cm.save!
+    end
+
+    it "returns a url to a file containing the asset map" do
+      expect_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
+      url = @cm.asset_map_url(generate_if_needed: true)
+      @cm.reload
+      expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+      expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+      expect(@cm.asset_map_attachment.context).to eq @cm
+      json = JSON.parse(@cm.asset_map_attachment.open.read)
+      expect(json).to eq({ "source_course" => @src.id.to_s,
+                           "source_host" => "pineapple.edu",
+                           "resource_mapping" => {
+                             "assignments" => { @old.id.to_s => @new.id.to_s }
+                           } })
     end
   end
 end

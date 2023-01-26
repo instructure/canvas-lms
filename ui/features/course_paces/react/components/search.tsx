@@ -16,24 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {APIPaceContextTypes, PaceContext, StoreState} from '../types'
+import {APIPaceContextTypes, OrderType, SortableColumn, StoreState} from '../types'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {getSearchTerm} from '../reducers/course_paces'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('course_paces_search')
 
+const {Item: FlexItem} = Flex as any
+
 interface StoreProps {
   readonly searchTerm: string
+  readonly currentSortBy: SortableColumn
+  readonly currentOrderType: OrderType
 }
 
 interface DispatchProps {
@@ -52,17 +57,38 @@ export const Search: React.FC<ComponentProps> = ({
   fetchPaceContexts,
   setSearchTerm,
   contextType,
+  currentOrderType,
+  currentSortBy,
 }) => {
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')
-    fetchPaceContexts(contextType, 1, '')
+    fetchPaceContexts({contextType, page: 1, searchTerm: ''})
   }
 
   const handleSearch = e => {
     e.preventDefault()
 
-    fetchPaceContexts(contextType, 1, searchTerm)
+    fetchPaceContexts({
+      contextType,
+      page: 1,
+      searchTerm,
+      sortBy: currentSortBy,
+      orderType: currentOrderType,
+      afterFetch: contexts =>
+        showFlashAlert({
+          message: I18n.t(
+            {
+              zero: 'No results found',
+              one: 'Showing 1 result below',
+              other: 'Showing %{count} results below',
+            },
+            {count: contexts.length}
+          ),
+          srOnly: true,
+          err: null,
+        }),
+    })
   }
 
   const renderClearButton = () => {
@@ -99,7 +125,7 @@ export const Search: React.FC<ComponentProps> = ({
         autoComplete="off"
       >
         <Flex>
-          <Flex.Item shouldGrow={true}>
+          <FlexItem shouldGrow={true}>
             <TextInput
               renderLabel={<ScreenReaderContent>{placeholderText()}</ScreenReaderContent>}
               placeholder={placeholderText()}
@@ -111,8 +137,8 @@ export const Search: React.FC<ComponentProps> = ({
               renderAfterInput={renderClearButton()}
               data-testid="search-input"
             />
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <Button
               color="primary"
               margin="0 0 0 small"
@@ -121,7 +147,7 @@ export const Search: React.FC<ComponentProps> = ({
             >
               {I18n.t('Search')}
             </Button>
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </form>
     </View>
@@ -131,6 +157,8 @@ export const Search: React.FC<ComponentProps> = ({
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     searchTerm: getSearchTerm(state),
+    currentSortBy: state.paceContexts.sortBy,
+    currentOrderType: state.paceContexts.order,
   }
 }
 

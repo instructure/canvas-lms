@@ -713,6 +713,7 @@ class DiscussionTopicsController < ApplicationController
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
           root_entry_id: entry.root_entry_id,
+          parent_id: entry.parent_id,
           entry_id: entry.id
         }
         if entry.root_entry_id.nil?
@@ -794,7 +795,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
                  CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
-                 ATTACHMENTS_FOLDER_ID: (@topic.for_assignment? && !@current_user.nil?) ? @current_user.submissions_folder(@context).id : Folder.unfiled_folder(@context).id,
+                 ATTACHMENTS_FOLDER_ID: @current_user.nil? ? Folder.unfiled_folder(@context).id : Folder.unfiled_folder(@current_user).id,
                  preferences: {
                    discussions_splitscreen_view: @current_user&.discussions_splitscreen_view? || false
                  }
@@ -895,7 +896,6 @@ class DiscussionTopicsController < ApplicationController
               INITIAL_POST_REQUIRED: @initial_post_required,
               THREADED: @topic.threaded?,
               ALLOW_RATING: @topic.allow_rating,
-              SORT_BY_RATING: @topic.sort_by_rating,
               TODO_DATE: @topic.todo_date,
               IS_ASSIGNMENT: @topic.assignment_id?,
               ASSIGNMENT_ID: @topic.assignment_id,

@@ -551,11 +551,23 @@ describe CoursePace do
       expect(result[:end_date_context]).to eq("hard")
     end
 
-    it "returns plan's end_date from db if a student plan" do
-      @course_pace[:end_date] = "2022-03-17"
+    it "returns section's end date if set and if it is a student plan" do
+      new_section = @course.course_sections.create! name: "new_section", end_at: "2022-01-30"
+      @course.enroll_student(@student, section: new_section, allow_multiple_enrollments: true, enrollment_state: "active")
+      @course.course_paces.create! course_section: new_section
       @course_pace[:user_id] = @student.id
       result = @course_pace.effective_end_date(with_context: true)
-      expect(result[:end_date].to_date).to eq(Date.parse("2022-03-17"))
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-30"))
+      expect(result[:end_date_context]).to eq("user")
+    end
+
+    it "returns the course end date if the section's end date is not set and if it is a student plan" do
+      @course.update conclude_at: Time.zone.parse("2022-01-28T13:00:00")
+      new_section = @course.course_sections.create! name: "new_section"
+      @course.enroll_student(@student, section: new_section, allow_multiple_enrollments: true, enrollment_state: "active")
+      @course_pace[:user_id] = @student.id
+      result = @course_pace.effective_end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-28"))
       expect(result[:end_date_context]).to eq("user")
     end
 
@@ -578,6 +590,23 @@ describe CoursePace do
       result = @course_pace.effective_end_date(with_context: true)
       expect(result[:end_date].to_date).to eq(Date.parse("2022-01-27"))
       expect(result[:end_date_context]).to eq("term")
+    end
+
+    it "returns section end date if applicable" do
+      other_section = @course.course_sections.create! name: "other_section", end_at: "2022-01-30"
+      section_plan = @course.course_paces.create! course_section: other_section
+      result = section_plan.effective_end_date(with_context: true)
+      expect(result[:end_date].to_date).to eq(Date.parse("2022-01-30"))
+      expect(result[:end_date_context]).to eq("section")
+    end
+
+    it "returns an hypothetical context-type for student pace when no fixed date is available" do
+      @course_pace[:user_id] = @student.id
+      @course.restrict_enrollments_to_course_dates = false
+      @course.enrollment_term.update start_at: nil, end_at: nil
+      result = @course_pace.effective_end_date(with_context: true)
+      expect(result[:end_date_context]).to eq("hypothetical")
+      expect(result[:end_date]).to be_nil
     end
 
     it "returns nil if no fixed date is available" do

@@ -223,7 +223,7 @@ class GradebookExportManager {
 
     const studentOrder = getStudentOrder()
     if (studentOrder && studentOrder.length > 0) {
-      params.student_order = studentOrder.map(Number)
+      params.student_order = studentOrder
     }
 
     return axios.post(this.exportingUrl, params).then(response => {

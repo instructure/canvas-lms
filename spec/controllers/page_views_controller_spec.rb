@@ -20,8 +20,6 @@
 
 require_relative "../cassandra_spec_helper"
 
-require "csv"
-
 describe PageViewsController do
   # Factory-like thing for page views.
   def page_view(user, url, options = {})

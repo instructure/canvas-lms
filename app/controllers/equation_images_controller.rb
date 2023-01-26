@@ -27,7 +27,7 @@ class EquationImagesController < ApplicationController
     # time the value gets here as `params[:id]` it has been unescaped once.
     # However if it was stored in the db single escaped, we need to re-escape
     # it here
-    @latex = URI.escape(@latex) if @latex == URI.unescape(@latex)
+    @latex = URI::DEFAULT_PARSER.escape(@latex) if @latex == URI::DEFAULT_PARSER.unescape(@latex)
 
     # This is nearly how we want it to pass it on to the next service, except
     # `+` signs are in tact. Since normally the `+` signifies a space and we

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_dependency "lti/message_authenticator"
 
 module Lti
   describe MessageAuthenticator do
@@ -137,6 +136,22 @@ module Lti
           validator = described_class.new(launch_url, message.signed_post_params("invalid"))
           expect(validator.valid?).to be false
           expect(Rails.cache.exist?(validator.send(:cache_key))).to be_falsey
+        end
+      end
+
+      context "no lti_version param is passed along" do
+        let(:signed_params) do
+          m = message.signed_post_params(tool.shared_secret)
+          m.delete(:lti_version)
+          m
+        end
+
+        it "doesn't throw any errors and still shows as invalid" do
+          message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
+          Timecop.freeze(Time.at(signed_params[:oauth_timestamp].to_i)) do
+            expect { message_authenticator.valid? }.not_to raise_error
+            expect(message_authenticator.valid?).to eq false
+          end
         end
       end
     end

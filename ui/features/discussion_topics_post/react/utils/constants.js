@@ -23,21 +23,35 @@ export const HIGHLIGHT_TIMEOUT = 6000
 export const SEARCH_TERM_DEBOUNCE_DELAY = 500
 export const DEFAULT_AVATAR_URL = 'http://canvas.instructure.com/images/messages/avatar-50.png'
 
+export const AllThreadsState = {
+  None: 0,
+  Expanded: 1,
+  Collapsed: 2,
+}
+
 const searchFilter = {
   searchTerm: '',
   setSearchTerm: () => {},
-  filter: '',
+  filter: 'all',
   setFilter: () => {},
   sort: '',
   setSort: () => {},
   pageNumber: 0,
   setPageNumber: () => {},
+  allThreadsStatus: AllThreadsState.None,
+  setAllThreadsStatus: () => {},
+  expandedThreads: [],
+  setExpandedThreads: () => {},
 }
 export const SearchContext = React.createContext(searchFilter)
 
 const discussionManagerUtilityContext = {
   replyFromId: '',
   setReplyFromId: () => {},
+  userSplitScreenPreference: true,
+  setUserSplitScreenPreference: () => {},
+  highlightEntryId: '',
+  setHighlightEntryId: () => {},
 }
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

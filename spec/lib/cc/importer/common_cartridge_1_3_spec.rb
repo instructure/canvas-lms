@@ -19,8 +19,6 @@
 
 require_relative "../cc_spec_helper"
 
-require "tmpdir"
-
 describe "Standard Common Cartridge importing" do
   context "in a cartridge" do
     before(:once) do

@@ -66,6 +66,14 @@ module FeatureFlags
       root_account.settings&.dig(:provision, "lti").present?
     end
 
+    def self.docviewer_enable_iwork_visible_on_hook(context)
+      DocviewerIworkPredicate.new(context, Shard.current.database_server.config[:region]).call
+    end
+
+    def self.usage_metrics_allowed_hook(context)
+      UsageMetricsPredicate.new(context, Shard.current.database_server.config[:region]).call
+    end
+
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)

@@ -118,9 +118,10 @@ describe CoursePacesController, type: :controller do
                                                                 blackout_date: true
                                                               })]
       @section = @course.course_sections.first
-      @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @first_student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @last_student_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: @another_section, allow_multiple_enrollments: true)
       @progress = @course_pace.create_publish_progress
-      get :index, { params: { course_id: @course.id } }
+      get :index, params: { course_id: @course.id }
 
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:course_paces)
@@ -134,13 +135,16 @@ describe CoursePacesController, type: :controller do
                                                         end_at: @course.end_at
                                                       }))
       expect(js_env[:ENROLLMENTS].length).to be(1)
-      expect(js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
-                                                                                     id: @student_enrollment.id,
-                                                                                     user_id: @student.id,
-                                                                                     course_id: @course.id,
-                                                                                     full_name: @student.name,
-                                                                                     sortable_name: @student.sortable_name
-                                                                                   }))
+      # only includes the most recent enrollment of each student
+      expect(js_env[:ENROLLMENTS]).not_to include(@first_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS]).to include(@last_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS][@last_student_enrollment.id]).to match(hash_including({
+                                                                                          id: @last_student_enrollment.id,
+                                                                                          user_id: @student.id,
+                                                                                          course_id: @course.id,
+                                                                                          full_name: @student.name,
+                                                                                          sortable_name: @student.sortable_name
+                                                                                        }))
       expect(js_env[:SECTIONS].length).to be(2)
       expect(js_env[:SECTIONS][@section.id]).to match(hash_including({
                                                                        id: @section.id,
@@ -223,7 +227,7 @@ describe CoursePacesController, type: :controller do
         progress = @course_pace.create_publish_progress
         delayed_job = progress.delayed_job
         original_run_at = delayed_job.run_at
-        get :index, { params: { course_id: @course.id } }
+        get :index, params: { course_id: @course.id }
         expect(response).to be_successful
         expect(delayed_job.reload.run_at).to be < original_run_at
       end
@@ -373,16 +377,35 @@ describe CoursePacesController, type: :controller do
   describe "GET #new" do
     context "course" do
       it "returns a created course pace if one already exists" do
-        get :new, { params: { course_id: @course.id } }
+        get :new, params: { course_id: @course.id }
         expect(response).to be_successful
         expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(@course_pace.id)
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
       end
 
+      it "returns a published course pace if one already exists" do
+        published_course_pace = @course_pace
+        course_pace_model(course: @course, workflow_state: "unpublished", published_at: nil)
+        get :new, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(published_course_pace.id)
+        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+      end
+
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+      end
+
       it "returns an instantiated course pace if one is not already available" do
         @course_pace.destroy
         expect(@course.course_paces.not_deleted.count).to eq(0)
-        get :new, { params: { course_id: @course.id } }
+        get :new, params: { course_id: @course.id }
         expect(response).to be_successful
         expect(@course.course_paces.not_deleted.count).to eq(0)
         json_response = JSON.parse(response.body)
@@ -405,7 +428,7 @@ describe CoursePacesController, type: :controller do
         progress = @course_pace.create_publish_progress
         delayed_job = progress.delayed_job
         original_run_at = delayed_job.run_at
-        get :new, { params: { course_id: @course.id } }
+        get :new, params: { course_id: @course.id }
         expect(response).to be_successful
         json_response = JSON.parse(response.body)
         expect(json_response["progress"]["workflow_state"]).to eq "queued"
@@ -416,15 +439,34 @@ describe CoursePacesController, type: :controller do
 
     context "course_section" do
       it "returns a draft course pace" do
-        get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
+        get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
         expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(nil)
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).to eq(nil)
       end
 
+      it "returns a published section pace if one already exists" do
+        section_pace_model(section: @course_section, workflow_state: "unpublished", published_at: nil)
+        publised_section_pace = section_pace_model(section: @course_section)
+        get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(publised_section_pace.id)
+        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+      end
+
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+      end
+
       it "returns an instantiated course pace if one is not already available" do
         expect(@course.course_paces.unpublished.for_section(@course_section).count).to eq(0)
-        get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
+        get :new, params: { course_id: @course.id, course_section_id: @course_section.id }
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_section(@course_section).count).to eq(0)
         json_response = JSON.parse(response.body)
@@ -447,18 +489,37 @@ describe CoursePacesController, type: :controller do
 
     context "enrollment" do
       it "returns a draft course pace" do
-        get :new, { params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id } }
+        get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
         expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(nil)
         expect(JSON.parse(response.body)["course_pace"]["published_at"]).to eq(nil)
         expect(JSON.parse(response.body)["course_pace"]["user_id"]).to eq(@student.id)
       end
 
+      it "returns a published student pace if one already exists" do
+        student_enrollment_pace_model(student_enrollment: @student_enrollment, workflow_state: "unpublished", published_at: nil)
+        publised_section_pace = student_enrollment_pace_model(student_enrollment: @student_enrollment)
+        get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["id"]).to eq(publised_section_pace.id)
+        expect(JSON.parse(response.body)["course_pace"]["published_at"]).not_to be_nil
+      end
+
+      it "ignores module items with no assignments for the pace scaffold" do
+        @course_pace.destroy
+        p = @course.wiki_pages.create! title: "P1", workflow_state: "active"
+        @mod2.add_item id: p.id, type: "page"
+
+        get :new, params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id }
+        expect(response).to be_successful
+        expect(JSON.parse(response.body)["course_pace"]["modules"].second["items"].count).to eq(2)
+      end
+
       it "returns an instantiated section pace if one is already published and the user is in that section" do
         @course_section.enrollments << @student_enrollment
         course_section_pace = course_pace_model(course: @course, course_section: @course_section)
         course_section_pace.publish
-        get :new, { params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id } }
+        get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
         json_response = JSON.parse(response.body)
         expect(json_response["course_pace"]["id"]).to eq(nil)
@@ -479,7 +540,7 @@ describe CoursePacesController, type: :controller do
 
       it "returns an instantiated course pace if one is not already available" do
         expect(@course.course_paces.unpublished.for_user(@student).count).to eq(0)
-        get :new, { params: { course_id: @course.id, enrollment_id: @student_enrollment.id } }
+        get :new, params: { course_id: @course.id, enrollment_id: @student_enrollment.id }
         expect(response).to be_successful
         expect(@course.course_paces.unpublished.for_user(@student).count).to eq(0)
         json_response = JSON.parse(response.body)
@@ -497,6 +558,23 @@ describe CoursePacesController, type: :controller do
         expect(m2["items"].first["published"]).to eq(true)
         expect(m2["items"].second["duration"]).to eq(4)
         expect(m2["items"].second["published"]).to eq(true)
+      end
+
+      context "when the user is on another shard" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @student2 = user_factory(active_all: true)
+          end
+        end
+
+        it "still creates the individual pace" do
+          @course_pace.update!(hard_end_dates: false)
+          enrollment = course_with_student(course: @course, user: @student2, active_all: true)
+          get :new, params: { course_id: @course.id, enrollment_id: enrollment.id }
+          expect(response).to be_successful
+        end
       end
     end
   end

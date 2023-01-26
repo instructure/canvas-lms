@@ -1,9 +1,4 @@
 ---
-new_equation_editor:
-  state: hidden
-  display_name: RCE's new and improved equation editor dialog
-  description: Includes the equation editor in the @instructure/canvas-rce package
-  applies_to: SiteAdmin
 buttons_and_icons_root_account:
   state: allowed
   applies_to: RootAccount
@@ -25,3 +20,15 @@ rce_ux_improvements:
   display_name: RCE UX Improvements
   description: Improve and streamline the RCE button and tray UX
   applies_to: SiteAdmin
+rce_better_paste:
+  state: hidden
+  display_name: Enhanced RCE paste from clipboard
+  description: Handle pasting of files, especially images.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on

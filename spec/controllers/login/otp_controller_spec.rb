@@ -187,6 +187,7 @@ describe Login::OtpController do
       it "sets a cookie" do
         post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now, remember_me: "1" } }
         expect(response).to redirect_to dashboard_url(login_success: 1)
+        expect(response["Set-Cookie"]).to include("SameSite=None")
         expect(cookies["canvas_otp_remember_me"]).not_to be_nil
         expect(request.env.fetch("extra-request-cost").to_f >= 150).to be_truthy
       end

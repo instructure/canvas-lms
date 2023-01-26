@@ -194,6 +194,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
     $conversationID: ID!
     $participants: [ID!]
     $createdBefore: DateTime
+    $first: Int
   ) {
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
@@ -201,7 +202,11 @@ export const REPLY_CONVERSATION_QUERY = gql`
         _id
         contextName
         subject
-        conversationMessagesConnection(participants: $participants, createdBefore: $createdBefore) {
+        conversationMessagesConnection(
+          participants: $participants
+          createdBefore: $createdBefore
+          first: $first
+        ) {
           nodes {
             ...ConversationMessage
           }

@@ -21,7 +21,6 @@
 require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
 require_relative "../../lti_1_3_spec_helper"
-require_dependency "lti/app_collator"
 
 module Lti
   describe AppCollator do

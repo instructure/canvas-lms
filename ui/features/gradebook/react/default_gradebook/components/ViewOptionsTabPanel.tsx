@@ -106,6 +106,7 @@ export default function ViewOptionsTabPanel({
     <div id="ViewOptionsTabPanel__Container">
       <View as="div" margin="small">
         <SimpleSelect
+          data-testid="arrange_by_dropdown"
           renderLabel={I18n.t('Arrange By')}
           onChange={handleColumnSortSelected}
           value={selectedSortKey.value}

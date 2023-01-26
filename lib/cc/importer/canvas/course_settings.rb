@@ -54,6 +54,7 @@ module CC::Importer::Canvas
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
       @course[:late_policy] = convert_late_policy(settings_doc(LATE_POLICY))
       @course[:blueprint_settings] = convert_blueprint_settings(settings_doc(BLUEPRINT_SETTINGS))
+      @course[:context_info] = convert_context_info(settings_doc(CONTEXT_INFO))
     end
 
     def convert_course_settings(doc)
@@ -230,6 +231,21 @@ module CC::Importer::Canvas
       late_policy["late_submission_minimum_percent"] = get_node_val(late_policy_node, "late_submission_minimum_percent")
 
       late_policy
+    end
+
+    def convert_context_info(doc)
+      context_info = {}
+      return context_info unless doc
+
+      node = doc.at_css("context_info")
+      context_info["course_id"] = get_node_val(node, "course_id")
+      context_info["course_name"] = get_node_val(node, "course_name")
+      context_info["root_account_id"] = get_node_val(node, "root_account_id")
+      context_info["root_account_uuid"] = get_node_val(node, "root_account_uuid")
+      context_info["root_account_name"] = get_node_val(node, "root_account_name")
+      context_info["canvas_domain"] = get_node_val(node, "canvas_domain")
+
+      context_info
     end
   end
 end

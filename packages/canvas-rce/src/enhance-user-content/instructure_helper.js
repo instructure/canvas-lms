@@ -19,8 +19,9 @@
 import htmlEscape from 'escape-html'
 import formatMessage from '../format-message'
 import {showFlashAlert} from '../common/FlashAlert'
-import {isPreviewable, loadDocPreview, showLoadingImage, removeLoadingImage} from './doc_previews'
+import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
+import {parseUrlOrNull} from '../util/url-util'
 
 const youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
 export function youTubeID(path) {
@@ -76,7 +77,7 @@ export function showFilePreview(event, opts = {}) {
   ) {
     showFilePreviewInOverlay(event, canvasOrigin)
   } else {
-    showFilePreviewInline(event, disableGooglePreviews)
+    showFilePreviewInline(event, canvasOrigin, disableGooglePreviews)
   }
 }
 
@@ -105,7 +106,7 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
   }
 }
 
-export function showFilePreviewInline(event, disableGooglePreviews) {
+export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews) {
   if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
     // if any modifier keys are pressed, do the browser default thing
     return
@@ -139,17 +140,23 @@ export function showFilePreviewInline(event, disableGooglePreviews) {
     .then(data => {
       const attachment = data && data.attachment
       removeLoadingImage($link)
+
+      let canvadoc_session_url = attachment.canvadoc_session_url
+
       if (
         attachment &&
-        ((!disableGooglePreviews && isPreviewable(attachment.content_type)) ||
-          attachment.canvadoc_session_url)
+        ((!disableGooglePreviews && isPreviewable(attachment.content_type)) || canvadoc_session_url)
       ) {
         $link.setAttribute('aria-expanded', 'true')
+
+        if (canvasOrigin && canvadoc_session_url !== null) {
+          canvadoc_session_url = parseUrlOrNull(canvadoc_session_url, canvasOrigin)?.toString()
+        }
 
         const $div = document.querySelector(`[id="${$link.getAttribute('aria-controls')}"]`)
         $div.style.display = 'block'
         loadDocPreview($div, {
-          canvadoc_session_url: attachment.canvadoc_session_url,
+          canvadoc_session_url,
           mimeType: attachment.content_type,
           public_url: attachment.public_url,
           attachment_preview_processing:

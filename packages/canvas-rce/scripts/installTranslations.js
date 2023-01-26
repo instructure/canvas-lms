@@ -208,7 +208,7 @@ export default function getTranslations(locale) {
   const getlocalelist = `
 export function getLocaleList() {
   return [
-    '${localeFileBasenames.map(l => l.replace(/_/g, '-')).join("',\n    '")}'
+    '${localeFileBasenames.map(l => l.replace(/_/g, '-')).join("',\n    '")}',
   ]
 }
 `

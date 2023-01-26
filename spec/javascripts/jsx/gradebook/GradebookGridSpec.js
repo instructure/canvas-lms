@@ -20,6 +20,7 @@ import {
   createGradebook,
   setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import fakeENV from 'helpers/fakeENV'
 import qs from 'qs'
 import _ from 'underscore'
 import {
@@ -730,7 +731,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
       gradebook.gridData.columns.frozen = columns.frozen.map(column => column.id)
       gradebook.gridData.columns.scrollable = columns.scrollable.map(column => column.id)
 
-      sinon.stub(gradebook, 'reorderCustomColumns').returns(Promise.resolve())
+      sinon.stub(gradebook.props, 'reorderCustomColumns').returns(Promise.resolve())
       sinon.stub(gradebook, 'renderViewOptionsMenu')
       sinon.stub(gradebook, 'updateColumnHeaders')
       sinon.stub(gradebook, 'saveCustomColumnOrder')
@@ -740,14 +741,14 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
       columns.frozen = [allColumns[0], allColumns[2], allColumns[1]]
       columns.scrollable = allColumns.slice(3, 8)
       gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns)
-      strictEqual(gradebook.reorderCustomColumns.callCount, 1)
+      strictEqual(gradebook.props.reorderCustomColumns.callCount, 1)
     })
 
     test('does not reorder custom columns when custom column order was not affected', () => {
       columns.frozen = [allColumns[1], allColumns[0], allColumns[2]]
       columns.scrollable = allColumns.slice(3, 8)
       gradebook.gradebookGrid.events.onColumnsReordered.trigger(null, columns)
-      strictEqual(gradebook.reorderCustomColumns.callCount, 0)
+      strictEqual(gradebook.props.reorderCustomColumns.callCount, 0)
     })
 
     test('stores custom column order when scrollable columns were reordered', () => {
@@ -1150,6 +1151,10 @@ test('includes the "student" column id when updating column headers', function (
 
 QUnit.module('Gradebook#onGridBlur', {
   setup() {
+    fakeENV.setup()
+    ENV.GRADEBOOK_OPTIONS = {
+      proxy_submissions_allowed: false,
+    }
     setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook()

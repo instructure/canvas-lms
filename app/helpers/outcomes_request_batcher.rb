@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class OutcomesRequestBatcher
-  MAX_JWT_SIZE = 8_000
+  # Max header size is 8K. We allow the JWT token to be at most 7K. This leaves 1K for any other information.
+  MAX_JWT_SIZE = 7_168
   def initialize(protocol, endpoint, context, scope, params)
     @requests = split_requests(protocol, endpoint, context, scope, params)
   end
@@ -28,15 +29,15 @@ class OutcomesRequestBatcher
   private
 
   def split_requests(protocol, endpoint, context, scope, params)
+    requests = []
     domain, jwt = extract_domain_jwt(
       context.root_account,
       scope,
-      params
+      **params
     )
 
-    return if domain.nil? || jwt.nil?
+    return requests if domain.nil? || jwt.nil?
 
-    requests = []
     if jwt.bytesize < MAX_JWT_SIZE
       # No need to split the request because it is small enough.
       requests.push({ protocol: protocol, endpoint: endpoint, domain: domain, jwt: jwt, params: params })

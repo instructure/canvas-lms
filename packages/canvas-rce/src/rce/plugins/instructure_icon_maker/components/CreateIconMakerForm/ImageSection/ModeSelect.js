@@ -19,17 +19,19 @@
 import React, {forwardRef} from 'react'
 import formatMessage from '../../../../../../format-message'
 import {modes, actions} from '../../../reducers/imageSection'
+import {ICON_MAKER_ADD_IMAGE_MENU_ID} from '../../../utils/IconMakerClose'
 
 import {Button} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 
-const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
+const ModeSelect = forwardRef(({dispatch, mountNode, onFocus, onBlur, rcsConfig}, ref) => {
   const menuFor = mode => (
     <Menu.Item
       key={mode.type}
       value={mode.type}
+      id={mode.type}
       onSelect={() => {
         dispatch({type: mode.type})
         dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: true})
@@ -43,10 +45,13 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
 
   return (
     <Menu
-      placement="bottom"
+      mountNode={mountNode}
+      placement="top"
       ref={ref}
       onFocus={onFocus}
       onBlur={onBlur}
+      // maps to data-position-content
+      id={ICON_MAKER_ADD_IMAGE_MENU_ID}
       trigger={
         <Button color="secondary" data-testid="add-image">
           {formatMessage('Add Image')}

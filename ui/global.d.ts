@@ -23,7 +23,6 @@ declare global {
 
   interface Window {
     readonly ENV?: any
-    external_tool_redirect: any
     webkitSpeechRecognition: any
     jsonData: any
   }
@@ -52,7 +51,6 @@ declare global {
   }
 
   declare interface JQueryStatic {
-    flashError: (any, number?) => void
     subscribe: any
     ajaxJSON: (
       url: string,
@@ -62,8 +60,6 @@ declare global {
       error?: any,
       options?: any
     ) => JQuery.JQueryXHR
-    flashWarning: any
-    flashMessage: any
     replaceTags: (string, string, string?) => string
     raw: any
     getScrollbarWidth: any

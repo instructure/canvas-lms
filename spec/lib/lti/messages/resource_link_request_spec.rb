@@ -162,13 +162,20 @@ describe Lti::Messages::ResourceLinkRequest do
         ]
       end
 
+      let(:line_items_url_params) do
+        # When we remove the feature flag we'll need to add "host: any" to this
+        { course_id: course.id }
+      end
+
       before do
-        allow(controller).to receive(:lti_line_item_index_url).and_return("lti_line_item_index_url")
+        allow(controller).to receive(:lti_line_item_index_url).with(
+          line_items_url_params
+        ).and_return("lti_line_item_index_url")
+
         allow(controller).to receive(:lti_line_item_show_url).with(
-          {
-            course_id: course.id,
+          line_items_url_params.merge(
             id: expected_assignment_line_item.id
-          }
+          )
         ).and_return("lti_line_item_show_url")
       end
 
@@ -189,8 +196,45 @@ describe Lti::Messages::ResourceLinkRequest do
           expect_assignment_resource_link_id(jws)
           expect_course_resource_link_id(course_jws)
           expect_assignment_and_grade_scope(course_jws)
-          expect_assignment_and_grade_line_items_url(course_jws)
           expect_assignment_and_grade_line_item_url_absent(course_jws)
+        end
+
+        describe "line_items and line_item urls" do
+          before do
+            allow_any_instance_of(Account).to receive(:domain).and_return("canonical-account-domain")
+          end
+
+          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+            # NOTE: when we remove the feature flag we'll have to modify the let(:line_items_url_params) above
+
+            before do
+              course.account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            end
+
+            it "uses the current domain in the line_items URL" do
+              expect_assignment_and_grade_line_items_url(jws)
+            end
+
+            it "uses the current domain in the line_item URL" do
+              expect_assignment_and_grade_line_item_url(jws)
+            end
+          end
+
+          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+            let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
+
+            before do
+              course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            end
+
+            it "uses the Account#domain in the line_items URL" do
+              expect_assignment_and_grade_line_items_url(jws)
+            end
+
+            it "uses the Account#domain in the line_item URL" do
+              expect_assignment_and_grade_line_item_url(jws)
+            end
+          end
         end
       end
 

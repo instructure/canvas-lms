@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/substitutions_helper"
-
 module Lti
   describe SubstitutionsHelper do
     subject { SubstitutionsHelper.new(course, root_account, user) }

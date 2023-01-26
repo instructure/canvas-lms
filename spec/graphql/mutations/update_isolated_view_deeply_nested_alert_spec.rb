@@ -43,7 +43,7 @@ RSpec.describe Mutations::UpdateIsolatedViewDeeplyNestedAlert do
   end
 
   def run_mutation(opts = {}, current_user = @teacher)
-    result = CanvasSchema.execute(mutation_str(opts), context: {
+    result = CanvasSchema.execute(mutation_str(**opts), context: {
                                     current_user: current_user,
                                     domain_root_account: @course.account.root_account,
                                     request: ActionDispatch::TestRequest.create

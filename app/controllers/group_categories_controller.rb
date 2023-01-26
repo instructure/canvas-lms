@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 # @API Group Categories
 #
 # Group Categories allow grouping of groups together in canvas. There are a few

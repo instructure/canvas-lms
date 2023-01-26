@@ -27,6 +27,17 @@ describe CoursePacing::PaceServiceInterface do
   end
 
   describe ".pace_for" do
+    context "when context is invalid" do
+      before do
+        allow(CoursePacing::PaceServiceInterface).to receive(:valid_context?).and_return(false)
+        allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_return("invalid context")
+      end
+
+      it "returns nil if invalid context" do
+        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq nil
+      end
+    end
+
     context "when there is an existing pace within the context" do
       before { allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_return("foobar") }
 
@@ -75,6 +86,16 @@ describe CoursePacing::PaceServiceInterface do
   end
 
   describe ".create_in_context" do
+    context "when context is invalid" do
+      before { allow(CoursePacing::PaceServiceInterface).to receive(:valid_context?).and_return(false) }
+
+      let(:context) { double(course_paces: double(not_deleted: double(take: "invalid context"))) }
+
+      it "returns nil if invalid context" do
+        expect(CoursePacing::PaceServiceInterface.create_in_context(context)).to eq nil
+      end
+    end
+
     context "when the context already has a pace" do
       let(:context) { double(course_paces: double(not_deleted: double(take: "foobar"))) }
 

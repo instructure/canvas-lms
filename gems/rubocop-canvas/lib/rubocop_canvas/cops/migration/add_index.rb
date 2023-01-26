@@ -104,11 +104,12 @@ module RuboCop
         end
 
         def check_add_reference(node)
-          check_non_transactional
-
           arg = index_argument(node).first
-          if arg.nil? || (!false?(arg) && !algorithm_concurrently?(arg))
-            add_offense arg || node, message: INDEX_ALGORITHM_CONCURRENTLY_MSG, severity: :warning
+          if arg.nil? || !false?(arg)
+            check_non_transactional
+            if arg.nil? || !algorithm_concurrently?(arg)
+              add_offense arg || node, message: INDEX_ALGORITHM_CONCURRENTLY_MSG, severity: :warning
+            end
           end
         end
 

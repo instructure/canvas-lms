@@ -250,7 +250,11 @@ describe('Address Book Component', () => {
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[1])
 
-      const tag = await screen.findByText('All in Chawns Course')
+      const tag = await screen.findByTestId('address-book-tag')
+      expect(tag.getAttribute('id')).toBe(
+        `address-book-label-${current_filter.context.contextID}-selectContext`
+      )
+
       expect(tag).toBeTruthy()
     })
 

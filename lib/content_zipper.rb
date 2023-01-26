@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require "zip"
-require "tmpdir"
-require "set"
 
 class ContentZipper
   def initialize(options = {})
@@ -314,7 +312,7 @@ class ContentZipper
 
     handle = nil
     begin
-      handle = attachment.open(need_local_file: true)
+      handle = attachment.open
       zipfile.get_output_stream(filename) { |zos| Zip::IOExtras.copy_stream(zos, handle) }
     rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
       Canvas::Errors.capture_exception(:content_export, e, :warn)

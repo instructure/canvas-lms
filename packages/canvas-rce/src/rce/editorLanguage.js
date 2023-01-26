@@ -48,6 +48,7 @@ const mapping = {
   ja: 'ja',
   ko: 'ko_KR',
   mi: undefined,
+  ms: undefined, // tiny has Malayalam but not Malay Standard, haiyaa
   nb: 'nb_NO',
   nl: 'nl',
   nn: 'nb_NO', // tiny doesn't have Norwegian (Nynorsk) so go to Norwegian (Bokmal)
@@ -84,7 +85,10 @@ function editorLanguage(locale) {
   if (locale.match('-x-')) {
     locale = locale.split('-x-')[0]
   }
-  return mapping[locale]
+  if (mapping[locale]) {
+    return mapping[locale]
+  }
+  return mapping[locale.split('-')[0]]
 }
 
 module.exports = editorLanguage

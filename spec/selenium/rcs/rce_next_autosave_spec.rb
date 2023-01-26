@@ -232,17 +232,13 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
     it "does not prompt to restore autosaved content if the RCE is hidden",
        ignore_js_errors: true do
       get "/accounts/#{@account.id}/settings#tab-announcements"
-      wait_for_rce
       fj('button:contains("New Announcement")').click
-
+      wait_for_rce
       edit_announcement
 
       get "/accounts/#{@account.id}/settings"
-      wait_for_rce
       wait_for_animations
-
       expect(f("#content")).not_to contain_jqcss('h2:contains("Found auto-saved content")')
-
       driver.local_storage.clear
     end
   end

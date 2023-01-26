@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 
 function validateDate(date, nullAllowed = false) {
   let valid = _.isDate(date)
@@ -45,6 +46,8 @@ function validatePeriodID(id: string) {
 }
 
 class GradingPeriodsHelper {
+  gradingPeriods: CamelizedGradingPeriod[]
+
   constructor(gradingPeriods) {
     this.gradingPeriods = validateGradingPeriodDates(gradingPeriods)
   }

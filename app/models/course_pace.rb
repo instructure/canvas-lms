@@ -139,7 +139,7 @@ class CoursePace < ActiveRecord::Base
                            run_at: run_at,
                            singleton: "course_pace_publish:#{global_id}",
                            on_conflict: :overwrite
-                         }, { enrollment_ids: enrollment_ids })
+                         }, enrollment_ids: enrollment_ids)
     progress
   end
 
@@ -194,27 +194,16 @@ class CoursePace < ActiveRecord::Base
 
               # If it exists let's just add the student to it and remove them from the other
               if correct_date_override
-                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
-                correct_date_override.assignment_override_students.create(
-                  user_id: user_id,
-                  no_enrollment: false
-                )
+                create_or_update_assignment_student_override!(correct_date_override, user_id)
               elsif current_override&.assignment_override_students&.size == 1
                 current_override.update(due_at: due_at)
               else
-                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
-                assignment.assignment_overrides.create!(
+                assignment_override = assignment.assignment_overrides.create!(
                   set_type: "ADHOC",
                   due_at_overridden: true,
-                  due_at: due_at,
-                  assignment_override_students: [
-                    AssignmentOverrideStudent.new(
-                      assignment: assignment,
-                      user_id: user_id,
-                      no_enrollment: false
-                    )
-                  ]
+                  due_at: due_at
                 )
+                create_or_update_assignment_student_override!(assignment_override, user_id)
               end
 
               # Remember content to refresh cache
@@ -242,7 +231,7 @@ class CoursePace < ActiveRecord::Base
     raise "Course pace is not deleted" unless deleted?
 
     grouped_paces_and_enrollments = student_enrollments.group_by do |enrollment|
-      student_section_ids = enrollment.user.student_enrollments.where(course: course).where.not(workflow_state: "deleted").pluck(:course_section_id)
+      student_section_ids = enrollment.user.student_enrollments.shard(shard).where(course: course).active.pluck(:course_section_id)
       pace = course.course_paces.published.where(course_section_id: student_section_ids).last
       pace || course.course_paces.published.primary.take
     end
@@ -287,7 +276,7 @@ class CoursePace < ActiveRecord::Base
           .where
           .not(course_section_id: course_section_course_pace_section_ids)
       end
-    @student_enrollments.where.not(workflow_state: "deleted")
+    @student_enrollments.active
   end
 
   def start_date(with_context: false)
@@ -316,6 +305,15 @@ class CoursePace < ActiveRecord::Base
     self[:end_date]&.in_time_zone(course.time_zone)
   end
 
+  def individual_pace_end_date
+    student_enrollment = user.student_enrollments.shard(shard).where(course: course).active.order(created_at: :desc).take
+    course_section_paces = course.course_paces.not_deleted.section_paces.preload(:course_section)
+    applied_section_pace = course_section_paces.find_by(course_section_id: student_enrollment.course_section_id)
+    return student_enrollment.course_section.end_at if applied_section_pace&.course_section_id
+
+    nil
+  end
+
   def effective_end_date(with_context: false)
     valid_date_range = CourseDateRange.new(course)
     range_end = valid_date_range.end_at[:date]
@@ -329,21 +327,57 @@ class CoursePace < ActiveRecord::Base
 
     is_student_plan = course.student_enrollments.find_by(user_id: user_id).present? if user_id
 
-    date = ((is_student_plan || hard_end_dates) && self[:end_date]) || range_end
+    date = if hard_end_dates
+             self[:end_date]
+           elsif is_student_plan
+             individual_pace_end_date
+           else
+             course_section&.end_at
+           end
+
+    date ||= range_end
     date = date&.to_date
 
     if with_context
-      context = if is_student_plan
+      context = if is_student_plan && date
                   "user"
+                elsif course_section&.end_at
+                  "section"
                 elsif date
                   hard_end_dates ? "hard" : valid_date_range.end_at[:date_context]
                 else
                   "hypothetical"
                 end
+
       { end_date: date&.in_time_zone(course.time_zone), end_date_context: context }
     else
       date&.in_time_zone(course.time_zone)
     end
+  end
+
+  # This method will attempt to find an existing AssignmentOverrideStudent for the given user and assignment override.
+  # If one exists it will update the workflow_state to active and update the assignment_override_id to the new override.
+  # It also checks to see if the old override is now empty and deletes it if it is.
+  # If no existing AssignmentOverrideStudent is found it will create a new one.
+  #
+  # @param assignment_override [AssignmentOverride] The assignment override to create or update the
+  #   AssignmentOverrideStudent for
+  # @param user_id [Integer] The user_id of the AssignmentOverrideStudent to create or update
+  # @return [AssignmentOverrideStudent] The AssignmentOverrideStudent that was created or updated
+  def create_or_update_assignment_student_override!(assignment_override, user_id)
+    assignment = assignment_override.assignment
+    assignment_override_student = assignment.assignment_override_students.find_by(user_id: user_id)
+    if assignment_override_student
+      original_override = assignment_override_student.assignment_override
+      assignment_override_student.update!(workflow_state: "active", assignment_override: assignment_override)
+      original_override.destroy_if_empty_set
+    else
+      assignment_override_student = assignment_override.assignment_override_students.create!(
+        user_id: user_id,
+        no_enrollment: false
+      )
+    end
+    assignment_override_student
   end
 
   def logging_for_weekends_required?

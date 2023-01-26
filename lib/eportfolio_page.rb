@@ -20,29 +20,35 @@
 
 module EportfolioPage
   def eportfolio_page_attributes
-    @categories = @portfolio.eportfolio_categories
-    if @portfolio.grants_right?(@current_user, session, :manage)
-      if @current_user && @current_user == @portfolio.user
-        @recent_submissions = @current_user.submissions.in_workflow_state(["submitted", "graded"]).order("created_at DESC").to_a
+    GuardRail.activate(:secondary) do
+      @categories = @portfolio.eportfolio_categories
+      if @portfolio.grants_right?(@current_user, session, :manage)
+        if @current_user && @current_user == @portfolio.user
+          @recent_submissions ||= Submission.joins(:course).joins(:assignment)
+                                            .where(user_id: @current_user, workflow_state: %w[submitted graded])
+                                            .where.not(course: { workflow_state: %w[created claimed deleted] })
+                                            .where.not(assignment: { workflow_state: %w[unpublished deleted] })
+                                            .order(created_at: :desc).to_a
+        end
+        @files ||= @current_user.attachments.to_a
+        @folders ||= @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
       end
-      @files = @current_user.attachments.to_a
-      @folders = @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
-    end
-    @recent_submissions ||= []
-    @files ||= []
-    @folders ||= []
-    @attachments = []
-    @page.content_sections.select { |s| s.is_a?(Hash) && s[:section_type] == "attachment" }.each do |section|
-      begin
-        attachment = @portfolio.user.attachments.find(section["attachment_id"])
-      rescue ActiveRecord::RecordNotFound
-        next
+      @recent_submissions ||= []
+      @files ||= []
+      @folders ||= []
+      @attachments = []
+      @page.content_sections.select { |s| s.is_a?(Hash) && s[:section_type] == "attachment" }.each do |section|
+        begin
+          attachment = @portfolio.user.attachments.find(section["attachment_id"])
+        rescue ActiveRecord::RecordNotFound
+          next
+        end
+        @attachments << attachment if attachment
       end
-      @attachments << attachment if attachment
+      @entries = @category.eportfolio_entries
+      @eportfolio_view = true
+      @show_left_side = true
     end
-    @entries = @category.eportfolio_entries
-    @eportfolio_view = true
-    @show_left_side = true
     add_crumb(@portfolio.name, eportfolio_path(@portfolio))
     if @owner_view
       add_crumb(t("#crumbs.eportfolio_welcome", "Welcome to Your ePortfolio"))

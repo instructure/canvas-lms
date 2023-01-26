@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "set"
 
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
@@ -151,12 +150,27 @@ class RequestThrottle
   # object won't be caught.
   def client_identifiers(request)
     request.env["canvas.request_throttle.user_id"] ||= [
+      tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
       (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
       tag_identifier("tool", tool_id(request)),
       tag_identifier("ip", request.ip)
     ].compact
+  end
+
+  # Bucket based on LTI Advantage client_id. Routes are identified by a combination of path
+  # and whether the controller uses the LtiServices concern -- see lti_advantage_route? method.
+  def lti_advantage_client_id_and_cluster(request)
+    return unless Lti::IMS::AdvantageAccessTokenRequestHelper.lti_advantage_route?(request)
+
+    client_id = Lti::IMS::AdvantageAccessTokenRequestHelper.token(request)&.client_id
+    return unless client_id
+
+    cluster_id = request.env["canvas.domain_root_account"]&.shard&.database_server_id
+    "#{client_id}-#{cluster_id}"
+  rescue Lti::IMS::AdvantageErrors::AdvantageClientError
+    nil
   end
 
   def tool_id(request)

@@ -185,10 +185,8 @@ class CourseSection < ActiveRecord::Base
     given { |user| course.account_membership_allows(user, :manage_calendar) }
     can :manage_calendar
 
-    given do |user, session|
-      user &&
-        course.sections_visible_to(user).where(id: self).exists? &&
-        course.grants_right?(user, session, :read_roster)
+    given do |user, _session|
+      user && course.sections_visible_to(user).where(id: self).exists?
     end
     can :read
 

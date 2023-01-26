@@ -25,7 +25,7 @@ export const hasText = settings => {
 }
 
 export const hasImage = settings => {
-  return settings.encodedImage.length > 0
+  return settings.imageSettings?.image.length > 0
 }
 
 export const hasOutline = settings => {

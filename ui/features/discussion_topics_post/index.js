@@ -27,8 +27,17 @@ ready(() => {
     <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />,
     $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0]
   )
+  // page style modifiers
+  document.querySelector('body')?.classList.add('full-width')
+  document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')
+  document.querySelector('#content')?.setAttribute('style', 'padding: 0 0 24px 24px')
+  document
+    .querySelector('.ic-app-nav-toggle-and-crumbs.no-print')
+    ?.setAttribute('style', 'margin: 0 0 0 24px')
+  document.querySelector('#easy_student_view')?.setAttribute('style', 'margin: 0 24px')
 })
-if (ENV.SEQUENCE != null) {
+const urlParams = new URLSearchParams(window.location.search)
+if (ENV.SEQUENCE != null && !urlParams.get('embed')) {
   // eslint-disable-next-line promise/catch-or-return
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {

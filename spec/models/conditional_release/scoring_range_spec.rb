@@ -19,7 +19,6 @@
 #
 
 require_relative "../../conditional_release_spec_helper"
-require_dependency "conditional_release/scoring_range"
 
 module ConditionalRelease
   describe ScoringRange, type: :model do

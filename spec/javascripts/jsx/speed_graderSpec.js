@@ -24,6 +24,7 @@ import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader'
 import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
 import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
 import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
+import QuizzesNextSpeedGrading from 'ui/features/speed_grader/QuizzesNextSpeedGrading'
 import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -124,6 +125,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com',
         show_help_menu_item: false,
         force_anonymous_grading: false,
+        GRADE_BY_QUESTION: false,
       }
       sandbox.stub(userSettings, 'get')
       userSettings.get.withArgs('eg_hide_student_names').returns(false)
@@ -181,6 +183,28 @@ QUnit.module('SpeedGrader', rootHooks => {
       return saveUserSettings.then(() => {
         ok(SpeedGraderHelpers.reloadPage.notCalled)
       })
+    })
+
+    test('sends a postMessage only when "grade_by_question" changes', () => {
+      const postMessageStub = sandbox.stub(
+        QuizzesNextSpeedGrading,
+        'postGradeByQuestionChangeMessage'
+      )
+      const checkbox = document.getElementById('enable_speedgrader_grade_by_question')
+      const form = $('#settings_form')
+
+      checkbox.checked = true
+      form.submit()
+      ok(postMessageStub.calledOnceWithExactly(sinon.match.any, true))
+
+      postMessageStub.resetHistory()
+      checkbox.checked = false
+      form.submit()
+      ok(postMessageStub.calledOnceWithExactly(sinon.match.any, false))
+
+      postMessageStub.resetHistory()
+      form.submit()
+      ok(postMessageStub.notCalled)
     })
   })
 
@@ -402,6 +426,29 @@ QUnit.module('SpeedGrader', rootHooks => {
 
     const submissionDropdown = document.getElementById('multiple_submissions')
     notOk(submissionDropdown.innerHTML.includes('Jan 1, 2010'))
+    SpeedGrader.teardown()
+  })
+
+  test('displays proxy submitter when one is present on the submission (multiple submissions)', () => {
+    SpeedGrader.setup()
+    const history = SpeedGrader.EG.currentStudent.submission.submission_history.map(h => {
+      return {...h, proxy_submitter: 'George Washington'}
+    })
+    SpeedGrader.EG.currentStudent.submission.submission_history = history
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    ok(submissionDropdown.innerHTML.includes('(George Washington)'))
+    SpeedGrader.teardown()
+  })
+
+  test('displays proxy submitter when one is present on the submission (single submission)', () => {
+    SpeedGrader.setup()
+    const firstHistory = SpeedGrader.EG.currentStudent.submission.submission_history[0]
+    firstHistory.proxy_submitter = 'Mike Tyson'
+    SpeedGrader.EG.currentStudent.submission.submission_history = [firstHistory]
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    ok(submissionDropdown.innerHTML.includes('by Mike Tyson'))
     SpeedGrader.teardown()
   })
 
@@ -1084,6 +1131,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         show_help_menu_item: false,
         RUBRIC_ASSESSMENT: {},
         update_submission_grade_url: 'my_url.com',
+        assignment_missing_shortcut: true,
       }
       fakeENV.setup(env)
       sandbox.spy($.fn, 'append')
@@ -1385,7 +1433,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
   test('contains iframe with the escaped student submission url', () => {
     let retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       external_tool_url: url,
@@ -1399,10 +1447,30 @@ QUnit.module('SpeedGrader', rootHooks => {
     buildIframeStub.restore()
   })
 
+  test('includes the grade_by_question query param when a new quiz and flag + setting are enabled', () => {
+    ENV.NQ_GRADE_BY_QUESTION_ENABLED = true
+    ENV.GRADE_BY_QUESTION = true
+    const originalJsonData = window.jsonData
+    window.jsonData = {quiz_lti: true}
+    const retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
+    const url = 'http://www.example.com/lti/launch/user/4'
+    const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
+    const submission = {
+      external_tool_url: url,
+      resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
+    }
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, submission)
+    const [srcUrl] = buildIframeStub.firstCall.args
+    const {searchParams} = new URL(decodeURIComponent(unescape(srcUrl).match(/http.*/)[0]))
+    strictEqual(searchParams.get('grade_by_question_enabled'), 'true')
+    buildIframeStub.restore()
+    window.jsonData = originalJsonData
+  })
+
   test('can be fullscreened', () => {
     const retrieveUrl =
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       url,
@@ -1417,7 +1485,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   test('allows options defined in iframeAllowances()', () => {
     const retrieveUrl =
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
-    const url = 'www.example.com/lti/launch/user/4'
+    const url = 'http://www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
     const submission = {
       url,
@@ -5599,6 +5667,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             help_url: 'example.com/support',
             show_help_menu_item: false,
             RUBRIC_ASSESSMENT: {assessment_user_id: '123', assessment_type: 'grading'},
+            assignment_missing_shortcut: true,
           })
           setupFixtures(`
           <div id="grade_container">

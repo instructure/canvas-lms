@@ -28,6 +28,12 @@ describe Attachment do
       expect { attachment_model(context: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
 
+    it "raises an error if you create in a deleted folder" do
+      course_factory
+      f1 = @course.folders.create!(name: "f1", workflow_state: "deleted")
+      expect { attachment_model(context: @course, folder: f1) }.to raise_error ActiveRecord::StatementInvalid, /Cannot create attachments in deleted folders/
+    end
+
     describe "category" do
       subject { attachment_model category: category }
 
@@ -73,7 +79,7 @@ describe Attachment do
 
   context "default_values" do
     before :once do
-      @course = course_model
+      course_model
     end
 
     it "sets the display name to the filename if it is nil" do
@@ -587,8 +593,9 @@ describe Attachment do
   end
 
   context "destroy" do
+    let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
+
     it "does not actually destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
       a.destroy
       expect(a).not_to be_frozen
@@ -596,7 +603,6 @@ describe Attachment do
     end
 
     it "is probably not possible to actually destroy... somehow" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
       a.destroy
       expect(a).not_to be_frozen
@@ -608,7 +614,6 @@ describe Attachment do
     it "does not show up in the context list after being destroyed" do
       @course = course_factory
       expect(@course).not_to be_nil
-      a = attachment_model(uploaded_data: default_uploaded_data, context: @course)
       expect(a.filename).to eql("doc.doc")
       expect(a.context).to eql(@course)
       a.destroy
@@ -619,14 +624,12 @@ describe Attachment do
     end
 
     it "still destroys without error if file data is lost" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       allow(a).to receive(:downloadable?).and_return(false)
       a.destroy
       expect(a).to be_deleted
     end
 
     it "replaces uploaded data on destroy_content_and_replace" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.content_type).to eq "application/msword"
       a.destroy_content_and_replace
       expect(a.content_type).to eq "application/pdf"
@@ -641,7 +644,6 @@ describe Attachment do
     end
 
     it "destroys content and record on destroy_permanently_plus" do
-      a = attachment_model
       a2 = attachment_model(root_attachment: a)
       expect(a).to receive(:make_childless).once
       expect(a).to receive(:destroy_content).once
@@ -672,7 +674,6 @@ describe Attachment do
     end
 
     it "does not do destroy_content_and_replace twice" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a.destroy_content_and_replace # works
       expect(a).not_to receive(:send_to_purgatory)
       a.destroy_content_and_replace # returns because it already happened
@@ -696,7 +697,6 @@ describe Attachment do
     end
 
     it "allows destroy_content_and_replace on children attachments" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a2 = attachment_model(root_attachment: a)
       a2.destroy_content_and_replace
       purgatory = Purgatory.where(attachment_id: [a.id, a2.id])
@@ -705,7 +705,6 @@ describe Attachment do
     end
 
     it "destroys all associated submission_draft_attachments on destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
         submission: submission,
@@ -720,7 +719,6 @@ describe Attachment do
     end
 
     it "does not destroy any submission_draft_attachments associated to other attachments on destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a2 = attachment_model(uploaded_data: default_uploaded_data)
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
@@ -733,6 +731,13 @@ describe Attachment do
       )
       a.destroy
       expect(a2.submission_draft_attachments.count).to eq 1
+    end
+
+    it "removes avatars from the destroyed file" do
+      user_model(avatar_image_url: a.public_url)
+      a.update(context: @user)
+      a.destroy
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     shared_examples_for "destroy_content_and_replace" do
@@ -1762,7 +1767,7 @@ describe Attachment do
     before do
       s3_storage!
       Attachment.current_root_account = @old_account
-      @root = attachment_model(filename: "unknown 2.loser")
+      @root = attachment_model(filename: "unknown 2.example")
       @child = attachment_model(root_attachment: @root)
 
       @old_object = double("old object")
@@ -2259,30 +2264,75 @@ describe Attachment do
     include WebMock::API
 
     context "instfs branch" do
-      before do
+      before :once do
         user_model
         attachment_model(context: @user)
-        public_url = "http://www.example.com/foo"
+        @public_url = "http://www.example.com/foo"
+        @attachment.update md5: Digest::SHA512.hexdigest("test response body")
+      end
+
+      before do
         allow(@attachment).to receive(:instfs_hosted?).and_return true
-        allow(@attachment).to receive(:public_url).and_return public_url
-
-        stub_request(:get, public_url)
-          .to_return(status: 200, body: "test response body", headers: {})
+        allow(@attachment).to receive(:public_url).and_return @public_url
       end
 
-      it "streams data to the block given" do
-        callback = false
-        @attachment.open do |data|
-          expect(data).to eq "test response body"
-          callback = true
+      context "with good data" do
+        before do
+          stub_request(:get, @public_url)
+            .to_return(status: 200, body: "test response body", headers: {})
         end
-        expect(callback).to eq true
+
+        it "streams data to the block given" do
+          callback = false
+          @attachment.open do |data|
+            expect(data).to eq "test response body"
+            callback = true
+          end
+          expect(callback).to eq true
+        end
+
+        it "streams to a tempfile without a block given" do
+          file = @attachment.open
+          expect(file).to be_a(Tempfile)
+          expect(file.read).to eq("test response body")
+        end
+
+        it "retries without duplicating already downloaded data" do
+          # WebMock operates at too high a level to simulate a read timeout, so we'll hack the Tempfile
+          # to raise one after the first write to it so we can test the exception flow
+          raised = false
+          allow(CanvasHttp::CircuitBreaker).to receive(:trip_if_necessary)
+          expect_any_instance_of(Tempfile).to receive(:<<).at_least(:once).and_wrap_original do |m, *args|
+            m.call(*args)
+            unless raised
+              raised = true
+              raise Net::ReadTimeout
+            end
+          end
+          file = @attachment.open
+          expect(file).to be_a(Tempfile)
+          expect(file.read).to eq("test response body")
+        end
       end
 
-      it "streams to a tempfile without a block given" do
-        file = @attachment.open
-        expect(file).to be_a(Tempfile)
-        expect(file.read).to eq("test response body")
+      context "with bad data and :integrity_check" do
+        # return bad data the first time, then correct data the second time
+        before do
+          stub_request(:get, @public_url)
+            .to_return(status: 200, body: "bad response body :( :(").then
+            .to_return(status: 200, body: "test response body")
+        end
+
+        # since we already sent bad data to the block, we can't fix this
+        it "raises an error in the block flow" do
+          expect { @attachment.open(integrity_check: true) { |data| data } }.to raise_error(Attachment::CorruptedDownload)
+        end
+
+        # we should rewind/truncate the tempfile and try the download again (but also log the exception)
+        it "retries the download in the tempfile flow" do
+          expect(Canvas::Errors).to receive(:capture_exception).with(:attachment, Attachment::CorruptedDownload, :info).once
+          expect(@attachment.open(integrity_check: true).read).to eq "test response body"
+        end
       end
     end
 

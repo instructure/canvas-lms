@@ -55,18 +55,21 @@ export const AuthorInfo = props => {
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
+          avatarSize: props.threadMode ? 'small' : 'medium',
         },
         desktop: {
-          authorNameTextSize: 'medium',
-          timestampTextSize: 'small',
+          authorNameTextSize: props.threadMode ? 'small' : 'medium',
+          timestampTextSize: props.threadMode ? 'x-small' : 'small',
           nameAndRoleDirection: 'row',
-          badgeMarginLeft: '-24px',
+          badgeMarginLeft: props.threadMode ? '-16px' : '-24px',
+          avatarSize: props.threadMode ? 'small' : 'medium',
         },
         mobile: {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
           badgeMarginLeft: '-16px',
+          avatarSize: 'small',
         },
       }}
       render={responsiveProps => (
@@ -94,6 +97,7 @@ export const AuthorInfo = props => {
             )}
             {hasAuthor && !isAnonymous(props) && (
               <Avatar
+                size={responsiveProps.avatarSize}
                 name={getDisplayName(props)}
                 src={avatarUrl}
                 margin="0"
@@ -101,7 +105,10 @@ export const AuthorInfo = props => {
               />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} />
+              <AnonymousAvatar
+                seedString={props.anonymousAuthor.shortName}
+                size={responsiveProps.avatarSize}
+              />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink={true}>
@@ -216,6 +223,7 @@ AuthorInfo.propTypes = {
    */
   isTopicAuthor: PropTypes.bool,
   discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
+  threadMode: PropTypes.bool,
 }
 
 const Timestamps = props => {

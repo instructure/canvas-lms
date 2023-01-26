@@ -30,8 +30,8 @@ module Canvas
     # lib/canvas/security/*.rb that need the existing module structure,
     # so method_missing works better at the moment.
     class << self
-      def method_missing(m, *args, &block)
-        CanvasSecurity.send(m, *args, &block)
+      def method_missing(...)
+        CanvasSecurity.send(...)
       end
     end
 

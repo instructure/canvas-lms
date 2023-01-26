@@ -27,6 +27,7 @@ import RCEWrapper, {
   mergeMenu,
   mergeToolbar,
   mergePlugins,
+  parsePluginsToExclude,
 } from '../../src/rce/RCEWrapper'
 
 const textareaId = 'myUniqId'
@@ -61,9 +62,6 @@ function createdMountedElement(additionalProps = {}) {
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       canUploadFiles: false,
       ...trayProps(),
-      features: {
-        new_equation_editor: true,
-      },
       ...additionalProps,
     })
   )
@@ -98,9 +96,7 @@ function defaultProps() {
     ltiTools: [],
     editorOptions: {},
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
-    features: {
-      new_equation_editor: true,
-    },
+    features: {},
     canvasOrigin: 'http://canvas.docker',
   }
 }
@@ -122,6 +118,13 @@ describe('RCEWrapper', () => {
     if (!global.MutationObserver) {
       global.MutationObserver = function MutationObserver(_props) {
         this.observe = () => {}
+      }
+    }
+
+    if (!global.ResizeObserver) {
+      global.ResizeObserver = function ResizeObserver() {
+        this.observe = () => {}
+        this.unobserve = () => {}
       }
     }
 
@@ -389,19 +392,28 @@ describe('RCEWrapper', () => {
         // mock enough for RCEWrapper.insertImagePlaceholder
         globalImage = global.Image
         global.Image = function () {
-          return {
-            src: null,
+          const img = {
+            _src: null,
             width: '10',
             height: '10',
             ...props,
+            get src() {
+              return this._src
+            },
+            // when the src is set, wait a tick then call the onload handler
+            set src(newSrc) {
+              this._src = newSrc
+              window.setTimeout(() => this.onload(), 1)
+            },
           }
+          return img
         }
       }
       function restoreImage() {
         global.Image = globalImage
       }
 
-      it('inserts a placeholder image with the proper metadata', () => {
+      it('inserts a placeholder image with the proper metadata', async () => {
         mockImage()
         const greenSquare =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
@@ -414,12 +426,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="green_square"
-      style="width: 10px; height: 10px; vertical-align: middle;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="green_square"
+  style="width: 10px; height: 10px; vertical-align: middle;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -429,7 +441,7 @@ describe('RCEWrapper', () => {
         restoreImage()
       })
 
-      it('inserts a placeholder image with an encoded name to prevent nested quotes', () => {
+      it('inserts a placeholder image with an encoded name to prevent nested quotes', async () => {
         mockImage()
         const greenSquare =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
@@ -442,12 +454,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="filename%20%22with%22%20quotes"
-      style="width: 10px; height: 10px; vertical-align: middle;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="filename%20%22with%22%20quotes"
+  style="width: 10px; height: 10px; vertical-align: middle;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -457,7 +469,7 @@ describe('RCEWrapper', () => {
         restoreImage()
       })
 
-      it('constrains the image placeholder to the width of the rce', () => {
+      it('constrains the image placeholder to the width of the rce', async () => {
         mockImage({width: 1000, height: 1000})
         const greenSquare =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
@@ -470,12 +482,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="green_square"
-      style="width: 500px; height: 500px; vertical-align: middle;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="green_square"
+  style="width: 500px; height: 500px; vertical-align: middle;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -485,7 +497,7 @@ describe('RCEWrapper', () => {
         restoreImage()
       })
 
-      it('inserts a text file placeholder image with the proper metadata', () => {
+      it('inserts a text file placeholder image with the proper metadata', async () => {
         const props = {
           name: 'file.txt',
           domObject: {},
@@ -493,12 +505,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="file.txt"
-      style="width: 8rem; height: 1rem; vertical-align: middle;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="file.txt"
+  style="width: 8rem; height: 1rem; vertical-align: middle;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -507,19 +519,19 @@ describe('RCEWrapper', () => {
         )
       })
 
-      it('inserts a video file placeholder image with the proper metadata', () => {
+      it('inserts a video file placeholder image with the proper metadata', async () => {
         const props = {
           name: 'file.mov',
           domObject: {},
           contentType: 'video/quicktime',
         }
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="file.mov"
-      style="width: 400px; height: 225px; vertical-align: bottom;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="file.mov"
+  style="width: 400px; height: 225px; vertical-align: bottom;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -528,19 +540,19 @@ describe('RCEWrapper', () => {
         )
       })
 
-      it('inserts an audio file placeholder image with the proper metadata', () => {
+      it('inserts an audio file placeholder image with the proper metadata', async () => {
         const props = {
           name: 'file.mp3',
           domObject: {},
           contentType: 'audio/mp3',
         }
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="file.mp3"
-      style="width: 320px; height: 14.25rem; vertical-align: bottom;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="file.mp3"
+  style="width: 320px; height: 14.25rem; vertical-align: bottom;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -549,7 +561,7 @@ describe('RCEWrapper', () => {
         )
       })
 
-      it('inserts a little placeholder for images displayed as links', () => {
+      it('inserts a little placeholder for images displayed as links', async () => {
         mockImage()
         const square =
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
@@ -563,12 +575,12 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <span
-      aria-label="Loading"
-      data-placeholder-for="square.png"
-      style="width: 10rem; height: 1rem; vertical-align: middle;"
-    >`
-        instance.insertImagePlaceholder(props)
+<span
+  aria-label="Loading"
+  data-placeholder-for="square.png"
+  style="width: 10rem; height: 1rem; vertical-align: middle;"
+>`
+        await instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
           editorCommandSpy,
           'mceInsertContent',
@@ -764,7 +776,7 @@ describe('RCEWrapper', () => {
   })
 
   describe('is_dirty()', () => {
-    it('is true if not hidden and defaultContent is not equal to getConent()', () => {
+    it('is true if not hidden and defaultContent is not equal to getContent()', () => {
       editor.serializer.serialize.returns(editor.content)
       const c = createBasicElement()
       c.setCode('different')
@@ -772,7 +784,7 @@ describe('RCEWrapper', () => {
       assert(c.is_dirty())
     })
 
-    it('is false if not hidden and defaultContent is equal to getConent()', () => {
+    it('is false if not hidden and defaultContent is equal to getContent()', () => {
       editor.serializer.serialize.returns(editor.content)
       const c = createBasicElement()
       editor.hidden = false
@@ -1219,23 +1231,31 @@ describe('RCEWrapper', () => {
         standardPlugins = ['foo', 'bar', 'baz']
       })
 
-      it('returns input of no custom plugins are provided', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        assert.deepStrictEqual(mergePlugins(a), a)
+      it('returns input if no custom or excluded plugins are provided', () => {
+        const standard = sleazyDeepCopy(standardPlugins)
+        assert.deepStrictEqual(mergePlugins(standard), standard)
       })
 
       it('merges items into the plugins', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        const b = ['fizz', 'buzz']
-        const result = standardPlugins.concat(b)
-        assert.deepStrictEqual(mergePlugins(a, b), result)
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['fizz', 'buzz']
+        const result = standardPlugins.concat(custom)
+        assert.deepStrictEqual(mergePlugins(standard, custom), result)
       })
 
       it('removes duplicates', () => {
-        const a = sleazyDeepCopy(standardPlugins)
-        const b = ['foo', 'fizz']
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['foo', 'fizz']
         const result = standardPlugins.concat(['fizz'])
-        assert.deepStrictEqual(mergePlugins(a, b), result)
+        assert.deepStrictEqual(mergePlugins(standard, custom), result)
+      })
+
+      it('removes plugins marked to exlude', () => {
+        const standard = sleazyDeepCopy(standardPlugins)
+        const custom = ['foo', 'fizz']
+        const exclusions = ['fizz', 'baz']
+        const result = ['foo', 'bar']
+        assert.deepStrictEqual(mergePlugins(standard, custom, exclusions), result)
       })
     })
 
@@ -1248,6 +1268,14 @@ describe('RCEWrapper', () => {
       it('removes instructure_media from plugins if instRecordDisabled is set', () => {
         const instance = createBasicElement({instRecordDisabled: true})
         assert.ok(!instance.tinymceInitOptions.plugins.includes('instructure_record'))
+      })
+    })
+
+    describe('parsePluginsToExclude', () => {
+      it('returns cleaned versions of plugins prefixed with a hyphen', () => {
+        const plugins = ['-abc', 'def', '-ghi', 'jkl']
+        const result = ['abc', 'ghi']
+        assert.deepStrictEqual(parsePluginsToExclude(plugins), result)
       })
     })
   })

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {parseLatex} from './EquationEditorModal/parseLatex'
-import advancedPreference from './EquationEditorModal/advancedPreference'
+import * as advancedPreference from './EquationEditorModal/advancedPreference'
 
 export default function (ed, document, _trayProps) {
   return import('./EquationEditorModal').then(module => {
@@ -54,10 +54,4 @@ export default function (ed, document, _trayProps) {
       container
     )
   })
-}
-
-export function oldClickCallback(ed, document) {
-  const ev = document.createEvent('CustomEvent')
-  ev.initCustomEvent('tinyRCE/initEquation', true, true, {ed})
-  document.dispatchEvent(ev)
 }

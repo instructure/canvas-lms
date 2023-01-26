@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment
+  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -901,7 +901,7 @@ class User < ActiveRecord::Base
   end
 
   def preserve_lti_id
-    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil?
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil? && !override_lti_id_lock
   end
 
   def ensure_lti_id
@@ -1354,18 +1354,13 @@ class User < ActiveRecord::Base
   end
 
   def self.all_course_admin_type_permissions_for(user)
-    enrollments = user.enrollments.active.of_admin_type
+    enrollments = Enrollment.for_user(user).of_admin_type.active_by_date.distinct_on(:role_id).to_a
     result = {}
 
     RoleOverride.permissions.each_key do |permission|
-      # initialize all permissions
-      result[permission] ||= []
-
-      enrollments.find_each do |enrollment|
-        # if available, iterate and set permissions that are enabled
-        # through the user's active course admin enrollments
-        enrollment.has_permission_to?(permission) == false ? next : result[permission] << true
-      end
+      # iterate and set permissions
+      # we want the highest level permission set the user is authorized for
+      result[permission] = true if enrollments.any? { |e| e.has_permission_to?(permission) }
     end
     result
   end
@@ -2095,6 +2090,10 @@ class User < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def membership_for_group_id?(group_id)
+    current_group_memberships.active.where(group_id: group_id).exists?
   end
 
   def has_student_enrollment?

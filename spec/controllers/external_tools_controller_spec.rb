@@ -19,6 +19,7 @@
 #
 
 require "lti_1_3_spec_helper"
+require_relative "lti/concerns/parent_frame_shared_examples"
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper
@@ -741,9 +742,12 @@ describe ExternalToolsController do
         tool
       end
 
-      let(:launch_hash) do
+      let(:decoded_jwt) do
         lti_launch = assigns[:lti_launch]
-        decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+        Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+      end
+
+      let(:launch_hash) do
         cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
         JSON.parse(cached_launch)
       end
@@ -778,13 +782,15 @@ describe ExternalToolsController do
           )
         end
 
-        let(:get_page) do
-          get "retrieve", params: {
+        let(:get_page_params) do
+          {
             course_id: @course.id,
             url: "http://www.example.com/launch",
             resource_link_lookup_uuid: rl.lookup_uuid
           }
         end
+
+        let(:get_page) { get "retrieve", params: get_page_params }
 
         it "sets the custom parameters in the launch hash" do
           get_page
@@ -853,6 +859,20 @@ describe ExternalToolsController do
           expect(
             launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
           ).to eq({ "abc" => "def", "expans" => @teacher.id })
+        end
+
+        it "if parent_frame_context is not given it does not include it in lti_message_hint" do
+          get_page
+          expect(decoded_jwt).to_not include("parent_frame_context")
+        end
+
+        context "when the parent parent_frame_context is passed" do
+          let(:get_page_params) { super().merge(parent_frame_context: 123) }
+
+          it "sets parent_frame_context in the lti_message_hint" do
+            get_page
+            expect(decoded_jwt["parent_frame_context"]).to eq("123")
+          end
         end
       end
 
@@ -940,7 +960,6 @@ describe ExternalToolsController do
                              })
       resource_link = Lti::ResourceLink.create_with(@course, tool2, nil, "http://tool2.com/testing")
 
-      puts "getting the retrieve endpoint.... #{@course.id} with lookup_id: #{resource_link.lookup_uuid}"
       # supply a different url to the endpoint
       get "retrieve", params: { course_id: @course.id, resource_link_lookup_uuid: resource_link.lookup_uuid, url: "http://tool1.com" }
       expect(response).to be_successful
@@ -1018,6 +1037,19 @@ describe ExternalToolsController do
       jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
       get :retrieve, params: { url: tool.url, account_id: account.id, secure_params: jwt }
       expect(assigns[:lti_launch].params["ext_lti_assignment_id"]).to eq lti_assignment_id
+    end
+
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        get :retrieve, params: {
+          url: tool.url, course_id: @course.id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
+
+      before { user_session(@student) }
+
+      let(:pfc_tool_context) { @course }
     end
 
     context "for Quizzes Next launch" do
@@ -1332,6 +1364,20 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params["custom_canvas_enrollment_state"]).to eq "inactive"
     end
 
+    it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
+      subject do
+        get "resource_selection", params: {
+          course_id: @course.id,
+          external_tool_id: new_valid_tool(@course).id,
+          parent_frame_context: pfc_tool.id
+        }
+      end
+
+      before { user_session(@student) }
+
+      let(:pfc_tool_context) { @course }
+    end
+
     context "with RCE parameters" do
       subject do
         user_session(@student)
@@ -1387,6 +1433,15 @@ describe ExternalToolsController do
             let(:selection_launch_param) { assigns[:lti_launch].params["custom_selection"] }
             let(:contents_launch_param) { assigns[:lti_launch].params["custom_contents"] }
           end
+
+          it "forwards parent_frame_context to the content item return url" do
+            user_session(@teacher)
+            tool.resource_selection = { message_type: "ContentItemSelectionRequest" }
+            tool.save!
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id }
+            expect(response).to be_successful
+            expect(assigns[:lti_launch].params["content_item_return_url"]).to include("parent_frame_context=#{tool.id}")
+          end
         end
       end
 
@@ -1398,13 +1453,13 @@ describe ExternalToolsController do
           t.save
           t
         end
+
+        let(:decoded_jwt) do
+          JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)
+        end
+
         let(:launch_params) do
-          JSON.parse(
-            fetch_and_delete_launch(
-              @course,
-              JSON::JWT.decode(assigns[:lti_launch].params["lti_message_hint"], :skip_verification)["verifier"]
-            )
-          )
+          JSON.parse(fetch_and_delete_launch(@course, decoded_jwt["verifier"]))
         end
 
         context "during a basic launch" do
@@ -1422,6 +1477,27 @@ describe ExternalToolsController do
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          end
+
+          context "when the parent_frame_context param is sent" do
+            before do
+              tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+              tool.save!
+              user_session(@teacher)
+              post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
+            end
+
+            it "forwards parent_frame_context to the deep link return url" do
+              deep_link_return_url = launch_params["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"]["deep_link_return_url"]
+              return_jwt = deep_link_return_url.match(/data=([^&]*)/)[1]
+              jwt = JSON::JWT.decode(return_jwt, :skip_verification)
+              expect(jwt[:parent_frame_context]).to be == tool.id.to_s
+              expect(response).to be_successful
+            end
+
+            it "includes parent_frame_context in the lti_message_hint" do
+              expect(decoded_jwt["parent_frame_context"]).to eq(tool.id.to_s)
+            end
           end
         end
       end

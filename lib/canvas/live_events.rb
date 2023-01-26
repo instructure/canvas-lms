@@ -70,6 +70,7 @@ module Canvas::LiveEvents
       course_id: course.global_id,
       uuid: course.uuid,
       account_id: course.global_account_id,
+      account_uuid: course.account.uuid,
       name: course.name,
       created_at: course.created_at,
       updated_at: course.updated_at,
@@ -293,11 +294,19 @@ module Canvas::LiveEvents
   end
 
   def self.assignments_bulk_updated(assignment_ids)
-    Assignment.where(id: assignment_ids).each { |a| assignment_updated(a) }
+    Assignment.where(id: assignment_ids).find_each { |a| assignment_updated(a) }
   end
 
   def self.submissions_bulk_updated(submissions)
     Submission.where(id: submissions).preload(:assignment).find_each { |submission| submission_updated(submission) }
+  end
+
+  def self.attachments_bulk_deleted(attachment_ids)
+    Attachment.where(id: attachment_ids).find_each { |a| attachment_deleted(a) }
+  end
+
+  def self.users_bulk_updated(user_ids)
+    User.where(id: user_ids).find_each { |u| user_updated(u) }
   end
 
   def self.get_assignment_override_data(override)
@@ -653,6 +662,7 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next =
       content_migration.migration_settings&.[](:import_quizzes_next) == true
+    need_resource_map = content_migration.source_course&.has_new_quizzes?
     payload = {
       content_migration_id: content_migration.global_id,
       context_id: context.global_id,
@@ -661,8 +671,10 @@ module Canvas::LiveEvents
       context_uuid: context.uuid,
       import_quizzes_next: import_quizzes_next,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
+      source_course_uuid: content_migration.source_course&.uuid,
       destination_course_lti_id: context.lti_context_id,
-      migration_type: content_migration.migration_type
+      migration_type: content_migration.migration_type,
+      resource_map_url: content_migration.asset_map_url(generate_if_needed: need_resource_map)
     }
 
     if context.respond_to?(:root_account)
@@ -764,9 +776,15 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.get_learning_outcome_context_uuid(outcome_id)
+    out = LearningOutcome.find_by(id: outcome_id)
+    out&.context&.uuid
+  end
+
   def self.get_learning_outcome_result_data(result)
     {
       learning_outcome_id: result.learning_outcome_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(result.learning_outcome_id),
       mastery: result.mastery,
       score: result.score,
       created_at: result.created_at,
@@ -795,6 +813,7 @@ module Canvas::LiveEvents
       learning_outcome_id: outcome.id,
       context_type: outcome.context_type,
       context_id: outcome.context_id,
+      context_uuid: outcome.context&.uuid,
       display_name: outcome.display_name,
       short_description: outcome.short_description,
       description: outcome.description,
@@ -815,15 +834,22 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_created", get_learning_outcome_data(outcome))
   end
 
+  def self.get_learning_outcome_group_context_uuid(group_id)
+    group = LearningOutcomeGroup.find_by(id: group_id)
+    group&.context&.uuid
+  end
+
   def self.get_learning_outcome_group_data(group)
     {
       learning_outcome_group_id: group.id,
       context_id: group.context_id,
+      context_uuid: group.context&.uuid,
       context_type: group.context_type,
       title: group.title,
       description: group.description,
       vendor_guid: group.vendor_guid,
       parent_outcome_group_id: group.learning_outcome_group_id,
+      parent_outcome_group_context_uuid: get_learning_outcome_group_context_uuid(group.learning_outcome_group_id),
       workflow_state: group.workflow_state
     }
   end
@@ -840,7 +866,9 @@ module Canvas::LiveEvents
     {
       learning_outcome_link_id: link.id,
       learning_outcome_id: link.content_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(link.content_id),
       learning_outcome_group_id: link.associated_asset_id,
+      learning_outcome_group_context_uuid: get_learning_outcome_group_context_uuid(link.associated_asset_id),
       context_id: link.context_id,
       context_type: link.context_type,
       workflow_state: link.workflow_state
@@ -973,6 +1001,7 @@ module Canvas::LiveEvents
       description: description.description,
       workflow_state: description.workflow_state,
       learning_outcome_id: description.learning_outcome_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(description.learning_outcome_id),
       root_account_id: description.root_account_id
     }
   end

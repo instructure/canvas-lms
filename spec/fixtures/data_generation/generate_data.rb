@@ -29,7 +29,7 @@ require_relative "../../factories/course_factory"
 require_relative "../../factories/user_factory"
 require_relative "../../factories/quiz_factory"
 require_relative "../../factories/outcome_factory"
-require "securerandom"
+
 require "optparse"
 
 # rubocop:disable Specs/ScopeIncludes
@@ -132,8 +132,7 @@ def create_discussion(course, creator, workflow_state = "published")
     title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
     message: "Discussion topic message",
     assignment: discussion_assignment,
-    workflow_state: workflow_state,
-    todo_date: 1.day.from_now(Time.zone.now)
+    workflow_state: workflow_state
   )
 end
 

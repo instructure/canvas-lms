@@ -767,9 +767,15 @@ class Conversation < ActiveRecord::Base
 
     course = context.is_a?(Course) ? context : context.context
 
-    # Can not reply if the course is hard or soft concluded
-    if course.is_a?(Course) && (course.workflow_state == "completed" || course.soft_concluded?)
-      return true
+    if course.is_a?(Course)
+      return true if course.workflow_state == "completed"
+
+      user_course_roles = course.all_current_enrollments.where(user_id: user.id).pluck(:type)
+
+      has_non_concluded_enrollment = !user_course_roles.empty? && user_course_roles.any? { |ucr| !course.soft_concluded?(ucr) }
+      has_non_concluded_section = course.sections_visible_to(user).any? { |vs| !vs.concluded? }
+
+      return true unless has_non_concluded_enrollment || has_non_concluded_section
     end
 
     # can still reply if a teacher is involved

@@ -131,6 +131,7 @@ export type CamelizedSubmission = {
   missing: boolean
   pointsDeducted: null | number
   postedAt: null | Date
+  proxySubmitter?: string
   rawGrade: string | null
   redoRequest: boolean
   score: null | number
@@ -157,13 +158,15 @@ export type CamelizedGradingPeriod = {
 }
 
 export type CamelizedGradingPeriodSet = {
-  id: string
-  gradingPeriods: CamelizedGradingPeriod[]
-  displayTotalsForAllGradingPeriods: boolean
-  weighted: boolean
-  title: string
-  enrollmentTermIDs?: string[]
   createdAt: Date
+  displayTotalsForAllGradingPeriods: boolean
+  enrollmentTermIDs?: string[]
+  gradingPeriods: CamelizedGradingPeriod[]
+  id: string
+  isClosed?: boolean
+  permissions: unknown
+  title: string
+  weighted: boolean
 }
 
 export type CamelizedAssignment = {
@@ -180,6 +183,11 @@ export type CamelizedAssignment = {
   postManually: boolean
   published: boolean
   submissionTypes: string
+  groupSet?: {
+    currentGroup: {
+      _id: string
+    }
+  }
 }
 
 export type PlagiarismData = {
@@ -219,4 +227,15 @@ export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
   hasOriginalityReport: boolean
   turnitinData?: PlagiarismDataMap
   vericiteData?: {provider: 'vericite'} & PlagiarismDataMap
+}
+
+export type FinalGradeOverride = {
+  courseGrade?: string
+  gradingPeriodGrades?: {
+    [gradingPeriodId: string]: string
+  }
+}
+
+export type FinalGradeOverrideMap = {
+  [userId: string]: FinalGradeOverride
 }

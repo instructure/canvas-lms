@@ -20,17 +20,27 @@ import React from 'react'
 import {fireEvent, render, waitFor, act} from '@testing-library/react'
 import {ImageOptions} from '../ImageOptions'
 import {actions} from '../../../../reducers/imageSection'
+import {actions as trayActions} from '../../../../reducers/svgSettings'
 
-jest.mock('../../ImageCropper/imageCropUtils', () => ({
+jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn(() =>
     Promise.resolve({
-      outerHTML: null,
+      outerHTML: '<svg />',
     })
   ),
 }))
 
+jest.mock('../../../../../shared/fileUtils', () => {
+  return {
+    convertFileToBase64: jest
+      .fn()
+      .mockReturnValue(Promise.resolve('data:image/png;base64,CROPPED')),
+  }
+})
+
 describe('ImageOptions', () => {
   const dispatchFn = jest.fn()
+  const trayDispatchFn = jest.fn()
   const defaultProps = {
     state: {
       image: null,
@@ -39,10 +49,15 @@ describe('ImageOptions', () => {
       collectionOpen: false,
       cropperOpen: false,
       loading: false,
+      cropperSettings: null,
+    },
+    settings: {
+      shape: 'square',
+      embedImage: null,
     },
     dispatch: dispatchFn,
     rcsConfig: {},
-    trayDispatch: () => {},
+    trayDispatch: trayDispatchFn,
   }
 
   beforeAll(() => {
@@ -92,29 +107,173 @@ describe('ImageOptions', () => {
       })
     })
 
-    it('sets state image when submitting', async () => {
-      await waitFor(() => {
-        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        expect(dispatchFn.mock.calls[0][0]).toEqual({
-          type: 'SetImage',
-          payload: 'data:image/svg+xml;base64,bnVsbA==',
-        })
-      })
-    })
-
     it('sets state cropper settings when submitting', async () => {
       await waitFor(() => {
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        expect(dispatchFn.mock.calls[1][0]).toEqual({
+        expect(dispatchFn).toHaveBeenCalledWith({
           type: 'SetCropperSettings',
           payload: {
-            image: 'data:image/png;base64,asdfasdfjksdf==',
             rotation: 0,
             scaleRatio: 1,
             shape: 'square',
             translateX: 0,
             translateY: 0,
           },
+        })
+      })
+    })
+
+    describe('when editing', () => {
+      let overrides
+
+      beforeEach(() => {
+        overrides = {
+          state: {
+            image: 'data:image/png;base64,asdfasdfjksdf==',
+            imageName: 'banana.png',
+            mode: 'Course',
+            collectionOpen: false,
+            cropperOpen: false,
+            loading: false,
+            cropperSettings: {
+              shape: 'square',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+          settings: {
+            shape: 'square',
+            embedImage: null,
+            imageSettings: {
+              cropperSettings: {
+                shape: 'square',
+                rotation: 0,
+                scaleRatio: 1.0,
+                translateX: 0,
+                translateY: 0,
+              },
+            },
+          },
+        }
+      })
+
+      it('updates icon shape if shape is different', async () => {
+        const {rerender} = subject(overrides)
+
+        overrides.state.cropperSettings = {
+          shape: 'circle',
+          rotation: 90,
+          scaleRatio: 1.5,
+          translateX: 0,
+          translateY: 0,
+        }
+        rerender(<ImageOptions {...{...defaultProps, ...overrides}} />)
+        await waitFor(() => {
+          expect(defaultProps.trayDispatch).toHaveBeenCalledWith({shape: 'circle'})
+        })
+      })
+
+      it('does not update icon shape if shape is not different', async () => {
+        const {rerender} = subject(overrides)
+
+        overrides.state.cropperSettings = {
+          shape: 'square',
+          rotation: 90,
+          scaleRatio: 1.5,
+          translateX: 0,
+          translateY: 0,
+        }
+        rerender(<ImageOptions {...{...defaultProps, ...overrides}} />)
+        await waitFor(() => {
+          expect(defaultProps.trayDispatch).not.toHaveBeenCalledWith({shape: 'square'})
+        })
+      })
+
+      it('updates embed image', async () => {
+        const {rerender} = subject(overrides)
+
+        overrides.state.cropperSettings = {
+          shape: 'circle',
+          rotation: 90,
+          scaleRatio: 1.5,
+          translateX: 0,
+          translateY: 0,
+        }
+        rerender(<ImageOptions {...{...defaultProps, ...overrides}} />)
+        await waitFor(() => {
+          expect(defaultProps.trayDispatch).toHaveBeenCalledWith({
+            type: 'SetEmbedImage',
+            payload: 'data:image/png;base64,CROPPED',
+          })
+        })
+      })
+
+      describe('if cropper settings did not change', () => {
+        beforeEach(() => {
+          overrides = {
+            state: {
+              image: 'data:image/png;base64,asdfasdfjksdf==',
+              imageName: 'banana.png',
+              mode: 'Course',
+              collectionOpen: false,
+              cropperOpen: false,
+              loading: false,
+              cropperSettings: {
+                shape: 'circle',
+                rotation: 90,
+                scaleRatio: 1.5,
+                translateX: 0,
+                translateY: 0,
+              },
+            },
+            settings: {
+              imageSettings: {
+                cropperSettings: {
+                  shape: 'circle',
+                  rotation: 90,
+                  scaleRatio: 1.5,
+                  translateX: 0,
+                  translateY: 0,
+                },
+              },
+            },
+          }
+          const {rerender} = subject(overrides)
+
+          overrides.state.cropperSettings = {
+            shape: 'circle',
+            rotation: 90,
+            scaleRatio: 1.5,
+            translateX: 0,
+            translateY: 0,
+          }
+          rerender(<ImageOptions {...{...defaultProps, ...overrides}} />)
+        })
+
+        it('does not update icon shape', async () => {
+          await waitFor(() => {
+            expect(defaultProps.trayDispatch).not.toHaveBeenCalledWith({
+              type: 'SetImageSettings',
+              payload: {
+                shape: 'circle',
+                rotation: 90,
+                scaleRatio: 1.5,
+                translateX: 0,
+                translateY: 0,
+              },
+            })
+          })
+        })
+
+        it('does not update embed image', async () => {
+          await waitFor(() => {
+            expect(defaultProps.trayDispatch).not.toHaveBeenCalledWith({
+              type: 'SetEmbedImage',
+              payload: 'data:image/png;base64,CROPPED',
+            })
+          })
         })
       })
     })
@@ -171,6 +330,10 @@ describe('ImageOptions', () => {
     beforeEach(() => {
       const component = subject({
         state: initialState,
+        settings: {
+          shape: 'square',
+          embedImage: 'data:image/png;base64,EMBED_IMAGE',
+        },
       })
       getByText = component.getByText
       getByTestId = component.getByTestId
@@ -184,7 +347,7 @@ describe('ImageOptions', () => {
 
     it('sets the image preview', () => {
       expect(getByTestId('selected-image-preview')).toHaveStyle(
-        'backgroundImage: url(data:image/png;base64,asdfasdfjksdf==)'
+        'backgroundImage: url(data:image/png;base64,EMBED_IMAGE)'
       )
     })
 
@@ -232,6 +395,15 @@ describe('ImageOptions', () => {
         fireEvent.click(getByText(/clear image/i))
 
         expect(dispatchFn).toHaveBeenCalledWith(actions.RESET_ALL)
+      })
+
+      it('executes tray dispatch callback', () => {
+        fireEvent.click(getByText(/clear image/i))
+
+        expect(trayDispatchFn).toHaveBeenCalledWith({
+          type: trayActions.SET_EMBED_IMAGE,
+          payload: null,
+        })
       })
     })
   })

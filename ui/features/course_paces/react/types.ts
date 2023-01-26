@@ -147,11 +147,16 @@ export interface UIState {
   readonly selectedContextId: string
   readonly loadingMessage: string
   readonly responsiveSize: ResponsiveSizes
+  readonly outerResponsiveSize: ResponsiveSizes
   readonly showLoadingOverlay: boolean
   readonly showPaceModal: boolean
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
+  readonly blueprintLocked?: boolean
 }
+
+export type SortableColumn = 'name' | null
+export type OrderType = 'asc' | 'desc'
 
 export interface PaceContextsState {
   readonly selectedContextType: APIPaceContextTypes
@@ -164,6 +169,9 @@ export interface PaceContextsState {
   readonly defaultPaceContext: PaceContext | null
   readonly isLoadingDefault: false
   readonly searchTerm: string
+  readonly sortBy: SortableColumn
+  readonly order: OrderType
+  readonly contextsPublishing: PaceContextProgress[]
 }
 
 export interface StoreState {
@@ -193,9 +201,23 @@ export interface PaceContext {
   applied_pace: Pace | null
 }
 
-export interface PaceContextApiResponse {
+export interface PaceContextProgress {
+  progress_context_id: string
+  pace_context: PaceContext
+  polling: boolean
+}
+
+export interface PaceContextsApiResponse {
   pace_contexts: PaceContext[]
   total_entries: number
+}
+
+export interface PaceContextsAsyncActionPayload {
+  result: PaceContextsApiResponse | PaceContext
+  page?: number
+  searchTerm?: string
+  sortBy?: SortableColumn
+  orderType?: OrderType
 }
 
 /* Random types  */

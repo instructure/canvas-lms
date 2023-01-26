@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# It seems like it sometimes gets confused and misses the table prefix without this...
-require_dependency "microsoft_sync"
-
 #
 # MicrosoftSync contains models used to sync course enrollments to Microsoft
 # Teams via Microsoft's APIs. For customers using their new (in development as

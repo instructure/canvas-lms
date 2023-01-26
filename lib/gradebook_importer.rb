@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 class GradebookImporter
   ASSIGNMENT_PRELOADED_FIELDS = %i[
     id title points_possible grading_type updated_at context_id context_type group_category_id
@@ -688,7 +686,7 @@ class GradebookImporter
   end
 
   def csv_stream(&block)
-    csv_file = attachment.open(need_local_file: true)
+    csv_file = attachment.open
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
       converters: %i[nil decimal_comma_to_period],
@@ -794,9 +792,13 @@ class GradebookImporter
     column.deleted? || column.read_only
   end
 
+  def no_score?(value)
+    value.blank? || value == "-"
+  end
+
   def no_change_to_value?(new_value:, current_value:, consider_excused: false)
     return true if new_value == current_value
-    return true if current_value.blank? && new_value.blank?
+    return true if no_score?(current_value) && no_score?(new_value)
 
     return false unless current_value.present? && new_value.present?
 

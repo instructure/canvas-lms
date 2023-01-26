@@ -47,10 +47,10 @@ export function PostMessage({...props}) {
           messageTextSize: 'fontSizeSmall',
         },
         desktop: {
-          titleMargin: '0 0 small 0',
-          titleTextSize: 'x-large',
-          titleTextWeight: 'normal',
-          messageTextSize: 'fontSizeMedium',
+          titleMargin: props.threadMode ? '0' : '0 0 small 0',
+          titleTextSize: props.threadMode ? 'medium' : 'x-large',
+          titleTextWeight: props.threadMode ? 'bold' : 'normal',
+          messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
         },
       }}
       render={responsiveProps => (
@@ -77,6 +77,7 @@ export function PostMessage({...props}) {
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
+                rceIdentifier={`${props.discussionEntry._id}-edit`}
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}
@@ -153,6 +154,7 @@ PostMessage.propTypes = {
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,
+  threadMode: PropTypes.bool,
 }
 
 PostMessage.defaultProps = {

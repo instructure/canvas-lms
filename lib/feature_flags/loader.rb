@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "yaml"
-
 module FeatureFlags
   module Loader
     def self.wrap_hook_method(method_name)

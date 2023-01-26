@@ -30,7 +30,7 @@ import {
   Sections,
   UIState,
   PaceContextsState,
-  PaceContextApiResponse,
+  PaceContextsApiResponse,
   StoreState,
   PaceContext,
 } from '../types'
@@ -204,7 +204,7 @@ export const COURSE_PACE_CONTEXT: PaceContext = {
   },
 }
 
-export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'A-C',
@@ -249,7 +249,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiResponse = {
   total_entries: 3,
 }
 
-export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'A-C',
@@ -268,7 +268,7 @@ export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextApiResponse = {
   total_entries: 1,
 }
 
-export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextApiResponse = {
+export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
   pace_contexts: [
     {
       name: 'Jon',
@@ -356,7 +356,7 @@ export const STUDENT_PACE: CoursePace = {
   start_date: '2021-10-01',
   start_date_context: 'user',
   end_date: '2021-12-15',
-  end_date_context: 'course',
+  end_date_context: 'user',
   workflow_state: 'active',
   exclude_weekends: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
@@ -375,11 +375,17 @@ export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
   entriesPerRequest: 10,
   isLoading: true,
   searchTerm: '',
+  order: 'asc',
+  sortBy: 'name',
+  isLoadingDefault: false,
+  defaultPaceContext: COURSE_PACE_CONTEXT,
+  contextsPublishing: [],
 }
 
 export const PROGRESS_RUNNING = {
   id: '900',
   completion: 25,
+  context_id: '30',
   message: undefined,
   workflow_state: 'running',
   url: '/api/v1/progress/900',

@@ -19,11 +19,7 @@
 #
 
 require "atom"
-require "set"
 require "canvas/draft_state_validations"
-require "bigdecimal"
-require_dependency "turnitin"
-require_dependency "vericite"
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -359,7 +355,7 @@ class Assignment < ActiveRecord::Base
 
     # If this assignment uses an external tool, duplicate that too, and mark
     # the assignment as "duplicating"
-    if external_tool_tag.present?
+    if external_tool? && external_tool_tag.present?
       result.external_tool_tag = external_tool_tag.dup
       result.workflow_state = "duplicating"
       result.duplication_started_at = Time.zone.now
@@ -770,7 +766,7 @@ class Assignment < ActiveRecord::Base
     return if annotatable_attachment.blank? || annotatable_attachment.canvadoc&.available?
 
     canvadocs_opts = { preferred_plugins: [Canvadocs::RENDER_PDFJS], wants_annotation: true }
-    annotatable_attachment.submit_to_canvadocs(1, canvadocs_opts)
+    annotatable_attachment.submit_to_canvadocs(1, **canvadocs_opts)
   end
   private :start_canvadocs_render
 
@@ -1190,6 +1186,7 @@ class Assignment < ActiveRecord::Base
         end
 
         options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
+        options[:url] = lti_resource_link_url if lti_resource_link_url
 
         return if options.empty?
 
@@ -1379,8 +1376,11 @@ class Assignment < ActiveRecord::Base
   def refresh_course_content_participation_counts
     progress = context.progresses.build(tag: "refresh_content_participation_counts")
     progress.save!
-    progress.process_job(context, :refresh_content_participation_counts,
-                         singleton: "refresh_content_participation_counts:#{context.global_id}")
+    progress.process_job(
+      context,
+      :refresh_content_participation_counts,
+      { singleton: "refresh_content_participation_counts:#{context.global_id}" }
+    )
   end
 
   def time_zone_edited
@@ -2082,12 +2082,20 @@ class Assignment < ActiveRecord::Base
       submission.grader = grader
       submission.grader_id = opts[:grader_id] if opts.key?(:grader_id)
       submission.grade = grade
-      submission.score = score
       submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
-      if opts[:return_if_score_unchanged] && !submission.changed?
+      submission.score = score
+
+      changed_attributes = submission.changed_attributes
+      # only mark excused changed if it was a changed attributes and did not go from nil -> false
+      excused_changed = changed_attributes.key?(:excused) && !(changed_attributes[:excused].nil? && opts[:excused] == false)
+      score_changed = changed_attributes.key?(:score)
+
+      # return submission if excused did not change and score did not change
+      if opts[:return_if_score_unchanged] && !excused_changed && !score_changed
         submission.score_unchanged = true
         return submission
       end
+
       did_grade = true if score.present? || submission.excused?
     end
 
@@ -2111,7 +2119,7 @@ class Assignment < ActiveRecord::Base
 
     if opts[:provisional]
       if !(score.present? || submission.excused) && opts[:grade] != ""
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
+        raise GradeError.new(error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE)
       end
 
       submission.find_or_create_provisional_grade!(
@@ -2254,13 +2262,20 @@ class Assignment < ActiveRecord::Base
     body url submission_type media_comment_id media_comment_type submitted_at
   ].freeze
   ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
-                                    %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid]).to_set
+                                    %w[comment group_comment attachments require_submission_type_is_valid resource_link_lookup_uuid student_id]).to_set
 
   def submit_homework(original_student, opts = {})
     raise "Student Required" unless original_student
 
     eula_timestamp = opts[:eula_agreement_timestamp]
     webhook_info = assignment_configuration_tool_lookups.take&.webhook_info
+    should_add_proxy = false
+
+    if opts[:proxied_student]
+      current_user = original_student
+      original_student = opts[:proxied_student]
+      should_add_proxy = true
+    end
 
     if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
@@ -2303,6 +2318,7 @@ class Assignment < ActiveRecord::Base
           homework.attachment_ids = nil
           homework.late_policy_status = nil
           homework.seconds_late_override = nil
+          homework.proxy_submitter_id = nil
         end
 
         student_id = homework.user.global_id
@@ -2313,6 +2329,7 @@ class Assignment < ActiveRecord::Base
         homework.lti_user_id = homework_lti_user_id_hash[student_id]
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
+        homework.proxy_submitter = current_user if should_add_proxy
 
         if webhook_info
           homework.turnitin_data[:webhook_info] = webhook_info
@@ -2600,7 +2617,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def generate_comments_from_files(_, attachment, commenter, progress)
-    file = attachment.open(need_local_file: true)
+    file = attachment.open
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
@@ -3722,7 +3739,7 @@ class Assignment < ActiveRecord::Base
     !!effective_post_policy&.post_manually?
   end
 
-  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false)
+  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3756,11 +3773,21 @@ class Assignment < ActiveRecord::Base
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
     delay_if_production.recalculate_module_progressions(submission_ids)
+
+    unless skip_content_participation_refresh
+      submission_ids.each_slice(1000) do |submission_id_slice|
+        ContentParticipation
+          .where(content_type: "Submission", content_id: submission_id_slice, content_item: "grade", workflow_state: "read")
+          .update_all(workflow_state: "unread")
+      end
+      course.refresh_content_participation_counts_for_users(user_ids)
+    end
+
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end
 
-  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, skip_muted_changed: false)
+  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, skip_muted_changed: false, skip_content_participation_refresh: true)
     submissions = if submission_ids.nil?
                     self.submissions.active
                   else
@@ -3773,6 +3800,7 @@ class Assignment < ActiveRecord::Base
     User.clear_cache_keys(user_ids, :submissions)
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state("graded").each(&:assignment_muted_changed) unless skip_muted_changed
+    course.refresh_content_participation_counts_for_users(user_ids) unless skip_content_participation_refresh
     hide_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!

@@ -510,8 +510,7 @@ module ApplicationHelper
       disableGooglePreviews: !service_enabled?(:google_docs_previews),
       logPageViews: !@body_class_no_headers,
       editorButtons: editor_buttons,
-      pandaPubSettings: CanvasPandaPub::Client.config.try(:slice, "push_url", "application_id"),
-      unsplashEnabled: PluginSetting.settings_for_plugin(:unsplash)&.dig("access_key")&.present?
+      pandaPubSettings: CanvasPandaPub::Client.config.try(:slice, "push_url", "application_id")
     }.each do |key, value|
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
@@ -965,7 +964,7 @@ module ApplicationHelper
     js_env(csp: csp_iframe_attribute) if csp_enforced?
 
     output = []
-    output = @meta_tags.map { |meta_attrs| tag.meta(meta_attrs) } if @meta_tags.present?
+    output = @meta_tags.map { |meta_attrs| tag.meta(**meta_attrs) } if @meta_tags.present?
 
     # set this if you want android users of your site to be prompted to install an android app
     # you can see an example of the one that instructure uses in InfoController#web_app_manifest
@@ -1403,6 +1402,10 @@ module ApplicationHelper
   end
 
   def find_heap_application_id
-    DynamicSettings.find(tree: :private)[:heap_app_id]
+    DynamicSettings.find(tree: :private)&.fetch([:heap_app_id])
+  end
+
+  def load_heap?
+    find_heap_application_id && @domain_root_account&.feature_enabled?(:send_usage_metrics)
   end
 end

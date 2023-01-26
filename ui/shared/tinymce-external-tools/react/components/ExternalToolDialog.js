@@ -29,6 +29,7 @@ import TinyMCEContentItem from '../../TinyMCEContentItem'
 import processEditorContentItems from '@canvas/deep-linking/processors/processEditorContentItems'
 import {Flex} from '@instructure/ui-flex'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {instuiPopupMountNode} from '@instructure/canvas-rce'
 
 const I18n = useI18nScope('ExternalToolDialog')
 
@@ -109,6 +110,14 @@ export default class ExternalToolDialog extends React.Component {
   handleBeforeUnload = ev => (ev.returnValue = I18n.t('Changes you made may not be saved.'))
 
   handleExternalContentReady = (ev, data) => {
+    // a2DataReady listener will insert the data to the editor,
+    // So only close the modal is needed, only if assignments_2_student flag is enabled,
+    // is readable by current user and it is a student assignment view.
+    if (ENV.a2_student_view) {
+      this.close()
+      return
+    }
+
     const {editor, win} = this.props
     const contentItems = data.contentItems
     if (contentItems.length === 1 && contentItems[0]['@type'] === 'lti_replace') {
@@ -181,6 +190,7 @@ export default class ExternalToolDialog extends React.Component {
         </form>
         <Overlay
           open={open}
+          mountNode={instuiPopupMountNode}
           label={label}
           onOpen={this.handleOpen}
           onClose={this.handleRemove}

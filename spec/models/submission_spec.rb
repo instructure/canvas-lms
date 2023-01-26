@@ -138,6 +138,18 @@ describe Submission do
     end
   end
 
+  describe ".json_serialization_full_parameters" do
+    it "can be provided additional methods to include in the params" do
+      params = Submission.json_serialization_full_parameters(methods: [:missing])
+      expect(params[:methods]).to include :missing
+    end
+
+    it "can provide an additional method with singular form (no array)" do
+      params = Submission.json_serialization_full_parameters(methods: :missing)
+      expect(params[:methods]).to include :missing
+    end
+  end
+
   describe "#anonymous_id" do
     subject { submission.anonymous_id }
 
@@ -460,7 +472,7 @@ describe Submission do
     it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
       # created by the DueDateCacher
-      student_in_course
+      student_in_course(active_all: true)
       @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
 
       override = @assignment.assignment_overrides.build
@@ -4427,6 +4439,17 @@ describe Submission do
       sub = @assignment.submit_homework(@user, attachments: [f])
       expect(sub.attachments).to eq []
     end
+
+    it "includes attachments in a user group that are not in a section group" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.attachments).to eq [f]
+    end
   end
 
   describe "versioned_attachments" do
@@ -4463,6 +4486,17 @@ describe Submission do
         submission.versioned_attachments
         expect(submission.versioned_attachments).to include user_attachment
       end
+    end
+
+    it "includes attachments uploaded from group by user without matching section id" do
+      @group = @course.groups.create!
+      @group.add_user(@user)
+      f = Attachment.create! uploaded_data: StringIO.new("blah"),
+                             context: @group,
+                             filename: "blah.txt",
+                             user: @user
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      expect(sub.versioned_attachments).to eq [f]
     end
   end
 
@@ -5142,6 +5176,26 @@ describe Submission do
 
       expect(@a1.submission_for_student(@u1).grade).to be_nil
       expect(@a1.submission_for_student(@u2).grade).to be_nil
+    end
+
+    it "does not update grader_id if submission is blank or missing with -" do
+      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+                                     {
+                                       @a1.id => {
+                                         @u1.id => { posted_grade: nil }
+                                       },
+                                       @a1.id => {
+                                         @u2.id => { posted_grade: "-" }
+                                       }
+                                     })
+
+      submission1 = @a1.submission_for_student(@u1)
+      submission2 = @a1.submission_for_student(@u2)
+
+      expect(submission1.grade).to be_nil
+      expect(submission2.grade).to be_nil
+      expect(submission1.grader_id).to be_nil
+      expect(submission2.grader_id).to be_nil
     end
 
     describe "submitting comments via bulk update" do
@@ -6057,6 +6111,48 @@ describe Submission do
 
         expect(submission.visible_rubric_assessments_for(@student, attempt: 0))
           .to contain_exactly(assessment_before_submitting)
+      end
+    end
+
+    context "anonymous peer reviews" do
+      before(:once) do
+        course = Course.create!
+        @reviewed_student = course.enroll_student(User.create!, workflow_state: "active").user
+        reviewing_student = course.enroll_student(User.create!, workflow_state: "active").user
+        @grading_teacher = course.enroll_teacher(User.create!, workflow_state: "active").user
+
+        assignment = course.assignments.create!(peer_reviews: true, anonymous_peer_reviews: true)
+        rubric_association = rubric_association_model(context: course, association_object: assignment, purpose: "grading")
+
+        @submission = assignment.submission_for_student(@reviewed_student)
+        @submission.assessment_requests.create!(
+          user: @reviewed_student,
+          assessor: reviewing_student,
+          assessor_asset: assignment.submission_for_student(reviewing_student)
+        )
+        rubric_association.rubric_assessments.create!({
+                                                        artifact: @submission,
+                                                        assessment_type: "peer_review",
+                                                        assessor: reviewing_student,
+                                                        rubric: rubric_association.rubric,
+                                                        user: @reviewed_student
+                                                      })
+
+        rubric_association.rubric_assessments.create!({
+                                                        artifact: @submission,
+                                                        assessment_type: "grading",
+                                                        assessor: @grading_teacher,
+                                                        rubric: rubric_association.rubric,
+                                                        user: @reviewed_student
+                                                      })
+      end
+
+      it "includes rubric assessments from teachers grading with identity attached" do
+        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[0].assessor).to eql(@grading_teacher)
+      end
+
+      it "does not include peer reviewer's identity when viewed by the reviewee" do
+        expect(@submission.visible_rubric_assessments_for(@reviewed_student)[1].assessor).to eql(nil)
       end
     end
   end

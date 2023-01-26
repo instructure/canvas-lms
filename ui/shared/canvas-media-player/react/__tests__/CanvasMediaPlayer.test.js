@@ -481,6 +481,8 @@ describe('CanvasMediaPlayer', () => {
       return {
         videoWidth: w,
         videoHeight: h,
+        offsetWidth: w,
+        offsetHeight: h,
         style: {},
         classList: {
           add: jest.fn(),
@@ -497,6 +499,17 @@ describe('CanvasMediaPlayer', () => {
       expect(player.classList.add).toHaveBeenCalledWith('audio-player')
       expect(player.style.width).toBe('320px')
       expect(player.style.height).toBe('14.25rem')
+      expect(container.style.width).toBe('500px')
+      expect(container.style.height).toBe('300px')
+    })
+
+    it('does not resize the container when the player is not visible', () => {
+      const container = document.createElement('div')
+      container.style.width = '500px'
+      container.style.height = '300px'
+      const player = makePlayer(1000, 500)
+      player.offsetHeight = 0
+      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
       expect(container.style.width).toBe('500px')
       expect(container.style.height).toBe('300px')
     })

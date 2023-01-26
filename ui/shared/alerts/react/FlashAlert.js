@@ -57,6 +57,33 @@ const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jqu
 const screenreaderMessageHolderId = 'flash_screenreader_holder'
 const timeout = 10000
 
+function findDetailMessage(err) {
+  let a = err.message
+  let b
+  if (err.response) {
+    if (err.response.data) {
+      try {
+        if (Array.isArray(err.response.data.errors)) {
+          // probably a canvas api
+          a = err.response.data.errors[0].message
+          b = err.message
+        } else if (err.response.data.message) {
+          // probably a canvas api too
+          a = err.response.data.message
+          b = err.message
+        }
+      } catch (ignore) {
+        a = err.message
+      }
+    }
+  }
+  return {a, b}
+}
+
+const isLoadingChunkError = a => {
+  return typeof a === 'string' && a.toLowerCase().includes('loading chunk')
+}
+
 // An Alert with a message and "Details" button which surfaces
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
@@ -115,37 +142,19 @@ export default class FlashAlert extends React.Component {
     })
   }
 
-  findDetailMessage() {
-    const err = this.props.error
-    let a = err.message
-    let b
-    if (err.response) {
-      if (err.response.data) {
-        try {
-          if (Array.isArray(err.response.data.errors)) {
-            // probably a canvas api
-            a = err.response.data.errors[0].message
-            b = err.message
-          } else if (err.response.data.message) {
-            // probably a canvas api too
-            a = err.response.data.message
-            b = err.message
-          }
-        } catch (ignore) {
-          a = err.message
-        }
-      }
-    }
-    return {a, b}
-  }
+  renderDetailMessage(a, b) {
+    const showPrimaryDetails = a && !isLoadingChunkError(a)
+    const showSecondaryDetails = b && !isLoadingChunkError(b)
 
-  renderDetailMessage() {
-    const {a, b} = this.findDetailMessage()
     return (
       <Text as="p" fontStyle="italic">
-        <Text>{a}</Text>
-        {b ? <br /> : null}
-        {b ? <Text>{b}</Text> : null}
+        {showPrimaryDetails && <Text>{a}</Text>}
+        {showSecondaryDetails && (
+          <>
+            <br />
+            <Text>{b}</Text>
+          </>
+        )}
       </Text>
     )
   }
@@ -153,19 +162,25 @@ export default class FlashAlert extends React.Component {
   render() {
     let details = null
     if (this.props.error) {
-      if (this.state.showDetails) {
-        details = this.renderDetailMessage()
-      } else {
-        details = (
-          <span>
-            <PresentationContent>
-              <Link isWithinText={false} as="button" onClick={this.showDetails}>
-                {I18n.t('Details')}
-              </Link>
-            </PresentationContent>
-            <ScreenReaderContent>{this.renderDetailMessage()}</ScreenReaderContent>
-          </span>
-        )
+      const {a, b} = findDetailMessage(this.props.error)
+      const showPrimaryDetails = a && !isLoadingChunkError(a)
+      const showSecondaryDetails = b && !isLoadingChunkError(b)
+
+      if (showPrimaryDetails || showSecondaryDetails) {
+        if (this.state.showDetails) {
+          details = this.renderDetailMessage(a, b)
+        } else {
+          details = (
+            <span>
+              <PresentationContent>
+                <Link isWithinText={false} as="button" onClick={this.showDetails}>
+                  {I18n.t('Details')}
+                </Link>
+              </PresentationContent>
+              <ScreenReaderContent>{this.renderDetailMessage(a, b)}</ScreenReaderContent>
+            </span>
+          )
+        }
       }
     }
 

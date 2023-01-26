@@ -30,6 +30,7 @@ import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
 import {up as enhanceUserContent} from './initializers/enhanceUserContent'
+import {up as forwardExternalContentReady} from './initializers/forwardExternalContentReady'
 import {isolate} from '@canvas/sentry'
 
 // Import is required, workaround for ARC-8398
@@ -55,6 +56,7 @@ let runOnceAfterLocaleFiles = () => {
   isolate(renderRailsFlashNotifications)()
   isolate(activateCourseMenuToggler)()
   isolate(enhanceUserContent)()
+  isolate(forwardExternalContentReady)()
 }
 
 window.addEventListener('canvasReadyStateChange', function ({detail}) {
@@ -135,7 +137,6 @@ if (ENV.use_high_contrast) {
     // 'loadend' gets fired after both successful and errored requests
     this.addEventListener('loadend', () => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
-      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
     })
     return send.apply(this, arguments)
   }
@@ -148,7 +149,6 @@ if (ENV.use_high_contrast) {
     // eslint-disable-next-line promise/catch-or-return
     promise.finally(() => {
       window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
-      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
     })
     return promise
   }

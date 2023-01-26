@@ -312,9 +312,7 @@ $(document).ready(function () {
   function showSubmissionContent() {
     $('#submit_assignment').show()
     $('.submit_assignment_link').hide()
-    $('html,body').scrollTo($('#submit_assignment'))
     createSubmitAssignmentTabs()
-    $('#submit_assignment_tabs li').first().focus()
   }
 
   $('.submit_assignment_link').click(function (event, skipConfirmation) {

@@ -23,6 +23,7 @@ import fetchMock from 'fetch-mock'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import svg from '../SingleColor/svg'
 import {Size} from '../../../../svg/constants'
+import {convertFileToBase64} from '../../../../../shared/fileUtils'
 
 jest.useFakeTimers()
 jest.mock('../../../../../shared/StoreContext', () => {
@@ -104,7 +105,7 @@ jest.mock('../../../../../../../bridge', () => {
   }
 })
 
-jest.mock('../../ImageCropper/imageCropUtils', () => {
+jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => {
   return {
     createCroppedImageSvg: () =>
       Promise.resolve({
@@ -113,10 +114,15 @@ jest.mock('../../ImageCropper/imageCropUtils', () => {
   }
 })
 
+jest.mock('../../../../../shared/fileUtils')
+
 describe('ImageSection', () => {
   let scrollIntoView
   const defaultProps = {
-    settings: {size: Size.Small},
+    settings: {
+      embedImage: 'data:image/png;base64,EMBED_IMAGE',
+      size: Size.Small,
+    },
     editing: false,
     editor: {},
     onChange: jest.fn(),
@@ -127,6 +133,7 @@ describe('ImageSection', () => {
   beforeEach(() => {
     scrollIntoView = jest.fn()
     window.HTMLElement.prototype.scrollIntoView = scrollIntoView
+    convertFileToBase64.mockImplementation(() => Promise.resolve('data:image/png;base64,CROPPED'))
   })
 
   afterEach(async () => {
@@ -177,6 +184,158 @@ describe('ImageSection', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetTranslateY',
       payload: -37.5,
+    })
+  })
+
+  describe('when changing shape', () => {
+    let overrides
+
+    beforeEach(() => {
+      overrides = {
+        settings: {
+          shape: 'square',
+          size: Size.Small,
+          imageSettings: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'square',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        },
+        editing: false,
+        editor: {},
+        onChange: jest.fn(),
+      }
+    })
+
+    it('updates cropper settings if has a value', async () => {
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+      await waitFor(() => {
+        expect(overrides.onChange).toHaveBeenCalledWith({
+          type: 'SetImageSettings',
+          payload: {
+            mode: '',
+            image: '',
+            imageName: '',
+            icon: '',
+            iconFillColor: '#000000',
+            cropperSettings: {
+              shape: 'circle',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          },
+        })
+      })
+    })
+
+    it('updates embed image', async () => {
+      const {rerender} = subject(overrides)
+
+      overrides.settings.shape = 'circle'
+      rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+
+      await waitFor(() => {
+        expect(overrides.onChange).toHaveBeenCalledWith({
+          type: 'SetEmbedImage',
+          payload: 'data:image/png;base64,CROPPED',
+        })
+      })
+    })
+
+    describe('if cropper settings is null', () => {
+      beforeEach(() => {
+        overrides = {
+          settings: {
+            shape: 'square',
+            size: Size.Small,
+            imageSettings: {
+              mode: '',
+              image: '',
+              imageName: '',
+              icon: '',
+              iconFillColor: '#000000',
+              cropperSettings: null,
+            },
+          },
+          editing: false,
+          editor: {},
+          onChange: jest.fn(),
+        }
+        const {rerender} = subject(overrides)
+
+        overrides.settings.shape = 'circle'
+        rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+      })
+
+      it('does not update cropper settings', async () => {
+        await waitFor(() => {
+          expect(overrides.onChange).not.toHaveBeenCalledWith({
+            type: 'SetImageSettings',
+            payload: {
+              shape: 'circle',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          })
+        })
+      })
+
+      it('does not update embed image', async () => {
+        await waitFor(() => {
+          expect(overrides.onChange).not.toHaveBeenCalledWith({
+            type: 'SetEmbedImage',
+            payload: 'data:image/png;base64,CROPPED',
+          })
+        })
+      })
+    })
+
+    describe('if cropper settings has already the same shape', () => {
+      beforeEach(() => {
+        const {rerender} = subject(overrides)
+        overrides.settings.shape = 'square'
+        rerender(<ImageSection {...{...defaultProps, ...overrides}} />)
+      })
+
+      it('does not update cropper settings', async () => {
+        await waitFor(() => {
+          expect(overrides.onChange).not.toHaveBeenCalledWith({
+            type: 'SetImageSettings',
+            payload: {
+              shape: 'square',
+              rotation: 0,
+              scaleRatio: 1.0,
+              translateX: 0,
+              translateY: 0,
+            },
+          })
+        })
+      })
+
+      it('does not update embed image', async () => {
+        await waitFor(() => {
+          expect(overrides.onChange).not.toHaveBeenCalledWith({
+            type: 'SetEmbedImage',
+            payload: 'data:image/png;base64,CROPPED',
+          })
+        })
+      })
     })
   })
 
@@ -302,7 +461,6 @@ describe('ImageSection', () => {
         })
         const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
         expect(payload.cropperSettings).toEqual({
-          image: 'data:image/png;base64,asdfasdfjksdf==',
           shape: 'square',
           rotation: 0,
           scaleRatio: 1.1,
@@ -382,14 +540,13 @@ describe('ImageSection', () => {
   })
 
   describe('when the "course images" mode is selected', () => {
-    let getByTestId, getByText, getByTitle
+    let getByTestId, getByText
 
     beforeEach(() => {
       const rendered = subject({rcsConfig: {features: {icon_maker_cropper: true}}})
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
-      getByTitle = rendered.getByTitle
 
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Course Images'))
@@ -401,67 +558,6 @@ describe('ImageSection', () => {
 
     it('scrolls the component into view smoothly 😎', async () => {
       await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({behavior: 'smooth'}))
-    })
-
-    describe('and an image is clicked', () => {
-      let originalFileReader
-      const flushPromises = () => new Promise(setTimeout)
-
-      beforeEach(() => {
-        fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
-
-        originalFileReader = FileReader
-        Object.defineProperty(global, 'FileReader', {
-          writable: true,
-          value: jest.fn().mockImplementation(() => ({
-            readAsDataURL() {
-              this.onloadend()
-            },
-            result: 'data:image/png;base64,asdfasdfjksdf==',
-          })),
-        })
-
-        // Click the first image
-        fireEvent.click(getByTitle('Click to embed image_one.png'))
-      })
-
-      afterEach(() => {
-        fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
-        Object.defineProperty(global, 'FileReader', {
-          writable: true,
-          value: originalFileReader,
-        })
-      })
-
-      it('dispatches an action to update parent state image', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImage',
-          payload: 'data:image/png;base64,asdfasdfjksdf==',
-        })
-      })
-
-      it('dispatches an action to update parent state image type', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImageType',
-          payload: 'Course',
-        })
-      })
-
-      it('dispatches an action to update parent state image name', async () => {
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
-        expect(defaultProps.onChange).toHaveBeenCalledWith({
-          type: 'SetEncodedImageName',
-          payload: 'grid.png',
-        })
-      })
     })
   })
 
@@ -488,7 +584,7 @@ describe('ImageSection', () => {
   })
 
   describe('when the "Single Color Image" mode is selected', () => {
-    let spyFn, getByTestId, getByText, container
+    let spyFn, getByTestId, getByText, container, rerender
 
     beforeAll(() => {
       spyFn = jest.spyOn(svg.art, 'source')
@@ -501,6 +597,7 @@ describe('ImageSection', () => {
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
       container = rendered.container
+      rerender = rendered.rerender
 
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Single Color Image'))
@@ -522,6 +619,9 @@ describe('ImageSection', () => {
           expect(getByTestId('selected-image-preview')).toBeInTheDocument()
         })
         fireEvent.click(getByTestId('icon-maker-art'))
+        convertFileToBase64.mockImplementation(
+          jest.requireActual('../../../../../shared/fileUtils').convertFileToBase64
+        )
       })
 
       it('sets default icon color', async () => {
@@ -545,6 +645,24 @@ describe('ImageSection', () => {
         })
         await waitFor(() => {
           expect(spyFn).toHaveBeenCalledWith('#00FF00')
+          expect(defaultProps.onChange).toHaveBeenCalledWith({
+            type: 'SetEmbedImage',
+            payload:
+              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDQ4MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgIDxwYXRoIGQ9Ik0yNDAgOTBDMTU3LjIxOSA5MCA5MCAxNTcuMjE5IDkwIDI0MEM5MCAzMjIuODQ0IDE1Ny4xNTkgMzkwIDI0MCAzOTBDMjQ0LjAyOSAzOTAgMjQ4LjAxOSAzODkuODQzIDI1MS45NyAzODkuNTNDMjcwLjM0MSAzODguMDc5IDI4NC40NzQgMzcyLjY3MiAyODQuNDc0IDM1NC4yNDVWMzE0Ljg4N0MyODQuNDc0IDMwNi44MjEgMjg3LjY3OCAyOTkuMDg1IDI5My4zODIgMjkzLjM4MkMyOTkuMDg1IDI4Ny42NzggMzA2LjgyMSAyODQuNDc0IDMxNC44ODcgMjg0LjQ3NEgzNTQuNTdDMzYzLjM2OSAyODQuNDc4IDM3MS44NDcgMjgxLjE3MSAzNzguMzIgMjc1LjIxQzM4NC43OTIgMjY5LjI0OSAzODguNzg1IDI2MS4wNzEgMzg5LjUwMyAyNTIuMzAxQzM4OS44MzQgMjQ4LjI0NiAzOTAgMjQ0LjE0NiAzOTAgMjQwQzM5MCAxNTcuMTU5IDMyMi44NDQgOTAgMjQwIDkwWk0xNDcuODg0IDI4My4xNDJDMTQyLjk1NyAyODQuMDU5IDEzNy44NjggMjgzLjQ5MyAxMzMuMjYyIDI4MS41MThDMTI4LjY1NiAyNzkuNTQyIDEyNC43MzkgMjc2LjI0NiAxMjIuMDA2IDI3Mi4wNDRDMTE5LjI3MyAyNjcuODQzIDExNy44NDcgMjYyLjkyNSAxMTcuOTA5IDI1Ny45MTRDMTE3Ljk3IDI1Mi45MDIgMTE5LjUxNiAyNDguMDIyIDEyMi4zNTEgMjQzLjg4OUMxMjUuMTg3IDIzOS43NTUgMTI5LjE4MyAyMzYuNTU2IDEzMy44MzcgMjM0LjY5NEMxMzguNDkgMjMyLjgzMiAxNDMuNTkxIDIzMi4zOTIgMTQ4LjQ5NCAyMzMuNDI5QzE1My4zOTggMjM0LjQ2NiAxNTcuODg0IDIzNi45MzMgMTYxLjM4NSAyNDAuNTE5QzE2NC44ODcgMjQ0LjEwNiAxNjcuMjQ2IDI0OC42NDkgMTY4LjE2NiAyNTMuNTc2QzE2OC43NzYgMjU2Ljg0OSAxNjguNzM1IDI2MC4yMTEgMTY4LjA0NiAyNjMuNDY4QzE2Ny4zNTcgMjY2LjcyNSAxNjYuMDMzIDI2OS44MTUgMTY0LjE1IDI3Mi41NjFDMTYyLjI2NiAyNzUuMzA2IDE1OS44NjEgMjc3LjY1NCAxNTcuMDcgMjc5LjQ3QzE1NC4yNzkgMjgxLjI4NSAxNTEuMTU3IDI4Mi41MzMgMTQ3Ljg4NCAyODMuMTQyVjI4My4xNDJaTTE1OC4yNDIgMTcwLjAxN0MxNTcuMzI0IDE2NS4wODkgMTU3Ljg4OSAxNTkuOTk5IDE1OS44NjQgMTU1LjM5MkMxNjEuODM5IDE1MC43ODUgMTY1LjEzNiAxNDYuODY3IDE2OS4zMzggMTQ0LjEzM0MxNzMuNTQgMTQxLjQgMTc4LjQ1OCAxMzkuOTc0IDE4My40NyAxNDAuMDM2QzE4OC40ODMgMTQwLjA5NyAxOTMuMzY0IDE0MS42NDQgMTk3LjQ5NyAxNDQuNDhDMjAxLjYzMSAxNDcuMzE2IDIwNC44MyAxNTEuMzE0IDIwNi42OTEgMTU1Ljk2OUMyMDguNTUyIDE2MC42MjMgMjA4Ljk5MSAxNjUuNzI1IDIwNy45NTIgMTcwLjYyOUMyMDYuOTE0IDE3NS41MzMgMjA0LjQ0NCAxODAuMDE5IDIwMC44NTYgMTgzLjUxOUMxOTcuMjY4IDE4Ny4wMiAxOTIuNzIzIDE4OS4zNzggMTg3Ljc5NSAxOTAuMjk1QzE4NC41MjMgMTkwLjkwNCAxODEuMTYzIDE5MC44NjMgMTc3LjkwNyAxOTAuMTczQzE3NC42NTEgMTg5LjQ4NCAxNzEuNTYyIDE4OC4xNiAxNjguODE4IDE4Ni4yNzdDMTY2LjA3NCAxODQuMzk0IDE2My43MjcgMTgxLjk4OSAxNjEuOTEyIDE3OS4xOTlDMTYwLjA5OCAxNzYuNDA5IDE1OC44NSAxNzMuMjg5IDE1OC4yNDIgMTcwLjAxN1pNMjI0Ljg1OCAzNjAuNTNDMjE4LjMwOSAzNjAuNTMgMjExLjkwNyAzNTguNTg4IDIwNi40NjEgMzU0Ljk0OUMyMDEuMDE2IDM1MS4zMTEgMTk2Ljc3MiAzNDYuMTM5IDE5NC4yNjYgMzQwLjA4OUMxOTEuNzU5IDMzNC4wMzggMTkxLjEwNCAzMjcuMzggMTkyLjM4MSAzMjAuOTU3QzE5My42NTkgMzE0LjUzNCAxOTYuODEzIDMwOC42MzQgMjAxLjQ0MyAzMDQuMDAzQzIwNi4wNzQgMjk5LjM3MiAyMTEuOTc0IDI5Ni4yMTkgMjE4LjM5OCAyOTQuOTQxQzIyNC44MjEgMjkzLjY2MyAyMzEuNDc5IDI5NC4zMTkgMjM3LjUyOSAyOTYuODI1QzI0My41OCAyOTkuMzMxIDI0OC43NTEgMzAzLjU3NiAyNTIuMzkgMzA5LjAyMUMyNTYuMDI4IDMxNC40NjYgMjU3Ljk3IDMyMC44NjggMjU3Ljk3IDMyNy40MTdDMjU3Ljk3IDMzNi4xOTkgMjU0LjQ4MiAzNDQuNjIyIDI0OC4yNzIgMzUwLjgzMUMyNDIuMDYyIDM1Ny4wNDEgMjMzLjY0IDM2MC41MyAyMjQuODU4IDM2MC41M1YzNjAuNTNaTTI4NS43MjggMTgwLjE1MkMyODAuODAxIDE4MS4wNjkgMjc1LjcxMSAxODAuNTA0IDI3MS4xMDUgMTc4LjUyOEMyNjYuNDk4IDE3Ni41NTMgMjYyLjU4MSAxNzMuMjU1IDI1OS44NDggMTY5LjA1NEMyNTcuMTE1IDE2NC44NTIgMjU1LjY4OSAxNTkuOTM0IDI1NS43NTEgMTU0LjkyMkMyNTUuODEzIDE0OS45MSAyNTcuMzYgMTQ1LjAyOCAyNjAuMTk2IDE0MC44OTVDMjYzLjAzMiAxMzYuNzYzIDI2Ny4wMyAxMzMuNTYzIDI3MS42ODQgMTMxLjcwMkMyNzYuMzM5IDEyOS44NDEgMjgxLjQ0IDEyOS40MDIgMjg2LjM0NCAxMzAuNDQxQzI5MS4yNDggMTMxLjQ3OSAyOTUuNzMzIDEzMy45NDggMjk5LjIzNCAxMzcuNTM2QzMwMi43MzQgMTQxLjEyMyAzMDUuMDkyIDE0NS42NjggMzA2LjAxIDE1MC41OTZDMzA3LjI0IDE1Ny4yMDUgMzA1Ljc5NCAxNjQuMDMyIDMwMS45OSAxNjkuNTc0QzI5OC4xODcgMTc1LjExNyAyOTIuMzM3IDE3OC45MjIgMjg1LjcyOCAxODAuMTUyWk0zNDMuNzI1IDI1Ny44NDhDMzM4Ljc5NyAyNTguNzY1IDMzMy43MDggMjU4LjIwMSAzMjkuMSAyNTYuMjI1QzMyNC40OTMgMjU0LjI1IDMyMC41NzUgMjUwLjk1MyAzMTcuODQyIDI0Ni43NTFDMzE1LjEwOCAyNDIuNTUgMzEzLjY4MiAyMzcuNjMxIDMxMy43NDQgMjMyLjYxOUMzMTMuODA2IDIyNy42MDcgMzE1LjM1MyAyMjIuNzI1IDMxOC4xODkgMjE4LjU5MkMzMjEuMDI1IDIxNC40NTkgMzI1LjAyMyAyMTEuMjU5IDMyOS42NzcgMjA5LjM5OEMzMzQuMzMyIDIwNy41MzcgMzM5LjQzNCAyMDcuMDk4IDM0NC4zMzggMjA4LjEzN0MzNDkuMjQyIDIwOS4xNzYgMzUzLjcyNyAyMTEuNjQ1IDM1Ny4yMjggMjE1LjIzM0MzNjAuNzI4IDIxOC44MjEgMzYzLjA4NiAyMjMuMzY3IDM2NC4wMDMgMjI4LjI5NUMzNjQuNjEzIDIzMS41NjcgMzY0LjU3MSAyMzQuOTI3IDM2My44ODIgMjM4LjE4M0MzNjMuMTkzIDI0MS40MzkgMzYxLjg2OSAyNDQuNTI3IDM1OS45ODYgMjQ3LjI3MUMzNTguMTAzIDI1MC4wMTYgMzU1LjY5NyAyNTIuMzYyIDM1Mi45MDcgMjU0LjE3N0MzNTAuMTE3IDI1NS45OTIgMzQ2Ljk5NyAyNTcuMjM5IDM0My43MjUgMjU3Ljg0OFYyNTcuODQ4WiIgZmlsbD0iIzAwRkYwMCIvPgogICAgPC9zdmc+CiAgICA=',
+          })
+          // Simulating rerender after updating settings' embedImage
+          rerender(
+            <ImageSection
+              {...{
+                ...defaultProps,
+                settings: {
+                  ...defaultProps.settings,
+                  embedImage:
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDQ4MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgIDxwYXRoIGQ9Ik0yNDAgOTBDMTU3LjIxOSA5MCA5MCAxNTcuMjE5IDkwIDI0MEM5MCAzMjIuODQ0IDE1Ny4xNTkgMzkwIDI0MCAzOTBDMjQ0LjAyOSAzOTAgMjQ4LjAxOSAzODkuODQzIDI1MS45NyAzODkuNTNDMjcwLjM0MSAzODguMDc5IDI4NC40NzQgMzcyLjY3MiAyODQuNDc0IDM1NC4yNDVWMzE0Ljg4N0MyODQuNDc0IDMwNi44MjEgMjg3LjY3OCAyOTkuMDg1IDI5My4zODIgMjkzLjM4MkMyOTkuMDg1IDI4Ny42NzggMzA2LjgyMSAyODQuNDc0IDMxNC44ODcgMjg0LjQ3NEgzNTQuNTdDMzYzLjM2OSAyODQuNDc4IDM3MS44NDcgMjgxLjE3MSAzNzguMzIgMjc1LjIxQzM4NC43OTIgMjY5LjI0OSAzODguNzg1IDI2MS4wNzEgMzg5LjUwMyAyNTIuMzAxQzM4OS44MzQgMjQ4LjI0NiAzOTAgMjQ0LjE0NiAzOTAgMjQwQzM5MCAxNTcuMTU5IDMyMi44NDQgOTAgMjQwIDkwWk0xNDcuODg0IDI4My4xNDJDMTQyLjk1NyAyODQuMDU5IDEzNy44NjggMjgzLjQ5MyAxMzMuMjYyIDI4MS41MThDMTI4LjY1NiAyNzkuNTQyIDEyNC43MzkgMjc2LjI0NiAxMjIuMDA2IDI3Mi4wNDRDMTE5LjI3MyAyNjcuODQzIDExNy44NDcgMjYyLjkyNSAxMTcuOTA5IDI1Ny45MTRDMTE3Ljk3IDI1Mi45MDIgMTE5LjUxNiAyNDguMDIyIDEyMi4zNTEgMjQzLjg4OUMxMjUuMTg3IDIzOS43NTUgMTI5LjE4MyAyMzYuNTU2IDEzMy44MzcgMjM0LjY5NEMxMzguNDkgMjMyLjgzMiAxNDMuNTkxIDIzMi4zOTIgMTQ4LjQ5NCAyMzMuNDI5QzE1My4zOTggMjM0LjQ2NiAxNTcuODg0IDIzNi45MzMgMTYxLjM4NSAyNDAuNTE5QzE2NC44ODcgMjQ0LjEwNiAxNjcuMjQ2IDI0OC42NDkgMTY4LjE2NiAyNTMuNTc2QzE2OC43NzYgMjU2Ljg0OSAxNjguNzM1IDI2MC4yMTEgMTY4LjA0NiAyNjMuNDY4QzE2Ny4zNTcgMjY2LjcyNSAxNjYuMDMzIDI2OS44MTUgMTY0LjE1IDI3Mi41NjFDMTYyLjI2NiAyNzUuMzA2IDE1OS44NjEgMjc3LjY1NCAxNTcuMDcgMjc5LjQ3QzE1NC4yNzkgMjgxLjI4NSAxNTEuMTU3IDI4Mi41MzMgMTQ3Ljg4NCAyODMuMTQyVjI4My4xNDJaTTE1OC4yNDIgMTcwLjAxN0MxNTcuMzI0IDE2NS4wODkgMTU3Ljg4OSAxNTkuOTk5IDE1OS44NjQgMTU1LjM5MkMxNjEuODM5IDE1MC43ODUgMTY1LjEzNiAxNDYuODY3IDE2OS4zMzggMTQ0LjEzM0MxNzMuNTQgMTQxLjQgMTc4LjQ1OCAxMzkuOTc0IDE4My40NyAxNDAuMDM2QzE4OC40ODMgMTQwLjA5NyAxOTMuMzY0IDE0MS42NDQgMTk3LjQ5NyAxNDQuNDhDMjAxLjYzMSAxNDcuMzE2IDIwNC44MyAxNTEuMzE0IDIwNi42OTEgMTU1Ljk2OUMyMDguNTUyIDE2MC42MjMgMjA4Ljk5MSAxNjUuNzI1IDIwNy45NTIgMTcwLjYyOUMyMDYuOTE0IDE3NS41MzMgMjA0LjQ0NCAxODAuMDE5IDIwMC44NTYgMTgzLjUxOUMxOTcuMjY4IDE4Ny4wMiAxOTIuNzIzIDE4OS4zNzggMTg3Ljc5NSAxOTAuMjk1QzE4NC41MjMgMTkwLjkwNCAxODEuMTYzIDE5MC44NjMgMTc3LjkwNyAxOTAuMTczQzE3NC42NTEgMTg5LjQ4NCAxNzEuNTYyIDE4OC4xNiAxNjguODE4IDE4Ni4yNzdDMTY2LjA3NCAxODQuMzk0IDE2My43MjcgMTgxLjk4OSAxNjEuOTEyIDE3OS4xOTlDMTYwLjA5OCAxNzYuNDA5IDE1OC44NSAxNzMuMjg5IDE1OC4yNDIgMTcwLjAxN1pNMjI0Ljg1OCAzNjAuNTNDMjE4LjMwOSAzNjAuNTMgMjExLjkwNyAzNTguNTg4IDIwNi40NjEgMzU0Ljk0OUMyMDEuMDE2IDM1MS4zMTEgMTk2Ljc3MiAzNDYuMTM5IDE5NC4yNjYgMzQwLjA4OUMxOTEuNzU5IDMzNC4wMzggMTkxLjEwNCAzMjcuMzggMTkyLjM4MSAzMjAuOTU3QzE5My42NTkgMzE0LjUzNCAxOTYuODEzIDMwOC42MzQgMjAxLjQ0MyAzMDQuMDAzQzIwNi4wNzQgMjk5LjM3MiAyMTEuOTc0IDI5Ni4yMTkgMjE4LjM5OCAyOTQuOTQxQzIyNC44MjEgMjkzLjY2MyAyMzEuNDc5IDI5NC4zMTkgMjM3LjUyOSAyOTYuODI1QzI0My41OCAyOTkuMzMxIDI0OC43NTEgMzAzLjU3NiAyNTIuMzkgMzA5LjAyMUMyNTYuMDI4IDMxNC40NjYgMjU3Ljk3IDMyMC44NjggMjU3Ljk3IDMyNy40MTdDMjU3Ljk3IDMzNi4xOTkgMjU0LjQ4MiAzNDQuNjIyIDI0OC4yNzIgMzUwLjgzMUMyNDIuMDYyIDM1Ny4wNDEgMjMzLjY0IDM2MC41MyAyMjQuODU4IDM2MC41M1YzNjAuNTNaTTI4NS43MjggMTgwLjE1MkMyODAuODAxIDE4MS4wNjkgMjc1LjcxMSAxODAuNTA0IDI3MS4xMDUgMTc4LjUyOEMyNjYuNDk4IDE3Ni41NTMgMjYyLjU4MSAxNzMuMjU1IDI1OS44NDggMTY5LjA1NEMyNTcuMTE1IDE2NC44NTIgMjU1LjY4OSAxNTkuOTM0IDI1NS43NTEgMTU0LjkyMkMyNTUuODEzIDE0OS45MSAyNTcuMzYgMTQ1LjAyOCAyNjAuMTk2IDE0MC44OTVDMjYzLjAzMiAxMzYuNzYzIDI2Ny4wMyAxMzMuNTYzIDI3MS42ODQgMTMxLjcwMkMyNzYuMzM5IDEyOS44NDEgMjgxLjQ0IDEyOS40MDIgMjg2LjM0NCAxMzAuNDQxQzI5MS4yNDggMTMxLjQ3OSAyOTUuNzMzIDEzMy45NDggMjk5LjIzNCAxMzcuNTM2QzMwMi43MzQgMTQxLjEyMyAzMDUuMDkyIDE0NS42NjggMzA2LjAxIDE1MC41OTZDMzA3LjI0IDE1Ny4yMDUgMzA1Ljc5NCAxNjQuMDMyIDMwMS45OSAxNjkuNTc0QzI5OC4xODcgMTc1LjExNyAyOTIuMzM3IDE3OC45MjIgMjg1LjcyOCAxODAuMTUyWk0zNDMuNzI1IDI1Ny44NDhDMzM4Ljc5NyAyNTguNzY1IDMzMy43MDggMjU4LjIwMSAzMjkuMSAyNTYuMjI1QzMyNC40OTMgMjU0LjI1IDMyMC41NzUgMjUwLjk1MyAzMTcuODQyIDI0Ni43NTFDMzE1LjEwOCAyNDIuNTUgMzEzLjY4MiAyMzcuNjMxIDMxMy43NDQgMjMyLjYxOUMzMTMuODA2IDIyNy42MDcgMzE1LjM1MyAyMjIuNzI1IDMxOC4xODkgMjE4LjU5MkMzMjEuMDI1IDIxNC40NTkgMzI1LjAyMyAyMTEuMjU5IDMyOS42NzcgMjA5LjM5OEMzMzQuMzMyIDIwNy41MzcgMzM5LjQzNCAyMDcuMDk4IDM0NC4zMzggMjA4LjEzN0MzNDkuMjQyIDIwOS4xNzYgMzUzLjcyNyAyMTEuNjQ1IDM1Ny4yMjggMjE1LjIzM0MzNjAuNzI4IDIxOC44MjEgMzYzLjA4NiAyMjMuMzY3IDM2NC4wMDMgMjI4LjI5NUMzNjQuNjEzIDIzMS41NjcgMzY0LjU3MSAyMzQuOTI3IDM2My44ODIgMjM4LjE4M0MzNjMuMTkzIDI0MS40MzkgMzYxLjg2OSAyNDQuNTI3IDM1OS45ODYgMjQ3LjI3MUMzNTguMTAzIDI1MC4wMTYgMzU1LjY5NyAyNTIuMzYyIDM1Mi45MDcgMjU0LjE3N0MzNTAuMTE3IDI1NS45OTIgMzQ2Ljk5NyAyNTcuMjM5IDM0My43MjUgMjU3Ljg0OFYyNTcuODQ4WiIgZmlsbD0iIzAwRkYwMCIvPgogICAgPC9zdmc+CiAgICA=',
+                },
+              }}
+            />
+          )
           expect(getByTestId('selected-image-preview')).toHaveStyle(
             'backgroundImage: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDQ4MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgIDxwYXRoIGQ9Ik0yNDAgOTBDMTU3LjIxOSA5MCA5MCAxNTcuMjE5IDkwIDI0MEM5MCAzMjIuODQ0IDE1Ny4xNTkgMzkwIDI0MCAzOTBDMjQ0LjAyOSAzOTAgMjQ4LjAxOSAzODkuODQzIDI1MS45NyAzODkuNTNDMjcwLjM0MSAzODguMDc5IDI4NC40NzQgMzcyLjY3MiAyODQuNDc0IDM1NC4yNDVWMzE0Ljg4N0MyODQuNDc0IDMwNi44MjEgMjg3LjY3OCAyOTkuMDg1IDI5My4zODIgMjkzLjM4MkMyOTkuMDg1IDI4Ny42NzggMzA2LjgyMSAyODQuNDc0IDMxNC44ODcgMjg0LjQ3NEgzNTQuNTdDMzYzLjM2OSAyODQuNDc4IDM3MS44NDcgMjgxLjE3MSAzNzguMzIgMjc1LjIxQzM4NC43OTIgMjY5LjI0OSAzODguNzg1IDI2MS4wNzEgMzg5LjUwMyAyNTIuMzAxQzM4OS44MzQgMjQ4LjI0NiAzOTAgMjQ0LjE0NiAzOTAgMjQwQzM5MCAxNTcuMTU5IDMyMi44NDQgOTAgMjQwIDkwWk0xNDcuODg0IDI4My4xNDJDMTQyLjk1NyAyODQuMDU5IDEzNy44NjggMjgzLjQ5MyAxMzMuMjYyIDI4MS41MThDMTI4LjY1NiAyNzkuNTQyIDEyNC43MzkgMjc2LjI0NiAxMjIuMDA2IDI3Mi4wNDRDMTE5LjI3MyAyNjcuODQzIDExNy44NDcgMjYyLjkyNSAxMTcuOTA5IDI1Ny45MTRDMTE3Ljk3IDI1Mi45MDIgMTE5LjUxNiAyNDguMDIyIDEyMi4zNTEgMjQzLjg4OUMxMjUuMTg3IDIzOS43NTUgMTI5LjE4MyAyMzYuNTU2IDEzMy44MzcgMjM0LjY5NEMxMzguNDkgMjMyLjgzMiAxNDMuNTkxIDIzMi4zOTIgMTQ4LjQ5NCAyMzMuNDI5QzE1My4zOTggMjM0LjQ2NiAxNTcuODg0IDIzNi45MzMgMTYxLjM4NSAyNDAuNTE5QzE2NC44ODcgMjQ0LjEwNiAxNjcuMjQ2IDI0OC42NDkgMTY4LjE2NiAyNTMuNTc2QzE2OC43NzYgMjU2Ljg0OSAxNjguNzM1IDI2MC4yMTEgMTY4LjA0NiAyNjMuNDY4QzE2Ny4zNTcgMjY2LjcyNSAxNjYuMDMzIDI2OS44MTUgMTY0LjE1IDI3Mi41NjFDMTYyLjI2NiAyNzUuMzA2IDE1OS44NjEgMjc3LjY1NCAxNTcuMDcgMjc5LjQ3QzE1NC4yNzkgMjgxLjI4NSAxNTEuMTU3IDI4Mi41MzMgMTQ3Ljg4NCAyODMuMTQyVjI4My4xNDJaTTE1OC4yNDIgMTcwLjAxN0MxNTcuMzI0IDE2NS4wODkgMTU3Ljg4OSAxNTkuOTk5IDE1OS44NjQgMTU1LjM5MkMxNjEuODM5IDE1MC43ODUgMTY1LjEzNiAxNDYuODY3IDE2OS4zMzggMTQ0LjEzM0MxNzMuNTQgMTQxLjQgMTc4LjQ1OCAxMzkuOTc0IDE4My40NyAxNDAuMDM2QzE4OC40ODMgMTQwLjA5NyAxOTMuMzY0IDE0MS42NDQgMTk3LjQ5NyAxNDQuNDhDMjAxLjYzMSAxNDcuMzE2IDIwNC44MyAxNTEuMzE0IDIwNi42OTEgMTU1Ljk2OUMyMDguNTUyIDE2MC42MjMgMjA4Ljk5MSAxNjUuNzI1IDIwNy45NTIgMTcwLjYyOUMyMDYuOTE0IDE3NS41MzMgMjA0LjQ0NCAxODAuMDE5IDIwMC44NTYgMTgzLjUxOUMxOTcuMjY4IDE4Ny4wMiAxOTIuNzIzIDE4OS4zNzggMTg3Ljc5NSAxOTAuMjk1QzE4NC41MjMgMTkwLjkwNCAxODEuMTYzIDE5MC44NjMgMTc3LjkwNyAxOTAuMTczQzE3NC42NTEgMTg5LjQ4NCAxNzEuNTYyIDE4OC4xNiAxNjguODE4IDE4Ni4yNzdDMTY2LjA3NCAxODQuMzk0IDE2My43MjcgMTgxLjk4OSAxNjEuOTEyIDE3OS4xOTlDMTYwLjA5OCAxNzYuNDA5IDE1OC44NSAxNzMuMjg5IDE1OC4yNDIgMTcwLjAxN1pNMjI0Ljg1OCAzNjAuNTNDMjE4LjMwOSAzNjAuNTMgMjExLjkwNyAzNTguNTg4IDIwNi40NjEgMzU0Ljk0OUMyMDEuMDE2IDM1MS4zMTEgMTk2Ljc3MiAzNDYuMTM5IDE5NC4yNjYgMzQwLjA4OUMxOTEuNzU5IDMzNC4wMzggMTkxLjEwNCAzMjcuMzggMTkyLjM4MSAzMjAuOTU3QzE5My42NTkgMzE0LjUzNCAxOTYuODEzIDMwOC42MzQgMjAxLjQ0MyAzMDQuMDAzQzIwNi4wNzQgMjk5LjM3MiAyMTEuOTc0IDI5Ni4yMTkgMjE4LjM5OCAyOTQuOTQxQzIyNC44MjEgMjkzLjY2MyAyMzEuNDc5IDI5NC4zMTkgMjM3LjUyOSAyOTYuODI1QzI0My41OCAyOTkuMzMxIDI0OC43NTEgMzAzLjU3NiAyNTIuMzkgMzA5LjAyMUMyNTYuMDI4IDMxNC40NjYgMjU3Ljk3IDMyMC44NjggMjU3Ljk3IDMyNy40MTdDMjU3Ljk3IDMzNi4xOTkgMjU0LjQ4MiAzNDQuNjIyIDI0OC4yNzIgMzUwLjgzMUMyNDIuMDYyIDM1Ny4wNDEgMjMzLjY0IDM2MC41MyAyMjQuODU4IDM2MC41M1YzNjAuNTNaTTI4NS43MjggMTgwLjE1MkMyODAuODAxIDE4MS4wNjkgMjc1LjcxMSAxODAuNTA0IDI3MS4xMDUgMTc4LjUyOEMyNjYuNDk4IDE3Ni41NTMgMjYyLjU4MSAxNzMuMjU1IDI1OS44NDggMTY5LjA1NEMyNTcuMTE1IDE2NC44NTIgMjU1LjY4OSAxNTkuOTM0IDI1NS43NTEgMTU0LjkyMkMyNTUuODEzIDE0OS45MSAyNTcuMzYgMTQ1LjAyOCAyNjAuMTk2IDE0MC44OTVDMjYzLjAzMiAxMzYuNzYzIDI2Ny4wMyAxMzMuNTYzIDI3MS42ODQgMTMxLjcwMkMyNzYuMzM5IDEyOS44NDEgMjgxLjQ0IDEyOS40MDIgMjg2LjM0NCAxMzAuNDQxQzI5MS4yNDggMTMxLjQ3OSAyOTUuNzMzIDEzMy45NDggMjk5LjIzNCAxMzcuNTM2QzMwMi43MzQgMTQxLjEyMyAzMDUuMDkyIDE0NS42NjggMzA2LjAxIDE1MC41OTZDMzA3LjI0IDE1Ny4yMDUgMzA1Ljc5NCAxNjQuMDMyIDMwMS45OSAxNjkuNTc0QzI5OC4xODcgMTc1LjExNyAyOTIuMzM3IDE3OC45MjIgMjg1LjcyOCAxODAuMTUyWk0zNDMuNzI1IDI1Ny44NDhDMzM4Ljc5NyAyNTguNzY1IDMzMy43MDggMjU4LjIwMSAzMjkuMSAyNTYuMjI1QzMyNC40OTMgMjU0LjI1IDMyMC41NzUgMjUwLjk1MyAzMTcuODQyIDI0Ni43NTFDMzE1LjEwOCAyNDIuNTUgMzEzLjY4MiAyMzcuNjMxIDMxMy43NDQgMjMyLjYxOUMzMTMuODA2IDIyNy42MDcgMzE1LjM1MyAyMjIuNzI1IDMxOC4xODkgMjE4LjU5MkMzMjEuMDI1IDIxNC40NTkgMzI1LjAyMyAyMTEuMjU5IDMyOS42NzcgMjA5LjM5OEMzMzQuMzMyIDIwNy41MzcgMzM5LjQzNCAyMDcuMDk4IDM0NC4zMzggMjA4LjEzN0MzNDkuMjQyIDIwOS4xNzYgMzUzLjcyNyAyMTEuNjQ1IDM1Ny4yMjggMjE1LjIzM0MzNjAuNzI4IDIxOC44MjEgMzYzLjA4NiAyMjMuMzY3IDM2NC4wMDMgMjI4LjI5NUMzNjQuNjEzIDIzMS41NjcgMzY0LjU3MSAyMzQuOTI3IDM2My44ODIgMjM4LjE4M0MzNjMuMTkzIDI0MS40MzkgMzYxLjg2OSAyNDQuNTI3IDM1OS45ODYgMjQ3LjI3MUMzNTguMTAzIDI1MC4wMTYgMzU1LjY5NyAyNTIuMzYyIDM1Mi45MDcgMjU0LjE3N0MzNTAuMTE3IDI1NS45OTIgMzQ2Ljk5NyAyNTcuMjM5IDM0My43MjUgMjU3Ljg0OFYyNTcuODQ4WiIgZmlsbD0iIzAwRkYwMCIvPgogICAgPC9zdmc+CiAgICA=)'
           )
@@ -562,9 +680,11 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
+                imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  mode: 'Course',
+                  imageName: 'banana.jpg',
+                },
               },
               editing: true,
             },
@@ -582,9 +702,12 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
+                embedImage: 'data:image/png;base64,EMBED_IMAGE_2',
+                imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  mode: 'Course',
+                  imageName: 'banana.jpg',
+                },
               },
               editing: true,
             },
@@ -592,7 +715,7 @@ describe('ImageSection', () => {
         />
       )
       expect(getByTestId('selected-image-preview')).toHaveStyle(
-        'backgroundImage: url(data:image/jpg;base64,asdfasdfjksdf==)'
+        'backgroundImage: url(data:image/png;base64,EMBED_IMAGE_2)'
       )
     })
 
@@ -604,10 +727,9 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
                 imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  imageName: 'banana.jpg',
                   mode: 'SingleColor',
                   icon: 'art',
                 },
@@ -630,10 +752,9 @@ describe('ImageSection', () => {
             ...defaultProps,
             ...{
               settings: {
-                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
-                encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg',
                 imageSettings: {
+                  image: 'data:image/jpg;base64,asdfasdfjksdf==',
+                  imageName: 'banana.jpg',
                   mode: 'SingleColor',
                   icon: 'art',
                   iconFillColor: '#00FF00',

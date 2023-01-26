@@ -520,6 +520,22 @@ describe DeveloperKey do
       end
     end
 
+    it "de-duplicates the scope list" do
+      key = DeveloperKey.create!(
+        scopes: [
+          "url:GET|/api/v1/courses/:course_id/quizzes",
+          "url:GET|/api/v1/courses/:course_id/users",
+          "url:GET|/api/v1/courses/:course_id/quizzes",
+          "url:GET|/api/v1/courses/:course_id/users",
+        ]
+      )
+
+      expect(key.scopes.sort).to eq [
+        "url:GET|/api/v1/courses/:course_id/quizzes",
+        "url:GET|/api/v1/courses/:course_id/users",
+      ]
+    end
+
     it "does validate scopes" do
       expect do
         DeveloperKey.create!(
@@ -1003,6 +1019,11 @@ describe DeveloperKey do
     developer_key_not_saved.redirect_uri = "tealpass://somewhere.edu/authentication"
     developer_key_not_saved.redirect_uris = ["tealpass://somewhere.edu/authentication"]
     expect(developer_key_not_saved).to be_valid
+  end
+
+  it "doesn't allow redirect_uris over 4096 characters" do
+    developer_key_not_saved.redirect_uris = ["https://test.example.com/" + ("a" * 4097), "https://example.com"]
+    expect(developer_key_not_saved).not_to be_valid
   end
 
   it "returns the correct count of access_tokens" do

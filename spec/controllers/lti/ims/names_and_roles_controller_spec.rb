@@ -20,9 +20,6 @@
 require_relative "concerns/advantage_services_shared_context"
 require_relative "concerns/advantage_services_shared_examples"
 require_relative "concerns/lti_services_shared_examples"
-require_dependency "lti/ims/names_and_roles_controller.rb"
-require_dependency "lti/ims/providers/course_memberships_provider.rb"
-require_dependency "lti/ims/providers/group_memberships_provider.rb"
 
 describe Lti::IMS::NamesAndRolesController do
   include Lti::IMS::NamesAndRolesMatchers
@@ -353,6 +350,30 @@ describe Lti::IMS::NamesAndRolesController do
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
 
+    describe "id field" do
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+        it "uses the Account#domain in the line item id" do
+          course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+          allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+          send_request
+          expect(json[:id]).to eq(
+            "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
+          )
+        end
+      end
+
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+        it "uses the host domain in the line item id" do
+          course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+          allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+          send_request
+          expect(json[:id]).to eq(
+            "http://test.host/api/lti/courses/#{course.id}/names_and_roles"
+          )
+        end
+      end
+    end
+
     context "when a course has a single enrollment" do
       it "returns teacher in members array" do
         enrollment = teacher_in_course(course: course, active_all: true)
@@ -658,6 +679,33 @@ describe Lti::IMS::NamesAndRolesController do
 
           it "returns a 400 bad_request and descriptive error message" do
             expect(json).to be_lti_advantage_error_response_body("bad_request", "Requested assignment not configured for external tool launches")
+          end
+        end
+
+        context "and the resource link contains additional custom params" do
+          let(:resource_link) do
+            rl = assignment_with_rlid_1.primary_resource_link
+            rl.update!(custom: custom_params)
+            rl
+          end
+          let(:tool) do
+            tool = super()
+            tool.settings[:custom_fields] = tool_params
+            tool.save!
+            tool
+          end
+          let(:custom_params) { { "foo" => "bar" } }
+          let(:tool_params) { { "baz" => "qux" } }
+          let(:expected_params) { custom_params.merge(tool_params).with_indifferent_access }
+          let(:rlid_param) { rlid_param_1 }
+
+          it "includes the custom params from the tool and the resource link" do
+            tool
+            resource_link
+            send_request
+            expect(json[:members][0][:message][0]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+              expected_params
+            )
           end
         end
 
@@ -1269,6 +1317,33 @@ describe Lti::IMS::NamesAndRolesController do
             let(:pass_thru_params) { super().merge(role: "http://purl.imsglobal.org/vocab/lis/v2/membership#Member") }
 
             it_behaves_like "returns assigned paginated group members"
+          end
+        end
+
+        context "and the resource link contains additional custom params" do
+          let(:resource_link) do
+            rl = assignment_with_rlid_1.primary_resource_link
+            rl.update!(custom: custom_params)
+            rl
+          end
+          let(:tool) do
+            tool = super()
+            tool.settings[:custom_fields] = tool_params
+            tool.save!
+            tool
+          end
+          let(:custom_params) { { "foo" => "bar" } }
+          let(:tool_params) { { "baz" => "qux" } }
+          let(:expected_params) { custom_params.merge(tool_params).with_indifferent_access }
+          let(:rlid_param) { rlid_param_1 }
+
+          it "includes the custom params from the tool and the resource link" do
+            tool
+            resource_link
+            send_request
+            expect(json[:members][0][:message][0]["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
+              expected_params
+            )
           end
         end
       end

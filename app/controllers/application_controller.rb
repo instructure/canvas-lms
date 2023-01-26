@@ -216,6 +216,7 @@ class ApplicationController < ActionController::Base
           current_user_visited_tabs: @current_user&.get_preference(:visited_tabs),
           discussions_reporting: react_discussions_post_enabled_for_preferences_use?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+          group_information: @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category ? @context.group_category.groups.pluck(:id, :name).map { |item| { id: item[0], label: item[1] } } : nil,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           help_link_name: help_link_name,
@@ -313,15 +314,15 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
-    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign course_paces_for_students
+    featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
+    account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
+    course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
-    extended_submission_state scheduled_page_publication
+    extended_submission_state scheduled_page_publication send_usage_metrics
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -799,20 +800,22 @@ class ApplicationController < ActionController::Base
     require_user
   end
 
+  # This can be appended to with << if needed
+  def csp_frame_ancestors
+    @csp_frame_ancestors ||= [].tap do |list|
+      # Allow iframing on all vanity domains as well as the canonical one
+      unless @domain_root_account.nil?
+        list.concat HostUrl.context_hosts(@domain_root_account, request.host)
+      end
+    end
+  end
+
   def set_response_headers
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
-      #
-      # Allow iframing on all vanity domains as well as the canonical one
-      #
-      equivalent_domains = []
-      unless @domain_root_account.nil?
-        equivalent_domains = HostUrl.context_hosts(@domain_root_account, request.host)
-      end
-
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(" ")};")
+      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
     end
     headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
@@ -1187,6 +1190,8 @@ class ApplicationController < ActionController::Base
       groups = @context.filter_visible_groups_for_user(groups)
 
       if opts[:include_accounts]
+        # reload @current_user to make sure we get a current value for their :enabled_account_calendars preference
+        @current_user.reload
         account_ids = @current_user.get_preference(:enabled_account_calendars) || []
         accounts = @current_user.associated_accounts.active.where(id: account_ids, account_calendar_visible: true)
       end
@@ -2231,7 +2236,7 @@ class ApplicationController < ActionController::Base
         # routes and stuff), then we'll build an actual named_context_url with the
         # params for show_relative
         res += named_context_url(@context, :context_file_url, attachment)
-        res += "/" + URI.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
+        res += "/" + URI::DEFAULT_PARSER.escape(attachment.full_display_path, FILE_PATH_ESCAPE_PATTERN)
         res += "?" + opts.to_query
       else
         # otherwise, just redirect to /files/:id

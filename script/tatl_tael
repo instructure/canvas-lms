@@ -14,8 +14,8 @@ linter_options = {
   skip_file_size_check: true,
   skip_wips: false,
   custom_comment_generation: true,
-  generate_comment_proc: proc do |config|
-    TatlTael::Linters.comments(config)
+  generate_comment_proc: proc do |**config|
+    TatlTael::Linters.comments(**config)
   end,
   auto_correct: ENV["AUTO_CORRECT_LINTERS"]
 }

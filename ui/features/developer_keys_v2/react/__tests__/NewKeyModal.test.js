@@ -19,6 +19,9 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import DeveloperKeyModal from '../NewKeyModal'
+import devKeyActions from '../actions/developerKeysActions'
+import moxios from 'moxios'
+import {successfulLtiKeySaveResponse} from './fixtures/responses'
 import $ from '@canvas/rails-flash-notifications'
 
 let oldEnv
@@ -317,31 +320,83 @@ describe('a11y checks', () => {
 
   describe('flash alerts checks', () => {
     const successfulSaveStub = jest.fn()
-    const unsuccessfulSaveStub = jest.fn()
+
+    function createWrapper(stateOverrides, actionOverrides) {
+      return mount(
+        modal({
+          createOrEditDeveloperKeyState: {
+            ...createDeveloperKeyState,
+            developerKey: {
+              ...developerKey,
+              tool_configuration: {
+                ...validToolConfig,
+              },
+            },
+            ...stateOverrides,
+          },
+          actions: {
+            ...fakeActions,
+            ...actionOverrides,
+          },
+          handleSuccessfulSave: successfulSaveStub,
+        })
+      )
+    }
 
     afterEach(() => {
       successfulSaveStub.mockClear()
-      unsuccessfulSaveStub.mockClear()
     })
-    describe('Developer Key gets edited and saved successfully', () => {
-      const updateLtiKeyStub = jest.fn().mockResolvedValue({
-        developer_key: developerKey,
-        tool_configuration: validToolConfig,
+    describe('LTI Developer Key is being created', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve({
+              developer_key: developerKey,
+              tool_configuration: validToolConfig,
+            })
+          }
+        })
+
+        const wrapper = createWrapper(
+          {isLtiKey: true},
+          {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+        )
+
+        await wrapper.instance().saveLtiToolConfiguration()
+
+        expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
       })
 
-      it('calls the provided success handler function', async () => {
-        const wrapper = mount(
-          modal({
-            createOrEditDeveloperKeyState: {
-              ...createDeveloperKeyState,
-            },
-            actions: {
-              ...fakeActions,
-              updateLtiKey: updateLtiKeyStub,
-            },
-            handleSuccessfulSave: successfulSaveStub,
-          })
+      it("doesn't flash an alert if the key fails to be created", async () => {
+        const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.reject(new Error('testing'))
+          }
+        })
+
+        const wrapper = createWrapper(
+          {isLtiKey: true},
+          {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
         )
+
+        await wrapper.instance().saveLtiToolConfiguration()
+
+        expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalled()
+        wrapper.unmount()
+      })
+    })
+
+    describe('LTI Developer Key is being edited', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const updateLtiKeyStub = jest.fn().mockResolvedValue({
+          developer_key: developerKey,
+          tool_configuration: validToolConfig,
+        })
+
+        const wrapper = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
         await wrapper
           .instance()
@@ -349,6 +404,71 @@ describe('a11y checks', () => {
 
         expect(updateLtiKeyStub).toHaveBeenCalled()
         expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
+      })
+
+      it("doesn't try to flash an alert if the key fails to save", async () => {
+        const updateLtiKeyStub = jest.fn().mockRejectedValue(null)
+        const wrapper = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
+
+        await wrapper
+          .instance()
+          .saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+
+        expect(updateLtiKeyStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalled()
+        wrapper.unmount()
+      })
+    })
+
+    // Turns out, for API keys, there's no difference in the code path taken,
+    // at least with respect to flashing an alert
+    describe('API Dev Key is being created/edited', () => {
+      it('flashes an alert if the key saves successfully', async () => {
+        const createOrEditStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve(null)
+          }
+        })
+
+        // TODO: Modify this state so that it shows a key being created, not being edited.
+        const wrapper = createWrapper(
+          {
+            developerKeyCreateOrEditSuccessful: true,
+            developerKeyCreateOrEditPending: false,
+            developerKeyCreateOrEditFailed: false,
+          },
+          {createOrEditDeveloperKey: createOrEditStub}
+        )
+
+        await wrapper.instance().submitForm()
+
+        expect(createOrEditStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
+      })
+
+      it("doesn't flash an alert if the key fails to save", async () => {
+        const createOrEditStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve(null)
+          }
+        })
+
+        // TODO: Modify this state so that it shows a key being created, not being edited.
+        const wrapper = createWrapper(
+          {
+            developerKeyCreateOrEditSuccessful: false,
+            developerKeyCreateOrEditPending: false,
+            developerKeyCreateOrEditFailed: true,
+          },
+          {createOrEditDeveloperKey: createOrEditStub}
+        )
+
+        await wrapper.instance().submitForm()
+
+        expect(createOrEditStub).toHaveBeenCalled()
+        expect(successfulSaveStub).not.toHaveBeenCalledTimes(1)
         wrapper.unmount()
       })
     })
@@ -393,6 +513,127 @@ it('flashes an error if redirect_uris is empty', () => {
   expect(flashStub).toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
 
   wrapper.unmount()
+})
+
+describe('redirect_uris is too long', () => {
+  let flashStub
+  const createOrEditSpy = jest.fn()
+  const actions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
+  const devKey = {
+    ...developerKey,
+    require_scopes: true,
+    redirect_uris: 'https://example.com/' + 'a'.repeat(4096),
+  }
+  const state = {...editDeveloperKeyState, developerKey: devKey}
+  const expectedMsg =
+    "One of the supplied redirect_uris is too long. Please ensure you've entered the correct value(s) for your redirect_uris."
+  let wrapper
+
+  beforeEach(() => {
+    flashStub = jest.spyOn($, 'flashError')
+    wrapper = mount(
+      modal({
+        createLtiKeyState,
+        createOrEditDeveloperKeyState: state,
+        listDeveloperKeyScopesState,
+        actions,
+        selectedScopes,
+      })
+    )
+  })
+
+  afterEach(() => {
+    flashStub.mockClear()
+    wrapper.unmount()
+  })
+
+  describe('and the key being saved is an LTI key', () => {
+    it('tries to flash an error saying the given redirect_uri is too long', () => {
+      wrapper.instance().saveLtiToolConfiguration()
+      expect(wrapper.instance().hasInvalidRedirectUris).toBeTruthy()
+      expect(flashStub).toHaveBeenCalledWith(expectedMsg)
+    })
+  })
+
+  describe('and the key being saved is an API key', () => {
+    it('tries to flash an error saying the given redirect_uri is too long', () => {
+      wrapper.instance().submitForm()
+      expect(wrapper.instance().hasInvalidRedirectUris).toBeTruthy()
+      expect(flashStub).toHaveBeenCalledWith(expectedMsg)
+    })
+  })
+})
+
+describe('receiving an HTTP response', () => {
+  beforeEach(() => {
+    moxios.install()
+  })
+
+  const createModalAndSaveKey = modalProps => {
+    const wrapper = mount(modal(modalProps))
+    wrapper.instance().setState({configurationMethod: 'json'})
+    wrapper.instance().saveLtiToolConfiguration()
+
+    wrapper.unmount()
+  }
+
+  it('shows flash message and closes modal', done => {
+    const handleSuccessfulSave = jest.fn()
+    const closeModal = jest.fn()
+
+    moxios.wait(async () => {
+      const request = moxios.requests.mostRecent()
+      await request.respondWith(successfulLtiKeySaveResponse)
+      // The actual flash alert call happens in App.js after handleSuccessfulSave
+      // is called, so making sure that handleSuccessfulSave is called is the best
+      // we can test for in this component. That is different from errors, where
+      // we call $.flashError in this component.
+      expect(handleSuccessfulSave).toHaveBeenCalled()
+      expect(closeModal).toHaveBeenCalled()
+      done()
+    })
+
+    const modalProps = {
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+      listDeveloperKeyScopesState,
+      actions: {...devKeyActions, developerKeysModalClose: closeModal},
+      handleSuccessfulSave,
+    }
+    createModalAndSaveKey(modalProps)
+  })
+
+  it('shows flash message and leaves modal open', done => {
+    const flashStub = jest.spyOn($, 'flashError')
+    const closeModal = jest.fn()
+
+    moxios.wait(async () => {
+      const request = moxios.requests.mostRecent()
+      await request.respondWith({
+        status: 422,
+        response: {
+          errors: [
+            {
+              field: 'lti_key',
+              message: 'tool configuration must have public jwk or public jwk url',
+              error_code: null,
+            },
+          ],
+        },
+      })
+      expect(flashStub).toHaveBeenCalledWith('Request failed with status code 422')
+      expect(closeModal).not.toHaveBeenCalled()
+      done()
+    })
+
+    const modalProps = {
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: {...editDeveloperKeyState, editing: true},
+      listDeveloperKeyScopesState,
+      actions: {...devKeyActions, developerKeysModalClose: closeModal},
+    }
+    createModalAndSaveKey(modalProps)
+  })
 })
 
 it('renders the saved toolConfiguration if it is present in state', () => {

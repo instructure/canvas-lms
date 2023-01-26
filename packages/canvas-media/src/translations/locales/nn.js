@@ -58,6 +58,7 @@ const locale = {
   "korean_da812d9": { "message": "Koreansk" },
   "latvian_2bbb6aab": { "message": "Latvisk" },
   "lithuanian_5adcbe24": { "message": "Litauisk" },
+  "loading_25990131": { "message": "Lastar..." },
   "macedonian_6ed541af": { "message": "Makedonsk" },
   "malay_f5dddce4": { "message": "Malayisk" },
   "maltese_916925e8": { "message": "Maltesisk" },

@@ -23,7 +23,7 @@ module AddressBook
   # shapes but no data -- while being separate from the original
   # MessageableUser strategy.
   class Empty < AddressBook::Base
-    def known_users(_users, **)
+    def known_users(_users, *)
       []
     end
 

@@ -19,7 +19,7 @@ ARG CANVAS_RAILS=6.1
 ENV CANVAS_RAILS=${CANVAS_RAILS}
 
 ENV YARN_VERSION 1.19.1-1
-ENV BUNDLER_VERSION 2.2.17
+ENV BUNDLER_VERSION 2.3.26
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
@@ -75,14 +75,8 @@ RUN set -eux; \
     config/locales/generated \
     log \
     node_modules \
-    packages/canvas-media/es \
-    packages/canvas-media/lib \
-    packages/canvas-media/node_modules \
     packages/canvas-planner/lib \
     packages/canvas-planner/node_modules \
-    packages/canvas-rce/canvas \
-    packages/canvas-rce/lib \
-    packages/canvas-rce/node_modules \
     packages/jest-moxios-utils/node_modules \
     packages/js-utils/es \
     packages/js-utils/lib \

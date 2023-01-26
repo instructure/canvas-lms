@@ -61,6 +61,7 @@ export default class AssignmentRowCellPropFactory {
       enteredGrade: submission.entered_grade,
       enteredScore: submission.entered_score,
       excused: !!submission.excused,
+      late_policy_status: submission.late_policy_status,
       grade: submission.grade,
       id: submission.id,
       rawGrade: submission.rawGrade,

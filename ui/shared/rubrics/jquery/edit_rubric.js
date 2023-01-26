@@ -212,9 +212,10 @@ const rubricEditing = {
     })
 
     $criterion.find('.cancel_button').click()
-
-    $criterion.find('div.long_description').remove()
-    $criterion.find('textarea.long_description').text(outcome.get('description'))
+    const tmpEl = document.createElement('div')
+    tmpEl.innerHTML = outcome.get('description')
+    const outcomeDescription = tmpEl.textContent || tmpEl.innerText || ''
+    $criterion.find('div.long_description').text(outcomeDescription)
     $criterion.find('.long_description_holder').toggleClass('empty', !outcome.get('description'))
 
     $criterion.find('.description_title').text(outcome.get('title'))
@@ -434,7 +435,7 @@ const rubricEditing = {
         ],
       })
       if ($criterion.hasClass('learning_outcome_criterion')) {
-        vals.long_description = $criterion.find('textarea.long_description').val()
+        vals.long_description = $criterion.find('div.long_description').val()
       }
       vals.mastery_points = $criterion.find('span.mastery_points').text()
       const pre_criterion = 'rubric[criteria][' + criterion_idx + ']'
@@ -649,7 +650,6 @@ const rubricEditing = {
       $criterion.find('.outcome_sr_content').attr('aria-hidden', !criterion.learning_outcome_id)
       if (criterion.learning_outcome_id) {
         $criterion.find('.long_description_holder').show()
-        $criterion.find('div.long_description').remove()
         if (criterion.long_description) {
           $criterion.find('.long_description_link').removeClass('hidden')
         }

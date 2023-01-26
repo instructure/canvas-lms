@@ -35,17 +35,17 @@ const calculateImageHeight = ({size, outlineSize}) => {
 
 export function buildImage(settings) {
   // Don't attempt to embed an image if none exist
-  if (!settings.encodedImage) return
+  if (!settings.imageSettings?.image) return
 
   let imageAttributes
-  if (STOCK_IMAGE_TYPES.includes(settings.encodedImageType)) {
+  if (STOCK_IMAGE_TYPES.includes(settings.imageSettings.mode)) {
     imageAttributes = {
       x: settings.x,
       y: settings.y,
       transform: settings.transform,
       width: settings.width,
       height: settings.height,
-      href: settings.encodedImage,
+      href: settings.embedImage,
     }
   } else {
     // we need to embed the encoded image
@@ -57,7 +57,7 @@ export function buildImage(settings) {
       transform: `translate(${translation}, ${translation})`,
       width: squareHeight,
       height: squareHeight,
-      href: settings.encodedImage,
+      href: settings.embedImage,
     }
   }
 

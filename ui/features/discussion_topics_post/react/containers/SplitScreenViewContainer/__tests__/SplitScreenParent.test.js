@@ -148,7 +148,7 @@ describe('SplitScreenParent', () => {
     })
   })
 
-  it('should render deeply nested alert', () => {
+  it('should render correct deeply nested alert at depth 4', () => {
     window.ENV = {
       should_show_deeply_nested_alert: true,
     }
@@ -157,6 +157,7 @@ describe('SplitScreenParent', () => {
         discussionEntryOverrides: {
           isolatedEntryId: '77',
           parentId: '77',
+          depth: 4,
         },
         overrides: {RCEOpen: true},
       })
@@ -165,6 +166,28 @@ describe('SplitScreenParent', () => {
     expect(
       queryByText(
         'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+      )
+    ).toBeTruthy()
+  })
+
+  it('should render correct deeply nested alert at depth 3', () => {
+    window.ENV = {
+      should_show_deeply_nested_alert: true,
+    }
+    const {queryByText} = setup(
+      defaultProps({
+        discussionEntryOverrides: {
+          isolatedEntryId: '77',
+          parentId: '77',
+          depth: 3,
+        },
+        overrides: {RCEOpen: true},
+      })
+    )
+
+    expect(
+      queryByText(
+        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
       )
     ).toBeTruthy()
   })

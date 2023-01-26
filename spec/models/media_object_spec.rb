@@ -85,19 +85,19 @@ describe MediaObject do
     it "does not create if the media object exists already" do
       MediaObject.create!(context: user_factory, media_id: "test")
       expect(MediaObject).not_to receive(:create!)
-      MediaObject.ensure_media_object("test", {})
+      MediaObject.ensure_media_object("test")
     end
 
     it "does not create if the media id doesn't exist in kaltura" do
       expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(false)
       expect(MediaObject).not_to receive(:create!)
-      MediaObject.ensure_media_object("test", {})
+      MediaObject.ensure_media_object("test")
       run_jobs
     end
 
     it "creates the media object" do
       expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(true)
-      MediaObject.ensure_media_object("test", { context: user_factory })
+      MediaObject.ensure_media_object("test", context: user_factory)
       run_jobs
       obj = MediaObject.by_media_id("test").first
       expect(obj.context).to eq @user

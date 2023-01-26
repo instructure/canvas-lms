@@ -21,6 +21,7 @@ import AssignmentRowCellPropFactory from 'ui/features/gradebook/react/default_gr
 import AssignmentCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/index'
 import GridEvent from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/GridEvent'
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
   let $container
@@ -34,6 +35,9 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
   }
 
   suiteHooks.beforeEach(() => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+    })
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -92,6 +96,7 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
       editor.destroy()
     }
     $container.remove()
+    fakeENV.teardown()
   })
 
   QUnit.module('initialization', hooks => {

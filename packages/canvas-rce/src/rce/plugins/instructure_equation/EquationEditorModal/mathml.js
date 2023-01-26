@@ -134,6 +134,10 @@ const mathml = {
   },
 
   isMathInElement(elem) {
+    if (elem?.getAttribute('data-testid') === 'mathml-preview-element') {
+      return true
+    }
+
     if (RCEGlobals.getFeatures()?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
       if (elem.querySelector('.math_equation_latex,.math_equation_mml')) {
@@ -149,10 +153,6 @@ const mathml = {
       if (/(?:\$\$|\\\()/.test(elem.textContent)) {
         return true
       }
-    }
-
-    if (RCEGlobals.getFeatures()?.new_equation_editor) {
-      return elem?.getAttribute('data-testid') === 'mathml-preview-element'
     }
 
     const mathElements = elem.getElementsByTagName('math')

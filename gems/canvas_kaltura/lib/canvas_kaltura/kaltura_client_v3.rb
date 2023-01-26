@@ -367,7 +367,7 @@ module CanvasKaltura
       params.each do |key, value|
         next if value.nil?
 
-        requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
+        requestParams += "&#{URI::DEFAULT_PARSER.escape(key.to_s)}=#{URI::DEFAULT_PARSER.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
       if response.is_a? Net::HTTPServiceUnavailable
@@ -384,7 +384,7 @@ module CanvasKaltura
     def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
-        http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
+        http = Net::HTTP.new(@host, @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port)
         http.use_ssl = @use_ssl
 
         if ENV["RAILS_ENV"] == "development"

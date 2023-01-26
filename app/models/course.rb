@@ -19,7 +19,6 @@
 #
 
 require "atom"
-require "csv"
 
 class Course < ActiveRecord::Base
   include Context
@@ -2787,16 +2786,18 @@ class Course < ActiveRecord::Base
                           :course_section_id,
                           :limit_privileges_to_course_section,
                           :type,
-                          :associated_user_id
+                          :associated_user_id,
+                          :workflow_state
                         )
 
-      enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
+      enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id, workflow_state|
         {
           course_section_id: section_id,
           limit_privileges_to_course_section: limit_privileges,
           type: type,
           associated_user_id: associated_user_id,
-          admin: ADMIN_TYPES.include?(type)
+          admin: ADMIN_TYPES.include?(type),
+          workflow_state: workflow_state
         }
       end
     end
@@ -3887,6 +3888,10 @@ class Course < ActiveRecord::Base
     content_participation_counts.each(&:refresh_unread_count)
   end
 
+  def refresh_content_participation_counts_for_users(user_ids)
+    content_participation_counts.where(user: user_ids).find_each(&:refresh_unread_count)
+  end
+
   attr_accessor :preloaded_nickname, :preloaded_favorite
 
   def favorite_for_user?(user)
@@ -3971,6 +3976,10 @@ class Course < ActiveRecord::Base
     context_external_tools.active.quiz_lti.first ||
       account.context_external_tools.active.quiz_lti.first ||
       root_account.context_external_tools.active.quiz_lti.first
+  end
+
+  def has_new_quizzes?
+    assignments.active.quiz_lti.exists?
   end
 
   def find_or_create_progressions_for_user(user)
@@ -4148,6 +4157,34 @@ class Course < ActiveRecord::Base
 
   def can_stop_being_template?
     !templated_accounts.exists?
+  end
+
+  def batch_update_context_modules(progress = nil, event:, module_ids:, skip_content_tags: false)
+    completed_ids = []
+    modules = context_modules.not_deleted.where(id: module_ids)
+    progress&.calculate_completion!(0, modules.size)
+    modules.each do |context_module|
+      # Break out of the loop if the progress has been canceled
+      break if progress&.reload&.failed?
+
+      case event.to_s
+      when "publish"
+        context_module.publish unless context_module.active?
+        unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
+          context_module.publish_items!(progress: progress)
+        end
+      when "unpublish"
+        context_module.unpublish unless context_module.unpublished?
+        if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
+          context_module.unpublish_items!(progress: progress)
+        end
+      when "delete"
+        context_module.destroy
+      end
+      progress&.increment_completion!(1) if progress&.total
+      completed_ids << context_module.id
+    end
+    completed_ids
   end
 
   private

@@ -20,7 +20,7 @@ begin
       t.before = proc { `script/generate_lti_variable_substitution_markdown` }
       t.files = %w[
         app/controllers/**/*.rb
-        {gems,vendor}/plugins/*/app/controllers/*.rb
+        {gems,vendor}/plugins/*/app/controllers/**/*.rb
         {gems,vendor}/plugins/*/lib/*.rb
       ]
 

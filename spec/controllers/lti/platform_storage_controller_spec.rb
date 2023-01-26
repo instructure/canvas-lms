@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/platform_storage_controller"
-
 describe Lti::PlatformStorageController do
   describe "#post_message_forwarding" do
     subject { get :post_message_forwarding }
@@ -64,6 +62,12 @@ describe Lti::PlatformStorageController do
       end
 
       it { is_expected.to be_successful }
+
+      it "modifies the frame-ancestors in the CSP header" do
+        subject
+        expect(response.headers["Content-Security-Policy"]).to \
+          match(/frame-ancestors [^;]*self[^;]*test\.host/)
+      end
     end
   end
 end

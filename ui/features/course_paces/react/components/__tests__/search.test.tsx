@@ -20,6 +20,7 @@ import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
 
 import {Search} from '../search'
+import {OrderType, SortableColumn} from '../../types'
 
 const fetchPaceContexts = jest.fn()
 const setSearchTerm = jest.fn()
@@ -29,6 +30,8 @@ const defaultProps = {
   fetchPaceContexts,
   setSearchTerm,
   contextType: 'section' as const,
+  currentSortBy: 'name' as SortableColumn,
+  currentOrderType: 'asc' as OrderType,
 }
 
 afterEach(() => {
@@ -90,5 +93,34 @@ describe('Search', () => {
 
     const searchInput = getByPlaceholderText('Search for students')
     expect(searchInput).toBeInTheDocument()
+  })
+
+  describe('SR-only alerts on search', () => {
+    it("renders a SR-only alert with the number of results when there's lots of results", () => {
+      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1, 2, 3]))
+      const {getByRole, getByText} = render(
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+      )
+      act(() => getByRole('button', {name: 'Search'}).click())
+      expect(getByText('Showing 3 results below')).toBeInTheDocument()
+    })
+
+    it('renders a SR-only alert indicating one result', () => {
+      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1]))
+      const {getByRole, getByText} = render(
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+      )
+      act(() => getByRole('button', {name: 'Search'}).click())
+      expect(getByText('Showing 1 result below')).toBeInTheDocument()
+    })
+
+    it('renders a SR-only alert indicating no results found', () => {
+      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([]))
+      const {getByRole, getByText} = render(
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+      )
+      act(() => getByRole('button', {name: 'Search'}).click())
+      expect(getByText('No results found')).toBeInTheDocument()
+    })
   })
 })

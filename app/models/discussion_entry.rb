@@ -30,14 +30,15 @@ class DiscussionEntry < ActiveRecord::Base
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
   has_many :discussion_entry_versions, -> { order(version: :desc) }, inverse_of: :discussion_entry, dependent: :destroy
-  has_many :legacy_subentries, -> { where("legacy=true") }, class_name: "DiscussionEntry", foreign_key: "parent_id"
-  has_many :root_discussion_replies, -> { where("legacy=false OR legacy=true AND parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
+  has_many :legacy_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id"
+  has_many :root_discussion_replies, -> { where("parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   has_many :discussion_subentries, -> { order(:created_at) }, class_name: "DiscussionEntry", foreign_key: "parent_id"
   has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id"
   has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   has_many :discussion_entry_participants
   has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   belongs_to :discussion_topic, inverse_of: :discussion_entries
+  belongs_to :quoted_entry, class_name: "DiscussionEntry"
   # null if a root entry
   belongs_to :parent_entry, class_name: "DiscussionEntry", foreign_key: :parent_id
   # also null if a root entry
@@ -313,7 +314,7 @@ class DiscussionEntry < ActiveRecord::Base
     #     change_column_default :discussion_entries, :legacy, false
     #   end
     # end
-    self.legacy = !(context.feature_enabled?(:react_discussions_post) && (Account.site_admin.feature_enabled?(:isolated_view) || Account.site_admin.feature_enabled?(:split_screen_view)))
+    self.legacy = !(context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:isolated_view))
   end
 
   def infer_root_entry_id

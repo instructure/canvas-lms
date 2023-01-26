@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "csv"
-
 describe Quizzes::QuizStatistics do
   before(:once) do
     student_in_course(active_all: true)

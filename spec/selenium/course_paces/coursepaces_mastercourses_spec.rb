@@ -164,9 +164,9 @@ describe "blueprinted course pace page" do
           expect(blueprint_container_for_pacing).not_to be_inactive
         end
 
-        it "disables the lock button for section paces" do
+        it "does not render the lock button for section paces" do
           click_context_link(@section_name)
-          expect(blueprint_container_for_pacing).to be_inactive
+          expect { blueprint_container_for_pacing }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
         end
       end
     end
@@ -199,13 +199,19 @@ describe "blueprinted course pace page" do
           run_master_course_migration(@master)
         end
 
+        it "shows the banner message properly" do
+          visit_course_paces_page course_id_override: @minion.id
+          wait_for_ajaximations
+          click_edit_default_pace_button
+          expect(find_all("#blueprint-lock-banner").count).to eq(1)
+          expect(f(".pace-redesign-inner-modal #blueprint-lock-banner")).to be_displayed
+        end
+
         it "disables all editing and publishing elements", ignore_js_errors: true, custom_timeout: 25 do
           visit_course_paces_page course_id_override: @minion.id
           wait_for_ajaximations
           click_edit_default_pace_button
-
-          # this should be uncommented when the settings button is properly disabled
-          # expect(click_course_pace_settings_button).to be_disabled
+          expect(course_pace_settings_button).to be_disabled
           expect(duration_field[0]).to be_disabled
         end
       end

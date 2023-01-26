@@ -20,7 +20,6 @@
 
 require "rubygems"
 require "zip"
-require "fileutils"
 
 # Call this with a block.  The block will take an array of filenames
 # extracted.  Once this block is executed, these extracted files and

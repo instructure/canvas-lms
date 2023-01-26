@@ -22,39 +22,26 @@ describe('svgSettings()', () => {
   let initialState = {}
   const subject = action => svgSettings(initialState, action)
 
-  it('handles "SetEncodedImage" actions', () => {
-    const dataUrl = 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=='
+  it('handles "SetImageSettings"', () => {
+    const imageSettings = {image: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa'}
 
     const nextState = subject({
-      type: 'SetEncodedImage',
-      payload: dataUrl,
+      type: 'SetImageSettings',
+      payload: imageSettings,
     })
 
-    expect(nextState).toMatchObject({
-      encodedImage: dataUrl,
-    })
+    expect(nextState.imageSettings).toEqual(imageSettings)
   })
 
-  it('handles "SetEncodedImageType" actions', () => {
-    const type = 'course'
+  it('handles "SetEmbedImage"', () => {
+    const embedImage = 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa'
 
     const nextState = subject({
-      type: 'SetEncodedImageType',
-      payload: type,
+      type: 'SetEmbedImage',
+      payload: embedImage,
     })
 
-    expect(nextState.encodedImageType).toEqual(type)
-  })
-
-  it('handles "SetEncodedImageName" actions', () => {
-    const name = 'banana.jpg'
-
-    const nextState = subject({
-      type: 'SetEncodedImageName',
-      payload: name,
-    })
-
-    expect(nextState.encodedImageName).toEqual(name)
+    expect(nextState.embedImage).toEqual(embedImage)
   })
 
   it('handles "SetX"', () => {

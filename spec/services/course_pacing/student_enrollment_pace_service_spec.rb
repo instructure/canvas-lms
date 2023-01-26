@@ -159,4 +159,24 @@ describe CoursePacing::StudentEnrollmentPaceService do
       end.to raise_error ActiveRecord::RecordNotFound
     end
   end
+
+  describe ".valid_context?" do
+    before :once do
+      section_one = add_section("Section One", course: course)
+      @first_student_enrollment = course.enroll_student(student, enrollment_state: "active", allow_multiple_enrollments: true)
+      @last_student_enrollment = course.enroll_student(student, enrollment_state: "active", section: section_one, allow_multiple_enrollments: true)
+    end
+
+    it "returns false for enrollments other than the student's most recent" do
+      expect(
+        CoursePacing::StudentEnrollmentPaceService.valid_context?(@first_student_enrollment)
+      ).to eq false
+    end
+
+    it "returns true for the most recent student enrollment" do
+      expect(
+        CoursePacing::StudentEnrollmentPaceService.valid_context?(@last_student_enrollment)
+      ).to eq true
+    end
+  end
 end
