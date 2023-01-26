@@ -336,13 +336,21 @@ const ProxyUploadModal = ({
       >
         <TableHead>
           <TableRow>
-            <TableColHeader id="thumbnail" width="1rem" theme={cellTheme} />
+            <TableColHeader id="thumbnail" width="1rem" theme={cellTheme}>
+              <ScreenReaderContent>{I18n.t('File Type')}</ScreenReaderContent>
+            </TableColHeader>
             <TableColHeader id="filename" theme={cellTheme}>
               {I18n.t('File Name')}
             </TableColHeader>
-            <TableColHeader id="upload-progress" width="30%" theme={cellTheme} />
-            <TableColHeader id="upload-success" width="1rem" theme={cellTheme} />
-            <TableColHeader id="delete" width="1rem" theme={cellTheme} />
+            <TableColHeader id="upload-progress" width="30%" theme={cellTheme}>
+              <ScreenReaderContent>{I18n.t('Upload Progress')}</ScreenReaderContent>
+            </TableColHeader>
+            <TableColHeader id="upload-success" width="1rem" theme={cellTheme}>
+              <ScreenReaderContent>{I18n.t('Upload Success')}</ScreenReaderContent>
+            </TableColHeader>
+            <TableColHeader id="delete" width="1rem" theme={cellTheme}>
+              <ScreenReaderContent>{I18n.t('Remove file')}</ScreenReaderContent>
+            </TableColHeader>
           </TableRow>
         </TableHead>
         <TableBody>{files.map(renderTableRow)}</TableBody>
@@ -370,9 +378,21 @@ const ProxyUploadModal = ({
             </>
           )}
         </TableCell>
-        <TableCell theme={cellTheme}>{file.isLoading && renderFileProgress(file)}</TableCell>
+        <TableCell theme={cellTheme}>
+          {file.isLoading && renderFileProgress(file)}
+          <ScreenReaderContent>
+            {file.isLoading
+              ? I18n.t('%{displayName} loading in progress', {displayName})
+              : I18n.t('%{displayName} loaded', {displayName})}
+          </ScreenReaderContent>
+        </TableCell>
         <TableCell theme={cellTheme}>
           {!file.isLoading && <IconCompleteSolid color="success" />}
+          <ScreenReaderContent>
+            {file.isLoading
+              ? I18n.t('%{displayName} loading pending', {displayName})
+              : I18n.t('%{displayName} loading success', {displayName})}
+          </ScreenReaderContent>
         </TableCell>
         <TableCell theme={cellTheme}>
           {!file.isLoading && (
