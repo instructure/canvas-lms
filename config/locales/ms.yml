@@ -18833,7 +18833,7 @@ ms:
       grade: "(gred: %{grade})"
       see_all_quiz_attempts: "Lihat semua percubaan kuiz"
       submission_to_view: "Serahan untuk dilihat:"
-      submitted: "*Diserahkan* %{submittedAt}"
+      submitted: "*Diserahkan* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Serahkan
     titles: 
       click_to_record: "Pertuturan kepada Teks"
