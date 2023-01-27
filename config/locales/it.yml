@@ -287,7 +287,7 @@ it:
   account: 
     default_account_name: "Account predefinito"
     default_site_administrator_account_name: "Amministratore del sito"
-    default_term_name: "Periodo predefinito"
+    default_term_name: "Trimestre predefinito"
     errors: 
       invalid_discovery_url: "L'URL di individuazione non è valido"
     feedback_coach: "Chiedi alla community"
@@ -315,7 +315,7 @@ it:
     tab_sis_import: "Importazione SIS"
     tab_statistics: Statistiche
     tab_sub_accounts: Subaccount
-    tab_terms: Periodi
+    tab_terms: Trimestri
     tab_users: Utenti
     turnitin_pledge: "La consegna di questo compito è il mio lavoro originale"
   account_580e7fda: account
@@ -474,18 +474,18 @@ it:
   account_proficiency_ratings_saved_292d9239: "Valutazioni livello di preparazione account salvate"
   account_reports: 
     default: 
-      active_terms: "Periodi attivi"
-      all_terms: "Tutti i periodi"
+      active_terms: "Trimestri attivi"
+      all_terms: "Tutti i trimestri"
       course_text: "Per il corso: %{course};"
       description: 
         header: Esempio
       end_text: "Data/Ora di fine: %{end_at};"
       error_text: "Errore. Segnala il seguente codice di errore al tuo amministratore di sistema: ErrorReport:%{error};"
-      extra_text_term: "Periodo: %{term_name};"
+      extra_text_term: "Trimestre: %{term_name};"
       message: "%{type} report generato con successo con le seguenti impostazioni. Account: %{account}; %{options}"
       section_text: "Per la sezione: %{section};"
       start_text: "Data/Ora di inizio: %{start_at};"
-      term_text: "Periodo: %{term_name};"
+      term_text: "Trimestre: %{term_name};"
     grades: 
       limited: "oggetti eliminati limitati in base ai giorni specificati;"
     grading_standard_id: grading_standard_id
@@ -569,10 +569,10 @@ it:
     report_header_student_sis_id: "ID SIS studente"
     report_header_submission_date: "data consegna"
     report_header_submission_score: "punteggio consegna"
-    report_header_term: periodo
+    report_header_term: trimestre
     report_header_term__id: term_id
-    report_header_term_id: "ID periodo"
-    report_header_term_sis: "SIS periodo"
+    report_header_term_id: "ID trimestre"
+    report_header_term_sis: "SIS trimestre"
     report_header_token_dev_key_id: "ID chiave sviluppatore"
     report_header_token_dev_key_name: "nome chiave sviluppatore"
     report_header_token_hint: "suggerimento token"
@@ -891,7 +891,7 @@ it:
       account_reports: 
         default: 
           parameters: 
-            header: Periodo
+            header: Trimestre
     cannot_manage_account: "Non sei autorizzato a gestire le impostazioni dell'account"
     cannot_manage_quotas: "Non sei autorizzato a gestire le impostazioni della quota"
     ccp_zero_activity_csv_parameters: 
@@ -1043,7 +1043,7 @@ it:
       account_reports: 
         bryan_engagement: 
           enrollment_term_ids: 
-            field: "ID periodo iscrizione"
+            field: "ID trimestre iscrizione"
     eportfolio_moderation: 
       eportfolio_moderation_crumb: "Moderazione ePortfolio"
       page_title: "Moderazione ePortfolio"
@@ -1059,7 +1059,7 @@ it:
       account_reports: 
         default: 
           description: 
-            text: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato periodo. Il file CSV risultante avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
+            text: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato trimestre. Il file CSV risultante avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
     group_type: gruppo
     gsd: 
       student_outcome_results: 
@@ -1134,12 +1134,12 @@ it:
               text: "ID SIS corso"
             text: "ID corso"
           parameters: 
-            note1: "È possibile lasciare vuoto l'ID corso per eseguire il report per tutti i corsi nel periodo."
+            note1: "È possibile lasciare vuoto l'ID corso per eseguire il report per tutti i corsi nel trimestre."
     lewisville_course_activity_report_csv_parameters: 
       account_reports: 
         default: 
           parameters: 
-            header: Periodo
+            header: Trimestre
     lti_report_csv_description: 
       account_reports: 
         default: 
@@ -1226,14 +1226,14 @@ it:
               sections: 
                 check_box: "CSV sezioni"
               terms: 
-                check_box: "CSV periodi"
+                check_box: "CSV trimestri"
               users: 
                 check_box: "CSV utenti"
               xlist: 
                 check_box: "CSV riferimento incrociato"
             sis_default: 
               parameters: 
-                note: "*Le impostazioni dei periodi hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e cross-listing."
+                note: "*Le impostazioni dei trimestri hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e cross-listing."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -1259,19 +1259,19 @@ it:
           sections: 
             check_box: "CSV sezioni"
           terms: 
-            check_box: "CSV periodi"
+            check_box: "CSV trimestri"
           users: 
             check_box: "CSV utenti"
           xlist: 
             check_box: "CSV riferimento incrociato"
         sis_default: 
           parameters: 
-            note: "*Le impostazioni dei periodi hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e riferimenti incrociati."
+            note: "*Le impostazioni dei trimestri hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e riferimenti incrociati."
     public_courses_csv_description: 
       account_reports: 
         default: 
           public_courses: 
-            text: "Questo report mostra tutti i corsi pubblici che non sono stati eliminati per un determinato periodo. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
+            text: "Questo report mostra tutti i corsi pubblici che non sono stati eliminati per un determinato trimestre. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
     quota_integer_required: "È richiesto un valore intero"
     quota_must_be_positive: "Il valore deve essere positivo"
     quota_not_updated: "La quota non è stata aggiornata"
@@ -1281,7 +1281,7 @@ it:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            text: "Questo report mostra tutti i corsi per un determinato periodo che sono stati eliminati negli ultimi 30 giorni. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
+            text: "Questo report mostra tutti i corsi per un determinato trimestre che sono stati eliminati negli ultimi 30 giorni. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
     reports_tab: 
       headers: 
         report_last_run: "Ultima esecuzione"
@@ -1543,7 +1543,7 @@ it:
       groups: Gruppi
       imported_items_title: "Elementi importati"
       sections_label: Sezioni
-      terms_label: Periodi
+      terms_label: Trimestri
       users_label: Utenti
     sis_batch_messages: 
       sis_batch_errors_title: "Errori che impediscono l'importazione"
@@ -1552,7 +1552,7 @@ it:
       account_reports: 
         sis_export: 
           description: 
-            text: "Report esportazione SIS: Questo report esporterà tutti i file necessari per utenti, account, periodi, corsi, sezioni, iscrizioni, gruppi, membri dei gruppi e cross-listing per un'importazione SIS nelle rispettive categorie. Questa operazione restituirà solo gli elementi creati o modificati tramite SIS."
+            text: "Report esportazione SIS: Questo report esporterà tutti i file necessari per utenti, account, trimestri, corsi, sezioni, iscrizioni, gruppi, membri dei gruppi e cross-listing per un'importazione SIS nelle rispettive categorie. Questa operazione restituirà solo gli elementi creati o modificati tramite SIS."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1570,19 +1570,19 @@ it:
           sections: 
             check_box: "CSV sezioni"
           terms: 
-            check_box: "CSV periodi"
+            check_box: "CSV trimestri"
           users: 
             check_box: "CSV utenti"
           xlist: 
             check_box: "CSV riferimento incrociato"
         sis_default: 
           parameters: 
-            note: "*Le impostazioni dei periodi hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e riferimenti incrociati."
+            note: "*Le impostazioni dei trimestri hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e riferimenti incrociati."
     sis_import: 
       add_sis_stickiness_instructions: "Con questa opzione selezionata, le modifiche effettuate tramite questa importazione SIS verranno elaborate come modifiche UI, impedendo alle successive importazioni SIS che non si sovrappongono di modificare i campi cambiati qui."
       add_sis_stickiness_label: "Elabora come modifiche UI"
       batch_import_instructions: |-
-          Se selezionata, questa opzione eliminerà tutti i dati correlati a questo periodo, inclusi tutti i corsi e le iscrizioni non presenti nel file di importazione selezionato sopra.  
+          Se selezionata, questa opzione eliminerà tutti i dati correlati a questo trimestre, inclusi tutti i corsi e le iscrizioni non presenti nel file di importazione selezionato sopra.  
           Per i dettagli, consulta la documentazione.
       batch_mode_label: "Si tratta di un aggiornamento batch completo"
       clear_sis_stickiness_instructions: "Con questa opzione selezionata, tutti i campi in tutti i record interessati da questa importazione SIS potranno essere modificati nel corso di future importazioni SIS che non si sovrappongono."
@@ -1684,14 +1684,14 @@ it:
               sections: 
                 check_box: "CSV sezioni"
               terms: 
-                check_box: "CSV periodi"
+                check_box: "CSV trimestri"
               users: 
                 check_box: "CSV utenti"
               xlist: 
                 check_box: "CSV riferimento incrociato"
             sis_default: 
               parameters: 
-                note: "*Le impostazioni dei periodi hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e cross-listing."
+                note: "*Le impostazioni dei trimestri hanno effetto solo sui file CSV per corsi, sezioni, iscrizioni e cross-listing."
       user_course_access_log: 
         parameters: 
           account_reports: 
@@ -1733,7 +1733,7 @@ it:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Questo è un report di tutti gli studenti iscritti a un corso in un determinato periodo che non hanno consegnato alcun compito tra l'intervallo di date specificato in un corso. Questo report contiene una riga per ogni iscrizione degli studenti che soddisfa i criteri. L'intervallo di date non può superare le due settimane."
+            text: "Questo è un report di tutti gli studenti iscritti a un corso in un determinato trimestre che non hanno consegnato alcun compito tra l'intervallo di date specificato in un corso. Questo report contiene una riga per ogni iscrizione degli studenti che soddisfa i criteri. L'intervallo di date non può superare le due settimane."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1756,13 +1756,13 @@ it:
           course: 
             text: "ID corso"
           parameters: 
-            note1: "È possibile lasciare vuoto l'ID corso per eseguire il report per tutti i corsi nel periodo."
+            note1: "È possibile lasciare vuoto l'ID corso per eseguire il report per tutti i corsi nel trimestre."
             note2: "I corsi con compiti disattivati potrebbero non riflettere in modo accurato i punteggi in questo report."
     terms_parameters: 
       account_reports: 
         default: 
           parameters: 
-            header: Periodo
+            header: Trimestre
     test_ldap_dialog_title: "Testa impostazioni LDAP"
     test_ldap_result_canceled: Annullato
     test_ldap_result_failed: "Non riuscito"
@@ -1781,7 +1781,7 @@ it:
         account_reports: 
           default: 
             parameters: 
-              header: Periodo
+              header: Trimestre
           student_assignment_grade: 
             login_ids: 
               field: "ID accesso"
@@ -1789,7 +1789,7 @@ it:
       account_reports: 
         default: 
           unpublishd_courses: 
-            text: "Questo report mostra tutti i corsi per un determinato periodo che non sono stati pubblicati. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
+            text: "Questo report mostra tutti i corsi per un determinato trimestre che non sono stati pubblicati. Il file CSV risultante avrà una riga per ciascun corso e mostrerà l'ID corso, l'ID SIS corso, il nome breve del corso, il nome del corso e le date di inizio e fine del corso."
     unrecognized_time_zone: "'%{timezone}' non è un fuso orario riconosciuto"
     unused_courses_csv_description: 
       account_reports: 
@@ -1849,7 +1849,7 @@ it:
       account_reports: 
         default: 
           zero_activity: 
-            text: "Questo report mostra tutti gli studenti iscritti a qualsiasi corso in un determinato periodo. Il file CSV risultante avrà una riga per ogni iscrizione degli utenti che non hanno visitato il corso da quella data."
+            text: "Questo report mostra tutti gli studenti iscritti a qualsiasi corso in un determinato trimestre. Il file CSV risultante avrà una riga per ogni iscrizione degli utenti che non hanno visitato il corso da quella data."
   accounts_752dc365: Account
   accounts_lti_546d15c7: "Account (LTI)"
   accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: "Struttura account: naviga gerarchicamente nella struttura degli account al attivare/disattivare la visibilità del calendario account"
@@ -1877,7 +1877,7 @@ it:
   active_directory_lookup_attribute_selector_d56a326f: "Selettore attributo di ricerca directory attiva"
   active_enrollments_count_report_66bc3cae: "Report numero di iscrizioni attive"
   active_students_e4c48a06: "Studenti attivi"
-  active_terms_83df727e: "Periodi attivi"
+  active_terms_83df727e: "Trimestri attivi"
   activerecord: 
     errors: 
       messages: 
@@ -2003,7 +2003,7 @@ it:
   add_new_domain_e097d4a0: "Aggiungi un nuovo dominio"
   add_new_group_7ac49f31: "Aggiungi nuovo gruppo"
   add_new_set_of_due_dates_e8e240f: "Aggiungi nuovo set di scadenze"
-  add_new_term_d2217c0d: "Aggiungi nuovo periodo"
+  add_new_term_d2217c0d: "Aggiungi nuovo trimestre"
   add_observers_to_courses_6f494a29: "Aggiungi osservatori a corsi"
   add_old_quiz_f4c546a: "Aggiungi vecchio quiz"
   add_other_calendar_c958e761: "Aggiungi altro calendario"
@@ -2269,7 +2269,7 @@ it:
   all_submission_comments_have_been_marked_as_read_74c0683b: "Tutti i commenti sono stati contrassegnati come letti"
   all_submission_comments_have_been_marked_as_read_7595389d: "Tutti i commenti sulla consegna sono stati contrassegnati come letti."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Tutte le consegne devono avere un voto selezionato."
-  all_terms_cd27b0fb: "Tutti i periodi"
+  all_terms_cd27b0fb: "Tutti i trimestri"
   all_timezones_5e8afa7b: "Tutti i fusi orari"
   all_types_allowed_287eb6b0: "Tutti i tipi consentiti"
   all_ungraded_artifacts_ec3ba09: "Tutti i manufatti non valutati"
@@ -2670,7 +2670,7 @@ it:
   allows_user_to_edit_content_migrations_19af4464: "Consente all'utente di modificare migrazioni di contenuti."
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: "Consente all’utente di modificare file e cartelle del corso."
   allows_user_to_edit_course_groups_d459145d: "Consente all'utente di modificare gruppi del corso."
-  allows_user_to_edit_course_image_name_course_code__8a4681c8: "Consente all'utente di modificare immagine, nome, codice, fuso orario, subaccount, periodo e altre opzioni del corso nella scheda Dettagli corso."
+  allows_user_to_edit_course_image_name_course_code__8a4681c8: "Consente all'utente di modificare immagine, nome, codice, fuso orario, subaccount, trimestre e altre opzioni del corso nella scheda Dettagli corso."
   allows_user_to_edit_course_pages_30f188b4: "Consente all'utente di modificare le pagine di modifica corso."
   allows_user_to_edit_course_pages_allows_user_to_de_65fec49b: |-
       Consente all’utente di modificare le pagine corso. Consente all’utente di definire gli utenti che possono modificare la pagina. Consente all’utente di aggiungere una pagina all’elenco di cose da fare dello studente.
@@ -3052,7 +3052,7 @@ it:
   an_error_occured_updating_the_flag_7df5de0a: "Si è verificato un errore durante l'aggiornamento del flag"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Si è verificato un errore durante l'eliminazione del set di periodi di valutazione"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Si è verificato un errore durante l'eliminazione del periodo di valutazione"
-  an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Si è verificato un errore durante il recupero dei periodi di iscrizione."
+  an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Si è verificato un errore durante il recupero dei trimestri di iscrizione."
   an_error_occured_while_fetching_grading_period_set_b4f12aa5: "Si è verificato un errore durante il recupero dei set di periodi di valutazione."
   an_error_occured_while_trying_to_find_the_lti_conf_90f50a4c: "Si è verificato un errore durante il tentativo di trovare la configurazione LTI"
   an_error_occured_while_updating_the_grading_period_9e024cd1: "Si è verificato un errore durante l'aggiornamento del set di periodi di valutazione."
@@ -3382,7 +3382,7 @@ it:
   answers_which_scored_in_the_top_27_a605232d: "Risposte che ricadono nel 27% dei punteggi più alti"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Le risposte verranno mostrate dopo l'ultimo tentativo"
   any_sub_account_ec7069f2: "Qualsiasi subaccount"
-  any_term_d49af19f: "Qualsiasi periodo"
+  any_term_d49af19f: "Qualsiasi trimestre"
   anyone_with_a_direct_link_private_b3bc9661: "Tutti quelli con un link diretto (privato)"
   anyone_with_the_url_9d7e5e07: "Tutti coloro che hanno un URL"
   api_7bd66e19: API
@@ -4431,7 +4431,7 @@ it:
   attach_4234a79b: Allega
   attach_a_file_86a4fc00: "Allega un file"
   attach_files_to_discussions_bd16c245: "Allega file alle discussioni"
-  attach_terms_2b8770a5: "Allega periodi"
+  attach_terms_2b8770a5: "Allega trimestri"
   attached_d7423f41: Allegato
   attached_display_name_afa00c2e: "Allegato: %{display_name}"
   attached_files_4c1d26cf: "File allegati:"
@@ -5696,7 +5696,7 @@ it:
   changing_course_pacing_days_may_modify_due_dates_3de835f6: "La modifica dei giorni di ritmo corso può modificare le date di scadenza"
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "La modifica dei giorni di ritmo corso può modificare le date di scadenza."
   changing_section_dates_may_override_course_and_ter_6634950e: "La modifica delle date della sezione può sostituire le impostazioni della disponibilità dei termini e del corso e il posizionamento nella pagina e nella dashboard dei corsi. Confermare le date di termine e del corso prima di modificare le date della sezione."
-  changing_the_course_participation_will_republish_a_1cc05b7: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data usando la partecipazione dei periodi."
+  changing_the_course_participation_will_republish_a_1cc05b7: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data usando la partecipazione trimestrale."
   changing_the_course_participation_will_republish_a_5715b0d5: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "La modifica delle norme sui ritardi influirà sulle consegne precedentemente valutate."
   changing_the_tenant_will_delete_existing_groups_f86c48dc: "La modifica del tenant eliminerà i gruppi esistenti."
@@ -5800,7 +5800,7 @@ it:
   click_on_the_account_navigation_button_to_access_n_fbe82181: "Fai clic sul pulsante di navigazione account per accedere alle preferenze di notifica."
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Fai clic sul pulsante di navigazione amministratore per accedere alle impostazioni account."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Fai clic sul pulsante di navigazione corsi per accedere ai corsi."
-  click_proceed_to_continue_b6eeffc6: "Fai clic su \"Continua\" per continuare."
+  click_proceed_to_continue_b6eeffc6: "Fai clic su \"Procedi\" per continuare."
   click_the_admin_navigation_button_to_access_accoun_38d881bf: "Fare clic sul pulsante di navigazione amministratore per accedere alle impostazioni account."
   click_the_button_above_to_add_content_4c7024a: "Clicca sul pulsante qui sopra per aggiungere contenuti"
   click_the_icon_to_add_a_calendar_b9ab4f7f: "Fai clic sull’icona \"+\" per aggiungere un calendario"
@@ -5841,8 +5841,8 @@ it:
   click_to_sort_by_sub_account_descending_88c611db: "Fai clic per ordinare i subaccount in ordine decrescente"
   click_to_sort_by_teacher_ascending_cda7a18c: "Fai clic per ordinare per insegnante in senso crescente"
   click_to_sort_by_teacher_descending_45ef0d1e: "Fai clic per ordinare per insegnante in senso decrescente"
-  click_to_sort_by_term_ascending_c3ef1eb7: "Fai clic per ordinare i periodi in ordine crescente"
-  click_to_sort_by_term_descending_199c48c0: "Fai clic per ordinare i periodi in ordine decrescente"
+  click_to_sort_by_term_ascending_c3ef1eb7: "Fai clic per ordinare i trimestri in ordine crescente"
+  click_to_sort_by_term_descending_199c48c0: "Fai clic per ordinare i trimestri in ordine decrescente"
   click_to_sort_c81ff8c8: "Fai clic per ordinare."
   click_to_split_set_here_9c35462a: "Fai clic per dividere il set qui"
   click_to_test_a_different_score_2e0bb6f0: "Fai clic per testare un punteggio diverso"
@@ -7733,7 +7733,7 @@ it:
       created_at: "Creato alle"
       default_view: "Visualizzazione predefinita"
       default_wiki_editing_roles: "Ruoli di modifica wiki predefiniti"
-      enrollment_term_id: "ID periodo di iscrizione"
+      enrollment_term_id: "ID trimestre di iscrizione"
       grading_standard_id: "ID standard di valutazione"
       group_weighting_scheme: "Schema ponderazione gruppi"
       hide_distribution_graphs: "Nascondi grafici di distribuzione"
@@ -7806,7 +7806,7 @@ it:
   course_pages_449f1dd4: "Pagine corso"
   course_participation_and_access_settings_7a3d6297: "Impostazioni di partecipazione e accesso al corso"
   course_participation_is_limited_to_course_start_an_7315866d: "La partecipazione al corso è limitata alle date di inizio e fine *corso*. Tutte le date sezione create nel corso possono sostituire le date del corso."
-  course_participation_is_limited_to_term_start_and__c8974314: "La partecipazione al corso è limitata alle date di inizio e fine *periodo*."
+  course_participation_is_limited_to_term_start_and__c8974314: "La partecipazione al corso è limitata alle date di inizio e fine *trimestre*."
   course_participation_is_set_to_expire_at_midnight__b05fb48e: "La partecipazione al corso scade a mezzanotte, per cui il giorno precedente è l'ultimo giorno in cui questo corso sarà attivo."
   course_people_3058c948: "Persone corso"
   course_quiz_export_1f59f15: "Esportazione quiz corso"
@@ -7946,7 +7946,7 @@ it:
       content_label: Contenuto
       course_code: "Codice corso"
       details: "Inserisci i dettagli per il nuovo corso."
-      enrollment_term_id: Periodo
+      enrollment_term_id: Trimestre
       headings: 
         copy_course: "Copia %{course}"
       name: Nome
@@ -8178,7 +8178,7 @@ it:
         default_due_time: "Scadenza predefinita"
         enable_course_paces: "Abilita ritmo corso"
         enable_pace_plans: "Abilita programmi di velocità"
-        enrollment_term_id: Periodo
+        enrollment_term_id: Trimestre
         enrollments_from_homeroom: Iscrizioni
         friendly_name: "Nome descrittivo"
         grading_scheme: "Schema di valutazione"
@@ -8979,7 +8979,7 @@ it:
   delete_selected_announcements_69e23710: "Elimina annunci selezionati"
   delete_selected_pages_7bc50580: "Elimina pagine selezionate"
   delete_survey_56fddbbd: "Elimina sondaggio"
-  delete_term_name_f707abc9: "Elimina periodo %{name}"
+  delete_term_name_f707abc9: "Elimina trimestre %{name}"
   delete_theme_918a7f24: "Eliminare tema?"
   delete_theme_bdb70d25: "Elimina tema"
   delete_themename_8c4223a3: "Eliminare %{themeName}?"
@@ -9793,10 +9793,10 @@ it:
   due_date_cannot_be_after_course_end_fd128a14: "La data di scadenza non può essere successiva alla fine del corso"
   due_date_cannot_be_after_lock_date_675b30aa: "La data di scadenza non può essere successiva alla data di blocco"
   due_date_cannot_be_after_section_end_b0f54388: "La data di scadenza non può essere successiva alla fine della sezione"
-  due_date_cannot_be_after_term_end_5d504cb1: "La data di scadenza non può essere successiva alla fine del periodo"
+  due_date_cannot_be_after_term_end_5d504cb1: "La data di scadenza non può essere successiva alla fine del trimestre"
   due_date_cannot_be_before_course_start_ecc523ba: "La data di scadenza non può essere precedente all'inizio del corso"
   due_date_cannot_be_before_section_start_f8950484: "La data di scadenza non può essere precedente all'inizio della sezione"
-  due_date_cannot_be_before_term_start_ea660b2c: "La data di scadenza non può essere precedente all'inizio del periodo"
+  due_date_cannot_be_before_term_start_ea660b2c: "La data di scadenza non può essere precedente all'inizio del trimestre"
   due_date_cannot_be_before_unlock_date_f263aab0: "La data di scadenza non può essere precedente alla data di sblocco"
   due_date_cannot_fall_in_a_closed_grading_period_e4336124: "La data di scadenza non può cadere in un periodo di valutazione chiuso"
   due_date_falls_in_a_closed_grading_period_e447ff2f: "La data di scadenza cade in un periodo di valutazione chiuso"
@@ -9963,7 +9963,7 @@ it:
   edit_status_612572db: "Modifica stato"
   edit_submission_status_from_speedgrader_5e1b1cd4: "Modifica stato invio da Speedgrader"
   edit_survey_b0d6890d: "Modifica sondaggio"
-  edit_term_name_29a8a322: "Modifica periodo %{name}"
+  edit_term_name_29a8a322: "Modifica trimestre %{name}"
   edit_text_27d8aa3d: "Modifica %{text}"
   edit_this_collaboration_393b1a9a: "Modifica questa collaborazione"
   edit_this_key_1ee53473: "Modifica questa chiave"
@@ -10233,10 +10233,10 @@ it:
   enrollment_summary_adf7ca3c: "Riepilogo iscrizioni"
   enrollment_term: 
     errors: 
-      delete_default_term: "Impossibile eliminare il periodo predefinito"
-      delete_term_with_courses: "Impossibile eliminare un periodo con corsi attivi"
+      delete_default_term: "Impossibile eliminare il trimestre predefinito"
+      delete_term_with_courses: "Impossibile eliminare un trimestre con corsi attivi"
       not_unique: "ID SIS \"%{sis_source_id}\" già in uso"
-  enrollment_term_7bfe840: "Periodo di iscrizione"
+  enrollment_term_7bfe840: "Trimestre di iscrizione"
   enrollment_terms_8753ec11: "Termini di iscrizione"
   enrollment_type_699c944: "tipo di iscrizione"
   enrollment_types_56c15a50: "Tipi di iscrizione"
@@ -11263,7 +11263,7 @@ it:
   filter_by_ip_address_40965f66: "Filtra per indirizzo IP"
   filter_by_name_34cbe139: "Filtra per nome"
   filter_by_student_name_or_secondary_id_83dc524f: "Filtra per nome studente o ID secondario"
-  filter_by_term_cfe778b2: "Filtra per periodo"
+  filter_by_term_cfe778b2: "Filtra per trimestre"
   filter_by_user_type_dbbd3e3d: "Filtra per tipo utente"
   filter_calendars_62680a26: "Filtra calendari"
   filter_conversations_by_course_or_group_38d0a55e: "Filtra conversazioni per corso o gruppo"
@@ -11441,7 +11441,7 @@ it:
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Intero: i nomi studente e le immagini profilo saranno nascosti"
   future_5416ea92: Futuro
   future_jobs_cf2964a1: "Lavori futuri"
-  future_terms_7fba2ae6: "Periodi futuri"
+  future_terms_7fba2ae6: "Trimestri futuri"
   galician_7e4508b5: Galiziano
   game_over_104baa: FINE
   gathering_files_933551d9: "Raccolta file in corso..."
@@ -14088,7 +14088,7 @@ it:
   like_post_from_author_79b874f1: "Post Mi piace da %{author}"
   like_this_entry_60da41a5: "Come questa voce"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Limita lunghezza nomi compiti (max 255)"
-  limit_course_participation_to_term_or_custom_cours_67797a86: "Limitare la partecipazione al corso alle date del periodo o del corso personalizzato?"
+  limit_course_participation_to_term_or_custom_cours_67797a86: "Limitare la partecipazione al corso alle date del trimestre o del corso personalizzato?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limita ciascuna fascia oraria a %{input_value} utente/i. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limita ciascuna fascia oraria a %{num_participants} *gruppi.* **utenti.**"
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limita membri del gruppo a (lascia vuoto per nessun limite)"
@@ -14287,7 +14287,7 @@ it:
   lock_c341af13: Blocca
   lock_date_cannot_be_after_course_end_a473158b: "La data di blocco non può essere successiva alla data di fine del corso"
   lock_date_cannot_be_after_section_end_d37da70c: "La data di blocco non può essere successiva alla data di fine della sezione"
-  lock_date_cannot_be_after_term_end_cf1a188f: "La data di blocco non può essere successiva alla data di fine del periodo"
+  lock_date_cannot_be_after_term_end_cf1a188f: "La data di blocco non può essere successiva alla data di fine del trimestre"
   lock_date_cannot_be_before_due_date_ac30f54: "La data di blocco non può essere precedente alla data di scadenza"
   lock_discussion_title_failed_9d49f2d: "Blocco discussione %{title} non riuscito"
   lock_discussion_title_succeeded_fb24ebfc: "Blocco discussione %{title} riuscito"
@@ -17108,7 +17108,7 @@ it:
   no_assignment_group_assigned_8f1cdb9b: "Nessun gruppo di compiti assegnato"
   no_assignment_name_adbb215b: "Nessun nome compito"
   no_assignments_with_that_name_found_1d7be1: "Non è stato trovato nessun compito con il nome specificato"
-  no_associated_terms_13bacefc: "Nessun periodo associato"
+  no_associated_terms_13bacefc: "Nessun trimestre associato"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Nessun allegato trovato per i seguenti ID: %{ids}"
   no_attributes_locked_611c5cc: "nessun attributo bloccato"
   no_blackout_dates_1297ec22: "Nessuna data blackout"
@@ -17159,7 +17159,7 @@ it:
   no_grades_to_hide_6f51fc5b: "Nessun voto da nascondere"
   no_grades_to_post_91425bfd: "Nessun voto da pubblicare"
   no_grades_to_post_fc148c1b: "Nessun voto da pubblicare"
-  no_grading_periods_configured_for_this_term_ca22393e: "nessun periodo di valutazione configurato per questo periodo"
+  no_grading_periods_configured_for_this_term_ca22393e: "nessun periodo di valutazione configurato per questo trimestre"
   no_grading_periods_set_up_a20a8819: "Nessun periodo di valutazione impostato"
   no_grading_schemes_to_display_8b0e92e7: "Nessuno schema di valutazione da visualizzare"
   no_integrations_available_6729d0ca: "Nessuna integrazione disponibile"
@@ -17217,10 +17217,10 @@ it:
   no_such_target_context_21158b9: "nessun contesto destinazione simile"
   no_such_target_group_7e183d46: "nessun gruppo target simile"
   no_template_selected_f59e797: "Nessun modello selezionato"
-  no_terms_eab5ee7b: "Nessun periodo"
+  no_terms_eab5ee7b: "Nessun trimestre"
   no_time_limit_for_long_running_conferences_d49fdfad: "Nessun limite di tempo (per le conferenze di lunga durata)"
   no_tls_618add1a: "Nessun TLS"
-  no_unassigned_terms_deb7b76b: "Nessun periodo non assegnato"
+  no_unassigned_terms_deb7b76b: "Nessun trimestre non assegnato"
   no_unresponsive_links_found_8ea497f9: "Nessun link che non risponde trovato"
   no_usage_rights_object_supplied_304b8d40: "Nessun oggetto 'usage_rights' fornito"
   no_user_98e6ccc4: "Nessun utente"
@@ -18266,7 +18266,7 @@ it:
   pass_fail_3d9461b0: "Superato/Non superato"
   password_8a271b1c: Password
   past_14da759a: Precedente
-  past_terms_4b6ec40e: "Periodi precedenti"
+  past_terms_4b6ec40e: "Trimestri precedenti"
   paste_google_meet_links_into_calendar_events_annou_2e363fc7: "Incolla i link Google Meet negli eventi di calendario, annunci, discussioni e in qualsiasi punto in cui utilizzi l’Editor di contenuti avanzati (RCE)"
   paste_json_26ad8050: "Incolla JSON"
   paste_url_8213b83: "Incolla URL"
@@ -18662,8 +18662,8 @@ it:
         section_end_days_adjustment: "Regolazione giorni fine sezione"
         section_name_selection: "Selezione nome sezione"
         section_start_days_adjustment: "Regolazione giorni inizio sezione"
-        term_end_days_adjustment: "Regolazione giorni fine periodo"
-        term_start_days_adjustment: "Regolazione giorni inizio periodo"
+        term_end_days_adjustment: "Regolazione giorni fine trimestre"
+        term_start_days_adjustment: "Regolazione giorni inizio trimestre"
     index: 
       author: Autore
       description: Descrizione
@@ -21297,9 +21297,9 @@ it:
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Limita l'accesso degli studenti ai corsi prima della data di inizio"
   restrict_students_from_annotating_6c28ab9b: "Limita le annotazioni degli studenti"
   restrict_students_from_viewing_course_after_course_c6baf31: "Limita la visualizzazione del corso da parte degli studenti dopo la data di fine corso"
-  restrict_students_from_viewing_course_after_term_e_1f93ccb9: "Limita la visualizzazione del corso da parte degli studenti dopo la data di fine periodo"
+  restrict_students_from_viewing_course_after_term_e_1f93ccb9: "Limita la visualizzazione del corso da parte degli studenti dopo la data di fine trimestre"
   restrict_students_from_viewing_course_before_cours_cca659a4: "Limita la visualizzazione del corso da parte degli studenti prima della data di inizio corso"
-  restrict_students_from_viewing_course_before_term__3c4924f0: "Limita la visualizzazione del corso da parte degli studenti prima della data di inizio periodo"
+  restrict_students_from_viewing_course_before_term__3c4924f0: "Limita la visualizzazione del corso da parte degli studenti prima della data di inizio trimestre"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Limita la visualizzazione dei corsi futuri nell'elenco iscrizioni"
   restricted_access_d3e99a39: "Accesso limitato"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Visualizzazione limitata per insegnanti in LMGB"
@@ -22072,7 +22072,7 @@ it:
   select_sub_account_6704196a: "Seleziona subaccount"
   select_submission_type_displayname_97e47bc2: "Seleziona tipo di consegna %{displayName}"
   select_target_groups_type_or_use_arrow_keys_to_nav_aa648826: "Seleziona gruppi target. Digita o utilizza i tasti freccia per spostarti. Sono consentite più selezioni."
-  select_term_f8083fb0: "Seleziona periodo"
+  select_term_f8083fb0: "Seleziona trimestre"
   select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Seleziona il file che desideri associare o aggiungi un file selezionando \"Crea file\"."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Seleziona il file che desideri associare o aggiungi un file selezionando \"Nuovo file\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Seleziona il file che desideri associare a questo *modulo* oppure aggiungi un file selezionando \"Nuovo file\"."
@@ -22929,7 +22929,7 @@ it:
   shared_brand_configs_e5d319d7: "Configurazioni brand condivise"
   shared_content_803ac37b: "Contenuto condiviso"
   shared_secret_892c88f2: "Segreto condiviso"
-  sharing_a_qr_code_can_give_others_immediate_access_79575158: "La condivisione di un codice QR fornisce alle altre persone un accesso immediato al tuo account attraverso le applicazioni per dispositivi mobile %{canvas}."
+  sharing_a_qr_code_can_give_others_immediate_access_79575158: "La condivisione di un codice QR può fornisce alle altre persone un accesso immediato al tuo account attraverso le applicazioni per dispositivi mobile %{canvas}."
   she_her_3f459cc2: Lei
   she_her_c8b5e3be: "Lei/a lei"
   shift_dates_b5a7b7a1: "Sposta date"
@@ -23096,7 +23096,7 @@ it:
       groups: "Gruppi: %{group_count}"
       logins: "Accessi: %{login_count}"
       sections: "Sezioni: %{section_count}"
-      terms: "Periodi: %{term_count}"
+      terms: "Trimestri: %{term_count}"
       user_observers: "Osservatori utenti: %{user_observers_count}"
       users: "Utenti: %{user_count}"
     messages: 
@@ -23275,7 +23275,7 @@ it:
       grade: "(voto: %{grade})"
       see_all_quiz_attempts: "Visualizza tutti i tentativi dei quiz"
       submission_to_view: "Consegna da visualizzare:"
-      submitted: "*Inviato:* %{submittedAt}"
+      submitted: "*Inviato:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Invia
     titles: 
       click_to_record: "Riconoscimento vocale"
@@ -24084,39 +24084,39 @@ it:
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenant mancante o sincronizzazione disabilitata. Controllare le impostazioni di integrazione della sincronizzazione di Microsoft per il corso e l’account."
   tenant_name_e174f404: "Nome tenant"
   tenant_name_input_area_283dfcde: "Area di ingresso nome tenant"
-  term_41f37cae: periodo
-  term_42976f1c: "Periodo:"
-  term_created_27d27c2b: "Periodo creato "
-  term_e1c1d390: Periodo
-  term_id_2e802ed1: "ID periodo"
-  term_id_74b933ef: "ID periodo"
-  term_name_30eb91a: "nome periodo"
-  term_sis_7edb8ab7: "SIS periodo"
-  term_sis_bfe0ae01: "SIS periodo"
-  term_sis_id_4613e944: "ID SIS periodo"
-  term_start_b8c2aad1: "inizio periodo"
-  term_starting_5bd5e070: "Inizio periodo "
+  term_41f37cae: trimestre
+  term_42976f1c: "Trimestre:"
+  term_created_27d27c2b: "Trimestre creato "
+  term_e1c1d390: Trimestre
+  term_id_2e802ed1: "ID trimestre"
+  term_id_74b933ef: "ID trimestre"
+  term_name_30eb91a: "nome trimestre"
+  term_sis_7edb8ab7: "SIS trimestre"
+  term_sis_bfe0ae01: "SIS trimestre"
+  term_sis_id_4613e944: "ID SIS trimestre"
+  term_start_b8c2aad1: "inizio trimestre"
+  term_starting_5bd5e070: "Inizio trimestre "
   terms: 
     errors: 
       not_unique: "ID SIS \"%{sis_source_id}\" già in uso"
     index: 
-      add_term: "Aggiungi periodo"
+      add_term: "Aggiungi trimestre"
       date: 
-        term_end: "fine periodo"
+        term_end: "fine trimestre"
         unspecified: quando
       messages: 
-        classes_in_term: "Non puoi eliminare un periodo che contiene ancora classi."
+        classes_in_term: "Non puoi eliminare un trimestre che contiene ancora classi."
         submitting: "Invio in corso..."
-      page_title: "%{account} periodi"
+      page_title: "%{account} trimestri"
       prompts: 
-        delete: "Vuoi eliminare questo periodo?"
+        delete: "Vuoi eliminare questo trimestre?"
       titles: 
-        term_details: "Dettagli periodo"
-      update_term: "Aggiorna periodo"
+        term_details: "Dettagli trimestre"
+      update_term: "Aggiorna trimestre"
     term: 
       buttons: 
-        add: "Aggiungi periodo"
-        update: "Aggiorna periodo"
+        add: "Aggiungi trimestre"
+        update: "Aggiorna trimestre"
       course_count: 
         one: "1 corso"
         other: "%{count} corsi"
@@ -24127,30 +24127,30 @@ it:
         students_can_access_from: "Gli **studenti** possono accedere da"
         tas_can_access_from: "Gli **assistenti** possono accedere da"
         teachers_can_access_from: "Gli **insegnanti** possono accedere da"
-      name: "Nome periodo:"
+      name: "Nome trimestre:"
       sis_source_id: "ID SIS:"
-      term_runs_from: "**Il periodo inizia** da"
+      term_runs_from: "**Il trimestre inizia** da"
       titles: 
-        term_ends: "Il periodo termina"
-        term_starts: "Il periodo inizia"
+        term_ends: "Il trimestre termina"
+        term_starts: "Il trimestre inizia"
       tooltips: 
-        term_ends_designers: "Per i progettisti il periodo termina"
-        term_ends_students: "Per gli studenti il periodo termina"
-        term_ends_tas: "Per gli assistenti il periodo termina"
-        term_ends_teachers: "Per gli insegnanti il periodo termina"
-        term_starts_designers: "Per i progettisti il periodo inizia"
-        term_starts_students: "Per gli studenti il periodo inizia"
-        term_starts_tas: "Per gli assistenti il periodo inizia"
-        term_starts_teachers: "Per gli insegnanti il periodo inizia"
+        term_ends_designers: "Per i progettisti il trimestre termina"
+        term_ends_students: "Per gli studenti il trimestre termina"
+        term_ends_tas: "Per gli assistenti il trimestre termina"
+        term_ends_teachers: "Per gli insegnanti il trimestre termina"
+        term_starts_designers: "Per i progettisti il trimestre inizia"
+        term_starts_students: "Per gli studenti il trimestre inizia"
+        term_starts_tas: "Per gli assistenti il trimestre inizia"
+        term_starts_teachers: "Per gli insegnanti il trimestre inizia"
     timespan: 
       date: 
-        term_end: "fine periodo"
-        term_start: "inizio periodo"
+        term_end: "fine trimestre"
+        term_start: "inizio trimestre"
         unspecified: quando
       timespan: "%{start_at} *a* %{end_at}"
-  terms_35d91184: "Periodi: "
-  terms_4d979628: Periodi
-  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Periodi non trovati. I periodi devono essere inclusi con multi_term_batch_mode"
+  terms_35d91184: "Trimestri: "
+  terms_4d979628: Trimestri
+  terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Trimestri non trovati. I trimestri devono essere inclusi con multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Attributi Termini di servizio non validi"
   terms_of_service_f183ff7f: "Termini di servizio"
   test_cluster_only_70e61c19: "Solo cluster di test"
@@ -24214,8 +24214,8 @@ it:
   the_beginning_date_for_the_courses_to_report_on_9c224177: "Data di inizio per i corsi per cui fare il report"
   the_beginning_date_for_the_quiz_due_date_1d978eb5: "Data di inizio per la data di scadenza del quiz"
   the_beginning_date_range_for_the_courses_to_report_82353138: "L’intervallo della data di inizio per i corsi per cui fare il report"
-  the_canvas_id_of_the_term_of_courses_to_report_on_c3cdae1c: "ID Canvas del periodo dei corsi per cui fare il report"
-  the_canvas_id_of_the_term_to_get_grades_from_a7b56720: "ID Canvas del periodo da cui ricevere i voti"
+  the_canvas_id_of_the_term_of_courses_to_report_on_c3cdae1c: "ID Canvas del trimestre dei corsi per cui fare il report"
+  the_canvas_id_of_the_term_to_get_grades_from_a7b56720: "ID Canvas del trimestre da cui ricevere i voti"
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
       L'ID entità SAML Canvas è %{metadata_url} e i metadati del provider dei servizi
       sono disponibili in quell'URL.
@@ -24471,15 +24471,15 @@ it:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Si è verificato un errore durante la sincronizzazione per cui non è stata completata"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Impossibile abilitare l’impostazione Sincronizza con SIS per il compito \"%{assignment_name}\" senza una data di scadenza."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Impossibile creare il team perché il gruppo Microsoft non ha proprietari. Questo potrebbe essere un errore intermittente: provare a ripetere la sincronizzazione e, se il problema persiste, contatta l'assistenza."
-  the_term_for_export_data_5aad7a0a: "Periodo per i dati di esportazione"
-  the_term_for_grade_export_data_d55a6be7: "Periodo per dati di esportazione voti"
+  the_term_for_export_data_5aad7a0a: "Trimestre per i dati di esportazione"
+  the_term_for_grade_export_data_d55a6be7: "Trimestre per dati di esportazione voti"
   the_term_has_ended_for_this_course_f0ab367: "Il trimestre è scaduto per questo corso"
-  the_term_id_to_report_on_4479d2fc: "ID periodo per cui fare il report"
-  the_term_to_export_assignment_groups_from_3015fbf: "Periodo da cui esportare i gruppi di compiti"
-  the_term_to_get_courses_from_f6af2678: "Periodo da cui richiedere i corsi"
-  the_term_to_report_on_5f586e7c: "Periodo per cui fare il report"
-  the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Periodo per cui fare il report (necessario per gli studenti report_type)"
-  the_terms_to_report_submissions_on_60c250db: "Periodo per cui fare il report invii"
+  the_term_id_to_report_on_4479d2fc: "ID trimestre per cui fare il report"
+  the_term_to_export_assignment_groups_from_3015fbf: "Trimestre da cui esportare i gruppi di compiti"
+  the_term_to_get_courses_from_f6af2678: "Trimestre da cui richiedere i corsi"
+  the_term_to_report_on_5f586e7c: "Trimestre per cui fare il report"
+  the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Trimestre per cui fare il report (necessario per gli studenti report_type)"
+  the_terms_to_report_submissions_on_60c250db: "Trimestre per cui fare il report invii"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Il titolo non può contenere più di %{length} caratteri"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Il titolo della seguente banca di domande è stato troncato: \"%{title}\""
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: "Lo strumento non è installato nel corso o nell'account"
@@ -24838,7 +24838,7 @@ it:
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Questa è un'anteprima della versione bozza del quiz"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Questa è un'anteprima della versione pubblicata del quiz"
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
-      Questo è un report di tutti gli studenti iscritti a un corso in un determinato periodo
+      Questo è un report di tutti gli studenti iscritti a un corso in un determinato trimestre
       che hanno inviato un compito. Questo report contiene una riga per ogni invio
         studente.
   this_is_a_secret_setting_and_may_only_be_modified__1bfaeae4: "Si tratta di un’impostazione segreta e può essere modificata solamente dalla console"
@@ -24953,7 +24953,7 @@ it:
   this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "Questo report mostra tutti gli esiti di apprendimento presenti in questo account. Il file CSV risultante avrà una riga per ogni esito e mostrerà i dettagli di tutti gli attributi associati a ciascun esito."
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
       Questo report mostra tutta l’attività degli utenti iscritti in un determinato corso o
-        tutti i corsi in determinato periodo. Il file csv generato avrà una riga per attività studente
+        tutti i corsi in determinato trimestre. Il file csv generato avrà una riga per attività studente
         e avrà le seguenti intestazioni; enrollment_type, ID sezione,
         ID SIS sezione, nome sezione, ID corso, ID SIS corso, nome corso, ID utente,
         ID SIS utente, tipo di contenuto, contenuto, numero di visualizzazioni, numero di partecipazioni, ultima
@@ -24961,17 +24961,17 @@ it:
         del tempo fino al momento in cui è stato generato il report.
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Questo report mostra tutta l’attività degli utenti iscritti in
-        tutti i corsi in determinato periodo. Il file csv generato avrà una riga per attività studente
+        tutti i corsi in determinato trimestre. Il file csv generato avrà una riga per attività studente
         e avrà le seguenti intestazioni: ID sezione,ID SIS sezione,
-        nome sezione, ID corso, ID SIS corso, nome corso, ID periodo, ID SIS periodo,
-        nome periodo, ID utente,ID SIS utente, nome utente, tipo di contenuto, contenuto, numero di visualizzazioni,
+        nome sezione, ID corso, ID SIS corso, nome corso, ID trimestre, ID SIS trimestre,
+        nome trimestre, ID utente,ID SIS utente, nome utente, tipo di contenuto, contenuto, numero di visualizzazioni,
         numero di partecipazioni, ultima visualizzazione. Il numero di visualizzazioni e il numero di partecipazioni sono
         dei contatori dall’inizio del tempo fino al momento in cui è stato generato il report.
         Saranno recuperati i dati di massimo un mese. Per impostazione predefinita, riporterà
         i dati dall’inizio della settimana precedente.
-  this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Questo report mostra tutti i corsi per un determinato periodo. Il file CSV risultante avrà una riga per ogni corso e riporterà i seguenti elementi: ID corso, ID SIS del corso, nome breve del corso, nome del corso, ID account, ID SIS dell'account, nome dell'account, spazio di archiviazione utilizzato in MB e totale di tutti i file in MB. Lo spazio di archiviazione utilizzato riflette tutti i file che non rispettano la quota dei corsi. La somma di tutti i file nel corso corrisponde alla somma di tutti i file del corso indipendentemente dall'impatto sulla quota dei corsi."
-  this_report_shows_grading_period_grades_and_overal_a86346a: "Questo report mostra i voti del periodo di valutazione (e i voti dei corsi globali) per ciascuno studente iscritto in un determinato periodo. Il file CSV risultante avrà una riga per ogni iscrizione."
-  this_report_shows_the_student_final_grade_results__5a508b55: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato periodo. Il file CSV generato avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
+  this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Questo report mostra tutti i corsi per un determinato trimestre. Il file CSV risultante avrà una riga per ogni corso e riporterà i seguenti elementi: ID corso, ID SIS del corso, nome breve del corso, nome del corso, ID account, ID SIS dell'account, nome dell'account, spazio di archiviazione utilizzato in MB e totale di tutti i file in MB. Lo spazio di archiviazione utilizzato riflette tutti i file che non rispettano la quota dei corsi. La somma di tutti i file nel corso corrisponde alla somma di tutti i file del corso indipendentemente dall'impatto sulla quota dei corsi."
+  this_report_shows_grading_period_grades_and_overal_a86346a: "Questo report mostra i voti del periodo di valutazione (e i voti dei corsi globali) per ciascuno studente iscritto in un determinato trimestre. Il file CSV risultante avrà una riga per ogni iscrizione."
+  this_report_shows_the_student_final_grade_results__5a508b55: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato trimestre. Il file CSV generato avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Questa pagina di esempio include gli elementi UI comuni in Canvas per semplificare la creazione del tuo branding personalizzato. Una volta iniziato ad apportare modifiche ai valori dei colori e alle immagini nella barra laterale di sinistra, vedrai il pulsante *Anteprima delle modifiche*. Fai clic per aggiornare questa pagina e visualizzare l'aspetto delle tue modifiche."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Questa pagina di esempio include gli elementi UI comuni in Canvas per semplificare la creazione del tuo branding personalizzato. Una volta iniziato ad apportare modifiche ai valori dei colori e alle immagini, vedrai il pulsante *Anteprima delle modifiche*. Fai clic per aggiornare questa pagina e visualizzare l'aspetto delle tue modifiche."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Questo ritmo sezione sarà rimosso e il ritmo tornerà al ritmo predefinito."
@@ -26208,7 +26208,7 @@ it:
   unlock_date_cannot_be_after_lock_date_591f7fda: "La data di sblocco non può essere successiva alla data di blocco"
   unlock_date_cannot_be_before_course_start_9c7b8524: "La data di sblocco non può essere precedente all'inizio del corso"
   unlock_date_cannot_be_before_section_start_793ddc66: "La data di sblocco non può essere precedente all'inizio della sezione"
-  unlock_date_cannot_be_before_term_start_d3c01813: "La data di sblocco non può essere precedente all'inizio del periodo"
+  unlock_date_cannot_be_before_term_start_d3c01813: "La data di sblocco non può essere precedente all'inizio del trimestre"
   unlock_discussion_title_failed_42a4252f: "Sblocco discussione %{title} non riuscito"
   unlock_discussion_title_succeeded_cd97847c: "Sblocco discussione %{title} riuscito"
   unlock_f6196bf5: Sblocca
@@ -26899,7 +26899,7 @@ it:
       Utenti e trimestri si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account. I subaccount hanno solo la proprietà di corsi e sezioni; non possiedono i dati dell'utente.
       Gli amministratori dei subaccount non possono visualizzare le informazioni SIS a meno che non abbiano anche il ruolo di istruttore in un corso. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS senza l'associazione del corso, poiché il ruolo di istruttore ha l'autorizzazione per leggere i dati SIS a livello di account.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Utenti e trimestri si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account. I subaccount hanno solo la proprietà di corsi e sezioni; non possiedono i dati dell'utente. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS a meno che non abbiano anche il ruolo di istruttore in un corso. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS senza l'associazione del corso, poiché il ruolo di istruttore ha l'autorizzazione per leggere i dati SIS a livello di account."
-  users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Utenti e periodi si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account."
+  users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Utenti e trimestri si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account."
   users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando è abilitata l’opzione Compiti e quiz - Aggiungi."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando le autorizzazioni Contenuto corso - Visualizza e Compiti e quiz - Aggiungi/Modifica/Elimina."
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Gli utenti possono accedere e creare (ma non modificare) singole rubriche di compiti tramite Compiti quando le opzioni Contenuto corso - Visualizza e Compiti e quiz - Aggiungi sono abilitate."
