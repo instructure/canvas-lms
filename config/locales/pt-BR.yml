@@ -25898,7 +25898,7 @@ pt-BR:
       loud_late: ATRASADA
       see_all_quiz_attempts: "Ver todas as tentativas de teste"
       submission_to_view: "Envio para exibir:"
-      submitted: "*Enviado:* %{submittedAt}"
+      submitted: "*Enviado:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Enviar
     titles: 
       click_to_record: "Voz para texto"
