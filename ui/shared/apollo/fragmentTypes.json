@@ -156,9 +156,6 @@
             "name": "NotificationPolicy"
           },
           {
-            "name": "OutcomeAlignment"
-          },
-          {
             "name": "OutcomeCalculationMethod"
           },
           {

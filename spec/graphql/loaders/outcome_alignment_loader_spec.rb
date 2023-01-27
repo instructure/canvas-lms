@@ -114,6 +114,7 @@ describe Loaders::OutcomeAlignmentLoader do
             module_workflow_state = "active"
             title = @assignment.title
             assignment_content_type = "assignment"
+            assignment_workflow_state = "published"
             if alignment[:title] == @discussion_item.title
               content_id = @discussion_assignment.id
               title = @discussion_item.title
@@ -142,7 +143,7 @@ describe Loaders::OutcomeAlignmentLoader do
             title = @bank.title
           end
 
-          expect(alignment[:id]).not_to be_nil
+          expect(alignment[:_id]).not_to be_nil
           expect(alignment[:content_id]).to eq content_id
           expect(alignment[:content_type]).to eq content_type
           expect(alignment[:context_id]).to eq @course.id
@@ -155,6 +156,7 @@ describe Loaders::OutcomeAlignmentLoader do
           expect(alignment[:module_url]).to eq module_url
           expect(alignment[:module_workflow_state]).to eq module_workflow_state
           expect(alignment[:assignment_content_type]).to eq assignment_content_type
+          expect(alignment[:assignment_workflow_state]).to eq assignment_workflow_state
         end
       end
     end
@@ -173,7 +175,7 @@ describe Loaders::OutcomeAlignmentLoader do
           alignments.each do |alignment|
             next unless alignment[:content_type] == "Assignment" && alignment[:title] == @assignment.title
 
-            expect(alignment[:id]).not_to be_nil
+            expect(alignment[:_id]).not_to be_nil
             expect(alignment[:content_id]).to eq @assignment.id
             expect(alignment[:content_type]).to eq "Assignment"
             expect(alignment[:context_id]).to eq @course.id
@@ -240,6 +242,20 @@ describe Loaders::OutcomeAlignmentLoader do
             expect(alignment[:module_name]).to eq module_name
             expect(alignment[:module_url]).to eq module_url
             expect(alignment[:module_workflow_state]).to eq module_workflow_state
+          end
+        end
+      end
+    end
+
+    it "resolves assignment workflow state to 'unpublished'" do
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment[:content_type] == "Assignment"
+
+            expect(alignment[:assignment_workflow_state]).to eq "unpublished"
           end
         end
       end
