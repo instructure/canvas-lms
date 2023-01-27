@@ -27101,7 +27101,7 @@ ar:
       loud_late: متأخر
       see_all_quiz_attempts: "عرض كل محاولات الاختبار"
       submission_to_view: "الإرسال المراد عرضه:"
-      submitted: "*تم الإرسال:* %{submittedAt}"
+      submitted: "*تم الإرسال:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: إرسال
     titles: 
       click_to_record: "الكلام إلى نص"
