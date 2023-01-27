@@ -228,7 +228,7 @@ class Assignment
             end
           end
         elsif @assignment.quiz && sub.quiz_submission
-          json['submission_history'] = qs_versions[sub.quiz_submission.id].map do |v|
+          json['submission_history'] = qs_versions[sub.quiz_submission.id]&.map do |v|
             # don't use v.model, because these are huge objects, and can be significantly expensive
             # to instantiate an actual AR object deserializing and reserializing the inner YAML
             qs = YAML.load(v.yaml)
