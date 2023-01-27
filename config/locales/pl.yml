@@ -26498,7 +26498,7 @@ pl:
       loud_late: "PO CZASIE"
       see_all_quiz_attempts: "Zobacz wszystkie próby podejścia do testu"
       submission_to_view: "Przesłane zadanie do wyświetlenia:"
-      submitted: "*Wysłano:* %{submittedAt}"
+      submitted: "*Wysłano:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Prześlij
     titles: 
       click_to_record: "Przetwarzanie mowy na tekst"
