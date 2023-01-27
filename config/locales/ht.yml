@@ -23909,7 +23909,7 @@ ht:
       loud_late: "AN RETA"
       see_all_quiz_attempts: "Afiche tout tantativ quiz yo"
       submission_to_view: "Soumisyon pou afiche"
-      submitted: "*Soumèt:* %{submittedAt}"
+      submitted: "*Soumèt:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Soumèt
     titles: 
       click_to_record: "Diskou a Tèks"
