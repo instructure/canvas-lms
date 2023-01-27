@@ -25896,7 +25896,7 @@ nl:
       loud_late: "TE LAAT"
       see_all_quiz_attempts: "Alle pogingen op toetsen zien"
       submission_to_view: "Weer te geven inzending:"
-      submitted: "*Ingeleverd:* %{submittedAt}"
+      submitted: "*Ingeleverd:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Inleveren
     titles: 
       click_to_record: "Van spraak tot tekst"
