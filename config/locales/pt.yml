@@ -25936,7 +25936,7 @@ pt:
       loud_late: ATRASADO
       see_all_quiz_attempts: "Ver todas as tentativas de teste"
       submission_to_view: "Envio para ver:"
-      submitted: "*Submetido:* %{submittedAt}"
+      submitted: "*Submetido:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Submeter
     titles: 
       click_to_record: "Voz para texto"
