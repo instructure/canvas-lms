@@ -7529,6 +7529,68 @@ describe Assignment do
       expect(submission_user_ids.sort).to eq [s1.id, s2.id]
     end
 
+    it "works for groups that has number on the name" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "12345#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works with groups that has number more than 2 strings separeted by underscore" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "#{i}_group_1234_#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works with groups that has number on the name and underscore" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "eval123group_12345#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
     it "excludes student names from filenames when anonymous grading is enabled" do
       @assignment.update!(anonymous_grading: true)
 
