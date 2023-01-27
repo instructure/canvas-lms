@@ -23480,7 +23480,7 @@ is:
       grade: "(einkunn: %{grade})"
       see_all_quiz_attempts: "Sjá allar próftilraunir"
       submission_to_view: "Skil til að skoða:"
-      submitted: "*Skilað:* %{submittedAt}"
+      submitted: "*Skilað:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Skila
     titles: 
       click_to_record: "Tal í texta"
