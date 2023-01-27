@@ -841,7 +841,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
     return @significant_version[version_number] if @significant_version.has_key?(version_number)
-    old_version = self.versions.get(version_number).model
+    begin
+      old_version = self.versions.get(version_number).model
+    rescue NoMethodError
+      return false
+    end
 
     needs_review = false
     # Allow for floating point rounding error comparing to versions created before BigDecimal was used
