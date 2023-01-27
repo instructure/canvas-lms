@@ -25893,7 +25893,7 @@ zh-Hant:
       loud_late: 逾期
       see_all_quiz_attempts: 檢視所有測驗嘗試
       submission_to_view: 要檢視的提交件：
-      submitted: "*已提交：* %{submittedAt}"
+      submitted: "*已提交：* %{submittedAt}%{proxy_submitter_label_text}"
     submit: 提交
     titles: 
       click_to_record: 語音轉換為文字
