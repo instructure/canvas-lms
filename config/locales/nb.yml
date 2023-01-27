@@ -25916,7 +25916,7 @@ nb:
       loud_late: "FOR SEN"
       see_all_quiz_attempts: "Se alle quizforsøk"
       submission_to_view: "Innleveringer for gjennomsyn:"
-      submitted: "*Sendt inn:* %{submittedAt}"
+      submitted: "*Sendt inn:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: "Send inn"
     titles: 
       click_to_record: "Tale til tekst"
