@@ -6726,7 +6726,7 @@ de:
       delete: Löschen
       edit: Ändern
       end_it_now: Beenden
-      in_progress: "In Bearbeitung"
+      in_progress: "Wird ausgeführt"
       join: Beitreten
       recording: "1 Aufzeichnung"
       recordings: "%{recordingCount} Aufzeichnungen"
@@ -7378,7 +7378,7 @@ de:
     index: 
       titles: 
         course_modules: Kursmodule
-    module_complete: Abgeschlossen
+    module_complete: Abschließen
     module_empty: "Modul „%{module}“ enthält keine Elemente."
     module_item_next: 
       drag_to_reorder: "Element durch Ziehen neu anordnen oder in anderes Modul verschieben"
@@ -7424,8 +7424,8 @@ de:
         unfulfilled: "muss die Seite anzeigen"
       settings: Einstellungen
     module_locked: Gesperrt
-    module_started: "In Bearbeitung"
-    module_unlocked: Freigegeben
+    module_started: "Wird ausgeführt"
+    module_unlocked: "Sperre aufgehoben"
     optgroup: 
       assignments: Aufgaben
       discussion_topics: Diskussionen
@@ -25808,7 +25808,7 @@ de:
       loud_late: VERSPÄTET
       see_all_quiz_attempts: "Alle Quizversuche anzeigen"
       submission_to_view: "Anzuzeigende Abgabe :"
-      submitted: "*Abgegeben:* %{submittedAt}"
+      submitted: "*Abgegeben:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Abgeben
     titles: 
       click_to_record: "Sprache als Text"
