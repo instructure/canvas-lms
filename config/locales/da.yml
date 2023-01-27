@@ -25909,7 +25909,7 @@ da:
       loud_late: SEN
       see_all_quiz_attempts: "Se alle test-forsøg"
       submission_to_view: "Aflevering, der skal vises:"
-      submitted: "*Afleveret:* %{submittedAt}"
+      submitted: "*Afleveret:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Aflever
     titles: 
       click_to_record: "Tale til tekst"
