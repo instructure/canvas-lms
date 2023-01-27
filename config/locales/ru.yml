@@ -26539,7 +26539,7 @@ ru:
       loud_late: ПОЗДНО
       see_all_quiz_attempts: "Посмотреть все попытки выполнения контрольной работы"
       submission_to_view: "Отправка для отображения:"
-      submitted: "*Отправлено:* %{submittedAt}"
+      submitted: "*Отправлено:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Отправить
     titles: 
       click_to_record: "Речь в текст"
