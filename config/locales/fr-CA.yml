@@ -24182,7 +24182,7 @@ fr-CA:
       loud_late: "EN RETARD"
       see_all_quiz_attempts: "Voir toutes les tentatives pour le questionnaire"
       submission_to_view: "Envoi à afficher :"
-      submitted: "*Envoyé :* %{submittedAt}"
+      submitted: "*Envoyé :* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Envoyer
     titles: 
       click_to_record: "Transcription écrite de la parole"
