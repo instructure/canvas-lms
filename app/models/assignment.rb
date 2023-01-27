@@ -114,9 +114,9 @@ class Assignment < ActiveRecord::Base
   delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
   belongs_to :group_category
-
   belongs_to :grader_section, class_name: "CourseSection", optional: true
   belongs_to :final_grader, class_name: "User", optional: true
+  has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
 
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
@@ -2633,7 +2633,10 @@ class Assignment < ActiveRecord::Base
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
-    file_map = zip_extractor.unzip_files.filter_map { |f| infer_comment_context_from_filename(f) }
+
+    assignment_student_group_names = active_groups.pluck(:name).map { |group_name| sanitize_user_name(group_name) }
+
+    file_map = zip_extractor.unzip_files.filter_map { |f| infer_comment_context_from_filename(f, assignment_student_group_names) }
     files_for_user = file_map.group_by { |f| f[:user] }
 
     comments = []
@@ -3163,13 +3166,17 @@ class Assignment < ActiveRecord::Base
   end
 
   # Infers the user, submission, and attachment from a filename
-  def infer_comment_context_from_filename(fullpath)
+  def infer_comment_context_from_filename(fullpath, student_group_names = [])
     filename = File.basename(fullpath)
-    split_filename = filename.split("_") - ["LATE"]
     # If the filename is like Richards_David_2_link.html, then there is no
     # useful attachment here.  The assignment was submitted as a URL and the
     # teacher commented directly with the gradebook.  Otherwise, grab that
     # last value and strip off everything after the first period.
+
+    # remove group name from file name
+    student_group_names.each { |group_name| filename.sub!("#{group_name}_", "") }
+
+    split_filename = filename.split("_") - ["LATE"]
 
     attachment_id, user, submission = nil
     if split_filename.first == "anon"
@@ -3177,6 +3184,8 @@ class Assignment < ActiveRecord::Base
       submission = Submission.active.where(assignment_id: self, anonymous_id: anon_id).first
       user = submission&.user
     else
+      # Expecting all context id from file name to be in the end not counting
+      # uploaded_filename in case the file has number as name
       user_id, attachment_id = split_filename.grep(/^\d+$/).take(2)
       if user_id
         user = User.where(id: user_id).first
@@ -4072,6 +4081,14 @@ class Assignment < ActiveRecord::Base
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
     end
+  end
+
+  def sanitize_user_name(user_name)
+    # necessary because we use /_\d+_/ to infer the user/attachment
+    # ids when teachers upload graded submissions
+    user_name.gsub!(/_(\d+)_/, '\1')
+    user_name.gsub!(/^(\d+)$/, '\1')
+    user_name.downcase
   end
 
   def mark_module_progressions_outdated
