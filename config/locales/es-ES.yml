@@ -19565,7 +19565,7 @@ es-ES:
       grade: "(nota: %{grade})"
       see_all_quiz_attempts: "Ver todos los intentos de prueba"
       submission_to_view: "Entrega para ver:"
-      submitted: "*Entregado:* %{submittedAt}"
+      submitted: "*Entregado:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Entregar
     titles: 
       click_to_record: "Voz a texto"
