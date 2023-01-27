@@ -21207,7 +21207,7 @@ sl:
       grade: "(ocena: %{grade})"
       see_all_quiz_attempts: "Ogled vseh poskusov pri kvizu"
       submission_to_view: "Oddaja za ogled:"
-      submitted: "*Poslano:* %{submittedAt}"
+      submitted: "*Poslano:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Pošlji
     titles: 
       click_to_record: "Govor v besedilo"
