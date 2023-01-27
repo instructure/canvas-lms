@@ -20601,7 +20601,7 @@ ca:
       grade: "(nota: %{grade})"
       see_all_quiz_attempts: "Mostra tots els intents de la prova"
       submission_to_view: "Entrega per visualitzar:"
-      submitted: "*S’ha entregat el:* %{submittedAt}"
+      submitted: "*S’ha entregat el:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Entrega
     titles: 
       click_to_record: "De veu a text"
