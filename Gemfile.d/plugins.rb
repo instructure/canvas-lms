@@ -23,6 +23,7 @@ end
 
 # Private Plugin Alignment
 gem "activeresource", "6.0.0"
+gem "colorize", "0.8.1", require: false
 gem "crypt", ">= 2.2.0"
 gem "dynect4r", "0.2.4"
 gem "maxminddb", "0.1.22"
