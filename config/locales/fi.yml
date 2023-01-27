@@ -22012,7 +22012,7 @@ fi:
       grade: "(arvosana: %{grade})"
       see_all_quiz_attempts: "Näytä kaikki testin yritykset"
       submission_to_view: "Tarkasteltava tehtäväpalautus:"
-      submitted: "*Lähetetty:* %{submittedAt}"
+      submitted: "*Lähetetty:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Lähetä
     titles: 
       click_to_record: "Puhe tekstiksi"
