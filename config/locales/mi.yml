@@ -25826,7 +25826,7 @@ mi:
       loud_late: "te mutunga"
       see_all_quiz_attempts: "Tirohia te nganatanga quiz katoa"
       submission_to_view: "tāpaetanga ki te tirohanga:"
-      submitted: "*Submitted:* %{submittedAt}"
+      submitted: "*Submitted:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Tuku
     titles: 
       click_to_record: "Kōrero ki te Kuputuhi"
