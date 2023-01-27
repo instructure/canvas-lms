@@ -17491,7 +17491,7 @@ sv-x-k12:
   only_after_their_last_attempt_3593d101: "Endast efter deras sista försök"
   only_available_to_students_with_link_107e2468: "Endast tillgängligt för elever via länk"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Endast tillgängliga elever med en länk. Inte synlig i elevfiler"
-  only_available_with_link_5ffb9492: "Endast tillgängligt med länk"
+  only_available_with_link_5ffb9492: "Endast tillgängligt med bläck"
   only_collect_grades_that_have_been_graded_since_th_96baed94: "Samla bara bedömningar som bedömts sedan start_at."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Endast anslag och diskussioner kan vara sektionsspecifika"
   only_csv_files_are_supported_e1ad5270: "Endast CSV-filer stöds."
@@ -22875,7 +22875,7 @@ sv-x-k12:
       grade: "(omdöme: %{grade})"
       see_all_quiz_attempts: "Se alla quizförsök"
       submission_to_view: "Inlämningar att visa:"
-      submitted: "*Inskickad:* %{submittedAt}"
+      submitted: "*Inskickad:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Spara
     titles: 
       click_to_record: "Tal till text"
