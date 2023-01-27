@@ -19471,7 +19471,7 @@ th:
       grade: "(เกรด: %{grade})"
       see_all_quiz_attempts: ดูการทำแบบทดสอบทั้งหมด
       submission_to_view: "ผลงานจัดส่งที่จะดู:"
-      submitted: "*จัดส่งแล้ว:* %{submittedAt}"
+      submitted: "*จัดส่งแล้ว:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: ส่ง
     titles: 
       click_to_record: คำพูดเป็นข้อความ
