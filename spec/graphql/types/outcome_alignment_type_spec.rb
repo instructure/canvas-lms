@@ -115,11 +115,16 @@ describe Types::OutcomeAlignmentType do
 
   describe "for outcome alignment to an Assignment" do
     before do
+      @assignment.unpublish
       @rubric.associate_with(@assignment, @course, purpose: "grading")
     end
 
     it "returns assignment_content_type 'assignment'" do
       expect(resolve_field("assignmentContentType")).to eq "assignment"
+    end
+
+    it "returns the workflow state of the assignment in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @assignment.workflow_state
     end
   end
 
@@ -130,6 +135,10 @@ describe Types::OutcomeAlignmentType do
 
     it "returns assignment_content_type 'quiz'" do
       expect(resolve_field("assignmentContentType")).to eq "quiz"
+    end
+
+    it "returns the workflow state of the quiz in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @quiz.workflow_state
     end
   end
 
@@ -159,6 +168,10 @@ describe Types::OutcomeAlignmentType do
 
     it "returns assignment_content_type 'discussion'" do
       expect(resolve_field("assignmentContentType")).to eq "discussion"
+    end
+
+    it "returns the workflow state of the discussion in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @discussion.workflow_state
     end
   end
 
