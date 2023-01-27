@@ -62,7 +62,7 @@ describe('contentInsertion', () => {
         decode: input => {
           return input
         },
-        encode: input => input,
+        encode: input => encodeURIComponent(input),
         setAttribs: (elem, attrs) => {
           if (elem?.nodeType === 1) {
             // this is an HTMLElement
@@ -294,6 +294,16 @@ describe('contentInsertion', () => {
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
         '<a href="http://www.google.com" title="PB&amp;J">3 &lt; 4</a>'
+      )
+    })
+
+    it('renders quotes correctly', () => {
+      link.href = 'http://www.google.com'
+      link.title = 'PB&J'
+      link.text = '"quote test"'
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual(
+        '<a href="http://www.google.com" title="PB&amp;J">&quot;quote test&quot;</a>'
       )
     })
   })
