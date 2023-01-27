@@ -25871,7 +25871,7 @@ zh-Hans:
       loud_late: 延迟
       see_all_quiz_attempts: 查看所有测验尝试
       submission_to_view: 要查看的提交项：
-      submitted: "*已提交：* %{submittedAt}"
+      submitted: "*已提交：* %{submittedAt}%{proxy_submitter_label_text}"
     submit: 提交
     titles: 
       click_to_record: 语音到文本
