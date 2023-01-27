@@ -25895,7 +25895,7 @@ ja:
       loud_late: 遅延
       see_all_quiz_attempts: 小テストのすべての試行を表示
       submission_to_view: "表示する提出物:"
-      submitted: "*提出済:* %{submittedAt}"
+      submitted: "*提出済:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: 提出
     titles: 
       click_to_record: 音声認識
