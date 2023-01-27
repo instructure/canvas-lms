@@ -62,6 +62,12 @@ describe CalendarEventsController do
       expect(get_event.call.web_conference).not_to be nil
     end
 
+    it "does not error on bad conference params" do
+      user_session(@teacher)
+      make_request.call(" s")
+      expect(response.status).to be < 400
+    end
+
     it "accepts an existing conference" do
       user_session(@teacher)
       conference = @course.web_conferences.create!(conference_params)
