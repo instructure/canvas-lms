@@ -269,6 +269,17 @@ export type AssessmentRequest = Readonly<{
   workflow_state?: string
 }>
 
+export type AssignedAssessments = {
+  assetId: string
+  workflowState: string
+  assetSubmissionType: string
+  anonymizedUser?: {
+    displayName: string
+    _id: string
+  }
+  anonymousId?: string
+}
+
 export type AttachmentData = Readonly<{
   attachment: Attachment
 }>
@@ -382,6 +393,7 @@ export type Submission = Readonly<{
   posted_at: null | Date
   rawGrade: string | null
   submitted_at: null | Date
+  assignedAssessments?: AssignedAssessments[]
 }
 
 export type UserSubmissionGroup = {

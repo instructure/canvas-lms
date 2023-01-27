@@ -20,7 +20,7 @@ import $ from 'jquery'
 import * as apollo from 'react-apollo'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CommentContent from '../CommentsTray/CommentContent'
-import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
+import CommentsTrayBody, {COMPLETED_PEER_REVIEW_TEXT} from '../CommentsTray/CommentsTrayBody'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -62,7 +62,8 @@ async function mockCreateSubmissionComment() {
     User: {shortName: 'sent user'},
     SubmissionComment: {comment: 'test reply comment'},
   }
-  const result = await mockQuery(CREATE_SUBMISSION_COMMENT, overrides, variables)
+
+  const result = await mockQuery(CREATE_SUBMISSION_COMMENT, [overrides], variables)
   return {
     request: {
       query: CREATE_SUBMISSION_COMMENT,
@@ -74,11 +75,12 @@ async function mockCreateSubmissionComment() {
 
 async function mockComments(overrides = {}) {
   const queryResult = await mockSubmissionCommentQuery(overrides)
-  return queryResult.result.data.submissionComments.commentsConnection.nodes
+
+  return queryResult.result.data?.submissionComments.commentsConnection.nodes
 }
 
-let mockedSetOnFailure = null
-let mockedSetOnSuccess = null
+let mockedSetOnFailure: (alertMessage: string) => void
+let mockedSetOnSuccess: (alertMessage: string) => void
 const originalENV = window.ENV
 
 function mockContext(children) {
@@ -94,18 +96,51 @@ function mockContext(children) {
   )
 }
 
+const getDefaultPropsWithReviewerSubmission = async (workflowState: string) => {
+  const props = await mockAssignmentAndSubmission()
+  const assetId = props.submission._id as string
+  const reviewerSubmission: {
+    id: string
+    _id: string
+    assignedAssessments: {
+      assetId: string
+      workflowState: string
+      assetSubmissionType: string | null
+    }[]
+  } = {
+    id: 'test-id',
+    _id: 'test-id',
+    assignedAssessments: [
+      {
+        assetId,
+        workflowState,
+        assetSubmissionType: 'online-text',
+      },
+      {
+        assetId: 'some other user id',
+        workflowState: 'assigned',
+        assetSubmissionType: 'online-text',
+      },
+    ],
+  }
+
+  return {...props, reviewerSubmission, isPeerReviewEnabled: false}
+}
+
 describe('CommentsTrayBody', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
 
   beforeEach(() => {
+    // @ts-ignore
     window.ENV = {...originalENV, RICH_CONTENT_APP_HOST: '', JWT: '123'}
     mockedSetOnFailure = jest.fn().mockResolvedValue({})
     mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
+    // @ts-ignore
     window.ENV = originalENV
   })
 
@@ -113,9 +148,11 @@ describe('CommentsTrayBody', () => {
     it('marks submission comments as read after timeout', async () => {
       jest.useFakeTimers()
 
-      const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1},
-      })
+      const props = await mockAssignmentAndSubmission([
+        {
+          Submission: {unreadCommentCount: 1},
+        },
+      ])
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [{read: false}],
@@ -124,6 +161,7 @@ describe('CommentsTrayBody', () => {
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
       const mockMutation = jest.fn()
+      // @ts-ignore
       apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
 
       render(
@@ -134,6 +172,7 @@ describe('CommentsTrayBody', () => {
         )
       )
 
+      // @ts-ignore
       act(() => jest.runAllTimers())
       await waitFor(() =>
         expect(mockMutation).toHaveBeenCalledWith({
@@ -146,6 +185,7 @@ describe('CommentsTrayBody', () => {
       jest.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
+        // @ts-ignore
         Submission: {unreadCommentCount: 1},
       })
       const overrides = {
@@ -156,10 +196,12 @@ describe('CommentsTrayBody', () => {
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
       const mockMutation = jest.fn()
+      // @ts-ignore
       apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
 
       render(
         mockContext(
+          // @ts-ignore
           <StudentViewContext.Provider value={{isObserver: true, allowChangesToSubmission: false}}>
             <MockedProvider mocks={mocks}>
               <CommentsTrayBody {...props} />
@@ -168,6 +210,7 @@ describe('CommentsTrayBody', () => {
         )
       )
 
+      // @ts-ignore
       act(() => jest.runAllTimers())
       expect(mockMutation).not.toHaveBeenCalled()
     })
@@ -175,16 +218,18 @@ describe('CommentsTrayBody', () => {
     it('renders an error when submission comments fail to be marked as read', async () => {
       jest.useFakeTimers()
 
-      const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1},
-      })
+      const props = await mockAssignmentAndSubmission([
+        {
+          Submission: {unreadCommentCount: 1},
+        },
+      ])
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [{read: false}],
         },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
-
+      // @ts-ignore
       apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
 
       render(
@@ -194,7 +239,7 @@ describe('CommentsTrayBody', () => {
           </MockedProvider>
         )
       )
-
+      // @ts-ignore
       act(() => jest.advanceTimersByTime(3000))
 
       expect(mockedSetOnFailure).toHaveBeenCalledWith(
@@ -205,16 +250,18 @@ describe('CommentsTrayBody', () => {
     it('alerts the screen reader when submission comments are marked as read', async () => {
       jest.useFakeTimers()
 
-      const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1},
-      })
+      const props = await mockAssignmentAndSubmission([
+        {
+          Submission: {unreadCommentCount: 1},
+        },
+      ])
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [{read: false}],
         },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
-
+      // @ts-ignore
       apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
 
       render(
@@ -224,7 +271,7 @@ describe('CommentsTrayBody', () => {
           </MockedProvider>
         )
       )
-
+      // @ts-ignore
       act(() => jest.advanceTimersByTime(3000))
 
       expect(mockedSetOnSuccess).toHaveBeenCalledWith(
@@ -236,20 +283,23 @@ describe('CommentsTrayBody', () => {
   describe('group assignments', () => {
     it('renders warning that comments will be sent to the whole group for group assignments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {
-          gradeGroupStudentsIndividually: false,
-          groupSet: {
-            _id: '1',
-            name: 'sample-group-set',
+      const props = await mockAssignmentAndSubmission([
+        {
+          Assignment: {
+            gradeGroupStudentsIndividually: false,
+            groupSet: {
+              _id: '1',
+              name: 'sample-group-set',
+            },
+            submissionTypes: ['online_text_entry', 'online_upload'],
           },
-          submissionTypes: ['online_text_entry', 'online_upload'],
+          Submission: {
+            ...SubmissionMocks.onlineUploadReadyToSubmit,
+          },
         },
-        Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit,
-        },
-      })
+      ])
       const {queryByText} = render(
+        // @ts-ignore
         <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
           <MockedProvider mocks={mocks}>
             <CommentsTrayBody {...props} />
@@ -263,20 +313,23 @@ describe('CommentsTrayBody', () => {
 
     it('does not render warning for grade students individually group assignments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {
-          gradeGroupStudentsIndividually: true,
-          groupSet: {
-            _id: '1',
-            name: 'sample-group-set',
+      const props = await mockAssignmentAndSubmission([
+        {
+          Assignment: {
+            gradeGroupStudentsIndividually: true,
+            groupSet: {
+              _id: '1',
+              name: 'sample-group-set',
+            },
+            submissionTypes: ['online_text_entry', 'online_upload'],
           },
-          submissionTypes: ['online_text_entry', 'online_upload'],
+          Submission: {
+            ...SubmissionMocks.onlineUploadReadyToSubmit,
+          },
         },
-        Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit,
-        },
-      })
+      ])
       const {queryByText} = render(
+        // @ts-ignore
         <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
           <MockedProvider mocks={mocks}>
             <CommentsTrayBody {...props} />
@@ -292,6 +345,7 @@ describe('CommentsTrayBody', () => {
       const mocks = [await mockSubmissionCommentQuery()]
       const props = await mockAssignmentAndSubmission()
       const {queryByText} = render(
+        // @ts-ignore
         <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
           <MockedProvider mocks={mocks}>
             <CommentsTrayBody {...props} />
@@ -309,8 +363,9 @@ describe('CommentsTrayBody', () => {
       const props = await mockAssignmentAndSubmission()
       props.submission.gradeHidden = true
       props.comments = []
+      const commentProps = {...props, comments: []}
 
-      const {queryByText} = render(mockContext(<CommentContent {...props} />))
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
 
       expect(
         queryByText("This is where you can leave a comment and view your instructor's feedback.")
@@ -361,6 +416,7 @@ describe('CommentsTrayBody', () => {
 
   it('renders error alert when data returned from mutation fails', async () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+    // @ts-ignore
     mocks[1].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()
 
@@ -478,6 +534,7 @@ describe('CommentsTrayBody', () => {
     const mocks = [await mockSubmissionCommentQuery()]
     const props = await mockAssignmentAndSubmission()
     const {queryByLabelText} = render(
+      // @ts-ignore
       <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
         <MockedProvider mocks={mocks}>
           <CommentsTrayBody {...props} />
@@ -491,6 +548,7 @@ describe('CommentsTrayBody', () => {
     const mocks = [await mockSubmissionCommentQuery()]
     const props = await mockAssignmentAndSubmission()
     const {queryByLabelText} = render(
+      // @ts-ignore
       <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
         <MockedProvider mocks={mocks}>
           <CommentsTrayBody {...props} />
@@ -579,6 +637,7 @@ describe('CommentsTrayBody', () => {
 
   it('renders error when query errors', async () => {
     const mocks = [await mockSubmissionCommentQuery()]
+    // @ts-ignore
     mocks[0].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()
     const {getByText} = render(
@@ -594,9 +653,9 @@ describe('CommentsTrayBody', () => {
 
   it('renders place holder text when no comments', async () => {
     const props = await mockAssignmentAndSubmission()
-    props.comments = []
+    const commentProps = {...props, comments: []}
 
-    const {getByText} = render(mockContext(<CommentContent {...props} />))
+    const {getByText} = render(mockContext(<CommentContent {...commentProps} />))
 
     expect(
       await waitFor(() =>
@@ -613,8 +672,8 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
-    const {getAllByTestId} = render(mockContext(<CommentContent {...props} />))
+    const commentProps = {...props, comments}
+    const {getAllByTestId} = render(mockContext(<CommentContent {...commentProps} />))
     const rows = getAllByTestId('comment-row')
 
     expect(rows).toHaveLength(comments.length)
@@ -627,8 +686,8 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
-    const {getAllByText} = render(mockContext(<CommentContent {...props} />))
+    const commentProps = {...props, comments}
+    const {getAllByText} = render(mockContext(<CommentContent {...commentProps} />))
     expect(getAllByText('bob builder')).toHaveLength(1)
   })
 
@@ -638,8 +697,8 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
-    const {getAllByText, queryAllByText} = render(mockContext(<CommentContent {...props} />))
+    const commentProps = {...props, comments}
+    const {getAllByText, queryAllByText} = render(mockContext(<CommentContent {...commentProps} />))
 
     expect(queryAllByText('bob builder')).toHaveLength(0)
     expect(getAllByText('Anonymous')).toHaveLength(1)
@@ -652,8 +711,8 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
-    const {container, getByText} = render(mockContext(<CommentContent {...props} />))
+    const commentProps = {...props, comments}
+    const {container, getByText} = render(mockContext(<CommentContent {...commentProps} />))
 
     const renderedAttachment = container.querySelector("a[href*='test-url.com']")
     expect(renderedAttachment).toBeInTheDocument()
@@ -675,8 +734,8 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
-    const {container, getByText} = render(mockContext(<CommentContent {...props} />))
+    const commentProps = {...props, comments}
+    const {container, getByText} = render(mockContext(<CommentContent {...commentProps} />))
 
     const renderedAttachment1 = container.querySelector("a[href*='attachment1.com']")
     expect(renderedAttachment1).toBeInTheDocument()
@@ -693,9 +752,9 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
+    const commentProps = {...props, comments}
 
-    const {container} = render(mockContext(<CommentContent {...props} />))
+    const {container} = render(mockContext(<CommentContent {...commentProps} />))
 
     expect(container.querySelector('a[href]')).toBeNull()
   })
@@ -712,9 +771,9 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
+    const commentProps = {...props, comments}
 
-    const {getAllByTestId} = render(mockContext(<CommentContent {...props} />))
+    const {getAllByTestId} = render(mockContext(<CommentContent {...commentProps} />))
 
     const rows = getAllByTestId('comment-row')
 
@@ -734,9 +793,9 @@ describe('CommentsTrayBody', () => {
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
-    props.comments = comments
+    const commentProps = {...props, comments}
 
-    const {container, getByText} = render(mockContext(<CommentContent {...props} />))
+    const {container, getByText} = render(mockContext(<CommentContent {...commentProps} />))
 
     const renderedAttachment = container.querySelector("a[href*='test-url.com']")
     expect(renderedAttachment).toBeInTheDocument()
@@ -745,7 +804,7 @@ describe('CommentsTrayBody', () => {
   })
 
   describe('peer review mode enabled', () => {
-    it('displays an alert when there is atleast 1 comment', async () => {
+    it('displays an alert when the assignedAssessments for the user is completed for this submission', async () => {
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [
@@ -756,11 +815,11 @@ describe('CommentsTrayBody', () => {
         },
       }
       const comments = await mockComments(overrides)
-      const props = await mockAssignmentAndSubmission()
-      props.comments = comments
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.submission.gradeHidden = true
       props.isPeerReviewEnabled = true
-      const {queryByText} = render(mockContext(<CommentContent {...props} />))
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
 
       expect(queryByText('Your peer review is complete!')).toBeInTheDocument()
     })
@@ -776,28 +835,28 @@ describe('CommentsTrayBody', () => {
         },
       }
       const comments = await mockComments(overrides)
-      const props = await mockAssignmentAndSubmission()
-      props.comments = comments
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.submission.gradeHidden = true
       props.isPeerReviewEnabled = false
-      const {queryByText} = render(mockContext(<CommentContent {...props} />))
+      const commentProps = {...props, comments}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
 
       expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
 
-    it('does not display an alert when there are no comments', async () => {
-      const props = await mockAssignmentAndSubmission()
-      props.comments = []
+    it('does not display an alert when the assignedAssessments does not have a completed workflow for this user', async () => {
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.submission.gradeHidden = true
       props.isPeerReviewEnabled = true
-      const {queryByText} = render(mockContext(<CommentContent {...props} />))
+      const commentProps = {...props, comments: []}
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
 
       expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
 
     it('renders a message with image if there are no comments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
-      const props = await mockAssignmentAndSubmission()
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.isPeerReviewEnabled = true
       const {getByText, getByTestId} = render(
         <MockedProvider mocks={mocks}>
@@ -816,14 +875,95 @@ describe('CommentsTrayBody', () => {
     })
 
     it('does not display an alert when the assignment has rubrics', async () => {
-      const props = await mockAssignmentAndSubmission()
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.assignment.rubric = {}
       props.submission.gradeHidden = true
-      props.comments = []
       props.isPeerReviewEnabled = true
+      const commentProps = {...props, comments: []}
 
-      const {queryByText} = render(mockContext(<CommentContent {...props} />))
+      const {queryByText} = render(mockContext(<CommentContent {...commentProps} />))
 
       expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with next peer review if user has other assigned reviews', async () => {
+      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText('You have 1 more Peer Review to complete.')).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with completed peer review text when no other assigned reviews remaining', async () => {
+      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText(COMPLETED_PEER_REVIEW_TEXT)).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('shows peer review prompt modal with unavailable peer review text when only unavailable reviews remaining', async () => {
+      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const props = await getDefaultPropsWithReviewerSubmission('assigned')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].assetSubmissionType = null
+      const {findByPlaceholderText, getByText, findByText, queryByTestId} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(await findByText('You have 1 more Peer Review to complete.')).toBeTruthy()
+      expect(await findByText('The submission is not available just yet.')).toBeTruthy()
+      expect(await findByText('Please check back soon.')).toBeTruthy()
+      expect(queryByTestId('peer-review-prompt-modal')).toBeInTheDocument()
+    })
+
+    it('does not show peer review modal if user already completed all peer reviews and leaves a comment', async () => {
+      const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, queryByTestId} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
     })
   })
 })
