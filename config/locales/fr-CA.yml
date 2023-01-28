@@ -1171,7 +1171,7 @@ fr-CA:
           account_reports: 
             default: 
               parameters: 
-                header: "Trimestre (limite 5)"
+                header: "Trimestre (limite 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -11348,6 +11348,7 @@ fr-CA:
   failed_to_delete_role_label_27959de3: "Échec de suppression de rôle %{label}"
   failed_to_delete_selected_pages_26fa87db: "Échec lors de la suppression des pages sélectionnées"
   failed_to_export_blueprint_course_settings_1ced8c6: "Échec de l’exportation des paramètres du cours modèle"
+  failed_to_export_context_info_acb07497: "Échec de l’exportation des informations contextuelles"
   failed_to_export_course_paces_e17583ba: "Échec de l’exportation des rythmes du cours"
   failed_to_export_pace_plans_9832daac: "Échec de l’exportation des plans Pace"
   failed_to_export_some_tool_settings_c992fc56: "Échec lors de l'exportation de certains réglages d'outil"
@@ -11775,6 +11776,7 @@ fr-CA:
   from_from_to_to_e31f6422: "Du %{from} au %{to}"
   from_gravatar_58372d5a: "Depuis Gravatar"
   from_grouptitle_860dff95: "De %{groupTitle}"
+  front_page_50cae87e: "Page de couverture"
   front_page_must_be_set_first_4dbbfdbe: "La première page doit être définie en premier"
   front_page_must_be_set_first_c5246f7d: "La première page doit être définie en premier"
   full_article_9296bb6f: "Article complet"
@@ -13669,8 +13671,8 @@ fr-CA:
       accompagné d’un message utile indiquant que l’outil ne peut pas accéder aux cours
       conclus.
   if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
-      S’il est activé, le JS de réponse de « Deep Linking » enverra des postMessages
-      à window.parent au lieu de window.top. Cela permet à la réponse de « Deep Linking »
+      S’il est activé, le JS de réponse de « Deep Linking » enverra des postMessages
+      à window.parent au lieu de window.top. Cela permet à la réponse de « Deep Linking »
       d’envoyer correctement les éléments de contenu aux nouveaux questionnaires, lorsqu’un outil est
       lancé depuis NQ.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
@@ -18533,6 +18535,7 @@ fr-CA:
   online_url_37830a72: "URL en ligne"
   only_a_maximum_of_100_events_can_be_created_ad703982: "Il n'est pas possible de créer plus de 100 événements"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "seulement un maximum de %{limit} événements peuvent être créés"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Seulement un maximum de %{max} correcteurs peuvent être assigné"
   only_account_administrators_can_change_this_settin_149f8fe3: "Seuls les administrateurs de compte peuvent modifier ce paramètre."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Ajouter uniquement des billets contenant une phrase spécifique dans le titre"
   only_after_their_last_attempt_3593d101: "Uniquement après leur dernière tentative"
@@ -18887,6 +18890,7 @@ fr-CA:
   own_copyright_cc59db55: "Détenteur des droits d’auteur"
   owner_email_236d1b2: "Courriel du propriétaire"
   owner_email_4d02f795: "Courriel du propriétaire :"
+  pace_duration_cb8f5de7: "Durée de Pace"
   pace_is_new_and_unpublished_9aa68306: "Pace est nouveau et non publié"
   pace_plan_56e8fb1d: "Plans PACE"
   pace_plans_4bb9c5ff: "Plans PACE"
@@ -19858,6 +19862,7 @@ fr-CA:
   pro_tip_30e41fa3: "CONSEIL DE PRO!"
   proceed_f3d33864: Continuer
   proceed_with_caution_aa9b3285: "Procéder avec prudence"
+  proceed_with_extreme_caution_f5716a27: "Procédez avec une extrême prudence"
   process_multiple_content_items_from_course_modules_6de90fd8: "Traiter plusieurs éléments de contenu de la page des modules de cours"
   processed_4725b02: Traité
   processing_2fcc9739: "Traitement en cours..."
@@ -23928,6 +23933,10 @@ fr-CA:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Affichage de %{count} acquis pour %{groupTitle}."
     other: "Affichage de %{count} acquis pour %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Affichage de 1 résultat ci-dessous"
+    other: "Affichage de %{count} résultats ci-dessous"
+    zero: "Aucun résultat trouvé"
   showing_search_results_below_4c9a63d9: "Affichage des résultats de recherche ci-dessous"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Affiche les notes de mise à jour fournies par Instructure dans le menu d’aide pour tous les utilisateurs (filtré par rôle de l’utilisateur)"
   shrink_permission_74b01aed: "Réduire %{permission}"
@@ -24552,6 +24561,7 @@ fr-CA:
   subject_114b2e98: Objet
   subject_1bc03dea: "Objet :"
   subject_details_12405b1: "Détails du sujet"
+  subject_home_8e593f72: "Maison du sujet"
   subject_home_page_41226803: "Page d’accueil du sujet"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Objet doit contenir moins de 255 caractères."
   subject_name_a1ac4da4: "Nom du sujet"
@@ -24624,6 +24634,7 @@ fr-CA:
   submission_score_b7a291e8: "Note de l’envoi"
   submission_sent_3f0d2ee1: "Envoi transmis"
   submission_status_3079e730: "Statut de l’envoi"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Envoi - Soumettre au nom de l’étudiant"
   submission_tray_429ac3df: "Bac d’envoi"
   submission_type_a925fc5f: "Type d’envoi"
   submission_type_displayname_currently_selected_3f8aa9f8: "Type d’envoi %{displayName}, actuellement sélectionné"
@@ -24775,7 +24786,7 @@ fr-CA:
   submit_ticket_5515ffd: "Soumettre le billet"
   submitted_318fad53: Envoyé
   submitted_at_4d5ea3aa: "Envoyé à"
-  submitted_by_name_dab6d5e1: "Envoyé par : %{name}"
+  submitted_by_name_dab6d5e1: "Envoyé par : %{name}"
   submitted_by_submitter_1dcd07a1: "Envoyé par %{submitter}"
   submitted_d5ba370a: "Soumis :"
   submitted_date_ba55b0ae: "Envoyé le %{date}"
@@ -25654,6 +25665,7 @@ fr-CA:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Ce critère est lié à un acquis d’apprentissage"
   this_due_date_is_managed_by_cfbb698c: "Cette échéance est gérée par"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Cette date d’échéance est gérée par Course Pacing."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Cette durée ne prend pas en compte les week-ends et les jours d’interdiction de tâches."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Cet élément est une alternative plus accessible qu'une réorganisation par glisser-déposer. Presser la touche Entrée ou Espace pour déplacer cette question."
   this_email_address_is_unconfirmed_f0fc8c6e: "Cette adresse courriel n'est pas confirmée."
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Cela active des paramètres de cours afin de permettre aux étudiants d’exporter le cours comme un dossier comprimé (.zip) Web hors ligne"
@@ -26002,6 +26014,7 @@ fr-CA:
   time_left_in_your_instant_trial_5dd0392b: "%{time} reste dans votre instantané d’essai"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} reste dans votre instantané d’essai *(étendre maintenant)*"
   time_limit_a6f1a51e: "Limite de durée"
+  time_to_complete_9d264097: "Le temps de terminer"
   time_zone_f56f5183: "Fuseau horaire"
   time_zones: 
     abu_dhabi: "Abou Dhabi"
@@ -26797,6 +26810,7 @@ fr-CA:
   today_76e10f9c: Aujourd’hui
   toggle_alignment_details_for_title_944f605: "Activer/désactiver les détails de l’alignement pour  %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Basculer les superpositions de couleurs de carte de cours"
+  toggle_due_date_compression_tooltip_f2edda2e: "Basculer la date d’échéance de l’infobulle de compression"
   toggle_editing_answer_text_as_html_9a93fe6: "Basculer l'édition du texte de réponse en mode HTML"
   toggle_filterpresetname_f8ae0191: "Basculer %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "activez/désactivez l’affichage des modules"
@@ -27253,6 +27267,7 @@ fr-CA:
   update_important_info_bcc01d6a: "Mettre à jour les informations importantes"
   update_inbox_page_to_use_react_instui_4d343fd: "Mettre à jour la page Boîte de réception pour utiliser react/instui"
   update_link_b7cab181: "Mettre le lien à jour"
+  update_lti_region_912491e4: "Mise à jour de la région LTI"
   update_name_6581781d: "Mettre à jour %{name}"
   update_pages_c91d7ba: "Mise à jour des pages"
   update_rating_6d29c2ef: "Mise à jour du classement"
@@ -27407,7 +27422,7 @@ fr-CA:
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utiliser ce panneau pour rechercher des personnes que vous souhaitez ajouter à ce cours."
   use_this_photo_3a594830: "Utiliser cette photo"
   use_webcam_1ed0bf6b: "Utiliser la webcam"
-  use_window_parent_in_deep_linking_response_8fe5f845: "Utiliser window.parent dans la réponse de « Deep Linking »"
+  use_window_parent_in_deep_linking_response_8fe5f845: "Utiliser window.parent dans la réponse de « Deep Linking »"
   used_by_permission_314a78dd: "Utilisé avec autorisation"
   user: 
     default_user_name: Utilisateur
@@ -28511,6 +28526,7 @@ fr-CA:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Vous pouvez découvrir plus d'informations sur ce groupe en cliquant ce lien : %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Vous pouvez vérifier les détails du groupe en cliquant ce lien : %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Vous pouvez fermer cette boîte de dialogue pour continuer à travailler si vous ne voulez pas attendre; l’affectation se poursuivra en arrière-plan."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Vous pouvez créer des ensembles de groupes où les étudiants peuvent s’inscrire eux-mêmes. Les étudiants sont encore limités à n’être que dans un seul groupe de l’ensemble, mais de cette façon, les étudiants peuvent s’organiser en groupes au lieu d’avoir besoin de l’enseignant pour faire le travail."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Vous pouvez créer des ensembles de groupes où les étudiants peuvent s’inscrire seuls. Les étudiants sont toujours limités\
                     à être dans un seul groupe de l’ensemble, mais de cette façon, les élèves peuvent s’organiser en groupes\
