@@ -11981,6 +11981,7 @@ fr:
   failed_to_delete_role_label_27959de3: "Échec de la suppression du rôle %{label}"
   failed_to_delete_selected_pages_26fa87db: "Échec de la suppression des pages sélectionnées"
   failed_to_export_blueprint_course_settings_1ced8c6: "Échec de l’export des paramètres de projet de cours"
+  failed_to_export_context_info_acb07497: "Échec de l’exportation des informations de contexte"
   failed_to_export_course_paces_e17583ba: "Impossible d’exporter les allures de cours"
   failed_to_export_pace_plans_9832daac: "Échec de l’export des plans de gestion d'allure"
   failed_to_export_some_tool_settings_c992fc56: "Échec de l’exportation de certains paramètres d’outil"
@@ -12470,6 +12471,7 @@ fr:
   from_from_to_to_e31f6422: "Du %{from} au %{to}"
   from_gravatar_58372d5a: "Depuis Gravatar"
   from_grouptitle_860dff95: "De %{groupTitle}"
+  front_page_50cae87e: "Première page"
   front_page_must_be_set_first_4dbbfdbe: "La première page doit être définie en premier"
   front_page_must_be_set_first_c5246f7d: "La page d'accueil doit d'abord être définie"
   full_article_9296bb6f: "Article complet"
@@ -18846,7 +18848,7 @@ fr:
   name_badfe525: nom
   name_conference_8e042dd2: "Conférence %{name}"
   name_count_students_d004ba32: "%{name} (%{count} élèves)"
-  name_count_users_ccc93c3d: "%{name} (%{count} Utilisateurs)"
+  name_count_users_ccc93c3d: "%{name} (%{count} utilisateurs)"
   name_current_grade_d8da149f: "%{name} note actuelle"
   name_current_score_b3198dfa: "Note actuelle de %{name}"
   name_e790ff1f: Nom...
@@ -19785,6 +19787,7 @@ fr:
   online_url_37830a72: "URL en ligne"
   only_a_maximum_of_100_events_can_be_created_ad703982: "Il n'est pas possible de créer plus de 100 événements"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "un maximum de %{limit} événements seulement peuvent être créés"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Seul un maximum de %{max} correcteurs peuvent être affectés"
   only_account_administrators_can_change_this_settin_149f8fe3: "Seuls les administrateurs de compte peuvent modifier ce paramètre."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Ajouter uniquement des billets contenant une phrase spécifique dans le titre"
   only_after_their_last_attempt_3593d101: "Uniquement après leur dernière tentative"
@@ -20147,6 +20150,7 @@ fr:
   own_copyright_cc59db55: "Détenteur des droits d’auteur"
   owner_email_236d1b2: "Courriel du propriétaire"
   owner_email_4d02f795: "E-mail du propriétaire :"
+  pace_duration_cb8f5de7: "Durée de l'allure"
   pace_is_new_and_unpublished_9aa68306: "L'allure est nouvelle et non publiée"
   pace_plan_56e8fb1d: "Plan de gestion d'allure"
   pace_plans_4bb9c5ff: "Plans de gestion d'allure"
@@ -21132,6 +21136,7 @@ fr:
   pro_tip_30e41fa3: "CONSEIL DE PRO !"
   proceed_f3d33864: Procéder
   proceed_with_caution_aa9b3285: "Soyez prudent"
+  proceed_with_extreme_caution_f5716a27: "Soyez extrêmement prudent"
   process_multiple_content_items_from_course_modules_6de90fd8: "Traiter plusieurs éléments de contenu depuis la page de modules de cours"
   processed_4725b02: Traité
   processing_2fcc9739: "Traitement en cours"
@@ -25622,6 +25627,10 @@ fr:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Affichage de %{count} résultat pour %{groupTitle}."
     other: "Affichage de %{count} résultats pour %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Affichage de 1 résultat ci-dessous"
+    other: "Affichage de %{count} résultats ci-dessous"
+    zero: "Aucun résultat trouvé"
   showing_search_results_below_4c9a63d9: "Affichage des résultats de recherche ci-dessous"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Affiche les notes de version fournies par Instructure dans le menu d'aide pour tous les utilisateurs (filtré par le rôle de l'utilisateur)."
   shrink_permission_74b01aed: "Réduire %{permission}"
@@ -26289,6 +26298,7 @@ fr:
   subject_114b2e98: Sujet
   subject_1bc03dea: "Sujet :"
   subject_details_12405b1: "Détails du sujet"
+  subject_home_8e593f72: "Accueil du sujet"
   subject_home_page_41226803: "Page d'accueil du sujet"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "L'objet doit contenir moins de 255 caractères."
   subject_name_a1ac4da4: "Nom du sujet"
@@ -26362,13 +26372,14 @@ fr:
   submission_score_b7a291e8: "Note de l’envoi"
   submission_sent_3f0d2ee1: "Soumission envoyée"
   submission_status_3079e730: "Statut de l'envoi"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Soumission – Soumettre au nom de l'élève"
   submission_tray_429ac3df: "Bac des soumissions"
   submission_type_a925fc5f: "Type d’envoi"
   submission_type_displayname_currently_selected_3f8aa9f8: "Type de soumission %{displayName}, actuellement sélectionné"
   submission_type_lti_placement_b448d5d0: "Type de soumission à placement LTI"
   submission_type_selection_72ce19f: "Sélection d’un type de soumission"
   submission_updated_8897f3b7: "Soumission mise à jour"
-  submission_uploaded_542c9ac6: "Soumission envoyée !"
+  submission_uploaded_542c9ac6: "Soumission envoyée !"
   submission_user_name_assignment_title_2cf5e3e9: "Soumission : %{user_name}, %{assignment_title}"
   submissions: 
     assignment_submit_success: "La tâche a été envoyée."
@@ -26519,7 +26530,7 @@ fr:
   submit_ticket_5515ffd: "Soumettre le ticket"
   submitted_318fad53: Soumis
   submitted_at_4d5ea3aa: "Envoyé à"
-  submitted_by_name_dab6d5e1: "Soumis par : %{name}"
+  submitted_by_name_dab6d5e1: "Soumis par : %{name}"
   submitted_by_submitter_1dcd07a1: "Soumis par %{submitter}"
   submitted_d5ba370a: "Soumis :"
   submitted_date_ba55b0ae: "Soumis %{date}"
@@ -27426,6 +27437,7 @@ fr:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Ce critère est lié à un résultat d’apprentissage"
   this_due_date_is_managed_by_cfbb698c: "Cette date d'échéance est gérée par"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Cette date d'échéance est gérée par une Allure de cours"
+  this_duration_does_not_take_into_account_weekends__19209a71: "Cette durée ne tient pas compte des semaines et jours de fermeture"
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Cet élément est une alternative plus accessible qu'une réorganisation par glisser-déposer. Presser la touche Entrée ou Espace pour déplacer cette question."
   this_email_address_is_unconfirmed_f0fc8c6e: "Cette adresse courriel n'est pas confirmée."
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Cela active un paramètre de cours permettant aux élèves d'exporter le cours sous forme d'archive web hors-ligne au format zip"
@@ -27780,6 +27792,7 @@ fr:
   time_left_in_your_instant_trial_5dd0392b: "%{time} restant pour votre Essai immédiat"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} restant pour votre Essai immédiat *(étendre maintenant)*"
   time_limit_a6f1a51e: "Limite de temps"
+  time_to_complete_9d264097: "Délai pour terminer"
   time_zone_f56f5183: "Fuseau horaire"
   time_zones: 
     abu_dhabi: "Abou Dhabi"
@@ -28578,6 +28591,7 @@ fr:
   toggle_alignment_details_for_title_944f605: "Basculer les détails de l'alignement pour %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Activer/Désactiver la couleur de surimpression pour la carte du cours"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Basculer sur la vue du tableau de bord ou sur le flux d'activité récente"
+  toggle_due_date_compression_tooltip_f2edda2e: "Basculer l'infobulle de compression de la date d'échéance"
   toggle_editing_answer_text_as_html_9a93fe6: "Passer l'édition du texte de réponse en mode HTML"
   toggle_filterpresetname_f8ae0191: "Basculer %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "rendre le module visible/invisible"
@@ -29046,6 +29060,7 @@ fr:
   update_important_info_bcc01d6a: "Mettre à jour les informations importantes"
   update_inbox_page_to_use_react_instui_4d343fd: "Mettre à jour la page de la boîte de réception pour utiliser react/instui"
   update_link_b7cab181: "Mettre le lien à jour"
+  update_lti_region_912491e4: "Mettre à jour la région LTI"
   update_name_6581781d: "Mettre à jour %{name}"
   update_pages_c91d7ba: "Mettre à jour des pages"
   update_rating_6d29c2ef: "Mettre à jour la note"
@@ -30351,6 +30366,7 @@ fr:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Vous pouvez découvrir plus d'informations sur ce groupe en cliquant ce lien : %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Vous pouvez vérifier les détails du groupe en cliquant ce lien : %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Vous pouvez fermer cette boîte de dialogue pour continuer votre travail si vous ne souhaitez pas attendre ; l'affectation se poursuivra en arrière-plan."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Vous pouvez créer des ensembles de groupes dans lesquels les élèves peuvent s'inscrire par eux-même. Les élèves sont toujours limité à un seul groupe par ensemble, mais de cette manière, ils peuvent s'organiser en groupes au lieu de devoir attendre que l’enseignant le fasse pour eux."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Vous pouvez créer des ensembles de groupes dans lesquels les élèves peuvent s’inscrire par eux-mêmes. Les élèves restent limités\
                     à un seul groupe de l’ensemble à la fois, mais les élèves peuvent ainsi s’organiser en groupes\
