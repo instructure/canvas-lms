@@ -12325,6 +12325,7 @@ ru:
   failed_to_delete_role_label_27959de3: "Не удалось удалить роль %{label}"
   failed_to_delete_selected_pages_26fa87db: "Не удалось удалить выбранные страницы"
   failed_to_export_blueprint_course_settings_1ced8c6: "Не удалось экспортировать настройки курса Blueprint"
+  failed_to_export_context_info_acb07497: "Не удалось экспортировать информацию о содержимом"
   failed_to_export_course_paces_e17583ba: "Не удалось экспортировать планы прохождения курсов"
   failed_to_export_pace_plans_9832daac: "Не удалось экспортировать планы темпов"
   failed_to_export_some_tool_settings_c992fc56: "Не удалось экспортировать некоторые настройки инструментов"
@@ -12824,6 +12825,7 @@ ru:
   from_from_to_to_e31f6422: "С %{from} по %{to}"
   from_gravatar_58372d5a: "Из Gravatar"
   from_grouptitle_860dff95: "От %{groupTitle}"
+  front_page_50cae87e: "Первая страница"
   front_page_must_be_set_first_4dbbfdbe: "Вначале должна быть установлена титульная страница"
   front_page_must_be_set_first_c5246f7d: "Сначала следует задать первую страницу"
   full_article_9296bb6f: "Статья целиком"
@@ -19318,7 +19320,7 @@ ru:
   name_badfe525: имя
   name_conference_8e042dd2: "Конференция %{name}"
   name_count_students_d004ba32: "%{name} (%{count} студентов)"
-  name_count_users_ccc93c3d: "%{name} (%{count} пользователей/пользователя)"
+  name_count_users_ccc93c3d: "%{name} (%{count} пользователя(-ей))"
   name_current_grade_d8da149f: "%{name} текущая оценка"
   name_current_score_b3198dfa: "%{name} текущая оценка"
   name_e790ff1f: Имя...
@@ -20263,6 +20265,7 @@ ru:
   online_url_37830a72: "Онлайн URL-адрес"
   only_a_maximum_of_100_events_can_be_created_ad703982: "могут быть созданы только максимум 100 событий"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "возможно создание только не более %{limit} событий"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Можно назначить максимум %{max} оценщиков"
   only_account_administrators_can_change_this_settin_149f8fe3: "Только администраторы учетных записей	 могут изменять этот параметр."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Добавлять только записи с определенной фразой в заголовке"
   only_after_their_last_attempt_3593d101: "Только после последней попытки"
@@ -20631,6 +20634,7 @@ ru:
   own_copyright_cc59db55: "Собственное авторское право"
   owner_email_236d1b2: "Адрес электронной почты владельца"
   owner_email_4d02f795: "Владелец электронной почты:"
+  pace_duration_cb8f5de7: "Продолжительность прохождения"
   pace_is_new_and_unpublished_9aa68306: "План новый и не опубликован"
   pace_plan_56e8fb1d: "План темпов"
   pace_plans_4bb9c5ff: "Планы темпов"
@@ -21617,6 +21621,7 @@ ru:
   pro_tip_30e41fa3: "ПРОФЕССИОНАЛЬНЫЙ СОВЕТ!"
   proceed_f3d33864: Продолжить
   proceed_with_caution_aa9b3285: "Соблюдайте осторожность"
+  proceed_with_extreme_caution_f5716a27: "Соблюдайте максимальную осторожность"
   process_multiple_content_items_from_course_modules_6de90fd8: "Обрабатывает несколько элементов контента со страницы модулей курса"
   processed_4725b02: Обработано
   processing_2fcc9739: "Идет обработка"
@@ -26257,6 +26262,10 @@ ru:
     many: "Отображение %{count} результатов для %{groupTitle}."
     one: "Отображение %{count} результата для %{groupTitle}."
     other: "Отображение %{count} результатов для %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Показан 1 результат ниже"
+    other: "Показано %{count} результата(-ов)"
+    zero: "Результаты не найдены"
   showing_search_results_below_4c9a63d9: "Результаты поиска показаны ниже"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Отображает примечания к выпуску, предоставленные в инструкции, в меню справки для всех пользователей (отфильтрованные по роли пользователя)"
   shrink_permission_74b01aed: "Свернуть %{permission}"
@@ -26942,6 +26951,7 @@ ru:
   subject_114b2e98: Тема
   subject_1bc03dea: "Тема:"
   subject_details_12405b1: "Детали темы"
+  subject_home_8e593f72: "Предметная область"
   subject_home_page_41226803: "Начальная страница темы"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Название темы должно содержать менее 255 символов."
   subject_name_a1ac4da4: "Наименование темы"
@@ -27015,6 +27025,7 @@ ru:
   submission_score_b7a291e8: "оценка отправки"
   submission_sent_3f0d2ee1: "Отправка выполнена"
   submission_status_3079e730: "Статус отправки"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Отправка - Отправить от имени учащегося"
   submission_tray_429ac3df: "Лоток отправки"
   submission_type_a925fc5f: "Тип сдаваемой работы"
   submission_type_displayname_currently_selected_3f8aa9f8: "Тип сдаваемой работы %{displayName}, выбран в настоящее время"
@@ -28101,6 +28112,7 @@ ru:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Этот критерий связан с результатом обучения"
   this_due_date_is_managed_by_cfbb698c: "Эта дата выполнения контролируется"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Эта даты выполнения контролируется Планом прохождения курса."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Эта продолжительность не учитывает выходные дни и дни отключения."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Этот элемент является более общедоступной альтернативой повторному заказу «перетащить и установить». Нажмите клавишу Enter или пробел, чтобы переместить этот вопрос."
   this_email_address_is_unconfirmed_f0fc8c6e: "Этот адрес электронной почты не подтвержден"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Активирует настройку курса, позволяющую учащимся экспортировать курс в виде архивной папки с веб-страницами для просмотра без выхода в Интернет"
@@ -28461,6 +28473,7 @@ ru:
   time_left_in_your_instant_trial_5dd0392b: "%{time} осталось в вашем Instant Trial"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} осталось в вашем Instant Trial *(развернуть)*"
   time_limit_a6f1a51e: "Ограничение времени"
+  time_to_complete_9d264097: "Время выполнения"
   time_zone_f56f5183: "Часовой пояс"
   time_zones: 
     abu_dhabi: Абу-Даби
@@ -29259,6 +29272,7 @@ ru:
   toggle_alignment_details_for_title_944f605: "Переключить параметры согласования для %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Включение/выключение наложения цветов карточки курса"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Переключить панель просмотра на недавний поток активности"
+  toggle_due_date_compression_tooltip_f2edda2e: "Переключить всплывающую подсказку даты исполнения"
   toggle_editing_answer_text_as_html_9a93fe6: "Показать редактируемый текст ответа в HTML"
   toggle_filterpresetname_f8ae0191: "Переключить %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "переключение видимости модуля"
@@ -29732,6 +29746,7 @@ ru:
   update_important_info_bcc01d6a: "Обновить важную информацию"
   update_inbox_page_to_use_react_instui_4d343fd: "Обновить страницу Inbox для использования react/instui"
   update_link_b7cab181: "Обновить ссылку"
+  update_lti_region_912491e4: "Обновить регион LTI"
   update_name_6581781d: "Обновить %{name}"
   update_pages_c91d7ba: "Обновление страниц"
   update_rating_6d29c2ef: "Обновить оценку"
@@ -31089,6 +31104,7 @@ ru:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Можно проверить группу, щелкнув по ссылке: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Можно проверить группу, пройдя по ссылке: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Вы можете закрыть это диалоговое окно для продолжения работы, если вы не хотите ждать; назначение продолжится в фоновом режиме."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Вы можете создавать наборы групп, в которых студенты смогут регистрироваться самостоятельно. Студенты все еще ограничены возможностью нахождения только в одной группе в наборе, но таким образом студенты могут организоваться в группы вместо того, чтобы привлекать преподавателя к выполнению этой работы."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Вы можете создавать наборы групп, в которых студенты смогут регистрироваться самостоятельно. Студенты все еще ограничены\
                     возможностью нахождения только в одной группе в наборе, но таким образом студенты могут организоваться в группы\
