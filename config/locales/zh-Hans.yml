@@ -11961,6 +11961,7 @@ zh-Hans:
   failed_to_delete_role_label_27959de3: "删除角色出错%{label}"
   failed_to_delete_selected_pages_26fa87db: 无法删除所选页面
   failed_to_export_blueprint_course_settings_1ced8c6: 无法导出模板课程设置
+  failed_to_export_context_info_acb07497: 无法导出上下文信息
   failed_to_export_course_paces_e17583ba: 导出课程进度失败
   failed_to_export_pace_plans_9832daac: 导出进度计划失败
   failed_to_export_some_tool_settings_c992fc56: 导出一些工具设置失败
@@ -12450,6 +12451,7 @@ zh-Hans:
   from_from_to_to_e31f6422: "从 %{from} 到 %{to}"
   from_gravatar_58372d5a: "来自 Gravatar"
   from_grouptitle_860dff95: "从 %{groupTitle}"
+  front_page_50cae87e: 首页
   front_page_must_be_set_first_4dbbfdbe: 必须先设置主页
   front_page_must_be_set_first_c5246f7d: 必须先设置主页
   full_article_9296bb6f: 全文
@@ -19764,6 +19766,7 @@ zh-Hans:
   online_url_37830a72: 在线网址
   only_a_maximum_of_100_events_can_be_created_ad703982: 仅可创建最多100个事件
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "最多可创建%{limit}个事件"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "最多只能分配 %{max} 个评分器"
   only_account_administrators_can_change_this_settin_149f8fe3: 仅帐户管理员可以更改此设置。
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: 只添加标题中具有特定短语的发布内容
   only_after_their_last_attempt_3593d101: 只有在他们的最后一次尝试之后
@@ -20123,6 +20126,7 @@ zh-Hans:
   own_copyright_cc59db55: 拥有版权
   owner_email_236d1b2: 所有者电子邮件
   owner_email_4d02f795: "所有者电子邮件:"
+  pace_duration_cb8f5de7: 进度时长
   pace_is_new_and_unpublished_9aa68306: 进度为新建且未发布
   pace_plan_56e8fb1d: 进度计划
   pace_plans_4bb9c5ff: 进度计划
@@ -21108,6 +21112,7 @@ zh-Hans:
   pro_tip_30e41fa3: 专业意见！
   proceed_f3d33864: 继续
   proceed_with_caution_aa9b3285: 谨慎考虑后再继续
+  proceed_with_extreme_caution_f5716a27: 请谨慎操作
   process_multiple_content_items_from_course_modules_6de90fd8: 从课程模块页面处理多个内容项
   processed_4725b02: 已处理
   processing_2fcc9739: 正在处理
@@ -25589,6 +25594,10 @@ zh-Hans:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "显示 %{groupTitle} 的 %{count} 个结果。"
     other: "显示 %{groupTitle} 的 %{count} 个结果。"
+  showing_count_results_below_61ddca33: 
+    one: "下方显示 1 个结果"
+    other: "下方显示 %{count} 个结果"
+    zero: 未发现结果
   showing_search_results_below_4c9a63d9: 下方显示搜索结果
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: 在帮助菜单中对所有用户（按用户角色筛选）显示Instructure提供的发行说明
   shrink_permission_74b01aed: "缩小 %{permission}"
@@ -26256,6 +26265,7 @@ zh-Hans:
   subject_114b2e98: 主题
   subject_1bc03dea: 主题：
   subject_details_12405b1: 主题详情
+  subject_home_8e593f72: 使用者主页
   subject_home_page_41226803: 主题首页
   subject_must_contain_fewer_than_255_characters_2e72cd02: "科目必须包含少于 255 个字符。"
   subject_name_a1ac4da4: 主题名称
@@ -26329,6 +26339,7 @@ zh-Hans:
   submission_score_b7a291e8: 提交项分数
   submission_sent_3f0d2ee1: 已发送提交项
   submission_status_3079e730: 提交状态
+  submission_submit_on_behalf_of_student_f0ed14e4: "提交 - 代表学生提交"
   submission_tray_429ac3df: 提交托盘
   submission_type_a925fc5f: 提交类型
   submission_type_displayname_currently_selected_3f8aa9f8: "当前选择了提交类型 %{displayName}"
@@ -27390,6 +27401,7 @@ zh-Hans:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: 此标准已链接至学习结果
   this_due_date_is_managed_by_cfbb698c: 此截止日期通过...管理
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: 此截止日期通过课程进度管理。
+  this_duration_does_not_take_into_account_weekends__19209a71: 该时长不考虑周末和中断日。
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: 此元素是一个拖放和重新排序的更方便的替代。按输入键或空格键来移动这个问题。
   this_email_address_is_unconfirmed_f0fc8c6e: 此电子邮件地址是未经证实
   this_enables_a_course_setting_to_allow_students_to_fc47219: 此操作启用课程设置，让学生能够把课程导出为离线网页压缩文件夹
@@ -27744,6 +27756,7 @@ zh-Hans:
   time_left_in_your_instant_trial_5dd0392b: "%{time} 留在您的即时测试中"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} 留在您的即时测试中*(立即展开)*"
   time_limit_a6f1a51e: 时限
+  time_to_complete_9d264097: 完成时间
   time_zone_f56f5183: 时区
   time_zones: 
     abu_dhabi: 阿布扎比
@@ -28541,6 +28554,7 @@ zh-Hans:
   toggle_alignment_details_for_title_944f605: "切换调整详情%{title}"
   toggle_course_card_color_overlays_b5b8137a: 切换课程卡颜色覆盖
   toggle_dashcard_view_or_recent_activity_stream_1de257: 切换断面视图或最近活动流
+  toggle_due_date_compression_tooltip_f2edda2e: 切换截止日期压缩工具提示
   toggle_editing_answer_text_as_html_9a93fe6: "切换编辑的文本答案为 HTML"
   toggle_filterpresetname_f8ae0191: "切换 %{filterPresetName}"
   toggle_module_visibility_781a2f6c: 切换模块可见性
@@ -29007,6 +29021,7 @@ zh-Hans:
   update_important_info_bcc01d6a: 更新重要信息
   update_inbox_page_to_use_react_instui_4d343fd: 更新收件箱页面以使用反应/instui
   update_link_b7cab181: 更新链接
+  update_lti_region_912491e4: "更新 LTI 地区"
   update_name_6581781d: "更新 %{name}"
   update_pages_c91d7ba: 更新页面
   update_rating_6d29c2ef: 更新评分
@@ -30307,6 +30322,7 @@ zh-Hans:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "通过点击此链接，您可以检查小组：%{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "您可以点击此链接查看群组：%{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: 如果您不想等待，可以关闭此对话框以继续工作。分配将在后台继续进行。
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: 您可以创建一些组让学生自行注册。学生仍然只能加入设置中的其中一组，但这样学生可以自行成组，不需要老师进行分组。
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       您可以创建小组集，让学生可以自行注册。学生将仍然被限制为
                     只能加入该集合中的一个小组，但通过这种方式，学生可以自行分组，
