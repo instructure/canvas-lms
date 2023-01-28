@@ -11056,6 +11056,7 @@ cy:
   failed_to_delete_role_label_27959de3: "Wedi methu dileu rôl %{label}"
   failed_to_delete_selected_pages_26fa87db: "Wedi methu dileu’r tudalennau sydd wedi’u dewis"
   failed_to_export_blueprint_course_settings_1ced8c6: "Wedi methu allgludo gosodiadau cwrs glasbrint"
+  failed_to_export_context_info_acb07497: "Wedi methu allgludo gwyboaeth cyd-destun"
   failed_to_export_course_paces_e17583ba: "Wedi methu allgludo cyflymderau'r cwrs"
   failed_to_export_pace_plans_9832daac: "Wedi methu allgludo cynlluniau cyflymder"
   failed_to_ignore_assignment_46565fa3: "Wedi methu anwybyddu aseiniad"
@@ -11472,6 +11473,7 @@ cy:
   from_from_to_to_e31f6422: "O %{from} i %{to}"
   from_gravatar_58372d5a: "O Gravatar"
   from_grouptitle_860dff95: "Gan %{groupTitle}"
+  front_page_50cae87e: "Tudalen Flaen"
   front_page_must_be_set_first_4dbbfdbe: "Rhaid gosod y dudalen flaen yn gyntaf"
   front_page_must_be_set_first_c5246f7d: "Rhaid gosod y Dudalen Flaen yn gyntaf"
   full_article_9296bb6f: "Erthygl lawn"
@@ -16943,7 +16945,7 @@ cy:
   name_badfe525: enw
   name_conference_8e042dd2: "%{name} Cynhadledd"
   name_count_students_d004ba32: "%{name} (%{count} Myfyriwr)"
-  name_count_users_ccc93c3d: "%{name} (%{count} Defnyddiwr)"
+  name_count_users_ccc93c3d: "%{name} (%{count} Defnyddwyr)"
   name_current_grade_d8da149f: "%{name} gradd bresennol"
   name_current_score_b3198dfa: "%{name} sgôr bresennol"
   name_e790ff1f: Enw...
@@ -17827,6 +17829,7 @@ cy:
   online_upload_59969592: "Llwytho i Fyny Ar-lein"
   online_url_37830a72: "URL Ar-lein"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "dim ond uchafswm o %{limit} digwyddiad mae modd eu creu"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "dim ond uchafswm o %{max} graddiwr mae modd eu neilltuo"
   only_account_administrators_can_change_this_settin_149f8fe3: "Dim ond gweinyddwyr cyfrif all newid y gosodiad hwn."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Ychwanegu dim ond postiadau sy’n cynnwys geiriau penodol yn y teitl"
   only_after_their_last_attempt_3593d101: "Dim ond Ar ôl eu Hymgais Ddiwethaf"
@@ -18164,6 +18167,7 @@ cy:
   own_copyright_cc59db55: "Eich Hawlfraint eich hun"
   owner_email_236d1b2: "E-bost Perchennog"
   owner_email_4d02f795: "E-bost Perchennog:"
+  pace_duration_cb8f5de7: "Hyd Cyflymder"
   pace_is_new_and_unpublished_9aa68306: "Mae’r cyflymder yn newydd a heb ei gyhoeddi"
   pace_plan_56e8fb1d: "Cynllun Cyflymder"
   pace_plans_4bb9c5ff: "Cynlluniau Cyflymder"
@@ -19081,6 +19085,7 @@ cy:
   pro_tip_30e41fa3: AWGRYM!
   proceed_f3d33864: "Bwrw ymlaen"
   proceed_with_caution_aa9b3285: "Dylech fwrw ymlaen yn ofalus"
+  proceed_with_extreme_caution_f5716a27: "Dylech fwrw ymlaen yn ofalus iawn"
   process_multiple_content_items_from_course_modules_6de90fd8: "Prosesu mwy nag un eitem cynnwys o dudalen fodiwlau’r cwrs"
   processed_4725b02: "Wedi’i brosesu"
   processing_2fcc9739: "Wrthi’n prosesu"
@@ -23103,6 +23108,10 @@ cy:
     one: "Dangos %{count} deilliant ar gyfer %{groupTitle}."
     other: "Dangos %{count} deilliant ar gyfer %{groupTitle}."
     two: "Dangos %{count} deilliant ar gyfer %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Dangos 1 canlyniad isod"
+    other: "Dangos %{count} canlyniad isod"
+    zero: "Heb ddod o hyd i ganlyniadau"
   showing_search_results_below_4c9a63d9: "Dangos Canlyniadau Chwilio Isod"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Yn dangos nodiadau rhyddhau a ddarperir gan Instructure yn y ddewislen help i bob defnyddiwr (wedi’u hidlo yn ôl rôl defnyddiwr)"
   shrink_permission_74b01aed: "Crebachu %{permission}"
@@ -23728,6 +23737,7 @@ cy:
   subject_114b2e98: Pwnc
   subject_1bc03dea: "Pwnc:"
   subject_details_12405b1: "Manylion y Pwnc"
+  subject_home_8e593f72: "Hafan Pwnc"
   subject_home_page_41226803: "Tudalen Hafan Pwnc"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Rhaid i bwnc gynnwys llai na 255 nod."
   subject_name_a1ac4da4: "Enw’r Pwnc"
@@ -23797,6 +23807,7 @@ cy:
   submission_requirement_8ba1ee08: "Gofyniad Aseiniad"
   submission_score_b7a291e8: "sgôr cyflwyniad"
   submission_sent_3f0d2ee1: "Cyflwyniad wedi’i anfon"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Cyflwyniad - Cyflwyno ar ran myfyriwr"
   submission_tray_429ac3df: "Ardal cyflwyniad"
   submission_type_a925fc5f: "Math o gyflwyniad"
   submission_type_displayname_currently_selected_3f8aa9f8: "Math o gyflwyniad %{displayName}, wedi’i ddewis ar hyn o bryd"
@@ -24822,6 +24833,7 @@ cy:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Mae’r maen prawf hwn yn gysylltiedig â Deilliant Dysgu"
   this_due_date_is_managed_by_cfbb698c: "Mae’r dyddiad erbyn hwn yn cael ei roi gan"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Mae’r dyddiad erbyn hwn yn cael ei reoli gan Gyflymder y Cwrs."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Nid yw’r cyfnod hwn yn cymryd penwythnosau a diwrnodau duwch i ystyriaeth."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Mae’r elfen hon yn fwy hwylus na newid y drefn drwy lusgo a gollwng. Pwyswch Enter neu’r Bylchwr i symud i’r cwestiwn hwn."
   this_email_address_is_unconfirmed_f0fc8c6e: "Dydy’r cyfeiriad e-bost hwn ddim wedi’i gadarnhau"
   this_enables_users_to_generate_and_download_course_4c69c531: "Mae hyn yn galluogi defnyddwyr i greu ePub ar gyfer y cwrs a’i lwytho i lawr."
@@ -25165,6 +25177,7 @@ cy:
   time_left_in_your_instant_trial_5dd0392b: "%{time} ar ôl yn eich treial"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} ar ôl yn eich treial *(ymestyn nawr)*"
   time_limit_a6f1a51e: "Terfyn Amser"
+  time_to_complete_9d264097: "Amser i gwblhau"
   time_zone_f56f5183: "Cylchfa Amser"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -25959,6 +25972,7 @@ cy:
   today_76e10f9c: Heddiw
   toggle_alignment_details_for_title_944f605: "Toglo manylion cysoni ar gyfer %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Toglo gorchuddion lliw ar gyfer cerdyn cwrs"
+  toggle_due_date_compression_tooltip_f2edda2e: "Toglo tooltip cywasgu dyddiad erbyn"
   toggle_editing_answer_text_as_html_9a93fe6: "Toglo’r nodwedd golygu testun ateb fel HTML"
   toggle_filterpresetname_f8ae0191: "Toglo %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "toglo opsiynau gweld modiwl"
@@ -26407,6 +26421,7 @@ cy:
   update_important_info_bcc01d6a: "Diweddaru Gwybodaeth Bwysig"
   update_inbox_page_to_use_react_instui_4d343fd: "Diweddaru’r dudalen Blwch Derbyn i ddefnyddio react/instui"
   update_link_b7cab181: "Diweddaru dolen"
+  update_lti_region_912491e4: "Diweddaru Rhanbarth LTI"
   update_name_6581781d: "Diweddaru %{name}"
   update_pages_c91d7ba: "Diweddaru tudalennau"
   update_rating_6d29c2ef: "Diweddaru Sgôr"
@@ -27646,6 +27661,7 @@ cy:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Fe allwch chi gael cip ar y grŵp drwy glicio’r ddolen hon: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Fe allwch chi gael cip ar y grŵp drwy glicio’r ddolen hon: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Gallwch chi gau’r blwch deialog hwn i barhau i weithio os nad ydych chi eisiau aros; bydd neilltuo yn parhau yn y cefndir."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Gallwch greu setiau o grwpiau y bydd myfyrwyr yn gallu cofrestru ar eu cyfer ar eu pen eu hunain. Bydd myfyrwyr yn dal i gael eu cyfyngu i fod mewn un grŵp yn unig yn y set, ond mae hyn yn golygu bod myfyrwyr yn gallu rhoi eu hunain mewn grwpiau yn hytrach na bod angen i’r athro wneud hynny."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Gallwch greu setiau o grwpiau y bydd myfyrwyr yn gallu cofrestru ar eu cyfer ar eu pen eu hunain. Bydd myfyrwyr yn dal i gael eu cyfyngu\
                     i fod mewn un grŵp yn unig yn y set, ond mae hyn yn golygu bod myfyrwyr yn gallu rhoi eu hunain mewn grwpiau\
