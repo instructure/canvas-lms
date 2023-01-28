@@ -1185,7 +1185,7 @@ es:
           account_reports: 
             default: 
               parameters: 
-                header: "Períodos (Límite 5)"
+                header: "Períodos (Límite 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -8058,7 +8058,7 @@ es:
     other: "%{count} archivos compartidos sin leer."
   count_unsynced_changes_1fc147e5: "%{count} Cambios no sincronizados"
   count_unsynched_changes_3a1249ba: "%{count} Cambios no sincronizados"
-  count_users_374d6e47: "(%{count} Usuarios)"
+  count_users_374d6e47: "(%{count} usuarios)"
   count_weeks_11fbd2dc: 
     one: "1 semana"
     other: "%{count} semanas"
@@ -11976,6 +11976,7 @@ es:
   failed_to_delete_role_label_27959de3: "No se pudo eliminar el rol %{label}"
   failed_to_delete_selected_pages_26fa87db: "No se pudieron eliminar las páginas seleccionadas"
   failed_to_export_blueprint_course_settings_1ced8c6: "No se pudo exportar la configuración del curso de proyecto"
+  failed_to_export_context_info_acb07497: "Error al exportar la información del contexto"
   failed_to_export_course_paces_e17583ba: "Falló al exportar los ritmos del curso"
   failed_to_export_pace_plans_9832daac: "No se pudieron exportar Pace Plans"
   failed_to_export_some_tool_settings_c992fc56: "Falló la exportación de la configuración de algunas herramientas"
@@ -12463,6 +12464,7 @@ es:
   from_from_to_to_e31f6422: "De %{from} a %{to}"
   from_gravatar_58372d5a: "Desde Gravatar"
   from_grouptitle_860dff95: "De %{groupTitle}"
+  front_page_50cae87e: "Página de inicio"
   front_page_must_be_set_first_4dbbfdbe: "La página de información se debe colocar en primer lugar"
   front_page_must_be_set_first_c5246f7d: "La página de información debe establecerse en primer lugar"
   full_article_9296bb6f: "Artículo completo"
@@ -19784,6 +19786,7 @@ es:
   online_url_37830a72: "URL en línea"
   only_a_maximum_of_100_events_can_be_created_ad703982: "solo se pueden crear un máximo de 100 eventos"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "solo se puede crear un máximo de %{limit} eventos"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Solo se puede asignar un máximo de %{max} estudiantes"
   only_account_administrators_can_change_this_settin_149f8fe3: "Solo los administradores de la cuenta pueden modificar esta configuración."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Solo agregue temas con una frase específica en el título"
   only_after_their_last_attempt_3593d101: "Solo después de su último intento"
@@ -20146,6 +20149,7 @@ es:
   own_copyright_cc59db55: "Derechos de autor propios"
   owner_email_236d1b2: "Correo electrónico del dueño"
   owner_email_4d02f795: "Correo electrónico del dueño:"
+  pace_duration_cb8f5de7: "Duración del ritmo"
   pace_is_new_and_unpublished_9aa68306: "El ritmo es nuevo y no publicado"
   pace_plan_56e8fb1d: "Pace Plan"
   pace_plans_4bb9c5ff: "Pace Plans"
@@ -21131,6 +21135,7 @@ es:
   pro_tip_30e41fa3: "¡CONSEJO PROFESIONAL!"
   proceed_f3d33864: Proceder
   proceed_with_caution_aa9b3285: "Proceda con cuidado"
+  proceed_with_extreme_caution_f5716a27: "Avanzar con precaución extrema"
   process_multiple_content_items_from_course_modules_6de90fd8: "Procesar múltiples ítems de contenido de la página de módulos del curso"
   processed_4725b02: Procesado
   processing_2fcc9739: Procesando
@@ -25615,6 +25620,10 @@ es:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Mostrando %{count} competencia para %{groupTitle}."
     other: "Mostrando %{count} competencias para %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Mostrando 1 resultado a continuación"
+    other: "Mostrando %{count} resultados a continuación"
+    zero: "No se encontraron resultados"
   showing_search_results_below_4c9a63d9: "Mostrando resultados de búsqueda a continuación"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Muestra notas de versión provistas por Instructure en el menú de ayuda para todos los usuarios (filtrados por rol del usuario)"
   shrink_permission_74b01aed: "Contraer %{permission}"
@@ -26280,6 +26289,7 @@ es:
   subject_114b2e98: Asunto
   subject_1bc03dea: "Tema:"
   subject_details_12405b1: "Información de la materia"
+  subject_home_8e593f72: "Página de inicio del tema"
   subject_home_page_41226803: "Página de inicio del curso"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "El tema debe contener menos de 255 caracteres."
   subject_name_a1ac4da4: "Nombre de la materia"
@@ -26353,6 +26363,7 @@ es:
   submission_score_b7a291e8: "Puntaje de la entrega"
   submission_sent_3f0d2ee1: "Entrega enviada"
   submission_status_3079e730: "Estado de presentación"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Presentación: Presentar en nombre del estudiante"
   submission_tray_429ac3df: "Bandeja de entregas"
   submission_type_a925fc5f: "Tipo de entrega"
   submission_type_displayname_currently_selected_3f8aa9f8: "Tipo de presentación %{displayName}, seleccionado actualmente"
@@ -27414,6 +27425,7 @@ es:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este criterio depende de una competencia de aprendizaje"
   this_due_date_is_managed_by_cfbb698c: "Esta fecha de entrega es administrada por"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Esta fecha de entrega es administrada por el ritmo del curso."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Esta duración no considera los fines de semana ni los días restringidos."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Este elemento ofrece una alternativa más accesible a la reordenación mediante la función arrastrar y soltar. Presione Entrar o Espacio para mover esta pregunta."
   this_email_address_is_unconfirmed_f0fc8c6e: "Esta dirección de correo electrónico no está confirmada"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Esto habilita una configuración del curso que les permite a los estudiantes exportar el curso como una carpeta .zip web fuera de línea"
@@ -27766,6 +27778,7 @@ es:
   time_left_in_your_instant_trial_5dd0392b: "%{time} disponible en su prueba instantánea"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} disponible en su prueba instantánea *(extender ahora)*"
   time_limit_a6f1a51e: "Límite de tiempo"
+  time_to_complete_9d264097: "Tiempo necesario para completar la actividad"
   time_zone_f56f5183: "Zona horaria"
   time_zones: 
     abu_dhabi: "Abu Dabi"
@@ -28565,6 +28578,7 @@ es:
   toggle_alignment_details_for_title_944f605: "Cambiar detalles de alineación para %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Cambiar las superposiciones de colores de la ficha del curso"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Intercambie la vista de las cartas en el panel de control o el flujo de actividad reciente"
+  toggle_due_date_compression_tooltip_f2edda2e: "Alternar herramienta de compresión de la fecha de entrega"
   toggle_editing_answer_text_as_html_9a93fe6: "Cambiar a editar el texto de respuesta como HTML"
   toggle_filterpresetname_f8ae0191: "Activar/desactivar %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "activar o desactivar visibilidad del módulo"
@@ -29032,6 +29046,7 @@ es:
   update_important_info_bcc01d6a: "Actualizar información importante"
   update_inbox_page_to_use_react_instui_4d343fd: "Actualizar página de la Bandeja de entrada para usar react/instui"
   update_link_b7cab181: "Actualizar el vínculo"
+  update_lti_region_912491e4: "Actualizar región de LTI"
   update_name_6581781d: "Actualizar %{name}"
   update_pages_c91d7ba: "Actualizar páginas"
   update_rating_6d29c2ef: "Actualizar calificación"
@@ -30338,6 +30353,7 @@ es:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Puede revisar el grupo haciendo clic en este vínculo: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Puede revisar el grupo haciendo clic en este vínculo: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Puede cerrar este cuadro de diálogo para seguir trabajando si no quiere esperar; la asignación continuará en segundo plano."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Puede crear conjuntos de grupos en los que los estudiantes se puedan registrar solos. Los estudiantes seguirán teniendo que pertenecer a un solo grupo del conjunto, pero de esta forma se podrán organizar en grupos ellos mismos en vez de tener que hacerlo el profesor."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Puede crear conjuntos de grupos en los que los estudiantes pueden inscribirse por su cuenta. Los estudiantes siguen\
                     estando limitados a estar en un solo grupo del conjunto, pero, de esta manera, pueden organizarse en grupos\
