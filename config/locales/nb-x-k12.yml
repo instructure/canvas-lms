@@ -7399,7 +7399,7 @@ nb-x-k12:
     one: "En ulest deling."
     other: "%{count} ulest deling."
   count_unsynced_changes_1fc147e5: "%{count} Usynkroniserte endringer"
-  count_users_374d6e47: "(%{count} Brukere)"
+  count_users_374d6e47: "(%{count} brukere)"
   count_weeks_11fbd2dc: 
     one: "1 uke"
     other: "%{count} uker"
@@ -10851,6 +10851,7 @@ nb-x-k12:
   failed_to_delete_role_label_27959de3: "Mislyktes i å slette rolle %{label}"
   failed_to_delete_selected_pages_26fa87db: "Sletting av valgte sider mislyktes"
   failed_to_export_blueprint_course_settings_1ced8c6: "Kunne ikke importere blueprint-faginnstillinger"
+  failed_to_export_context_info_acb07497: "Kunne ikke eksportere kontekstinformasjon"
   failed_to_export_course_paces_e17583ba: "Eksport av tempoer for fag mislyktes"
   failed_to_export_pace_plans_9832daac: "Kunne ikke eksportere tempoplaner"
   failed_to_ignore_assignment_46565fa3: "Kunne ikke ignorere oppgave"
@@ -11261,6 +11262,7 @@ nb-x-k12:
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
   from_gravatar_58372d5a: "Fra Gravatar"
   from_grouptitle_860dff95: "Fra %{groupTitle}"
+  front_page_50cae87e: Forside
   front_page_must_be_set_first_4dbbfdbe: "Forsiden må etableres først"
   front_page_must_be_set_first_c5246f7d: "Fremside må settes opp først"
   full_article_9296bb6f: "Hele artikkelen"
@@ -16653,7 +16655,7 @@ nb-x-k12:
   name_badfe525: navn
   name_conference_8e042dd2: "%{name}-videomøte"
   name_count_students_d004ba32: "%{name} (%{count} Elever)"
-  name_count_users_ccc93c3d: "%{name} (%{count} Brukere)"
+  name_count_users_ccc93c3d: "%{name} (%{count} brukere)"
   name_current_grade_d8da149f: "%{name} gjeldende vurdering"
   name_current_score_b3198dfa: "%{name} gjeldende resultat"
   name_e790ff1f: Navn…
@@ -17531,6 +17533,7 @@ nb-x-k12:
   online_upload_59969592: "Opplasting på nett"
   online_url_37830a72: "URL på nett"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Bare maksimalt %{limit} hendelser kan opprettes"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Bare maksimalt %{max} karaktersettere kan tilordnes"
   only_account_administrators_can_change_this_settin_149f8fe3: "Kun kontoadministratorer kan endre denne innstillingen."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Legg kun til innlegg med en spesifikk frase i tittelen"
   only_after_their_last_attempt_3593d101: "Bare etter deres siste forsøk"
@@ -17872,6 +17875,7 @@ nb-x-k12:
   own_copyright_cc59db55: "Egen Opphavsrett"
   owner_email_236d1b2: "Epost eier"
   owner_email_4d02f795: "Eierens epost:"
+  pace_duration_cb8f5de7: Tempovarighet
   pace_is_new_and_unpublished_9aa68306: "Tempo er nytt og ikke publisert"
   pace_plan_56e8fb1d: Tempoplan
   pace_plans_4bb9c5ff: "Pace Plans"
@@ -18790,6 +18794,7 @@ nb-x-k12:
   pro_tip_30e41fa3: PROFFTIPS!
   proceed_f3d33864: Fortsett
   proceed_with_caution_aa9b3285: "Fortsett med forsiktighet."
+  proceed_with_extreme_caution_f5716a27: "Fortsett med ekstrem forsiktighet"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandle flere innholdselementer fra fagmodulsiden"
   processed_4725b02: Behandlet
   processing_2fcc9739: Behandler
@@ -22699,6 +22704,10 @@ nb-x-k12:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Viser %{count} mål for %{groupTitle}."
     other: "Viser %{count} mål for %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Viser 1 resultat nedenfor"
+    other: "Viser %{count} resultater nedenfor"
+    zero: "Ingen resultater ble funnet"
   showing_search_results_below_4c9a63d9: "Vis søkeresultater nedenfor"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Viser Instructure-leverte utgivelsesmerknader i hjelpemenyen for alle brukere (filtrert etter brukerrolle)"
   shrink_permission_74b01aed: "Mindre %{permission}"
@@ -23298,6 +23307,7 @@ nb-x-k12:
   subject_114b2e98: Tema
   subject_1bc03dea: "Tittel:"
   subject_details_12405b1: Titteldetaljer
+  subject_home_8e593f72: "Startside for tema"
   subject_home_page_41226803: "Startside for tema"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Tittel må inneholde maksimalt 255 tegn."
   subject_name_a1ac4da4: Tittelnavn
@@ -23366,6 +23376,7 @@ nb-x-k12:
   submission_records_will_be_filtered_by_date_using__b3990a1: "Innleveringsoppføringer vil bli filtrert etter dato ved bruk av «submitted_at»-tidsstempelet hvis det er tilgjengelig. Når «submitted_at» ikke er tilgjengelig, vil «graded_at»-feltet bli brukt. Hvis ingen av feltene er fylt ut, vil innleveringsoppføringen aldri bli inkludert i rapporten ved filtrering etter dato."
   submission_score_b7a291e8: innleveringsresultat
   submission_sent_3f0d2ee1: "Innlevering sendt"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Innlevering – Send inn på vegne av en elev"
   submission_tray_429ac3df: Innleveringsskuff
   submission_type_a925fc5f: Innleveringstype
   submission_type_displayname_currently_selected_3f8aa9f8: "Innleveringstype %{displayName}, valgt for øyeblikket"
@@ -24354,6 +24365,7 @@ nb-x-k12:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Dette kriteriet er koblet til et læringsutbytte"
   this_due_date_is_managed_by_cfbb698c: "Denne forfallsdatoen administreres av"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Denne forfallsdatoen administreres av Fagtempo."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheten tar ikke hensyn til helger og blackout-dager."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette elementet er et mer tilgjengelig alternativ til å dra og slippe innspilling. Trykk 'enter' eller mellomrom for å flytte dette spørmålet."
   this_email_address_is_unconfirmed_f0fc8c6e: "Denne e-postadressen er ubekreftet"
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette gjør det mulig å generere og laste ned fag ePub."
@@ -24694,6 +24706,7 @@ nb-x-k12:
   time_left_in_your_instant_trial_5dd0392b: "%{time} Gjenstående av prøveperioden"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} Gjenstående av prøveperioden *(forleng nå)*"
   time_limit_a6f1a51e: Tidsbegrensning
+  time_to_complete_9d264097: "Tid til å fullføre"
   time_zone_f56f5183: Tidssone
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -25480,6 +25493,7 @@ nb-x-k12:
   today_76e10f9c: "I dag"
   toggle_alignment_details_for_title_944f605: "Detaljer for justeringsbytte for %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Veksle fargen på fagkortene"
+  toggle_due_date_compression_tooltip_f2edda2e: "Aktiver verktøytips for komprimering av forfallsdato"
   toggle_editing_answer_text_as_html_9a93fe6: "Toggle redigering svar tekst som HTML"
   toggle_filterpresetname_f8ae0191: "Bytt %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "slå av/på modulsynlighet"
@@ -25918,6 +25932,7 @@ nb-x-k12:
   update_important_info_bcc01d6a: "Oppdater viktig info"
   update_inbox_page_to_use_react_instui_4d343fd: "Oppdater innbokssiden for å bruke react/instui"
   update_link_b7cab181: "Oppdater lenker"
+  update_lti_region_912491e4: "Oppdater LTI-område"
   update_name_6581781d: "Oppdater %{name}"
   update_pages_c91d7ba: "Oppdatere sider"
   update_rating_6d29c2ef: "Oppdatere Vurdering"
@@ -27116,6 +27131,7 @@ nb-x-k12:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Du kan se gruppen ved å klikke på denne lenken: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Du kan se gruppen ved å klikke på denne lenken: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Du kan lukke denne dialogen for å fortsette å jobbe hvis du ikke vil vente. Tilordningen fortsetter i bakgrunnen."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Du kan lage sett med grupper der elevene kan melde seg på egenhånd. Elevene er fortsatt begrenset til å være i bare én gruppe i settet, men på denne måten kan elevene organisere seg i grupper selv, i stedet for å ha faglæreren til å gjøre arbeidet."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Du kan lage sett med grupper der elevene kan melde seg på egenhånd. Elevene er fortsatt begrenset\
                     til å være i bare én gruppe i settet, men på denne måten kan elevene organisere seg i grupper selv\
