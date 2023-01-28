@@ -11986,6 +11986,7 @@ pt:
   failed_to_delete_role_label_27959de3: "Não foi possível eliminar o papel %{label}"
   failed_to_delete_selected_pages_26fa87db: "Falha ao eliminar páginas selecionadas"
   failed_to_export_blueprint_course_settings_1ced8c6: "Falha na exportação de planos de curso"
+  failed_to_export_context_info_acb07497: "Falha em exportar informação de contexto"
   failed_to_export_course_paces_e17583ba: "Falha ao exportar ritmos das disciplinas"
   failed_to_export_pace_plans_9832daac: "Falha nos planos de pausa de exportação"
   failed_to_export_some_tool_settings_c992fc56: "Falha ao exportar algumas configurações da ferramenta"
@@ -12475,6 +12476,7 @@ pt:
   from_from_to_to_e31f6422: "De %{from} a %{to}"
   from_gravatar_58372d5a: "Do Gravatar"
   from_grouptitle_860dff95: "A partir de %{groupTitle}"
+  front_page_50cae87e: "Primeira página"
   front_page_must_be_set_first_4dbbfdbe: "É necessário definir primeiro a primeira página"
   front_page_must_be_set_first_c5246f7d: "A primeira página deve ser configurada primeiro"
   full_article_9296bb6f: "Artigo completo"
@@ -19802,6 +19804,7 @@ pt:
   online_url_37830a72: "URL online"
   only_a_maximum_of_100_events_can_be_created_ad703982: "apenas podem ser criados até 100 eventos"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "apenas um máximo de %{limit} eventos pode ser criado"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Apenas um máximo de %{max} graduações podem ser atribuídas"
   only_account_administrators_can_change_this_settin_149f8fe3: "Apenas os administradores da conta podem alterar essa definição."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Adicione apenas publicações com uma frase específica no título"
   only_after_their_last_attempt_3593d101: "Apenas após a sua última tentativa"
@@ -20166,6 +20169,7 @@ pt:
   own_copyright_cc59db55: "Direitos de autor próprios"
   owner_email_236d1b2: "E-mail do proprietário"
   owner_email_4d02f795: "E-mail do proprietário:"
+  pace_duration_cb8f5de7: "Duração do Ritmo"
   pace_is_new_and_unpublished_9aa68306: "Pace é novo e inédito"
   pace_plan_56e8fb1d: "Plano de Pausa"
   pace_plans_4bb9c5ff: "Planos de Pausa"
@@ -21152,6 +21156,7 @@ pt:
   pro_tip_30e41fa3: "DICA PRO!"
   proceed_f3d33864: Prosseguir
   proceed_with_caution_aa9b3285: "Procede com Cuidado"
+  proceed_with_extreme_caution_f5716a27: "Proceder com extrema cautela"
   process_multiple_content_items_from_course_modules_6de90fd8: "Processar vários itens de conteúdo da página de módulos da disciplina"
   processed_4725b02: Processado
   processing_2fcc9739: Processando
@@ -25654,6 +25659,10 @@ pt:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Mostrar %{count} resultado para %{groupTitle}."
     other: "Mostrar %{count} resultados para %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Mostrar 1 resultado abaixo"
+    other: "Mostrar %{count} resultados abaixo"
+    zero: "Nenhum resultado encontrado"
   showing_search_results_below_4c9a63d9: "Mostrando os resultados da pesquisa abaixo"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Mostra notas de lançamento fornecidas pela Instructure no menu de ajuda para todos os utilizadores (filtradas por função do utilizador)"
   shrink_permission_74b01aed: "Encolher %{permission}"
@@ -26325,6 +26334,7 @@ pt:
   subject_114b2e98: Assunto
   subject_1bc03dea: "Assunto:"
   subject_details_12405b1: "Detalhes do assunto"
+  subject_home_8e593f72: "Assunto Início"
   subject_home_page_41226803: "Página principal do assunto"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "O assunto deve conter menos de 255 caracteres."
   subject_name_a1ac4da4: "Nome do Assunto"
@@ -26398,6 +26408,7 @@ pt:
   submission_score_b7a291e8: "pontuação do envio"
   submission_sent_3f0d2ee1: "Submissão enviada"
   submission_status_3079e730: "Status de submissão"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Submissão - Submeter em nome do aluno"
   submission_tray_429ac3df: "Bandeja de submissão"
   submission_type_a925fc5f: "Tipo de envio"
   submission_type_displayname_currently_selected_3f8aa9f8: "Tipo de submissão %{displayName}, atualmente selecionado"
@@ -27463,6 +27474,7 @@ pt:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este critério está vinculado ao resultado de aprendizado"
   this_due_date_is_managed_by_cfbb698c: "Esta data de vencimento é gerida por"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Esta data de vencimento é gerida pelo Pacote de Disciplina."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Esta duração não tem em conta os fins de semana e os dias de blackout."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Este elemento é uma alternativa mais acessível a reordenação através de arrastar e largar. Pressione Enter ou Espaço para mover esta questão."
   this_email_address_is_unconfirmed_f0fc8c6e: "Este endereço de email não está confirmado"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Isso permite que uma configuração de disciplina permita que os alunos exportem a disciplina como uma pasta zip offline na Web"
@@ -27817,6 +27829,7 @@ pt:
   time_left_in_your_instant_trial_5dd0392b: "%{time} deixada em seu teste imediato"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} deixada em seu teste imediato *(estenda agora)*"
   time_limit_a6f1a51e: "Limite de tempo"
+  time_to_complete_9d264097: "Tempo para completar"
   time_zone_f56f5183: "Fuso Horário"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -28615,6 +28628,7 @@ pt:
   toggle_alignment_details_for_title_944f605: "Alternar detalhes de alinhamento para %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Alternar as superposições de cor do cartão da disciplina"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Expandir vista ou registo de actividade recente"
+  toggle_due_date_compression_tooltip_f2edda2e: "Alternar a dica de compressão da data de vencimento"
   toggle_editing_answer_text_as_html_9a93fe6: "Alterar edição do texto de resposta como HTML"
   toggle_filterpresetname_f8ae0191: "Alternar %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "alternar visibilidade do módulo"
@@ -29083,6 +29097,7 @@ pt:
   update_important_info_bcc01d6a: "Atualizar Informação Importante"
   update_inbox_page_to_use_react_instui_4d343fd: "Atualizar a página da caixa de entrada para utilizar o react/instui"
   update_link_b7cab181: "Atualizar ligação"
+  update_lti_region_912491e4: "Atualizar a Região LTI"
   update_name_6581781d: "Atualizar %{name}"
   update_pages_c91d7ba: "Atualizar páginas"
   update_rating_6d29c2ef: "Classificação de atualização"
@@ -30403,6 +30418,7 @@ pt:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Pode verificar outros grupos clicando nesta ligação: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Pode verificar outros grupos clicando nesta ligação: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Pode fechar esta caixa de diálogo para continuar a trabalhar se não quiser esperar; a atribuição continuará em segundo plano."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Podes criar conjuntos de grupos onde os alunos se podem inscrever por conta própria. Os alunos ainda estão limitados a estar num único grupo no conjunto, mas desta forma os alunos podem organizar-se em grupos em vez de precisarem do professor para fazer o trabalho."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Pode criar conjuntos de grupos onde os alunos podem inscrever-se por conta própria. Os alunos ainda estão limitados\
                     a estar num único grupo no conjunto, mas desta forma os alunos podem organizar-se em grupos\
