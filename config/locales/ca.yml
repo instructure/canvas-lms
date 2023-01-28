@@ -942,7 +942,7 @@ ca:
           account_reports: 
             default: 
               parameters: 
-                header: "Condicions (límit 5)"
+                header: "Condicions (límit 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -6559,13 +6559,13 @@ ca:
     other: "%{count} missatges sense llegir."
   count_unread_release_notes_3be26022: 
     one: "Una nota sobre el llançament sense llegir."
-    other: "%{count} notes sobre el llançament sense llegir."
+    other: "%{count} notes sobre el llançament sense llegir."
   count_unread_replies_86976ab: "%{count} respostes no llegides"
   count_unread_shares_ff9e91a5: 
     one: "Un contingut compartit sense llegir."
     other: "%{count} continguts compartits sense llegir."
   count_unsynced_changes_1fc147e5: "%{count} canvis no sincronitzats"
-  count_users_374d6e47: "(%{count} usuaris)"
+  count_users_374d6e47: "(%{count} usuaris)"
   count_weeks_11fbd2dc: 
     one: "1 setmana"
     other: "%{count} setmanes"
@@ -9688,6 +9688,7 @@ ca:
   failed_to_delete_role_label_27959de3: "No s’ha pogut suprimir el rol %{label}"
   failed_to_delete_selected_pages_26fa87db: "No s’han pogut suprimir les pàgines seleccionades"
   failed_to_export_blueprint_course_settings_1ced8c6: "No s’ha pogut exportar la configuració del curs plantilla"
+  failed_to_export_context_info_acb07497: "No s’ha pogut exportar la informació del context"
   failed_to_export_course_paces_e17583ba: "No s’han pogut exportar els ritmes de l’assignatura"
   failed_to_export_pace_plans_9832daac: "No s’han pogut exportar els plans de ritme."
   failed_to_ignore_assignment_46565fa3: "No s’ha pogut ignorar l’activitat"
@@ -10070,6 +10071,7 @@ ca:
   from_from_to_to_e31f6422: "Del %{from} al %{to}"
   from_gravatar_58372d5a: "Del Gravatar"
   from_grouptitle_860dff95: "De %{groupTitle}"
+  front_page_50cae87e: "Pàgina frontal"
   front_page_must_be_set_first_c5246f7d: "Primer s'ha de configurar la primera pàgina"
   full_article_9296bb6f: "Article complet"
   full_letter_grade_3f2ed2e4: "Nota amb lletra completa"
@@ -14919,7 +14921,7 @@ ca:
   name_badfe525: nom
   name_conference_8e042dd2: "Conferència de %{name}"
   name_count_students_d004ba32: "%{name} (%{count} estudiants)"
-  name_count_users_ccc93c3d: "%{name} (%{count} usuaris)"
+  name_count_users_ccc93c3d: "%{name} (%{count} usuaris)"
   name_current_grade_d8da149f: "Nota actual de %{name}"
   name_current_score_b3198dfa: "Puntuació actual de %{name}"
   name_e790ff1f: Nom...
@@ -15750,6 +15752,7 @@ ca:
   online_upload_59969592: "Penjada en línia"
   online_url_37830a72: "URL en línia"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "només es poden crear %{limit} esdeveniments com a màxim"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Només es poden assignar %{max} qualificadors com a màxim"
   only_account_administrators_can_change_this_settin_149f8fe3: "Només els administradors de l'usuari poden canviar aquesta configuració."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Afegeix només publicacions amb una frase específica al títol"
   only_after_their_last_attempt_3593d101: "Només després del seu últim intent"
@@ -16024,6 +16027,7 @@ ca:
   own_copyright_cc59db55: "Copyright propi"
   owner_email_236d1b2: "Adreça electrònica del propietari"
   owner_email_4d02f795: "Adreça electrònica del propietari:"
+  pace_duration_cb8f5de7: "Durada del ritme"
   pace_is_new_and_unpublished_9aa68306: "El ritme es nou i no s’ha publicat"
   pace_plan_56e8fb1d: "Pla de ritme"
   pace_plans_4bb9c5ff: "Plans de ritme"
@@ -16906,6 +16910,7 @@ ca:
   pro_tip_30e41fa3: "CONSELL PROFESSIONAL!"
   proceed_f3d33864: Continua
   proceed_with_caution_aa9b3285: "Aneu amb compte"
+  proceed_with_extreme_caution_f5716a27: "Aneu amb molt de compte"
   process_multiple_content_items_from_course_modules_6de90fd8: "Processa diversos elements del contingut des de les pàgines del mòduls del curs"
   processed_4725b02: "S’ha processat"
   processing_2fcc9739: "S'està processant"
@@ -20377,6 +20382,10 @@ ca:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "S’està mostrant %{count} resultat per a %{groupTitle}."
     other: "S’estan mostrant %{count} resultats per a %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "S’està mostrant 1 resultat a sota"
+    other: "S’estan mostrant %{count} resultats a sota"
+    zero: "No s'ha trobat cap resultat"
   showing_search_results_below_4c9a63d9: "S’estan mostrant els resultats de la cerca a sota"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Mostra les notes sobre el llançament que Instructure ha facilitat al menú Ajuda per a tots els usuaris (filtrats per rol de l'usuari)"
   shrink_permission_74b01aed: "Redueix %{permission}"
@@ -20955,6 +20964,7 @@ ca:
   subject_114b2e98: Assumpte
   subject_1bc03dea: "Assumpte:"
   subject_details_12405b1: "Informació de la matèria"
+  subject_home_8e593f72: "Inici de la matèria"
   subject_home_page_41226803: "Pàgina inicial de la matèria"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "L'assumpte ha de tenir menys de 255 caràcters."
   subject_name_a1ac4da4: "Nom de la matèria"
@@ -21020,6 +21030,7 @@ ca:
   submission_records_will_be_filtered_by_date_using__b3990a1: "Els registres d’entrega es filtraran per data amb la marca de temps “submitted_at” si està disponible. Quan “submitted_at” no estigui disponible, es farà servir el camp “graded_at”. Si cap camp està emplenat, el registre d’entrega no s’inclourà mai a l’informe en filtrar per data."
   submission_score_b7a291e8: "puntuació de l’entrega"
   submission_sent_3f0d2ee1: "Entrega enviada"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Entrega: envieu-ho en nom de l’estudiant"
   submission_tray_429ac3df: "Safata d'entrega"
   submission_type_a925fc5f: "Tipus d'entrega"
   submission_type_displayname_currently_selected_3f8aa9f8: "Tipus d'entrega %{displayName}, seleccionada actualment"
@@ -21959,6 +21970,7 @@ ca:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Aquest criteri està enllaçat amb un resultat d'aprenentatge"
   this_due_date_is_managed_by_cfbb698c: "Aquesta data de lliurament està gestionada per"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Ritme de l'assignatura gestiona aquesta data de lliurament."
+  this_duration_does_not_take_into_account_weekends__19209a71: "En aquesta durada no es tenen en compte els caps de setmana ni els dies sense descomptes."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Aquest element és una alternativa més accessible per a reordenar arrossegant i deixant anar. Premeu Retorn o Espai per desplaçar aquesta pregunta."
   this_email_address_is_unconfirmed_f0fc8c6e: "Aquesta adreça electrònica no s'ha confirmat"
   this_enables_users_to_generate_and_download_course_4c69c531: "Aquesta opció permet als usuaris generar i baixar una assignatura en format ePub."
@@ -22268,6 +22280,7 @@ ca:
   time_2b5aac58: Hora
   time_block_5a7cda5c: "Bloc de temps"
   time_limit_a6f1a51e: "Límit de temps"
+  time_to_complete_9d264097: "Temps que falta per completar"
   time_zone_f56f5183: "Zona horària"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -22875,6 +22888,7 @@ ca:
   today_76e10f9c: Avui
   toggle_alignment_details_for_title_944f605: "Commuta els detalls de l'alineació per a %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Commuta les superposicions de color de les targetes de l'assignatura"
+  toggle_due_date_compression_tooltip_f2edda2e: "Commuteu la descripció emergent de compressió de la data de lliurament"
   toggle_editing_answer_text_as_html_9a93fe6: "Commuta l'edició del text de resposta com a HTML"
   toggle_filterpresetname_f8ae0191: "Commuta %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "commuta la visibilitat del contingut"
@@ -23291,6 +23305,7 @@ ca:
   update_important_info_bcc01d6a: "Actualitza la informació important"
   update_inbox_page_to_use_react_instui_4d343fd: "Actualitza la pàgina de la safata d'entrada per utilitzar react/instui"
   update_link_b7cab181: "Actualitza l'enllaç"
+  update_lti_region_912491e4: "Actualitzeu la regió d’LTI, interoperabilitat d'eines d'aprenentatge"
   update_name_6581781d: "Actualitza %{name}"
   update_pages_c91d7ba: "Actualitza pàgines"
   update_rating_6d29c2ef: "Actualitza la classificació"
@@ -24404,6 +24419,7 @@ ca:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Per fer una ullada al grup, feu clic en aquest enllaç: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Per fer una ullada al grup, feu clic en aquest enllaç: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Si no voleu esperar, podeu tancar aquest quadre de diàleg per seguir treballant; l’assignació continuarà en segon terme."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Podeu crear conjunts de grups als quals els estudiants puguin registrar-se ells mateixos. Els estudiants encara estan limitats per estar en un sol grup del conjunt, però d'aquesta manera es poden organitzar ells mateixos en grups, enlloc de fer-ho el professor."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Podeu crear conjunts de grups als quals els estudiants puguin registrar-se ells mateixos. Els estudiants encara estan limitats\
                     a estar en un sol grup del conjunt, però d'aquesta manera es poden organitzar ells mateixos en grups,\
