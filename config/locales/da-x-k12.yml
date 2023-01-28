@@ -10822,6 +10822,7 @@ da-x-k12:
   failed_to_delete_role_label_27959de3: "Kunne ikke slette rolle %{label}"
   failed_to_delete_selected_pages_26fa87db: "Kunne ikke slette valgte sider"
   failed_to_export_blueprint_course_settings_1ced8c6: "Kunne ikke eksportere indstillinger til blueprint-fag"
+  failed_to_export_context_info_acb07497: "Kontekstoplysningerne kunne ikke eksporteres"
   failed_to_export_course_paces_e17583ba: "Eksport af fagtempoer mislykkedes"
   failed_to_export_pace_plans_9832daac: "Kunne ikke eksportere tempoplaner"
   failed_to_ignore_assignment_46565fa3: "Kunne ikke ignorere opgaven"
@@ -11232,6 +11233,7 @@ da-x-k12:
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
   from_gravatar_58372d5a: "Fra Gravatar"
   from_grouptitle_860dff95: "Fra %{groupTitle}"
+  front_page_50cae87e: Forside
   front_page_must_be_set_first_4dbbfdbe: "Forsiden skal indstilles først"
   front_page_must_be_set_first_c5246f7d: "Forsiden skal indstilles først"
   full_article_9296bb6f: "Fuld artikel"
@@ -17489,6 +17491,7 @@ da-x-k12:
   online_upload_59969592: "Online upload"
   online_url_37830a72: "Online URL"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Der kan kun oprettes maks. %{limit} begivenheder"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Der kan kun tildeles maks. %{max} vurderingsgivere"
   only_account_administrators_can_change_this_settin_149f8fe3: "Kun kontoadministratorer kan ændre denne indstilling."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Opret kun opslag med en specifik sætning i overskriften"
   only_after_their_last_attempt_3593d101: "Kun efter deres sidste forsøg"
@@ -17826,6 +17829,7 @@ da-x-k12:
   own_copyright_cc59db55: "Ejer ophavsret"
   owner_email_236d1b2: "E-mailens ejer"
   owner_email_4d02f795: "Ejerens e-mail:"
+  pace_duration_cb8f5de7: "Tempo varighed"
   pace_is_new_and_unpublished_9aa68306: "Tempo er nyt og ikke offentliggjort"
   pace_plan_56e8fb1d: Tempoplan
   pace_plans_4bb9c5ff: Tempoplaner
@@ -18740,6 +18744,7 @@ da-x-k12:
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Fortsæt
   proceed_with_caution_aa9b3285: "Fortsæt med forsigtighed"
+  proceed_with_extreme_caution_f5716a27: "Fortsæt med ekstrem forsigtighed"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandl flere indholdselementer fra siden med fagforløb"
   processed_4725b02: Forarbejdet
   processing_2fcc9739: Behandler
@@ -22642,6 +22647,10 @@ da-x-k12:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Viser %{count} læringsudbytte for %{groupTitle}."
     other: "Viser %{count} læringsudbytter for %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Viser 1 resultat nedenfor"
+    other: "Viser %{count} resultater nedenfor"
+    zero: "Der blev ikke fundet resultater"
   showing_search_results_below_4c9a63d9: "Viser søgeresultater nedenfor"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Viser udgivelsesnotater leveret af Instructure i hjælpemenuen for alle brugere (filtreret efter brugerrolle)"
   shrink_permission_74b01aed: "Formindsk %{permission}"
@@ -23240,6 +23249,7 @@ da-x-k12:
   subject_114b2e98: Emne
   subject_1bc03dea: "Emne:"
   subject_details_12405b1: Emnedetaljer
+  subject_home_8e593f72: "Fagets startside"
   subject_home_page_41226803: "Emnets startside"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Emne skal indeholde færre end 255 tegn."
   subject_name_a1ac4da4: "Emnets navn"
@@ -23307,6 +23317,7 @@ da-x-k12:
   submission_records_will_be_filtered_by_date_using__b3990a1: "Afleveringsposter vil blive filtreret efter dato ved hjælp af \"submitted_at\" tidsstempel, hvis det er tilgængeligt. Hvis \"submitted_at\" er ikke tilgængelig, bruges feltet \"graded_at\". Hvis ingen af felterne er udfyldt, vil afleveringsposten aldrig blive inkluderet i rapporten, når der filtreres efter dato."
   submission_score_b7a291e8: afleveringsresultat
   submission_sent_3f0d2ee1: "Aflevering sendt"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Aflevering – Indsend på vegne af elev"
   submission_tray_429ac3df: Afleveringsbakke
   submission_type_a925fc5f: Afleveringstype
   submission_type_displayname_currently_selected_3f8aa9f8: "Afleveringsform %{displayName}, aktuelt valgt"
@@ -24297,6 +24308,7 @@ da-x-k12:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Dette kriterie er linket til et læringsudbytte"
   this_due_date_is_managed_by_cfbb698c: "Denne afleveringsdato administreres af"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Afleveringsdatoer administreres gennem fagtempo."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varighed tager ikke højde for weekender og blackout-dage."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette element er et mere tilgængeligt alternativ til træk & slip omorganisering. Tryk på Enter eller Mellemrum for at flytte dette spørgsmål."
   this_email_address_is_unconfirmed_f0fc8c6e: "Denne e-mailadresse er ubekræftet"
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette giver brugere mulighed for at danne og downloade ePub."
@@ -24636,6 +24648,7 @@ da-x-k12:
   time_left_in_your_instant_trial_5dd0392b: "%{time} tilbage i din øjeblikkelige prøveversion"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} tilbage i din øjeblikkelige prøveversion *(forlæng nu)*"
   time_limit_a6f1a51e: Tidsbegrænsning
+  time_to_complete_9d264097: "Tid til at fuldføre"
   time_zone_f56f5183: Tidszone
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -25419,6 +25432,7 @@ da-x-k12:
   today_76e10f9c: "I dag"
   toggle_alignment_details_for_title_944f605: "Skift justeringsoplysninger for %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Slå fagets korts farveoverlejringer til eller fra"
+  toggle_due_date_compression_tooltip_f2edda2e: "Skift værktøjstip til komprimering af afleveringsdato"
   toggle_editing_answer_text_as_html_9a93fe6: "Skift redigering af svartekst som HTML"
   toggle_filterpresetname_f8ae0191: "Skift %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "skift forløbets synlighed"
@@ -25855,6 +25869,7 @@ da-x-k12:
   update_important_info_bcc01d6a: "Opdater vigtig info"
   update_inbox_page_to_use_react_instui_4d343fd: "Opdater siden Indbakke for at bruge react/instui"
   update_link_b7cab181: "Opdater link"
+  update_lti_region_912491e4: "Opdater LTI-region"
   update_name_6581781d: "Opdater %{name}"
   update_pages_c91d7ba: "Opdater sider"
   update_rating_6d29c2ef: "Opdater bedømmelse"
@@ -27050,6 +27065,7 @@ da-x-k12:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Du kan undersøge gruppen ved at klikke på dette link: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Du kan undersøge gruppen ved at klikke på dette link: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Du kan lukke denne dialogboks for at fortsætte dit arbejde, hvis du ikke vil vente. Tildelingen fortsætter i baggrunden."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Du kan oprette gruppesæt, hvor de eleverne kan tilmelde sig på egen hånd. Eleverne er stadig begrænset til kun at være i én gruppe i sættet, men på denne måde kan de eleverne organisere sig i grupper i stedet for, at læreren skal gøre arbejdet."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Du kan oprette gruppesæt, hvor eleverne selv kan tilmelde sig. Eleverne er stadig begrænset til\
                     kun at være medlem af én gruppe, men på denne måde kan eleverne selv organisere sig i grupper\
