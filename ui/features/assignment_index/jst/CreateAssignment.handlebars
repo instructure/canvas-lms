@@ -89,7 +89,7 @@
             class="datetime_field input-medium"
             type="text"
             name="due_at"
-            value="{{datetimeFormatted dueAt}}"
+            value="{{datetimeFormatted dueAt format='medium'}}"
             {{#unless master_course_restrictions.due_dates}}
               aria-labelledby="due_at_label_{{uniqLabel}}"
               title="{{accessibleDateFormat}}"

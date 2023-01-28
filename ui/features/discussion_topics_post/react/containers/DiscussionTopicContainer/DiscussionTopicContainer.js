@@ -294,6 +294,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     borderStyle="solid"
                     borderColor="primary"
                     padding="xx-small 0 small"
+                    margin="0 0 small 0"
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />

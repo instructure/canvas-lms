@@ -47,13 +47,14 @@ if Plugin.installed?('bundler_lockfile_extensions')
     true
   end
 
+  base_gemfile = ENV.fetch("BUNDLE_GEMFILE", "Gemfile")
   lockfile_defs = SUPPORTED_VERSIONS.map do |x|
     prepare_environment = lambda do
       Object.send(:remove_const, :CANVAS_RAILS)
       ::CANVAS_RAILS = x
     end
 
-    ["Gemfile.rails#{x.delete(".")}.lock", {
+    ["#{base_gemfile}.rails#{x.delete(".")}.lock", {
       default: x == CANVAS_RAILS,
       install_filter: install_filter,
       prepare_environment: prepare_environment,

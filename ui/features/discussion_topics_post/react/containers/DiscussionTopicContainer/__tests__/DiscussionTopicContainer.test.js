@@ -159,7 +159,7 @@ describe('DiscussionTopicContainer', () => {
   it('renders infoText only when there are replies', async () => {
     const container = setup({discussionTopic: Discussion.mock()})
     const infoText = await container.findByTestId('replies-counter')
-    expect(infoText).toHaveTextContent('56 replies, 2 unread')
+    expect(infoText).toHaveTextContent('56 Replies, 2 Unread')
   })
 
   it('does not render unread when there are none', async () => {
@@ -172,7 +172,7 @@ describe('DiscussionTopicContainer', () => {
       }),
     })
     const infoText = await container.findByTestId('replies-counter')
-    expect(infoText).toHaveTextContent('24 replies')
+    expect(infoText).toHaveTextContent('24 Replies')
   })
 
   it('renders Graded info when assignment info exists', async () => {

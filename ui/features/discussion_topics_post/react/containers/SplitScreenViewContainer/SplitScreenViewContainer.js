@@ -500,7 +500,7 @@ export const SplitScreenViewContainer = props => {
           )}
         </SplitScreenParent>
         {!props.RCEOpen && (
-          <View as="div" borderWidth="small none none none" padding="medium none none">
+          <View as="div" borderWidth="small none none none">
             <SplitScreenThreadsContainer
               discussionTopic={props.discussionTopic}
               discussionEntry={splitScreenEntryOlderDirection.data.legacyNode}
@@ -550,6 +550,7 @@ export const SplitScreenViewContainer = props => {
         </Flex.Item>
         <Flex.Item>
           <CloseButton
+            size="medium"
             margin="small auto none"
             placement="end"
             offset="small"

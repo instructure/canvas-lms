@@ -414,10 +414,10 @@ export const DiscussionThreadContainer = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          padding: 'medium xx-small small',
+          padding: 'small xx-small small',
         },
         desktop: {
-          padding: 'medium medium small',
+          padding: 'small medium small',
         },
       }}
       render={responsiveProps => (

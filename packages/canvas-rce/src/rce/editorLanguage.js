@@ -48,6 +48,7 @@ const mapping = {
   ja: 'ja',
   ko: 'ko_KR',
   mi: undefined,
+  ms: undefined, // tiny has Malayalam but not Malay Standard, haiyaa
   nb: 'nb_NO',
   nl: 'nl',
   nn: 'nb_NO', // tiny doesn't have Norwegian (Nynorsk) so go to Norwegian (Bokmal)

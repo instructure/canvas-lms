@@ -350,6 +350,30 @@ describe Lti::IMS::NamesAndRolesController do
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
 
+    describe "id field" do
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+        it "uses the Account#domain in the line item id" do
+          course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+          allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+          send_request
+          expect(json[:id]).to eq(
+            "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
+          )
+        end
+      end
+
+      context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+        it "uses the host domain in the line item id" do
+          course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+          allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+          send_request
+          expect(json[:id]).to eq(
+            "http://test.host/api/lti/courses/#{course.id}/names_and_roles"
+          )
+        end
+      end
+    end
+
     context "when a course has a single enrollment" do
       it "returns teacher in members array" do
         enrollment = teacher_in_course(course: course, active_all: true)

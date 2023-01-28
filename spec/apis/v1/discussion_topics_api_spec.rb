@@ -563,7 +563,7 @@ describe DiscussionTopicsController, type: :request do
         "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
         "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
         "podcast_has_student_posts" => false,
-        "attachments" => [{ "content-type" => "unknown/unknown",
+        "attachments" => [{ "content-type" => "text/plain",
                             "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                             "filename" => "content.txt",
                             "display_name" => "content.txt",
@@ -1838,7 +1838,7 @@ describe DiscussionTopicsController, type: :request do
       "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
       "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
       "attachments" =>
-        [{ "content-type" => "unknown/unknown",
+        [{ "content-type" => "text/plain",
            "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
            "filename" => "content.txt",
            "display_name" => "content.txt",

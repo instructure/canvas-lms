@@ -444,9 +444,9 @@ export default class EditCalendarEventView extends Backbone.View {
       const start_at_key = start_date_key.replace(/start_date/, 'start_at')
       const end_at_key = start_date_key.replace(/start_date/, 'end_at')
 
-      const start_date = this.$el.find(`[name='${start_date_key}']`).data('date')
-      const start_time = this.$el.find(`[name='${start_time_key}']`).data('date')
-      const end_time = this.$el.find(`[name='${end_time_key}']`).data('date')
+      const start_date = this.$el.find(`[name='${start_date_key}']`).change().data('date')
+      const start_time = this.$el.find(`[name='${start_time_key}']`).change().data('date')
+      const end_time = this.$el.find(`[name='${end_time_key}']`).change().data('date')
       if (!start_date) return
 
       data = _.omit(data, start_date_key, start_time_key, end_time_key)

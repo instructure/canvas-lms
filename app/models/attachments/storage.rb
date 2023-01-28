@@ -30,7 +30,7 @@ class Attachments::Storage
       # populate attachment fields if they were not already set
       attachment.size ||= data.size
       attachment.filename ||= detect_filename(data)
-      attachment.content_type ||= detect_mimetype(data)
+      attachment.content_type ||= attachment.detect_mimetype(data)
     else
       attachment.uploaded_data = data
     end
@@ -50,20 +50,6 @@ class Attachments::Storage
       data.filename
     elsif data.instance_of?(File)
       File.basename(data)
-    end
-  end
-
-  def self.detect_mimetype(data)
-    if data.respond_to?(:content_type) && (data.content_type.blank? || data.content_type.strip == "application/octet-stream")
-      res = nil
-      res ||= File.mime_type?(data.original_filename) if data.respond_to?(:original_filename)
-      res ||= File.mime_type?(data)
-      res ||= "text/plain" unless data.respond_to?(:path)
-      res || "unknown/unknown"
-    elsif data.respond_to?(:content_type)
-      data.content_type
-    else
-      "unknown/unknown"
     end
   end
 end

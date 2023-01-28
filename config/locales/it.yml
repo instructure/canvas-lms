@@ -11015,6 +11015,7 @@ it:
   failed_to_delete_role_label_27959de3: "Impossibile eliminare il ruolo %{label}"
   failed_to_delete_selected_pages_26fa87db: "Impossibile eliminare le pagine selezionate"
   failed_to_export_blueprint_course_settings_1ced8c6: "Impossibile esportare impostazioni Modello di base corso"
+  failed_to_export_context_info_acb07497: "Impossibile esportare le informazioni di contesto"
   failed_to_export_course_paces_e17583ba: "Esportazione velocità corso non riuscita"
   failed_to_export_pace_plans_9832daac: "Impossibile esportare programmi di velocità"
   failed_to_export_some_tool_settings_c992fc56: "Esportazione di alcune impostazioni dello strumento non riuscita"
@@ -11430,6 +11431,7 @@ it:
   from_from_to_to_e31f6422: "Da %{from} a %{to}"
   from_gravatar_58372d5a: "Da Gravatar"
   from_grouptitle_860dff95: "Da %{groupTitle}"
+  front_page_50cae87e: "Pagina iniziale"
   front_page_must_be_set_first_4dbbfdbe: "Devi prima impostare la pagina iniziale"
   front_page_must_be_set_first_c5246f7d: "Devi prima impostare la pagina iniziale"
   full_article_9296bb6f: "Articolo completo"
@@ -17784,6 +17786,7 @@ it:
   online_url_37830a72: "URL online"
   only_a_maximum_of_100_events_can_be_created_ad703982: "è possibile creare solo un massimo di 100 eventi"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "è possibile creare solo un massimo di %{limit} eventi"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "È possibile assegnare solo un massimo di %{max} voti"
   only_account_administrators_can_change_this_settin_149f8fe3: "Questa impostazione può essere modificata solo dagli amministratori dell’account."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Aggiungi solo post con una frase specifica nel titolo"
   only_after_their_last_attempt_3593d101: "Solo dopo il loro ultimo tentativo"
@@ -18129,6 +18132,7 @@ it:
   own_copyright_cc59db55: "Proprietà copyright"
   owner_email_236d1b2: "Email proprietario"
   owner_email_4d02f795: "Email proprietario:"
+  pace_duration_cb8f5de7: "Durata ritmo"
   pace_is_new_and_unpublished_9aa68306: "Il ritmo è nuovo e non pubblicato"
   pace_plan_56e8fb1d: "Programma di velocità"
   pace_plans_4bb9c5ff: "Programmi di velocità"
@@ -19062,6 +19066,7 @@ it:
   pro_tip_30e41fa3: "CONSIGLIO UTILE!"
   proceed_f3d33864: Continua
   proceed_with_caution_aa9b3285: "Procedere con attenzione"
+  proceed_with_extreme_caution_f5716a27: "Procedere con estrema attenzione"
   process_multiple_content_items_from_course_modules_6de90fd8: "Elabora elementi di contenuto multipli da una pagina moduli corso"
   processed_4725b02: Elaborato
   processing_2fcc9739: "Elaborazione in corso"
@@ -23032,6 +23037,10 @@ it:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Visualizzazione di %{count} risultato per %{groupTitle}."
     other: "Visualizzazione di %{count} risultati per %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Visualizzazione di 1 risultato di seguito"
+    other: "Visualizzazione di %{count} risultati di seguito"
+    zero: "Nessun risultato trovato"
   showing_search_results_below_4c9a63d9: "Visualizzazione risultati di ricerca sotto"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Mostra le note di rilascio fornite dall’infrastruttura nel menu della guida per tutti gli utenti (filtrate per ruolo utente)"
   shrink_permission_74b01aed: "Riduci %{permission}"
@@ -23275,7 +23284,7 @@ it:
       grade: "(voto: %{grade})"
       see_all_quiz_attempts: "Visualizza tutti i tentativi dei quiz"
       submission_to_view: "Consegna da visualizzare:"
-      submitted: "*Inviato:* %{submittedAt}"
+      submitted: "*Inviato:* %{submittedAt}%{proxy_submitter_label_text}"
     submit: Invia
     titles: 
       click_to_record: "Riconoscimento vocale"
@@ -23642,6 +23651,7 @@ it:
   subject_114b2e98: Oggetto
   subject_1bc03dea: "Oggetto:"
   subject_details_12405b1: "Dettagli oggetto"
+  subject_home_8e593f72: "Home page oggetto"
   subject_home_page_41226803: "Seleziona home page"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "L'oggetto deve contenere meno di 255 caratteri."
   subject_name_a1ac4da4: "Nome oggetto"
@@ -23711,6 +23721,7 @@ it:
   submission_requirement_8ba1ee08: "Requisiti invio"
   submission_score_b7a291e8: "punteggio consegna"
   submission_sent_3f0d2ee1: "Consegna inviata"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Consegna - Invia per conto dello studente"
   submission_tray_429ac3df: "Riquadro invio"
   submission_type_a925fc5f: "Tipo di consegna"
   submission_type_displayname_currently_selected_3f8aa9f8: "Tipo di consegna %{displayName}, attualmente selezionato"
@@ -24725,6 +24736,7 @@ it:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Questo criterio è collegato a un esito di apprendimento"
   this_due_date_is_managed_by_cfbb698c: "Questa data di scadenza è gestita da"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Questa data di scadenza è gestita da Pianificazione del corso"
+  this_duration_does_not_take_into_account_weekends__19209a71: "Questa durata non prende in considerazione i week-end e i giorni di blackout."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Questo elemento è un alternativa più accessibile al riordino per trascinamento. Premi Invio o la barra spaziatrice per spostare questa domanda."
   this_email_address_is_unconfirmed_f0fc8c6e: "Questo indirizzo email non è confermato"
   this_enables_users_to_generate_and_download_course_4c69c531: "Questo consente agli utenti di generare e scaricare l'ePub del corso."
@@ -25071,6 +25083,7 @@ it:
   time_left_in_your_instant_trial_5dd0392b: "%{time} rimasti nel tuo periodo di prova istantaneo"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} rimasti nel tuo periodo di prova istantaneo *(estendi adesso)*"
   time_limit_a6f1a51e: "Limite di tempo"
+  time_to_complete_9d264097: "Ora da completare"
   time_zone_f56f5183: "Fuso orario"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -25866,6 +25879,7 @@ it:
   today_76e10f9c: Oggi
   toggle_alignment_details_for_title_944f605: "Abilita/disabilita dettagli allineamento per %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Abilita/Disabilita sovrapposizioni colore scheda corso"
+  toggle_due_date_compression_tooltip_f2edda2e: "Attiva/Disattiva tooltip di compressione data di scadenza"
   toggle_editing_answer_text_as_html_9a93fe6: "Abilita/Disabilita la modifica del testo delle risposte come HTML"
   toggle_filterpresetname_f8ae0191: "Passa a %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "abilita/disabilita visibilità modulo"
@@ -26311,6 +26325,7 @@ it:
   update_important_info_bcc01d6a: "Aggiorna info importanti"
   update_inbox_page_to_use_react_instui_4d343fd: "Aggiorna pagina Posta in arrivo per usare react/instui"
   update_link_b7cab181: "Aggiorna link"
+  update_lti_region_912491e4: "Aggiorna regione LTI"
   update_name_6581781d: "Aggiorna %{name}"
   update_pages_c91d7ba: "Aggiorna pagine"
   update_rating_6d29c2ef: "Aggiorna valutazione"
@@ -27521,6 +27536,7 @@ it:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Puoi dare un'occhiata al gruppo facendo clic su questo link: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Puoi dare un'occhiata al gruppo facendo clic su questo link: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Se non vuoi aspettare, puoi chiudere questa finestra di dialogo per continuare a lavorare; l’assegnazione continuerà in background."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Puoi creare un set di gruppi in cui gli studenti possono registrarsi autonomamente. Il limite che impone agli studenti di trovarsi in un solo gruppo del set continua a essere applicato, ma in questo modo gli studenti possono organizzarsi in gruppi in autonomia anziché rivolgersi all'insegnante."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Puoi creare un set di gruppi in cui gli studenti possono registrarsi autonomamente. Il limite che impone agli studenti\
                     di trovarsi in un solo gruppo del set continua a essere applicato, ma in questo modo gli studenti possono organizzarsi in gruppi in autonomia\

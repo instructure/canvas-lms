@@ -169,4 +169,47 @@ describe HealthChecks do
     expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 3, tags: { type: :deep, key: :deep_check_name_error })
     expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 4, tags: { type: :deep, key: :deep_check_name_success })
   end
+
+  it "reports pre-computed metrics to statsd" do
+    allow(InstStatsd::Statsd).to receive(:gauge)
+    allow(InstStatsd::Statsd).to receive(:timing)
+
+    HealthChecks.send_to_statsd(
+      {
+        readiness: {
+          readiness_check_name_error: { time: 1, status: false },
+          readiness_check_name_success: { time: 2, status: true },
+        },
+        deep: {
+          deep_check_name_error: { time: 3, status: false },
+          deep_check_name_success: { time: 4, status: true },
+        },
+      }
+    )
+
+    expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 0, tags: { type: :deep, key: :deep_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 0, tags: { type: :readiness, key: :readiness_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 1, tags: { type: :deep, key: :deep_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 1, tags: { type: :readiness, key: :readiness_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 1, tags: { type: :readiness, key: :readiness_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 2, tags: { type: :readiness, key: :readiness_check_name_success })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 3, tags: { type: :deep, key: :deep_check_name_error })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 4, tags: { type: :deep, key: :deep_check_name_success })
+  end
+
+  it "adds additional tags to the reported metrics" do
+    allow(InstStatsd::Statsd).to receive(:gauge)
+    allow(InstStatsd::Statsd).to receive(:timing)
+
+    HealthChecks.send_to_statsd(
+      {
+        readiness: {
+          readiness_check_name_error: { time: 1, status: false },
+        },
+      }, { cluster: "C1" }
+    )
+
+    expect(InstStatsd::Statsd).to have_received(:gauge).with("canvas.health_checks.status", 0, tags: { type: :readiness, key: :readiness_check_name_error, cluster: "C1" })
+    expect(InstStatsd::Statsd).to have_received(:timing).with("canvas.health_checks.response_time_ms", 1, tags: { type: :readiness, key: :readiness_check_name_error, cluster: "C1" })
+  end
 end

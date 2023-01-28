@@ -194,6 +194,7 @@ export const SplitScreenParent = props => {
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
+                    threadParent={true}
                     postUtilities={
                       <ThreadActions
                         id={props.discussionEntry.id}

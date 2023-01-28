@@ -153,7 +153,7 @@ describe SisBatch do
     # 1 zip file and 2 csv files
     atts = Attachment.where(context: batch)
     expect(atts.count).to eq 3
-    expect(atts.pluck(:content_type)).to match_array %w[unknown/unknown text/csv text/csv]
+    expect(atts.pluck(:content_type)).to match_array %w[application/zip text/csv text/csv]
   end
 
   it "makes parallel importers" do

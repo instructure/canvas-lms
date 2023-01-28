@@ -49,17 +49,17 @@ describe('ReplyInfo', () => {
   describe('desktop', () => {
     it('renders the expanded reply info text', () => {
       const container = setup({replyCount: 24, unreadCount: 5})
-      expect(container.getAllByText('24 replies, 5 unread').length).toBe(2)
+      expect(container.getAllByText('24 Replies, 5 Unread').length).toBe(2)
     })
 
     it('omits the unread count if there are no unread replies', () => {
       const container = setup({replyCount: 24, unreadCount: 0})
-      expect(container.getAllByText('24 replies').length).toBe(2)
+      expect(container.getAllByText('24 Replies').length).toBe(2)
     })
 
     it('uses the singular tense of reply if there is only one reply', () => {
       const container = setup({replyCount: 1})
-      expect(container.getAllByText('1 reply').length).toBe(2)
+      expect(container.getAllByText('1 Reply').length).toBe(2)
     })
   })
 
@@ -72,19 +72,19 @@ describe('ReplyInfo', () => {
 
     it('renders the condensed reply info text', () => {
       const container = setup({replyCount: 24, unreadCount: 5})
-      expect(container.getByText('24 replies (5)')).toBeInTheDocument()
+      expect(container.getByText('24 Replies (5)')).toBeInTheDocument()
       // Renders the full expanded text for screen readers
-      expect(container.getByText('24 replies, 5 unread')).toBeInTheDocument()
+      expect(container.getByText('24 Replies, 5 Unread')).toBeInTheDocument()
     })
 
     it('omits the unread count if there are no unread replies', () => {
       const container = setup({replyCount: 24, unreadCount: 0})
-      expect(container.getAllByText('24 replies').length).toBe(2)
+      expect(container.getAllByText('24 Replies').length).toBe(2)
     })
 
     it('uses the singular tense of reply if there is only one reply', () => {
       const container = setup({replyCount: 1})
-      expect(container.getAllByText('1 reply').length).toBe(2)
+      expect(container.getAllByText('1 Reply').length).toBe(2)
     })
   })
 })
