@@ -6099,6 +6099,7 @@ th:
     one: หนึ่งแชร์ที่ไม่ได้อ่าน
     other: "%{count} แชร์ที่ไม่ได้อ่าน"
   count_unsynced_changes_1fc147e5: "%{count} การเปลี่ยนแปลงที่ไม่ได้ซิงค์"
+  count_users_374d6e47: "(%{count} ผู้ใช้)"
   count_weeks_11fbd2dc: 
     one: "1 สัปดาห์"
     other: "%{count} สัปดาห์"
@@ -8965,6 +8966,7 @@ th:
   failed_to_delete_role_label_27959de3: "ไม่สามารถลบบทบาท %{label}"
   failed_to_delete_selected_pages_26fa87db: ไม่สามารถลบเพจที่เลือก
   failed_to_export_blueprint_course_settings_1ced8c6: ไม่สามารถส่งออกค่าปรับตั้งบทเรียนพิมพ์เขียว
+  failed_to_export_context_info_acb07497: ไม่สามารถส่งออกข้อมูลแวดล้อม
   failed_to_export_course_paces_e17583ba: ล้มเหลวในการส่งออกความก้าวหน้าในบทเรียน
   failed_to_export_pace_plans_9832daac: ไม่สามารถส่งออกแผนเนื้อหา
   failed_to_ignore_assignment_46565fa3: ไม่สามารถละเว้นภารกิจได้
@@ -9322,6 +9324,7 @@ th:
   from_from_to_to_e31f6422: "จาก %{from} ถึง %{to}"
   from_gravatar_58372d5a: "จาก Gravatar"
   from_grouptitle_860dff95: "จาก %{groupTitle}"
+  front_page_50cae87e: หน้าแรก
   front_page_must_be_set_first_c5246f7d: จะต้องกำหนดหน้าแรกก่อน
   full_article_9296bb6f: บทความเต็ม
   full_letter_grade_3f2ed2e4: เกรดแบบตัวอักษรแบบละเอียด
@@ -14770,6 +14773,7 @@ th:
   online_upload_59969592: การอัพโหลดออนไลน์
   online_url_37830a72: "URL ออนไลน์"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "จัดทำกิจกรรมได้สูงสุด %{limit} รายการ"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "กำหนดผู้ให้เกรดได้สูงสุด %{max} เท่านั้น"
   only_account_administrators_can_change_this_settin_149f8fe3: เฉพาะผู้ดูแลบัญชีผู้ใช้เท่านั้นที่สามารถแก้ไขค่าปรับตั้งนี้
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: เพิ่มโพสต์ที่มีวลีเฉพาะในชื่อเท่านั้น
   only_after_their_last_attempt_3593d101: หลังจากการดำเนินการล่าสุดสำหรับคนเหล่านี้เท่านั้น
@@ -15028,6 +15032,7 @@ th:
   own_copyright_cc59db55: เป็นเจ้าของลิขสิทธิ์
   owner_email_236d1b2: อีเมลเจ้าของ
   owner_email_4d02f795: "อีเมลเจ้าของ:"
+  pace_duration_cb8f5de7: ระยะเวลาของโครงสร้างการเรียนรู้
   pace_is_new_and_unpublished_9aa68306: ลำดับเป็นรายการใหม่และยังไม่ได้เผยแพร่
   pace_plan_56e8fb1d: แผนเนื้อหา
   pace_plans_4bb9c5ff: "Pace Plans"
@@ -15877,6 +15882,7 @@ th:
   pro_tip_30e41fa3: คำแนะนำของโปร!
   proceed_f3d33864: ดำเนินการต่อ
   proceed_with_caution_aa9b3285: ดำเนินการด้วยความระมัดระวัง
+  proceed_with_extreme_caution_f5716a27: ดำเนินการด้วยความระมัดระวังเป็นพิเศษ
   processed_4725b02: ประมวลผลแล้ว
   processing_2fcc9739: กำลังประมวลผล
   product_name: Canvas
@@ -19252,6 +19258,10 @@ th:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "กำลังแสดง %{count} ผลลัพธ์สำหรับ %{groupTitle}"
     other: "กำลังแสดง %{count} ผลลัพธ์สำหรับ %{groupTitle}"
+  showing_count_results_below_61ddca33: 
+    one: "กำลังแสดง 1 ผลลัพธ์ด้านล่าง"
+    other: "กำลังแสดง %{count} ผลลัพธ์ด้านล่าง"
+    zero: ไม่พบผลลัพธ์
   showing_search_results_below_4c9a63d9: กำลังแสดงผลการค้นหาด้านล่าง
   shrink_permission_74b01aed: "ย่อ %{permission}"
   shuffle_answers_edb602b7: สลับคำตอบ
@@ -19814,6 +19824,7 @@ th:
   subject_114b2e98: หัวเรื่อง
   subject_1bc03dea: "หัวเรื่อง:"
   subject_details_12405b1: รายละเอียดวิชา
+  subject_home_8e593f72: หน้าหลักวิชา
   subject_home_page_41226803: หน้าหลักวิชา
   subject_must_contain_fewer_than_255_characters_2e72cd02: "หัวเรื่องจะต้องยาวน้อยกว่า 255 ตัวอักษร"
   subject_name_a1ac4da4: ชื่อวิชา
@@ -19879,6 +19890,7 @@ th:
   submission_records_will_be_filtered_by_date_using__b3990a1: "ระเบียนข้อมูลการจัดส่งจะถูกกรองจากวันที่โดยใช้เวลากำกับ \"submitted_at\" หากมีแจ้งไว้ หากไม่มี \"submitted_at\" ฟิลด์ \"graded_at\" จะถูกใช้ หากฟิลด์ทั้งหมดไม่ได้กรอกไว้ ประวัติการจัดส่งจะไม่ถูกรวมอยู่ในรายงานเมื่อมีการคัดกรองจากวันที่"
   submission_score_b7a291e8: คะแนนผลงานจัดส่ง
   submission_sent_3f0d2ee1: ส่งผลงานจัดส่งแล้ว
+  submission_submit_on_behalf_of_student_f0ed14e4: "ผลงานจัดส่ง - ส่งในนามของผู้เรียน"
   submission_tray_429ac3df: ถาดข้อมูลผลงานจัดส่ง
   submission_type_a925fc5f: ประเภทการจัดส่ง
   submission_type_displayname_currently_selected_3f8aa9f8: "ประเภทการจัดส่ง %{displayName} ถูกเลือกในปัจจุบัน"
@@ -20741,6 +20753,7 @@ th:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: เกณฑ์นี้เชื่อมโยงไว้กับผลการเรียนรู้
   this_due_date_is_managed_by_cfbb698c: วันครบกำหนดนี้จัดการโดย
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "วันครบกำหนดนี้จัดการโดยเส้นทางการเรียนรู้บทเรียน (Course Pacing)"
+  this_duration_does_not_take_into_account_weekends__19209a71: ระยะเวลานี้ไม่ได้พิจารณาช่วงสุดสัปดาห์และช่วงที่ไม่อนุญาต
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "องค์ประกอบนี้เป็นทางเลือกที่เข้าถึงได้มากกว่าเพื่อจัดลำดับใหม่แบบลากและวาง กด Enter หรือ Space เพื่อย้ายคำถามนี้"
   this_email_address_is_unconfirmed_f0fc8c6e: อีเมลแอดเดรสนี้ยกเลิกการยืนยันแล้ว
   this_enables_users_to_generate_and_download_course_4c69c531: "ทั้งนี้เพื่อให้ผู้ใช้สามารถจัดทำและดาวน์โหลด ePub บทเรียน"
@@ -20999,6 +21012,7 @@ th:
   time_2b5aac58: เวลา
   time_block_5a7cda5c: บล็อคเวลา
   time_limit_a6f1a51e: เกณฑ์เวลา
+  time_to_complete_9d264097: เวลาในการดำเนินการ
   time_zone_f56f5183: เขตเวลา
   time_zones: 
     abu_dhabi: อาบูดาบี
@@ -21465,6 +21479,7 @@ th:
   today_76e10f9c: วันนี้
   toggle_alignment_details_for_title_944f605: "เปิดปิดรายละเอียดการผสานสำหรับ %{title}"
   toggle_course_card_color_overlays_b5b8137a: เปิดปิดโอเวอร์เลย์สีการ์ดข้อมูลบทเรียน
+  toggle_due_date_compression_tooltip_f2edda2e: เปิดปิดคำแนะนำในการใช้เครื่องมือบีบอัดวันครบกำหนด
   toggle_editing_answer_text_as_html_9a93fe6: "เปิดปิดข้อความคำตอบเป็น HTML"
   toggle_filterpresetname_f8ae0191: "สลับ %{filterPresetName}"
   toggle_module_visibility_781a2f6c: เปิดปิดการแสดงผลหน่วยการเรียน
@@ -21815,6 +21830,7 @@ th:
   update_important_info_bcc01d6a: อัพเดตข้อมูลที่สำคัญ
   update_inbox_page_to_use_react_instui_4d343fd: "อัพเดตเพจกล่องจดหมายเพื่อใช้ react/instui"
   update_link_b7cab181: อัพเดตลิงค์
+  update_lti_region_912491e4: "อัพเดตพื้นที่ LTI"
   update_name_6581781d: "อัพเดต %{name}"
   update_pages_c91d7ba: อัพเดตเพจ
   update_rating_6d29c2ef: อัพเดตคะแนน
@@ -22865,6 +22881,7 @@ th:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "คุณสามารถตรวจสอบกลุ่มโดยคลิกที่ลิงค์นี้: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "คุณสามารถตรวจสอบกลุ่มโดยคลิกที่ลิงค์นี้: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "คุณสามารถปิดกล่องโต้ตอบนี้เพื่อดำเนินการต่อไปหากไม่ต้องการรอ การจัดสรรจะดำเนินการต่ออยู่เบื้องหลัง"
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "คุณสามารถจัดทำชุดกลุ่มที่ผู้เรียนสามารถสมัครได้เอง ผู้เรียนยังถูกจำกัดให้ต้องเข้าร่วมเพียงกลุ่มเดียวในชุดกลุ่ม แต่วิธีนี้จะทำให้ผู้เรียนสามารถกำหนดโครงสร้างตัวเองเข้ากับกลุ่มแทนการรอให้ผู้สอนทำให้"
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       คุณสามารถจัดทำชุดกลุ่มที่ผู้เรียนสามารถสมัครได้เอง ผู้เรียนยังถูกจำกัด\
                     ให้ต้องเข้าร่วมเพียงกลุ่มเดียวในชุดกลุ่ม แต่วิธีนี้จะทำให้ผู้เรียนสามารถกำหนดโครงสร้างตัวเองเข้ากับกลุ่ม\
