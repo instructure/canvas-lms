@@ -11980,6 +11980,7 @@ sv:
   failed_to_delete_role_label_27959de3: "Det gick inte att ta bort rollen %{label}"
   failed_to_delete_selected_pages_26fa87db: "Det gick inte att radera valda sidor"
   failed_to_export_blueprint_course_settings_1ced8c6: "Det gick inte att exportera inställningar för Blueprint-kurs"
+  failed_to_export_context_info_acb07497: "Det gick inte att exportera kontextinformation"
   failed_to_export_course_paces_e17583ba: "Det gick inte att exportera kurstakter"
   failed_to_export_pace_plans_9832daac: "Det gick inte att exportera taktplanerna"
   failed_to_export_some_tool_settings_c992fc56: "Misslyckades med att exportera vissa verktygsinställningar"
@@ -12469,6 +12470,7 @@ sv:
   from_from_to_to_e31f6422: "Från %{from} till %{to}"
   from_gravatar_58372d5a: "Från Gravatar"
   from_grouptitle_860dff95: "Från %{groupTitle}"
+  front_page_50cae87e: Framsida
   front_page_must_be_set_first_4dbbfdbe: "Framsidan måste ställas in först"
   front_page_must_be_set_first_c5246f7d: "Framsidan måste ställas in först"
   full_article_9296bb6f: "Fullständig artikel"
@@ -19794,13 +19796,14 @@ sv:
   online_url_37830a72: "Online URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "max 100 händelser kan skapas"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "endast ett maximalt antal %{limit} händelser kan skapas"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Max %{max} bedömare kan tilldelas"
   only_account_administrators_can_change_this_settin_149f8fe3: "Endast administratörer kan ändra den här inställningen."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Lägg endast till inlägg med en specifik fras i titeln"
   only_after_their_last_attempt_3593d101: "Endast efter deras sista försök"
   only_announcements_can_be_section_specific_1ff992a: "Endast meddelanden kan vara sektionsspecifika"
   only_available_to_students_with_link_107e2468: "Endast tillgängligt för studenter via länk"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Endast tillgängliga studenter med en länk. Inte synlig i studentfiler"
-  only_available_with_link_5ffb9492: "Endast tillgängligt med bläck"
+  only_available_with_link_5ffb9492: "Endast tillgängligt med länk"
   only_collect_grades_that_have_been_graded_since_th_96baed94: "Samla bara omdömen som bedömts sedan start_at."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Endast anslag och diskussioner kan vara sektionsspecifika"
   only_course_announcements_can_be_section_specific_eabcd6e0: "Endast kurs-aviseringar kan vara sektionsspecifika"
@@ -20156,6 +20159,7 @@ sv:
   own_copyright_cc59db55: "Egen upphovsrätt"
   owner_email_236d1b2: "Ägarens e-postadress"
   owner_email_4d02f795: "Ägarens e-post:"
+  pace_duration_cb8f5de7: Taktvaraktighet
   pace_is_new_and_unpublished_9aa68306: "Takten är ny och opublicerad"
   pace_plan_56e8fb1d: Taktplan
   pace_plans_4bb9c5ff: Taktplaner
@@ -21141,6 +21145,7 @@ sv:
   pro_tip_30e41fa3: PROFFSTIPS!
   proceed_f3d33864: Fortsätt
   proceed_with_caution_aa9b3285: "Fortsätt med försiktighet"
+  proceed_with_extreme_caution_f5716a27: "Fortsätt med stor försiktighet"
   process_multiple_content_items_from_course_modules_6de90fd8: "Behandla flera innehållsobjekt från kursmodulsidan"
   processed_4725b02: Bearbetad
   processing_2fcc9739: Bearbetar
@@ -25623,6 +25628,10 @@ sv:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Visar %{count} lärandemål för %{groupTitle}."
     other: "Visar %{count} lärandemål för %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Visar 1 resultat nedan"
+    other: "Visar %{count} resultat nedan"
+    zero: "Inga resultat hittades"
   showing_search_results_below_4c9a63d9: "Visa sökresultat nedan"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Visar versionsinformation från Instructure i hjälpmenyn för alla användare (filtrerad efter användarroll)"
   shrink_permission_74b01aed: "Dölj %{permission}"
@@ -26290,6 +26299,7 @@ sv:
   subject_114b2e98: Ämne
   subject_1bc03dea: "Ämne:"
   subject_details_12405b1: Ämnesinformation
+  subject_home_8e593f72: Ämneshemsida
   subject_home_page_41226803: Ämneshemsida
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Ämnet måste innehålla mindre än 255 tecken."
   subject_name_a1ac4da4: Ämnesnamn
@@ -26363,6 +26373,7 @@ sv:
   submission_score_b7a291e8: "inlämningens resultat"
   submission_sent_3f0d2ee1: "Inlämningen skickad"
   submission_status_3079e730: Inlämningsstatus
+  submission_submit_on_behalf_of_student_f0ed14e4: "Inlämning – Lämna in för students räkning"
   submission_tray_429ac3df: Inlämningsfack
   submission_type_a925fc5f: Inlämningstyp
   submission_type_displayname_currently_selected_3f8aa9f8: "Inlämningstypen %{displayName} är vald"
@@ -27427,6 +27438,7 @@ sv:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Det här kriteriet är länkat till ett lärandemål"
   this_due_date_is_managed_by_cfbb698c: "Det här inlämningsdatumet hanteras av"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Det här inlämningsdatum hanteras av kurstakt."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Den här varaktigheten tar inte hänsyn till veckoslut och blackout-dagar."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Det här elementet är ett mer tillgängligt alternativ än dra & släpp omorganiserande. Tryck på Enter eller Blankstegs-tangenten för att flytta den här frågan."
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressen är inte bekräftad"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Detta aktiverar en kursinställning så att studenter kan exportera kurserna som en webbzipmapp offline."
@@ -27779,6 +27791,7 @@ sv:
   time_left_in_your_instant_trial_5dd0392b: "%{time} Lämnats i din Instant Trial"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} Lämnats i din Instant Trial * (förläng nu)*"
   time_limit_a6f1a51e: Tidsgräns
+  time_to_complete_9d264097: "Tid för slutföra"
   time_zone_f56f5183: Tidszon
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -28577,6 +28590,7 @@ sv:
   toggle_alignment_details_for_title_944f605: "Växla justeringsdetaljer för %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Växla färgöverlägg för kurskort"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Starta dashcard vy eller senaste aktivitet flöde"
+  toggle_due_date_compression_tooltip_f2edda2e: "Verktygstips om växling till komprimering av inlämningsdatum"
   toggle_editing_answer_text_as_html_9a93fe6: "Starta redigering av svarstext som HTML"
   toggle_filterpresetname_f8ae0191: "Växla %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "slå på/av modul synlighet"
@@ -29045,6 +29059,7 @@ sv:
   update_important_info_bcc01d6a: "Uppdatera viktig information"
   update_inbox_page_to_use_react_instui_4d343fd: "Uppdatera inkorgssidan för att använda React/InstUI"
   update_link_b7cab181: "Uppdatera länk"
+  update_lti_region_912491e4: "Uppdatera LTI-region"
   update_name_6581781d: "Uppdatera %{name}"
   update_pages_c91d7ba: "Uppdatera sidor"
   update_rating_6d29c2ef: "Uppdatera ranking"
@@ -30355,6 +30370,7 @@ sv:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Klicka på den här länken för att ta en titt på gruppen: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Klicka på den här länken för att ta en titt på gruppen: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Du kan stänga den här dialogrutan om du vill fortsätta arbeta och inte vill vänta. Tilldelningen sker i bakgrunden."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Du kan skapa en uppsättning grupper där studenter kan registrera sig själva. Studenter är fortfarande begränsade till en grupp per uppsättning, men på det här sättet kan studenter själva organisera sig utan att deras lärare utför arbetet."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Du kan skapa gruppuppsättningar där studenter kan registrera sig själva. Studenter är fortfarande begränsade\
                     till en grupp i uppsättningen, men på detta sätt kan studenter på egen hand ordna in sig i grupper\
