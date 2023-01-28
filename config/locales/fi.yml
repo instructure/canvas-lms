@@ -10262,6 +10262,7 @@ fi:
   failed_to_delete_role_label_27959de3: "Roolin %{label} poistaminen epäonnistui."
   failed_to_delete_selected_pages_26fa87db: "Valittujen sivujen poisto ei onnistunut"
   failed_to_export_blueprint_course_settings_1ced8c6: "Blueprint-kurssin asetusten vienti epäonnistui"
+  failed_to_export_context_info_acb07497: "Kontekstin tietojen siirto epäonnistui"
   failed_to_export_course_paces_e17583ba: "Kurssin toteutustahtisuunnitelmien vienti epäonnistui"
   failed_to_export_pace_plans_9832daac: "Toteutustahtisuunnitelmien vienti epäonnistui"
   failed_to_ignore_assignment_46565fa3: "Tehtävien ohitus epäonnistui"
@@ -10654,6 +10655,7 @@ fi:
   from_from_to_to_e31f6422: "%{from}-%{to}"
   from_gravatar_58372d5a: Gravatar-sovelluksesta
   from_grouptitle_860dff95: "Lähettäjältä %{groupTitle}"
+  front_page_50cae87e: Etusivu
   front_page_must_be_set_first_4dbbfdbe: "Etusivu täytyy määrittää ensimmäiseksi"
   front_page_must_be_set_first_c5246f7d: "Etusivu täytyy ensin olla valittuna"
   full_article_9296bb6f: "Koko artikkeli"
@@ -16764,6 +16766,7 @@ fi:
   online_upload_59969592: "Tiedoston lataus verkossa"
   online_url_37830a72: "Verkkosivun osoite"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Enintään %{limit} tapahtumaa voidaan luoda"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Enintään %{max} arvosanan antajaa voidaan kohdistaa"
   only_account_administrators_can_change_this_settin_149f8fe3: "Vain tilin pääkäyttäjät voivat muuttaa tätä asetusta."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Lisää vain ne keskusteluviestit, joiden otsikossa on ennalta määrätty lause"
   only_after_their_last_attempt_3593d101: "Vain viimeisen yrityksen jälkeen"
@@ -17084,6 +17087,7 @@ fi:
   own_copyright_cc59db55: "Omista tekijänoikeudet"
   owner_email_236d1b2: "Omistajan sähköpostiosoite"
   owner_email_4d02f795: "Omistajan sähköpostiosoite:"
+  pace_duration_cb8f5de7: "Tahdituksen kesto"
   pace_is_new_and_unpublished_9aa68306: "Tahti on uusi ja julkaisematon"
   pace_plan_56e8fb1d: Toteutustahtisuunnitelma
   pace_plans_4bb9c5ff: Toteutustahtisuunnitelmat
@@ -17983,6 +17987,7 @@ fi:
   pro_tip_30e41fa3: AMMATTILAISVINKKI!
   proceed_f3d33864: Jatka
   proceed_with_caution_aa9b3285: "Etene varoen"
+  proceed_with_extreme_caution_f5716a27: "Jatka erittäin varovasti"
   process_multiple_content_items_from_course_modules_6de90fd8: "Käsittele useita sisältökohteita kurssimoduulien sivulta"
   processed_4725b02: Käsitelty
   processing_2fcc9739: Käsitellään
@@ -21776,6 +21781,10 @@ fi:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Näyttää %{count} tuloksen kohteelle %{groupTitle}."
     other: "Näyttää %{count} tulokset kohteille %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Näytetään 1 tulos alla"
+    other: "Näytetään %{count} tulosta alla"
+    zero: "Tuloksia ei löytynyt"
   showing_search_results_below_4c9a63d9: "Näytetään hakutulokset alla"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Näyttää Ohjaajan tarjoamat julkaisumuistiinpanot ohje-valikossa kaikille käyttäjille (suodatettuna käyttäjäroolin mukaan)"
   shrink_permission_74b01aed: "Kutista %{permission}"
@@ -22373,6 +22382,7 @@ fi:
   subject_114b2e98: Aihe
   subject_1bc03dea: "Aihe:"
   subject_details_12405b1: "Aiheen tiedot"
+  subject_home_8e593f72: "Aiheen etusivu"
   subject_home_page_41226803: "Aiheen etusivu"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Aiheessa on oltava alle 255 merkkiä."
   subject_name_a1ac4da4: "Aiheen nimi"
@@ -22441,6 +22451,7 @@ fi:
   submission_requirement_8ba1ee08: "Lähetyksen vaatimukset"
   submission_score_b7a291e8: "tehtäväpalautuksen pistemäärä"
   submission_sent_3f0d2ee1: "Tehtäväpalautus lähetetty"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Lähetys - Lähetä opiskelijan puolesta"
   submission_tray_429ac3df: "Tehtäväpalautuksen tietopaneeli"
   submission_type_a925fc5f: "Tehtävän palautustapa"
   submission_type_displayname_currently_selected_3f8aa9f8: "Lähetystyyppi %{displayName}, parhaillaan valittu"
@@ -23417,6 +23428,7 @@ fi:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Tämä kriteeri on linkitetty osaamistulokseen"
   this_due_date_is_managed_by_cfbb698c: "Tätä määräpäivää hallitsee"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Tätä päivämäärä hallitsee kurssin tahditus."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Tämä kesto ei huomioi tilin viikonloppuja ja lukituspäiviä."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Tämä elementti on paremmin saavutettavissa oleva vaihtoehto vedä- ja pudota uuteen järjestykseen -tehtävälle. Siirrä tätä kysymystä painamalla Enter tai Välilyönti."
   this_email_address_is_unconfirmed_f0fc8c6e: "Tätä sähköpostiosoitetta ei ole vahvistettu"
   this_enables_users_to_generate_and_download_course_4c69c531: "Tämä mahdollistaa käyttäjien luovan ja lataavan kurssin ePubin."
@@ -23746,6 +23758,7 @@ fi:
   time_2b5aac58: Aika
   time_block_5a7cda5c: Aikalohko
   time_limit_a6f1a51e: Aikaraja
+  time_to_complete_9d264097: Valmistumisaika
   time_zone_f56f5183: Aikavyöhyke
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -24513,6 +24526,7 @@ fi:
   today_76e10f9c: "Tämä päivä"
   toggle_alignment_details_for_title_944f605: "Vaihda liitettyjen kohteiden tietoja kohteelle %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Vaihtele kurssikorttien värikerroksia"
+  toggle_due_date_compression_tooltip_f2edda2e: "Vaihda määräpäivän pakkaustyökalua"
   toggle_editing_answer_text_as_html_9a93fe6: "Vaihda vastaustekstin muokkaamista HTML:ksi"
   toggle_filterpresetname_f8ae0191: "Vaihda %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "vaihtele moduulin näkyvyyttä"
@@ -24951,6 +24965,7 @@ fi:
   update_important_info_bcc01d6a: "Päivitä tärkeät tiedot"
   update_inbox_page_to_use_react_instui_4d343fd: "Päivitä saapuvien postien sivua käyttämään reaktiota/instuita"
   update_link_b7cab181: "Päivitä linkki"
+  update_lti_region_912491e4: "Päivitä LTI-alue"
   update_name_6581781d: "Päivitä %{name}"
   update_pages_c91d7ba: "Päivitä sivuja"
   update_rating_6d29c2ef: "Päivitä luokitus"
@@ -26123,6 +26138,7 @@ fi:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Voit tarkastella ryhmää napsauttamalla tätä linkkiä: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Voit tarkastella ryhmää napsauttamalla tätä linkkiä: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Voit sulkea tämän keskusteluruudun jatkaaksesi työskentelemistä, jos et halua odottaa; kohdistaminen jatkuu taustalla."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Voit luoda ryhmien joukkoja, joihin opiskelijat voivat rekisteröityä itse. Opiskelijat voivat liittyä vain yhteen ryhmäjoukon ryhmistä. Jos itserekisteröityminen on sallittu, opiskelijat voivat organisoida itsensä ryhmiin sen sijaan, että opettajan täytyisi tehdä ryhmäjako."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Voit luoda ryhmäjoukkoja, joihin opiskelijat voivat rekisteröityä itse. Opiskelijat voivat\
                     liittyä vain yhteen ryhmäjoukon ryhmistä. Jos itserekisteröityminen on sallittu, opiskelijat voivat organisoida itsensä ryhmiin\
