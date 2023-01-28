@@ -11974,6 +11974,7 @@ ja:
   failed_to_delete_role_label_27959de3: "ロールの削除ができませんでした%{label}"
   failed_to_delete_selected_pages_26fa87db: 選択したページを削除できませんでした
   failed_to_export_blueprint_course_settings_1ced8c6: ブループリントコース設定のエクスポートに失敗
+  failed_to_export_context_info_acb07497: コンテキスト情報のエクスポートに失敗しました
   failed_to_export_course_paces_e17583ba: コースペースのエクスポートに失敗しました
   failed_to_export_pace_plans_9832daac: ペースプランのエクスポートに失敗しました。
   failed_to_export_some_tool_settings_c992fc56: 一部のツール設定のエクスポートに失敗しました
@@ -12462,6 +12463,7 @@ ja:
   from_from_to_to_e31f6422: "%{from} ～ %{to}"
   from_gravatar_58372d5a: "Gravatar から"
   from_grouptitle_860dff95: "%{groupTitle}から"
+  front_page_50cae87e: フロントページ
   front_page_must_be_set_first_4dbbfdbe: "トップ ページを最初に設定する必要があります"
   front_page_must_be_set_first_c5246f7d: 表紙を先に設定してください
   full_article_9296bb6f: 記事全文
@@ -18842,7 +18844,7 @@ ja:
   name_badfe525: 名前
   name_conference_8e042dd2: "%{name}会議"
   name_count_students_d004ba32: "%{name}（%{count}の受講者）"
-  name_count_users_ccc93c3d: "%{name}(%{count} ユーザー)"
+  name_count_users_ccc93c3d: "%{name} (%{count} のユーザー)"
   name_current_grade_d8da149f: "%{name} 現在の評定"
   name_current_score_b3198dfa: "%{name} の現在のスコア"
   name_e790ff1f: 名前...
@@ -19781,6 +19783,7 @@ ja:
   online_url_37830a72: "オンライン URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: 最高100のイベントを作成することができます
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "イベントは、最大%{limit}件しか作成できません"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "評価者は、最大%{max}名しか割り当てられません"
   only_account_administrators_can_change_this_settin_149f8fe3: この設定を変更できるのは、アカウント管理者だけです。
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: 指定した語句がタイトルに含まれている投稿のみを追加
   only_after_their_last_attempt_3593d101: 最終試行後のみ
@@ -20142,6 +20145,7 @@ ja:
   own_copyright_cc59db55: 著作権保有
   owner_email_236d1b2: 所有者の電子メール
   owner_email_4d02f795: 所有者の電子メール：
+  pace_duration_cb8f5de7: ペース期間
   pace_is_new_and_unpublished_9aa68306: ペースは新規・未公開
   pace_plan_56e8fb1d: ペース計画
   pace_plans_4bb9c5ff: ペース計画
@@ -21125,6 +21129,7 @@ ja:
   pro_tip_30e41fa3: プロのヒント！
   proceed_f3d33864: 続行する
   proceed_with_caution_aa9b3285: 慎重に進めてください
+  proceed_with_extreme_caution_f5716a27: 細心の注意を払って進んでください
   process_multiple_content_items_from_course_modules_6de90fd8: コースモジュールページの複数のコンテンツアイテムを処理します
   processed_4725b02: 処理済み
   processing_2fcc9739: 処理中
@@ -25613,6 +25618,10 @@ ja:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "%{count}の%{groupTitle}の結果を表示中。"
     other: "%{count}の%{groupTitle}のアウトカムを表示中。"
+  showing_count_results_below_61ddca33: 
+    one: 検索結果がありません
+    other: "以下の%{count}件の結果を表示"
+    zero: 結果が見つかりませんでした
   showing_search_results_below_4c9a63d9: 検索結果を下に表示中
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Instructure が提供するリリースノートをすべてのユーザーのヘルプメニューに表示します（ユーザー役割で絞り込み）"
   shrink_permission_74b01aed: "%{permission}を縮小する"
@@ -26280,6 +26289,7 @@ ja:
   subject_114b2e98: 件名
   subject_1bc03dea: 件名：
   subject_details_12405b1: 件名詳細
+  subject_home_8e593f72: "件名 ホーム"
   subject_home_page_41226803: 対象ホームページ
   subject_must_contain_fewer_than_255_characters_2e72cd02: 件名は255文字未満でなければなりません。
   subject_name_a1ac4da4: 件名
@@ -26353,6 +26363,7 @@ ja:
   submission_score_b7a291e8: 提出物のスコア
   submission_sent_3f0d2ee1: 提出を送信しました
   submission_status_3079e730: 提出状態
+  submission_submit_on_behalf_of_student_f0ed14e4: "提出 - 代わりに提出する"
   submission_tray_429ac3df: 提出トレイ
   submission_type_a925fc5f: 提出物のタイプ
   submission_type_displayname_currently_selected_3f8aa9f8: "提出タイプ %{displayName}、現在選択されているもの"
@@ -27417,6 +27428,7 @@ ja:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: この基準がリンクされている学習アウトカムがあります。
   this_due_date_is_managed_by_cfbb698c: この期日を管理するもの
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: この期限は、コースペーシングによって管理されます。
+  this_duration_does_not_take_into_account_weekends__19209a71: この期間には、週末や停電の日は考慮されません。
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: このエレメントは、ドラッグ＆ドロップによる並べ替えよりも便利な方法です。エンター、またはスペースを押して、この質問を移動してください。
   this_email_address_is_unconfirmed_f0fc8c6e: このメールアドレスは、確認されていません。
   this_enables_a_course_setting_to_allow_students_to_fc47219: "これにより、受講生がコースをオフラインのウェブ ZIP ォルダとしてエクスポートできるようにするコース設定が可能となります"
@@ -27771,6 +27783,7 @@ ja:
   time_left_in_your_instant_trial_5dd0392b: "%{time} インスタントトライアルに残留"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} インスタントトライアル *(今すぐ延長)*"
   time_limit_a6f1a51e: 制限時間
+  time_to_complete_9d264097: 終了までの時間
   time_zone_f56f5183: "タイム ゾーン"
   time_zones: 
     abu_dhabi: アブダビ
@@ -28569,6 +28582,7 @@ ja:
   toggle_alignment_details_for_title_944f605: "%{title} の位置調整の詳細を切り替える"
   toggle_course_card_color_overlays_b5b8137a: トグルコースカードカラーオーバーレイ
   toggle_dashcard_view_or_recent_activity_stream_1de257: トグルダッシュカードビュー、または最近のアクティビティーストリーム
+  toggle_due_date_compression_tooltip_f2edda2e: 期限圧縮ツールチップをトグルする
   toggle_editing_answer_text_as_html_9a93fe6: "回答テキストを HTML として編集するかどうか"
   toggle_filterpresetname_f8ae0191: "トグル%{filterPresetName}"
   toggle_module_visibility_781a2f6c: モジュール可視性を切り替える
@@ -29037,6 +29051,7 @@ ja:
   update_important_info_bcc01d6a: 重要な情報を更新する
   update_inbox_page_to_use_react_instui_4d343fd: react/instuiを使用するように受信トレイページを更新します
   update_link_b7cab181: リンクを更新する
+  update_lti_region_912491e4: LTI地域の更新
   update_name_6581781d: "%{name}を更新"
   update_pages_c91d7ba: ページを更新
   update_rating_6d29c2ef: 評価を更新する
@@ -30344,6 +30359,7 @@ ja:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "下のリンクをクリックすると、グループについて調べることができます: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "このリンクをクリックすると、グループについて調べることができます: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: 待ちたくない場合には、このダイアログボックスを閉じて作業を続けることができます。割り当てはバックグラウンドで継続されます。
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: 受講者が自分でサインアップできるグループのセットを作成することができます。受講者はセット内の1つのグループにしか所属できないことに変わりはありませんが、この方法では教員が作業を行う必要がなく、受講者が自分でグループを編成することができます。
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       受講者が自分でサインアップできるグループのセットを作成することができます。教員が作業をする代わりに、\
                     受講者たちはセット内で1グループに制限されていますが、\
