@@ -11968,6 +11968,7 @@ nl:
   failed_to_delete_role_label_27959de3: "Rol verwijderen mislukt %{label}"
   failed_to_delete_selected_pages_26fa87db: "Kan de geselecteerde pagina's niet verwijderen"
   failed_to_export_blueprint_course_settings_1ced8c6: "Exporteren van instellingen voor blauwdrukcursus is mislukt"
+  failed_to_export_context_info_acb07497: "Exporteren van contextinfo is mislukt"
   failed_to_export_course_paces_e17583ba: "Exporteren van cursustempo's is mislukt"
   failed_to_export_pace_plans_9832daac: "Kan tempoplannen niet exporteren"
   failed_to_export_some_tool_settings_c992fc56: "Exporteren van enkele toolinstellingen is mislukt"
@@ -12457,6 +12458,7 @@ nl:
   from_from_to_to_e31f6422: "Van %{from} tot %{to}"
   from_gravatar_58372d5a: "Van Gravatar"
   from_grouptitle_860dff95: "Uit %{groupTitle}"
+  front_page_50cae87e: Voorpagina
   front_page_must_be_set_first_4dbbfdbe: "Voorpagina moet eerst worden ingesteld"
   front_page_must_be_set_first_c5246f7d: "Voorpagina moet eerst worden ingesteld"
   full_article_9296bb6f: "Volledig artikel"
@@ -19775,6 +19777,7 @@ nl:
   online_url_37830a72: "Online URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "er kunnen slechts maximaal 100 gebeurtenissen worden aangemaakt"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "er kunnen slechts maximaal %{limit} evenementen worden gemaakt"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Er kunnen maximaal slechts %{max} beoordelaars worden toegewezen"
   only_account_administrators_can_change_this_settin_149f8fe3: "Alleen accountbeheerders kunnen deze instelling wijzigen."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Alleen berichten plaatsen met een specifieke woordgroep in de titel"
   only_after_their_last_attempt_3593d101: "Alleen na de laatste poging"
@@ -20134,6 +20137,7 @@ nl:
   own_copyright_cc59db55: "Eigen auteursrecht"
   owner_email_236d1b2: "Eigenaar van e-mail"
   owner_email_4d02f795: "Eigenaar van e-mail:"
+  pace_duration_cb8f5de7: "Duur van tempo"
   pace_is_new_and_unpublished_9aa68306: "Tempo is nieuw en niet gepubliceerd"
   pace_plan_56e8fb1d: Tempoplan
   pace_plans_4bb9c5ff: Tempoplannen
@@ -21121,6 +21125,7 @@ nl:
   pro_tip_30e41fa3: "HANDIGE TIP!"
   proceed_f3d33864: Doorgaan
   proceed_with_caution_aa9b3285: "Ga voorzichtig te werk"
+  proceed_with_extreme_caution_f5716a27: "Ga uiterst voorzichtig te werk"
   process_multiple_content_items_from_course_modules_6de90fd8: "Meerdere inhoudsitems verwerken vanaf de pagina Cursusmodules"
   processed_4725b02: Verwerkt
   processing_2fcc9739: "Aan het verwerken"
@@ -25614,6 +25619,10 @@ nl:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Tonen van %{count} leerdoel voor %{groupTitle}."
     other: "Tonen van %{count} leerdoelen voor %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Hieronder wordt 1 resultaat weergegeven"
+    other: "Hieronder worden %{count} resultaten weergegeven"
+    zero: "Geen resultaten gevonden"
   showing_search_results_below_4c9a63d9: "Zoekresultaten hieronder weergeven"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Toont door Instructure geleverde releaseopmerkingen in het helpmenu voor alle gebruikers (gefilterd op gebruikersrol)"
   shrink_permission_74b01aed: "%{permission} samenvouwen"
@@ -26279,6 +26288,7 @@ nl:
   subject_114b2e98: Onderwerp
   subject_1bc03dea: "Onderwerp:"
   subject_details_12405b1: Vakdetails
+  subject_home_8e593f72: "Startpagina onderwerp"
   subject_home_page_41226803: "Startpagina van vak"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Onderwerp moet minder dan 255 tekens bevatten."
   subject_name_a1ac4da4: Vaknaam
@@ -26352,6 +26362,7 @@ nl:
   submission_score_b7a291e8: "score van inzending"
   submission_sent_3f0d2ee1: "Inlevering verzonden"
   submission_status_3079e730: Inzendingsstatus
+  submission_submit_on_behalf_of_student_f0ed14e4: "Inlevering - Inleveren namens cursist"
   submission_tray_429ac3df: "Menu voor inzending"
   submission_type_a925fc5f: "Type inlevering"
   submission_type_displayname_currently_selected_3f8aa9f8: "Inleveringstype %{displayName}, momenteel geselecteerd"
@@ -27416,6 +27427,7 @@ nl:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Dit criterium is aan een leerresultaat gekoppeld"
   this_due_date_is_managed_by_cfbb698c: "Deze inleverdatum wordt beheerd door"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Deze inleverdatum wordt beheerd door Cursustempo."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Bij deze tijdsduur wordt geen rekening gehouden met weekends en uitvaldagen."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dit element is een meer toegankelijk alternatief dan herordenen door middel van slepen en neerzetten. Kies Enter of Spatie om deze vraag te verplaatsen."
   this_email_address_is_unconfirmed_f0fc8c6e: "Dit e-mailadres is niet bevestigd"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Met deze cursusinstelling kunnen cursisten de cursus exporteren als een offline web zip-map"
@@ -27770,6 +27782,7 @@ nl:
   time_left_in_your_instant_trial_5dd0392b: "%{time} achtergebleven in je instantproefversie"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} achtergebleven in je instantproefversie *(nu verlengen)*"
   time_limit_a6f1a51e: Tijdslimiet
+  time_to_complete_9d264097: "Tijd om te voltooien"
   time_zone_f56f5183: Standaardtijdzone
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -28568,6 +28581,7 @@ nl:
   toggle_alignment_details_for_title_944f605: "Afstemmingsdetails in-/uitschakelen voor %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Wisselen tussen kleurenoverlays voor cursuskaarten"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Dashcard zicht aan- en uitzetten voor recente activiteitenstroom"
+  toggle_due_date_compression_tooltip_f2edda2e: "Tooltip compressie inleverdatum"
   toggle_editing_answer_text_as_html_9a93fe6: "Het bewerken van antwoordtekst als HTML in-/uitschakelen"
   toggle_filterpresetname_f8ae0191: "%{filterPresetName} wisselen"
   toggle_module_visibility_781a2f6c: "zichtbaarheid van module in-/uitschakelen"
@@ -29034,6 +29048,7 @@ nl:
   update_important_info_bcc01d6a: "Belangrijke informatie bijwerken"
   update_inbox_page_to_use_react_instui_4d343fd: "Updaten van inboxpagina voor gebruik van react/instui"
   update_link_b7cab181: "Koppeling bijwerken"
+  update_lti_region_912491e4: "LTI-regio bijwerken"
   update_name_6581781d: "%{name} bijwerken"
   update_pages_c91d7ba: "Pagina's bijwerken"
   update_rating_6d29c2ef: "Beoordeling bijwerken"
@@ -30344,6 +30359,7 @@ nl:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Je kunt de groep uitchecken door op deze link te klikken: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Je kunt de groep uitchecken door op deze link te klikken: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Je kunt dit dialoogvenster sluiten om door te gaan als je niet wilt wachten. Toewijzing gaat dan gewoon door in de achtergrond."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Je kunt reeksen groepen maken waarvoor cursisten zichzelf kunnen inschrijven. Cursisten zijn nog steeds beperkt tot lidmaatschap van slechts één groep in de reeks, maar op deze manier kunnen cursisten zichzelf indelen in groepen zodat de cursusleider dat niet hoeft te doen."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Je kunt reeksen groepen maken waarvoor cursisten zichzelf kunnen inschrijven. Cursisten zijn nog steeds beperkt\
                     tot lidmaatschap van slechts één groep in de reeks, maar op deze manier kunnen cursisten zichzelf indelen in groepen\
