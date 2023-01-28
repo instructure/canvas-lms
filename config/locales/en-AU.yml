@@ -11994,6 +11994,7 @@ en-AU:
   failed_to_delete_role_label_27959de3: "Failed to delete role %{label}"
   failed_to_delete_selected_pages_26fa87db: "Failed to delete selected pages"
   failed_to_export_blueprint_course_settings_1ced8c6: "Failed to export blueprint course settings"
+  failed_to_export_context_info_acb07497: "Failed to export context info"
   failed_to_export_course_paces_e17583ba: "Failed to export course paces"
   failed_to_export_pace_plans_9832daac: "Failed to export pace plans"
   failed_to_export_some_tool_settings_c992fc56: "Failed to export some tool settings"
@@ -12483,6 +12484,7 @@ en-AU:
   from_from_to_to_e31f6422: "From %{from} to %{to}"
   from_gravatar_58372d5a: "From Gravatar"
   from_grouptitle_860dff95: "From %{groupTitle}"
+  front_page_50cae87e: "Front Page"
   front_page_must_be_set_first_4dbbfdbe: "Front page must be set first"
   front_page_must_be_set_first_c5246f7d: "Front Page must be set first"
   full_article_9296bb6f: "Full article"
@@ -19832,6 +19834,7 @@ en-AU:
   online_url_37830a72: "Online URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "only a maximum of 100 events can be created"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "only a maximum of %{limit} events can be created"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Only a maximum of %{max} graders can be assigned"
   only_account_administrators_can_change_this_settin_149f8fe3: "Only account administrators can change this setting."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Only add posts with a specific phrase in the title"
   only_after_their_last_attempt_3593d101: "Only After Their Last Attempt"
@@ -20197,6 +20200,7 @@ en-AU:
   own_copyright_cc59db55: "Own Copyright"
   owner_email_236d1b2: "Owner Email"
   owner_email_4d02f795: "Owner Email:"
+  pace_duration_cb8f5de7: "Pace Duration"
   pace_is_new_and_unpublished_9aa68306: "Pace is new and unpublished"
   pace_plan_56e8fb1d: "Pace Plan"
   pace_plans_4bb9c5ff: "Pace Plans"
@@ -21183,6 +21187,7 @@ en-AU:
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Proceed
   proceed_with_caution_aa9b3285: "Proceed with Caution"
+  proceed_with_extreme_caution_f5716a27: "Proceed with Extreme Caution"
   process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
   processed_4725b02: Processed
   processing_2fcc9739: Processing
@@ -25689,6 +25694,10 @@ en-AU:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Showing %{count} outcome for %{groupTitle}."
     other: "Showing %{count} outcomes for %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Showing 1 result below"
+    other: "Showing %{count} results below"
+    zero: "No results found"
   showing_search_results_below_4c9a63d9: "Showing Search Results Below"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Shows Instructure-provided release notes in the help menu for all users (filtered by user role)"
   shrink_permission_74b01aed: "Shrink %{permission}"
@@ -26360,6 +26369,7 @@ en-AU:
   subject_114b2e98: Subject
   subject_1bc03dea: "Subject:"
   subject_details_12405b1: "Subject Details"
+  subject_home_8e593f72: "Subject Home"
   subject_home_page_41226803: "Subject Home Page"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Subject must contain fewer than 255 characters."
   subject_name_a1ac4da4: "Subject Name"
@@ -26433,6 +26443,7 @@ en-AU:
   submission_score_b7a291e8: "submission score"
   submission_sent_3f0d2ee1: "Submission sent"
   submission_status_3079e730: "Submission status"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Submission - Submit on behalf of student"
   submission_tray_429ac3df: "Submission tray"
   submission_type_a925fc5f: "Submission Type"
   submission_type_displayname_currently_selected_3f8aa9f8: "Submission type %{displayName}, currently selected"
@@ -27499,6 +27510,7 @@ en-AU:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "This criterion is linked to a Learning Outcome"
   this_due_date_is_managed_by_cfbb698c: "This due date is managed by"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "This due date is managed by Course Pacing."
+  this_duration_does_not_take_into_account_weekends__19209a71: "This duration does not take into account weekends and blackout days."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "This element is a more accessible alternative to drag & drop reordering. Press Enter or Space to move this question."
   this_email_address_is_unconfirmed_f0fc8c6e: "This email address is unconfirmed."
   this_enables_a_course_setting_to_allow_students_to_fc47219: "This enables a course setting to allow students to export the course as an offline web zip folder"
@@ -27853,6 +27865,7 @@ en-AU:
   time_left_in_your_instant_trial_5dd0392b: "%{time} left in your Instant Trial"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} left in your Instant Trial *(extend now)*"
   time_limit_a6f1a51e: "Time Limit"
+  time_to_complete_9d264097: "Time to complete"
   time_zone_f56f5183: "Time Zone"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -28651,6 +28664,7 @@ en-AU:
   toggle_alignment_details_for_title_944f605: "Toggle alignment details for %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Toggle course card colour overlays"
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Toggle dashcard view or recent activity stream"
+  toggle_due_date_compression_tooltip_f2edda2e: "Toggle due date compression tooltip"
   toggle_editing_answer_text_as_html_9a93fe6: "Toggle editing answer text as HTML"
   toggle_filterpresetname_f8ae0191: "Toggle %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "toggle module visibility"
@@ -29120,6 +29134,7 @@ en-AU:
   update_important_info_bcc01d6a: "Update Important Info"
   update_inbox_page_to_use_react_instui_4d343fd: "Update Inbox page to use react/instui"
   update_link_b7cab181: "Update link"
+  update_lti_region_912491e4: "Update LTI Region"
   update_name_6581781d: "Update %{name}"
   update_pages_c91d7ba: "Update pages"
   update_rating_6d29c2ef: "Update Rating"
@@ -30441,6 +30456,7 @@ en-AU:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "You can check out the group by clicking this link: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "You can check out the group by clicking this link: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "You can close this dialogue box to continue working if you don't want to wait; assigning will continue in the background."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organise themselves into groups instead of needing the teacher to do the work."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       You can create sets of groups where students can sign up on their own. Students are still limited\
                     to being in only one group in the set, but this way students can organise themselves into groups\
