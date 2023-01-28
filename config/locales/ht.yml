@@ -11324,6 +11324,7 @@ ht:
   failed_to_delete_role_label_27959de3: "Echèk eliminasyon wòl %{label}"
   failed_to_delete_selected_pages_26fa87db: "Pa rive efase paj ki seleksyone yo"
   failed_to_export_blueprint_course_settings_1ced8c6: "Echèk ekspòtasyon paramèt kou Blueprint"
+  failed_to_export_context_info_acb07497: "Echèk ekspòtasyon enfòmasyon kontèks"
   failed_to_export_course_paces_e17583ba: "Echèk ekspòtasyon frekans kou"
   failed_to_export_pace_plans_9832daac: "Ekspòtasyon plan kadans lan echwe"
   failed_to_export_some_tool_settings_c992fc56: "Echèk ekspòtsyon kèk zouti paramèt"
@@ -11751,6 +11752,7 @@ ht:
   from_from_to_to_e31f6422: "De %{from} a %{to}"
   from_gravatar_58372d5a: "De Gravatar"
   from_grouptitle_860dff95: "De %{groupTitle}"
+  front_page_50cae87e: "Premye Paj"
   front_page_must_be_set_first_4dbbfdbe: "Paj prensipal la dwe defini dabò"
   front_page_must_be_set_first_c5246f7d: "Paj Dakèy la dwe defini an premye"
   full_article_9296bb6f: "Atik o konplè"
@@ -18307,6 +18309,7 @@ ht:
   online_url_37830a72: "URL an Liy"
   only_a_maximum_of_100_events_can_be_created_ad703982: "sèlman yon maksimòm a 100 evènman ki ka kreye"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "sèlman yon maksimòm de %{limit} aktivite ki ka kreye"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Yo ka asiyen sèlman yon maksimòm %{max} korektè"
   only_account_administrators_can_change_this_settin_149f8fe3: "Sèlman administratè kont yo ki ka chanje paramèt sa a."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Ajoute piblikasyon avèk yon fraz espesyal nan tit la sèlman"
   only_after_their_last_attempt_3593d101: "Sèlman Aprè Dènye Tantativ yo a"
@@ -18664,6 +18667,7 @@ ht:
   own_copyright_cc59db55: "Genyen Dwa dotè"
   owner_email_236d1b2: "Imèl Pwopriyetè"
   owner_email_4d02f795: "Imèl Pwopriyetè:"
+  pace_duration_cb8f5de7: "Dire Ritm"
   pace_is_new_and_unpublished_9aa68306: "Rit la nouvo e li pa pibliye"
   pace_plan_56e8fb1d: "Plan Kadans"
   pace_plans_4bb9c5ff: "Plan Kadans"
@@ -19615,6 +19619,7 @@ ht:
   pro_tip_30e41fa3: "PRO TIP!"
   proceed_f3d33864: Pwosede
   proceed_with_caution_aa9b3285: "Avanse ak Prekosyon"
+  proceed_with_extreme_caution_f5716a27: "Avanse ak Anpil Prekosyon"
   process_multiple_content_items_from_course_modules_6de90fd8: "Trete plizyè eleman kontni apati de paj modil kou a"
   processed_4725b02: Trete
   processing_2fcc9739: "An tretman"
@@ -23655,6 +23660,10 @@ ht:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Afichaj %{count} rezilta pou %{groupTitle}."
     other: "Afichaj %{count} rezilta pou %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Montre 1 rezilta anba a"
+    other: "Montre %{count} rezilta anba a"
+    zero: "Nou pa jwenn rezilta"
   showing_search_results_below_4c9a63d9: "Montre Rezilta Rechèch Anba a"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Afiche nòt mizajou Instructure bay nan meni èd la pou tout itilizatè yo (filtre pa wòl itilizatè a)"
   shrink_permission_74b01aed: "Diminye %{permission}"
@@ -24279,6 +24288,7 @@ ht:
   subject_114b2e98: Sijè
   subject_1bc03dea: "Sijè:"
   subject_details_12405b1: "Detay Sijè"
+  subject_home_8e593f72: "Akèy Sijè"
   subject_home_page_41226803: "Pat Dakèy Matyè a"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Sijè a dwe genyen mwens pase 255 karaktè."
   subject_name_a1ac4da4: "Non Sijè"
@@ -24351,6 +24361,7 @@ ht:
   submission_score_b7a291e8: "nòt soumisyon"
   submission_sent_3f0d2ee1: "Soumisyon ale"
   submission_status_3079e730: "Estati Soumisyon"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Soumisyon - Soumèt nan non elèv la"
   submission_tray_429ac3df: "Plato soumisyon"
   submission_type_a925fc5f: "Tip Soumisyon"
   submission_type_displayname_currently_selected_3f8aa9f8: "Tip soumisyon %{displayName}, seleksyone kounye a"
@@ -25380,6 +25391,7 @@ ht:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Kritè sa a asosye ak yon Rezilta Aprantisaj"
   this_due_date_is_managed_by_cfbb698c: "Delè sa a jere pa"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Delè sa a jere pa Frekans Kou."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Dire sa a pa konsène wikenn ak jou entèdiksyon yo."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Eleman sa a se yon altènatif ki pi aksesib pou re òganizasyon an glise depoze. Peze Enter oswa Espas pou deplase kesyon sa a."
   this_email_address_is_unconfirmed_f0fc8c6e: "Adrès imèl la pa konfime"
   this_enables_users_to_generate_and_download_course_4c69c531: "Sa pèmèt itilizatè yo jenere epi telechaje ePub kou."
@@ -25728,6 +25740,7 @@ ht:
   time_left_in_your_instant_trial_5dd0392b: "%{time} Ki rete nan Tès Imedya ou a"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} Ki rete nan Tès Imedya ou a *(pwolonje kounye a)*"
   time_limit_a6f1a51e: Delè
+  time_to_complete_9d264097: "Tan pou konplete"
   time_zone_f56f5183: "Fizo Orè"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -26523,6 +26536,7 @@ ht:
   today_76e10f9c: "Jodi a"
   toggle_alignment_details_for_title_944f605: "Chanje detay aliyman pou %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Chanje sipèpozisyon koulè kat kou yo"
+  toggle_due_date_compression_tooltip_f2edda2e: "Chanje lejand konpresyon delè a"
   toggle_editing_answer_text_as_html_9a93fe6: "Aktive/Dezaktive modifikasyon repons tèks an HTML"
   toggle_filterpresetname_f8ae0191: "Chanje %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "chanje mòd vizibilite"
@@ -26982,6 +26996,7 @@ ht:
   update_important_info_bcc01d6a: "Aktyalize enfo enpòtan"
   update_inbox_page_to_use_react_instui_4d343fd: "Aktyalize paj beat resepsyon an pou ka itilize react/instui"
   update_link_b7cab181: "Lyen Aktyalize"
+  update_lti_region_912491e4: "Aktyalize Rejyon LTI a"
   update_name_6581781d: "Aktyalize %{name}"
   update_pages_c91d7ba: "Aktyalize paj"
   update_rating_6d29c2ef: "Aktyalize Klasman"
@@ -28234,6 +28249,7 @@ ht:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Ou ka konsilte gwoup la si w klike sou lyen sa a: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Ou ka konsilte gwoup la si w klike sou lyen sa a: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Ou ka fèmen bwat dyalòg sa a pou pou w ka kontinye travay si w pa vle ret tann; afektasyon an ap kontinye fèt anba anba."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Ou ka kreye divès ansanm gwoup kote elèv yo kapab enskri pou kont yo. Elèv yo ap toujou limite a yon sèl gwoup nan ansanm nan, men nan fason sa a elèv yo ap ka òganize yo an gwoup olye yo bezwen yon pwofesè fè travay la."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Ou kapab kreye yon seri gwoup kote elèv yo kapab enskri pou kont yo. Elèv yo toujou limite\
                     pou yon nan yon sèl gwoup nan seri gwoup yo, men nan fason sa a, elèv yo kapab òganize yo an gwoup\
