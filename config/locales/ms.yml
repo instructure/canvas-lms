@@ -319,6 +319,7 @@ ms:
       term_text: "Penggal: %{term_name};"
     grades: 
       limited: "objek yang dipadamkan dihadkan mengikut hari yang ditentukan;"
+    grading_standard_id: grading_standard_id
     outcomes: 
       order: "Susunan: %{order}"
     report_header_account_id: account_id
@@ -376,6 +377,8 @@ ms:
     report_header_nonxlist_course_id: nonxlist_course_id
     report_header_outcome_score: "skor hasil"
     report_header_parent_account_id: parent_account_id
+    report_header_restrict_course_dates: restrict_enrollments_to_course_dates
+    report_header_restrict_section_dates: restrict_enrollments_to_section_dates
     report_header_role: peranan
     report_header_role_id: role_id
     report_header_section: seksyen
@@ -4288,6 +4291,7 @@ ms:
   canvas_files_889a274f: "Fail Canvas"
   canvas_for_elementary_e6f5a06f: "Canvas untuk Sekolah Rendah"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   canvas_guides_d65431: "Panduan Canvas"
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas membantu anda memanfaatkan teknologi kolaboratif supaya berbilang
@@ -5781,7 +5785,7 @@ ms:
     other: "%{count} hari lalu"
   count_days_de0c6a32: 
     one: "1 Penapis"
-    other: "{{count}} Penapis"
+    other: "%{count} Penapis"
     zero: ""
   count_discussions_found_fc326362: "%{count} perbincangan ditemui."
   count_errors_prohibited_this_note_from_being_saved_fb546efe: 
@@ -5948,6 +5952,7 @@ ms:
     one: "Satu perkongsian belum dibaca."
     other: "%{count} perkongsian belum dibaca."
   count_unsynced_changes_1fc147e5: "%{count} Perubahan Belum Disegerakkan"
+  count_users_374d6e47: "(%{count} Pengguna)"
   count_weeks_11fbd2dc: 
     one: "1 minggu"
     other: "%{count} minggu"
@@ -8664,6 +8669,7 @@ ms:
   failed_to_delete_role_label_27959de3: "Gagal memadamkan peranan %{label}"
   failed_to_delete_selected_pages_26fa87db: "Gagal memadamkan halaman yang dipilih"
   failed_to_export_blueprint_course_settings_1ced8c6: "Gagal mengeksport tetapan kursus cetakan biru"
+  failed_to_export_context_info_acb07497: "Gagal untuk mengeksport maklumat konteks"
   failed_to_export_course_paces_e17583ba: "Gagal mengeksport pergerakan kursus"
   failed_to_ignore_assignment_46565fa3: "Gagal mengabaikan tugasan"
   failed_to_import_media_objects_4c1fcb4f: "Gagal mengimport objek media"
@@ -8996,6 +9002,7 @@ ms:
   from_from_to_to_e31f6422: "Dari %{from} hingga %{to}"
   from_gravatar_58372d5a: "Daripada Gravatar"
   from_grouptitle_860dff95: "Daripada %{groupTitle}"
+  front_page_50cae87e: "Halaman Depan"
   front_page_must_be_set_first_c5246f7d: "Halaman Depan mesti ditetapkan dahulu"
   full_article_9296bb6f: "Artikel penuh"
   full_letter_grade_3f2ed2e4: "Gred Huruf Penuh"
@@ -9766,6 +9773,7 @@ ms:
   has_been_automatically_selected_based_upon_where_t_61f805c5: "telah dipilih secara automatik berdasarkan tempat tika Canvas akaun ini bermastautin. Dalam sesetengah kes, rantaunya boleh jadi berbeza."
   has_similarity_score_d5f332b4: "Mempunyai skor keserupaan"
   has_submissions_6c12ef4c: "Mempunyai serahan"
+  has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Mempunyai serahan tidak bergred"
   have_a_question_about_canvas_ask_it_here_5781cce: "Ada soalan mengenai Canvas? Tanya soalan tersebut di sini."
   have_not_been_graded_df2a5fd2: "Belum digredkan"
@@ -13472,6 +13480,7 @@ ms:
   name_badfe525: nama
   name_conference_8e042dd2: "Persidangan %{name}"
   name_count_students_d004ba32: "%{name} (%{count} Pelajar)"
+  name_count_users_ccc93c3d: "%{name} (%{count} Pengguna)"
   name_current_grade_d8da149f: "Gred semasa %{name}"
   name_current_score_b3198dfa: "Skor semasa %{name}"
   name_e790ff1f: Nama...
@@ -14246,6 +14255,7 @@ ms:
   online_upload_59969592: "Muat Naik Dalam Talian"
   online_url_37830a72: "URL Dalam Talian"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "hanya boleh mencipta maksimum %{limit} acara"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Hanya maksimum %{max} penggred boleh ditetapkan"
   only_account_administrators_can_change_this_settin_149f8fe3: "Hanya pentadbir akaun boleh mengubah tetapan ini."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Hanya tambah siaran dengan frasa tertentu dalam tajuk"
   only_after_their_last_attempt_3593d101: "Hanya Selepas Percubaan Terakhir Mereka"
@@ -14500,6 +14510,7 @@ ms:
   own_copyright_cc59db55: "Hak Cipta Sendiri"
   owner_email_236d1b2: "E-mel Pemilik"
   owner_email_4d02f795: "E-mel Pemilik:"
+  pace_duration_cb8f5de7: "Tempoh Pergerakan"
   pace_is_new_and_unpublished_9aa68306: "Pergerakan adalah baharu dan belum diterbitkan"
   pace_type_76cf749: "Jenis Pergerakan"
   pacename_pace_created_75aa4eda: "Pergerakan %{paceName} dicipta"
@@ -15327,6 +15338,7 @@ ms:
   pro_tip_30e41fa3: "PETUA PROFESIONAL!"
   proceed_f3d33864: Teruskan
   proceed_with_caution_aa9b3285: "Teruskan dengan Berhati-hati"
+  proceed_with_extreme_caution_f5716a27: "Teruskan dengan Amat Berhati-hati"
   processed_4725b02: "Telah diproses"
   processing_2fcc9739: Memproses
   product_name: Canvas
@@ -18621,6 +18633,10 @@ ms:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Tunjuk %{count} hasil untuk %{groupTitle}."
     other: "Tunjuk %{count} hasil untuk %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Menunjukkan 1 hasil di bawah"
+    other: "Menunjukkan %{count} hasil di bawah"
+    zero: "Tiada hasil ditemui"
   showing_search_results_below_4c9a63d9: "Menunjukkan Hasil Carian Di Bawah"
   shrink_permission_74b01aed: "Kecilkan %{permission}"
   shuffle_answers_edb602b7: "Kocok Jawapan"
@@ -19167,6 +19183,7 @@ ms:
   subject_114b2e98: Subjek
   subject_1bc03dea: "Subjek:"
   subject_details_12405b1: "Butiran Subjek"
+  subject_home_8e593f72: "Laman Utama Subjek"
   subject_home_page_41226803: "Laman Utama Subjek"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Subjek mesti mengandungi kurang daripada 255 aksara."
   subject_name_a1ac4da4: "Nama Subjek"
@@ -19232,6 +19249,7 @@ ms:
   submission_records_will_be_filtered_by_date_using__b3990a1: "Rekod serahan akan ditapis mengikut tarikh menggunakan cap masa \"submitted_at\" jika tersedia. Apabila \"submitted_at\" tidak tersedia, medan \"graded_at\" akan digunakan. Jika kedua-dua medan tidak diisi, rekod serahan tidak akan dimasukkan sama sekali dalam laporan apabila ditapis mengikut tarikh."
   submission_score_b7a291e8: "skor serahan"
   submission_sent_3f0d2ee1: "Serahan dihantar"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Serahan - Serah bagi pihak pelajar"
   submission_tray_429ac3df: "Dulang serahan"
   submission_type_a925fc5f: "Jenis Serahan"
   submission_type_displayname_currently_selected_3f8aa9f8: "Jenis serahan %{displayName} dipilih pada masa ini"
@@ -19428,6 +19446,7 @@ ms:
   switzerland_41_f861e414: "Switzerland (+41)"
   syllabus: "Silibus Kursus"
   syllabus_f191f65b: Silibus
+  syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   syllabus_tutorial_tray_97e8ef82: "Dulang Tutorial Silibus"
   symbols_35065d67: Simbol
   sync_68e5c167: Segerakkan
@@ -20059,6 +20078,7 @@ ms:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Kriteria ini dipautkan kepada Hasil Pembelajaran"
   this_due_date_is_managed_by_cfbb698c: "Tarikh siap ini diurus oleh"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Tarikh siap ini diurus oleh Pergerakan Kursus."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Tempoh ini tidak mengambil kira hari minggu dan hari tegah liputan."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Elemen ini ialah alternatif yang lebih mudah diakses berbanding penyusunan semula secara seret dan lepas. Tekan ENTER atau Jarak untuk mengalih soalan ini."
   this_email_address_is_unconfirmed_f0fc8c6e: "Alamat e-mel ini tidak disahkan"
   this_enables_users_to_generate_and_download_course_4c69c531: "Ini membolehkan pengguna untuk menjana dan memuat turun ePub kursus."
@@ -20297,6 +20317,7 @@ ms:
   time_2b5aac58: Masa
   time_block_5a7cda5c: "Blok Masa"
   time_limit_a6f1a51e: "Had Masa"
+  time_to_complete_9d264097: "Masa untuk dilengkapkan."
   time_zone_f56f5183: "Zon Masa"
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -20718,6 +20739,7 @@ ms:
   today_76e10f9c: "Hari Ini"
   toggle_alignment_details_for_title_944f605: "Togol butiran penjajaran untuk %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Togol tindihan warna kad kursus"
+  toggle_due_date_compression_tooltip_f2edda2e: "Togol petua alat pemampatan tarikh siap"
   toggle_editing_answer_text_as_html_9a93fe6: "Togol mengedit teks jawapan sebagai HTML"
   toggle_filterpresetname_f8ae0191: "Togol %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "togol kebolehlihatan modul"
@@ -21053,6 +21075,7 @@ ms:
   update_important_info_bcc01d6a: "Kemas Kini Maklumat Penting"
   update_inbox_page_to_use_react_instui_4d343fd: "Kemas Kini halaman Peti Masuk untuk menggunakan react/instui"
   update_link_b7cab181: "Kemas kini pautan"
+  update_lti_region_912491e4: "Kemas kini Rantau LTI"
   update_name_6581781d: "Kemas kini %{name}"
   update_pages_c91d7ba: "Kemas kini halaman"
   update_rating_6d29c2ef: "Kemas Kini Penarafan"
@@ -22059,6 +22082,7 @@ ms:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Anda boleh menyemak kumpulan ini dengan mengklik pautan ini: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Anda boleh menyemak kumpulan ini dengan mengklik pautan ini: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Anda boleh menutup kotak dialog ini untuk meneruskan kerja jika anda tidak mahu menanti; penetapan akan diteruskan di latar belakang."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Anda boleh mencipta set kumpulan yang membolehkan belajar mendaftar sendiri. Pelajar masih dihadkan untuk berada dalam satu kumpulan sahaja dalam set, tetapi cara ini membolehkan pelajar menyusun atur diri sendiri ke dalam kumpulan berbanding dengan memerlukan guru melakukan pembahagian itu."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Anda boleh mencipta set kumpulan yang membenarkan pelajar mendaftar sendiri. Pelajar masih dihadkan\
                     untuk berada dalam satu kumpulan sahaja dalam set, tetapi cara ini membolehkan pelajar menyusun atur diri sendiri ke dalam kumpulan\
