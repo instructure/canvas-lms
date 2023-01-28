@@ -11975,6 +11975,7 @@ zh-Hant:
   failed_to_delete_role_label_27959de3: "無法刪除身份%{label}"
   failed_to_delete_selected_pages_26fa87db: 無法刪除選取的頁面
   failed_to_export_blueprint_course_settings_1ced8c6: 無法匯出藍圖課程設定
+  failed_to_export_context_info_acb07497: 無法匯出內容資訊
   failed_to_export_course_paces_e17583ba: 無法匯出課程進度
   failed_to_export_pace_plans_9832daac: 無法匯出進度計畫
   failed_to_export_some_tool_settings_c992fc56: 無法匯出某些工具設定
@@ -12462,6 +12463,7 @@ zh-Hant:
   from_from_to_to_e31f6422: "自 %{from} 至 %{to}"
   from_gravatar_58372d5a: "來自 Gravatar"
   from_grouptitle_860dff95: "來自 %{groupTitle}"
+  front_page_50cae87e: 首頁
   front_page_must_be_set_first_4dbbfdbe: 必須先設置標題版
   front_page_must_be_set_first_c5246f7d: 必須先設定首頁
   full_article_9296bb6f: 全文
@@ -18839,7 +18841,7 @@ zh-Hant:
   name_badfe525: 名稱
   name_conference_8e042dd2: "%{name} 會議"
   name_count_students_d004ba32: "%{name}（%{count} 個學生）"
-  name_count_users_ccc93c3d: "%{name}（%{count} 使用者）"
+  name_count_users_ccc93c3d: "%{name}（%{count} 個使用者）"
   name_current_grade_d8da149f: "%{name} 目前評分"
   name_current_score_b3198dfa: "%{name} 的當前分數"
   name_e790ff1f: 名稱...
@@ -19778,6 +19780,7 @@ zh-Hant:
   online_url_37830a72: "線上 URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "最多只能創建 100 個事件"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "最多只能創建 %{limit} 個活動"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "最多只能建立 %{max} 個評分者"
   only_account_administrators_can_change_this_settin_149f8fe3: 僅帳戶管理員可以變更此設定。
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: 僅在標題中添加具有特定片語的帖子
   only_after_their_last_attempt_3593d101: 僅在他們的最後一次嘗試之後
@@ -20140,6 +20143,7 @@ zh-Hant:
   own_copyright_cc59db55: 自有版權
   owner_email_236d1b2: 所有者電子郵件
   owner_email_4d02f795: 所有者電子郵件：
+  pace_duration_cb8f5de7: 進度持續時間
   pace_is_new_and_unpublished_9aa68306: 進度是新的並已取消發佈
   pace_plan_56e8fb1d: 進度計畫
   pace_plans_4bb9c5ff: 進度計畫
@@ -21125,6 +21129,7 @@ zh-Hant:
   pro_tip_30e41fa3: 小技巧！
   proceed_f3d33864: 繼續
   proceed_with_caution_aa9b3285: 請謹慎進行
+  proceed_with_extreme_caution_f5716a27: 請非常謹慎進行
   process_multiple_content_items_from_course_modules_6de90fd8: 處理來自課程單元頁面的多個內容項目
   processed_4725b02: 處理完畢
   processing_2fcc9739: 處理中
@@ -25611,6 +25616,10 @@ zh-Hant:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "顯示 %{groupTitle} 的 %{count} 成果。"
     other: "顯示 %{groupTitle} 的 %{count} 成果。"
+  showing_count_results_below_61ddca33: 
+    one: "顯示以下的 1 個結果"
+    other: "顯示以下的 %{count} 個結果"
+    zero: 找不到結果
   showing_search_results_below_4c9a63d9: 顯示以下的搜尋結果
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "在適用於所有使用者的支援選單中顯示 Instructure 提供的發佈說明（依使用者身份篩選）"
   shrink_permission_74b01aed: "折疊 %{permission}"
@@ -26276,6 +26285,7 @@ zh-Hant:
   subject_114b2e98: 主題
   subject_1bc03dea: 主題：
   subject_details_12405b1: 主題詳細資料
+  subject_home_8e593f72: 科目首頁
   subject_home_page_41226803: 科目主頁
   subject_must_contain_fewer_than_255_characters_2e72cd02: "主題不得多於 255 個字符。"
   subject_name_a1ac4da4: 主題名稱
@@ -26349,6 +26359,7 @@ zh-Hant:
   submission_score_b7a291e8: 提交項目分數
   submission_sent_3f0d2ee1: 已傳送的提交項目
   submission_status_3079e730: 提交項目狀態
+  submission_submit_on_behalf_of_student_f0ed14e4: "提交項目 - 代表學生提交"
   submission_tray_429ac3df: 提交項目收集箱
   submission_type_a925fc5f: 提交類型
   submission_type_displayname_currently_selected_3f8aa9f8: "提交類型 %{displayName}，目前選擇"
@@ -27413,6 +27424,7 @@ zh-Hant:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: 此標準連接至學習成果
   this_due_date_is_managed_by_cfbb698c: 此截止日期的管理者
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: 此截止日期由「課程進度」管理。
+  this_duration_does_not_take_into_account_weekends__19209a71: 此持續時間未考慮到週末和管制日。
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: 除了拖放排序，該元素更容易使用。請按下回車或空格鍵，以移動該問題。
   this_email_address_is_unconfirmed_f0fc8c6e: 該電郵地址未驗證
   this_enables_a_course_setting_to_allow_students_to_fc47219: 通過此課程設定，學生可將課程內容導出為離線網路壓縮檔案夾
@@ -27767,6 +27779,7 @@ zh-Hant:
   time_left_in_your_instant_trial_5dd0392b: "%{time} 留下您的即時試用"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} 留下您的即時試用 *(現在擴展)*"
   time_limit_a6f1a51e: 時間限制
+  time_to_complete_9d264097: 待完成時間
   time_zone_f56f5183: 時區
   time_zones: 
     abu_dhabi: 阿布達比
@@ -28565,6 +28578,7 @@ zh-Hant:
   toggle_alignment_details_for_title_944f605: "切換校準詳細資料%{title}"
   toggle_course_card_color_overlays_b5b8137a: 切換課程卡顏色覆蓋
   toggle_dashcard_view_or_recent_activity_stream_1de257: 切換儀表板視角或近期活動流
+  toggle_due_date_compression_tooltip_f2edda2e: 切換截止日期壓縮工具提示
   toggle_editing_answer_text_as_html_9a93fe6: "切換編輯答案文字為 HTML"
   toggle_filterpresetname_f8ae0191: "切換 %{filterPresetName}"
   toggle_module_visibility_781a2f6c: 切換單元可見度
@@ -29033,6 +29047,7 @@ zh-Hant:
   update_important_info_bcc01d6a: 更新重要資訊
   update_inbox_page_to_use_react_instui_4d343fd: "更新收件匣頁面後可使用 react/instui"
   update_link_b7cab181: 更新連結
+  update_lti_region_912491e4: "更新 LTI 區域"
   update_name_6581781d: "更新 %{name}"
   update_pages_c91d7ba: 更新頁面
   update_rating_6d29c2ef: 更新評級
@@ -30339,6 +30354,7 @@ zh-Hant:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "您可以透過按一下以下連結檢視該群組: %{link}。"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "您可以透過按一下以下連結檢視該群組: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: 如果您不想要等待，您可以關閉此對話方塊以繼續作業；指派將在背景中繼續。
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: 您可以建立幾組學生可以自己註冊的小組。學生仍受限於只在該小組的一個群組中，但這樣學生可以將他們自己組織為群組，而不需要教師做這項工作。
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       您可以建立小組，允許學生自行註冊。學生仍受限於\
                     只在該小組的一個群組中，但這樣學生可以將他們自己組織為群組\
