@@ -11110,6 +11110,7 @@ is:
   failed_to_delete_role_label_27959de3: "Ekki tókst að eyða hlutverki %{label}"
   failed_to_delete_selected_pages_26fa87db: "Ekki tókst að eyða völdum síðum"
   failed_to_export_blueprint_course_settings_1ced8c6: "Mistókst að flytja úr stillingar Blueprint námskeiðs"
+  failed_to_export_context_info_acb07497: "Tókst ekki að flytja út upplýsingar yfirlits"
   failed_to_export_course_paces_e17583ba: "Ekki tókst að flytja út tímaáætlanir námskeiðs"
   failed_to_export_pace_plans_9832daac: "Ekki tókst að flytja út tímaáætlanir"
   failed_to_export_some_tool_settings_c992fc56: "Ekki tókst að flytja út vissar stillingar verkfæra"
@@ -11529,6 +11530,7 @@ is:
   from_from_to_to_e31f6422: "Frá %{from} til %{to}"
   from_gravatar_58372d5a: "Frá Gravatar"
   from_grouptitle_860dff95: "Frá %{groupTitle}"
+  front_page_50cae87e: Forsíða
   front_page_must_be_set_first_4dbbfdbe: "Fyrst þarf að ákvarða forsíðu"
   front_page_must_be_set_first_c5246f7d: "Setja þarf upp framsíðu fyrst"
   full_article_9296bb6f: "Öll greinin"
@@ -17942,6 +17944,7 @@ is:
   online_url_37830a72: "Vefslóð á netinu"
   only_a_maximum_of_100_events_can_be_created_ad703982: "Ekki er hægt að stofna fleiri viðburði en 100"
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Takmörk eru á hve marga viðburði %{limit} er hægt að búa til"
+  only_a_maximum_of_max_graders_can_be_assigned_baa63e68: "Aðeins er hægt að úthluta að hámarki %{max} einkunnargjöfum"
   only_account_administrators_can_change_this_settin_149f8fe3: "Aðeins stjórnendur reiknings geta breytt þessari stillingu."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Bæta aðeins við póstum með sértæka setningu í titlinum"
   only_after_their_last_attempt_3593d101: "Aðeins eftir síðustu tilraun"
@@ -18292,6 +18295,7 @@ is:
   own_copyright_cc59db55: "Eigin útgáfuréttur"
   owner_email_236d1b2: "Netfang eiganda"
   owner_email_4d02f795: "Netfang eiganda:"
+  pace_duration_cb8f5de7: "Tímalengd áætlunar"
   pace_is_new_and_unpublished_9aa68306: "Hraði er nýr og óbirtur"
   pace_plan_56e8fb1d: Tímaáætlun
   pace_plans_4bb9c5ff: "Stilla áætlanir"
@@ -19233,6 +19237,7 @@ is:
   pro_tip_30e41fa3: "FAGLEGT RÁÐ!"
   proceed_f3d33864: "Halda áfram"
   proceed_with_caution_aa9b3285: "Haldið áfram af varúð"
+  proceed_with_extreme_caution_f5716a27: "Haldið áfram af mikilli varúð"
   process_multiple_content_items_from_course_modules_6de90fd8: "Vinna með mörg efnisatriði frá einingasíðum námsskeiðs"
   processed_4725b02: Unnið
   processing_2fcc9739: Vinna
@@ -23235,6 +23240,10 @@ is:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "Sýnir %{count} niðurstöðu fyrir %{groupTitle}."
     other: "Sýnir %{count} niðurstöður fyrir %{groupTitle}."
+  showing_count_results_below_61ddca33: 
+    one: "Sýnir 1 niðurstöðu hér að neðan"
+    other: "Sýnir %{count} niðurstöður hér að neðan"
+    zero: "Engar niðurstöður fundust"
   showing_search_results_below_4c9a63d9: "Sýnir leitarniðurstöður að neðan"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Sýnir Leiðbeinendaútvegaða útgáfuyfirlýsingu í hjálparvalmynd fyrir alla notendur (síað eftir notenda hlutverkum)"
   shrink_permission_74b01aed: "Minnka %{permission}"
@@ -23851,6 +23860,7 @@ is:
   subject_114b2e98: Efni
   subject_1bc03dea: "Efni:"
   subject_details_12405b1: "Upplýsingar efnis"
+  subject_home_8e593f72: "Heimasvæði efnis"
   subject_home_page_41226803: "Heimasíða efnis"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Efni verður að innihalda færri en 255 stafi."
   subject_name_a1ac4da4: "Nafn efnis"
@@ -23921,6 +23931,7 @@ is:
   submission_score_b7a291e8: skilaeinkunn
   submission_sent_3f0d2ee1: "Skil send"
   submission_status_3079e730: "Staða á skilum"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Skil - Skilað fyrir hönd nemanda"
   submission_tray_429ac3df: Skilabakki
   submission_type_a925fc5f: "Tegund skila"
   submission_type_displayname_currently_selected_3f8aa9f8: "Gerð innsendingar %{displayName}, er nú valin"
@@ -24941,6 +24952,7 @@ is:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Þessi forsenda er tengd námsniðurstöðu"
   this_due_date_is_managed_by_cfbb698c: "Þessum skiladegi er stjórnað af"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Þessum skiladegi er stjórnað af tímaáætlun námskeiðs."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Þessi tímalengd tekur ekki tillit til helga og frídaga."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Þetta er aðgengilegri kostur við endurröðun en að draga og sleppa. Ýttu á Enter eða bilslá til að færa spurninguna."
   this_email_address_is_unconfirmed_f0fc8c6e: "Þetta netfang er óstaðfest"
   this_enables_users_to_generate_and_download_course_4c69c531: "Þetta gerir notendum kleift að búa til og hlaða niður námskeiði í ePub."
@@ -25289,6 +25301,7 @@ is:
   time_left_in_your_instant_trial_5dd0392b: "%{time} eftir af reynslutíma"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} eftir af reynslutíma *(framlengja núna)*"
   time_limit_a6f1a51e: Tímamörk
+  time_to_complete_9d264097: "Tími til að ljúka"
   time_zone_f56f5183: Tímabelti
   time_zones: 
     abu_dhabi: "Abu Dhabi"
@@ -26084,6 +26097,7 @@ is:
   today_76e10f9c: "Í dag"
   toggle_alignment_details_for_title_944f605: "Víxlaðu jöfnunarupplýsingum fyrir %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Víxla litum á spjaldi námskeiðs"
+  toggle_due_date_compression_tooltip_f2edda2e: "Víxlaðu verkfæraráði þjöppunar skiladaga"
   toggle_editing_answer_text_as_html_9a93fe6: "Víxla breytingum á texta svars í HTML"
   toggle_filterpresetname_f8ae0191: "Víxla %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "víxla sýnileika eininga"
@@ -26534,6 +26548,7 @@ is:
   update_important_info_bcc01d6a: "Uppfæra mikilvægar upplýsingar"
   update_inbox_page_to_use_react_instui_4d343fd: "Uppfæra innhólfssíðuna til að nota react/instui"
   update_link_b7cab181: "Uppfæra tengil"
+  update_lti_region_912491e4: "Uppfæra LTI svæði"
   update_name_6581781d: "Uppfæra %{name}"
   update_pages_c91d7ba: "Uppfæra síður"
   update_rating_6d29c2ef: "Uppfæra mat"
@@ -27770,6 +27785,7 @@ is:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Smelltu á tengilinn til að skoða hópinn: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Smelltu á tengilinn til að skoða hópinn: %{link}"
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Þú getur lokað þessum glugga til að halda áfram að vinna ef þú vilt ekki bíða; úthlutun mun halda áfram í bakgrunni."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Þú getur búið til sett af hópum þar sem nemendur geta skráð sig á eigin spýtur. Nemendur eru enn takmarkaðir við að vera í einum hópi í settinu, en þannig geta nemendur skipulagt sig í hópa í stað þess að þurfa kennarann til að vinna verkið."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Þú getur búið til hópasett þar sem nemendur geta skráð sig á eigin spýtur. Nemendur eru enn takmarkaðir\
                     við að vera í einum hópi í settinu, en þannig geta nemendur skipulagt sig í hópa\
