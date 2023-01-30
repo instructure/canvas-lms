@@ -1384,7 +1384,6 @@ DEPENDENCIES
   sentry-ruby (= 5.1.0)
   shoulda-matchers (= 4.3.0)
   simple_oauth (= 0.3.1)
-  simple_uuid (= 0.4.0)
   simplecov (= 0.21.2)
   simplecov-rcov (= 0.2.3)
   simply_versioned!
@@ -1401,7 +1400,6 @@ DEPENDENCIES
   switchman (= 3.3.1)
   switchman-inst-jobs (= 4.0.13)
   testrailtagging (= 0.3.8.7)
-  thrift (= 0.9.3.0)
   thrift_client (= 0.9.3)!
   timecop (= 0.9.5)
   turnitin_api!
