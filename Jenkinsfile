@@ -612,6 +612,7 @@ pipeline {
                     .execute {
                       def nestedStages = [:]
 
+                      callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.codeStage(nestedStages))()
                       callableWithDelegate(lintersStage.groovyStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()

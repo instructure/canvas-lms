@@ -21,6 +21,10 @@ import groovy.transform.Field
 @Field final static STAGE_NAME = 'Detect Files Changed (Pre-Build)'
 @Field final static STAGE_NAME_POST_BUILD = 'Detect Files Changed (Post-Build)'
 
+def hasBundleFiles(buildConfig) {
+  return buildConfig[STAGE_NAME].value('bundleFiles')
+}
+
 def hasDockerDevFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('dockerDevFiles')
 }
@@ -73,6 +77,7 @@ def preBuild(stageConfig) {
   stageConfig.value('addedOrDeletedSpecFiles', sh(script: 'git diff --name-only --diff-filter=AD HEAD^..HEAD | grep "_spec.rb"', returnStatus: true) == 0)
 
   dir(env.LOCAL_WORKDIR) {
+    stageConfig.value('bundleFiles', sh(script: 'git diff --name-only HEAD^..HEAD | grep "Gemfile"', returnStatus: true) == 0)
     stageConfig.value('specFiles', sh(script: "${WORKSPACE}/build/new-jenkins/spec-changes.sh", returnStatus: true) == 0)
   }
 
