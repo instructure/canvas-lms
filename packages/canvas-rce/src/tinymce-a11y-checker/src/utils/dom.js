@@ -28,12 +28,15 @@ export function walk(node, fn, done) {
   processBatch()
 }
 
-export function select(editor, elem, indicateFn = indicate) {
+export function select(elem, indicateFn = indicate) {
   if (elem == null) {
     return
   }
-  elem.scrollIntoView()
-  indicateFn(editor, elem)
+  elem.scrollIntoView(false)
+  if (elem.ownerDocument?.documentElement) {
+    elem.ownerDocument.documentElement.scrollTop += 5 // room for the indicator highlight
+  }
+  indicateFn(elem)
 }
 
 export function prepend(parent, child) {
@@ -106,7 +109,7 @@ export function splitStyleAttribute(styleString) {
 
 export function createStyleString(styleObj) {
   let styleString = Object.keys(styleObj)
-    .map(key => `${key}:${styleObj[key]}`)
+    .map((key) => `${key}:${styleObj[key]}`)
     .join(";")
   if (styleString) {
     styleString = `${styleString};`
@@ -116,5 +119,5 @@ export function createStyleString(styleObj) {
 
 export function hasTextNode(elem) {
   const nodes = Array.from(elem.childNodes)
-  return nodes.some(x => x.nodeType === Node.TEXT_NODE)
+  return nodes.some((x) => x.nodeType === Node.TEXT_NODE)
 }

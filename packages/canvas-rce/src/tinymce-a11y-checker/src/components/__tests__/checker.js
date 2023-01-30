@@ -33,6 +33,9 @@ beforeEach(() => {
     getContainer: () => ({
       querySelector: () => fakeIframe
     }),
+    dom: {
+      doc: document,
+    },
     on: jest.fn(),
     focus: jest.fn()
   }

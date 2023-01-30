@@ -1,117 +1,66 @@
-import offset from "bloody-offset"
+// The styling used to highlight the a11y violation.
+// These rules will be assigned to the selector we build below
+// that locates the violating element in the DOM
+export const INDICATOR_STYLE = `
+outline:2px solid #2D3B45;
+outline-offset:2px;
+`
 
-const MARGIN = 3
-const THROTTLE = 10
+// id of the style element where we inject CSS that will generate the
+// a11y violation hightlight.
+export const A11Y_CHECKER_STYLE_ELEM_ID = "a11y-checker-style"
 
-export function indicatorRegion(
-  editorFrame,
-  target,
-  offsetFn = offset,
-  boundingRectOverride
-) {
-  const outerShape = offsetFn(editorFrame)
-  const b = boundingRectOverride || target.getBoundingClientRect()
-  const innerShape = {
-    top: b.top,
-    left: b.left,
-    width: b.right - b.left,
-    height: b.bottom - b.top
-  }
-
-  return {
-    width: innerShape.width,
-    height: innerShape.height,
-    left: outerShape.left + innerShape.left,
-    top: outerShape.top + innerShape.top
+// Remove the current indicator(s) by removing the contents of
+// the style element
+export function clearIndicators(doc) {
+  const checker_style = doc.getElementById(A11Y_CHECKER_STYLE_ELEM_ID)
+  if (checker_style) {
+    checker_style.textContent = ""
   }
 }
 
-function indicatorContainer() {
-  return (
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.body
-  )
-}
-
-export function clearIndicators(parent) {
-  const container = parent || indicatorContainer()
-  Array.from(
-    container.querySelectorAll(".a11y-checker-selection-indicator")
-  ).forEach(existingElem => {
-    existingElem.parentNode.removeChild(existingElem)
-  })
-}
-
-export default function indicate(editor, elem, margin = MARGIN) {
-  clearIndicators()
-
-  const editorFrame = editor.getContainer().querySelector("iframe")
-
-  const el = document.createElement("div")
-  el.className = "a11y-checker-selection-indicator"
-
-  const region = indicatorRegion(editorFrame, elem)
-
-  // The z-index below is set to be one below the Instructure UI tray
-  // that the a11y checker uses.  It may need to be updated in the future.
-  el.setAttribute(
-    "style",
-    `
-    border: 2px solid #000;
-    background-color: #008EE2;
-    position: absolute;
-    display: block;
-    borderRadius: 5px;
-    z-index: 9998;
-    left: ${region.left - margin}px;
-    top: ${region.top - margin}px;
-    width: ${region.width + 2 * margin}px;
-    height: ${region.height + 2 * margin}px;
-    opacity: 0.5;
-  `
-  )
-
-  indicatorContainer().appendChild(el)
-
-  el.style.opacity = 0.8
-  el.style.transition = "opacity 0.4s"
-
-  let lastAdjust = 0
-  const adjust = (timestamp) => {
-    if (timestamp - lastAdjust > THROTTLE) {
-      lastAdjust = timestamp
-
-      if (el.parentElement === null) {
-        return
-      }
-
-      const boundingRect = elem.getBoundingClientRect()
-      const region = indicatorRegion(editorFrame, elem, offset, boundingRect)
-      const editorFrameOffset = offset(editorFrame)
-      el.style.left = `${region.left - margin}px`
-      el.style.top = `${region.top - margin}px`
-      el.style.display = "block"
-      if (boundingRect.top < 0) {
-        const newHeight = region.height + boundingRect.top
-        if (newHeight < 0) {
-          el.style.display = "none"
-        }
-        const newTop = region.height - newHeight
-        el.style.height = `${newHeight}px`
-        el.style.marginTop = `${newTop}px`
-      }
-      if (boundingRect.bottom > editorFrameOffset.height) {
-        const newHeight =
-          region.height + (editorFrameOffset.height - boundingRect.bottom)
-        if (newHeight < 0) {
-          el.style.display = "none"
-        }
-        el.style.height = `${newHeight}px`
-      }
-      window.requestAnimationFrame(adjust)
-    }
+// build a selector in the shape of
+// "body>:nth-child(x)>:nth-child(y)"
+// that will select the given elem in the body
+export function buildDepthSelector(elem) {
+  const elemBody = elem.ownerDocument.body
+  const depths = []
+  let target = elem
+  while (target && parent && target !== elemBody) {
+    let parent = target.parentElement
+    const depth = findChildDepth(parent, target)
+    depths.unshift(`>:nth-child(${depth})`)
+    target = parent
+    parent = target?.parentElement
   }
 
-  window.requestAnimationFrame(adjust)
+  return `body${depths.join("")}`
+}
+
+// compute the ordinal of target relative to its parent
+export function findChildDepth(parent, target) {
+  if (!(parent && target)) return 0
+  const children = parent.children
+  const depth = Array.from(children).findIndex((child) => child === target)
+  return depth + 1
+}
+
+// guarantee that the <style> element we use for adding the
+// CSS that generates the a11y violation indicator exists in the dom
+export function ensureA11yCheckerStyleElement(doc) {
+  let styleElem = doc.getElementById(A11Y_CHECKER_STYLE_ELEM_ID)
+  if (!styleElem) {
+    styleElem = doc.createElement("style")
+    styleElem.id = A11Y_CHECKER_STYLE_ELEM_ID
+    doc.head.appendChild(styleElem)
+  }
+  return styleElem
+}
+
+// highlight the given element
+export default function indicate(elem) {
+  const doc = elem.ownerDocument
+  const styleElem = ensureA11yCheckerStyleElement(doc)
+  const selector = buildDepthSelector(elem)
+  styleElem.textContent = `${selector}{${INDICATOR_STYLE}}`
 }

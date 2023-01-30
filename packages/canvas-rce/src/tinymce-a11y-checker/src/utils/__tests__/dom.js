@@ -27,13 +27,12 @@ describe("select", () => {
   })
 
   test("scrolls the node into view", () => {
-    dom.select(editor, node, indicateFn)
+    dom.select(node, indicateFn)
     expect(node.scrollIntoView).toBeCalled()
   })
-
-  test("calls the indicator function with the editor and the node", () => {
-    dom.select(editor, node, indicateFn)
-    expect(indicateFn).toHaveBeenCalledWith(editor, node)
+  test("calls the indicator function with the node", () => {
+    dom.select(node, indicateFn)
+    expect(indicateFn).toHaveBeenCalledWith(node)
   })
 
   test("select does not throw if node is underfined or null", () => {
