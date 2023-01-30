@@ -19,6 +19,8 @@
 #
 
 class ContentMigration < ActiveRecord::Base
+  ignored_columns = %w[asset_map_attachment_id].freeze
+
   include Workflow
   include TextHelper
   include Rails.application.routes.url_helpers
