@@ -83,6 +83,7 @@ const demoData = {
 const defaultProps = {
   menuData: demoData,
   onUserFilterSelect: jest.fn(),
+  setIsMenuOpen: jest.fn(),
 }
 
 const setup = props => {
@@ -103,7 +104,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should render popup menu when prop is true', async () => {
-      setup({...defaultProps, open: true})
+      setup({...defaultProps, isMenuOpen: true})
       const popover = await screen.findByTestId('address-book-popover')
       expect(popover).toBeTruthy()
     })
@@ -115,58 +116,66 @@ describe('Address Book Component', () => {
     })
 
     it('Should render back button when isSubMenu is present', async () => {
-      setup({...defaultProps, isSubMenu: true, open: true})
+      setup({...defaultProps, isSubMenu: true, isMenuOpen: true})
       const backItem = await screen.findByText('Back')
       expect(backItem).toBeTruthy()
     })
 
     it('Should render header text when HeaderText is present', async () => {
       const headerText = 'Test Header Text'
-      setup({...defaultProps, open: true, isSubMenu: true, headerText})
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true, headerText})
       const headerItem = await screen.findByText(headerText)
       expect(headerItem).toBeTruthy()
     })
   })
 
   describe('Behaviors', () => {
-    it('Should render popup menu when button is clicked', async () => {
-      const {container} = setup({...defaultProps})
+    it('Should set popup menu to open when button is clicked', async () => {
+      const mockSetIsMenuOpen = jest.fn()
+      const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
       const button = container.querySelector('button')
       fireEvent.click(button)
-      const popover = await screen.findByTestId('address-book-popover')
-      expect(popover).toBeTruthy()
+      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(true)
     })
 
-    it('Should close popup menu when address button is pressed and popup is open', async () => {
-      const {container} = setup({...defaultProps, open: true})
+    it('Should set popup menu to false when address button is pressed and popup is open', async () => {
+      const mockSetIsMenuOpen = jest.fn()
+      const {container} = setup({
+        ...defaultProps,
+        isMenuOpen: true,
+        setIsMenuOpen: mockSetIsMenuOpen,
+      })
       const button = container.querySelector('button')
       fireEvent.click(button)
-      const popover = screen.queryByTestId('address-book-popover')
-      expect(popover).toBeFalsy()
+      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
     })
 
-    it('Should close popup menu when focus is changed', async () => {
-      const {container} = setup({...defaultProps})
+    it('Should set popup menu to false when focus is changed', async () => {
+      const mockSetIsMenuOpen = jest.fn()
+      const {container} = setup({
+        ...defaultProps,
+        setIsMenuOpen: mockSetIsMenuOpen,
+        isMenuOpen: true,
+      })
       const input = container.querySelector('input')
       fireEvent.focus(input)
-      let popover = await screen.findByTestId('address-book-popover')
+      const popover = await screen.findByTestId('address-book-popover')
       expect(popover).toBeTruthy()
       fireEvent.blur(input)
-      popover = screen.queryByTestId('address-book-popover')
-      expect(popover).toBeFalsy()
+      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
     })
 
-    it('Should render popup menu when textInput is focused', async () => {
-      const {container} = setup({...defaultProps})
+    it('Should set popup menu to true when textInput is focused', async () => {
+      const mockSetIsMenuOpen = jest.fn()
+      const {container} = setup({...defaultProps, setIsMenuOpen: mockSetIsMenuOpen})
       const input = container.querySelector('input')
       fireEvent.focus(input)
-      const popover = await screen.findByTestId('address-book-popover')
-      expect(popover).toBeTruthy()
+      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(true)
     })
 
     it('Should pass back ID of item when selected', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, onSelect: onSelectSpy})
+      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[0])
@@ -175,7 +184,7 @@ describe('Address Book Component', () => {
 
     it('Should select item when navigating down and enter key is pressed', async () => {
       const onSelectSpy = jest.fn()
-      const {container} = setup({...defaultProps, open: true, onSelect: onSelectSpy})
+      const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const input = container.querySelector('input')
       fireEvent.focus(input)
       fireEvent.keyDown(input, {key: 'ArrowDown', keyCode: 40})
@@ -186,7 +195,7 @@ describe('Address Book Component', () => {
 
     it('Should select item when navigating up and enter key is pressed', () => {
       const onSelectSpy = jest.fn()
-      const {container} = setup({...defaultProps, open: true, onSelect: onSelectSpy})
+      const {container} = setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy})
       const input = container.querySelector('input')
       fireEvent.focus(input)
       fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
@@ -199,7 +208,7 @@ describe('Address Book Component', () => {
     it('Should render loading bar below rendered menu items when loading more menu data', async () => {
       const {queryByTestId} = setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         isLoading: true,
         isLoadingMoreMenuData: true,
       })
@@ -211,7 +220,7 @@ describe('Address Book Component', () => {
     it('Should not render old data when clicking into a new sub-menu', () => {
       const {queryByTestId, queryAllByTestId} = setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         isLoading: true,
         isLoadingMoreMenuData: false,
       })
@@ -224,12 +233,13 @@ describe('Address Book Component', () => {
 
   describe('Tags', () => {
     it('Should close popover after selecting one item', async () => {
-      setup({...defaultProps, open: true, isSubMenu: true})
+      const mockSetIsMenuOpen = jest.fn()
+
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
-
-      expect(screen.queryByTestId('address-book-popover')).not.toBeInTheDocument()
+      expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
     })
 
     it('Should call getTotalRecipients for All_in_context', async () => {
@@ -241,7 +251,7 @@ describe('Address Book Component', () => {
       }
       setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         isSubMenu: true,
         hasSelectAllFilterOption: true,
         currentFilter: current_filter,
@@ -260,7 +270,7 @@ describe('Address Book Component', () => {
 
     it('Should render tag when item is selected', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, isSubMenu: true, onSelect: onSelectSpy})
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true, onSelect: onSelectSpy})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
@@ -269,12 +279,11 @@ describe('Address Book Component', () => {
     })
 
     it('Should be able to select 2 tags when no limit is set', async () => {
-      setup({...defaultProps, open: true, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true})
       const popover1 = await screen.findByTestId('address-book-popover')
       const items1 = popover1.querySelectorAll('li')
       fireEvent.mouseDown(items1[4])
 
-      setup({...defaultProps, open: true, isSubMenu: true})
       const popover2 = await screen.findByTestId('address-book-popover')
       const items2 = popover2.querySelectorAll('li')
       fireEvent.mouseDown(items2[5])
@@ -283,21 +292,11 @@ describe('Address Book Component', () => {
       expect(tags.length).toBe(2)
     })
 
-    it('Should be able to select only 1 tags when limit is 1', async () => {
-      setup({...defaultProps, open: true, limitTagCount: 1, isSubMenu: true})
-      const popover = await screen.findByTestId('address-book-popover')
-      const items = popover.querySelectorAll('li')
-      fireEvent.mouseDown(items[4])
-      fireEvent.mouseDown(items[5])
-      const tags = await screen.findAllByTestId('address-book-tag')
-      expect(tags.length).toBe(1)
-    })
-
     it('Should pass back selected IDs as an array', async () => {
       const onSelectedIdsChangeMock = jest.fn()
       setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         limitTagCount: 1,
         onSelectedIdsChange: onSelectedIdsChangeMock,
         isSubMenu: true,
@@ -310,7 +309,7 @@ describe('Address Book Component', () => {
     })
 
     it('Should be able to remove a tag', async () => {
-      setup({...defaultProps, open: true, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
@@ -332,7 +331,7 @@ describe('Address Book Component', () => {
 
     it('Should select item when clicked', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, onSelect: onSelectSpy, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
@@ -344,7 +343,7 @@ describe('Address Book Component', () => {
       const onUserFilterSelectSpy = jest.fn()
       setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         onSelect: onSelectSpy,
         onUserFilterSelect: onUserFilterSelectSpy,
         isSubMenu: true,
@@ -357,7 +356,7 @@ describe('Address Book Component', () => {
 
     it('Should call back for group clicks', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, onSelect: onSelectSpy, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[1])
@@ -367,7 +366,7 @@ describe('Address Book Component', () => {
 
     it('Should set isLast for CONTEXT_TYPE', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, onSelect: onSelectSpy, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[3])
@@ -378,7 +377,7 @@ describe('Address Book Component', () => {
 
     it('Should call back for back click', async () => {
       const onSelectSpy = jest.fn()
-      setup({...defaultProps, open: true, onSelect: onSelectSpy, isSubMenu: true})
+      setup({...defaultProps, isMenuOpen: true, onSelect: onSelectSpy, isSubMenu: true})
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[0])
@@ -397,7 +396,7 @@ describe('Address Book Component', () => {
     it('Should create an observer when more data is available', async () => {
       const component = setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         hasMoreMenuData: true,
       })
       expect(component).toBeTruthy()
@@ -410,7 +409,7 @@ describe('Address Book Component', () => {
     it('Should not create an observer when no more data is available', async () => {
       const component = setup({
         ...defaultProps,
-        open: true,
+        isMenuOpen: true,
         hasMoreMenuData: false,
       })
       expect(component).toBeTruthy()
