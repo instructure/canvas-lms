@@ -66,7 +66,7 @@ export const AuthorInfo = props => {
           timestampTextSize: props.threadMode ? 'x-small' : 'small',
           nameAndRoleDirection: 'row',
           badgeMarginLeft: props.threadMode ? '-16px' : '-24px',
-          avatarSize: 'medium',
+          avatarSize: props.threadMode && !props.threadParent ? 'small' : 'medium',
         },
         mobile: {
           authorNameTextSize: 'small',
@@ -228,6 +228,7 @@ AuthorInfo.propTypes = {
   isTopicAuthor: PropTypes.bool,
   discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
   threadMode: PropTypes.bool,
+  threadParent: PropTypes.bool,
 }
 
 const Timestamps = props => {

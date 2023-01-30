@@ -271,7 +271,7 @@ export const SplitScreenParent = props => {
                     attachment={props.discussionEntry.attachment}
                   >
                     {threadActions.length > 0 && (
-                      <View as="div" padding="x-small none none">
+                      <View as="div" padding="0">
                         <ThreadingToolbar
                           discussionEntry={props.discussionEntry}
                           isIsolatedView={true}

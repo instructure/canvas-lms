@@ -435,7 +435,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               <>
                                 <View
                                   as="div"
-                                  padding="small none none"
+                                  padding="0"
                                   display={responsiveProps.replyButton.display}
                                 >
                                   <span className="discussion-topic-reply-button">

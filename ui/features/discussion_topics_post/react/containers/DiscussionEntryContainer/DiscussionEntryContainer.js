@@ -107,16 +107,16 @@ export const DiscussionEntryContainer = props => {
         desktop: {
           direction: 'row',
           authorInfo: {
-            padding: threadMode ? '0' : 'xx-small 0 0 0',
+            padding: threadMode ? '0 0 small xx-small' : 'xx-small 0 0 0',
           },
           postUtilities: {
             align: threadMode ? 'stretch' : 'start',
-            margin: threadMode ? '0 0 x-small 0' : '0',
+            margin: threadMode ? '0 0 x-small small' : '0',
             padding: 'xx-small',
           },
           postMessage: {
-            padding: threadMode ? '0 xx-small xx-small' : 'x-small 0 small xx-large',
-            paddingNoAuthor: '0 0 xx-small xx-small',
+            padding: threadMode || props.isTopic ? '0 0 small xx-small' : '0 0 small xx-large',
+            paddingNoAuthor: '0 0 small small',
             margin: '0',
           },
         },
@@ -138,7 +138,7 @@ export const DiscussionEntryContainer = props => {
         },
       }}
       render={responsiveProps => (
-        <Flex direction="column">
+        <Flex direction="column" padding="0 0 small small">
           <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
               {hasAuthor && (
@@ -149,6 +149,7 @@ export const DiscussionEntryContainer = props => {
                 >
                   <AuthorInfo
                     author={props.author}
+                    threadParent={props.threadParent}
                     anonymousAuthor={props.anonymousAuthor}
                     editor={props.editor}
                     isUnread={props.isUnread}
@@ -162,7 +163,7 @@ export const DiscussionEntryContainer = props => {
                     discussionEntryVersions={
                       props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
                     }
-                    threadMode={threadMode && !searchTerm}
+                    threadMode={threadMode}
                   />
                 </Flex.Item>
               )}
@@ -190,7 +191,8 @@ export const DiscussionEntryContainer = props => {
           >
             {props.quotedEntry && <ReplyPreview {...props.quotedEntry} />}
             <PostMessage
-              threadMode={threadMode && !searchTerm}
+              isTopic={props.isTopic}
+              threadMode={threadMode && !props.isTopic}
               discussionEntry={props.discussionEntry}
               discussionAnonymousState={props.discussionTopic?.anonymousState}
               canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
