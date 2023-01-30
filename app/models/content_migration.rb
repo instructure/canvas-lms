@@ -21,12 +21,15 @@
 class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
+  include Rails.application.routes.url_helpers
+
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, class_name: "Attachment"
   belongs_to :exported_attachment, class_name: "Attachment"
+  belongs_to :asset_map_attachment, class_name: "Attachment", optional: true
   belongs_to :source_course, class_name: "Course"
   belongs_to :root_account, class_name: "Account"
   has_one :content_export
@@ -1116,10 +1119,10 @@ class ContentMigration < ActiveRecord::Base
     "!/blueprint/blueprint_subscriptions/#{child_subscription_id}/#{id}"
   end
 
-  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
+  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   def asset_id_mapping
-    return {} unless source_course
+    return nil unless (imported? || importing?) && source_course
 
     mapping = {}
     master_template = migration_type == "master_course_import" &&
@@ -1141,14 +1144,25 @@ class ContentMigration < ActiveRecord::Base
       mapping[key] ||= {}
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
-        # between source id and migration_id in the MasterContentTags
-        master_template.master_content_tags
-                       .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
-                              migration_id: mig_id_to_dest_id.keys)
-                       .pluck(:content_id, :migration_id)
-                       .each do |src_id, mig_id|
-          dest_id = mig_id_to_dest_id[mig_id]
-          mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+        # between source id and migration_id in the MasterContentTags (except for ContentTags, which
+        # fortunately _aren't_ complicated)
+        if asset_type == "ContentTag"
+          src_ids = source_course.context_module_tags.pluck(:id)
+          src_ids.each do |src_id|
+            global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
+            mig_id = master_template.migration_id_for(global_asset_string)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        else
+          master_template.master_content_tags
+                         .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
+                                migration_id: mig_id_to_dest_id.keys)
+                         .pluck(:content_id, :migration_id)
+                         .each do |src_id, mig_id|
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
         end
       else
         # with course copy, there is no stored mapping between source id and migration_id,
@@ -1166,6 +1180,30 @@ class ContentMigration < ActiveRecord::Base
     end
 
     mapping
+  end
+
+  def asset_map_url(generate_if_needed: false)
+    generate_asset_map if !asset_map_attachment && generate_if_needed
+    asset_map_attachment && file_download_url(asset_map_attachment, { verifier: asset_map_attachment.uuid,
+                                                                      download: "1",
+                                                                      download_frd: "1",
+                                                                      host: HostUrl.context_host(context) })
+  end
+
+  def generate_asset_map
+    data = asset_id_mapping
+    return if data.nil?
+
+    payload = {
+      "source_host" => source_course.root_account.domain,
+      "source_course" => source_course_id.to_s,
+      "resource_mapping" => data
+    }
+
+    self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
+    Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
+    asset_map_attachment.save!
+    save!
   end
 
   set_broadcast_policy do |p|

@@ -662,6 +662,7 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next =
       content_migration.migration_settings&.[](:import_quizzes_next) == true
+    need_resource_map = content_migration.source_course&.has_new_quizzes?
     payload = {
       content_migration_id: content_migration.global_id,
       context_id: context.global_id,
@@ -670,8 +671,10 @@ module Canvas::LiveEvents
       context_uuid: context.uuid,
       import_quizzes_next: import_quizzes_next,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
+      source_course_uuid: content_migration.source_course&.uuid,
       destination_course_lti_id: context.lti_context_id,
-      migration_type: content_migration.migration_type
+      migration_type: content_migration.migration_type,
+      resource_map_url: content_migration.asset_map_url(generate_if_needed: need_resource_map)
     }
 
     if context.respond_to?(:root_account)
