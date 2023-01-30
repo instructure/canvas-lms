@@ -596,13 +596,7 @@ describe "Common Cartridge exporting" do
     end
 
     it "exports context.xml" do
-      fake_canvas_host = "pineapple.127.0.0.1.xip.io" # something AccountDomain won't try to look up :P
-      if @course.root_account.respond_to?(:account_domains)
-        @course.root_account.account_domains.create!(host: fake_canvas_host)
-      else
-        # this is incompatible with MRA prepend, unfortunately, or I'd just use it all the time
-        allow_any_instance_of(Account).to receive(:primary_domain).and_return(OpenStruct.new(host: fake_canvas_host))
-      end
+      allow_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
       run_export
       expect(@manifest_doc.at_css('file[href="course_settings/context.xml"]')).not_to be_nil
       context_info = Nokogiri::XML(@zip_file.read("course_settings/context.xml"))
@@ -611,7 +605,7 @@ describe "Common Cartridge exporting" do
       expect(context_info.at_css("root_account_id").text).to eq @course.root_account.global_id.to_s
       expect(context_info.at_css("root_account_uuid").text).to eq @course.root_account.uuid.to_s
       expect(context_info.at_css("root_account_name").text).to eq @course.root_account.name.to_s
-      expect(context_info.at_css("canvas_domain").text).to eq fake_canvas_host
+      expect(context_info.at_css("canvas_domain").text).to eq "pineapple.edu"
       expect(ccc_schema.validate(context_info)).to be_empty
     end
 
