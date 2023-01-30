@@ -30,6 +30,7 @@ describe Attachments::Storage do
     it "calls instfs direct upload if inst-fs is enabled" do
       expect(InstFS).to receive(:direct_upload)
       Attachments::Storage.store_for_attachment(@attachment, @file)
+      expect(@attachment.md5).to eq "8c1005505bb0b4353992a50533f6108d0c06365b234443d9ccc1190c6acd1d01fa7f8590ac9f46fd83304433b0862dd1c2d18915a8f19aed71903aa2934bdfda"
       expect(@attachment.instfs_uuid).to eq(@uuid)
     end
 

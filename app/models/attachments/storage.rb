@@ -25,7 +25,7 @@ class Attachments::Storage
         file_name: attachment.display_name
       )
       attachment.instfs_uuid = instfs_uuid
-      attachment.md5 = Digest::SHA2.new(512).file(data) if digest_file? data
+      attachment.md5 = Digest::SHA2.new(512).file(data).hexdigest if digest_file? data
 
       # populate attachment fields if they were not already set
       attachment.size ||= data.size
