@@ -364,8 +364,9 @@ class ConferencesController < ApplicationController
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save
           end
+          user_ids = member_ids
           @conference.add_initiator(@current_user)
-          @conference.invite_users_from_context(member_ids)
+          user_ids.count > WebConference.max_invitees_sync_size ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
