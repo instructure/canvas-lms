@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.3] - 2023-01-30
+
+- Change the violation highlight from an absolutely positioned blue box
+  to an outline created with just CSS
+
 ## [4.1.2] - 2022-11-30
 
 - Changes to cope with the RCE being put in browser-native fullscreen

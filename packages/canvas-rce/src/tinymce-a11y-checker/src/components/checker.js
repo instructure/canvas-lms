@@ -68,7 +68,6 @@ export default class Checker extends React.Component {
   }
 
   onFullscreenChange = (event) => {
-    clearIndicators(event.target)
     this.selectCurrent()
   }
 
@@ -145,11 +144,11 @@ export default class Checker extends React.Component {
   }
 
   selectCurrent() {
-    clearIndicators()
+    clearIndicators(this.props.editor.dom.doc)
     const errorNode = this.errorNode()
     if (errorNode) {
       this.getFormState()
-      dom.select(this.props.editor, errorNode)
+      dom.select(errorNode)
     } else {
       this.firstError()
     }
@@ -282,7 +281,7 @@ export default class Checker extends React.Component {
 
   handleClose() {
     this.onLeaveError()
-    clearIndicators()
+    clearIndicators(this.props.editor.dom.doc)
     this.setState({ open: false })
   }
 
