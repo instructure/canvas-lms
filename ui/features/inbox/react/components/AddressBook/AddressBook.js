@@ -69,7 +69,8 @@ export const AddressBook = ({
   limitTagCount,
   headerText,
   width,
-  open,
+  isMenuOpen,
+  setIsMenuOpen,
   onUserFilterSelect,
   fetchMoreMenuData,
   hasMoreMenuData,
@@ -85,7 +86,6 @@ export const AddressBook = ({
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
   const popoverInstanceId = useRef(`address-book-menu-${nanoid()}`)
-  const [isMenuOpen, setIsMenuOpen] = useState(open)
   const [selectedItem, setSelectedItem] = useState(null)
   const [selectedMenuItems, setSelectedMenuItems] = useState([])
   const [isLimitReached, setLimitReached] = useState(false)
@@ -199,7 +199,7 @@ export const AddressBook = ({
       textInputRef?.current?.setAttribute('disabled', true)
       setIsMenuOpen(false)
     }
-  }, [selectedMenuItems, limitTagCount, textInputRef])
+  }, [selectedMenuItems, limitTagCount, textInputRef, setIsMenuOpen])
 
   // set initial recipients from props
   useEffect(() => {
@@ -691,7 +691,8 @@ AddressBook.propTypes = {
   /**
    * Bool which determines if addressbook is open
    */
-  open: PropTypes.bool,
+  isMenuOpen: PropTypes.bool,
+  setIsMenuOpen: PropTypes.func,
   /**
    * use State function to set user filter for conversations
    */

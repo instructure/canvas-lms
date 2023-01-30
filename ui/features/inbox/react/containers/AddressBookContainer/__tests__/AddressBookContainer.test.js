@@ -226,6 +226,26 @@ describe('Should load <AddressBookContainer> normally', () => {
       items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)
     })
+
+    it('Should be able to select only 1 tags when limit is 1', async () => {
+      setup({limitTagCount: 1, open: true})
+      // Find initial courses and students sub-menu
+      let items = await screen.findAllByTestId('address-book-item')
+      expect(items.length).toBe(2)
+
+      // Click students submenu
+      fireEvent.mouseDown(items[1])
+      items = await screen.findAllByTestId('address-book-item')
+      expect(items.length).toBe(4)
+
+      // Click on 2 students to try to create 2 tags
+      fireEvent.mouseDown(items[1])
+      fireEvent.mouseDown(items[2])
+
+      // Verify that only 1 tag was created
+      const tags = await screen.findAllByTestId('address-book-tag')
+      expect(tags.length).toBe(1)
+    })
   })
 
   describe('Callbacks', () => {
