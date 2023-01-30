@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# NOTE: Indented gems are meant to indicate transient dependencies of parent gems
+# NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
 def gem_override(name, version)
   if File.directory?("vendor/#{name}")
@@ -29,13 +29,11 @@ end
 
 gem "bootsnap", "1.13.0", require: false
 gem "rails", ::CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
-  gem "tzinfo", "2.0.4"
-  gem "zeitwerk", "2.6.6"
+gem "tzinfo", "2.0.4"
 gem_override "switchman", "3.3.1"
-  gem "guardrail", "3.0.2"
+gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
-  gem "irb", "1.4.1"
-  gem "open4", "1.3.4", require: false
+gem "irb", "1.4.1"
 
 gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
@@ -47,7 +45,6 @@ gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
 gem "aws-sdk-core", "3.168.4", require: false
-  gem "aws-partitions", "1.687.0", require: false
 gem "aws-sdk-dynamodb", "1.80.0"
 gem "aws-sdk-kinesis", "1.43.0", require: false
 gem "aws-sdk-s3", "1.117.2", require: false
@@ -64,7 +61,6 @@ gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-  gem "adobe_connect", "1.0.11", require: false
 gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "ddtrace", "0.42.0", require: false
@@ -81,8 +77,6 @@ gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
 gem "i18n", "1.9.1"
 gem "i18nliner", "0.2.2", github: "instructure/i18nliner", ref: "ruby3"
-  gem "ruby2ruby", "2.4.4", require: false
-  gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.6.3", require: false
 gem "ims-lti", "2.3.3", require: "ims"
@@ -90,25 +84,17 @@ gem "rrule", "0.4.4", require: false
 
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"
-  gem "statsd-ruby", "1.4.0", require: false
-  gem "aroi", "0.0.7", require: false
-  gem "dogstatsd-ruby", "4.8.2"
 gem_override "inst-jobs", "3.1.6"
-  gem "fugit", "1.4.0", require: false
-    gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"
-  gem "aws-sdk-autoscaling", "1.49.0", require: false
 gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem "json", "~> 2.6.1"
 gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a87964f74c07a14cafeb98cfcae4e29f"
-  gem "ecma-re-validator", "0.2.1"
 gem "json-jwt", "1.13.0", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
-  gem "mini_mime", "1.1.2", require: false
 gem "marginalia", "1.11.1", require: false
 gem "mime-types", "3.3.1"
 gem "mini_magick", "4.11.0"
@@ -125,7 +111,6 @@ gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.2.0"
 gem "prawn-rails", "1.3.0"
-  gem "matrix", "0.4.2"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
 gem "rack-test", "1.1.0"
@@ -143,7 +128,6 @@ gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
-  gem "nokogiri-xmlsec-instructure", "0.10.2", require: false
 gem "sanitize", "6.0.0", require: false
 gem "sentry-ruby", "5.1.0"
 gem "sentry-rails", "5.1.0"
@@ -157,10 +141,7 @@ gem "week_of_month", "1.2.5",
     github: "instructure/week-of-month", ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
-# needs pin to satisfy varying requirements of google_drive and another gem
 gem "faraday", "0.17.4"
-  gem "faraday_middleware", "0.14.0"
-  gem "multipart-post", "2.1.1"
 
 path "engines" do
   gem "audits"
@@ -195,6 +176,7 @@ path "gems" do
   gem "canvas_time"
   gem "canvas_unzip"
   gem "config_file"
+  gem "csv_diff"
   gem "diigo"
   gem "dynamic_settings"
   gem "event_stream"
@@ -215,6 +197,3 @@ path "gems" do
   gem "utf8_cleaner"
   gem "workflow"
 end
-
-gem "csv_diff", path: "gems"
-  gem "sqlite3", "1.4.2"

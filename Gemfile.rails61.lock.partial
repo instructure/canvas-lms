@@ -782,7 +782,6 @@ GEM
       activerecord (>= 6.0, < 7.1)
       rspec (>= 3.6)
       rspec-rails (>= 4.0)
-    open4 (1.3.4)
     outrigger (3.0.1)
       activerecord (>= 6.0, < 7.1)
       railties (>= 6.0, < 7.1)
@@ -1164,16 +1163,12 @@ DEPENDENCIES
   acts_as_list!
   addressable (= 2.7.0)
   adheres_to_policy!
-  adobe_connect (= 1.0.11)
   after_transaction_commit (= 2.2.2)
   apollo-federation (= 1.1.5)
-  aroi (= 0.0.7)
   attachment_fu!
   audits!
   authlogic (= 6.4.2)
   autoextend!
-  aws-partitions (= 1.687.0)
-  aws-sdk-autoscaling (= 1.49.0)
   aws-sdk-core (= 3.168.4)
   aws-sdk-dynamodb (= 1.80.0)
   aws-sdk-kinesis (= 1.43.0)
@@ -1237,24 +1232,19 @@ DEPENDENCIES
   diigo!
   diplomat (= 2.6.3)
   docx (= 0.6.2)
-  dogstatsd-ruby (= 4.8.2)
   dotenv (= 2.7.5)
   dress_code (= 1.2.1)
   dynamic_settings!
   dynect4r (= 0.2.4)
-  ecma-re-validator (= 0.2.1)
   encrypted_cookie_store-instructure (= 1.2.12)
   escape_code (= 0.2)
-  et-orbi (= 1.2.4)
   event_stream!
   factory_bot (= 6.2.1)
   faraday (= 0.17.4)
-  faraday_middleware (= 0.14.0)
   ffi (= 1.14.2)
   ffi-icu (= 0.4.0)!
   flakey_spec_catcher (~> 0.11.2)
   folio-pagination (= 0.0.12)
-  fugit (= 1.4.0)
   gepub (= 1.0.15)
   gergich (= 2.0.0)
   google_drive!
@@ -1294,28 +1284,23 @@ DEPENDENCIES
   luminosity_contrast (= 0.2.1)
   mail (= 2.7.1)
   marginalia (= 1.11.1)
-  matrix (= 0.4.2)
   maxminddb (= 0.1.22)
   mechanize (= 2.7.7)
   mime-types (= 3.3.1)
   mime-types-data (= 3.2021.0901)
   mini_magick (= 4.11.0)
-  mini_mime (= 1.1.2)
   moodle_importer!
   multi_json (= 1.15.0)
   multipart!
-  multipart-post (= 2.1.1)
   net-imap (= 0.2.3)
   net-ldap (= 0.16.3)
   net-pop (= 0.1.1)
   net-smtp (= 0.3.1)
   nokogiri (= 1.13.8)
-  nokogiri-xmlsec-instructure (= 0.10.2)
   oauth (= 0.5.4)
   oauth2 (= 1.4.4)
   oj (= 3.10.16)
   once-ler (= 2.0.1)
-  open4 (= 1.3.4)
   outrigger (= 3.0.1)
   pact (= 1.57.0)
   pact-messages (= 0.2.0)
@@ -1370,8 +1355,6 @@ DEPENDENCIES
   ruby-progressbar (= 1.11.0)
   ruby-rtf (= 0.0.5)
   ruby2_keywords (= 0.0.3)
-  ruby2ruby (= 2.4.4)
-  ruby_parser (= 3.18.1)
   rubycas-client (= 2.3.9)
   rubyzip (= 2.3.0)
   saml2 (= 3.1.2)
@@ -1391,10 +1374,8 @@ DEPENDENCIES
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (= 0.3.0)!
-  sqlite3 (= 1.4.2)
   sshkey (= 2.0.0)
   stackprof
-  statsd-ruby (= 1.4.0)
   stormbreaker (= 0.0.8)
   stringify_ids!
   switchman (= 3.3.1)
@@ -1420,7 +1401,6 @@ DEPENDENCIES
   xml-simple (= 1.1.5)
   yard (= 0.9.25)
   yard-appendix (= 0.1.8)
-  zeitwerk (= 2.6.6)
   zendesk_api (= 1.28.0)
 
 RUBY VERSION
