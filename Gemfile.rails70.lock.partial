@@ -321,8 +321,10 @@ PATH
       railties
     stringify_ids (1.0.0)
     turnitin_api (0.1.0)
+      activesupport
       faraday (~> 0.17.3)
       faraday_middleware (~> 0.8)
+      inst_statsd
       simple_oauth (~> 0.3)
     twitter (1.0.0)
       html_text_helper
