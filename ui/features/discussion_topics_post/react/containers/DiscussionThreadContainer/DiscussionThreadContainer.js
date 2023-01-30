@@ -518,7 +518,7 @@ export const DiscussionThreadContainer = props => {
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     {threadActions.length > 0 && (
-                      <View as="div" padding="x-small none none">
+                      <View as="div">
                         <ThreadingToolbar
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}
