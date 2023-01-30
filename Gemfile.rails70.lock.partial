@@ -630,6 +630,7 @@ GEM
       retriable (~> 1.4)
       signet (~> 0.6)
     google-protobuf (3.21.12)
+    google-protobuf (3.21.12-x86_64-darwin)
     google-protobuf (3.21.12-x86_64-linux)
     graphql (1.12.14)
     graphql-batch (0.4.3)
@@ -770,6 +771,10 @@ GEM
     netrc (0.11.0)
     nio4r (2.5.8)
     nokogiri (1.13.8-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.13.8-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
@@ -1147,6 +1152,8 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  arm64-darwin
+  x86_64-darwin
   x86_64-linux
 
 DEPENDENCIES
