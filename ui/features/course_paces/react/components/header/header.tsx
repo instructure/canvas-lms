@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -25,7 +25,6 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {Metric, MetricGroup} from '@instructure/ui-metric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
 import {IconCoursesLine, IconInfoLine} from '@instructure/ui-icons'
@@ -41,6 +40,15 @@ import {actions} from '../../actions/ui'
 import {paceContextsActions} from '../../actions/pace_contexts'
 import {generateModalLauncherId} from '../../utils/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {Table} from '@instructure/ui-table'
+
+const {
+  Body: TableBody,
+  Head: TableHead,
+  Row: TableRow,
+  Cell: TableCell,
+  ColHeader: TableColHeader,
+} = Table as any
 
 const I18n = useI18nScope('course_paces_header')
 
@@ -83,6 +91,7 @@ const NEW_PACE_ALERT_MESSAGES = {
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const [newPaceAlertDismissed, setNewPaceAlertDismissed] = useState(false)
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
+  const metricsTableRef = useRef<HTMLElement | null>(null)
 
   const fetchDefaultPaceContext = props.fetchDefaultPaceContext
   const updated_at = props.coursePace?.updated_at
@@ -96,13 +105,16 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
     }
   }, [fetchDefaultPaceContext, updated_at])
 
-  if (window.ENV.FEATURES.course_paces_redesign) {
-    const metricTheme = {
-      valueFontSize: '1.125rem',
-      labelFontSize: '0.875rem',
-      padding: '0 0.75rem',
-    }
+  useEffect(() => {
+    // This is a way of overriding the fontWeight property of the Table.ColHeader style
+    // it looks like the value is hardcoded in the theme and it ignores when the param
+    // is set in the prop
+    metricsTableRef.current?.querySelectorAll<HTMLElement>('th').forEach(el => {
+      el.style.fontWeight = 'normal'
+    })
+  }, [])
 
+  if (window.ENV.FEATURES.course_paces_redesign) {
     const getDurationLabel = planDays => {
       if (!planDays) return false
       let weeks
@@ -147,68 +159,90 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                 ) : null}
                 <FlexItem>
                   <span className="course-paces-metrics-heading">
-                    <MetricGroup>
-                      <Metric
-                        data-testid="number-of-students"
-                        theme={metricTheme}
-                        textAlign="start"
-                        renderLabel={
-                          <View as="div" margin="none none xx-small none">
-                            {I18n.t('Students')}
-                          </View>
-                        }
-                        renderValue={props.defaultPaceContext?.associated_student_count}
-                        isGroupChild={true}
-                      />
-                      <Metric
-                        data-testid="number-of-sections"
-                        theme={metricTheme}
-                        textAlign="start"
-                        renderLabel={
-                          <View as="div" margin="none none xx-small none">
-                            {I18n.t('Sections')}
-                          </View>
-                        }
-                        renderValue={props.defaultPaceContext?.associated_section_count}
-                        isGroupChild={true}
-                      />
-                      <Metric
-                        data-testid="default-pace-duration"
-                        theme={metricTheme}
-                        textAlign="start"
-                        renderLabel={
-                          <View
-                            as="div"
-                            aria-label={I18n.t('Pace Duration')}
-                            display="inline-flex"
-                            margin="none none xxx-small none"
-                            theme={{
-                              marginXxxSmall: '0.2rem',
-                            }}
+                    <Table
+                      elementRef={e => {
+                        metricsTableRef.current = e
+                      }}
+                      caption={I18n.t('Metrics')}
+                      layout="auto"
+                    >
+                      <TableHead>
+                        <TableRow theme={{borderColor: 'transparent'}}>
+                          <TableColHeader
+                            id="students-col-header"
+                            theme={{padding: '0rem 0.75rem'}}
                           >
-                            {I18n.t('Pace Duration')}
-                            <Tooltip
-                              renderTip={durationTooltipText}
-                              on={['hover', 'focus']}
-                              color="primary"
+                            <Text size="small">{I18n.t('Students')}</Text>
+                          </TableColHeader>
+                          <TableColHeader
+                            id="sections-col-header"
+                            theme={{padding: '0rem  0.75rem'}}
+                          >
+                            <Text size="small">{I18n.t('Sections')}</Text>
+                          </TableColHeader>
+                          <TableColHeader
+                            id="duration-col-header"
+                            data-testid="duration-col-header"
+                            theme={{padding: '0rem  0.75rem'}}
+                          >
+                            <View
+                              as="div"
+                              aria-label={I18n.t('Pace Duration')}
+                              display="inline-flex"
+                              margin="x-small none none none"
+                              theme={{
+                                marginXSmall: '0.475rem',
+                              }}
                             >
-                              <View
-                                as="div"
-                                role="tooltip"
-                                aria-label={durationTooltipText}
-                                margin="none none none xx-small"
+                              <Text size="small">{I18n.t('Pace Duration')}</Text>
+                              <Tooltip
+                                renderTip={durationTooltipText}
+                                on={['hover', 'focus']}
+                                color="primary"
                               >
-                                <IconInfoLine as="div" size="x-small" />
-                              </View>
-                            </Tooltip>
-                          </View>
-                        }
-                        renderValue={
-                          getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) || '--'
-                        }
-                        isGroupChild={true}
-                      />
-                    </MetricGroup>
+                                <View
+                                  as="div"
+                                  role="tooltip"
+                                  aria-label={durationTooltipText}
+                                  margin="none none none xx-small"
+                                >
+                                  <IconInfoLine as="div" size="x-small" />
+                                </View>
+                              </Tooltip>
+                            </View>
+                          </TableColHeader>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow theme={{borderColor: 'transparent'}}>
+                          <TableCell
+                            data-testid="number-of-students"
+                            theme={{padding: '0rem  0.75rem'}}
+                          >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                              {props.defaultPaceContext?.associated_student_count}
+                            </Text>
+                          </TableCell>
+                          <TableCell
+                            data-testid="number-of-sections"
+                            theme={{padding: '0rem  0.75rem'}}
+                          >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                              {props.defaultPaceContext?.associated_section_count}
+                            </Text>
+                          </TableCell>
+                          <TableCell
+                            data-testid="default-pace-duration"
+                            theme={{padding: '0rem  0.75rem'}}
+                          >
+                            <Text size="medium" weight="bold" theme={{fontSizeMedium: '1.125rem'}}>
+                              {getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) ||
+                                '--'}
+                            </Text>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                   </span>
                 </FlexItem>
               </Flex>
