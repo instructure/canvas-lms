@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update the tinymce-a11y-checker dependency version to 4.1.3 (updated highlight on violations)
+- Fixed encoding bug related to quotations
+- Altered keyboard shortcuts
+- Updated keyboard shortcut modal appearance
 
 # 5.6.12 - 2023-01-26
 
