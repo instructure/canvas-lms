@@ -28,10 +28,15 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import ViewManager from './ViewManager'
 import UnavailablePeerReview from '../UnavailablePeerReview'
+import NeedsSubmissionPeerReview from '../NeedsSubmissionPeerReview'
 
 const I18n = useI18nScope('assignments_2_submission_histories_query')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+
+function shouldDisplayNeedsSubmissionPeerReview({assignment, reviewerSubmission}) {
+  return assignment.env.peerReviewModeEnabled && reviewerSubmission?.state === 'unsubmitted'
+}
 
 function shouldDisplayUnavailablePeerReview({assignment, reviewerSubmission}) {
   return (
@@ -52,6 +57,18 @@ class SubmissionHistoriesQuery extends React.Component {
 
   render() {
     const {submission} = this.props.initialQueryData
+
+    if (shouldDisplayNeedsSubmissionPeerReview(this.props.initialQueryData)) {
+      return (
+        <>
+          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} />
+          <AssignmentToggleDetails
+            description={this.props.initialQueryData.assignment.description}
+          />
+          <NeedsSubmissionPeerReview />
+        </>
+      )
+    }
 
     if (shouldDisplayUnavailablePeerReview(this.props.initialQueryData)) {
       return (
