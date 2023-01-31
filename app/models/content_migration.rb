@@ -380,7 +380,7 @@ class ContentMigration < ActiveRecord::Base
     p
   end
 
-  def queue_migration(plugin = nil, retry_count: 0, expires_at: nil)
+  def queue_migration(plugin = nil, retry_count: 0, expires_at: nil, priority: Delayed::LOW_PRIORITY)
     reset_job_progress unless plugin && plugin.settings[:skip_initial_progress]
 
     expires_at ||= Setting.get("content_migration_job_expiration_hours", "48").to_i.hours.from_now
@@ -391,7 +391,7 @@ class ContentMigration < ActiveRecord::Base
 
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
-      queue_opts = { priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+      queue_opts = { priority: priority, max_attempts: 1,
                      expires_at: expires_at }
       if strand
         queue_opts[:strand] = strand

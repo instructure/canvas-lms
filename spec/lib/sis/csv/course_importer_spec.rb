@@ -802,6 +802,9 @@ describe SIS::CSV::CourseImporter do
     it "tries to queue a migration afterwards" do
       account_admin_user(active_all: true)
       c1 = @account.courses.create!(sis_source_id: "acourse1")
+      expect(MasterCourses::MasterMigration).to receive(:start_new_migration!)
+        .with(anything, anything, hash_including(priority: 25, retry_later: true))
+        .and_call_original
       process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
