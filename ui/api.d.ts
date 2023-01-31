@@ -227,6 +227,7 @@ export type AssessmentRequest = Readonly<{
   user_id?: string
   user_name?: string
   available: boolean
+  workflow_state?: string
 }>
 
 export type AttachmentData = Readonly<{
