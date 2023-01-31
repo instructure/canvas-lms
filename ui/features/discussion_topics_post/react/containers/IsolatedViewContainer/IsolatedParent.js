@@ -47,7 +47,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 const I18n = useI18nScope('discussion_posts')
 
 export const IsolatedParent = props => {
-  const {setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
     UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
   )
@@ -93,7 +92,6 @@ export const IsolatedParent = props => {
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => {
-          setReplyFromId(null)
           props.setRCEOpen(true)
         }}
         isReadOnly={props.RCEOpen}
