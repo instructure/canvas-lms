@@ -64,11 +64,6 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
 
   protected
 
-  # def me(token)
-  #   token.options[:me] ||= token.get("/v2.1/me").parsed['data']
-  #   raw_data = token.get("/v2.1/me").parsed
-  #   Rails.logger.info "Clever data123: #{raw_data}"
-  # end
   def me(token)
     token.options[:me] ||= begin
                              raw_data = token.get("/v2.1/me").parsed
@@ -77,10 +72,8 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
                              data["name.first"] = data.dig("name", "first")
                              data["name.last"] = data.dig("name", "last")
                              data['name.full'] = "#{data['name.first']} #{data['name.last']}"
-                             # data["sortable_name"] = data.dig("name", "full")
                              data["district_username"] = data.dig("credentials", "district_username")
                              data.slice!(*(self.class.recognized_federated_attributes + ["district"]))
-                             Rails.logger.info "Clever data123: #{data}"
                              data
                            end
   end
