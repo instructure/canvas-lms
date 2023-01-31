@@ -46,6 +46,15 @@ describe('CanvasRce', () => {
     expect(rceRef.current.getCode()).toEqual('How sweet.')
   })
 
+  it('passes autosave prop to child components', async () => {
+    const rceRef = createRef(null)
+
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={false} />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+    expect(rceRef.current.props.autosave.enabled).toEqual(false)
+  })
+
   describe('merging UI elements', () => {
     // the only way I can think of to test these functions
     // is to look at the props passed to the mock Editor component
