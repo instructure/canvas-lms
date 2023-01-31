@@ -1206,7 +1206,7 @@ describe ContentMigration do
     end
 
     it "returns a url to a file containing the asset map" do
-      expect_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
+      allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
       url = @cm.asset_map_url(generate_if_needed: true)
       @cm.reload
       expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
@@ -1218,6 +1218,46 @@ describe ContentMigration do
                            "resource_mapping" => {
                              "assignments" => { @old.id.to_s => @new.id.to_s }
                            } })
+    end
+
+    context "when not on a test cluster" do
+      let(:content_migration) do
+        @cm.update!(source_course: source_course)
+
+        @cm
+      end
+      let(:source_course) { course_factory }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return nil
+        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+      end
+
+      it "uses the 'production' host" do
+        expect(content_migration.context.root_account).to receive(:domain).with(nil)
+
+        content_migration.asset_map_url(generate_if_needed: true)
+      end
+    end
+
+    context "when on a test cluster" do
+      let(:content_migration) do
+        @cm.update!(source_course: source_course)
+
+        @cm
+      end
+      let(:source_course) { course_factory }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
+        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+      end
+
+      it "uses the test host" do
+        expect(content_migration.context.root_account).to receive(:domain).with("banana")
+
+        content_migration.asset_map_url(generate_if_needed: true)
+      end
     end
   end
 end

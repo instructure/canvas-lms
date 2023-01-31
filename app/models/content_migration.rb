@@ -1184,10 +1184,15 @@ class ContentMigration < ActiveRecord::Base
 
   def asset_map_url(generate_if_needed: false)
     generate_asset_map if !asset_map_attachment && generate_if_needed
-    asset_map_attachment && file_download_url(asset_map_attachment, { verifier: asset_map_attachment.uuid,
-                                                                      download: "1",
-                                                                      download_frd: "1",
-                                                                      host: HostUrl.context_host(context) })
+    asset_map_attachment && file_download_url(
+      asset_map_attachment,
+      {
+        verifier: asset_map_attachment.uuid,
+        download: "1",
+        download_frd: "1",
+        host: context.root_account.domain(ApplicationController.test_cluster_name)
+      }
+    )
   end
 
   def generate_asset_map
@@ -1195,7 +1200,7 @@ class ContentMigration < ActiveRecord::Base
     return if data.nil?
 
     payload = {
-      "source_host" => source_course.root_account.domain,
+      "source_host" => source_course.root_account.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id.to_s,
       "resource_mapping" => data
     }
