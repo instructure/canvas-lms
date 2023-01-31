@@ -51,22 +51,24 @@ module BundlerLockfileExtensions
   class << self
     attr_accessor :lockfile_default, :lockfile_defs, :lockfile_filter, :lockfile_path, :lockfile_writes_enabled
 
+    def enabled?
+      !!@lockfile_defs
+    end
+
     def enable(lockfile_defs)
-      lockfile_default = lockfile_defs.find { |x| !!x[1][:default] }[0]
+      @lockfile_default = lockfile_defs.find { |x| !!x[1][:default] }[0]
+      @lockfile_defs = lockfile_defs
 
-      BundlerLockfileExtensions.lockfile_default = lockfile_default
-      BundlerLockfileExtensions.lockfile_defs = lockfile_defs
-
-      BundlerLockfileExtensions.lockfile_path =
+      @lockfile_path =
         if defined?(Bundler::CLI::Cache) || defined?(Bundler::CLI::Lock)
           @lockfile_writes_enabled = true
-          lockfile_default
+          lockfile_default.to_s
         elsif (!Bundler.settings[:deployment] && defined?(Bundler::CLI::Install)) || defined?(Bundler::CLI::Update)
           # Sadly, this is the only place where the lockfile_path can be set correctly for the installation-like paths.
           # Ideally, it would go into before-install-all, but that is called after the lockfile is already loaded.
           BundlerLockfileExtensions.install_filter_lockfile_name(lockfile_default)
         else
-          lockfile_default
+          lockfile_default.to_s
         end
 
       Bundler::Dsl.class_eval do
@@ -85,6 +87,8 @@ module BundlerLockfileExtensions
       end
 
       Bundler::Definition.prepend(BundlerDefinitionFilterableSources)
+
+      @lockfile_defs[lockfile_default][:prepare_environment]&.call
     end
 
     def each_lockfile_for_writing(lock)
@@ -92,12 +96,12 @@ module BundlerLockfileExtensions
 
       @lockfile_writes_enabled = true
 
-      @lockfile_path = lock
+      @lockfile_path = lock.to_s
       yield @lockfile_path
 
       if lock_def[:install_filter]
         @lockfile_filter = lock_def[:install_filter]
-        @lockfile_path = install_filter_lockfile_name(lock)
+        @lockfile_path = install_filter_lockfile_name(lock).to_s
         yield @lockfile_path
 
         @lockfile_filter = nil
@@ -121,7 +125,7 @@ module BundlerLockfileExtensions
         next if lock == lockfile_default
 
         @lockfile_path = install_filter_lockfile_name(lock)
-        opts[:prepare_environment].call
+        opts[:prepare_environment]&.call
 
         definition = Bundler::Definition.build(Bundler.default_gemfile, @lockfile_path, unlock)
         definition.resolve_remotely!
