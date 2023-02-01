@@ -22,21 +22,21 @@ import $ from 'jquery'
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
-    extensions: ['autoload-all.js']
+    extensions: ['autoload-all.js'],
   },
   tex2jax: {
-    ignoreClass: 'mathjax_ignore'
+    ignoreClass: 'mathjax_ignore',
   },
   extensions: ['Safe.js'],
   Safe: {
-    safeProtocols: {http: true, https: true, file: false, javascript: false, data: false}
+    safeProtocols: {http: true, https: true, file: false, javascript: false, data: false},
   },
   MathMenu: {
     styles: {
-      '.MathJax_Menu': {'z-index': 2001}
-    }
+      '.MathJax_Menu': {'z-index': 2001},
+    },
   },
-  showMathMenu: true
+  showMathMenu: true,
 }
 
 const mathml = {
@@ -50,70 +50,75 @@ const mathml = {
       window.MathJax = localConfig
       if (window.MathJaxIsLoading) return
       window.MathJaxIsLoading = true
-      $.ajax({
-        url: `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=${configFile}&locale=${locale}`,
-        cache: true,
-        success: () => {
-          window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function () {
-            // get the mathjax context menu above the rce's equation editor
-            window.MathJax.Menu.BGSTYLE['z-index'] = 2000
-          })
-          window.MathJax.Hub.Register.StartupHook('End Config', function () {
-            // wait until MathJAx is configured before calling the callback
-            cb?.()
-          })
-          if (ENV?.FEATURES?.new_math_equation_handling) {
-            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function (message) {
-              mathImageHelper.catchEquationImages(message[1])
-            })
-            window.MathJax.Hub.Register.MessageHook('Math Processing Error', function (message) {
-              const elem = message[1]
-              // ".math_equation_latex" is the elem we added for MathJax to typeset the image equation
-              if (elem.parentElement?.classList.contains('math_equation_latex')) {
-                // The equation we image we were trying to replace and failed is up 1 and back 1.
-                // If we remove its "mathjaxified" attribute, the "End Math" handler
-                // won't remove it from the DOM.
-                if (elem.parentElement.previousElementSibling?.hasAttribute('mathjaxified')) {
-                  elem.parentElement.previousElementSibling.removeAttribute('mathjaxified')
-                }
-                // remove the "math processing error" mathjax output.
-                elem.parentElement.remove()
-              }
-            })
-            window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
-              const elem = message[1]
-              mathImageHelper.removeStrayEquationImages(elem)
-              mathImageHelper.nearlyInfiniteStyleFix(elem)
-              elem
-                .querySelectorAll('.math_equation_latex')
-                .forEach(m => m.classList.add('fade-in-equation'))
-            })
-          } else {
-            // though isMathInElement ignores <math> w/in .hidden-readable elements,
-            // MathJax does not and will process it anyway. This is a problem when
-            // you open the equation editor while editing a quiz and it adds to the DOM
-            // elements that will get saved with the quiz.
-            // There's a feature request against MathJax (https://github.com/mathjax/MathJax/issues/505)
-            // to add an ignoreClass config prop to the mml2jax processor, but it's not available.
-            // Since we want to ignore <math> in .hidden-readable spans, let's remove the MathJunk™
-            // right after MathJax adds it.
-            window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
-              $(message[1])
-                .find('.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]')
-                .remove()
-            })
-          }
 
-          // leaving this here so I don't have to keep looking up how to see all messages
-          // window.MathJax.Hub.Startup.signal.Interest(function (message) {
-          //   console.log('>>> MathJax startup:', message)
-          // })
-          // window.MathJax.Hub.signal.Interest(function(message) {
-          //   console.log('>>> MathJax signal', message)
-          // })
-          delete window.MathJaxIsLoading
-        },
-        dataType: 'script'
+      const scriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        document.head.appendChild(script)
+        script.onload = resolve
+        script.onerror = reject
+        script.async = true
+        script.src = `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=${configFile}&locale=${locale}`
+      })
+      // eslint-disable-next-line promise/catch-or-return
+      scriptPromise.then(() => {
+        window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function () {
+          // get the mathjax context menu above the rce's equation editor
+          window.MathJax.Menu.BGSTYLE['z-index'] = 2000
+        })
+        window.MathJax.Hub.Register.StartupHook('End Config', function () {
+          // wait until MathJAx is configured before calling the callback
+          cb?.()
+        })
+        if (ENV?.FEATURES?.new_math_equation_handling) {
+          window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function (message) {
+            mathImageHelper.catchEquationImages(message[1])
+          })
+          window.MathJax.Hub.Register.MessageHook('Math Processing Error', function (message) {
+            const elem = message[1]
+            // ".math_equation_latex" is the elem we added for MathJax to typeset the image equation
+            if (elem.parentElement?.classList.contains('math_equation_latex')) {
+              // The equation we image we were trying to replace and failed is up 1 and back 1.
+              // If we remove its "mathjaxified" attribute, the "End Math" handler
+              // won't remove it from the DOM.
+              if (elem.parentElement.previousElementSibling?.hasAttribute('mathjaxified')) {
+                elem.parentElement.previousElementSibling.removeAttribute('mathjaxified')
+              }
+              // remove the "math processing error" mathjax output.
+              elem.parentElement.remove()
+            }
+          })
+          window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
+            const elem = message[1]
+            mathImageHelper.removeStrayEquationImages(elem)
+            mathImageHelper.nearlyInfiniteStyleFix(elem)
+            elem
+              .querySelectorAll('.math_equation_latex')
+              .forEach(m => m.classList.add('fade-in-equation'))
+          })
+        } else {
+          // though isMathInElement ignores <math> w/in .hidden-readable elements,
+          // MathJax does not and will process it anyway. This is a problem when
+          // you open the equation editor while editing a quiz and it adds to the DOM
+          // elements that will get saved with the quiz.
+          // There's a feature request against MathJax (https://github.com/mathjax/MathJax/issues/505)
+          // to add an ignoreClass config prop to the mml2jax processor, but it's not available.
+          // Since we want to ignore <math> in .hidden-readable spans, let's remove the MathJunk™
+          // right after MathJax adds it.
+          window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
+            $(message[1])
+              .find('.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]')
+              .remove()
+          })
+        }
+
+        // leaving this here so I don't have to keep looking up how to see all messages
+        // window.MathJax.Hub.Startup.signal.Interest(function (message) {
+        //   console.log('>>> MathJax startup:', message)
+        // })
+        // window.MathJax.Hub.signal.Interest(function(message) {
+        //   console.log('>>> MathJax signal', message)
+        // })
+        delete window.MathJaxIsLoading
       })
     } else {
       // Make sure we always call the callback if it is loaded already and make sure we
@@ -226,7 +231,7 @@ const mathml = {
     }
   },
 
-  processNewMathEventName: 'process-new-math'
+  processNewMathEventName: 'process-new-math',
 }
 
 const mathImageHelper = {
@@ -300,7 +305,7 @@ const mathImageHelper = {
         e.setAttribute('style', s)
       }
     })
-  }
+  },
 }
 
 function handleNewMath(event) {
