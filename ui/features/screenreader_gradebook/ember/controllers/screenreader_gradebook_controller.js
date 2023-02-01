@@ -85,7 +85,7 @@ function studentsUniqByEnrollments(...args) {
       array.pushObject(student)
       return array
     },
-    removedItem(array, enrollment, _, instanceMeta) {
+    removedItem(array, enrollment, __, instanceMeta) {
       const student = array.findBy('id', enrollment.user_id)
       student.sections.removeObject(enrollment.course_section_id)
 
@@ -177,7 +177,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     }
   })(),
 
-  selectedGradingPeriod: function (key, newValue) {
+  selectedGradingPeriod: function (_key, newValue) {
     let savedGP
     const savedGradingPeriodId = userSettings.contextGet('gradebook_current_grading_period')
     if (savedGradingPeriodId) {
@@ -418,6 +418,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       () =>
         $.ajaxJSON(`/api/v1/progress/${attachmentProgress.progress_id}`, 'GET').then(response => {
           if (response.workflow_state === 'completed') {
+            // eslint-disable-next-line promise/catch-or-return
             $.ajaxJSON(
               `/api/v1/users/${ENV.current_user_id}/files/${attachmentProgress.attachment_id}`,
               'GET'
@@ -478,7 +479,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
     }
     const component = React.createElement(GradebookSelector, props)
-    return ReactDOM.render(component, mountPoint)
+    ReactDOM.render(component, mountPoint)
   }.on('init'),
 
   willDestroy() {

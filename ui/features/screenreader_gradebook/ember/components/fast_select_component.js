@@ -42,16 +42,21 @@ const FastSelectComponent = Component.extend({
   },
 
   valueDidChange: function () {
-    const {items} = this
-    const {value} = this
     let selected = null
-    if (value && items) {
-      selected = items.findBy(this.valuePath, value)
+    if (this.value && this.items) {
+      selected = this.items.findBy(this.valuePath, this.value)
     }
-    set(this, 'selected', selected)
-  }
-    .observes('value')
-    .on('init'),
+    set(this, 'selected', selected || null)
+  }.observes('value'),
+
+  initialize: function () {
+    const value = this.value || this.valueDefault
+    let selected
+    if (value && this.items) {
+      selected = this.items.findBy(this.valuePath, value)
+    }
+    set(this, 'selected', selected || null)
+  }.on('init'),
 
   itemsWillChange: function () {
     const {items} = this
@@ -109,7 +114,7 @@ const FastSelectComponent = Component.extend({
     this.arrayDidChange(this.items, 0, 0, get(this.items, 'length'))
   }.observes('labelPath'),
 
-  arrayDidChange(items, start, removeCount, addCount) {
+  arrayDidChange(items, start, _removeCount, addCount) {
     let value
     const select = get(this, 'element')
     const hasDefault = get(this, 'hasDefaultOption')
@@ -127,7 +132,7 @@ const FastSelectComponent = Component.extend({
       const option = doc.createElement('option')
       option.textContent = label
       option.value = value
-      if (this.value === value) {
+      if ((this.value || this.valueDefault) === value) {
         option.selected = true
         set(this, 'selected', item)
       }
