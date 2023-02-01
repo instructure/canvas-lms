@@ -26,12 +26,13 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
   end
 
   def self.recognized_params
-    [ :login_attribute, :district_id, :jit_provisioning ].freeze
+    [:login_attribute, :district_id, :jit_provisioning].freeze
   end
 
   def self.login_attributes
     ['id'.freeze, 'sis_id'.freeze, 'email'.freeze, 'student_number'.freeze, 'teacher_number'.freeze].freeze
   end
+
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
@@ -64,25 +65,31 @@ class AccountAuthorizationConfig::Clever < AccountAuthorizationConfig::Oauth2
 
   protected
 
+  def user_endpoint(data)
+    "/v2.1/#{data["type"].pluralize}/#{data["id"]}"
+  end
+
   def me(token)
     token.options[:me] ||= begin
-                             raw_data = token.get("/v2.1/me").parsed
-                             data = raw_data["data"].dup
-                             data = data.merge(token.get("/v2.1/#{raw_data["type"]}s/#{data["id"]}").parsed["data"])
+                             data = token.get("/v2.1/me").parsed["data"]
+                             user_object = token.get(user_endpoint(data)).parsed["data"]
+                             data = data.merge(user_object)
                              data["name.first"] = data.dig("name", "first")
                              data["name.last"] = data.dig("name", "last")
                              data['name.full'] = "#{data['name.first']} #{data['name.last']}"
                              data["district_username"] = data.dig("credentials", "district_username")
                              data.slice!(*(self.class.recognized_federated_attributes + ["district"]))
                              data
+                           rescue => exception
+                             Sentry.capture_exception(exception)
                            end
   end
 
   def client_options
     {
-        site: 'https://api.clever.com'.freeze,
-        authorize_url: 'https://clever.com/oauth/authorize',
-        token_url: 'https://clever.com/oauth/tokens'.freeze
+      site: 'https://api.clever.com'.freeze,
+      authorize_url: 'https://clever.com/oauth/authorize',
+      token_url: 'https://clever.com/oauth/tokens'.freeze
     }
   end
 
