@@ -1610,7 +1610,7 @@ RSpec.describe ApplicationController do
         expect(external_tools).to eq([{ id: tool.id, title: "bob", base_url: "http://example.com", icon_url: "http://example.com", canvas_icon_class: "icon-commons" }])
       end
 
-      it "doesn't return tools that are mapped to disabled feature flags" do
+      it "doesn't return tools that are mapped to disabled feature flags -- course navigation" do
         @course = course_model
         tool = analytics_2_tool_factory(context: @course)
 
@@ -1621,6 +1621,19 @@ RSpec.describe ApplicationController do
         @course.enable_feature!(:analytics_2)
         external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
         expect(external_tools).to include({ id: tool.id, title: "Analytics 2", base_url: "http://example.com", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ANALYTICS_2 })
+      end
+
+      it "doesn't return tools that are mapped to disabled feature flags -- account navigation" do
+        @account = account_model
+        tool = admin_analytics_tool_factory(context: @account)
+
+        allow(controller).to receive(:polymorphic_url).and_return("http://admin_analytics.example.com/")
+        external_tools = controller.external_tools_display_hashes(:account_navigation, @account)
+        expect(external_tools).not_to include({ title: "Admin Analytics", base_url: "http://admin_analytics.example.com/", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
+
+        @account.enable_feature!(:admin_analytics)
+        external_tools = controller.external_tools_display_hashes(:account_navigation, @account)
+        expect(external_tools).to include({ id: tool.id, title: "Admin Analytics", base_url: "http://admin_analytics.example.com/", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
       end
     end
 

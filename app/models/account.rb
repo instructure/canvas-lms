@@ -1823,7 +1823,7 @@ class Account < ActiveRecord::Base
 
   def external_tool_tabs(opts, user)
     tools = Lti::ContextToolFinder.new(self, type: :account_navigation).all_tools_scope_union.to_unsorted_array
-                                  .select { |t| t.permission_given?(:account_navigation, user, self) }
+                                  .select { |t| t.permission_given?(:account_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
