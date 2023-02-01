@@ -294,10 +294,10 @@ class ContextModulesApiController < ApplicationController
           @context,
           :batch_update_context_modules,
           { run_at: Time.now },
-          batch_update_params
+          **batch_update_params
         )
       else
-        completed_ids = @context.batch_update_context_modules(batch_update_params)
+        completed_ids = @context.batch_update_context_modules(**batch_update_params)
       end
       render json: { completed: completed_ids, progress: progress }
     end
