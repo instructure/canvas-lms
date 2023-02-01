@@ -23,6 +23,7 @@ module Api::V1::SisImport
   include Api::V1::Attachment
   include Api::V1::User
   include Api::V1::SisImportError
+  include SisImportHelper
 
   def sis_imports_json(batches, user, session)
     SisBatch.load_downloadable_attachments(batches)
@@ -34,12 +35,10 @@ module Api::V1::SisImport
   def sis_import_json(batch, user, session, includes: [])
     json = api_json(batch, user, session)
     if batch.errors_attachment_id
-      verification = Attachments::Verification.new(batch.errors_attachment)
-      jwt_token = verification.verifier_for_user(user, expires: 1.hour.from_now)
       json[:errors_attachment] = attachment_json(
         batch.errors_attachment,
         user,
-        { verifier: jwt_token },
+        { verifier: sis_import_error_attachment_token(batch, user: user) },
         # skip permission checks since the context is a sis_import it will fail permission checks
         { skip_permission_checks: true }
       )
