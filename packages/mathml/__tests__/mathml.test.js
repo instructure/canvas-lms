@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import mathml, {mathImageHelper} from '..'
 
 let stub = null
@@ -34,30 +33,40 @@ describe('MathML and MathJax it', () => {
     delete window.MathJax
     delete window.MathJaxIsLoading
     document.body.innerHTML = ''
+    document.head.innerHTML = ''
   })
 
   it('loadMathJax loads mathJax', () => {
-    stub = jest.spyOn($, 'ajax')
     mathml.loadMathJax('bogus')
-    expect(stub).toHaveBeenCalledTimes(1)
+    expect(
+      Array.from(document.querySelectorAll('script[src]')).filter(el =>
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
+      ).length
+    ).toEqual(1)
   })
 
   it('loadMathJax does not load mathJax', () => {
-    stub = jest.spyOn($, 'ajax')
     window.MathJax = {
       Hub: {
         Queue: () => {},
       },
     }
     mathml.loadMathJax('bogus')
-    expect(stub).not.toHaveBeenCalled()
+    expect(
+      Array.from(document.querySelectorAll('script[src]')).filter(el =>
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
+      ).length
+    ).toEqual(0)
   })
 
   it("loadMathJax doesn't download mathjax if in-flight", () => {
-    stub = jest.spyOn($, 'ajax')
     mathml.loadMathJax('bogus')
     mathml.loadMathJax('bogus')
-    expect(stub).toHaveBeenCalledTimes(1)
+    expect(
+      Array.from(document.querySelectorAll('script[src]')).filter(el =>
+        el.src.includes('//cdnjs.cloudflare.com/ajax/libs/mathjax')
+      ).length
+    ).toEqual(1)
   })
 
   it('isMathJaxLoaded return true', () => {
