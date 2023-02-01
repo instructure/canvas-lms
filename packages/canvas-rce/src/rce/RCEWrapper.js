@@ -2039,7 +2039,9 @@ class RCEWrapper extends React.Component {
           onFullscreen={this.handleClickFullscreen}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
-          onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
+          onWordcountModalOpen={() =>
+            launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
+          }
           disabledPlugins={this.pluginsToExclude}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
