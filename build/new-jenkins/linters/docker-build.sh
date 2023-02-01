@@ -11,6 +11,7 @@ docker tag $WEBPACK_BUILDER_IMAGE local/webpack-builder
 # The steps taken by this image require git support
 cp .dockerignore Dockerfile.jenkins.linters.dockerignore
 echo "!.git" >> Dockerfile.jenkins.linters.dockerignore
+echo "!gems/plugins/*/.git" >> Dockerfile.jenkins.linters.dockerignore
 
 DOCKER_BUILDKIT=1 docker build \
   --file Dockerfile.jenkins.linters \
