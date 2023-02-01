@@ -198,19 +198,6 @@ RSpec.describe Lti::Result, type: :model do
         end
       end
 
-      context "with result_maximum less than 0" do
-        let(:result_maximum) { -1 }
-
-        it "raises an error" do
-          expect do
-            result
-          end.to raise_error(
-            ActiveRecord::RecordInvalid,
-            "Validation failed: Result maximum must be greater than or equal to 0"
-          )
-        end
-      end
-
       context "with result_maximum 0 and the line item's score_maximum 0" do
         it "does not raise an error" do
           expect do
@@ -222,19 +209,6 @@ RSpec.describe Lti::Result, type: :model do
               result_score: 0.5
             )
           end.not_to raise_error
-        end
-      end
-
-      context "with result_maximum 0 and the line item's score_maximum not 0" do
-        let(:result_maximum) { 0 }
-
-        it "raises an error" do
-          expect do
-            result
-          end.to raise_error(
-            ActiveRecord::RecordInvalid,
-            "Validation failed: Result maximum cannot be zero if line item's maximum is not zero"
-          )
         end
       end
     end

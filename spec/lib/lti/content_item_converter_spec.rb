@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "lti/content_item_converter"
-
 module Lti
   describe ContentItemConverter do
     describe "#self.convert_resource_selection" do

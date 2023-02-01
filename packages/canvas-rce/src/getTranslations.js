@@ -119,6 +119,9 @@ export default function getTranslations(locale) {
           case 'mi':
             p = import('./translations/locales/mi')
             break
+          case 'ms':
+            p = import('./translations/locales/ms')
+            break
           case 'nb':
             p = import('./translations/locales/nb')
             break
@@ -235,6 +238,7 @@ export function getLocaleList() {
     'ja',
     'ko',
     'mi',
+    'ms',
     'nb',
     'nb-x-k12',
     'nl',
@@ -258,6 +262,6 @@ export function getLocaleList() {
     'zh',
     'zh-Hans',
     'zh-Hant',
-    'zh-HK'
+    'zh-HK',
   ]
 }

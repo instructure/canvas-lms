@@ -25,20 +25,21 @@ class MarkDonePresenter
     @ctrl = ctrl
     @context = context
     @asset = asset
-    module_item_id ||= infer_item_id
+    module_item_id = use_or_infer_item_id(module_item_id)
     @item = ContentTag.find(module_item_id.to_i) if module_item_id
     @module = @item.context_module if @item
     @user = user
   end
 
-  def infer_item_id
-    item_context =
-      case @context
-      when Course
-        @context
-      when Group
-        @context.context
-      end
+  def use_or_infer_item_id(item_id)
+    return item_id if item_id.present? && item_id.respond_to?(:to_i)
+
+    item_context = case @context
+                   when Course
+                     @context
+                   when Group
+                     @context.context
+                   end
     return unless item_context.is_a?(Course)
 
     item_ids = GuardRail.activate(:secondary) { item_context.module_items_visible_to(@user).where(content_type: @asset.class.name, content_id: @asset.id).reorder(nil).pluck(:id) }

@@ -29,7 +29,6 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Ychwanegu CC/Is-deitlau" },
   "add_image_60b2de07": { "message": "Ychwanegu Delwedd" },
   "aleph_f4ffd155": { "message": "Aleph" },
-  "align_11050992": { "message": "Alinio" },
   "alignment_and_lists_5cebcb69": { "message": "Aliniad a Rhestrau" },
   "all_4321c3a1": { "message": "Y cyfan" },
   "all_apps_a50dea49": { "message": "Pob Ap" },
@@ -94,7 +93,6 @@ const locale = {
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Canslo" },
   "cap_product_3a5265a6": { "message": "Cynnyrch Cap" },
-  "center_align_e68d9997": { "message": "Alinio i’r Canol" },
   "centered_dot_64d5e378": { "message": "Dot Canolog" },
   "centered_horizontal_dots_451c5815": {
     "message": "Dotiau Llorweddol Canolog"
@@ -165,14 +163,10 @@ const locale = {
   "course_files_62deb8f8": { "message": "Ffeiliau Cwrs" },
   "course_files_a31f97fc": { "message": "Ffeiliau cwrs" },
   "course_images_f8511d04": { "message": "Delweddau Cwrs" },
-  "course_link_b369426": { "message": "Dolen Cwrs" },
   "course_links_b56959b9": { "message": "Dolenni Cwrs" },
   "course_media_ec759ad": { "message": "Cyfryngau Cwrs" },
   "course_navigation_dd035109": { "message": "Dewislen Crwydro’r Cwrs" },
   "create_icon_110d6463": { "message": "Creu Eicon" },
-  "create_icon_maker_icon_c716bffe": {
-    "message": "Creu Eicon Gwneuthurwr Eiconau"
-  },
   "creative_commons_license_725584ae": {
     "message": "Trwydded Creative Commons:"
   },
@@ -186,7 +180,6 @@ const locale = {
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
   "decorative_icon_9a7f3fc3": { "message": "Eicon Addurniadol" },
   "decorative_type_upper_f2c95e3": { "message": "Addurniadol { TYPE_UPPER }" },
-  "decrease_indent_d9cf469d": { "message": "Lleihau Mewnoliad" },
   "deep_purple_bb3e2907": { "message": "Porffor Tywyll" },
   "definite_integral_fe7ffed1": { "message": "Integryn Pendant" },
   "degree_symbol_4a823d5f": { "message": "Symbol Gradd" },
@@ -213,7 +206,6 @@ const locale = {
     "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
   },
   "division_sign_72190870": { "message": "Arwydd Rhannu" },
-  "document_678cd7bf": { "message": "Dogfen" },
   "documents_81393201": { "message": "Dogfennau" },
   "done_54e3d4b6": { "message": "Wedi gorffen" },
   "double_dagger_faf78681": { "message": "Cyllell Ddwbl" },
@@ -242,7 +234,6 @@ const locale = {
   },
   "edit_c5fbea07": { "message": "Golygu" },
   "edit_course_link_5a5c3c59": { "message": "Golygu Dolen Cwrs" },
-  "edit_equation_f5279959": { "message": "Golygu Hafaliad" },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Golygu’r Eicon Gwneuthurwr Eiconau Presennol"
   },
@@ -267,17 +258,16 @@ const locale = {
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Amrywiad)" },
   "equals_sign_c51bdc58": { "message": "Hafalnod" },
-  "equation_1c5ac93c": { "message": "Hafaliad" },
   "equation_editor_39fbc3f1": { "message": "Golygydd Hafaliadau" },
   "equivalence_class_7b0f11c0": { "message": "Dosbarth Cydwerthedd" },
   "equivalent_identity_654b3ce5": { "message": "Cywerth (Hunaniaeth)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Yn bodoli" },
+  "exit_fullscreen_b7eb0aa4": { "message": "Gadael y Sgrin Lawn" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Ehangu rhagolwg yn ddiofyn"
   },
   "expand_to_see_types_f5d29352": { "message": "Ehangu i weld { types }" },
-  "external_link_d3f9e62a": { "message": "Dolen Allanol" },
   "external_tools_6e77821": { "message": "Adnoddau Allanol" },
   "extra_large_b6cdf1ff": { "message": "Mawr Iawn" },
   "extra_small_9ae33252": { "message": "Bach Iawn" },
@@ -338,7 +328,6 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Ffeiliau grŵp" },
   "group_images_98e0ac17": { "message": "Delweddau Grŵp" },
   "group_isomorphism_45b1458c": { "message": "Isomorthffedd Grŵp" },
-  "group_link_63e626b3": { "message": "Dolen Grŵp" },
   "group_links_9493129e": { "message": "Dolenni Grwpiau" },
   "group_media_2f3d128a": { "message": "Cyfryngau Grŵp" },
   "group_navigation_99f191a": { "message": "Dewislen Crwydro Grwpiau" },
@@ -357,7 +346,6 @@ const locale = {
   },
   "home_351838cd": { "message": "Hafan" },
   "html_code_editor_fd967a44": { "message": "golygydd cod html" },
-  "html_editor_fb2ab713": { "message": "Golygydd HTML" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Rydw i wedi cael caniatâd i ddefnyddio’r ffeil hon."
   },
@@ -387,17 +375,12 @@ const locale = {
     "message": "Cyfran Ddychmygol (o Rif Cymhleth)"
   },
   "in_element_of_19ca2f33": { "message": "Yn (Elfen O)" },
-  "increase_indent_6af90f7c": { "message": "Cynyddu Mewnoliad" },
   "indefinite_integral_6623307e": { "message": "Integryn Amhendant" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Casgliad" },
   "infinity_7a10f206": { "message": "Anfeidredd" },
   "insert_593145ef": { "message": "Mewnosod" },
-  "insert_equella_links_49a8dacd": { "message": "Mewnosod Dolenni Equella" },
   "insert_link_6dc23cae": { "message": "Mewnosod Dolen" },
-  "insert_math_equation_57c6e767": {
-    "message": "Mewnosod hafaliad mathemategol"
-  },
   "integers_336344e1": { "message": "Cyfanrif" },
   "intersection_cd4590e4": { "message": "Croestoriad" },
   "invalid_entry_f7d2a0f5": { "message": "Cofnod annilys." },
@@ -412,7 +395,6 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Eicon Celfyddydau Iaith" },
   "languages_icon_9d20539": { "message": "Eicon Ieithoedd" },
   "large_9c5e80e7": { "message": "Mawr" },
-  "left_align_43d95491": { "message": "Alinio i’r Chwith" },
   "left_angle_bracket_c87a6d07": { "message": "Braced Ongl Chwith" },
   "left_arrow_4fde1a64": { "message": "Saeth i’r Chwith" },
   "left_arrow_with_hook_5bfcad93": {
@@ -559,6 +541,7 @@ const locale = {
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
   "parallel_d55d6e38": { "message": "Paralel" },
   "partial_derivative_4a9159df": { "message": "Rhannol (Deilliadol)" },
+  "paste_5963d1c1": { "message": "Gludo" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Pobl" },
   "percentage_34ab7c2c": { "message": "Canran" },
@@ -611,13 +594,9 @@ const locale = {
     "message": "Cyfran Go Iawn (o Rif Cymhleth)"
   },
   "record_7c9448b": { "message": "Recordio" },
-  "record_upload_media_5fdce166": {
-    "message": "Recordio Cyfryngau/Llwytho Cyfryngau i Fyny"
-  },
   "red_8258edf3": { "message": "Coch" },
   "relationships_6602af70": { "message": "Perthynas" },
   "religion_icon_246e0be1": { "message": "Eicon Crefydd" },
-  "remove_link_d1f2f4d0": { "message": "Tynnu Dolen" },
   "replace_e61834a7": { "message": "Disodli" },
   "reset_95a81614": { "message": "Ailosod" },
   "resize_ec83d538": { "message": "Ailfeintio" },
@@ -631,7 +610,6 @@ const locale = {
   "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
     "message": "Ardal Testun Cyfoethog. Pwyswch ALT+0 ar gyfer bysellau cyflym y Golygydd Cynnwys Cyfoethog."
   },
-  "right_align_39e7a32a": { "message": "Alinio i’r Dde" },
   "right_angle_bracket_d704e2d6": { "message": "Braced Ongl Dde" },
   "right_arrow_35e0eddf": { "message": "Saeth i’r Dde" },
   "right_arrow_with_hook_29d92d31": { "message": "Saeth i’r Dde gyda Bachyn" },
@@ -656,9 +634,6 @@ const locale = {
     "message": "Yn anffodus, dydy’r golygydd HTML hardd ddim ar gael drwy fysellfwrdd.  Cael mynediad at y golygydd HTML crai yma."
   },
   "save_11a80ec3": { "message": "Cadw" },
-  "saved_icon_maker_icons_df86e2a1": {
-    "message": "Eiconau’r Gwneuthurwr Eiconau a Gadwyd"
-  },
   "script_l_42a7b254": { "message": "Sgript L" },
   "search_280d00bd": { "message": "Chwilio" },
   "search_term_b2d2235": { "message": "Term Chwilio" },
@@ -673,10 +648,6 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O i agor y golygydd html hardd."
   },
-  "show_audio_options_b489926b": { "message": "Dangos opsiynau sain" },
-  "show_image_options_1e2ecc6b": { "message": "Dangos opsiynau delwedd" },
-  "show_link_options_545338fd": { "message": "Dangos opsiynau dolen" },
-  "show_video_options_6ed3721a": { "message": "Dangos opsiynau fideo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Amrywiad)" },
   "single_color_image_4e5d4dbc": { "message": "Delwedd un lliw" },
@@ -717,9 +688,6 @@ const locale = {
   "succeeds_equal_158e8c3a": { "message": "Ar ôl Hafalnod" },
   "sum_b0842d31": { "message": "Swm" },
   "superscript_8cb349a2": { "message": "Uwchysgrif" },
-  "superscript_and_subscript_37f94a50": {
-    "message": "Uwch-ysgrif ac Is-ysgrif"
-  },
   "superset_c4db8a7a": { "message": "Uwch-set" },
   "superset_strict_c77dd6d2": { "message": "Uwch-set (Strict)" },
   "supported_file_types_srt_or_webvtt_7d827ed": {
@@ -814,13 +782,9 @@ const locale = {
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Saeth Croeslinol i fyny ac i’r dde"
   },
-  "upload_document_253f0478": { "message": "Llwytho Dogfen i fyny" },
   "upload_file_fd2361b8": { "message": "Llwytho Ffeil i Fyny" },
   "upload_image_6120b609": { "message": "Llwytho Delwedd i Fyny" },
   "upload_media_ce31135a": { "message": "Llwytho Cyfryngau i fyny" },
-  "upload_record_media_e4207d72": {
-    "message": "Llwytho i Fyny/Recordio Cyfryngau"
-  },
   "uploading_19e8a4e7": { "message": "Llwytho i fyny" },
   "uppercase_delta_d4f4bc41": { "message": "Delta Fawr" },
   "uppercase_gamma_86f492e9": { "message": "Gamma Fawr" },
@@ -896,6 +860,9 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": { "message": "Gweld bysellau hwylus" },
   "view_title_description_67940918": {
     "message": "Gweld disgrifiad { title }"
+  },
+  "view_word_and_character_counts_a743dd0c": {
+    "message": "Gweld y cyfrif geiriau a’r cyfrif nodau"
   },
   "white_87fa64fd": { "message": "Gwyn" },
   "width_492fec76": { "message": "Lled" },

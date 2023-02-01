@@ -172,7 +172,6 @@ module Canvas::Plugins::DefaultPlugins
                               encrypted_settings: [:secret]
                             })
 
-    require_dependency "cc/importer/cc_worker"
     Canvas::Plugin.register "canvas_cartridge_importer", :export_system, {
       name: -> { I18n.t "canvas_cartridge_name", "Canvas Cartridge Importer" },
       display_name: -> { I18n.t "canvas_cartridge_display", "Canvas Common Cartridge" },
@@ -190,7 +189,6 @@ module Canvas::Plugins::DefaultPlugins
         valid_contexts: %w[Account Course]
       },
     }
-    require_dependency "canvas/migration/worker/course_copy_worker"
     Canvas::Plugin.register "course_copy_importer", :export_system, {
       name: -> { I18n.t :course_copy_name, "Copy Canvas Course" },
       display_name: -> { I18n.t :course_copy_display, "Course Copy" },
@@ -209,7 +207,6 @@ module Canvas::Plugins::DefaultPlugins
         valid_contexts: %w[Course]
       },
     }
-    require_dependency "canvas/migration/worker/zip_file_worker"
     Canvas::Plugin.register "zip_file_importer", :export_system, {
       name: -> { I18n.t :zip_file_name, ".zip file" },
       display_name: -> { I18n.t :zip_file_display, "File Import" },
@@ -400,15 +397,6 @@ module Canvas::Plugins::DefaultPlugins
                               },
                               settings_partial: "plugins/inst_fs_settings",
                               validator: "InstFsValidator"
-                            })
-    Canvas::Plugin.register("unsplash", nil, {
-                              name: -> { t :name, "Unsplash" },
-                              description: -> { t :description, "Unsplash image search service" },
-                              author: "Unsplash",
-                              author_website: "https://unsplash.com/documentation",
-                              version: "1.0.0",
-                              settings: { access_key: nil },
-                              settings_partial: "plugins/unsplash_settings"
                             })
     Canvas::Plugin.register("asset_user_access_logs", nil, {
                               name: -> { t :name, "AUA Logger" },

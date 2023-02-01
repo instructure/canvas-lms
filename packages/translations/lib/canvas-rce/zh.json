@@ -406,7 +406,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "嵌套大于" },
   "nested_less_than_27d17e58": { "message": "嵌套小于" },
-  "next_page_d2a39853": { "message": "下一页" },
   "no_changes_to_save_d29f6e91": { "message": "没有更改要保存。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "没有选择文件" },
@@ -417,7 +416,6 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "未找到{ filterTerm }的结果"
   },
-  "no_results_found_for_term_1564c08e": { "message": "未找到{ term }的结果。" },
   "none_3b5e34d2": { "message": "无" },
   "none_selected_b93d56d2": { "message": "未选中任何项" },
   "not_equal_6e2980e6": { "message": "不相等" },
@@ -482,7 +480,6 @@
   "preview_53003fd2": { "message": "预览" },
   "preview_in_overlay_ed772c46": { "message": "在图层中预览" },
   "preview_inline_9787330": { "message": "嵌入式预览" },
-  "previous_page_928fc112": { "message": "上一页" },
   "prime_917ea60e": { "message": "质" },
   "prime_numbers_13464f61": { "message": "质数" },
   "product_39cf144f": { "message": "乘积" },
@@ -537,10 +534,8 @@
   "save_11a80ec3": { "message": "保存" },
   "script_l_42a7b254": { "message": "花体 L" },
   "search_280d00bd": { "message": "搜索" },
-  "search_term_b2d2235": { "message": "搜索学期" },
   "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
   "select_language_7c93a900": { "message": "选择语言" },
-  "selected_274ce24f": { "message": "已选择" },
   "selected_linkfilename_c093b1f2": { "message": "已选择 { linkFileName }" },
   "set_minus_b46e9b88": { "message": "设置负" },
   "sharp_music_ab956814": { "message": "升调（音乐）" },
@@ -653,9 +648,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "切换工具提示" },
   "tools_2fcf772e": { "message": "工具" },
   "top_66e0adb6": { "message": "顶部" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "找到了{ totalResults }个结果，当前显示{ numDisplayed }个结果"
-  },
   "tray_839df38a": { "message": "托盘" },
   "triangle_6072304e": { "message": "三角形" },
   "turnstile_yields_f9e76df1": { "message": "十字转门（产生）" },

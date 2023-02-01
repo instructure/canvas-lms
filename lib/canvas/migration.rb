@@ -29,8 +29,3 @@ module Canvas::Migration
     Rails.logger
   end
 end
-
-require_dependency "canvas/migration/migrator"
-require_dependency "canvas/migration/migrator_helper"
-require_dependency "canvas/migration/worker"
-require_dependency "canvas/migration/xml_helper"

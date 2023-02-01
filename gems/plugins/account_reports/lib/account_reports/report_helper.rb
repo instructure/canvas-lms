@@ -451,6 +451,10 @@ module AccountReports::ReportHelper
                 raise DatabaseReplicationError, "Replica failed to catch up in the allotted time"
               end
     files ? compile_parallel_zip_report(files, replica: replica) : write_report_from_rows(headers, replica: replica)
+  rescue => e
+    report_runner.fail
+    fail_with_error(e)
+  ensure
     GuardRail.activate(:primary) { @account_report.delete_account_report_rows }
   end
 

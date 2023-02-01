@@ -58,7 +58,7 @@ describe('doFileUpload()', () => {
   it('adds the canvas-rce-upload-container element when opened', async () => {
     await doFileUpload(fauxEditor, document, {
       accept: undefined,
-      panels: ['COMPUTER', 'UNSPLASH', 'URL'],
+      panels: ['COMPUTER', 'URL'],
       preselectedFile: undefined,
     })
     expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()

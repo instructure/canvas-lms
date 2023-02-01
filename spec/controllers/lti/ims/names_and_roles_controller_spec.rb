@@ -20,9 +20,6 @@
 require_relative "concerns/advantage_services_shared_context"
 require_relative "concerns/advantage_services_shared_examples"
 require_relative "concerns/lti_services_shared_examples"
-require_dependency "lti/ims/names_and_roles_controller.rb"
-require_dependency "lti/ims/providers/course_memberships_provider.rb"
-require_dependency "lti/ims/providers/group_memberships_provider.rb"
 
 describe Lti::IMS::NamesAndRolesController do
   include Lti::IMS::NamesAndRolesMatchers

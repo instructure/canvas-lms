@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "microsoft_sync"
-
 #
 # See MicrosoftSync::Group for more info on Microsoft sync. This model is
 # essentially a cache between a Canvas user, and their Microsoft AAD object ID

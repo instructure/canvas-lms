@@ -450,7 +450,6 @@
   },
   "nested_greater_than_d852e60d": { "message": "ネストされた＞" },
   "nested_less_than_27d17e58": { "message": "ネストされた＜" },
-  "next_page_d2a39853": { "message": "次のページ" },
   "no_changes_to_save_d29f6e91": { "message": "保存する変更はありません。" },
   "no_e16d9132": { "message": "いいえ" },
   "no_file_chosen_9a880793": { "message": "ファイルが選択されていません" },
@@ -460,9 +459,6 @@
   "no_results_940393cf": { "message": "結果がありません。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "{ filterTerm }の結果が見つかりませんでした"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "{ term }の結果は見つかりませんでした。"
   },
   "none_3b5e34d2": { "message": "なし" },
   "none_selected_b93d56d2": { "message": "選択されたものなし" },
@@ -536,7 +532,6 @@
   "preview_53003fd2": { "message": "プレビュー" },
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
   "preview_inline_9787330": { "message": "インラインでのプレビュー" },
-  "previous_page_928fc112": { "message": "前のページ" },
   "prime_917ea60e": { "message": "素数" },
   "prime_numbers_13464f61": { "message": "素数" },
   "product_39cf144f": { "message": "積" },
@@ -595,10 +590,8 @@
   "save_11a80ec3": { "message": "保存" },
   "script_l_42a7b254": { "message": "スクリプト L" },
   "search_280d00bd": { "message": "検索" },
-  "search_term_b2d2235": { "message": "検索用語" },
   "select_crop_shape_d441feeb": { "message": "クロップ形状の選択" },
   "select_language_7c93a900": { "message": "言語を選択する" },
-  "selected_274ce24f": { "message": "選択されました" },
   "selected_linkfilename_c093b1f2": { "message": "選択された{ linkFileName }" },
   "set_minus_b46e9b88": { "message": "マイナス設定" },
   "sharp_music_ab956814": { "message": "シャープ (音楽)" },
@@ -717,9 +710,6 @@
   "toggle_tooltip_d3b7cb86": { "message": "ツールチップを切り替える" },
   "tools_2fcf772e": { "message": "ツール" },
   "top_66e0adb6": { "message": "上" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults }結果が見つかりました。{ numDisplayed }結果が現在表示されています"
-  },
   "tray_839df38a": { "message": "トレイ" },
   "triangle_6072304e": { "message": "三角形" },
   "turnstile_yields_f9e76df1": { "message": "回転式改札(イールド)" },

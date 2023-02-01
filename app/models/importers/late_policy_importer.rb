@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "importers"
-
 module Importers
   class LatePolicyImporter < Importer
     self.item_class = LatePolicy

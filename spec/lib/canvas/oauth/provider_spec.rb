@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "canvas/oauth/provider"
-
 module Canvas::OAuth
   describe Provider do
     let(:provider) { Provider.new("123") }

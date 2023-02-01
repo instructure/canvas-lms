@@ -39,6 +39,9 @@ module DataFixup
       "url:GET|/api/v1/accounts/:account_id/tool_proxies/:tool_proxy_id/recreate_subscriptions" => "DELETED",
       "url:POST|/api/v1/courses/:course_id/outcome_imports" => "url:POST|/api/v1/courses/:course_id/outcome_imports(/group/:learning_outcome_group_id)",
       "url:POST|/api/v1/accounts/:account_id/outcome_imports" => "url:POST|/api/v1/accounts/:account_id/outcome_imports(/group/:learning_outcome_group_id)",
+      "url:GET|/api/v1/image_search" => "DELETED",
+      "url:POST|/api/v1/image_selection/:id" => "DELETED",
+
     }.freeze
 
     def self.create_scope_query(old_route)

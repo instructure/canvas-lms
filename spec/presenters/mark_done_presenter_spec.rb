@@ -47,6 +47,24 @@ describe MarkDonePresenter do
     tag.context_module_action(@user, :done)
   end
 
+  describe "#initialize" do
+    it "doesn't blow up trying to coerce a garbage receiver into an integer" do
+      ctrl = double("Controller", session: true)
+      context = double("Context", "grants_any_right?" => true)
+      garbage_item_id = { "'": nil }
+      mdp = MarkDonePresenter.new(ctrl, context, garbage_item_id, @user, nil)
+      expect(mdp.item).to be_nil
+    end
+
+    it "is happy setting item attr with a valid module item id" do
+      ctrl = double("Controller", session: true)
+      context = double("Context", "grants_any_right?" => true)
+      tag = add_wiki_page_to_module
+      mdp = MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
+      expect(mdp.item).to eq tag
+    end
+  end
+
   describe "#has_requirement?" do
     it "is false when there is no mark as done requirement" do
       tag = add_wiki_page_to_module

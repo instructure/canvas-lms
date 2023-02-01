@@ -44,6 +44,7 @@ class DeveloperKey < ActiveRecord::Base
   serialize :scopes, Array
 
   before_validation :normalize_public_jwk_url
+  before_validation :normalize_scopes
   before_validation :validate_scopes!
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
@@ -392,6 +393,10 @@ class DeveloperKey < ActiveRecord::Base
 
   def normalize_public_jwk_url
     self.public_jwk_url = nil if public_jwk_url.blank?
+  end
+
+  def normalize_scopes
+    self.scopes = scopes.uniq
   end
 
   def manage_external_tools(enqueue_args, method, affected_account)

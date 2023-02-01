@@ -28,7 +28,7 @@ import {Link} from '@instructure/ui-link'
 import {Metric, MetricGroup} from '@instructure/ui-metric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
-import {IconCoursesLine} from '@instructure/ui-icons'
+import {IconCoursesLine, IconInfoLine} from '@instructure/ui-icons'
 import PacePicker from './pace_picker'
 import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
@@ -40,6 +40,7 @@ import {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
 import {paceContextsActions} from '../../actions/pace_contexts'
 import {generateModalLauncherId} from '../../utils/utils'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('course_paces_header')
 
@@ -85,6 +86,9 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 
   const fetchDefaultPaceContext = props.fetchDefaultPaceContext
   const updated_at = props.coursePace?.updated_at
+  const durationTooltipText = I18n.t(
+    'This duration does not take into account weekends and blackout days.'
+  )
 
   useEffect(() => {
     if (window.ENV.FEATURES.course_paces_redesign) {
@@ -148,7 +152,11 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         data-testid="number-of-students"
                         theme={metricTheme}
                         textAlign="start"
-                        renderLabel={I18n.t('Students')}
+                        renderLabel={
+                          <View as="div" margin="none none xx-small none">
+                            {I18n.t('Students')}
+                          </View>
+                        }
                         renderValue={props.defaultPaceContext?.associated_student_count}
                         isGroupChild={true}
                       />
@@ -156,7 +164,11 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         data-testid="number-of-sections"
                         theme={metricTheme}
                         textAlign="start"
-                        renderLabel={I18n.t('Sections')}
+                        renderLabel={
+                          <View as="div" margin="none none xx-small none">
+                            {I18n.t('Sections')}
+                          </View>
+                        }
                         renderValue={props.defaultPaceContext?.associated_section_count}
                         isGroupChild={true}
                       />
@@ -164,7 +176,33 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         data-testid="default-pace-duration"
                         theme={metricTheme}
                         textAlign="start"
-                        renderLabel={I18n.t('Duration')}
+                        renderLabel={
+                          <View
+                            as="div"
+                            aria-label={I18n.t('Pace Duration')}
+                            display="inline-flex"
+                            margin="none none xxx-small none"
+                            theme={{
+                              marginXxxSmall: '0.2rem',
+                            }}
+                          >
+                            {I18n.t('Pace Duration')}
+                            <Tooltip
+                              renderTip={durationTooltipText}
+                              on={['hover', 'focus']}
+                              color="primary"
+                            >
+                              <View
+                                as="div"
+                                role="tooltip"
+                                aria-label={durationTooltipText}
+                                margin="none none none xx-small"
+                              >
+                                <IconInfoLine as="div" size="x-small" />
+                              </View>
+                            </Tooltip>
+                          </View>
+                        }
                         renderValue={
                           getDurationLabel(props.defaultPaceContext?.applied_pace?.duration) || '--'
                         }

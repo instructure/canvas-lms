@@ -19,7 +19,6 @@
 #
 
 require_relative "../../spec_helper"
-require_dependency "api/v1/course_json"
 
 module Api
   module V1

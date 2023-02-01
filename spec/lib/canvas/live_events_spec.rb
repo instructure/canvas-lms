@@ -1208,12 +1208,19 @@ describe Canvas::LiveEvents do
   describe ".content_migration_completed" do
     let(:course) { course_factory }
     let(:source_course) { course_factory }
-    let(:migration) { ContentMigration.create(context: course, source_course: source_course, migration_type: "some_type") }
+    let(:migration) do
+      ContentMigration.create(context: course,
+                              source_course: source_course,
+                              migration_type: "some_type",
+                              workflow_state: "imported")
+    end
 
     before do
       migration.migration_settings[:import_quizzes_next] = true
       course.lti_context_id = "abc"
       source_course.lti_context_id = "def"
+      expect(source_course).to receive(:has_new_quizzes?).and_return(true)
+      expect(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
     end
 
     it "sent events with expected payload" do
@@ -1226,9 +1233,11 @@ describe Canvas::LiveEvents do
           context_uuid: course.uuid,
           import_quizzes_next: true,
           domain: course.root_account.domain,
-          source_course_lti_id: migration.source_course.lti_context_id,
+          source_course_lti_id: source_course.lti_context_id,
+          source_course_uuid: source_course&.uuid,
           destination_course_lti_id: course.lti_context_id,
-          migration_type: migration.migration_type
+          migration_type: migration.migration_type,
+          resource_map_url: "http://example.com/resource_map.json"
         ),
         hash_including(
           context_type: course.class.to_s,
@@ -1848,6 +1857,7 @@ describe Canvas::LiveEvents do
           description: @outcome_group.description,
           vendor_guid: @outcome_group.vendor_guid,
           parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          parent_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           workflow_state: @outcome_group.workflow_state
         }.compact).once
 
@@ -1866,6 +1876,7 @@ describe Canvas::LiveEvents do
           description: @global_outcome_group.description,
           vendor_guid: @global_outcome_group.vendor_guid,
           parent_outcome_group_id: nil,
+          parent_outcome_group_context_uuid: nil,
           workflow_state: @global_outcome_group.workflow_state
         }.compact).once
 
@@ -1888,6 +1899,7 @@ describe Canvas::LiveEvents do
           description: @outcome_group.description,
           vendor_guid: @outcome_group.vendor_guid,
           parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          parent_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           updated_at: @outcome_group.updated_at,
           workflow_state: @outcome_group.workflow_state
         }.compact).once
@@ -1909,6 +1921,7 @@ describe Canvas::LiveEvents do
           description: @global_outcome_group.description,
           vendor_guid: @global_outcome_group.vendor_guid,
           parent_outcome_group_id: nil,
+          parent_outcome_group_context_uuid: nil,
           updated_at: @global_outcome_group.updated_at,
           workflow_state: @global_outcome_group.workflow_state
         }.compact).once
@@ -1933,8 +1946,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_created", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state
@@ -1955,8 +1969,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_updated", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,
@@ -1976,8 +1991,9 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_link_updated", {
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
-          learning_outcome_group_id: @outcome_group.id.to_s,
           learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_group_context_uuid: @outcome_group.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,

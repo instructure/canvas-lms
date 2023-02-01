@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "lti/tool_consumer_profile_creator"
-
 module Lti
   describe ToolConsumerProfileCreator do
     let(:root_account) do

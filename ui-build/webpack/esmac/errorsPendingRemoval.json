@@ -127,12 +127,6 @@
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/shared/lti/jquery/messages.js",
-    "target": "ui/shared/rce/plugins/canvas_mentions/constants.js",
-    "request": "../../rce/plugins/canvas_mentions/constants"
-  },
-  {
-    "name": "SpecifierMismatchError",
     "source": "ui/shared/outcomes/react/hooks/useGroupCreate.js",
     "target": "ui/shared/outcomes/graphql/Management.js",
     "request": "@canvas/outcomes/graphql/Management"

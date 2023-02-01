@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {bool, func, oneOf, string} from 'prop-types'
+import {bool, element, func, oneOf, oneOfType, string} from 'prop-types'
 import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -119,11 +119,20 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
   return options
 }
 
-function renderType(contentType, contentSubtype, onChange, userContextType, containingContextType) {
+function renderType(
+  contentType,
+  contentSubtype,
+  mountNode,
+  onChange,
+  userContextType,
+  containingContextType
+) {
   // Check containingContextType so that we always show context links
   if (containingContextType === 'course' || containingContextType === 'group') {
     return (
       <SimpleSelect
+        data-testid="filter-content-type"
+        mountNode={mountNode}
         renderLabel={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
         assistiveText={formatMessage('Use arrow keys to navigate options.')}
         onChange={(e, selection) => {
@@ -157,6 +166,7 @@ export default function Filter(props) {
   const {
     contentType,
     contentSubtype,
+    mountNode,
     onChange,
     sortValue,
     searchString,
@@ -219,11 +229,20 @@ export default function Filter(props) {
   return (
     <View display="block" direction="column">
       {!isEdit &&
-        renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
+        renderType(
+          contentType,
+          contentSubtype,
+          mountNode,
+          onChange,
+          userContextType,
+          containingContextType
+        )}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item shouldGrow={true} shouldShrink={true} margin="none xx-small none none">
             <SimpleSelect
+              data-testid="filter-content-subtype"
+              mountNode={mountNode}
               renderLabel={
                 <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
               }
@@ -276,6 +295,8 @@ export default function Filter(props) {
           {contentSubtype !== 'all' && (
             <Flex.Item shouldGrow={true} shouldShrink={true} margin="none none none xx-small">
               <SimpleSelect
+                data-testid="filter-sort-by"
+                mountNode={mountNode}
                 renderLabel={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
                 assistiveText={formatMessage('Use arrow keys to navigate options.')}
                 onChange={(e, selection) => {
@@ -325,6 +346,12 @@ Filter.propTypes = {
    * `contentType` is the primary filter setting (e.g. links, files)
    */
   contentType: oneOf(['links', 'user_files', 'course_files', 'group_files']).isRequired,
+
+  /**
+   * `mountNode` is where INSTUI popups should mount. This is necessary for them
+   * to work correctly when the RCE is in fullscreen
+   */
+  mountNode: oneOfType([element, func]),
 
   /**
    * `onChange` is called when any of the Filter settings are changed

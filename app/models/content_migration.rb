@@ -19,16 +19,17 @@
 #
 
 class ContentMigration < ActiveRecord::Base
-  ignored_columns = %w[asset_map_attachment_id].freeze
-
   include Workflow
   include TextHelper
+  include Rails.application.routes.url_helpers
+
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, class_name: "Attachment"
   belongs_to :exported_attachment, class_name: "Attachment"
+  belongs_to :asset_map_attachment, class_name: "Attachment", optional: true
   belongs_to :source_course, class_name: "Course"
   belongs_to :root_account, class_name: "Account"
   has_one :content_export
@@ -772,6 +773,32 @@ class ContentMigration < ActiveRecord::Base
     @cross_institution
   end
 
+  def find_source_course_for_import
+    return unless context.is_a?(Course)
+
+    data = context.full_migration_hash[:context_info]
+    return unless data.is_a?(Hash)
+
+    course_id = data[:course_id]
+    account_global_id = data[:root_account_id]
+    account_uuid = data[:root_account_uuid]
+    return unless course_id && account_global_id && account_uuid
+
+    possible_root_account = Account.find_by(id: account_global_id)
+    real_root_account = possible_root_account if possible_root_account&.uuid == account_uuid
+    if Object.const_defined?(:AccountDomain) && !real_root_account
+      domain = data[:canvas_domain]
+      possible_root_account = domain && AccountDomain.find_cached(domain)&.account
+      real_root_account = possible_root_account if possible_root_account&.uuid == account_uuid
+    end
+
+    if real_root_account
+      self.source_course_id = Shard.global_id_for(course_id, real_root_account.shard)
+    end
+
+    source_course_id
+  end
+
   def set_date_shift_options(opts)
     if opts && (Canvas::Plugin.value_to_boolean(opts[:shift_dates]) || Canvas::Plugin.value_to_boolean(opts[:remove_dates]))
       migration_settings[:date_shift_options] = opts.slice(:shift_dates, :remove_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
@@ -1090,6 +1117,98 @@ class ContentMigration < ActiveRecord::Base
 
   def notification_link_anchor
     "!/blueprint/blueprint_subscriptions/#{child_subscription_id}/#{id}"
+  end
+
+  ASSET_ID_MAP_TYPES = %w[Announcement Assignment Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
+
+  def asset_id_mapping
+    return nil unless (imported? || importing?) && source_course
+
+    mapping = {}
+    master_template = migration_type == "master_course_import" &&
+                      master_course_subscription&.master_template
+    global_ids = master_template.present? || use_global_identifiers?
+
+    ASSET_ID_MAP_TYPES.each do |asset_type|
+      klass = asset_type.constantize
+      next unless klass.column_names.include? "migration_id"
+
+      key = Context.api_type_name(klass)
+      mig_id_to_dest_id = context.shard.activate do
+        scope = klass.where(context: context).where.not(migration_id: nil)
+        scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
+        scope.pluck(:migration_id, :id).to_h
+      end
+      next if mig_id_to_dest_id.empty?
+
+      mapping[key] ||= {}
+      if master_template
+        # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
+        # between source id and migration_id in the MasterContentTags (except for ContentTags, which
+        # fortunately _aren't_ complicated)
+        if asset_type == "ContentTag"
+          src_ids = source_course.context_module_tags.pluck(:id)
+          src_ids.each do |src_id|
+            global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
+            mig_id = master_template.migration_id_for(global_asset_string)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        else
+          master_template.master_content_tags
+                         .where(content_type: asset_type == "Announcement" ? "DiscussionTopic" : asset_type,
+                                migration_id: mig_id_to_dest_id.keys)
+                         .pluck(:content_id, :migration_id)
+                         .each do |src_id, mig_id|
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        end
+      else
+        # with course copy, there is no stored mapping between source id and migration_id,
+        # so we will need to recompute migration_ids to discover the mapping
+        source_course.shard.activate do
+          src_ids = klass.where(context: source_course).pluck(:id)
+          src_ids.each do |src_id|
+            asset_string = klass.asset_string(src_id)
+            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[key][src_id.to_s] = dest_id.to_s if dest_id
+          end
+        end
+      end
+    end
+
+    mapping
+  end
+
+  def asset_map_url(generate_if_needed: false)
+    generate_asset_map if !asset_map_attachment && generate_if_needed
+    asset_map_attachment && file_download_url(
+      asset_map_attachment,
+      {
+        verifier: asset_map_attachment.uuid,
+        download: "1",
+        download_frd: "1",
+        host: context.root_account.domain(ApplicationController.test_cluster_name)
+      }
+    )
+  end
+
+  def generate_asset_map
+    data = asset_id_mapping
+    return if data.nil?
+
+    payload = {
+      "source_host" => source_course.root_account.domain(ApplicationController.test_cluster_name),
+      "source_course" => source_course_id.to_s,
+      "resource_mapping" => data
+    }
+
+    self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
+    Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
+    asset_map_attachment.save!
+    save!
   end
 
   set_broadcast_policy do |p|

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "sis/group_membership_importer"
-
 module SIS
   describe GroupMembershipImporter do
     def create_group(opts = {})

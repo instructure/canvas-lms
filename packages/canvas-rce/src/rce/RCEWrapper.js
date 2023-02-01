@@ -27,6 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
+import {uid} from '@instructure/uid'
 import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
@@ -337,7 +338,7 @@ class RCEWrapper extends React.Component {
       announcement: null,
       confirmAutoSave: false,
       autoSavedContent: '',
-      id: this.props.id || this.props.textareaId || `${Date.now()}`,
+      id: this.props.id || this.props.textareaId || `${uid('rce', 2)}`,
       height: ht,
       fullscreenState: {
         prevHeight: ht,
@@ -347,6 +348,7 @@ class RCEWrapper extends React.Component {
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
+      popupMountNode: instuiPopupMountNode(),
     }
     this._statusBarId = `${this.state.id}_statusbar`
 
@@ -380,6 +382,27 @@ class RCEWrapper extends React.Component {
     this.resizeObserver = new ResizeObserver(_entries => {
       this._handleFullscreenResize()
     })
+  }
+
+  // when the RCE is put into fullscreen we need to move the div
+  // tinymce mounts popup menus into from the body to the rce-wrapper
+  // or the menus wind up behind the RCE. I can't find a way to
+  // configure tinymce to say where that div is mounted, do this
+  // is a bit of a hack to tag the div that is this RCE's
+  _tagTinymceAuxDiv() {
+    const tinyauxlist = document.querySelectorAll('.tox-tinymce-aux')
+    if (tinyauxlist.length) {
+      const myaux = tinyauxlist[tinyauxlist.length - 1]
+      if (myaux.id) {
+        // eslint-disable-next-line no-console
+        console.error('Unexpected ID on my tox-tinymce-aux element')
+      }
+      myaux.id = `tinyaux-${this.id}`
+    }
+  }
+
+  _myTinymceAuxDiv() {
+    return document.getElementById(`tinyaux-${this.id}`)
   }
 
   getRequiredFeatureStatuses() {
@@ -771,9 +794,11 @@ class RCEWrapper extends React.Component {
     // at the bottom of the body. When we're fullscreen the menus need to be mounted
     // in the fullscreen element or they won't show up. Let's move tinymce's mount point
     // when we go into fullscreen, then put it back when we're finished.
-    const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
-    tinymenuhost.remove()
-    this._elementRef.current.appendChild(tinymenuhost)
+    const tinymenuhost = this._myTinymceAuxDiv()
+    if (tinymenuhost) {
+      tinymenuhost.remove()
+      this._elementRef.current.appendChild(tinymenuhost)
+    }
 
     this._elementRef.current.addEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
     this.setState({
@@ -786,9 +811,11 @@ class RCEWrapper extends React.Component {
 
   _exitFullscreen() {
     if (document[FS_ELEMENT]) {
-      const tinymenuhost = document.querySelector('.tox.tox-silver-sink.tox-tinymce-aux')
-      tinymenuhost.remove()
-      document.body.appendChild(tinymenuhost)
+      const tinymenuhost = this._myTinymceAuxDiv()
+      if (tinymenuhost) {
+        tinymenuhost.remove()
+        document.body.appendChild(tinymenuhost)
+      }
       document[FS_EXIT]()
     }
   }
@@ -804,6 +831,7 @@ class RCEWrapper extends React.Component {
       window.visualViewport?.removeEventListener('resize', this._handleFullscreenResize)
       this._setHeight(this.state.fullscreenState.prevHeight)
     }
+    this.setState({popupMountNode: instuiPopupMountNode()})
     this.focusCurrentView()
   }
 
@@ -1119,7 +1147,86 @@ class RCEWrapper extends React.Component {
       )
     }
 
+    this._setupSelectionSaving(editor)
+
     this.props.onInitted?.(editor)
+  }
+
+  /**
+   * Sets up selection saving and restoration logic.
+   *
+   * There are certain actions a user can take when the RCE is not focused that clear the selection inside the
+   * editor, such as invoking the Find feature of the browser. If the user then tries to insert content without
+   * going back to the editor, the content would be inserted at the top of the RCE, instead of where their cursor
+   * was.
+   *
+   * This method adds logic that saves and restores the selection to work around the issue.
+   *
+   * @private
+   */
+  _setupSelectionSaving = editor => {
+    let savedSelection = null
+    let selectionWasReset = false
+    let editorHasFocus = false
+
+    const restoreSelectionIfNecessary = () => {
+      if (savedSelection && selectionWasReset) {
+        this.editor.selection.setRng(savedSelection.range, savedSelection.isForward)
+        selectionWasReset = false
+      }
+    }
+
+    editor.on('blur', () => {
+      editorHasFocus = false
+      selectionWasReset = false
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
+      }
+    })
+
+    editor.on('focus', () => {
+      // We need to restore the selection when the editor regains focus because sometimes the editor regains
+      // focus without the user setting the selection themselves (such as when they interact with the toolbar)
+      // and if we didn't, we would end up saving the reset selection before a user managed to actually insert
+      // content.
+      restoreSelectionIfNecessary()
+
+      editorHasFocus = true
+      selectionWasReset = false
+    })
+
+    editor.on('SelectionChange', () => {
+      if (editorHasFocus) {
+        // We don't care if a selection reset occurs when the editor has focus, the user probably intended that
+        // At least they will see the effect
+        return
+      }
+
+      const selection = this.editor.selection.normalize()
+
+      // Detect a browser-reset selection (e.g. From invoking the Find command)
+      if (
+        selection.startContainer?.nodeName === 'BODY' &&
+        selection.startContainer === selection.endContainer &&
+        selection.startOffset === 0 &&
+        selection.endOffset === 0
+      ) {
+        selectionWasReset = true
+      }
+    })
+
+    editor.on('BeforeExecCommand', () => {
+      restoreSelectionIfNecessary()
+    })
+
+    editor.on('ExecCommand', (/* event */) => {
+      // Commands may have modified the selection, we need to recapture it
+      savedSelection = {
+        range: this.editor.selection.getRng().cloneRange(),
+        isForward: this.editor.selection.isForward(),
+      }
+    })
   }
 
   _forceCloseFloatingToolbar = () => {
@@ -1731,6 +1838,7 @@ class RCEWrapper extends React.Component {
     this.pendingEventHandlers.forEach(e => {
       myTiny.on(e.name, e.handler)
     })
+    this._tagTinymceAuxDiv()
     this.registerTextareaChange()
     this._elementRef.current.addEventListener('keydown', this.handleKey, true)
     // give the textarea its initial size
@@ -1919,6 +2027,7 @@ class RCEWrapper extends React.Component {
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
+            mountNode={this.state.popupMountNode}
             key={this.id}
             canvasOrigin={this.getCanvasUrl()}
             bridge={bridge}

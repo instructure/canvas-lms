@@ -122,21 +122,6 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
         <h4>
           <Text weight="bold">{I18n.t('Unpublished Changes')}</Text>
         </h4>
-        {window.ENV.FEATURES.course_paces_redesign && (
-          <CondensedButton
-            data-testid="reset-all-button"
-            interaction={cancelDisabled ? 'disabled' : 'enabled'}
-            onClick={() => setResetWarningModalOpen(true)}
-            margin="small 0 0"
-          >
-            {I18n.t('Reset all')}
-          </CondensedButton>
-        )}
-        <ResetPaceWarningModal
-          open={isResetWarningModalOpen}
-          onCancel={() => setResetWarningModalOpen(false)}
-          onConfirm={handleResetConfirmed}
-        />
       </View>
       <ol className="course_pace_changes">
         {unpublishedChanges.map(
@@ -148,6 +133,21 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
             )
         )}
       </ol>
+      {window.ENV.FEATURES.course_paces_redesign && (
+        <CondensedButton
+          data-testid="reset-all-button"
+          interaction={cancelDisabled ? 'disabled' : 'enabled'}
+          onClick={() => setResetWarningModalOpen(true)}
+          margin="small 0 0"
+        >
+          {I18n.t('Reset all')}
+        </CondensedButton>
+      )}
+      <ResetPaceWarningModal
+        open={isResetWarningModalOpen}
+        onCancel={() => setResetWarningModalOpen(false)}
+        onConfirm={handleResetConfirmed}
+      />
     </View>
   )
 }

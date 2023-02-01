@@ -19,7 +19,6 @@
 #
 
 require_relative "../../lti2_spec_helper"
-require_dependency "lti/subscriptions_validator"
 module Lti
   describe SubscriptionsValidator do
     include_context "lti2_spec_helper"

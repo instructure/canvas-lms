@@ -118,7 +118,8 @@ describe CoursePacesController, type: :controller do
                                                                 blackout_date: true
                                                               })]
       @section = @course.course_sections.first
-      @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @first_student_enrollment = @course.enrollments.find_by(user_id: @student.id)
+      @last_student_enrollment = @course.enroll_student(@student, enrollment_state: "active", section: @another_section, allow_multiple_enrollments: true)
       @progress = @course_pace.create_publish_progress
       get :index, params: { course_id: @course.id }
 
@@ -134,13 +135,16 @@ describe CoursePacesController, type: :controller do
                                                         end_at: @course.end_at
                                                       }))
       expect(js_env[:ENROLLMENTS].length).to be(1)
-      expect(js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
-                                                                                     id: @student_enrollment.id,
-                                                                                     user_id: @student.id,
-                                                                                     course_id: @course.id,
-                                                                                     full_name: @student.name,
-                                                                                     sortable_name: @student.sortable_name
-                                                                                   }))
+      # only includes the most recent enrollment of each student
+      expect(js_env[:ENROLLMENTS]).not_to include(@first_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS]).to include(@last_student_enrollment.id)
+      expect(js_env[:ENROLLMENTS][@last_student_enrollment.id]).to match(hash_including({
+                                                                                          id: @last_student_enrollment.id,
+                                                                                          user_id: @student.id,
+                                                                                          course_id: @course.id,
+                                                                                          full_name: @student.name,
+                                                                                          sortable_name: @student.sortable_name
+                                                                                        }))
       expect(js_env[:SECTIONS].length).to be(2)
       expect(js_env[:SECTIONS][@section.id]).to match(hash_including({
                                                                        id: @section.id,
@@ -554,6 +558,23 @@ describe CoursePacesController, type: :controller do
         expect(m2["items"].first["published"]).to eq(true)
         expect(m2["items"].second["duration"]).to eq(4)
         expect(m2["items"].second["published"]).to eq(true)
+      end
+
+      context "when the user is on another shard" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @student2 = user_factory(active_all: true)
+          end
+        end
+
+        it "still creates the individual pace" do
+          @course_pace.update!(hard_end_dates: false)
+          enrollment = course_with_student(course: @course, user: @student2, active_all: true)
+          get :new, params: { course_id: @course.id, enrollment_id: enrollment.id }
+          expect(response).to be_successful
+        end
       end
     end
   end

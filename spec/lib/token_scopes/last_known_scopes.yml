@@ -1114,10 +1114,6 @@
 - verb: POST
   path: "/api/v1/accounts/:account_id/developer_keys"
 - verb: GET
-  path: "/api/v1/image_search"
-- verb: POST
-  path: "/api/v1/image_selection/:id"
-- verb: GET
   path: "/api/v1/immersive_reader/authenticate"
 - verb: GET
   path: "/api/v1/search/rubrics"
