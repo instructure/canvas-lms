@@ -1,5 +1,6 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
+<%# TODO: once react_discussions_post is no longer feature_flag_dependent, remove the anchor param %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}", entry_id: asset.id) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -8,7 +9,7 @@
 
 <% define_content :footer_link do %>
   <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to join view the announcement" %>
+    <%= t :link, "Click here to view the announcement" %>
   </a>
 <% end %>
 
