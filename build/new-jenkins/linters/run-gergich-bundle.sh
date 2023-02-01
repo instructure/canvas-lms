@@ -26,7 +26,7 @@ done
 # If this is a plugin build and the change would require Gemfile.lock, the above
 # check would catch the issue and the corresponding canvas-lms build would catch
 # OSS issues.
-if [[ "$SKIP_OSS_CHECK" != "1" || "$GERRIT_PROJECT" == "canvas-lms" ]]; then
+if [[ "$SKIP_OSS_CHECK" != "1" && "$GERRIT_PROJECT" == "canvas-lms" ]]; then
   read -r -a PLUGINS_LIST_ARR <<< "$PLUGINS_LIST"
   rm -rf $(printf 'gems/plugins/%s ' "${PLUGINS_LIST_ARR[@]}")
 
