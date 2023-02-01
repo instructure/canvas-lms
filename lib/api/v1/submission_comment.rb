@@ -38,7 +38,7 @@ module Api::V1::SubmissionComment
   def submission_comment_json(submission_comment, user)
     sc_hash = submission_comment.as_json(
       include_root: false,
-      only: %w[id author_id author_name created_at edited_at comment]
+      only: %w[id author_id author_name created_at edited_at comment attempt]
     )
 
     if submission_comment.media_comment?
