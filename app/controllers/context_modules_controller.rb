@@ -638,10 +638,6 @@ class ContextModulesController < ApplicationController
         render :json => @module.errors, :status => :bad_request
       end
     end
-
-    puts "#################"
-    puts @current_user.inspect
-    puts "#################"
   end
 
   def destroy

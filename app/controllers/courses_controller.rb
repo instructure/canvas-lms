@@ -1645,7 +1645,6 @@ class CoursesController < ApplicationController
       return
     end
 
-
     @context = api_find(Course.active, params[:id])
 
     if @context && @current_user

@@ -19,7 +19,7 @@ module Turnitin
   class OutcomeResponseProcessor
 
     # this one goes to 14 (so that the last attempt is ~24hr after the first)
-    MAX_ATTEMPTS=14
+    MAX_ATTEMPTS=5
 
     def self.max_attempts
       MAX_ATTEMPTS

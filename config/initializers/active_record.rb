@@ -25,7 +25,7 @@ class ActiveRecord::Base
   class << self
     delegate :distinct_on, :find_ids_in_batches, to: :all
 
-    def find_ids_in_ranges(opts={}, &block)
+    def find_ids_in_ranges(opts = {}, &block)
       opts.reverse_merge!(:loose => true)
       all.find_ids_in_ranges(opts, &block)
     end
@@ -67,7 +67,7 @@ class ActiveRecord::Base
       end
     end
     if options && options[:include_root]
-      result = {self.class.base_class.model_name.element => result}
+      result = { self.class.base_class.model_name.element => result }
     end
     result
   end
@@ -87,45 +87,45 @@ class ActiveRecord::Base
   def self.all_models
     return @all_models if @all_models.present?
     @all_models = (ActiveRecord::Base.models_from_files +
-                   [Version]).compact.uniq.reject { |model|
+      [Version]).compact.uniq.reject { |model|
       (model < Tableless) ||
-      model.abstract_class?
+        model.abstract_class?
     }
   end
 
   def self.models_from_files
     @from_files ||= begin
-      Dir[
-        "#{Rails.root}/app/models/**/*.rb",
-        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-      ].sort.each do |file|
-        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
-        ActiveSupport::Dependencies.require_or_load(file)
-      end
-      ActiveRecord::Base.descendants
-    end
+                      Dir[
+                        "#{Rails.root}/app/models/**/*.rb",
+                        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+                        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+                      ].sort.each do |file|
+                        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
+                        ActiveSupport::Dependencies.require_or_load(file)
+                      end
+                      ActiveRecord::Base.descendants
+                    end
   end
 
   def self.maximum_text_length
-    @maximum_text_length ||= 64.kilobytes-1
+    @maximum_text_length ||= 64.kilobytes - 1
   end
 
   def self.maximum_long_text_length
-    @maximum_long_text_length ||= 500.kilobytes-1
+    @maximum_long_text_length ||= 500.kilobytes - 1
   end
 
   def self.maximum_string_length
     255
   end
 
-  def self.find_by_asset_string(string, asset_types=nil)
+  def self.find_by_asset_string(string, asset_types = nil)
     find_all_by_asset_string([string], asset_types)[0]
   end
 
-  def self.find_all_by_asset_string(strings, asset_types=nil)
+  def self.find_all_by_asset_string(strings, asset_types = nil)
     # TODO: start checking asset_types, if provided
-    strings.map{ |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
+    strings.map { |str| parse_asset_string(str) }.group_by(&:first).inject([]) do |result, (klass, id_pairs)|
       next result if asset_types && !asset_types.include?(klass)
       result.concat((klass.constantize.where(id: id_pairs.map(&:last)).to_a rescue []))
     end
@@ -232,7 +232,7 @@ class ActiveRecord::Base
     end
   end
 
-  def self.skip_touch_context(skip=true)
+  def self.skip_touch_context(skip = true)
     @@skip_touch_context = skip
   end
 
@@ -349,11 +349,11 @@ class ActiveRecord::Base
       value = options[:delimiter] + value + options[:delimiter]
       delimiter = connection.quote(options[:delimiter])
       column_str = "#{delimiter} || %s || #{delimiter}"
-      args = args.map{ |a| column_str % a.to_s }
+      args = args.map { |a| column_str % a.to_s }
     end
 
     value = wildcard_pattern(value, options)
-    cols = args.map{ |col| like_condition(col, '?', !options[:case_sensitive]) }
+    cols = args.map { |col| like_condition(col, '?', !options[:case_sensitive]) }
     sanitize_sql_array ["(" + cols.join(" OR ") + ")", *([value] * cols.size)]
   end
 
@@ -374,7 +374,7 @@ class ActiveRecord::Base
   end
 
   def self.coalesce_chain(cols)
-    "(#{cols.map{|col| coalesce_clause(col)}.join(" || ' ' || ")})"
+    "(#{cols.map { |col| coalesce_clause(col) }.join(" || ' ' || ")})"
   end
 
   def self.coalesce_clause(column)
@@ -414,17 +414,17 @@ class ActiveRecord::Base
     column = options[:column] || "created_at"
     max_date = (options[:max_date] || Time.zone.now).midnight
     num_days = options[:num_days] || 20
-    min_date = (options[:min_date] || max_date.advance(:days => -(num_days-1))).midnight
+    min_date = (options[:min_date] || max_date.advance(:days => -(num_days - 1))).midnight
 
     offset = max_date.utc_offset
 
     expression = "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
 
     result = where(
-        "#{column} >= ? AND #{column} < ?",
-        min_date,
-        max_date.advance(:days => 1)
-      ).
+      "#{column} >= ? AND #{column} < ?",
+      min_date,
+      max_date.advance(:days => 1)
+    ).
       group(expression).
       order(expression).
       count
@@ -436,14 +436,14 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    ary.each_with_index.inject('CASE '){ |string, (values, i)|
-      string << "WHEN #{col} IN (" << Array(values).map{ |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
+    ary.each_with_index.inject('CASE ') { |string, (values, i)|
+      string << "WHEN #{col} IN (" << Array(values).map { |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
     } << "ELSE #{ary.size} END"
   end
 
   def self.rank_hash(ary)
-    ary.each_with_index.inject(Hash.new(ary.size + 1)){ |hash, (values, i)|
-      Array(values).each{ |value| hash[value] = i + 1 }
+    ary.each_with_index.inject(Hash.new(ary.size + 1)) { |hash, (values, i)|
+      Array(values).each { |value| hash[value] = i + 1 }
       hash
     }
   end
@@ -452,9 +452,9 @@ class ActiveRecord::Base
     column = column.to_s
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      sql = ''
-      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
-      sql << <<-SQL
+               sql = ''
+               sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
+               sql << <<-SQL
         WITH RECURSIVE t AS (
           SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
           UNION ALL
@@ -463,13 +463,13 @@ class ActiveRecord::Base
           WHERE t.#{column} IS NOT NULL
         )
         SELECT #{column} FROM t WHERE #{column} IS NOT NULL
-      SQL
-      sql << ")" if include_nil
-      find_by_sql(sql)
-    else
-      conditions = "#{column} IS NOT NULL" unless include_nil
-      find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
-    end
+               SQL
+               sql << ")" if include_nil
+               find_by_sql(sql)
+             else
+               conditions = "#{column} IS NOT NULL" unless include_nil
+               find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
+             end
     result.map(&column.to_sym)
   end
 
@@ -489,7 +489,7 @@ class ActiveRecord::Base
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
   #   belongs_to :context, polymorphic: [:course, :account]
-  def self.belongs_to(name, scope = nil, options={})
+  def self.belongs_to(name, scope = nil, options = {})
     options = scope if scope.is_a?(Hash)
     if options[:polymorphic] == true
       raise "Please pass an array of valid types for polymorphic associations. Use exhaustive: false if you really don't want to validate them"
@@ -501,7 +501,7 @@ class ActiveRecord::Base
     reflection = super[name.to_s]
 
     if reflection.options[:polymorphic].is_a?(Array) ||
-        reflection.options[:polymorphic].is_a?(Hash)
+      reflection.options[:polymorphic].is_a?(Hash)
       reflection.options[:exhaustive] = exhaustive
       reflection.options[:polymorphic_prefix] = polymorphic_prefix
       add_polymorph_methods(reflection)
@@ -589,9 +589,11 @@ class ActiveRecord::Base
         next
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield(retries) } }
-    connection.clear_query_cache
-    result
+    Shackles.activate(:master) do
+      result = transaction(:requires_new => true) { uncached { yield(retries) } }
+      connection.clear_query_cache
+      result
+    end
   end
 
   def self.current_xlog_location
@@ -679,10 +681,11 @@ ActiveRecord::Relation.class_eval do
 
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
-    selects = select_values.flat_map{|sel| sel.to_s.split(",").map(&:strip) }
+    selects = select_values.flat_map { |sel| sel.to_s.split(",").map(&:strip) }
     id_keys = [primary_key, "*", "#{table_name}.#{primary_key}", "#{table_name}.*"]
-    id_keys.all?{|k| !selects.include?(k) }
+    id_keys.all? { |k| !selects.include?(k) }
   end
+
   private :select_values_necessitate_temp_table?
 
   def find_in_batches_needs_temp_table?
@@ -692,6 +695,7 @@ ActiveRecord::Relation.class_eval do
       distinct_value ||
       select_values_necessitate_temp_table?
   end
+
   private :find_in_batches_needs_temp_table?
 
   def can_use_cursor?
@@ -761,22 +765,22 @@ ActiveRecord::Relation.class_eval do
     begin
       index = "temp_primary_key"
       case connection.adapter_name
-        when 'PostgreSQL'
-          begin
-            old_proc = connection.raw_connection.set_notice_processor {}
-            if pluck && pluck.any?{|p| p == primary_key.to_s}
-              connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
-              index = primary_key.to_s
-            else
-              pluck.unshift(index) if pluck
-              connection.execute "ALTER TABLE #{table}
+      when 'PostgreSQL'
+        begin
+          old_proc = connection.raw_connection.set_notice_processor {}
+          if pluck && pluck.any? { |p| p == primary_key.to_s }
+            connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
+            index = primary_key.to_s
+          else
+            pluck.unshift(index) if pluck
+            connection.execute "ALTER TABLE #{table}
                                ADD temp_primary_key SERIAL PRIMARY KEY"
-            end
-          ensure
-            connection.raw_connection.set_notice_processor(&old_proc) if old_proc
           end
-        else
-          raise "Temp tables not supported!"
+        ensure
+          connection.raw_connection.set_notice_processor(&old_proc) if old_proc
+        end
+      else
+        raise "Temp tables not supported!"
       end
 
       includes = includes_values + preload_values
@@ -836,7 +840,7 @@ ActiveRecord::Relation.class_eval do
 
   def not_recently_touched
     scope = self
-    if((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
+    if ((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
       personal_space -= 1
       # truncate to seconds
       bound = Time.at(Time.now.to_i - personal_space).utc
@@ -882,7 +886,7 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes)
     uniq_identifier = "#{table_name}.#{primary_key}"
     scopes << self
-    sub_query = (scopes).map {|s| s.except(:select, :order).select(uniq_identifier).to_sql}.join(" UNION ALL ")
+    sub_query = (scopes).map { |s| s.except(:select, :order).select(uniq_identifier).to_sql }.join(" UNION ALL ")
     unscoped.where("#{uniq_identifier} IN (#{sub_query})")
   end
 
@@ -935,7 +939,7 @@ ActiveRecord::Relation.class_eval do
 end
 
 module UpdateAndDeleteWithJoins
-  def deconstruct_joins(joins_sql=nil)
+  def deconstruct_joins(joins_sql = nil)
     unless joins_sql
       joins_sql = ''
       add_joins!(joins_sql, nil)
@@ -1066,13 +1070,13 @@ end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   def bulk_insert(table_name, records)
     keys = records.first.keys
-    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
     records.each do |record|
       execute <<-SQL
         INSERT INTO #{quote_table_name(table_name)}
           (#{quoted_keys})
         VALUES
-          (#{keys.map{ |k| quote(record[k]) }.join(', ')})
+          (#{keys.map { |k| quote(record[k]) }.join(', ')})
       SQL
     end
   end
@@ -1088,7 +1092,7 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   #     string_agg(name::text, '|')       (postgres)
 
   def func(name, *args)
-    "#{name}(#{args.map{ |arg| func_arg_esc(arg) }.join(', ')})"
+    "#{name}(#{args.map { |arg| func_arg_esc(arg) }.join(', ')})"
   end
 
   def func_arg_esc(arg)
@@ -1106,10 +1110,10 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   def infer_group_by_columns(columns)
     columns.map { |col|
       col.respond_to?(:columns) ?
-          col.columns.map { |c|
-            "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
-          } :
-          col
+        col.columns.map { |c|
+          "#{col.quoted_table_name}.#{quote_column_name(c.name)}"
+        } :
+        col
     }
   end
 end
