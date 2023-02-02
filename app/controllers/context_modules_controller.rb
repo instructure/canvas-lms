@@ -79,7 +79,6 @@ class ContextModulesController < ApplicationController
       if @context && @current_user && enrollment = StudentEnrollment.find_by(course_id: @context.id, user_id: @current_user.id)
         settings = SettingsService.get_enrollment_settings(id: enrollment.id)
         sequence_control = false if !settings["sequence_control"].nil? && settings["sequence_control"] == false
-        sequence_control = false
       end
 
 
@@ -639,10 +638,6 @@ class ContextModulesController < ApplicationController
         render :json => @module.errors, :status => :bad_request
       end
     end
-
-    puts "#################"
-    puts @current_user.inspect
-    puts "#################"
   end
 
   def destroy
