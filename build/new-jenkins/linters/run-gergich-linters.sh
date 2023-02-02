@@ -42,7 +42,7 @@ if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
-node_modules/.bin/tsc -p tsconfig.json --noEmit & TSC_PID=$!
+ruby script/tsc & TSC_PID=$!
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint

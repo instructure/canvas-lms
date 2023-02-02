@@ -26,7 +26,7 @@ gem "parallel", "1.22.0", require: false # dependency of rubocop and canvas
 gem "regexp_parser", "1.8.2", require: false # dependency of rubocop and several other gems
 
 group :test do
-  gem "gergich", "2.0.0", require: false
+  gem "gergich", "2.1.1", require: false
     gem "mime-types-data", "3.2021.0901", require: false
 
   gem "rubocop", "1.22.3", require: false
