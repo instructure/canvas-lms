@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock
+  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -906,7 +906,7 @@ class User < ActiveRecord::Base
   end
 
   def preserve_lti_id
-    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil? && !override_lti_id_lock
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil?
   end
 
   def ensure_lti_id
