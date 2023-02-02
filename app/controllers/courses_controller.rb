@@ -2714,9 +2714,6 @@ class CoursesController < ApplicationController
   # If a user has content management rights, but not full course editing rights, the only attribute
   # editable through this endpoint will be "syllabus_body"
   #
-  # If an account has set prevent_course_availability_editing_by_teachers, a teacher cannot include
-  # course[start_at], course[conclude_at], or course[restrict_enrollments_to_course_dates] here.
-  #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to move the course to.
   #
@@ -2968,10 +2965,6 @@ class CoursesController < ApplicationController
 
     if authorized_action(@course, @current_user, %i[update manage_content manage_course_content_edit])
       return render_update_success if params[:for_reload]
-
-      return render_unauthorized_action if (%w[start_at end_at restrict_enrollments_to_course_dates] & params_for_update.keys).present? &&
-                                           @course.root_account.settings[:prevent_course_availability_editing_by_teachers] &&
-                                           !@course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
 
       unless @course.grants_right?(@current_user, :update)
         # let users with :manage_couse_content_edit only update the body
