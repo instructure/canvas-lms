@@ -42,6 +42,7 @@ if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
+node_modules/.bin/tsc -p tsconfig.json --noEmit & TSC_PID=$!
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
@@ -51,5 +52,6 @@ node ui-build/tools/component-info.mjs -i -v -g
 
 bin/rails css:styleguide doc:api
 
+wait $TSC_PID
 gergich status
 echo "LINTER OK!"

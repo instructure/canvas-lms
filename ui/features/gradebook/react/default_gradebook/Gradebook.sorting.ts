@@ -114,7 +114,7 @@ export function secondaryAndTertiarySort(
   {asc = true}
 ) {
   let result
-  result = localeSort(a.sortable_name, b.sortable_name, {asc})
+  result = localeSort(a.sortable_name || '', b.sortable_name || '', {asc})
   if (result === 0) {
     result = idSort(a, b, {asc})
   }

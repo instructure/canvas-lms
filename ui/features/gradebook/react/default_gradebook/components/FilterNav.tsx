@@ -130,7 +130,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'section',
             value: a.id,
             created_at: new Date().toISOString(),
@@ -154,7 +154,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'module' && c.value === m.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'module',
             value: m.id,
             created_at: new Date().toISOString(),
@@ -178,7 +178,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'grading-period',
             value: a.id,
             created_at: new Date().toISOString(),
@@ -203,7 +203,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'assignment-group' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'assignment-group',
             value: a.id,
             created_at: new Date().toISOString(),
@@ -237,7 +237,7 @@ export default function FilterNav({
               ),
               onToggle: () => {
                 const filter: Filter = {
-                  id: uuid(),
+                  id: uuid.v4(),
                   type: 'student-group',
                   value: group.id,
                   created_at: new Date().toISOString(),
@@ -264,7 +264,7 @@ export default function FilterNav({
         ),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'submissions',
             value: 'has-ungraded-submissions',
             created_at: new Date().toISOString(),
@@ -280,7 +280,7 @@ export default function FilterNav({
         ),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'submissions',
             value: 'has-submissions',
             created_at: new Date().toISOString(),
@@ -349,13 +349,13 @@ export default function FilterNav({
         onCloseDateModal={() => setIsDateModalOpen(false)}
         onSelectDates={(startDateValue, endDateValue) => {
           const startDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'start-date',
             value: startDateValue,
             created_at: new Date().toISOString(),
           }
           const endDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'end-date',
             value: endDateValue,
             created_at: new Date().toISOString(),
