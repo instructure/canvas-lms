@@ -70,27 +70,84 @@ describe "BundlerLockfileExtensions" do
         BundlerLockfileExtensions.enable({
           "\#{__FILE__}.lock": {
             default: true,
-            install_filter: lambda { |_, x| !x.to_s.include?("canvas_color") },
+            install_filter: lambda { |_, x| !x.to_s.include?("test_local") },
           },
         })
       end
 
-      gem "canvas_color", path: "#{File.dirname(__FILE__)}/../../canvas_color"
+      gem "test_local", path: "test_local"
       gem "concurrent-ruby", "1.2.0"
     RUBY
 
-    with_gemfile(contents) do |file|
+    with_gemfile(contents) do |file, dir|
+      create_local_gem(dir, "test_local", "")
+
       invoke_bundler("install", file.path)
 
-      expect(File.read("#{file.path}.lock")).to include("canvas_color")
-      expect(File.read("#{file.path}.lock.partial")).not_to include("canvas_color")
+      expect(File.read("#{file.path}.lock")).to include("test_local")
+      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
 
       expect(File.read("#{file.path}.lock")).to include("concurrent-ruby")
       expect(File.read("#{file.path}.lock.partial")).to include("concurrent-ruby")
     end
   end
 
+  it "regenerates the lockfile when a source is completely removed and its dependencies no longer exist" do
+    contents = <<-RUBY
+      unless BundlerLockfileExtensions.enabled?
+        BundlerLockfileExtensions.enable({
+          "\#{__FILE__}.lock": {
+            default: true,
+            install_filter: lambda { |_, x| !x.to_s.include?("test_local") },
+          },
+        })
+      end
+
+      if ENV["USE_TEST_LOCAL_GEM"] == "1"
+        gem "test_local", path: "test_local"
+      end
+
+      gem "concurrent-ruby", "1.2.0"
+    RUBY
+
+    with_gemfile(contents) do |file, dir|
+      create_local_gem(dir, "test_local", <<-RUBY)
+        spec.add_dependency "dummy", "0.9.6"
+      RUBY
+
+      invoke_bundler("install", file.path, env: { "USE_TEST_LOCAL_GEM" => "1" })
+
+      expect(File.read("#{file.path}.lock")).to include("dummy")
+      expect(File.read("#{file.path}.lock")).to include("test_local")
+      expect(File.read("#{file.path}.lock.partial")).to include("dummy")
+      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
+
+      invoke_bundler("install", file.path, env: { "USE_TEST_LOCAL_GEM" => "0" })
+
+      expect(File.read("#{file.path}.lock")).not_to include("dummy")
+      expect(File.read("#{file.path}.lock")).not_to include("test_local")
+      expect(File.read("#{file.path}.lock.partial")).not_to include("dummy")
+      expect(File.read("#{file.path}.lock.partial")).not_to include("test_local")
+    end
+  end
+
   private
+
+  def create_local_gem(dir, name, content)
+    FileUtils.mkdir_p("#{dir}/#{name}")
+    File.open("#{dir}/#{name}/#{name}.gemspec", "w") do |f|
+      f.write(<<-RUBY)
+      Gem::Specification.new do |spec|
+        spec.name          = "#{name}"
+        spec.version       = "0.0.1"
+        spec.authors       = ["Instructure"]
+        spec.summary       = "for testing only"
+
+        #{content}
+      end
+      RUBY
+    end
+  end
 
   def with_gemfile(content)
     dir = Dir.mktmpdir
@@ -104,7 +161,7 @@ describe "BundlerLockfileExtensions" do
       f.rewind
     end
 
-    yield(file)
+    yield(file, dir)
   ensure
     FileUtils.remove_dir(dir, true)
   end

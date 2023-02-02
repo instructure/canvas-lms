@@ -40,6 +40,13 @@ module BundlerDefinitionFilterableSources
     super(...)
   end
 
+  def nothing_changed?
+    locked_specs = instance_variable_get(:@locked_specs).to_hash.keys
+    actual_specs = converge_locked_specs.to_hash.keys
+
+    super && (locked_specs - actual_specs).empty?
+  end
+
   private
 
   def source_included?(source)
