@@ -58,5 +58,49 @@ const uploadMediaTranslations = {
     LIST_EXPANDED: 'List expanded.',
     OPTION_SELECTED: '{option} selected.',
   },
+
+  // Structure copied from @instructure/media-capture translations file
+  MediaCaptureStrings: {
+    ARIA_TIMEBAR_LABEL: formatMessage('Timebar'),
+    ARIA_VIDEO_LABEL: formatMessage('Video Player'),
+    ARIA_VOLUME: formatMessage('Current Volume Level'),
+    ARIA_RECORDING: formatMessage('Recording'),
+    DEFAULT_ERROR: formatMessage('Something went wrong accessing your webcam.'),
+    DEVICE_AUDIO: formatMessage('Mic'),
+    DEVICE_VIDEO: formatMessage('Webcam'),
+    FILE_PLACEHOLDER: formatMessage('Untitled'),
+    FINISH: formatMessage('Finish'),
+    WEBCAM_VIDEO_SELECTION_LABEL: formatMessage('Select video source'),
+    WEBCAM_AUDIO_SELECTION_LABEL: formatMessage('Select audio source'),
+    NO_WEBCAM: formatMessage('No Video'),
+    // Modified string to match from ui/shared/media-recorder/react/components/MediaRecorder.js
+    NOT_ALLOWED_ERROR: formatMessage('Please allow Canvas to access your microphone and webcam.'),
+    NOT_READABLE_ERROR: formatMessage('Your webcam may already be in use.'),
+    PLAYBACK_PAUSE: formatMessage('Pause'),
+    PLAYBACK_PLAY: formatMessage('Play'),
+    PREVIEW: formatMessage('PREVIEW'),
+    SAVE_MEDIA: formatMessage('Save Media'),
+    // Modified string to match from ui/shared/media-recorder/react/components/MediaRecorder.js
+    SR_FILE_INPUT: formatMessage('File name'),
+    START: formatMessage('Start Recording'),
+    START_OVER: formatMessage('Start Over'),
+    SCREEN_DEFAULT_ERROR: formatMessage('Something went wrong while sharing your screen.'),
+    MIC_BLOCKED: formatMessage('Your microphone is blocked in the browser settings.'),
+    WEBCAM_BLOCKED: formatMessage('Your webcam is blocked in the browser settings.'),
+    MIC_AND_WEBCAM_BLOCKED: formatMessage(
+      'Your webcam and microphone are blocked in the browser settings.'
+    ),
+    NO_MIC_EXIST: formatMessage(
+      'We couldn’t detect a working microphone connected to your device.'
+    ),
+    NO_WEBCAM_EXIST: formatMessage('We couldn’t detect a working webcam connected to your device.'),
+    NO_MIC_AND_WEBCAM_EXIST: formatMessage(
+      'We couldn’t detect a working webcam or microphone connected to your device.'
+    ),
+    WEBCAM_DISABLED: formatMessage('Webcam Disabled'),
+    MICROPHONE_DISABLED: formatMessage('Microphone Disabled'),
+    SYSTEM_AUDIO_ALLOWED: formatMessage('System Audio Allowed'),
+    SYSTEM_AUDIO_DISABLED: formatMessage('System Audio Disabled'),
+  },
 }
 export default uploadMediaTranslations
