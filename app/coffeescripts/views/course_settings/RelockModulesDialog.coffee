@@ -13,7 +13,7 @@ define [
 
     renderIfNeeded: () ->
 #      if data.relock_warning
-#        @module_id = data.id
+      if ENV.relock_warning == true
         @render().show()
 
     dialogOptions: ->
@@ -29,5 +29,5 @@ define [
       ]
 
     relock: =>
-      url = "/api/v1/courses/#{ENV.COURSE_ID}/modules/#{@module_id}/relock"
+      url = "/api/v1/courses/#{ENV.COURSE_ID}/relock"
       @dialog.disableWhileLoading $.ajaxJSON(url, 'PUT', {}, => @close())

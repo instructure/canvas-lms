@@ -40,11 +40,11 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDialog'
 
-  window.onload = (event) => {
-    console.log("page is fully loaded");
-    var relock_modules_dialog = new RelockModulesDialog();
-    relock_modules_dialog.renderIfNeeded();
-  };
+  // window.onload = (event) => {
+  //   console.log("page is fully loaded");
+  //   var relock_modules_dialog = new RelockModulesDialog();
+  //   relock_modules_dialog.renderIfNeeded();
+  // };
 
   var GradePublishing = {
     status: null,
@@ -134,6 +134,8 @@ import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDia
         initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash);
 
     $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show();
+    var relock_modules_dialog = new RelockModulesDialog();
+    relock_modules_dialog.renderIfNeeded();
 
     $add_section_form.formSubmit({
       required: ['course_section[name]'],
@@ -311,6 +313,9 @@ import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDia
       },
       success: function(data) {
         $('#course_reload_form').submit();
+        console.log(data);
+        console.log(data.course);
+        // $(this).loadingImage('remove');
       },
       error: function(data) {
         $(this).loadingImage('remove');

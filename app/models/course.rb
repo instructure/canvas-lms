@@ -3096,9 +3096,6 @@ class Course < ActiveRecord::Base
     @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
 
-  def relock_warning?
-    @relock_warning = true
-  end
 
   private
 
