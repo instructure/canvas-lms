@@ -147,6 +147,7 @@ class Submission < ActiveRecord::Base
   attr_accessor :require_submission_type_is_valid
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
+  scope :deleted, -> { where("submissions.workflow_state = 'deleted'") }
   scope :for_enrollments, ->(enrollments) { where(user_id: enrollments.select(:user_id)) }
   scope :with_comments, -> { preload(:submission_comments) }
   scope :unread_for, lambda { |user_id|
