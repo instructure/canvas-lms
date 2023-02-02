@@ -4389,7 +4389,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  showSimilarityScore = _assignment => !!this.options.show_similarity_score
+  showSimilarityScore = (_assignment: Assignment) => !!this.options.show_similarity_score
 
   viewUngradedAsZero = () =>
     !!(this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
