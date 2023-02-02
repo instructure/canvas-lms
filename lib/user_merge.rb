@@ -87,16 +87,8 @@ class UserMerge
       end
     end
 
-    # moving LTI IDs to the new user is preferable if possible, so launches from new enrollments or global nav
-    # will continue using the same ID as before - but if the target user has already done LTI launches,
-    # we need to use the past lti id system instead
-    if can_move_lti_ids?
-      move_lti_ids
-    else
-      populate_past_lti_ids
-    end
-
     copy_favorites
+    populate_past_lti_ids
     handle_communication_channels
     destroy_conflicting_module_progressions
     move_enrollments
@@ -256,56 +248,6 @@ class UserMerge
         UserPreferenceValue.where(id: record).update_all(value: new_value)
       end
     end
-  end
-
-  def can_move_lti_ids?
-    # the target has already done an LTI 1.1 launch
-    return false if target_user.lti_context_id.present?
-
-    # we can't tell explicitly if the user has done an LTI 1.3 launch but we can infer
-    # they are unlikely to have done so if they have no enrollments or account users
-    return false if target_user.has_enrollment? || target_user.account_membership?
-
-    true
-  end
-
-  def move_lti_ids
-    lti_context_id = from_user.lti_context_id
-    lti_id = from_user.lti_id
-    uuid = from_user.uuid
-
-    # null out the relevant ids for from_user (this will cause new values to be generated for 2 of the 3,
-    # which is fine; this user is about to be deleted)
-    from_user.update(lti_context_id: nil, lti_id: nil, uuid: nil)
-
-    # now update shadow records. we can't wait for the UserSync job due to the unique constraint on lti_context_id,
-    # so update shadow records manually
-    now = from_user.updated_at
-    dummy_uuid = from_user.uuid
-    dummy_lti_id = from_user.lti_id
-    Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
-      User.where(lti_context_id: lti_context_id).update_all(lti_context_id: nil, uuid: dummy_uuid, lti_id: dummy_lti_id, updated_at: now)
-    end
-
-    if merge_data
-      # store target user's existing lti_id and uuid in MergeData so we can restore them in a split
-      # (the target lti_context_is is nil or we wouldn't be here, but the lti_id is populated on create, not on demand)
-      merge_data.items.create!(user: target_user, item_type: "lti_id", item: target_user.lti_id)
-      merge_data.items.create!(user: target_user, item_type: "uuid", item: target_user.uuid)
-    end
-
-    # finally, move the source user LTI IDs to the target user
-    target_user.lti_context_id = lti_context_id
-    target_user.override_lti_id_lock = true
-    target_user.lti_id = lti_id
-    target_user.uuid = uuid
-    target_user.save!
-  end
-
-  # used by SplitUsers to undo this operation from merge
-  def move_lti_ids_to(target_user)
-    @target_user = target_user
-    move_lti_ids
   end
 
   def populate_past_lti_ids
