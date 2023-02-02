@@ -1645,18 +1645,13 @@ class CoursesController < ApplicationController
       return
     end
 
-
     @context = api_find(Course.active, params[:id])
 
     if @context && @current_user
       current_user_enrollment = @current_user.not_ended_enrollments.find_by(type: "StudentEnrollment", course: @context)
       if current_user_enrollment
         current_user_settings = SettingsService.get_enrollment_settings(id: current_user_enrollment.id)
-        if Account.first.name == 'Primavera Online High School'
-          sequence_control = false
-        else
-          sequence_control = current_user_settings.fetch('sequence_control', true)
-        end
+        sequence_control = current_user_settings.fetch('sequence_control', true)
         if sequence_control
           @current_requirement = CourseProgress.new(@context, @current_user).current_content_tag
         end

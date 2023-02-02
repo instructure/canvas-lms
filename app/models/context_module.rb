@@ -259,11 +259,7 @@ class ContextModule < ActiveRecord::Base
 
     if enrollment
       settings = enrollment ? SettingsService.get_enrollment_settings(id: enrollment.id) : {}
-      if Account.first.name == 'Primavera Online High School'
-        sequence_control = false
-      else
-        sequence_control = settings.fetch('sequence_control', true)
-      end
+      sequence_control = settings.fetch('sequence_control', true)
       return true unless sequence_control
     end
 
