@@ -160,10 +160,12 @@ def maybeSlackSendFailure() {
 
 def maybeSlackSendSuccess() {
   if (configuration.isChangeMerged() && isPatchsetRetriggered()) {
+    def patchsetPrefix = env.GERRIT_CHANGE_URL ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>" : env.JOB_NAME
+
     slackSend(
       channel: getSlackChannel(),
       color: 'good',
-      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>"
+      message: "${patchsetPrefix} succeeded on re-trigger. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>"
     )
   }
 
@@ -176,10 +178,12 @@ def maybeSlackSendSuccess() {
 
 def maybeSlackSendRetrigger() {
   if (configuration.isChangeMerged() && isPatchsetRetriggered()) {
+    def patchsetPrefix = env.GERRIT_CHANGE_URL ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>" : env.JOB_NAME
+
     slackSend(
       channel: getSlackChannel(),
       color: 'warning',
-      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${env.GERRIT_EVENT_ACCOUNT_EMAIL} has been re-triggered. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+      message: "${patchsetPrefix} by ${env.GERRIT_EVENT_ACCOUNT_EMAIL} has been re-triggered. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
     )
   }
 }
