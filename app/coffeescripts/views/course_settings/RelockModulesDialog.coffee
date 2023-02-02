@@ -4,16 +4,16 @@ define [
   'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
-  'jst/modules/RelockModulesDialog'
+  'jst/course_settings/RelockModulesDialog'
 ], (I18n, $, _, DialogBaseView, template) ->
 
   class RelockModulesDialog extends DialogBaseView
 
     template: template
 
-    renderIfNeeded: (data) ->
-      if data.relock_warning
-        @module_id = data.id
+    renderIfNeeded: () ->
+#      if data.relock_warning
+#        @module_id = data.id
         @render().show()
 
     dialogOptions: ->
