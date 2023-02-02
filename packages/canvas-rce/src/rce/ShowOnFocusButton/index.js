@@ -38,6 +38,7 @@ export default class ShowOnFocusButton extends Component {
     onClick: func,
     screenReaderLabel: string.isRequired,
     margin: string,
+    id: string.isRequired,
   }
 
   state = {
@@ -60,6 +61,7 @@ export default class ShowOnFocusButton extends Component {
   renderButton() {
     return (
       <IconButton
+        id={this.props.id}
         data-testid="ShowOnFocusButton__button"
         color="primary"
         aria-haspopup="dialog"
