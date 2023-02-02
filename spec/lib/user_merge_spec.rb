@@ -81,7 +81,6 @@ describe UserMerge do
       expect(user1.reload.past_lti_ids.take.user_lti_id).to eq old_lti
       expect(user1.past_lti_ids.take.user_lti_context_id).to eq old_lti_context
       user3 = user_model
-      Lti::Asset.opaque_identifier_for(user3)
       UserMerge.from(user1).into(user3)
       expect(user3.reload.past_lti_ids.where(context_id: course1).take.user_lti_id).to eq user_1_old_lti
       expect(user3.past_lti_ids.where(context_id: course2).take.user_lti_id).to eq old_lti
@@ -870,7 +869,6 @@ describe UserMerge do
       @shard1.activate do
         account = Account.create!
         @user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1, account: account)
-        Lti::Asset.opaque_identifier_for(@user1)
       end
       course = course_factory(active_all: true)
       user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1)
@@ -884,63 +882,6 @@ describe UserMerge do
       expect(
         UserPastLtiId.shard(course).where(user_id: @user1).take.user_lti_id
       ).to eq "fake_lti_id_from_old_merge"
-    end
-
-    describe "move_lti_ids" do
-      before :once do
-        @shard1.activate do
-          account1 = Account.create!
-          @user1 = user_with_pseudonym(username: "user1@example.com", account: account1)
-          @lti_context_id_1 = Lti::Asset.opaque_identifier_for(@user1)
-          @lti_id_1 = @user1.lti_id
-          @uuid1 = @user1.uuid
-        end
-        @user2 = user_with_pseudonym
-        @lti_id_2 = @user2.lti_id
-        @uuid2 = @user2.uuid
-      end
-
-      it "moves lti ids to the new user if possible" do
-        UserMerge.from(@user1).into(@user2)
-
-        expect(@user1.reload).to be_deleted
-        expect(@user1.lti_context_id).to be_nil
-        expect([@uuid1, @uuid2]).not_to include @user1.uuid
-
-        expect(@user2.reload.lti_context_id).to eq @lti_context_id_1
-        expect(@user2.lti_id).to eq @lti_id_1
-        expect(@user2.uuid).to eq @uuid1
-
-        merge_items = UserMergeData.active.find_by(user_id: @user2.id).items
-        expect(merge_items.find_by(item_type: "lti_id").item).to eq @lti_id_2
-        expect(merge_items.find_by(item_type: "uuid").item).to eq @uuid2
-      end
-
-      it "doesn't move lti ids if the target user has enrollments" do
-        @shard1.activate do
-          account = Account.create!
-          course_with_student(account: account, user: @user1, active_all: true)
-        end
-        course_with_student(user: @user2, active_all: true)
-
-        UserMerge.from(@user1).into(@user2)
-
-        expect(@user1.reload.lti_context_id).to eq @lti_context_id_1
-        expect(@user1.lti_id).to eq @lti_id_1
-        expect(@user1.uuid).to eq @uuid1
-
-        expect(@user2.reload.lti_context_id).to be_nil
-        expect(@user2.lti_id).to eq @lti_id_2
-        expect(@user2.uuid).to eq @uuid2
-        expect(@user2.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist
-      end
-
-      it "doesn't move lti ids if the target user has an lti_context_id" do
-        lti_context_id_2 = Lti::Asset.opaque_identifier_for(@user2)
-        UserMerge.from(@user1).into(@user2)
-        expect(@user1.reload.lti_context_id).to eq @lti_context_id_1
-        expect(@user2.reload.lti_context_id).to eq lti_context_id_2
-      end
     end
 
     it "moves prefs over with old format" do
