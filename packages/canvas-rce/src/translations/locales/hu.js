@@ -185,6 +185,7 @@ const locale = {
   "delta_53765780": { "message": "Delta" },
   "describe_the_icon_f6a18823": { "message": "(Írja le az ikont)" },
   "describe_the_video_2fe8f46a": { "message": "(A videó leírása)" },
+  "description_436c48d7": { "message": "Leírás" },
   "details_98a31b68": { "message": "Részletek" },
   "diagonal_dots_7d71b57e": { "message": "Átlós pontok" },
   "diamond_b8dfe7ae": { "message": "Gyémánt" },
