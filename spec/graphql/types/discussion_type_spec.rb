@@ -20,7 +20,7 @@
 
 require_relative "../graphql_spec_helper"
 
-RSpec.shared_examples "DiscussionType" do
+RSpec.shared_context "DiscussionTypeContext" do
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
   let(:default_permissions) do
     [
@@ -158,6 +158,10 @@ RSpec.shared_examples "DiscussionType" do
       default_permissions.concat(manage_content_permission)
     end
   end
+end
+
+RSpec.shared_examples "DiscussionType" do
+  include_context "DiscussionTypeContext"
 
   it "works" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
@@ -752,12 +756,34 @@ describe Types::DiscussionType do
     end
   end
 
-  context "groups discussion" do
+  context "group discussion with deleted group" do
     let_once(:discussion) { group_discussion_with_deleted_group }
-    include_examples "DiscussionType"
+    include_context "DiscussionTypeContext"
 
     it "doesn't show child topic associated to a deleted group" do
       expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1", "group 2"])
+    end
+  end
+
+  context "group discussion context name sorting" do
+    let_once(:discussion) do
+      course = @course || course_factory(active_all: true)
+      group_category = course.group_categories.create!(name: "category")
+      course.groups.create!(name: "group 10", group_category: group_category)
+      course.groups.create!(name: "group 2", group_category: group_category)
+      course.groups.create!(name: "group 1", group_category: group_category)
+      course.groups.create!(name: "group 11", group_category: group_category)
+
+      topic = course.discussion_topics.build(title: "topic")
+      topic.group_category = group_category
+      topic.save!
+      topic
+    end
+    include_context "DiscussionTypeContext"
+
+    it "sorts child_topics by their context_name" do
+      # eq is used instead of match_array to make sure it is ordered properly
+      expect(discussion_type.resolve("childTopics { contextName }")).to eq(["group 1", "group 10", "group 11", "group 2"])
     end
   end
 
