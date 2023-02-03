@@ -73,7 +73,7 @@ module BundlerLockfileExtensions
         elsif (!Bundler.settings[:deployment] && defined?(Bundler::CLI::Install)) || defined?(Bundler::CLI::Update)
           # Sadly, this is the only place where the lockfile_path can be set correctly for the installation-like paths.
           # Ideally, it would go into before-install-all, but that is called after the lockfile is already loaded.
-          BundlerLockfileExtensions.install_filter_lockfile_name(lockfile_default)
+          install_lockfile_name(lockfile_default)
         else
           lockfile_default.to_s
         end
@@ -121,6 +121,14 @@ module BundlerLockfileExtensions
       "#{lock}.partial"
     end
 
+    def install_lockfile_name(lock)
+      if @lockfile_defs[lock][:install_filter]
+        install_filter_lockfile_name(lock)
+      else
+        lock.to_s
+      end
+    end
+
     def write_all_lockfiles
       current_definition = Bundler.definition
       unlock = current_definition.instance_variable_get(:@unlock)
@@ -131,11 +139,12 @@ module BundlerLockfileExtensions
       lockfile_defs.each do |lock, opts|
         next if lock == lockfile_default
 
-        @lockfile_path = install_filter_lockfile_name(lock)
+        @lockfile_path = install_lockfile_name(lock)
         opts[:prepare_environment]&.call
 
         definition = Bundler::Definition.build(Bundler.default_gemfile, @lockfile_path, unlock)
         definition.resolve_remotely!
+        definition.specs
 
         each_lockfile_for_writing(lock) { |x| definition.lock(x) }
       end

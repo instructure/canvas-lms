@@ -131,6 +131,30 @@ describe "BundlerLockfileExtensions" do
     end
   end
 
+  it "fails if an additional lockfile contains an invalid gem" do
+    contents = <<-RUBY
+      unless BundlerLockfileExtensions.enabled?
+        BundlerLockfileExtensions.enable({
+          "\#{__FILE__}.old.lock": {
+            default: true,
+          },
+          "\#{__FILE__}.new.lock": {
+            default: false,
+          },
+        })
+      end
+
+      gem "concurrent-ruby", ">= 1.2.0"
+    RUBY
+
+    with_gemfile(contents) do |file|
+      invoke_bundler("install", file.path)
+      replace_gemfile_lock_pin("#{file.path}.new.lock", "concurrent-ruby", "9.9.9")
+
+      expect { invoke_bundler("install", file.path) }.to raise_error(/concurrent-ruby\s+\(9\.9\.9\)\s+has\s+removed\s+it/m)
+    end
+  end
+
   private
 
   def create_local_gem(dir, name, content)
@@ -176,5 +200,11 @@ describe "BundlerLockfileExtensions" do
       raise "bundle #{subcommand} failed: #{output}" unless status.success?
     end
     output
+  end
+
+  def replace_gemfile_lock_pin(path, name, version)
+    new_contents = File.read(path).gsub(%r{#{name} \([0-9.]+\)}, "#{name} (#{version})")
+
+    File.write(path, new_contents)
   end
 end
