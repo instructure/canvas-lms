@@ -12,7 +12,6 @@ define [
     template: template
 
     renderIfNeeded: () ->
-#      if data.relock_warning
       if ENV.relock_warning == true
         @render().show()
 
