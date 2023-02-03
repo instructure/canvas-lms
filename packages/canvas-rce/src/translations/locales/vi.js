@@ -23,6 +23,7 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n  other {}\n}"
   },
+  "description_436c48d7": { "message": "Mô tả" },
   "icon_215a1dc6": { "message": "Biểu tượng" }
 }
 

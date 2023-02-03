@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# 5.6.13 - 2023-01-30
+## 5.6.14 - 2023-02-03
+
+### Changed
+
+- Transpile the `??` null-coallescing operator for consumers that don't support it
+- Fix focus management when closing keyboard shortcut modal
+- Add additional translated strings
+
+## 5.6.13 - 2023-01-30
 
 ### Changed
 
@@ -14,13 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Altered keyboard shortcuts
 - Updated keyboard shortcut modal appearance
 
-# 5.6.12 - 2023-01-26
+## 5.6.12 - 2023-01-26
 
 ### Changed
 
 - Update the CHANGELOG for changes that were published with v5.6.11
 
-# 5.6.11 - 2023-01-25
+## 5.6.11 - 2023-01-25
 
 ### Changed
 
@@ -29,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhance copy/paste and drag-and-drop into the RCE
 - Transform initial content to ensure Canvas URLs are relative and remove unnecessary data attributes
 
-# 5.6.10 - 2022-12-09
+## 5.6.10 - 2022-12-09
 
 ### Changed
 
@@ -41,13 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Properties to disable specific plugins (e.g. word count)
 
-# 5.6.9 - 2022-11-19
+## 5.6.9 - 2022-11-19
 
 ### Changed
 
 - Fixed a bug causing errors when used outside of Canvas
 
-# 5.6.8 - 2022-11-16
+## 5.6.8 - 2022-11-16
 
 ### Added
 
@@ -59,14 +67,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Word count modal can be opened from the status bar
 - Fixed a bug related to uploading files in external apps
 
-# 5.6.3 - 2022-11-11
+## 5.6.3 - 2022-11-11
 
 ### Changed
 
 - Fixes to handling of relative URLs in enhance user content
 - Fixes to document preview in iframe-embedded scenarios
 
-# 5.6.2 - 2022-11-03
+## 5.6.2 - 2022-11-03
 
 ### Added
 
@@ -79,7 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unsplash now respects plugin settings
 - Misc bug fixes and enhancements
 
-# 5.6.1 - 2022-09-14
+## 5.6.1 - 2022-09-14
 
 ### Added
 

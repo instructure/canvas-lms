@@ -49,6 +49,7 @@ const locale = {
   "course_files_a31f97fc": { "message": "과목 파일" },
   "course_navigation_dd035109": { "message": "과목 탐색" },
   "delimiters_4db4840d": { "message": "구분자" },
+  "description_436c48d7": { "message": "설명" },
   "details_98a31b68": { "message": "세부 정보" },
   "dimensions_45ddb7b7": { "message": "치수" },
   "discussions_a5f96392": { "message": "토론" },

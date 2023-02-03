@@ -65,6 +65,7 @@ const locale = {
   "cyan_c1d5f68a": { "message": "ירקרק-כחול" },
   "deep_purple_bb3e2907": { "message": "סגול כהה" },
   "delimiters_4db4840d": { "message": "מפסקים" },
+  "description_436c48d7": { "message": "תיאור" },
   "details_98a31b68": { "message": "פרטים" },
   "dimensions_45ddb7b7": { "message": "ממדים" },
   "discussions_a5f96392": { "message": "דיונים " },

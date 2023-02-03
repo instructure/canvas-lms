@@ -101,6 +101,7 @@ const locale = {
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
   "deep_purple_bb3e2907": { "message": "Koyu Mor" },
   "delimiters_4db4840d": { "message": "Ayıraçlar" },
+  "description_436c48d7": { "message": "Açıklama" },
   "details_98a31b68": { "message": "Ayrıntılar" },
   "dimensions_45ddb7b7": { "message": "Tanımlamalar" },
   "discussions_a5f96392": { "message": "Tartışmalar" },
