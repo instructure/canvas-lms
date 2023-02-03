@@ -155,6 +155,68 @@ describe "BundlerLockfileExtensions" do
     end
   end
 
+  # This section tests that the following constraint is adhered to:
+  # 1. All dependencies under a private source must be pinned in the private plugin gemspec
+  context "filtered dependency pins" do
+    let(:gemfile_contents) do
+      <<-RUBY
+        unless BundlerLockfileExtensions.enabled?
+          BundlerLockfileExtensions.enable({
+            "\#{__FILE__}.v1.lock": {
+              default: true,
+              install_filter: lambda { |_, x| !x.to_s.include?("packagecloud") && !x.to_s.include?("test_local") },
+              prepare_environment: -> { ::VERSION = "1" },
+            },
+            "\#{__FILE__}.v2.lock": {
+              default: false,
+              install_filter: lambda { |_, x| !x.to_s.include?("packagecloud") && !x.to_s.include?("test_local") },
+              prepare_environment: -> { ::VERSION = "2" },
+            },
+          })
+        end
+
+        gem "test_local", path: "test_local"
+        gem "concurrent-ruby", "1.2.0"
+
+        eval(File.read("\#{__dir__}/test_local/Gemfile"))
+      RUBY
+    end
+
+    let(:private_gemfile_contents) do
+      <<-RUBY
+        if ::VERSION == ENV["USE_VERSION"]
+          source "https://packagecloud.io/instructure/rubygems-public/" do
+            gem "hola", ">= 0.1.3"
+          end
+        end
+      RUBY
+    end
+
+    it "fails if a filtered dependency isn't included in the gemspec" do
+      with_gemfile(gemfile_contents) do |file, dir|
+        create_local_gem(dir, "test_local", "")
+
+        File.write("#{dir}/test_local/Gemfile", private_gemfile_contents)
+
+        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "1" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "2" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+      end
+    end
+
+    it "fails if a filtered dependency isn't pinned to an exact version in the gemspec" do
+      with_gemfile(gemfile_contents) do |file, dir|
+        create_local_gem(dir, "test_local", <<-RUBY)
+          spec.add_dependency "dummy", ">= 0.9.6"
+        RUBY
+
+        File.write("#{dir}/test_local/Gemfile", private_gemfile_contents)
+
+        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "1" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+        expect { invoke_bundler("install", file.path, env: { "USE_VERSION" => "2" }) }.to raise_error(/unable to prove that private gem hola was pinned/)
+      end
+    end
+  end
+
   private
 
   def create_local_gem(dir, name, content)
