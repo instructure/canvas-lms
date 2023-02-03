@@ -923,7 +923,7 @@ GEM
       io-console (~> 0.5)
     request_store (1.5.1)
       rack (>= 1.4)
-    rest-client (2.1.1)
+    rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
