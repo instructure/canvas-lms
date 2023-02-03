@@ -2528,6 +2528,7 @@ export const courseAlignmentMocks = ({
     title = 'Alignment 1',
     contentType = 'Assignment',
     assignmentContentType = 'assignment',
+    assignmentWorkflowState = 'published',
     moduleName = 'Module 1',
     moduleWorkflowState = 'active',
   } = {}) => ({
@@ -2535,6 +2536,7 @@ export const courseAlignmentMocks = ({
     title,
     contentType,
     assignmentContentType,
+    assignmentWorkflowState,
     url: `/courses/${courseId}/outcomes/${outcomeId}/alignments/${id}`,
     moduleName,
     moduleUrl: `/courses/${courseId}/modules/1`,
