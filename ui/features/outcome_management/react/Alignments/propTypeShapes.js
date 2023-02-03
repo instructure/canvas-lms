@@ -27,6 +27,7 @@ export const alignmentShape = PropTypes.shape({
   moduleUrl: PropTypes.string,
   moduleWorkflowState: PropTypes.string,
   assignmentContentType: PropTypes.oneOf(['assignment', 'discussion', 'quiz']),
+  assignmentWorkflowState: PropTypes.string,
 })
 
 export const outcomeWithAlignmentShape = PropTypes.shape({

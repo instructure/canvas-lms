@@ -127,6 +127,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     moduleUrl,
                     moduleWorkflowState,
                     assignmentContentType,
+                    assignmentWorkflowState,
                   }) => (
                     <AlignmentItem
                       id={_id}
@@ -138,6 +139,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                       moduleUrl={moduleUrl}
                       moduleWorkflowState={moduleWorkflowState}
                       assignmentContentType={assignmentContentType}
+                      assignmentWorkflowState={assignmentWorkflowState}
                     />
                   )
                 )}

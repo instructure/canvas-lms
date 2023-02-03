@@ -42,6 +42,7 @@ const AlignmentItem = ({
   moduleUrl,
   moduleWorkflowState,
   assignmentContentType,
+  assignmentWorkflowState,
 }) => {
   const renderIcon = () => {
     let icon
@@ -91,7 +92,9 @@ const AlignmentItem = ({
             <a href={url} target="_blank" rel="noreferrer">
               <TruncateText>
                 <Text size="medium" data-testid="alignment-item-title">
-                  {title}
+                  {assignmentWorkflowState === 'unpublished'
+                    ? I18n.t('%{title} (unpublished)', {title})
+                    : title}
                 </Text>
               </TruncateText>
             </a>
