@@ -26,14 +26,17 @@ const I18n = useI18nScope('react_collaborations')
 class NewCollaborationsDropDown extends React.Component {
   render() {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)
-    const hasOne = this.props.ltiCollaborators.length === 1
+    const hasOne = this.props?.ltiCollaborators.length === 1
     return (
-      <div className="al-dropdown__container create-collaborations-dropdown">
+      <div
+        className="al-dropdown__container create-collaborations-dropdown"
+        data-testid="new-collaborations-dropdown"
+      >
         {hasOne ? (
           <a
             className="Button Button--primary"
             aria-label={I18n.t('Add Collaboration')}
-            href={`/${context}/${contextId}/lti_collaborations/external_tools/${this.props.ltiCollaborators[0].id}?launch_type=collaboration&display=borderless`}
+            href={`/${context}/${contextId}/lti_collaborations/external_tools/${this.props?.ltiCollaborators[0].id}?launch_type=collaboration&display=borderless`}
           >
             {I18n.t('+ Collaboration')}
           </a>
@@ -61,7 +64,7 @@ class NewCollaborationsDropDown extends React.Component {
                 return (
                   <li key={ltiCollaborator.id}>
                     <a href={itemUrl} rel="external" role="menuitem">
-                      {ltiCollaborator.name}
+                      {ltiCollaborator?.collaboration?.text}
                     </a>
                   </li>
                 )
