@@ -257,6 +257,7 @@
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Nem sikerült beolvasni a fájl tartalmát"
   },
+  "file_name_8fd421ff": { "message": "Fájlnév" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Túllépte a fájltárolási kvótát"
   },

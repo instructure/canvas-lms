@@ -265,6 +265,7 @@
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Ha habido un error al obtener el contenido"
   },
+  "file_name_8fd421ff": { "message": "Nombre del archivo" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "La capacidad de almacenamiento del archivo se ha superado"
   },

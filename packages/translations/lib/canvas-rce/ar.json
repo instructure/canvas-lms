@@ -245,6 +245,7 @@
   "failed_getting_file_contents_e9ea19f4": {
     "message": "تعذر الحصول على محتويات الملف"
   },
+  "file_name_8fd421ff": { "message": "اسم الملف" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "تم تجاوز حصة تخزين الملفات"
   },

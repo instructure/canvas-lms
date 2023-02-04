@@ -257,6 +257,7 @@
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Kan geen bestandsinhoud ophalen"
   },
+  "file_name_8fd421ff": { "message": "Bestandsnaam" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Opslagquota voor bestanden overschreden"
   },
