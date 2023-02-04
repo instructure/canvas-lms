@@ -196,7 +196,15 @@ module Lti::Messages
     # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' propertys
     def add_assignment_and_grade_service_claims!
       @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
-      @message.assignment_and_grade_service.lineitems = @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
+
+      @message.assignment_and_grade_service.lineitems =
+        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
+          @expander.controller.lti_line_item_index_url(
+            host: @context.root_account.domain, course_id: course_id_for_ags_url
+          )
+        else
+          @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
+        end
     end
 
     # Used to construct URLs for AGS endpoints like line item index, or line item show
@@ -213,7 +221,14 @@ module Lti::Messages
 
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
-        @expander.controller.polymorphic_url([@context, :names_and_roles])
+        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
+          @expander.controller.polymorphic_url(
+            [@context, :names_and_roles],
+            host: @context.root_account.domain
+          )
+        else
+          @expander.controller.polymorphic_url([@context, :names_and_roles])
+        end
       @message.names_and_roles_service.service_versions = ["2.0"]
     end
 

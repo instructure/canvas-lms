@@ -198,6 +198,22 @@ test('render hides date picker and points_possible for pages', function () {
   equal(view.$('input[name=points_possible]').length, 0)
 })
 
+test('includes the year in the input for current-year dates', function () {
+  const now = new Date()
+  const assignment = new Assignment(
+    buildAssignment({
+      id: 4,
+      name: 'Science Project',
+      due_at: now.toISOString(),
+      points_possible: 10,
+      position: 2,
+    })
+  )
+  const view = createView(assignment)
+  const input = view.$el.find('.datetime_field')
+  ok(input.val().includes(now.getFullYear()))
+})
+
 test('onSaveSuccess adds model to assignment group for creation', function () {
   sandbox.stub(DialogFormView.prototype, 'close')
   equal(this.group.get('assignments').length, 2)

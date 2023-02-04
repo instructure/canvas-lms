@@ -209,20 +209,6 @@ describe('ComposeModalContainer', () => {
     })
   })
 
-  describe('Send individual messages', () => {
-    it('allows toggling the setting', async () => {
-      const {findByTestId} = setup()
-      const checkbox = await findByTestId('individual-message-checkbox')
-      expect(checkbox.checked).toBe(false)
-
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(true)
-
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(false)
-    })
-  })
-
   describe('Course Select', () => {
     it('queries graphql for courses', async () => {
       const component = setup()

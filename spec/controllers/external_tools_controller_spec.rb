@@ -2166,6 +2166,16 @@ describe ExternalToolsController do
 
   describe "'GET 'generate_sessionless_launch'" do
     let(:login_pseudonym) { pseudonym(@user) }
+    let(:tool) { new_valid_tool(@course) }
+    let(:url) { URI.parse(JSON.parse(response.body)["url"]) }
+    let(:query_params) { CGI.parse(url.query) }
+    let(:verifier) { query_params["verifier"].first }
+    let(:session_token) { SessionToken.parse(query_params["session_token"].first) }
+    let(:launch_settings) do
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
+      JSON.parse(Canvas.redis.get(redis_key))
+    end
+    let(:tool_settings) { launch_settings["tool_settings"] }
 
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
@@ -2174,17 +2184,9 @@ describe ExternalToolsController do
     end
 
     it "generates a sessionless launch" do
-      @tool = new_valid_tool(@course)
-
-      get :generate_sessionless_launch, params: { course_id: @course.id, id: @tool.id }
+      get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id }
 
       expect(response).to be_successful
-
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
-      tool_settings = launch_settings["tool_settings"]
 
       expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
       expect(launch_settings["tool_name"]).to eq "bob"
@@ -2193,24 +2195,34 @@ describe ExternalToolsController do
       expect(tool_settings["custom_canvas_user_id"]).to eq @user.id.to_s
     end
 
-    it "strips query param from launch_url before signing, attaches to post body, and removes query params in url for launch" do
-      @tool = new_valid_tool(@course, { url: "http://www.example.com/basic_lti?tripping", post_only: true })
+    context "when using an API token" do
+      let(:access_token) { login_pseudonym.user.access_tokens.create(purpose: "test") }
 
-      get :generate_sessionless_launch, params: { course_id: @course.id, id: @tool.id }
+      before { controller.instance_variable_set :@access_token, access_token }
 
-      expect(response).to be_successful
+      it "adds a session_token to log the user in" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id }
 
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+        expect(response).to be_successful
 
-      expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
-      expect(launch_settings["tool_settings"]).to have_key "tripping"
+        expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
+      end
+    end
+
+    context "when the launch url has query params" do
+      let(:tool) { new_valid_tool(@course, { url: "http://www.example.com/basic_lti?tripping", post_only: true }) }
+
+      it "strips query param from launch_url before signing, attaches to post body, and removes query params in url for launch" do
+        get :generate_sessionless_launch, params: { course_id: @course.id, id: tool.id }
+
+        expect(response).to be_successful
+
+        expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
+        expect(launch_settings["tool_settings"]).to have_key "tripping"
+      end
     end
 
     it "generates a sessionless launch for an external tool assignment" do
-      tool = new_valid_tool(@course)
       assignment_model(course: @course,
                        name: "tool assignment",
                        submission_types: "external_tool",
@@ -2223,12 +2235,6 @@ describe ExternalToolsController do
       get :generate_sessionless_launch, params: { course_id: @course.id, launch_type: "assessment", assignment_id: @assignment.id }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
-      tool_settings = launch_settings["tool_settings"]
-
       expect(launch_settings["launch_url"]).to eq "http://www.example.com/basic_lti"
       expect(launch_settings["tool_name"]).to eq "bob"
       expect(launch_settings["analytics_id"]).to eq "some_tool"
@@ -2239,7 +2245,6 @@ describe ExternalToolsController do
     end
 
     it "passes whitelisted `platform` query param to lti launch body" do
-      tool = new_valid_tool(@course)
       assignment_model(course: @course,
                        name: "tool assignment",
                        submission_types: "external_tool",
@@ -2257,22 +2262,15 @@ describe ExternalToolsController do
       }
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
-      tool_settings = launch_settings["tool_settings"]
-
       expect(tool_settings["ext_platform"]).to eq "mobile"
     end
 
     it "requires context_module_id for module_item launch type" do
-      @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
                               context_module: @cm,
                               content_type: "ContextExternalTool",
-                              content: @tool)
+                              content: tool)
 
       get :generate_sessionless_launch,
           params: { course_id: @course.id,
@@ -2284,13 +2282,12 @@ describe ExternalToolsController do
     end
 
     it "Sets the correct resource_link_id for module items when module_item_id is provided" do
-      @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
                               context_module: @cm,
                               content_type: "ContextExternalTool",
                               content: @tool,
-                              url: @tool.url,
+                              url: tool.url,
                               title: "my module item title")
       @cm.content_tags << @tg
       @cm.save!
@@ -2304,25 +2301,19 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
 
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
-
       expect(launch_settings["tool_settings"]["resource_link_id"]).to eq opaque_id(@tg)
       expect(launch_settings["tool_settings"]["resource_link_title"]).to eq "my module item title"
     end
 
     it "makes the module item available for variable expansions" do
-      @tool = new_valid_tool(@course)
-      @tool.settings[:custom_fields] = { "standard" => "$Canvas.moduleItem.id" }
-      @tool.save!
+      tool.settings[:custom_fields] = { "standard" => "$Canvas.moduleItem.id" }
+      tool.save!
       @cm = ContextModule.create(context: @course)
       @tg = ContentTag.create(context: @course,
                               context_module: @cm,
                               content_type: "ContextExternalTool",
-                              content: @tool,
-                              url: @tool.url)
+                              content: tool,
+                              url: tool.url)
       @cm.content_tags << @tg
       @cm.save!
       @course.save!
@@ -2333,10 +2324,6 @@ describe ExternalToolsController do
                     module_item_id: @tg.id,
                     content_type: "ContextExternalTool" }
 
-      json = JSON.parse(response.body)
-      verifier = CGI.parse(URI.parse(json["url"]).query)["verifier"].first
-      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
-      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       expect(launch_settings.dig("tool_settings", "custom_standard")).to eq @tg.id.to_s
     end
 
@@ -2351,9 +2338,8 @@ describe ExternalToolsController do
     end
 
     it "redirects if there is no launch url associated with the tool" do
-      no_url_tool = new_valid_tool(@course)
-      no_url_tool.update!(url: nil)
-      params = { course_id: @course.id, id: no_url_tool.id }
+      tool.update!(url: nil)
+      params = { course_id: @course.id, id: tool.id }
       expect(get(:generate_sessionless_launch, params: params)).to redirect_to course_url(@course)
     end
 
@@ -2383,37 +2369,26 @@ describe ExternalToolsController do
         get :generate_sessionless_launch, params: params
         expect(response).to be_successful
 
-        json = JSON.parse(response.body)
-        url = URI.parse(json["url"])
-        token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
-
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
         expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
-        expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+        expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
       it "returns the lti 1.3 launch url with a session token when given a url and tool id" do
         get :generate_sessionless_launch, params: params.merge(url: "http://lti13testtool.docker/deep_link")
         expect(response).to be_successful
 
-        json = JSON.parse(response.body)
-        url = URI.parse(json["url"])
-        query_params = URI.decode_www_form(url.query).to_h
-        token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
-
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
         expect(query_params).to have_key("display")
         expect(query_params).to have_key("launch_url")
         expect(query_params).to have_key("session_token")
-        expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+        expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
       it "returns the specified launch url for a deep link" do
         get :generate_sessionless_launch, params: params.merge(id: tool.id, url: "http://lti13testtool.docker/deep_link")
         expect(response).to be_successful
-        json = JSON.parse(response.body)
-        url = URI.parse(json["url"])
-        expect(CGI.parse(url.query)["launch_url"]).to eq ["http://lti13testtool.docker/deep_link"]
+        expect(query_params["launch_url"]).to eq ["http://lti13testtool.docker/deep_link"]
       end
 
       context "when not passing tool_id" do
@@ -2423,32 +2398,22 @@ describe ExternalToolsController do
           get :generate_sessionless_launch, params: params.merge(resource_link_lookup_uuid: rl.lookup_uuid)
           expect(response).to be_successful
 
-          json = JSON.parse(response.body)
-          url = URI.parse(json["url"])
-          query_params = URI.decode_www_form(url.query).to_h
-          token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
-
           expect(url.path).to eq("#{course_external_tools_path(@course)}/retrieve")
           expect(query_params).to have_key("display")
           expect(query_params).to have_key("resource_link_lookup_uuid")
           expect(query_params).to have_key("session_token")
-          expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+          expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
         end
 
         it "returns the lti 1.3 launch url with a session token when given a url and a lookup_id" do
           get :generate_sessionless_launch, params: params.merge(url: "http://lti13testtool.docker/deep_link", resource_link_lookup_uuid: rl.lookup_uuid)
           expect(response).to be_successful
 
-          json = JSON.parse(response.body)
-          url = URI.parse(json["url"])
-          query_params = URI.decode_www_form(url.query).to_h
-          token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
-
           expect(url.path).to eq("#{course_external_tools_path(@course)}/retrieve")
           expect(query_params).to have_key("display")
           expect(query_params).to have_key("resource_link_lookup_uuid")
           expect(query_params).to have_key("session_token")
-          expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+          expect(session_token.pseudonym_id).to eq(login_pseudonym.global_id)
         end
       end
 

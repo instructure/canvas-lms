@@ -3726,6 +3726,7 @@ class Course < ActiveRecord::Base
       end
     end
     DueDateCacher.recompute_users_for_course(fake_student.id, self)
+    fake_student.update_root_account_ids
     fake_student
   end
   private :sync_enrollments
@@ -3886,6 +3887,10 @@ class Course < ActiveRecord::Base
 
   def refresh_content_participation_counts(_progress)
     content_participation_counts.each(&:refresh_unread_count)
+  end
+
+  def refresh_content_participation_counts_for_users(user_ids)
+    content_participation_counts.where(user: user_ids).find_each(&:refresh_unread_count)
   end
 
   attr_accessor :preloaded_nickname, :preloaded_favorite
@@ -4153,6 +4158,34 @@ class Course < ActiveRecord::Base
 
   def can_stop_being_template?
     !templated_accounts.exists?
+  end
+
+  def batch_update_context_modules(progress = nil, event:, module_ids:, skip_content_tags: false)
+    completed_ids = []
+    modules = context_modules.not_deleted.where(id: module_ids)
+    progress&.calculate_completion!(0, modules.size)
+    modules.each do |context_module|
+      # Break out of the loop if the progress has been canceled
+      break if progress&.reload&.failed?
+
+      case event.to_s
+      when "publish"
+        context_module.publish unless context_module.active?
+        unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
+          context_module.publish_items!(progress: progress)
+        end
+      when "unpublish"
+        context_module.unpublish unless context_module.unpublished?
+        if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
+          context_module.unpublish_items!(progress: progress)
+        end
+      when "delete"
+        context_module.destroy
+      end
+      progress&.increment_completion!(1) if progress&.total
+      completed_ids << context_module.id
+    end
+    completed_ids
   end
 
   private

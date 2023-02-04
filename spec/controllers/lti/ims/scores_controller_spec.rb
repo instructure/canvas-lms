@@ -89,6 +89,28 @@ module Lti::IMS
           expect(json["resultUrl"]).to include "results"
         end
 
+        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+          it "uses the Account#domain in the resultUrl" do
+            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            send_request
+            expect(json["resultUrl"]).to start_with(
+              "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
+            )
+          end
+        end
+
+        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+          it "uses the host domain in the resultUrl" do
+            course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+            allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+            send_request
+            expect(json["resultUrl"]).to start_with(
+              "http://test.host/api/lti/courses/#{course.id}/line_items/"
+            )
+          end
+        end
+
         context "with no existing result" do
           it "creates a new result" do
             expect { send_request }.to change(Lti::Result, :count).by(1)
@@ -532,11 +554,28 @@ module Lti::IMS
                 expect(result.submission.attachments).to include attachment
               end
 
-              it "returns a progress url" do
-                send_request
-                progress_url =
-                  json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
-                expect(progress_url).to include expected_progress_url
+              let(:actual_progress_url) do
+                json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
+              end
+
+              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
+                it "returns a progress URL with the Account#domain" do
+                  course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  send_request
+                  expect(actual_progress_url).to \
+                    start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
+                end
+              end
+
+              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
+                it "returns a progress URL with the Account#domain" do
+                  course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
+                  allow_any_instance_of(Account).to receive(:domain).and_return("canonical.host")
+                  send_request
+                  expect(actual_progress_url).to \
+                    start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
+                end
               end
 
               it "calculates content_type from extension" do

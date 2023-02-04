@@ -19,10 +19,11 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
-import {darken, statusColors, defaultColors} from '../../constants/colors'
+import {darken, defaultColors} from '../../constants/colors'
 import {render, within} from '@testing-library/react'
 import Gradebook from '../../Gradebook'
 import store from '../../stores/index'
+import {AssignmentGroup, Student} from '../../../../../../api.d'
 import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
@@ -63,7 +64,7 @@ describe('GridColor', () => {
 
   it('renders the correct styles', () => {
     const node = document.createElement('div')
-    render(<Gradebook {...defaultGradebookProps} gridColorNode={node} colors={statusColors()} />)
+    render(<Gradebook {...defaultGradebookProps} gridColorNode={node} />)
     const styleText = [
       `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }`,
       `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }`,
@@ -101,5 +102,196 @@ describe('ExportProgressBar', () => {
   it('renders', () => {
     const {getByTestId} = render(<Gradebook {...defaultGradebookProps} />)
     expect(getByTestId('export-progress-bar')).toBeInTheDocument()
+  })
+})
+
+const assignmentGroups: AssignmentGroup[] = [
+  {
+    id: '4',
+    name: 'Assignments',
+    position: 1,
+    group_weight: 0,
+    sis_source_id: null,
+    integration_data: {},
+    rules: {},
+    assignments: [
+      {
+        id: '135',
+        due_at: null,
+        unlock_at: null,
+        lock_at: null,
+        points_possible: 10,
+        grading_type: 'points',
+        assignment_group_id: '4',
+        grading_standard_id: null,
+        created_at: '2022-10-17T18:07:04Z',
+        updated_at: '2022-11-17T22:01:25Z',
+        peer_reviews: true,
+        automatic_peer_reviews: false,
+        position: 15,
+        grade_group_students_individually: false,
+        anonymous_peer_reviews: false,
+        group_category_id: null,
+        post_to_sis: false,
+        moderated_grading: false,
+        omit_from_final_grade: false,
+        intra_group_peer_reviews: false,
+        anonymous_instructor_annotations: false,
+        anonymous_grading: false,
+        graders_anonymous_to_graders: false,
+        grader_count: 0,
+        grader_comments_visible_to_graders: true,
+        final_grader_id: null,
+        grader_names_visible_to_final_grader: true,
+        allowed_attempts: -1,
+        annotatable_attachment_id: null,
+        secure_params:
+          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsdGlfYXNzaWdubWVudF9pZCI6ImIwY2ZhZDBkLThjNTktNDRhMS1iNTNjLTY1ZjI0N2Y5MGViYiIsImx0aV9hc3NpZ25tZW50X2Rlc2NyaXB0aW9uIjoiIn0.9SnL8X-tPwMIRGDkT3bpNxp-93145z7NMicOdoToDTQ',
+        lti_context_id: 'b0cfad0d-8c59-44a1-b53c-65f247f90ebb',
+        course_id: '4',
+        name: 'Media Assignment',
+        submission_types: ['media_recording'],
+        has_submitted_submissions: false,
+        due_date_required: false,
+        max_name_length: 255,
+        grades_published: true,
+        graded_submissions_exist: true,
+        is_quiz_assignment: false,
+        can_duplicate: true,
+        original_course_id: null,
+        original_assignment_id: null,
+        original_lti_resource_link_id: null,
+        original_assignment_name: null,
+        original_quiz_id: null,
+        workflow_state: 'published',
+        important_dates: false,
+        muted: true,
+        html_url: 'http://canvas.docker/courses/4/assignments/135',
+        has_overrides: false,
+        sis_assignment_id: null,
+        integration_id: null,
+        integration_data: {},
+        allowed_extensions: ['pdf'],
+        module_ids: [],
+        module_positions: [],
+        published: true,
+        unpublishable: true,
+        only_visible_to_overrides: false,
+        assignment_visibility: [],
+        locked_for_user: false,
+        submissions_download_url:
+          'http://canvas.docker/courses/4/assignments/135/submissions?zip=1',
+        post_manually: false,
+        anonymize_students: false,
+        require_lockdown_browser: false,
+      },
+    ],
+  },
+]
+
+describe('assignments-filter', () => {
+  it('renders Assignment Names label', () => {
+    const {getByText, rerender} = render(<Gradebook {...defaultGradebookProps} />)
+
+    rerender(
+      <Gradebook
+        {...defaultGradebookProps}
+        recentlyLoadedAssignmentGroups={{
+          assignmentGroups: [],
+        }}
+      />
+    )
+
+    expect(getByText(/Assignment Names/)).toBeInTheDocument()
+  })
+
+  it('disables the input if the grid has not yet rendered', function () {
+    const {getByTestId, rerender} = render(<Gradebook {...defaultGradebookProps} />)
+
+    rerender(
+      <Gradebook
+        {...defaultGradebookProps}
+        recentlyLoadedAssignmentGroups={{
+          assignmentGroups,
+        }}
+      />
+    )
+    expect(getByTestId('assignments-filter-select')).toBeDisabled()
+  })
+})
+
+describe('student-names-filter', () => {
+  it('renders Student Names label', () => {
+    const {getByText, rerender} = render(<Gradebook {...defaultGradebookProps} />)
+
+    rerender(<Gradebook {...defaultGradebookProps} recentlyLoadedStudents={[]} />)
+
+    expect(getByText(/Student Names/)).toBeInTheDocument()
+  })
+
+  const students: Student[] = [
+    {
+      id: '28',
+      name: 'Ganondorf',
+      created_at: '2022-07-05T14:11:48-06:00',
+      sortable_name: 'Ganondorf',
+      short_name: 'Ganondorf',
+      sis_user_id: null,
+      integration_id: null,
+      sis_import_id: null,
+      login_id: '9088409122',
+      last_name: '',
+      first_name: 'Ganondorf',
+      enrollments: [
+        {
+          id: '27',
+          user_id: '28',
+          course_id: '4',
+          type: 'StudentEnrollment',
+          created_at: '2022-07-05T20:11:49Z',
+          updated_at: '2022-07-05T20:11:51Z',
+          associated_user_id: null,
+          start_at: null,
+          end_at: null,
+          course_section_id: '10',
+          root_account_id: '2',
+          limit_privileges_to_course_section: false,
+          enrollment_state: 'active',
+          role_id: '19',
+          last_activity_at: '2022-11-30T23:51:09Z',
+          last_attended_at: null,
+          total_activity_time: 43233,
+          sis_import_id: null,
+          grades: {
+            html_url: 'http://canvas.docker/courses/4/grades/28',
+            current_grade: null,
+            current_score: 53.33,
+            final_grade: null,
+            final_score: 53.33,
+            unposted_current_score: 53.33,
+            unposted_current_grade: null,
+            unposted_final_score: 53.33,
+            unposted_final_grade: null,
+          },
+          sis_account_id: null,
+          sis_course_id: null,
+          course_integration_id: null,
+          sis_section_id: null,
+          section_integration_id: null,
+          sis_user_id: null,
+          html_url: 'http://canvas.docker/courses/4/users/28',
+        },
+      ],
+      email: null,
+      group_ids: ['2', '3', '5'],
+    },
+  ]
+
+  it('disables the input if the grid has not yet rendered', function () {
+    const {getByTestId, rerender} = render(<Gradebook {...defaultGradebookProps} />)
+
+    rerender(<Gradebook {...defaultGradebookProps} recentlyLoadedStudents={students} />)
+
+    expect(getByTestId('students-filter-select')).toBeDisabled()
   })
 })

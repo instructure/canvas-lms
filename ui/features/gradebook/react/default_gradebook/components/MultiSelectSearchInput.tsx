@@ -33,6 +33,7 @@ function MultiSelectSearchInput(props) {
   return (
     <View as="div" textAlign="start" margin="0 0 small 0">
       <CanvasMultiSelect
+        data-testid={props['data-test-id']}
         id={props.id}
         label={props.label}
         selectedOptionIds={selectedOptionIds}
@@ -55,6 +56,7 @@ function MultiSelectSearchInput(props) {
 MultiSelectSearchInput.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  'data-test-id': PropTypes.string,
   customMatcher: PropTypes.func,
   disabled: PropTypes.bool.isRequired,
   options: PropTypes.arrayOf(

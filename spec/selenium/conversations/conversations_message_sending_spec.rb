@@ -629,28 +629,89 @@ describe "conversations new" do
         expect(@s1.conversations.last.conversation.context).to eq @admin.account
       end
 
-      it "allows messages to be sent individually for account-level groups", priority: "2" do
-        @group.destroy
-        account_level_group = Account.default.groups.create(name: "the account level group")
-        account_level_group.add_user(@s1)
-        account_level_group.add_user(@s2)
-        account_level_group.save
-        user_logged_in({ user: @s1 })
-        get "/conversations"
-        f("button[data-testid='compose']").click
-        f("input[placeholder='Select Course']").click
-        wait_for_ajaximations
-        fj("li:contains('#{account_level_group.name}')").click
-        force_click("input[data-testid='individual-message-checkbox']")
-        ff("input[aria-label='Address Book']")[1].click
-        fj("li:contains('second student')").click
-        f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
-        fj("button:contains('Send')").click
-        wait_for_ajaximations
-        expect(@s2.conversations.last.conversation.conversation_messages.last.body).to eq "sent to everyone in the account level group"
+      context "individual message sending" do
+        it "allows messages to be sent individually for account-level groups", priority: "2" do
+          @group.destroy
+          account_level_group = Account.default.groups.create(name: "the account level group")
+          account_level_group.add_user(@s1)
+          account_level_group.add_user(@s2)
+          account_level_group.save
+          user_logged_in({ user: @s1 })
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          f("input[placeholder='Select Course']").click
+          wait_for_ajaximations
+          fj("li:contains('#{account_level_group.name}')").click
+          force_click("input[data-testid='individual-message-checkbox']")
+          ff("input[aria-label='Address Book']")[1].click
+          fj("li:contains('second student')").click
+          f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+          expect(@s2.conversations.last.conversation.conversation_messages.last.body).to eq "sent to everyone in the account level group"
+        end
+
+        it "automatically sets individual message sending when max group conversation count is surpassed" do
+          Setting.set("max_group_conversation_size", 2)
+
+          user_session(@teacher)
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          f("input[placeholder='Select Course']").click
+          fj("li:contains('#{@course.name}')").click
+          ff("input[aria-label='Address Book']")[1].click
+          expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
+          fj("div[data-testid='address-book-item']:contains('Students')").click
+          wait_for_ajaximations
+
+          fj("div[data-testid='address-book-item']:contains('All in Students')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in Students')")).to be_present
+          expect(f("input[data-testid='individual-message-checkbox']")).to be_disabled
+
+          f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          # since we are past max_group_conversation_sive, convos are created async
+          expect(Conversation.count).to eq 0
+          run_jobs
+
+          # once jobs complete, 3 new Convos are created
+          expect(Conversation.count).to eq 3
+        end
+
+        it "respects checkbox if it is checked, then unchecked" do
+          checkbox_selector = "input[data-testid='individual-message-checkbox']"
+
+          user_session(@teacher)
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          f("input[placeholder='Select Course']").click
+          fj("li:contains('#{@course.name}')").click
+          ff("input[aria-label='Address Book']")[1].click
+          expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
+          fj("div[data-testid='address-book-item']:contains('Students')").click
+          wait_for_ajaximations
+
+          fj("div[data-testid='address-book-item']:contains('All in Students')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in Students')")).to be_present
+
+          force_click(checkbox_selector)
+          expect(f(checkbox_selector).attribute("checked")).to eq "true"
+
+          force_click(checkbox_selector)
+          expect(f(checkbox_selector).attribute("checked")).to be_nil
+
+          f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          # if count is one, then it is grouped, which is what we want
+          expect(Conversation.count).to eq 1
+        end
       end
 
-      describe "include observers button" do
+      context "include observers button" do
         before do
           @observer = user_factory(active_all: true, active_state: "active", name: "an observer")
           observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")

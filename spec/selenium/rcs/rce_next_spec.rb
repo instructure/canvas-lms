@@ -1598,6 +1598,17 @@ describe "RCE next tests", ignore_js_errors: true do
         doc_btn.click
         menu_id = doc_btn.attribute("aria-owns")
         expect(f("##{menu_id}")).to be_displayed
+      end
+
+      it "traps focus in fullscreen" do
+        visit_front_page_edit(@course)
+        full_screen_button.click
+        active_elem = driver.execute_script("return document.activeElement") # content area
+        active_elem.send_keys(:tab)
+        driver.execute_script("return document.activeElement").send_keys(:tab) # status bar button
+        driver.execute_script("return document.activeElement").send_keys(:tab) # kb shortcut button
+        new_active_elem = driver.execute_script("return document.activeElement") # content area
+        expect(new_active_elem).to eq(active_elem)
         exit_full_screen_button.click
       end
     end

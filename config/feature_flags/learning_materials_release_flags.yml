@@ -8,6 +8,7 @@ buttons_and_icons_root_account:
   environments:
     production:
       state: hidden
+
 buttons_and_icons_cropper:
   state: hidden
   display_name: Cropper & Associated Features in Buttons & Icons
@@ -15,11 +16,13 @@ buttons_and_icons_cropper:
     When enabled, turns on the Button & Icons image cropper, course images
     source, and upload image source.
   applies_to: SiteAdmin
+
 rce_ux_improvements:
   state: hidden
   display_name: RCE UX Improvements
   description: Improve and streamline the RCE button and tray UX
   applies_to: SiteAdmin
+
 rce_better_paste:
   state: hidden
   display_name: Enhanced RCE paste from clipboard
@@ -32,3 +35,11 @@ rce_better_paste:
       state: allowed_on
     ci:
       state: allowed_on
+
+explicit_latex_typesetting:
+  state: hidden
+  display_name: Explicit LaTeX Typesetting
+  description: |-
+    Instead of typesetting LaTeX anywhere, only typeset LaTeX where
+    it is explicitly enabled.
+  applies_to: SiteAdmin

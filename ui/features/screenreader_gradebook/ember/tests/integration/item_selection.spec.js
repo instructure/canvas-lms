@@ -264,14 +264,18 @@ test('screenreader_gradebook assignment selection: grade for field updates', fun
   const assignment_name_selector = "label[for='student_and_assignment_grade']"
 
   const selectedAssigName = this.controller.get('selectedAssignment.name')
-  checkText(assignment_name_selector, `Grade for: ${selectedAssigName}`)
+  const selectedStudentName = this.controller.get('selectedStudent.name')
+  checkText(assignment_name_selector, `Grade for ${selectedStudentName} - ${selectedAssigName}`)
 
   Ember.run(() =>
     this.controller.set('selectedAssignment', this.controller.get('assignments').objectAt(2))
   )
 
   const newSelectedAssigName = this.controller.get('selectedAssignment.name')
-  return checkText(assignment_name_selector, `Grade for: ${newSelectedAssigName}`)
+  return checkText(
+    assignment_name_selector,
+    `Grade for ${selectedStudentName} - ${newSelectedAssigName}`
+  )
 })
 
 QUnit.module('screenreader_gradebook assignment navigation: assignment sorting', {

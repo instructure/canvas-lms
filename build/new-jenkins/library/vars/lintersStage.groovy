@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['code', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'code', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -76,6 +76,21 @@ def masterBouncerStage(stages) {
         command: 'master_bouncer check'
       )
     }
+  }
+}
+
+def bundleStage(stages, buildConfig) {
+  { ->
+    def bundleEnvVars = [
+      "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+    ]
+
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'bundle',
+      envVars: bundleEnvVars,
+      required: filesChangedStage.hasBundleFiles(buildConfig),
+      command: './build/new-jenkins/linters/run-gergich-bundle.sh',
+    )
   }
 }
 

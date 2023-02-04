@@ -210,5 +210,22 @@ describe ContentParticipationCount do
       @submission.save!
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
+
+    context "muted assignments" do
+      it "ignores counts from muted assignments" do
+        @assignment.grade_student(@student, grade: 3, grader: @teacher)
+        @assignment.muted = true
+        @assignment.save
+        expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
+      end
+
+      it "does not ignore muted assignments when visibility_feedback_student_grades_page enabled" do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+        @assignment.grade_student(@student, grade: 3, grader: @teacher)
+        @assignment.muted = true
+        @assignment.save
+        expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
+      end
+    end
   end
 end

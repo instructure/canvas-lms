@@ -83,10 +83,6 @@ class AssignmentGroupsApiController < ApplicationController
   # @argument integration_data [Object]
   #   The integration data of the Assignment Group
   #
-  # @argument rules
-  #   The grading rules that are applied within this assignment group
-  #   See the Assignment Group object definition for format
-  #
   # @returns AssignmentGroup
   def create
     @assignment_group = @context.assignment_groups.temp_record
@@ -103,7 +99,25 @@ class AssignmentGroupsApiController < ApplicationController
   # @API Edit an Assignment Group
   #
   # Modify an existing Assignment Group.
-  # Accepts the same parameters as Assignment Group creation
+  #
+  # @argument name [String]
+  #   The assignment group's name
+  #
+  # @argument position [Integer]
+  #   The position of this assignment group in relation to the other assignment groups
+  #
+  # @argument group_weight [Float]
+  #   The percent of the total grade that this assignment group represents
+  #
+  # @argument sis_source_id [String]
+  #   The sis source id of the Assignment Group
+  #
+  # @argument integration_data [Object]
+  #   The integration data of the Assignment Group
+  #
+  # @argument rules
+  #   The grading rules that are applied within this assignment group
+  #   See the Assignment Group object definition for format
   #
   # @returns AssignmentGroup
   def update

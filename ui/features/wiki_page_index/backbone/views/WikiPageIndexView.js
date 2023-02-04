@@ -107,7 +107,12 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     })
     this.collection.on('fetched:last', () => {
       this.fetchedLast = true
-      return this.render()
+      if (this.focusAfterRenderSelector) {
+        // We do a setTimeout here just to force it to the next tick.
+        return setTimeout(() => {
+          $(this.focusAfterRenderSelector).focus()
+        }, 1)
+      }
     })
 
     this.collection.on('sortChanged', this.sortChanged.bind(this))

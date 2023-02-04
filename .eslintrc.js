@@ -47,6 +47,7 @@ module.exports = {
     INST: true,
     tinyMCE: true,
     tinymce: true,
+    structuredClone: true,
   },
   plugins: [
     'promise',

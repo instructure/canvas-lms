@@ -107,7 +107,6 @@ export const defaultGradebookProps: GradebookProps = {
   dispatch: new RequestDispatch(),
   fetchGradingPeriodAssignments: () => Promise.resolve({}),
   fetchStudentIds: () => Promise.resolve([]),
-  filterNavNode: document.createElement('div'),
   flashAlerts: [],
   flashMessageContainer: document.createElement('div'),
   gradebookEnv: defaultGradebookEnv,
@@ -122,18 +121,22 @@ export const defaultGradebookProps: GradebookProps = {
   isModulesLoading: false,
   isStudentIdsLoading: false,
   locale: 'en',
+  loadDataForCustomColumn: () => Promise.resolve(),
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Another Module', position: 2},
     {id: '3', name: 'Module 2', position: 3},
   ],
+  recentlyLoadedCustomColumnData: null,
   reloadStudentData: () => {},
+  reorderCustomColumns: () => Promise.resolve(),
   settingsModalButtonContainer: document.createElement('div'),
   sisOverrides: [],
   studentIds: [],
   viewOptionsMenuNode: document.createElement('div'),
   performanceControls: new PerformanceControls(),
   isCustomColumnsLoading: false,
+  updateColumnOrder: () => Promise.resolve(),
 }
 
 export function createGradebook(
@@ -213,8 +216,6 @@ export function setFixtureHtml($fixture) {
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>
         <div id="gradebook_grid"></div>
-        <div id="gradebook-student-search"></div>
-        <div id="gradebook-assignment-search"></div>
       </div>
     </div>
   `)

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "simple_oauth"
+require "inst_statsd"
+require "active_support/core_ext/string/filters"
 
 module TurnitinApi
   class OutcomesResponseTransformer
@@ -27,6 +29,16 @@ module TurnitinApi
 
     attr_accessor :outcomes_response_json, :key, :lti_params
 
+    class InvalidResponse < StandardError; end
+
+    KNOWN_ERROR_MESSAGES = {
+      api_login_failed: 'API Login failed: "oauth_signature" incorrect credentials and/or signature calculation',
+      api_product_inactive: "API product inactive or expired",
+      oauth_consumer_key: '"oauth_consumer_key" value is missing or not valid.',
+      not_enabled: "This integration is not currently enabled. Contact your account administrator.",
+      not_found: "The requested Object Result could not be found."
+    }.freeze
+
     def initialize(key, secret, lti_params, outcomes_response_json)
       @key = key
       @secret = secret
@@ -35,7 +47,21 @@ module TurnitinApi
     end
 
     def response
-      @response ||= make_call(outcomes_response_json["outcomes_tool_placement_url"])
+      @response ||= make_call(outcomes_response_json["outcomes_tool_placement_url"]).tap do |resp|
+        if (200..299).cover?(resp.status)
+          resp
+        else
+          error_msg = KNOWN_ERROR_MESSAGES.find { |_name, text| resp.body&.include?(text) }&.first
+          error_msg ||= :unknown
+
+          stats_tags = { status: resp.status, message: error_msg }
+          InstStatsd::Statsd.increment("lti.tii.outcomes_response_bad", tags: stats_tags)
+
+          raise InvalidResponse,
+                "TII returned #{resp.status} code, content length=#{resp.body&.length}, " \
+                "message #{error_msg}, body #{resp.body&.truncate(100).inspect}"
+        end
+      end
     end
 
     # download original

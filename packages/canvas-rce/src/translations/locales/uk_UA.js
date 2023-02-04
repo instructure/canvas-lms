@@ -141,7 +141,6 @@ const locale = {
   "modules_c4325335": { "message": "Розділи" },
   "my_files_2f621040": { "message": "Мої файли" },
   "name_1aed4a1b": { "message": "Ім''я" },
-  "next_page_d2a39853": { "message": "Наступна Сторінка" },
   "no_e16d9132": { "message": "Ні" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Попередній перегляд  для цього файлу недоступний."
@@ -158,7 +157,6 @@ const locale = {
   "percentage_34ab7c2c": { "message": "Відсоток" },
   "pink_68ad45cb": { "message": "Рожевий" },
   "preview_53003fd2": { "message": "Попередній перегляд" },
-  "previous_page_928fc112": { "message": "Попередня сторінка" },
   "published_c944a23d": { "message": "опубліковано" },
   "purple_7678a9fc": { "message": "Фіолетовий" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
@@ -172,7 +170,6 @@ const locale = {
   },
   "save_11a80ec3": { "message": "Зберегти" },
   "search_280d00bd": { "message": "Пошук" },
-  "selected_274ce24f": { "message": "Обраний" },
   "size_b30e1077": { "message": "Розмір" },
   "star_8d156e09": { "message": "Помітити зіркою" },
   "submit_a3cc6859": { "message": "Підтвердити" },

@@ -351,7 +351,7 @@ class JobsV2Controller < ApplicationController
 
   # @{not an}API return information about job clusters
   #
-  # @param job_shards [Optional, Array] ids of specific job shards to query
+  # @argument job_shards [Optional, Array] ids of specific job shards to query
   #
   # @example_response
   #   [

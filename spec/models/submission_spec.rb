@@ -138,6 +138,18 @@ describe Submission do
     end
   end
 
+  describe ".json_serialization_full_parameters" do
+    it "can be provided additional methods to include in the params" do
+      params = Submission.json_serialization_full_parameters(methods: [:missing])
+      expect(params[:methods]).to include :missing
+    end
+
+    it "can provide an additional method with singular form (no array)" do
+      params = Submission.json_serialization_full_parameters(methods: :missing)
+      expect(params[:methods]).to include :missing
+    end
+  end
+
   describe "#anonymous_id" do
     subject { submission.anonymous_id }
 

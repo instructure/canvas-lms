@@ -148,7 +148,7 @@ describe('customColumnsState', () => {
     })
 
     it('does not send additional requests', () => {
-      expect(getRequests().length).toStrictEqual(1)
+      expect(getRequests().length).toStrictEqual(2)
     })
   })
 })

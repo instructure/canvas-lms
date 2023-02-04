@@ -20,31 +20,9 @@
 
 gem "bundler", "~> 2.2"
 
-if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new("1.14.0") &&
-   Gem::Version.new(Gem::VERSION) < Gem::Version.new("2.6.9")
-  raise "Please run `gem update --system` to bring RubyGems to 2.6.9 or newer for use with Bundler 1.14 or newer."
-end
-
 if RUBY_ENGINE == "truffleruby"
   warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 elsif RUBY_VERSION >= "3.2.0"
   warn "Ruby 3.2+ support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 end
 ruby ">= 2.7.0"
-
-# Add the version number to the Gemfile.lock as Gemfile.<version>.lock
-Bundler::SharedHelpers.class_eval do
-  class << self
-    def default_lockfile
-      lockfile = "#{Bundler.default_gemfile}.rails#{CANVAS_RAILS.delete(".")}.lock"
-      Pathname.new(lockfile)
-    end
-  end
-end
-
-Bundler::Dsl.class_eval do
-  def to_definition(_lockfile, unlock)
-    @sources << @rubygems_source if @sources.respond_to?(:include?) && !@sources.include?(@rubygems_source)
-    Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
-  end
-end

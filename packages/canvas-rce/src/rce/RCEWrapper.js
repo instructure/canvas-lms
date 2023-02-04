@@ -28,6 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
 import {uid} from '@instructure/uid'
+import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
@@ -39,11 +40,11 @@ import {sanitizePlugins} from './sanitizePlugins'
 import RCEGlobals from './RCEGlobals'
 import defaultTinymceConfig from '../defaultTinymceConfig'
 import {
-  FS_ENABLED,
-  FS_ELEMENT,
-  FS_REQUEST,
-  FS_EXIT,
   FS_CHANGEEVENT,
+  FS_ELEMENT,
+  FS_ENABLED,
+  FS_EXIT,
+  FS_REQUEST,
   instuiPopupMountNode,
 } from '../util/fullscreenHelpers'
 
@@ -69,6 +70,7 @@ import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
+import {transformRceContentForEditing} from './transformContent'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -313,6 +315,11 @@ class RCEWrapper extends React.Component {
     this._prettyHtmlEditorRef = React.createRef()
     this._showOnFocusButton = null
 
+    // Processed initial content
+    this.initialContent = transformRceContentForEditing(this.props.defaultContent, {
+      origin: this.props.canvasOrigin || window?.location?.origin,
+    })
+
     injectTinySkin()
 
     // FWIW, for historic reaasons, the height does not include the
@@ -369,9 +376,10 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('./initA11yChecker')
-      .then(initA11yChecker => {
-        initA11yChecker.default(this.language)
+    this.a11yCheckerReady = import('tinymce-a11y-checker')
+      .then(a11yChecker => {
+        const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
+        a11yChecker.setLocale(locale)
         this.checkAccessibility()
       })
       .catch(err => {
@@ -825,11 +833,17 @@ class RCEWrapper extends React.Component {
       this.resizeObserver.observe(document[FS_ELEMENT])
       window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
       this._handleFullscreenResize()
+      this._focusRegion = FocusRegionManager.activateRegion(document[FS_ELEMENT], {
+        shouldContainFocus: true,
+      })
     } else {
       event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
       this.resizeObserver.unobserve(event.target)
       window.visualViewport?.removeEventListener('resize', this._handleFullscreenResize)
       this._setHeight(this.state.fullscreenState.prevHeight)
+      if (this._focusRegion) {
+        FocusRegionManager.blurRegion(event.target, this._focusRegion.id)
+      }
     }
     this.setState({popupMountNode: instuiPopupMountNode()})
     this.focusCurrentView()
@@ -891,18 +905,21 @@ class RCEWrapper extends React.Component {
     if (this.mceInstance().isDirty()) {
       return true
     }
-    const content = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
-    return content !== this.cleanInitialContent()
+    const currentHtml = this.isHidden() ? this.textareaValue() : this.mceInstance()?.getContent()
+    return currentHtml !== this._mceSerializedInitialHtml
   }
 
-  cleanInitialContent() {
-    if (!this._cleanInitialContent) {
+  /**
+   * Holds a copy of the initial content of the editor as serialized by tinyMCE to normalize it.
+   */
+  get _mceSerializedInitialHtml() {
+    if (!this._mceSerializedInitialHtmlCached) {
       const el = window.document.createElement('div')
-      el.innerHTML = this.props.defaultContent
+      el.innerHTML = this.initialContent
       const serializer = this.mceInstance().serializer
-      this._cleanInitialContent = serializer.serialize(el, {getInner: true})
+      this._mceSerializedInitialHtmlCached = serializer.serialize(el, {getInner: true})
     }
-    return this._cleanInitialContent
+    return this._mceSerializedInitialHtmlCached
   }
 
   isHtmlView() {
@@ -1044,7 +1061,7 @@ class RCEWrapper extends React.Component {
       event.stopPropagation()
       this.setFocusAbilityForHeader(true)
       focusToolbar(this._elementRef.current)
-    } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
+    } else if (event.code === 'F8' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
       this.openKBShortcutModal()
@@ -1995,7 +2012,7 @@ class RCEWrapper extends React.Component {
             id={mceProps.textareaId}
             textareaName={mceProps.name}
             init={this.tinymceInitOptions}
-            initialValue={mceProps.defaultContent}
+            initialValue={this.initialContent}
             onInit={this.onInit}
             onClick={this.handleFocusEditor}
             onKeypress={this.handleFocusEditor}
@@ -2022,7 +2039,9 @@ class RCEWrapper extends React.Component {
           onFullscreen={this.handleClickFullscreen}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
-          onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
+          onWordcountModalOpen={() =>
+            launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
+          }
           disabledPlugins={this.pluginsToExclude}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (

@@ -61,7 +61,8 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
         :hide_submissions,
         { preserve_method_args: true },
         progress: progress,
-        submission_ids: submissions_scope.pluck(:id)
+        submission_ids: submissions_scope.pluck(:id),
+        skip_content_participation_refresh: false
       )
       { assignment: assignment, progress: progress, sections: sections }
     else

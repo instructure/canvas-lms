@@ -2528,14 +2528,11 @@ describe Attachment do
 
     it "detects the content_type from the body" do
       url = "http://example.com/test.png"
-      expect(CanvasHttp).to receive(:get).with(url).and_yield(FakeHttpResponse.new("200", "this is a jpeg", "content-type" => "image/jpeg"))
+      expect(CanvasHttp).to receive(:get).with(url).and_yield(FakeHttpResponse.new("200", file_fixture("cn_image.jpg").read, "content-type" => "image/jpeg"))
       att = Attachment.clone_url_as_attachment(url)
       expect(att).to be_present
       expect(att).to be_new_record
       expect(att.content_type).to eq "image/jpeg"
-      att.context = Account.default
-      att.save!
-      expect(att.open.read).to eq "this is a jpeg"
     end
 
     context "with non-200 responses" do
@@ -2565,6 +2562,61 @@ describe Attachment do
         it "raises the invalid response error" do
           expect { subject }.to raise_error(CanvasHttp::InvalidResponseCodeError)
         end
+      end
+    end
+  end
+
+  describe ".migrate_attachments" do
+    before :once do
+      @merge_user_1 = student_in_course(active_all: true).user
+      @merge_user_2 = student_in_course(active_all: true).user
+
+      @user_1_file = Attachment.create!(user: @merge_user_1, context: @merge_user_1, filename: "hi.txt",
+                                        uploaded_data: StringIO.new("hi_data"))
+    end
+
+    it "changes the context over to the new context" do
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      expect(@user_1_file.reload.context).to eq @merge_user_2
+    end
+
+    it "doesn't move files that already exist in the new context" do
+      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+                                        uploaded_data: StringIO.new("hi_data"))
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      expect(@user_1_file.reload.context).to eq @merge_user_1
+    end
+
+    it "does move files that already exist (by filename), but have nil md5" do
+      @user_1_file.update(md5: nil)
+      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+                                        uploaded_data: StringIO.new("hi_data"))
+      @user_2_file.update(md5: nil)
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      expect(@user_1_file.reload.context).to eq @merge_user_2
+    end
+
+    it "handles name changes for files that are different but have the same name" do
+      @user_2_file = Attachment.create!(user: @merge_user_2, context: @merge_user_2, filename: "hi.txt",
+                                        uploaded_data: StringIO.new("yo_data"))
+      Attachment.migrate_attachments(@merge_user_1, @merge_user_2)
+      expect(@user_1_file.title).not_to eq(@user_1_file.reload.title)
+      expect(@user_1_file.title).not_to eq(@user_2_file.title)
+      expect(@user_1_file.context).to eq @merge_user_2
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "copies the attachment to the new shard and leaves the existing attachment" do
+        @shard1.activate do
+          @merge_user_3 = user_model
+        end
+        Attachment.migrate_attachments(@merge_user_1, @merge_user_3)
+        expect(@user_1_file.reload.context).to eq @merge_user_1
+        expect(@user_1_file.user).to eq @merge_user_3
+        new_attachment = @merge_user_3.attachments.find_by(filename: @user_1_file.title, md5: @user_1_file.md5)
+        expect(new_attachment.full_display_path).to eq @user_1_file.full_display_path
       end
     end
   end

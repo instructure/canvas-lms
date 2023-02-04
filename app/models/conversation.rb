@@ -521,6 +521,8 @@ class Conversation < ActiveRecord::Base
     participant = conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if user
+      raise IncomingMail::Errors::InvalidParticipant if replies_locked_for?(user, conversation_participants.map(&:user_id))
+
       participant.update_attribute(:workflow_state, "read") if participant.workflow_state == "unread"
       message = truncate_message(message)
       add_message(user, message, opts)
@@ -774,7 +776,6 @@ class Conversation < ActiveRecord::Base
 
       has_non_concluded_enrollment = !user_course_roles.empty? && user_course_roles.any? { |ucr| !course.soft_concluded?(ucr) }
       has_non_concluded_section = course.sections_visible_to(user).any? { |vs| !vs.concluded? }
-
       return true unless has_non_concluded_enrollment || has_non_concluded_section
     end
 

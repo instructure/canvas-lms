@@ -81,13 +81,11 @@ QUnit.module('Gradebook', suiteHooks => {
   QUnit.module('#_updateEssentialDataLoaded()', () => {
     function createInitializedGradebook(options) {
       gradebook = createGradebook(options)
-      sinon.stub(gradebook.dataLoader, 'loadInitialData')
       sinon.stub(gradebook, 'finishRenderingUI')
 
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)
       gradebook.setAssignmentsLoaded()
-      gradebook.setCustomColumnsLoaded(true)
     }
 
     function waitForTick() {
@@ -111,7 +109,6 @@ QUnit.module('Gradebook', suiteHooks => {
 
     test('does not finish rendering the UI when custom columns are not loaded', async () => {
       createInitializedGradebook()
-      gradebook.setCustomColumnsLoaded(false)
       gradebook._updateEssentialDataLoaded()
       await waitForTick()
       strictEqual(gradebook.finishRenderingUI.callCount, 0)
@@ -160,44 +157,6 @@ QUnit.module('Gradebook#renderAssignmentSearchFilter)', {
   teardown() {
     $fixtures.innerHTML = ''
   },
-})
-
-test('renders Assignment Names label', function () {
-  this.gradebook.renderAssignmentSearchFilter([])
-  const assignmentSearch = document.querySelector('#gradebook-assignment-search')
-  ok(assignmentSearch.textContent.includes('Assignment Names'))
-})
-
-test('enables the input if there is at least one assignment to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  notOk(assignmentSearchInput.disabled)
-})
-
-test('disables the input if the grid has not yet rendered', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'pending')
-  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  ok(assignmentSearchInput.disabled)
-})
-
-test('disables the input if there are no assignments to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  this.gradebook.renderAssignmentSearchFilter([])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  ok(assignmentSearchInput.disabled)
-})
-
-test('displays a select menu option for each assignment', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  const assignment = {id: '1', name: 'An assignment'}
-  this.gradebook.renderAssignmentSearchFilter([assignment])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  assignmentSearchInput.click()
-  const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
-  ok(options.some(option => option.textContent === assignment.name))
-  assignmentSearchInput.click() // close the menu to avoid DOM test pollution
 })
 
 QUnit.module('Gradebook#rowFilter', contextHooks => {

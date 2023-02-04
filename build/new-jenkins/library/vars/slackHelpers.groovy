@@ -29,12 +29,12 @@ def sendSlackFailureWithMsg(String channel, String extraText, boolean pingAuthor
   def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
   def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
   def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-  def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${pingAuthor ? authorSlackMsg : authorSlackId} failed against ${branchSegment}"
+  def authorSegment = env.GERRIT_CHANGE_URL ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${pingAuthor ? authorSlackMsg : authorSlackId}" : env.JOB_NAME
 
   slackSend(
     channel: channel,
     color: 'danger',
-    message: "${authorSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n${extraText}"
+    message: "${authorSegment} failed against ${branchSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n${extraText}"
   )
 }
 

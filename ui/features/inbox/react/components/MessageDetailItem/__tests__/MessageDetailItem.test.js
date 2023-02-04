@@ -60,11 +60,53 @@ describe('MessageDetailItem', () => {
   })
 
   it('renders with provided data', () => {
-    const {getByText} = setup()
+    const {getByText} = setup({body: 'a link to google.com'})
 
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
     expect(getByText('This is the body text for the message.')).toBeInTheDocument()
+    expect(getByText('Fake Course 1')).toBeInTheDocument()
+    expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
+  })
+
+  it('renders with a link when a link is present', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: 'a link to google.com',
+      },
+      contextName: 'Fake Course 1',
+    }
+
+    const {getByText, queryByText} = render(<MessageDetailItem {...props} />)
+
+    expect(getByText('Tom Thompson')).toBeInTheDocument()
+    expect(getByText(', Billy Harris')).toBeInTheDocument()
+    expect(queryByText('a link to google.com')).not.toBeInTheDocument()
+    expect(getByText('google.com')).toBeInTheDocument()
+    expect(getByText('a link to')).toBeInTheDocument()
+    expect(getByText('Fake Course 1')).toBeInTheDocument()
+    expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
+  })
+
+  it('renders with an xss attempt', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: "<script>alert('XSS')</script>",
+      },
+      contextName: 'Fake Course 1',
+    }
+
+    const {getByText} = render(<MessageDetailItem {...props} />)
+
+    expect(getByText('Tom Thompson')).toBeInTheDocument()
+    expect(getByText(', Billy Harris')).toBeInTheDocument()
+    expect(getByText("<script>alert('XSS')</script>")).toBeInTheDocument()
     expect(getByText('Fake Course 1')).toBeInTheDocument()
     expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
   })

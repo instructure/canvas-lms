@@ -489,7 +489,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Ugnezdeni znak za večje kot" },
   "nested_less_than_27d17e58": { "message": "Ugnezdeni znak za manjše kot" },
-  "next_page_d2a39853": { "message": "Naslednja stran" },
   "no_changes_to_save_d29f6e91": {
     "message": "Ni sprememb, ki bi jih bilo mogoče shraniti."
   },
@@ -501,9 +500,6 @@ const locale = {
   "no_results_940393cf": { "message": "Ni rezultatov." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ni najdenih rezultatov za { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Ni najdenih rezultatov za { term }."
   },
   "none_3b5e34d2": { "message": "Brez" },
   "none_selected_b93d56d2": { "message": "Nobena ni izbrana" },
@@ -577,7 +573,6 @@ const locale = {
     "message": "Predogled v prekrivnem elementu"
   },
   "preview_inline_9787330": { "message": "Vstavljen predogled" },
-  "previous_page_928fc112": { "message": "Prejšnja stran" },
   "prime_917ea60e": { "message": "Pra" },
   "prime_numbers_13464f61": { "message": "Praštevila" },
   "product_39cf144f": { "message": "Zmnožek" },
@@ -646,10 +641,8 @@ const locale = {
   "save_11a80ec3": { "message": "Shrani" },
   "script_l_42a7b254": { "message": "Skript L" },
   "search_280d00bd": { "message": "Iskanje" },
-  "search_term_b2d2235": { "message": "Iskalni izraz" },
   "select_crop_shape_d441feeb": { "message": "Izberite obliko izrezovanja" },
   "select_language_7c93a900": { "message": "Izberite jezik" },
-  "selected_274ce24f": { "message": "Izbrano" },
   "selected_linkfilename_c093b1f2": { "message": "Izbrano { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Nastavi minus" },
   "sharp_music_ab956814": { "message": "Ostro (glasba)" },
@@ -772,9 +765,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Preklop opisa orodja" },
   "tools_2fcf772e": { "message": "Orodja" },
   "top_66e0adb6": { "message": "Vrh" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } najdenih rezultatov, od tega jih je trenutno prikazanih { numDisplayed }."
-  },
   "tray_839df38a": { "message": "Trak" },
   "triangle_6072304e": { "message": "Trikotnik" },
   "turnstile_yields_f9e76df1": { "message": "Vrtilni križ (odnos)" },

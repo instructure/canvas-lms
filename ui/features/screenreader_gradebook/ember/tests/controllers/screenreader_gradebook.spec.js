@@ -662,6 +662,18 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
           equal(selectedSubmission.gradeLocked, true)
         })
       }))
+
+    test('selectedSubmission displays the proper preview text', () =>
+      asyncHelper.waitForRequests().then(() => {
+        const selectedSubmission = srgb.get('selectedSubmission')
+        const submissionClone = {...selectedSubmission}
+        submissionClone.submission_type = null
+        return Ember.run(() => {
+          srgb.set('selectedSubmission', submissionClone)
+          const previewText = srgb.get('submissionPreviewText')
+          equal(previewText, 'Has not submitted')
+        })
+      }))
   })
 
   QUnit.module('with selected assignment', hooks => {

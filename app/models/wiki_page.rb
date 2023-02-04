@@ -131,13 +131,19 @@ class WikiPage < ActiveRecord::Base
         p.save_without_broadcasting!
       end
     end
+
     if context.wiki_pages.not_deleted.where(title: self.title).where.not(id: id).first
-      real_title = self.title.gsub(/-(\d*)\z/, "") # remove any "-#" at the end
-      n = $1 ? $1.to_i + 1 : 2
+      if /-\d+\z/.match?(self.title)
+        # A page with this title already exists and the title ends in -<some number>.
+        # This has potential to conflict with our handling of duplicate title names.
+        # We tried to fix in earnest but there are too many edge cases. Thus, we just disallow this.
+        errors.add(:title, t("A page with this title already exists. Please choose a different title."))
+      end
+      n = 2
       new_title = nil
       loop do
         mod = "-#{n}"
-        new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
+        new_title = self.title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
         break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id: id).exists?
       end

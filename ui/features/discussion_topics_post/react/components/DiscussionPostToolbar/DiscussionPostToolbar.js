@@ -233,7 +233,7 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
-                {!props.userSplitScreenPreference && (
+                {!ENV.isolated_view && !props.userSplitScreenPreference && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <ExpandCollapseThreadsButton />
                   </Flex.Item>

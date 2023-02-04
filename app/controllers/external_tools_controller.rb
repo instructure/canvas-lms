@@ -1507,10 +1507,20 @@ class ExternalToolsController < ApplicationController
             else
               URI(course_external_tools_sessionless_launch_url(@context))
             end
-      uri.query = { verifier: verifier }.to_query
+
+      # NOTE: now that we are using session_token here for LTI 1.1 tools, we
+      # _might_ be able to simplify the above code and just do a regular launch
+      # with token like we do for LTI 1.3 -- see this comment's commit
+      uri.query = { verifier: verifier, session_token: session_token_if_authorized }.compact.to_query
 
       render json: { id: @tool.id, name: @tool.name, url: uri.to_s }
     end
+  end
+
+  def session_token_if_authorized
+    generate_session_token
+  rescue Lti::Concerns::SessionlessLaunches::UnauthorizedClient
+    nil
   end
 
   def set_tool_attributes(tool, params)

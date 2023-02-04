@@ -1221,7 +1221,7 @@ class CalendarEventsApiController < ApplicationController
 
   # @API Save enabled account calendars
   #
-  #  Creates and updates the enabled_account_calendars and mark_feature_as_seen user preferences
+  # Creates and updates the enabled_account_calendars and mark_feature_as_seen user preferences
   #
   # @argument mark_feature_as_seen [Optional, Boolean]
   #   Flag to mark account calendars feature as seen

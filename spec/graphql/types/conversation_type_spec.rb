@@ -154,6 +154,16 @@ describe Types::ConversationType do
       result = conversation_type.resolve("conversationMessagesConnection { nodes { body } }")
       expect(result).to match_array(@conversation.conversation.conversation_messages.where.not(id: message).pluck(:body))
     end
+
+    # This test is for legacy conversations that don't have a set workflow state
+    it "returns messages whose conversation participants workflow is nil" do
+      message = @conversation.conversation.add_message(@student, "delete me")
+      participant = message.conversation_message_participants.where(user_id: @teacher.id).first
+      participant.workflow_state = nil
+      participant.save(validate: false)
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { body } }")
+      expect(result).to match_array(@conversation.conversation.conversation_messages.pluck(:body))
+    end
   end
 
   context "conversationPaticipants" do

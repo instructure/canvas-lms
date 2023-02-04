@@ -37,7 +37,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       # map assignment id to quiz/discussion id
       assignments_sub = Assignment
                         .active
-                        .select("assignments.id as assignment_id, discussion_topics.id as discussion_id, quizzes.id as quiz_id")
+                        .select("assignments.id as assignment_id, assignments.workflow_state as assignment_workflow_state, discussion_topics.id as discussion_id, quizzes.id as quiz_id")
                         .where(context: @context)
                         .left_joins(:discussion_topic)
                         .left_joins(:quiz)
@@ -60,7 +60,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                              WHEN content_tags.content_type = 'Rubric' THEN rubrics.title
                              ELSE content_tags.title
                            END AS title,
-                         content_tags.learning_outcome_id, content_tags.created_at, content_tags.updated_at, assignments.assignment_id, assignments.discussion_id, assignments.quiz_id
+                         content_tags.learning_outcome_id, content_tags.created_at, content_tags.updated_at, assignments.assignment_id, assignments.assignment_workflow_state, assignments.discussion_id, assignments.quiz_id
                        ")
                        .where(context: @context, content_type: %w[Rubric Assignment AssessmentQuestionBank])
                        .joins("LEFT OUTER JOIN (#{assignments_sub.to_sql}) AS assignments ON content_tags.content_id = assignments.assignment_id AND content_tags.content_type = 'Assignment'")
@@ -105,7 +105,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
       indirect_alignments = Assignment
                             .active
-                            .select("assignments.id, 'indirect' as alignment_type, assignments.id as content_id, 'Assignment' as content_type, assignments.context_id, assignments.context_type, quizzes.title as title, #{outcome.id} as learning_outcome_id, assignments.created_at, assignments.updated_at, assignments.id as assignment_id, null::bigint as discussion_id, quizzes.id as quiz_id, modules.module_id, modules.module_name, modules.module_workflow_state")
+                            .select("assignments.id, 'indirect' as alignment_type, assignments.id as content_id, 'Assignment' as content_type, assignments.context_id, assignments.context_type, quizzes.title as title, #{outcome.id} as learning_outcome_id, assignments.created_at, assignments.updated_at, assignments.id as assignment_id, assignments.workflow_state as assignment_workflow_state, null::bigint as discussion_id, quizzes.id as quiz_id, modules.module_id, modules.module_name, modules.module_workflow_state")
                             .where(context: @context)
                             .left_joins(:quiz)
                             .where(quizzes: { id: quizzes_to_outcome_indirect })
@@ -147,7 +147,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
 
   def alignment_hash(alignment)
     {
-      id: id(alignment),
+      _id: id(alignment),
       title: alignment[:title],
       content_id: alignment[:content_id],
       content_type: alignment[:content_type],
@@ -160,6 +160,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       module_url: module_url(alignment),
       module_workflow_state: alignment[:module_workflow_state],
       assignment_content_type: assignment_content_type(alignment),
+      assignment_workflow_state: alignment[:assignment_workflow_state],
       created_at: alignment[:created_at],
       updated_at: alignment[:updated_at]
     }

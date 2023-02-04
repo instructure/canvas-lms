@@ -477,7 +477,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Geschachtelt größer als" },
   "nested_less_than_27d17e58": { "message": "Geschachtelt kleiner als" },
-  "next_page_d2a39853": { "message": "Nächste Seite" },
   "no_changes_to_save_d29f6e91": {
     "message": "Keine Änderungen zu speichern."
   },
@@ -489,9 +488,6 @@ const locale = {
   "no_results_940393cf": { "message": "Keine Ergebnisse." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Es wurden keine Ergebnisse für { filterTerm } gefunden."
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Es wurden keine Ergebnisse für { term } gefunden."
   },
   "none_3b5e34d2": { "message": "Keine" },
   "none_selected_b93d56d2": { "message": "Keines ausgewählt" },
@@ -567,7 +563,6 @@ const locale = {
   "preview_53003fd2": { "message": "Vorschau" },
   "preview_in_overlay_ed772c46": { "message": "Vorschau in Overlay" },
   "preview_inline_9787330": { "message": "Inlne-Vorschau" },
-  "previous_page_928fc112": { "message": "Vorherige Seite" },
   "prime_917ea60e": { "message": "Primzahl" },
   "prime_numbers_13464f61": { "message": "Primzahlen" },
   "product_39cf144f": { "message": "Produkt" },
@@ -634,10 +629,8 @@ const locale = {
   "save_11a80ec3": { "message": "Speichern" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Suchen" },
-  "search_term_b2d2235": { "message": "Suchbegriff" },
   "select_crop_shape_d441feeb": { "message": "Zuschnittsform auswählen" },
   "select_language_7c93a900": { "message": "Sprache auswählen" },
-  "selected_274ce24f": { "message": "Ausgewählt" },
   "selected_linkfilename_c093b1f2": {
     "message": "Ausgewählter { linkFileName }"
   },
@@ -762,9 +755,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Quickinfo für Umschalten" },
   "tools_2fcf772e": { "message": "Tools" },
   "top_66e0adb6": { "message": "Oben" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } gefundene Ergebnisse, { numDisplayed } derzeit angezeigte Ergebnisse"
-  },
   "tray_839df38a": { "message": "Fach" },
   "triangle_6072304e": { "message": "Dreieck" },
   "turnstile_yields_f9e76df1": { "message": "Drehkreuz (Erträge)" },

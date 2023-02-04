@@ -25,6 +25,9 @@
 import $ from 'jquery'
 import preventDefault from 'prevent-default'
 import {isolate} from '@canvas/sentry'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import {GroupNavigationSelector} from '../../shared/group-navigation-selector'
 
 // modules that do their own thing on every page that simply need to be required
 import '@canvas/media-comments'
@@ -40,6 +43,13 @@ import './sanitizeCSSOverflow'
 
 if (ENV.page_view_update_url) {
   isolate(() => import(/* webpackChunkName: "[request]" */ './trackPageViews'))()
+}
+
+if (document.querySelector('#group-switch-mount-point')) {
+  ReactDOM.render(
+    <GroupNavigationSelector options={ENV.group_information} />,
+    document.querySelector('#group-switch-mount-point')
+  )
 }
 
 // preventDefault so we dont change the hash

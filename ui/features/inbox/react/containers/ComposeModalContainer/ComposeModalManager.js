@@ -59,7 +59,7 @@ const ComposeModalManager = props => {
 
     const lastAuthor = props.conversationMessage
       ? props.conversationMessage?.author
-      : props.conversation?.messages[0].author
+      : props.conversation?.messages[0]?.author
 
     if (
       lastAuthor &&
@@ -84,7 +84,7 @@ const ComposeModalManager = props => {
     variables: {
       conversationID: props.conversation?._id,
       participants: getReplyRecipientIDs(),
-      ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
+      ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
       first: props.isForward && props.conversationMessage ? 1 : null,
     },
     notifyOnNetworkStatusChange: true,
@@ -132,7 +132,7 @@ const ComposeModalManager = props => {
               conversationID: props.conversation?._id,
               participants: getReplyRecipientIDs(),
               ...(props.conversationMessage && {
-                createdBefore: props.conversationMessage.createdAt,
+                createdBefore: props.conversationMessage?.createdAt,
               }),
             },
           })
@@ -148,7 +148,7 @@ const ComposeModalManager = props => {
         variables: {
           conversationID: props.conversation?._id,
           participants: getReplyRecipientIDs(),
-          ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
+          ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
         },
         data: {legacyNode: replyQueryResult.legacyNode},
       })
@@ -339,6 +339,7 @@ const ComposeModalManager = props => {
       setSendingMessage={setSendingMessage}
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
+      maxGroupRecipientsMet={props.maxGroupRecipientsMet}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
       isPrivateConversation={!!props?.conversation?.isPrivate}
@@ -357,6 +358,7 @@ ComposeModalManager.propTypes = {
   conversationsQueryOption: PropTypes.object,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  maxGroupRecipientsMet: PropTypes.bool,
 }
 
 export default ComposeModalManager

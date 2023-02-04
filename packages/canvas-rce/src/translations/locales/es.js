@@ -493,7 +493,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Anidado mayor a" },
   "nested_less_than_27d17e58": { "message": "Anidado menor a" },
-  "next_page_d2a39853": { "message": "Próxima página" },
   "no_changes_to_save_d29f6e91": { "message": "No hay cambios para guardar." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No se seleccionó ningún archivo" },
@@ -503,9 +502,6 @@ const locale = {
   "no_results_940393cf": { "message": "No hay resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No se encontraron resultados para { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "No se encontraron resultados para { term }."
   },
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Nada seleccionado" },
@@ -585,7 +581,6 @@ const locale = {
   "preview_53003fd2": { "message": "Vista previa" },
   "preview_in_overlay_ed772c46": { "message": "Vista previa en superposición" },
   "preview_inline_9787330": { "message": "Vista previa en línea" },
-  "previous_page_928fc112": { "message": "Página anterior" },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primos" },
   "product_39cf144f": { "message": "Producto" },
@@ -654,10 +649,8 @@ const locale = {
   "save_11a80ec3": { "message": "Guardar" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Buscar" },
-  "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": { "message": "Seleccionar forma de corte" },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
-  "selected_274ce24f": { "message": "Seleccionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionado"
   },
@@ -784,9 +777,6 @@ const locale = {
   },
   "tools_2fcf772e": { "message": "Herramientas" },
   "top_66e0adb6": { "message": "Arriba" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultados encontrados, { numDisplayed } resultados que se muestran actualmente"
-  },
   "tray_839df38a": { "message": "Bandeja" },
   "triangle_6072304e": { "message": "Triángulo" },
   "turnstile_yields_f9e76df1": { "message": "Trinquete (da resultados)" },

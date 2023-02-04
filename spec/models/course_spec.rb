@@ -7659,4 +7659,121 @@ describe Course do
       end
     end
   end
+
+  describe "#batch_update_context_modules" do
+    before do
+      @course = course_model
+      @test_modules = (1..4).map { |x| @course.context_modules.create! name: "test module #{x}" }
+      @test_modules[2..3].each { |m| m.update_attribute(:workflow_state, "unpublished") }
+      @modules_to_update = [@test_modules[1], @test_modules[3]]
+
+      @wiki_page = @course.wiki_pages.create(title: "Wiki Page Title")
+      @wiki_page.unpublish!
+      @wiki_page_tag = @test_modules[3].add_item(id: @wiki_page.id, type: "wiki_page")
+      @wiki_page_tag.trigger_unpublish!
+
+      @ids_to_update = @modules_to_update.map(&:id)
+      Account.site_admin.enable_feature!(:module_publish_menu)
+    end
+
+    context "with publish event" do
+      it "publishes the modules" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_published
+        end
+      end
+
+      it "publishes the items" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_published
+          m.content_tags.each do |tag|
+            expect(tag.reload).to be_published
+          end
+        end
+      end
+
+      it "does not publish the items when skip_content_tags is true" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish, skip_content_tags: true)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_published
+          m.content_tags.each do |tag|
+            expect(tag.reload).not_to be_published
+          end
+        end
+      end
+    end
+
+    context "with unpublish event" do
+      it "unpublishes the modules" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :unpublish)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_unpublished
+        end
+      end
+
+      it "unpublishes the items" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :unpublish)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_unpublished
+          m.content_tags.each do |tag|
+            expect(tag.reload).to be_unpublished
+          end
+        end
+      end
+
+      it "does not unpublish the items when skip_content_tags is true" do
+        @wiki_page_tag.trigger_publish!
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :unpublish, skip_content_tags: true)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_unpublished
+          m.content_tags.each do |tag|
+            expect(tag.reload).not_to be_unpublished
+          end
+        end
+      end
+    end
+
+    context "with delete event" do
+      it "deletes the modules" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :delete)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_deleted
+        end
+      end
+
+      it "deletes the items" do
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :delete)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_deleted
+          m.content_tags.each do |tag|
+            expect(tag.reload).to be_deleted
+          end
+        end
+      end
+
+      it "deletes the content tags even if skip_content_tags is true" do
+        @wiki_page_tag.trigger_publish!
+        @course.batch_update_context_modules(module_ids: @ids_to_update, event: :delete, skip_content_tags: true)
+        @modules_to_update.each do |m|
+          expect(m.reload).to be_deleted
+          m.content_tags.each do |tag|
+            expect(tag.reload).to be_deleted
+          end
+        end
+      end
+    end
+
+    it "increments the progress" do
+      progress = Progress.create!(context: @course, tag: "context_module_batch_update", user: @teacher)
+      expect(progress).to receive(:increment_completion!).twice
+      @course.batch_update_context_modules(progress, module_ids: @ids_to_update, event: :publish)
+    end
+
+    it "returns the completed_ids" do
+      completed_ids = @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish)
+      expect(completed_ids).to eq @ids_to_update
+    end
+  end
 end

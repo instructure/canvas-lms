@@ -31,8 +31,8 @@ const I18n = useI18nScope('conversations_2')
 export const MessageDetailParticipants = ({...props}) => {
   const [participantsExpanded, setParticipantsExpanded] = useState(false)
 
-  const uniqueMessageRecipients = props.conversationMessage.recipients.filter(
-    p => p.name !== props.conversationMessage.author.name
+  const uniqueMessageRecipients = props.conversationMessage?.recipients?.filter(
+    p => p.name !== props.conversationMessage?.author?.name
   )
 
   const participantsToShow = participantsExpanded
@@ -55,7 +55,7 @@ export const MessageDetailParticipants = ({...props}) => {
       <Flex.Item shouldShrink={true} shouldGrow={true}>
         <View overflowX="hidden" overflowY="hidden" width="100%" display="block">
           <Text weight="bold" size={props.participantsSize}>
-            {props.conversationMessage.author.name}
+            {props.conversationMessage?.author?.name}
           </Text>
           {!participantsToShow.length ? null : (
             <Text size={props.participantsSize} data-testid="participant-list">

@@ -414,10 +414,10 @@ export const DiscussionThreadContainer = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          padding: 'medium xx-small small',
+          padding: 'small xx-small small',
         },
         desktop: {
-          padding: 'medium medium small',
+          padding: 'small medium small',
         },
       }}
       render={responsiveProps => (
@@ -518,7 +518,7 @@ export const DiscussionThreadContainer = props => {
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     {threadActions.length > 0 && (
-                      <View as="div" padding="x-small none none">
+                      <View as="div">
                         <ThreadingToolbar
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}

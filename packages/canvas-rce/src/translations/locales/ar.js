@@ -465,7 +465,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
-  "next_page_d2a39853": { "message": "الصفحة التالية" },
   "no_changes_to_save_d29f6e91": { "message": "لا توجد تغييرات للحفظ." },
   "no_e16d9132": { "message": "لا" },
   "no_file_chosen_9a880793": { "message": "لم يتم اختيار ملف" },
@@ -475,9 +474,6 @@ const locale = {
   "no_results_940393cf": { "message": "لا توجد نتائج." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "لم يتم العثور على نتائج لـ { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "لم يتم العثور على نتائج لـ { term }."
   },
   "none_3b5e34d2": { "message": "بلا" },
   "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
@@ -547,7 +543,6 @@ const locale = {
   "preview_53003fd2": { "message": "معاينة" },
   "preview_in_overlay_ed772c46": { "message": "المعاينة بشكل متراكب" },
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
-  "previous_page_928fc112": { "message": "الصفحة السابقة" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "منتج" },
@@ -608,10 +603,8 @@ const locale = {
   "save_11a80ec3": { "message": "حفظ" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "بحث" },
-  "search_term_b2d2235": { "message": "مصطلح البحث" },
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
-  "selected_274ce24f": { "message": "تم التحديد" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } المحدد" },
   "set_minus_b46e9b88": { "message": "Set Minus" },
   "sharp_music_ab956814": { "message": "Sharp (موسيقي)" },
@@ -726,9 +719,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "تبديل تلميح الأداة" },
   "tools_2fcf772e": { "message": "الأدوات" },
   "top_66e0adb6": { "message": "Top" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "تم العثور على { totalResults } من النتائج، { numDisplayed } من النتائج قيد العرض حاليًا"
-  },
   "tray_839df38a": { "message": "العلبة" },
   "triangle_6072304e": { "message": "مثلث" },
   "turnstile_yields_f9e76df1": { "message": "Turnstile (Yields)" },

@@ -56,7 +56,9 @@ function makeExternalLinkIcon(forLink) {
   const dir = (forLink && window.getComputedStyle(forLink).direction) || 'ltr'
   const $icon = document.createElement('span')
   $icon.setAttribute('class', 'external_link_icon')
-  const style = `margin-inline-start: 5px; ${dir === 'rtl' ? 'transform:scale(-1, 1)' : ''}`
+  const style = `margin-inline-start: 5px; display: inline-block; ${
+    dir === 'rtl' ? 'transform:scale(-1, 1)' : ''
+  }`
   $icon.setAttribute('style', style)
   $icon.setAttribute('role', 'presentation')
   $icon.innerHTML = IconExternalLinkSVG

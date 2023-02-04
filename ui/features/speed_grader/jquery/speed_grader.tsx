@@ -2604,7 +2604,8 @@ EG = {
           missing: s.missing,
           excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
-          proxy_submitter: s.proxy_submitter ? ` (${s.proxy_submitter})` : null,
+          proxy_submitter: s.proxy_submitter,
+          proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade,
         }

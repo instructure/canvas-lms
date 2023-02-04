@@ -2086,10 +2086,20 @@ describe GradebooksController do
           expect(submissions).to all include("assignment_visible" => true)
         end
 
+        it "includes missing in base submission object" do
+          submission = json.first["submission"]
+          expect(submission).to include("missing" => false)
+        end
+
         it "includes missing in submission history" do
           submission_history = json.first["submission"]["submission_history"]
           submissions = submission_history.map { |submission| submission["submission"] }
           expect(submissions).to all include("missing" => false)
+        end
+
+        it "includes late in base submission object" do
+          submission = json.first["submission"]
+          expect(submission).to include("late" => false)
         end
 
         it "includes late in submission history" do
@@ -2109,50 +2119,94 @@ describe GradebooksController do
           user_session(@teacher)
         end
 
-        let(:post_params) do
-          {
-            course_id: @course.id,
-            submission: {
-              assignment_id: @assignment.id,
-              user_id: @student.id,
-              grade: 10,
-              set_by_default_grade: true
+        context "setting grades" do
+          let(:post_params) do
+            {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @assignment.id,
+                user_id: @student.id,
+                grade: 10,
+                set_by_default_grade: true
+              }
             }
-          }
+          end
+
+          it "does not set the grader_id on missing submissions if set_by_default_grade is true" do
+            @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+
+            expect { post(:update_submission, params: post_params, format: :json) }.not_to change {
+              @submission.reload.grader_id
+            }.from(nil)
+          end
+
+          it "sets the grader_id on missing submissions if set_by_default_grade is false" do
+            post_params[:submission][:set_by_default_grade] = false
+            @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+
+            expect { post(:update_submission, params: post_params, format: :json) }.to change {
+              @submission.reload.grader_id
+            }.from(nil).to(@teacher.id)
+          end
+
+          it "sets the grader_id on missing submissions when set_by_default_grade is true and the late policy status is missing" do
+            @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+            @submission.update!(late_policy_status: "missing")
+
+            expect { post(:update_submission, params: post_params, format: :json) }.to change {
+              @submission.reload.grader_id
+            }.from(nil).to(@teacher.id)
+          end
+
+          it "sets the grader_id on non missing submissions when set_by_default_grade is true" do
+            @assignment.update!(due_at: 10.days.from_now, submission_types: "online_text_entry")
+
+            expect { post(:update_submission, params: post_params, format: :json) }.to change {
+              @submission.reload.grader_id
+            }.from(nil).to(@teacher.id)
+          end
         end
 
-        it "does not set the grader_id on missing submissions if set_by_default_grade is true" do
-          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+        context "marking students as missing" do
+          let(:post_params) do
+            {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @assignment.id,
+                user_id: @student.id,
+                late_policy_status: "missing",
+                set_by_default_grade: true
+              }
+            }
+          end
 
-          expect { post(:update_submission, params: post_params, format: :json) }.not_to change {
-            @submission.reload.grader_id
-          }.from(nil)
-        end
+          it "marks not-yet-graded students as missing" do
+            expect { post(:update_submission, params: post_params, format: :json) }.to change {
+              @submission.reload.missing?
+            }.from(false).to(true)
+          end
 
-        it "sets the grader_id on missing submissions if set_by_default_grade is false" do
-          post_params[:submission][:set_by_default_grade] = false
-          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
+          it "marks already-graded students as missing" do
+            @assignment.grade_student(@student, grade: 2, grader: @teacher)
+            expect { post(:update_submission, params: post_params, format: :json) }.to change {
+              @submission.reload.missing?
+            }.from(false).to(true)
+          end
 
-          expect { post(:update_submission, params: post_params, format: :json) }.to change {
-            @submission.reload.grader_id
-          }.from(nil).to(@teacher.id)
-        end
+          it "marks not-yet-graded students as missing when passed dont_overwrite_grades param" do
+            params = post_params.merge(dont_overwrite_grades: true)
+            expect { post(:update_submission, params: params, format: :json) }.to change {
+              @submission.reload.missing?
+            }.from(false).to(true)
+          end
 
-        it "sets the grader_id on missing submissions when set_by_default_grade is true and the late policy status is missing" do
-          @assignment.update!(due_at: 10.days.ago, submission_types: "online_text_entry")
-          @submission.update!(late_policy_status: "missing")
-
-          expect { post(:update_submission, params: post_params, format: :json) }.to change {
-            @submission.reload.grader_id
-          }.from(nil).to(@teacher.id)
-        end
-
-        it "sets the grader_id on non missing submissions when set_by_default_grade is true" do
-          @assignment.update!(due_at: 10.days.from_now, submission_types: "online_text_entry")
-
-          expect { post(:update_submission, params: post_params, format: :json) }.to change {
-            @submission.reload.grader_id
-          }.from(nil).to(@teacher.id)
+          it "does not modify already-graded students when passed dont_overwrite_grades param" do
+            @assignment.grade_student(@student, grade: 2, grader: @teacher)
+            params = post_params.merge(dont_overwrite_grades: true)
+            expect { post(:update_submission, params: params, format: :json) }.not_to change {
+              @submission.reload.missing?
+            }.from(false)
+          end
         end
       end
 
