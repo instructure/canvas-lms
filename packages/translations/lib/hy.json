@@ -356,6 +356,9 @@
     "record_7c9448b": {
         "message": "Գրառում"
     },
+    "recording_98da6bda": {
+        "message": "Ձայնագրում"
+    },
     "red_8258edf3": {
         "message": "Կարմիր"
     },
@@ -382,6 +385,9 @@
     },
     "star_8d156e09": {
         "message": "Նշել աստղիկով"
+    },
+    "start_over_f7552aa9": {
+        "message": "Սկսել նորից"
     },
     "submit_a3cc6859": {
         "message": "Ուղարկել"
@@ -439,6 +445,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Օգտագործման իրավունք՝"
+    },
+    "video_player_b371005": {
+        "message": "Տեսաձայնագրության նվագարկիչ"
     },
     "view_ba339f93": {
         "message": "Դիտել"

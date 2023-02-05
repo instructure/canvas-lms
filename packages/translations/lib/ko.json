@@ -293,6 +293,9 @@
     "record_7c9448b": {
         "message": "녹음/녹화"
     },
+    "recording_98da6bda": {
+        "message": "녹음/녹화"
+    },
     "relationships_6602af70": {
         "message": "관계"
     },
@@ -313,6 +316,9 @@
     },
     "star_8d156e09": {
         "message": "별표 표시"
+    },
+    "start_over_f7552aa9": {
+        "message": "새로 시작"
     },
     "submit_a3cc6859": {
         "message": "제출"

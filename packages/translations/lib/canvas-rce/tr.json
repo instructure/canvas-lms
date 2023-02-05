@@ -75,6 +75,7 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Lisansı:"
   },
+  "current_volume_level_c55ab825": { "message": "Mevcut Ses Seviyesi" },
   "custom_6979cd81": { "message": "Özelleştir" },
   "cyan_c1d5f68a": { "message": "Cam göbeği" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
@@ -103,6 +104,7 @@
   "file_url_c12b64be": { "message": "Dosya URL" },
   "files_c300e900": { "message": "Dosyalar" },
   "files_index_af7c662b": { "message": "Dosya Başlıkları" },
+  "finish_bc343002": { "message": "Tamamla" },
   "format_4247a9c5": { "message": "Format" },
   "generating_preview_45b53be0": { "message": "Oluşturma önizlemesi..." },
   "grades_a61eba0a": { "message": "Notlar" },
@@ -168,6 +170,7 @@
   "purple_7678a9fc": { "message": "Mor" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
   "record_7c9448b": { "message": "Kayıt" },
+  "recording_98da6bda": { "message": "Kaydediliyor" },
   "red_8258edf3": { "message": "Kırmızı" },
   "relationships_6602af70": { "message": "İlişkiler" },
   "replace_e61834a7": { "message": "Değiştir" },
@@ -179,6 +182,7 @@
   "something_went_wrong_89195131": { "message": "Bazı sorunlar oluştu." },
   "sort_by_e75f9e3e": { "message": "Sırala" },
   "star_8d156e09": { "message": "Yıldız" },
+  "start_over_f7552aa9": { "message": "Baştan Başla" },
   "submit_a3cc6859": { "message": "Gönder" },
   "syllabus_f191f65b": { "message": "Ders Programı" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
@@ -209,6 +213,7 @@
     "message": "Erişim tablosu seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
   },
   "unpublished_dfd8801": { "message": "yayınlanmadı" },
+  "untitled_16aa4f2b": { "message": "Başlıksız" },
   "upload_file_fd2361b8": { "message": "Dosya Yükle" },
   "upload_image_6120b609": { "message": "Görsel Yükle" },
   "upload_media_ce31135a": { "message": "Medya Dosyası Yükle" },
@@ -226,15 +231,20 @@
   "user_media_14fbf656": { "message": "Kullanıcı Medya Dosyası" },
   "video_options_24ef6e5d": { "message": "Video Seçenekleri" },
   "video_options_tray_3b9809a5": { "message": "Video Seçenekleri Yan Menüsü" },
+  "video_player_b371005": { "message": "Video Oynatıcı" },
   "view_ba339f93": { "message": "Göster" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Klavye Kısayollarını Göster"
   },
+  "webcam_fe91b20f": { "message": "Web Kamerası" },
   "width_492fec76": { "message": "Genişlik" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Genişlik ve yükseklik rakam olmalı"
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Ana Sayfası" },
-  "yes_dde87d5": { "message": "Evet" }
+  "yes_dde87d5": { "message": "Evet" },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Web kameranız kullanılıyor olabilir."
+  }
 }
