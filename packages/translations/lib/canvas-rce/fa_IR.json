@@ -46,6 +46,7 @@
   "course_files_a31f97fc": { "message": "فایل های درس" },
   "course_navigation_dd035109": { "message": "پیمایش درس" },
   "creative_commons_license_725584ae": { "message": "مجوز کریتیو کامنز:" },
+  "current_volume_level_c55ab825": { "message": "سطح حجم فعلی" },
   "custom_6979cd81": { "message": "سفارشی" },
   "cyan_c1d5f68a": { "message": "آبی تیره" },
   "deep_purple_bb3e2907": { "message": "ارغوانی پر رنگ" },
@@ -67,6 +68,7 @@
   "file_name_8fd421ff": { "message": "نام فایل" },
   "files_c300e900": { "message": "فایل ها" },
   "files_index_af7c662b": { "message": "فهرست فایل ها" },
+  "finish_bc343002": { "message": "پایان" },
   "folder_tree_fbab0726": { "message": "درخت پوشه" },
   "format_4247a9c5": { "message": "قالب" },
   "generating_preview_45b53be0": { "message": "در حال ایجاد پیش نمایش..." },
@@ -105,6 +107,7 @@
   "locked_762f138b": { "message": "قفل شده" },
   "magenta_4a65993c": { "message": "ارغوانی" },
   "media_af190855": { "message": "رسانه" },
+  "mic_a7f3d311": { "message": "میکروفون" },
   "minimize_file_preview_da911944": { "message": "کمینه کردن پیش نمایش فایل" },
   "minimize_video_20aa554b": { "message": "کمینه کردن تصویر" },
   "misc_3b692ea7": { "message": "متفرقه" },
@@ -116,6 +119,7 @@
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
   },
   "no_results_940393cf": { "message": "No results." },
+  "no_video_1ed00b26": { "message": "بدون تصویر" },
   "none_3b5e34d2": { "message": "هیچ کدام" },
   "olive_6a3e4d6b": { "message": "زیتون" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
@@ -125,16 +129,23 @@
   "or_9b70ccaa": { "message": "یا" },
   "orange_81386a62": { "message": "نارنجی" },
   "pages_e5414c2c": { "message": "صفحه ها" },
+  "pause_12af3bb4": { "message": "مکث" },
   "people_b4ebb13c": { "message": "افراد" },
   "percentage_34ab7c2c": { "message": "درصد" },
   "pink_68ad45cb": { "message": "صورتی" },
+  "play_1a47eaa7": { "message": "نمایش" },
   "play_media_comment_35257210": { "message": "پخش نظر رسانه ای" },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "لطفاً به Canvas اجازه دهید تا به میکروفون و وب کم شما دسترسی پیدا کند."
+  },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
+  "preview_a3f8f854": { "message": "پیش نمایش" },
   "published_c944a23d": { "message": "منتشر شده" },
   "pumpkin_904428d5": { "message": "کدوتنبل" },
   "purple_7678a9fc": { "message": "ارغوانی" },
   "quizzes_7e598f57": { "message": "آزمون ها" },
   "record_7c9448b": { "message": "ضبط کردن" },
+  "recording_98da6bda": { "message": "در حال ضبط" },
   "red_8258edf3": { "message": "قرمز" },
   "relationships_6602af70": { "message": "روابط" },
   "replace_e61834a7": { "message": "جایگزین کردن" },
@@ -148,6 +159,8 @@
   "something_went_wrong_d238c551": { "message": "مشکلی پیش آمد" },
   "sort_by_e75f9e3e": { "message": "مرتب کردن بر اساس" },
   "star_8d156e09": { "message": "ستاره دار کردن" },
+  "start_over_f7552aa9": { "message": "شروع دوباره" },
+  "start_recording_9a65141a": { "message": "شروع ضبط" },
   "submit_a3cc6859": { "message": "ارسال" },
   "syllabus_f191f65b": { "message": "سرفصل" },
   "teal_f729a294": { "message": "سبز مایل به آبی" },
@@ -174,6 +187,7 @@
   "toggle_tooltip_d3b7cb86": { "message": "تغییر ابزار راهنما" },
   "top_66e0adb6": { "message": "بالا" },
   "unpublished_dfd8801": { "message": "منتشر نشده" },
+  "untitled_16aa4f2b": { "message": "بدون عنوان" },
   "upload_file_fd2361b8": { "message": "بارگذاری فایل" },
   "upload_image_6120b609": { "message": "بارگذاری عکس" },
   "upload_media_ce31135a": { "message": "بارگذاری رسانه" },
@@ -184,8 +198,13 @@
     "message": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
   },
   "user_files_78e21703": { "message": "فایل های کاربر" },
+  "video_player_b371005": { "message": "پخش کننده فیلم" },
   "view_ba339f93": { "message": "مشاهده" },
+  "webcam_fe91b20f": { "message": "دوربین" },
   "wiki_home_9cd54d0": { "message": "صفحه اصلی ویکی" },
   "yes_dde87d5": { "message": "بله" },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "وب کم شما ممکن است در حال استفاده باشد."
+  },
   "zoom_f3e54d69": { "message": "بزرگنمایی" }
 }
