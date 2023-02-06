@@ -19,7 +19,7 @@
 
 module Autoextend
   class Railtie < Rails::Railtie
-    initializer "inject autoextend hooks", before: (::Rails.version < "7.0" ? :initialize_dependency_mechanism : :setup_once_autoloader) do
+    initializer "inject autoextend hooks", before: :setup_once_autoloader do
       ::Autoextend.inject_into_zetwerk
     end
   end

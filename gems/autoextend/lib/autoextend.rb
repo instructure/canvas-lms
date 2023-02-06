@@ -207,42 +207,5 @@ module Autoextend::ModuleMethods
   end
 end
 
-module Autoextend::ActiveSupport
-  module Dependencies
-    def new_constants_in(*_descs)
-      super.each do |constant_name|
-        constant = Object.const_get(constant_name, false)
-        next unless constant.is_a?(Module)
-
-        Autoextend.const_added(constant, source: :"ActiveSupport::Dependencies", recursive: true)
-      end
-    end
-
-    # override this method to always track constants, even if we're requiring
-    # instead of loading dependencies (i.e. eager_loading).
-    # yes, this adds a minimal amount of overhead to booting in production
-    # mode, but it's within a standard deviation of without it
-    def require_or_load(file_name, _const_path = nil)
-      return super if ActiveSupport::Dependencies.load?
-
-      const_paths = loadable_constants_for_path(file_name)
-      parent_paths = const_paths.collect { |const_path| const_path[/.*(?=::)/] || ::Object }
-      result = nil
-      ::ActiveSupport::Dependencies.new_constants_in(*parent_paths) { result = super }
-      result
-    end
-  end
-end
-
-# if ActiveSupport exists, hook in to allow us to get notifications from
-# all autoloaded constants
-Autoextend.hook(:"ActiveSupport::Dependencies",
-                Autoextend::ActiveSupport::Dependencies,
-                method: :prepend)
-Autoextend.hook(:"ActiveSupport::Dependencies",
-                Autoextend::ActiveSupport::Dependencies,
-                method: :prepend,
-                singleton: true)
-
 Module.prepend(Autoextend::ModuleMethods)
 Class.prepend(Autoextend::ClassMethods)
