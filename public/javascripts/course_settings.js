@@ -40,12 +40,6 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDialog'
 
-  // window.onload = (event) => {
-  //   console.log("page is fully loaded");
-  //   var relock_modules_dialog = new RelockModulesDialog();
-  //   relock_modules_dialog.renderIfNeeded();
-  // };
-
   var GradePublishing = {
     status: null,
     checkup: function () {
