@@ -752,6 +752,9 @@
     "exists_2e62bdaa": {
         "message": "Eksisterer"
     },
+    "exit_fullscreen_b7eb0aa4": {
+        "message": "Exit Fullscreen"
+    },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Utvid førehandsvisinga som standard"
     },
@@ -847,6 +850,9 @@
     },
     "finnish_4df2923d": {
         "message": "Finsk"
+    },
+    "flat_music_76d5a5c3": {
+        "message": "Flat (Music)"
     },
     "focus_element_options_toolbar_18d993e": {
         "message": "Sentrer alternativ-menyen"
@@ -1045,6 +1051,9 @@
     },
     "icon_size_9353edea": {
         "message": "Ikonstorleik"
+    },
+    "if_left_empty_link_text_will_display_as_course_lin_61087540": {
+        "message": "If left empty link, text will display as course link name"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
@@ -1342,6 +1351,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Microphone Disabled"
     },
     "middle_27dc1d5": {
         "message": "Midtpunkt"
@@ -1790,6 +1802,9 @@
     "restore_auto_save_deccd84b": {
         "message": "Gjenopprette auto-lagring?"
     },
+    "reverse_turnstile_does_not_yield_7558be06": {
+        "message": "Reverse Turnstile (Does Not Yield)"
+    },
     "rho_a0244a36": {
         "message": "Rho"
     },
@@ -1856,6 +1871,9 @@
     "save_11a80ec3": {
         "message": "Lagre"
     },
+    "save_media_cb9e786e": {
+        "message": "Save Media"
+    },
     "schedule_preview_3bcda153": {
         "message": "Førehandsvising av timeplan"
     },
@@ -1874,11 +1892,17 @@
     "search_280d00bd": {
         "message": "Søk"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Select audio source"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Vel skjæringsform"
     },
     "select_language_7c93a900": {
         "message": "Vel språk"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Select video source"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Vald { linkFileName }"
@@ -1889,8 +1913,14 @@
     "set_minus_b46e9b88": {
         "message": "Sett minus"
     },
+    "sharp_music_ab956814": {
+        "message": "Sharp (Music)"
+    },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Bruk Shift-O for å opne den pene HTML-editoren."
+    },
+    "shortcut_911d6255": {
+        "message": "Shortcut"
     },
     "show_all_ae37d610": {
         "message": "Vis alt"
@@ -1934,6 +1964,9 @@
     "something_went_wrong_89195131": {
         "message": "Noko gjekk gale."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Something went wrong accessing your webcam."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Noko gjekk gale. Veit ikkje kva som kan visast."
     },
@@ -1942,6 +1975,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Noko gjekk gale"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Something went wrong while sharing your screen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sorter etter"
@@ -2069,6 +2105,12 @@
     "syllabus_f191f65b": {
         "message": "Emneoversikt"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "System Audio Allowed"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "System Audio Disabled"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/piltastar"
     },
@@ -2174,6 +2216,9 @@
     "time_2b5aac58": {
         "message": "Tidspunkt"
     },
+    "timebar_a4d18443": {
+        "message": "Timebar"
+    },
     "title_ee03d132": {
         "message": "Tittel"
     },
@@ -2227,6 +2272,9 @@
     },
     "turkish_5b69578b": {
         "message": "Tyrkisk"
+    },
+    "turnstile_yields_f9e76df1": {
+        "message": "Turnstile (Yields)"
     },
     "type_control_f9_to_access_image_options_text_a47e319f": {
         "message": "vel ctrl+F9 for å sjå alternativ for bildet. { text }"
@@ -2414,6 +2462,21 @@
     "view_title_description_67940918": {
         "message": "Vis { title } skildring"
     },
+    "view_word_and_character_counts_a743dd0c": {
+        "message": "View word and character counts"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "We couldn’t detect a working microphone connected to your device."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "We couldn’t detect a working webcam connected to your device."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "We couldn’t detect a working webcam or microphone connected to your device."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webcam Disabled"
+    },
     "webcam_fe91b20f": {
         "message": "Webkamera"
     },
@@ -2473,6 +2536,15 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Bildet ditt har blitt komprimert for ikondesignaren. Bilder mindre enn { size } KB blir ikkje komprimert."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Your microphone is blocked in the browser settings."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Your webcam and microphone are blocked in the browser settings."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Your webcam is blocked in the browser settings."
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Ditt webkamera kan allereie være i bruk"
