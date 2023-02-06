@@ -307,9 +307,6 @@ import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDia
       },
       success: function(data) {
         $('#course_reload_form').submit();
-        console.log(data);
-        console.log(data.course);
-        // $(this).loadingImage('remove');
       },
       error: function(data) {
         $(this).loadingImage('remove');

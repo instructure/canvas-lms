@@ -3095,12 +3095,10 @@ class Course < ActiveRecord::Base
     @progressions ||= {}
     @progressions[user.id] ||= ContextModuleProgressions::Finder.find_or_create_for_context_and_user(self, user)
   end
-
-
+  
   private
 
   def effective_due_dates
     @effective_due_dates ||= EffectiveDueDates.for_course(self)
   end
-
 end
