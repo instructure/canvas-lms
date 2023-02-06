@@ -2336,6 +2336,23 @@ describe Attachment do
       end
     end
 
+    shared_examples_for "non-streaming integrity_check" do
+      it "accepts a correct md5" do
+        @attachment.md5 = Digest::MD5.hexdigest("good data")
+        expect { @attachment.open(integrity_check: true) }.not_to raise_error
+      end
+
+      it "rejects an invalid md5" do
+        @attachment.md5 = Digest::MD5.hexdigest("bad data")
+        expect { @attachment.open(integrity_check: true) }.to raise_error(Attachment::CorruptedDownload)
+      end
+
+      it "does nothing if there is no md5" do
+        @attachment.md5 = nil
+        expect { @attachment.open(integrity_check: true) }.not_to raise_error
+      end
+    end
+
     context "s3_storage" do
       before do
         s3_storage!
@@ -2366,6 +2383,30 @@ describe Attachment do
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))
         file = @attachment.open
         expect(file).to be_a(Tempfile)
+      end
+
+      describe "integrity_check" do
+        before do
+          expect_any_instance_of(@attachment.s3object.class).to receive(:get) do |_s3, args|
+            args[:response_target].write("good data")
+          end
+        end
+
+        include_examples "non-streaming integrity_check"
+      end
+    end
+
+    context "local storage" do
+      before :once do
+        attachment_model
+      end
+
+      describe "integrity_check" do
+        before do
+          allow(@attachment).to receive(:full_filename).and_return(File.join(RSpec.configuration.fixture_path, "good_data.txt"))
+        end
+
+        include_examples "non-streaming integrity_check"
       end
     end
   end
