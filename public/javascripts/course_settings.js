@@ -38,6 +38,7 @@ import './vendor/jquery.scrollTo'
 import 'jqueryui/autocomplete'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+import RelockModulesDialog from 'compiled/views/course_settings/RelockModulesDialog'
 
   var GradePublishing = {
     status: null,
@@ -127,6 +128,8 @@ import 'jqueryui/tabs'
         initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash);
 
     $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show();
+    var relock_modules_dialog = new RelockModulesDialog();
+    relock_modules_dialog.renderIfNeeded();
 
     $add_section_form.formSubmit({
       required: ['course_section[name]'],
