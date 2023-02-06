@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "A great discussion" },
+  "a_wonderful_assignment_d3139d9b": { "message": "A wonderful assignment" },
   "add_to_do_7537af64": { "message": "Додайте до плану роботи" },
   "add_to_do_7def3c37": { "message": "Додайте до плану роботи" },
   "address_3159962f": { "message": "Адреса:" },
   "all_day_fb42c4fc": { "message": "Весь день" },
   "all_items_loaded_aa256183": { "message": "Всі елементи завантажені" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "An amazing discussion assignment"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Виникла помилка при спробі відхилити цю можливість."
   },
@@ -45,6 +50,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Початок вашої історії завдань"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Below is an example of how students will see their schedule"
+  },
   "calendar_a8563bb2": { "message": "Календар:" },
   "calendar_event_89aadc1c": { "message": "Календарна подія" },
   "canvas_planner_98ed106": { "message": "Планувальник Canvas" },
@@ -56,13 +64,13 @@
     "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
   },
   "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-    "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Hide # missing item}\n  other {Hide # missing items}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
   },
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Show # missing item}\n  other {Show # missing items}\n}"
   },
   "course_8a63b4a3": { "message": "Курс" },
   "course_to_do_bcbbab54": { "message": "Зробити { course }" },
@@ -88,13 +96,32 @@
   "edit_c5fbea07": { "message": "Редагувати" },
   "edit_title_72e5a21e": { "message": "Редагувати { title }" },
   "error_loading_grades_e0b38f4d": { "message": "Помилка завантаження оцінок" },
+  "error_loading_items_5218438e": { "message": "Error loading items" },
   "error_loading_more_items_3f109d9f": {
     "message": "Помилка завантаження інших елементів"
   },
   "error_loading_past_items_2881dbb1": {
     "message": "Помилка завантаження попередніх елементів"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "Виправдано" },
+  "extended_9a58dcb6": { "message": "Extended" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Failed getting course list"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Failed getting To Do list"
+  },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Failed peeking into your future"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Failed peeking into your past"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Failed saving changes on { name }."
+  },
+  "failed_to_delete_name_bdd7b810": { "message": "Failed to delete { name }." },
   "failed_to_delete_to_do_64edff49": {
     "message": "Не вдалося видалити завдання"
   },
@@ -107,7 +134,11 @@
   "failed_to_save_to_do_ddc7503b": {
     "message": "Не вдалося зберегти завдання"
   },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Failure loading the To Do list"
+  },
   "feedback_6dcc1991": { "message": "Зворотній зв''язок" },
+  "fun_quiz_47ab0b0": { "message": "Fun quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Перейти на Панель інструментів Card View"
   },
@@ -118,7 +149,15 @@
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "join_6cafecca": { "message": "Приєднатися" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "join active online meeting"
+  },
+  "join_online_meeting_b1725843": { "message": "join online meeting" },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Jump to navigation toolbar"
+  },
   "jump_to_today_254ccf41": { "message": "Перейти на Сьогодні" },
+  "language_arts_35b79a8b": { "message": "Language Arts" },
   "late_2be42b88": { "message": "Пізніше" },
   "load_more_a36f9cf9": { "message": "Завантажити більше" },
   "load_prior_dates_f2b0f6f0": { "message": "Завантажте попередні дати" },
@@ -138,6 +177,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Виглядає наче тут нічого немає"
   },
+  "math_ede93050": { "message": "Math" },
   "missing_1a256b3b": { "message": "Відсутній" },
   "missing_items_for_title_516511f8": {
     "message": "Відсутні елементи для { title }"
@@ -154,6 +194,7 @@
     "message": "Термін виконання не призначено"
   },
   "no_grade_3b4d7f3e": { "message": "Оцінка відсутня" },
+  "nothing_due_this_week_d45c9ef9": { "message": "Nothing Due This Week" },
   "nothing_for_now_e3e3ce2a": { "message": "Зараз нічого" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Тут ніщо не вимагає уваги."
@@ -173,6 +214,7 @@
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Покано тільки останній період оцінювання."
   },
+  "opportunities_popup_f6703842": { "message": "opportunities popup" },
   "optional_add_course_ef0d70fc": { "message": "Опціонально: Додати курс" },
   "page_50c4823d": { "message": "Сторінка" },
   "peer_review_74f26a13": { "message": "Експертна оцінка" },
@@ -184,9 +226,12 @@
   "previous_month_bb1e3c84": { "message": "Попередній місяць" },
   "pts_699bd9aa": { "message": "бали" },
   "quiz_e0dcce8f": { "message": "Контрольна робота" },
+  "redo_363c58b7": { "message": "Redo" },
   "reminder_date_4564d12d": { "message": "Нагадування: { date }" },
   "replies_4a8577c8": { "message": "Відповіді" },
   "save_11a80ec3": { "message": "Зберегти" },
+  "schedule_preview_3bcda153": { "message": "Schedule Preview" },
+  "science_8d92214a": { "message": "Science" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Прокрутіть вверх, щоб побачити свою історію!"
   },
@@ -195,6 +240,7 @@
   },
   "show_all_ae37d610": { "message": "Показати все" },
   "show_my_grades_ebd08684": { "message": "Показати мої оцінки" },
+  "social_studies_13fa30c7": { "message": "Social Studies" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } до { endDate }"
   },
@@ -207,16 +253,21 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } до { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Student To Do" },
   "submitted_318fad53": { "message": "Підтверджено" },
   "success_to_do_created_e34ed395": {
     "message": "Успіх: План робіт створений"
   },
   "task_16b0ef38": { "message": "Завдання" },
+  "the_best_assignment_15e98be1": { "message": "The best assignment" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Дата та час, до якого це потрібно виконати"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "З цим елементом не пов''язані бали"
+  },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "There is nothing planned for today."
   },
   "time_2b5aac58": { "message": "Час" },
   "title_ee03d132": { "message": "Назва" },
@@ -232,6 +283,14 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Завтра в { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Неможливо позначити як завершений."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Use arrow keys to navigate options."
+  },
+  "view_next_week_7f61f755": { "message": "View next week" },
+  "view_previous_week_6f83849f": { "message": "View previous week" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Weekly schedule navigation"
   },
   "yesterday_at_date_1aa6d18e": { "message": "Вчора в { date }" },
   "yesterday_c6bd6abf": { "message": "Вчора" },

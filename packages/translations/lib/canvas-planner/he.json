@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "A great discussion" },
+  "a_wonderful_assignment_d3139d9b": { "message": "A wonderful assignment" },
   "add_to_do_7537af64": { "message": "הוספת פריט לביצוע" },
   "add_to_do_7def3c37": { "message": "הוספת מטלה לביצוע" },
   "address_3159962f": { "message": "כתובת:" },
   "all_day_fb42c4fc": { "message": "כל היום" },
   "all_items_loaded_aa256183": { "message": "כל הפריטים נטענו" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "An amazing discussion assignment"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "אירעה שגיאה בעת נסיון לוותר על ההזדמנות"
   },
@@ -27,6 +32,9 @@
   "assignmenttype_title_due_datetime_a112d8ff": {
     "message": "{ assignmentType } { title }, תאריך יעד { datetime }."
   },
+  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+    "message": "{ assignmentType } { title } has a to do time at { datetime }."
+  },
   "assignmenttype_title_is_marked_as_done_a8dc46ef": {
     "message": "{ assignmentType } { title } מסומן כבוצע."
   },
@@ -42,6 +50,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Below is an example of how students will see their schedule"
+  },
   "calendar_a8563bb2": { "message": "יומן:" },
   "calendar_event_89aadc1c": { "message": "אירוע יומן" },
   "canvas_planner_98ed106": { "message": "מתכנן קנבס" },
@@ -53,13 +64,13 @@
     "message": "{ count, plural,\n     =0 {# הזדמנויות}\n    one {הזדמנות #}\n  other {# הזדמנויות}\n}"
   },
   "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-    "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Hide # missing item}\n  other {Hide # missing items}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
   },
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Show # missing item}\n  other {Show # missing items}\n}"
   },
   "course_8a63b4a3": { "message": "קורס" },
   "course_to_do_bcbbab54": { "message": "{ course } לביצוע" },
@@ -85,13 +96,32 @@
   "edit_c5fbea07": { "message": "עריכה" },
   "edit_title_72e5a21e": { "message": "עריכת { title }" },
   "error_loading_grades_e0b38f4d": { "message": "שגיאת טעינת ציונים" },
+  "error_loading_items_5218438e": { "message": "Error loading items" },
   "error_loading_more_items_3f109d9f": {
     "message": "שגיאה בטעינת פריטים נוספים"
   },
   "error_loading_past_items_2881dbb1": {
     "message": "שגיאה בטעינת פריטים קודמים"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "נסלח" },
+  "extended_9a58dcb6": { "message": "Extended" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Failed getting course list"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Failed getting To Do list"
+  },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Failed peeking into your future"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Failed peeking into your past"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Failed saving changes on { name }."
+  },
+  "failed_to_delete_name_bdd7b810": { "message": "Failed to delete { name }." },
   "failed_to_delete_to_do_64edff49": { "message": "ביטול המטלה לביצוע נכשל" },
   "failed_to_get_new_activity_17e7ec7c": {
     "message": "כשלון בקבלת פעילות חדשה"
@@ -100,7 +130,11 @@
     "message": "טעינת הזדמנויות נכשלה"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "שמירת המטלה לביצוע נכשלה" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Failure loading the To Do list"
+  },
   "feedback_6dcc1991": { "message": "משוב" },
+  "fun_quiz_47ab0b0": { "message": "Fun quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "מעבר לחלון הצגת הגיליון"
   },
@@ -111,7 +145,15 @@
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "join_6cafecca": { "message": "הצטרפות" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "join active online meeting"
+  },
+  "join_online_meeting_b1725843": { "message": "join online meeting" },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Jump to navigation toolbar"
+  },
   "jump_to_today_254ccf41": { "message": "עבור להיום" },
+  "language_arts_35b79a8b": { "message": "Language Arts" },
   "late_2be42b88": { "message": "איחור" },
   "load_more_a36f9cf9": { "message": "טענו עוד" },
   "load_prior_dates_f2b0f6f0": { "message": "טעינת מועדים קודמים" },
@@ -127,6 +169,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "נראה שאין פה כלום"
   },
+  "math_ede93050": { "message": "Math" },
   "missing_1a256b3b": { "message": "חסר" },
   "missing_items_for_title_516511f8": { "message": "חסרים פריטים ל { title }" },
   "my_grades_98834476": { "message": "הציונים שלי" },
@@ -137,6 +180,7 @@
   "next_month_749b1778": { "message": "החודש הבא" },
   "no_due_dates_assigned_e8f5bac8": { "message": "לא הוגדרו תאריכי יעד" },
   "no_grade_3b4d7f3e": { "message": "ללא ציון" },
+  "nothing_due_this_week_d45c9ef9": { "message": "Nothing Due This Week" },
   "nothing_for_now_e3e3ce2a": { "message": "אין כלום לעכשיו" },
   "nothing_here_needs_attention_c4eaded6": { "message": "אין צורך לבצע דבר" },
   "nothing_more_to_do_b665da42": { "message": "אין משימות נוספות" },
@@ -152,6 +196,7 @@
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*רק תקופת הציונים האחרונה מוצגת."
   },
+  "opportunities_popup_f6703842": { "message": "opportunities popup" },
   "optional_add_course_ef0d70fc": { "message": "אופציונלי: הוספת קורס" },
   "page_50c4823d": { "message": "דף" },
   "peer_review_74f26a13": { "message": "ביקורת עמיתים" },
@@ -163,9 +208,12 @@
   "previous_month_bb1e3c84": { "message": "החודש הקודם" },
   "pts_699bd9aa": { "message": "נקודות" },
   "quiz_e0dcce8f": { "message": "בוחן" },
+  "redo_363c58b7": { "message": "Redo" },
   "reminder_date_4564d12d": { "message": "תזכורת: { date }" },
   "replies_4a8577c8": { "message": "תשובות" },
   "save_11a80ec3": { "message": "שמירה " },
+  "schedule_preview_3bcda153": { "message": "Schedule Preview" },
+  "science_8d92214a": { "message": "Science" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "דפדוף מעלה כדי לעיין בהסטוריה שלך!"
   },
@@ -174,6 +222,7 @@
   },
   "show_all_ae37d610": { "message": "הצגה של הכל" },
   "show_my_grades_ebd08684": { "message": "הצגה של ציוני" },
+  "social_studies_13fa30c7": { "message": "Social Studies" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } ל { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -182,14 +231,19 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": { "message": "{ startTime } ל { endTime }" },
+  "student_to_do_c018c835": { "message": "Student To Do" },
   "submitted_318fad53": { "message": "הוגשה" },
   "success_to_do_created_e34ed395": { "message": "הצלחה: פריט משימה נוצר" },
   "task_16b0ef38": { "message": "מטלה" },
+  "the_best_assignment_15e98be1": { "message": "The best assignment" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "התאריך והשעה של פריט משימה זו הגיע"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "אין נקודות המשויכות לפריט זה"
+  },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "There is nothing planned for today."
   },
   "time_2b5aac58": { "message": "זמן " },
   "title_ee03d132": { "message": "כותרת" },
@@ -203,6 +257,14 @@
   "tomorrow_at_date_b53f2cf1": { "message": "מחר, בתאריך { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "אין אפשרות לסמן כהושלם"
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Use arrow keys to navigate options."
+  },
+  "view_next_week_7f61f755": { "message": "View next week" },
+  "view_previous_week_6f83849f": { "message": "View previous week" },
+  "weekly_schedule_navigation_6b042645": {
+    "message": "Weekly schedule navigation"
   },
   "yesterday_at_date_1aa6d18e": { "message": "אתמול, בתאריך { date }" },
   "yesterday_c6bd6abf": { "message": "אתמול" },
