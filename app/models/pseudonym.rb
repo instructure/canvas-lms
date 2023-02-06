@@ -516,18 +516,12 @@ class Pseudonym < ActiveRecord::Base
   end
   alias_method :has_changes_to_save?, :changed?
 
-  if Rails.version < "7.0"
-    def attribute_names_for_partial_writes
-      strip_inferred_authentication_provider(super)
-    end
-  else
-    def attribute_names_for_partial_inserts
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_inserts
+    strip_inferred_authentication_provider(super)
+  end
 
-    def attribute_names_for_partial_updates
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_updates
+    strip_inferred_authentication_provider(super)
   end
 
   def strip_inferred_authentication_provider(attribute_names)

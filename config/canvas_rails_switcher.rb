@@ -27,7 +27,7 @@
 # 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
 
 DEFAULT_VERSION = "7.0"
-SUPPORTED_VERSIONS = %w[6.1 7.0].freeze
+SUPPORTED_VERSIONS = %w[7.0].freeze
 
 unless defined?(CANVAS_RAILS)
   file_path = File.expand_path("RAILS_VERSION", __dir__)

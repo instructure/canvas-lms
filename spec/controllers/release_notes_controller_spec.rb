@@ -270,10 +270,8 @@ describe ReleaseNotesController do
         # The second spanish request shouldn't call the method at all though
         expect(ReleaseNote).to receive(:latest).exactly(@user.roles(@student_enrollment.root_account).length * 2).times.and_call_original
         get "latest"
-        subject.send(:clear_ivars)
         get "latest"
         @user.update_attribute :locale, "en"
-        subject.send(:clear_ivars)
         get "latest"
       end
     end
@@ -282,7 +280,6 @@ describe ReleaseNotesController do
       get "latest"
       res = JSON.parse(response.body)
       expect(res[0]["new"]).to eq(true)
-      subject.send(:clear_ivars)
       get "latest"
       res = JSON.parse(response.body)
       expect(res[0]["new"]).to eq(false)
@@ -307,7 +304,6 @@ describe ReleaseNotesController do
 
     it "includes no notes if the user has seen them all" do
       get "latest"
-      subject.send(:clear_ivars)
       get "unread_count"
       res = JSON.parse(response.body)
       expect(res["unread_count"]).to eq(0)
