@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
@@ -105,6 +105,8 @@ const PaceContextsTable = ({
   contextsPublishing,
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
+  const [newOrderType, setNewOrderType] = useState(currentOrderType)
+  const tableRef = useRef<HTMLElement | null>(null)
   const paceType = contextType === 'student_enrollment' ? 'student' : 'section'
   const tableCaption = I18n.t('%{paceType} paces: sorted by %{sortBy} in %{orderType} order', {
     paceType,
@@ -116,6 +118,23 @@ const PaceContextsTable = ({
     setHeaders(getHeaderByContextType())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contextType])
+
+  useEffect(() => {
+    setNewOrderType(currentOrderType === 'asc' ? 'desc' : 'asc')
+  }, [currentOrderType])
+
+  useEffect(() => {
+    tableRef.current?.querySelectorAll<HTMLElement>('th[data-button-label]').forEach(el => {
+      const buttonHeaderLabel = el.getAttribute('data-button-label')
+      const sortingButton = el.querySelector('button')
+      // InstUI uses the default announcement for the aria-sort attribute,
+      // but that does not provide any description for the sorting button
+      // this overrides the column header aria-sort and sets a custom announcement
+      // for the sorting button
+      el.removeAttribute('aria-sort')
+      sortingButton?.setAttribute('aria-label', buttonHeaderLabel)
+    })
+  }, [newOrderType])
 
   const formatDate = (date: string) => {
     if (!date) return '--'
@@ -212,12 +231,10 @@ const PaceContextsTable = ({
   }
 
   const handleSort = () => {
-    const newOrderType = currentOrderType === 'asc' ? 'desc' : 'asc'
     const message = I18n.t('Sorted by %{sortBy} in %{orderType} order', {
       sortBy: currentSortBy,
       orderType: SORT_TYPE[newOrderType],
     })
-
     setOrderType(newOrderType)
     screenReaderFlashMessage(message)
   }
@@ -226,6 +243,10 @@ const PaceContextsTable = ({
     const sortingProps = {
       onRequestSort: handleSort,
       sortDirection: currentSortBy ? SORT_TYPE[currentOrderType] : 'none',
+      'data-button-label': I18n.t('Sort %{orderType} by %{sortBy}', {
+        sortBy: currentSortBy,
+        orderType: SORT_TYPE[newOrderType],
+      }),
     }
     return (
       <TableHead renderSortLabel={I18n.t('Sort By')}>
@@ -238,6 +259,7 @@ const PaceContextsTable = ({
               theme={{padding: '0.75rem'}}
               {...(header.sortable && {
                 ...sortingProps,
+                'aria-label': header.text,
                 'data-testid': `sortable-column-${header.key}`,
               })}
             >
@@ -321,7 +343,13 @@ const PaceContextsTable = ({
         )
       ) : (
         <View as="div" margin="none none large none" borderWidth="0 small">
-          <Table data-testid="course-pace-context-table" caption={tableCaption}>
+          <Table
+            elementRef={e => {
+              tableRef.current = e
+            }}
+            data-testid="course-pace-context-table"
+            caption={tableCaption}
+          >
             {renderHeader()}
             {!isLoading && (
               <TableBody>
