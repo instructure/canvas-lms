@@ -1,5 +1,7 @@
 {
   "to": "transifex",
+  "organization": "Instructure",
+  "organizationSlug": "instructure",
   "project": "Canvas (Crowdsource)",
   "projectSlug": "canvas-crowdsource",
   "resource": "Canvas Packages",
