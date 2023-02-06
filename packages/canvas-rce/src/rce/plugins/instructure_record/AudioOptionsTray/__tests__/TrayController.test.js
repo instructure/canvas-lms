@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 
 import TrayController, {CONTAINER_ID} from '../TrayController'
-import FakeEditor from '../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../__tests__/FakeEditor'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 

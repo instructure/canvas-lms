@@ -19,7 +19,7 @@
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import MentionDropdown from '../MentionDropdown'
-import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
+import FakeEditor from '../../../__tests__/FakeEditor'
 import tinymce from 'tinymce'
 import getPosition from '../getPosition'
 import {ARIA_ID_TEMPLATES} from '../../../constants'

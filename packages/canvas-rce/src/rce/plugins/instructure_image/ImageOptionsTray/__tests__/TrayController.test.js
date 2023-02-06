@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 
 import TrayController, {CONTAINER_ID} from '../TrayController'
-import FakeEditor from '../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../__tests__/FakeEditor'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
 
 describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
@@ -235,7 +235,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
 
       it('sets focus on the editor', () => {
         // Focus otherwise goes to the document body at this time.
-        expect(document.activeElement).toEqual(editors[0].$container)
+        expect(document.activeElement).toBe(editors[0].$iframe)
       })
     })
   })

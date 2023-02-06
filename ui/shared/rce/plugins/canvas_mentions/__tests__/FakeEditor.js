@@ -16,6 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* ****************************
+ *
+ * The original tinymce editor mock in
+ * packages/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor.js
+ * has been replaced with a new more realistic one in
+ * packages/canvas-rce/src/rce/__tests_/FakeEditor.js
+ * but I could not get the tests in this directory to pass using it so
+ * I copied the deprecated FakeEditor from there to here since
+ * these are the only specs using it any more.
+ *
+ **************************** */
+
 export default class FakeEditor {
   constructor(textareaId) {
     this.id = textareaId
@@ -26,11 +38,8 @@ export default class FakeEditor {
       },
     }
     this.callbacks = {}
-
     this._selectedNode = null
-
     this._collapsed = false
-
     this.getContainer = () => this._$container
     this.isHidden = () => false
     this.getContent = () => this._$container.innerHTML
@@ -39,24 +48,20 @@ export default class FakeEditor {
         this._$container.innerHTML = content
       }
     }
-
     this.execCommand = (command, userInterface, value) => {
       switch (command) {
-        case 'mceInsertContent':
+        case 'mceInsertContent': {
           const newNode = document.createElement('div')
           newNode.innerHTML = value
           this.getBody().appendChild(newNode.firstChild)
+        }
       }
     }
-
     this.getBody = () => this.getContainer().firstChild
     this.getWin = () => window
-
     this.selection = {
       getNode: () => this._selectedNode,
-
       getContent: () => (this._selectedNode ? this._selectedNode.outerHTML : ''),
-
       setContent: contentString => {
         if (this._selectedNode) {
           this._selectedNode.remove()
@@ -88,7 +93,6 @@ export default class FakeEditor {
       getBookmark: () => {},
       moveToBookmark: () => {},
     }
-
     this.dom = {
       getParent: (el, selector) => {
         let ancestor = el && el.parentNode

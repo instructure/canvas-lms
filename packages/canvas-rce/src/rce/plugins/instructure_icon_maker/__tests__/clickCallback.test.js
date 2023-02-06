@@ -18,7 +18,7 @@
 
 import clickCallback, {ICONS_TRAY_CONTAINER_ID} from '../clickCallback'
 import ReactDOM from 'react-dom'
-import FakeEditor from '../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../__tests__/FakeEditor'
 import {waitFor} from '@testing-library/react'
 
 jest.mock('react-dom', () => ({

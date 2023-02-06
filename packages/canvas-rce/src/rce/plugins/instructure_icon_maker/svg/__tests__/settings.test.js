@@ -19,7 +19,7 @@
 import fetchMock from 'fetch-mock'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, statuses} from '../settings'
-import Editor from '../../../shared/__tests__/FakeEditor'
+import Editor from '../../../../__tests__/FakeEditor'
 
 jest.mock('../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn().mockReturnValue(

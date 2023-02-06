@@ -18,7 +18,7 @@
 import {screen, waitFor, fireEvent} from '@testing-library/dom'
 
 import TrayController from '../TrayController'
-import FakeEditor from '../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../__tests__/FakeEditor'
 
 describe('RCE "Images" Plugin > ImageOptionsTray > TrayController for Icon Maker Icons', () => {
   const isIconMaker = true

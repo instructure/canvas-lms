@@ -41,6 +41,7 @@
     "build:cjs": "babel --out-dir lib src --ignore '**/__tests__,**/__mocks__' --config-file=./babel.config.cjs.js --extensions '.ts,.tsx,.js'",
     "build:canvas": "scripts/build-canvas",
     "build:watch": "yarn clean:es && yarn build:es --watch",
+    "build:cjs:watch": "yarn build:cjs --watch",
     "build:cafe": "wp --config webpack.testcafe.config.js",
     "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js*' '**/*.ts*'",
