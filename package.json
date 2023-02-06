@@ -133,7 +133,6 @@
     "immer": "^3",
     "immutability-helper": "^3",
     "immutable": "^3.8.2",
-    "intl-polyfills": "*",
     "is-valid-domain": "^0.0.11",
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "jquery-getscrollbarwidth": "^1.0.0",

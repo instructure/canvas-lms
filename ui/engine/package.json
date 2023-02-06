@@ -13,7 +13,13 @@
     "build:canvas": "yarn run check && yarn run lint"
   },
   "dependencies": {
-    "@instructure/updown": "^1.3"
+    "@instructure/updown": "^1.3",
+    "@formatjs/intl-getcanonicallocales": "^2",
+    "@formatjs/intl-locale": "^3",
+    "@formatjs/intl-pluralrules": "^5",
+    "@formatjs/intl-datetimeformat": "^6",
+    "@formatjs/intl-numberformat": "^8",
+    "@formatjs/intl-relativetimeformat": "^11"
   },
   "eslintConfig": {
     "env": {
