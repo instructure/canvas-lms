@@ -33,7 +33,7 @@ import {
   isAudioElement,
   findMediaPlayerIframe,
 } from '../ContentSelection'
-import FakeEditor from './FakeEditor'
+import FakeEditor from '../../../__tests__/FakeEditor'
 
 describe('RCE > Plugins > Shared > Content Selection', () => {
   let $container

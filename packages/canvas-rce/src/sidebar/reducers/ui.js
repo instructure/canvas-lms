@@ -57,6 +57,14 @@ function selectedAccordionIndex(state = '', action) {
       return ''
 
     case CHANGE_ACCORDION:
+      try {
+        if (action.index !== window.sessionStorage.getItem('canvas_rce_links_accordion_index')) {
+          window.sessionStorage.setItem('canvas_rce_links_accordion_index', action.index)
+        }
+      } catch (err) {
+        // If there is an error accessing session storage, just ignore it.
+        // We are likely in a test environment
+      }
       return action.index
 
     default:

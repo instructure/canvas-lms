@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 
 import LinkOptionsDialogController, {CONTAINER_ID} from '../LinkOptionsDialogController'
-import FakeEditor from '../../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../../__tests__/FakeEditor'
 import bridge from '../../../../../../bridge'
 import LinkOptionsDialogDriver from './LinkOptionsDialogDriver'
 

@@ -101,6 +101,7 @@ describe('SavedIconMakerList()', () => {
       onImageEmbed: jest.fn(),
       sortBy: {sort: 'alphabetical', order: 'asc'},
       searchString: '',
+      ...mockContent,
     }
   })
 

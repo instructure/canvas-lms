@@ -21,6 +21,8 @@ import {act, render, waitFor, waitForElementToBeRemoved, fireEvent} from '@testi
 
 import bridge from '../../../../bridge'
 import * as fakeSource from '../../../../rcs/fake'
+import initialState from '../../../../sidebar/store/initialState'
+import sidebarHandlers from '../../../../sidebar/containers/sidebarHandlers'
 import CanvasContentTray from '../CanvasContentTray'
 
 jest.useFakeTimers()
@@ -42,6 +44,18 @@ jest.mock('../../../../bridge', () => {
   return original
 })
 
+const storeInitialState = {
+  ...initialState({
+    contextId: '1201',
+    contextType: 'course',
+    canvasOrigin: 'http://canvas:3000',
+    jwt: 'xyzzy',
+    host: 'http://canvas.rcs:3001',
+    refreshToken: () => {},
+  }),
+  ...sidebarHandlers(() => {}),
+}
+
 describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
@@ -52,10 +66,12 @@ describe('RCE Plugins > CanvasContentTray', () => {
       bridge,
       editor,
       containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
-      contextId: '1201',
-      contextType: 'course',
+      contextId: storeInitialState.contextId,
+      contextType: storeInitialState.contextType,
+      canvasOrigin: storeInitialState.canvasOrigin,
       source: fakeSource,
       themeUrl: 'http://localhost/tinymce-theme.swf',
+      storeProps: storeInitialState,
       ...override,
     }
     return props

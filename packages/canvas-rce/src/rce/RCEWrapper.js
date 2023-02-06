@@ -20,6 +20,7 @@ import PropTypes from 'prop-types'
 import React, {Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
 import _ from 'lodash'
+import {StoreProvider} from './plugins/shared/StoreContext'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
@@ -604,7 +605,11 @@ class RCEWrapper extends React.Component {
           if (!fileMetaProps.domObject.preview) URL.revokeObjectURL(image.src)
 
           // we constrain the <img> to max-width: 100%, so scale the size down if necessary
-          const maxWidth = this.iframe.contentDocument.body.clientWidth
+          const maxWidth = Math.floor(
+            this.mceInstance().getBody().clientWidth ||
+              window.visualViewport?.width ||
+              Number.MAX_SAFE_INTEGER
+          )
           if (width > maxWidth) {
             height = Math.round((maxWidth / width) * height)
             width = maxWidth
@@ -1985,100 +1990,116 @@ class RCEWrapper extends React.Component {
       )
     }
     return (
-      <div
-        key={this.id}
-        className={`${styles.root} rce-wrapper`}
-        ref={this._elementRef}
-        onFocus={this.handleFocusRCE}
-        onBlur={this.handleBlurRCE}
+      <StoreProvider
+        jwt={this.props.trayProps?.jwt}
+        refreshToken={this.props.trayProps?.refreshToken}
+        host={this.props.trayProps?.host}
+        contextType={this.props.trayProps?.contextType}
+        contextId={this.props.trayProps?.contextId}
+        canvasOrigin={this.props.canvasOrigin}
       >
-        {this.state.shouldShowOnFocusButton && (
-          <ShowOnFocusButton
-            id={`show-on-focus-btn-${this.id}`}
-            onClick={this.openKBShortcutModal}
-            margin="xx-small"
-            screenReaderLabel={formatMessage('View keyboard shortcuts')}
-            ref={el => (this._showOnFocusButton = el)}
-          >
-            <IconKeyboardShortcutsLine />
-          </ShowOnFocusButton>
-        )}
-        <AlertMessageArea
-          messages={this.state.messages}
-          liveRegion={this.props.liveRegion}
-          afterDismiss={this.removeAlert}
-        />
-        {this.state.editorView === PRETTY_HTML_EDITOR_VIEW && this.renderHtmlEditor()}
-        <div
-          style={{display: this.state.editorView === PRETTY_HTML_EDITOR_VIEW ? 'none' : 'block'}}
-        >
-          <Editor
-            id={mceProps.textareaId}
-            textareaName={mceProps.name}
-            init={this.tinymceInitOptions}
-            initialValue={mceProps.defaultContent}
-            onInit={this.onInit}
-            onClick={this.handleFocusEditor}
-            onKeypress={this.handleFocusEditor}
-            onActivate={this.handleFocusEditor}
-            onRemove={this.onRemove}
-            onFocus={this.handleFocusEditor}
-            onBlur={this.handleBlurEditor}
-            onNodeChange={this.onNodeChange}
-            onEditorChange={this.onEditorChange}
-          />
-        </div>
-        <StatusBar
-          id={this._statusBarId}
-          rceIsFullscreen={this._isFullscreen()}
-          readOnly={this.props.readOnly}
-          onChangeView={newView => this.toggleView(newView)}
-          path={this.state.path}
-          wordCount={this.state.wordCount}
-          editorView={this.state.editorView}
-          preferredHtmlEditor={getHtmlEditorCookie()}
-          onResize={this.onResize}
-          onKBShortcutModalOpen={this.openKBShortcutModal}
-          onA11yChecker={this.onA11yChecker}
-          onFullscreen={this.handleClickFullscreen}
-          a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
-          a11yErrorsCount={this.state.a11yErrorsCount}
-          onWordcountModalOpen={() =>
-            launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
-          }
-          disabledPlugins={this.pluginsToExclude}
-        />
-        {this.props.trayProps && this.props.trayProps.containingContext && (
-          <CanvasContentTray
-            mountNode={this.state.popupMountNode}
-            key={this.id}
-            canvasOrigin={this.getCanvasUrl()}
-            bridge={bridge}
-            editor={this}
-            onTrayClosing={this.handleContentTrayClosing}
-            use_rce_icon_maker={this.props.use_rce_icon_maker}
-            {...trayProps}
-          />
-        )}
-        <KeyboardShortcutModal
-          onExited={this.KBShortcutModalExited}
-          onDismiss={this.closeKBShortcutModal}
-          open={this.state.KBShortcutModalOpen}
-        />
-        {this.state.confirmAutoSave ? (
-          <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
-            <RestoreAutoSaveModal
-              savedContent={this.state.autoSavedContent}
-              open={this.state.confirmAutoSave}
-              onNo={() => this.restoreAutoSave(false)}
-              onYes={() => this.restoreAutoSave(true)}
-            />
-          </Suspense>
-        ) : null}
-        <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
-          {this.state.announcement}
-        </Alert>
-      </div>
+        {storeProps => {
+          return (
+            <div
+              key={this.id}
+              className={`${styles.root} rce-wrapper`}
+              ref={this._elementRef}
+              onFocus={this.handleFocusRCE}
+              onBlur={this.handleBlurRCE}
+            >
+              {this.state.shouldShowOnFocusButton && (
+                <ShowOnFocusButton
+                  id={`show-on-focus-btn-${this.id}`}
+                  onClick={this.openKBShortcutModal}
+                  margin="xx-small"
+                  screenReaderLabel={formatMessage('View keyboard shortcuts')}
+                  ref={el => (this._showOnFocusButton = el)}
+                >
+                  <IconKeyboardShortcutsLine />
+                </ShowOnFocusButton>
+              )}
+              <AlertMessageArea
+                messages={this.state.messages}
+                liveRegion={this.props.liveRegion}
+                afterDismiss={this.removeAlert}
+              />
+              {this.state.editorView === PRETTY_HTML_EDITOR_VIEW && this.renderHtmlEditor()}
+              <div
+                style={{
+                  display: this.state.editorView === PRETTY_HTML_EDITOR_VIEW ? 'none' : 'block',
+                }}
+              >
+                <Editor
+                  id={mceProps.textareaId}
+                  textareaName={mceProps.name}
+                  init={this.tinymceInitOptions}
+                  initialValue={mceProps.defaultContent}
+                  onInit={this.onInit}
+                  onClick={this.handleFocusEditor}
+                  onKeypress={this.handleFocusEditor}
+                  onActivate={this.handleFocusEditor}
+                  onRemove={this.onRemove}
+                  onFocus={this.handleFocusEditor}
+                  onBlur={this.handleBlurEditor}
+                  onNodeChange={this.onNodeChange}
+                  onEditorChange={this.onEditorChange}
+                />
+              </div>
+              <StatusBar
+                id={this._statusBarId}
+                rceIsFullscreen={this._isFullscreen()}
+                readOnly={this.props.readOnly}
+                onChangeView={newView => this.toggleView(newView)}
+                path={this.state.path}
+                wordCount={this.state.wordCount}
+                editorView={this.state.editorView}
+                preferredHtmlEditor={getHtmlEditorCookie()}
+                onResize={this.onResize}
+                onKBShortcutModalOpen={this.openKBShortcutModal}
+                onA11yChecker={this.onA11yChecker}
+                onFullscreen={this.handleClickFullscreen}
+                a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
+                a11yErrorsCount={this.state.a11yErrorsCount}
+                onWordcountModalOpen={() =>
+                  launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
+                }
+                disabledPlugins={this.pluginsToExclude}
+              />
+              {this.props.trayProps?.containingContext && (
+                <CanvasContentTray
+                  mountNode={this.state.popupMountNode}
+                  key={this.id}
+                  canvasOrigin={this.getCanvasUrl()}
+                  bridge={bridge}
+                  editor={this}
+                  onTrayClosing={this.handleContentTrayClosing}
+                  use_rce_icon_maker={this.props.use_rce_icon_maker}
+                  {...trayProps}
+                  storeProps={storeProps}
+                />
+              )}
+              <KeyboardShortcutModal
+                onExited={this.KBShortcutModalExited}
+                onDismiss={this.closeKBShortcutModal}
+                open={this.state.KBShortcutModalOpen}
+              />
+              {this.state.confirmAutoSave ? (
+                <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
+                  <RestoreAutoSaveModal
+                    savedContent={this.state.autoSavedContent}
+                    open={this.state.confirmAutoSave}
+                    onNo={() => this.restoreAutoSave(false)}
+                    onYes={() => this.restoreAutoSave(true)}
+                  />
+                </Suspense>
+              ) : null}
+              <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
+                {this.state.announcement}
+              </Alert>
+            </div>
+          )
+        }}
+      </StoreProvider>
     )
   }
 }
