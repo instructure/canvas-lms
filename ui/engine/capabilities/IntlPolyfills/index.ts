@@ -17,6 +17,9 @@
  */
 
 import type {Capability} from '@instructure/updown';
+import {shouldPolyfill as spfGCL} from '@formatjs/intl-getcanonicallocales/should-polyfill';
+import {shouldPolyfill as spfL} from '@formatjs/intl-locale/should-polyfill';
+import {shouldPolyfill as spfPR} from '@formatjs/intl-pluralrules/should-polyfill';
 import {shouldPolyfill as spfNF} from '@formatjs/intl-numberformat/should-polyfill';
 import {shouldPolyfill as spfDTF} from '@formatjs/intl-datetimeformat/should-polyfill';
 import {shouldPolyfill as spfRTF} from '@formatjs/intl-relativetimeformat/should-polyfill';
@@ -41,18 +44,33 @@ type PolyfillerUpValue = {
 };
 
 type PolyfillerArgs = {
-  subsys: Function
-  should: (locale: string) => string | undefined
+  subsysName: string
+  should: (locale?: string) => string | boolean | undefined
   polyfill: () => Promise<unknown>
-  localeLoader: (locale: string) => Promise<void>
+  localeLoader?: (locale: string) => Promise<void>
 };
 
-function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerArgs): Capability {
-  const subsysName = subsys.name;
+function polyfillerFactory({subsysName, should, polyfill, localeLoader}: PolyfillerArgs): Capability {
+  const subsys = Intl[subsysName];
   const native = subsys;
   const nativeName = 'Native' + subsysName;
 
   async function up(givenLocales: Array<string>): Promise<PolyfillerUpValue> {
+    // If this subsystem doesn't provide `supportedLocalesOf` then it is not
+    // locale-specific, so we merely have to check if it is there.
+    if (!(subsys?.supportedLocalesOf instanceof Function)) {
+      if (should()) {
+        await polyfill();
+        return {subsys: subsysName, locale: 'all locales', source: 'polyfill' };
+      }
+      return {subsys: subsysName, locale: 'all locales', source: 'native'};
+    }
+
+    // If on the other hand it IS locale-specific, make sure we were actually
+    // passed a localeLoader function
+    if (!(localeLoader instanceof Function))
+      throw new TypeError(`polyfillerFactory needs localeLoader for ${subsysName}`);
+
     // 'en' is the final fallback, don't settle for that unless it's the only
     // available locale, in which case we do nothing.
     const locales = [...givenLocales];
@@ -66,14 +84,16 @@ function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerA
       for (const locale of locales) {
         const nativeSupport = Intl[subsysName].supportedLocalesOf([locale]);
         if (nativeSupport.length > 0)
-          return {subsys: subsysName, locale: native[0], source: 'native'};
+          return {subsys: subsysName, locale: nativeSupport[0], source: 'native'};
 
         const doable = should(locale);
         if (!doable || doable === 'en') continue;
         await polyfill();
-        await localeLoader(doable);
+        if (typeof doable === 'string') await localeLoader(doable);
         Intl[nativeName] = native;
-        return {subsys: subsysName, locale, source: 'polyfill', loaded: doable};
+        const retval: PolyfillerUpValue =  {subsys: subsysName, locale, source: 'polyfill'};
+        if (typeof doable === 'string') retval.loaded = doable;
+        return retval; 
       }
       /* eslint-enable no-await-in-loop */
       return {subsys: subsysName, locale: fallback, error: 'polyfill unavailable'};
@@ -84,8 +104,10 @@ function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerA
   }
 
   function down(): void {
-    delete Intl[nativeName];
-    Intl[subsysName] = native;
+    if (subsysName) {
+      delete Intl[nativeName];
+      Intl[subsysName] = native;
+    }
   }
 
   return {
@@ -97,47 +119,90 @@ function polyfillerFactory({subsys, should, polyfill, localeLoader}: PolyfillerA
   };
 }
 
-const intlSubsystemsInUse: Capability[] = [
-  polyfillerFactory({
-    subsys: Intl.DateTimeFormat,
+const subsystems: { [subsys: string]: Capability } = {
+  getcanonicallocales: polyfillerFactory({
+    subsysName: 'getCanonicalLocales',
+    should: spfGCL,
+    polyfill: () => import('@formatjs/intl-getcanonicallocales/polyfill'),
+  }),
+
+  locale: polyfillerFactory({
+    subsysName: 'Locale',
+    should: spfL,
+    polyfill: () => import('@formatjs/intl-locale/polyfill-force'),
+  }),
+
+  pluralrules: polyfillerFactory({
+    subsysName: 'PluralRules',
+    should: spfPR,
+    polyfill: () => import('@formatjs/intl-pluralrules/polyfill-force'),
+    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('pluralrules', l)),
+  }),
+
+  datetimeformat: polyfillerFactory({
+    subsysName: 'DateTimeFormat',
     should: spfDTF,
     polyfill: async () => {
       await import('@formatjs/intl-datetimeformat/polyfill-force');
       await import(/* webpackIgnore: true */ `${FORMAT_JS_DIR}/intl-datetimeformat/add-all-tz.js`);
     },
-    localeLoader: (l: string) =>
-      import(/* webpackIgnore: true */ localeDataFor('datetimeformat', l)),
+    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('datetimeformat', l)),
   }),
 
-  polyfillerFactory({
-    subsys: Intl.NumberFormat,
+  numberformat: polyfillerFactory({
+    subsysName: 'NumberFormat',
     should: spfNF,
     polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
     localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('numberformat', l)),
   }),
 
-  polyfillerFactory({
-    subsys: Intl.RelativeTimeFormat,
+  relativetimeformat: polyfillerFactory({
+    subsysName: 'RelativeTimeFormat',
     should: spfRTF,
     polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
-    localeLoader: (l: string) =>
-      import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l)),
+    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l)),
   }),
-];
+};
+
+function polyfillUp(...polyfills: unknown[]) {
+  polyfills.forEach(polyfillResult => {
+    if (typeof polyfillResult === 'undefined') return;
+    const r = polyfillResult as PolyfillerUpValue;
+    if (r.error)
+      // eslint-disable-next-line no-console
+      console.error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`);
+    if (r.source === 'polyfill')
+      // eslint-disable-next-line no-console
+      console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`);
+  });
+}
+
+// See https://formatjs.io/docs/polyfills/ for a good graphical explanation of why
+// these all have to be loaded in the dependent order specified.
+
+const level1: Capability = {
+  up: polyfillUp,
+  requires: [subsystems.getcanonicallocales],
+};
+
+const level2: Capability = {
+  up: polyfillUp,
+  requires: [level1, subsystems.locale],
+};
+
+const level3: Capability = {
+  up: polyfillUp,
+  requires: [level2, subsystems.pluralrules],
+};
+
+const level4: Capability = {
+  up: polyfillUp,
+  requires: [level3, subsystems.numberformat]
+};
 
 const IntlPolyfills: Capability = {
-  up: (...polyfills) => {
-    polyfills.forEach(polyfillResult => {
-      const r = polyfillResult as PolyfillerUpValue;
-      if (r.error)
-        // eslint-disable-next-line no-console
-        console.error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`);
-      if (r.source === 'polyfill')
-        // eslint-disable-next-line no-console
-        console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`);
-    });
-  },
-  requires: intlSubsystemsInUse,
+  up:polyfillUp,
+  requires: [level4, subsystems.datetimeformat, subsystems.relativetimeformat],
 };
 
 export default IntlPolyfills;
