@@ -97,17 +97,17 @@ class ContentParticipationCount < ActiveRecord::Base
         SQL
 
         muted_condition = " AND (assignments.muted IS NULL OR NOT assignments.muted)"
-        posted_at_condition = " AND submissions.posted_at IS NOT NULL"
+        posted_at_condition = " AND (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)"
         visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         submission_conditions << (visibility_feedback_enabled ? posted_at_condition : muted_condition)
 
         subs_with_grades = Submission.active.graded
-                                     .joins(:assignment)
+                                     .joins(assignment: [:post_policy])
                                      .where(submission_conditions)
                                      .where.not(submissions: { score: nil })
                                      .pluck(:id)
         subs_with_comments = Submission.active
-                                       .joins(:assignment, :submission_comments)
+                                       .joins(:submission_comments, assignment: [:post_policy])
                                        .where(submission_conditions)
                                        .where(<<~SQL.squish, user).pluck(:id)
                                          (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
@@ -116,7 +116,7 @@ class ContentParticipationCount < ActiveRecord::Base
                                          AND submission_comments.author_id <> ?
                                        SQL
         subs_with_assessments = Submission.active
-                                          .joins(:assignment, :rubric_assessments)
+                                          .joins(:rubric_assessments, assignment: [:post_policy])
                                           .where(submission_conditions)
                                           .where.not(rubric_assessments: { data: nil })
                                           .pluck(:id)
