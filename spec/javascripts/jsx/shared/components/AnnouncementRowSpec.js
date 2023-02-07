@@ -182,7 +182,9 @@ test('renders manage menu if canManage is true', () => {
 
 test('does not render Allow Comments menu item if announcements are globally locked', () => {
   const tree = mount(
-    <AnnouncementRow {...makeProps({canManage: true, announcementsLocked: true})} />
+    <AnnouncementRow
+      {...makeProps({canManage: true, canDelete: true, announcementsLocked: true})}
+    />
   )
 
   // If we click the menu, it does not actually pop up the new menu in this tree,

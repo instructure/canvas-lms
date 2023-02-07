@@ -130,7 +130,10 @@ export default class AnnouncementsIndex extends Component {
             <AnnouncementRow
               key={announcement.id}
               announcement={announcement}
-              canManage={announcement.permissions.delete}
+              canManage={
+                this.props.permissions.manage_course_content_edit && announcement.permissions.update
+              }
+              canDelete={this.props.permissions.manage_course_content_delete}
               masterCourseData={this.props.masterCourseData}
               onSelectedChanged={this.props.announcementSelectionChangeStart}
               onManageMenuSelect={this.onManageAnnouncement}
