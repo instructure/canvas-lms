@@ -54,7 +54,7 @@ highlighted selection, respectively, in the launch request.
 ### Settings
 All of these settings are contained for the **editor_button** placement:
 
--   url: &lt;url&gt; (optional)
+-   url: &lt;url&gt; (required if not set on main tool configuration)
 
     This is the URL that will be POSTed to when users click the left tab. It can
      be the same as the tool's URL, or something different. Domain and URL
@@ -63,11 +63,18 @@ All of these settings are contained for the **editor_button** placement:
      security warnings for users, it is recommended that URLs be over SSL (https).
      This setting is required if a url is not set on the main tool configuration.
 
--   text: &lt;text&gt; (optional)
+-   text: &lt;text&gt; (required if not set on main tool configuration)
 
     This is the default text that will be shown on the hover-over tip for the RCE
     button. This can be overridden by language-specific settings if desired by
     using the labels setting. This is required if a text value is not set on the main tool configuration.
+
+-   icon_url &lt;url&gt; (required if not set on main tool configuration)
+
+    The URL for an icon that identifies your tool in the RCE toolbar. It is
+    recommended that this icon be at least 16x16 px,in PNG or SVG format, and
+    The url must be an https (SSL) URL. This setting is required if icon_url is
+    not set on the main tool configuration.
 
 -   labels: &lt;set of locale-label pairs&gt; (optional)
 
@@ -88,12 +95,6 @@ All of these settings are contained for the **editor_button** placement:
     for this placement, but is not required. See the
     <a href="file.content_item.html" target=_"blank">Deep Linking
     documentation</a> for more information, including accepted values.
-
--   icon_url &lt;url&gt; (optional)
-
-    The URL for an icon that identifies your tool in the RCE toolbar. It is
-    it is recommended that this icon be at least 16 x 16 px and png or svg format
-    the url should be secured over SSL (https
 
 -   selection_width: &lt;pixels&gt; (optional)
 
