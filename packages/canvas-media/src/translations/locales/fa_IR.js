@@ -62,7 +62,6 @@ const locale = {
   "macedonian_6ed541af": { "message": "مقدونی" },
   "malay_f5dddce4": { "message": "مالایی" },
   "maltese_916925e8": { "message": "مالتیایی" },
-  "maori_new_zealand_5380a95f": { "message": "Māori (New Zealand)" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
   },
