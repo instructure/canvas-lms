@@ -690,6 +690,7 @@ ult: audio/x-mod
 uni: audio/x-mod
 upa: application/vnd.hbci
 url: text/x-uri
+usdz: model/vnd.usd+zip
 ustar: application/x-ustar
 vala: text/x-vala
 vbk: audio/vnd.nortel.vbk
