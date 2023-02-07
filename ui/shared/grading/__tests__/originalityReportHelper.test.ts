@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -23,12 +22,32 @@ import {
   originalityReportSubmissionKey,
 } from '../originalityReportHelper'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
+import type {SubmissionOriginalityData} from '../grading.d'
 
-function submission(overrides = {}) {
+function submission(overrides = {}): {
+  id: string
+  _id: string
+  submitted_at: string
+  submissionType: string
+  attachments: any[]
+  originalityData: {
+    [key: string]: SubmissionOriginalityData
+  }
+} {
   return {
-    id: 1,
-    _id: 1,
+    id: '1',
+    _id: '1',
     submitted_at: '05 October 2011 14:48 UTC',
+    submissionType: 'online_text_entry',
+    originalityData: {
+      'submission_1_2011-10-05T14:48:00Z': {
+        report_url: 'string',
+        similarity_score: 0,
+        state: 'scored',
+        status: 'none',
+      },
+    },
+    attachments: [],
     ...overrides,
   }
 }
@@ -42,6 +61,7 @@ describe('originalityReportSubmissionKey', () => {
 
   it('returns the key for the camelized graphql submission', async () => {
     const gqlSubmission = await mockSubmission({
+      // @ts-ignore
       Submission: {
         submittedAt: '2011-10-05T14:48:00Z',
         id: 1,
@@ -171,7 +191,11 @@ describe('getOriginalityData', () => {
   ]
 
   it('returns the camelized data if there is data associated with an attachment with a score and report', () => {
-    const sub = submission({submissionType: 'online_upload', attachments, originalityData})
+    const sub = submission({
+      submissionType: 'online_upload',
+      attachments,
+      originalityData,
+    })
     expect(getOriginalityData(sub, 0)).toEqual({
       score: 0,
       state: 'acceptable',
@@ -192,6 +216,7 @@ describe('getOriginalityData', () => {
 
   it('returns the camelized data if there is originality data associated with the text entry using a gql submission', async () => {
     const gqlSubmission = await mockSubmission({
+      // @ts-ignore
       Submission: {
         id: 'asefasdfasdfasdfasdf',
         _id: 4,

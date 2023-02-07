@@ -24,33 +24,25 @@ import {
   scoreToGrade,
 } from './GradingSchemeHelper'
 import numberHelper from '@canvas/i18n/numberHelper'
+import type {GradeInput, GradeResult} from './grading.d'
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
 const PERCENTAGES = /[%％﹪٪]/
-
-type PassFailResult = {
-  enteredAs: null | string
-  late_policy_status: null | string
-  excused: boolean
-  grade: string
-  score: null | number
-  valid: boolean
-}
 
 export const GradingSchemeBounds = Object.freeze({
   LOWER: 'LOWER',
   UPPER: 'UPPER',
 })
 
-function toNumber(bigValue: Big) {
+function toNumber(bigValue: Big): number {
   return parseFloat(bigValue.round(MAX_PRECISION).toString())
 }
 
-function pointsFromPercentage(percentage: number, pointsPossible: number) {
+function pointsFromPercentage(percentage: number, pointsPossible: number): number {
   return toNumber(new Big(percentage).div(100).times(pointsPossible))
 }
 
-function percentageFromPoints(points: number, pointsPossible: number) {
+function percentageFromPoints(points: number, pointsPossible: number): number {
   return toNumber(new Big(points).div(pointsPossible).times(100))
 }
 
@@ -65,7 +57,7 @@ function invalid(value) {
   }
 }
 
-function parseAsGradingScheme(value: string, options) {
+function parseAsGradingScheme(value: number, options): null | GradeInput {
   if (!options.gradingScheme) {
     return null
   }
@@ -84,7 +76,7 @@ function parseAsGradingScheme(value: string, options) {
   }
 }
 
-function parseAsPercent(value: string, options) {
+function parseAsPercent(value: string, options): null | GradeInput {
   const percentage = numberHelper.parse(value.replace(PERCENTAGES, ''))
   if (Number.isNaN(Number(percentage))) {
     return null
@@ -109,7 +101,7 @@ function parseAsPercent(value: string, options) {
   }
 }
 
-function parseAsPoints(value: string, options) {
+function parseAsPoints(value: string, options): null | GradeInput {
   const points = numberHelper.parse(value)
   if (Number.isNaN(Number(points))) {
     return null
@@ -125,8 +117,8 @@ function parseAsPoints(value: string, options) {
   }
 }
 
-function parseForGradingScheme(value, options) {
-  const result =
+function parseForGradingScheme(value, options): GradeResult {
+  const result: null | GradeInput =
     parseAsGradingScheme(value, options) ||
     parseAsPoints(value, options) ||
     parseAsPercent(value, options)
@@ -145,8 +137,9 @@ function parseForGradingScheme(value, options) {
   return invalid(value)
 }
 
-function parseForPercent(value, options) {
-  const result = parseAsPercent(value, options) || parseAsGradingScheme(value, options)
+function parseForPercent(value, options): GradeResult {
+  const result: null | GradeInput =
+    parseAsPercent(value, options) || parseAsGradingScheme(value, options)
 
   if (result) {
     return {
@@ -182,10 +175,10 @@ function parseForPoints(value, options) {
   return invalid(value)
 }
 
-function parseForPassFail(value: string, options: {pointsPossible: number}): PassFailResult {
+function parseForPassFail(value: string, options: {pointsPossible: number}): GradeResult {
   const cleanValue = value.toLowerCase()
 
-  const result: PassFailResult = {
+  const result: GradeResult = {
     enteredAs: 'passFail',
     late_policy_status: null,
     excused: false,
@@ -261,7 +254,7 @@ export function isMissing(grade) {
   return `${grade}`.trim().toLowerCase() === 'mi'
 }
 
-export function parseTextValue(value: string, options) {
+export function parseTextValue(value: string, options): GradeResult {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
   if (trimmedValue === '') {

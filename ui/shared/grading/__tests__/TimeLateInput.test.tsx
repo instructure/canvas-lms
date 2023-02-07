@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -81,21 +80,21 @@ describe('TimeLateInput', () => {
 
   it('converts the value unit to days if the late policy interval is "day"', () => {
     props.secondsLate = 2 * SECONDS_PER_DAY
-    const input = getTimeLateInput(DAYS)
+    const input = getTimeLateInput(DAYS) as HTMLInputElement
     expect(input.value).toEqual('2')
   })
 
   it('converts the value unit to hours if the late policy interval is "hour"', () => {
     props.secondsLate = 2 * SECONDS_PER_DAY
     props.lateSubmissionInterval = 'hour'
-    const input = getTimeLateInput(HOURS)
+    const input = getTimeLateInput(HOURS) as HTMLInputElement
     expect(input.value).toEqual('48')
   })
 
   it('rounds the input value to two digits after the decimal point', () => {
     props.secondsLate = 2 * SECONDS_PER_DAY + 4 * SECONDS_PER_MINUTE
     props.lateSubmissionInterval = 'hour'
-    const input = getTimeLateInput(HOURS)
+    const input = getTimeLateInput(HOURS) as HTMLInputElement
     expect(input.value).toEqual('48.07')
   })
 

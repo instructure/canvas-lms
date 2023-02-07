@@ -342,6 +342,11 @@ export type WorkflowState =
   | 'unsubmitted'
   | 'untaken'
 
+export type SimilarityScore = {
+  similarityScore: number
+  status: 'error' | 'pending' | 'scored'
+}
+
 export type Submission = Readonly<{
   anonymous_id: string
   assignment_id: string
@@ -357,13 +362,14 @@ export type Submission = Readonly<{
   has_postable_comments: boolean
   has_originality_report: boolean
   id: string
-  late_policy_status: null | string
+  late_policy_status: null | LatePolicyStatus
   late: boolean
   missing: boolean
   points_deducted: null | number
   redo_request: boolean
   score: null | number
   seconds_late: number
+  similarityInfo: null | SimilarityScore
   submission_type: SubmissionType
   url: null | string
   user_id: string
@@ -448,3 +454,5 @@ export type GradingPeriodSet = Readonly<{
 export type GradingPeriodSetGroup = {
   grading_period_sets: GradingPeriodSet[]
 }
+
+export type LatePolicyStatus = 'missing' | 'late' | 'extended'
