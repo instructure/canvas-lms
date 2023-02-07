@@ -312,6 +312,14 @@ describe WikiPage do
       expect(@page.reload.publish_at).to be_nil
     end
 
+    it "unpublishes if publish_at date is removed" do
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+
+      @page.update publish_at: nil
+      expect(@page.reload).to be_unpublished
+    end
+
     it "clears a publish_at date when manually unpublishing" do
       @page.publish_at = 1.hour.from_now
       @page.save!
