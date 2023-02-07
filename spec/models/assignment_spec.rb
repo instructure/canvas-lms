@@ -9282,6 +9282,45 @@ describe Assignment do
             expect(assignment).to_not receive(:refresh_course_content_participation_counts)
           end
         end
+
+        context "when changing submission_types for an assignment" do
+          before do
+            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+          end
+
+          it "unread count changes between 0 and 1 when going to not_graded and any other submission_type" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            expect(student_unread_count_counts).to eq 1
+            assignment.submission_types = "not_graded"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 0
+            assignment.submission_types = "online_text_entry"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "does call refresh_course_content_participation_counts when changing to a not_graded submission_type" do
+            expect(assignment).to receive(:refresh_course_content_participation_counts).twice
+            assignment.submission_types = "not_graded"
+            assignment.save!
+            assignment.submission_types = "online_text_entry"
+            assignment.save!
+          end
+
+          it "does not call refresh_course_content_participation_counts when not changing to something other than not_graded" do
+            assignment.submission_types = "on_paper"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+          end
+
+          it "does not call refresh_course_content_participation_counts when changing something other than submission_types" do
+            assignment.title = "New Title"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+          end
+        end
       end
 
       describe "grade change audit records" do
