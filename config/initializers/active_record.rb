@@ -2219,3 +2219,13 @@ if Rails.version >= "6.1"
   # rubocop:enable Lint/RescueException
   # rubocop:enable Naming/RescuedExceptionsVariableName
 end
+
+module AdditionalIgnoredColumns
+  def ignored_columns
+    return super unless superclass <= ActiveRecord::Base && !abstract_class?
+
+    columns_to_ignore = DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name]&.split(",") || []
+    super + columns_to_ignore
+  end
+end
+ActiveRecord::Base.singleton_class.include(AdditionalIgnoredColumns)
