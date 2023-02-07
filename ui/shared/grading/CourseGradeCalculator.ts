@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -21,6 +20,7 @@ import _ from 'underscore'
 import round from 'round'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
+import {AssignmentGroupGrade} from './grading.d'
 
 function combineAssignmentGroupGrades(assignmentGroupGrades, includeUngraded: boolean, options) {
   const scopedAssignmentGroupGrades = _.map(assignmentGroupGrades, assignmentGroupGrade => {
@@ -156,7 +156,7 @@ function calculateWithGradingPeriods(
 
   const gradingPeriodsById = _.keyBy(gradingPeriods, 'id')
   const gradingPeriodGradesByPeriodId = {}
-  const periodBasedAssignmentGroupGrades = []
+  const periodBasedAssignmentGroupGrades: AssignmentGroupGrade[] = []
 
   for (let gp = 0; gp < gradingPeriods.length; gp++) {
     const groupGrades = {}

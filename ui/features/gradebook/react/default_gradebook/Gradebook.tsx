@@ -69,12 +69,15 @@ import type {
   GradebookSettings,
   GradebookStudent,
   GradingPeriodAssignmentMap,
-  GradingScheme,
   InitialActionStates,
   PendingGradeInfo,
   SubmissionFilterValue,
 } from './gradebook.d'
-import type {CamelizedGradingPeriodSet, FinalGradeOverrideMap} from '@canvas/grading/grading.d'
+import type {
+  CamelizedGradingPeriodSet,
+  FinalGradeOverrideMap,
+  GradingScheme,
+} from '@canvas/grading/grading.d'
 import type {
   GridColumn,
   GridData,

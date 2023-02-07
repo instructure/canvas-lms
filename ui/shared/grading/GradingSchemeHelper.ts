@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
@@ -18,15 +19,14 @@
  */
 
 import round from 'round'
+import type {GradingScheme} from './grading.d'
 
-type GradingScheme = [string, number]
-
-export function indexOfGrade(grade: string, gradingSchemes: GradingScheme[]) {
+export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
   return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
 }
 
-export function gradeToScoreUpperBound(grade: string, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -59,7 +59,7 @@ export function gradeToScoreUpperBound(grade: string, gradingSchemes: GradingSch
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
 }
 
-export function gradeToScoreLowerBound(grade: string, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: GradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {

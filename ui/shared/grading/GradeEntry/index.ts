@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -17,21 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const EnterGradesAs = Object.freeze({
+import type GradeOverrideInfo from './GradeOverrideInfo'
+import type {GradeEntryMode, GradingScheme} from '../grading.d'
+
+export const EnterGradesAs = {
   GRADING_SCHEME: 'gradingScheme',
   PASS_FAIL: 'passFail',
   PERCENTAGE: 'percent',
   POINTS: 'points',
-})
+} as const
+
+type GradeEntryOptions = {
+  gradingScheme: string | {data: GradingScheme[]}
+}
 
 export default class GradeEntry {
-  constructor(options = {}) {
+  options: GradeEntryOptions
+
+  constructor(options: GradeEntryOptions) {
     this.options = {
-      ...options,
+      ...(options || {}),
     }
   }
 
-  get enterGradesAs() {
+  get enterGradesAs(): GradeEntryMode {
     return EnterGradesAs.POINTS
   }
 
@@ -39,19 +47,19 @@ export default class GradeEntry {
     return this.options.gradingScheme || null
   }
 
-  formatGradeInfoForDisplay(/* gradeInfo */) {
+  formatGradeInfoForDisplay(_gradeInfo) {
     return null
   }
 
-  formatGradeInfoForInput(/* gradeInfo */) {
+  formatGradeInfoForInput(_gradeInfo) {
     return null
   }
 
-  hasGradeChanged(/* assignedGradeInfo, currentGradeInfo, previousGradeInfo */) {
+  hasGradeChanged(_assignedGradeInfo, _currentGradeInfo, _previousGradeInfo) {
     return false
   }
 
-  parseValue(/* value */) {
+  parseValue(_value): GradeOverrideInfo | null {
     return null
   }
 }

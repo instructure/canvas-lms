@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'
+import type {FormatGradeOptions} from './grading.d'
 
 const I18n = useI18nScope('sharedGradeFormatHelper')
 
@@ -34,8 +34,6 @@ const PASS_GRADES = ['complete', 'pass']
 const FAIL_GRADES = ['incomplete', 'fail']
 
 const UNGRADED = '–'
-
-type FormatGradeOptions = {defaultValue?: string; gradingType?: string; delocalize?: boolean}
 
 function isPassFail(grade, gradeType: null | string = null) {
   if (gradeType) {

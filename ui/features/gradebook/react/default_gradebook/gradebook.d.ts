@@ -23,6 +23,8 @@ import type {
   AttachmentData,
   GradingPeriod,
   GradingPeriodSet,
+  GradingScheme,
+  GradingStandard,
   GradingType,
   Module,
   ModuleMap,
@@ -164,14 +166,6 @@ export type GradebookOptions = {
   version: null | string
 }
 
-export type GradingStandard = [string, number]
-
-export type GradingScheme = {
-  id?: string
-  title?: string
-  data: GradingStandard[]
-}
-
 export type LatePolicy = {
   missing_submission_deduction_enabled: boolean
   missing_submission_deduction: number
@@ -190,7 +184,7 @@ export type GradingPeriodAssignmentMap = {
 
 export type CourseContent = {
   contextModules: Module[]
-  courseGradingScheme: {data: boolean} | null
+  courseGradingScheme: GradingScheme | null
   defaultGradingScheme: GradingScheme | null
   gradingSchemes: GradingScheme[]
   gradingPeriodAssignments: GradingPeriodAssignmentMap

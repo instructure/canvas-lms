@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -310,43 +309,43 @@ describe('GradeOverrideEntry', () => {
 
       describe('.percentage', () => {
         it('is set to the lower bound for a matching scheme key', () => {
-          expect(parseValue('B').grade.percentage).toEqual(80.0)
+          expect(parseValue('B').grade?.percentage).toEqual(80.0)
         })
 
         it('is set to the decimal form of an explicit percentage', () => {
-          expect(parseValue('83.45%').grade.percentage).toEqual(83.45)
+          expect(parseValue('83.45%').grade?.percentage).toEqual(83.45)
         })
 
         it('is set to the decimal of a given integer', () => {
-          expect(parseValue(83).grade.percentage).toEqual(83.0)
+          expect(parseValue(83).grade?.percentage).toEqual(83.0)
         })
 
         it('is set to the decimal of a given stringified integer', () => {
-          expect(parseValue('73').grade.percentage).toEqual(73.0)
+          expect(parseValue('73').grade?.percentage).toEqual(73.0)
         })
 
         it('is set to the given decimal', () => {
-          expect(parseValue(73.45).grade.percentage).toEqual(73.45)
+          expect(parseValue(73.45).grade?.percentage).toEqual(73.45)
         })
 
         it('is set to the decimal of a given stringified decimal', () => {
-          expect(parseValue('73.45').grade.percentage).toEqual(73.45)
+          expect(parseValue('73.45').grade?.percentage).toEqual(73.45)
         })
 
         it('converts percentages using the "％" symbol', () => {
-          expect(parseValue('83.35％').grade.percentage).toEqual(83.35)
+          expect(parseValue('83.35％').grade?.percentage).toEqual(83.35)
         })
 
         it('converts percentages using the "﹪" symbol', () => {
-          expect(parseValue('83.35﹪').grade.percentage).toEqual(83.35)
+          expect(parseValue('83.35﹪').grade?.percentage).toEqual(83.35)
         })
 
         it('converts percentages using the "٪" symbol', () => {
-          expect(parseValue('83.35٪').grade.percentage).toEqual(83.35)
+          expect(parseValue('83.35٪').grade?.percentage).toEqual(83.35)
         })
 
         it('is rounded to 15 decimal places', () => {
-          const {percentage} = parseValue(81.1234567890123456789).grade
+          const percentage = parseValue(81.1234567890123456789).grade?.percentage
           expect(String(percentage)).toEqual('81.12345678901235')
         })
 
@@ -358,7 +357,7 @@ describe('GradeOverrideEntry', () => {
             ['1.0', 0.6],
             ['0.0', 0.5],
           ]
-          expect(parseValue('3.0').grade.percentage).toEqual(80.0)
+          expect(parseValue('3.0').grade?.percentage).toEqual(80.0)
         })
 
         it('is set to the lower bound for a matching percentage scheme key', () => {
@@ -369,62 +368,62 @@ describe('GradeOverrideEntry', () => {
             ['65%', 0.6],
             ['0%', 0.5],
           ]
-          expect(parseValue('85%').grade.percentage).toEqual(80.0)
+          expect(parseValue('85%').grade?.percentage).toEqual(80.0)
         })
 
         it('is set to zero when given zero', () => {
-          expect(parseValue(0).grade.percentage).toEqual(0)
+          expect(parseValue(0).grade?.percentage).toEqual(0)
         })
 
         it('is set to the given numerical value when not using a grading scheme', () => {
           options.gradingScheme = null
-          expect(parseValue('81.45').grade.percentage).toEqual(81.45)
+          expect(parseValue('81.45').grade?.percentage).toEqual(81.45)
         })
       })
 
       describe('.schemeKey', () => {
         it('is set to the matching scheme key when given an integer', () => {
-          expect(parseValue(81).grade.schemeKey).toEqual('B')
+          expect(parseValue(81).grade?.schemeKey).toEqual('B')
         })
 
         it('is set to the matching scheme key with the same case', () => {
-          expect(parseValue('B').grade.schemeKey).toEqual('B')
+          expect(parseValue('B').grade?.schemeKey).toEqual('B')
         })
 
         it('uses the exact scheme key when matching with different case', () => {
-          expect(parseValue('b').grade.schemeKey).toEqual('B')
+          expect(parseValue('b').grade?.schemeKey).toEqual('B')
         })
 
         it('matches an explicit percentage value to a scheme value for the grade scheme key', () => {
-          expect(parseValue('83.45%').grade.schemeKey).toEqual('B')
+          expect(parseValue('83.45%').grade?.schemeKey).toEqual('B')
         })
 
         it('uses numerical values as implicit percentage values', () => {
-          expect(parseValue(83).grade.schemeKey).toEqual('B')
+          expect(parseValue(83).grade?.schemeKey).toEqual('B')
         })
 
         it('is set to the matching scheme key when given a stringified integer', () => {
-          expect(parseValue('73').grade.schemeKey).toEqual('C')
+          expect(parseValue('73').grade?.schemeKey).toEqual('C')
         })
 
         it('is set to the matching scheme key when given an decimal', () => {
-          expect(parseValue(73.45).grade.schemeKey).toEqual('C')
+          expect(parseValue(73.45).grade?.schemeKey).toEqual('C')
         })
 
         it('is set to the matching scheme key when given a stringified decimal', () => {
-          expect(parseValue('73.45').grade.schemeKey).toEqual('C')
+          expect(parseValue('73.45').grade?.schemeKey).toEqual('C')
         })
 
         it('converts percentages using the "％" symbol', () => {
-          expect(parseValue('83.35％').grade.schemeKey).toEqual('B')
+          expect(parseValue('83.35％').grade?.schemeKey).toEqual('B')
         })
 
         it('converts percentages using the "﹪" symbol', () => {
-          expect(parseValue('83.35﹪').grade.schemeKey).toEqual('B')
+          expect(parseValue('83.35﹪').grade?.schemeKey).toEqual('B')
         })
 
         it('converts percentages using the "٪" symbol', () => {
-          expect(parseValue('83.35٪').grade.schemeKey).toEqual('B')
+          expect(parseValue('83.35٪').grade?.schemeKey).toEqual('B')
         })
 
         it('is set to the matching scheme key when given a numerical scheme key', () => {
@@ -435,7 +434,7 @@ describe('GradeOverrideEntry', () => {
             ['1.0', 0.6],
             ['0.0', 0.5],
           ]
-          expect(parseValue('3.0').grade.schemeKey).toEqual('3.0')
+          expect(parseValue('3.0').grade?.schemeKey).toEqual('3.0')
         })
 
         it('is set to the matching scheme key when given a percentage scheme key', () => {
@@ -446,20 +445,20 @@ describe('GradeOverrideEntry', () => {
             ['65%', 0.6],
             ['0%', 0.5],
           ]
-          expect(parseValue('95%').grade.schemeKey).toEqual('95%')
+          expect(parseValue('95%').grade?.schemeKey).toEqual('95%')
         })
 
         it('is set to the lowest scheme key when given zero', () => {
-          expect(parseValue(0).grade.schemeKey).toEqual('F')
+          expect(parseValue(0).grade?.schemeKey).toEqual('F')
         })
 
         it('ignores whitespace from the given value when setting the grade', () => {
-          expect(parseValue(' B ').grade.schemeKey).toEqual('B')
+          expect(parseValue(' B ').grade?.schemeKey).toEqual('B')
         })
 
         it('is set to null when not using a grading scheme', () => {
           options.gradingScheme = null
-          expect(parseValue('81.45').grade.schemeKey).toEqual(null)
+          expect(parseValue('81.45').grade?.schemeKey).toEqual(null)
         })
       })
 
@@ -600,20 +599,20 @@ describe('GradeOverrideEntry', () => {
 
       describe('.percentage', () => {
         it('is set to the given grade percentage', () => {
-          expect(gradeInfoFromGrade({percentage: 81.1234}).grade.percentage).toEqual(81.1234)
+          expect(gradeInfoFromGrade({percentage: 81.1234}).grade?.percentage).toEqual(81.1234)
         })
       })
 
       describe('.schemeKey', () => {
         it('is set to the scheme key matching the given grade percentage', () => {
-          expect(gradeInfoFromGrade({percentage: 81.1234, schemeKey: 'B'}).grade.schemeKey).toEqual(
-            'B'
-          )
+          expect(
+            gradeInfoFromGrade({percentage: 81.1234, schemeKey: 'B'}).grade?.schemeKey
+          ).toEqual('B')
         })
 
         it('is set to null when not using a grading scheme', () => {
           options.gradingScheme = null
-          expect(gradeInfoFromGrade({percentage: 81.1234}).grade.schemeKey).toEqual(null)
+          expect(gradeInfoFromGrade({percentage: 81.1234}).grade?.schemeKey).toEqual(null)
         })
       })
     })
