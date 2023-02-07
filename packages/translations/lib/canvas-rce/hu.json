@@ -244,7 +244,6 @@
   "equivalent_identity_654b3ce5": { "message": "Egyenértékű (identitás)" },
   "eta_b8828f99": { "message": "Eta" },
   "exists_2e62bdaa": { "message": "Létezik" },
-  "exit_fullscreen_b7eb0aa4": { "message": "Exit Fullscreen" },
   "expand_preview_by_default_2abbf9f8": {
     "message": "Az előnézet kibontása alapértelmezés szerint"
   },
@@ -437,7 +436,6 @@
   },
   "medium_5a8e9ead": { "message": "Közepes" },
   "mic_a7f3d311": { "message": "Mikrofon" },
-  "microphone_disabled_15c83130": { "message": "Microphone Disabled" },
   "middle_27dc1d5": { "message": "Középső" },
   "minimize_file_preview_da911944": {
     "message": "Fájl előnézet méretének csökkentése"
@@ -617,13 +615,10 @@
     "message": "Sajnos a szép HTML-szerkesztő nem érhető el billentyűzettel. Itt érheti el a nyers HTML-szerkesztőt."
   },
   "save_11a80ec3": { "message": "Mentés" },
-  "save_media_cb9e786e": { "message": "Save Media" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Keresés" },
-  "select_audio_source_21043cd5": { "message": "Select audio source" },
   "select_crop_shape_d441feeb": { "message": "Válassza ki a kivágás alakját" },
   "select_language_7c93a900": { "message": "Válasszon nyelvet" },
-  "select_video_source_1b5c9dbe": { "message": "Select video source" },
   "selected_linkfilename_c093b1f2": {
     "message": "Kijelölve: { linkFileName }"
   },
@@ -632,7 +627,6 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O a szép html-szerkesztő megnyitásához."
   },
-  "shortcut_911d6255": { "message": "Shortcut" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (változat)" },
   "single_color_image_4e5d4dbc": { "message": "Egyszínű kép" },
@@ -641,9 +635,6 @@
   "small_b070434a": { "message": "Kicsi" },
   "solid_circle_9f061dfc": { "message": "Kitöltött kör" },
   "something_went_wrong_89195131": { "message": "Hiba történt!" },
-  "something_went_wrong_accessing_your_webcam_6643b87e": {
-    "message": "Something went wrong accessing your webcam."
-  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Hiba történt! Nem tudom, mit mutassak."
   },
@@ -651,9 +642,6 @@
     "message": "Valami elromlott. Ellenőrizze a kapcsolatot, töltse be újra az oldalt, és próbálja újra."
   },
   "something_went_wrong_d238c551": { "message": "Hiba történt!" },
-  "something_went_wrong_while_sharing_your_screen_8de579e5": {
-    "message": "Something went wrong while sharing your screen."
-  },
   "sort_by_e75f9e3e": { "message": "Rendezés alapja" },
   "spades_suit_b37020c2": { "message": "Treff (kártyszín)" },
   "square_511eb3b3": { "message": "Négyzet" },
@@ -700,8 +688,6 @@
     "message": "Váltson a rich text szerkesztőre"
   },
   "syllabus_f191f65b": { "message": "Tematika" },
-  "system_audio_allowed_b2508f8c": { "message": "System Audio Allowed" },
-  "system_audio_disabled_c177bd13": { "message": "System Audio Disabled" },
   "tab_arrows_4cf5abfc": { "message": "Tab/Nyilak" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Kékeszöld" },
@@ -747,7 +733,6 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Bár a videója a megfelelő címmel jelenik majd meg a böngészőben, az adatbázisban nem sikerült frissíteni."
   },
-  "timebar_a4d18443": { "message": "Timebar" },
   "title_ee03d132": { "message": "Cím" },
   "to_be_posted_when_d24bf7dc": { "message": "Időzített közzététel: { when }" },
   "to_do_when_2783d78f": { "message": "Teendő : { when }" },
@@ -858,19 +843,6 @@
   "view_title_description_67940918": {
     "message": "Tekintse meg a { title } leírását"
   },
-  "view_word_and_character_counts_a743dd0c": {
-    "message": "View word and character counts"
-  },
-  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
-    "message": "We couldn’t detect a working microphone connected to your device."
-  },
-  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
-    "message": "We couldn’t detect a working webcam connected to your device."
-  },
-  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
-    "message": "We couldn’t detect a working webcam or microphone connected to your device."
-  },
-  "webcam_disabled_30c66986": { "message": "Webcam Disabled" },
   "webcam_fe91b20f": { "message": "Webkamera" },
   "white_87fa64fd": { "message": "fehér" },
   "width_492fec76": { "message": "Szélesség" },
@@ -887,15 +859,6 @@
   },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Nem tölthet fel egy üres fájlt."
-  },
-  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
-    "message": "Your microphone is blocked in the browser settings."
-  },
-  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
-    "message": "Your webcam and microphone are blocked in the browser settings."
-  },
-  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
-    "message": "Your webcam is blocked in the browser settings."
   },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Úgy tűnik a webkamera már használatban van."
