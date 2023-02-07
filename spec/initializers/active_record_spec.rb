@@ -338,6 +338,31 @@ module ActiveRecord
           .to eq [user]
       end
     end
+
+    describe ".ignored_columns" do
+      it "ignores additional columns specified in Consul" do
+        # If this test is the first one to run that requires User - preload User so that the correct
+        # accessors (getters / setters) already exist since the "ensure" block won't create them. In
+        # a real situation, we would first perform a rolling restart after having unset this key and
+        # finished pre-deploy migrations everywhere.
+        User.create!(name: "user u1")
+
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
+          {
+            "users" => "name"
+          }
+        )
+
+        User.reset_column_information
+        expect { User.create!(name: "user u2") }.to raise_exception(ActiveModel::UnknownAttributeError)
+      ensure
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
+
+        User.reset_column_information
+        User.create!(name: "user u2")
+      end
+    end
   end
 
   describe ".asset_string" do
