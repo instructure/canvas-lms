@@ -16,7 +16,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "jira_ref_parser", "1.0.1"
   spec.add_dependency "outrigger", "~> 3.0"
-  spec.add_dependency "rubocop", "~> 1.19"
+  # FIXME: this is a temporary version lock to avoid a bug in rubocop 1.45.0
+  # https://github.com/rubocop/rubocop/issues/11549
+  spec.add_dependency "rubocop", "<=1.44.1"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"
