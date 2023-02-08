@@ -270,30 +270,46 @@ class UserMerge
   end
 
   def move_lti_ids
-    lti_context_id = from_user.lti_context_id
-    lti_id = from_user.lti_id
-    uuid = from_user.uuid
+    # retrieve the ids from the old user and nil them out
+    from_lti_context_id = from_user.lti_context_id
+    from_lti_id = from_user.lti_id
+    from_uuid = from_user.uuid
 
-    # null out the relevant ids for from_user (this will cause new values to be generated for 2 of the 3,
-    # which is fine; this user is about to be deleted)
     from_user.override_lti_id_lock = true
-    # so assigning the lti_context_id to target_user below avoids the unique constraint
-    from_user.update_shadow_records_synchronously!
-    from_user.update!(lti_context_id: nil, lti_id: nil, uuid: nil)
+    from_user.lti_context_id = nil
+    from_user.lti_id = nil
+    from_user.uuid = nil
 
-    if merge_data
-      # store target user's existing lti_id and uuid in MergeData so we can restore them in a split
-      # (the target lti_context_is is nil or we wouldn't be here, but the lti_id is populated on create, not on demand)
-      merge_data.items.create!(user: target_user, item_type: "lti_id", item: target_user.lti_id)
-      merge_data.items.create!(user: target_user, item_type: "uuid", item: target_user.uuid)
+    # get the old ids from the target user and replace them with the source user's
+    target_lti_id = target_user.lti_id
+    target_uuid = target_user.uuid
+
+    target_user.override_lti_id_lock = true
+    target_user.lti_context_id = from_lti_context_id
+    target_user.lti_id = from_lti_id
+    target_user.uuid = from_uuid
+
+    # perform the move in the DB, updating shadow records synchronously so the target user
+    # doesn't trip over the unique constraint. retry once in case of odd timing issues
+    User.unique_constraint_retry do
+      from_user.lti_context_id_will_change!
+      from_user.update_shadow_records_synchronously!
+      from_user.save!
+
+      target_user.save!
     end
 
-    # finally, move the source user LTI IDs to the target user
-    target_user.lti_context_id = lti_context_id
-    target_user.override_lti_id_lock = true
-    target_user.lti_id = lti_id
-    target_user.uuid = uuid
-    target_user.save!
+    if merge_data
+      # finally, store target user's existing lti_id and uuid in MergeData so we can restore them in a split
+      # (the target lti_context_is is nil or we wouldn't be here, but the lti_id is populated on create, not on demand)
+      merge_data.items.create!(user: target_user, item_type: "lti_id", item: target_lti_id)
+      merge_data.items.create!(user: target_user, item_type: "uuid", item: target_uuid)
+    end
+  rescue ActiveRecord::RecordNotUnique
+    # if we fail to move lti ids after a retry, put the source user's ids back and fall back on the old behavior
+    from_user.update! lti_context_id: from_lti_context_id, lti_id: from_lti_id, uuid: from_uuid
+    InstStatsd::Statsd.increment("user_merge.move_lti_ids.unique_constraint_failure")
+    populate_past_lti_ids
   end
 
   # used by SplitUsers to undo this operation from merge
