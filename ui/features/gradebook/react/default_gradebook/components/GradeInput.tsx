@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,7 +17,6 @@
  */
 
 import React, {Component} from 'react'
-import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -27,8 +25,14 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
+import type {TextInputInteraction} from '@instructure/ui-text-input/types/index'
 
 const I18n = useI18nScope('gradebook')
+
+type Message = {
+  text: string
+  type: 'error' | 'hint'
+}
 
 function normalizeSubmissionGrade(props) {
   const {submission, assignment, enterGradesAs: formatType, gradingScheme} = props
@@ -116,38 +120,36 @@ function stateFromProps(props) {
   }
 }
 
-export default class GradeInput extends Component {
-  static propTypes = {
-    assignment: shape({
-      anonymizeStudents: bool.isRequired,
-      gradingType: oneOf([
-        'gpa_scale',
-        'letter_grade',
-        'not_graded',
-        'pass_fail',
-        'points',
-        'percent',
-      ]).isRequired,
-      pointsPossible: number,
-    }).isRequired,
-    disabled: bool,
-    enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
-    gradingScheme: arrayOf(Array),
-    onSubmissionUpdate: func,
-    pendingGradeInfo: shape({
-      excused: bool.isRequired,
-      grade: string,
-      valid: bool.isRequired,
-    }),
-    submission: shape({
-      enteredGrade: string,
-      enteredScore: number,
-      excused: bool.isRequired,
-      id: string,
-    }).isRequired,
-    submissionUpdating: bool,
+type Props = {
+  assignment: {
+    anonymizeStudents: boolean
+    gradingType: 'gpa_scale' | 'letter_grade' | 'not_graded' | 'pass_fail' | 'points' | 'percent'
+    pointsPossible: number
   }
+  disabled: boolean
+  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  gradingScheme: Array<Array<string>>
+  onSubmissionUpdate: Function
+  pendingGradeInfo: {
+    excused: boolean
+    grade: string
+    valid: boolean
+  }
+  submission: {
+    enteredGrade: string
+    enteredScore: number
+    excused: boolean
+    id: string
+  }
+  submissionUpdating: boolean
+}
 
+type State = {
+  formattedGrade: string
+  grade: string
+}
+
+export default class GradeInput extends Component<Props, State> {
   static defaultProps = {
     disabled: false,
     gradingScheme: null,
@@ -261,14 +263,14 @@ export default class GradeInput extends Component {
       )
     }
 
-    let interaction = 'enabled'
+    let interaction: TextInputInteraction = 'enabled'
     if (!isDisabled && isBusy) {
       interaction = 'readonly'
     } else if (isDisabled || currentGradeInfo.excused) {
       interaction = 'disabled'
     }
 
-    const messages = []
+    const messages: Message[] = []
     const score = this.props.submission.enteredScore
     if (this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid) {
       messages.push({type: 'error', text: I18n.t('This is not a valid grade')})
@@ -284,6 +286,7 @@ export default class GradeInput extends Component {
         id="grade-detail-tray--grade-input"
         interaction={interaction}
         messages={messages}
+        // @ts-ignore
         onInput={this.handleTextChange}
         onBlur={this.handleTextBlur}
         placeholder="–"

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -25,7 +24,11 @@ export function originalityReportSubmissionKey(submission: {
   submittedAt?: null | string | Date
 }): string {
   try {
-    const submittedAtDate = new Date(submission.submitted_at || submission.submittedAt)
+    const submitted_at = submission.submitted_at || submission.submittedAt
+    if (!submitted_at) {
+      return ''
+    }
+    const submittedAtDate = new Date(submitted_at)
     const submittedAtString = `${submittedAtDate.toISOString().split('.')[0]}Z`
     return submittedAtString ? `submission_${submission.id}_${submittedAtString}` : ''
   } catch (_error) {
