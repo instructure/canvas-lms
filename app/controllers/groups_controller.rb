@@ -268,9 +268,13 @@ class GroupsController < ApplicationController
       is_current_user_a_student = @context.user_is_student?(@current_user)
 
       if is_current_user_section_restricted && is_current_user_a_student
+        # Gets all groups in the context
         group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
+        # Find all groups from that scope that can be limited from the section restriction parameter
         groups_with_restricted_categories_or_teacher_assigned = group_scope.where(group_categories: { self_signup: nil }).or(group_scope.where(group_categories: { self_signup: "restricted" }))
-        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) }
+        # Find all groups that have users with different sections than the current user and DONT have the current_user in them
+        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) || g.includes_user?(@current_user) }
+        # Remove the groups found above from the groups returned by the api
         @groups = all_groups -= groups_with_no_common_section_with_current_user
       end
     end
