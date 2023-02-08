@@ -168,7 +168,7 @@ PATH
       activesupport (>= 6.0)
       jira_ref_parser (= 1.0.1)
       outrigger (~> 3.0)
-      rubocop (<= 1.44.1)
+      rubocop (~> 1.19)
 
 PATH
   remote: gems
