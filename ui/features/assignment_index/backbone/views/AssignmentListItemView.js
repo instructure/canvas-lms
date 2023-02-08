@@ -266,6 +266,9 @@ export default AssignmentListItemView = (function () {
     }
 
     updatePublishState() {
+      this.view.$el
+        .find('.speed-grader-link-container')
+        ?.toggleClass('hidden', !this.view.model.get('published'))
       return this.view.$el
         .find('.ig-row')
         .toggleClass('ig-published', this.view.model.get('published'))
@@ -364,7 +367,12 @@ export default AssignmentListItemView = (function () {
       if (!data.canManage) {
         data = this._setJSONForGrade(data)
       }
-
+      data.courseId = this.model.get('course_id')
+      data.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
+      data.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
+      // publishing and unpublishing the underlying model does not rerender this view.
+      // this sets initial value, then it keeps up with class toggling behavior on updatePublishState()
+      data.initialUnpublishedState = !this.model.get('published')
       data.canEdit = this.canEdit()
       data.canShowBuildLink = this.canShowBuildLink()
       data.canMove = this.canMove()
