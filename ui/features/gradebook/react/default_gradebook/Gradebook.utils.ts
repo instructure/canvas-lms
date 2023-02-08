@@ -283,6 +283,7 @@ export const getLabelForFilter = (
   } else if (filter.type === 'assignment-group') {
     return assignmentGroups.find(a => a.id === filter.value)?.name || I18n.t('Assignment Group')
   } else if (filter.type === 'grading-period') {
+    if (filter.value === '0') return I18n.t('All Grading Periods')
     return gradingPeriods.find(g => g.id === filter.value)?.title || I18n.t('Grading Period')
   } else if (filter.type === 'student-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
