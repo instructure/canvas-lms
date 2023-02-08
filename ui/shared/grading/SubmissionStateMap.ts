@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -38,7 +37,10 @@ type StudentSubmissionMap = {
 }
 
 function submissionGradingPeriodInformation(assignment: Assignment, student: Student) {
-  const submissionInfo = assignment.effectiveDueDates[student.id] || {}
+  const submissionInfo: {
+    grading_period_id?: null | string
+    in_closed_grading_period?: boolean
+  } = assignment.effectiveDueDates?.[student.id] || {}
   return {
     gradingPeriodID: submissionInfo.grading_period_id,
     inClosedGradingPeriod: submissionInfo.in_closed_grading_period,
@@ -132,7 +134,9 @@ function missingSubmission(student: Student, assignment: Assignment) {
     missing: false,
     seconds_late: 0,
   }
-  const dueDates = assignment.effectiveDueDates[student.id] || {}
+  const dueDates: {
+    due_at?: null | string
+  } = assignment.effectiveDueDates?.[student.id] || {}
   if (dueDates.due_at != null && new Date(dueDates.due_at) < new Date()) {
     submission.missing = true
   }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -18,7 +17,6 @@
  */
 
 import React from 'react'
-import {bool, func, shape, string} from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -28,20 +26,19 @@ import PostGradesStore from './PostGradesStore'
 
 const I18n = useI18nScope('modules')
 
+type Props = {
+  labelText: string
+  store: ReturnType<typeof PostGradesStore>
+  renderAsButton?: boolean
+  returnFocusTo: {
+    focus: () => void
+  }
+}
+
 // The PostGradesApp mounts a single "Sync Grades" button, which pops up
 // the PostGradesDialog when clicked.
-class PostGradesApp extends React.Component {
-  static propTypes = {
-    labelText: string.isRequired,
-    store: shape({
-      addChangeListener: func.isRequired,
-      removeChangeListener: func.isRequired,
-    }).isRequired,
-    renderAsButton: bool,
-    returnFocusTo: shape({
-      focus: func.isRequired,
-    }).isRequired,
-  }
+class PostGradesApp extends React.Component<Props> {
+  boundForceUpdate: () => void = () => {}
 
   static defaultProps = {
     renderAsButton: false,
@@ -59,7 +56,7 @@ class PostGradesApp extends React.Component {
       resizable: false,
       buttons: [],
       close() {
-        ReactDOM.unmountComponentAtNode(this)
+        ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
         if (returnFocusTo) {
           returnFocusTo.focus()

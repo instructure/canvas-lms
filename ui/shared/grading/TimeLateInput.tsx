@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -87,6 +86,7 @@ export default function TimeLateInput(props) {
             interaction={props.disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            // @ts-ignore
             locale={props.locale}
             min="0"
             onBlur={handleNumberInputBlur}
