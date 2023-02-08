@@ -38,6 +38,27 @@ describe "collaborations" do
         setup_google_drive
       end
 
+      context "someone else's collaboration (:granular_permissions_manage_course_content)" do
+        before do
+          Account.default.enable_feature! :granular_permissions_manage_course_content
+          # teacher does this
+          create_collaboration!(type, "changeable collab")
+
+          # now log in as site admin
+          site_admin_logged_in
+        end
+
+        it "can be deleted by users when manage_course_content_delete is true" do
+          get "/courses/#{@course.id}/collaborations"
+          expect(fj("a:contains('changeable collab')")).to be_present
+
+          f(".delete_collaboration_link").click
+          f("#delete_collaboration_dialog .delete_button").click
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_jqcss("a:contains('changeable collab')")
+        end
+      end
+
       it "is editable", priority: "1" do
         be_editable(type, title)
       end
