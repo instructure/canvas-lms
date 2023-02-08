@@ -1,5 +1,3 @@
-
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -81,11 +79,11 @@ export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
   // does the following need .toPrecision(4) ?
   const scoreWithLowerBound = Math.max(roundedScore, 0)
   const letter = gradingSchemes.find((row, i) => {
-    const schemeScore = (row[1] * 100).toPrecision(4)
+    const schemeScore: string = (row[1] * 100).toPrecision(4)
     // The precision of the lower bound (* 100) must be limited to eliminate
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= schemeScore || i === gradingSchemes.length - 1
+    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemes.length - 1
   }) as GradingScheme
   if (!letter) {
     throw new Error('grading scheme not found')
