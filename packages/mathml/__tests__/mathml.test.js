@@ -45,7 +45,8 @@ describe('MathML and MathJax it', () => {
     ).toEqual(1)
   })
 
-  it('loadMathJax does not load mathJax', () => {
+  it('loadMathJax does not load mathJax if already loaded', () => {
+    // this exists if mathjax has already loaded successfully
     window.MathJax = {
       Hub: {
         Queue: () => {},
@@ -159,7 +160,6 @@ describe('mathEquationHelper', () => {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true,
       },
     }
     document.body.innerHTML = ''
@@ -234,7 +234,6 @@ describe('isMathJaxIgnored', () => {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
-        inline_math_everywhere: true,
       },
     }
     document.body.innerHTML = ''

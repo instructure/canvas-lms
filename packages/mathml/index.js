@@ -212,8 +212,12 @@ const mathml = {
     return !!window.MathJax?.Hub
   },
 
+  shouldProcess(elem) {
+    return this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)
+  },
+
   processNewMathInElem(elem) {
-    if (this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)) {
+    if (this.shouldProcess(elem)) {
       if (this.isMathJaxLoaded()) {
         this.reloadElement(elem)
       } else {
