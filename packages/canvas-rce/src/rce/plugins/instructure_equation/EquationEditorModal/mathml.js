@@ -50,6 +50,7 @@ const mathml = {
       window.MathJax = localConfig
       if (window.MathJaxIsLoading) return
       window.MathJaxIsLoading = true
+
       const scriptPromise = new Promise((resolve, reject) => {
         const script = document.createElement('script')
         document.head.appendChild(script)
