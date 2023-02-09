@@ -65,7 +65,7 @@ WEBPACK_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-runner | md5sum)
 BASE_IMAGE_ID=$(docker images --filter=reference=starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY --format '{{.ID}}')
 
 BASE_RUNNER_BUILD_ARGS=(
-  --build-arg CANVAS_RAILS=${CANVAS_RAILS:-6.1}
+  --build-arg CANVAS_RAILS=${CANVAS_RAILS:-7.0}
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
 )
