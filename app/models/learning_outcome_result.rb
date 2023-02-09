@@ -162,8 +162,12 @@ class LearningOutcomeResult < ActiveRecord::Base
   def check_for_existing_results
     # Find all LearningOutcomeResults for a user for a specific learning_outcome_id
     out_results = LearningOutcomeResult.active.preload(:alignment).where(learning_outcome_id: alignment.learning_outcome_id, user_id: user.id).to_a
-    # Check if there is a LearningOutcomeResult for the alignment
-    out_results.select! { |res| res.alignment.content_type == "AssessmentQuestionBank" ? res.associated_asset_id == associated_asset_id : res.alignment.content_id == alignment.content_id }
+    # Check if there is already a LearningOutcomeResult for the same quiz/assignment with the same alignment.
+    # (we need to check both type and id so that we do not match ids for different types)
+    out_results.select! do |res|
+      res.associated_asset_type == associated_asset_type && res.associated_asset_id == associated_asset_id &&
+        res.alignment.content_type == alignment.content_type && res.alignment.content_id == alignment.content_id
+    end
     unless out_results.empty?
       # Delete current LearningOutcomeResult
       self.workflow_state = "deleted"

@@ -442,14 +442,16 @@ describe LearningOutcomeResult do
             user: student,
             score: 2,
             learning_outcome_id: @outcome.id,
-            associated_asset_id: @quiz1.id
+            associated_asset_id: @quiz1.id,
+            associated_asset_type: "Quizzes::Quiz"
           )
           lor2 = LearningOutcomeResult.create(
             alignment: @qb_alignment,
             user: student,
             score: 2,
             learning_outcome_id: @outcome.id,
-            associated_asset_id: @quiz2.id
+            associated_asset_id: @quiz2.id,
+            associated_asset_type: "Quizzes::Quiz"
           )
           expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
           expect(LearningOutcomeResult.find(lor2.id).workflow_state).to eq("active")
@@ -461,12 +463,57 @@ describe LearningOutcomeResult do
             user: student,
             score: 2,
             learning_outcome_id: @outcome.id,
-            associated_asset_id: @quiz1.id
+            associated_asset_id: @quiz1.id,
+            associated_asset_type: "Quizzes::Quiz"
           )
           same_lor = lor1.clone
           same_lor.save!
           expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
           expect(LearningOutcomeResult.find(same_lor.id).workflow_state).to eq("deleted")
+        end
+      end
+
+      describe "for multiple QuestionBanks with questions used in same quizzes" do
+        def create_bank(title, course, quiz, outcome)
+          bank = course.assessment_question_banks.create!(title: title)
+          q = bank.assessment_questions.create!(
+            question_data: {
+              "name" => "#{title} question 1",
+              "points_possible" => 10,
+              "answers" => [{ "id" => 1 }, { "id" => 2 }]
+            }
+          )
+          outcome.align(bank, course, mastery_score: 0.7)
+          quiz.add_assessment_questions [q]
+          tag = ContentTag.find_by(content_type: "AssessmentQuestionBank", content_id: bank.id)
+          [bank, tag]
+        end
+
+        before :once do
+          @quiz = course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy: "keep_highest")
+          @bank1, @qb_alignment1 = create_bank("Test Bank1", course, @quiz, @outcome)
+          @bank2, @qb_alignment2 = create_bank("Test Bank2", course, @quiz, @outcome)
+        end
+
+        it "store one result per alignment" do
+          lor1 = LearningOutcomeResult.create(
+            alignment: @qb_alignment1,
+            user: student,
+            score: 2,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz.id,
+            associated_asset_type: "Quizzes::Quiz"
+          )
+          lor2 = LearningOutcomeResult.create(
+            alignment: @qb_alignment2,
+            user: student,
+            score: 2,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz.id,
+            associated_asset_type: "Quizzes::Quiz"
+          )
+          expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
+          expect(LearningOutcomeResult.find(lor2.id).workflow_state).to eq("active")
         end
       end
     end
