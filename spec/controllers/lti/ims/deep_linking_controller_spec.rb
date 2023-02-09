@@ -498,6 +498,17 @@ module Lti
                   expect { subject }.to change { context_module.content_tags.count }.by 1
                 end
 
+                context "when window.targetName is _blank" do
+                  let(:content_items) do
+                    [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", window: { targetName: "_blank" } }]
+                  end
+
+                  it "sets new_tab true on module item" do
+                    subject
+                    expect(context_module.content_tags.last.new_tab).to eq true
+                  end
+                end
+
                 it "asks to reload page" do
                   subject
                   expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
