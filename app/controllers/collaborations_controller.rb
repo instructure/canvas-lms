@@ -214,6 +214,9 @@ class CollaborationsController < ApplicationController
     if authorized_action(@collaboration, @current_user, :read)
       @collaboration.touch
       begin
+        # error out when user tries to open a collaboration while masquerading
+        raise GoogleDrive::MasqueradingException, "cannot show collaboration when masquerading" if logged_in_user != @current_user
+
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", "participate")
@@ -233,6 +236,10 @@ class CollaborationsController < ApplicationController
           flash[:error] = t "errors.cannot_load_collaboration", "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
+      rescue GoogleDrive::MasqueradingException => e
+        Canvas::Errors.capture(e, {}, :warn)
+        flash[:error] = t "errors.no_masquerading_on_collaboration", "Viewing a collaboration while acting as another user is not permitted."
+        redirect_to named_context_url(@context, :context_collaborations_url)
       rescue GoogleDrive::ConnectionException => e
         Canvas::Errors.capture(e, {}, :warn)
         flash[:error] = t "errors.cannot_load_collaboration", "Cannot load collaboration"
@@ -273,11 +280,17 @@ class CollaborationsController < ApplicationController
     if content_item
       @collaboration = collaboration_from_content_item(content_item)
       users, group_ids = content_item_visibility(content_item)
+      # if user is masquerading, since masquerador will be the author, masqueradee will be automatic invitee
+      users << @current_user if logged_in_user != @current_user
     else
-      users     = User.where(id: Array(params[:user])).to_a
+      users = User.where(id: Array(params[:user])).to_a
+      # if user is masquerading, since masquerador will be the author, masqueradee will be automatic invitee
+      users << @current_user if logged_in_user != @current_user
       group_ids = Array(params[:group])
       collaboration_params = params.require(:collaboration).permit(:title, :description, :url)
-      collaboration_params[:user] = @current_user
+
+      # if creator is masquerading, set collaboration owner to masquerader, not masqueradee
+      collaboration_params[:user] = logged_in_user
       @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
       collaboration_params.delete(:url) unless @collaboration.is_a?(ExternalToolCollaboration)
       @collaboration.attributes = collaboration_params
@@ -431,7 +444,8 @@ class CollaborationsController < ApplicationController
     collaboration.attributes = {
       title: content_item["title"],
       description: content_item["text"],
-      user: @current_user
+      # if user is masquerading, set collaboration author to masquerador, not masqueradee
+      user: logged_in_user
     }
     collaboration.data = content_item
     collaboration.url = content_item["url"]
