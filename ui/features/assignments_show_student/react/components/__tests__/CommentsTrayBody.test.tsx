@@ -854,10 +854,11 @@ describe('CommentsTrayBody', () => {
       expect(queryByText('Your peer review is complete!')).not.toBeInTheDocument()
     })
 
-    it('renders a message with image if there are no comments', async () => {
+    it('renders a message to add a comment to complete the review if there are no comments', async () => {
       const mocks = [await mockSubmissionCommentQuery()]
       const props = await getDefaultPropsWithReviewerSubmission('assigned')
       props.isPeerReviewEnabled = true
+      props.assignment.rubric = null
       const {getByText, getByTestId} = render(
         <MockedProvider mocks={mocks}>
           <CommentsTrayBody {...props} />
@@ -870,6 +871,23 @@ describe('CommentsTrayBody', () => {
             'Add a comment to complete your peer review. You will only see comments written by you.'
           )
         ).toBeInTheDocument()
+      )
+      expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
+    })
+
+    it('renders a message that only comments authored by the viewer are visible if there are no comments and a rubric atttached', async () => {
+      const mocks = [await mockSubmissionCommentQuery()]
+      const props = await mockAssignmentAndSubmission()
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = {id: 123}
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(getByText('You will only see comments written by you.')).toBeInTheDocument()
       )
       expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
     })
