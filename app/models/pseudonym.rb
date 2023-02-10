@@ -178,10 +178,11 @@ class Pseudonym < ActiveRecord::Base
                .order("authentication_provider_id NULLS LAST").first
   end
 
-  def self.for_auth_configuration(unique_id, aac)
+  def self.for_auth_configuration(unique_id, aac, include_suspended: false)
     auth_id = aac.try(:auth_provider_filter)
-    active_only.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
-               .order("authentication_provider_id NULLS LAST").take
+    scope = include_suspended ? active : active_only
+    scope.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
+         .order("authentication_provider_id NULLS LAST").take
   end
 
   def audit_log_update
