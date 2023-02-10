@@ -54,6 +54,7 @@ import type {
   SubmissionCommentData,
   UserSubmissionGroup,
 } from '../../../../api.d'
+import type {GradebookSettingsModalProps} from './components/GradebookSettingsModal'
 import type {
   AssignmentStudentMap,
   ColumnOrderSettings,
@@ -68,8 +69,10 @@ import type {
   GradebookOptions,
   GradebookSettings,
   GradebookStudent,
+  GradebookViewOptions,
   GradingPeriodAssignmentMap,
   InitialActionStates,
+  LatePolicyCamelized,
   PendingGradeInfo,
   SubmissionFilterValue,
 } from './gradebook.d'
@@ -340,7 +343,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   filteredAssignmentIds: string[] = []
 
-  gradebookSettingsModal?: React.RefObject<HTMLElement & {open: () => void}>
+  gradebookSettingsModal: React.RefObject<HTMLElement & {open: () => void}>
 
   isRunningScoreToUngraded: boolean
 
@@ -541,6 +544,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     }
     this.setStudentGroups(this.options.student_groups)
+    this.gradebookSettingsModal = React.createRef()
   }
 
   bindGridEvents = () => {
@@ -2011,9 +2015,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  renderGradebookSettingsModal = () => {
-    this.gradebookSettingsModal = React.createRef()
-    const props = {
+  renderGradebookSettingsModal = (): void => {
+    const props: GradebookSettingsModalProps = {
       anonymousAssignmentsPresent: _.some(this.assignments, assignment => {
         return assignment.anonymous_grading
       }),
@@ -2026,9 +2029,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onClose: () => {
         return this.gradebookSettingsModalButton.current?.focus()
       },
-      onCourseSettingsUpdated: settings => {
-        return this.courseSettings.handleUpdated(settings, this.props.fetchFinalGradeOverrides)
-      },
+      onCourseSettingsUpdated: (settings: {allowFinalGradeOverride: boolean}) =>
+        this.courseSettings.handleUpdated(settings, this.props.fetchFinalGradeOverrides),
       onLatePolicyUpdate: this.onLatePolicyUpdate,
       postPolicies: this.postPolicies,
       ref: this.gradebookSettingsModal,
@@ -2039,7 +2041,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     const $container = document.querySelector("[data-component='GradebookSettingsModal']")
-    return AsyncComponents.renderGradebookSettingsModal(props, $container)
+    if ($container instanceof HTMLElement) {
+      AsyncComponents.renderGradebookSettingsModal(props, $container)
+    }
   }
 
   gradebookSettingsModalViewOptionsProps = () => {
@@ -2049,7 +2053,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       allowSortingByModules: modulesEnabled,
       allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
-      loadCurrentViewOptions: () => {
+      loadCurrentViewOptions: (): GradebookViewOptions => {
         const {criterion, direction} = this.getColumnSortSettingsViewOptionsMenuProps()
         const {
           viewUngradedAsZero,
@@ -2083,7 +2087,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showSeparateFirstLastNames,
     statusColors: colors,
     viewUngradedAsZero,
-  }) => {
+  }): Promise<void | void[]> => {
     // We may have to save changes to more than one endpoint, depending on
     // which options have changed. Additionally, a couple options require us to
     // update the grid when they change. Let's sort out which endpoints we
@@ -2319,7 +2323,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.buildRows()
   }
 
-  studentSearchMatcher = (option, searchTerm: string) => {
+  studentSearchMatcher = (
+    option: {
+      id: string
+      label: string
+    },
+    searchTerm: string
+  ) => {
     const term = searchTerm?.toLowerCase() || ''
     const studentName = option.label?.toLowerCase() || ''
 
@@ -4094,7 +4104,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return contextModules
   }
 
-  onLatePolicyUpdate = latePolicy => {
+  onLatePolicyUpdate = (latePolicy: Partial<LatePolicyCamelized>) => {
     this.setLatePolicy(latePolicy)
     return this.applyLatePolicy()
   }
