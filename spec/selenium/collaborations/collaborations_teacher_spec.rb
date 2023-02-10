@@ -91,6 +91,46 @@ describe "collaborations" do
         no_delete_with_no_access
       end
     end
+
+    context "when user is masquerading" do
+      before do
+        course_with_teacher_logged_in
+        setup_google_drive
+      end
+
+      after do
+        close_extra_windows
+      end
+
+      it "disallows viewing collaborations" do
+        create_collaboration!("google_docs", "Created By Teacher")
+
+        site_admin_logged_in
+        get "/courses/#{@course.id}/collaborations/#{Collaboration.last.id}?become_user_id=#{@teacher.id}"
+
+        fj("a:contains('Proceed')").click
+        wait_for_ajaximations
+        assert_flash_error_message "Viewing a collaboration while acting as another user is not permitted."
+      end
+
+      it "sets real user as author and auto-invites masqueraded user when creating a collaboration" do
+        create_collaboration!("google_docs", "Created By Teacher")
+
+        site_admin_logged_in
+        setup_google_drive
+        get "/courses/#{@course.id}/collaborations?become_user_id=#{@teacher.id}"
+        fj("a:contains('Proceed')").click
+
+        fj("a:contains('Start a new collaboration')").click
+        f("input#collaboration_title").send_keys "created by admin while masquerading"
+        force_click("button:contains('Start Collaborating')")
+        wait_for_ajaximations
+        collab = Collaboration.last
+        expect(collab.user_id).to eq @user.id
+        expect(collab.user_id).not_to eq @teacher.id
+        expect(collab.users.count { |u| u.id == @teacher.id }).to eq 1
+      end
+    end
   end
 
   describe "Accessibility" do
