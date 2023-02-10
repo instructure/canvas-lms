@@ -181,6 +181,33 @@ describe('RubricTab', () => {
       const {findByText} = render(<RubricTab {...props} />)
       expect(await findByText('Total Points: 8')).toBeInTheDocument()
     })
+
+    it('shows alert explaining that the rubric needs to be filled out to complete the review', async () => {
+      const props = await makeProps({graded: false})
+      props.peerReviewModeEnabled = true
+      const {findByText} = render(<RubricTab {...props} />)
+
+      expect(
+        await findByText(
+          'Fill out the rubric below after reviewing the student submission to complete this review.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('does not display alert explaining that the rubric needs to be filled out if already completed ', async () => {
+      const props = await makeProps({graded: false})
+      props.peerReviewModeEnabled = true
+      const assessment = {_id: '1', assessor: {_id: '1'}}
+      props.assessments = [assessment]
+      window.ENV.current_user.id = '1'
+      const {queryByText} = render(<RubricTab {...props} />)
+
+      expect(
+        await queryByText(
+          'Fill out the rubric below after reviewing the student submission to complete this review.'
+        )
+      ).not.toBeInTheDocument()
+    })
   })
 
   describe('ungraded rubric', () => {

@@ -147,13 +147,20 @@ export default function CommentContent(props) {
   const peerReviewText = I18n.t(
     'Add a comment to complete your peer review. You will only see comments written by you.'
   )
+  const rubricPeerReviewText = I18n.t('You will only see comments written by you.')
 
   const peerReviewCompleteText = I18n.t('Your peer review is complete!')
 
   let placeholder
   if (!props.comments.length) {
     if (props.isPeerReviewEnabled) {
-      placeholder = <SVGWithTextPlaceholder text={peerReviewText} url={noCommentsPeerReview} />
+      if (props.assignment.rubric) {
+        placeholder = (
+          <SVGWithTextPlaceholder text={rubricPeerReviewText} url={noCommentsPeerReview} />
+        )
+      } else {
+        placeholder = <SVGWithTextPlaceholder text={peerReviewText} url={noCommentsPeerReview} />
+      }
     } else if (!props.submission.gradeHidden) {
       placeholder = <SVGWithTextPlaceholder text={defaultText} url={noComments} />
     }
