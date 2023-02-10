@@ -90,7 +90,7 @@ export type Student = Readonly<{
   }>
 
 export type StudentMap = {
-  [id: string]: Student
+  [studentId: string]: Student
 }
 
 export type StudentGroup = Partial<
@@ -242,7 +242,7 @@ export type Assignment = Readonly<{
   }>
 
 export type AssignmentMap = {
-  [id: string]: Assignment
+  [assignmentId: string]: Assignment
 }
 
 export type AssignmentGroup = Readonly<{

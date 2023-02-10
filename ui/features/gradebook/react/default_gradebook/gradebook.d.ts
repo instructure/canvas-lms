@@ -166,16 +166,40 @@ export type GradebookOptions = {
   version: null | string
 }
 
+export type GradebookViewOptions = {
+  columnSortSettings: {
+    criterion: string
+    direction: 'ascending' | 'descending'
+  }
+  hideTotal: boolean
+  showNotes: boolean
+  showSeparateFirstLastNames: boolean
+  showUnpublishedAssignments: boolean
+  hideAssignmentGroupTotals: boolean
+  statusColors: StatusColors
+  viewUngradedAsZero: boolean
+}
+
 export type LatePolicy = {
+  late_submission_deduction_enabled: boolean
+  late_submission_deduction: number
+  late_submission_interval: 'day' | 'hour'
+  late_submission_minimum_percent_enabled: boolean
+  late_submission_minimum_percent: number
   missing_submission_deduction_enabled: boolean
   missing_submission_deduction: number
 }
 
 // TODO: remove the need for this type
 export type LatePolicyCamelized = {
+  lateSubmissionDeductionEnabled: boolean
+  lateSubmissionDeduction: number
+  lateSubmissionInterval: 'day' | 'hour'
+  lateSubmissionMinimumPercentEnabled: boolean
+  lateSubmissionMinimumPercent: number
   missingSubmissionDeductionEnabled: boolean
   missingSubmissionDeduction: number
-  lateSubmissionInterval: string
+  newRecord?: boolean
 }
 
 export type GradingPeriodAssignmentMap = {
