@@ -32,6 +32,8 @@ import {
   PRIMARY_PACE,
   PROGRESS_FAILED,
   PROGRESS_RUNNING,
+  PACE_CONTEXTS_DEFAULT_STATE,
+  DEFAULT_UI_STATE,
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
 import {paceContextsActions} from '../pace_contexts'
@@ -337,10 +339,35 @@ describe('Course paces actions', () => {
       expect(asyncDispatch.mock.calls[4]).toEqual([uiActions.hideLoadingOverlay()])
     })
 
-    it('fetches the pace context info again', async () => {
+    it('fetches the pace context info again with all the previous filters', async () => {
       const asyncDispatch = jest.fn(() => Promise.resolve())
-      const getState = mockGetState({...PRIMARY_PACE}, PRIMARY_PACE)
+      paceContextsActions.fetchPaceContexts = jest.fn().mockReturnValue('fetchPaceContextsThunk')
+      const page = 2
+      const order = 'desc'
+      const contextType = 'student_enrollment'
+      const sortBy = PACE_CONTEXTS_DEFAULT_STATE.sortBy
+      const searchTerm = 'Jo'
+      const getState = () => ({
+        ...DEFAULT_STORE_STATE,
+        ui: {...DEFAULT_UI_STATE, selectedContextType: 'Enrollment'},
+        paceContexts: {
+          ...PACE_CONTEXTS_DEFAULT_STATE,
+          selectedContextType: contextType,
+          page,
+          order,
+          searchTerm,
+        },
+      })
+
       await coursePaceActions.removePace()(asyncDispatch, getState)
+      expect(paceContextsActions.fetchPaceContexts).toHaveBeenCalledTimes(1)
+      expect(paceContextsActions.fetchPaceContexts).toHaveBeenCalledWith({
+        contextType,
+        searchTerm,
+        sortBy,
+        page,
+        orderType: order,
+      })
       expect(asyncDispatch.mock.calls[3].toString()).toMatch('fetchPaceContextsThunk')
     })
 
