@@ -18,7 +18,11 @@
 
 import {camelize, underscore} from 'convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
-import type {PlagiarismData, SimilarityEntry} from '@canvas/grading/grading.d'
+import type {
+  PlagiarismData,
+  SimilarityEntry,
+  CamelizedSubmissionWithOriginalityReport,
+} from '@canvas/grading/grading.d'
 
 export function isGraded(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
@@ -52,9 +56,9 @@ export function isHideable(submission) {
 //   - "pending" reports (reports still being processed)
 //   - scored reports, with higher scores (indicating more likely plagiarism) first
 export function extractSimilarityInfo(submission) {
-  const sub = camelize(submission)
+  const sub = camelize(submission) as CamelizedSubmissionWithOriginalityReport
   let plagiarismData
-  let type
+  let type: 'vericite' | 'turnitin' | 'originality_report' | null = null
 
   if (sub.vericiteData?.provider === 'vericite') {
     type = 'vericite'

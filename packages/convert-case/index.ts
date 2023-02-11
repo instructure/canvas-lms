@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function camelizeString(str, lowerFirst) {
+function camelizeString(str: string, lowerFirst: boolean = false) {
   return (str || '').replace(/(?:^|[-_])(\w)/g, (_, c, index) => {
     if (index === 0 && lowerFirst) {
       return c ? c.toLowerCase() : ''
@@ -26,16 +26,17 @@ function camelizeString(str, lowerFirst) {
   })
 }
 
-function underscoreString(str) {
+function underscoreString(str: string) {
   return str.replace(/([A-Z])/g, $1 => `_${$1.toLowerCase()}`)
 }
 
 // Convert all property keys in an object to camelCase
-export function camelize(props) {
-  let prop
-  const attrs = {}
+export function camelize(props: {[key: string]: any}) {
+  const attrs: {
+    [key: string]: any
+  } = {}
 
-  for (prop in props) {
+  for (const prop in props) {
     if (props.hasOwnProperty(prop)) {
       attrs[camelizeString(prop, true)] = props[prop]
     }
@@ -44,9 +45,11 @@ export function camelize(props) {
   return attrs
 }
 
-export function underscore(props) {
+export function underscore(props: {[key: string]: any}) {
   let prop
-  const attrs = {}
+  const attrs: {
+    [key: string]: any
+  } = {}
 
   for (prop in props) {
     if (props.hasOwnProperty(prop)) {

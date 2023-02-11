@@ -104,7 +104,7 @@ export type SubmissionTrayProps = {
   isOpen: boolean
   isFirstStudent: boolean
   isLastStudent: boolean
-  latePolicy: LatePolicyCamelized
+  latePolicy?: LatePolicyCamelized
   locale: string
   editSubmissionComment: (commentId: string | null) => void
   onClose: () => void

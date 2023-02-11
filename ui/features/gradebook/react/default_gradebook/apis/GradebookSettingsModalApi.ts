@@ -84,5 +84,7 @@ export function updateCourseSettings(
   }
 ) {
   const url = `/api/v1/courses/${courseId}/settings`
-  return axios.put(url, underscore(settings)).then(response => ({data: camelize(response.data)}))
+  return axios.put(url, underscore(settings)).then(response => ({
+    data: camelize<{allowFinalGradeOverride: boolean}>(response.data),
+  }))
 }

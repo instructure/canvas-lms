@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import INST from 'browser-sniffer'
 
 class SafeString {
-  constructor(string) {
+  'string': string
+
+  constructor(string: any) {
     this.string = typeof string === 'string' ? string : `${string}`
   }
 
@@ -36,10 +39,10 @@ const ENTITIES = {
   "'": '&#x27;',
   '/': '&#x2F;',
   '`': '&#x60;', // for old versions of IE
-  '=': '&#x3D;' // in case of unquoted attributes
-}
+  '=': '&#x3D;', // in case of unquoted attributes
+} as const
 
-function htmlEscape(str) {
+export function htmlEscape(str: string): string {
   // ideally we should wrap this in a SafeString, but this is how it has
   // always worked :-/
   return str.replace(/[&<>"'\/`=]/g, c => ENTITIES[c])
@@ -47,7 +50,7 @@ function htmlEscape(str) {
 
 // Escapes HTML tags from string, or object string props of `strOrObject`.
 // returns the new string, or the object with escaped properties
-export default function escape(strOrObject) {
+export default function escape<T>(strOrObject: string | SafeString | Object) {
   if (typeof strOrObject === 'string') {
     return htmlEscape(strOrObject)
   } else if (strOrObject instanceof SafeString) {
@@ -62,7 +65,7 @@ export default function escape(strOrObject) {
       strOrObject[k] = escape(v)
     }
   }
-  return strOrObject
+  return strOrObject as T
 }
 escape.SafeString = SafeString
 
@@ -78,7 +81,7 @@ const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
 const unescapeSource = `(?:${Object.keys(UNESCAPE_ENTITIES).join('|')})`
 const UNESCAPE_REGEX = new RegExp(unescapeSource, 'g')
 
-function unescape(str) {
+function unescape(str: string) {
   return str.replace(UNESCAPE_REGEX, match => UNESCAPE_ENTITIES[match])
 }
 
