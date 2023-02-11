@@ -24,6 +24,7 @@ import type {
   GradebookOptions,
   GradebookSettings,
   InitialActionStates,
+  LatePolicyCamelized,
 } from './gradebook.d'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
 import {camelize} from 'convert-case'
@@ -132,7 +133,9 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
     gradingSchemes: options.grading_schemes.map(camelize),
     gradingPeriodAssignments: {},
     assignmentStudentVisibility: {},
-    latePolicy: options.late_policy ? camelize(options.late_policy) : undefined,
+    latePolicy: options.late_policy
+      ? camelize<LatePolicyCamelized>(options.late_policy)
+      : undefined,
     students: new StudentDatastore({}, {}),
     modulesById: {},
   }

@@ -44,6 +44,7 @@ import type {
   GradingPeriod,
   Module,
   Section,
+  Student,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
@@ -490,14 +491,14 @@ export function maxAssignmentCount(
 }
 
 // mutative
-export function escapeStudentContent(student) {
+export function escapeStudentContent(student: Student) {
   const unescapedName = student.name
   const unescapedSortableName = student.sortable_name
   const unescapedFirstName = student.first_name
   const unescapedLastName = student.last_name
 
   // TODO: selectively escape fields
-  const escapedStudent = htmlEscape(student)
+  const escapedStudent = htmlEscape<Student>(student)
   escapedStudent.name = unescapedName
   escapedStudent.sortable_name = unescapedSortableName
   escapedStudent.first_name = unescapedFirstName

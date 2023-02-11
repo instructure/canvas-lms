@@ -63,18 +63,18 @@ export type Student = Readonly<{
   avatar_url?: string
   created_at: string
   email: null | string
-  first_name: string
   group_ids: string[]
   id: string
   integration_id: null | string
-  last_name: string
   login_id: string
-  name: string
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
 }> & {
   enrollments: Enrollment[]
+  first_name: string
+  last_name: string
+  name: string
 } & Partial<{
     computed_current_score: number
     computed_final_score: number

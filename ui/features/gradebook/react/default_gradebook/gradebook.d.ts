@@ -213,7 +213,7 @@ export type CourseContent = {
   gradingSchemes: GradingScheme[]
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   assignmentStudentVisibility: {[assignmentId: string]: null | StudentMap}
-  latePolicy: LatePolicyCamelized
+  latePolicy?: LatePolicyCamelized
   students: StudentDatastore
   modulesById: ModuleMap
 }
