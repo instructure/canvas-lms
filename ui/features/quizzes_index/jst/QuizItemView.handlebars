@@ -86,6 +86,86 @@
     </div>
 
     {{#if canOpenManageOptions}}
+      {{#if showSpeedGraderLinkFlag}}
+        <div class="ig-admin">
+          {{#if cyoe.isTrigger}}
+          <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+          {{/if}}
+          {{#if cyoe.isReleased}}
+          <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
+            <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
+          </span>
+          <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
+          {{/if}}
+          {{#if can_update}}
+              <span class="sis-button" data-view="sis-button"></span>
+              <span data-view="lock-icon" class="lock-icon"></span>
+              <span data-view="publish-icon" class="publish-icon"></span>
+          {{/if}}
+          <div class="inline-block">
+            <button class="al-trigger al-trigger-gray Button--icon-action" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" role="button">
+              <i class="icon-more" aria-hidden="true"></i>
+              <span class="screenreader-only">{{#t}}Options for {{title_label}}{{/t}}</span>
+            </button>
+
+            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+              {{#if can_update}}
+                <li role="presentation">
+                  <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
+                </li>
+              {{/if}}
+              {{#if canShowQuizBuildShortCut}}
+                <li role="presentation">
+                  <a href="{{build_url}}" id="ui-id-{{id}}-5" class="icon-quiz" tabindex="-1" role="menuitem" title='{{#t}}Build Quiz{{/t}}'>{{#t}}Build{{/t}}</a>
+                </li>
+              {{/if}}
+              {{#ifAll assignment_id showSpeedGraderLink}}
+                <li role="presentation" class="speed-grader-link-container {{#if initialUnpublishedState}}hidden{{/if}}">
+                  <a href="/courses/{{courseId}}/gradebook/speed_grader?assignment_id={{assignment_id}}" id="ui-id-{{id}}-6" class="icon-speed-grader speed-grader-link" tabindex="-1" role="menuitem" title="{{#t}}Navigate to Speed Grader for {{name}}{{/t}}">{{#t}}SpeedGrader{{/t}}</a>
+                </li>
+              {{/ifAll}}
+              {{#if canDuplicate}}
+              <li>
+                <a
+                  class="duplicate_assignment icon-copy-course"
+                  id="assignment_{{id}}_settings_duplicate_item"
+                  aria-label="{{#t}}Duplicate Quiz {{name}}{{/t}}"
+                  data-focus-returns-to"assign_{{id}}_manage_link"
+                >{{#t}}Duplicate{{/t}}</a>
+              </li>
+              {{/if}}
+              {{#unless is_locked}}
+                <li role="presentation">
+                {{#if permissions.delete}}
+                  <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+                {{else}}
+                  <a id="ui-id-{{id}}-3" class="delete-item icon-trash disabled" aria-disabled="true" tabindex="-1" role="menuitem" title='{{#t}}Delete Quiz{{/t}}'>{{#t}}Delete{{/t}}</a>
+                {{/if}}
+                </li>
+              {{/unless}}
+              {{#ifAll can_update migrateQuizEnabled}}
+                <li role="presentation">
+                  <a href="#" id="ui-id-{{id}}-4" class="icon-export migrate" tabindex="-1" role="menuitem" title='{{#t}}Migrate Quiz{{/t}}'>{{#t}}Migrate{{/t}}</a>
+                </li>
+              {{/ifAll}}
+              {{#if DIRECT_SHARE_ENABLED}}
+                <li role="presentation">
+                  <a href="#" class="icon-user quiz-send-to" role="menuitem" title="{{#t}}Send Quiz to User{{/t}}">{{#t}}Send to...{{/t}}</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-duplicate quiz-copy-to" role="menuitem" title="{{#t}}Copy Quiz to Course{{/t}}">{{#t}}Copy to...{{/t}}</a>
+                </li>
+              {{/if}}
+              {{#ifAll can_update cyoe.isCyoeAble}}
+                <li role="presentation">
+                  <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+                </li>
+              {{/ifAll}}
+              {{#if can_update}}{{>ui/shared/external-tools/jst/_external_tools_menu.handlebars quiz_menu_tools}}{{/if}}
+            </ul>
+          </div>
+        </div>
+      {{else}}
         <div class="ig-admin">
           {{#if cyoe.isTrigger}}
           <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
@@ -159,6 +239,7 @@
             </ul>
           </div>
         </div>
+      {{/if}}
     {{/if}}
   </div>
 {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}

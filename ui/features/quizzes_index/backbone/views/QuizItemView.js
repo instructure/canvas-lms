@@ -250,6 +250,7 @@ export default class ItemView extends Backbone.View {
   }
 
   updatePublishState() {
+    this.$('.speed-grader-link-container')?.toggleClass('hidden', !this.model.get('published'))
     return this.$('.ig-row').toggleClass('ig-published', this.model.get('published'))
   }
 
@@ -374,10 +375,17 @@ export default class ItemView extends Backbone.View {
       this.model.get('is_master_course_child_content') &&
       this.model.get('restricted_by_master_course')
 
+    base.courseId = ENV.context_asset_string.split('_')[1]
+    base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
+    base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
+
+    // publishing and unpublishing the underlying model does not rerender this view.
+    // this sets initial value, then it keeps up with class toggling behavior on updatePublishState()
+    base.initialUnpublishedState = !this.model.get('published')
+
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
     base.canOpenManageOptions =
       this.canManage() || this.canDuplicate() || this.canDelete() || base.DIRECT_SHARE_ENABLED
-
     return base
   }
 }
