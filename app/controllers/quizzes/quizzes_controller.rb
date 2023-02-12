@@ -135,6 +135,7 @@ class Quizzes::QuizzesController < ApplicationController
           new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
           new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
           migrate_quiz_enabled: quiz_lti_enabled?,
+          show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
@@ -151,7 +152,8 @@ class Quizzes::QuizzesController < ApplicationController
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
-        NEW_QUIZZES_SELECTED: quiz_engine_selection
+        NEW_QUIZZES_SELECTED: quiz_engine_selection,
+        SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
       }
       if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
         hash[:COURSE_ID] = @context.id.to_s
