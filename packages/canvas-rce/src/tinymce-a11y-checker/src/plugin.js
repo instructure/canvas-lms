@@ -4,6 +4,7 @@ import Checker from "./components/checker"
 import formatMessage from "./format-message"
 import checkNode from "./node-checker"
 
+let isCheckerOpen = false
 let instance
 const pendingInstanceCallbacks = []
 const container = document.createElement("div")
@@ -16,25 +17,29 @@ tinymce.create("tinymce.plugins.AccessibilityChecker", {
       ui,
       { done, config, additionalRules, mountNode }
     ) {
-      ReactDOM.render(
-        <Checker
-          getBody={ed.getBody.bind(ed)}
-          editor={ed}
-          additionalRules={additionalRules}
-          mountNode={mountNode}
-        />,
-        container,
-        function () {
-          // this is a workaround for react 16 since ReactDOM.render is not
-          // guaranteed to return the instance synchronously (especially if called
-          // within another component's lifecycle method eg: componentDidMount). see:
-          // https://github.com/facebook/react/issues/10309#issuecomment-318434635
-          instance = this
-          if (config) getInstance(instance => instance.setConfig(config))
-          pendingInstanceCallbacks.forEach(cb => cb(instance))
-          instance.check(done)
-        }
-      )
+      if (!isCheckerOpen) {
+        ReactDOM.render(
+          <Checker
+            getBody={ed.getBody.bind(ed)}
+            editor={ed}
+            additionalRules={additionalRules}
+            mountNode={mountNode}
+            onClose={() => isCheckerOpen = false}
+          />,
+          container,
+          function () {
+            // this is a workaround for react 16 since ReactDOM.render is not
+            // guaranteed to return the instance synchronously (especially if called
+            // within another component's lifecycle method eg: componentDidMount). see:
+            // https://github.com/facebook/react/issues/10309#issuecomment-318434635
+            instance = this
+            if (config) getInstance(instance => instance.setConfig(config))
+            pendingInstanceCallbacks.forEach(cb => cb(instance))
+            instance.check(done)
+          }
+        )
+        isCheckerOpen = true
+      }
     })
 
     ed.addCommand("checkAccessibility", function (
