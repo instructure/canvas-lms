@@ -941,6 +941,13 @@ describe UserMerge do
         expect(@user2.lti_id).to eq @lti_id_2
         expect(@user2.uuid).to eq @uuid2
         expect(@user2.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist
+
+        # ensure past lti ids aren't orphaned when another merge happens
+        user3 = user_with_pseudonym
+        uuid3 = user3.uuid
+        UserMerge.from(@user2).into(user3)
+        expect(user3.reload.uuid).to eq uuid3
+        expect(user3.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist
       end
 
       it "doesn't move lti ids if the target user has an lti_context_id" do

@@ -266,6 +266,9 @@ class UserMerge
     # they are unlikely to have done so if they have no enrollments or account users
     return false if target_user.has_enrollment? || target_user.account_membership?
 
+    # the source user already has past LTI IDs that would be orphaned if we did this
+    return false if from_user.past_lti_ids.shard(from_user.associated_shards).exists?
+
     true
   end
 
