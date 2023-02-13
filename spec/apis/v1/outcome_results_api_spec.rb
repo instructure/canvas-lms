@@ -498,11 +498,12 @@ describe "Outcome Results API", type: :request do
 
       describe "user_ids parameter" do
         it "restricts results to specified users" do
+          # api endpoint requires an array of strings
           student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
-          student_id_str = student_ids.join(",")
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ["users"]),
-                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ["users"])
+
+          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_ids, include: ["users"]),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, user_ids: student_ids, include: ["users"])
           json = JSON.parse(response.body)
           expect(json.keys.sort).to eq %w[linked meta rollups]
           expect(json["rollups"].size).to eq 2
@@ -531,9 +532,10 @@ describe "Outcome Results API", type: :request do
           pseudonym.user_id = @student.id
           pseudonym.sis_user_id = "123"
           pseudonym.save
-          api_call(:get, outcome_results_url(outcome_course, user_ids: "sis_user_id:123", include: ["users"]),
+          # rollups api requires user_ids to be an array
+          api_call(:get, outcome_results_url(outcome_course, user_ids: ["sis_user_id:123"], include: ["users"]),
                    controller: "outcome_results", action: "index", format: "json", course_id: outcome_course.id.to_s,
-                   user_ids: "sis_user_id:123", include: ["users"])
+                   user_ids: ["sis_user_id:123"], include: ["users"])
           json = JSON.parse(response.body)
           expect(json["linked"]["users"][0]["id"].to_i).to eq @student.id
         end
@@ -546,11 +548,11 @@ describe "Outcome Results API", type: :request do
           pseudonym.sis_user_id = "123"
           pseudonym.save
           student_ids << "sis_user_id:123"
-          student_id_str = student_ids.join(",")
           @user = @teacher
-          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ["users"]),
+          #  rollups api requires that student_ids is an array
+          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_ids, include: ["users"]),
                    controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s,
-                   user_ids: student_id_str, include: ["users"])
+                   user_ids: student_ids, include: ["users"])
           json = JSON.parse(response.body)
           expect(json["linked"]["users"].size).to eq 3
           expect(json["linked"]["users"].map { |h| h["id"].to_i }.max).to eq sis_id_student.id
@@ -750,7 +752,8 @@ describe "Outcome Results API", type: :request do
       describe "user_ids parameter" do
         it "restricts aggregate to specified users" do
           outcome_students
-          student_id_str = outcome_students[0..1].map(&:id).join(",")
+          #  rollups api requires that user_ids is an array
+          student_id_str = outcome_students[0..1].map(&:id).map(&:to_s)
           @user = @teacher
           api_call(:get, outcome_rollups_url(outcome_course, aggregate: "course", user_ids: student_id_str),
                    controller: "outcome_results", action: "rollups", format: "json",
