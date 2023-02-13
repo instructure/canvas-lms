@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [4.2.3] - 2023-01-30
+## [4.1.4] - 2023-02-14
+
+- Fixed a bug where the a11y checker could be opened twice and cause
+  content to become deleted
+
+## [4.1.3] - 2023-01-30
 
 - Change the violation highlight from an absolutely positioned blue box
   to an outline created with just CSS
