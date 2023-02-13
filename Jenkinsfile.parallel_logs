@@ -105,7 +105,7 @@ pipeline {
     stage('Create Gerrit') {
       steps {
         script {
-          credentials.withGerritCredentials {
+          withGerritCredentials {
             sh 'build/new-jenkins/push-rspec-parallel-log.sh'
           }
         }
