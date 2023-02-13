@@ -57,3 +57,7 @@ on_worker_boot do
   config = LaunchDarkly::Config.new(opts)
   Rails.configuration.launch_darkly_client = LaunchDarkly::LDClient.new(ENV['LAUNCH_DARKLY_SDK_KEY'], config)
 end
+
+if ENV['RACK_ENV'] == 'development'
+  worker_timeout 3600
+end
