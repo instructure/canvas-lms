@@ -30,7 +30,7 @@ end
 gem "bootsnap", "1.13.0", require: false
 gem "rails", "7.0.3"
 gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.3.1"
+gem_override "switchman", "3.3.2"
 gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.13"
 gem "irb", "1.4.1"
