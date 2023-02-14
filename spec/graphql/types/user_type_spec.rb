@@ -289,6 +289,22 @@ describe Types::UserType do
       @student.enrollments.update_all workflow_state: "completed"
       expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }")).to eq []
     end
+
+    it "excludes enrollments that have a state of creation_pending" do
+      expect(user_type.resolve("enrollments { _id }").length).to eq 1
+      @student.enrollments.update(workflow_state: "creation_pending")
+      expect(user_type.resolve("enrollments { _id }")).to eq []
+    end
+
+    it "excludes enrollments that have a enrollment_state of pending_active" do
+      expect(user_type.resolve("enrollments { _id }", current_user: @student).length).to eq @student.enrollments.count
+
+      @course1.update(start_at: 1.week.from_now, restrict_enrollments_to_course_dates: true)
+
+      expect(@student.enrollments.where(course_id: @course1)[0].enrollment_state.state).to eq "pending_active"
+
+      expect(user_type.resolve("enrollments { _id }", current_user: @student)).to eq [@student.enrollments.where(course_id: @course2).first.to_param]
+    end
   end
 
   context "email" do

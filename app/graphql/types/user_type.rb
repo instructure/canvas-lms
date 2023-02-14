@@ -451,7 +451,7 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false)
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true)
       scope = Enrollment.joins(:course)
 
       scope = if current_only
@@ -464,6 +464,8 @@ module Loaders
       scope = scope.where(course_id: course_ids) if course_ids.present?
 
       scope = scope.where.not(enrollments: { workflow_state: "completed" }) if exclude_concluded
+
+      scope = scope.active_by_date_or_completed if exclude_pending_enrollments
 
       order_by.each { |o| scope = scope.order(o) }
 
