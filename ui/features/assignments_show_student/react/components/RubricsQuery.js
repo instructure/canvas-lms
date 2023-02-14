@@ -20,7 +20,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import React, {useEffect, useCallback} from 'react'
+import React from 'react'
 import RubricTab from './RubricTab'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -39,6 +39,7 @@ export default function RubricsQuery(props) {
       courseID: props.assignment.env.courseId,
       submissionAttempt: props.submission.attempt,
     },
+    fetchPolicy: 'no-cache',
     onCompleted: data => {
       const parsedAssessments = data.submission?.rubricAssessmentsConnection?.nodes?.map(
         assessment => transformRubricAssessmentData(assessment)
