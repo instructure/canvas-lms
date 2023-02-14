@@ -55,7 +55,7 @@ module AccountReports
             }
           },
           "mgp_grade_export_csv" => {
-            title: proc { I18n.t("MGP Grade Export") },
+            title: proc { I18n.t("Multiple Grading Periods Grade Export") },
             description_partial: true,
             parameters_partial: true,
             parameters: {
