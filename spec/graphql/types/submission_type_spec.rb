@@ -28,6 +28,7 @@ describe Types::SubmissionType do
   end
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
+  let(:submission_type_peer_review) { GraphQLTypeTester.new(@submission, current_user: @student) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
@@ -239,7 +240,6 @@ describe Types::SubmissionType do
 
   describe "submission comments" do
     before(:once) do
-      student_in_course(active_all: true)
       @submission.update_column(:attempt, 2) # bypass infer_values callback
       @comment1 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 1)
       @comment2 = @submission.add_comment(author: @teacher, comment: "test2", attempt: 2)
@@ -271,10 +271,17 @@ describe Types::SubmissionType do
       ).to eq [@comment1.id.to_s]
     end
 
-    it "will show alll comments for all attempts if all_comments is true" do
+    it "will show all comments for all attempts if all_comments is true" do
       expect(
         submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}")
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
+    end
+
+    it "will only show comments written by the reviewer if peerReview is true" do
+      comment3 = @submission.add_comment(author: @student, comment: "test3", attempt: 2)
+      expect(
+        submission_type_peer_review.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
+      ).to eq [comment3.id.to_s]
     end
 
     it "will combine comments for attempt nil, 0, and 1" do
