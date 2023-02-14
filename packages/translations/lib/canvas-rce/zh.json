@@ -151,6 +151,7 @@
   "describe_the_icon_f6a18823": { "message": "（描述图标）" },
   "describe_the_type_ff448da5": { "message": "（描述{ TYPE }）" },
   "describe_the_video_2fe8f46a": { "message": "（视频说明）" },
+  "description_436c48d7": { "message": "说明" },
   "details_98a31b68": { "message": "详情" },
   "diagonal_dots_7d71b57e": { "message": "斜点" },
   "diamond_b8dfe7ae": { "message": "菱形" },
@@ -543,6 +544,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "按 Shift-O 打开精美 HTML 编辑器。"
   },
+  "shortcut_911d6255": { "message": "快捷方式" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma（变体）" },
   "single_color_image_4e5d4dbc": { "message": "单色图像" },

@@ -151,6 +151,7 @@
   "describe_the_icon_f6a18823": { "message": "（描述圖示）" },
   "describe_the_type_ff448da5": { "message": "（描述 { TYPE }）" },
   "describe_the_video_2fe8f46a": { "message": "（描述影片）" },
+  "description_436c48d7": { "message": "描述" },
   "details_98a31b68": { "message": "詳細資料" },
   "diagonal_dots_7d71b57e": { "message": "對角點" },
   "diamond_b8dfe7ae": { "message": "鑽石形" },
@@ -547,6 +548,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "按 Shift-O 開啟美觀 HTML 編輯器。"
   },
+  "shortcut_911d6255": { "message": "快速鍵" },
   "sigma_5c35e553": { "message": "σ" },
   "sigma_variant_8155625": { "message": "σ（變量）" },
   "single_color_image_4e5d4dbc": { "message": "單色圖像" },

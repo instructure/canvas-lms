@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "(وصف الفيديو)"
     },
+    "description_436c48d7": {
+        "message": "الوصف"
+    },
     "details_98a31b68": {
         "message": "التفاصيل"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
+    },
+    "shortcut_911d6255": {
+        "message": "اختصار"
     },
     "show_all_ae37d610": {
         "message": "عرض الكل"

@@ -159,6 +159,7 @@
   "describe_the_icon_f6a18823": { "message": "(Das Symbol beschreiben)" },
   "describe_the_type_ff448da5": { "message": "(beschreiben Sie den { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Beschreiben Sie das Video)" },
+  "description_436c48d7": { "message": "Beschreibung" },
   "details_98a31b68": { "message": "Details" },
   "diagonal_dots_7d71b57e": { "message": "Diagonale Punkte" },
   "diamond_b8dfe7ae": { "message": "Diamond" },
@@ -619,6 +620,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O, um den Pretty HTML-Editor zu öffnen."
   },
+  "shortcut_911d6255": { "message": "Shortcut" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Einfarbiges Bild" },
