@@ -1,5 +1,7 @@
 # Using Docker for Canvas Development
 
+_*This document and its associated scripts are deprecated in favor of the `inst` CLI. Go [here](./../../inst-cli/doc/docker/developing_with_docker.md) for more info.*_
+
 You can use Docker in your development environment for a more seamless
 way to get started developing Canvas.
 
