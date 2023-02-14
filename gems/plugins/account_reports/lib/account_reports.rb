@@ -109,6 +109,8 @@ module AccountReports
   def self.generate_report(account_report)
     account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
+      locale = account_report.parameters["locale"]
+      I18n.locale = locale if locale
       REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
       error_report_id = report_on_exception(e, { user: account_report.user })

@@ -20,6 +20,7 @@
 
 class AccountReport < ActiveRecord::Base
   include Workflow
+  include LocaleSelection
 
   belongs_to :account, inverse_of: :account_reports
   belongs_to :user, inverse_of: :account_reports
@@ -107,6 +108,7 @@ class AccountReport < ActiveRecord::Base
   end
 
   def run_report(type = nil)
+    parameters["locale"] = infer_locale(user: user, root_account: account)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
