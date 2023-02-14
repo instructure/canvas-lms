@@ -50,6 +50,8 @@ class Attachment < ActiveRecord::Base
   VALID_CATEGORIES = [ICON_MAKER_ICONS, UNCATEGORIZED].freeze
   VALID_VISIBILITIES = %w[inherit context institution public].freeze
 
+  NOTIFICATION_MAX_DISPLAY = 20
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -1155,10 +1157,10 @@ class Attachment < ActiveRecord::Base
                      .group(:context_id, :context_type)
                      .having("MAX(updated_at)<?", quiet_period)
                      .limit(500)
-                     .pluck(Arel.sql("COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type"))
+                     .pluck(Arel.sql("COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), ARRAY_AGG(display_name), context_id, context_type"))
       break if file_batches.empty?
 
-      file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
+      file_batches.each do |count, attachment_id, last_updated_at, display_name, context_id, context_type|
         # clear the need_notify flag for this batch
         Attachment.where("need_notify AND updated_at <= ? AND context_id = ? AND context_type = ?", last_updated_at, context_id, context_type)
                   .update_all(need_notify: nil)
@@ -1180,7 +1182,7 @@ class Attachment < ActiveRecord::Base
         next if recipient_keys.empty?
 
         notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? "New Files Added" : "New File Added")
-        data = { count: count }
+        data = { count: count, display_names: display_name }
         DelayedNotification.delay_if_production(priority: 30).process(record, notification, recipient_keys, data)
       end
     end
