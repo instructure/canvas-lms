@@ -23439,6 +23439,7 @@ nn:
   the_courses_delete_permission_affects_viewing_the__b8744b4c: "Løyve for Emne - slett påverkar om ein ser knappen for Slett dette emnet permanent, som berre vert vist for emne som er oppretta manuelt"
   the_courses_publish_permission_allows_the_user_to__30694e34: "Løyve for Emne - pubiser lar brukaren publisere emne som ikkje inneheld modular. For å publisere/avpublisere modulinnhald så må løyve for Emne Innhald - legg til/rediger/slett være slått på"
   the_courses_reset_permission_resets_course_content_921321c3: "Løyve for Emne - Tilbakestill tilbakestiller innhald i emne både for manuelt oppretta emne og emne som har SIS (for emne som har SIS så gjeld ikkje løyve for SIS Data - administrer)"
+  the_csv_header_row_is_invalid_a8ec1787: "CSV overskrifta er ugyldig"
   the_date_entered_is_invalid_4503a477: "Ugyldig dato"
   the_date_entered_was_invalid_7091cf9b: "Datoen som vart lagt inn var ugyldig"
   the_date_is_not_valid_b6285fb5: "Datoen er ikkje gyldig."
@@ -23505,6 +23506,7 @@ nn:
   the_group_groupname_was_selected_because_the_previ_e080c168: "Gruppa \"%{groupName}\" er vald fordi den førehandsvalde gruppa ikkje inneheld studentar. Du kan endre gruppeval i vurderingsoversikta."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "Gruppa \"%{groupName}\" er vald fordi studenten du søkte fram ikkje er i den førehandsvalde gruppa. Du kan endre vald gruppe i vurderingsoversikta."
   the_id_of_the_course_to_report_on_5911ebc5: "IDen til emnet rapporten gjeld for"
+  the_image_will_be_cropped_to_a_5_1_aspect_ratio_57369a9c: "Bilde vert forminska til eit 5:1 forhold"
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerte spørsmålsteksten for dette spørsmålet er for lang."
   the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Importøren vil migrerast frå API v3 til v4.1. Brukarnamn og passord vil ikkje endrast, men du bør sørge for at kontoen din har tilgang til v4.1 innan febraur 2021."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institusjonen der du logga på er ikkje konfigurert på denne kontoen."
@@ -23541,6 +23543,7 @@ nn:
       
       Takk,
       Canvas Brukerstøtte
+  the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Microsoft 365 tenaren som vert brukt i kontoinnstillingar er ikkje ein Utdanningstenar, og kan ikkje bli brukt med Microsoft Teams synkroniseringsintegrasjonen."
   the_module_item_is_locked_27fe420b: "Modulelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Det siste resultata for brukar %{current_user_name} og læringsmål %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Neste tilgjengelege avtale på dette emnet er *%{date}*"
@@ -23592,6 +23595,7 @@ nn:
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fana for studentmerknader inkluderer dokumentet for oppgåva. Faner for fleire innleveringstypar kan også være tilgjengelege"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
+  the_submitted_after_date_to_report_on_9d90f026: "For sein datoen som skal brukast"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Emneoversikta lar deg ynskje studentane velkomne til
       emnet. Bruk oversikta til å spesifisere måla til emnet, vise til kontaktinformasjon og andre detaljar, eller du kan laste opp ei PDF med eit eksisterande
@@ -23935,6 +23939,7 @@ nn:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       Dette løyvet styrer kun oppretting av brukarar på kontonivå. For å legge til brukarar
       på eit emne, må 'Brukarar - legg til / fjern studentar frå emne' eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå andre emne til dette emnet' må vere slått på.
+  this_permission_requires_the_account_and_course_le_618da734: "Dette løyve krev også funksjonaliteten Konto og Emne nivå læringsutbytte meistringsnivå, som må bli slått på av ein Custom Success Manager hos Instructure"
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Dette løyve bør kun bli gitt til brukarar som institusjonen har gjeve løyve til å opptre som andre brukarar i heile kontoen"
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Plasseringa krev at leverandør støttar dyplenking. Sjekk med leverandør om dei har støtte for ein slik funksjonalitet"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dette pronomenet vil visast etter namnet ditt når det er skrudd på"
