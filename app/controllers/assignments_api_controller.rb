@@ -781,6 +781,8 @@ class AssignmentsApiController < ApplicationController
     if course_copy_retry?
       new_assignment.context = target_course
       new_assignment.assignment_group = target_assignment.assignment_group
+    else
+      new_assignment.asset_map = Assignment::DUPLICATED_IN_CONTEXT
     end
 
     # Specify the updating user to ensure that audit events are created

@@ -1715,6 +1715,75 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    context "when the assignment is duplicated in context" do
+      subject do
+        api_call_as_user(
+          @teacher,
+          :post,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+          {
+            controller: "assignments_api",
+            action: "duplicate",
+            format: "json", course_id: @course.id.to_s,
+            assignment_id: assignment.id.to_s
+          },
+          {},
+          {},
+          { expected_status: 200 }
+        )
+      end
+
+      let(:assignment) do
+        @course.assignments.create!(
+          title: "some assignment",
+          assignment_group: @group,
+          due_at: Time.zone.now + 1.week
+        )
+      end
+
+      it 'sets the assignment "asset_map" to a value indicating a map is not needed' do
+        expect_any_instance_of(Assignment).to receive(:asset_map=).with("duplicated_in_context")
+
+        subject
+      end
+    end
+
+    context "when the assignment is duplicated into a new context" do
+      subject do
+        api_call_as_user(
+          @teacher,
+          :post,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json",
+          {
+            controller: "assignments_api",
+            action: "duplicate",
+            format: "json", course_id: @course.id.to_s,
+            assignment_id: assignment.id.to_s,
+            target_course_id: new_course.id
+          },
+          {},
+          {},
+          { expected_status: 200 }
+        )
+      end
+
+      let(:assignment) do
+        @course.assignments.create!(
+          title: "some assignment",
+          assignment_group: @group,
+          due_at: Time.zone.now + 1.week
+        )
+      end
+
+      let(:new_course) { course_model }
+
+      it 'sets the assignment "asset_map" to a value indicating a map is not needed' do
+        expect_any_instance_of(Assignment).not_to receive(:asset_map=)
+
+        subject
+      end
+    end
+
     context "Quizzes.Next course copy retry" do
       let(:assignment) do
         @course.assignments.create(
