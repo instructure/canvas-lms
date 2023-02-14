@@ -1378,6 +1378,58 @@ test_1,u1,student,active)
         end
       end
     end
+
+    it "restores linked observers included in previous batch imports" do
+      course = @account.courses.create!(name: "one", sis_source_id: "c1", workflow_state: "available")
+      term = @account.enrollment_terms.first
+      student = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
+      observer = user_with_managed_pseudonym(account: @account, sis_user_id: "u2")
+      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+
+      process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
+      student_enrollment = course.enrollments.where(user: student).take
+      observer_enrollment = course.observer_enrollments.where(user: observer).take
+      expect(student_enrollment.workflow_state).to eq "active"
+      expect(observer_enrollment.workflow_state).to eq "active"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id,associated_user_id\n,u1,student,deleted,c1,u1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "deleted"
+      expect(observer_enrollment.reload.workflow_state).to eq "deleted"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id,associated_user_id\n,u2,observer,active,c1,u1\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "active"
+      expect(observer_enrollment.reload.workflow_state).to eq "active"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,deleted,c1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "deleted"
+      expect(observer_enrollment.reload.workflow_state).to eq "deleted"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "active"
+      expect(observer_enrollment.reload.workflow_state).to eq "active"
+    end
+
+    it "restores linked observers removed in previous batch imports" do
+      course = @account.courses.create!(name: "one", sis_source_id: "c1", workflow_state: "available")
+      term = @account.enrollment_terms.first
+      student = user_with_managed_pseudonym(account: @account, sis_user_id: "u1")
+      observer = user_with_managed_pseudonym(account: @account, sis_user_id: "u2")
+      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+
+      process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
+      student_enrollment = course.enrollments.where(user: student).take
+      observer_enrollment = course.observer_enrollments.where(user: observer).take
+      expect(student_enrollment.workflow_state).to eq "active"
+      expect(observer_enrollment.workflow_state).to eq "active"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id,associated_user_id\n,u2,observer,active,c1,u1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "deleted"
+      expect(observer_enrollment.reload.workflow_state).to eq "deleted"
+
+      process_csv_data([%(section_id,user_id,role,status,course_id\n,u1,student,active,c1)], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload.workflow_state).to eq "active"
+      expect(observer_enrollment.reload.workflow_state).to eq "active"
+    end
   end
 
   describe "remove_previous_imports" do

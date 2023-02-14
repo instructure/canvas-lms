@@ -489,6 +489,7 @@ class Enrollment < ActiveRecord::Base
     self.end_at = other.end_at
     self.course_section_id = other.course_section_id
     self.root_account_id = other.root_account_id
+    self.sis_batch_id = other.sis_batch_id
     self.skip_touch_user = other.skip_touch_user
     if skip_broadcasts
       save_without_broadcasting!
