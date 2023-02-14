@@ -175,6 +175,7 @@
   "describe_the_icon_f6a18823": { "message": "(Describe el icono)" },
   "describe_the_type_ff448da5": { "message": "(Describir el { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Describir el vídeo)" },
+  "description_436c48d7": { "message": "Descripción" },
   "details_98a31b68": { "message": "Detalles" },
   "diagonal_dots_7d71b57e": { "message": "Puntos diagonales" },
   "diamond_b8dfe7ae": { "message": "Diamond" },
@@ -649,6 +650,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Mayús-O para abrir el editor html agradable."
   },
+  "shortcut_911d6255": { "message": "Atajo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Imagen unicolor" },

@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "(Describir el video)"
     },
+    "description_436c48d7": {
+        "message": "Descripción"
+    },
     "details_98a31b68": {
         "message": "Detalles"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Mayúsc-O para abrir el editor html agradable."
+    },
+    "shortcut_911d6255": {
+        "message": "Atajo"
     },
     "show_all_ae37d610": {
         "message": "Mostrar todos"
