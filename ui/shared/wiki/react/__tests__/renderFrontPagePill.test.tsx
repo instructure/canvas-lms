@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen} from '@testing-library/react'
+import {screen, render} from '@testing-library/react'
 import {renderFrontPagePill} from '../renderFrontPagePill'
 
 const removePillContainer = (): void => {
@@ -25,25 +25,23 @@ const removePillContainer = (): void => {
 }
 
 describe('renderFrontPagePill', () => {
-  beforeEach(() => {
+  it('renders the pill with whatever text you pass it', () => {
     const container = document.createElement('div')
     container.className = 'front-page'
-    document.body.appendChild(container)
-  })
 
-  afterEach(() => {
-    removePillContainer()
-  })
+    const frontPagePill = renderFrontPagePill(container, {children: 'Front Page'})
 
-  it('renders the pill with whatever text you pass it', () => {
-    renderFrontPagePill({children: 'Front Page'})
-    const pill = screen.getByText('Front Page')
+    const {getByText} = render(frontPagePill)
+    const pill = getByText('Front Page')
     expect(pill).toBeInTheDocument()
+
+    removePillContainer()
   })
 
   it('does not render a pill if there is no front page container in the dom', () => {
+    const container = document.createElement('div')
     removePillContainer()
-    renderFrontPagePill({children: 'Front Page'})
+    renderFrontPagePill(container, {children: 'Front Page'})
     const pill = screen.queryByText('Front Page')
     expect(pill).not.toBeInTheDocument()
   })

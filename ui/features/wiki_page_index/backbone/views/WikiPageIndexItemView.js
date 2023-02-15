@@ -110,6 +110,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
 
     super.render(...arguments)
+    renderFrontPagePill(this.$el[0], {children: this.toJSON().frontPageText})
     this.changeSelectPageCheckbox()
 
     // attach/re-attach the icons
@@ -141,7 +142,6 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   afterRender() {
-    renderFrontPagePill({children: this.toJSON().frontPageText})
     return this.$el.find("td:not('.not_clickable'):first").redirectClickTo(this.$wikiPageLink)
   }
 
