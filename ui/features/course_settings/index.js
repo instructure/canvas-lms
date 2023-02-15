@@ -119,10 +119,7 @@ ready(() => {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <CourseAvailabilityOptions
-          canManage={
-            ENV.PERMISSIONS.can_manage_courses ||
-            (ENV.PERMISSIONS.manage && !ENV.PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS)
-          }
+          canManage={ENV.PERMISSIONS.edit_course_availability}
           viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
           viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
         />
