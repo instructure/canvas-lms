@@ -71,26 +71,15 @@ module Outcomes
     #        :users    - The users to lookup results for (required)
     #        :context  - The context to lookup results for (required)
     #        :outcomes - The outcomes to lookup results for (required)
+    #        :assignments - The assignments to lookup results for (required)
     #
     # Returns json object
-    def find_outcomes_service_outcome_results(user, opts)
-      required_opts = %i[users context outcomes]
+    def find_outcomes_service_outcome_results(opts)
+      required_opts = %i[users context outcomes assignments]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
-      users, context, outcomes = opts.values_at(*required_opts)
+      users, context, outcomes, assignments = opts.values_at(*required_opts)
       user_uuids = users.pluck(:uuid).join(",")
-
-      # check if the logged in user has manage_grades & view_all_grades permissions
-      # if not, apply exclude_muted_associations to the assignment query
-      assignment_ids =
-        if context.grants_any_right?(user, :manage_grades, :view_all_grades)
-          Assignment.active.where(context: context).quiz_lti.pluck(:id).join(",")
-        else
-          # return if there is more than one user in users as this would indicate
-          # user with insufficient permissions accessing the LMGB
-          return if users.length > 1
-
-          Assignment.active.where(context: context).quiz_lti.exclude_muted_associations_for_user(users[0]).pluck(:id).join(",")
-        end
+      assignment_ids = assignments.pluck(:id).join(",")
 
       outcome_ids = outcomes.pluck(:id).join(",")
       get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids)
@@ -103,16 +92,15 @@ module Outcomes
     # context - results context (aka current course)
     #
     # Returns an array of LearningOutcomeResult objects
-    def handle_outcome_service_results(results, context)
+    def handle_outcomes_service_results(results, context, outcomes, users, assignments)
       # if results are nil - FF is turned off for the given context
       # if results are empty - no results were matched
       if results.blank?
         Rails.logger.warn("No Outcome Service outcome results found for context: #{context.uuid}")
         return nil
       end
-      # if results are not nil or empty (aka not blank) - results were found
       # return resolved results list of Rollup objects
-      resolve_outcome_results(results, context)
+      resolve_outcome_results(results, context, outcomes, users, assignments)
     end
 
     # Internal: Add an order clause to a relation so results are returned in an
