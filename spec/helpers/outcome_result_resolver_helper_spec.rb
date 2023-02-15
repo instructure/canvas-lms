@@ -37,23 +37,25 @@ describe OutcomeResultResolverHelper do
 
   describe "removes the alignment result" do
     it "if there is a rubric result for that student, assignment, and outcome" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcome = create_outcome
+      assignments.push(create_alignment)
       lor = create_learning_outcome_result @students[0], 1.0
 
       # We cannot have two LORs for the same student, assignment, and outcome in the db
       lor.workflow_state = "deleted"
       lor.save!
 
-      create_alignment_with_rubric({ assignment: @assignment })
+      assignments.push(create_alignment_with_rubric({ assignment: @assignment }))
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 0
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[0]], assignments).size).to eq 0
     end
 
     it "if a rubric result exists for multiple students for the same assignment and outcome" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcome = create_outcome
+      assignments.push(create_alignment)
       lor1 = create_learning_outcome_result @students[0], 1.0
       lor2 = create_learning_outcome_result @students[1], 1.0
 
@@ -63,16 +65,17 @@ describe OutcomeResultResolverHelper do
       lor2.workflow_state = "deleted"
       lor2.save!
 
-      create_alignment_with_rubric({ assignment: @assignment })
+      assignments.push(create_alignment_with_rubric({ assignment: @assignment }))
       create_learning_outcome_result_from_rubric @students[0], 1.0
       create_learning_outcome_result_from_rubric @students[1], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 0
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[0], @students[1]], assignments).size).to eq 0
     end
 
     it "for just one student if a rubric result exists for their assignment and outcome" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcome = create_outcome
+      assignments.push(create_alignment)
       lor = create_learning_outcome_result @students[0], 1.0
       create_learning_outcome_result @students[1], 1.0
 
@@ -80,73 +83,79 @@ describe OutcomeResultResolverHelper do
       lor.workflow_state = "deleted"
       lor.save!
 
-      create_alignment_with_rubric({ assignment: @assignment })
+      assignments.push(create_alignment_with_rubric({ assignment: @assignment }))
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[0], @students[1]], assignments).size).to eq 1
     end
 
     it "for an assignment with multiple outcomes aligned, where one outcome has a rubric result for a student" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcomes = []
+      outcomes.push(create_outcome)
+      assignments.push(create_alignment)
       create_learning_outcome_result @students[0], 1.0
 
-      create_outcome
-      create_alignment
+      outcomes.push(create_outcome)
+      assignments.push(create_alignment)
       lor = create_learning_outcome_result @students[0], 1.0
 
       # We cannot have two LORs for the same student, assignment, and outcome in the db
       lor.workflow_state = "deleted"
       lor.save!
 
-      create_alignment_with_rubric({ assignment: @assignment })
+      assignments.push(create_alignment_with_rubric({ assignment: @assignment }))
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, outcomes, [@students[0]], assignments).size).to eq 1
     end
   end
 
   describe "doesn't remove the alignment result" do
     it "if there is no rubric result for that student, assignment, and outcome" do
-      create_outcome
+      outcome = create_outcome
       create_alignment
       create_learning_outcome_result @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[0]], [@assignment]).size).to eq 1
     end
 
     it "if there is no rubric result for that student" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcome = create_outcome
+      assignments.push(create_alignment)
       create_learning_outcome_result @students[0], 1.0
 
-      create_alignment_with_rubric({ assignment: @assignment })
+      assignments.push(create_alignment_with_rubric({ assignment: @assignment }))
       create_learning_outcome_result_from_rubric @students[1], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[0], @students[1]], assignments).size).to eq 1
     end
 
     it "if there is no rubric result for that assignment" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcome = create_outcome
+      assignments.push(create_alignment)
       create_learning_outcome_result @students[2], 1.0
 
-      create_alignment_with_rubric
+      assignments.push(create_alignment_with_rubric)
       create_learning_outcome_result_from_rubric @students[2], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, [outcome], [@students[2]], assignments).size).to eq 1
     end
 
     it "if there is no rubric result for that outcome" do
-      create_outcome
-      create_alignment
+      assignments = []
+      outcomes = []
+      outcomes.push(create_outcome)
+      assignments.push(create_alignment)
       create_learning_outcome_result @students[0], 1.0
 
-      create_outcome
-      create_alignment_with_rubric
+      outcomes.push(create_outcome)
+      assignments.push(create_alignment_with_rubric)
       create_learning_outcome_result_from_rubric @students[0], 1.0
 
-      expect(resolve_outcome_results(authoritative_results_from_db, @course).size).to eq 1
+      expect(resolve_outcome_results(authoritative_results_from_db, @course, outcomes, [@students[0]], assignments).size).to eq 1
     end
   end
 end
