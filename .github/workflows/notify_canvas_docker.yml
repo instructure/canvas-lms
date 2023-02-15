@@ -3,7 +3,7 @@ name: 'Submodule Notify Parent'
 on:
   push:
     branches:
-      - master    
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
       env:
         CI_TOKEN: ${{ secrets.CI_TOKEN }}
         PARENT_REPO: StrongMind/canvas-docker
-        PARENT_BRANCH: master
+        PARENT_BRANCH: main
         WORKFLOW_ID: 37283728
       run: |
         curl -fL --retry 3 -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ env.CI_TOKEN }}" https://api.github.com/repos/${{ env.PARENT_REPO }}/actions/workflows/${{ env.WORKFLOW_ID }}/dispatches -d '{"ref":"${{ env.PARENT_BRANCH }}"}'
