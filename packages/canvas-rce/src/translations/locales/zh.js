@@ -250,6 +250,7 @@ const locale = {
   "extracurricular_icon_67c8ca42": { "message": "课外图标" },
   "f_function_fe422d65": { "message": "F（函数）" },
   "failed_getting_file_contents_e9ea19f4": { "message": "文件内容获取失败" },
+  "file_name_8fd421ff": { "message": "文件名称" },
   "file_storage_quota_exceeded_b7846cd1": { "message": "超出文件存储大小限制" },
   "file_url_c12b64be": { "message": "文件URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename }文件图标" },

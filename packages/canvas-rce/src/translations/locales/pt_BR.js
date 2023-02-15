@@ -276,6 +276,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Falha ao obter o conteúdo do arquivo"
   },
+  "file_name_8fd421ff": { "message": "Nome do arquivo" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Cota de armazenamento de arquivos excedida"
   },

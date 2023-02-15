@@ -162,6 +162,7 @@ const locale = {
   "purple_7678a9fc": { "message": "Фіолетовий" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
   "record_7c9448b": { "message": "Записати" },
+  "recording_98da6bda": { "message": "Запис" },
   "red_8258edf3": { "message": "Червоний" },
   "relationships_6602af70": { "message": "Зв''язки" },
   "replace_e61834a7": { "message": "Замінити" },
@@ -173,6 +174,7 @@ const locale = {
   "search_280d00bd": { "message": "Пошук" },
   "size_b30e1077": { "message": "Розмір" },
   "star_8d156e09": { "message": "Помітити зіркою" },
+  "start_over_f7552aa9": { "message": "Почати з початку" },
   "submit_a3cc6859": { "message": "Підтвердити" },
   "syllabus_f191f65b": { "message": "Навчальний план" },
   "teal_f729a294": { "message": "Бірюзовий" },
@@ -198,6 +200,7 @@ const locale = {
   "uploading_19e8a4e7": { "message": "Завантаження" },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Права використання:" },
+  "video_player_b371005": { "message": "Відеопрогравач" },
   "view_ba339f93": { "message": "Вигляд" },
   "wiki_home_9cd54d0": { "message": "Домашня сторінка Wiki" },
   "yes_dde87d5": { "message": "Так" }

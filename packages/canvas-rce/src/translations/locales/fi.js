@@ -284,6 +284,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Tiedoston sisällön haku epäonnistui"
   },
+  "file_name_8fd421ff": { "message": "Tiedoston nimi" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Tiedoston tallennustilan kiintiö ylitetty"
   },

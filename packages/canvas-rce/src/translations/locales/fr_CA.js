@@ -282,6 +282,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Échec de la récupération du contenu du fichier"
   },
+  "file_name_8fd421ff": { "message": "Nom du fichier" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Quota de stockage du fichier dépassé"
   },

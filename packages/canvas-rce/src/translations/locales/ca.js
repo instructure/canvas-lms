@@ -286,6 +286,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "No s''ha pogut obtenir el contingut del fitxer"
   },
+  "file_name_8fd421ff": { "message": "Nom del fitxer" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "S''ha superat la quota d''emmagatzematge de fitxers"
   },

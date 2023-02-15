@@ -273,6 +273,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Gagal mendapatkan kandungan fail"
   },
+  "file_name_8fd421ff": { "message": "Nama fail" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Melebihi kuota storan fail"
   },
