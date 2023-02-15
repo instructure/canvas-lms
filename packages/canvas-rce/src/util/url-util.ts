@@ -32,6 +32,15 @@ export function parseUrlOrNull(url: string | null | undefined, base?: string | U
   }
 }
 
+export function relativizeUrl(url: string): string {
+  const parsed = URI.parse(url)
+  delete parsed.scheme
+  delete parsed.userinfo
+  delete parsed.host
+  delete parsed.port
+  return URI.serialize(parsed)
+}
+
 /**
  * Converts the given URL into a relative URL if it meets the following criteria:
  * - is parsable by the browser URL class
@@ -43,39 +52,58 @@ export function parseUrlOrNull(url: string | null | undefined, base?: string | U
  * or when running locally and the port is different. There isn't a security issue because the user could just manually
  * put in the transformed content anyways.
  *
- * @param inputValue URL to relativize
+ * @param inputUrlStr URL to relativize
  * @param origin Origin to check for
  */
 export function relativeHttpUrlForHostname<TInput extends string | null | undefined>(
-  inputValue: TInput,
+  inputUrlStr: TInput,
   origin: string
 ): TInput {
-  if (!inputValue) {
-    return inputValue
+  if (inputUrlStr == null || inputUrlStr === '') {
+    return inputUrlStr
   }
 
-  if (!inputValue?.match(/^https?:/i)) {
+  if (!inputUrlStr?.match(/^https?:/i) || !origin?.match(/^https?:/i)) {
     // Already relative or not a http/https protocol url
-    return inputValue
+    return inputUrlStr
   }
 
-  const url = parseUrlOrNull(inputValue)
-  if (!url) {
-    return inputValue
+  const url = parseUrlOrNull(inputUrlStr)
+  if (url == null) {
+    return inputUrlStr
   }
 
-  // Handle the simple case of origins matching
+  // Handle the simple case of origins matching. Note that the parsed URL will always have a lowercase origin
+  // new URL("hTTps://CaNvAs.CoM").origin === 'https://canvas.com'
   if (url.origin === origin.toLowerCase()) {
-    return url.toString().substring(url.origin.length) as TInput
+    return relativizeUrl(inputUrlStr) as TInput
   }
 
   // Handle the more complex case of hostname/port matching
-  const originHostname = parseUrlOrNull(origin)?.hostname
+  const originUrl = parseUrlOrNull(origin)
+  const originHostname = originUrl?.hostname
 
-  if (url.hostname.toLowerCase() === originHostname?.toLowerCase()) {
-    return url.toString().substring(url.origin.length) as TInput
+  // Port checks are only needed if the port is not the default port for http or https.
+  // If the port isn't an http port, then we don't want equivalence, especially for local origins,
+  // since you might be running canvas on "localhost:3000" and some LTI tool on "localhost:4000"
+  // But elsewhere, "http://canvas.com:80" and "http://canvas.com" are equivalent
+  const urlUsesHttpPort = url.port === '80' || url.port === '443' || url.port === ''
+  const originUsesHttpPort =
+    originUrl == null ||
+    originUrl?.port === '80' ||
+    originUrl?.port === '443' ||
+    originUrl?.port === ''
+
+  const portCheckNeeded = !(urlUsesHttpPort && originUsesHttpPort)
+
+  if (portCheckNeeded && originUrl?.port !== url?.port) {
+    return inputUrlStr
+  }
+
+  if (url.hostname === originHostname?.toLowerCase()) {
+    return relativizeUrl(inputUrlStr) as TInput
   } else {
-    return inputValue
+    return inputUrlStr
   }
 }
 

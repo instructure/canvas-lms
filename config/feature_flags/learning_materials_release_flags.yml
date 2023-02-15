@@ -77,3 +77,18 @@ rce_improved_placeholders:
       state: allowed_on
     ci:
       state: allowed_on
+
+rce_transform_loaded_content:
+  state: hidden
+  display_name: Transform RCE Content on Load
+  description: |-
+    Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
+    Needed for the RCE to function fully in New Quizzes.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on

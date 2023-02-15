@@ -1283,4 +1283,71 @@ describe('RCEWrapper', () => {
       )
     })
   })
+
+  describe('feature flags', () => {
+    describe('rce_transform_loaded_content', () => {
+      const encodeHTML = html => {
+        const e = document.createElement('div')
+        e.textContent = html
+        return e.innerHTML
+      }
+      const exampleUrlsWithoutOrigin = [
+        // basic example
+        '/some/path',
+
+        // basic example with query
+        '/some/path?query=string&another=string',
+
+        // basic example with query and hash
+        '/some/path?query=string#hash',
+
+        // This contains characters from different languages, in the path, query, and hash
+        '/somewhere%20neat/%E6%9F%90%E5%A4%84/%E0%A4%95%E0%A4%B9%E0%A5%80%E0%A4%82?%D0%BA%D0%BB%D1%8E%D1%87=%D1%86%D0%B5%D0%BD%D0%B8%D1%82%D1%8C&eochair+eile=#Um%20lugar%20especial%20na%20p%C3%A1gina',
+      ]
+
+      // Note: template strings aren't used here because these values are whitespace-sensitive
+      const contentWithAbsoluteUrls = exampleUrlsWithoutOrigin
+        .map(it => encodeHTML(it))
+        .flatMap(urlWithoutOrigin => [
+          `<img src="http://example.com${urlWithoutOrigin}">`,
+          `<iframe src="http://example.com${urlWithoutOrigin}"></iframe>`,
+          `<img src="http://example2.com${urlWithoutOrigin}">`,
+          `<iframe src="http://example2.com${urlWithoutOrigin}"></iframe>`,
+        ])
+        .join(``)
+
+      const contentWithRelativeUrls = exampleUrlsWithoutOrigin
+        .map(it => encodeHTML(it))
+        .flatMap(urlWithoutOrigin => [
+          `<img src="${urlWithoutOrigin}">`,
+          `<iframe src="${urlWithoutOrigin}"></iframe>`,
+          `<img src="http://example2.com${urlWithoutOrigin}">`,
+          `<iframe src="http://example2.com${urlWithoutOrigin}"></iframe>`,
+        ])
+        .join(``)
+
+      it('handles false', () => {
+        createMountedElement({
+          canvasOrigin: 'http://example.com/',
+          defaultContent: contentWithAbsoluteUrls,
+
+          features: {
+            rce_transform_loaded_content: false,
+          },
+        })
+        expect(rce.editor.getContent()).toBe(contentWithAbsoluteUrls)
+      })
+
+      it('handles true', () => {
+        createMountedElement({
+          canvasOrigin: 'http://example.com/',
+          defaultContent: contentWithAbsoluteUrls,
+          features: {
+            rce_transform_loaded_content: true,
+          },
+        })
+        expect(rce.editor.getContent()).toBe(contentWithRelativeUrls)
+      })
+    })
+  })
 })
