@@ -124,6 +124,32 @@ describe UsersController, type: :request do
       expect(json.map { |r| r["discussion_topic_id"] }).to eq([@dt1.id])
     end
 
+    it "filters the activity stream summary to currently active courses if requested" do
+      @student = user_factory(active_all: true)
+      @shard1.activate do
+        @account = Account.create!
+        @course1 = course_factory(active_all: true, account: @account)
+        @course1.enroll_student(@student).accept!
+        @course2 = course_factory(active_all: true, account: @account)
+        course2_enrollment = @course2.enroll_student(@student)
+        course2_enrollment.accept!
+        @dt1 = discussion_topic_model(context: @course1)
+        @dt2 = discussion_topic_model(context: @course2)
+        course2_enrollment.destroy!
+      end
+      json = api_call(:get, "/api/v1/users/self/activity_stream/summary",
+                      { controller: "users", action: "activity_stream_summary", format: "json" })
+      expect(json).to eq [
+        { "type" => "DiscussionTopic", "count" => 2, "unread_count" => 2, "notification_category" => nil }
+      ]
+
+      json = api_call(:get, "/api/v1/users/self/activity_stream/summary?only_active_courses=true",
+                      { controller: "users", action: "activity_stream_summary", format: "json", only_active_courses: "true" })
+      expect(json).to eq [
+        { "type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil }
+      ]
+    end
+
     it "finds cross-shard submission comments" do
       @student = user_factory(active_all: true)
       course_factory(active_all: true)

@@ -17,6 +17,8 @@
  */
 
 import React from 'react'
+import {IconArrowNestLine, IconPeerReviewLine, IconPeerGradedLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Assignment, AssessmentRequest} from '../../../../api.d'
 
@@ -65,6 +67,8 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
     ? I18n.t('Anonymous Student')
     : assessment.user_name
 
+  const {workflow_state} = assessment
+
   const studentPeerReviewUrl = () => {
     const {anonymous_peer_reviews, course_id, id} = assignment
     const {anonymous_id, user_id} = assessment
@@ -94,13 +98,19 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
           >
             {title}
           </a>
-          <span className="type_icon display_icons" title={title} role="none">
+          <span
+            className="type_icon display_icons"
+            title={title}
+            role="none"
+            style={{fontSize: '1.125rem'}}
+          >
             <span className="screenreader-only">{title}</span>
-            <span>
-              <i className="icon-forward" style={{color: 'inherit'}} />
-              &nbsp;
-              <i className="icon-peer-review" style={{color: 'inherit'}} />
-            </span>
+            <View as="span" margin="0 0 0 medium">
+              <IconArrowNestLine />
+            </View>
+            <View as="span" margin="0 0 0 small">
+              {workflow_state === 'completed' ? <IconPeerGradedLine /> : <IconPeerReviewLine />}
+            </View>
           </span>
           <div className="ig-info">
             <div className="module-item-title">

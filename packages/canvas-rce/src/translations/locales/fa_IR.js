@@ -130,7 +130,6 @@ const locale = {
   "modules_c4325335": { "message": "ماژول ها" },
   "my_files_2f621040": { "message": "فایل های من" },
   "name_1aed4a1b": { "message": "نام" },
-  "next_page_d2a39853": { "message": "صفحه بعد" },
   "no_e16d9132": { "message": "خیر" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
@@ -150,7 +149,6 @@ const locale = {
   "pink_68ad45cb": { "message": "صورتی" },
   "play_media_comment_35257210": { "message": "پخش نظر رسانه ای" },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
-  "previous_page_928fc112": { "message": "صفحه قبل" },
   "published_c944a23d": { "message": "منتشر شده" },
   "pumpkin_904428d5": { "message": "کدوتنبل" },
   "purple_7678a9fc": { "message": "ارغوانی" },
@@ -164,7 +162,6 @@ const locale = {
   "save_11a80ec3": { "message": "ذخیره سازی" },
   "search_280d00bd": { "message": "جستجو" },
   "select_language_7c93a900": { "message": "انتخاب زبان" },
-  "selected_274ce24f": { "message": "انتخاب شده" },
   "size_b30e1077": { "message": "اندازه" },
   "something_went_wrong_89195131": { "message": "اشکالی رخ داده است." },
   "something_went_wrong_d238c551": { "message": "مشکلی پیش آمد" },

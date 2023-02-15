@@ -294,6 +294,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     borderStyle="solid"
                     borderColor="primary"
                     padding="xx-small 0 small"
+                    margin="0 0 small 0"
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
@@ -434,7 +435,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               <>
                                 <View
                                   as="div"
-                                  padding="small none none"
+                                  padding="0"
                                   display={responsiveProps.replyButton.display}
                                 >
                                   <span className="discussion-topic-reply-button">

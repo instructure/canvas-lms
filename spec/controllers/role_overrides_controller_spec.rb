@@ -50,13 +50,50 @@ describe RoleOverridesController do
     end
   end
 
-  it "deactivates a role" do
-    role = @account.roles.build(name: "NewRole")
-    role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
-    role.workflow_state = "active"
-    role.save!
-    delete "remove_role", params: { account_id: @account.id, id: role.id }
-    expect(@account.roles.where(name: "NewRole").first).to be_inactive
+  describe "remove_role" do
+    it "deactivates a role" do
+      role = @account.roles.build(name: "NewRole")
+      role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
+      role.workflow_state = "active"
+      role.save!
+      delete "remove_role", params: { account_id: @account.id, id: role.id }
+      expect(@account.roles.where(name: "NewRole").first).to be_inactive
+    end
+  end
+
+  describe "activate_role" do
+    before do
+      @role = @account.roles.build(name: "NewRole")
+      @role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
+      @role.workflow_state = "inactive"
+      @role.save!
+    end
+
+    it "re-activates a role" do
+      post "activate_role", params: { account_id: @account, id: @role }
+      expect(@account.roles.where(name: "NewRole").first).to be_active
+    end
+
+    it "does not allow unauthorized users to re-activate a role" do
+      unauthorized_user = user_factory(active_all: true)
+      user_session(unauthorized_user)
+      post "activate_role", params: { account_id: @account, id: @role }
+      expect(response).to have_http_status :unauthorized
+    end
+
+    it "will only re-activate if specified role is inactive" do
+      @role.update!(workflow_state: "deleted")
+      post "activate_role", params: { account_id: @account, id: @role }
+      expect(response).to have_http_status :not_found
+      expect(response.body).to include("role not found")
+    end
+
+    it "will only re-activate if specified role name does not already exist" do
+      @role.update!(workflow_state: "active")
+      post "activate_role", params: { account_id: @account, id: @role }
+      expect(response).to have_http_status :bad_request
+      expect(response.body).to include("An active role already exists with that name")
+    end
   end
 
   describe "update" do

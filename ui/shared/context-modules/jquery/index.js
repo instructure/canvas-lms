@@ -69,6 +69,7 @@ import {
   setExpandAllButton,
   updateProgressionState,
 } from './utils'
+import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -1011,6 +1012,23 @@ modules.initModuleManagement = function (duplicate) {
         }
         const view = initPublishButton($publishIcon, publishData)
         overrideModel(moduleItems, relock_modules_dialog, view.model, view)
+
+        if (window.ENV?.FEATURES?.module_publish_menu) {
+          const publishMenu = $module.find('.module-publish-icon')[0]
+          // Make sure the data attributes on publishMenu are correct. When a new module is created it copies from the
+          // template and may not have the correct data attributes.
+          publishMenu.dataset.courseId = data.context_module.context_id
+          publishMenu.dataset.moduleId = data.context_module.id
+          publishMenu.dataset.published = data.context_module.workflow_state === 'published'
+          ReactDOM.render(
+            <ContextModulesPublishIcon
+              courseId={data.context_module.context_id}
+              moduleId={data.context_module.id}
+              published={data.context_module.workflow_state === 'published'}
+            />,
+            publishMenu
+          )
+        }
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)

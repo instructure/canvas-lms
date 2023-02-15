@@ -166,18 +166,7 @@
             <%= left_side %>
           <% else %>
             <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-              <a class="al-trigger al-trigger--within-left-menu" href="#" data-popup-within="#wrapper">
-                <%= t("Switch Group")%>
-                <i class="icon-mini-arrow-down"></i>
-              </a>
-              <ul class="al-options">
-                <% @context.group_category.groups.active.by_name.each do |group| %>
-                  <li class="<%= 'active-selection' if group_homepage_pathfinder(group) %>"><%= link_to group.short_name, group_path(group) %></li>
-                <% end %>
-              </ul>
-
-              <!-- this is so if there's more than 25 groups it doesn't immediately close the "Switch Group" menu when you open it, see: KNO-38 -->
-              <script> document.getElementById('left-side').addEventListener('click', e => e.stopPropagation()) </script>
+              <span id="group-switch-mount-point"></span>
             <% end %>
             <% if @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
               <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>

@@ -11,6 +11,9 @@
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n  other {}\n}"
     },
+    "description_436c48d7": {
+        "message": "Mô tả"
+    },
     "icon_215a1dc6": {
         "message": "Biểu tượng"
     }

@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
-import {CloseButton, Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
@@ -41,6 +41,7 @@ import styles from './styles'
 // Import the <math-field> container and all
 // the relevant math fonts from mathlive
 import '../mathlive'
+import {insertTextIntoLatexTextarea} from './latexTextareaUtil'
 
 export default class EquationEditorModal extends Component {
   static debounceRate = 1000
@@ -53,6 +54,8 @@ export default class EquationEditorModal extends Component {
   hostPageDisablesShortcuts = null
 
   previewElement = React.createRef()
+
+  advancedEditor = React.createRef()
 
   // **************** //
   // Helper functions //
@@ -85,8 +88,14 @@ export default class EquationEditorModal extends Component {
 
   executeCommand = (cmd, advancedCmd) => {
     if (this.state.advanced) {
-      const effectiveCmd = advancedCmd || cmd
-      this.setState(state => ({workingFormula: state.workingFormula + effectiveCmd}))
+      const insertionText = advancedCmd || cmd
+
+      const textarea = this.advancedEditor.current?._textarea
+      if (textarea) {
+        insertTextIntoLatexTextarea(textarea, insertionText)
+
+        this.setState({workingFormula: textarea.value})
+      }
     } else {
       this.mathField.insert(cmd, {focus: 'true'})
     }
@@ -299,6 +308,7 @@ export default class EquationEditorModal extends Component {
                 label=""
                 value={this.state.workingFormula}
                 onChange={e => this.setState({workingFormula: e.target.value})}
+                ref={this.advancedEditor}
               />
             </div>
             <div className={css(styles.latexToggle)}>

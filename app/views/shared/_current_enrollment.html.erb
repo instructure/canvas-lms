@@ -40,15 +40,16 @@
           <% favorite_course = @favorite_course_ids.include?(current_enrollment.course_id) %>
           <% past_course = enrollments_for_index(:past).include? current_enrollment %>
           <% favorite_past_course = past_course && favorite_course %>
-          <% tooltip_message = t('nonfavorited_tooltip', "Click to add to the courses menu.") if !favorite_course %>
-          <% tooltip_message = t("This course cannot be added to the courses menu unless the course is active.") if (!show_link || past_course) %>
-          <% tooltip_message = t('favorited_tooltip', "Click to remove from the courses menu.") if favorite_course || favorite_past_course %>
+          <% tooltip_message = t('nonfavorited_tooltip', "Click to add %{course_name} to the courses menu.", course_name: current_enrollment.course.name) if !favorite_course %>
+          <% tooltip_message = t("%{course_name} cannot be added to the courses menu unless the course is active.", course_name: current_enrollment.course.name) if (!show_link || past_course) %>
+          <% tooltip_message = t('favorited_tooltip', "Click to remove %{course_name} from the courses menu.", course_name: current_enrollment.course.name) if favorite_course || favorite_past_course %>
           <span
             class="<%= "course-list-favorite-course" if favorite_course %> <%= "course-list-not-favoritable disabled" if (!show_link || favorite_past_course) %> <%= "course-list-favoritable" if show_link %>"
             data-tooltip="bottom"
             title="<%= tooltip_message %>"
             role="button"
             tabindex="0"
+            data-course-name="<%= current_enrollment.course.name %>"
             data-course-id="<%= current_enrollment.course_id %>"
             <% if (show_link && (favorite_past_course || !(past_course && !favorite_course))) %>
                 <%= "data-favorite-url=#{api_v1_add_favorite_course_url(current_enrollment.course_id)}" %>

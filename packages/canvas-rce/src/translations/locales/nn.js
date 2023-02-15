@@ -463,7 +463,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Nøsta større enn" },
   "nested_less_than_27d17e58": { "message": "Nøsta mindre enn" },
-  "next_page_d2a39853": { "message": "Neste side" },
   "no_changes_to_save_d29f6e91": { "message": "Ingen endringar å lagre." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
@@ -541,7 +540,6 @@ const locale = {
   "preview_53003fd2": { "message": "Førehandsvising" },
   "preview_in_overlay_ed772c46": { "message": "Førehandsvisning i nytt lag" },
   "preview_inline_9787330": { "message": "Førehandsvising i teksten" },
-  "previous_page_928fc112": { "message": "Førre side" },
   "prime_917ea60e": { "message": "Primtal" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -603,10 +601,8 @@ const locale = {
   "save_11a80ec3": { "message": "Lagre" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Søk" },
-  "search_term_b2d2235": { "message": "Søkeord" },
   "select_crop_shape_d441feeb": { "message": "Vel skjæringsform" },
   "select_language_7c93a900": { "message": "Vel språk" },
-  "selected_274ce24f": { "message": "Valt" },
   "selected_linkfilename_c093b1f2": { "message": "Vald { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Sett minus" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
@@ -722,9 +718,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Vis/skjul tips" },
   "tools_2fcf772e": { "message": "Verktøy" },
   "top_66e0adb6": { "message": "Topp" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultat funne, { numDisplayed } resultat viser akkurat no."
-  },
   "tray_839df38a": { "message": "Sidemeny" },
   "triangle_6072304e": { "message": "Trekant" },
   "type_control_f9_to_access_image_options_text_a47e319f": {

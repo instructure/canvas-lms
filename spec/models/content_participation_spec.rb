@@ -285,25 +285,26 @@ describe ContentParticipation do
       before do
         Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
         @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+        ContentParticipation.create_or_update({
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "unread",
+                                              })
       end
 
       it "unread_count is 1 when at least one submission participation item is unread" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student)
-          ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "read")
-          ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
-        end.to change(ContentParticipationCount, :count).by 1
+        ContentParticipation.participate(content: @content, user: @student)
+        ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "read")
+        ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
 
         cpc = ContentParticipationCount.where(user_id: @student).first
         expect(cpc.unread_count).to eq 1
       end
 
       it "unread_count is 0 when all submission participation items are read" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "read", content_item: "comment")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "read", content_item: "rubric")
-        end.to change(ContentParticipationCount, :count).by 1
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read", content_item: "comment")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read", content_item: "rubric")
 
         cpc = ContentParticipationCount.where(user_id: @student).first
         expect(cpc.unread_count).to eq 0
@@ -374,6 +375,11 @@ describe ContentParticipation do
           @content2 = @assignment2.submit_homework(@student)
           @assignment = temp_assignment
           @content2.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+          ContentParticipation.create_or_update({
+                                                  content: @content2,
+                                                  user: @student,
+                                                  workflow_state: "unread",
+                                                })
         end
 
         it "unread_count is 2 when submissions are unread" do
@@ -416,19 +422,24 @@ describe ContentParticipation do
 
       context "when multiple courses exist" do
         before do
-          @course2 = Course.create!
-          @course2_student = student_in_course(course: @course2, active_all: true).user
-          @course2_assignment = assignment_model(course: @course2, due_at: 2.days, points_possible: 10)
+          @course2 = Course.create!(account: @account)
+          @course2.offer!
+          @course2_student = User.create!
+          @course2.enroll_student(@course2_student, enrollment_state: "active")
+          @course2_assignment = @course2.assignments.create!(due_at: 2.days, points_possible: 10)
           @course2_content = @course2_assignment.submit_homework(@course2_student)
 
           @course2_content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+          ContentParticipation.create_or_update({
+                                                  content: @course2_content,
+                                                  user: @course2_student,
+                                                  workflow_state: "unread",
+                                                })
         end
 
         it "unread_count is 1 for each course" do
-          expect do
-            ContentParticipation.participate(content: @content, user: @student)
-            ContentParticipation.participate(content: @course2_content, user: @course2_student)
-          end.to change(ContentParticipationCount, :count).by 2
+          ContentParticipation.participate(content: @content, user: @student)
+          ContentParticipation.participate(content: @course2_content, user: @course2_student)
 
           cpc1 = @course.content_participation_counts.where(user_id: @student).first
           expect(cpc1.unread_count).to eq 1

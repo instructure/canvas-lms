@@ -28,6 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {debounce} from '@instructure/debounce'
 import {uid} from '@instructure/uid'
+import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 import getCookie from '../common/getCookie'
 
 import formatMessage from '../format-message'
@@ -369,9 +370,10 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('./initA11yChecker')
-      .then(initA11yChecker => {
-        initA11yChecker.default(this.language)
+    this.a11yCheckerReady = import('tinymce-a11y-checker')
+      .then(a11yChecker => {
+        const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
+        a11yChecker.setLocale(locale)
         this.checkAccessibility()
       })
       .catch(err => {
@@ -825,11 +827,17 @@ class RCEWrapper extends React.Component {
       this.resizeObserver.observe(document[FS_ELEMENT])
       window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
       this._handleFullscreenResize()
+      this._focusRegion = FocusRegionManager.activateRegion(document[FS_ELEMENT], {
+        shouldContainFocus: true,
+      })
     } else {
       event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
       this.resizeObserver.unobserve(event.target)
       window.visualViewport?.removeEventListener('resize', this._handleFullscreenResize)
       this._setHeight(this.state.fullscreenState.prevHeight)
+      if (this._focusRegion) {
+        FocusRegionManager.blurRegion(event.target, this._focusRegion.id)
+      }
     }
     this.setState({popupMountNode: instuiPopupMountNode()})
     this.focusCurrentView()
@@ -1044,7 +1052,7 @@ class RCEWrapper extends React.Component {
       event.stopPropagation()
       this.setFocusAbilityForHeader(true)
       focusToolbar(this._elementRef.current)
-    } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
+    } else if (event.code === 'F8' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
       this.openKBShortcutModal()
@@ -2022,7 +2030,9 @@ class RCEWrapper extends React.Component {
           onFullscreen={this.handleClickFullscreen}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
-          onWordcountModalOpen={() => launchWordcountModal(this.mceInstance(), document)}
+          onWordcountModalOpen={() =>
+            launchWordcountModal(this.mceInstance(), document, {skipEditorFocus: true})
+          }
           disabledPlugins={this.pluginsToExclude}
         />
         {this.props.trayProps && this.props.trayProps.containingContext && (

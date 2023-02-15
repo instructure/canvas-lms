@@ -134,7 +134,7 @@ describe('IsolatedParent', () => {
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}},
         })
       )
-      expect(queryAllByText('2 replies, 1 unread').length).toBe(2)
+      expect(queryAllByText('2 Replies, 1 Unread').length).toBe(2)
     })
 
     it('does not display unread count if it is 0', async () => {
@@ -143,8 +143,8 @@ describe('IsolatedParent', () => {
           discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}},
         })
       )
-      expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
-      expect(queryAllByText('2 replies').length).toBe(2)
+      expect(queryAllByText('2 Replies, 0 Unread').length).toBe(0)
+      expect(queryAllByText('2 Replies').length).toBe(2)
     })
   })
 

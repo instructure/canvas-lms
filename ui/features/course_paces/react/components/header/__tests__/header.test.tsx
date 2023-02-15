@@ -20,15 +20,18 @@ import React from 'react'
 import {waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {renderConnected} from '../../../__tests__/utils'
-import {PRIMARY_PACE, HEADING_STATS_API_RESPONSE} from '../../../__tests__/fixtures'
-import {Header} from '../header'
-import {paceContextsActions} from '../../../actions/pace_contexts'
+import {
+  PRIMARY_PACE,
+  HEADING_STATS_API_RESPONSE,
+  DEFAULT_STORE_STATE,
+} from '../../../__tests__/fixtures'
+import ConnectedHeader, {Header} from '../header'
+import {CoursePace} from 'features/course_paces/react/types'
 
 const defaultProps = {
   context_type: 'Course',
   context_id: '17',
   newPace: false,
-  fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
 }
 
 describe('Course paces header', () => {
@@ -105,35 +108,58 @@ describe('Course paces header', () => {
       fetchMock.restore()
     })
 
-    it('renders the data pulled from the context api', () => {
+    it('renders metrics as table', async () => {
       window.ENV.COURSE_ID = 30
-      fetchMock.mock('/api/v1/courses/30/pace_contexts?type=course', HEADING_STATS_API_RESPONSE)
-      const {findByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      const {getByRole, getByTestId} = renderConnected(
+        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
+      )
+      await waitFor(() => {
+        expect(getByRole('columnheader', {name: 'Students'})).toBeInTheDocument()
+        expect(getByRole('columnheader', {name: 'Sections'})).toBeInTheDocument()
+        expect(getByTestId('duration-col-header')).toBeInTheDocument()
+      })
+    })
 
-      waitFor(() => {
-        expect(findByRole('heading', {name: 'Defense Against the Dark Arts'})).toBeTruthy()
-        expect(findByRole('row', {name: 'Students 30'})).toBeTruthy()
-        expect(findByRole('row', {name: 'Sections 3'})).toBeTruthy()
-        expect(findByRole('row', {name: 'Duration 9 Weeks, 2 Days'})).toBeTruthy()
+    it('renders the data pulled from the context api', async () => {
+      window.ENV.COURSE_ID = 30
+      fetchMock.mock(
+        '/api/v1/courses/30/pace_contexts?type=course',
+        JSON.stringify(HEADING_STATS_API_RESPONSE)
+      )
+      const {getByRole, getByTestId} = renderConnected(
+        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
+      )
+
+      await waitFor(() => {
+        expect(getByRole('heading', {name: 'Defense Against the Dark Arts'})).toBeInTheDocument()
+        expect(getByTestId('number-of-students').textContent).toEqual('30')
+        expect(getByTestId('number-of-sections').textContent).toEqual('3')
+        expect(getByTestId('default-pace-duration').textContent).toEqual('9 weeks, 2 days')
       })
     })
 
     it('renders the proper button for preexisting pace', () => {
-      const {getByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      const {getByRole} = renderConnected(<ConnectedHeader {...defaultProps} />)
       const getStartedButton = getByRole('button', {name: 'Edit Default Course Pace'})
       expect(getStartedButton).toBeInTheDocument()
     })
 
     it('renders the proper button for empty state', () => {
-      const {getByRole} = renderConnected(
-        <Header {...defaultProps} coursePace={{id: undefined, context_type: 'Course'}} />
-      )
+      const coursePace = {
+        ...DEFAULT_STORE_STATE.coursePace,
+        id: undefined,
+        context_type: 'Course',
+      } as CoursePace
+      const state = {...DEFAULT_STORE_STATE, coursePace}
+      const {getByRole} = renderConnected(<ConnectedHeader {...defaultProps} />, state)
       const getStartedButton = getByRole('button', {name: 'Create Course Pace'})
       expect(getStartedButton).toBeInTheDocument()
     })
 
     it('renders an info tooltip for durations stat', () => {
-      const {getAllByRole} = renderConnected(<Header {...defaultProps} coursePace={PRIMARY_PACE} />)
+      const {getAllByRole} = renderConnected(
+        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
+      )
       expect(
         getAllByRole('tooltip', {
           name: 'This duration does not take into account weekends and blackout days.',

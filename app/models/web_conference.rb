@@ -258,6 +258,7 @@ class WebConference < ActiveRecord::Base
     new_invitees.uniq.each do |u|
       add_invitee(u)
     end
+    save
   end
 
   def recording_ready!
@@ -625,5 +626,9 @@ class WebConference < ActiveRecord::Base
     when Account
       self.root_account_id = context.resolved_root_account_id
     end
+  end
+
+  def self.max_invitees_sync_size
+    Setting.get("max_invitees_sync_size", 100).to_i
   end
 end

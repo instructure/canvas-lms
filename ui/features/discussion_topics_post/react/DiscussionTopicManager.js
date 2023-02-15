@@ -343,7 +343,7 @@ const DiscussionTopicManager = props => {
               viewPortWidth: '100vw',
             },
             desktop: {
-              viewPortWidth: '50vw',
+              viewPortWidth: '480px',
             },
           }}
           render={responsiveProps => {
@@ -357,7 +357,7 @@ const DiscussionTopicManager = props => {
                   <Mask onClick={() => setSplitScreenViewOpen(false)} />
                 )}
                 <DrawerLayout.Content label="Splitscreen View Content">
-                  <View display="block" padding="medium medium 0 xx-small">
+                  <View display="block" padding="medium medium 0 small" height="100vh">
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}

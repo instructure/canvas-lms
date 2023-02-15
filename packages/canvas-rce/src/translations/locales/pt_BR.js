@@ -489,7 +489,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Aninhado maior que" },
   "nested_less_than_27d17e58": { "message": "Aninhado menos de" },
-  "next_page_d2a39853": { "message": "Próxima página" },
   "no_changes_to_save_d29f6e91": {
     "message": "Não há alterações para salvar."
   },
@@ -501,9 +500,6 @@ const locale = {
   "no_results_940393cf": { "message": "Sem resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nenhum resultado encontrado para { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Nenhum resultado encontrado para { term }."
   },
   "none_3b5e34d2": { "message": "Nenhum" },
   "none_selected_b93d56d2": { "message": "Nenhum selecionado" },
@@ -579,7 +575,6 @@ const locale = {
     "message": "Pré-visualizar na sobreposição"
   },
   "preview_inline_9787330": { "message": "Pré-visualizar em linha" },
-  "previous_page_928fc112": { "message": "Página anterior" },
   "prime_917ea60e": { "message": "Melhor" },
   "prime_numbers_13464f61": { "message": "Números primos" },
   "product_39cf144f": { "message": "Produto" },
@@ -646,10 +641,8 @@ const locale = {
   "save_11a80ec3": { "message": "Salvar" },
   "script_l_42a7b254": { "message": "Roteiro L" },
   "search_280d00bd": { "message": "Pesquisar" },
-  "search_term_b2d2235": { "message": "Termo de pesquisa" },
   "select_crop_shape_d441feeb": { "message": "Selecionar a forma de corte" },
   "select_language_7c93a900": { "message": "Selecionar idioma" },
-  "selected_274ce24f": { "message": "Selecionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "Selecionado { linkFileName }"
   },
@@ -774,9 +767,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Alternar dica da ferramenta" },
   "tools_2fcf772e": { "message": "Ferramentas" },
   "top_66e0adb6": { "message": "Superior" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } resultados encontrados, { numDisplayed } resultados atualmente exibidos"
-  },
   "tray_839df38a": { "message": "Bandeja" },
   "triangle_6072304e": { "message": "Triângulo" },
   "turnstile_yields_f9e76df1": { "message": "Catraca (Rendimentos)" },

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {setLocale} from 'tinymce-a11y-checker'
+import {LtiMessageHandler} from '../lti_message_handler'
+import {SUBJECT_ALLOW_LIST} from '../messages'
 
-if (ENV?.LOCALE) {
-  let locale = ENV.LOCALE
-  if (locale === 'zh-Hant') {
-    locale = 'zh-HK'
-  }
-  setLocale(locale)
+const handler: LtiMessageHandler<unknown> = ({responseMessages}) => {
+  const useFrame = ENV?.FEATURES?.lti_platform_storage
+
+  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
+    if (['lti.get_data', 'lti.put_data'].includes(subject) && useFrame) {
+      return {
+        subject,
+        frame: 'post_message_forwarding',
+      }
+    }
+
+    return {subject}
+  })
+  responseMessages.sendResponse({supported_messages})
+  return true
 }
+
+export default handler

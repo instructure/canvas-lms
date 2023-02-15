@@ -11,6 +11,9 @@
     "count_plural_one_show_missing_item_other_show_miss_509327ef": {
         "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
     },
+    "description_436c48d7": {
+        "message": "Описание"
+    },
     "english_c60612e2": {
         "message": "Английский"
     },

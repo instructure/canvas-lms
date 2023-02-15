@@ -161,7 +161,7 @@ module Interfaces::SubmissionInterface
         scope = scope.where(attempt: target_attempt)
       end
       scope = scope.reorder(created_at: sort_order) if sort_order
-      scope
+      scope.select { |comment| comment.grants_right?(current_user, :read) }
     end
   end
 

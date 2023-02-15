@@ -821,6 +821,8 @@ class UsersController < ApplicationController
 
   # @API Activity stream summary
   # Returns a summary of the current user's global activity stream.
+  # @argument only_active_courses [Boolean]
+  #   If true, will only return objects for courses the user is actively participating in
   #
   # @example_response
   #   [
@@ -837,7 +839,9 @@ class UsersController < ApplicationController
   #   ]
   def activity_stream_summary
     if @current_user
-      api_render_stream_summary
+      opts = {}
+      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
+      api_render_stream_summary(opts)
     else
       render_unauthorize_action
     end
@@ -1315,7 +1319,7 @@ class UsersController < ApplicationController
     GuardRail.activate(:secondary) do
       # we _don't_ want to get context if the user is the context
       # so that for missing user context we can 401, but for others we can 404
-      get_context(include_deleted: true) if params[:account_id] || params[:course_id] || params[:group_id]
+      get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = api_find_all(@context&.all_users || User, [params[:id]]).first

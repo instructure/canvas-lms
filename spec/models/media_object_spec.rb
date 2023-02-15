@@ -294,6 +294,15 @@ describe MediaObject do
       expect(att.folder.name).to eq "Uploaded Media"
       expect(att[:media_entry_id]).to eql mo[:media_id]
     end
+
+    it "doesn't recreate deleted attachments" do
+      mo = @media_object
+      att = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"), media_entry_id: mo.media_id)
+      att.destroy
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(Attachment.count).to eq 1
+      expect(Attachment.find_by(media_entry_id: mo.media_id).file_state).to eq "deleted"
+    end
   end
 
   describe ".guaranteed_title" do

@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment
+  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -267,7 +267,7 @@ class User < ActiveRecord::Base
     scopes.map!(&:to_sql)
     from("(#{scopes.join("\nUNION\n")}) users")
   }
-  scope :active, -> { where("users.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
 
   scope :has_created_account, -> { where("users.workflow_state NOT IN ('creation_pending', 'deleted')") }
 
@@ -489,6 +489,11 @@ class User < ActiveRecord::Base
       UserAccountAssociation.for_root_accounts.for_user_id(id).each do |uaa|
         refreshed_root_account_ids << Shard.relative_id_for(uaa.account_id, Shard.current, shard)
       end
+    end
+
+    if fake_student?
+      # We don't need to worry about relative ids here because test students are never cross-shard
+      refreshed_root_account_ids << enrollments.where(type: "StudentViewEnrollment").pick(:root_account_id)
     end
 
     # Update the user
@@ -750,6 +755,8 @@ class User < ActiveRecord::Base
 
   def new_registration(form_params = {}); end
 
+  def update_shadow_records_synchronously!; end
+
   # DEPRECATED, override new_registration instead
   def new_teacher_registration(form_params = {})
     new_registration(form_params)
@@ -901,7 +908,7 @@ class User < ActiveRecord::Base
   end
 
   def preserve_lti_id
-    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil?
+    errors.add(:lti_id, "Cannot change lti_id!") if lti_id_changed? && !lti_id_was.nil? && !override_lti_id_lock
   end
 
   def ensure_lti_id
@@ -1354,18 +1361,13 @@ class User < ActiveRecord::Base
   end
 
   def self.all_course_admin_type_permissions_for(user)
-    enrollments = user.enrollments.active.of_admin_type
+    enrollments = Enrollment.for_user(user).of_admin_type.active_by_date.distinct_on(:role_id).to_a
     result = {}
 
     RoleOverride.permissions.each_key do |permission|
-      # initialize all permissions
-      result[permission] ||= []
-
-      enrollments.find_each do |enrollment|
-        # if available, iterate and set permissions that are enabled
-        # through the user's active course admin enrollments
-        enrollment.has_permission_to?(permission) == false ? next : result[permission] << true
-      end
+      # iterate and set permissions
+      # we want the highest level permission set the user is authorized for
+      result[permission] = true if enrollments.any? { |e| e.has_permission_to?(permission) }
     end
     result
   end

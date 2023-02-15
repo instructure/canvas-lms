@@ -34,6 +34,70 @@ module Gradebook
       tab(label: "Advanced").click
     end
 
+    def self.click_view_options_tab
+      tab(label: "View Options").click
+    end
+
+    def self.arrange_by_dropdown
+      f('[data-testid="arrange_by_dropdown"]')
+    end
+
+    def self.default_order
+      f("#sort-default-ascending")
+    end
+
+    def self.assignment_name_ascend
+      f("#sort-name-ascending")
+    end
+
+    def self.assignment_name_descend
+      f("#sort-name-descending")
+    end
+
+    def self.due_date_ascend
+      f("#sort-due_date-ascending")
+    end
+
+    def self.due_date_descend
+      f("#sort-due_date-descending")
+    end
+
+    def self.points_ascend
+      f("#sort-points-ascending")
+    end
+
+    def self.points_descend
+      f("#sort-points-descending")
+    end
+
+    def self.modules_ascend
+      f("#sort-module_position-ascending")
+    end
+
+    def self.modules_descend
+      f("#sort-module_position-descending")
+    end
+
+    def self.notes_checkbox
+      fj('label:contains("Notes")')
+    end
+
+    def self.unpublished_checkbox
+      fj('label:contains("Unpublished Assignments")')
+    end
+
+    def self.split_names_checkbox
+      fj('label:contains("Split Student Names")')
+    end
+
+    def self.ungraded_as_zero_checkbox
+      fj('label:contains("View ungraded as 0")')
+    end
+
+    def self.ungraded_as_zero_confirm_button
+      f('[data-testid="confirm-button"]')
+    end
+
     def self.click_late_policy_tab
       tab(label: "Late Policies").click
     end

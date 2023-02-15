@@ -8,17 +8,13 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 
 docker tag $WEBPACK_BUILDER_IMAGE local/webpack-builder
 
-docker build \
-  --file Dockerfile.jenkins.linters-runner \
-  --label "WEBPACK_BUILDER_IMAGE=$WEBPACK_BUILDER_IMAGE" \
-  --tag "local/linters-runner" \
-  "$WORKSPACE"
+# The steps taken by this image require git support
+cp .dockerignore Dockerfile.jenkins.linters.dockerignore
+echo "!.git" >> Dockerfile.jenkins.linters.dockerignore
+echo "!gems/plugins/*/.git" >> Dockerfile.jenkins.linters.dockerignore
 
-# The .git directory is ignored by .dockerignore, so we work around this by
-# mounting the .git directory itself as the build context and copying it in.
-docker build \
-  --build-arg DST_WORKDIR="$DOCKER_WORKDIR/.git" \
-  --file Dockerfile.jenkins.linters-final \
+DOCKER_BUILDKIT=1 docker build \
+  --file Dockerfile.jenkins.linters \
   --label "WEBPACK_BUILDER_IMAGE=$WEBPACK_BUILDER_IMAGE" \
   --tag "$1" \
-  "$LOCAL_WORKDIR/.git"
+  "$WORKSPACE"

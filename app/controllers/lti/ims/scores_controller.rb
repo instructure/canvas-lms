@@ -471,12 +471,22 @@ module Lti::IMS
           Progress.find(preflight_json[:progress][:id]).update!(created_at: submitted_at)
         end
 
+        progress_url =
+          if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
+            lti_progress_show_url(
+              host: line_item.root_account.domain,
+              id: preflight_json[:progress][:id]
+            )
+          else
+            lti_progress_show_url(id: preflight_json[:progress][:id])
+          end
+
         {
           json: {
             type: item[:type],
             url: item[:url],
             title: item[:title],
-            progress: lti_progress_show_url(id: preflight_json[:progress][:id])
+            progress: progress_url
           },
           preflight_json: preflight_json,
           attachment: attachment
@@ -524,7 +534,16 @@ module Lti::IMS
     end
 
     def result_url
-      lti_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
+      if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
+        lti_result_show_url(
+          host: line_item.root_account.domain,
+          course_id: context.id,
+          line_item_id: line_item.id,
+          id: result.id
+        )
+      else
+        lti_result_show_url(course_id: context.id, line_item_id: line_item.id, id: result.id)
+      end
     end
 
     def submission_type

@@ -1314,7 +1314,7 @@ describe ConversationsController, type: :request do
                                   {
                                     "filename" => "test.txt",
                                     "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
-                                    "content-type" => "unknown/unknown",
+                                    "content-type" => "text/plain",
                                     "display_name" => "test.txt",
                                     "id" => attachment.id,
                                     "uuid" => attachment.uuid,

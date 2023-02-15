@@ -881,7 +881,7 @@ describe ContentMigrationsController, type: :request do
       @page = @src.wiki_pages.create! title: "der page"
       @topic = @src.discussion_topics.create! message: "some topic"
       @quiz = @src.quizzes.create! title: "a quiz", quiz_type: "assignment"
-      @file = @src.attachments.create! filename: "teh_file", uploaded_data: StringIO.new("data")
+      @file = @src.attachments.create! filename: "teh_file.txt", uploaded_data: StringIO.new("data")
 
       @dst = course_factory active_all: true
       @user = @dst.teachers.first
@@ -895,7 +895,7 @@ describe ContentMigrationsController, type: :request do
       expect(@dst.wiki_pages.find(json["pages"][@page.id.to_s]).title).to eq "der page"
       expect(@dst.discussion_topics.find(json["discussion_topics"][@topic.id.to_s]).message).to eq "some topic"
       expect(@dst.quizzes.find(json["quizzes"][@quiz.id.to_s]).title).to eq "a quiz"
-      expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file"
+      expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file.txt"
     end
 
     describe "course copy" do

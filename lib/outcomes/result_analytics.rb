@@ -72,7 +72,7 @@ module Outcomes
     #        :context  - The context to lookup results for (required)
     #        :outcomes - The outcomes to lookup results for (required)
     #
-    # Returns a relation of the results
+    # Returns json object
     def find_outcomes_service_outcome_results(user, opts)
       required_opts = %i[users context outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
@@ -93,12 +93,16 @@ module Outcomes
         end
 
       outcome_ids = outcomes.pluck(:id).join(",")
-      handle_outcome_service_results(
-        get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids),
-        context
-      )
+      get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids)
     end
 
+    # Converts json results from OS API to LearningOutcomeResults and removes duplicate result data
+    # Tech debt: decouple conversion and removing duplicates
+    #
+    # results - OS api results json (see get_lmgb_results)
+    # context - results context (aka current course)
+    #
+    # Returns an array of LearningOutcomeResult objects
     def handle_outcome_service_results(results, context)
       # if results are nil - FF is turned off for the given context
       # if results are empty - no results were matched
@@ -108,7 +112,7 @@ module Outcomes
       end
       # if results are not nil or empty (aka not blank) - results were found
       # return resolved results list of Rollup objects
-      resolve_outcome_results(results)
+      resolve_outcome_results(results, context)
     end
 
     # Internal: Add an order clause to a relation so results are returned in an

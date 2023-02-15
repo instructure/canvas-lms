@@ -33,6 +33,7 @@ export const AddressBookContainer = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
   const [canSendAllMessage, setCanSendAllMessage] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(props.open)
 
   const isOnObserverSubmenu = () => {
     return (
@@ -53,6 +54,7 @@ export const AddressBookContainer = props => {
   }, [inputValue, searchTerm, setSearchTerm])
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
+    skip: !isMenuOpen,
     variables: {
       context:
         filterHistory[filterHistory.length - 1]?.context?.contextID ||
@@ -260,7 +262,8 @@ export const AddressBookContainer = props => {
       selectedRecipients={props.selectedRecipients}
       limitTagCount={props.limitTagCount}
       width={props.width}
-      open={props.open}
+      isMenuOpen={isMenuOpen}
+      setIsMenuOpen={setIsMenuOpen}
       hasSelectAllFilterOption={props.hasSelectAllFilterOption && canSendAllMessage}
       currentFilter={filterHistory[filterHistory.length - 1]}
       activeCourseFilter={props.activeCourseFilter}
@@ -318,6 +321,7 @@ AddressBookContainer.defaultProps = {
   onInputValueChange: () => {},
   hasSelectAllFilterOption: false,
   courseContextCode: '',
+  open: false,
 }
 
 export default AddressBookContainer

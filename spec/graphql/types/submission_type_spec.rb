@@ -301,6 +301,37 @@ describe Types::SubmissionType do
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil
     end
+
+    context "grants_rights check" do
+      before(:once) do
+        @assignment.update_attribute(:peer_reviews, true)
+        @student2 = User.create!
+        @student3 = User.create!
+        @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+        @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
+        @peer_review_submission = @assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.hours.ago)
+        @assignment.submit_homework(@student2, body: "test", submitted_at: 1.hour.ago)
+        @assignment.submit_homework(@student3, body: "test", submitted_at: 1.hour.ago)
+        @assignment.assign_peer_review(@student2, @student)
+        @assignment.assign_peer_review(@student3, @student)
+        @peer_review_submission.add_comment(author: @student3, comment: "this comment shouldnt be seen")
+      end
+
+      let(:resolver) { GraphQLTypeTester.new(@peer_review_submission, current_user: @student2) }
+
+      it "returns no comments when student2 has no comments" do
+        expect(
+          resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
+        ).to eq []
+      end
+
+      it "only returns comments for student2" do
+        student_2_comment = @peer_review_submission.add_comment(author: @student2, comment: "this is a student comment")
+        expect(
+          resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
+        ).to eq [student_2_comment.id.to_s]
+      end
+    end
   end
 
   describe "submission_drafts" do

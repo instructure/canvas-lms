@@ -60,11 +60,11 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         inboxConversation.messages = conversation?.commentsConnection.nodes
       } else {
         inboxConversation._id = conversation?.conversation?._id
-        inboxConversation.subject = conversation?.conversation?.subject
+        inboxConversation.subject = conversation?.conversation?.subject || ''
         inboxConversation.lastMessageCreatedAt =
-          conversation?.conversation.conversationMessagesConnection.nodes[0].createdAt
+          conversation?.conversation.conversationMessagesConnection.nodes[0]?.createdAt || ''
         inboxConversation.lastMessageContent =
-          conversation?.conversation.conversationMessagesConnection.nodes[0].body
+          conversation?.conversation.conversationMessagesConnection.nodes[0]?.body || ''
         inboxConversation.workflowState = conversation?.workflowState
         inboxConversation.label = conversation?.label
         inboxConversation.messages =

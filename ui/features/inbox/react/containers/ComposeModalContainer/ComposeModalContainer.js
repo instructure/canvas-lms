@@ -208,6 +208,13 @@ const ComposeModalContainer = props => {
     setSendIndividualMessages(prev => !prev)
   }
 
+  // if maxGroupRecipientsMet, change individual message setting to true
+  useEffect(() => {
+    if (props.maxGroupRecipientsMet) {
+      setSendIndividualMessages(true)
+    }
+  }, [props.maxGroupRecipientsMet])
+
   const onContextSelect = context => {
     if (context && context?.contextID) {
       setCourseMessages([])
@@ -370,6 +377,7 @@ const ComposeModalContainer = props => {
                   contextName={props.pastConversation?.contextName}
                   courses={props.courses}
                   selectedRecipients={props.selectedIds}
+                  maxGroupRecipientsMet={props.maxGroupRecipientsMet}
                   isReply={props.isReply}
                   isForward={props.isForward}
                   onContextSelect={onContextSelect}
@@ -462,6 +470,7 @@ ComposeModalContainer.propTypes = {
   setSendingMessage: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  maxGroupRecipientsMet: PropTypes.bool,
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,

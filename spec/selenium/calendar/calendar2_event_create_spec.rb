@@ -527,6 +527,19 @@ describe "calendar2" do
           expect(child_event.reload.end_at).to eq(end_at)
         end
       end
+
+      it "updates the event to the correct time when saving across DST window" do
+        @user.time_zone = "America/Denver"
+        @user.save!
+        start_at = DateTime.parse("2022-03-01 1:00pm -0600")
+        event = CalendarEvent.create!(context: @course, start_at: start_at)
+        get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+        expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")
+        replace_content(f("[name=\"start_date\"]"), "2022-03-14")
+        wait_for_new_page_load { more_options_submit_button.click }
+        get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+        expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")
+      end
     end
 
     context "assignment creation" do

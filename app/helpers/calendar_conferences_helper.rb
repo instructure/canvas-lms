@@ -24,6 +24,8 @@ module CalendarConferencesHelper
   def find_and_update_or_initialize_calendar_event(context, calendar_event_params, override_params = {})
     return nil if calendar_event_params.blank?
 
+    return nil unless calendar_event_params.respond_to?(:merge)
+
     valid_params = calendar_event_params.merge(override_params).slice(:web_conference, :title, :context_code, :start_at, :end_at, :description)
     if calendar_event_params[:web_conference].calendar_event
       CalendarEvent.find(calendar_event_params[:web_conference].calendar_event.id).tap do |event|
@@ -39,6 +41,8 @@ module CalendarConferencesHelper
 
   def find_or_initialize_conference(context, conference_params, override_params = {})
     return nil if conference_params.blank?
+
+    return nil unless conference_params.respond_to?(:merge)
 
     valid_params = conference_params.merge(override_params).slice(:title, :description, :conference_type, :lti_settings, :user_settings, :start_at, :end_at)
 

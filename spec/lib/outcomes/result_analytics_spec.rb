@@ -119,7 +119,7 @@ describe Outcomes::ResultAnalytics do
             attempts: {}
           }
         ]
-        expect(ra).to receive(:resolve_outcome_results).with(os_results)
+        expect(ra).to receive(:resolve_outcome_results).with(os_results, @course)
         ra.send(:handle_outcome_service_results, os_results, @course)
       end
     end

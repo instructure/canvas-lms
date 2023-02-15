@@ -367,6 +367,28 @@ describe "threaded discussions" do
           expect(fj("div:contains(#{new_reply.summary})")).to be_present
         end
 
+        it "replies correctly to first_reply from within the thread" do
+          # Open Thread
+          f("button[data-testid='expand-button']").click
+          wait_for_ajaximations
+          # Click the reply from inside the thread
+          ff("button[data-testid='threading-toolbar-reply']")[1].click
+
+          # Reply to the 1st reply from inside of the thread
+          type_in_tiny("textarea", "replying to 1st level reply from discussion")
+          f("button[data-testid='DiscussionEdit-submit'").click
+          wait_for_ajaximations
+          new_reply = DiscussionEntry.last
+
+          # Verify new entry data is correct
+          expect(new_reply.depth).to eq 2
+          expect(new_reply.parent_id).to eq @first_reply.id
+          # Verify that reply was posted
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+          # Verify that the correct level is opened
+          expect(fj("div:contains(#{new_reply.summary})")).to be_present
+        end
+
         it "replies correctly to second reply" do
           f("button[data-testid='expand-button']").click
           wait_for_ajaximations

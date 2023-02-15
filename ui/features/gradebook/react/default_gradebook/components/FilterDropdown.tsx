@@ -249,7 +249,7 @@ const FilterDropdown = ({
                 {items.map(a => {
                   return (
                     <MenuItem key={a.id} as="div">
-                      <TruncateText>{a.name}</TruncateText>
+                      <TruncateText position="middle">{a.name}</TruncateText>
                     </MenuItem>
                   )
                 })}

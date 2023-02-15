@@ -20,6 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ajax from 'ic-ajax'
+import {ApolloProvider, createClient} from '@canvas/apollo'
 import round from 'round'
 import userSettings from '@canvas/user-settings'
 import fetchAllPages from '../helpers/xhr/fetch_all_pages'
@@ -38,6 +39,7 @@ import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import GradebookSelector from '../../react/GradebookSelector'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import '@canvas/datetime'
 import 'jquery-tinypubsub'
@@ -104,6 +106,7 @@ const contextUrl = get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 const ScreenreaderGradebookController = Ember.ObjectController.extend({
   init() {
     this.set('effectiveDueDates', Ember.ObjectProxy.create({content: {}}))
+    this.set('proxyUploadOpen', false)
     return this.set(
       'assignmentsFromGroups',
       Ember.ArrayProxy.create({content: [], isLoaded: false})
@@ -379,6 +382,9 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     selectItem(property, item) {
       return this.announce(property, item)
+    },
+    openProxyUploadModal() {
+      this.set('proxyUploadOpen', true)
     },
   },
 
@@ -1215,6 +1221,74 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     return !!get(window, 'ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server')
   },
 
+  proxySubmissionsAllowed: function () {
+    const hasPermission = get(window, 'ENV.GRADEBOOK_OPTIONS.proxy_submissions_allowed')
+    const assignment = this.get('selectedAssignment')
+    if (!assignment) {
+      return false
+    }
+    const isFileUploadAssingment = assignment.submission_types?.includes('online_upload')
+    return hasPermission && isFileUploadAssingment
+  }.property('selectedAssignment'),
+
+  closeProxyUploadModal() {
+    this.set('proxyUploadOpen', false)
+  },
+
+  renderProxyUploadModal: function () {
+    const mountPoint = document.querySelector('[data-component="IndividualProxyUploader"]')
+    if (!mountPoint) {
+      return
+    }
+    const assignment = this.get('selectedAssignment')
+    if (!assignment) {
+      return
+    }
+    const student = this.get('selectedStudent')
+    if (!student) {
+      return
+    }
+    const component = (
+      <ApolloProvider client={createClient()}>
+        <ProxyUploadModal
+          open={this.get('proxyUploadOpen')}
+          onClose={this.closeProxyUploadModal.bind(this)}
+          assignment={assignment}
+          student={student}
+          submission={this.get('selectedSubmission')}
+          reloadSubmission={sub => this.updateSubmissionValues(sub)}
+        />
+      </ApolloProvider>
+    )
+
+    return ReactDOM.render(component, mountPoint)
+  }
+    .on('init')
+    .observes('selectedAssignment', 'proxyUploadOpen'),
+
+  updateSubmissionValues(sub) {
+    const selected = this.get('selectedSubmission')
+    const selectedClone = {...selected, ...sub}
+    return this.updateSubmissionsFromExternal([selectedClone])
+  },
+
+  submissionPreviewText: function () {
+    const submission = this.get('selectedSubmission')
+    if (!submission) {
+      return
+    }
+    if (!submission.submission_type) {
+      return I18n.t('Has not submitted')
+    }
+    if (submission.proxy_submitter) {
+      return I18n.t('Submitted by %{proxy} on %{date}', {
+        proxy: submission.proxy_submitter,
+        date: $.datetimeString(submission.submitted_at),
+      })
+    }
+    return I18n.t('Submitted on %{date}', {date: $.datetimeString(submission.submitted_at)})
+  }.property('selectedSubmission'),
+
   assignmentGroupsHash() {
     const ags = {}
     if (!this.get('assignment_groups')) {
@@ -1327,6 +1401,15 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     selectedSubmission.gradeLocked = submissionState.locked
     selectedSubmission[selectedSubmission.late_policy_status] = true
     return selectedSubmission
+  }.property('selectedStudent', 'selectedAssignment'),
+
+  gradeForStudentAndAssignment: function () {
+    const student = this.get('selectedStudent')
+    const assignment = this.get('selectedAssignment')
+    return I18n.t('Grade for %{student} - %{assignment}', {
+      student: student.name,
+      assignment: assignment.name,
+    })
   }.property('selectedStudent', 'selectedAssignment'),
 
   selectedSubmissionHidden: function () {

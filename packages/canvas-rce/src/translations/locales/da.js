@@ -483,7 +483,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Indlejret større end" },
   "nested_less_than_27d17e58": { "message": "Indlejret mindre end" },
-  "next_page_d2a39853": { "message": "Næste side" },
   "no_changes_to_save_d29f6e91": { "message": "Ingen ændringer at gemme." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
@@ -493,9 +492,6 @@ const locale = {
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultater fundet for { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Der blev ikke fundet nogen resultater for { term }."
   },
   "none_3b5e34d2": { "message": "Ingen" },
   "none_selected_b93d56d2": { "message": "Ingen valgt" },
@@ -565,7 +561,6 @@ const locale = {
   "preview_53003fd2": { "message": "Eksempel" },
   "preview_in_overlay_ed772c46": { "message": "Overlejret forhåndsvisning" },
   "preview_inline_9787330": { "message": "Indbygget forhåndsvisning" },
-  "previous_page_928fc112": { "message": "Forrige side" },
   "prime_917ea60e": { "message": "Forbered" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -632,10 +627,8 @@ const locale = {
   "save_11a80ec3": { "message": "Gem" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Søg" },
-  "search_term_b2d2235": { "message": "Søgeord" },
   "select_crop_shape_d441feeb": { "message": "Vælg beskæringsform" },
   "select_language_7c93a900": { "message": "Vælg sprog" },
-  "selected_274ce24f": { "message": "Valgt" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Mængde minus" },
   "sharp_music_ab956814": { "message": "Hævet (musik)" },
@@ -758,9 +751,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Skift værktøjstip" },
   "tools_2fcf772e": { "message": "Værktøjer" },
   "top_66e0adb6": { "message": "Top" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } fundne resultater, { numDisplayed } resultater vises i øjeblikket"
-  },
   "tray_839df38a": { "message": "Bakke" },
   "triangle_6072304e": { "message": "Trekant" },
   "turnstile_yields_f9e76df1": { "message": "Drejekors (afkast)" },

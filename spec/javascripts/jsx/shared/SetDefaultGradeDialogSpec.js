@@ -106,14 +106,20 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       sandbox.stub($, 'publish')
     })
 
-    test('submit reports number of students', async () => {
+    test('submit reports number of students scored', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
       ]
       respondWithPayload(payload)
       const students = [{id: '3'}, {id: '4'}]
-      dialog = new SetDefaultGradeDialog({assignment, students, context_id, alert})
+      dialog = new SetDefaultGradeDialog({
+        missing_shortcut_enabled: true,
+        assignment,
+        students,
+        context_id,
+        alert,
+      })
       dialog.show()
       clickSetDefaultGrade()
       const {
@@ -121,7 +127,57 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '2 Student scores updated')
+      strictEqual(message, '2 student scores updated')
+    })
+
+    test('submit reports number of students marked as missing', async () => {
+      const payload = [
+        {submission: {id: '11', assignment_id: '2', user_id: '3'}},
+        {submission: {id: '22', assignment_id: '2', user_id: '4'}},
+      ]
+      respondWithPayload(payload)
+      const students = [{id: '3'}, {id: '4'}]
+      dialog = new SetDefaultGradeDialog({
+        missing_shortcut_enabled: true,
+        assignment,
+        students,
+        context_id,
+        alert,
+      })
+      dialog.show()
+      document.querySelector('input[name="default_grade"]').value = 'mi'
+      clickSetDefaultGrade()
+      const {
+        firstCall: {
+          args: [message],
+        },
+      } = alert
+      strictEqual(message, '2 students marked as missing')
+    })
+
+    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
+      const payload = [
+        {submission: {id: '11', assignment_id: '2', user_id: '3'}},
+        {submission: {id: '22', assignment_id: '2', user_id: '4'}},
+      ]
+      respondWithPayload(payload)
+      const students = [{id: '3'}, {id: '4'}]
+      dialog = new SetDefaultGradeDialog({
+        missing_shortcut_enabled: false,
+        assignment,
+        students,
+        context_id,
+        alert,
+      })
+      dialog.show()
+      document.querySelector('input[name="default_grade"]').value = 'mi'
+      clickSetDefaultGrade()
+      const {
+        firstCall: {
+          args: [message],
+        },
+      } = alert
+      strictEqual(message, '2 student scores updated')
     })
 
     test('submit reports number of students when api includes duplicates due to group assignments', async () => {
@@ -134,7 +190,14 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       respondWithPayload(payload)
       const students = [{id: '3'}, {id: '4'}, {id: '5'}, {id: '6'}]
       // adjust page size so that we generate two requests
-      dialog = new SetDefaultGradeDialog({assignment, students, context_id, page_size: 2, alert})
+      dialog = new SetDefaultGradeDialog({
+        missing_shortcut_enabled: true,
+        assignment,
+        students,
+        context_id,
+        page_size: 2,
+        alert,
+      })
       dialog.show()
       clickSetDefaultGrade()
       const {
@@ -142,7 +205,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '4 Student scores updated')
+      strictEqual(message, '4 student scores updated')
     })
   })
 })

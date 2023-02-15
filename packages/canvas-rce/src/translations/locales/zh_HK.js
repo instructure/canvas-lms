@@ -429,7 +429,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "巢式大於" },
   "nested_less_than_27d17e58": { "message": "巢式小於" },
-  "next_page_d2a39853": { "message": "下一頁" },
   "no_changes_to_save_d29f6e91": { "message": "沒有要儲存的變更。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "未選擇檔案" },
@@ -439,9 +438,6 @@ const locale = {
   "no_results_940393cf": { "message": "無結果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "找不到 { term } 的結果。"
   },
   "none_3b5e34d2": { "message": "無" },
   "none_selected_b93d56d2": { "message": "未選擇任何項目" },
@@ -507,7 +503,6 @@ const locale = {
   "preview_53003fd2": { "message": "預覽" },
   "preview_in_overlay_ed772c46": { "message": "覆蓋預覽" },
   "preview_inline_9787330": { "message": "預覽內嵌" },
-  "previous_page_928fc112": { "message": "上一頁" },
   "prime_917ea60e": { "message": "質數" },
   "prime_numbers_13464f61": { "message": "質數" },
   "product_39cf144f": { "message": "產品" },
@@ -564,10 +559,8 @@ const locale = {
   "save_11a80ec3": { "message": "儲存" },
   "script_l_42a7b254": { "message": "指令集 L" },
   "search_280d00bd": { "message": "搜尋" },
-  "search_term_b2d2235": { "message": "搜尋學期" },
   "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
   "select_language_7c93a900": { "message": "選擇語言" },
-  "selected_274ce24f": { "message": "已選擇" },
   "selected_linkfilename_c093b1f2": { "message": "已選定 { linkFileName }" },
   "set_minus_b46e9b88": { "message": "設定 -" },
   "sharp_music_ab956814": { "message": "#（音樂）" },
@@ -680,9 +673,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "切換工具提示" },
   "tools_2fcf772e": { "message": "工具" },
   "top_66e0adb6": { "message": "頂部" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "找到 { totalResults } 個結果，目前顯示 { numDisplayed } 個結果"
-  },
   "tray_839df38a": { "message": "收集箱" },
   "triangle_6072304e": { "message": "三角形" },
   "turnstile_yields_f9e76df1": { "message": "T 形符號（產生）" },

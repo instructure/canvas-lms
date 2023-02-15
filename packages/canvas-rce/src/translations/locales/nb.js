@@ -481,7 +481,6 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Nested større enn" },
   "nested_less_than_27d17e58": { "message": "Nested mindre enn" },
-  "next_page_d2a39853": { "message": "Neste side" },
   "no_changes_to_save_d29f6e91": { "message": "Ingen endringer å lagre." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
@@ -491,9 +490,6 @@ const locale = {
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funnet for { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "Ikke funnet resultater for { term }."
   },
   "none_3b5e34d2": { "message": "Ingen" },
   "none_selected_b93d56d2": { "message": "Ingen valgt" },
@@ -565,7 +561,6 @@ const locale = {
   "preview_53003fd2": { "message": "Forhåndsvisning" },
   "preview_in_overlay_ed772c46": { "message": "Forhåndsvis i utvidet vindu" },
   "preview_inline_9787330": { "message": "Forhåndsvis i vindu" },
-  "previous_page_928fc112": { "message": "Forrige side" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtall" },
   "product_39cf144f": { "message": "Produkt" },
@@ -630,10 +625,8 @@ const locale = {
   "save_11a80ec3": { "message": "Lagre" },
   "script_l_42a7b254": { "message": "Skript L" },
   "search_280d00bd": { "message": "Søk" },
-  "search_term_b2d2235": { "message": "Søkeord" },
   "select_crop_shape_d441feeb": { "message": "Velg beskjæringsform" },
   "select_language_7c93a900": { "message": "Velg språk" },
-  "selected_274ce24f": { "message": "Valgt" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Angi minus" },
   "sharp_music_ab956814": { "message": "Sharp/iss (musikk)" },
@@ -752,9 +745,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Bytte verktøytips" },
   "tools_2fcf772e": { "message": "Verktøy" },
   "top_66e0adb6": { "message": "Topp" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "{ totalResults } Funnet resultatet, { numDisplayed } resultater vises nå"
-  },
   "tray_839df38a": { "message": "Brett" },
   "triangle_6072304e": { "message": "Trekant" },
   "turnstile_yields_f9e76df1": { "message": "Turnstile (gir etter)" },

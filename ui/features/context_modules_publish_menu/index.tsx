@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,13 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {setLocale} from 'tinymce-a11y-checker'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ContextModulesPublishMenu from '@canvas/context-modules-publish-menu/ContextModulesPublishMenu'
+import ready from '@instructure/ready'
 
-export default function initA11yChecker(locale) {
-  if (locale) {
-    if (locale === 'zh-Hant') {
-      locale = 'zh-HK'
-    }
-    setLocale(locale)
+ready(() => {
+  const menuElement = document.getElementById('context-modules-publish-menu')
+  if (menuElement) {
+    ReactDOM.render(
+      <ContextModulesPublishMenu
+        courseId={menuElement.dataset.courseId}
+        runningProgressId={menuElement.dataset.progressId}
+      />,
+      menuElement
+    )
   }
-}
+})

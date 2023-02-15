@@ -346,8 +346,8 @@ module AttachmentFu # :nodoc:
 
       if is_a?(Attachment)
         # glean information from the file handle
-        self.content_type = detect_mimetype(file_data)
-        self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
+        self.content_type = File.mime_types.include?(content_type) ? content_type : detect_mimetype(file_data)
+        self.filename = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
         file_from_path = true
         if file_data.respond_to?(:path) && file_data.path.present?
           temp_paths.unshift file_data
@@ -413,7 +413,7 @@ module AttachmentFu # :nodoc:
           if md5.present? && (ns = infer_namespace)
             scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
             scope = scope.where.not(filename: nil)
-            scope = scope.where("id<>?", self) unless new_record?
+            scope = scope.where.not(id: self) unless new_record?
             scope.detect { |a| a.store.exists? }
           end
         end
@@ -430,7 +430,7 @@ module AttachmentFu # :nodoc:
       elsif file_data.respond_to?(:content_type)
         file_data.content_type
       else
-        "unknown/unknown"
+        File.mime_type?(file_data)
       end
     end
 

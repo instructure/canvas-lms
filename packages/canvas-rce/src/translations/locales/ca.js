@@ -505,7 +505,6 @@ const locale = {
     "message": "Estructura imbricada més gran que"
   },
   "nested_less_than_27d17e58": { "message": "Estructura imbricada inferior a" },
-  "next_page_d2a39853": { "message": "Pàgina següent" },
   "no_changes_to_save_d29f6e91": { "message": "No hi ha cap canvi per desar." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No s''ha triat cap fitxer" },
@@ -515,9 +514,6 @@ const locale = {
   "no_results_940393cf": { "message": "Sense resultats." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No s''ha trobat cap resultat per a { filterTerm }"
-  },
-  "no_results_found_for_term_1564c08e": {
-    "message": "No s''ha trobat cap resultat per a { term }."
   },
   "none_3b5e34d2": { "message": "Cap" },
   "none_selected_b93d56d2": { "message": "No se’n ha seleccionat cap" },
@@ -597,7 +593,6 @@ const locale = {
     "message": "Visualització prèvia en superposició"
   },
   "preview_inline_9787330": { "message": "Visualització prèvia en línia" },
-  "previous_page_928fc112": { "message": "Pàgina anterior" },
   "prime_917ea60e": { "message": "Primer" },
   "prime_numbers_13464f61": { "message": "Números primers" },
   "product_39cf144f": { "message": "Producte" },
@@ -662,12 +657,10 @@ const locale = {
   "save_11a80ec3": { "message": "Desa" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Cerca" },
-  "search_term_b2d2235": { "message": "Terme de cerca" },
   "select_crop_shape_d441feeb": {
     "message": "Selecciona l’opció Retalla la forma"
   },
   "select_language_7c93a900": { "message": "Selecciona l''idioma" },
-  "selected_274ce24f": { "message": "Seleccionat" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionat"
   },
@@ -792,9 +785,6 @@ const locale = {
   "toggle_tooltip_d3b7cb86": { "message": "Commuta la informació sobre eines" },
   "tools_2fcf772e": { "message": "Eines" },
   "top_66e0adb6": { "message": "Superior" },
-  "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-    "message": "S''han trobat { totalResults } resultats; en aquest moment, es mostren { numDisplayed } resultats"
-  },
   "tray_839df38a": { "message": "Safata" },
   "triangle_6072304e": { "message": "Triangle" },
   "turnstile_yields_f9e76df1": { "message": "Trinquet (produeix)" },

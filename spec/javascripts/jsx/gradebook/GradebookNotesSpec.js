@@ -52,8 +52,6 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       setColumns() {},
       setNumberOfColumnsToFreeze() {},
     }
-    sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
-    sandbox.stub(this.gradebook, 'reorderCustomColumns')
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
   },
 })
@@ -86,24 +84,6 @@ test('shows the notes column after request resolves', function () {
     data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
-})
-
-test('reorders custom columns after request resolves', function () {
-  this.gradebook.setTeacherNotesHidden(false)
-  equal(this.gradebook.reorderCustomColumns.callCount, 0)
-  this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
-  })
-  equal(this.gradebook.reorderCustomColumns.callCount, 1)
-})
-
-test('reorders custom columns using the column ids', function () {
-  this.gradebook.setTeacherNotesHidden(false)
-  this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
-  })
-  const [columnIds] = this.gradebook.reorderCustomColumns.getCall(0).args
-  deepEqual(columnIds, ['2401', '2402'])
 })
 
 test('sets teacherNotesUpdating to false after request resolves', function () {
@@ -251,28 +231,8 @@ QUnit.module('Gradebook#showNotesColumn', {
       hidden: true,
     }
     this.gradebook = createGradebook({teacher_notes: teacherNotes})
-    sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
     sandbox.stub(this.gradebook, 'toggleNotesColumn')
   },
-})
-
-test('loads the notes if they have not yet been loaded', function () {
-  this.gradebook.teacherNotesNotYetLoaded = true
-  this.gradebook.showNotesColumn()
-  strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 1)
-})
-
-test('loads the notes using the teacher notes column id', function () {
-  this.gradebook.teacherNotesNotYetLoaded = true
-  this.gradebook.showNotesColumn()
-  const [columnId] = this.gradebook.dataLoader.loadCustomColumnData.lastCall.args
-  strictEqual(columnId, '2401')
-})
-
-test('does not load the notes if they are already loaded', function () {
-  this.gradebook.teacherNotesNotYetLoaded = false
-  this.gradebook.showNotesColumn()
-  strictEqual(this.gradebook.dataLoader.loadCustomColumnData.callCount, 0)
 })
 
 QUnit.module('Gradebook#getTeacherNotesViewOptionsMenuProps')

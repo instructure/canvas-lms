@@ -39,7 +39,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import UploadFileSVG from '../../../../assignments_show_student/images/UploadFile.svg'
+import UploadFileSVG from '../../../features/assignments_show_student/images/UploadFile.svg'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -128,7 +128,7 @@ const ProxyUploadModal = ({
   }
 
   const handleSuccess = sub => {
-    setAlert({text: I18n.t('Submission uploaded!'), variant: 'success'})
+    setAlert({text: I18n.t('Submission uploaded successfully!'), variant: 'success'})
     setUploadSuccess(true)
     setTimeout(() => reload(sub), 3000)
   }
@@ -218,9 +218,10 @@ const ProxyUploadModal = ({
     // This is taken almost verbatim from the uploadFiles method in the
     // upload-file module.  Rather than calling that method, we call uploadFile
     // for each file to track progress for the individual uploads.
+    const assignmentCourseId = assignment.courseId || assignment.course_id
     const uploadUrl =
       assignment.groupSet?.currentGroup == null
-        ? `/api/v1/courses/${assignment.courseId}/assignments/${assignment.id}/submissions/${student.id}/files`
+        ? `/api/v1/courses/${assignmentCourseId}/assignments/${assignment.id}/submissions/${student.id}/files`
         : `/api/v1/groups/${assignment.groupSet.currentGroup._id}/files`
 
     const uploadPromises: any[] = []
@@ -416,6 +417,7 @@ const ProxyUploadModal = ({
         id="proxyInputFileDrop"
         data-testid="proxyInputFileDrop"
         accept=""
+        shouldAllowMultiple={true}
         onDropAccepted={files => handleDropAccept(files)}
         onDropRejected={_files => {
           setAlert({text: I18n.t('Error uploading files'), variant: 'error'})
@@ -423,7 +425,7 @@ const ProxyUploadModal = ({
         renderLabel={
           <View as="div" padding="xx-large large" background="primary">
             <Img src={UploadFileSVG} width="160px" margin="small" />
-            <Heading>{I18n.t('Drag a file here, or')}</Heading>
+            <Heading aria-hidden="true">{I18n.t('Drag a file here, or')}</Heading>
             <Text color="brand">{I18n.t('Choose a file to upload')}</Text>
           </View>
         }
@@ -451,16 +453,21 @@ const ProxyUploadModal = ({
         </Modal.Header>
         <Modal.Body>
           {alert && (
-            <Alert
-              open={true}
-              variant={alert.variant}
-              renderCloseButtonLabel={I18n.t('Close')}
-              onDismiss={() => setAlert(null)}
-              margin="small"
-              timeout={3000}
-            >
-              {I18n.t('%{text}', {text: alert.text})}
-            </Alert>
+            <>
+              <Alert
+                open={true}
+                variant={alert.variant}
+                renderCloseButtonLabel={I18n.t('Close')}
+                onDismiss={() => setAlert(null)}
+                margin="small"
+                timeout={3000}
+              >
+                {I18n.t('%{text}', {text: alert.text})}
+              </Alert>
+              <p role="alert" className="screenreader-only">
+                {I18n.t('%{text}', {text: alert.text})}
+              </p>
+            </>
           )}
           <div ref={containerRef}>
             {renderFilesTable()}

@@ -38,7 +38,7 @@ import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
-import ProxyUploadModal from './ProxyUploadModal'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {
   GradingStandard,
@@ -262,6 +262,7 @@ export default class SubmissionTray extends React.Component<
           <Button
             variant="link"
             onClick={this.toggleUploadModal}
+            aria-label={I18n.t('Submit for Student %{name}', {name: this.props.student.name})}
             data-testid="submit-for-student-button"
           >
             {I18n.t('Submit for Student')}
@@ -285,6 +286,10 @@ export default class SubmissionTray extends React.Component<
         </View>
       )
     }
+  }
+
+  closeUploadModal = () => {
+    this.setState({proxyUploadModalOpen: false})
   }
 
   toggleUploadModal = () => {
@@ -322,7 +327,7 @@ export default class SubmissionTray extends React.Component<
     return (
       <ProxyUploadModal
         open={this.state.proxyUploadModalOpen}
-        onClose={this.toggleUploadModal}
+        onClose={this.closeUploadModal}
         assignment={this.props.assignment}
         student={this.props.student}
         submission={this.props.submission}

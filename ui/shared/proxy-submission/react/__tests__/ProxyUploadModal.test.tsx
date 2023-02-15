@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ProxyUploadModal, {ProxyUploadModalProps} from '../components/ProxyUploadModal'
+import ProxyUploadModal, {ProxyUploadModalProps} from '../ProxyUploadModal'
 
 const defaultProps: ProxyUploadModalProps = {
   student: {
@@ -49,10 +49,10 @@ describe('ProxyUploadModal', () => {
     expect(getByText('Upload File')).toBeInTheDocument()
   })
   it('indicates files are being uploaded once added to input', async () => {
-    const {getByTestId, getByText} = renderComponent()
+    const {getByTestId, getAllByText} = renderComponent()
     const input = await waitFor(() => getByTestId('proxyInputFileDrop'))
     const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
     userEvent.upload(input, file)
-    expect(getByText('Uploading files')).toBeInTheDocument()
+    expect(getAllByText('Uploading files')[0]).toBeInTheDocument()
   })
 })

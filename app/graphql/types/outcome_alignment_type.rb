@@ -23,10 +23,8 @@ module Types
     graphql_name "OutcomeAlignment"
 
     implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
 
-    global_id_field :id
-
+    field :_id, ID, null: false
     field :title, String, null: false
     field :content_id, ID, null: false
     field :content_type, String, null: false
@@ -39,5 +37,6 @@ module Types
     field :module_url, String, null: true
     field :module_workflow_state, String, null: true
     field :assignment_content_type, String, null: true
+    field :assignment_workflow_state, String, null: true
   end
 end

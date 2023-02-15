@@ -76,6 +76,7 @@ test('returns true when submissions are loaded', () => {
     createAssignmentProp(),
     createStudentsProp(),
     'contextId',
+    true,
     'selectedSection',
     false,
     true
@@ -89,6 +90,7 @@ test('returns false when submissions are not loaded', () => {
     createAssignmentProp(),
     createStudentsProp(),
     'contextId',
+    true,
     'selectedSection',
     false,
     false
@@ -102,6 +104,7 @@ test('returns false when grades are not published', () => {
     {...createAssignmentProp(), grades_published: false},
     createStudentsProp(),
     'contextId',
+    true,
     'selectedSection',
     false,
     true
@@ -122,6 +125,7 @@ QUnit.module('SetDefaultGradeDialogManager#showDialog', {
       assignment,
       createStudentsProp(),
       'contextId',
+      true,
       'selectedSection',
       opts.isAdmin,
       true

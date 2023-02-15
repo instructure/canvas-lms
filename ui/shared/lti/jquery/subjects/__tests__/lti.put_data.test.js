@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import handler from '../org.imsglobal.lti.put_data'
+import handler from '../lti.put_data'
 import * as platformStorage from '../../platform_storage'
 
-describe('org.imsglobal.lti.put_data handler', () => {
+describe('lti.put_data handler', () => {
   let message
   let responseMessages
   let event
