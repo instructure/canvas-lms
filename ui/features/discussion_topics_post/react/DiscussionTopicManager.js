@@ -303,6 +303,12 @@ const DiscussionTopicManager = props => {
       if (sort === 'asc') {
         setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
       }
+      if (
+        discussionTopicQuery.data.legacyNode.availableForUser &&
+        discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
+      ) {
+        discussionTopicQuery.refetch(variables)
+      }
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -385,15 +391,6 @@ const DiscussionTopicManager = props => {
                         })
                       }}
                       isHighlighted={isTopicHighlighted}
-                      onDiscussionReplyPost={() => {
-                        // When post requires a reply, check to see if we can refatch after initial post
-                        if (
-                          discussionTopicQuery.data.legacyNode.availableForUser &&
-                          discussionTopicQuery.data.legacyNode.initialPostRequiredForCurrentUser
-                        ) {
-                          discussionTopicQuery.refetch(variables)
-                        }
-                      }}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
