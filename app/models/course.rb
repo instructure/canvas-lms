@@ -1900,6 +1900,12 @@ class Course < ActiveRecord::Base
         (concluded? && grants_right?(user, :read_as_admin))
     end
     can :direct_share
+
+    given do |user|
+      account.grants_any_right?(user, :manage_courses, :manage_courses_admin) ||
+        (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
+    end
+    can :edit_course_availability
   end
 
   def allows_gradebook_uploads?

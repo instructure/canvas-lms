@@ -3183,6 +3183,77 @@ describe CoursesController do
       @course.reload
       expect(@course.name).to eq init_course_name
     end
+
+    context "course availability options" do
+      before :once do
+        @account = Account.default
+      end
+
+      it "updates a course's availability options" do
+        user_session(@teacher)
+        start_at = 5.weeks.ago.beginning_of_day
+        conclude_at = 10.weeks.from_now.beginning_of_day
+        put "update", params: { id: @course.id, course: { start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true } }
+        @course.reload
+        expect(@course.start_at).to eq start_at
+        expect(@course.conclude_at).to eq conclude_at
+        expect(@course.restrict_enrollments_to_course_dates).to eq true
+      end
+
+      context "when prevent_course_availability_editing_by_teachers is enabled" do
+        before :once do
+          @account.settings[:prevent_course_availability_editing_by_teachers] = true
+          @account.save!
+        end
+
+        it "returns 401 if the user is a teacher" do
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { restrict_enrollments_to_course_dates: true } }
+          expect(response).to be_unauthorized
+          put "update", params: { id: @course.id, course: { start_at: 1.day.ago, restrict_enrollments_to_course_dates: true } }
+          expect(response).to be_unauthorized
+          put "update", params: { id: @course.id, course: { conclude_at: 1.day.from_now, restrict_enrollments_to_course_dates: true } }
+          expect(response).to be_unauthorized
+        end
+
+        it "returns 401 if a teacher tries to set end_at in an api request" do
+          # NOTE: end_at is an alias for conclude_at supported only in api requests (ignored otherwise)
+          allow(controller).to receive(:api_request?).and_return(true)
+          user_session(@teacher)
+          @course.update!(restrict_enrollments_to_course_dates: true)
+          put "update", params: { id: @course.id, course: { end_at: 1.day.from_now } }
+          expect(response).to be_unauthorized
+        end
+
+        it "allows admins to update course availability options still" do
+          account_admin_user(active_all: true)
+          user_session(@admin)
+          start_at = 6.weeks.ago.beginning_of_day
+          put "update", params: { id: @course.id, course: { start_at: start_at, restrict_enrollments_to_course_dates: true } }
+          expect(response).to be_redirect
+          @course.reload
+          expect(@course.start_at).to eq start_at
+          expect(@course.restrict_enrollments_to_course_dates).to eq true
+        end
+
+        it "allows teachers to update other course settings" do
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { name: "cool new course" } }
+          expect(response).to be_redirect
+          expect(@course.reload.name).to eq "cool new course"
+        end
+
+        it "allows teachers to update other settings along with course availability settings if the latter remains unchanged" do
+          start_at = 6.weeks.ago.beginning_of_day
+          conclude_at = 3.weeks.from_now.beginning_of_day
+          @course.update!(start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true)
+          user_session(@teacher)
+          put "update", params: { id: @course.id, course: { name: "cool new course", start_at: start_at, conclude_at: conclude_at, restrict_enrollments_to_course_dates: true } }
+          expect(response).to be_redirect
+          expect(@course.reload.name).to eq "cool new course"
+        end
+      end
+    end
   end
 
   describe "POST 'unconclude'" do
