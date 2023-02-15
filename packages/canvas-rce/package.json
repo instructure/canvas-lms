@@ -150,7 +150,7 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^4.1.3",
+    "tinymce-a11y-checker": "^4.1.4",
     "text-field-edit": "^3.2.0"
   },
   "devDependencies": {
