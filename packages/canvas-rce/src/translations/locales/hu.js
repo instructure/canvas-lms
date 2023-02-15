@@ -172,6 +172,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Kép kivágása" },
   "cup_product_14174434": { "message": "Kupa termék" },
   "current_image_f16c249c": { "message": "Aktuális kép" },
+  "current_volume_level_c55ab825": { "message": "Aktuális hangerőszint" },
   "custom_6979cd81": { "message": "Egyéni" },
   "cyan_c1d5f68a": { "message": "Cián" },
   "dagger_57e0f4e5": { "message": "Tőr" },
@@ -278,6 +279,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Nem sikerült beolvasni a fájl tartalmát"
   },
+  "file_name_8fd421ff": { "message": "Fájlnév" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Túllépte a fájltárolási kvótát"
   },
@@ -289,6 +291,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Fájlok" },
   "files_index_af7c662b": { "message": "Fájlok indexe" },
+  "finish_bc343002": { "message": "Befejezés" },
   "flat_music_76d5a5c3": { "message": "Lapos (zene)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Az elem opciók eszköztár fókuszba helyezése"
@@ -453,6 +456,7 @@ const locale = {
     "message": "A médiafájl feldolgozás alatt áll. Kérlek, próbáld újra később."
   },
   "medium_5a8e9ead": { "message": "Közepes" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
   "middle_27dc1d5": { "message": "Középső" },
   "minimize_file_preview_da911944": {
     "message": "Fájl előnézet méretének csökkentése"
@@ -491,6 +495,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nincs találat a követezőre: { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Nincs videó" },
   "none_3b5e34d2": { "message": "Nincs" },
   "none_selected_b93d56d2": { "message": "Egy sincs kiválasztva" },
   "not_equal_6e2980e6": { "message": "Nem egyenlő" },
@@ -532,6 +537,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Párhuzamos" },
   "partial_derivative_4a9159df": { "message": "Részleges (származék)" },
   "paste_5963d1c1": { "message": "Beillesztés" },
+  "pause_12af3bb4": { "message": "Szünet" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Résztvevők" },
   "percentage_34ab7c2c": { "message": "Százalék" },
@@ -547,7 +553,11 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (változat)" },
   "pink_68ad45cb": { "message": "Rózsaszín" },
   "pixels_52ece7d1": { "message": "Pixelek" },
+  "play_1a47eaa7": { "message": "Lejátszás" },
   "play_media_comment_35257210": { "message": "Média megjegyzés lejátszása." },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Kérjük, engedélyezze, hogy a Canvas hozzáférhessen a mikrofonhoz és a webkamerához!"
+  },
   "plus_d43cd4ec": { "message": "Plusz" },
   "plus_minus_f8be2e83": { "message": "Plusz minusz" },
   "posted_when_a578f5ab": { "message": "Közzétéve: { when }" },
@@ -556,6 +566,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Megelőzi az egyenlőt" },
   "preformatted_d0670862": { "message": "Előre formázott" },
   "preview_53003fd2": { "message": "Előnézet" },
+  "preview_a3f8f854": { "message": "ELŐNÉZET" },
   "preview_in_overlay_ed772c46": { "message": "Előnézet a fedvényben" },
   "preview_inline_9787330": { "message": "Soron belüli előnézet" },
   "prime_917ea60e": { "message": "Prím" },
@@ -578,6 +589,7 @@ const locale = {
     "message": "Valódi rész (a komplex számból)"
   },
   "record_7c9448b": { "message": "Felvétel" },
+  "recording_98da6bda": { "message": "Felvétel" },
   "red_8258edf3": { "message": "Vörös" },
   "relationships_6602af70": { "message": "Kapcsolatok" },
   "religion_icon_246e0be1": { "message": "Vallás ikon" },
@@ -667,6 +679,8 @@ const locale = {
     "message": "Négyzetes csoporthalmaz (szigorú)"
   },
   "star_8d156e09": { "message": "Csillagozás" },
+  "start_over_f7552aa9": { "message": "Újrakezdés" },
+  "start_recording_9a65141a": { "message": "Felvétel elkezdése" },
   "steel_blue_14296f08": { "message": "Acélkék" },
   "styles_2aa721ef": { "message": "Stílusok" },
   "submit_a3cc6859": { "message": "Beküldés" },
@@ -760,6 +774,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Unió" },
   "unpublished_dfd8801": { "message": "nem publikált" },
+  "untitled_16aa4f2b": { "message": "Cím nélküli" },
   "untitled_efdc2d7d": { "message": "névtelen" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Fel és Balra Átlós Nyíl"
@@ -836,6 +851,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Függőleges pontok" },
   "video_options_24ef6e5d": { "message": "Videóbeállítások" },
   "video_options_tray_3b9809a5": { "message": "Videóbeállítások tálca" },
+  "video_player_b371005": { "message": "Videólejátszó" },
   "video_player_for_9e7d373b": { "message": "Audio lejátszó ehhez" },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videólejátszó ehhez: { title }"
@@ -848,6 +864,7 @@ const locale = {
   "view_title_description_67940918": {
     "message": "Tekintse meg a { title } leírását"
   },
+  "webcam_fe91b20f": { "message": "Webkamera" },
   "white_87fa64fd": { "message": "fehér" },
   "width_492fec76": { "message": "Szélesség" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -863,6 +880,9 @@ const locale = {
   },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Nem tölthet fel egy üres fájlt."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Úgy tűnik a webkamera már használatban van."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoomolás" },

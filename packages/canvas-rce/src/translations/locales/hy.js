@@ -137,6 +137,7 @@ const locale = {
   "purple_7678a9fc": { "message": "Մանուշակագույն" },
   "quizzes_7e598f57": { "message": "Թեստեր" },
   "record_7c9448b": { "message": "Գրառում" },
+  "recording_98da6bda": { "message": "Ձայնագրում" },
   "red_8258edf3": { "message": "Կարմիր" },
   "relationships_6602af70": { "message": "Հարաբերություններ" },
   "replace_e61834a7": { "message": "Փոխարինել" },
@@ -146,6 +147,7 @@ const locale = {
   "search_280d00bd": { "message": "Որոնել" },
   "size_b30e1077": { "message": "Չափ" },
   "star_8d156e09": { "message": "Նշել աստղիկով" },
+  "start_over_f7552aa9": { "message": "Սկսել նորից" },
   "submit_a3cc6859": { "message": "Ուղարկել" },
   "syllabus_f191f65b": { "message": "Դասընթացի ծրագիր" },
   "teal_f729a294": { "message": "Փիրուզագույն" },
@@ -170,6 +172,7 @@ const locale = {
   "uploading_19e8a4e7": { "message": "Բեռնում" },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Օգտագործման իրավունք՝" },
+  "video_player_b371005": { "message": "Տեսաձայնագրության նվագարկիչ" },
   "view_ba339f93": { "message": "Դիտել" },
   "wiki_home_9cd54d0": { "message": "Վիկիի տնային էջ" },
   "yes_dde87d5": { "message": "Այո" }

@@ -274,6 +274,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Kunne ikke hente filindhold"
   },
+  "file_name_8fd421ff": { "message": "Filnavn" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Kvote for fillagring er overskredet"
   },

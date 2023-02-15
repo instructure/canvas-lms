@@ -259,6 +259,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Echèk rekiperasyon kontni fichye yo"
   },
+  "file_name_8fd421ff": { "message": "Non fichye" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Quota estokaj fichye a depase"
   },

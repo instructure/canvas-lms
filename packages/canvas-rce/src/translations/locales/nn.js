@@ -168,6 +168,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Skjær bilde" },
   "cup_product_14174434": { "message": "Cup-produkt" },
   "current_image_f16c249c": { "message": "Gjeldande bilde" },
+  "current_volume_level_c55ab825": { "message": "Gjeldande volumnivå" },
   "custom_6979cd81": { "message": "Eigendefinert" },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
@@ -270,6 +271,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Henting av filinnhald mislukkast"
   },
+  "file_name_8fd421ff": { "message": "Filnamn" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Lagringskvota er overskriden"
   },
@@ -283,6 +285,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filoversikt" },
+  "finish_bc343002": { "message": "Fullfør" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Sentrer alternativ-menyen"
   },
@@ -436,6 +439,7 @@ const locale = {
     "message": "Mediefil vart prosessert. Prøv på ny seinare."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mic" },
   "middle_27dc1d5": { "message": "Midtpunkt" },
   "minimize_file_preview_da911944": {
     "message": "Minimer førehandsvising av fil"
@@ -474,6 +478,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funne for { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ingen video" },
   "none_3b5e34d2": { "message": "Ingen" },
   "none_selected_b93d56d2": { "message": "Ingen vald" },
   "not_equal_6e2980e6": { "message": "Ikkje lik" },
@@ -515,6 +520,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Parallell" },
   "partial_derivative_4a9159df": { "message": "Partiell (Derivert)" },
   "paste_5963d1c1": { "message": "Lim inn" },
+  "pause_12af3bb4": { "message": "Pause" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personar" },
   "percentage_34ab7c2c": { "message": "Prosenttal" },
@@ -530,7 +536,11 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Variant)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixlar" },
+  "play_1a47eaa7": { "message": "Spel av" },
   "play_media_comment_35257210": { "message": "Spel av medieinnhald." },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Vær god å gje Canvas tilgang til din mikrofon og ditt webkamera"
+  },
   "plus_d43cd4ec": { "message": "Pluss" },
   "plus_minus_f8be2e83": { "message": "Pluss/Minus" },
   "posted_when_a578f5ab": { "message": "Posta: { when }" },
@@ -539,6 +549,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Føregåande lik" },
   "preformatted_d0670862": { "message": "Førehandsformatert" },
   "preview_53003fd2": { "message": "Førehandsvising" },
+  "preview_a3f8f854": { "message": "Førehandsvisning" },
   "preview_in_overlay_ed772c46": { "message": "Førehandsvisning i nytt lag" },
   "preview_inline_9787330": { "message": "Førehandsvising i teksten" },
   "prime_917ea60e": { "message": "Primtal" },
@@ -561,6 +572,7 @@ const locale = {
     "message": "Reell del (av komplekst tal)"
   },
   "record_7c9448b": { "message": "Spel inn" },
+  "recording_98da6bda": { "message": "Opptak" },
   "red_8258edf3": { "message": "Raud" },
   "relationships_6602af70": { "message": "Relasjon" },
   "religion_icon_246e0be1": { "message": "Religion-ikon" },
@@ -643,6 +655,8 @@ const locale = {
     "message": "Kvadratisk Supersett (Streng)"
   },
   "star_8d156e09": { "message": "Merk med stjerne" },
+  "start_over_f7552aa9": { "message": "Start på nytt" },
+  "start_recording_9a65141a": { "message": "Start opptak" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Send!" },
@@ -732,6 +746,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "upublisert" },
+  "untitled_16aa4f2b": { "message": "Utan tittel" },
   "untitled_efdc2d7d": { "message": "utan tittel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Diagonal pil opp til venstre"
@@ -806,12 +821,14 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Vertikale prikkar" },
   "video_options_24ef6e5d": { "message": "Videoalternativ" },
   "video_options_tray_3b9809a5": { "message": "Menyalternativ for video" },
+  "video_player_b371005": { "message": "Videoavspelar" },
   "video_player_for_9e7d373b": { "message": "Videospelar for" },
   "video_player_for_title_ffd9fbc4": { "message": "Videospelar for { title }" },
   "view_ba339f93": { "message": "Vis" },
   "view_description_30446afc": { "message": "Vis skildring" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Sjå hurtigtastar" },
   "view_title_description_67940918": { "message": "Vis { title } skildring" },
+  "webcam_fe91b20f": { "message": "Webkamera" },
   "white_87fa64fd": { "message": "Kvit" },
   "width_492fec76": { "message": "Vidde" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -830,6 +847,9 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Bildet ditt har blitt komprimert for ikondesignaren. Bilder mindre enn { size } KB blir ikkje komprimert."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Ditt webkamera kan allereie være i bruk"
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },

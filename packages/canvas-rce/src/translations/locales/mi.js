@@ -279,6 +279,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "I rahua te whiwhi ihirangi kōnae"
   },
+  "file_name_8fd421ff": { "message": "Ingoa kōnae" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Te rokiroki kōnae motunga hipa"
   },

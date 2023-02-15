@@ -276,6 +276,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Nie udało się pobrać zawartości pliku"
   },
+  "file_name_8fd421ff": { "message": "Nazwa pliku" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Przekroczono przydział magazynowania plików"
   },
