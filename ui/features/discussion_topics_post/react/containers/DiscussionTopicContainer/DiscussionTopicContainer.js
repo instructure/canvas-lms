@@ -504,7 +504,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 if (createDiscussionEntry) {
                                   createDiscussionEntry(message, fileId, anonymousAuthorState)
                                   setExpandedReply(false)
-                                  props.onDiscussionReplyPost()
                                 }
                               }}
                               onCancel={() => {
@@ -586,10 +585,6 @@ DiscussionTopicContainer.propTypes = {
    * useState Boolean to toggle highlight
    */
   isHighlighted: PropTypes.bool,
-  /**
-   * Callback to be called when discussion post is submitted
-   */
-  onDiscussionReplyPost: PropTypes.func,
 }
 
 export default DiscussionTopicContainer
