@@ -12,3 +12,6 @@ minimums:
   chrome: 107
   safari: 14
   firefox: 91
+chrome_os_lts:
+  chrome: 102
+  platform: 14695
