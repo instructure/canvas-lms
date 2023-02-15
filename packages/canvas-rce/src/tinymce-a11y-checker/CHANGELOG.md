@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed a bug where the a11y checker could be opened twice and cause
   content to become deleted
+- change `$(npm bin)/command` to `npx command`
 
 ## [4.1.3] - 2023-01-30
 
