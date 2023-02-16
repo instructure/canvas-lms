@@ -133,9 +133,14 @@ module ContextModulesHelper
 
   def process_module_data(mod, is_student = false, current_user = nil, session = nil)
     # pre-calculated module view data can be added here
+    items = mod.content_tags_visible_to(@current_user)
+    items = items.reject do |item|
+      item.content.respond_to?(:hide_on_modules_view?) && item.content.hide_on_modules_view?
+    end
+
     module_data = {
       published_status: mod.published? ? "published" : "unpublished",
-      items: mod.content_tags_visible_to(@current_user)
+      items: items
     }
 
     if cyoe_enabled?(@context)

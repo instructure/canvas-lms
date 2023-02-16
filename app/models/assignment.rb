@@ -3919,6 +3919,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def hide_on_modules_view?
+    ["duplicating", "failed_to_duplicate"].include?(workflow_state)
+  end
+
   private
 
   def grading_type_requires_points?
