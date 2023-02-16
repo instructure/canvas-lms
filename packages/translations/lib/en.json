@@ -2180,6 +2180,9 @@
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor."
   },
+  "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+    "message": "The selected file exceeds the { maxSize } Byte limit"
+  },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "There are no points associated with this item"
   },
