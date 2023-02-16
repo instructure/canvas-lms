@@ -34,7 +34,16 @@ def call() {
   }
 
   if (env.ALLOW_JENKINSFILE_CHANGES != "1" && git.changedFiles(CHANGED_FILES, 'origin/master')) {
-    error 'Jenkinsfile has been updated. Please retrigger your patchset for the latest updates.'
+    error '''
+    Jenkinsfile is different from the expected version and changes are not allowed in the currently running job.
+
+    You are seeing this error because one of the following:
+    1. You got unlucky and someone merged a Jenkinsfile change between when the build started and the rebase happened. You
+        should re-trigger your PS in this case.
+    2. A parent patchset has a change which will cause it to be built with the -Jenkinsfile job. You can bypass this error
+        by adding a no-op change to Jenkinsfile that will force this PS to use the local version of the build scripts. If
+        you do this, you will need to rebase your PS to keep the build scripts up-to-date manually.
+    '''
   }
 }
 
