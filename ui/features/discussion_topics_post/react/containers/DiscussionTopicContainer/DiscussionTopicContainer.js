@@ -218,7 +218,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[id='Discussion Podcast Feed']")
+  const podcast_url =
+    document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
+    document.querySelector("link[type='application/rss+xml']")
 
   return (
     <Responsive
@@ -244,7 +246,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           podcastButton: {
             display: 'block',
-            padding: 'small none none',
+            padding: 'small none none none',
             textSize: 'small',
           },
           RCE: {
@@ -271,7 +273,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           podcastButton: {
             display: 'inline-block',
-            padding: 'small none none small',
+            padding: 'none none none small',
             textSize: 'medium',
           },
           RCE: {
@@ -466,7 +468,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   <View
                                     as="div"
                                     padding={responsiveProps.podcastButton.padding}
-                                    display={responsiveProps.podcastButton.display}
+                                    display={responsiveProps.replyButton.display}
                                   >
                                     <PodcastFeed
                                       linkUrl={podcast_url.href}
