@@ -3732,6 +3732,46 @@ describe User do
     end
   end
 
+  describe "#participating_student_current_and_unrestricted_concluded_course_ids" do
+    let(:user) { User.create! }
+
+    before do
+      # restricts view of this course when it is in the past (it IS in the past)
+      @restricted = Account.default.courses.create!(
+        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Restricted",
+        restrict_student_past_view: true
+      )
+      # doesnt restrict view of this course when it is in the past (it IS in the past)
+      @unrestricted = Account.default.courses.create!(
+        start_at: 2.months.ago, conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Unrestricted",
+        restrict_student_past_view: false
+      )
+      @restricted.offer!
+      @unrestricted.offer!
+    end
+
+    it "includes unrestricted but not restricted course" do
+      course_with_student course: @restricted, user: user, active_all: true
+      course_with_student course: @unrestricted, user: user, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).to include(@unrestricted.id)
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).not_to include(@restricted.id)
+    end
+
+    it "includes unrestricted concluded and restricted current course" do
+      @restricted.update(conclude_at: nil, restrict_enrollments_to_course_dates: false)
+      course_with_student course: @restricted, user: user, active_all: true
+      course_with_student course: @unrestricted, user: user, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids)
+        .to contain_exactly(@restricted.id, @unrestricted.id)
+    end
+  end
+
   describe "from_tokens" do
     specs_require_sharding
 
