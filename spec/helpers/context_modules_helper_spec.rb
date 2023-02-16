@@ -242,6 +242,17 @@ describe ContextModulesHelper do
         expect(item_data[:show_cyoe_placeholder]).to eq false
       end
     end
+
+    it "does not return items that are hide_on_modules_view? == true" do
+      course = course_factory(active_all: true)
+      test_module = course.context_modules.create! name: "test module"
+      hidden_assignment = course.assignments.create!(workflow_state: "failed_to_duplicate")
+      test_module.add_item(type: "assignment", id: hidden_assignment.id)
+
+      module_data = process_module_data(test_module, true, @student, @session)
+
+      expect(module_data[:items]).to be_empty
+    end
   end
 
   describe "add_mastery_paths_to_cache_key" do

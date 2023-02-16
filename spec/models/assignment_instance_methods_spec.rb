@@ -62,4 +62,30 @@ describe Assignment do
       expect(first_student_position).to eq(initial_student_first ? 1 : 2)
     end
   end
+
+  describe "#hide_on_modules_view?" do
+    before(:once) do
+      @course = Course.create!
+    end
+
+    it "returns true when the assignment is in the failed_to_duplicate state" do
+      assignment = @course.assignments.create!(workflow_state: "failed_to_duplicate", **assignment_valid_attributes)
+      expect(assignment.hide_on_modules_view?).to eq true
+    end
+
+    it "returns true when the assignment is in the duplicating state" do
+      assignment = @course.assignments.create!(workflow_state: "duplicating", **assignment_valid_attributes)
+      expect(assignment.hide_on_modules_view?).to eq true
+    end
+
+    it "returns false when the assignment is in the published state" do
+      assignment = @course.assignments.create!(workflow_state: "published", **assignment_valid_attributes)
+      expect(assignment.hide_on_modules_view?).to eq false
+    end
+
+    it "returns false when the assignment is in the unpublished state" do
+      assignment = @course.assignments.create!(workflow_state: "unpublished", **assignment_valid_attributes)
+      expect(assignment.hide_on_modules_view?).to eq false
+    end
+  end
 end
