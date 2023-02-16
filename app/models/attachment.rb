@@ -582,7 +582,7 @@ class Attachment < ActiveRecord::Base
       # splitting the string, etc.
       #
       # The infer_root_account_id accessor is still present above, but I didn't verify there
-      # isn't any code still accessing the namespace for the account id directly.
+      # isn't any code still accessing the namespace for the account id directly. d
       ns = root_attachment.try(:namespace) if root_attachment_id
       ns ||= Attachment.current_namespace
       ns ||= context.root_account.file_namespace rescue nil
@@ -2333,7 +2333,7 @@ class Attachment < ActiveRecord::Base
 
       from_attachments.each do |attachment|
         match = to_attachments.detect { |a| attachment.matches_full_display_path?(a.full_display_path) }
-        next if match && (match.md5&.== attachment.md5)
+        next if match && match.md5 == attachment.md5
 
         if to_context.is_a? User
           attachment.user_id = to_context.id
