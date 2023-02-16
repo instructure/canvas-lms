@@ -190,8 +190,8 @@ class Conversation < ActiveRecord::Base
           # give them all messages
           # NOTE: individual messages in group conversations don't have tags
           self.class.connection.execute(sanitize_sql([<<~SQL.squish, id, current_user.id, user_ids]))
-            INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state)
-            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
+            INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state, root_account_ids)
+            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active', '#{read_attribute(:root_account_ids)}'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
             WHERE conversation_messages.conversation_id = ?
               AND conversation_messages.conversation_id = conversation_participants.conversation_id
@@ -408,7 +408,8 @@ class Conversation < ActiveRecord::Base
             conversation_participant_id: cp.id,
             user_id: cp.user_id,
             tags: message_tags ? serialized_tags(message_tags) : nil,
-            workflow_state: "active"
+            workflow_state: "active",
+            root_account_ids: read_attribute(:root_account_ids)
           }
         end
         # some of the participants we're about to insert may have been soft-deleted,

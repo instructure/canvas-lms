@@ -434,6 +434,7 @@ describe UsersController, type: :request do
 
       "submission_comments" => [
         {
+          "attempt" => nil,
           "body" => "c1",
           "comment" => "c1",
           "author" => {
@@ -451,6 +452,7 @@ describe UsersController, type: :request do
           "id" => @sub.submission_comments[0].id
         },
         {
+          "attempt" => nil,
           "body" => "c2",
           "comment" => "c2",
           "author" => {
@@ -572,6 +574,7 @@ describe UsersController, type: :request do
 
       "submission_comments" => [
         {
+          "attempt" => nil,
           "body" => "c1",
           "comment" => "c1",
           "author" => {
@@ -589,6 +592,7 @@ describe UsersController, type: :request do
           "id" => @sub.submission_comments[0].id
         },
         {
+          "attempt" => nil,
           "body" => "c2",
           "comment" => "c2",
           "author" => {

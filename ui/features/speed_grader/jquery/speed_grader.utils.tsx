@@ -136,7 +136,7 @@ export const configureRecognition = (recognition, messages) => {
   }
 
   // xsslint safeString.function linebreak
-  function linebreak(transcript) {
+  function linebreak(transcript: string) {
     return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
   }
 }

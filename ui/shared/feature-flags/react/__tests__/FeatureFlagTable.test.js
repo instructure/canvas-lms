@@ -30,6 +30,7 @@ const rows = [
   sampleData.offFeature,
   sampleData.siteAdminOnFeature,
   sampleData.siteAdminOffFeature,
+  sampleData.shadowedRootAccountFeature,
 ]
 const title = 'Section 123'
 
@@ -75,5 +76,16 @@ describe('feature_flags::FeatureFlagTable', () => {
           ' please be sure you fully understand the functionality and possible impacts to users.'
       ).length
     ).toBe(2)
+  })
+
+  it('Includes tooltips for shadow features', () => {
+    const {getAllByTestId, getByText} = render(<FeatureFlagTable rows={rows} title={title} />)
+    expect(getAllByTestId('ff-table-row')[7]).toHaveTextContent('Shadow')
+    expect(
+      getByText(
+        'This feature option is only visible to users with Site Admin access. It is similar to "Hidden",' +
+          ' but end users will not see it even if enabled by a Site Admin user.'
+      )
+    ).toBeInTheDocument()
   })
 })

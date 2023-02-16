@@ -125,45 +125,49 @@ tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
       if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
         return
       }
-      if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
-        // it's very doubtful that we won't have retrieved the session data yet,
-        // since it takes a while for the RCE to initialize, but if we haven't
-        // wait until we do to carry on and finish pasting.
-        // eslint-disable-next-line promise/catch-or-return
-        config.sessionPromise.finally(() => {
-          if (config.session === null) {
-            // we failed to get the session and don't know if usage rights are required in this course|group
-            // In all probability, the file upload will fail too, but I feel like we have to do something here.
-            showFlashAlert({
-              message: formatMessage(
-                'If Usage Rights are required, the file will not publish until enabled in the Files page.'
-              ),
-              type: 'info',
-            } as TsMigrationAny)
+
+      // it's very doubtful that we won't have retrieved the session data yet,
+      // since it takes a while for the RCE to initialize, but if we haven't
+      // wait until we do to carry on and finish pasting.
+      // eslint-disable-next-line promise/catch-or-return
+      config.sessionPromise.finally(() => {
+        if (config.session === null) {
+          // we failed to get the session and don't know if usage rights are required in this course|group
+          // In all probability, the file upload will fail too, but I feel like we have to do something here.
+          showFlashAlert({
+            message: formatMessage(
+              'If Usage Rights are required, the file will not publish until enabled in the Files page.'
+            ),
+            type: 'info',
+          } as TsMigrationAny)
+        }
+        // even though usage rights might be required by the course, canvas has no place
+        // on the user to store it. Only Group and Course.
+        const requiresUsageRights =
+          config.session.usageRightsRequired &&
+          /(?:course|group)/.test(bridge.trayProps.get(ed).contextType)
+        if (requiresUsageRights) {
+          return getUsageRights(ed, document, file)
+        } else {
+          const fileMetaProps = {
+            altText: file.name,
+            contentType: file.type,
+            displayAs: 'embed',
+            isDecorativeImage: false,
+            name: file.name,
+            parentFolderId: 'media',
+            size: file.size,
+            domObject: file,
           }
-          if (config.session && config.session.usageRightsRequired) {
-            return getUsageRights(ed, document, file)
-          } else {
-            const fileMetaProps = {
-              altText: file.name,
-              contentType: file.type,
-              displayAs: 'embed',
-              isDecorativeImage: false,
-              name: file.name,
-              parentFolderId: 'media',
-              size: file.size,
-              domObject: file,
-            }
-            let tabContext = 'documents'
-            if (isImage(file.type)) {
-              tabContext = 'images'
-            } else if (isAudioOrVideo(file.type)) {
-              tabContext = 'media'
-            }
-            store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
+          let tabContext = 'documents'
+          if (isImage(file.type)) {
+            tabContext = 'images'
+          } else if (isAudioOrVideo(file.type)) {
+            tabContext = 'media'
           }
-        })
-      }
+          store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
+        }
+      })
     } else {
       delegateToTiny(ed, event)
     }

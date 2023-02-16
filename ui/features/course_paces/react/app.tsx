@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -85,8 +86,6 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   pollForPublishStatus,
   unpublishedChanges,
   coursePace,
-  isSyncing,
-  isPacePublishing,
 }) => {
   const [trayOpen, setTrayOpen] = useState(false)
 

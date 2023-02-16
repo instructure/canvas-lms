@@ -34,6 +34,7 @@ describe('AlignmentOutcomeItem', () => {
         moduleUrl: '/courses/1/modules/1',
         moduleWorkflowState: 'active',
         assignmentContentType: 'assignment',
+        assignmentWorkflowState: 'published',
       },
     ],
     ...props,

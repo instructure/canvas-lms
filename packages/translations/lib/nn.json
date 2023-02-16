@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Gjeldande bilde"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Gjeldande volumnivå"
+    },
     "custom_6979cd81": {
         "message": "Eigendefinert"
     },
@@ -838,6 +841,9 @@
     },
     "filipino_33339264": {
         "message": "Filipinsk"
+    },
+    "finish_bc343002": {
+        "message": "Fullfør"
     },
     "finnish_4df2923d": {
         "message": "Finsk"
@@ -1334,6 +1340,9 @@
     "medium_5a8e9ead": {
         "message": "Medium"
     },
+    "mic_a7f3d311": {
+        "message": "Mic"
+    },
     "middle_27dc1d5": {
         "message": "Midtpunkt"
     },
@@ -1447,6 +1456,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Ingen resultat funne for { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Ingen video"
     },
     "none_3b5e34d2": {
         "message": "Ingen"
@@ -1583,6 +1595,9 @@
     "paste_5963d1c1": {
         "message": "Lim inn"
     },
+    "pause_12af3bb4": {
+        "message": "Pause"
+    },
     "peer_review_74f26a13": {
         "message": "Fagfellevurdering"
     },
@@ -1631,8 +1646,14 @@
     "pixels_52ece7d1": {
         "message": "Pixlar"
     },
+    "play_1a47eaa7": {
+        "message": "Spel av"
+    },
     "play_media_comment_35257210": {
         "message": "Spel av medieinnhald."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Vær god å gje Canvas tilgang til din mikrofon og ditt webkamera"
     },
     "plus_d43cd4ec": {
         "message": "Pluss"
@@ -1669,6 +1690,9 @@
     },
     "preview_53003fd2": {
         "message": "Førehandsvising"
+    },
+    "preview_a3f8f854": {
+        "message": "Førehandsvisning"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Førehandsvisning i nytt lag"
@@ -1732,6 +1756,9 @@
     },
     "record_7c9448b": {
         "message": "Spel inn"
+    },
+    "recording_98da6bda": {
+        "message": "Opptak"
     },
     "red_8258edf3": {
         "message": "Raud"
@@ -1954,6 +1981,12 @@
     },
     "star_8d156e09": {
         "message": "Merk med stjerne"
+    },
+    "start_over_f7552aa9": {
+        "message": "Start på nytt"
+    },
+    "start_recording_9a65141a": {
+        "message": "Start opptak"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } til { endDate }"
@@ -2216,6 +2249,9 @@
     "unpublished_dfd8801": {
         "message": "upublisert"
     },
+    "untitled_16aa4f2b": {
+        "message": "Utan tittel"
+    },
     "untitled_efdc2d7d": {
         "message": "utan tittel"
     },
@@ -2348,6 +2384,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Menyalternativ for video"
     },
+    "video_player_b371005": {
+        "message": "Videoavspelar"
+    },
     "video_player_for_9e7d373b": {
         "message": "Videospelar for"
     },
@@ -2374,6 +2413,9 @@
     },
     "view_title_description_67940918": {
         "message": "Vis { title } skildring"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webkamera"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigasjon for vekestimeplan"
@@ -2431,6 +2473,9 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Bildet ditt har blitt komprimert for ikondesignaren. Bilder mindre enn { size } KB blir ikkje komprimert."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Ditt webkamera kan allereie være i bruk"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

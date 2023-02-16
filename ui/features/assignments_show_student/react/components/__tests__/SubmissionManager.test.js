@@ -39,6 +39,7 @@ import TextEntry from '../AttemptType/TextEntry'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import store from '../stores'
+import {availableReviewCount} from '../../helpers/PeerReviewHelpers'
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
@@ -346,7 +347,7 @@ describe('SubmissionManager', () => {
     inDocument: false,
   })
 
-  describe('Submission completed modal after clicking the "Submit Assignment" button', () => {
+  describe('Peer Review modal after clicking the "Submit Assignment" button', () => {
     const {assign} = window.location
     let props, createSubmissionResult, submissionHistoriesResult, mocks, oldEnv
     const variables = {
@@ -409,7 +410,7 @@ describe('SubmissionManager', () => {
     })
 
     it('is present when there are assigned assessments', async () => {
-      const {getByText, getByRole} = render(
+      const {getByText, getByRole, findByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -426,6 +427,14 @@ describe('SubmissionManager', () => {
 
       const peerReviewButton = getByRole('button', {name: 'Peer Review'})
       expect(peerReviewButton).toBeInTheDocument()
+      expect(await findByText('Your work has been submitted.')).toBeTruthy()
+      expect(await findByText('Check back later to view feedback.')).toBeTruthy()
+      const assignedAssessmentsTotal = props.submission.assignedAssessments.length
+      const availableTotal = availableReviewCount(props.submission.assignedAssessments)
+      expect(
+        await findByText(`You have ${assignedAssessmentsTotal} Peer Reviews to complete.`)
+      ).toBeTruthy()
+      expect(await findByText(`Peer submissions ready for review: ${availableTotal}`)).toBeTruthy()
     })
 
     it('is not present when there are no assigned assessments', async () => {
@@ -469,7 +478,7 @@ describe('SubmissionManager', () => {
         ],
       }
 
-      const {getByText, queryByRole} = render(
+      const {getByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
@@ -1563,7 +1572,7 @@ describe('SubmissionManager', () => {
     })
     describe('with rubrics', () => {
       const originalENV = window.ENV
-      let props, fakeStore, mocks
+      let props, mocks
 
       function generateAssessmentItem(
         criterionId,

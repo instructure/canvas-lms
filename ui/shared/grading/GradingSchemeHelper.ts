@@ -17,15 +17,14 @@
  */
 
 import round from 'round'
+import type {GradingScheme} from './grading.d'
 
-type GradingScheme = [string, number]
-
-export function indexOfGrade(grade: string, gradingSchemes: GradingScheme[]) {
+export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
   return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
 }
 
-export function gradeToScoreUpperBound(grade: string, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -58,7 +57,7 @@ export function gradeToScoreUpperBound(grade: string, gradingSchemes: GradingSch
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
 }
 
-export function gradeToScoreLowerBound(grade: string, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: GradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -80,11 +79,11 @@ export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
   // does the following need .toPrecision(4) ?
   const scoreWithLowerBound = Math.max(roundedScore, 0)
   const letter = gradingSchemes.find((row, i) => {
-    const schemeScore = (row[1] * 100).toPrecision(4)
+    const schemeScore: string = (row[1] * 100).toPrecision(4)
     // The precision of the lower bound (* 100) must be limited to eliminate
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= schemeScore || i === gradingSchemes.length - 1
+    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemes.length - 1
   }) as GradingScheme
   if (!letter) {
     throw new Error('grading scheme not found')

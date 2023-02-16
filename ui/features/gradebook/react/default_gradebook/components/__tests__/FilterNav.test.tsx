@@ -226,6 +226,21 @@ describe('FilterNav', () => {
     expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('Module 1')
   })
 
+  it('render All Grading Periods filter', async () => {
+    store.setState({
+      appliedFilters: [
+        {
+          id: '1',
+          type: 'grading-period',
+          value: '0',
+          created_at: new Date().toISOString(),
+        },
+      ],
+    })
+    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('All Grading Periods')
+  })
+
   it('opens tray', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))

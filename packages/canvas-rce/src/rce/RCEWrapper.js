@@ -1073,8 +1073,14 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  handleExternalClick = () => {
-    this._forceCloseFloatingToolbar()
+  handleExternalClick = event => {
+    // We want to respect previous focus, so no need to focus editor.
+    this._forceCloseFloatingToolbar(false)
+    // If the event is marked as defaultPrevented, don't focus anything.
+    // Event marked in StatusBar's "Switch pretty/raw HTML" button click to keep the text area focused.
+    if (!event.defaultPrevented) {
+      event.target.focus()
+    }
     debounce(this.checkAccessibility, 1000)()
   }
 
@@ -1237,7 +1243,7 @@ class RCEWrapper extends React.Component {
     })
   }
 
-  _forceCloseFloatingToolbar = () => {
+  _forceCloseFloatingToolbar = (focusEditor = true) => {
     if (this._elementRef.current) {
       const moreButton = this._elementRef.current.querySelector(
         '.tox-toolbar-overlord .tox-toolbar__group:last-child button:last-child'
@@ -1245,8 +1251,10 @@ class RCEWrapper extends React.Component {
       if (moreButton?.getAttribute('aria-owns')) {
         // the floating toolbar is open
         moreButton.click() // close the floating toolbar
-        const editor = this.mceInstance() // return focus to the editor
-        editor?.focus()
+        if (focusEditor) {
+          const editor = this.mceInstance() // return focus to the editor
+          editor?.focus()
+        }
       }
     }
   }
@@ -1525,14 +1533,18 @@ class RCEWrapper extends React.Component {
 
   KBShortcutModalExited = () => {
     if (this.state.KBShortcutFocusReturn === this.iframe) {
-      // if the iframe has focus, we need to forward it on to tinymce
+      // launched using a kb shortcut
+      // the iframe has focus so we need to forward it on to tinymce editor
       this.editor.focus(false)
-    } else if (this._showOnFocusButton && document.activeElement === document.body) {
-      // when the modal is opened from the showOnFocus button, focus doesn't
-      // get automatically returned to the button like it should.
-      this._showOnFocusButton.focus()
-    } else {
+    } else if (
+      this.state.KBShortcutFocusReturn === document.getElementById(`show-on-focus-btn-${this.id}`)
+    ) {
+      // launched from showOnFocus button
+      // edge case where focusing KBShortcutFocusReturn doesn't work
       this._showOnFocusButton?.focus()
+    } else {
+      // launched from kb shortcut button on status bar
+      this.state.KBShortcutFocusReturn?.focus()
     }
   }
 
@@ -1982,6 +1994,7 @@ class RCEWrapper extends React.Component {
       >
         {this.state.shouldShowOnFocusButton && (
           <ShowOnFocusButton
+            id={`show-on-focus-btn-${this.id}`}
             onClick={this.openKBShortcutModal}
             margin="xx-small"
             screenReaderLabel={formatMessage('View keyboard shortcuts')}

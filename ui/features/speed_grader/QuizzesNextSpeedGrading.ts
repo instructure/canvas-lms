@@ -86,6 +86,10 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
         return registerCb(postChangeSubmissionMessage, message.payload || {singleLtiLaunch: true})
       case 'quizzesNext.submissionUpdate':
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
+      case 'quizzesNext.previousStudent':
+        return EG.prev()
+      case 'quizzesNext.nextStudent':
+        return EG.next()
     }
   }
 

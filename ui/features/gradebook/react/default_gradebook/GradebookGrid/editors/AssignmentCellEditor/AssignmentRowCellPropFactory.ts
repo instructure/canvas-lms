@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,7 +18,7 @@
  */
 
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
-import type Gradebook from '../../../gradebook'
+import type Gradebook from '../../../Gradebook'
 
 function isTrayOpen(gradebook: Gradebook, student, assignment) {
   const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()

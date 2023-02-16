@@ -19,6 +19,7 @@
 import type {
   Enrollment,
   GradingType,
+  LatePolicyStatus,
   Override,
   Submission,
   SubmissionType,
@@ -172,22 +173,23 @@ export type CamelizedGradingPeriodSet = {
 export type CamelizedAssignment = {
   allowedAttempts: number
   anonymizeStudents: boolean
-  gradingType: GradingType
   courseId: string
   dueAt: string | null
-  htmlUrl: string
-  id: string
-  moderatedGrading: boolean
-  muted: boolean
-  name: string
-  postManually: boolean
-  published: boolean
-  submissionTypes: string
+  gradingType: GradingType
   groupSet?: {
     currentGroup: {
       _id: string
     }
   }
+  htmlUrl: string
+  id: string
+  moderatedGrading: boolean
+  muted: boolean
+  name: string
+  pointsPossible: number
+  postManually: boolean
+  published: boolean
+  submissionTypes: string
 }
 
 export type PlagiarismData = {
@@ -238,4 +240,59 @@ export type FinalGradeOverride = {
 
 export type FinalGradeOverrideMap = {
   [userId: string]: FinalGradeOverride
+}
+
+export type GradeType = 'gradingScheme' | 'percent' | 'points' | 'passFail' | 'excused' | 'missing'
+
+export type GradeEntryMode = 'gradingScheme' | 'passFail' | 'percent' | 'points'
+
+export type GradeInput = {
+  enteredAs: GradeType
+  percent: null | number
+  points: number
+  schemeKey: null | string
+}
+
+export type GradeResult = {
+  enteredAs: null | GradeType
+  late_policy_status: null | LatePolicyStatus
+  excused: boolean
+  grade: null | string
+  score: null | number
+  valid: boolean
+}
+
+export type AssignmentGroupGrade = {
+  assignmentGroupId: string
+  assignmentGroupWeight: any
+  current: {
+    score: number
+    possible: number
+    submission_count: any
+    submissions: any
+  }
+  final: {
+    score: number
+    possible: number
+    submission_count: any
+    submissions: any
+  }
+  scoreUnit: string
+}
+
+export type FormatGradeOptions = {
+  formatType?: 'points_out_of_fraction'
+  defaultValue?: string
+  gradingType?: string
+  delocalize?: boolean
+  precision?: number
+  pointsPossible?: number
+}
+
+export type GradingStandard = [string, number]
+
+export type GradingScheme = {
+  id?: string
+  title?: string
+  data: GradingStandard[]
 }

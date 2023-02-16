@@ -204,7 +204,7 @@ export default class WikiPageView extends Backbone.View {
     this.reloadView.on('reload', () => this.render())
     this.reloadView.pollForChanges()
 
-    renderFrontPagePill({
+    renderFrontPagePill(this.$el[0], {
       margin: 'small',
       children: this.toJSON().frontPageText,
     })

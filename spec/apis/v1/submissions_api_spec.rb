@@ -896,6 +896,21 @@ describe "Submissions API", type: :request do
     expect(comment["id"]).to eq @submission.submission_comments.first.id
   end
 
+  it "returns attempt along with submission comments" do
+    submission_with_comment
+
+    json = api_call(:get,
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
+                    { controller: "submissions_api", action: "index",
+                      format: "json", course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s },
+                    { include: %w[submission_comments] })
+
+    expect(json.first["submission_comments"].size).to eq 1
+    comment = json.first["submission_comments"].first
+    expect(comment).to have_key("attempt")
+  end
+
   it "returns a valid preview url for quiz submissions" do
     @student = student1 = user_factory(active_all: true)
     course_with_teacher_logged_in(active_all: true) # need to be logged in to view the preview url below
@@ -1010,6 +1025,7 @@ describe "Submissions API", type: :request do
                           "user_id" => student1.id,
                           "submission_comments" =>
          [{ "comment" => "Well here's the thing...",
+            "attempt" => nil,
             "media_comment" => {
               "media_id" => "3232",
               "media_type" => "audio",
@@ -1345,6 +1361,7 @@ describe "Submissions API", type: :request do
          "user_id" => student1.id,
          "submission_comments" =>
          [{ "comment" => "Well here's the thing...",
+            "attempt" => nil,
             "media_comment" => {
               "media_type" => "audio",
               "media_id" => "3232",

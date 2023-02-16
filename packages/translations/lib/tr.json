@@ -254,6 +254,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons Lisansı:"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Mevcut Ses Seviyesi"
+    },
     "custom_6979cd81": {
         "message": "Özelleştir"
     },
@@ -367,6 +370,9 @@
     },
     "files_index_af7c662b": {
         "message": "Dosya Başlıkları"
+    },
+    "finish_bc343002": {
+        "message": "Tamamla"
     },
     "format_4247a9c5": {
         "message": "Format"
@@ -608,6 +614,9 @@
     "record_7c9448b": {
         "message": "Kayıt"
     },
+    "recording_98da6bda": {
+        "message": "Kaydediliyor"
+    },
     "red_8258edf3": {
         "message": "Kırmızı"
     },
@@ -640,6 +649,9 @@
     },
     "star_8d156e09": {
         "message": "Yıldız"
+    },
+    "start_over_f7552aa9": {
+        "message": "Baştan Başla"
     },
     "submit_a3cc6859": {
         "message": "Gönder"
@@ -710,6 +722,9 @@
     "unpublished_dfd8801": {
         "message": "yayınlanmadı"
     },
+    "untitled_16aa4f2b": {
+        "message": "Başlıksız"
+    },
     "upload_file_fd2361b8": {
         "message": "Dosya Yükle"
     },
@@ -749,11 +764,17 @@
     "video_options_tray_3b9809a5": {
         "message": "Video Seçenekleri Yan Menüsü"
     },
+    "video_player_b371005": {
+        "message": "Video Oynatıcı"
+    },
     "view_ba339f93": {
         "message": "Göster"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Klavye Kısayollarını Göster"
+    },
+    "webcam_fe91b20f": {
+        "message": "Web Kamerası"
     },
     "width_492fec76": {
         "message": "Genişlik"
@@ -772,5 +793,8 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Dün"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Web kameranız kullanılıyor olabilir."
     }
 }

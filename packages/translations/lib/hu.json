@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Aktuális kép"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Aktuális hangerőszint"
+    },
     "custom_6979cd81": {
         "message": "Egyéni"
     },
@@ -829,6 +832,9 @@
     },
     "filipino_33339264": {
         "message": "filippínó"
+    },
+    "finish_bc343002": {
+        "message": "Befejezés"
     },
     "finnish_4df2923d": {
         "message": "Finn"
@@ -1334,6 +1340,9 @@
     "medium_5a8e9ead": {
         "message": "Közepes"
     },
+    "mic_a7f3d311": {
+        "message": "Mikrofon"
+    },
     "middle_27dc1d5": {
         "message": "Középső"
     },
@@ -1447,6 +1456,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Nincs találat a követezőre: { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Nincs videó"
     },
     "none_3b5e34d2": {
         "message": "Nincs"
@@ -1583,6 +1595,9 @@
     "paste_5963d1c1": {
         "message": "Beillesztés"
     },
+    "pause_12af3bb4": {
+        "message": "Szünet"
+    },
     "peer_review_74f26a13": {
         "message": "Társértékelés"
     },
@@ -1631,8 +1646,14 @@
     "pixels_52ece7d1": {
         "message": "Pixelek"
     },
+    "play_1a47eaa7": {
+        "message": "Lejátszás"
+    },
     "play_media_comment_35257210": {
         "message": "Média megjegyzés lejátszása."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Kérjük, engedélyezze, hogy a Canvas hozzáférhessen a mikrofonhoz és a webkamerához!"
     },
     "plus_d43cd4ec": {
         "message": "Plusz"
@@ -1669,6 +1690,9 @@
     },
     "preview_53003fd2": {
         "message": "Előnézet"
+    },
+    "preview_a3f8f854": {
+        "message": "ELŐNÉZET"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Előnézet a fedvényben"
@@ -1731,6 +1755,9 @@
         "message": "Valódi rész (a komplex számból)"
     },
     "record_7c9448b": {
+        "message": "Felvétel"
+    },
+    "recording_98da6bda": {
         "message": "Felvétel"
     },
     "red_8258edf3": {
@@ -1957,6 +1984,12 @@
     },
     "star_8d156e09": {
         "message": "Csillagozás"
+    },
+    "start_over_f7552aa9": {
+        "message": "Újrakezdés"
+    },
+    "start_recording_9a65141a": {
+        "message": "Felvétel elkezdése"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate }-tól/től { endDate }-ig"
@@ -2219,6 +2252,9 @@
     "unpublished_dfd8801": {
         "message": "nem publikált"
     },
+    "untitled_16aa4f2b": {
+        "message": "Cím nélküli"
+    },
     "untitled_efdc2d7d": {
         "message": "névtelen"
     },
@@ -2351,6 +2387,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Videóbeállítások tálca"
     },
+    "video_player_b371005": {
+        "message": "Videólejátszó"
+    },
     "video_player_for_9e7d373b": {
         "message": "Audio lejátszó ehhez"
     },
@@ -2377,6 +2416,9 @@
     },
     "view_title_description_67940918": {
         "message": "Tekintse meg a { title } leírását"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webkamera"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Heti menetrend navigáció"
@@ -2431,6 +2473,9 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Elérte a legelső tennivalót!"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Úgy tűnik a webkamera már használatban van."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

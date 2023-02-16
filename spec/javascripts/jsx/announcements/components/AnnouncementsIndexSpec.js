@@ -35,7 +35,8 @@ const makeProps = (props = {}) =>
       announcementsLastPage: 5,
       permissions: {
         create: true,
-        manage_content: true,
+        manage_course_content_delete: true,
+        manage_course_content_edit: true,
         moderate: true,
       },
       getAnnouncements() {},
@@ -54,7 +55,8 @@ const store = {
     contextId: '1',
     permissions: {
       create: true,
-      manage_content: true,
+      manage_course_content_delete: true,
+      manage_course_content_edit: true,
       moderate: true,
     },
     selectedAnnouncements: [],
@@ -93,20 +95,28 @@ test('calls getAnnouncements if hasLoadedAnnouncements is false', () => {
   equal(getAnnouncements.callCount, 1)
 })
 
-test('should render IndexHeader if we have manage_content permissions', () => {
+test('should render IndexHeader if we have manage_course_content_edit/delete permissions', () => {
   const tree = mount(
     <Provider store={store}>
-      <AnnouncementsIndex {...makeProps({permissions: {manage_content: true}})} />
+      <AnnouncementsIndex
+        {...makeProps({
+          permissions: {manage_course_content_delete: true, manage_course_content_edit: true},
+        })}
+      />
     </Provider>
   )
   const node = tree.find('IndexHeader')
   ok(node.exists())
 })
 
-test('should render IndexHeader even if we do not have manage_content permissions', () => {
+test('should render IndexHeader even if we do not have manage_course_content_edit/delete permissions', () => {
   const tree = mount(
     <Provider store={store}>
-      <AnnouncementsIndex {...makeProps({permissions: {manage_content: false}})} />
+      <AnnouncementsIndex
+        {...makeProps({
+          permissions: {manage_course_content_delete: true, manage_course_content_edit: true},
+        })}
+      />
     </Provider>
   )
   const node = tree.find('IndexHeader')
@@ -120,9 +130,7 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     announcements: sampleData.announcements,
     announcementSelectionChangeStart: selectSpy,
     hasLoadedAnnouncements: true,
-    permissions: {
-      moderate: true,
-    },
+    permissions: {moderate: true, manage_course_content_delete: true},
   }
   const tree = mount(
     <Provider store={store}>
@@ -136,6 +144,28 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     deepEqual(selectSpy.firstCall.args, [{selected: true, id: sampleData.announcements[0].id}])
     done()
   })
+})
+
+test('does not show checkbox if manage_course_content_edit/delete is false ', () => {
+  const selectSpy = sinon.spy()
+  const props = {
+    announcements: sampleData.announcements,
+    announcementSelectionChangeStart: selectSpy,
+    hasLoadedAnnouncements: true,
+    permissions: {
+      moderate: true,
+      manage_course_content_delete: false,
+      manage_course_content_edit: false,
+    },
+  }
+  const tree = mount(
+    <Provider store={store}>
+      <AnnouncementsIndex {...makeProps(props)} />
+    </Provider>
+  )
+
+  const node = tree.find('input[type="checkbox"]')
+  notOk(node.exists())
 })
 
 test('onManageAnnouncement shows delete modal when called with delete action', assert => {

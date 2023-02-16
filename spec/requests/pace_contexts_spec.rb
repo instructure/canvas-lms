@@ -427,13 +427,13 @@ describe "Pace Contexts API" do
           @student_1 = user_model(name: "Student Foo", sortable_name: "A, Foo")
           @student_2 = user_model(name: "Student Bar", sortable_name: "B, Foo")
           @student_3 = user_model(name: "Student Boo", sortable_name: "C, Boo")
-          course.enroll_student(@student_1, enrollment_state: "active")
-          course.enroll_student(@student_2, enrollment_state: "active")
-          course.enroll_student(@student_3, enrollment_state: "active")
+          @student_1_enrollment = course.enroll_student(@student_1, enrollment_state: "active")
+          @student_2_enrollment = course.enroll_student(@student_2, enrollment_state: "active")
+          @student_3_enrollment = course.enroll_student(@student_3, enrollment_state: "active")
         end
 
         it "filters by context ids" do
-          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", contexts: "[#{@student_1.id}, #{@student_3.id}]", format: :json }
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", contexts: "[#{@student_1_enrollment.id}, #{@student_3_enrollment.id}]", format: :json }
           expect(response.status).to eq 200
           json = JSON.parse(response.body)
 

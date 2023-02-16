@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
-import type {Filter, FilterDrilldownData} from '../gradebook.d'
+import type {Filter, FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
@@ -130,7 +130,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'section',
             value: a.id,
             created_at: new Date().toISOString(),
@@ -154,7 +154,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'module' && c.value === m.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'module',
             value: m.id,
             created_at: new Date().toISOString(),
@@ -167,25 +167,41 @@ export default function FilterNav({
   }
 
   if (gradingPeriods.length > 0) {
+    const gradingPeriodItems: FilterDrilldownMenuItem[] = gradingPeriods.map(a => ({
+      id: a.id,
+      name: a.title,
+      isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
+      onToggle: () => {
+        const filter: Filter = {
+          id: uuid.v4(),
+          type: 'grading-period',
+          value: a.id,
+          created_at: new Date().toISOString(),
+        }
+        toggleFilter(filter)
+      },
+    }))
     filterItems['grading-periods'] = {
       id: 'grading-periods',
       name: I18n.t('Grading Periods'),
       parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'grading-period'),
-      items: gradingPeriods.map(a => ({
-        id: a.id,
-        name: a.title,
-        isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'grading-period',
-            value: a.id,
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      })),
+      items: [
+        {
+          id: 'ALL_GRADING_PERIODS',
+          name: I18n.t('All Grading Periods'),
+          isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === '0'),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'grading-period',
+              value: '0',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        } as FilterDrilldownMenuItem,
+      ].concat(gradingPeriodItems),
       itemGroups: [],
     }
     dataMap['grading-periods'] = filterItems['grading-periods']
@@ -203,7 +219,7 @@ export default function FilterNav({
         isSelected: appliedFilters.some(c => c.type === 'assignment-group' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'assignment-group',
             value: a.id,
             created_at: new Date().toISOString(),
@@ -237,7 +253,7 @@ export default function FilterNav({
               ),
               onToggle: () => {
                 const filter: Filter = {
-                  id: uuid(),
+                  id: uuid.v4(),
                   type: 'student-group',
                   value: group.id,
                   created_at: new Date().toISOString(),
@@ -264,7 +280,7 @@ export default function FilterNav({
         ),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'submissions',
             value: 'has-ungraded-submissions',
             created_at: new Date().toISOString(),
@@ -280,7 +296,7 @@ export default function FilterNav({
         ),
         onToggle: () => {
           const filter: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'submissions',
             value: 'has-submissions',
             created_at: new Date().toISOString(),
@@ -349,13 +365,13 @@ export default function FilterNav({
         onCloseDateModal={() => setIsDateModalOpen(false)}
         onSelectDates={(startDateValue, endDateValue) => {
           const startDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'start-date',
             value: startDateValue,
             created_at: new Date().toISOString(),
           }
           const endDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'end-date',
             value: endDateValue,
             created_at: new Date().toISOString(),

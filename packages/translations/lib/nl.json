@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "(beschrijf de video)"
     },
+    "description_436c48d7": {
+        "message": "Beschrijving"
+    },
     "details_98a31b68": {
         "message": "Details"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Shift-O om de pretty HTML-editor te openen."
+    },
+    "shortcut_911d6255": {
+        "message": "Snelkoppeling"
     },
     "show_all_ae37d610": {
         "message": "Alles tonen"

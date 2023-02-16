@@ -130,6 +130,33 @@
     },
     "type": "feature_option"
   },
+  "shadowedRootAccountFeature": {
+    "feature": "shadowFeature",
+    "applies_to": "RootAccount",
+    "root_opt_in": true,
+    "display_name": "Shadow Feature",
+    "description": "This does ninja things",
+    "shadow": true,
+    "feature_flag": {
+      "feature": "shadow_feature",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": true
+        }
+      },
+      "locked": false,
+      "hidden": true,
+      "parent_state": "allowed_on"
+    },
+    "type": "feature_option"
+  },
   "allowedOnCourseFeature": {
     "feature": "feature6",
     "applies_to": "Course",

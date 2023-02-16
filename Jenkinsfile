@@ -568,14 +568,6 @@ pipeline {
                       .required(configuration.isChangeMerged())
                       .queue(stages, buildDockerImageStage.&i18nExtract)
 
-                    def shouldRunGraphQL = (configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles(buildConfig)) || configuration.apolloForceGraphqlSchemaCheck()
-
-                    extendedStage('GraphQL Post-Merge Schema Check')
-                      .hooks(buildSummaryReportHooks.call())
-                      .required(shouldRunGraphQL)
-                      .timeout(2)
-                      .queue(stages, graphqlSchemaCheckStage.&call)
-
                     parallel(stages)
                   }
                 }

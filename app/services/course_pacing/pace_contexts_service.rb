@@ -38,7 +38,7 @@ class CoursePacing::PaceContextsService
     when "student_enrollment"
       student_enrollments = course.all_real_student_enrollments.current_and_future.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*")
       student_enrollments = student_enrollments.joins(:user).where("users.name ILIKE ?", "%#{params[:search_term]}%") if params[:search_term].present?
-      student_enrollments = student_enrollments.joins(:user).where("users.id in ( ? )", JSON.parse(params[:contexts])) if params[:contexts].present?
+      student_enrollments = student_enrollments.joins(:user).where("enrollments.id in ( ? )", JSON.parse(params[:contexts])) if params[:contexts].present?
       student_enrollments = student_enrollments.joins(:user).order("users.sortable_name") if params[:sort] == "name"
       student_enrollments = student_enrollments.reverse_order if params[:order] == "desc"
       student_enrollments.to_a

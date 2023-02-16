@@ -326,19 +326,32 @@ describe ContextController do
     end
 
     context "profiles enabled" do
-      it "does not show the dummy course as common" do
+      before do
         account_admin_user
         course_with_student(active_all: true)
 
         account = Account.default
         account.settings = { enable_profiles: true }
         account.save!
-        expect(account.enable_profiles?).to be_truthy
-        Course.ensure_dummy_course
+      end
 
+      it "does not show the dummy course as common" do
+        expect(@admin.account.enable_profiles?).to be_truthy
+
+        Course.ensure_dummy_course
         user_session(@admin)
         get "roster_user", params: { course_id: @course.id, id: @student.id }
         expect(assigns["user_data"][:common_contexts]).to be_empty
+      end
+
+      it "displays user short name in breadcrumb" do
+        @student.short_name = "display"
+        @student.save
+        user_session(@admin)
+        get "roster_user", params: { course_id: @course.id, id: @student.id }
+
+        expect(assigns[:_crumbs]).to include(["People", "/courses/#{@course.id}/users", {}])
+        expect(assigns[:_crumbs]).to include([@student.short_name.to_s, "/courses/#{@course.id}/users/#{@student.id}", {}])
       end
     end
   end

@@ -4,16 +4,41 @@ if [[ "$SKIP_CANVAS_PRECOMMIT_HOOK" == "1" ]]; then
   exit 0
 fi
 
-SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$(
+  cd -- "$(dirname "$0")" >/dev/null 2>&1
+  pwd -P
+)"
 CANVAS=$(dirname $SCRIPTPATH)
 
-if [ `pwd -P` = $CANVAS ]; then
+if [ $(pwd -P) = $CANVAS ]; then
+  # if .ts or .tsx files have changed, run tsc
+  if git diff --cached --name-only | grep -qE '\.(ts|tsx)$'; then
+    if [ -f node_modules/.bin/tsc ]; then
+      echo 'Checking TypeScript...'
+      node_modules/.bin/tsc -p tsconfig.json --noEmit
+      if [ $? -ne 0 ]; then
+        echo 'TypeScript errors found, aborting commit'
+        exit 1
+      fi
+    else
+      echo 'Trying to run tsc inside Docker. If you want things quicker yarn install locally.'
+      docker-compose exec -T web node_modules/.bin/tsc -p tsconfig.json --noEmit ||
+        echo "You should run yarn locally or check to make sure docker is running."
+    fi
+  fi
+
+  # if .js, .ts, or .tsx files have changed, run eslint
   if [ -f node_modules/.bin/lint-staged ]; then
+    echo 'Running ESLint...'
     yarn run --silent lint:staged
+    if [ $? -ne 0 ]; then
+      echo 'ESLint errors found, aborting commit'
+      exit 1
+    fi
   else
-    echo 'Trying to run lint:staged inside Docker, if you want things quicker yarn install locally.'
-    docker-compose run --rm --no-deps web yarn run lint:staged ||
-    echo 'You should run `yarn` locally or check to make sure docker is running.'
+    echo 'Trying to run lint:staged inside Docker. If you want things quicker yarn install locally.'
+    docker-compose exec -T web yarn run lint:staged ||
+      echo "You should run yarn locally or check to make sure docker is running."
   fi
 fi
 

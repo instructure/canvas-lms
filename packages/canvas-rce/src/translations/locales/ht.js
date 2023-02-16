@@ -173,6 +173,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Dekri Ikòn nan)" },
   "describe_the_type_ff448da5": { "message": "(Dekri { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Dekri videyo a)" },
+  "description_436c48d7": { "message": "Deskripsyon" },
   "details_98a31b68": { "message": "Detay" },
   "diagonal_dots_7d71b57e": { "message": "Pwen Dagonal" },
   "diamond_b8dfe7ae": { "message": "Dyaman" },
@@ -259,6 +260,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Echèk rekiperasyon kontni fichye yo"
   },
+  "file_name_8fd421ff": { "message": "Non fichye" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Quota estokaj fichye a depase"
   },
@@ -608,6 +610,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O pou ka ouvri bèl editè html la."
   },
+  "shortcut_911d6255": { "message": "Rakousi" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Varyan)" },
   "single_color_image_4e5d4dbc": { "message": "Imaj Yon sèl Koulè" },
