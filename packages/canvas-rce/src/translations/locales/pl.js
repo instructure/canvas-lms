@@ -186,6 +186,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(opisz ikonę)" },
   "describe_the_type_ff448da5": { "message": "(opisz { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(opisz wideo)" },
+  "description_436c48d7": { "message": "Opis" },
   "details_98a31b68": { "message": "Szczegóły" },
   "diagonal_dots_7d71b57e": { "message": "Kropki po przekątnej" },
   "diamond_b8dfe7ae": { "message": "Diament" },
@@ -642,6 +643,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Naciśnij Shift-O, aby otworzyć ulepszony edytor HTML."
   },
+  "shortcut_911d6255": { "message": "Skrót" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (wariant)" },
   "single_color_image_4e5d4dbc": { "message": "Obraz jednokolorowy" },

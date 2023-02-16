@@ -189,6 +189,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Whakaahuahia te ata)" },
   "describe_the_type_ff448da5": { "message": "(Whakaahuahia te { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Whakātu te ataata)" },
+  "description_436c48d7": { "message": "Whakāhuatanga" },
   "details_98a31b68": { "message": "Ngā taipitopito" },
   "diagonal_dots_7d71b57e": { "message": "Ira Hauroki" },
   "diamond_b8dfe7ae": { "message": "Taimana" },
@@ -643,6 +644,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Neke O ki te huaki ataahua html etita."
   },
+  "shortcut_911d6255": { "message": "Pokatata" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Taupe)" },
   "single_color_image_4e5d4dbc": { "message": "Whakapakoko kotahi te Tae" },

@@ -192,6 +192,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Descrever o ícone)" },
   "describe_the_type_ff448da5": { "message": "(Descrever o { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Descreva o vídeo)" },
+  "description_436c48d7": { "message": "Descrição" },
   "details_98a31b68": { "message": "Detalhes" },
   "diagonal_dots_7d71b57e": { "message": "Pontos diagonais" },
   "diamond_b8dfe7ae": { "message": "Diamante" },
@@ -654,6 +655,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O para abrir o editor de html bonito."
   },
+  "shortcut_911d6255": { "message": "Atalho" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Variante)" },
   "single_color_image_4e5d4dbc": { "message": "Imagem a uma cor" },
