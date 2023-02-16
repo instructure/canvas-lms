@@ -69,12 +69,15 @@ export const GroupNavigationSelector = props => {
     setSelectedOptionId(id)
     setInputValue(option)
     setIsShowingOptions(false)
-    window.location = id
+    const path = window.location.pathname.split('/')
+    path[2] = id
+    window.location = path.join('/')
   }
 
   return (
     <View as="div" padding="0 0 medium 0">
       <Select
+        data-testid="group-selector"
         renderLabel={I18n.t('Select Group')}
         assistiveText={I18n.t('Use arrow keys to navigate options.')}
         inputValue={inputValue}
