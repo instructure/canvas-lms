@@ -410,6 +410,8 @@ class SubmissionComment < ActiveRecord::Base
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
     if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
+      return if draft?
+
       if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         return update_participation_with_ff_on
       end
@@ -436,7 +438,7 @@ class SubmissionComment < ActiveRecord::Base
     return if provisional_grade_id.present?
 
     self.class.connection.after_transaction_commit do
-      submission.user.clear_cache_key(:submissions)
+      submission.user.clear_cache_key(:potential_unread_submission_ids)
       submission.mark_item_unread("comment")
     end
   end
