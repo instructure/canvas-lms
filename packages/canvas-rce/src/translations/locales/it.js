@@ -194,6 +194,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Descrivi l’icona)" },
   "describe_the_type_ff448da5": { "message": "(Descrivi { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Descrivi il video)" },
+  "description_436c48d7": { "message": "Descrizione" },
   "details_98a31b68": { "message": "Dettagli" },
   "diagonal_dots_7d71b57e": { "message": "Punti diagonali" },
   "diamond_b8dfe7ae": { "message": "Rombo" },
@@ -658,6 +659,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Maiusc+O per aprire l’editor html sicuro."
   },
+  "shortcut_911d6255": { "message": "Scorciatoia" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variante)" },
   "single_color_image_4e5d4dbc": { "message": "Immagine monocolore" },

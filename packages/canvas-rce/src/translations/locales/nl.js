@@ -188,6 +188,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Beschrijf het pictogram)" },
   "describe_the_type_ff448da5": { "message": "(Beschrijf het { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(beschrijf de video)" },
+  "description_436c48d7": { "message": "Beschrijving" },
   "details_98a31b68": { "message": "Details" },
   "diagonal_dots_7d71b57e": { "message": "Diagonale punten" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
@@ -654,6 +655,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O om de pretty HTML-editor te openen."
   },
+  "shortcut_911d6255": { "message": "Snelkoppeling" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enkelkleurige afbeelding" },

@@ -194,6 +194,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Opišite ikono)" },
   "describe_the_type_ff448da5": { "message": "(Opišite { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Opišite videoposnetek)" },
+  "description_436c48d7": { "message": "Opis" },
   "details_98a31b68": { "message": "Podrobnosti" },
   "diagonal_dots_7d71b57e": { "message": "Diagonalne pike" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
@@ -650,6 +651,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Urejevalnik Pretty HTML Editor odprete s pritiskom na tipki Shift+O"
   },
+  "shortcut_911d6255": { "message": "Bližnjica" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (različica)" },
   "single_color_image_4e5d4dbc": { "message": "Enobarvna slika" },

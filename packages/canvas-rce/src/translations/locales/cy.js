@@ -188,6 +188,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Disgrifiwch yr eicon)" },
   "describe_the_type_ff448da5": { "message": "(Disgrifiwch y { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Disgrifiwch y fideo)" },
+  "description_436c48d7": { "message": "Disgrifiad" },
   "details_98a31b68": { "message": "Manylion" },
   "diagonal_dots_7d71b57e": { "message": "Dotiau Croeslinol" },
   "diamond_b8dfe7ae": { "message": "Diemwnt" },
@@ -642,6 +643,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O i agor y golygydd html hardd."
   },
+  "shortcut_911d6255": { "message": "Llwybr byr" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (Amrywiad)" },
   "single_color_image_4e5d4dbc": { "message": "Delwedd un lliw" },
