@@ -191,7 +191,7 @@ export type Assignment = Readonly<{
   graders_anonymous_to_graders: boolean
   grades_published: boolean
   grading_standard_id: string | null
-  grading_type: string
+  grading_type: GradingType
   group_category_id: string | null
   has_overrides: boolean
   has_submitted_submissions: boolean
