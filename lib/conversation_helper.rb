@@ -35,7 +35,7 @@ module ConversationHelper
       ids = ids.split(",").map(&:to_i)
     end
     # ids must be sorted for the scope to work
-    write_attribute(:root_account_ids, ids.sort.join(","))
+    write_attribute(:root_account_ids, ids&.sort&.join(","))
   end
 
   def global_root_account_ids
