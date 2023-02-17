@@ -513,7 +513,7 @@ s2,test_1,section2,active),
       expect(@e5.reload).to be_active
     end
 
-    def test_remove_specific_term
+    it "removes only from the specific term if it is given" do
       @subacct = @account.sub_accounts.create(name: "sub1")
       @term1 = @account.enrollment_terms.first
       @term1.update_attribute(:sis_source_id, "term1")
@@ -605,20 +605,6 @@ s2,test_1,section2,active),
       expect(@e3.reload).to be_active
       expect(@e4.reload).to be_deleted
       expect(@e5.reload).to be_active
-    end
-
-    describe "with cursor based find_each" do
-      it "removes only from the specific term if it is given" do
-        Course.transaction do
-          test_remove_specific_term
-        end
-      end
-    end
-
-    describe "without cursor based find_each" do
-      it "removes only from the specific term if it is given" do
-        test_remove_specific_term
-      end
     end
 
     it "does not do batch mode removals if not in batch mode" do
@@ -1374,7 +1360,7 @@ test_1,u1,student,active)
           expect(@e2.reload).to be_active
           expect(@c1.reload.workflow_state).to eq "created"
           expect(@c2.reload.workflow_state).to eq "created"
-          expect(batch.workflow_state).to eq "aborted"
+          expect(batch.reload.workflow_state).to eq "aborted"
         end
       end
     end

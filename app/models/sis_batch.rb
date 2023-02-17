@@ -390,6 +390,21 @@ class SisBatch < ActiveRecord::Base
     @data_file = nil
     return self if workflow_state == "aborted"
 
+    if batch_mode? && import_finished
+      # in batch mode, there's still a lot of work left to do, and it needs to be done in a separate job
+      # from the last ParallelImporter or a failed job will retry that bit of the import (and not the batch cleanup!)
+      save!
+      delay(
+        priority: Delayed::LOW_PRIORITY,
+        max_attempts: Setting.get("sis_import_cleanup_batch_attempts", "1").to_i
+      )
+        .do_batch_end_work(import_finished)
+    else
+      do_batch_end_work(import_finished)
+    end
+  end
+
+  def do_batch_end_work(import_finished)
     remove_previous_imports if batch_mode? && import_finished
     @has_errors = sis_batch_errors.exists?
     import_finished = !(@has_errors && sis_batch_errors.failed.exists?) if import_finished
