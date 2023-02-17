@@ -89,15 +89,17 @@ class WikiPagesController < ApplicationController
   def show
     GuardRail.activate(:secondary) do
       if @page.new_record?
+        wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
         if @page.grants_any_right?(@current_user, session, :update, :update_content)
           flash[:info] = t("notices.create_non_existent_page", 'The page "%{title}" does not exist, but you can create it below', title: @page.title)
+          InstStatsd::Statsd.increment("wikipage.show.page_does_not_exist.with_edit_rights") unless wiki_page&.deleted?
           encoded_name = @page_name && CGI.escape(@page_name).tr("+", " ")
           redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
-          wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
-          flash[:warning] = if wiki_page && wiki_page.deleted?
+          flash[:warning] = if wiki_page&.deleted?
                               t("notices.page_deleted", 'The page "%{title}" has been deleted.', title: @page.title)
                             else
+                              InstStatsd::Statsd.increment("wikipage.show.page_does_not_exist.without_edit_rights")
                               t("notices.page_does_not_exist", 'The page "%{title}" does not exist.', title: @page.title)
                             end
           redirect_to polymorphic_url([@context, :wiki_pages])
