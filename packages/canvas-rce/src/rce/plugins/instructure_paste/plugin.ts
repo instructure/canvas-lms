@@ -90,17 +90,10 @@ function handleMultiFilePaste(_files) {
   } as TsMigrationAny)
 }
 
-function delegateToTiny(ed: Editor, event: RCEClipOrDragEvent) {
-  // delegate to tinymce and prevent infinite recursion
-  event.instructure_handled_already = true
-  ed.fire('paste', event as TinyClipboardEvent)
-}
-
 tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
   const store = initStore(bridge.trayProps.get(ed))
 
   function handlePasteOrDrop(event: RCEClipOrDragEvent) {
-    if (event.instructure_handled_already) return
     const cbdata =
       event.type === 'paste'
         ? (event as TinyClipboardEvent).clipboardData
@@ -110,12 +103,13 @@ tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
 
     if (types.includes('Files')) {
       if (files.length > 1) {
+        event.preventDefault()
         handleMultiFilePaste(files)
         return
       }
 
       if (isMicrosoftWordContentInEvent(event)) {
-        delegateToTiny(ed, event)
+        // delegate to tiny
         return
       }
 
@@ -169,7 +163,7 @@ tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
         }
       })
     } else {
-      delegateToTiny(ed, event)
+      // delegate to tiny
     }
   }
   ed.on('paste', handlePasteOrDrop)
