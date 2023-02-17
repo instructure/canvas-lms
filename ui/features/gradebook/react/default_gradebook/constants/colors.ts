@@ -49,13 +49,13 @@ const defaultStatusColors = {
   resubmitted: defaultColors.green,
 }
 
-export function statusColors(userColors = {}) {
+export function statusColors(userColors = {}): StatusColors {
   return {
     ...defaultStatusColors,
     ...userColors,
   }
 }
 
-export function darken(color, percent) {
+export function darken(color: string, percent: number) {
   return Color(color).darken(percent)
 }
