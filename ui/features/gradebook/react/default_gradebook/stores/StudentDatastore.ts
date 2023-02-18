@@ -93,7 +93,7 @@ export default class StudentDatastore {
     return user
   }
 
-  listStudents({includePlaceholders = true} = {}) {
+  listStudents({includePlaceholders = true} = {}): GradebookStudent[] {
     return this.studentIds.reduce((students: GradebookStudent[], id: string) => {
       const student =
         this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)

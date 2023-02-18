@@ -66,7 +66,7 @@ declare global {
   }
 
   declare interface JQueryStatic {
-    subscribe: any
+    subscribe: (topic: string, callback: (...args: any[]) => void) => void
     ajaxJSON: (
       url: string,
       submit_type?: string,
@@ -76,7 +76,7 @@ declare global {
       options?: any
     ) => JQuery.JQueryXHR
     replaceTags: (string, string, string?) => string
-    raw: any
+    raw: (str: string) => string
     getScrollbarWidth: any
     datetimeString: any
     ajaxJSONFiles: any

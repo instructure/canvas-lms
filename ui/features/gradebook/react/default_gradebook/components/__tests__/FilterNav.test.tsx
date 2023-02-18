@@ -109,9 +109,33 @@ const defaultProps: FilterNavProps = {
     {...defaultSectionProps, id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
-    {...defaultGradingPeriodProps, id: '1', title: 'Grading Period 1', startDate: new Date(1)},
-    {...defaultGradingPeriodProps, id: '2', title: 'Grading Period 2', startDate: new Date(2)},
-    {...defaultGradingPeriodProps, id: '3', title: 'Grading Period 3', startDate: new Date(3)},
+    {
+      ...defaultGradingPeriodProps,
+      id: '1',
+      title: 'Grading Period 1',
+      startDate: new Date(1),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
+    {
+      ...defaultGradingPeriodProps,
+      id: '2',
+      title: 'Grading Period 2',
+      startDate: new Date(2),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
+    {
+      ...defaultGradingPeriodProps,
+      id: '3',
+      title: 'Grading Period 3',
+      startDate: new Date(3),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
   ],
   studentGroupCategories: {
     '1': {

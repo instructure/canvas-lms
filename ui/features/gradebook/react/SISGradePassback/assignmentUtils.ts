@@ -20,25 +20,35 @@ import $ from 'jquery'
 import _ from 'underscore'
 import '@canvas/util/createStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
-import type {Override} from '../../../../api.d'
 
-type PartialAssignment = {
-  id: string
-  name: string
-  due_at: string
-  needs_grading_count: number
-  overrides: Override[]
-}
+type PartialAssignment = Pick<
+  AssignmentWithOverride,
+  | 'id'
+  | 'name'
+  | 'due_at'
+  | 'needs_grading_count'
+  | 'overrides'
+  | 'please_ignore'
+  | 'original_error'
+>
 
 const assignmentUtils = {
   copyFromGradebook(assignment: PartialAssignment): PartialAssignment & {
     please_ignore: boolean
     original_error: boolean
   } {
-    const a = _.pick(assignment, ['id', 'name', 'due_at', 'needs_grading_count', 'overrides'])
-    a.please_ignore = false
-    a.original_error = false
-    return a
+    const a: PartialAssignment = _.pick<PartialAssignment, PartialAssignment>(assignment, [
+      'id',
+      'name',
+      'due_at',
+      'needs_grading_count',
+      'overrides',
+    ])
+    return {
+      ...a,
+      please_ignore: false,
+      original_error: false,
+    }
   },
 
   namesMatch(a: {name: string}, b: {name: string}) {
@@ -61,8 +71,9 @@ const assignmentUtils = {
     }
   },
 
-  notUniqueName(assignments, a) {
-    return assignments.some(_.partial(assignmentUtils.namesMatch, a))
+  notUniqueName(assignments: AssignmentWithOverride[], a: AssignmentWithOverride) {
+    const fn = _.partial(assignmentUtils.namesMatch, a)
+    return assignments.some(fn)
   },
 
   noDueDateForEveryoneElseOverride(a) {
@@ -74,7 +85,7 @@ const assignmentUtils = {
     }
   },
 
-  withOriginalErrors(assignments) {
+  withOriginalErrors(assignments: AssignmentWithOverride[]) {
     // This logic handles an assignment with multiple overrides
     // because #setGradeBookAssignments runs on load
     // it does not have a reference to what the currently viewed section is.
@@ -83,7 +94,7 @@ const assignmentUtils = {
     // being viewed for that section. If the override is valid make
     // original error false so that the override is not shown. Vice versa
     // for the invalid override on the assignment.
-    _.each(assignments, a => {
+    _.each(assignments, (a: AssignmentWithOverride) => {
       if (
         typeof a.recentlyUpdated === 'boolean' &&
         a.recentlyUpdated &&
@@ -155,26 +166,26 @@ const assignmentUtils = {
         a.original_error = false
       }
     })
-    return _.filter(assignments, a => a.original_error && !a.please_ignore)
+    return _.filter(assignments, a => Boolean(a.original_error && !a.please_ignore))
   },
 
-  withOriginalErrorsNotIgnored(assignments) {
+  withOriginalErrorsNotIgnored(assignments: AssignmentWithOverride[]) {
     return _.filter(assignments, a => (a.original_error || a.hadOriginalErrors) && !a.please_ignore)
   },
 
-  withErrors(assignments) {
+  withErrors(assignments: AssignmentWithOverride[]) {
     return _.filter(assignments, a => assignmentUtils.hasError(assignments, a))
   },
 
-  notIgnored(assignments: {please_ignore: boolean}[]) {
+  notIgnored(assignments: AssignmentWithOverride[]) {
     return _.filter(assignments, a => !a.please_ignore)
   },
 
-  needsGrading(assignments: {needs_grading_count: number}[]) {
+  needsGrading(assignments: AssignmentWithOverride[]) {
     return _.filter(assignments, a => a.needs_grading_count > 0)
   },
 
-  hasError(assignments, a) {
+  hasError(assignments: AssignmentWithOverride[], a: AssignmentWithOverride) {
     // //Decided to ignore
     if (a.please_ignore) return false
 
@@ -331,12 +342,14 @@ const assignmentUtils = {
     assignments: AssignmentWithOverride[]
   ) {
     const url = '/api/v1/' + selected.type + 's/' + selected.id + '/post_grades/'
-    const data = {assignments: _.map(assignments, assignment => assignment.id)}
+    const data = {
+      assignments: _.map(assignments, assignment => assignment.id),
+    }
     $.ajax(url, {
       type: 'POST',
       data: JSON.stringify(data),
       contentType: 'application/json; charset=utf-8',
-      success: msg => {
+      success: (msg: {message: string; error: string}) => {
         if (msg.error) {
           $.flashError(msg.error)
         } else {

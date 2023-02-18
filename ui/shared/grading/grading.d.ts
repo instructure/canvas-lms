@@ -144,11 +144,14 @@ export type SubmissionCamelized = {
 }
 
 export type CamelizedGradingPeriod = {
-  id: string
-  title: string
-  startDate: Date
+  closeDate: Date
   endDate: Date
+  id: string
   isClosed: boolean
+  isLast: boolean
+  startDate: Date
+  title: string
+  weight: number
 }
 
 export type CamelizedGradingPeriodSet = {
@@ -161,6 +164,17 @@ export type CamelizedGradingPeriodSet = {
   permissions: unknown
   title: string
   weighted: boolean
+}
+
+export type SerializedGradingPeriod = {
+  close_date: string
+  end_date: string
+  id: string
+  is_closed?: boolean
+  is_last?: boolean | string
+  start_date: string
+  title: string
+  weight: number
 }
 
 export type CamelizedAssignment = {
