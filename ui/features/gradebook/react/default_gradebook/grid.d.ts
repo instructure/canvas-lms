@@ -51,16 +51,34 @@ export type GridColumn = {id: string; cssClass: string; headerCssClass: string} 
   }>
 }>
 
-export type GridData = {
-  columns: {
-    definitions: {
-      // Add later: total_grade?: GridColumn
-      // Add later: total_grade_override?: GridColumn
-      [key: string]: GridColumn
-    }
-    frozen: string[]
-    scrollable: string[]
+export type GridDataColumns = {
+  definitions: {
+    // Add later: total_grade?: GridColumn
+    // Add later: total_grade_override?: GridColumn
+    [key: string]: GridColumn
   }
+  frozen: string[]
+  scrollable: string[]
+}
+
+export type GridDataColumnsWithObjects = {
+  definitions: {
+    [key: string]: GridColumn
+  }
+  frozen: {
+    id: string
+    customColumnId: string
+    type: 'custom_column'
+  }[]
+  scrollable: {
+    id: string
+    customColumnId: string
+    type: 'custom_column'
+  }[]
+}
+
+export type GridData = {
+  columns: GridDataColumns
   rows: GradebookStudent[]
 }
 

@@ -329,14 +329,9 @@ export type Lti = {
 
 export type ColumnOrderSettings = {
   customOrder?: string[]
-  direction: 'ascending' | 'descending'
+  direction?: 'ascending' | 'descending'
   freezeTotalGrade?: boolean | 'true'
   sortType: string
-}
-
-export type Progress = {
-  id: string
-  workflow_state: string
 }
 
 export type ProgressData = {
@@ -408,10 +403,29 @@ export type AssignmentWithOverride = {
   name: string
   due_at: string
   please_ignore: boolean
+  recentlyUpdated: boolean
   hadOriginalErrors: boolean
+  overrides: unknown[]
+  original_error?: boolean
+  needs_grading_count: number
+  currentlySelected: {
+    id: string
+    type: string
+  }
+  selectedSectionForEveryone: string
   overrideForThisSection: {
     id: string
     course_section_id: string
     due_at: null | Date
   }
+}
+
+export type Progress = {
+  id: string
+  workflow_state: string
+}
+
+export type ProgressCamelized = {
+  progressId: string
+  workflowState: string
 }

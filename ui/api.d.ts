@@ -492,7 +492,7 @@ export type GradingPeriod = Readonly<{
   }
   start_date: string
   title: string
-  weight: null | number
+  weight: number
 }>
 
 export type SubmissionAttemptsComments = {
