@@ -578,8 +578,8 @@
 #         },
 #         "rubric_settings": {
 #           "description": "(Optional) An object describing the basic attributes of the rubric, including the point total. Included if there is an associated rubric.",
-#           "example": "{\"points_possible\"=>12}",
-#           "type": "string"
+#           "example": {"points_possible": "12"},
+#           "type": "object"
 #         },
 #         "rubric": {
 #           "description": "(Optional) A list of scoring criteria and ratings for each rubric criterion. Included if there is an associated rubric.",
