@@ -112,7 +112,7 @@ module Outcomes
         )
       end
 
-      parents = find_parents(group, group_context)
+      parents = find_parents(group, group_context, model: model)
       raise InvalidDataError, I18n.t("An outcome group can only have one parent") if parents.length > 1
 
       parent = parents.first
@@ -291,7 +291,16 @@ module Outcomes
       @root_parents[given_context] ||= LearningOutcomeGroup.find_or_create_root(given_context, true)
     end
 
-    def find_parents(object, given_context, allow_indirect: false)
+    def find_parents(object, given_context, allow_indirect: false, model: nil)
+      if !model.nil? && !model.new_record? && object[:learning_outcome_group_id]
+        parent_group = LearningOutcomeGroup.find(object[:learning_outcome_group_id])
+        if parent_group.ancestor_ids.member?(model.id)
+          raise InvalidDataError, I18n.t(
+            "Cyclic reference detected when importing: %{vendor_guid}",
+            vendor_guid: object[:vendor_guid]
+          )
+        end
+      end
       if object[:parent_guids].nil? || object[:parent_guids].blank?
         group = [LearningOutcomeGroup.find(object[:learning_outcome_group_id])] if object[:learning_outcome_group_id]
         group ||= [root_parent(given_context)]
