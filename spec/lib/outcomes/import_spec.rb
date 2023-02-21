@@ -284,6 +284,12 @@ RSpec.describe Outcomes::Import do
       importer.import_group(**group_attributes, workflow_state: "deleted")
       expect(parent1.reload.workflow_state).to eq "deleted"
     end
+
+    it "fails if group will cause cyclic reference" do
+      expect do
+        importer.import_group(**group_attributes, vendor_guid: existing_group.vendor_guid, parent_guid: "", learning_outcome_group_id: existing_group.id)
+      end.to raise_error(klass::InvalidDataError, /Cyclic reference detected/)
+    end
   end
 
   describe "#import_outcome" do
