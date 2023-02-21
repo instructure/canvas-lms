@@ -57,6 +57,8 @@ export function isExternalLink(element, canvasOrigin = window.location.origin) {
 }
 
 export function showFilePreview(event, opts = {}) {
+  event.stopPropagation()
+
   const {canvasOrigin, disableGooglePreviews} = {...opts}
   let target = null
   if (event.target?.href) {
