@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mathml, {mathImageHelper} from '..'
+import mathml, {mathImageHelper} from '../mathml'
+import RCEGlobals from '../../../../RCEGlobals'
 
 let stub = null
 describe('MathML and MathJax it', () => {
@@ -24,7 +25,7 @@ describe('MathML and MathJax it', () => {
     const mathElem = document.createElement('math')
     mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
     document.body.innerHTML = mathElem.outerHTML
-    window.ENV.locale = 'en'
+    RCEGlobals.getConfig = jest.fn().mockReturnValue({locale: 'en'})
   })
 
   afterEach(() => {
@@ -87,12 +88,6 @@ describe('MathML and MathJax it', () => {
 })
 
 describe('isMathInElement', () => {
-  beforeEach(() => {
-    window.ENV = {
-      FEATURES: {},
-    }
-  })
-
   it('returns true if there is mathml', () => {
     const mathElem = document.createElement('div')
     mathElem.innerHTML = '<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>'
@@ -111,11 +106,7 @@ describe('isMathInElement', () => {
 
 describe('isMathInElement, with new_math_equation_handling on', () => {
   beforeEach(() => {
-    window.ENV = {
-      FEATURES: {
-        new_math_equation_handling: true,
-      },
-    }
+    RCEGlobals.getFeatures = jest.fn().mockReturnValue({new_math_equation_handling: true})
   })
 
   it('returns true if there is mathml', () => {
@@ -157,11 +148,6 @@ describe('isMathInElement, with new_math_equation_handling on', () => {
 
 describe('mathEquationHelper', () => {
   beforeEach(() => {
-    window.ENV = {
-      FEATURES: {
-        new_math_equation_handling: true,
-      },
-    }
     document.body.innerHTML = ''
   })
 
@@ -231,11 +217,6 @@ describe('mathEquationHelper', () => {
 
 describe('isMathJaxIgnored', () => {
   beforeEach(() => {
-    window.ENV = {
-      FEATURES: {
-        new_math_equation_handling: true,
-      },
-    }
     document.body.innerHTML = ''
   })
 
