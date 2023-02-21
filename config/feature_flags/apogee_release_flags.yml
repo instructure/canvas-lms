@@ -182,3 +182,16 @@ deprioritize_section_overrides_for_nonactive_enrollments:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+additional_speedgrader_links:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Add SpeedGrader links to Assignments and Quizzes index views
+  description: Reorders some menu options for more consistency and adds link
+    to SpeedGrader.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
