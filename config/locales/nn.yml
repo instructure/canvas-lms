@@ -17215,6 +17215,7 @@ nn:
   outcome_results_23a0a117: Læringsmålresultat
   outcome_results_title: Læringsmålresultat
   outcome_score_141cf00a: læringsmålpoeng
+  outcome_service_results_to_canvas_reporting_749667bc: "Rapportering til Canvas for Læringsmål"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Læringsmål: %{title} har status som %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Læringsutbytte med canvas ID \"%{id}\" ikkje funne"
   outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Læringsmål med ID %{guid} eksisterer allereie i eit anna urelatert emne eller konto (%{name}) "
@@ -24304,7 +24305,11 @@ nn:
   to_access_the_account_settings_tab_account_level_s_9676d44b: "For å ha tilgang til Kontoinnstillingar så må \"Kontonivå innstillingar - administrer\" vere slått på"
   to_access_the_assignments_index_page_course_conten_49d884f2: "For å få tilgang til oppgåveoversikta må Emneinnhald - vis vere slått på."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "For å sjå oppgåveoversikta må 'Emneinnhald - vis' vere slått på. For å skilje mellom oppgåver fordelt på enkeltstudentar må 'Brukarar - vis liste' òg vere slått på."
+  to_access_the_calculation_tab_the_outcome_proficie_cdd40cdf: "For å ha tilgang til Kalkuleringsfana må løyve for Læringsmål ferdigheitsberekning - legg til/rediger vere slått på. For å tilgang til Administrerfana må løyve for Læringsmål - legg til/rediger/slett og vere slått på"
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "For å få tilgang til Emner-fana under Kontonavigering-, må ‘Emner - vis liste’ være aktivert."
+  to_access_the_courses_link_in_account_navigation_c_a2c556e6: "For å få tilgang til Emner-fana under Kontonavigering-, må \"Emner - administrer\" og  ‘Emner - vis liste’ være aktivert."
+  to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "For å ha tilgang til lenka Administrer spørsmålsbankar frå quizoversikta må 'Emneinnhald - vis' og 'Oppgåver og Quizar - legg til / endre / slett' vere slått på. "
+  to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "For å ha tilgang til meistringsfana må løyve for Læringsmål meistringsskala - legg til/rediger og vere slått på. For å ha tilgang til administrerfana må løyve for Læringsmål - legg til/rediger/slett og vere slått på"
   to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "For å sjå personoversikta og grupper, må 'Brukarar - vis liste' òg vere slått på."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "For å sjå personoversikta og grupper, må 'Brukarar - vis liste' òg vere slått på."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "For å sjå personoversikta må 'Brukarar - vis liste' vere aktivert. Dersom denne løyva er aktivert samstundes som 'Brukarar - sjå primær e-postadresse' er deaktivert, vil brukarane sjå e-postadresser som login-ID. For å sjå login-ID må 'Personar - legg til / fjern studentar i emne' og 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar i emne' óg vere aktivert."
@@ -24321,12 +24326,16 @@ nn:
       For å sjå Personoversikta på kontonivå, må 'Brukarar - vis liste' vere slått på.
       
       Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar.
+  to_access_the_quizzes_index_page_course_content_vi_d9607c01: "For å få tilgang til quizoversikta må Emneinnhald - vis vere slått på."
   to_access_the_student_interactions_report_courses__e8432cd0: "For å sjå rapporten om studentars interaksjon, må Emne - sjå bruksrapportar være aktivert."
   to_access_the_student_interactions_report_grades_v_69105662: "For å sjå rapporten om studentars interaksjon, må Vurderingar - sjå alle vurderingar være aktivert."
   to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "For å kunne opptre som anna bruker må \"Brukarar - opptre som\" vere slått på"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_add_a_course_courses_add_must_also_be_enabled_8c2231d9: "For å legge til eit emne må \"Emne - legg til\" vere slått på"
+  to_add_a_course_group_to_a_collaboration_groups_ad_c26d8db0: "For å legge til ei gruppe i eit samarbeid må Gruppar - legg til vere slått på"
+  to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "For å legge til ein brukar med SIS ID, SIS Data - administrer må være skrudd på."
+  to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "For å legge til grupper på kontonivå via CSV må SIS Data - importer vere slått på."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "For å legge til kunngjeringar, må 'Diskusjonar - moderer' òg vere slått på. For å sjå dei siste kunngjeringane på forsida, må boksen 'Vis siste kunngjeringar på forsida til emnet' vere merka av i emneinnstillingar."
   to_add_announcements_discussions_moderate_must_als_a83fd681: "For å opprette kunngjeringar, må 'Diskusjonar - moderer' óg vere slått på."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "For å legge til tilknytta emne, må 'Blueprint-emne - legg til / endre / slett' og 'Emne - legg til / endre / slett' óg vere slått på."
@@ -24339,6 +24348,7 @@ nn:
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
   to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
   to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "For å legge til eller fjerne brukarar i eit emne må det naudsynte løyve vere slått på (f.eks Brukarar - Faglærar)"
+  to_add_or_remove_users_to_a_course_via_sis_the_app_a1eee199: "For å legge til eller fjerne brukarar i eit emne via SIS må det naudsynte løyve vere slått på (f.eks Brukarar - Faglærar)"
   to_add_students_to_a_collaboration_users_view_list_806a5935: "For å legge til studentar i eit samarbeid må Brukarar - vis liste og vere slått på. "
   to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "For å legge studentar til i eit modereringssett, må Vurderingar - sjå alle vurderingar være skrudd på."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: "For å legge til brukarar i eit emne, må 'Brukarar - legg til / fjern studentar frå andre emne til dette emnet' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassitentar' òg vere slått på."
@@ -24706,6 +24716,7 @@ nn:
   toggle_tooltip_1ed3b35e: "vis/skjul tips"
   toggle_tooltip_2447b4fa: "Vis/skjul tips"
   toggle_tooltip_d3b7cb86: "Vis/skjul tips"
+  toggling_placement_ee1ab8b5: "Bytte plassering"
   tolerance_value_9e96573c: Toleranseverdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange påloggingsforsøk. Prøv på nytt seinare eller ta kontakt med systemadministrator."
   too_many_members_b8b15069: "For mange medlemmar"
@@ -25984,6 +25995,9 @@ nn:
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Dersom aktivert, viser dette flagget ein studentveljar på dashbordet til observatørar."
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Når aktivert vil faglærars gjeremålsliste åpnast automatisk i eit nytt vindu"
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Når aktivert vil fuksjonen med \"@mention\" i diskusjonar bli slått på"
+  when_enabled_turns_on_the_button_icons_image_cropp_abbc3d8b: |-
+      Når slått på vises Knappar og Ikon bildekuttar, kilde for emnebildar
+      og kilde for opplasting av bilde.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når vurderingsresultat vert skjult for anonyme oppgåver, vil resultata bli skjult for alle i emnet. Anonymitet innførast på nytt."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker emnet. Du kan la sida vise aktivitetsstraum, liste over emnemodular, emneoversikt eller ei tilpassa side du lagar sjølv. Standard er aktivitetsstraumen på emnet."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
