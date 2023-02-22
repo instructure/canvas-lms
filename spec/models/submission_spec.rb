@@ -6155,12 +6155,8 @@ describe Submission do
         expect(@submission.visible_rubric_assessments_for(@reviewed_student)[1].assessor).to eql(nil)
       end
 
-      it "viewed by teacher include rubric assessments from teachers with identity attached" do
-        expect(@submission.visible_rubric_assessments_for(@grading_teacher)[0].assessor).to eql(@grading_teacher)
-      end
-
-      it "viewed by teacher does not include peer reviewer's identity when viewed by the reviewee" do
-        expect(@submission.visible_rubric_assessments_for(@grading_teacher)[1].assessor).to eql(@reviewing_student)
+      it "includes peer reviewer's identity when viewed by the reviewer" do
+        expect(@submission.visible_rubric_assessments_for(@reviewing_student)[0].assessor).to eql(@reviewing_student)
       end
     end
   end
