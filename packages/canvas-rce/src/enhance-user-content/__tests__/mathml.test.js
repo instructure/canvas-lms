@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mathml, {mathImageHelper, MathJaxDirective} from '../mathml'
-import RCEGlobals from '../../../../RCEGlobals'
+import Mathml, {mathImageHelper, MathJaxDirective} from '../mathml'
 
 let stub = null
 describe('MathML and MathJax it', () => {
+  let mathml
+
   beforeEach(() => {
-    RCEGlobals.getConfig = jest.fn().mockReturnValue({locale: 'en'})
+    mathml = new Mathml()
   })
 
   afterEach(() => {
@@ -93,14 +94,14 @@ describe('MathML and MathJax it', () => {
     })
 
     it('does not modify localConfig when disabled', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: false})
+      mathml = new Mathml({explicit_latex_typesetting: false}, {locale: 'en'})
       mathml.loadMathJax('bogus')
       expect(window.MathJax).not.toHaveProperty('elements')
       expect(window.MathJax.tex2jax).not.toHaveProperty('processClass')
     })
 
     it('modifies localConfig when enabled', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: true})
+      mathml = new Mathml({explicit_latex_typesetting: true}, {locale: 'en'})
       mathml.loadMathJax('bogus')
       expect(window.MathJax.elements).toContain(elem)
       expect(window.MathJax.tex2jax.processClass).toEqual(MathJaxDirective.Process)
@@ -109,6 +110,12 @@ describe('MathML and MathJax it', () => {
 })
 
 describe('isMathInElement', () => {
+  let mathml
+
+  beforeEach(() => {
+    mathml = new Mathml()
+  })
+
   it('returns true if there is mathml', () => {
     const mathElem = document.createElement('div')
     mathElem.innerHTML = '<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>'
@@ -126,8 +133,10 @@ describe('isMathInElement', () => {
 })
 
 describe('isMathInElement, with new_math_equation_handling on', () => {
+  let mathml
+
   beforeEach(() => {
-    RCEGlobals.getFeatures = jest.fn().mockReturnValue({new_math_equation_handling: true})
+    mathml = new Mathml({new_math_equation_handling: true})
   })
 
   it('returns true if there is mathml', () => {
@@ -160,9 +169,16 @@ describe('isMathInElement, with new_math_equation_handling on', () => {
   })
 
   it('handles "process-new-math" event', () => {
-    stub = jest.spyOn(mathml, 'processNewMathInElem')
+    stub = jest.spyOn(Mathml.prototype, 'processNewMathInElem')
     const elem = document.createElement('span')
-    window.dispatchEvent(new CustomEvent('process-new-math', {detail: {target: elem}}))
+    window.dispatchEvent(
+      new CustomEvent(Mathml.processNewMathEventName, {
+        detail: {
+          target: elem,
+          features: {new_math_equation_handling: true},
+        },
+      })
+    )
     expect(stub).toHaveBeenCalledWith(elem)
   })
 })
@@ -237,8 +253,11 @@ describe('mathEquationHelper', () => {
 })
 
 describe('isMathJaxIgnored', () => {
+  let mathml
+
   beforeEach(() => {
     document.body.innerHTML = ''
+    mathml = new Mathml()
   })
 
   afterEach(() => {
@@ -282,7 +301,7 @@ describe('isMathJaxIgnored', () => {
 
   describe('when explicit_latex_typesetting is on', () => {
     beforeEach(() => {
-      RCEGlobals.getFeatures = jest.fn().mockReturnValue({explicit_latex_typesetting: true})
+      mathml = new Mathml({explicit_latex_typesetting: true})
     })
 
     it('ignores elements without the process directive class', () => {
