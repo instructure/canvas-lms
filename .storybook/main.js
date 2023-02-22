@@ -59,7 +59,6 @@ module.exports = {
           path.resolve(canvasDir, 'packages/jquery-popover'),
           path.resolve(canvasDir, 'packages/jquery-selectmenu'),
           path.resolve(canvasDir, 'packages/jquery-sticky'),
-          path.resolve(canvasDir, 'packages/mathml'),
           path.resolve(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),

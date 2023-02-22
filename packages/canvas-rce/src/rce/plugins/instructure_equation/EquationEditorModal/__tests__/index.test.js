@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
-import mathml, {MathJaxDirective} from '../mathml'
+import Mathml, {MathJaxDirective} from '../../../../../enhance-user-content/mathml'
 import advancedPreference from '../advancedPreference'
 import {MathfieldElement} from 'mathlive'
 import RCEGlobals from '../../../../RCEGlobals'
@@ -61,12 +61,6 @@ const editInAdvancedMode = text => {
   fireEvent.change(advancedEditor(), {target: {value: text}})
 }
 
-jest.mock('../mathml', () => {
-  const module = jest.requireActual('../mathml')
-  module.default.processNewMathInElem = jest.fn()
-  return module
-})
-
 jest.mock('../advancedPreference', () => {
   return {
     isSet: jest.fn(),
@@ -76,7 +70,7 @@ jest.mock('../advancedPreference', () => {
 })
 
 describe('EquationEditorModal', () => {
-  let mockFn
+  let mockFn, mathml
 
   afterAll(() => {
     jest.resetAllMocks()
@@ -84,6 +78,7 @@ describe('EquationEditorModal', () => {
 
   beforeEach(() => {
     mockFn = jest.fn()
+    mathml = new Mathml()
     MathfieldElement.prototype.setOptions = jest.fn()
   })
 
@@ -188,13 +183,13 @@ describe('EquationEditorModal', () => {
     })
 
     it('does not have process directive if explicit_latex_typsetting is off', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: false})
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({explicit_latex_typesetting: false})
       renderModal({openAdvanced: true})
       expect(advancedPreview()).not.toHaveClass(MathJaxDirective.Process)
     })
 
     it('contains the process directive if explicit_latex_typesetting is on', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: true})
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({explicit_latex_typesetting: true})
       renderModal({openAdvanced: true})
       expect(advancedPreview()).toHaveClass(MathJaxDirective.Process)
     })
@@ -204,6 +199,8 @@ describe('EquationEditorModal', () => {
       const testDebounceRate = 100
 
       beforeAll(() => {
+        jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({explicit_latex_typesetting: false})
+        jest.spyOn(Mathml.prototype, 'processNewMathInElem')
         actualDebounceRate = EquationEditorModal.debounceRate
         EquationEditorModal.debounceRate = testDebounceRate
       })

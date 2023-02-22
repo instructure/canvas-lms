@@ -56,7 +56,7 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import mathml from 'mathml'
+import {Mathml} from '@instructure/canvas-rce'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {
@@ -1062,6 +1062,9 @@ modules.initModuleManagement = function (duplicate) {
       }
 
       if (window.ENV?.FEATURES?.explicit_latex_typesetting === false) {
+        // new_math_equation_handling is always true for modules
+        // application_controller.rb:660
+        const mathml = new Mathml({new_math_equation_handling: true}, {locale: ENV?.locale || 'en'})
         if (mathml.isMathMLOnPage()) {
           if (mathml.isMathJaxLoaded()) {
             mathml.reloadElement('content')

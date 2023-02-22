@@ -17,9 +17,8 @@
  */
 
 import $ from 'jquery'
-import RCEGlobals from '../../../RCEGlobals'
 
-export const MathJaxDirective = Object.freeze({
+const MathJaxDirective = Object.freeze({
   Ignore: 'mathjax_ignore',
   Process: 'mathjax_process',
 })
@@ -44,19 +43,24 @@ const localConfig = {
   showMathMenu: true,
 }
 
-const mathml = {
+class Mathml {
+  constructor(features = {}, config = {}) {
+    this._features = features
+    this._config = config
+  }
+
   loadMathJax(configFile = 'TeX-MML-AM_SVG', cb = null) {
     if (this.preventMathJax()) {
       return
     }
     if (!this.isMathJaxLoaded()) {
       // Statically declare this in the localConfig above as part of MAT-1219
-      if (RCEGlobals.getFeatures()?.explicit_latex_typesetting) {
+      if (this._features?.explicit_latex_typesetting) {
         localConfig.elements = document.getElementsByClassName(MathJaxDirective.Process)
         localConfig.tex2jax.processClass = MathJaxDirective.Process
       }
 
-      const locale = RCEGlobals.getConfig()?.locale || 'en'
+      const locale = this._config?.locale || 'en'
       // signal local config to mathjax as it loads
       window.MathJax = localConfig
       if (window.MathJaxIsLoading) return
@@ -80,7 +84,7 @@ const mathml = {
           // wait until MathJAx is configured before calling the callback
           cb?.()
         })
-        if (RCEGlobals.getFeatures()?.new_math_equation_handling) {
+        if (this._features?.new_math_equation_handling) {
           window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function (message) {
             mathImageHelper.catchEquationImages(message[1])
           })
@@ -139,22 +143,22 @@ const mathml = {
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub])
       cb?.()
     }
-  },
+  }
 
   preventMathJax() {
     return /(?:rubrics|\/files)/.test(window.location.pathname)
-  },
+  }
 
   isMathOnPage() {
     return this.isMathInElement(document.body)
-  },
+  }
 
   isMathInElement(elem) {
     if (elem?.getAttribute('data-testid') === 'mathml-preview-element') {
       return true
     }
 
-    if (RCEGlobals.getFeatures()?.new_math_equation_handling) {
+    if (this._features?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
       if (elem.querySelector('.math_equation_latex,.math_equation_mml')) {
         return true
@@ -183,17 +187,22 @@ const mathml = {
       }
     }
     return false
-  },
+  }
 
-  mathJaxGenerated: /^MathJax|MJX/,
+  get mathJaxGenerated() {
+    return /^MathJax|MJX/
+  }
+
   // elements to ignore selector
-  ignore_list: '#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat',
+  get ignore_list() {
+    return '#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat'
+  }
 
   isMathJaxIgnored(elem) {
     if (!elem) return true
 
     if (
-      RCEGlobals.getFeatures()?.explicit_latex_typesetting &&
+      this._features?.explicit_latex_typesetting &&
       !elem.classList.contains(MathJaxDirective.Process)
     ) {
       return true
@@ -224,20 +233,20 @@ const mathml = {
       elem = elem.parentElement
     }
     return false
-  },
+  }
 
   // legacy api
   isMathMLOnPage() {
     return this.isMathOnPage()
-  },
+  }
 
   isMathJaxLoaded() {
     return !!window.MathJax?.Hub
-  },
+  }
 
   shouldProcess(elem) {
     return this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)
-  },
+  }
 
   processNewMathInElem(elem) {
     if (this.shouldProcess(elem)) {
@@ -247,7 +256,7 @@ const mathml = {
         this.loadMathJax(undefined)
       }
     }
-  },
+  }
 
   /*
    * elem: string with elementId or en elem object
@@ -256,9 +265,11 @@ const mathml = {
     if (this.isMathJaxLoaded()) {
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, elem])
     }
-  },
+  }
 
-  processNewMathEventName: 'process-new-math',
+  static get processNewMathEventName() {
+    return 'process-new-math'
+  }
 }
 
 const mathImageHelper = {
@@ -336,11 +347,13 @@ const mathImageHelper = {
 }
 
 function handleNewMath(event) {
-  if (event?.detail?.target) {
-    mathml.processNewMathInElem(event.detail.target)
+  if (event?.detail) {
+    const {features, config, target} = event.detail
+    const mathml = new Mathml(features, config)
+    mathml.processNewMathInElem(target)
   }
 }
 
-window.addEventListener('process-new-math', handleNewMath)
+window.addEventListener(Mathml.processNewMathEventName, handleNewMath)
 
-export {mathml as default, mathImageHelper}
+export {Mathml as default, mathImageHelper, MathJaxDirective}

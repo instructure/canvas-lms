@@ -64,7 +64,6 @@ module.exports = {
           path.join(canvasDir, 'packages/jquery-sticky'),
           path.join(canvasDir, 'packages/jquery-popover'),
           path.join(canvasDir, 'packages/jquery-selectmenu'),
-          path.join(canvasDir, 'packages/mathml'),
           path.join(canvasDir, 'packages/defer-promise'),
           path.resolve(canvasDir, 'packages/convert-case'),
           path.resolve(canvasDir, 'packages/html-escape'),
