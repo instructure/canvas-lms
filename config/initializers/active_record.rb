@@ -2213,11 +2213,36 @@ if Rails.version >= "6.1"
 end
 
 module AdditionalIgnoredColumns
-  def ignored_columns
-    return super unless superclass <= ActiveRecord::Base && !abstract_class?
+  def self.included(klass)
+    klass.extend(ClassMethods)
+    klass.prepend(InstanceMethods)
 
-    columns_to_ignore = DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name]&.split(",") || []
-    super + columns_to_ignore
+    klass.reset_ignored_columns!
+
+    ::Canvas::Reloader.on_reload do
+      klass.reset_ignored_columns!
+    end
+  end
+
+  module InstanceMethods
+    def ignored_columns
+      return super unless superclass <= ActiveRecord::Base && !abstract_class?
+
+      cache_class = ActiveRecord::Base.singleton_class
+      return super unless cache_class.columns_to_ignore_enabled
+
+      cache_class.columns_to_ignore_cache[table_name] ||= DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name]&.split(",") || []
+      super + cache_class.columns_to_ignore_cache[table_name]
+    end
+  end
+
+  module ClassMethods
+    attr_accessor :columns_to_ignore_cache, :columns_to_ignore_enabled
+
+    def reset_ignored_columns!
+      @columns_to_ignore_cache = {}
+      @columns_to_ignore_enabled = !DynamicSettings.find("activerecord", tree: :store)["ignored_columns_disabled"]
+    end
   end
 end
 ActiveRecord::Base.singleton_class.include(AdditionalIgnoredColumns)
