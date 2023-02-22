@@ -340,27 +340,54 @@ module ActiveRecord
     end
 
     describe ".ignored_columns" do
-      it "ignores additional columns specified in Consul" do
+      before do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+
         # If this test is the first one to run that requires User - preload User so that the correct
         # accessors (getters / setters) already exist since the "ensure" block won't create them. In
         # a real situation, we would first perform a rolling restart after having unset this key and
         # finished pre-deploy migrations everywhere.
         User.create!(name: "user u1")
+      end
 
-        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
+      after do
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store).and_call_original
+
+        reset_cache!
+        User.create!(name: "user u2")
+      end
+
+      def reset_cache!
+        Canvas::Reloader.reload!
+        User.reset_column_information
+      end
+
+      def set_ignored_columns_state!(columns, enabled)
+        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
           {
-            "users" => "name"
+            "ignored_columns_disabled" => !enabled
           }
         )
 
-        User.reset_column_information
-        expect { User.create!(name: "user u2") }.to raise_exception(ActiveModel::UnknownAttributeError)
-      ensure
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
+          {
+            "users" => columns
+          }
+        )
 
-        User.reset_column_information
-        User.create!(name: "user u2")
+        reset_cache!
+      end
+
+      it "ignores additional columns specified in Consul" do
+        set_ignored_columns_state!("name", true)
+        expect { User.create!(name: "user u2") }.to raise_exception(ActiveModel::UnknownAttributeError)
+      end
+
+      it "does not ignore additional columns if disabled" do
+        set_ignored_columns_state!("name", false)
+        expect(DynamicSettings).not_to receive(:find).with("activerecord/ignored_columns")
+        expect { User.create!(name: "user u2") }.not_to raise_exception
       end
     end
   end
