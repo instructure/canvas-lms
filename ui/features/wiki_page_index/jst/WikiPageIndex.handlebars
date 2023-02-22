@@ -123,7 +123,7 @@
         </table>
       {{/if}}
     {{/if}}
-      <div class="paginatedLoadingIndicator loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}">
+      <div class="paginatedLoadingIndicator loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}" style="background-image: none;">
         <img src="/images/ajax-reload-animated.gif">
         {{#unless fetched}}{{#t 'loading'}}Loading ...{{/t}}{{else}}{{#t 'loading_more'}}Loading more ...{{/t}}{{/unless}}
       </div>
