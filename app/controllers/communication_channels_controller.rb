@@ -117,7 +117,7 @@ class CommunicationChannelsController < ApplicationController
   #   The type of communication channel.
   #
   #   In order to enable push notification support, the server must be
-  #   properly configured (via sns.yml) to communicate with Amazon
+  #   properly configured (via `sns_creds` in Vault) to communicate with Amazon
   #   Simple Notification Services, and the developer key used to create
   #   the access token from this request must have an SNS ARN configured on
   #   it.

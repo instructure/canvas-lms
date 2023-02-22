@@ -172,14 +172,6 @@ class DeveloperKey < ActiveRecord::Base
       Shard.birth.activate do
         @special_keys ||= {}
 
-        if Rails.env.test?
-          # TODO: we have to do this because tests run in transactions
-          testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
-          testkey.auto_expire_tokens = false if testkey.new_record?
-          testkey.save! if testkey.changed?
-          return @special_keys[default_key_name] = testkey
-        end
-
         key = @special_keys[default_key_name]
         return key if key
 
@@ -197,13 +189,14 @@ class DeveloperKey < ActiveRecord::Base
     end
 
     # for now, only one AWS account for SNS is supported
-    def sns
-      unless defined?(@sns)
-        settings = ConfigFile.load("sns")
-        @sns = nil
-        @sns = Aws::SNS::Client.new(settings) if settings
+    def sns(region:)
+      @sns ||= {}
+
+      unless @sns[region].present?
+        settings = Rails.application.credentials.sns_creds
+        @sns[region] = Aws::SNS::Client.new(settings.merge(region: region)) if settings
       end
-      @sns
+      @sns[region]
     end
 
     def test_cluster_checks_enabled?

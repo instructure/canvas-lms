@@ -237,6 +237,13 @@ describe "CommunicationChannels API", type: :request do
       end
 
       context "not configured push" do
+        let(:dk) { DeveloperKey.default }
+
+        before do
+          dk.update!(sns_arn: nil)
+          allow(DeveloperKey).to receive(:default).and_return(dk)
+        end
+
         it "complains about sns not being configured" do
           @post_params[:communication_channel] = { token: "registration_token", type: "push" }
           raw_api_call(:post, @path, @path_options, @post_params)
@@ -249,12 +256,7 @@ describe "CommunicationChannels API", type: :request do
         before { @post_params.merge!(communication_channel: { token: +"registration_token", type: "push" }) }
 
         let(:client) { double }
-        let(:dk) do
-          dk = DeveloperKey.default
-          dk.sns_arn = "apparn"
-          dk.save!
-          dk
-        end
+        let(:dk) { DeveloperKey.default }
 
         it "works" do
           allow(DeveloperKey).to receive(:sns).and_return(client)

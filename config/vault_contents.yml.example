@@ -33,6 +33,9 @@ development:
 #        access_key_id: <access_key_id>
 #        secret_access_key: <secret_access_key>
 #      sentry_dsn: garbage-dsn-here
+#      sns_creds:
+#        access_key_id: <access_key_id>
+#        secret_access_key: <secret_access_key>
 #      twilio_creds:
 #        account_sid: <sid>
 #        auth_token: <token>
