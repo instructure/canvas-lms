@@ -77,7 +77,7 @@ export function downloadToWrap(url) {
 // take a url to a file (e.g. /files/17), and convert it to
 // it's in-context url (e.g. /courses/2/files/17).
 // Add wrap=1 to the url so it previews, not downloads
-// If it is a user file, add the verifier
+// If it is a user file or being referenced from a different origin, add the verifier
 // NOTE: this can be removed once canvas-rce-api is updated
 //       to normalize the file URLs it returns.
 export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
@@ -92,7 +92,10 @@ export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
     parsed = changeDownloadToWrapParams(parsed)
     parsed = addContext(parsed, contextType, contextId)
     // if this is a user file, add the verifier
-    if (fileInfo.uuid && contextType.includes('user')) {
+    if (
+      fileInfo.uuid &&
+      (contextType.includes('user') || (!!canvasOrigin && canvasOrigin !== window.location.origin))
+    ) {
       delete parsed.search
       parsed.query.verifier = fileInfo.uuid
     }
