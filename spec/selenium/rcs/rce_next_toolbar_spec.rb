@@ -359,6 +359,62 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
     end
 
     context "math equations" do
+      it "renders math equation from math modal" do
+        page_title = "math_rendering"
+        create_wiki_page_with_text(page_title)
+        visit_existing_wiki_edit(@course, page_title)
+        equation_editor_button.click
+        advanced_editor_toggle.click
+        advanced_editor_textarea.send_keys '\sqrt{81}'
+        equation_editor_done_button.click
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body).to contain_css("img.equation_image")
+          expect(math_image.attribute("title")).to eq '\sqrt{81}'
+          click_repeat(math_image)
+        end
+        edit_math_image_button.click
+        expect(advanced_editor_textarea.text).to eq '\sqrt{81}'
+
+        equation_editor_done_button.click
+        save_button.click
+        wait_for_ajaximations
+        expect(math_rendering_exists?).to eq true
+      end
+
+      it "renders inline LaTeX in the equation editor" do
+        page_title = "math_rendering"
+        body = "<p>\\(\\LaTeX\\)</p>"
+        @course.wiki_pages.create!(title: page_title, body: body)
+        visit_existing_wiki_edit(@course, page_title)
+        in_frame rce_page_body_ifr_id do
+          double_click("#tinymce p")
+        end
+        equation_editor_button.click
+        editor_text = advanced_editor_textarea.text
+        expect(editor_text).to eq("\\LaTeX")
+      end
+
+      it "redirects focus in the equation editor" do
+        skip("MAT-1248")
+
+        def active_element
+          driver.execute_script("return document.activeElement") # rubocop:disable Specs/NoExecuteScript
+        end
+
+        page_title = "math_focus"
+        create_wiki_page_with_text(page_title)
+        visit_existing_wiki_edit(@course, page_title)
+        equation_editor_button.click
+        advanced_editor_toggle.click
+        first_math_symbol_button.click
+        expect(active_element).to eq(advanced_editor_textarea)
+
+        advanced_editor_toggle.click
+        first_math_symbol_button.click
+        expect(active_element).to eq(basic_editor_textarea)
+      end
+
       it 'renders math equations for inline math with "\("' do
         title = "Assignment-Title with Math \\(x^2\\)"
         @assignment = @course.assignments.create!(name: title)
