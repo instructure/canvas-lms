@@ -74,6 +74,10 @@ module CanvasHttp
     CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &block)
   end
 
+  def self.patch(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Patch, *args, **kwargs, &block)
+  end
+
   # Use this helper method to do HTTP GET requests. It knows how to handle
   # HTTPS urls, and follows redirects to a given depth.
   #
