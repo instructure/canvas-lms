@@ -296,6 +296,7 @@ export default class EquationEditorModal extends Component {
                 keypress-sound="none"
                 plonk-sound="none"
                 math-mode-space=" "
+                data-testid="math-field"
               />
             </div>
             <div style={{display: this.state.advanced ? null : 'none'}}>
@@ -309,6 +310,7 @@ export default class EquationEditorModal extends Component {
                 value={this.state.workingFormula}
                 onChange={e => this.setState({workingFormula: e.target.value})}
                 ref={this.advancedEditor}
+                data-testid="advanced-editor"
               />
             </div>
             <div className={css(styles.latexToggle)}>
