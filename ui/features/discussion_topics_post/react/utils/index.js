@@ -197,6 +197,7 @@ export const getOptimisticResponse = ({
   quotedEntry = null,
   isAnonymous = false,
   depth = null,
+  attachment = null,
 } = {}) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -273,7 +274,9 @@ export const getOptimisticResponse = ({
         rootEntryId,
         isolatedEntryId,
         quotedEntry,
-        attachment: null,
+        attachment: attachment
+          ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}
+          : null,
         discussionEntryVersionsConnection: {
           nodes: [],
           __typename: 'DiscussionEntryVersionConnection',

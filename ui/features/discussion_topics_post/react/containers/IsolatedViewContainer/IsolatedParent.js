@@ -25,7 +25,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
-import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -240,9 +239,9 @@ export const IsolatedParent = props => {
                     anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
-                    onSave={(message, _includeReplyPreview, fileId) => {
+                    onSave={(message, _includeReplyPreview, file) => {
                       if (props.onSave) {
-                        props.onSave(props.discussionEntry, message, fileId)
+                        props.onSave(props.discussionEntry, message, file)
                         setIsEditing(false)
                       }
                     }}

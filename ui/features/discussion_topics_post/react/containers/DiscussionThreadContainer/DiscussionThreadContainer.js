@@ -307,13 +307,13 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const onUpdate = (message, _includeReplyPreview, fileId) => {
+  const onUpdate = (message, _includeReplyPreview, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
-        fileId,
-        removeAttachment: !fileId,
+        fileId: file?._id,
+        removeAttachment: !file?._id,
       },
     })
   }
@@ -369,7 +369,7 @@ export const DiscussionThreadContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expandReplies])
 
-  const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, fileId) => {
+  const onReplySubmit = (message, includeReplyPreview, _replyId, isAnonymousAuthor, file) => {
     const getParentId = () => {
       switch (props.discussionEntry.depth) {
         case 1:
@@ -386,7 +386,7 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
         parentEntryId: getParentId(),
-        fileId,
+        fileId: file?._id,
         isAnonymousAuthor,
         includeReplyPreview,
         message,
@@ -394,6 +394,7 @@ export const DiscussionThreadContainer = props => {
       },
       optimisticResponse: getOptimisticResponse({
         message,
+        attachment: file,
         parentId: getParentId(),
         rootEntryId: props.discussionEntry.rootEntryId,
         quotedEntry:
@@ -564,13 +565,13 @@ export const DiscussionThreadContainer = props => {
                   rceIdentifier={props.discussionEntry._id}
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                  onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
+                  onSubmit={(message, includeReplyPreview, file, anonymousAuthorState) => {
                     onReplySubmit(
                       message,
                       includeReplyPreview,
                       props.discussionEntry.parentId,
                       anonymousAuthorState,
-                      fileId
+                      file
                     )
                   }}
                   onCancel={() => setEditorExpanded(false)}

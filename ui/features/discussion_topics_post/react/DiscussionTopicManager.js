@@ -373,17 +373,18 @@ const DiscussionTopicManager = props => {
                     <DiscussionTopicContainer
                       updateDraftCache={updateDraftCache}
                       discussionTopic={discussionTopicQuery.data.legacyNode}
-                      createDiscussionEntry={(message, fileId, isAnonymousAuthor) => {
+                      createDiscussionEntry={(message, file, isAnonymousAuthor) => {
                         createDiscussionEntry({
                           variables: {
                             discussionTopicId: ENV.discussion_topic_id,
                             message,
-                            fileId,
+                            fileId: file?._id,
                             courseID: ENV.course_id,
                             isAnonymousAuthor,
                           },
                           optimisticResponse: getOptimisticResponse({
                             message,
+                            attachment: file,
                             isAnonymous:
                               !!discussionTopicQuery.data.legacyNode.anonymousState &&
                               discussionTopicQuery.data.legacyNode.canReplyAnonymously,
