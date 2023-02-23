@@ -183,12 +183,13 @@ export const IsolatedViewContainer = props => {
     }
   }
 
-  const onUpdate = (discussionEntry, message, fileId) => {
+  const onUpdate = (discussionEntry, message, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: discussionEntry._id,
         message,
-        removeAttachment: !fileId,
+        removeAttachment: !file?._id,
+        fileId: file?._id,
       },
     })
   }
@@ -197,19 +198,20 @@ export const IsolatedViewContainer = props => {
     window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
-  const onReplySubmit = (message, fileId, includeReplyPreview, replyId, isAnonymousAuthor) => {
+  const onReplySubmit = (message, file, includeReplyPreview, replyId, isAnonymousAuthor) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         parentEntryId: replyId,
         isAnonymousAuthor,
         message,
-        fileId,
+        fileId: file?._id,
         includeReplyPreview,
         courseID: ENV.course_id,
       },
       optimisticResponse: getOptimisticResponse({
         message,
+        attachment: file,
         parentId: replyId,
         rootEntryId: props.discussionEntryId,
         quotedEntry: buildQuotedReply(
@@ -422,10 +424,10 @@ export const IsolatedViewContainer = props => {
                 rceIdentifier={props.replyFromId}
                 discussionAnonymousState={props.discussionTopic?.anonymousState}
                 canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                onSubmit={(message, includeReplyPreview, fileId, anonymousAuthorState) => {
+                onSubmit={(message, includeReplyPreview, file, anonymousAuthorState) => {
                   onReplySubmit(
                     message,
-                    fileId,
+                    file,
                     includeReplyPreview,
                     props.replyFromId,
                     anonymousAuthorState
