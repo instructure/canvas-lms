@@ -585,6 +585,23 @@ describe AccountNotification do
         expect(messages.first.body).to include(an.message)
         expect(an.reload.messages_sent_at).to be_present # hopefully shouldn't double-send accidentally
       end
+
+      it "does not create messages when suppress_notifications = true" do
+        initial_message_count = Message.count
+        Account.default.settings[:suppress_notifications] = true
+        Account.default.save!
+        Notification.create!(name: "Account Notification", category: "TestImmediately")
+
+        an = account_notification(account: Account.default, send_message: true, role_ids: [student_role.id], message: "wazzuuuuup")
+        user_ids = create_users(3, active_all: true)
+        allow(an).to receive(:applicable_user_ids).and_return(user_ids)
+        Setting.set("account_notification_message_batch_size", 2) # split into 2 batches
+
+        expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[0, 2])).and_call_original
+        expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids[2, 3])).and_call_original
+        an.broadcast_messages
+        expect(Message.count).to eq initial_message_count
+      end
     end
   end
 

@@ -203,6 +203,18 @@ class Notification < Switchman::UnshardedRecord
   # options - a hash of extra options to merge with the options used to build the Message
   #
   def create_message(asset, to_list, options = {})
+    if asset.respond_to?(:account)
+      return if asset.account&.root_account&.suppress_notifications?
+    end
+
+    if asset.respond_to?(:context) && asset.context.respond_to?(:root_account)
+      return if asset.context&.root_account&.suppress_notifications?
+    end
+
+    if asset.respond_to?(:context) && asset.context.respond_to?(:account)
+      return if asset.context.account&.root_account&.suppress_notifications?
+    end
+
     preload_asset_roles_if_needed(asset)
 
     NotificationMessageCreator.new(self, asset, options.merge(to_list:)).create_message

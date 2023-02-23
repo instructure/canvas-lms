@@ -23,28 +23,45 @@ describe ConferencesController do
     allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { domain: "wimba.test" })])
   end
 
-  it "notifies participants" do
-    notification_model(name: "Web Conference Invitation")
-    course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
-    @teacher = @user
-    @teacher.register!
-    @student1 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student1@example.com")).user
-    @student1.register!
-    @student2 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student2@example.com")).user
-    @student2.register!
-    [@teacher, @student1, @student2].each { |u| u.email_channel.confirm! }
+  context "notifications" do
+    before do
+      notification_model(name: "Web Conference Invitation")
+      course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
+      @teacher = @user
+      @teacher.register!
+      @student1 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student1@example.com")).user
+      @student1.register!
+      @student2 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student2@example.com")).user
+      @student2.register!
+      [@teacher, @student1, @student2].each { |u| u.email_channel.confirm! }
+    end
 
-    post "/courses/#{@course.id}/conferences", params: { web_conference: { "duration" => "60", "conference_type" => "Wimba", "title" => "let's chat", "description" => "" }, user: { "all" => "1" } }
-    expect(response).to be_redirect
-    @conference = WebConference.first
-    expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
+    it "notifies participants" do
+      post "/courses/#{@course.id}/conferences", params: { web_conference: { "duration" => "60", "conference_type" => "Wimba", "title" => "let's chat", "description" => "" }, user: { "all" => "1" } }
+      expect(response).to be_redirect
+      @conference = WebConference.first
+      expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
 
-    @student3 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student3@example.com")).user
-    @student3.register!
-    @student3.email_channel.confirm!
-    put "/courses/#{@course.id}/conferences/#{@conference.id}", params: { web_conference: { "title" => "moar" }, user: { @student3.id => "1" } }
-    expect(response).to be_redirect
-    expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
+      @student3 = student_in_course(active_all: true, user: user_with_pseudonym(username: "student3@example.com")).user
+      @student3.register!
+      @student3.email_channel.confirm!
+      put "/courses/#{@course.id}/conferences/#{@conference.id}", params: { web_conference: { "title" => "moar" }, user: { @student3.id => "1" } }
+      expect(response).to be_redirect
+      expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
+    end
+
+    it "creates stream items for, but not notifies participants when suppress_notifications = true" do
+      initial_message_count = Message.count
+      initial_stream_item_count = StreamItem.count
+      Account.default.settings[:suppress_notifications] = true
+      Account.default.save!
+
+      post "/courses/#{@course.id}/conferences", params: { web_conference: { "duration" => "60", "conference_type" => "Wimba", "title" => "let's chat", "description" => "" }, user: { "all" => "1" } }
+      expect(response).to be_redirect
+      expect(Message.count).to eq initial_message_count
+      expect(StreamItem.count).to eq initial_stream_item_count + 1
+      expect(StreamItem.last.data.id).to eq WebConference.last.id
+    end
   end
 
   it "finds the correct conferences for group news feed" do

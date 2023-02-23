@@ -718,6 +718,12 @@
                   <%= settings.label     :kill_joy, :en => "Remove hidden game from 404 page" %>
                 </div>
               <% end %>
+              <% unless @account.site_admin? %>
+                <div>
+                  <%= settings.check_box :suppress_notifications, :checked => @account.suppress_notifications? %>
+                  <%= settings.label     :suppress_notifications, :en => "Suppress notifications from being created and sent out" %>
+                </div>
+              <% end %>
             <% end %>
             <% unless @account.site_admin? %>
               <div>

@@ -1040,6 +1040,36 @@ describe SIS::CSV::UserImporter do
     expect(Message.where(communication_channel_id: user2.email_channel, notification_id: notification).first).not_to be_nil
   end
 
+  it "does not send merge opportunity notifications on reactivation when suppress_notifications = true" do
+    @account.settings[:suppress_notifications] = true
+    @account.save!
+    Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+    user1 = User.create!(name: "User Uno")
+    user1.pseudonyms.create!(unique_id: "user1", account: @account)
+    communication_channel(user1, { username: "user1@example.com", active_cc: true })
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user1@example.com,deleted"
+    )
+    user2 = Pseudonym.by_unique_id("user2").first.user
+    expect(user1).not_to eq user2
+    expect(user1.last_name).to eq "Uno"
+    expect(user2.last_name).to eq "Dos"
+    expect(user1.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.count).to eq 1
+    expect(user2.pseudonyms.first.communication_channel_id).not_to be_nil
+    expect(user1.email_channel).not_to eq user2.email_channel
+    expect(Message.count).to eq 0
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user1@example.com,active"
+    )
+    user2.reload
+    expect(Message.count).to eq 0
+  end
+
   it "does not send merge opportunity notifications if the conflicting cc is retired or unconfirmed" do
     notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
     u1 = User.create! { |u| u.workflow_state = "registered" }
