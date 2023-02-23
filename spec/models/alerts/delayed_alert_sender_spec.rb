@@ -331,5 +331,22 @@ module Alerts
         DelayedAlertSender.evaluate_for_course(@course, nil)
       end.to change(DelayedMessage, :count).by(1)
     end
+
+    it "does not create delayed messages when suppress_notifications = true" do
+      Account.default.settings[:suppress_notifications] = true
+      Account.default.save!
+      Notification.create(name: "Alert")
+
+      course_with_teacher(active_all: 1)
+      student_in_course(active_all: 1)
+      communication_channel(@student, { username: "student@example.com", active_cc: true })
+      alert = @course.alerts.build(recipients: [:student])
+      alert.criteria.build(criterion_type: "Interaction", threshold: 7)
+      alert.save!
+      @course.start_at = 30.days.ago
+      expect do
+        DelayedAlertSender.evaluate_for_course(@course, nil)
+      end.not_to change(DelayedMessage, :count)
+    end
   end
 end

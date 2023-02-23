@@ -109,6 +109,18 @@ describe "root account basic settings" do
     end
   end
 
+  it "lets admins enable suppress_notifications on root account settings", ignore_js_errors: true do
+    account.settings[:suppress_notifications] = false
+    account.save!
+
+    user_session(@admin)
+    get account_settings_url
+    f("#account_settings_suppress_notifications").click
+    driver.switch_to.alert.accept
+    submit_form("#account_settings")
+    expect(Account.default.reload.settings[:suppress_notifications]).to be true
+  end
+
   context "editing slack API key" do
     before :once do
       account_admin_user(account: Account.site_admin)

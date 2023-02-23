@@ -2399,6 +2399,28 @@ describe CalendarEventsApiController, type: :request do
           expect(Message.last.user_id).to eq @user.id
           expect(Message.last.notification_name).to eq "Web Conference Invitation"
         end
+
+        it "only creates stream items but not notifications when suppress_notifications is true" do
+          initial_stream_item_count = StreamItem.count
+          account = Account.default
+          account.settings[:suppress_notifications] = true
+          account.save!
+
+          api_call(:post,
+                   "/api/v1/calendar_events.json",
+                   {
+                     controller: "calendar_events_api", action: "create", format: "json"
+                   },
+                   {
+                     calendar_event: {
+                       context_code: "course_#{@course.id}",
+                       title: "API Test",
+                       web_conference: { conference_type: "BigBlueButton", title: "BBB Conference" }
+                     }
+                   })
+          expect(Message.count).to eq 0
+          expect(StreamItem.count).to eq(initial_stream_item_count + 1)
+        end
       end
 
       it "does not show web conferences by default" do

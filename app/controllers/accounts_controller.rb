@@ -1817,6 +1817,7 @@ class AccountsController < ApplicationController
                                    :include_students_in_global_survey,
                                    :kill_joy,
                                    :license_type,
+                                   :suppress_notifications,
                                    { lock_all_announcements: [:value, :locked] }.freeze,
                                    :login_handle_name,
                                    :mfa_settings,

@@ -146,6 +146,22 @@ $(document).ready(function () {
       return false
     }
   })
+
+  $('#account_settings_suppress_notifications').click(event => {
+    if (event.target.checked) {
+      // eslint-disable-next-line no-alert
+      const result = window.confirm(
+        I18n.t(
+          'suppress_notifications_warning',
+          "You have 'Suppress notifications from being created and sent out' checked, are you sure you want to continue?"
+        )
+      )
+      if (!result) {
+        $('#account_settings_suppress_notifications').attr('checked', false)
+      }
+    }
+  })
+
   $('.datetime_field').datetime_field({
     addHiddenInput: true,
   })

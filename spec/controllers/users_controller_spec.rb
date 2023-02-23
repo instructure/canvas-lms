@@ -999,61 +999,78 @@ describe UsersController do
         expect(p.user).to be_pre_registered
       end
 
-      it "notifies the user if a merge opportunity arises" do
-        account = Account.create!
-        user_with_pseudonym(account:)
-        account.account_users.create!(user: @user)
-        user_session(@user, @pseudonym)
-        @admin = @user
+      context "merge opportunity notifications" do
+        before do
+          @notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+          @account = Account.create!
+          user_with_pseudonym(account: @account)
+          @account.account_users.create!(user: @user)
+          user_session(@user, @pseudonym)
+          @admin = @user
 
-        u = User.create! { |user| user.workflow_state = "registered" }
-        communication_channel(u, { username: "jacob@instructure.com", active_cc: true })
-        u.pseudonyms.create!(unique_id: "jon@instructure.com")
-        notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+          @u = User.create! { |user| user.workflow_state = "registered" }
+          communication_channel(@u, { username: "jacob@instructure.com", active_cc: true })
+        end
 
-        post "create",
-             params: {
-               account_id: account.id,
-               pseudonym: {
-                 unique_id: "jacob@instructure.com",
-                 send_confirmation: "0"
+        it "notifies the user if a merge opportunity arises" do
+          @u.pseudonyms.create!(unique_id: "jon@instructure.com")
+
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
                },
-               user: {
-                 name: "Jacob Fugal"
-               }
-             },
-             format: "json"
-        expect(response).to be_successful
-        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
-        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_present
-      end
+               format: "json"
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+          expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: @notification).first).to be_present
+        end
 
-      it "does not notify the user if the merge opportunity can't log in'" do
-        notification = Notification.create(name: "Merge Email Communication Channel", category: "Registration")
+        it "does not notify user of opportunity when suppress_notifications = true" do
+          initial_message_count = Message.count
+          @u.pseudonyms.create!(unique_id: "jon@instructure.com")
+          @account.settings[:suppress_notifications] = true
+          @account.save!
 
-        account = Account.create!
-        user_with_pseudonym(account:)
-        account.account_users.create!(user: @user)
-        user_session(@user, @pseudonym)
-        @admin = @user
-
-        u = User.create! { |user| user.workflow_state = "registered" }
-        communication_channel(u, { username: "jacob@instructure.com", active_cc: true })
-        post "create",
-             params: {
-               account_id: account.id,
-               pseudonym: {
-                 unique_id: "jacob@instructure.com",
-                 send_confirmation: "0"
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
                },
-               user: {
-                 name: "Jacob Fugal"
-               }
-             },
-             format: "json"
-        expect(response).to be_successful
-        p = Pseudonym.where(unique_id: "jacob@instructure.com").first
-        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_nil
+               format: "json"
+          expect(response).to be_successful
+          expect(Message.count).to eq initial_message_count
+        end
+
+        it "does not notify the user if the merge opportunity can't log in'" do
+          post "create",
+               params: {
+                 account_id: @account.id,
+                 pseudonym: {
+                   unique_id: "jacob@instructure.com",
+                   send_confirmation: "0"
+                 },
+                 user: {
+                   name: "Jacob Fugal"
+                 }
+               },
+               format: "json"
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: "jacob@instructure.com").first
+          expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: @notification).first).to be_nil
+        end
       end
     end
   end
