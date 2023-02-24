@@ -1237,6 +1237,12 @@ ru:
         default: 
           lti_reports: 
             text: "В этом отчете содержится экспорт данных, который показывает информацию об использовании LTI (инструмент обучения оперативной совместимости)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Период
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4890,6 +4896,7 @@ ru:
   audio_1c89b0c8: аудио
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Аудио контент не поддерживается Вашим устройством или приложением."
   audio_dd489fcc: Аудио
+  audio_file_bf3ece7e: Аудиофайл
   audio_player_for_label_dd9a6819: "Аудиоплеер для %{label}"
   august_781433e8: Август
   australia_61_eb9bb701: "Австралия (+61)"
@@ -6373,6 +6380,7 @@ ru:
   cluster_cluster_b57fe99a: "Комплект: %{cluster}"
   cluster_f407976: Группа
   code_93e9abbb: код
+  code_file_424dc478: "Файл кода"
   code_is_case_sensitive_d8175cad: "Код чувствителен к регистру."
   cog_icon_69bdffd5: "Иконка шестеренки"
   col_is_sorted_ascending_cc5152cc: "%{col} отсортировано в восходящем порядке"
@@ -6431,6 +6439,7 @@ ru:
     errors: 
       cannot_load_collaboration: "Невозможно загрузить совместную работу"
       create_failed: "Ошибка создания совместной работы"
+      no_masquerading_on_collaboration: "Просмотр совместной работы под именем другого пользователя не допускается."
       no_name: "Введите название для этой совместной работы"
       not_enabled: "Совместная работа не включена для этого сайта Canvas"
       title_too_long: "Пожалуйста, используйте не больше %{maxLength} символов для имени. Используйте описание для дополнительного содержимого."
@@ -10773,6 +10782,10 @@ ru:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Отобразить значения"
   displaying_to_students_b1e92058: "Показывается студентам"
+  displayname_loaded_14d71a0a: "%{displayName} загружено"
+  displayname_loading_in_progress_2be325fd: "Выполняется загрузка %{displayName}"
+  displayname_loading_pending_3aa2723e: "%{displayName} ожидает загрузки"
+  displayname_loading_success_8177d735: "Загрузка %{displayName} успешно выполнена"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Отображает конфетти для учителей, которые запустили средство проверки подлинности ссылок на
       курс, и при этом не были выявлены какие-либо проблемы.
@@ -10793,6 +10806,7 @@ ru:
   do_nothing_9672b478: "Ничего не делать"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Файл Doc"
   document_to_annotate_d37b93bc: "Документ для аннотации"
   docviewer_apple_iwork_file_support_dc772b31: "Поддержка файла Docviewer Apple iWork"
   docviewer_area_created_37502a31: "Создана область просмотра документов Docviewer"
@@ -11291,6 +11305,7 @@ ru:
   enabled_unlocked_8d3a5df7: "Включено (разблокировано)"
   enabled_web_services_f620b2be: "Включенные веб-сервисы"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Включает измененное диалоговое окно «Отправить сообщения учащимся, которые...», которое позволяет отправлять сообщения наблюдателям в дополнение к учащимся."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Активирует доступ к API новых тестов с открытым доступом: API новых тестов."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Активирует доступ к API новых тестов с открытым доступом через Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Позволяет показывать отчеты о плагиате и оценки сходства в лотке отправки нового журнала оценок."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Позволяет применять важные даты к заданиям, событиям календаря и другим элементам."
@@ -11888,6 +11903,7 @@ ru:
       exclusion: забронировано
       greater_than: "должно быть больше %{count}"
       greater_than_or_equal_to: "должно быть больше или равно %{count}"
+      in: "должно быть в %{count}"
       inclusion: "не включено в список"
       invalid: неверно
       less_than: "должно быть меньше %{count}"
@@ -12072,6 +12088,7 @@ ru:
   exceeded_the_maximum_length_number_characters_2d25611e: "Превышена максимальная длина (%{number} символа(-ов))"
   exceeds_expectations_5910fc3a: "Превышает ожидания"
   exceeds_mastery_1f995dce: "Превышает проходной балл"
+  excel_file_c6b9890: "Файл Excel"
   excelsior_student_activity_tracking_7a1ba44d: "Отслеживание активности студентов Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Исключите все данные, которые не обновлялись с данной даты"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Исключить задания с оценкой 0."
@@ -12569,6 +12586,7 @@ ru:
   file_storage_32477f6: "Хранение файлов"
   file_tree_collapsed_d4b0ae96: "Дерево файлов свернуто"
   file_tree_expanded_a1d20c4a: "Дерево файлов развернуто"
+  file_type_fd1ba7ee: "Тип файла"
   file_upload_9cae6da5: "Отправка файла"
   file_upload_failed_af22dd91: "Не удалось загрузить файл"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Загрузка файла, необходим file_url или content_export_id"
@@ -12750,6 +12768,7 @@ ru:
   flags_tab_updates_c4c209f1: "Обновления вкладки фагов"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: Flash-файл
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr отображает SafeSearch изображения в рамках общедоступного домена Creative Commons.
@@ -12766,6 +12785,7 @@ ru:
   folder_705fd2d7: Папка
   folder_browsing_tree_1f00a3ae: "Просмотр дерева папки"
   folder_icon_29017021: "Иконка папки"
+  folder_locked_b91cd0c4: "Папка заблокирована"
   folder_tree_fbab0726: "Структура папки"
   folders: 
     event_updated: "Событие было успешно обновлено."
@@ -14798,6 +14818,7 @@ ru:
   html5_media_recorder_in_rce_bb59b78f: "Устройство записи мультимедиа HTML5 в RCE"
   html_editor_fb2ab713: "Редактор HTML"
   html_fc8563c6: html
+  html_file_62393d3f: HTML-файл
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "Ответ HTTP: %{code}"
@@ -15178,6 +15199,7 @@ ru:
   ilumno_grade_export_251bc4b5: "Экспорт оценки Ilumno"
   image_8ad06: Изображение
   image_c1c98202: изображение
+  image_file_2b538bc: "Файл изображения"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id не является допустимым ID"
   image_search_b0944fc2: "Поиск изображений"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url и image_id не могут быть установлены одновременно."
@@ -15657,6 +15679,7 @@ ru:
   ireland_f7bb9899: Ирландия
   irish_567e109f: Ирландский
   is_an_lti_1_3_tool_770480a1: "Является инструментом LTI 1.3."
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " использует бесплатную версию BigBlueButton, которая предоставляет 10 аналогичных видеоконференций, каждая из которых имеет по 1 хосту и до 24 участников. Записи хранятся в течение 7 дней."
   isolated_entry_post_error_page_2a447d08: "Страница ошибки публикации изолированной записи"
@@ -16299,6 +16322,8 @@ ru:
   loading_grades_for_coursename_26784c2d: "Загрузка оценок для %{courseName}"
   loading_grading_periods_c635d96: "Загрузка периодов оценок..."
   loading_grading_periods_for_coursename_bbe46919: "Загрузка периодов оценок для %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Загрузка схем оценивания..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Сбой загрузки схем оценивания.  Попробуйте еще раз"
   loading_group_f1647ebb: "Загрузка %{group}"
   loading_grouptitle_dba362d2: "Загрузка %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Загрузка содержания объявления в главной комнате"
@@ -19511,6 +19536,7 @@ ru:
   new_quizzes_migration_required_7854aa1a: "Необходима миграция новых тестирований"
   new_quizzes_on_the_quizzes_page_b21f338d: "Новые тестирования на странице «Тестирования»"
   new_quizzes_public_api_18d95321: "API новых тестов с открытым доступом"
+  new_quizzes_public_api_quiz_items_16bc741d: "API новых тестов с открытым доступом: Тесты"
   new_quizzes_service_jwt_refresh_ca28ca8: "Обновление сервисных JWT Новых тестирований"
   new_quizzes_site_admin_service_user_a331233a: "Новые тесты, администратор сайта, пользователь услуги"
   new_quizzes_submission_274b5c57: "Отправка новых тестов"
@@ -19563,6 +19589,7 @@ ru:
   next_month_749b1778: "Следующий месяц"
   next_month_b55a387c: "Следующий месяц"
   next_page_d2a39853: "Следующая страница"
+  next_peer_review_3d05ef23: "Рассмотрение следующим коллегой"
   next_question_f37bac25: "Следующий вопрос"
   next_run_at_635de64a: "Следующий запуск в"
   next_steps_ce0f0d0c: "Дальнейшие действия"
@@ -20833,6 +20860,7 @@ ru:
     exception: "Нам очень жаль, но произошла ошибка. Повторите попытку через некоторое время."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDF-файл
   peer_632472b7: "Эксперт:"
   peer_review_74f26a13: "Рассмотрение коллегами"
   peer_review_assignment_7d314c59: "Задание для независимой оценки"
@@ -20842,6 +20870,7 @@ ru:
   peer_review_for_assignment_ce72fc52: "Рассмотрение коллегами для %{assignment}"
   peer_review_for_name_bcffa32f: "Рассмотрение коллегами для %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Рассмотрение коллегами для %{name} Срок исполнения: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Подсказка для рассмотрения коллегами"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Поддержка рассмотрения коллегами в улучшениях заданий"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Независимо оцененные задания еще не обработаны в новом потоке заданий. Перейти на старую страницу создания заданий?"
   peer_reviewed_graded_discussion_b339df5b: "Рецензируемая дискуссия с выставлением оценок:"
@@ -21594,6 +21623,7 @@ ru:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Публикация оценок приведет к обновлению вашего браузера. Это может занять некоторое время."
   posting_to_students_eaa57964: "Отправка студентам"
   powered_by_instructure_504d676d: "Под управлением Instructure"
+  powerpoint_file_c4cb12af: "Файл PowerPoint"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -25444,6 +25474,7 @@ ru:
                                     Свяжитесь с нами через #canvas-sre в Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "Пользователь SFTP был создан. Может потребоваться до четырех часов до начала работы этого пользователя."
   sftp_user_management_19868cb3: "Управление пользователями SFTP"
+  shadow_e98b5937: Тень
   shard_5d340495: Сегмент
   shard_id_optional_382e5dda: "Идентификатор сегмента (опционально)"
   shard_shard_95c57736: "Сегмент: %{shard}"
@@ -26549,6 +26580,7 @@ ru:
   sort_by_72dbba9c: "Сортировать по"
   sort_by_e75f9e3e: "Сортировать по"
   sort_courses_cf94b8d4: "Сортировать курсы"
+  sort_ordertype_by_sortby_a0dd1c8: "Сортировать %{orderType} по %{sortBy}"
   sort_outcome_column_c53702ed: "Столбец результатов сортировки"
   sort_students_1a561e98: "Сортировка студентов"
   sortable_name_73f707cf: "Сортируемое имя"
@@ -26879,6 +26911,7 @@ ru:
       по результатам прохождения курса обучения. Результаты представлены в похожем на журнал успеваемости
       формате, а прогресс отображается в баллах и в виде достижения уровня мастерства/приближения к
       уровню мастерства/исправления недочетов.
+  student_outcome_result_b26b7ab4: "Итоговый результат учащегося"
   student_pace_2200bf85: "План прохождения студента"
   student_page_history_ce86b3c2: "История страницы студента"
   student_page_history_pages_update_ae55fa03: "История страницы студента (Страницы - Обновить)"
@@ -26896,6 +26929,7 @@ ru:
   student_sis_id_abe6b292: "идентификатор sis студента"
   student_student_number_5c98bd2d: "Студент %{student_number}"
   student_studentnumber_f398d9c2: "Студент %{studentNumber}"
+  student_submission_report_af01e697: "Отчет об отправке учащегося"
   student_submissions_910da1b3: "Сданные работы студентов"
   student_submissions_report_prospect_education_108daf59: "Отчет о сданных работах студентов (Prospect Education)"
   student_summary: 
@@ -27589,6 +27623,7 @@ ru:
   text_entry_e1808b2f: "Ввод текста"
   text_entry_submission_7b0ae0c5: "Отправка текстовой записи"
   text_entry_submission_cannot_be_empty_3d187cae: "Текстовое поле не может быть пустым"
+  text_file_73d8d08c: "Текстовый файл"
   text_input_d3480b8c: "Ввод текста"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Текст без вопроса перемещен в Стимул; добавьте вопрос, чтобы он мог отображаться в тесте."
   thai_8f9bc548: Тайский
@@ -27905,6 +27940,7 @@ ru:
   the_state_parameter_is_required_ffadf213: "Необходимо ввести параметр состояния"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "На вкладке аннотации студента содержится документ для отправки. Также могут быть доступны вкладки с дополнительными типами отправки."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Студент для отчетности; по умолчанию принимает значение идентификатора Canvas, если не указано как SIS в student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Отправка недоступна прямо сейчас."
   the_submitted_after_date_to_report_on_9d90f026: "Представленный после даты отчет"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Программа занятий позволяет вам поприветствовать пользователей, регистрирующихся в учебном курсе, и поделиться ожиданиями
@@ -28248,6 +28284,9 @@ ru:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Эта функция заставляет API загрузки файла отправки проверять тип файла
       по расширениям связанного задания.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Эта опциональная функция видна только пользователям с правом доступа Администратор сайта. Она аналогична
+                                «Скрыто», но конечные пользователи не увидят ее, даже в случае ее активации пользователем с правом доступа Администратор сайта.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Эта функция доступна только пользователям с правами администратора сайта.
                                   Конечные пользователи не будут видеть его до тех пор, пока он не будет включен администратором сайта.
@@ -28759,6 +28798,7 @@ ru:
   title_required_3ff5969: "Необходим заголовок"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} панель"
+  title_unpublished_51ddbc6a: "%{title} (публикация отменена)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" был успешно создан."
   title_was_successfully_updated_14b78676: "\"%{title}\" был успешно обновлен."
   titles: 
@@ -29894,7 +29934,9 @@ ru:
   upload_media_ce31135a: "Загрузить медиа"
   upload_not_available_for_this_folder_8f8623c6: "Отправка недоступна для этой папки"
   upload_percent_complete_d533d3e2: "Загрузить долю завершенной работы в процентах"
+  upload_progress_df577c48: "Выполняется отправка"
   upload_progress_for_name_39f03acf: "Ход загрузки для %{name}"
+  upload_success_f51f3a39: "Отправка выполнена"
   upload_successful_ca47465f: "Успешно загружено"
   upload_your_outcomes_bceeadbe: "Загрузите свои результаты!"
   uploaded_285a2bfb: Загружено
@@ -29981,6 +30023,7 @@ ru:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Использовать новый инструмент теста LTI вместо обычных тестов canvas"
   use_the_new_scheduler_1273b832: "Использовать новый планировщик"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Использовать эту конфигурацию для регистрации родителей/наблюдателей"
+  use_this_grading_scheme_52aa4ecf: "Использовать эту схему оценивания"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Используйте данный список для удаления заданных учащихся. Добавить нового учащегося с комбинированным полем после списка."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Эта панель служит для устранения проблем с повторяющимися результатами или отсутствием результатов поиска по людям."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Используйте эту панель для решения проблем с дубликатами или людьми, не найденными при выполненном вами поиске."
@@ -30559,6 +30602,7 @@ ru:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Руководства по видеоконференциям для занятий в удаленном режиме"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Инструменты для организации видеоконференций позволяют установить индивидуальную связь между учителями и учащимися."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Видео контент не поддерживается Вашим устройством или приложением."
+  video_file_f7188ffe: Видеофайл
   video_player_b371005: Видео-плеер
   video_player_for_label_6a5fdb03: "Видеоплеер для %{label}"
   vietnam_84_e50a2a44: "Вьетнам (+84)"
@@ -31276,11 +31320,22 @@ ru:
   you_have_changed_the_progression_requirements_for__6772bc89: "Вы изменили требования к прохождению для активного курса. На курсе могут быть студенты, которые уже продвинулись до этого модуля или других, связанных с ним."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Вы завершили коллегиальное рецензирование %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Вы завершили коллегиальное рецензирование в отношении %{person}. Спасибо"
+  you_have_completed_your_peer_reviews_543ad84: "Вы выполнили свои задания рассмотрения коллегами!"
   you_have_count_calendars_left_f0cbcac4: 
     few: "У вас осталось %{count} календаря(-ей)"
     many: "У вас осталось %{count} календаря(-ей)"
     one: "У вас остался 1 календарь"
     other: "У вас осталось %{count} календаря(-ей)"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    few: "Вам необходимо сделать еще %{count} рассмотрения(-й) коллегами."
+    many: "Вам необходимо сделать еще %{count} рассмотрения(-й) коллегами."
+    one: "Вам необходимо сделать еще 1 рассмотрение коллегой."
+    other: "Вам необходимо сделать еще %{count} рассмотрения(-й) коллегами."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    few: "Вам необходимо сделать %{count} рассмотрения(-й) коллегами."
+    many: "Вам необходимо сделать %{count} рассмотрения(-й) коллегами."
+    one: "Вам необходимо сделать 1 рассмотрение коллегой."
+    other: "Вам необходимо сделать %{count} рассмотрения(-й) коллегами."
   you_have_count_peer_reviews_to_complete_52e065e: "Вам необходимо сделать %{count} рассмотрения(-й) коллегами"
   you_have_count_submissions_to_grade_6c5b511a: "У вас %{count} представлений для оценки"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Вы создали комментарий, который не был опубликован. Продолжить и сохранить этот комментарий как черновик? (Черновики комментариев можно опубликовать в любое время.)"
@@ -31364,6 +31419,7 @@ ru:
   you_must_set_usage_rights_87fc1382: "Вы должны задать права на использование"
   you_must_specify_a_usage_right_5eb57f87: "Вы должны указать право на использование"
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Необходимо указать, следует ли включить или отключить Microsoft Teams Sync"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Вы должны представить свою собственную работу, прежде чем сможете проверить работы своих коллег."
   you_must_use_a_number_912ce4bd: "Вы должны использовать число"
   you_must_use_a_positive_number_203b86fe: "Вы должны использовать положительное число"
   you_must_use_an_integer_78d2530f: "Вы должны использовать целое число"
@@ -31508,6 +31564,7 @@ ru:
   zero_activity_title: "Нулевая активность"
   zip_26961da: zip
   zip_argument_error: "Для загрузки файлов .zip требуется папка, в которую будет осуществляться загрузка."
+  zip_file_3e736239: Zip-файл
   zip_file_description: "Подключаемый модуль перемещения для распаковки архивов .zip в файлах курса, группы или пользователя"
   zip_file_display: "Импорт файла"
   zip_file_file_description: "Распаковать файл .zip в папку"
