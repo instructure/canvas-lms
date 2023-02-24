@@ -1216,6 +1216,12 @@ ja:
         default: 
           lti_reports: 
             text: このレポートは、LTIを表示するデータのエクスポートを提供します(学習ツール相互運用)。
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: 期間
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4798,6 +4804,7 @@ ja:
   audio_1c89b0c8: オーディオ
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: オーディオコンテンツは、デバイス、またはアプリでサポートされていません。
   audio_dd489fcc: オーディオ
+  audio_file_bf3ece7e: 音声ファイル
   audio_player_for_label_dd9a6819: "%{label}のオーディオプレーヤー"
   august_781433e8: ８月
   australia_61_eb9bb701: "オーストラリア (+61)"
@@ -6284,6 +6291,7 @@ ja:
   cluster_cluster_b57fe99a: "クラスタ：%{cluster}"
   cluster_f407976: クラスタ
   code_93e9abbb: コード
+  code_file_424dc478: コードファイル
   code_is_case_sensitive_d8175cad: コードは大文字と小文字を区別します。
   cog_icon_69bdffd5: 歯車のアイコン
   col_is_sorted_ascending_cc5152cc: "%{col}は昇順で並べ替え"
@@ -6340,6 +6348,7 @@ ja:
     errors: 
       cannot_load_collaboration: コラボレーションを読み込めません
       create_failed: コラボレーションの作成に失敗しました
+      no_masquerading_on_collaboration: 他のユーザーの振りをしてコラボレーションを閲覧することは禁止されています。
       no_name: このコラボレーションの名前を入力してください
       not_enabled: "この Canvas サイトではコラボレーションは使用可能になっていません"
       title_too_long: "名前には、%{maxLength} 文字以下を使用してください。内容を追加する場合は、説明を使用してください。"
@@ -10476,6 +10485,10 @@ ja:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: 表示値
   displaying_to_students_b1e92058: 受講生へ表示中
+  displayname_loaded_14d71a0a: "%{displayName} 読み込み済み"
+  displayname_loading_in_progress_2be325fd: "%{displayName} 読み込み中"
+  displayname_loading_pending_3aa2723e: "%{displayName} 読み込み待機中"
+  displayname_loading_success_8177d735: "%{displayName} 読み込み成功"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       コースでリンクバリデータを実行し、問題が見つからなかった教員に
       紙吹雪を表示します。
@@ -10496,6 +10509,7 @@ ja:
   do_nothing_9672b478: 何もしない
   doc_50924b72: DOC
   doc_c63509f8: 文書
+  doc_file_b1d0042f: ドキュメントファイル
   document_to_annotate_d37b93bc: 注釈を付けるドキュメント
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork ファイル対応"
   docviewer_area_created_37502a31: "Docviewer の領域が作成されました"
@@ -10990,6 +11004,7 @@ ja:
   enabled_unlocked_8d3a5df7: 有効（ロック解除）
   enabled_web_services_f620b2be: "使用可能になっている Web サービス"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 再設計された「次のような受講者にメッセージを送信する...」ダイアログを有効にして、受講者に加えてオブザーバーにもメッセージを送信することができるようになりました。
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: 新規小テストパブリックAPIへのアクセスを可能にします。小テスト項目API。
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: Canvasから新規小テストパブリックAPIにアクセスできるようにします。
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 新しい評定表提出トレイで、盗作レポートと類似性スコアの表示を有効にします。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 重要な日付を割り当てて、カレンダーイベントなどに適用できるようにします。
@@ -11583,6 +11598,7 @@ ja:
       exclusion: は予約されています
       greater_than: "は %{count} より大きい値でなければなりません"
       greater_than_or_equal_to: "は %{count} 以上でなければなりません"
+      in: "%{count}内である必要があります"
       inclusion: はリストに含まれていません
       invalid: は無効です
       less_than: "は %{count} より小さい値でなければなりません"
@@ -11717,6 +11733,7 @@ ja:
   exceeded_the_maximum_length_number_characters_2d25611e: "最大長 (%{number} 文字) を超えました"
   exceeds_expectations_5910fc3a: 期待値を超えている
   exceeds_mastery_1f995dce: 十分熟達している
+  excel_file_c6b9890: "Excel ファイル"
   excelsior_student_activity_tracking_7a1ba44d: 優秀な受講者アクティビティの追跡
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: 指定した日付以降、更新されていないデータを除外することができます。
   exclude_assignments_graded_with_a_0_score_5c853dc4: 採点が0点の課題は除外してください。
@@ -12213,6 +12230,7 @@ ja:
   file_storage_32477f6: "ファイル ストレージ"
   file_tree_collapsed_d4b0ae96: ファイルツリーが折りたたまれている
   file_tree_expanded_a1d20c4a: ファイルツリーが展開されている
+  file_type_fd1ba7ee: ファイルの種類
   file_upload_9cae6da5: ファイルのアップロード
   file_upload_failed_af22dd91: ファイルのアップロードに失敗しました
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "ファイルアップロード、file_url、または content_export_id が必要です"
@@ -12394,6 +12412,7 @@ ja:
   flags_tab_updates_c4c209f1: フラグタブの更新
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: フラッシュファイル
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr は、SafeSearchクリエイティブコモンズパブリックドメイン内に画像を表示します。
@@ -12410,6 +12429,7 @@ ja:
   folder_705fd2d7: フォルダ
   folder_browsing_tree_1f00a3ae: フォルダ参照ツリー
   folder_icon_29017021: フォルダのアイコン
+  folder_locked_b91cd0c4: ロックされたフォルダ
   folder_tree_fbab0726: フォルダツリー
   folders: 
     event_updated: イベントは正常に更新されました。
@@ -14387,6 +14407,7 @@ ja:
   html5_media_recorder_in_rce_bb59b78f: "RCEの HTML5 メディアレコーダー"
   html_editor_fb2ab713: "HTML エディタ"
   html_fc8563c6: html
+  html_file_62393d3f: HTMLファイル
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP 応答：%{code}"
@@ -14765,6 +14786,7 @@ ja:
   ilumno_grade_export_251bc4b5: "Ilumno 評定エクスポート"
   image_8ad06: 画像
   image_c1c98202: 画像
+  image_file_2b538bc: 画像ファイル
   image_id_is_not_a_valid_id_7dd6bad6: "image_id は有効な ID ではありません"
   image_search_b0944fc2: 画像検索
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url と image_id の両方はセットできません。"
@@ -15230,6 +15252,7 @@ ja:
   ireland_353_3cd32cc0: "アイルランド (+353)"
   ireland_f7bb9899: アイルランド
   irish_567e109f: アイルランド語
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " は、BigBlueButtonの無料バージョンを使用しており、それぞれが1人の主催者と最大24人の参加者をもつビデオ会議を10会議、同時に提供することができます。録音は7日間保存されます。"
   isolated_entry_post_error_page_2a447d08: 孤立したエントリの投稿エラーページ
@@ -15862,6 +15885,8 @@ ja:
   loading_grades_for_coursename_26784c2d: "%{courseName}の評定を読み込み中"
   loading_grading_periods_c635d96: 採点期間を読み込み中...
   loading_grading_periods_for_coursename_bbe46919: "%{courseName}の採点期間を読み込み中"
+  loading_grading_schemes_dc26ebd3: 評定スキームを読み込み中...
+  loading_grading_schemes_failed_please_try_again_269918df: 評定スキームの読み込みに失敗しました。もう一度やり直してください
   loading_group_f1647ebb: "%{group}を読み込み中"
   loading_grouptitle_dba362d2: "%{groupTitle}を読み込んでいます。"
   loading_homeroom_announcement_content_1654f8c7: ホームルームの通知コンテンツを読み込み中
@@ -19031,6 +19056,7 @@ ja:
   new_quizzes_migration_required_7854aa1a: 新しい小テストの移行が必要です
   new_quizzes_on_the_quizzes_page_b21f338d: 小テストページの新しい小テスト
   new_quizzes_public_api_18d95321: 新規小テストパブリックAPI
+  new_quizzes_public_api_quiz_items_16bc741d: 新規小テスト公開API：小テスト項目
   new_quizzes_service_jwt_refresh_ca28ca8: 新しいクイズサービスJWTの更新
   new_quizzes_site_admin_service_user_a331233a: "新規小テスト サイト管理者サービスユーザー"
   new_quizzes_submission_274b5c57: 新規小テスト提出
@@ -19083,6 +19109,7 @@ ja:
   next_month_749b1778: 翌月
   next_month_b55a387c: 翌月
   next_page_d2a39853: 次のページ
+  next_peer_review_3d05ef23: 次のピアレビュー
   next_question_f37bac25: 次の質問
   next_run_at_635de64a: 次の実行：
   next_steps_ce0f0d0c: 次の手順
@@ -20339,6 +20366,7 @@ ja:
     exception: 申し訳ありません。エラーが発生しました。後でもう一度試してください。
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDFファイル
   peer_632472b7: ピア：
   peer_review_74f26a13: "ピア レビュー"
   peer_review_assignment_7d314c59: ピアレビュー課題
@@ -20348,6 +20376,7 @@ ja:
   peer_review_for_assignment_ce72fc52: "%{assignment}のピア レビュー"
   peer_review_for_name_bcffa32f: "%{name}のピア評価"
   peer_review_for_name_due_dueattext_f5f6547d: "%{name}のピア評価期限：%{dueAtText}"
+  peer_review_prompt_571c5d22: ピアレビュープロンプト
   peer_review_support_in_assignment_enhancements_b1df2b76: 課題の強化におけるピアレビューのサポート
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: ピアレビューは新しい課題フローではまだ処理されていません。レガシー作成課題ページに移動しますか？
   peer_reviewed_graded_discussion_b339df5b: ピアレビューされる採点対象となるディスカッション：
@@ -21098,6 +21127,7 @@ ja:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: 評定を転記すると、ブラウザが更新されます。これには少し時間がかかる場合があります。
   posting_to_students_eaa57964: 受講者への掲示
   powered_by_instructure_504d676d: "Instructure を搭載"
+  powerpoint_file_c4cb12af: PowerPointファイル
   powerschool_a30f0bfc: パワースクール
   ppt_534cb87: PPT
   ppt_9393890d: PPT
@@ -24810,6 +24840,7 @@ ja:
                                     Slack内の #canvas-sre までお問い合わせください。
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: SFTPユーザが作成されました。このユーザが使えるようになるまで、最大4時間かかることがあります。
   sftp_user_management_19868cb3: SFTPユーザ管理
+  shadow_e98b5937: シャドー
   shard_5d340495: 破片
   shard_id_optional_382e5dda: "シャード ID (オプション)"
   shard_shard_95c57736: "分割データベース：%{shard}"
@@ -25895,6 +25926,7 @@ ja:
   sort_by_72dbba9c: 並べ替え基準
   sort_by_e75f9e3e: 分類する
   sort_courses_cf94b8d4: コース並べ替え
+  sort_ordertype_by_sortby_a0dd1c8: "%{orderType}を%{sortBy}で並べ替える"
   sort_outcome_column_c53702ed: アウトカム列の並べ替え
   sort_students_1a561e98: 受講者の並べ替え
   sortable_name_73f707cf: 並べ替え可能な名前
@@ -26223,6 +26255,7 @@ ja:
       進行アウトカムを迅速に確認できるようになります。アウトカムは評定表のような
       形式で表示され、進行状況は数値スコアおよび、達成/近い
       達成/修復可能の両方で表示されます。
+  student_outcome_result_b26b7ab4: 受講者アウトカムの結果
   student_pace_2200bf85: 受講者のペース
   student_page_history_ce86b3c2: 学生ページの履歴
   student_page_history_pages_update_ae55fa03: "受講生のページ履歴（ページ - 更新）"
@@ -26240,6 +26273,7 @@ ja:
   student_sis_id_abe6b292: "受講者 SIS ID"
   student_student_number_5c98bd2d: "受講者%{student_number}"
   student_studentnumber_f398d9c2: "受講者%{studentNumber}"
+  student_submission_report_af01e697: 受講者提出レポート
   student_submissions_910da1b3: 受講者提出
   student_submissions_report_prospect_education_108daf59: "受講者提出レポート (Prospect Education)"
   student_summary: 
@@ -26914,6 +26948,7 @@ ja:
   text_entry_e1808b2f: テキストエントリ
   text_entry_submission_7b0ae0c5: テキスト入力の提出
   text_entry_submission_cannot_be_empty_3d187cae: テキスト入力送信は、空にすることはできません
+  text_file_73d8d08c: テキストファイル
   text_input_d3480b8c: テキスト入力
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Text No Question（テキスト質問なし）はStimulus（スティミュラス）に移動しました。小テストの中で表示できるように質問を追加してください。"
   thai_8f9bc548: タイ語
@@ -27219,6 +27254,7 @@ ja:
   the_state_parameter_is_required_ffadf213: 状態パラメータが必要です
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: 受講者の注釈タブには、課題のドキュメントが含まれています。追加の送信タイプのタブも利用できる場合があります。
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "レポート対象の受講者は、student_id_typeの SIS で指定されている場合を除き、デフォルトでは Canvas ID が使用されます"
+  the_submission_is_not_available_just_yet_b3c199c: 提出物はまだ利用できません。
   the_submitted_after_date_to_report_on_9d90f026: レポートの対象となる提出後の日付
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       シラバスは、コースユーザーを迎え入れ、コースで期待される事柄を
@@ -27554,6 +27590,9 @@ ja:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       この機能により、提出ファイルのアップロードAPIは、
       関連付けられた割り当ての許可された拡張子に対してファイルタイプをチェックします。
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      この機能オプションは、サイト管理者アクセス権を持つユーザにのみ表示されます。これは
+                                「非表示」と似ていますが、サイト管理者が有効にしても、エンドユーザには表示されません。
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       この機能オプションは、サイト管理者のアクセス権を持つユーザーにのみ表示されます。
                                   エンドユーザーには、サイト管理者ユーザーによって有効にされるまで表示されません。
@@ -28059,6 +28098,7 @@ ja:
   title_required_3ff5969: タイトルが必要です
   title_separator: ": "
   title_tray_ec9f7488: "%{title}トレイ"
+  title_unpublished_51ddbc6a: "%{title}（未公開）"
   title_was_successfully_created_f2a07c56: "\"%{title}\" は正常に作成されました。"
   title_was_successfully_updated_14b78676: "\"%{title}\" は正常に更新されました。"
   titles: 
@@ -29188,7 +29228,9 @@ ja:
   upload_media_ce31135a: メディアを読み込む
   upload_not_available_for_this_folder_8f8623c6: このフォルダにはアップロードできません
   upload_percent_complete_d533d3e2: アップロード完了率
+  upload_progress_df577c48: アップロードの進行状況
   upload_progress_for_name_39f03acf: "%{name} の進行状況をアップロードする"
+  upload_success_f51f3a39: アップロード成功
   upload_successful_ca47465f: アップロードが成功しました
   upload_your_outcomes_bceeadbe: アウトカムをアップロードしてください！
   uploaded_285a2bfb: アップロードされました
@@ -29275,6 +29317,7 @@ ja:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: 定期的なキャンバスクイズの代わりに、新しいクイズLTIツールを使用する
   use_the_new_scheduler_1273b832: 新しいスケジューラーを使う
   use_this_configuration_for_parent_observer_registr_e49f8f66: 親/監視者の登録の設定を使う
+  use_this_grading_scheme_52aa4ecf: この評定方法を使用する
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: このリストを使って、課題を与えられた受講者を削除します。コンボボックスのある受講者をリスト後に追加する。
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: このパネルを使用して、重複を解決、または検索で見つからなかった人物を見つけます。
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: このパネルを使用して、重複を解決、または検索で見つからなかった人物を見つけます。
@@ -29837,6 +29880,7 @@ ja:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: 遠隔地の教室用のビデオ会議ガイド
   video_conferencing_tools_enable_face_to_face_conne_144420a5: ビデオ会議ツールは、教員と受講者間における直接顔を合わせたつながりを可能にします。
   video_content_is_not_supported_by_your_device_or_a_25214f57: ビデオコンテンツは、デバイス、またはアプリでサポートされていません。
+  video_file_f7188ffe: ビデオファイル
   video_player_b371005: ビデオプレーヤー
   video_player_for_label_6a5fdb03: "%{label}のビデオプレーヤー"
   vietnam_84_e50a2a44: ベトナム（+84）
@@ -30519,9 +30563,16 @@ ja:
   you_have_changed_the_progression_requirements_for__6772bc89: アクティブなコースの進捗要件を変更しました。このモジュールをすでに進めている受講者、またはこのモジュールに依存している他のモジュールを進めている受講者がいる可能性があります。
   you_have_completed_a_peer_review_for_name_4dd2264b: "%{name}のピアレビューを完了しました"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "%{person}名分のピアレビューを完了しました。ありがとうございました"
+  you_have_completed_your_peer_reviews_543ad84: ピアレビューを完了しました！
   you_have_count_calendars_left_f0cbcac4: 
     one: "予定表が%{count}残っています"
     other: "カレンダーが%{count}残っています"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "まだ%{count}件の完了すべきピアレビューが残っています。"
+    other: "まだ%{count}件の完了すべきピアレビューが残っています。"
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "まだ%{count}の完了すべきピアレビューが残っています。"
+    other: "まだ%{count}の完了すべきピアレビューが残っています。"
   you_have_count_peer_reviews_to_complete_52e065e: "%{count}つのピアレビューを完了する必要があります。"
   you_have_count_submissions_to_grade_6c5b511a: "採点する提出が %{count} あります"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: まだ投稿されていないコメントを作成しました。このコメントを下書きとして保存しますか？(下書きコメントはいつでも投稿できます)。
@@ -30605,6 +30656,7 @@ ja:
   you_must_set_usage_rights_87fc1382: 使用権を設定する必要があります
   you_must_specify_a_usage_right_5eb57f87: 使用権を指定する必要があります。
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Microsoft Teamsの同期を有​​効にするか無効にするかを指定する必要があります"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: ピアレビューを行う前に、自分の作品を提出する必要があります。
   you_must_use_a_number_912ce4bd: 数字を使用する必要があります
   you_must_use_a_positive_number_203b86fe: 正の数字を使用する必要があります
   you_must_use_an_integer_78d2530f: 整数を使用する必要があります
@@ -30747,6 +30799,7 @@ ja:
   zero_activity_title: "ゼロ アクティビティ"
   zip_26961da: zip
   zip_argument_error: ".zip をアップロードするには、アップロード先のフォルダが必要です。"
+  zip_file_3e736239: Zipファイル
   zip_file_description: ".zip アーカイブをコース、グループ、またはユーザ ファイルに解凍するための移行プラグイン"
   zip_file_display: "ファイル インポート"
   zip_file_file_description: ".zip ファイルをフォルダに解凍"
