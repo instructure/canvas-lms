@@ -21,16 +21,18 @@ import {fireEvent, render, within} from '@testing-library/react'
 
 import {
   ExternalToolSelectionDialog,
-  LtiToolsModalProps,
+  ExternalToolSelectionDialogProps,
 } from '../ExternalToolSelectionDialog/ExternalToolSelectionDialog'
 import {RceToolWrapper} from '../../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
 
-describe('LtiToolModal', () => {
+describe('ExternalToolSelectionDialog', () => {
   const fakeEnv = createDeepMockProxy<ExternalToolsEnv>()
 
-  function buildProps(override: Partial<LtiToolsModalProps> = {}): LtiToolsModalProps {
+  function buildProps(
+    override: Partial<ExternalToolSelectionDialogProps> = {}
+  ): ExternalToolSelectionDialogProps {
     return {
       onDismiss: () => null,
       ltiButtons: RceToolWrapper.forEditorEnv(fakeEnv, [
@@ -61,7 +63,7 @@ describe('LtiToolModal', () => {
     }
   }
 
-  function renderComponent(propOverrides: Partial<LtiToolsModalProps> = {}) {
+  function renderComponent(propOverrides: Partial<ExternalToolSelectionDialogProps> = {}) {
     return render(<ExternalToolSelectionDialog {...buildProps(propOverrides)} />)
   }
 
@@ -143,8 +145,13 @@ describe('LtiToolModal', () => {
     })
     const tool1 = getByText('Tool 1')
     tool1.click()
-    expect(doAction).toHaveBeenCalled()
+
     expect(onDismiss).toHaveBeenCalled()
+    expect(doAction).toHaveBeenCalled()
+
+    // Ensure onDismiss() was called before doAction(), otherwise the new dialog won't open
+    // From https://github.com/facebook/jest/issues/4402#issuecomment-534516219
+    expect(onDismiss.mock.invocationCallOrder[0]).toBeLessThan(doAction.mock.invocationCallOrder[0])
   })
 
   describe('filtering', () => {
