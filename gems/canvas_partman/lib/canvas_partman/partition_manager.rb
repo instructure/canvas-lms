@@ -98,8 +98,6 @@ SQL
         base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
           base_class.connection.add_foreign_key partition_table, foreign_key.to_table, **foreign_key.options.except(:name)
         end
-
-        CanvasPartman.after_create_callback.call(base_class, partition_table)
       end
 
       partition_table

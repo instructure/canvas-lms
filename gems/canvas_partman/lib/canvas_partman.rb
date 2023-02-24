@@ -36,7 +36,7 @@ module CanvasPartman
     #   during partition table creation/deletion so that the behavior
     #   when partition management is happening can be bounded to avoid
     #   operational impacts from long running transactions
-    attr_accessor :migrations_scope, :timeout_seconds, :after_create_callback
+    attr_accessor :migrations_scope, :timeout_seconds
 
     def timeout_value
       timeout_seconds.call
@@ -45,5 +45,4 @@ module CanvasPartman
 
   self.migrations_scope = "partitions"
   self.timeout_seconds = -> { 90 }
-  self.after_create_callback = ->(parent_class, table) {}
 end
