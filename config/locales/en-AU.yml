@@ -1217,6 +1217,12 @@ en-AU:
         default: 
           lti_reports: 
             text: "This report provides an export of data that shows LTI (Learning Tool Interoperability) usage information."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Term
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4808,6 +4814,7 @@ en-AU:
   audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Audio content is not supported by your device or app."
   audio_dd489fcc: Audio
+  audio_file_bf3ece7e: "Audio File"
   audio_player_for_label_dd9a6819: "Audio player for %{label}"
   august_781433e8: August
   australia_61_eb9bb701: "Australia (+61)"
@@ -6292,6 +6299,7 @@ en-AU:
   cluster_cluster_b57fe99a: "Cluster: %{cluster}"
   cluster_f407976: Cluster
   code_93e9abbb: code
+  code_file_424dc478: "Code File"
   code_is_case_sensitive_d8175cad: "Code is case sensitive."
   cog_icon_69bdffd5: "Cog icon"
   col_is_sorted_ascending_cc5152cc: "%{col} is sorted ascending"
@@ -6348,6 +6356,7 @@ en-AU:
     errors: 
       cannot_load_collaboration: "Cannot load collaboration"
       create_failed: "Collaboration creation failed"
+      no_masquerading_on_collaboration: "Viewing a collaboration while acting as another user is not permitted."
       no_name: "Please enter a name for this document"
       not_enabled: "Collaborations have not been enabled for this Canvas site"
       title_too_long: "Please use %{maxLength} characters or less for the name. Use the description for additional content."
@@ -10498,6 +10507,10 @@ en-AU:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Display Values"
   displaying_to_students_b1e92058: "Displaying to Students"
+  displayname_loaded_14d71a0a: "%{displayName} loaded"
+  displayname_loading_in_progress_2be325fd: "%{displayName} loading in progress"
+  displayname_loading_pending_3aa2723e: "%{displayName} loading pending"
+  displayname_loading_success_8177d735: "%{displayName} loading success"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Displays confetti for teachers that run the link validator on
       a course and no issues are found.
@@ -10518,6 +10531,7 @@ en-AU:
   do_nothing_9672b478: "Do Nothing"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Doc File"
   document_to_annotate_d37b93bc: "Document to annotate"
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork file support"
   docviewer_area_created_37502a31: "Docviewer area created"
@@ -11012,6 +11026,7 @@ en-AU:
   enabled_unlocked_8d3a5df7: "Enabled (unlocked)"
   enabled_web_services_f620b2be: "Enabled Web Services"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Enables a redesigned Message Students Who... dialog that allows for messaging observers in addition to students."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Enables access to the New Quizzes Public API: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Enables access to the New Quizzes Public API through Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Enables display of plagiarism reports and similarity scores in the New Markbook submission tray."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Enables important dates to be applied to assignments, calendar events, and others."
@@ -11603,6 +11618,7 @@ en-AU:
       exclusion: "is reserved"
       greater_than: "must be greater than %{count}"
       greater_than_or_equal_to: "must be greater than or equal to %{count}"
+      in: "must be in %{count}"
       inclusion: "is not included in the list"
       invalid: "is invalid"
       less_than: "must be less than %{count}"
@@ -11737,6 +11753,7 @@ en-AU:
   exceeded_the_maximum_length_number_characters_2d25611e: "Exceeded the maximum length (%{number} characters)"
   exceeds_expectations_5910fc3a: "Exceeds Expectations"
   exceeds_mastery_1f995dce: "Exceeds Mastery"
+  excel_file_c6b9890: "Excel File"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Student Activity Tracking"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Exclude any data that hasn't been updated since the given date"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Exclude assignments graded with a 0 score."
@@ -12234,6 +12251,7 @@ en-AU:
   file_storage_32477f6: "File Storage"
   file_tree_collapsed_d4b0ae96: "File tree collapsed"
   file_tree_expanded_a1d20c4a: "File tree expanded"
+  file_type_fd1ba7ee: "File Type"
   file_upload_9cae6da5: "File Upload"
   file_upload_failed_af22dd91: "File upload failed"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "File upload, file_url, or content_export_id is required"
@@ -12415,6 +12433,7 @@ en-AU:
   flags_tab_updates_c4c209f1: "Flags tab updates"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "Flash File"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr displays SafeSearch images within the Creative Commons Public Domain.
@@ -12431,6 +12450,7 @@ en-AU:
   folder_705fd2d7: Folder
   folder_browsing_tree_1f00a3ae: "Folder Browsing Tree"
   folder_icon_29017021: "Folder icon"
+  folder_locked_b91cd0c4: "Folder Locked"
   folder_tree_fbab0726: "Folder tree"
   folders: 
     event_updated: "Event was successfully updated."
@@ -14418,6 +14438,7 @@ en-AU:
   html5_media_recorder_in_rce_bb59b78f: "HTML5 Media Recorder in RCE"
   html_editor_fb2ab713: "HTML Editor"
   html_fc8563c6: html
+  html_file_62393d3f: "HTML File"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP Response: %{code}"
@@ -14798,6 +14819,7 @@ en-AU:
   ilumno_grade_export_251bc4b5: "Ilumno Mark Export"
   image_8ad06: Image
   image_c1c98202: image
+  image_file_2b538bc: "Image File"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id is not a valid ID."
   image_search_b0944fc2: "Image Search"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url and image_id cannot both be set."
@@ -15280,6 +15302,7 @@ en-AU:
   ireland_f7bb9899: Ireland
   irish_567e109f: Irish
   is_an_lti_1_3_tool_770480a1: "Is an LTI 1.3 Tool."
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " is using a free version of BigBlueButton that provides 10 concurrent video conferences, each with 1 host and up to 24 attendees. Recordings are stored for 7 days."
   isolated_entry_post_error_page_2a447d08: "Isolated Entry Post Error Page"
@@ -15912,6 +15935,8 @@ en-AU:
   loading_grades_for_coursename_26784c2d: "Loading marks for %{courseName}"
   loading_grading_periods_c635d96: "Loading marking periods..."
   loading_grading_periods_for_coursename_bbe46919: "Loading marking periods for %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Loading Grading Schemes..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Loading Grading Schemes Failed.  Please Try Again"
   loading_group_f1647ebb: "Loading %{group}"
   loading_grouptitle_dba362d2: "Loading %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Loading Homeroom Announcement Content"
@@ -19082,6 +19107,7 @@ en-AU:
   new_quizzes_migration_required_7854aa1a: "New Quizzes migration required"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes on the Quizzes page"
   new_quizzes_public_api_18d95321: "New Quizzes Public API"
+  new_quizzes_public_api_quiz_items_16bc741d: "New Quizzes Public API: Quiz Items"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes Service JWT Refresh"
   new_quizzes_site_admin_service_user_a331233a: "New Quizzes Site Admin Service User"
   new_quizzes_submission_274b5c57: "New Quizzes Submission"
@@ -19134,6 +19160,7 @@ en-AU:
   next_month_749b1778: "Next Month"
   next_month_b55a387c: "Next month"
   next_page_d2a39853: "Next Page"
+  next_peer_review_3d05ef23: "Next Peer Review"
   next_question_f37bac25: "Next Question"
   next_run_at_635de64a: "Next run at"
   next_steps_ce0f0d0c: "Next Steps"
@@ -20395,6 +20422,7 @@ en-AU:
     exception: "We're sorry, an error has occurred, please try again later."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "PDF File"
   peer_632472b7: "Peer:"
   peer_review_74f26a13: "Peer Review"
   peer_review_assignment_7d314c59: "Peer Review Assignment"
@@ -20404,6 +20432,7 @@ en-AU:
   peer_review_for_assignment_ce72fc52: "Peer Review for %{assignment}"
   peer_review_for_name_bcffa32f: "Peer review for %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peer review for %{name} Due: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Peer Review Prompt"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Peer Review Support in Assignment Enhancements"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?"
   peer_reviewed_graded_discussion_b339df5b: "Peer-reviewed graded discussion:"
@@ -21156,6 +21185,7 @@ en-AU:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Posting marks will refresh your browser. This may take a moment."
   posting_to_students_eaa57964: "Posting to Students"
   powered_by_instructure_504d676d: "Powered By Instructure"
+  powerpoint_file_c4cb12af: "PowerPoint File"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24878,6 +24908,7 @@ en-AU:
                                     Please reach out in #canvas-sre in Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP user has been created. It can take up to four hours for this user to start working."
   sftp_user_management_19868cb3: "SFTP User Management"
+  shadow_e98b5937: Shadow
   shard_5d340495: Shard
   shard_id_optional_382e5dda: "Shard ID (optional)"
   shard_shard_95c57736: "Shard: %{shard}"
@@ -25971,6 +26002,7 @@ en-AU:
   sort_by_72dbba9c: "Sort by"
   sort_by_e75f9e3e: "Sort By"
   sort_courses_cf94b8d4: "Sort courses"
+  sort_ordertype_by_sortby_a0dd1c8: "Sort %{orderType} by %{sortBy}"
   sort_outcome_column_c53702ed: "Sort Outcome Column"
   sort_students_1a561e98: "Sort Students"
   sortable_name_73f707cf: "Sortable Name"
@@ -26299,6 +26331,7 @@ en-AU:
       on course learning outcomes. Outcomes are presented in a Markbook-like
       format and progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
+  student_outcome_result_b26b7ab4: "Student Outcome Result"
   student_pace_2200bf85: "Student Pace"
   student_page_history_ce86b3c2: "Student Page History"
   student_page_history_pages_update_ae55fa03: "Student Page History (Pages - Update)"
@@ -26316,6 +26349,7 @@ en-AU:
   student_sis_id_abe6b292: "student sis id"
   student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
+  student_submission_report_af01e697: "Student Submission Report"
   student_submissions_910da1b3: "Student Submissions"
   student_submissions_report_prospect_education_108daf59: "Student Submissions Report (Prospect Education)"
   student_summary: 
@@ -26993,6 +27027,7 @@ en-AU:
   text_entry_e1808b2f: "Text Entry"
   text_entry_submission_7b0ae0c5: "Text Entry Submission"
   text_entry_submission_cannot_be_empty_3d187cae: "The text entry submission cannot be empty."
+  text_file_73d8d08c: "Text File"
   text_input_d3480b8c: "Text input"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Text No Question has moved to a Stimulus; please add a question so it can display within the quiz."
   thai_8f9bc548: Thai
@@ -27301,6 +27336,7 @@ en-AU:
   the_state_parameter_is_required_ffadf213: "The state parameter is required"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "The student to report on; defaults to Canvas id unless specified as SIS in student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "The submission is not available just yet."
   the_submitted_after_date_to_report_on_9d90f026: "The submitted after date to report on"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       The Syllabus lets you welcome your course users and share expectations
@@ -27636,6 +27672,9 @@ en-AU:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       This feature makes the submissions file upload api check the filetype against
       the allowed extensions of the associated assignment.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      This feature option is only visible to users with Site Admin access. It is similar to
+                                "Hidden", but end users will not see it even if enabled by a Site Admin user.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       This feature option is only visible to users with Site Admin access.
                                   End users will not see it until enabled by a Site Admin user.
@@ -28141,6 +28180,7 @@ en-AU:
   title_required_3ff5969: "Title required"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tray"
+  title_unpublished_51ddbc6a: "%{title} (unpublished)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" was successfully created."
   title_was_successfully_updated_14b78676: "\"%{title}\" was successfully updated."
   titles: 
@@ -29271,7 +29311,9 @@ en-AU:
   upload_media_ce31135a: "Upload Media"
   upload_not_available_for_this_folder_8f8623c6: "Upload not available for this folder"
   upload_percent_complete_d533d3e2: "Upload Percent Complete"
+  upload_progress_df577c48: "Upload Progress"
   upload_progress_for_name_39f03acf: "Upload progress for %{name}"
+  upload_success_f51f3a39: "Upload Success"
   upload_successful_ca47465f: "Upload successful"
   upload_your_outcomes_bceeadbe: "Upload your Outcomes!"
   uploaded_285a2bfb: Uploaded
@@ -29358,6 +29400,7 @@ en-AU:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool in place of regular canvas quizzes."
   use_the_new_scheduler_1273b832: "Use the new scheduler."
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Use this configuration for parent/observer registration"
+  use_this_grading_scheme_52aa4ecf: "Use This Grading Scheme"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Use this list to remove assigned students. Add new students with combo box after list."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Use this panel to resolve duplicate results or people not found with your search."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Use this panel to resolve duplicates or people not found with your search."
@@ -29921,6 +29964,7 @@ en-AU:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video Conferencing Guides for Remote Classrooms"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Video conferencing tools enable face-to-face connection between teachers and students."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
+  video_file_f7188ffe: "Video File"
   video_player_b371005: "Video Player"
   video_player_for_label_6a5fdb03: "Video player for %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -30618,9 +30662,16 @@ en-AU:
   you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it."
   you_have_completed_a_peer_review_for_name_4dd2264b: "You have completed a peer review for %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "You have completed a peer review for %{person}. Thank you"
+  you_have_completed_your_peer_reviews_543ad84: "You have completed your Peer Reviews!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "You have 1 calendar left"
     other: "You have %{count} calendars left"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "You have 1 more Peer Review to complete."
+    other: "You have %{count} more Peer Reviews to complete."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "You have 1 Peer Review to complete."
+    other: "You have %{count} Peer Reviews to complete."
   you_have_count_peer_reviews_to_complete_52e065e: "You have %{count} Peer Reviews to complete"
   you_have_count_submissions_to_grade_6c5b511a: "You have %{count} submissions to mark"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "You have created a comment that has not been posted. Do you want to proceed and save this comment as a draft? (You can post draft comments at any time.)"
@@ -30704,6 +30755,7 @@ en-AU:
   you_must_set_usage_rights_87fc1382: "You must set usage rights"
   you_must_specify_a_usage_right_5eb57f87: "You must specify a usage right."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "You must specify whether to enable or disable Microsoft Teams sync"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "You must submit your own work before you can review your peers."
   you_must_use_a_number_912ce4bd: "You must use a number"
   you_must_use_a_positive_number_203b86fe: "You must use a positive number"
   you_must_use_an_integer_78d2530f: "You must use an integer"
@@ -30846,6 +30898,7 @@ en-AU:
   zero_activity_title: "Zero Activity"
   zip_26961da: zip
   zip_argument_error: "A .zip upload requires a folder to upload to."
+  zip_file_3e736239: "Zip File"
   zip_file_description: "Migration plugin for unpacking .zip archives into course, group, or user files"
   zip_file_display: "File Import"
   zip_file_file_description: "Unzip .zip file into folder"
