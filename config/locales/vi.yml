@@ -909,6 +909,12 @@ vi:
         default: 
           lti_reports: 
             text: "Báo cáo này cung cấp bản xuất dữ liệu trình bày thông tin sử dụng LTI (Khả Năng Tương Tác Của Công Cụ Học Tập)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: "Học Kỳ"
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -3511,6 +3517,7 @@ vi:
   audio_1c89b0c8: "âm thanh"
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Nội dung âm thanh không được thiết bị hoặc ứng dụng của bạn hỗ trợ."
   audio_dd489fcc: "Âm thanh"
+  audio_file_bf3ece7e: "Tập Tin Âm Thanh"
   audio_player_for_label_dd9a6819: "Trình phát âm thanh cho %{label}"
   august_781433e8: "Tháng Tám"
   australia_61_eb9bb701: "Úc (+61)"
@@ -4638,6 +4645,7 @@ vi:
   cluster_cluster_b57fe99a: "Cụm: %{cluster}"
   cluster_f407976: Cụm
   code_93e9abbb: mã
+  code_file_424dc478: "Tập Tin Mã"
   code_is_case_sensitive_d8175cad: "Mã phân biệt chữ hoa chữ thường."
   cog_icon_69bdffd5: "Biểu tượng bánh răng"
   col_is_sorted_ascending_cc5152cc: "%{col} được sắp xếp theo thứ tự tăng dần"
@@ -4684,6 +4692,7 @@ vi:
     errors: 
       cannot_load_collaboration: "Không thể tải cộng tác"
       create_failed: "Tạo cộng tác không thành công"
+      no_masquerading_on_collaboration: "Không được phép xem cộng tác trong khi đóng vai trò là người dùng khác."
       no_name: "Vui lòng nhập tên cho cộng tác này."
       not_enabled: "Cộng tác chưa được bật cho trang Canvas này"
       title_too_long: "Vui lòng sử dụng %{maxLength} ký tự trở xuống cho tên. Sử dụng mô tả cho nội dung bổ sung."
@@ -7814,6 +7823,10 @@ vi:
   display_totals_for_all_grading_periods_option_4a72586: "Hiển thị tổng số đối với tùy chọn Tất Cả Thời Gian Phân Loại Điểm"
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Hiển Thị Các Giá Trị"
+  displayname_loaded_14d71a0a: "Đã tải %{displayName}"
+  displayname_loading_in_progress_2be325fd: "Tải %{displayName} đang tiến hành"
+  displayname_loading_pending_3aa2723e: "Tải %{displayName} đang chờ"
+  displayname_loading_success_8177d735: "Tải %{displayName} thành công"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Hiển thị pháo hoa giấy đối với giáo viên chạy trình xác thực liên kết trên
       một khóa học và không tìm thấy có vấn đề gì.
@@ -7830,6 +7843,7 @@ vi:
   do_nothing_9672b478: "Không Làm Gì Cả"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Tập Tin Doc"
   document_to_annotate_d37b93bc: "Tài liệu để chú thích"
   docviewer_apple_iwork_file_support_dc772b31: "Hỗ trợ tệp Docviewer Apple iWork"
   docviewer_area_created_37502a31: "Đã tạo phần Docviewer"
@@ -8193,6 +8207,7 @@ vi:
   enabled_links_be110215: "Đã Bật Các Liên Kết"
   enabled_web_services_f620b2be: "Đã Bật Các Dịch Vụ Web"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Bật hộp thoại Nhắn Tin cho Sinh Viên... được thiết kế lại, cho phép nhắn tin cho những người quan sát ngoài sinh viên."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Cho phép truy cập API Công Cộng Câu Hỏi Kiểm Tra Mới: API Mục Câu Hỏi Kiểm Tra."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Cho phép truy cập vào API Công Khai Các Câu Hỏi Kiểm Tra Mới thông qua Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Bật hiển thị báo cáo đạo văn và điểm số tương tự trong khay nộp Sổ Điểm Mới."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Cho phép áp dụng các ngày quan trọng cho bài tập, sự kiện lịch và những ngày khác."
@@ -8675,6 +8690,7 @@ vi:
       exclusion: "được lưu trữ"
       greater_than: "phải lớn hơn %{count}"
       greater_than_or_equal_to: "phải lớn hơn hoặc bằng %{count}"
+      in: "phải nằm trong %{count}"
       inclusion: "không có trong danh sách"
       invalid: "không hợp lệ"
       less_than: "phải nhỏ hơn %{count}"
@@ -8805,6 +8821,7 @@ vi:
   exceeded_the_maximum_length_number_characters_2d25611e: "Vượt quá độ dài tối đa (%{number} ký tự)"
   exceeds_expectations_5910fc3a: "Vượt Quá Kỳ Vọng"
   exceeds_mastery_1f995dce: "Vượt Quá Thành Thạo"
+  excel_file_c6b9890: "Tập Tin Excel"
   excelsior_student_activity_tracking_7a1ba44d: "Theo Dõi Hoạt Động của Sinh Viên Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Loại trừ bất kỳ dữ liệu nào chưa được cập nhật kể từ ngày được đưa ra"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Loại trừ các bài tập bị chấm điểm 0."
@@ -9102,6 +9119,7 @@ vi:
   file_storage_32477f6: "Lưu Trữ Tập Tin"
   file_tree_collapsed_d4b0ae96: "Cây tập tin đã được thu gọn"
   file_tree_expanded_a1d20c4a: "Cây tập tin được mở rộng"
+  file_type_fd1ba7ee: "Loại Tập Tin"
   file_upload_9cae6da5: "Tải Lên Tập Tin"
   file_upload_failed_af22dd91: "Tải lên tập tin không thành công"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Tải lên tập tin, file_url, hoặc content_export_id là bắt buộc"
@@ -9235,6 +9253,7 @@ vi:
   flags_tab_updates_c4c209f1: "Các Cập Nhật tab Cờ"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "Tập Tin Flash"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr hiển thị SafeSearch hình ảnh trong Miền Công Khai Tài Sản Sáng Tạo Công Cộng.
@@ -9250,6 +9269,7 @@ vi:
   folder_705fd2d7: "Thư mục"
   folder_browsing_tree_1f00a3ae: "Cây Duyệt Thư Mục"
   folder_icon_29017021: "Biểu tượng thư mục"
+  folder_locked_b91cd0c4: "Thư Mục Đã Khóa"
   folder_tree_fbab0726: "Cây thư mục"
   folders: 
     event_updated: "Sự kiện đã được cập nhật thành công."
@@ -10409,6 +10429,7 @@ vi:
   howard_assignments_report_f3254802: "Báo Cáo Bài Tập của Howard"
   however_if_these_additional_permissions_are_enable_35d3082c: "Tuy nhiên, nếu các quyền bổ sung này được bật, nhưng quyền cập nhật Trang không được bật, người dùng vẫn có thể điều chỉnh cài đặt khóa nội dung trên các trang riêng lẻ trong Khóa Học Tổng Thể Cơ Bản."
   html_fc8563c6: html
+  html_file_62393d3f: "Tập Tin HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "Phản Hồi HTTP: %{code}"
@@ -10642,6 +10663,7 @@ vi:
   ilumno_grade_export_251bc4b5: "Xuất Điểm Ilumno"
   image_8ad06: "Hình ảnh"
   image_c1c98202: "hình ảnh"
+  image_file_2b538bc: "Tập Tin Ảnh"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id không phải ID hợp lệ"
   image_search_b0944fc2: "Tìm Kiếm Hình Ảnh"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url và image_id đều không thể được thiết lập."
@@ -10979,6 +11001,7 @@ vi:
   ip_filter_is_not_valid_152a46d8: "Bộ lọc IP không hợp lệ."
   ireland_353_3cd32cc0: "Ailen (+353)"
   irish_567e109f: "Tiếng Ailen"
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   isolated_entry_post_error_page_2a447d08: "Trang Lỗi Bài Đăng Mục Nhập Biệt Lập"
   isolated_entry_query_error_f0bfae18: "Lỗi truy vấn Mục Nhập Biệt Lập"
@@ -11543,6 +11566,8 @@ vi:
   loading_grades_for_coursename_26784c2d: "Đang tải các điểm cho %{courseName}"
   loading_grading_periods_c635d96: "Đang tải các thời gian phân loại điểm..."
   loading_grading_periods_for_coursename_bbe46919: "Đang tải các thời gian phân loại điểm cho %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Đang Tải Các Chế Độ Cho Điểm..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Tải Chế Độ Cho Điểm Không Thành Công.  Vui Lòng Thử Lại"
   loading_group_f1647ebb: "Đang tải %{group}"
   loading_grouptitle_dba362d2: "Đang tải %{groupTitle}."
   loading_homeroom_course_name_9f63923d: "Đang tải Tên Khóa Học Chủ Nhiệm"
@@ -14104,6 +14129,7 @@ vi:
   new_quizzes_migration_required_7854aa1a: "Di chuyển Câu Hỏi Kiểm Tra Mới bắt buộc"
   new_quizzes_on_the_quizzes_page_b21f338d: "Câu Hỏi Kiểm Tra Mới trên trang Câu Hỏi Kiểm Tra"
   new_quizzes_public_api_18d95321: "API Công Khai Các Câu Hỏi Kiểm Tra Mới"
+  new_quizzes_public_api_quiz_items_16bc741d: "API Công Cộng Câu Hỏi Kiểm Tra Mới: Mục Câu Hỏi Kiểm Tra"
   new_quizzes_service_jwt_refresh_ca28ca8: "Làm Mới Dịch Vụ JWT Các Câu Hỏi Kiểm Tra Mới"
   new_quizzes_site_admin_service_user_a331233a: "Người Dùng Dịch Vụ Quản Trị Viên Trang Các Câu Hỏi Kiểm Tra"
   new_quizzes_submission_274b5c57: "Nộp Bài Câu Hỏi Kiểm Tra Mới"
@@ -14150,6 +14176,7 @@ vi:
   next_month_749b1778: "Tháng Tiếp Theo"
   next_month_b55a387c: "Tháng sau"
   next_page_d2a39853: "Trang Sau"
+  next_peer_review_3d05ef23: "Bình Duyệt Tiếp Theo"
   next_question_f37bac25: "Câu Hỏi Tiếp Theo"
   next_run_at_635de64a: "Lần Chạy Tiếp Theo vào"
   next_steps_ce0f0d0c: "Bước Tiếp Theo"
@@ -15167,6 +15194,7 @@ vi:
   pause_auto_refresh_9bd773ca: "Tạm dừng tự động làm mới"
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "Tập Tin PDF"
   peer_632472b7: "Ngang Hàng:"
   peer_review_74f26a13: "Bình Duyệt"
   peer_review_assignment_7d314c59: "Bài Tập Bình Duyệt"
@@ -15176,6 +15204,7 @@ vi:
   peer_review_for_assignment_ce72fc52: "Bình Duyệt cho %{assignment}"
   peer_review_for_name_bcffa32f: "Bình duyệt cho %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Bình duyệt cho %{name} Hạn: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Nhắc Nhở Bình Duyệt"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Hỗ Trợ Bình Duyệt trong Cải Tiến Bài Tập"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Bài tập đã được bình duyệt chưa được xử lý trong dòng bài tập mới. Đi đến trang tạo bài tập kế thừa?"
   peer_reviews_api: 
@@ -15816,6 +15845,7 @@ vi:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Đăng điểm sẽ làm mới trình duyệt của bạn. Điều này sẽ tốn một chút thời gian."
   posting_to_students_eaa57964: "Đang đăng đến Sinh Viên"
   powered_by_instructure_504d676d: "Được Cung Cấp Bởi Instructure"
+  powerpoint_file_c4cb12af: "Tập Tin PowerPoint"
   ppt_534cb87: PPT
   ppt_9393890d: ppt
   practice_quiz_19a8505d: "Kiểm tra luyện tập"
@@ -18743,6 +18773,7 @@ vi:
                                     Vui lòng liên hệ vào #canvas-sre trong Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "Người dùng SFTP đã được tạo. Có thể mất đến tối đa bốn giờ để người dùng này bắt đầu hoạt động."
   sftp_user_management_19868cb3: "Quản Lý Người Dùng SFTP"
+  shadow_e98b5937: Bóng
   shard_5d340495: "Phân Đoạn"
   shard_id_optional_382e5dda: "ID phân đoạn (tùy chọn)"
   shard_shard_95c57736: "Phân đoạn: %{shard}"
@@ -19427,6 +19458,7 @@ vi:
   sort_15eac63f: "Sắp Xếp"
   sort_by_72dbba9c: "Sắp xếp theo"
   sort_by_e75f9e3e: "Sắp Xếp Theo"
+  sort_ordertype_by_sortby_a0dd1c8: "Sắp xếp %{orderType} theo %{sortBy}"
   sort_outcome_column_c53702ed: "Sắp Xếp Cột Kết Quả"
   sort_students_1a561e98: "Sắp Xếp Sinh Viên"
   sortable_name_73f707cf: "Tên Có Thể Sắp Xếp"
@@ -19713,6 +19745,7 @@ vi:
       tiến độ kết quả học tập của khóa học. Kết quả được trình bày ở
       định dạng giống như Sổ Điểm và tiến trình được hiển thị cả dưới dạng điểm bằng số và mức độ thành thạo/gần
       thành thạo/cần sửa chữa.
+  student_outcome_result_b26b7ab4: "Kết Quả của Sinh Viên"
   student_pace_2200bf85: "Nhịp độ Sinh Viên"
   student_page_history_ce86b3c2: "Lịch Sử Trang Sinh Viên"
   student_paired_successfully_a88def61: "Ghép cặp sinh viên thành công"
@@ -19727,6 +19760,7 @@ vi:
   student_sis_id_abe6b292: "id sis sinh viên"
   student_student_number_5c98bd2d: "Sinh Viên %{student_number}"
   student_studentnumber_f398d9c2: "Sinh Viên %{studentNumber}"
+  student_submission_report_af01e697: "Báo Cáo về Bài Nộp của Sinh Viên"
   student_submissions_910da1b3: "Bài Nộp của Sinh Viên"
   student_submissions_report_prospect_education_108daf59: "Báo Cáo Bài Nộp của Sinh Viên (Prospect Education)"
   student_tour_38b735c8: "Chuyến Tham Quan Cho Sinh Viên"
@@ -20296,6 +20330,7 @@ vi:
   text_entry_e1808b2f: "Nhập Văn Bản"
   text_entry_submission_7b0ae0c5: "Gửi Mục Nhập Văn Bản"
   text_entry_submission_cannot_be_empty_3d187cae: "Không thể để trống nội dung gửi mục nhập văn bản"
+  text_file_73d8d08c: "Tập Tin Văn Bản"
   text_input_d3480b8c: "Nhập văn bản"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Văn Bản Không Có Câu Hỏi đã chuyển thành một Tác Nhân Thúc Đẩy; vui lòng thêm một câu hỏi để có thể hiển thị trong câu hỏi kiểm tra."
   thai_8f9bc548: "Tiếng Thái"
@@ -20533,6 +20568,7 @@ vi:
   the_state_parameter_is_required_ffadf213: "Bắt buộc có thông số trạng thái"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Tab chú thích của sinh viên bao gồm tài liệu cho bài tập. Cũng có thể có các tab có loại bài nộp bổ sung."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Sinh viên để báo cáo; mặc định là id Canvas trừ khi được chỉ định là SIS trong student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Bài nộp hiện chưa khả dụng."
   the_submitted_after_date_to_report_on_9d90f026: "Ngày “gửi sau” để báo cáo"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Chương Trình Học cho phép bạn đón chào những người dùng khóa học và chia sẻ các kỳ vọng
@@ -20788,6 +20824,9 @@ vi:
       Khi nhiều tập tin được nộp cùng nhau bằng
       một công cụ của bên thứ ba thông qua API Dịch Vụ Bài Tập và Lớp, đặc tính này sẽ khiến chúng được
       nhóm vào một bài nộp, thay vì tạo ra nhiều bài nộp riêng lẻ.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Tùy chọn tính năng này chỉ hiển thị cho người dùng có quyền truy cập Quản Trị Viên Trang Web. Tùy chọn tính năng này giống với
+                                "Ẩn", nhưng người dùng cuối sẽ không nhìn thấy kể cả khi được người dùng Quản Trị Viên Trang Web bật.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Tùy chọn đặc tính này chỉ được hiển thị cho người dùng có quyền truy cập Quản Trị Viên Trang.
                                   Người dùng cuối sẽ không thể xem tùy chọn này cho tới khi được người dùng Quản Trị Viên Trang cho phép.
@@ -21205,6 +21244,7 @@ vi:
   title_required_3ff5969: "Tiêu đề bắt buộc"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} khay"
+  title_unpublished_51ddbc6a: "%{title} (chưa phát hành)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" đã được tạo thành công."
   title_was_successfully_updated_14b78676: "\"%{title}\" đã được cập nhật thành công."
   titles: 
@@ -21834,7 +21874,9 @@ vi:
   upload_media_ce31135a: "Tải Lên Phương Tiện"
   upload_not_available_for_this_folder_8f8623c6: "Tải lên không khả dụng cho thư mục này"
   upload_percent_complete_d533d3e2: "Hoàn Thành Tải Lên Phần Trăm"
+  upload_progress_df577c48: "Tiến Trình Tải Lên"
   upload_progress_for_name_39f03acf: "Tiến trình tải lên cho %{name}"
+  upload_success_f51f3a39: "Tải Lên Thành Công"
   upload_successful_ca47465f: "Tải lên thành công"
   upload_your_outcomes_bceeadbe: "Tải lên Kết Quả của bạn!"
   uploaded_285a2bfb: "Đã tải lên"
@@ -21897,6 +21939,7 @@ vi:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Sử dụng dấu chấm phẩy để phân biệt các trường trong việc xuất trang tính tương thích"
   use_the_new_assignments_teacher_page_8add7e46: "Sử dụng trang giáo viên cho các bài tập mới"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Sử dụng công cụ ngoài Cộng Tác mới cho phép nhiều tùy chọn công cụ hơn để sử dụng cho cộng tác"
+  use_this_grading_scheme_52aa4ecf: "Sử Dụng Chế Độ Cho Điểm Này"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Sử dụng danh sách này để loại bỏ các sinh viên được chỉ định. Thêm các học sinh mới vào hộp nhóm sau khi ghi vào danh sách."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Sử dụng bảng này để giải quyết các kết quả trùng lặp hoặc người không tìm thấy trong tìm kiếm của bạn."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Sử dụng bảng này để tìm kiếm những người bạn muốn thêm vào khóa học này."
@@ -22360,6 +22403,7 @@ vi:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Hướng Dẫn Hội Nghị Video cho Lớp Học Từ Xa"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Các công cụ hội nghị cho phép giáo viên và học sinh kết nối trực tiếp."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Nội dung video không được thiết bị hoặc ứng dụng của bạn hỗ trợ."
+  video_file_f7188ffe: "Tập Tin Video"
   video_player_b371005: "Trình Phát Video"
   video_player_for_label_6a5fdb03: "Trình phát video cho %{label}"
   vietnam_84_e50a2a44: "Việt Nam (+84)"
@@ -22917,9 +22961,16 @@ vi:
   you_have_changed_the_progression_requirements_for__6772bc89: "Bạn đã thay đổi các yêu cầu về tiến trình cho một khóa học đang hoạt động. Có thể đã có những sinh viên đã đang trong quá trình đến học phần này và những sinh viên khác phụ thuộc vào học phần đó."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Bạn đã hoàn thành một bình duyệt cho %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Bạn đã hoàn thành một bình duyệt .cho %{person}. Xin cảm ơn"
+  you_have_completed_your_peer_reviews_543ad84: "Bạn đã hoàn thành Bình Duyệt của mình!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Bạn còn 1 lịch"
     other: "Bạn còn %{count} lịch"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Bạn có 1 Bình Duyệt nữa cần hoàn thành."
+    other: "Bạn có %{count} Bình Duyệt nữa cần hoàn thành."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Bạn có 1 Bình Duyệt cần hoàn thành."
+    other: "Bạn có %{count} Bình Duyệt cần hoàn thành."
   you_have_count_peer_reviews_to_complete_52e065e: "Bạn có %{count} Bình Duyệt cần hoàn thành"
   you_have_count_submissions_to_grade_6c5b511a: "Bạn còn %{count} bài nộp để chấm điểm"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Bạn đã tạo một bình luận chưa được đăng. Bạn có muốn tiếp tục và lưu bình luận này làm bản nháp không? (Bạn có thể đăng bình luận nháp vào bất kỳ lúc nào.)"
@@ -22989,6 +23040,7 @@ vi:
   you_must_set_document_usage_rights_b4afa1e9: "Bạn phải đặt quyền sử dụng tài liệu"
   you_must_set_usage_rights_87fc1382: "Bạn phải đặt quyền sử dụng"
   you_must_specify_a_usage_right_5eb57f87: "Bạn phải chỉ định quyền sử dụng."
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Bạn phải gửi phần việc của mình trước khi có thể thực hiện bình duyệt."
   you_must_use_a_number_912ce4bd: "Bạn phải sử dụng số"
   you_must_use_a_positive_number_203b86fe: "Bạn phải sử dụng số dương"
   you_must_use_an_integer_78d2530f: "Bạn phải sử dụng một số nguyên"
@@ -23115,6 +23167,7 @@ vi:
   zero_activity_title: "Không Hoạt Động"
   zip_26961da: zip
   zip_argument_error: "Bắt buộc phải có một thư mục để tải tập tin .zip lên."
+  zip_file_3e736239: "Tập Tin Zip"
   zip_file_description: "Trình cắm di chuyển để giải nén các tập tin lưu trữ .zip thành các tập tin khóa học, tập tin nhóm hoặc tập tin người dùng"
   zip_file_display: "Nhập Tập Tin"
   zip_file_file_description: "Giải nén tập tin .zip vào thư mục"
