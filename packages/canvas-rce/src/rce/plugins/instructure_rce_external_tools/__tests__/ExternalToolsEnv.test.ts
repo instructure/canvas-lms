@@ -57,7 +57,6 @@ describe('ExternalToolsEnv', () => {
   test('contextAssetInfo', () => {
     expect(editorEnv().contextAssetInfo).toEqual(null)
 
-    // Ensure editor tools override INST
     rceWrapper.props.trayProps = {
       contextType: 'user',
       contextId: '4567',
@@ -66,6 +65,21 @@ describe('ExternalToolsEnv', () => {
     expect(editorEnv().contextAssetInfo).toEqual({
       contextType: 'user',
       contextId: '4567',
+    })
+
+    // Containing context should override
+    rceWrapper.props.trayProps = {
+      contextType: 'user',
+      contextId: '4567',
+      containingContext: {
+        contextType: 'course',
+        contextId: '1234',
+      },
+    }
+
+    expect(editorEnv().contextAssetInfo).toEqual({
+      contextType: 'course',
+      contextId: '1234',
     })
   })
 

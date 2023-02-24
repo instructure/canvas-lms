@@ -130,9 +130,8 @@ export function externalToolsEnvFor(
     } | null {
       const trayProps = props()?.trayProps
 
-      // First try the editor
       if (trayProps != null) {
-        const {contextId, contextType} = trayProps
+        const {contextId, contextType} = trayProps.containingContext ?? trayProps
 
         if (
           contextId != null &&

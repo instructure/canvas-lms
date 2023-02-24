@@ -55,13 +55,13 @@ export function filterItemsByTitleSubstring<T extends {title: string}>(
   return items.filter(item => item.title.toLocaleLowerCase().includes(lowerTerm))
 }
 
-export interface LtiToolsModalProps {
+export interface ExternalToolSelectionDialogProps {
   ltiButtons: RceToolWrapper[]
 
   onDismiss: () => void
 }
 
-export function ExternalToolSelectionDialog(props: LtiToolsModalProps): JSX.Element {
+export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogProps): JSX.Element {
   const [filterTerm, setFilterTerm] = useState('')
   const [filteredResults, setFilteredResults] = useState(props.ltiButtons)
   const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -141,8 +141,8 @@ export function ExternalToolSelectionDialog(props: LtiToolsModalProps): JSX.Elem
                     title={b.title}
                     image={b.image}
                     onAction={() => {
-                      b.openDialog()
                       props.onDismiss()
+                      b.openDialog()
                     }}
                     description={b.description}
                   />
