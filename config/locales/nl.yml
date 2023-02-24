@@ -1216,6 +1216,12 @@ nl:
         default: 
           lti_reports: 
             text: "Dit rapport biedt een export van data die gebruiksinformatie toont over LTI (Leerinstrument Operabiliteit)"
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Periode
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4800,6 +4806,7 @@ nl:
   audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Audiocontent wordt niet ondersteund door je apparaat of app."
   audio_dd489fcc: Audio
+  audio_file_bf3ece7e: Audiobestand
   audio_player_for_label_dd9a6819: "Audio-speler voor %{label}"
   august_781433e8: Augustus
   australia_61_eb9bb701: "Australië (+61)"
@@ -6279,6 +6286,7 @@ nl:
   cluster_cluster_b57fe99a: "Cluster: %{cluster}"
   cluster_f407976: Cluster
   code_93e9abbb: code
+  code_file_424dc478: Codebestand
   code_is_case_sensitive_d8175cad: "Code is hoofdlettergevoelig."
   cog_icon_69bdffd5: Tandwiel
   col_is_sorted_ascending_cc5152cc: "%{col} is oplopend gesorteerd"
@@ -6335,6 +6343,7 @@ nl:
     errors: 
       cannot_load_collaboration: "Kan samenwerking niet laden"
       create_failed: "Het maken van samenwerking mislukt"
+      no_masquerading_on_collaboration: "Een samenwerking bekijken terwijl je je als een ander gebruiker voordoet, is niet toegestaan."
       no_name: "Voer een naam in voor deze samenwerking."
       not_enabled: "Samenwerkingen zijn niet ingeschakeld voor deze Canvas-site"
       title_too_long: "Gebruik %{maxLength} tekens of minder voor de naam. De beschrijving gebruiken voor extra inhoud."
@@ -10472,6 +10481,10 @@ nl:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Waarden weergeven"
   displaying_to_students_b1e92058: "Weergeven aan cursisten"
+  displayname_loaded_14d71a0a: "%{displayName} geladen"
+  displayname_loading_in_progress_2be325fd: "%{displayName} wordt geladen"
+  displayname_loading_pending_3aa2723e: "Laden van %{displayName} in behandeling"
+  displayname_loading_success_8177d735: "Laden van %{displayName} is gelukt"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Toont confetti voor cursusleiders die de linkvalidator uitvoeren voor
       een cursus wanneer er geen problemen worden aangetroffen.
@@ -10492,6 +10505,7 @@ nl:
   do_nothing_9672b478: "Niets doen"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: Documentbestand
   document_to_annotate_d37b93bc: "Document voor annotatie"
   docviewer_apple_iwork_file_support_dc772b31: "Ondersteuning voor Docviewer Apple iWork-bestand"
   docviewer_area_created_37502a31: "Docviewer-gebied gemaakt"
@@ -10986,6 +11000,7 @@ nl:
   enabled_unlocked_8d3a5df7: "Ingeschakeld (ontgrendeld)"
   enabled_web_services_f620b2be: "Ingeschakelde webservices"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Schakelt een nieuw ontworpen dialoogvenster Cursisten berichten die... in waarmee naar waarnemers in aanvulling op cursisten berichten kunnen worden gestuurd."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Biedt toegang tot de Openbare API van Nieuwe toetsen: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Biedt toegang tot de Openbare API van Nieuwe toetsen via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Hiermee kunnen plagiaatrapporten en vergelijkbaarheidsscores in het inleveringsvak voor Nieuwe cijferlijst worden weergegeven."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Zorgt ervoor dat belangrijke datums worden toegepast op opdrachten, kalenderevenementen en dergelijke."
@@ -11577,6 +11592,7 @@ nl:
       exclusion: "is gereserveerd"
       greater_than: "moet groter zijn dan %{count}"
       greater_than_or_equal_to: "moet groter zijn dan of gelijk zijn aan %{count}"
+      in: "moet in %{count} zijn"
       inclusion: "is niet opgenomen in de lijst"
       invalid: "is ongeldig"
       less_than: "moet kleiner zijn dan %{count}"
@@ -11711,6 +11727,7 @@ nl:
   exceeded_the_maximum_length_number_characters_2d25611e: "Heeft de maximumlengte overschreden (%{number} tekens)"
   exceeds_expectations_5910fc3a: "Overtreft verwachtingen"
   exceeds_mastery_1f995dce: "Overtreft Meesterschap"
+  excel_file_c6b9890: Excel-bestand
   excelsior_student_activity_tracking_7a1ba44d: "Volgen van cursistenactiviteit van Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Eventuele gegevens die niet zijn bijgewerkt sinds de gegeven datum moeten worden uitgesloten"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Opdrachten beoordeeld met een 0 score uitsluiten."
@@ -12208,6 +12225,7 @@ nl:
   file_storage_32477f6: Bestandsopslag
   file_tree_collapsed_d4b0ae96: "Bestandsstructuur samengevouwen"
   file_tree_expanded_a1d20c4a: "Bestandsstructuur uitgevouwen"
+  file_type_fd1ba7ee: Bestandstype
   file_upload_9cae6da5: "Bestand uploaden"
   file_upload_failed_af22dd91: "Bestand uploaden mislukt"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Uploaden van bestand, file_url of content_export_id is vereist"
@@ -12389,6 +12407,7 @@ nl:
   flags_tab_updates_c4c209f1: "Updates voor markeringstabbladen"
   flash_6afbf65a: "Flash "
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: Flash-bestand
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr geeft SafeSearch-afbeeldingen binnen het Creative Commons Public Domain weer.
@@ -12405,6 +12424,7 @@ nl:
   folder_705fd2d7: Map
   folder_browsing_tree_1f00a3ae: "Structuur voor bladeren door mappen"
   folder_icon_29017021: "Map pictogram"
+  folder_locked_b91cd0c4: "Map vergrendeld"
   folder_tree_fbab0726: Mappenstructuur
   folders: 
     event_updated: "Gebeurtenis is succesvol bijgewerkt."
@@ -14382,6 +14402,7 @@ nl:
   html5_media_recorder_in_rce_bb59b78f: "HTML5-mediarecorder in RCE"
   html_editor_fb2ab713: "HTML Editor"
   html_fc8563c6: html
+  html_file_62393d3f: HTML-bestand
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP-reactie: %{code}"
@@ -14762,6 +14783,7 @@ nl:
   ilumno_grade_export_251bc4b5: Ilumno-cijferexport
   image_8ad06: Afbeelding
   image_c1c98202: afbeelding
+  image_file_2b538bc: Afbeeldingsbestand
   image_id_is_not_a_valid_id_7dd6bad6: "'image_id' is geen geldig ID"
   image_search_b0944fc2: "Afbeelding zoeken"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url en image_id kunnen niet allebei ingesteld zijn."
@@ -15224,6 +15246,7 @@ nl:
   ireland_353_3cd32cc0: "Ierland (+353)"
   ireland_f7bb9899: Ierland
   irish_567e109f: Iers
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " maakt gebruik van een gratis versie van BigBlueButton die 10 gelijktijdige videovergaderingen toestaat, elk met 1 host en maximaal 24 deelnemers. Opnamen worden voor 7 dagen opgeslagen."
   isolated_entry_post_error_page_2a447d08: "Foutpagina voor plaatsen van geïsoleerde invoer"
@@ -15856,6 +15879,8 @@ nl:
   loading_grades_for_coursename_26784c2d: "Cijfers voor %{courseName} worden geladen"
   loading_grading_periods_c635d96: "Beoordelingsperiodes laden..."
   loading_grading_periods_for_coursename_bbe46919: "Laden van beoordelingsperioden voor %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Beoordelingsschema's laden..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Laden van beoordelingsschema's is mislukt.  Probeer het opnieuw"
   loading_group_f1647ebb: "%{group} aan het laden"
   loading_grouptitle_dba362d2: "%{groupTitle} aan het laden."
   loading_homeroom_announcement_content_1654f8c7: "Inhoud van klaslokaalaankondiging wordt geladen"
@@ -19025,6 +19050,7 @@ nl:
   new_quizzes_migration_required_7854aa1a: "Migratie van Nieuwe toetsen vereist"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nieuwe toetsen op de pagina Toetsen"
   new_quizzes_public_api_18d95321: "Openbare API Nieuwe toetsen"
+  new_quizzes_public_api_quiz_items_16bc741d: "Public API van Nieuwe toetsen: Toetsitems"
   new_quizzes_service_jwt_refresh_ca28ca8: "Service JWT voor Nieuwe toetsen vernieuwd"
   new_quizzes_site_admin_service_user_a331233a: "Gebruiker sitebeheerservice Nieuwe toetsen"
   new_quizzes_submission_274b5c57: "Inlevering van Nieuwe toetsen"
@@ -19077,6 +19103,7 @@ nl:
   next_month_749b1778: "Volgende maand"
   next_month_b55a387c: "Volgende maand"
   next_page_d2a39853: "Volgende pagina"
+  next_peer_review_3d05ef23: "Volgende peer review"
   next_question_f37bac25: "Volgende vraag"
   next_run_at_635de64a: "Volgende uitvoering op"
   next_steps_ce0f0d0c: "Volgende stappen"
@@ -20332,6 +20359,7 @@ nl:
     exception: "Onze excuses, er is een fout opgetreden. Probeer het later opnieuw."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDF-bestand
   peer_632472b7: "Peer:"
   peer_review_74f26a13: Peerbeoordeling
   peer_review_assignment_7d314c59: "Opdracht voor peerbeoordeling"
@@ -20341,6 +20369,7 @@ nl:
   peer_review_for_assignment_ce72fc52: "Peerbeoordeling voor %{assignment}"
   peer_review_for_name_bcffa32f: "Peerbeoordeling voor %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peerbeoordeling voor %{name} in te leveren: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Prompt voor peer review"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Ondersteuning voor peerbeoordeling in Opdrachtverbeteringen"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Opdrachten voor peerbeoordeling zijn nog niet in de nieuwe stroom voor opdrachten opgenomen. Wil je naar de verouderde pagina voor het maken van opdrachten?"
   peer_reviewed_graded_discussion_b339df5b: "Door cursusgenoten beoordeelde discussie:"
@@ -21094,6 +21123,7 @@ nl:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Door de cijfers te posten wordt je browser vernieuwd. Dit kan enkele momenten duren."
   posting_to_students_eaa57964: "Posten naar cursisten"
   powered_by_instructure_504d676d: "Aangestuurd door Instructure"
+  powerpoint_file_c4cb12af: PowerPoint-bestand
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24809,6 +24839,7 @@ nl:
                                     Neem contact op in #canvas-sre in Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP-gebruiker is aangemaakt. Het kan tot vier uur duren voordat deze gebruiker begint te werken."
   sftp_user_management_19868cb3: SFTP-gebruikersbeheer
+  shadow_e98b5937: Schaduw
   shard_5d340495: Shard
   shard_id_optional_382e5dda: "Shard-ID (optioneel)"
   shard_shard_95c57736: "Shard: %{shard}"
@@ -25896,6 +25927,7 @@ nl:
   sort_by_72dbba9c: "Sorteren op"
   sort_by_e75f9e3e: "Sorteren op"
   sort_courses_cf94b8d4: "Cursussen sorteren"
+  sort_ordertype_by_sortby_a0dd1c8: "%{orderType} sorteren op %{sortBy}"
   sort_outcome_column_c53702ed: "Leerdoelkolom sorteren"
   sort_students_1a561e98: "Cursisten sorteren"
   sortable_name_73f707cf: "Sorteerbare naam"
@@ -26222,6 +26254,7 @@ nl:
       op het gebied van leerresultaten weer te geven. De resultaten worden in een cijferlijst-achtige
       indeling gepresenteerd en de voortgang wordt als een numerieke score en als bekwaam/bijna
       bekwaam/verbetering weergegeven.
+  student_outcome_result_b26b7ab4: "Leerdoelresultaat van student"
   student_pace_2200bf85: Cursistentempo
   student_page_history_ce86b3c2: "Paginageschiedenis van cursist"
   student_page_history_pages_update_ae55fa03: "Paginageschiedenis van cursisten (Pagina's - Updaten)"
@@ -26239,6 +26272,7 @@ nl:
   student_sis_id_abe6b292: cursist-SIS-ID
   student_student_number_5c98bd2d: "Cursist %{student_number}"
   student_studentnumber_f398d9c2: "Cursist %{studentNumber}"
+  student_submission_report_af01e697: "Rapport Studentinlevering"
   student_submissions_910da1b3: "Inleveringen van cursist"
   student_submissions_report_prospect_education_108daf59: "Rapport voor inleveringen van cursist (Prospect Education)"
   student_summary: 
@@ -26912,6 +26946,7 @@ nl:
   text_entry_e1808b2f: Tekstinvoer
   text_entry_submission_7b0ae0c5: "Inlevering van tekstinvoer"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstinvoer inzending mag niet leeg zijn"
+  text_file_73d8d08c: Tekstbestand
   text_input_d3480b8c: "Tekst input"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Tekst (geen vraag) is verplaatst naar een Stimulus; voeg een vraag toe zodat deze binnen de toets kan worden weergegeven."
   thai_8f9bc548: Thai
@@ -27218,6 +27253,7 @@ nl:
   the_state_parameter_is_required_ffadf213: "De staat parameter is verplicht"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Het tabblad voor cursistaantekeningen  bevat het document voor de opdracht. Tabbladen met aanvullende inleveringstypen kunnen ook beschikbaar zijn."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "De cursist voor rapportage; komt standaard op Canvas-ID te staan, tenzij opgegeven als SIS in student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "De inlevering is nu nog niet beschikbaar."
   the_submitted_after_date_to_report_on_9d90f026: "De 'ingeleverd na datum' voor rapportage"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Met de Syllabus kun je de gebruikers van je cursus welkom heten en je verwachtingen delen
@@ -27553,6 +27589,9 @@ nl:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Deze functie zorgt ervoor dat de upload-API voor inleveringsbestanden het bestandstype controleert op basis van
       de toegestane extensies van de gekoppelde opdracht.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Deze functieoptie is alleen zichtbaar voor gebruikers met Sitebeheerderstoegang. Dat lijkt op
+                                "Verborgen", maar eindgebruikers krijgen het niet te zien, ook niet als een Sitebeheerder dat heeft ingeschakeld.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Deze functieoptie is alleen zichtbaar voor gebruikers met toegang als sitebeheerder.
                                   Eindgebruikers zullen hem niet zien totdat die door een sitebeheerder-gebruiker is ingeschakeld.
@@ -28058,6 +28097,7 @@ nl:
   title_required_3ff5969: "Titel verplicht"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tray"
+  title_unpublished_51ddbc6a: "%{title} (niet-gepubliceerd)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" is succesvol aangemaakt."
   title_was_successfully_updated_14b78676: "\"%{title}\" is succesvol bijgewerkt."
   titles: 
@@ -29184,7 +29224,9 @@ nl:
   upload_media_ce31135a: "Media uploaden"
   upload_not_available_for_this_folder_8f8623c6: "Upload niet beschikbaar voor deze map"
   upload_percent_complete_d533d3e2: "Percentage voltooid uploaden"
+  upload_progress_df577c48: "Voortgang van upload"
   upload_progress_for_name_39f03acf: "Voortgang voor %{name} uploaden"
+  upload_success_f51f3a39: "Uploaden is gelukt"
   upload_successful_ca47465f: "Upload succesvol"
   upload_your_outcomes_bceeadbe: "Upload je leerdoelen!"
   uploaded_285a2bfb: Geüpload
@@ -29271,6 +29313,7 @@ nl:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Gebruik de nieuwe toets LTI-tool in plaats van de gewone Canvas toetsen"
   use_the_new_scheduler_1273b832: "De nieuwe planner gebruiken"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Deze configuratie gebruiken voor registratie ouder/waarnemer"
+  use_this_grading_scheme_52aa4ecf: "Dit beoordelingsschema gebruiken"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Gebruik deze lijst om toegewezen cursisten te verwijderen. Voeg nieuwe cursisten toe via een keuzelijst met invoervak."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Gebruik dit paneel om dubbele resultaten te verwijderen of om personen toe te voegen die je niet met je zoekopdracht hebt gevonden."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Gebruik dit paneel om duplicaten te verwijderen of om personen toe te voegen die je niet met je zoekopdracht hebt gevonden."
@@ -29832,6 +29875,7 @@ nl:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Handleidingen voor videovergaderingen voor klaslokalen op afstand"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Met tools voor videoconferencing kunnen directe beeldverbindingen tussen cursusleiders en cursisten worden ingesteld."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video-inhoud wordt niet ondersteund door je apparaat of app."
+  video_file_f7188ffe: Videobestand
   video_player_b371005: Videospeler
   video_player_for_label_6a5fdb03: "Videospeler voor %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -30519,9 +30563,16 @@ nl:
   you_have_changed_the_progression_requirements_for__6772bc89: "Je hebt de voortgangsvereisten voor een actieve cursus veranderd. Er kunnen cursisten zijn die al naar deze module door zijn gegaan en anderen die ervan afhankelijk zijn."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Je hebt een peerbeoordeling voltooid voor %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Je hebt een peerbeoordeling voltooid voor %{person}. Bedankt"
+  you_have_completed_your_peer_reviews_543ad84: "Je hebt je peer reviews voltooid!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Je hebt 1 resterende kalender"
     other: "Je hebt %{count} resterende kalenders"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Je moet nog 1 peer review uitvoeren."
+    other: "Je moet nog %{count} peer reviews uitvoeren."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Je moet 1 peer review uitvoeren."
+    other: "Je moet %{count} peer reviews uitvoeren."
   you_have_count_peer_reviews_to_complete_52e065e: "Je moet %{count} peerbeoordelingen uitvoeren"
   you_have_count_submissions_to_grade_6c5b511a: "Je moet %{count} inleveringen beoordelen"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Je hebt een opmerking aangemaakt die niet is gepost. Wil je doorgaan en deze opmerking als een concept opslaan? (Je kunt op ieder gewenst moment conceptopmerkingen posten.)"
@@ -30605,6 +30656,7 @@ nl:
   you_must_set_usage_rights_87fc1382: "Je moet de gebruiksrechten instellen"
   you_must_specify_a_usage_right_5eb57f87: "Je moet een gebruiksrecht aangeven."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Je moet aangeven of je Microsoft Teams Sync wilt inschakelen of uitschakelen"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Je moet je eigen werk inleveren voordat je je peers kunt reviewen."
   you_must_use_a_number_912ce4bd: "Je moet een getal gebruiken"
   you_must_use_a_positive_number_203b86fe: "Je moet een positief getal gebruiken"
   you_must_use_an_integer_78d2530f: "Je moet een geheel getal gebruiken"
@@ -30747,6 +30799,7 @@ nl:
   zero_activity_title: "Geen activiteit"
   zip_26961da: zip
   zip_argument_error: "Voor het uploaden van een zipbestand is een map nodig om naar te uploaden."
+  zip_file_3e736239: ZIP-bestand
   zip_file_description: "Migratieplug-in voor het uitpakken van gewone zipbestanden in cursus, groep, of gebruikersbestanden"
   zip_file_display: Bestandsimport
   zip_file_file_description: "Zip-bestand uitpakken in map"
