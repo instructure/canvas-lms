@@ -84,6 +84,9 @@ const locale = {
   "swedish_59a593ca": { "message": "Swedeg" },
   "tagalog_74906db7": { "message": "Tagalog" },
   "thai_8f9bc548": { "message": "Thai" },
+  "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+    "message": "Mae’r ffeil wedi’i dewis yn fwy na’r terfyn Beit { maxSize }"
+  },
   "turkish_5b69578b": { "message": "Twrceg" },
   "ukrainian_945b00b7": { "message": "Wcreineg" },
   "vietnamese_e7a76583": { "message": "Fietnameg" },
