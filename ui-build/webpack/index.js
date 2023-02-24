@@ -30,6 +30,7 @@ const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const esmacPlugin = require('webpack-esmac-plugin')
 const webpackPublicPath = require('./webpackPublicPath')
 const {canvasDir} = require('#params')
+const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
 
 require('./bundles')
 
@@ -49,7 +50,8 @@ const skipSourcemaps = Boolean(
 // These flags are used by the build system to enable caching - it assumes that the cache is only reused
 // when no build dependencies are changing.
 const useBuildCache = process.env.USE_BUILD_CACHE === '1'
-const writeBuildCache = process.env.WRITE_BUILD_CACHE === '1' || process.env.NODE_ENV === 'development'
+const writeBuildCache =
+  process.env.WRITE_BUILD_CACHE === '1' || process.env.NODE_ENV === 'development'
 
 const createBundleAnalyzerPlugin = (...args) => {
   const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
@@ -80,7 +82,8 @@ module.exports = {
       resolve: {hash: true, timestamp: false},
       resolveBuildDependencies: {hash: true, timestamp: false},
     },
-  }) || null),
+  }) ||
+    null),
   performance: skipSourcemaps
     ? false
     : {
@@ -422,6 +425,11 @@ module.exports = {
       // runtime error in case we didn't cover them all, or provide a sink like
       // this, which i'm gonna go with for now:
       process: {env: {}},
+    }),
+
+    new RetryChunkLoadPlugin({
+      maxRetries: 3,
+      retryDelay: `function(retryAttempt) { return retryAttempt * 1000 }`
     }),
   ]
     .concat(writeBuildCache ? [] : readOnlyCachePlugin())
