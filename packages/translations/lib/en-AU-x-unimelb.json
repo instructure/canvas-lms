@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Current Image"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Current Volume Level"
+    },
     "custom_6979cd81": {
         "message": "Custom"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "Filipino"
+    },
+    "finish_bc343002": {
+        "message": "Finish"
     },
     "finnish_4df2923d": {
         "message": "Finnish"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "Medium"
     },
+    "mic_a7f3d311": {
+        "message": "Mic"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Microphone Disabled"
+    },
     "middle_27dc1d5": {
         "message": "Middle"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "No results found for { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "No Video"
     },
     "none_3b5e34d2": {
         "message": "None"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "Paste"
     },
+    "pause_12af3bb4": {
+        "message": "Pause"
+    },
     "peer_review_74f26a13": {
         "message": "Peer Review"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
+    "play_1a47eaa7": {
+        "message": "Play"
+    },
     "play_media_comment_35257210": {
         "message": "Play media comment."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Play media comment by { name } from { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Please allow Canvas to access your microphone and webcam."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1690,6 +1714,9 @@
     },
     "preview_53003fd2": {
         "message": "Preview"
+    },
+    "preview_a3f8f854": {
+        "message": "PREVIEW"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Preview in overlay"
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "Record"
+    },
+    "recording_98da6bda": {
+        "message": "Recording"
     },
     "red_8258edf3": {
         "message": "Red"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "Save"
     },
+    "save_media_cb9e786e": {
+        "message": "Save Media"
+    },
     "schedule_preview_3bcda153": {
         "message": "Schedule Preview"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "Search"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Select audio source"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Select crop shape"
     },
     "select_language_7c93a900": {
         "message": "Select Language"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Select video source"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Selected { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "Something went wrong."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Something went wrong accessing your webcam."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Something went wrong and I don''t know what to show you."
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Something went wrong"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Something went wrong while sharing your screen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sort By"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "Star"
+    },
+    "start_over_f7552aa9": {
+        "message": "Start Over"
+    },
+    "start_recording_9a65141a": {
+        "message": "Start Recording"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } to { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "Subject overview"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "System Audio Allowed"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "System Audio Disabled"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/Arrows"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor."
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "The selected file exceeds the { maxSize } Byte limit"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "There are no points associated with this item"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "Time"
+    },
+    "timebar_a4d18443": {
+        "message": "Timebar"
     },
     "title_ee03d132": {
         "message": "Title"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "unpublished"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Untitled"
     },
     "untitled_efdc2d7d": {
         "message": "untitled"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Video Options Tray"
     },
+    "video_player_b371005": {
+        "message": "Video Player"
+    },
     "video_player_for_9e7d373b": {
         "message": "Video player for "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "View word and character counts"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "We couldn’t detect a working microphone connected to your device."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "We couldn’t detect a working webcam connected to your device."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "We couldn’t detect a working webcam or microphone connected to your device."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webcam Disabled"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webcam"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Weekly schedule navigation"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Your image has been compressed for Icon Maker. Images less than { size } KB will not be compressed."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Your microphone is blocked in the browser settings."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Your webcam and microphone are blocked in the browser settings."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Your webcam is blocked in the browser settings."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Your webcam may already be in use."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

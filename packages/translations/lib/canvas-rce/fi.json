@@ -155,6 +155,9 @@
   "crop_image_807ebb08": { "message": "Rajaa kuva" },
   "cup_product_14174434": { "message": "Korkkituote" },
   "current_image_f16c249c": { "message": "Nykyinen kuva" },
+  "current_volume_level_c55ab825": {
+    "message": "Nykyinen äänenvoimakkuuden taso"
+  },
   "custom_6979cd81": { "message": "Mukauta" },
   "cyan_c1d5f68a": { "message": "Syaani" },
   "dagger_57e0f4e5": { "message": "Tikari" },
@@ -278,6 +281,7 @@
   },
   "files_c300e900": { "message": "Tiedostot" },
   "files_index_af7c662b": { "message": "Tiedostojen indeksi" },
+  "finish_bc343002": { "message": "Lopeta" },
   "flat_music_76d5a5c3": { "message": "Flat (musiikki)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Tarkanne elementtien asetusten työkalupalkki"
@@ -446,6 +450,8 @@
     "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
   },
   "medium_5a8e9ead": { "message": "Tietoväline" },
+  "mic_a7f3d311": { "message": "Mikrofoni" },
+  "microphone_disabled_15c83130": { "message": "Mikrofoni pois käytöstä" },
   "middle_27dc1d5": { "message": "Kohtalainen" },
   "minimize_file_preview_da911944": {
     "message": "Minimoi tiedoston esikatselu"
@@ -488,6 +494,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ei videota" },
   "none_3b5e34d2": { "message": "Ei mitään" },
   "none_selected_b93d56d2": { "message": "Ei valintoja" },
   "not_equal_6e2980e6": { "message": "Ei yhtä suuri" },
@@ -527,6 +534,7 @@
   "parallel_d55d6e38": { "message": "Rungon suuntainen" },
   "partial_derivative_4a9159df": { "message": "Osittainen (johdannainen)" },
   "paste_5963d1c1": { "message": "Liitä" },
+  "pause_12af3bb4": { "message": "Keskeytä" },
   "pentagon_17d82ea3": { "message": "Viisikulmio" },
   "people_b4ebb13c": { "message": "Henkilöt" },
   "percentage_34ab7c2c": { "message": "Prosenttimäärä" },
@@ -544,9 +552,13 @@
   "pi_variant_10f5f520": { "message": "Pi (Muuttuja)" },
   "pink_68ad45cb": { "message": "Vaaleanpunainen" },
   "pixels_52ece7d1": { "message": "Pikselit" },
+  "play_1a47eaa7": { "message": "Toista" },
   "play_media_comment_35257210": { "message": "Toista mediakommentti." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Toista mediakommentti { name } kohteesta { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Anna Canvasin käyttää mikrofoniasi ja nettikameraasi."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/miinus" },
@@ -556,6 +568,7 @@
   "precedes_equal_20701e84": { "message": "Edeltää yhtä suurta" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
   "preview_53003fd2": { "message": "Esikatsele" },
+  "preview_a3f8f854": { "message": "ESIKATSELU" },
   "preview_in_overlay_ed772c46": { "message": "Esikatselu asettelussa" },
   "preview_inline_9787330": { "message": "Esikatselu inline-tilassa" },
   "prime_917ea60e": { "message": "Alku" },
@@ -578,6 +591,7 @@
     "message": "Todellinen osa (kompleksinumerosta)"
   },
   "record_7c9448b": { "message": "Nauhoita" },
+  "recording_98da6bda": { "message": "Nauhoitetaan" },
   "red_8258edf3": { "message": "Punainen" },
   "relationships_6602af70": { "message": "Suhteet" },
   "religion_icon_246e0be1": { "message": "Uskonnon kuvake" },
@@ -620,10 +634,13 @@
     "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."
   },
   "save_11a80ec3": { "message": "Tallenna" },
+  "save_media_cb9e786e": { "message": "Tallenna media" },
   "script_l_42a7b254": { "message": "Merkkijono L" },
   "search_280d00bd": { "message": "Hae" },
+  "select_audio_source_21043cd5": { "message": "Valitse äänilähde" },
   "select_crop_shape_d441feeb": { "message": "Valitse rajauksen muoto" },
   "select_language_7c93a900": { "message": "Valitse kieli" },
+  "select_video_source_1b5c9dbe": { "message": "Valitse videolähde" },
   "selected_linkfilename_c093b1f2": { "message": "Valittu { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Aseta miinus" },
   "sharp_music_ab956814": { "message": "Terävä (musiikki)" },
@@ -642,6 +659,9 @@
   "small_b070434a": { "message": "Pieni" },
   "solid_circle_9f061dfc": { "message": "Kiinteä ympyrä" },
   "something_went_wrong_89195131": { "message": "Jotakin meni pieleen." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Jotakin meni pieleen, kun yritettiin käyttää verkkokameraa."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
   },
@@ -649,6 +669,9 @@
     "message": "Jotakin meni pieleen. Tarkista yhteytesi, lataa sivu uudelleen ja yritä uudelleen."
   },
   "something_went_wrong_d238c551": { "message": "Jotakin meni pieleen." },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Jokin meni pieleen näyttösi jakamisen yhteydessä."
+  },
   "sort_by_e75f9e3e": { "message": "Lajitteluperuste" },
   "spades_suit_b37020c2": { "message": "Pata (suit)" },
   "square_511eb3b3": { "message": "Neliö" },
@@ -661,6 +684,8 @@
   "square_superset_3be8dae1": { "message": "Neliöosajoukko" },
   "square_superset_strict_fa4262e4": { "message": "Neliöosajoukko (tiukka)" },
   "star_8d156e09": { "message": "Tähti" },
+  "start_over_f7552aa9": { "message": "Aloita alusta" },
+  "start_recording_9a65141a": { "message": "Aloita nauhoitus" },
   "steel_blue_14296f08": { "message": "Teräksensininen" },
   "styles_2aa721ef": { "message": "Tyylit" },
   "submit_a3cc6859": { "message": "Lähetä" },
@@ -687,6 +712,10 @@
     "message": "Vaihda tekstimuotoilueditoriin"
   },
   "syllabus_f191f65b": { "message": "Opinto-ohjelma" },
+  "system_audio_allowed_b2508f8c": { "message": "Järjestelmän audio sallittu" },
+  "system_audio_disabled_c177bd13": {
+    "message": "Järjestelmän audio pois käytöstä"
+  },
   "tab_arrows_4cf5abfc": { "message": "TAB/Nuolet" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Sinivihreä" },
@@ -740,6 +769,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Vaikka videollasi on oikea otsikko selaimessa, sen päivitys tietokannassa epäonnistui."
   },
+  "timebar_a4d18443": { "message": "Aikapalkki" },
   "title_ee03d132": { "message": "Otsikko" },
   "to_be_posted_when_d24bf7dc": { "message": "Lähetetään: { when }" },
   "to_do_when_2783d78f": { "message": "Tehtävä: { when }" },
@@ -761,6 +791,7 @@
   },
   "union_e6b57a53": { "message": "Liitto" },
   "unpublished_dfd8801": { "message": "julkaisematon" },
+  "untitled_16aa4f2b": { "message": "Nimetön" },
   "untitled_efdc2d7d": { "message": "Nimetön" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Diagonaalinen nuoli ylös ja vasemmalle"
@@ -835,6 +866,7 @@
   "vertical_dots_bfb21f14": { "message": "Pystysuorat pisteet" },
   "video_options_24ef6e5d": { "message": "Videoasetukset" },
   "video_options_tray_3b9809a5": { "message": "Videoasetusten ilmoitusalue" },
+  "video_player_b371005": { "message": "Videosoitin" },
   "video_player_for_9e7d373b": { "message": "Videonauhuri kohteelle " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videonauhuri kohteelle { title }"
@@ -850,6 +882,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "Tarkastele sanamäärää ja merkkien määrää"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Emme havainneet toimivaa mikrofonia, joka olisi kytkettynä puhelimeen."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Emme havainneet verkkokameraa, joka olisi kytkettynä puhelimeen."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Emme havainneet toimivaa verkkokameraa tai mikrofonia, jotka olisivat kytkettynä laitteeseesi."
+  },
+  "webcam_disabled_30c66986": { "message": "Webkamera pois käytöstä" },
+  "webcam_fe91b20f": { "message": "Nettikamera" },
   "white_87fa64fd": { "message": "Valkoinen" },
   "width_492fec76": { "message": "Leveys" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -868,6 +911,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Kuvasi on pakattu Icon Makeria varten. Alle { size } KB:n kokoisia kuvia ei pakata."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Mikrofonisi on estetty selainasetuksissa."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Mikrofonisi ja verkkokamerasi on lukittu selainasetuksissa."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Verkkokamerasi lukitaan selainasetuksissa."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Nettikamerasi saattaa olla jo käytössä."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoomaa" },

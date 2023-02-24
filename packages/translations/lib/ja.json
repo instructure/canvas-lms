@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "現在の画像"
     },
+    "current_volume_level_c55ab825": {
+        "message": "現在の音量のレベル"
+    },
     "custom_6979cd81": {
         "message": "カスタム"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "フィリピン語"
+    },
+    "finish_bc343002": {
+        "message": "フィニッシュ"
     },
     "finnish_4df2923d": {
         "message": "フィンランド語"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "中"
     },
+    "mic_a7f3d311": {
+        "message": "マイク"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "マイク無効"
+    },
     "middle_27dc1d5": {
         "message": "中位"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "{ filterTerm }の結果が見つかりませんでした"
+    },
+    "no_video_1ed00b26": {
+        "message": "ビデオなし"
     },
     "none_3b5e34d2": {
         "message": "なし"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "貼り付け"
     },
+    "pause_12af3bb4": {
+        "message": "一時停止"
+    },
     "peer_review_74f26a13": {
         "message": "ピア レビュー"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "ピクセル"
     },
+    "play_1a47eaa7": {
+        "message": "再生"
+    },
     "play_media_comment_35257210": {
         "message": "メディア コメントの再生。"
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "{ name }まで{ createdAt }からのメディアのコメントを再生します。"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
     },
     "plus_d43cd4ec": {
         "message": "プラス"
@@ -1689,6 +1713,9 @@
         "message": "フォーマット済み"
     },
     "preview_53003fd2": {
+        "message": "プレビュー"
+    },
+    "preview_a3f8f854": {
         "message": "プレビュー"
     },
     "preview_in_overlay_ed772c46": {
@@ -1752,6 +1779,9 @@
         "message": "（複素数の）実数部分"
     },
     "record_7c9448b": {
+        "message": "記録"
+    },
+    "recording_98da6bda": {
         "message": "記録"
     },
     "red_8258edf3": {
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "保存"
     },
+    "save_media_cb9e786e": {
+        "message": "メディアを保存する"
+    },
     "schedule_preview_3bcda153": {
         "message": "スケジュールプレビュー"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "検索"
     },
+    "select_audio_source_21043cd5": {
+        "message": "音声源を選択"
+    },
     "select_crop_shape_d441feeb": {
         "message": "クロップ形状の選択"
     },
     "select_language_7c93a900": {
         "message": "言語を選択する"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "ビデオ源を選択"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "選択された{ linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "問題が発生しました。"
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "ウェブカムにアクセス中にエラーが生じました。"
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "何かがうまくいきませんでした。何を見せればいいのかわかりません。"
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "なにかが失敗しました"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "画面の共有中に問題が発生しました。"
     },
     "sort_by_e75f9e3e": {
         "message": "分類する"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "スター"
+    },
+    "start_over_f7552aa9": {
+        "message": "最初からやり直し"
+    },
+    "start_recording_9a65141a": {
+        "message": "録画開始"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } - { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "シラバス"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "システムオーディオを許可"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "システムオーディオが無効"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/矢印"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "pretty HTMLエディタはキーボードからはアクセスできません。ShiftOを押してpretty HTMLエディタを開きます。"
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "選択されたファイルは、{ maxSize }バイト数制限を越えています"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "このアイテムに関連付けられているポイントはありません。"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "時間"
+    },
+    "timebar_a4d18443": {
+        "message": "タイムバー"
     },
     "title_ee03d132": {
         "message": "タイトル"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "未公開"
+    },
+    "untitled_16aa4f2b": {
+        "message": "無題"
     },
     "untitled_efdc2d7d": {
         "message": "無題"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "ビデオオプショントレイ"
     },
+    "video_player_b371005": {
+        "message": "ビデオプレーヤー"
+    },
     "video_player_for_9e7d373b": {
         "message": "（）のビデオプレーヤー "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "語数・文字数を表示"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "デバイスに接続されているオンになっているマイクを検出できませんでした。"
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "デバイスに接続されているオンになっているウェブカメラを検出できませんでした。"
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "デバイスに接続されているオンになっているウェブカメラやマイクを検出できませんでした。"
+    },
+    "webcam_disabled_30c66986": {
+        "message": "ウェブカメラが無効"
+    },
+    "webcam_fe91b20f": {
+        "message": "ウェブカム"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "週間スケジュールのナビゲーション"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "あなたの画像はIcon Maker用に圧縮されています。{ size }KB未満の画像は圧縮されません。"
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "ブラウザの設定でマイクがブロックされています。"
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "ブラウザの設定でウェブカメラとマイクがブロックされています。"
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "ブラウザの設定でウェブカメラがブロックされています。"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "あなたのウェブカメラは既に使用中かもしれません。"
     },
     "zeta_5ef24f0e": {
         "message": "ゼータ"

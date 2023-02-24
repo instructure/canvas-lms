@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "目前的圖像"
     },
+    "current_volume_level_c55ab825": {
+        "message": "目前音量"
+    },
     "custom_6979cd81": {
         "message": "自訂"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "菲律賓語"
+    },
+    "finish_bc343002": {
+        "message": "完成"
     },
     "finnish_4df2923d": {
         "message": "芬蘭語"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "中"
     },
+    "mic_a7f3d311": {
+        "message": "麥克風"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "停用麥克風"
+    },
     "middle_27dc1d5": {
         "message": "中間"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "找不到 { filterTerm } 的結果"
+    },
+    "no_video_1ed00b26": {
+        "message": "無影片"
     },
     "none_3b5e34d2": {
         "message": "無"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "貼上"
     },
+    "pause_12af3bb4": {
+        "message": "暫停"
+    },
     "peer_review_74f26a13": {
         "message": "同儕互評"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "像素"
     },
+    "play_1a47eaa7": {
+        "message": "播放"
+    },
     "play_media_comment_35257210": {
         "message": "播放媒體評論。"
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "播放{ name }於{ createdAt }創建的媒體評論。"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
     },
     "plus_d43cd4ec": {
         "message": "+"
@@ -1689,6 +1713,9 @@
         "message": "已預先格式化"
     },
     "preview_53003fd2": {
+        "message": "預覽"
+    },
+    "preview_a3f8f854": {
         "message": "預覽"
     },
     "preview_in_overlay_ed772c46": {
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "錄製"
+    },
+    "recording_98da6bda": {
+        "message": "正在錄製"
     },
     "red_8258edf3": {
         "message": "紅色"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "儲存"
     },
+    "save_media_cb9e786e": {
+        "message": "儲存媒體"
+    },
     "schedule_preview_3bcda153": {
         "message": "排程預覽"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "搜尋"
     },
+    "select_audio_source_21043cd5": {
+        "message": "選擇音訊資源"
+    },
     "select_crop_shape_d441feeb": {
         "message": "選擇裁剪形狀"
     },
     "select_language_7c93a900": {
         "message": "選擇語言"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "選擇視訊資源"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "已選定 { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "出現問題。"
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "存取網路攝影機出現問題。"
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "出現問題；我不知道應該展示什麼內容。"
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "似乎出問題了"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "分享您的畫面時發生錯誤。"
     },
     "sort_by_e75f9e3e": {
         "message": "排序依據"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "星形"
+    },
+    "start_over_f7552aa9": {
+        "message": "重新開始"
+    },
+    "start_recording_9a65141a": {
+        "message": "開始錄製"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } 至 { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "課程大綱"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "允許系統音訊"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "停用系統音訊"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/箭頭"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "美觀 HTML 編輯器無法用鍵盤存取。按 ShiftO 開啟原始 HTML 編輯器。"
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "選取的檔案超過 { maxSize } 位元組限制"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "沒有與此項目關聯的分數。"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "時間"
+    },
+    "timebar_a4d18443": {
+        "message": "時間欄"
     },
     "title_ee03d132": {
         "message": "標題"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "未發佈"
+    },
+    "untitled_16aa4f2b": {
+        "message": "無標題"
     },
     "untitled_efdc2d7d": {
         "message": "無標題"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "影片選項收集箱"
     },
+    "video_player_b371005": {
+        "message": "影片播放器"
+    },
     "video_player_for_9e7d373b": {
         "message": "影片播放器，標題為 "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "檢視文字和字元計數"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "我們偵測不到與您的裝置連線的工作中麥克風。"
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "我們偵測不到與您的裝置連線的工作中攝影機。"
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "我們偵測不到與您的裝置連線的工作中攝影機或麥克風。"
+    },
+    "webcam_disabled_30c66986": {
+        "message": "停用網路攝影機"
+    },
+    "webcam_fe91b20f": {
+        "message": "網路攝影機"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "每週排程導航工具"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "您的影像已壓縮用於圖示製作者。將不壓縮小於 { size } KB 的影像。"
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "您的麥克風在瀏覽器設定中遭到封鎖。"
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "您的攝影機麥克風在瀏覽器設定中遭到封鎖。"
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "您的攝影機在瀏覽器設定中遭到封鎖。"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "您的網路攝影機可能已在使用中。"
     },
     "zeta_5ef24f0e": {
         "message": "θ"

@@ -161,6 +161,7 @@
   "crop_image_807ebb08": { "message": "Ajustar la imagen" },
   "cup_product_14174434": { "message": "Producto cup" },
   "current_image_f16c249c": { "message": "Imagen actual" },
+  "current_volume_level_c55ab825": { "message": "Nivel de volumen actual" },
   "custom_6979cd81": { "message": "Personalizar" },
   "cyan_c1d5f68a": { "message": "Turquesa" },
   "dagger_57e0f4e5": { "message": "Involución" },
@@ -280,6 +281,7 @@
   },
   "files_c300e900": { "message": "Archivos" },
   "files_index_af7c662b": { "message": "Índice de archivos" },
+  "finish_bc343002": { "message": "Terminar" },
   "flat_music_76d5a5c3": { "message": "Bemol (Música)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Barra de herramientas de opciones para centrarse en un ítem"
@@ -450,6 +452,8 @@
     "message": "Archivo multimedia en proceso. Inténtalo de nuevo más tarde."
   },
   "medium_5a8e9ead": { "message": "Regular" },
+  "mic_a7f3d311": { "message": "Micrófono" },
+  "microphone_disabled_15c83130": { "message": "Micrófono desactivado" },
   "middle_27dc1d5": { "message": "El medio" },
   "minimize_file_preview_da911944": {
     "message": "Minimizar la vista previa del archivo"
@@ -496,6 +500,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No se han encontrado resultados para { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "No hay vídeo" },
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Ninguna seleccionada" },
   "not_equal_6e2980e6": { "message": "No es igual" },
@@ -539,6 +544,7 @@
   "parallel_d55d6e38": { "message": "Paralelo" },
   "partial_derivative_4a9159df": { "message": "Parcial (Derivado)" },
   "paste_5963d1c1": { "message": "Pegar" },
+  "pause_12af3bb4": { "message": "Pausar" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personas" },
   "percentage_34ab7c2c": { "message": "Porcentaje" },
@@ -554,11 +560,15 @@
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Píxeles" },
+  "play_1a47eaa7": { "message": "Reproducir" },
   "play_media_comment_35257210": {
     "message": "Reproducir comentario multimedia."
   },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Reproducir comentario multimedia de { name } desde { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Permite que Canvas acceda a tu micrófono y cámara web."
   },
   "plus_d43cd4ec": { "message": "Más" },
   "plus_minus_f8be2e83": { "message": "Más/Menos" },
@@ -568,6 +578,7 @@
   "precedes_equal_20701e84": { "message": "Precede o es igual a" },
   "preformatted_d0670862": { "message": "Previamente formateado" },
   "preview_53003fd2": { "message": "Vista previa" },
+  "preview_a3f8f854": { "message": "VISTA PREVIA" },
   "preview_in_overlay_ed772c46": { "message": "Vista previa en superposición" },
   "preview_inline_9787330": { "message": "Vista previa online" },
   "prime_917ea60e": { "message": "Primo" },
@@ -590,6 +601,7 @@
     "message": "Porción real (de un número complejo)"
   },
   "record_7c9448b": { "message": "Grabar" },
+  "recording_98da6bda": { "message": "Grabación" },
   "red_8258edf3": { "message": "Rojo" },
   "relationships_6602af70": { "message": "Relaciones" },
   "religion_icon_246e0be1": { "message": "Icono religión" },
@@ -636,12 +648,15 @@
     "message": "Lamentablemente, no se puede acceder al Editor HTML agradable desde el teclado. Accede al Editor de HTML sin formato aquí."
   },
   "save_11a80ec3": { "message": "Guardar" },
+  "save_media_cb9e786e": { "message": "Guardar contenido multimedia" },
   "script_l_42a7b254": { "message": "L cursiva" },
   "search_280d00bd": { "message": "Buscar" },
+  "select_audio_source_21043cd5": { "message": "Seleccionar fuente de audio" },
   "select_crop_shape_d441feeb": {
     "message": "Seleccionar la forma de recorte"
   },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
+  "select_video_source_1b5c9dbe": { "message": "Seleccionar fuente de vídeo" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionado"
   },
@@ -662,6 +677,9 @@
   "small_b070434a": { "message": "Pequeño" },
   "solid_circle_9f061dfc": { "message": "Círculo negro" },
   "something_went_wrong_89195131": { "message": "Ha habido un error." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Ha habido un error al intentar acceder a tu cámara web."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Algo ha salido mal y no sé qué mostrar."
   },
@@ -669,6 +687,9 @@
     "message": "Ha habido un error. Comprueba tu conexión, vuelve a cargar la página e inténtalo de nuevo."
   },
   "something_went_wrong_d238c551": { "message": "Ha habido un error." },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Ha habido un error al compartir tu pantalla."
+  },
   "sort_by_e75f9e3e": { "message": "Ordenar por" },
   "spades_suit_b37020c2": { "message": "Picas (Naipes)" },
   "square_511eb3b3": { "message": "Cuadrado" },
@@ -685,6 +706,8 @@
     "message": "Superconjunto cuadrado (Estricto)"
   },
   "star_8d156e09": { "message": "Destacar" },
+  "start_over_f7552aa9": { "message": "Volver a empezar" },
+  "start_recording_9a65141a": { "message": "Comenzar grabación" },
   "steel_blue_14296f08": { "message": "Azul acero" },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Entregar" },
@@ -711,6 +734,10 @@
     "message": "Cambiar al editor de texto enriquecido"
   },
   "syllabus_f191f65b": { "message": "Programa de la asignatura" },
+  "system_audio_allowed_b2508f8c": { "message": "Audio del sistema activado" },
+  "system_audio_disabled_c177bd13": {
+    "message": "Audio del sistema desactivado"
+  },
   "tab_arrows_4cf5abfc": { "message": "Tabulador/flechas" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Verde azulado" },
@@ -762,6 +789,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Aunque tu vídeo tendrá el título correcto en el navegador, no pudimos actualizarlo en la base de datos."
   },
+  "timebar_a4d18443": { "message": "Barra de tiempo" },
   "title_ee03d132": { "message": "Título" },
   "to_be_posted_when_d24bf7dc": { "message": "Para publicar: { when }" },
   "to_do_when_2783d78f": { "message": "Tareas pendientes: { when }" },
@@ -785,6 +813,7 @@
   },
   "union_e6b57a53": { "message": "Unión" },
   "unpublished_dfd8801": { "message": "no publicado" },
+  "untitled_16aa4f2b": { "message": "Sin título" },
   "untitled_efdc2d7d": { "message": "sin título" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Flecha diagonal hacia arriba y hacia la izquierda"
@@ -859,6 +888,7 @@
   "vertical_dots_bfb21f14": { "message": "Puntos verticales" },
   "video_options_24ef6e5d": { "message": "Opciones de vídeo" },
   "video_options_tray_3b9809a5": { "message": "Bandeja de opciones de vídeo" },
+  "video_player_b371005": { "message": "Reproductor de vídeo" },
   "video_player_for_9e7d373b": { "message": "Reproductor de vídeo para " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Reproductor de vídeo para { title }"
@@ -872,6 +902,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "Ver el recuento de palabras y caracteres"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "No hemos podido detectar un micrófono que funcione conectado a tu dispositivo."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "No hemos podido detectar una cámara web que funcione conectada a tu dispositivo."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "No hemos podido detectar una cámara web o un micrófono que funcionen conectados a tu dispositivo."
+  },
+  "webcam_disabled_30c66986": { "message": "Cámara web desactivada" },
+  "webcam_fe91b20f": { "message": "Cámara web" },
   "white_87fa64fd": { "message": "Blanco" },
   "width_492fec76": { "message": "Ancho" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -890,6 +931,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Se ha comprimido la imagen para Icon Maker. Las imágenes menores de { size } KB no se comprimirán."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Tu micrófono está bloqueado en la configuración del navegador."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Tu cámara web y micrófono están bloqueados en la configuración del navegador."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Tu cámara web está bloqueada en la configuración del navegador."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Es posible que tu cámara web ya esté en uso."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },
