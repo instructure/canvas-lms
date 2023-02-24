@@ -155,7 +155,7 @@ describe StreamItemsHelper do
       expect(@categorized["Conversation"].first.path).to match("/conversations/#{@conversation.id}")
       expect(@categorized["Assignment"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}")
       expect(@categorized["DiscussionTopic"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}")
-      expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}")
+      expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}?entry_id=#{DiscussionEntry.last.id}")
       expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
   end
