@@ -14,7 +14,7 @@ services:
       - tmp:/usr/src/app/tmp
       - yarn-cache:/home/docker/.cache/yarn
     environment:
-      JSPEC_PATH: ${JSPEC_PATH}
+      JSPEC_PATH: ${JSPEC_PATH:-}
       NODE_ENV: CI
     command: yarn run test:karma:watch:headless
 volumes:
