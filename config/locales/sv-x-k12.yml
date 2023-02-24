@@ -1120,6 +1120,12 @@ sv-x-k12:
         default: 
           lti_reports: 
             text: "Rapporten innehåller en export av data som visar användningsinformation för LTIs (Learning Tool Interoperability)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Termin
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4406,6 +4412,7 @@ sv-x-k12:
   audio_1c89b0c8: ljud
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Ljudinnehåll stöds inte av din enhet eller app."
   audio_dd489fcc: Ljud
+  audio_file_bf3ece7e: Ljudfil
   audio_player_for_label_dd9a6819: "Ljudspelare för %{label}"
   august_781433e8: Augusti
   australia_61_eb9bb701: "Australien (+61)"
@@ -5775,6 +5782,7 @@ sv-x-k12:
   cluster_cluster_b57fe99a: "Kluster: %{cluster}"
   cluster_f407976: Kluster
   code_93e9abbb: kod
+  code_file_424dc478: Kodfil
   code_is_case_sensitive_d8175cad: "Koden är skiftlägeskänslig"
   cog_icon_69bdffd5: Kugghjulsikon
   col_is_sorted_ascending_cc5152cc: "%{col} sorteras stigande"
@@ -5821,6 +5829,7 @@ sv-x-k12:
     errors: 
       cannot_load_collaboration: "Det går inte att ladda samarbete"
       create_failed: "Ett fel uppstod när samarbete skapades"
+      no_masquerading_on_collaboration: "Det är inte tillåtet att visa ett samarbete när du agerar som en annan användare."
       no_name: "Ange ett namn för det här samarbetet."
       not_enabled: "Samarbeten har inte aktiveras för den här Canvas-platsen"
       title_too_long: "Använd högst %{maxLength} tecken för namnet. Använd beskrivningen för ytterligare innehåll."
@@ -9495,6 +9504,10 @@ sv-x-k12:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Visa värden"
   displaying_to_students_b1e92058: "Visar för elever"
+  displayname_loaded_14d71a0a: "%{displayName} inläst"
+  displayname_loading_in_progress_2be325fd: "Inläsning av %{displayName} pågår"
+  displayname_loading_pending_3aa2723e: "Inläsning av %{displayName} väntar"
+  displayname_loading_success_8177d735: "%{displayName} har lästs in"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Visar konfetti för lärare som kör länkvalidering i
       en kurs för att visa att inga problem föreligger.
@@ -9511,6 +9524,7 @@ sv-x-k12:
   do_nothing_9672b478: "Gör ingenting"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: DOC-fil
   document_to_annotate_d37b93bc: "Dokument för kommentering"
   docviewer_apple_iwork_file_support_dc772b31: "Stöd i Docviewer för Apple iWork-filer"
   docviewer_area_created_37502a31: "Docviewer-område har skapats"
@@ -9956,6 +9970,7 @@ sv-x-k12:
   enabled_unlocked_8d3a5df7: "Aktiverad (olåst)"
   enabled_web_services_f620b2be: "Aktiverade webbtjänster"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverar en omdesignad dialog för ”Meddela elever som ...” som möjliggör meddelanden till observatörer utöver elever."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Aktiverar åtkomst till offentlig API för New Quizzes: API för quizobjekt"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Ger åtkomst till offentlig API för New Quizzes via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Gör att plagiatrapporter och likhetsresultat kan visas i inlämningsfacket för nya omdömesboken."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Gör att viktiga datum kan tillämpas i uppgifter, kalenderhändelser och annat."
@@ -10521,6 +10536,7 @@ sv-x-k12:
       exclusion: "är reserverad"
       greater_than: "måste vara större än %{count}"
       greater_than_or_equal_to: "måste vara större eller lika med %{count}"
+      in: "måste vara i %{count}"
       inclusion: "finns inte med i listan"
       invalid: "är ogiltig"
       less_than: "måste vara mindre än %{count}"
@@ -10655,6 +10671,7 @@ sv-x-k12:
   exceeded_the_maximum_length_number_characters_2d25611e: "Överskred maxlängden (%{number} tecken)"
   exceeds_expectations_5910fc3a: "Överträffar förväntningarna"
   exceeds_mastery_1f995dce: "Överträffar måluppfyllelse"
+  excel_file_c6b9890: Excel-fil
   excelsior_student_activity_tracking_7a1ba44d: "Elevaktivitetsspårning för Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Undanta data som inte uppdaterats sedan det angivna datumet"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Undanta uppgifter som fått resultatet 0."
@@ -11016,6 +11033,7 @@ sv-x-k12:
   file_storage_32477f6: Fillagring
   file_tree_collapsed_d4b0ae96: "Filträd stängt"
   file_tree_expanded_a1d20c4a: "Filträd expanderat"
+  file_type_fd1ba7ee: Filtyp
   file_upload_9cae6da5: Filuppladdning
   file_upload_failed_af22dd91: "Det gick inte att ladda upp filen"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Filuppladdningar, file_url eller content_export_id krävs"
@@ -11166,6 +11184,7 @@ sv-x-k12:
   flags_tab_updates_c4c209f1: "Flaggar uppdateringar för flik"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: Flash-fil
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr visar SafeSearch bilder i Creative Commons offentliga domän.
@@ -11181,6 +11200,7 @@ sv-x-k12:
   folder_705fd2d7: Mapp
   folder_browsing_tree_1f00a3ae: "Träd för bläddring i mappar"
   folder_icon_29017021: Mappikon
+  folder_locked_b91cd0c4: "Mappen är låst"
   folder_tree_fbab0726: Mappträd
   folders: 
     event_updated: "Händelsen har uppdaterats."
@@ -12623,6 +12643,7 @@ sv-x-k12:
   however_if_these_additional_permissions_are_enable_35d3082c: "Men om dessa ytterligare inställningar är aktiverade, men behörigheten Sidor – uppdatera inte är det, kan användaren fortfarande ändra låsinställningar för innehåll på enskilda sidor i en Blueprint-huvudkurs."
   html_editor_fb2ab713: HTML-redigerare
   html_fc8563c6: html
+  html_file_62393d3f: HTML-fil
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP-svar: %{code}"
@@ -12985,6 +13006,7 @@ sv-x-k12:
   ilumno_grade_export_251bc4b5: "Bedömningsrapport för Ilumno"
   image_8ad06: Bild
   image_c1c98202: bild
+  image_file_2b538bc: Bildfil
   image_id_is_not_a_valid_id_7dd6bad6: "image_id är inte ett giltigt ID"
   image_search_b0944fc2: Bildsökning
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url och image_id kan inte båda ställas in."
@@ -13411,6 +13433,7 @@ sv-x-k12:
   ip_filter_is_not_valid_152a46d8: "IP-filtret är inte giltigt."
   ireland_353_3cd32cc0: "Irland (+353)"
   irish_567e109f: Irländska
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " använder en kostnadsfri version av BigBlueButton som medger 10 samtidiga videokonferenser, var och en med 1 värd och upp till 24 deltagare. Inspelningar sparas i upp till 7 dagar."
   isolated_entry_post_error_page_2a447d08: "Felsida för enstaka kommentar"
@@ -14008,6 +14031,8 @@ sv-x-k12:
   loading_grades_for_coursename_26784c2d: "Läser in bedömningar för %{courseName}"
   loading_grading_periods_c635d96: "Läser in bedömningsperioder ..."
   loading_grading_periods_for_coursename_bbe46919: "Läser in bedömningsperioder för %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Läser in bedömningsscheman …"
+  loading_grading_schemes_failed_please_try_again_269918df: "Det gick inte att läsa in bedömningsscheman.  Försök igen"
   loading_group_f1647ebb: "Läser in %{group}."
   loading_grouptitle_dba362d2: "Läser in %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Läs in meddelandeinnehåll för fjärrundervisning"
@@ -16790,6 +16815,7 @@ sv-x-k12:
   new_quizzes_migration_required_7854aa1a: "Migrering av New Quizzes krävs"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på sidan Quiz"
   new_quizzes_public_api_18d95321: "Offentlig API för New Quizzes"
+  new_quizzes_public_api_quiz_items_16bc741d: "Offentlig API för New Quizzes: Quizobjekt"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uppdatering av New Quizzes Service JWT"
   new_quizzes_site_admin_service_user_a331233a: "Webbplatsadministratör för användare av New Quizzes-tjänst"
   new_quizzes_submission_274b5c57: "Inlämning för New Quizzes"
@@ -16838,6 +16864,7 @@ sv-x-k12:
   next_month_749b1778: "Nästa månad"
   next_month_b55a387c: "Nästa månad"
   next_page_d2a39853: "Nästa sida"
+  next_peer_review_3d05ef23: "Nästa kamratrespons"
   next_question_f37bac25: "Nästa fråga"
   next_run_at_635de64a: "Nästa körning vid"
   next_steps_ce0f0d0c: "Nästa steg"
@@ -18016,6 +18043,7 @@ sv-x-k12:
     exception: "Ursäkta, ett fel uppstod, vänligen försök igen senare."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDF-fil
   peer_632472b7: "Kamratrespons:"
   peer_review_74f26a13: Kamratrespons
   peer_review_assignment_7d314c59: Kamratresponsuppgift
@@ -18025,6 +18053,7 @@ sv-x-k12:
   peer_review_for_assignment_ce72fc52: "Kamratresponsuppgift för %{assignment}"
   peer_review_for_name_bcffa32f: "Kamratrespons för %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Kamratrespons för %{name} Inlämningsdatum: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Uppmaning till kamratrespons"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Stöd för kamratrespons i uppgiftsförbättringar"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Kamratresponsuppgifter hanteras ännu inte i det nya uppgiftsflödet. Öppna den äldre versionen av sidan för att skapa uppgifter?"
   peer_reviewed_graded_discussion_b339df5b: "Förgranskad bedömningsdiskussion:"
@@ -18714,6 +18743,7 @@ sv-x-k12:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Genom att lägga ut omdömen uppdateras din webbläsare. Detta kan ta en stund."
   posting_to_students_eaa57964: "Publicerar till elever"
   powered_by_instructure_504d676d: "Tillhandahålls av Instructure"
+  powerpoint_file_c4cb12af: PowerPoint-fil
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -22009,6 +22039,7 @@ sv-x-k12:
                                     Kontakta #canvas-sre i Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP-användaren har skapats. Det kan ta upp till fyra timmar innan den här nyckeln börjar fungera."
   sftp_user_management_19868cb3: SFTP-användarhantering
+  shadow_e98b5937: Skugga
   shard_5d340495: Skärva
   shard_id_optional_382e5dda: "Skärv-ID (valfritt)"
   shard_shard_95c57736: "Skärva: %{shard}"
@@ -22882,6 +22913,7 @@ sv-x-k12:
   sort_by_72dbba9c: "Sortera efter"
   sort_by_e75f9e3e: "Sortera efter"
   sort_courses_cf94b8d4: "Sortera kurser"
+  sort_ordertype_by_sortby_a0dd1c8: "Sortera %{orderType} efter %{sortBy}"
   sort_outcome_column_c53702ed: "Sortera kolumnen för lärandemål"
   sort_students_1a561e98: "Sortera elever"
   sortable_name_73f707cf: "Sorterbart namn"
@@ -23183,6 +23215,7 @@ sv-x-k12:
       . Lärandemålen presenteras i ett format som påminner om bedömningsöversikten
       och framsteg visas både som ett numeriskt värde och som  måluppfyllelse/nära
       måluppfyllelse/stödåtgärd.
+  student_outcome_result_b26b7ab4: "Lärandemålsresultat för elever"
   student_pace_2200bf85: Elevtakt
   student_page_history_ce86b3c2: "Sidhistorik för elev"
   student_page_history_pages_update_ae55fa03: "Sidhistorik för elev (Sidor – uppdatera)"
@@ -23199,6 +23232,7 @@ sv-x-k12:
   student_sis_id_abe6b292: "elevens sis id"
   student_student_number_5c98bd2d: "Elev %{student_number}"
   student_studentnumber_f398d9c2: "Elev %{studentNumber}"
+  student_submission_report_af01e697: "Inlämningsrapport för elev"
   student_submissions_910da1b3: Elevinlämning
   student_submissions_report_prospect_education_108daf59: "Inlämningsrapport för elev (Prospect Education)"
   student_tour_38b735c8: Elevgenomgång
@@ -23824,6 +23858,7 @@ sv-x-k12:
   text_entry_e1808b2f: Textinmatning
   text_entry_submission_7b0ae0c5: "Inlämning av textinmatning"
   text_entry_submission_cannot_be_empty_3d187cae: "Inlämningar av textinlägg får inte vara tomma"
+  text_file_73d8d08c: Textfil
   text_input_d3480b8c: Textinlägg
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Texten Ingen fråga har flyttats till en stimulans. Lägg till en fråga så att den kan visas inom quizet."
   thai_8f9bc548: Thailändska
@@ -24119,6 +24154,7 @@ sv-x-k12:
   the_state_parameter_is_required_ffadf213: "Delstatsparametern krävs"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fliken för elevnoteringar innehåller dokumentet för uppgiften. Flikar med flera inlämningstyper kan finnas."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Eleven som ska rapporteras har standardinställningen Canvas-ID om den inte är angiven som SIS i student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Inlämningen är ännu inte tillgänglig."
   the_submitted_after_date_to_report_on_9d90f026: "Den inlämnade efter-datumet som ska rapporteras"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Via kursöversikten kan du välkomna kursdeltagarna och dela dina förväntningar på kursen
@@ -24420,6 +24456,9 @@ sv-x-k12:
       Med den här funktionen kan
       tredjepartsverktyg lämna in flera filer samtidigt via Service-API:t för bedömningar och omdömen
       som grupperas som en inlämning istället för att skapa flera separata inlämningar.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Det här funktionsalternativet är endast synligt för användare med platsadministratörsbehörighet. Det påminner om
+                                ”Dold”, men slutanvändare ser det inte även om en platsadministratör har aktiverad det.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Det här funktionsalternativet är endast synligt för användare med platsadministratörsåtkomst.
                                   Slutanvändare kan inte se det förrän det aktiverats av en platsadministratör.
@@ -24915,6 +24954,7 @@ sv-x-k12:
   title_required_3ff5969: "Rubrik krävs"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} fack"
+  title_unpublished_51ddbc6a: "%{title} (avpublicerad)"
   title_was_successfully_created_f2a07c56: "%{title} skapades."
   title_was_successfully_updated_14b78676: "%{title} uppdaterades."
   titles: 
@@ -25981,7 +26021,9 @@ sv-x-k12:
   upload_media_ce31135a: "Ladda upp media"
   upload_not_available_for_this_folder_8f8623c6: "Uppladdning är inte tillgängligt för den här mappen"
   upload_percent_complete_d533d3e2: "Slutförandeprocent för uppladdning"
+  upload_progress_df577c48: "Förlopp för uppladdning"
   upload_progress_for_name_39f03acf: "Ladda upp förlopp för %{name}"
+  upload_success_f51f3a39: "Uppladdningen lyckades"
   upload_successful_ca47465f: "Laddades upp"
   upload_your_outcomes_bceeadbe: "Ladda upp dina lärandemål!"
   uploaded_285a2bfb: Uppladdade
@@ -26056,6 +26098,7 @@ sv-x-k12:
   use_the_new_interface_for_managing_permissions_907e8e8f: "Använd det nya gränssnittet för att hantera tillstånd"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Använd det nya quiz LTI-verktyget istället för vanliga canvas quizzes"
   use_the_new_scheduler_1273b832: "Använd den nya schemabokaren"
+  use_this_grading_scheme_52aa4ecf: "Använd det här bedömningsschemat"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Använd denna lista för att ta bort tilldelade elever. Lägg till nya elever med kombirutan efter listan."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Använd den här panelen för att lösa problem med duplicerade resultat eller personer som inte hittas med din sökning."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Använd den här panelen för att söka efter personer som du vill lägga till den här kursen."
@@ -26561,6 +26604,7 @@ sv-x-k12:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Videokonferensguider för fjärrklassrum"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Med videokonferensverktyg möjliggörs en personlig anslutning mellan lärare och elever."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoinnehåll stöds inte av din enhet eller app."
+  video_file_f7188ffe: Videofil
   video_player_b371005: Videospelare
   video_player_for_label_6a5fdb03: "Videospelare för %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -27205,9 +27249,16 @@ sv-x-k12:
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat utvecklingskraven för en aktiv kurs. Det kan finnas elever som redan har gått vidare till den här modulen och andra som är beroende av den."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Du har slutfört en kamratrespons för %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har slutfört en kamratresponsuppgift för %{person}. Tack"
+  you_have_completed_your_peer_reviews_543ad84: "Du har slutför dina kamratresponser!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Du har 1 kalender kvar"
     other: "Du har %{count} kalendrar kvar"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Du har 1 kamratrespons kvar att slutföra."
+    other: "Du har %{count} fler kamratresponser kvar att slutföra."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Du har 1 kamratrespons att slutföra"
+    other: "Du har %{count} kamratresponser att slutföra."
   you_have_count_peer_reviews_to_complete_52e065e: "Du har %{count} kamratresponser att slutföra"
   you_have_count_submissions_to_grade_6c5b511a: "Du har %{count} inlämningar att bedöma"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Du har skapat en kommentar som ännu inte har publicerats. Vill du fortsätta och spara den här kommentarer som ett utkast? (Du kan publicera utkastkommentarer när du vill.)"
@@ -27287,6 +27338,7 @@ sv-x-k12:
   you_must_set_usage_rights_87fc1382: "Du måste ange användarrättigheter"
   you_must_specify_a_usage_right_5eb57f87: "Du måste specificera en användningsrättighet."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Du måste ange om du vill aktivera eller inaktivera Microsoft Teams Sync."
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Du måste lämna in ditt eget arbete innan du kan granska dina kamrater."
   you_must_use_a_number_912ce4bd: "Du måste använda en siffra"
   you_must_use_a_positive_number_203b86fe: "Du måste använda en positiv siffra"
   you_must_use_an_integer_78d2530f: "Du måste använda ett heltal"
@@ -27418,6 +27470,7 @@ sv-x-k12:
   zero_activity_title: "Noll aktivitet"
   zip_26961da: zip
   zip_argument_error: "En uppladdning av zip-fil kräver en mapp att ladda upp till."
+  zip_file_3e736239: ZIP-fil
   zip_file_description: "Migreringsplugin för uppackning av zip-arkiv till kurs, grupper eller användarfiler"
   zip_file_display: Filimport
   zip_file_file_description: "Packa upp zip-fil i mapp"
