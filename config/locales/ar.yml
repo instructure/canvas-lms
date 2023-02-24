@@ -1256,6 +1256,12 @@ ar:
         default: 
           lti_reports: 
             text: "يقدم هذا التقرير تصديرًا للبيانات التي تُظهر معلومات استخدام LTI (تبادلية تشغيل الأداة التعليمية)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: "الفصل الدراسي"
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4962,6 +4968,7 @@ ar:
   audio_1c89b0c8: صوت
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "جهازك أو تطبيقك لا يدعم المحتويات الصوتية."
   audio_dd489fcc: صوت
+  audio_file_bf3ece7e: "ملف الصوت"
   audio_player_for_label_dd9a6819: "مشغل الصوت لـ %{label}"
   august_781433e8: أغسطس
   australia_61_eb9bb701: "أستراليا (+61)"
@@ -6451,6 +6458,7 @@ ar:
   cluster_cluster_b57fe99a: "المجموعة: %{cluster}"
   cluster_f407976: المجموعة
   code_93e9abbb: رمز
+  code_file_424dc478: "ملف الرموز"
   code_is_case_sensitive_d8175cad: "الرمز حساس لحالة الأحرف."
   cog_icon_69bdffd5: "رمز الترس"
   col_is_sorted_ascending_cc5152cc: "%{col} تم فرزه تصاعديًا"
@@ -6511,6 +6519,7 @@ ar:
     errors: 
       cannot_load_collaboration: "تعذر تحميل التعاون"
       create_failed: "فشل إنشاء التعاون"
+      no_masquerading_on_collaboration: "غير مسموح بعرض التعاون أثناء العمل كمستخدم آخر."
       no_name: "الرجاء إدخال اسم لهذا التعاون."
       not_enabled: "لم يتم تمكين علاقات التعاون لموقع Canvas هذا"
       title_too_long: "الرجاء استخدام %{maxLength} حرفًا أو أقل للاسم. استخدم الوصف للمحتوى الإضافي."
@@ -11055,6 +11064,10 @@ ar:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "عرض القيم"
   displaying_to_students_b1e92058: "العرض للطلاب"
+  displayname_loaded_14d71a0a: "تم تحميل %{displayName}"
+  displayname_loading_in_progress_2be325fd: "تحميل %{displayName} قيد التقدم"
+  displayname_loading_pending_3aa2723e: "تحميل %{displayName} معلق"
+  displayname_loading_success_8177d735: "نجح تحميل %{displayName}"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       تعرض قصاصات ورقية ملونة للمعلمين الذين يشغلون أداة التحقق من الارتباطات على
       مساق محدد وعدم العثور على مشكلات.
@@ -11075,6 +11088,7 @@ ar:
   do_nothing_9672b478: "عدم القيام بشيء"
   doc_50924b72: DOC
   doc_c63509f8: مستند
+  doc_file_b1d0042f: "ملف Doc"
   document_to_annotate_d37b93bc: "المستند المطلوب إضافة تعليقات توضيحية له"
   docviewer_apple_iwork_file_support_dc772b31: "دعم ملف Docviewer Apple iWork"
   docviewer_area_created_37502a31: "تم إنشاء مساحة في Docviewer"
@@ -11577,6 +11591,7 @@ ar:
   enabled_unlocked_8d3a5df7: "تم التمكين (غير مؤّمن)"
   enabled_web_services_f620b2be: "خدمات الويب المُمكّنة"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "لتمكين مربع حوار معاد تصميمه \"إرسال رسائل للطلاب الذين...\" الذي يسمح بمراسلة المراقبين بالإضافة إلى الطلاب."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "لتمكين الوصول إلى واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة: واجهة برمجة تطبيقات عناصر الاختبار الموجز."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "لتمكين الوصول إلى واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة من خلال Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "يمكّن من عرض تقارير الانتحال وتشابه الدرجات في درج إرسال دفتر الدرجات الجديد."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "لتمكين التواريخ المهمة المقرر تطبيقها على المهام وأحداث التقويم وغير ذلك."
@@ -12180,6 +12195,7 @@ ar:
       exclusion: محجوز
       greater_than: "يجب أن يكون أكبر من %{count}"
       greater_than_or_equal_to: "يجب أن يكون أكبر من أو مساويًا لـ %{count}"
+      in: "يجب أن يوجد في %{count}"
       inclusion: "لم يتم تضمينه في القائمة"
       invalid: "غير صالح"
       less_than: "يجب أن يكون أقل من %{count}"
@@ -12414,6 +12430,7 @@ ar:
   exceeded_the_maximum_length_number_characters_2d25611e: "تجاوز الحد الأقصى للطول (%{number} من الأحرف)"
   exceeds_expectations_5910fc3a: "يفوق التوقعات"
   exceeds_mastery_1f995dce: "تجاوز الإتقان"
+  excel_file_c6b9890: "ملف Excel"
   excelsior_student_activity_tracking_7a1ba44d: "تعقب نشاط طلاب Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "استثناء أي بيانات لم يتم تحديثها منذ التاريخ المحدد"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "استبعاد المهام المقيّمة بدرجة 0."
@@ -12911,6 +12928,7 @@ ar:
   file_storage_32477f6: "تخزين الملفات"
   file_tree_collapsed_d4b0ae96: "تم طي شجرة الملف"
   file_tree_expanded_a1d20c4a: "تم توسيع شجرة الملف"
+  file_type_fd1ba7ee: "نوع الملف"
   file_upload_9cae6da5: "تحميل ملف"
   file_upload_failed_af22dd91: "فشل تحميل الملف"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "مطلوب تحميل ملف أو file_url أو content_export_id"
@@ -13092,6 +13110,7 @@ ar:
   flags_tab_updates_c4c209f1: "تحديثات علامة تبويب العلامات"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "ملف Flash"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       يعرض Flickr صور SafeSearch داخل مجال عام للمشاع الإبداعي.
@@ -13108,6 +13127,7 @@ ar:
   folder_705fd2d7: المجلد
   folder_browsing_tree_1f00a3ae: "شجرة استعراض المجلدات"
   folder_icon_29017021: "رمز المجلد"
+  folder_locked_b91cd0c4: "المجلد مقفل"
   folder_tree_fbab0726: "شجرة المجلد"
   folders: 
     event_updated: "تم تحديث الحدث بنجاح."
@@ -15193,6 +15213,7 @@ ar:
   html5_media_recorder_in_rce_bb59b78f: "مسجل وسائط HTML5 في محرر المحتوى المنسق"
   html_editor_fb2ab713: "محرر HTML"
   html_fc8563c6: html
+  html_file_62393d3f: "ملف HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "استجابة HTTP: %{code}"
@@ -15572,6 +15593,7 @@ ar:
   ilumno_grade_export_251bc4b5: "تصدير تقديرات Ilumno"
   image_8ad06: الصورة
   image_c1c98202: صورة
+  image_file_2b538bc: "ملف صورة"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id ليس معرف صالح"
   image_search_b0944fc2: "بحث عن الصورة"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "لا يمكن تحديد كل من image_url و image_id كمجموعة."
@@ -16037,6 +16059,7 @@ ar:
   ireland_353_3cd32cc0: "أيرلندا (+353)"
   ireland_f7bb9899: أيرلندا
   irish_567e109f: الأيرلندية
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " يستخدم إصدارًا مجانيًا لـ BigBlueButton الذي يوفر 10 مؤتمرات فيديو متزامنة، كل منها بمضيف واحد وحتى 24 من الحضور. يتم فرز التسجيلات لمدة 7 أيام."
   isolated_entry_post_error_page_2a447d08: "صفحة خطأ منشور الكيان المعزول"
@@ -16686,6 +16709,8 @@ ar:
   loading_grades_for_coursename_26784c2d: "جارٍ تحميل تقديرات %{courseName}"
   loading_grading_periods_c635d96: "جارٍ تحميل فترات التقييم..."
   loading_grading_periods_for_coursename_bbe46919: "جارٍ تحميل فترات التقديرات لـ%{courseName}"
+  loading_grading_schemes_dc26ebd3: "جارٍ تحميل مخططات الدرجات..."
+  loading_grading_schemes_failed_please_try_again_269918df: "تعذر تحميل مخططات الدرجات.  يرجى إعادة المحاولة"
   loading_group_f1647ebb: "جارٍ تحميل %{group}"
   loading_grouptitle_dba362d2: "جارٍ تحميل %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "جارٍ تحميل محتوى إعلان جلسة تسجيل الحضور"
@@ -19939,6 +19964,7 @@ ar:
   new_quizzes_migration_required_7854aa1a: "مطلوب ترحيل الاختبارات الموجزة"
   new_quizzes_on_the_quizzes_page_b21f338d: "اختبارات موجزة جديدة على صفحة الاختبارات الموجزة"
   new_quizzes_public_api_18d95321: "واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة"
+  new_quizzes_public_api_quiz_items_16bc741d: "واجهة برمجة التطبيقات العامة للاختبارات الموجزة الجديدة: عناصر الاختبار الموجز"
   new_quizzes_service_jwt_refresh_ca28ca8: "تحديث JWT لخدمة الاختبارات الموجزة الجديدة"
   new_quizzes_site_admin_service_user_a331233a: "مستخدم خدمة مسؤول موقع الاختبارات الموجزة الجديدة"
   new_quizzes_submission_274b5c57: "إرسال New Quizzes"
@@ -19991,6 +20017,7 @@ ar:
   next_month_749b1778: "الشهر القادم"
   next_month_b55a387c: "الشهر القادم"
   next_page_d2a39853: "الصفحة التالية"
+  next_peer_review_3d05ef23: "مراجعة الأقران التالية"
   next_question_f37bac25: "السؤال التالي"
   next_run_at_635de64a: "التشغيل التالي في"
   next_steps_ce0f0d0c: "الخطوات التالية"
@@ -21267,6 +21294,7 @@ ar:
     exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "ملف PDF"
   peer_632472b7: "النظير:"
   peer_review_74f26a13: "المراجعة النظيرة"
   peer_review_assignment_7d314c59: "مهمة مراجعة أقران"
@@ -21276,6 +21304,7 @@ ar:
   peer_review_for_assignment_ce72fc52: "مراجعة نظيرة لـ %{assignment}"
   peer_review_for_name_bcffa32f: "مراجعة أقران لـ %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "مراجعة أقران %{name} المستحقة: %{dueAtText}"
+  peer_review_prompt_571c5d22: "مطالبة مراجعة الأقران"
   peer_review_support_in_assignment_enhancements_b1df2b76: "مراجعات الأقران مدعومة في تعزيزات المهام"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "لم تتم معالجة مهام مراجعة الأقران حتى الآن في تدفق المهام الجديدة. هل تريد التوجه إلى صفحة إنشاء المهام القديمة؟"
   peer_reviewed_graded_discussion_b339df5b: "مناقشة بدرجات يراجعها الأقران:"
@@ -22027,6 +22056,7 @@ ar:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "سيؤدي نشر الدرجات إلى تحديث المستعرض. قد يستغرق هذا بعض الوقت."
   posting_to_students_eaa57964: "جارٍ النشر للطلاب"
   powered_by_instructure_504d676d: "مدعوم بواسطة Instructure"
+  powerpoint_file_c4cb12af: "ملف PowerPoint"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -26002,6 +26032,7 @@ ar:
                                     يرجى التواصل من خلال #canvas-sre في Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "تم إنشاء مستخدم SFTP. قد يستغرق بدء عمل هذا المستخدم ما يصل إلى أربع ساعات."
   sftp_user_management_19868cb3: "إدارة مستخدم SFTP"
+  shadow_e98b5937: الظل
   shard_5d340495: المقطع
   shard_id_optional_382e5dda: "معرف القطعة (اختياري)"
   shard_shard_95c57736: "المقطع: %{shard}"
@@ -27121,6 +27152,7 @@ ar:
   sort_by_72dbba9c: "الفزر حسب"
   sort_by_e75f9e3e: "الفزر حسب"
   sort_courses_cf94b8d4: "ترتيب المساقات"
+  sort_ordertype_by_sortby_a0dd1c8: "فرز %{orderType} حسب %{sortBy}"
   sort_outcome_column_c53702ed: "فرز عمود المخرجات"
   sort_students_1a561e98: "فرز الطلاب"
   sortable_name_73f707cf: "اسم قابل للفرز"
@@ -27453,6 +27485,7 @@ ar:
       لى حصائل تعلم المساق. يتم عرض الحصائل بتنسيق
       يشبه دفتر الدرجات ويتم عرض التقدم كنتيجة رقيمة وكإجادة/قريب
       من الإجادة/تصحيحي.
+  student_outcome_result_b26b7ab4: "نتيجة مخرجات الطالب"
   student_pace_2200bf85: "سرعة الطالب"
   student_page_history_ce86b3c2: "محفوظات صفحات الطالب"
   student_page_history_pages_update_ae55fa03: "سجل صفحة الطالب (الصفحات - تحديث)"
@@ -27470,6 +27503,7 @@ ar:
   student_sis_id_abe6b292: "معرف sis للطالب"
   student_student_number_5c98bd2d: "الطالب %{student_number}"
   student_studentnumber_f398d9c2: "طالب %{studentNumber}"
+  student_submission_report_af01e697: "تقرير إرسال الطالب"
   student_submissions_910da1b3: "إرسالات الطالب"
   student_submissions_report_prospect_education_108daf59: "تقرير إرسالات الطالب (Prospect Education)"
   student_summary: 
@@ -28175,6 +28209,7 @@ ar:
   text_entry_e1808b2f: "إدخال النص"
   text_entry_submission_7b0ae0c5: "إرسال إدخال نصي"
   text_entry_submission_cannot_be_empty_3d187cae: "لا يمكن أن يكون إرسال إدخال النص فارغاً"
+  text_file_73d8d08c: "ملف نص"
   text_input_d3480b8c: "إدخال النص"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "تم نقل \"النص (بدون سؤال) إلى Stimulus، يرجى إضافة سؤال حتى يمكن عرضه داخل الاختبار الموجز."
   thai_8f9bc548: التايوانية
@@ -28501,6 +28536,7 @@ ar:
   the_state_parameter_is_required_ffadf213: "معلمة الحالة مطلوبة"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "تتضمن علامة تبويب التعليق التوضيحي للطالب المستند المطلوب للمهمة. قد تتوفر أيضًا علامات تبويب بأنواع إرسال إضافية."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "يتم ضبط الطالب المطلوب الإبلاغ عنه بشكل افتراضي إلى معرف Canvas ما لم يتم تحديده كـ SIS في student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "الإرسال غير متاح بعد."
   the_submitted_after_date_to_report_on_9d90f026: "تاريخ بعد الإرسال المطلوب الإبلاغ عنه"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       يمكّنك المخطط الدراسي بترحيب بمستخدمي مساقك ومشاركة التوقعات
@@ -28852,6 +28888,9 @@ ar:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       تقوم هذه الميزة بالتحقق من api لتحميل ملف الإرسالات
       مقارنة بالملحقات المسموح بها للمهمة المقترنة.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      لا يظهر خيار الميزة هذا إلا للمستخدمين بوصول مسؤول الموقع. إنه مشابه لـ
+                                "المخفي"، لكن المستخدمين النهائيين لن يروه حتى لو كان ممكّنًا بواسطة مستخدم مسؤول موقع.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       لا يظهر خيار الميزة هذا إلا للمستخدمين المتمتعين بإمكانية وصول مسؤول الموقع.
                                   لن يراه المستخدمون النهائيون حتى يقوم مستخدم مسؤول موقع بتمكينه.
@@ -29369,6 +29408,7 @@ ar:
   title_required_3ff5969: "العنوان مطلوب"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} العلبة"
+  title_unpublished_51ddbc6a: "%{title} (غير منشور)"
   title_was_successfully_created_f2a07c56: "تم إنشاء \"%{title}\" بنجاح."
   title_was_successfully_updated_14b78676: "تم تحديث \"%{title}\" بنجاح."
   titles: 
@@ -30515,7 +30555,9 @@ ar:
   upload_media_ce31135a: "تحميل الوسائط"
   upload_not_available_for_this_folder_8f8623c6: "التحميل غير متاح لهذا المجلد"
   upload_percent_complete_d533d3e2: "اكتملت النسبة المئوية للتحميل"
+  upload_progress_df577c48: "تقدم التحميل"
   upload_progress_for_name_39f03acf: "تقدم التحميل لـ %{name}"
+  upload_success_f51f3a39: "تم تحميل بنجاح"
   upload_successful_ca47465f: "تم التحميل بنجاح"
   upload_your_outcomes_bceeadbe: "تحميل النواتج الخاصة بك!"
   uploaded_285a2bfb: "تم التحميل"
@@ -30602,6 +30644,7 @@ ar:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "استخدام أداة اختبار LTI الجديدة بدلاً من اختبارات Canvas"
   use_the_new_scheduler_1273b832: "استخدام المجدول الجديد"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "استخدام هذا التكوين لتسجيل ولي الأمر/المراقب."
+  use_this_grading_scheme_52aa4ecf: "استخدام مخطط الدرجات هذا"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "استخدم هذه القائمة لإزالة الطلاب المعينين. أضف طلابًا جددًا من خلال مربع تحرير وسرد بعد القائمة."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "استخدم هذه الشاشة لحل النتائج المكررة أو الأشخاص الذين لم يتم العثور عليهم بالبحث الذي تجريه."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "استخدم هذه اللوحة لحل التكرارات أو الأشخاص الذين لم يتم العثور عليهم خلال بحثك."
@@ -31196,6 +31239,7 @@ ar:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "أدلة مؤتمرات الفيديو للصفوف عن بعد"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "تمكّن أدوات مؤتمرات الفيديو الاتصال وجهاً لوجه بين المعلمين والطلاب."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "جهازك أو تطبيقك لا يدعم محتوى الفيديو."
+  video_file_f7188ffe: "ملف الفيديو"
   video_player_b371005: "مشغل الفيديو"
   video_player_for_label_6a5fdb03: "مشغل الفيديو لـ %{label}"
   vietnam_84_e50a2a44: "فيتنام (+84)"
@@ -31923,6 +31967,7 @@ ar:
   you_have_changed_the_progression_requirements_for__6772bc89: "لقد قمت بتغيير متطلبات التقدم لمساق نشط. من المحتمل وجود طلاب تقدموا بالفعل إلى هذه الوحدة وإلى وحدات أخرى تعتمد عليها."
   you_have_completed_a_peer_review_for_name_4dd2264b: "لقد أكلمت مراجعة أقران لـ %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "لقد أكلمت مراجعة نظراء لـ %{person}. شكراً لك!"
+  you_have_completed_your_peer_reviews_543ad84: "لقد أكلمت مراجعة الأقران الخاصة بك!"
   you_have_count_calendars_left_f0cbcac4: 
     few: "تبقى لديك %{count} من التقويمات"
     many: "تبقى لديك %{count} من التقويمات"
@@ -31930,6 +31975,20 @@ ar:
     other: "تبقى لديك %{count} من التقويمات"
     two: "تبقى لديك %{count} من التقويمات"
     zero: "تبقى لديك %{count} من التقويمات"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    few: "لديك %{count} من مراجعات الأقران الإضافية التي يجب إكمالها"
+    many: "لديك %{count} من مراجعات الأقران الإضافية التي يجب إكمالها"
+    one: "لديك مراجعة أقران إضافية يجب إكمالها."
+    other: "لديك %{count} من مراجعات الأقران الإضافية التي يجب إكمالها"
+    two: "لديك %{count} من مراجعات الأقران الإضافية التي يجب إكمالها"
+    zero: "لديك %{count} من مراجعات الأقران الإضافية التي يجب إكمالها"
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    few: "لديك %{count} من مراجعات الأقران يجب إكمالها."
+    many: "لديك %{count} من مراجعات الأقران يجب إكمالها."
+    one: "لديك مراجعة أقران واحدة يجب إكمالها."
+    other: "لديك %{count} من مراجعات الأقران يجب إكمالها."
+    two: "لديك %{count} من مراجعات الأقران يجب إكمالها."
+    zero: "لديك %{count} من مراجعات الأقران يجب إكمالها."
   you_have_count_peer_reviews_to_complete_52e065e: "لديك %{count} من مراجعات الأقران يجب إكمالها"
   you_have_count_submissions_to_grade_6c5b511a: "لديك %{count} من الإرسالات للتعليم"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "لقد أنشأت تعليقًا لم يُنشر. هل تريد المتابعة وحفظ هذا التعليق كمسودة؟ (يمكن نشر مسودات التعليقات في أي وقت)."
@@ -32013,6 +32072,7 @@ ar:
   you_must_set_usage_rights_87fc1382: "يجب أن تعيّن حقوق الاستخدام"
   you_must_specify_a_usage_right_5eb57f87: "يتعين عليك تعيين حقوق الاستخدام."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "يجب تحديد تمكين أو تعطيل مزامنة Microsoft Teams"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "يجب إرسال عملك قبل أن تتمكن من مراجعة أقرانك."
   you_must_use_a_number_912ce4bd: "يجب استخدام رقم"
   you_must_use_a_positive_number_203b86fe: "يجب استخدام عدد موجب"
   you_must_use_an_integer_78d2530f: "يجب استخدام عدد صحيح"
@@ -32159,6 +32219,7 @@ ar:
   zero_activity_title: "نشاط صفري"
   zip_26961da: zip
   zip_argument_error: "تحميل ملف بتنسيق .zip بحاجة إلى مجلد لتحميله."
+  zip_file_3e736239: "الملف المضغوط"
   zip_file_description: "المكون الإضافي للترحيل لإلغاء ضغط الملفات التي بتنسيق ‎.zip في ملفات مستخدم أو مجموعة أو مساق"
   zip_file_display: "استيراد الملف"
   zip_file_file_description: "إلغاء ضغط ملف بتنسيق .zip في مجلد"
