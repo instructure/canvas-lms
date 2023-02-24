@@ -944,11 +944,13 @@ class User < ActiveRecord::Base
   end
 
   def email
-    value = Rails.cache.fetch(email_cache_key) do
-      email_channel.try(:path) || :none
+    shard.activate do
+      value = Rails.cache.fetch(email_cache_key) do
+        email_channel.try(:path) || :none
+      end
+      # this sillyness is because rails equates falsey as not in the cache
+      value == :none ? nil : value
     end
-    # this sillyness is because rails equates falsey as not in the cache
-    value == :none ? nil : value
   end
 
   def email_cache_key
