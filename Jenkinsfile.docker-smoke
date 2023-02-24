@@ -82,7 +82,6 @@ EOF
                 source script/common/canvas/build_helpers.sh
 
                 build_images
-                check_gemfile
                 docker_compose_up
                 build_assets
               '''

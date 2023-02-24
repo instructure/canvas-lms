@@ -32,25 +32,6 @@ function build_images {
   stop_spinner
 }
 
-function check_gemfile {
-  if [[ -e Gemfile.lock ]]; then
-    message \
-'For historical reasons, the Canvas Gemfile.lock is not tracked by git. We may
-need to remove it before we can install gems, to prevent conflicting dependency
-errors.'
-    confirm_command 'rm -f Gemfile.lock' || true
-  fi
-
-  # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'
-  if ! _canvas_lms_track_with_log $DOCKER_COMMAND run --no-deps --rm web touch Gemfile.lock; then
-    message \
-"The 'docker' user is not allowed to write to Gemfile.lock. We need write
-permissions so we can install gems."
-    touch Gemfile.lock
-    confirm_command 'chmod a+rw Gemfile.lock' || true
-  fi
-}
-
 function build_assets {
   message "Building assets..."
   start_spinner "> Bundle install..."
