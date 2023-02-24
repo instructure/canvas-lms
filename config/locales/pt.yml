@@ -1217,6 +1217,12 @@ pt:
         default: 
           lti_reports: 
             text: "Este relatório disponibiliza uma exportação de dados que mostram a informação de utilização LTI (Utilização da Ferramenta de Aprendizagem)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Período
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4804,6 +4810,7 @@ pt:
   audio_1c89b0c8: áudio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Não é suportado conteúdo audio pelo seu dispositivo ou app."
   audio_dd489fcc: Áudio
+  audio_file_bf3ece7e: "Ficheiro de Áudio"
   audio_player_for_label_dd9a6819: "Leitor de áudio para %{label}"
   august_781433e8: Agosto
   australia_61_eb9bb701: "Austrália (+61)"
@@ -6288,6 +6295,7 @@ pt:
   cluster_cluster_b57fe99a: "Cluster: %{cluster}"
   cluster_f407976: Cluster
   code_93e9abbb: código
+  code_file_424dc478: "Ficheiro de código"
   code_is_case_sensitive_d8175cad: "O Código é sensível a maiúsculas."
   cog_icon_69bdffd5: "Ícone cog"
   col_is_sorted_ascending_cc5152cc: "%{col} está classificado ascendente"
@@ -6344,6 +6352,7 @@ pt:
     errors: 
       cannot_load_collaboration: "Não foi possível carregar colaboração"
       create_failed: "Falha na criação de colaboração"
+      no_masquerading_on_collaboration: "Não é permitido ver uma colaboração enquanto se atua como outro utilizador."
       no_name: "Introduza um nome para esta colaboração."
       not_enabled: "As colaborações não foram ativadas para este site do Canvas"
       title_too_long: "Utilize %{maxLength} caracteres ou menos para o nome. Utilize a descrição para conteúdo adicional."
@@ -10493,6 +10502,10 @@ pt:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Exibir valores"
   displaying_to_students_b1e92058: "Exibir para os alunos"
+  displayname_loaded_14d71a0a: "%{displayName} carregado"
+  displayname_loading_in_progress_2be325fd: "%{displayName} carregamento em progresso"
+  displayname_loading_pending_3aa2723e: "%{displayName} carregamento pendente"
+  displayname_loading_success_8177d735: "%{displayName} sucesso de carregamento"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Exibe confetti para professores que gerem o validador de ligação
       numa disciplina e não são encontrados problemas.
@@ -10513,6 +10526,7 @@ pt:
   do_nothing_9672b478: "Não fazer nada"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Ficheiro Doc"
   document_to_annotate_d37b93bc: "Documento a anotar"
   docviewer_apple_iwork_file_support_dc772b31: "Suporte de ficheiros Docviewer Apple iWork"
   docviewer_area_created_37502a31: "Área do Docviewer criada"
@@ -11004,6 +11018,7 @@ pt:
   enabled_unlocked_8d3a5df7: "Ativado (desbloqueado)"
   enabled_web_services_f620b2be: "Serviços da web ativados"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Permite um diálogo redesenhado de Alunos de Mensagens que... permite o envio de observadores de mensagens para além dos alunos."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Permite o acesso à API Pública dos Novos Questionários: API de Itens do Questionário."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Permite o acesso ao Novo API Público de Questionários através do Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Permite a exibição de relatórios de plágio e pontuações de similaridade na bandeja de envio do Novo Livro de notas."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permite que datas importantes sejam aplicadas a tarefas, eventos de calendário, e outros."
@@ -11595,6 +11610,7 @@ pt:
       exclusion: "está reservado"
       greater_than: "tem de ser superior a %{count}"
       greater_than_or_equal_to: "tem de ser igual ou superior a %{count}"
+      in: "devem estar em %{count}"
       inclusion: "não está incluído na lista"
       invalid: "é inválido"
       less_than: "tem de ser inferior a %{count}"
@@ -11729,6 +11745,7 @@ pt:
   exceeded_the_maximum_length_number_characters_2d25611e: "Excedeu o comprimento máximo (%{number} caracteres)"
   exceeds_expectations_5910fc3a: "Excede às expectativas"
   exceeds_mastery_1f995dce: "Excede a Excelência"
+  excel_file_c6b9890: "Ficheiro Excel"
   excelsior_student_activity_tracking_7a1ba44d: "Acompanhamento da atividade do aluno Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Excluir quaisquer dados que não tenham sido atualizados desde a data indicada"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Excluir tarefas classificadas com uma pontuação 0."
@@ -12226,6 +12243,7 @@ pt:
   file_storage_32477f6: "Armazenamento de arquivos"
   file_tree_collapsed_d4b0ae96: "Árvore de ficheiro recolhida"
   file_tree_expanded_a1d20c4a: "Árvore de ficheiro expandida"
+  file_type_fd1ba7ee: "Tipo de ficheiro"
   file_upload_9cae6da5: "Carregar de arquivos"
   file_upload_failed_af22dd91: "Carregamento de ficheiro falhou"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Carregamento de ficheiro, file_url ou content_export_id é obrigatório"
@@ -12407,6 +12425,7 @@ pt:
   flags_tab_updates_c4c209f1: "Atualizações do separador Bandeiras"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "Ficheiro Flash"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       O Flickr exibe imagens SafeSearch no domínio público da Creative Commons.
@@ -12423,6 +12442,7 @@ pt:
   folder_705fd2d7: Pasta
   folder_browsing_tree_1f00a3ae: "Árvore de navegação de pastas"
   folder_icon_29017021: "ícone de pasta"
+  folder_locked_b91cd0c4: "Pasta Trancada"
   folder_tree_fbab0726: "Árvore de pastas"
   folders: 
     event_updated: "O evento foi atualizado com sucesso."
@@ -14405,6 +14425,7 @@ pt:
   html5_media_recorder_in_rce_bb59b78f: "Gravador de mídia HTML5 em RCE"
   html_editor_fb2ab713: "Editor HTML"
   html_fc8563c6: html
+  html_file_62393d3f: "Ficheiro HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "Resposta HTTP: %{code}"
@@ -14785,6 +14806,7 @@ pt:
   ilumno_grade_export_251bc4b5: "Exportação de classificação Ilumno"
   image_8ad06: Imagem
   image_c1c98202: imagem
+  image_file_2b538bc: "Ficheiro de Imagem"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id não é uma ID válida"
   image_search_b0944fc2: "Pesquisa de imagens"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url e image_id não conseguem ser definidas"
@@ -15252,6 +15274,7 @@ pt:
   ireland_f7bb9899: Irlanda
   irish_567e109f: Irlandês
   is_an_lti_1_3_tool_770480a1: "É uma ferramenta LTI 1.3."
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " está a utilizar uma versão gratuita de BigBlueButton que fornece 10 videoconferências simultâneas, cada uma com 1 anfitrião e até 24 participantes. As gravações são armazenadas durante 7 dias."
   isolated_entry_post_error_page_2a447d08: "Página de Erro de Posto de Entrada Isolado"
@@ -15884,6 +15907,8 @@ pt:
   loading_grades_for_coursename_26784c2d: "Notas de carregamento para %{courseName}"
   loading_grading_periods_c635d96: "Períodos de classificação de carga..."
   loading_grading_periods_for_coursename_bbe46919: "Carregar períodos de carga para %{courseName}"
+  loading_grading_schemes_dc26ebd3: "A carregar Esquemas de Classificação..."
+  loading_grading_schemes_failed_please_try_again_269918df: "A carregar Esquemas de Classificação Falhados.  Por favor, tente novamente"
   loading_group_f1647ebb: "A carregar %{group}"
   loading_grouptitle_dba362d2: "Carregamento %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "A carregar Conteúdo do Anúncio de Homeroom"
@@ -19052,6 +19077,7 @@ pt:
   new_quizzes_migration_required_7854aa1a: "Migração necessária para novos Testes"
   new_quizzes_on_the_quizzes_page_b21f338d: "Novos Testes na página de Testes"
   new_quizzes_public_api_18d95321: "Novos API público de Questionários"
+  new_quizzes_public_api_quiz_items_16bc741d: "Novos Questionários API Públicos: Itens do Questionário"
   new_quizzes_service_jwt_refresh_ca28ca8: "Novo Serviço de Questionários Actualização JWT"
   new_quizzes_site_admin_service_user_a331233a: "Novo Questionário Utilizador do Serviço de Administração do Site"
   new_quizzes_submission_274b5c57: "Apresentação de Novos Questionários"
@@ -19104,6 +19130,7 @@ pt:
   next_month_749b1778: "Próximo mês"
   next_month_b55a387c: "Próximo mês"
   next_page_d2a39853: "Próxima página"
+  next_peer_review_3d05ef23: "Próxima Revisão por Pares"
   next_question_f37bac25: "Próxima pergunta"
   next_run_at_635de64a: "Próxima execução em"
   next_steps_ce0f0d0c: "Próximas etapas"
@@ -20364,6 +20391,7 @@ pt:
     exception: "Ocorreu um erro, tente novamente mais tarde."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "Ficheiro PDF"
   peer_632472b7: "Pares:"
   peer_review_74f26a13: "Revisão por colegas"
   peer_review_assignment_7d314c59: "Tarefa de Revisão por Pares"
@@ -20373,6 +20401,7 @@ pt:
   peer_review_for_assignment_ce72fc52: "Revisão por colegas de %{assignment}"
   peer_review_for_name_bcffa32f: "Revisão por pares para o %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Revisão por pares para o %{name} Due: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Pronta Revisão por Pares"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Apoio à Revisão pelos Pares em Melhorias de Atribuição"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Tarefas revisadas por pares ainda não foram tratadas no novo fluxo de tarefas. Página de tarefa de criação legada?"
   peer_reviewed_graded_discussion_b339df5b: "Discussão classificada por pares:"
@@ -21125,6 +21154,7 @@ pt:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "A publicação de avaliações atualizará seu navegador. Isso pode demorar um pouco."
   posting_to_students_eaa57964: "Postagem para os alunos"
   powered_by_instructure_504d676d: "Alimentado por estrutura"
+  powerpoint_file_c4cb12af: "PowerPoint Ficheiro"
   powerschool_a30f0bfc: "Escola com Vida"
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24843,6 +24873,7 @@ pt:
                                     Por favor, contate-nos em #canvas-sre em Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "O utilizador SFTP foi criado. Pode demorar até quatro horas para este utilizador começar a trabalhar."
   sftp_user_management_19868cb3: "Gestão de utilizadores SFTP"
+  shadow_e98b5937: Sombra
   shard_5d340495: Fragmento
   shard_id_optional_382e5dda: "Identificação da Lasca (opcional)"
   shard_shard_95c57736: "Fragmento: %{shard}"
@@ -25936,6 +25967,7 @@ pt:
   sort_by_72dbba9c: "Classificar por"
   sort_by_e75f9e3e: "Classificar por"
   sort_courses_cf94b8d4: "Classificar disciplinas"
+  sort_ordertype_by_sortby_a0dd1c8: "Ordenar %{orderType} por %{sortBy}"
   sort_outcome_column_c53702ed: "Ordenar coluna de resultados"
   sort_students_1a561e98: "Classificar Alunos"
   sortable_name_73f707cf: "Nome ordenável"
@@ -26264,6 +26296,7 @@ pt:
       dos resultados de aprendizagem da disciplina. Os resultados são apresentados em um
       formato similar ao do livro de classificação e o progresso é exibido tanto como uma pontuação numérica quanto como
       masterizado/quase-mestre/corretivo.
+  student_outcome_result_b26b7ab4: "Resultado do Resultado do Estudante"
   student_pace_2200bf85: "Ritmo do Estudante"
   student_page_history_ce86b3c2: "Histórico da página do aluno"
   student_page_history_pages_update_ae55fa03: "Histórico das Páginas do Aluno (Páginas - Atualizar)"
@@ -26281,6 +26314,7 @@ pt:
   student_sis_id_abe6b292: "id do sis do aluno"
   student_student_number_5c98bd2d: "Estudante %{student_number}"
   student_studentnumber_f398d9c2: "Aluno %{studentNumber}"
+  student_submission_report_af01e697: "Relatório de Submissão de Alunos"
   student_submissions_910da1b3: "Submissões do Aluno"
   student_submissions_report_prospect_education_108daf59: "Relatório de Submissões do Aluno (Educação de Prospectiva)"
   student_summary: 
@@ -26958,6 +26992,7 @@ pt:
   text_entry_e1808b2f: "Entrada de texto"
   text_entry_submission_7b0ae0c5: "Envio de entrada de texto"
   text_entry_submission_cannot_be_empty_3d187cae: "O campo de entrada de texto não pode estar vazio."
+  text_file_73d8d08c: "Ficheiro de Texto"
   text_input_d3480b8c: "Inserir texto"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "O texto Nenhuma pergunta foi movido para um Estímulo; por favor, adicione uma pergunta para que possa ser exibida no questionário."
   thai_8f9bc548: Tailandês
@@ -27265,6 +27300,7 @@ pt:
   the_state_parameter_is_required_ffadf213: "É necessário o parâmetro de estado"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "O separador da anotação do aluno inclui o documento para o trabalho. Podem também estar disponíveis separadores com tipos de apresentação adicionais."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "O aluno a reportar; por defeito não faz a id Canvas, a menos como especificado como SIS em student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "A submissão ainda não está disponível."
   the_submitted_after_date_to_report_on_9d90f026: "Os submetidos após data a relatar sobre"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       O Syllabus permite que você receba os utilizadores da sua disciplina e partilhe as expectativas
@@ -27600,6 +27636,9 @@ pt:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Esse recurso faz com que a API de carregamento do ficheiro de envios verifique o tipo de ficheiro com relação
       às extensões permitidas da atribuição associada.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Esta opção só é visível para os utilizadores com acesso a Administrador do Site. É semelhante a
+                                "Oculta", mas os utilizadores finais não a verão, mesmo que activada por um utilizador Administrador do Site.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Esta opção só é visível para os utilizadores com acesso ao Site Admin.
                                   Os utilizadores finais não a verão até que seja activada por um utilizador Administrador do Site.
@@ -28105,6 +28144,7 @@ pt:
   title_required_3ff5969: "Título requerido"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} bandeja"
+  title_unpublished_51ddbc6a: "%{title} (não publicado)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" foi criada com sucesso."
   title_was_successfully_updated_14b78676: "\"%{title}\" foi actualizado com sucesso."
   titles: 
@@ -29234,7 +29274,9 @@ pt:
   upload_media_ce31135a: "Carregar Multimédia"
   upload_not_available_for_this_folder_8f8623c6: "Carregamento não disponível para esta pasta"
   upload_percent_complete_d533d3e2: "Porcentagem de Carregamento Completo"
+  upload_progress_df577c48: "Progresso de carregamento"
   upload_progress_for_name_39f03acf: "Carregar progresso para %{name}"
+  upload_success_f51f3a39: "Sucesso de carregamento"
   upload_successful_ca47465f: "Atualização efetuada com sucesso"
   upload_your_outcomes_bceeadbe: "Carregue seus resultados!"
   uploaded_285a2bfb: Carregado
@@ -29321,6 +29363,7 @@ pt:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilizar a nova ferramenta de teste LTI em substituição dos testes canvas frequentes"
   use_the_new_scheduler_1273b832: "Utilize o novo calendarizador"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Utilizar esta configuração para registo de pais/observadores"
+  use_this_grading_scheme_52aa4ecf: "Usa este esquema de classificação"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Use esta lista para remover alunos atribuídos. Adicione novos alunos com a caixa de combinação após a lista."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Use este painel para resolver resultados duplicados ou pessoas não encontradas com sua pesquisa."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Use este painel para resolver duplicatas ou pessoas não encontradas com sua pesquisa."
@@ -29883,6 +29926,7 @@ pt:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Guias de videoconferência para salas de aula remotas"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "As ferramentas de videoconferência permitem uma ligação presencial entre professores e alunos."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Não é suportado conteúdo vídeo pelo seu dispositivo ou app."
+  video_file_f7188ffe: "Ficheiro de Vídeo"
   video_player_b371005: "Reprodutor de vídeo"
   video_player_for_label_6a5fdb03: "Leitor de vídeo para %{label}"
   vietnam_84_e50a2a44: "Vietnã (+84)"
@@ -30578,9 +30622,16 @@ pt:
   you_have_changed_the_progression_requirements_for__6772bc89: "Alterou os requisitos de progressão relativos a uma disciplina ativa. É possível que haja alunos que já avançaram para este módulo e para outros que dependem dele."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Concluiu uma revisão por pares para %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Você completou uma revisão por pares para %{person}. Obrigado"
+  you_have_completed_your_peer_reviews_543ad84: "Completaste as tuas Revisões de Pares!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Ainda tem 1 calendário"
     other: "Ainda tem %{count} calendários"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Tens mais 1 Revisão de Pares para completar."
+    other: "Tens %{count} mais Revisões de Pares para completar."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Tens mais 1 Revisão de Pares para completar."
+    other: "Tens %{count} mais 1 Revisão de Pares para completar."
   you_have_count_peer_reviews_to_complete_52e065e: "Tem Revisões por pares %{count} para completar"
   you_have_count_submissions_to_grade_6c5b511a: "Você tem %{count} submissões para classificar"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Criou um comentário que não foi publicado. Deseja prosseguir e guardar este comentário como um rascunho? (Pode publicar o rascunho dos comentários em qualquer altura)."
@@ -30664,6 +30715,7 @@ pt:
   you_must_set_usage_rights_87fc1382: "Deve definir os direitos de utilização"
   you_must_specify_a_usage_right_5eb57f87: "É necessário especificar um direito de utilização."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Deve especificar se deve activar ou desactivar a sincronização do Microsoft Teams"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Tens de submeter o teu próprio trabalho antes de poderes rever os teus pares."
   you_must_use_a_number_912ce4bd: "É necessário utilizar um número"
   you_must_use_a_positive_number_203b86fe: "É necessário utilizar um número positivo"
   you_must_use_an_integer_78d2530f: "Deve usar um número inteiro"
@@ -30806,6 +30858,7 @@ pt:
   zero_activity_title: "Nenhuma atividade"
   zip_26961da: zip
   zip_argument_error: "É necessária uma pasta para fazer o carregamento de um ficheiro .zip."
+  zip_file_3e736239: "Ficheiro Zip"
   zip_file_description: "Plug-in de migração para descompactar arquivos .zip para disciplina, grupo ou ficheiros de utilizador"
   zip_file_display: "Importação de ficheiro"
   zip_file_file_description: "Descompactar ficheiro .zip para pasta"
