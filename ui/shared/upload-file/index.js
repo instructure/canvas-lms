@@ -72,7 +72,7 @@ function postUploadFailed(err) {
  *   To get this off of an input element: `input.files[0]`
  *   To get this off of a drop event: `e.dataTransfer.files[0]`
  */
-export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios, onProgress) {
+export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios, onProgress, ignoreResult = false) {
   if (!file && !preflightData.url) {
     throw new Error('expected either a file to upload or a url to clone', {file, preflightData})
   } else if (file && preflightData.url) {
@@ -95,7 +95,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios, o
   return ajaxLib
     .post(preflightUrl, preflightData)
     .catch(preflightFailed)
-    .then(response => completeUpload(response.data, file, {ajaxLib, onProgress}))
+    .then(response => completeUpload(response.data, file, {ajaxLib, onProgress, ignoreResult}))
 }
 
 /*
