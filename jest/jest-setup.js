@@ -57,7 +57,6 @@ const ignoredErrors = [
   /Cannot read property 'activeElement' of undefined/,
   /Cannot read property 'name' of null/,
   /contextType was defined as an instance property on %s/,
-  /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
   /Function components cannot be given refs/,
   /invalid messageType: undefined/,
