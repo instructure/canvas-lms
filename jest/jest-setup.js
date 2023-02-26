@@ -52,7 +52,7 @@ const ignoredErrors = [
   /<Provider> does not support changing `store` on the fly/,
   /A component is changing a controlled input of type %s to be uncontrolled/,
   /A theme registry has already been initialized/,
-  /An update to (%s|DefaultToolForm) inside a test was not wrapped in act/,
+  /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
   /Cannot read property 'activeElement' of undefined/,
   /Cannot read property 'name' of null/,
