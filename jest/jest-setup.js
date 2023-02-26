@@ -55,7 +55,7 @@ const ignoredErrors = [
   /A theme registry has already been initialized/,
   /An update to (%s|DefaultToolForm) inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /Cannot read property '(activeElement|useRealTimers)' of undefined/,
+  /Cannot read property 'activeElement' of undefined/,
   /Cannot read property 'name' of null/,
   /contextType was defined as an instance property on %s/,
   /Error writing result to store for query/,
