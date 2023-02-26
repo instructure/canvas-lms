@@ -24,6 +24,9 @@ import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {updateOutcomeGroupMock} from '@canvas/outcomes/mocks/Management'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()

@@ -20,6 +20,9 @@ import {act, render, waitFor} from '@testing-library/react'
 import {ExpandableErrorAlert} from '../ExpandableErrorAlert'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 describe('ExpandableErrorAlert', () => {
   it('displays child content', () => {

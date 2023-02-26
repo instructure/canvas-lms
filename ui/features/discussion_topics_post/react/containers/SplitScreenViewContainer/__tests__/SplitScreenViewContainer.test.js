@@ -25,6 +25,9 @@ import {SplitScreenViewContainer} from '../SplitScreenViewContainer'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),

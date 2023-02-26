@@ -24,6 +24,9 @@ import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {transformRubricData, transformRubricAssessmentData} from '../../helpers/RubricHelpers'
 import store from '../stores'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 function gradedOverrides() {
   return {

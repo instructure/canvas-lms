@@ -52,6 +52,7 @@ const ignoredErrors = [
   /Can't perform a React state update on an unmounted component/,
   /Cannot read property 'activeElement' of undefined/,
   /contextType was defined as an instance property on %s/,
+  /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
@@ -60,7 +61,6 @@ const ignoredErrors = [
   /Invariant Violation/,
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /Render methods should be a pure function of props and state/,
-  /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
   /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
   /WARNING: heuristic fragment matching going on!/,
