@@ -86,7 +86,6 @@ const ignoredWarnings = [
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
-  /shared_brand_configs.* not called/,
   /value provided is not in a recognized RFC2822 or ISO format/,
 ]
 global.console = {
