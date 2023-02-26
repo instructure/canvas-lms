@@ -70,7 +70,6 @@ const ignoredErrors = [
   /The prop `renderLabel` is marked as required in `Select`/,
   /WARNING: heuristic fragment matching going on!/,
   /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
-  /You are using the simple \(heuristic\) fragment matcher, but your queries contain union or interface types./,
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
