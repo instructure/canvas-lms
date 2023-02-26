@@ -74,7 +74,7 @@ const ignoredErrors = [
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
-  /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
+  /The prop `focusOnInit` is marked as required in `(TextEntry|UrlEntry)`/,
   /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
   /The prop `label` is marked as required in `(FormFieldLayout|Modal)`/,
   /The prop `renderLabel` is marked as required in `Select`/,
