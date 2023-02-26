@@ -65,7 +65,6 @@ const ignoredErrors = [
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
-  /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invariant Violation/,
   /Prop `children` should be supplied unless/,
   /Render methods should be a pure function of props and state/,
