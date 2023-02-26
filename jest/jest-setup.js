@@ -72,7 +72,6 @@ const ignoredErrors = [
   /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
   /The prop `label` is marked as required in `Modal`/,
   /The prop `renderLabel` is marked as required in `Select`/,
-  /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
   /WARNING: heuristic fragment matching going on!/,
   /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
   /You are using the simple \(heuristic\) fragment matcher, but your queries contain union or interface types./,
