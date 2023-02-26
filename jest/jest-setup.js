@@ -60,7 +60,7 @@ const ignoredErrors = [
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
   /Function components cannot be given refs/,
-  /invalid messageType: (notSupported|undefined)/,
+  /invalid messageType: undefined/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
