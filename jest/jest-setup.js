@@ -60,7 +60,6 @@ const ignoredErrors = [
   /contextType was defined as an instance property on %s/,
   /Error writing result to store for query/,
   /Expected one of Group, Option in Select but found 'option'/,
-  /Failed loading the language file for/,
   /Function components cannot be given refs/,
   /invalid messageType: (notSupported|undefined)/,
   /Invalid prop `children` supplied to `(Option|View)`/,
