@@ -49,7 +49,6 @@ const globalError = global.console.error
 const ignoredErrors = [
   /\[object Object\]/,
   /%s has a method called shouldComponentUpdate/,
-  /`NaN` is an invalid value for the `%s` css style property/,
   /<Provider> does not support changing `store` on the fly/,
   /A component is changing a controlled input of type %s to be uncontrolled/,
   /A theme registry has already been initialized/,
