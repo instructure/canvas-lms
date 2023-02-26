@@ -21,6 +21,9 @@ import {render, act, fireEvent} from '@testing-library/react'
 import JobsIndex from '../index'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import mockJobsApi from './MockJobsApi'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.useFakeTimers()
