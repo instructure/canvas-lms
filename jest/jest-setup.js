@@ -70,7 +70,6 @@ const ignoredErrors = [
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invariant Violation/,
-  /It looks like you're using the wrong act/,
   /Prop `children` should be supplied unless/,
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,

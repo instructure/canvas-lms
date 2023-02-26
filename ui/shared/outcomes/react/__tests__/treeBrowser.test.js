@@ -78,7 +78,7 @@ describe('useManageOutcomes', () => {
     await act(async () => jest.runAllTimers())
 
     expect(result.current.collections['100']).toBeDefined()
-    act(() => result.current.queryCollections({id: '100', parentGroupId: '1'}))
+    result.current.queryCollections({id: '100', parentGroupId: '1'})
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'Loading Account folder 0.',
       srOnly: true,
