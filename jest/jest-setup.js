@@ -74,7 +74,7 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /The prop `focusOnInit` is marked as required in `(TextEntry|UrlEntry)`/,
   /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
-  /The prop `label` is marked as required in `(FormFieldLayout|Modal)`/,
+  /The prop `label` is marked as required in `Modal`/,
   /The prop `renderLabel` is marked as required in `Select`/,
   /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
   /WARNING: heuristic fragment matching going on!/,
