@@ -50,7 +50,6 @@ const ignoredErrors = [
   /\[object Object\]/,
   /%s has a method called shouldComponentUpdate/,
   /<Provider> does not support changing `store` on the fly/,
-  /A component is changing a controlled input of type %s to be uncontrolled/,
   /A theme registry has already been initialized/,
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
