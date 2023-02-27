@@ -274,7 +274,7 @@ export default function StatusBar(props) {
         >
           <IconKeyboardShortcutsLine />
         </IconButton>
-        {props.readOnly || (isAvailable('ally_checker') && renderA11yButton())}
+        {!props.readOnly && isAvailable('ally_checker') && renderA11yButton()}
       </View>
     )
   }
@@ -321,7 +321,7 @@ export default function StatusBar(props) {
 
     return (
       <View display="inline-block" padding="0 0 0 x-small">
-        {props.readOnly || (
+        {!props.readOnly && (
           <IconButton
             data-btn-id="rce-edit-btn"
             color="primary"
