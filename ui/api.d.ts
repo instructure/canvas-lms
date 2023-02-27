@@ -70,6 +70,7 @@ export type Student = Readonly<{
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
+  section_ids: string[]
 }> & {
   enrollments: Enrollment[]
   first_name: string
@@ -80,6 +81,7 @@ export type Student = Readonly<{
     computed_final_score: number
     cssClass: string
     displayName: string
+    index: number
     initialized: boolean
     isConcluded: boolean
     isInactive: boolean
@@ -285,9 +287,26 @@ export type AttachmentData = Readonly<{
 }>
 
 export type Attachment = {
-  id: string
-  updated_at: string
+  canvadoc_url?: string
+  comment_id?: string
+  content_type: string
   created_at: string
+  crocodoc_url?: string
+  display_name: string
+  filename: string
+  hijack_crocodoc_session?: boolean
+  id: string
+  mime_class: string
+  provisional_canvadoc_url?: null | string
+  provisional_crocodoc_url?: null | string
+  submitted_to_crocodoc?: boolean
+  submitter_id: string
+  updated_at: string
+  upload_status: string
+  view_inline_ping_url?: string
+  viewed_at: string
+  word_count: number
+  workflow_state: 'pending_upload' | 'processing'
 }
 
 export type Module = Readonly<{
@@ -358,8 +377,16 @@ export type SimilarityScore = {
   status: 'error' | 'pending' | 'scored'
 }
 
+export type TurnitinAsset = {
+  status: string
+  provider: string
+  similarity_score?: number
+  state?: string
+  public_error_message?: string
+}
+
 export type Submission = Readonly<{
-  anonymous_id: string
+  anonymous_id?: string
   assignment_id: string
   assignment_visible?: boolean
   attempt: number | null
@@ -370,13 +397,15 @@ export type Submission = Readonly<{
   grade_matches_current_submission: boolean
   gradeLocked: boolean
   grading_period_id: string
-  has_postable_comments: boolean
+  grading_type: GradingType
   has_originality_report: boolean
+  has_postable_comments: boolean
   id: string
   late_policy_status: null | LatePolicyStatus
   late: boolean
   missing: boolean
-  points_deducted: null | number
+  points_deducted: null | string | number
+  provisional_grade_id: string
   redo_request: boolean
   score: null | number
   seconds_late: number
@@ -384,16 +413,27 @@ export type Submission = Readonly<{
   submission_type: SubmissionType
   url: null | string
   user_id: string
+  versioned_attachments?: any
+  word_count: null | number
   workflow_state: WorkflowState
 }> & {
+  assignedAssessments?: AssignedAssessments[]
+  attempt?: number
   excused: boolean
+  external_tool_url?: string
   grade: string | null
+  graded_at: string | null
   gradingType: GradingType
+  has_originality_score?: any
   hidden: boolean
   posted_at: null | Date
+  proxy_submitter?: string
   rawGrade: string | null
+  submission_comments: SubmissionComment[]
   submitted_at: null | Date
-  assignedAssessments?: AssignedAssessments[]
+  turnitin_data?: TurnitinAsset
+  updated_at: string
+  final_provisional_grade?: string
 }
 
 export type UserSubmissionGroup = {
@@ -402,21 +442,35 @@ export type UserSubmissionGroup = {
 }
 
 export type SubmissionComment = Readonly<{
-  id: string
-  created_at: string
+  anonymous_id: string
+  attachments: Attachment[]
+  attempt?: number
+  author_id: string
+  avatar_path: string
+  cached_attachments: Attachment[]
   comment: string
-  edited_at: null | string
-  updated_at: string
+  created_at: string
   display_updated_at?: string
+  draft: boolean
+  edited_at: null | string
+  group_comment_id: string
+  id: string
   is_read?: boolean
-  author_name?: string
+  media_comment_id: string
+  media_comment_type: string
+  publishable: boolean
+  submission_comment: SubmissionComment
+  updated_at: string
   author?: {
     id: string
     display_name: string
     avatar_image_url: string
     html_url: string
   }
-}>
+}> & {
+  author_name: string
+  posted_at: string
+}
 
 export type SubmissionCommentData = {
   group_comment: 1 | 0

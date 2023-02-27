@@ -46,13 +46,6 @@ export type PartialStudent = {
   }
 }
 
-export type SubmissionOriginalityData = {
-  report_url: string
-  similarity_score: number
-  state: string
-  status: string
-}
-
 export type OriginalityData = {
   reportUrl: string
   score: number
@@ -75,7 +68,7 @@ export type CamelizedStudent = {
 }
 
 // TODO: remove the need for this
-export type SubmissionComment = {
+export type SubmissionCommentCamelized = {
   allowedAttempts: number
   anonymizeStudents: boolean
   anonymousGrading: boolean
@@ -109,7 +102,7 @@ export type SubmissionComment = {
 }
 
 // TODO: remove the need for this
-export type CamelizedSubmission = {
+export type SubmissionCamelized = {
   anonymousId: string
   assignmentId: string
   assignmentVisible?: boolean
@@ -192,14 +185,18 @@ export type CamelizedAssignment = {
   submissionTypes: string
 }
 
-export type PlagiarismData = {
+export type SubmissionOriginalityData = {
   status: string
+  provider: string
   similarity_score: number
+  state?: string
+  public_error_message?: string
+  report_url?: string
 }
 
 export type SimilarityEntry = {
   id: string
-  data: PlagiarismData
+  data: SubmissionOriginalityData
 }
 
 export type SubmissionWithOriginalityReport = Submission & {
@@ -211,24 +208,24 @@ export type SubmissionWithOriginalityReport = Submission & {
   }>
   has_originality_report: boolean
   turnitin_data?: {
-    [key: string]: PlagiarismData
+    [key: string]: SubmissionOriginalityData
   }
   vericite_data?: {provider: 'vericite'} & {
-    [key: string]: PlagiarismData
+    [key: string]: SubmissionOriginalityData
   }
 }
 
-export type PlagiarismDataMap = {
-  [key: string]: PlagiarismData
+export type SubmissionOriginalityDataMap = {
+  [key: string]: SubmissionOriginalityData
 }
 
 export type SimilarityType = 'vericite' | 'turnitin' | 'originality_report'
 
-export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
+export type CamelizedSubmissionWithOriginalityReport = SubmissionCamelized & {
   attachments: Array<{id: string}>
   hasOriginalityReport: boolean
-  turnitinData?: PlagiarismDataMap
-  vericiteData?: {provider: 'vericite'} & PlagiarismDataMap
+  turnitinData?: SubmissionOriginalityDataMap
+  vericiteData?: {provider: 'vericite'} & SubmissionOriginalityDataMap
 }
 
 export type FinalGradeOverride = {
@@ -296,3 +293,30 @@ export type GradingScheme = {
   title?: string
   data: GradingStandard[]
 }
+
+export type ProvisionalGrade = {
+  anonymous_grader_id?: string
+  grade: string
+  provisional_grade_id: string
+  readonly: boolean
+  scorer_id?: string
+  scorer_name?: string
+  selected?: boolean
+  score: number | null
+  rubric_assessments: RubricAssessment[]
+}
+
+export type RubricAssessment = {
+  id: string
+  assessor_id: string
+  anonymous_assessor_id: string
+  assessment_type: string
+  assessor_name: string
+}
+
+export type SubmissionState =
+  | 'not_gradeable'
+  | 'not_graded'
+  | 'graded'
+  | 'resubmitted'
+  | 'not_submitted'

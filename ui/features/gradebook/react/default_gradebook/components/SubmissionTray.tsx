@@ -41,13 +41,12 @@ import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
-import type {
-  GradingStandard,
-  LatePolicyCamelized,
-  PendingGradeInfo,
-  SerializedComment,
-} from '../gradebook.d'
-import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
+import type {GradingStandard, LatePolicyCamelized, PendingGradeInfo} from '../gradebook.d'
+import {
+  CamelizedAssignment,
+  CamelizedSubmission,
+  SubmissionCommentCamelized,
+} from '@canvas/grading/grading'
 
 import {Link} from '@instructure/ui-link'
 
@@ -122,7 +121,7 @@ export type SubmissionTrayProps = {
   deleteSubmissionComment: (commentId: string) => void
   setProcessing: (processing: boolean) => void
   onAnonymousSpeedGraderClick: (speedGraderUrl: string) => void
-  submissionComments: SerializedComment[]
+  submissionComments: SubmissionCommentCamelized[]
   showSimilarityScore: boolean
   proxySubmissionsAllowed: boolean
   reloadSubmission: (student: any, submission: any, proxyDetails: any) => void

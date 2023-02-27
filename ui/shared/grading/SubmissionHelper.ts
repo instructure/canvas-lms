@@ -19,7 +19,7 @@
 import {camelize, underscore} from 'convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
 import type {
-  PlagiarismData,
+  SubmissionOriginalityData,
   SimilarityEntry,
   CamelizedSubmissionWithOriginalityReport,
 } from '@canvas/grading/grading.d'
@@ -84,13 +84,7 @@ export function extractSimilarityInfo(submission) {
 }
 
 function getSimilarityEntries(submission, plagiarismData) {
-  const entries: {
-    id: string
-    data: {
-      status: string
-      similarity_score: number
-    }
-  }[] = []
+  const entries: SimilarityEntry[] = []
 
   if (submission.submissionType === 'online_upload' && submission.attachments != null) {
     // A submission with attachments may have a plagiarism report for each
@@ -146,7 +140,7 @@ function similarityEntryComparator(a: SimilarityEntry, b: SimilarityEntry): numb
   return orderedStatuses.indexOf(aStatus || 'none') - orderedStatuses.indexOf(bStatus || 'none')
 }
 
-export function similarityIcon(similarityData: PlagiarismData): string {
+export function similarityIcon(similarityData: SubmissionOriginalityData): string {
   const {status, similarity_score} = similarityData
 
   let iconClass

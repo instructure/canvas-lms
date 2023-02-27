@@ -17,7 +17,7 @@
  */
 
 import type {GradebookStudent} from './gradebook.d'
-import type {SubmissionComment} from '@canvas/grading.grading.d'
+import type {SubmissionCommentCamelized} from '@canvas/grading/grading.d'
 import type {StatusColors} from './constants/colors'
 import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 
@@ -102,7 +102,7 @@ export type GridDisplaySettings = {
     open: boolean
     studentId: string
     assignmentId: string
-    comments: SubmissionComment[]
+    comments: SubmissionCommentCamelized[]
     commentsLoaded: boolean
     commentsUpdating: boolean
     editedCommentId: string | null
