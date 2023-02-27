@@ -25,15 +25,12 @@ import type {
   GradingPeriodSet,
   GradingScheme,
   GradingStandard,
-  GradingType,
   Module,
   ModuleMap,
   Section,
   Student,
   StudentGroupCategoryMap,
   StudentMap,
-  SubmissionType,
-  WorkflowState,
 } from '../api.d'
 
 export type CourseSettingsType = {
@@ -355,41 +352,6 @@ export type FlashMessage = {
   key: string
   message: string
   variant: string
-}
-
-// TODO: remove the need for this type
-export type SubmissionCamelized = {
-  anonymousId: string
-  assignmentId: string
-  assignmentVisible?: boolean
-  attempt: number | null
-  enteredGrade: string | null
-  enteredScore: number | null
-  excused: boolean
-  grade: string | null
-  gradeMatchesCurrentSubmission: boolean
-  cachedDueDate: string | null
-  drop?: boolean
-  gradeLocked: boolean
-  gradingPeriodId: string | null
-  gradingType: GradingType
-  hasPostableComments: boolean
-  hidden: boolean
-  id: string
-  latePolicyStatus: null | string
-  late: boolean
-  missing: boolean
-  pointsDeducted: number | null
-  postedAt: string | null
-  rawGrade: string | null
-  redoRequest: boolean
-  score: null | number
-  secondsLate: number | null
-  submissionType: SubmissionType
-  submittedAt: null | Date
-  url: null | string
-  userId: string
-  workflowState: WorkflowState
 }
 
 export type AssignmentStudentMap = {

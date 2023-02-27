@@ -16,8 +16,188 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type JQuery from 'jquery'
+import type {
+  ProvisionalGrade,
+  RubricAssessment,
+  SubmissionOriginalityData,
+  SubmissionState,
+} from '@canvas/grading/grading.d'
+import type {
+  Attachment,
+  AttachmentData,
+  Student,
+  Submission,
+  SubmissionComment,
+} from '../../../api.d'
+import PostPolicies from '../react/PostPolicies/index'
+
 interface Window {
   jsonData: any
+}
+
+export type StudentWithSubmission = Student & {
+  id: string
+  anonymous_id: string
+  provisional_crocodoc_urls: ProvisionalCrocodocUrl[]
+  rubric_assessments: RubricAssessment[]
+  submission: Submission & {
+    currentSelectedIndex: number
+    submission_history: any | Submission[]
+    provisional_grades: ProvisionalGrade[]
+    show_grade_in_dropdown: boolean
+  }
+  submission_state: SubmissionState
+  needs_provisional_grade: boolean
+  avatar_path: string
+  index: number
+}
+
+export type SpeedGrader = {
+  resolveStudentId: (studentId: string | null) => string | undefined
+  handleGradeSubmit: (event, use_existing_score: boolean) => void
+  addCommentDeletionHandler: (commentElement: JQuery, comment: SubmissionComment) => void
+  addCommentSubmissionHandler: (commentElement: JQuery, comment: SubmissionComment) => void
+  addSubmissionComment: (comment?: boolean) => void
+  onProvisionalGradesFetched: (data: {
+    needs_provisional_grade: boolean
+    provisional_grades: ProvisionalGrade[]
+    updated_at: string
+    final_provisional_grade: string
+  }) => void
+  anyUnpostedComment: () => boolean
+  assessmentAuditTray?: JQuery | null
+  attachmentIframeContents: (attachment: Attachment) => string
+  beforeLeavingSpeedgrader: (event: BeforeUnloadEvent) => void
+  changeToSection: (sectionId: string) => void
+  currentDisplayedSubmission: () => Submission
+  currentIndex: () => number
+  currentStudent: StudentWithSubmission
+  domReady: () => void
+  resetReassignButton: () => void
+  updateHistoryForCurrentStudent: (behavior: 'push' | 'replace') => void
+  fetchProvisionalGrades: () => void
+  displayExpirationWarnings: (
+    aggressiveWarnings: number[],
+    count: number,
+    crocodocMessage: string
+  ) => void
+  setGradeReadOnly: (readOnly: boolean) => void
+  showStudent: () => void
+  initialVersion?: number
+  parseDocumentQuery: () => any
+  getOriginalRubricInfo: () => any
+  totalStudentCount: () => number
+  formatGradeForSubmission: (grade: string) => string
+  skipRelativeToCurrentIndex: (skip: number) => void
+  initComments: () => void
+  renderAttachment: (attachment: Attachment) => void
+  goToStudent: (studentIdentifier: any, historyBehavior?: 'push' | 'replace' | null) => void
+  handleGradingError: (error: GradingError) => void
+  handleStatePopped: (event: PopStateEvent) => void
+  getStudentNameAndGrade: (student?: StudentWithSubmission) => string
+  handleStudentChanged: (historyBehavior: 'push' | 'replace' | null) => void
+  isStudentConcluded: (currentStudent: string) => boolean
+  postPolicies?: PostPolicies
+  reassignAssignment: () => void
+  refreshFullRubric: () => void
+  selectProvisionalGrade: (gradeId: string, existingGrade?: boolean) => void
+  setCurrentStudentRubricAssessments: () => void
+  setReadOnly: (readOnly: boolean) => void
+  renderSubmissionPreview: () => void
+  renderComment: (commentData: SubmissionComment, incomingOpts?: any) => JQuery
+  showSubmission: () => void
+  showSubmissionDetails: () => void
+  tearDownAssessmentAuditTray: () => void
+  renderLtiLaunch: (
+    $iframe_holder: JQuery,
+    lti_retrieve_url: string,
+    submission: Partial<Submission>
+  ) => void
+  setCurrentStudentAvatar: () => void
+  setActiveProvisionalGradeFields: (options?: {
+    grade?: null | Partial<ProvisionalGrade>
+    label?: string
+  }) => void
+  handleSubmissionSelectionChange: () => void
+  isGradingTypePercent: () => boolean
+  jsonReady: () => void
+  setInitiallyLoadedStudent: () => void
+  setupGradeLoadingSpinner: () => void
+  next: () => void
+  prev: () => void
+  refreshSubmissionsToView: () => void
+  renderProvisionalGradeSelector: (options?: {showingNewStudent?: boolean}) => void
+  revertFromFormSubmit: (options?: {draftComment?: boolean; errorSubmitting?: boolean}) => void
+  setUpAssessmentAuditTray: () => void
+  shouldParseGrade: () => boolean
+  showDiscussion: () => void
+  showRubric: (options?: {validateEnteredData?: boolean}) => void
+  updateSelectMenuStatus: (student: any) => void
+  renderCommentAttachment: (
+    comment: SubmissionComment,
+    attachmentData: AttachmentData | Attachment,
+    options: any
+  ) => JQuery
+  updateStatsInHeader: () => void
+  setOrUpdateSubmission: (submission: any) => {
+    rubric_assessments: {
+      id: string
+    }[]
+  }
+  generateWarningTimings: (count: number) => number[]
+  emptyIframeHolder: (element?: JQuery) => void
+  showGrade: () => void
+  toggleFullRubric: (opt?: string) => void
+  updateWordCount: (count?: number | null) => void
+  populateTurnitin: (
+    submission: Partial<Submission>,
+    assetString: string,
+    turnitinAsset_: SubmissionOriginalityData,
+    $turnitinScoreContainer: JQuery,
+    $turnitinInfoContainer_: JQuery,
+    isMostRecent: boolean
+  ) => void
+  populateVeriCite: (
+    submission: Partial<Submission>,
+    assetString: string,
+    vericiteAsset: SubmissionOriginalityData,
+    $vericiteScoreContainer: JQuery,
+    $vericiteInfoContainer: JQuery,
+    isMostRecent: boolean
+  ) => void
+  current_prov_grade_index?: string
+  getGradeToShow: (submission: Submission) => Grade
+  setupProvisionalGraderDisplayNames: () => void
+  handleProvisionalGradeSelected: (params: {
+    selectedGrade?: {
+      provisional_grade_id: string
+    }
+    isNewGrade: boolean
+  }) => void
+  compareStudentsBy: (
+    f: (student1: StudentWithSubmission) => number
+  ) => (studentA: StudentWithSubmission, studentB: StudentWithSubmission) => any
+  plagiarismIndicator: (options: {
+    plagiarismAsset: SubmissionOriginalityData
+    reportUrl?: null | string
+    tooltip: string
+  }) => JQuery
+  loadSubmissionPreview: (
+    attachment: Attachment | null,
+    submission: Partial<Submission> | null
+  ) => void
+  hasUnsubmittedRubric: (originalRubric: any) => boolean
+  refreshGrades: (
+    callback: (submission: Submission) => void,
+    retry?: (
+      submission: Submission,
+      originalSubmission: Submission,
+      numRequests: number
+    ) => boolean,
+    retryDelay?: number
+  ) => void
+  setState: (state: any) => void
 }
 
 export type Grade = {
@@ -36,55 +216,6 @@ export type GradingError = {
   }
 }
 
-export type StudentWithSubmission = {
-  submission_state: 'graded' | 'not_graded' | 'not_submitted' | 'not_gradeable'
-  submission: Submission
-}
-
-export type TurnitinAsset = {
-  status: string
-  provider: string
-  similarity_score?: number
-  state?: string
-  public_error_message?: string
-}
-
-export type Submission = {
-  attempt?: number
-  excused?: boolean
-  graded_at: string | null
-  has_originality_score?: any
-  id?: string
-  late?: boolean
-  score?: number
-  submission_type?: string
-  turnitin_data?: TurnitinAsset
-  versioned_attachments?: any
-  word_count?: number
-}
-
-export type RubricAssessment = {
-  id: string
-  assessor_id: string
-  anonymous_assessor_id: string
-  assessment_type: string
-}
-
-export type Attachment = {
-  canvadoc_url?: string
-  content_type: string
-  crocodoc_url?: string
-  display_name: string
-  filename: string
-  id: string
-  mime_class: string
-  provisional_canvadoc_url?: null | string
-  provisional_crocodoc_url?: null | string
-  upload_status: string
-  viewed_at: string
-  word_count: number
-}
-
 type GradeLoadingStateMap = {
   [userId: string]: boolean
 }
@@ -92,4 +223,8 @@ type GradeLoadingStateMap = {
 export type GradeLoadingData = {
   currentStudentId: string
   gradesLoading: GradeLoadingStateMap
+}
+
+export type ProvisionalCrocodocUrl = {
+  attachment_id: string
 }

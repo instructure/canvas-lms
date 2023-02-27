@@ -78,7 +78,7 @@ import type {
 } from './gradebook.d'
 import type {
   CamelizedGradingPeriodSet,
-  CamelizedSubmission,
+  SubmissionCamelized,
   FinalGradeOverrideMap,
   GradingScheme,
 } from '@canvas/grading/grading.d'
@@ -3788,7 +3788,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  addPendingGradeInfo = (submission: CamelizedSubmission, gradeInfo) => {
+  addPendingGradeInfo = (submission: SubmissionCamelized, gradeInfo) => {
     if (!this.actionStates) throw new Error('actionStates not initialized')
     const {userId, assignmentId} = submission
     const pendingGradeInfo: PendingGradeInfo = {assignmentId, userId, ...gradeInfo}
@@ -3796,7 +3796,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.actionStates.pendingGradeInfo.push(pendingGradeInfo)
   }
 
-  removePendingGradeInfo = (submission: CamelizedSubmission) => {
+  removePendingGradeInfo = (submission: SubmissionCamelized) => {
     if (!this.actionStates) throw new Error('actionStates missing')
     this.actionStates.pendingGradeInfo = _.reject(
       this.actionStates.pendingGradeInfo,

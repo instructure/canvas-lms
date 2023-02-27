@@ -23,6 +23,7 @@ describe('SubmissionAttempts', () => {
   const props: SubmissionAttemptsProps = {
     attempts: {
       1: [
+        // @ts-ignore
         {
           id: '1',
           comment: 'this is a comment',
@@ -35,6 +36,7 @@ describe('SubmissionAttempts', () => {
         },
       ],
       3: [
+        // @ts-ignore
         {
           id: '5',
           comment: 'this is comment 3',
@@ -45,6 +47,7 @@ describe('SubmissionAttempts', () => {
           author_name: 'user 123',
           display_updated_at: 'Friday December 2nd',
         },
+        // @ts-ignore
         {
           id: '6',
           comment: 'this is comment 5',
@@ -57,6 +60,7 @@ describe('SubmissionAttempts', () => {
         },
       ],
       2: [
+        // @ts-ignore
         {
           id: '2',
           comment: 'this is a comment 2',
