@@ -412,7 +412,7 @@ module Importers
       assignments = migration.imported_migration_items_by_class(Assignment).select(&:needs_update_cached_due_dates)
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
-        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user)
+        DueDateCacher.recompute_course(migration.context, assignments: assignments, update_grades: true, executing_user: migration.user, skip_late_policy_applicator: !!migration.date_shift_options)
       end
       quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
       Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?

@@ -1186,6 +1186,12 @@ describe DueDateCacher do
         DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
       end
 
+      it "does not kick off a LatePolicyApplicator job when explicitly told not to" do
+        expect(LatePolicyApplicator).not_to receive(:for_assignment)
+
+        DueDateCacher.new(@course, [@assignment], skip_late_policy_applicator: true).recompute
+      end
+
       it "runs the GradeCalculator inline when update_grades is true" do
         expect(@course).to receive(:recompute_student_scores_without_send_later)
 
