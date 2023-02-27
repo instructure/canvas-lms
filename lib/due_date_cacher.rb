@@ -117,7 +117,7 @@ class DueDateCacher
     recompute_course(assignment.context, **opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
@@ -128,7 +128,7 @@ class DueDateCacher
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user)
+    due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user, skip_late_policy_applicator: skip_late_policy_applicator)
     if run_immediately
       due_date_cacher.recompute
     else
@@ -172,7 +172,7 @@ class DueDateCacher
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
 
@@ -192,6 +192,7 @@ class DueDateCacher
     @user_ids = Array(user_ids)
     @update_grades = update_grades
     @original_caller = original_caller
+    @skip_late_policy_applicator = skip_late_policy_applicator
 
     if executing_user.present?
       @executing_user_id = executing_user.is_a?(User) ? executing_user.id : executing_user
@@ -306,7 +307,7 @@ class DueDateCacher
       @course.recompute_student_scores_without_send_later(@user_ids)
     end
 
-    if @assignment_ids.size == 1
+    if @assignment_ids.size == 1 && !@skip_late_policy_applicator
       # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
       # of student scores.  No changes to the Course record can trigger such re-calculations so
       # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
