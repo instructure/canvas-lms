@@ -20,6 +20,8 @@ import React, {useState} from 'react'
 import {node} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
 import {propType as termsPropType} from '../store/TermsStore'
@@ -79,7 +81,13 @@ export default function NewCourseModal({terms, children}) {
         closeModal()
         showFlashAlert({
           type: 'success',
-          message: I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name}),
+          message: (
+            <Text>
+              {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
+              &emsp;
+              <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
+            </Text>
+          ),
         })
       })
       .error(() => {
