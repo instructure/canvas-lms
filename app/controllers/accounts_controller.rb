@@ -1100,7 +1100,7 @@ class AccountsController < ApplicationController
         Account.inheritable_settings.each do |setting|
           # when changing k5 settings on an account, the value gets saved to the root account and special
           # locking rules apply, so don't remove it from the update params here
-          next if setting == :enable_as_k5_account
+          next if K5::EnablementService::K5_SETTINGS.include? setting
           next unless params.dig(:account, :settings)
           next if !Account.account_settings_options[setting].key?(:boolean) && params.dig(:account, :settings, setting) != @account.parent_account&.send(setting)
           next if value_to_boolean(params.dig(:account, :settings, setting, :locked))
@@ -1146,7 +1146,8 @@ class AccountsController < ApplicationController
         params[:account][:ip_filters] = [] if remove_ip_filters
 
         enable_k5 = params.dig(:account, :settings, :enable_as_k5_account, :value)
-        K5::EnablementService.set_k5_settings(@account, value_to_boolean(enable_k5)) unless enable_k5.nil?
+        use_classic_font = params.dig(:account, :settings, :use_classic_font_in_k5, :value)
+        K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font)) unless enable_k5.nil?
 
         # validate/normalize default due time parameter
         if (default_due_time = params.dig(:account, :settings, :default_due_time, :value))

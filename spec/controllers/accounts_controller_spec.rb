@@ -592,18 +592,30 @@ describe AccountsController do
         user_session(@user)
       end
 
-      it "calls the K5::EnablementService if enable_as_k5_account is present in params" do
-        expect(K5::EnablementService).to receive(:set_k5_settings).with(@account, true)
-        post "update", params: toggle_k5_params(@account.id, "true")
+      it "calls K5::EnablementService with correct args if enable_as_k5_account is present in params" do
+        set_k5_settings_double = double("set_k5_settings")
+        expect(K5::EnablementService).to receive(:new).with(@account).and_return(set_k5_settings_double)
+        expect(set_k5_settings_double).to receive(:set_k5_settings).with(true, false)
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   settings: {
+                                     enable_as_k5_account: {
+                                       value: "true"
+                                     },
+                                     use_classic_font_in_k5: {
+                                       value: "false"
+                                     }
+                                   }
+                                 } }
       end
 
-      it "doesn't call the K5::EnablementService or change k5 settings if enable_as_k5_account isn't present in params" do
+      it "doesn't call K5::EnablementService or change k5 settings if enable_as_k5_account isn't present in params" do
         @account.settings[:enable_as_k5_account] = {
           value: true,
           locked: true
         }
         @account.save!
-        expect(K5::EnablementService).not_to receive(:set_k5_settings)
+        expect(K5::EnablementService).not_to receive(:new)
         post "update", params: { id: @account.id,
                                  account: {
                                    settings: {

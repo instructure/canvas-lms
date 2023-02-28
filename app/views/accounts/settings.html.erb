@@ -537,27 +537,40 @@
           <h2 class="screenreader-only"><%= t('Features') %></h2>
           <legend><%= t(:features_title, "Features") %></legend>
           <%= f.fields_for :settings do |settings| %>
-            <%= settings.fields_for :enable_as_k5_account do |k5| %>
-              <div>
-                <% k5_settings = @account.enable_as_k5_account %>
-                <% disabled = k5_settings[:locked] && k5_settings[:inherited] %>
+            <div>
+              <% k5_settings = @account.enable_as_k5_account %>
+              <% disabled = k5_settings[:locked] && k5_settings[:inherited] %>
+              <%= settings.fields_for :enable_as_k5_account do |k5| %>
                 <%= k5.check_box :value, :checked => k5_settings[:value], :disabled => disabled %>
                 <%= k5.label :value, t("Canvas for Elementary") %>
-                <div id="k5_account_warning_message" class="account_settings__k5-help-text">
-                  <i class='icon-warning-borderless'></i>
-                  <div class="account_settings__k5-help-text-container">
-                    <p>
-                      <%= t ("This setting significantly changes the Canvas experience for students and teachers.")%>
-                    </p>
-                    <p>
-                      <%= t do %>
-                        To learn more about Canvas for Elementary, please refer to <a href="<%= t(:'#community.canvas_for_elementary') %>" target="_blank">our documentation</a>.
-                      <% end %>
-                    </p>
-                  </div>
+              <% end %>
+              <div id="k5_account_warning_message" class="account_settings__k5-help-text">
+                <i class='icon-warning-borderless'></i>
+                <div class="account_settings__k5-help-text-container">
+                  <p>
+                    <%= t ("This setting significantly changes the Canvas experience for students and teachers.")%>
+                  </p>
+                  <p>
+                    <%= t do %>
+                      To learn more about Canvas for Elementary, please refer to <a href="<%= t(:'#community.canvas_for_elementary') %>" target="_blank">our documentation</a>.
+                    <% end %>
+                  </p>
+                  <% if Account.site_admin.feature_enabled?(:k5_font_selection) %>
+                    <% font_settings = @account.use_classic_font_in_k5 %>
+                    <%= settings.fields_for :use_classic_font_in_k5 do |font| %>
+                      <div>
+                        <span class="screenreader-only"><%= t('Canvas for Elementary Font Selection') %></span>
+                        <%= font.radio_button :value, false, checked: !font_settings[:value], disabled: disabled, id: "k5_font_disabled_radio" %>
+                        <%= font.label :value, t("Large Balsamiq Font (for Elementary)"), for: "k5_font_disabled_radio", style: "margin-bottom: 0;" %>
+                        <br />
+                        <%= font.radio_button :value, true, checked: font_settings[:value], disabled: disabled, id: "k5_font_enabled_radio" %>
+                        <%= font.label :value, t("Regular Lato Font (for grades 6+)"), for: "k5_font_enabled_radio" %>
+                      </div>
+                    <% end %>
+                  <% end %>
                 </div>
               </div>
-            <% end %>
+            </div>
 
             <% if @account.primary_settings_root_account? %>
               <% if @account.grants_right?(@current_user, :manage_site_settings) %>
