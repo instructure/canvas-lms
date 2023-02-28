@@ -783,7 +783,7 @@ class AssignmentsApiController < ApplicationController
       new_assignment.assignment_group = target_assignment.assignment_group
       set_assignment_asset_map(new_assignment) if new_assignment.quiz_lti?
     else
-      new_assignment.asset_map = Assignment::DUPLICATED_IN_CONTEXT
+      new_assignment.resource_map = Assignment::DUPLICATED_IN_CONTEXT
     end
 
     # Specify the updating user to ensure that audit events are created

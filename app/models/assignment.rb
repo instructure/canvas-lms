@@ -80,7 +80,7 @@ class Assignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
 
   attr_accessor(
-    :asset_map,
+    :resource_map,
     :copying,
     :grade_posting_in_progress,
     :needs_update_cached_due_dates,

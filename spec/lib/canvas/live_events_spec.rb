@@ -899,16 +899,16 @@ describe Canvas::LiveEvents do
 
     context "when the assignment contains a value for 'asset_map'" do
       before do
-        @assignment.asset_map = "https://www.instructure.com/asset-map.json"
+        @assignment.resource_map = "https://www.instructure.com/asset-map.json"
       end
 
-      it "includes the asset_map in the live event" do
+      it "includes the resource_map in the live event" do
         expect_event(
           "assignment_created",
           hash_including(
             {
               assignment_id: @assignment.global_id.to_s,
-              asset_map: "https://www.instructure.com/asset-map.json"
+              resource_map: "https://www.instructure.com/asset-map.json"
             }
           )
         )
