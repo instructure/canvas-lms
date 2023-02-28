@@ -54,7 +54,6 @@ const ignoredErrors = [
   /Cannot read property 'activeElement' of undefined/,
   /Cannot read property 'name' of null/,
   /contextType was defined as an instance property on %s/,
-  /Expected one of Group, Option in Select but found 'option'/,
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
