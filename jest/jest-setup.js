@@ -59,7 +59,7 @@ const ignoredErrors = [
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invariant Violation/,
-  /Prop `children` should be supplied unless/,
+  /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
