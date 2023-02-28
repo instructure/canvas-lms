@@ -84,9 +84,9 @@ export default class FileType extends React.Component {
   renderOptions() {
     return this.props.options.map(option => {
       return (
-        <option key={option.key} value={option.key}>
+        <Select.Option key={option.key} value={option.key}>
           {option.display}
-        </option>
+        </Select.Option>
       )
     })
   }

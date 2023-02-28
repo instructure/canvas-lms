@@ -71,18 +71,18 @@ export default class Filters extends React.Component {
 
   renderAssignToFilterOptions() {
     const everyone = [
-      <option key="all" value="all">
+      <Select.Option key="all" value="all">
         {I18n.t('Everyone')}
-      </option>,
+      </Select.Option>,
     ]
     const others = this.props.overrides.map(override => {
       const pieces =
         override.set.__typename === 'AdhocStudents' ? override.set.students : [override.set]
       const display = pieces.map(this.overrideName).join(', ')
       return (
-        <option key={override.lid} value={override.lid}>
+        <Select.Option key={override.lid} value={override.lid}>
           {display}
-        </option>
+        </Select.Option>
       )
     })
     return everyone.concat(others)
@@ -90,15 +90,15 @@ export default class Filters extends React.Component {
 
   renderAttemptFilterOptions() {
     const options = [
-      <option key="all" value="all">
+      <Select.Option key="all" value="all">
         {I18n.t('All')}
-      </option>,
+      </Select.Option>,
     ]
     for (let i = 1; i <= this.props.numAttempts; i++) {
       options.push(
-        <option key={i} value={i.toString()}>
+        <Select.Option key={i} value={i.toString()}>
           {I18n.t('Attempt %{count}', {count: i})}
-        </option>
+        </Select.Option>
       )
     }
     return options
@@ -106,18 +106,18 @@ export default class Filters extends React.Component {
 
   renderStatusFilterOptions() {
     return [
-      <option key="all" value="all">
+      <Select.Option key="all" value="all">
         {I18n.t('All')}
-      </option>,
-      <option key="excused" value="excused">
+      </Select.Option>,
+      <Select.Option key="excused" value="excused">
         {I18n.t('Excused')}
-      </option>,
-      <option key="late" value="late">
+      </Select.Option>,
+      <Select.Option key="late" value="late">
         {I18n.t('Late')}
-      </option>,
-      <option key="missing" value="missing">
+      </Select.Option>,
+      <Select.Option key="missing" value="missing">
         {I18n.t('Missing')}
-      </option>,
+      </Select.Option>,
     ]
   }
 

@@ -91,8 +91,12 @@ export default class OverrideAttempts extends React.Component {
           onChange={this.onChangeAttemptsAllowed}
           allowEmpty={false}
         >
-          <option value="limited">{I18n.t('Limited')}</option>
-          <option value="unlimited">{I18n.t('Unlimited')}</option>
+          <Select.Option key="limited" value="limited">
+            {I18n.t('Limited')}
+          </Select.Option>
+          <Select.Option key="unlimited" value="unlimited">
+            {I18n.t('Unlimited')}
+          </Select.Option>
         </Select>
       </Flex.Item>
     )
