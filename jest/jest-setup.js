@@ -48,7 +48,6 @@ plannerFormatMessage.setup({
 const globalError = global.console.error
 const ignoredErrors = [
   /\[object Object\]/,
-  /%s has a method called shouldComponentUpdate/,
   /<Provider> does not support changing `store` on the fly/,
   /A theme registry has already been initialized/,
   /An update to %s inside a test was not wrapped in act/,
