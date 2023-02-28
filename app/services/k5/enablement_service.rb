@@ -18,46 +18,73 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class K5::EnablementService
-  def self.set_k5_settings(account, enable_k5)
-    # Only tweak stuff if the k5 setting has changed
-    unless enable_k5 == account.enable_as_k5_account?
-      # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
-      # This is important in determining whether k5 mode dashboard is shown to a user
-      account.settings[:enable_as_k5_account] = {
-        locked: enable_k5,
-        value: enable_k5
+  K5_SETTINGS = [:enable_as_k5_account, :use_classic_font_in_k5].freeze
+
+  def initialize(account)
+    @account = account
+    @root_account = account.root_account
+  end
+
+  def set_k5_settings(enable_k5, use_classic_font)
+    # Only tweak stuff if something has changed
+    return if enable_k5 == @account.enable_as_k5_account? && use_classic_font == @account.use_classic_font_in_k5?
+
+    # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
+    # This is important in determining whether k5 mode dashboard is shown to a user
+    @account.settings[:enable_as_k5_account] = {
+      locked: enable_k5,
+      value: enable_k5
+    }
+
+    # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
+    enable_k5 ? add_to_root_account_id_set(@account, :k5_accounts) : remove_from_root_account_id_set(@account, :k5_accounts)
+
+    # Only allow setting font if k5 is on. If k5 is disabled, remove font settings.
+    if enable_k5
+      @account.settings[:use_classic_font_in_k5] = {
+        locked: true,
+        value: use_classic_font
       }
-      account.save
+      use_classic_font ? add_to_root_account_id_set(@account, :k5_classic_font_accounts) : remove_from_root_account_id_set(@account, :k5_classic_font_accounts)
+    else
+      @account.settings.delete(:use_classic_font_in_k5)
+      remove_from_root_account_id_set(@account, :k5_classic_font_accounts)
+    end
 
-      # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
-      if enable_k5
-        add_to_root_account_id_set(account, :k5_accounts)
-      else
-        remove_from_root_account_id_set(account, :k5_accounts)
-      end
+    unset_font_in_descendent_accounts
+    @root_account.save! unless @account.root_account?
 
-      # Invalidate the cached k5 settings for all users in the account
-      account.root_account.clear_k5_cache
+    # Invalidate the cached k5 settings for all users in the account
+    @account.root_account.clear_k5_cache
+  end
+
+  private
+
+  def add_to_root_account_id_set(account, setting)
+    account_ids = @root_account.settings[setting] || []
+    account_ids = Set.new(account_ids)
+    @root_account.settings[setting] = account_ids.add(account.id).to_a
+  end
+
+  def remove_from_root_account_id_set(account, setting)
+    account_ids = @root_account.settings[setting] || []
+    account_ids = Set.new(account_ids)
+    @root_account.settings[setting] = account_ids.delete(account.id).to_a
+  end
+
+  def unset_font_in_descendent_accounts
+    descendent_account_ids = Account.sub_account_ids_recursive(@account.id)
+    k5_classic_font_account_ids = @root_account.settings[:k5_classic_font_accounts]
+    affected_account_ids = descendent_account_ids & k5_classic_font_account_ids
+
+    # there should only be 0 or 1 affected accounts since we remove font settings from descendents
+    # each time a parent is updated, so there shouldn't be a way to accumulate multiple descendents
+    # with font settings
+    affected_account_ids.each do |id|
+      subaccount = Account.find(id)
+      subaccount.settings.delete(:use_classic_font_in_k5)
+      subaccount.save!
+      remove_from_root_account_id_set(subaccount, :k5_classic_font_accounts)
     end
   end
-
-  def self.add_to_root_account_id_set(account, setting)
-    account_ids = account.root_account.settings[setting] || []
-    account_ids = Set.new(account_ids)
-    modify_root_account_id_set(account, setting, account_ids.add(account.id))
-  end
-  private_class_method :add_to_root_account_id_set
-
-  def self.remove_from_root_account_id_set(account, setting)
-    account_ids = account.root_account.settings[setting] || []
-    account_ids = Set.new(account_ids)
-    modify_root_account_id_set(account, setting, account_ids.delete(account.id))
-  end
-  private_class_method :remove_from_root_account_id_set
-
-  def self.modify_root_account_id_set(account, setting, account_ids)
-    account.root_account.settings[setting] = account_ids.to_a
-    account.root_account.save!
-  end
-  private_class_method :modify_root_account_id_set
 end

@@ -366,6 +366,8 @@ class Account < ActiveRecord::Base
   add_setting :rce_favorite_tool_ids, inheritable: true
 
   add_setting :enable_as_k5_account, boolean: true, default: false, inheritable: true
+  add_setting :use_classic_font_in_k5, boolean: true, default: false, inheritable: true
+
   # Allow accounts with strict data residency requirements to turn off mobile
   # push notifications which may be routed through US datacenters by Google/Apple
   add_setting :enable_push_notifications, boolean: true, root_only: true, default: true
@@ -487,6 +489,10 @@ class Account < ActiveRecord::Base
   def enable_as_k5_account!
     settings[:enable_as_k5_account] = { value: true }
     save!
+  end
+
+  def use_classic_font_in_k5?
+    use_classic_font_in_k5[:value]
   end
 
   def conditional_release?
