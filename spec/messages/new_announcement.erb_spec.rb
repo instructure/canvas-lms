@@ -23,7 +23,7 @@ require_relative "messages_helper"
 describe "new_announcement" do
   include MessagesCommon
 
-  before :once do
+  before do
     announcement_model
   end
 
@@ -38,6 +38,18 @@ describe "new_announcement" do
       expect(@message.subject).to eq "value for title: value for name"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.html_body).to include "Replies to this email will be posted as a reply to the announcement,"
+    end
+
+    it "does not show announcement reply helper if announcement is locked" do
+      @a.locked = true
+      @a.save!
+
+      generate_message(notification_name, path_type, asset)
+      expect(@message.subject).to eq "value for title: value for name"
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.html_body).not_to include "Replies to this email will be posted as a reply to the announcement,"
     end
   end
 
