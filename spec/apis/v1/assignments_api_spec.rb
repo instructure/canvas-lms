@@ -1741,8 +1741,8 @@ describe AssignmentsApiController, type: :request do
         )
       end
 
-      it 'sets the assignment "asset_map" to a value indicating a map is not needed' do
-        expect_any_instance_of(Assignment).to receive(:asset_map=).with("duplicated_in_context")
+      it 'sets the assignment "resource_map" to a value indicating a map is not needed' do
+        expect_any_instance_of(Assignment).to receive(:resource_map=).with("duplicated_in_context")
 
         subject
       end
@@ -1777,8 +1777,8 @@ describe AssignmentsApiController, type: :request do
 
       let(:new_course) { create_course }
 
-      it 'sets the assignment "asset_map" to a value indicating a map is not needed' do
-        expect_any_instance_of(Assignment).not_to receive(:asset_map=)
+      it 'sets the assignment "resource_map" to a value indicating a map is not needed' do
+        expect_any_instance_of(Assignment).not_to receive(:resource_map=)
 
         subject
       end

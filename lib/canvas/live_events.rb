@@ -256,7 +256,7 @@ module Canvas::LiveEvents
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
       submission_types: assignment.submission_types,
       created_on_blueprint_sync: created_on_blueprint_sync || false,
-      asset_map: assignment.asset_map
+      resource_map: assignment.resource_map
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
