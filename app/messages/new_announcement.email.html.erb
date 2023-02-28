@@ -30,4 +30,6 @@
 </div>
 <% end %>
 
-<%= t :announcement_info, "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course." %>
+<% if !asset.locked? %>
+  <%= t :announcement_info, "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course." %>
+<% end %>
