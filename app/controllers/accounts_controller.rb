@@ -1098,6 +1098,9 @@ class AccountsController < ApplicationController
         # For each inheritable setting, if the value for the account is the same as the inheritable value,
         # remove it from the settings hash on the account
         Account.inheritable_settings.each do |setting|
+          # when changing k5 settings on an account, the value gets saved to the root account and special
+          # locking rules apply, so don't remove it from the update params here
+          next if setting == :enable_as_k5_account
           next unless params.dig(:account, :settings)
           next if !Account.account_settings_options[setting].key?(:boolean) && params.dig(:account, :settings, setting) != @account.parent_account&.send(setting)
           next if value_to_boolean(params.dig(:account, :settings, setting, :locked))
