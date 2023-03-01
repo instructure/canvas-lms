@@ -70,7 +70,6 @@ const ignoredErrors = [
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /\[Text\] .* in version 8.0.0/i,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Please update the following components: %s/,
   /value provided is not in a recognized RFC2822 or ISO format/,
