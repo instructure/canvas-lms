@@ -116,7 +116,7 @@ export default class FileType extends React.Component {
                 <Select
                   multiple={true}
                   closeOnSelect={false}
-                  label={<ScreenReaderContent>{I18n.t('Options')}</ScreenReaderContent>}
+                  renderLabel={<ScreenReaderContent>{I18n.t('Options')}</ScreenReaderContent>}
                   selectedOption={this.state.selectedOptions}
                   onChange={this.handleInputChange}
                 >

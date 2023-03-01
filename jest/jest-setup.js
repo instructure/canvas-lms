@@ -67,7 +67,6 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /The prop `focusOnInit` is marked as required in `(UrlEntry)`/,
   /The prop `id` is marked as required in `(ColHeader|FormField|Option)`/,
-  /The prop `renderLabel` is marked as required in `Select`/,
   /WARNING: heuristic fragment matching going on!/,
   /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
   /You seem to have overlapping act\(\) calls/,

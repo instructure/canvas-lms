@@ -126,7 +126,7 @@ export default class Filters extends React.Component {
       <Flex as="div" margin="medium 0 0 0" wrap="wrap">
         <Flex.Item>
           <Select
-            label={I18n.t('Assign To')}
+            renderLabel={I18n.t('Assign To')}
             onChange={this.onChangeAssignTo}
             data-testid="assignToFilter"
           >
@@ -135,7 +135,7 @@ export default class Filters extends React.Component {
         </Flex.Item>
         <Flex.Item margin="0 0 0 small">
           <Select
-            label={I18n.t('attempts.filter', 'Attempts')}
+            renderLabel={I18n.t('attempts.filter', 'Attempts')}
             onChange={this.onChangeAttempt}
             data-testid="attemptFilter"
           >
@@ -144,7 +144,7 @@ export default class Filters extends React.Component {
         </Flex.Item>
         <Flex.Item margin="0 0 0 small">
           <Select
-            label={I18n.t('Status')}
+            renderLabel={I18n.t('Status')}
             onChange={this.onChangeStatus}
             data-testid="statusFilter"
           >
