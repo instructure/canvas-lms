@@ -52,6 +52,6 @@ export default class KalturaSessionLoader {
   }
 
   kalturaProtocol() {
-    return INST.kalturaSettings.protocol + ':' || window.location.protocol
+    return INST.kalturaSettings.protocol || window.location.protocol
   }
 }
