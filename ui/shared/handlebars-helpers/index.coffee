@@ -640,5 +640,4 @@ Handlebars.registerHelper name, fn for name, fn of {
   lookup: (obj, key) ->
     obj && obj[key]
 }
-
 export default Handlebars

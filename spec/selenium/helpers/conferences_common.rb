@@ -85,10 +85,6 @@ module ConferencesCommon
     expect(concluded_conference_list).to include_text "There are no concluded conferences"
   end
 
-  def verify_conference_includes_recordings
-    expect(first_conference_in_list(new_conference_list)).to include_text "Recording"
-  end
-
   def verify_conference_does_not_include_recordings
     expect(first_conference_in_list(new_conference_list)).not_to include_text "Recording"
   end
