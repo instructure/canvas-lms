@@ -6,7 +6,7 @@ namespace :brand_configs do
   task write: :environment do
     if (md5 = ENV["BRAND_CONFIG_MD5"])
       BrandConfig.find(md5).save_all_files!
-    else
+    elsif BrandConfig.table_exists?
       BrandConfig.clean_unused_from_db!
       BrandConfig.find_each(&:save_all_files!)
     end
