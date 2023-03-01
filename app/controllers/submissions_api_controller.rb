@@ -358,6 +358,10 @@ class SubmissionsApiController < ApplicationController
     else
       assignments = assignment_scope.to_a
     end
+    
+    unless assignments.present?
+      return render(json: [], status: :ok)
+    end
 
     assignment_visibilities = {}
     assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
