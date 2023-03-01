@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  addMruToolId,
-  RceToolWrapper,
-  updateExternalToolMruButtonVisibility,
-} from '../RceToolWrapper'
+import {addMruToolId, RceToolWrapper} from '../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {IconLtiLine, IconLtiSolid} from '@instructure/ui-icons/es/svg'
@@ -52,7 +48,7 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: expect.stringContaining(button.icon_url),
-        })
+        }),
       )
     })
 
@@ -67,7 +63,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon-lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -83,7 +79,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon_lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -99,7 +95,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'lti',
           },
-          []
+          [],
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -137,13 +133,13 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: button.icon_url,
-        })
+        }),
       )
 
       expect(result).toEqual(
         expect.not.objectContaining({
           icon: expect.anything(),
-        })
+        }),
       )
     })
 
@@ -154,7 +150,7 @@ describe('RceExternalToolHelper', () => {
           name: 'SomeName',
           id: '_SomeId',
         },
-        []
+        [],
       )
       expect(config.title).toEqual('SomeName')
     })
@@ -168,7 +164,7 @@ describe('RceExternalToolHelper', () => {
           icon_url: 'example.com',
           canvas_icon_class: 'some_icon',
         },
-        []
+        [],
       )
       expect(config.iconId).toEqual('lti_tool__SomeId')
       expect(config.image).toEqual('example.com')
@@ -185,8 +181,8 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12']
-        ).find(it => it.isMruTool)?.id
+          ['12'],
+        ).find(it => it.isMruTool)?.id,
       ).toBe('12')
 
       expect(
@@ -199,56 +195,9 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12']
-        ).find(it => it.isMruTool)?.id
+          ['12'],
+        ).find(it => it.isMruTool)?.id,
       ).toBe('12')
-    })
-  })
-
-  describe('showHideButtons', () => {
-    let fakeEditor = createDeepMockProxy<ExternalToolsEditor>()
-    let button: HTMLDivElement
-    let menuButton: HTMLDivElement
-
-    beforeAll(() => {
-      const edContainer = document.createElement('div')
-      document.body.appendChild(edContainer)
-
-      fakeEditor = createDeepMockProxy<ExternalToolsEditor>(
-        {},
-        {
-          editorContainer: edContainer,
-        }
-      )
-    })
-    beforeEach(() => {
-      fakeEditor.mockClear()
-
-      button = document.createElement('div')
-      button.setAttribute('class', 'tox-tbtn')
-      button.setAttribute('aria-label', 'Apps')
-      button.setAttribute('style', 'display: flex')
-      button.innerHTML = 'Apps'
-      fakeEditor.editorContainer.appendChild(button)
-
-      menuButton = document.createElement('div')
-      menuButton.setAttribute('class', 'tox-tbtn--select')
-      menuButton.setAttribute('aria-label', 'Apps')
-      menuButton.setAttribute('style', 'display: flex')
-      menuButton.innerHTML = 'Apps'
-      fakeEditor.editorContainer.appendChild(menuButton)
-    })
-
-    afterEach(() => {
-      fakeEditor.editorContainer.innerHTML = ''
-    })
-
-    it('shows MRU button if there is an MRU', () => {
-      window.localStorage.setItem('ltimru', 'anything')
-      updateExternalToolMruButtonVisibility(externalToolsEnvFor(fakeEditor))
-
-      expect(menuButton.getAttribute('aria-hidden')).toEqual('false')
-      expect(menuButton.style.display).toEqual('flex')
     })
   })
 
