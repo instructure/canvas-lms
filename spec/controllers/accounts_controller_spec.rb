@@ -583,99 +583,38 @@ describe AccountsController do
           } }
       end
 
-      describe "enable_as_k5_account setting" do
-        before :once do
-          @account = Account.create!
-          @user = account_admin_user(account: @account)
-        end
-
-        before do
-          user_session(@user)
-        end
-
-        it "is locked once the setting is enabled" do
-          post "update", params: toggle_k5_params(@account.id, true)
-          @account.reload
-          expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
-          expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
-        end
-
-        it "is unlocked if the setting is disabled" do
-          @account.settings[:enable_as_k5_account] = {
-            value: true,
-            locked: true
-          }
-          post "update", params: toggle_k5_params(@account.id, false)
-          @account.reload
-          expect(@account.settings[:enable_as_k5_account][:value]).to be_falsey
-          expect(@account.settings[:enable_as_k5_account][:locked]).to be_falsey
-        end
+      before :once do
+        @account = Account.create!
+        @user = account_admin_user(account: @account)
       end
 
-      describe "k5_accounts set on root account" do
-        before :once do
-          @root_account = Account.create!
-          @subaccount1 = @root_account.sub_accounts.create!
-          @subaccount2 = @subaccount1.sub_accounts.create!
-          @user = account_admin_user(account: @root_account)
-        end
+      before do
+        user_session(@user)
+      end
 
-        before do
-          user_session(@user)
-        end
+      it "calls the K5::EnablementService if enable_as_k5_account is present in params" do
+        expect(K5::EnablementService).to receive(:set_k5_settings).with(@account, true)
+        post "update", params: toggle_k5_params(@account.id, "true")
+      end
 
-        it "is nil by default" do
-          expect(@root_account.settings[:k5_accounts]).to be_nil
-        end
-
-        it "contains root account id if k5 is enabled on root account" do
-          post "update", params: toggle_k5_params(@root_account.id, true)
-          @root_account.reload
-          expect(@root_account.settings[:k5_accounts]).to include(@root_account.id)
-        end
-
-        it "contains subaccount id (but not other ids) if k5 is enabled on subaccount" do
-          post "update", params: toggle_k5_params(@subaccount2.id, true)
-          @root_account.reload
-          expect(@root_account.settings[:k5_accounts]).to include(@subaccount2.id)
-          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
-          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount1.id)
-        end
-
-        it "contains middle subaccount id (but not other ids) if k5 is enabled on middle subaccount" do
-          post "update", params: toggle_k5_params(@subaccount1.id, true)
-          @root_account.reload
-          expect(@root_account.settings[:k5_accounts]).to include(@subaccount1.id)
-          expect(@root_account.settings[:k5_accounts]).not_to include(@root_account.id)
-          expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount2.id)
-        end
-
-        it "does not contain the root account if k5 is disabled on the root account" do
-          toggle_k5_setting(@root_account)
-          post "update", params: toggle_k5_params(@root_account.id, false)
-          expect(@root_account.reload.settings[:k5_accounts]).to be_empty
-        end
-
-        it "does not contain a subaccount if k5 is disabled on that subaccount" do
-          toggle_k5_setting(@subaccount1)
-          post "update", params: toggle_k5_params(@subaccount1.id, false)
-          expect(@root_account.reload.settings[:k5_accounts]).to be_empty
-        end
-
-        it "is not changed unless enable_as_k5_account is modified" do
-          @root_account.settings[:k5_accounts] = [@root_account.id] # in reality this wouldn't ever contain the account if enable_as_k5_account is off
-          @root_account.save!
-          post "update", params: toggle_k5_params(@root_account.id, false) # already set to false, so shouldn't touch k5_accounts
-          @root_account.reload
-          expect(@root_account.settings[:k5_accounts][0]).to be @root_account.id
-          expect(@root_account.settings[:k5_accounts].length).to be 1
-        end
+      it "doesn't call the K5::EnablementService or change k5 settings if enable_as_k5_account isn't present in params" do
+        @account.settings[:enable_as_k5_account] = {
+          value: true,
+          locked: true
+        }
+        @account.save!
+        expect(K5::EnablementService).not_to receive(:set_k5_settings)
+        post "update", params: { id: @account.id,
+                                 account: {
+                                   settings: {
+                                     emoji_deny_list: "middle_finger,eggplant"
+                                   }
+                                 } }
+        expect(@account.settings[:enable_as_k5_account][:value]).to be_truthy
+        expect(@account.settings[:enable_as_k5_account][:locked]).to be_truthy
       end
 
       it "clears the cached k5_user value for all users when the setting is changed" do
-        @account = Account.create!
-        @user = account_admin_user(account: @account)
-        user_session(@user)
         post "update", params: toggle_k5_params(@account.id, false)
         service = K5::UserService.new(@user, @account.root_account, nil)
         enable_cache(:redis_cache_store) do

@@ -1145,24 +1145,8 @@ class AccountsController < ApplicationController
         remove_ip_filters = params[:account].delete(:remove_ip_filters)
         params[:account][:ip_filters] = [] if remove_ip_filters
 
-        k5_settings = params.dig(:account, :settings, :enable_as_k5_account)
-        unless k5_settings.nil?
-          enable_as_k5 = value_to_boolean(k5_settings[:value])
-          # Only tweak stuff if the k5 setting has changed
-          unless enable_as_k5 == @account.enable_as_k5_account?
-            # Lock enable_as_k5_account as ON down the inheritance chain once an account enables it
-            # This is important in determining whether k5 mode dashboard is shown to a user
-            params[:account][:settings][:enable_as_k5_account][:locked] = enable_as_k5
-            # Add subaccount ids with k5 mode enabled to the root account's setting k5_accounts
-            k5_accounts = @account.root_account.settings[:k5_accounts] || []
-            k5_accounts = Set.new(k5_accounts)
-            enable_as_k5 ? k5_accounts.add(@account.id) : k5_accounts.delete(@account.id)
-            @account.root_account.settings[:k5_accounts] = k5_accounts.to_a
-            @account.root_account.save!
-            # Invalidate the cached k5 settings for all users in the account
-            @account.root_account.clear_k5_cache
-          end
-        end
+        enable_k5 = params.dig(:account, :settings, :enable_as_k5_account, :value)
+        K5::EnablementService.set_k5_settings(@account, value_to_boolean(enable_k5)) unless enable_k5.nil?
 
         # validate/normalize default due time parameter
         if (default_due_time = params.dig(:account, :settings, :default_due_time, :value))
@@ -1806,7 +1790,6 @@ class AccountsController < ApplicationController
                                    { usage_rights_required: [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory,
-                                   { enable_as_k5_account: [:value, :locked] }.freeze,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
