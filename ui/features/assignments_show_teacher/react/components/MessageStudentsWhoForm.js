@@ -138,7 +138,7 @@ export default class MessageStudentsWhoForm extends React.Component {
     return (
       <FormFieldGroup description="" layout="columns">
         <Select
-          label={<ScreenReaderContent>{I18n.t('Filter Students')}</ScreenReaderContent>}
+          renderLabel={<ScreenReaderContent>{I18n.t('Filter Students')}</ScreenReaderContent>}
           selectedOption={this.props.selectedFilter}
           onChange={this.handleFilterChange}
           data-testid="filter-students"
@@ -157,7 +157,7 @@ export default class MessageStudentsWhoForm extends React.Component {
       <FormFieldGroup description={I18n.t('Message students who')}>
         {this.renderFilter()}
         <Select
-          label={I18n.t('To:')}
+          renderLabel={I18n.t('To:')}
           multiple={true}
           selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}
