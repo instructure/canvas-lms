@@ -650,11 +650,16 @@ describe AccountsController do
           expect(@root_account.settings[:k5_accounts]).not_to include(@subaccount2.id)
         end
 
-        it "contains nothing once disabled" do
+        it "does not contain the root account if k5 is disabled on the root account" do
           toggle_k5_setting(@root_account)
           post "update", params: toggle_k5_params(@root_account.id, false)
-          @root_account.reload
-          expect(@root_account.settings[:k5_accounts]).to be_empty
+          expect(@root_account.reload.settings[:k5_accounts]).to be_empty
+        end
+
+        it "does not contain a subaccount if k5 is disabled on that subaccount" do
+          toggle_k5_setting(@subaccount1)
+          post "update", params: toggle_k5_params(@subaccount1.id, false)
+          expect(@root_account.reload.settings[:k5_accounts]).to be_empty
         end
 
         it "is not changed unless enable_as_k5_account is modified" do
