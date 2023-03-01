@@ -39,6 +39,13 @@ describe CoursePacing::PaceContextsService do
       it "returns an array of the active sections" do
         expect(subject.contexts_of_type("section")).to match_array [default_section, section_one]
       end
+
+      it "returns specific sections" do
+        params = { contexts: [default_section.id] }
+        filtered_contexts = subject.contexts_of_type("section", params: params)
+        expect(filtered_contexts).to match_array [default_section]
+        expect(filtered_contexts).not_to include section_one
+      end
     end
 
     context "for type 'student_enrollment'" do
@@ -52,6 +59,13 @@ describe CoursePacing::PaceContextsService do
       it "returns an array of the student enrollments" do
         expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
         expect(subject.contexts_of_type("student_enrollment")).not_to include fake_enrollment
+      end
+
+      it "returns specific student enrollments" do
+        params = { contexts: [enrollment_two.id] }
+        filtered_contexts = subject.contexts_of_type("student_enrollment", params: params)
+        expect(filtered_contexts).to match_array [enrollment_two]
+        expect(filtered_contexts).not_to include enrollment
       end
 
       context "when a user has multiple enrollment sources in a course" do

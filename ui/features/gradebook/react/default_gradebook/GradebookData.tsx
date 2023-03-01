@@ -156,19 +156,14 @@ export default function GradebookData(props: Props) {
 
   useEffect(() => {
     if (gradingPeriodSet) {
-      fetchGradingPeriodAssignments()
-        .then(() => {
-          if (currentGradingPeriodId !== '0') {
-            loadAssignmentGroups(currentGradingPeriodId)
-          }
-        })
-        .catch(error => {
-          throw new Error('Failed to load grading period assignments', error)
-        })
-    } else {
-      loadAssignmentGroups().catch(error => {
-        throw new Error('Failed to load assignment groups', error)
+      // eslint-disable-next-line promise/catch-or-return
+      fetchGradingPeriodAssignments().then(() => {
+        if (currentGradingPeriodId !== '0') {
+          loadAssignmentGroups(currentGradingPeriodId)
+        }
       })
+    } else {
+      loadAssignmentGroups()
     }
   }, [
     gradingPeriodSet,

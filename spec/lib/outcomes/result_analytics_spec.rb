@@ -78,23 +78,23 @@ describe Outcomes::ResultAnalytics do
       outcome_ids = @outcomes.pluck(:id).join(",")
       uuids = "#{@students[0].uuid},#{@students[1].uuid},#{@students[2].uuid}"
       expect(ra).to receive(:get_lmgb_results).with(@course, quiz.id.to_s, "canvas.assignment.quizzes", outcome_ids, uuids).and_return(nil)
-      opts = { context: @course, users: @students, outcomes: @outcomes }
-      ra.send(:find_outcomes_service_outcome_results, @teacher, opts)
+      opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
+      ra.send(:find_outcomes_service_outcome_results, opts)
     end
 
     it "returns nil if session user is a student and there are more than 1 users sent in the opts" do
-      opts = { context: @course, users: @students, outcomes: @outcomes }
-      results = ra.find_outcomes_service_outcome_results(@student, opts)
+      opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
+      results = ra.find_outcomes_service_outcome_results(opts)
       expect(results).to eq nil
     end
 
-    describe "#handle_outcome_service_results" do
+    describe "#handle_outcomes_service_results" do
       it "logs warning and returns nil if results are nil" do
         allow(Rails.logger).to receive(:warn)
         expect(Rails.logger).to receive(:warn).with(
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
-        results = ra.handle_outcome_service_results(nil, @course)
+        results = ra.handle_outcomes_service_results(nil, @course, @students, @outcomes, [@assignment])
         expect(results).to eq nil
       end
 
@@ -103,7 +103,7 @@ describe Outcomes::ResultAnalytics do
         expect(Rails.logger).to receive(:warn).with(
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
-        results = ra.handle_outcome_service_results({}, @course)
+        results = ra.handle_outcomes_service_results({}, @course, @students, @outcomes, [@assignment])
         expect(results).to eq nil
       end
 
@@ -119,8 +119,8 @@ describe Outcomes::ResultAnalytics do
             attempts: {}
           }
         ]
-        expect(ra).to receive(:resolve_outcome_results).with(os_results, @course)
-        ra.send(:handle_outcome_service_results, os_results, @course)
+        expect(ra).to receive(:resolve_outcome_results).with(os_results, @course, @students, @outcomes, [@assignment])
+        ra.send(:handle_outcomes_service_results, os_results, @course, @students, @outcomes, [@assignment])
       end
     end
   end

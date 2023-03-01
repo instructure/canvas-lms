@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   IconAttachMediaLine,
   IconCodeLine,
@@ -31,24 +32,26 @@ import {
   IconZippedLine,
 } from '@instructure/ui-icons'
 
-export const DEFAULT_ICON = <IconPaperclipLine />
+const I18n = useI18nScope('mime_class_icons')
+
+export const DEFAULT_ICON = <IconPaperclipLine title={I18n.t('File')} />
 
 export const ICON_TYPES = {
-  audio: <IconAttachMediaLine />,
-  code: <IconCodeLine />,
-  doc: <IconDocumentLine />,
-  file: <IconPaperclipLine />,
-  flash: <IconPaperclipLine />,
-  folder: <IconFolderLine />,
-  'folder-locked': <IconFolderLockedLine />,
-  html: <IconCodeLine />,
-  image: <IconImageLine />,
-  pdf: <IconPdfLine />,
-  ppt: <IconMsPptLine />,
-  text: <IconDocumentLine />,
-  video: <IconAttachMediaLine />,
-  xls: <IconMsExcelLine />,
-  zip: <IconZippedLine />,
+  audio: <IconAttachMediaLine title={I18n.t('Audio File')} />,
+  code: <IconCodeLine title={I18n.t('Code File')} />,
+  doc: <IconDocumentLine title={I18n.t('Doc File')} />,
+  file: <IconPaperclipLine title={I18n.t('File')} />,
+  flash: <IconPaperclipLine title={I18n.t('Flash File')} />,
+  folder: <IconFolderLine title={I18n.t('Folder')} />,
+  'folder-locked': <IconFolderLockedLine title={I18n.t('Folder Locked')} />,
+  html: <IconCodeLine title={I18n.t('HTML File')} />,
+  image: <IconImageLine title={I18n.t('Image File')} />,
+  pdf: <IconPdfLine title={I18n.t('PDF File')} />,
+  ppt: <IconMsPptLine title={I18n.t('PowerPoint File')} />,
+  text: <IconDocumentLine title={I18n.t('Text File')} />,
+  video: <IconAttachMediaLine title={I18n.t('Video File')} />,
+  xls: <IconMsExcelLine title={I18n.t('Excel File')} />,
+  zip: <IconZippedLine title={I18n.t('Zip File')} />,
 }
 
 export function getIconByType(attachment_type) {

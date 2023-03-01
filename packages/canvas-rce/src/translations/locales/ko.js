@@ -49,6 +49,7 @@ const locale = {
   "course_files_a31f97fc": { "message": "과목 파일" },
   "course_navigation_dd035109": { "message": "과목 탐색" },
   "delimiters_4db4840d": { "message": "구분자" },
+  "description_436c48d7": { "message": "설명" },
   "details_98a31b68": { "message": "세부 정보" },
   "dimensions_45ddb7b7": { "message": "치수" },
   "discussions_a5f96392": { "message": "토론" },
@@ -99,6 +100,7 @@ const locale = {
   "preview_53003fd2": { "message": "미리 보기" },
   "quizzes_7e598f57": { "message": "퀴즈" },
   "record_7c9448b": { "message": "녹음/녹화" },
+  "recording_98da6bda": { "message": "녹음/녹화" },
   "relationships_6602af70": { "message": "관계" },
   "reset_95a81614": { "message": "원래대로" },
   "save_11a80ec3": { "message": "저장" },
@@ -106,6 +108,7 @@ const locale = {
   "size_b30e1077": { "message": "크기" },
   "sort_by_e75f9e3e": { "message": "정렬 조건" },
   "star_8d156e09": { "message": "별표 표시" },
+  "start_over_f7552aa9": { "message": "새로 시작" },
   "submit_a3cc6859": { "message": "제출" },
   "syllabus_f191f65b": { "message": "요강" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {

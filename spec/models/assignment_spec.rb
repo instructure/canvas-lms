@@ -7529,6 +7529,68 @@ describe Assignment do
       expect(submission_user_ids.sort).to eq [s1.id, s2.id]
     end
 
+    it "works for groups that has number on the name" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "12345#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works with groups that has number more than 2 strings separeted by underscore" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "#{i}_group_1234_#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "works with groups that has number on the name and underscore" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "12345 Groups"
+      @assignment.update group_category_id: gc.id,
+                         grade_group_students_individually: false
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "eval123group_12345#{i}", context: @course }
+
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
     it "excludes student names from filenames when anonymous grading is enabled" do
       @assignment.update!(anonymous_grading: true)
 
@@ -9241,6 +9303,84 @@ describe Assignment do
             expect(student_unread_count_counts).to eq 1
             assignment.hide_submissions
             expect(student_unread_count_counts).to eq 1
+          end
+        end
+
+        context "when changing workflow_state for an assignment" do
+          before do
+            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+          end
+
+          it "unread count changes between 0 and 1 when going to unpublished and published workflow_state" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            expect(student_unread_count_counts).to eq 1
+            assignment.workflow_state = "unpublished"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 0
+            assignment.workflow_state = "published"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "does call refresh_course_content_participation_counts when changing to a trigger workflow_state" do
+            expect(assignment).to receive(:refresh_course_content_participation_counts).twice
+            assignment.workflow_state = "unpublished"
+            assignment.save!
+            assignment.workflow_state = "published"
+            assignment.save!
+          end
+
+          it "does not call refresh_course_content_participation_counts when not changing to a trigger workflow_state" do
+            assignment.workflow_state = "duplicating"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+          end
+
+          it "does not call refresh_course_content_participation_counts when changing something other than workflow_state" do
+            assignment.title = "New Title"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+          end
+        end
+
+        context "when changing submission_types for an assignment" do
+          before do
+            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+          end
+
+          it "unread count changes between 0 and 1 when going to not_graded and any other submission_type" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            expect(student_unread_count_counts).to eq 1
+            assignment.submission_types = "not_graded"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 0
+            assignment.submission_types = "online_text_entry"
+            assignment.save!
+            run_jobs
+            expect(student_unread_count_counts).to eq 1
+          end
+
+          it "does call refresh_course_content_participation_counts when changing to a not_graded submission_type" do
+            expect(assignment).to receive(:refresh_course_content_participation_counts).twice
+            assignment.submission_types = "not_graded"
+            assignment.save!
+            assignment.submission_types = "online_text_entry"
+            assignment.save!
+          end
+
+          it "does not call refresh_course_content_participation_counts when not changing to something other than not_graded" do
+            assignment.submission_types = "on_paper"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
+          end
+
+          it "does not call refresh_course_content_participation_counts when changing something other than submission_types" do
+            assignment.title = "New Title"
+            assignment.save!
+            expect(assignment).to_not receive(:refresh_course_content_participation_counts)
           end
         end
       end

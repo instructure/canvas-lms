@@ -187,7 +187,7 @@
 #     }
 
 class OutcomeResultsController < ApplicationController
-  CACHE_EXPIRATION = 60.seconds
+  CACHE_EXPIRATION = 5.minutes
   include Api::V1::OutcomeResults
   include Outcomes::Enrollments
   include Outcomes::ResultAnalytics
@@ -356,26 +356,53 @@ class OutcomeResultsController < ApplicationController
 
   private
 
-  def fetch_os_results(opts)
-    Rails.cache.fetch(generate_cache_results_key(opts), expires_in: CACHE_EXPIRATION) do
-      results = find_outcomes_service_outcome_results(
-        @current_user,
-        users: opts[:all_users] ? @all_users : @users,
-        context: @context,
-        outcomes: @outcomes,
-        **opts
-      )
-      # storing only the attributes that are required for (s)lmgb in the cache
-      results&.map { |r| r.slice(:external_outcome_id, :associated_asset_id, :user_uuid, :points, :points_possible, :submitted_at) }
-    end
+  def find_new_quiz_assignments
+    # check if the logged in user has manage_grades & view_all_grades permissions
+    # if not, apply exclude_muted_associations to the assignment query
+    @new_quiz_assignments =
+      if context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+        Assignment.active.where(context: context).quiz_lti
+      else
+        # return if there is more than one user in users as this would indicate
+        # user with insufficient permissions accessing the LMGB
+        return if @users.length > 1
+
+        Assignment.active.where(context: context).quiz_lti.exclude_muted_associations_for_user(@users[0])
+      end
+  end
+
+  def fetch_and_handle_os_results_for_all_users(opts)
+    os_results_json = find_outcomes_service_outcome_results(
+      users: @all_users,
+      context: @context,
+      outcomes: @outcomes,
+      assignments: @new_quiz_assignments,
+      **opts
+    )
+    return if os_results_json.nil?
+
+    handle_outcomes_service_results(os_results_json, @context, @outcomes, @all_users, @new_quiz_assignments)
   end
 
   def fetch_and_convert_os_results(opts)
-    os_results_json = fetch_os_results(opts)
-    return if os_results_json.nil?
+    # Returns a list of new quiz assignments for the current context
+    # If it is empty then no need to continue
+    return if find_new_quiz_assignments.empty?
 
-    # converts json to LearningOutcomeResult objects and removes duplicate rubric results, if found.
-    handle_outcome_service_results(os_results_json, @context)
+    # fetches and converts OS results json to LearningOutcomeResult objects then removes duplicate rubric results, if found.
+    results = Rails.cache.fetch(generate_cache_results_key, expires_in: CACHE_EXPIRATION) do
+      fetch_and_handle_os_results_for_all_users(opts)
+    end
+
+    # Remove users that are filtered out since we are pulling all results from OS.
+    # See filter_users_by_excludes for why this is needed.
+    unless opts[:all_users]
+      user_map = @users.index_by(&:uuid)
+      results = results&.filter do |r|
+        user_map.key?(r.user_uuid)
+      end
+    end
+    results
   end
 
   def find_canvas_os_results(opts = { all_users: false })
@@ -392,21 +419,17 @@ class OutcomeResultsController < ApplicationController
     [canvas_results, os_results]
   end
 
-  # there are 2 different types of opt params in LMGB & sLMGB: {:all_users: false} or {:all_users: true}
-  # {} is the same exact option as {:all_users :false}.  Given this, there will be two keys created for
-  # OS that will either contain {:all_users: false} or {:all_users: true}.  Example:
-  # lmgb_{all_users=>true}, lmgb_{all_users=>false}
-  # In addition to these cache keys there are two other parameters that could be concatenated that are
+  # There are two other parameters that could be concatenated that are
   # specific when viewing sLMGB and course section LMGB
   # For sLMGB ... user_ids plus a delimited list of students' user ids will be present in the cache key in the form of:
-  # slmgb_user_ids_1|2|3_{all_users=>true}
+  # slmgb_user_ids_1|2|3
   # For course section LMGB ... student_id plus the section id will be present in the cache key in the form of:
-  # lmgb_section_id_123_{all_users=>true}
+  # lmgb_section_id_123
   # FURTHERMORE... to ensure the cache key is unique, the key also includes the @current_user.uuid, @context.uuid, & @domain_root_account.uuid
   # example of cache key:
-  # slmgb_user_ids_5319_{:include_hidden=>false}/context_uuid/xDlV3Ca2nBRtRHX2K0ie0Wxng6grJKzEXSuIGoey/
+  # slmgb_user_ids_5319/context_uuid/xDlV3Ca2nBRtRHX2K0ie0Wxng6grJKzEXSuIGoey/
   #    current_user_uuid/dPu5lwmdwEJxBUqfiNlzyod3jbvVtdD0u8GrnVje/account_uuid/SYMqtl31AbcfmV6WfKkO5gqwpNr7Mvx21RHgG1bc
-  def generate_cache_results_key(opts)
+  def generate_cache_results_key
     # lmgb overall course
     results_type = "lmgb"
     # if section_id params is present then it is a course section and should be cached with section_id param
@@ -414,7 +437,6 @@ class OutcomeResultsController < ApplicationController
     # slmgb is identified with the user_ids parameter and should be cached with user_ids params
     results_type = "slmgb_user_ids_#{params[:user_ids].join("|")}" unless params[:user_ids].nil?
 
-    cache_key =  "#{results_type}_#{opts}"
     # Adding the currently logged in course, currently logged in user, and domain_root_account for session uniqueness
     # looking around at other Rails.cache implementations, context and/or current_user and/or domain_root_account
     # are used for uniqueness. We will use all 3's uuid for tripley safe measures.
@@ -422,7 +444,7 @@ class OutcomeResultsController < ApplicationController
     #   app/controllers/quizzes/quizzes_controller.rb
     #   app/controllers/quizzes_next/quizzes_api_controller.rb
     #   app/controllers/application_controller.rb
-    [cache_key, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid]
+    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid]
   end
 
   # used in sLMGB/LMGB
@@ -431,6 +453,7 @@ class OutcomeResultsController < ApplicationController
     filter_users_by_excludes
 
     @results, @outcome_service_results = find_canvas_os_results(opts)
+
     @results = @results.preload(:user)
     ActiveRecord::Associations.preload(@results, :learning_outcome)
     if @outcome_service_results.nil?
@@ -485,6 +508,7 @@ class OutcomeResultsController < ApplicationController
 
     if os_userids_with_results.nil?
       @users = @users.select { |u| userids_with_results.include? u.id }
+
     else
       os_userids_with_results = os_userids_with_results.pluck(:user_id).uniq
       os_userids_with_results.push(userids_with_results).flatten!
@@ -568,8 +592,8 @@ class OutcomeResultsController < ApplicationController
       @outcome_service_results.push(@results).flatten!
       aggregate_rollups = [aggregate_outcome_results_rollup(@outcome_service_results, @context, params[:aggregate_stat])]
     end
+
     aggregate_outcome_results_rollups_json(aggregate_rollups)
-    # no pagination, so no meta field
   end
 
   def linked_include_collections

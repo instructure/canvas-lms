@@ -26,7 +26,7 @@
   js_bundle :context_modules_publish_icon
 %>
 
-<% cache_if_module(context_module, @can_view, @is_student, @can_view_unpublished, @current_user, @context) do %>
+<% cache_if_module(context_module, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, @current_user, @context) do %>
 <div
   class="item-group-condensed context_module
     <%= 'editable_context_module' if @can_add %>

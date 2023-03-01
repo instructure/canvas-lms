@@ -170,7 +170,7 @@ module CanvasPartman::Concerns
 
         if partitioning_strategy == :by_date
           date = attr[1].is_a?(ActiveModel::Attribute) ? attr[1].value : attr[1]
-          date = date.utc if Rails.version < "7.0" ? ActiveRecord::Base.default_timezone == :utc : ActiveRecord.default_timezone == :utc
+          date = date.utc if ActiveRecord.default_timezone == :utc
 
           case partitioning_interval
           when :weeks

@@ -613,7 +613,7 @@ GEM
     gepub (1.0.15)
       nokogiri (>= 1.8.2, < 2.0)
       rubyzip (> 1.1.1, < 2.4)
-    gergich (2.0.0)
+    gergich (2.1.1)
       httparty (~> 0.17)
       sqlite3 (~> 1.4)
     git (1.11.0)
@@ -843,7 +843,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.2.3)
+    pg (1.4.5)
     pg_query (2.2.0)
       google-protobuf (>= 3.19.2)
     prawn (2.4.0)
@@ -1063,7 +1063,10 @@ GEM
       spring (>= 0.9.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
-    sqlite3 (1.4.2)
+    sqlite3 (1.6.0-aarch64-linux)
+    sqlite3 (1.6.0-arm64-darwin)
+    sqlite3 (1.6.0-x86_64-darwin)
+    sqlite3 (1.6.0-x86_64-linux)
     sshkey (2.0.0)
     stackprof (0.2.23)
     statsd-ruby (1.4.0)
@@ -1074,7 +1077,7 @@ GEM
       rspec (~> 3.8)
     strscan (3.0.5)
     swearjar (1.4.0)
-    switchman (3.3.1)
+    switchman (3.3.2)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
@@ -1261,7 +1264,7 @@ DEPENDENCIES
   flakey_spec_catcher (~> 0.11.2)
   folio-pagination (= 0.0.12)
   gepub (= 1.0.15)
-  gergich (= 2.0.0)
+  gergich (= 2.1.1)
   google_drive!
   graphql (= 1.12.14)
   graphql-batch (= 0.4.3)
@@ -1324,7 +1327,7 @@ DEPENDENCIES
   parallel (= 1.22.0)
   parallel_tests
   pdf-reader (= 2.5.0)
-  pg (= 1.2.3)
+  pg (= 1.4.5)
   pg_query (= 2.2.0)
   prawn-rails (= 1.3.0)
   pry-byebug (= 3.10.1)
@@ -1394,7 +1397,7 @@ DEPENDENCIES
   stackprof
   stormbreaker (= 0.0.8)
   stringify_ids!
-  switchman (= 3.3.1)
+  switchman (= 3.3.2)
   switchman-inst-jobs (= 4.0.13)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!

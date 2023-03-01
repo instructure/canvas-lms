@@ -98,7 +98,8 @@ describe ContentParticipation do
         end.to change(ContentParticipation, :count).by 1
       end
 
-      it "doesn't change the read state if submission is not posted" do
+      it "doesn't change the read state if submission is not posted and post policy is manual" do
+        @assignment.ensure_post_policy(post_manually: true)
         @content.update_columns(posted_at: nil)
 
         ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")

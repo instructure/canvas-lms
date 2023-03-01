@@ -194,6 +194,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Descriviu la icona)" },
   "describe_the_type_ff448da5": { "message": "(Descriviu el { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Descriu el vídeo)" },
+  "description_436c48d7": { "message": "Descripció" },
   "details_98a31b68": { "message": "Detalls" },
   "diagonal_dots_7d71b57e": { "message": "Punts en diagonal" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
@@ -286,6 +287,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "No s''ha pogut obtenir el contingut del fitxer"
   },
+  "file_name_8fd421ff": { "message": "Nom del fitxer" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "S''ha superat la quota d''emmagatzematge de fitxers"
   },
@@ -669,6 +671,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Premeu Maj+O per obrir l''editor de dades HTML processades."
   },
+  "shortcut_911d6255": { "message": "Drecera" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Imatge d’un sol color" },

@@ -35,18 +35,34 @@ describe "reported_reply" do
     let(:path_type) { :email }
 
     it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
-      expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
-      expect(msg.html_body.include?("View the reply in the discussion: \n<a href=\"http://localhost/courses/#{@object.discussion_topic.course.id}/discussion_topics/#{@object.discussion_topic.id}?entry_id=#{@object.id}\">")).to eq(true)
+      msg = generate_message(notification_name, path_type, asset, data: { report_type: "offensive" })
+      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@object.id}#entry-#{@object.id}"
+      expect(msg.subject).to include "Reported reply in #{@topic.title}, #{@topic.context.name}"
+      expect(msg.body).to include "Reported as offensive: #{@object.author_name}, #{@object.context.name}"
+      expect(msg.html_body).to include "Reported as offensive: #{@object.author_name}, #{@object.context.name}"
+      expect(msg.body).to include "View the discussion:"
+      expect(msg.html_body).to include "View the reply in the discussion using the link below."
     end
 
     it "renders anonymous user if discussion is anonymous" do
+      real_author_name = @object.author_name
       @topic.anonymous_state = "full_anonymity"
       @topic.save!
 
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.html_body.include?("Anonymous")).to eq(true)
+      msg = generate_message(notification_name, path_type, asset, data: { report_type: "offensive" })
+      expect(@object.author_name).not_to include real_author_name
+      expect(@object.author_name).to include "Anonymous"
+      expect(msg.body).to include "Reported as offensive: #{@object.author_name}, #{@object.context.name}"
+      expect(msg.html_body).to include "Reported as offensive: #{@object.author_name}, #{@object.context.name}"
+    end
+  end
+
+  describe "summary" do
+    let(:path_type) { :summary }
+
+    it "renders summary" do
+      msg = generate_message(notification_name, path_type, asset, data: { report_type: "offensive" })
+      expect(msg.subject).to include "Reported reply in #{@topic.title}, #{@topic.context.name}"
     end
   end
 end

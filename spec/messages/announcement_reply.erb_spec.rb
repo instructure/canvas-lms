@@ -27,10 +27,11 @@ describe "announcement_reply" do
     course_with_teacher(active_all: true)
     @announcement = announcement_model(user: @teacher, discussion_type: "threaded")
     @announcement.reply_from(user: @teacher, text: "hai")
+    @entry = @announcement.discussion_entries.last
   end
 
   let(:notification_name) { :announcement_reply }
-  let(:asset) { @announcement }
+  let(:asset) { @entry }
 
   context ".email" do
     let(:path_type) { :email }
@@ -38,7 +39,7 @@ describe "announcement_reply" do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement value for title: value for name"
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
       expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
     end
 
@@ -75,8 +76,8 @@ describe "announcement_reply" do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement: value for title: value for name"
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
-      expect(msg.body.strip).to eq "value for message"
+      expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
+      expect(msg.body.strip).to eq "hai"
     end
   end
 
@@ -86,7 +87,7 @@ describe "announcement_reply" do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "Canvas Alert"
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
       expect(msg.body).to include("Canvas Alert - Announcement Comment: value for title, value for name")
     end
   end

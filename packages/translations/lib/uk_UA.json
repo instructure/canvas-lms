@@ -620,6 +620,9 @@
     "record_7c9448b": {
         "message": "Записати"
     },
+    "recording_98da6bda": {
+        "message": "Запис"
+    },
     "red_8258edf3": {
         "message": "Червоний"
     },
@@ -664,6 +667,9 @@
     },
     "star_8d156e09": {
         "message": "Помітити зіркою"
+    },
+    "start_over_f7552aa9": {
+        "message": "Почати з початку"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } до { endDate }"
@@ -766,6 +772,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Права використання:"
+    },
+    "video_player_b371005": {
+        "message": "Відеопрогравач"
     },
     "view_ba339f93": {
         "message": "Вигляд"

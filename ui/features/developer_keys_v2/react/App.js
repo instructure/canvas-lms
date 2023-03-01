@@ -21,6 +21,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Alert} from '@instructure/ui-alerts'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
@@ -31,6 +33,7 @@ import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
 import DeveloperKeyModalTrigger from './NewKeyTrigger'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = useI18nScope('react_developer_keys')
 /**
@@ -133,6 +136,62 @@ class DeveloperKeysApp extends React.Component {
     this.setState({selectedTab: id})
   }
 
+  buildDevKeyOIDCText(features) {
+    const today = new Date()
+    const changeDate = new Date(1688212799000) // July 1, 2023 at 11:59:59 UTC
+    const formattedDate = DateHelper.formatDateForDisplay(changeDate)
+    const linkMarkup = `<a href="https://community.canvaslms.com/t5/The-Product-Blog/The-LTI-1-3-OIDC-Auth-Endpoint-is-Changing-You-Won-t-Believe-the/ba-p/551677">$1</a>`
+    const secondParagraph = I18n.t(
+      '*For LTI 1.3 Tool Developers:* Follow the directions in the "What exactly will you need to change?" section of the Community article.',
+      {wrappers: [`<strong>$1</strong>`]}
+    )
+    const makeAlertMsg = (testid, first, third) => {
+      return (
+        <div data-testid={testid}>
+          <View as="div" margin="small">
+            <Text dangerouslySetInnerHTML={{__html: first}} />
+          </View>
+          <View as="div" margin="small">
+            <Text dangerouslySetInnerHTML={{__html: secondParagraph}} />
+          </View>
+          <View as="div" margin="small">
+            <Text dangerouslySetInnerHTML={{__html: third}} />
+          </View>
+        </div>
+      )
+    }
+
+    if (changeDate > today) {
+      const firstParagraph = I18n.t(
+        'On %{date}, the LTI 1.3 OIDC Auth endpoint will be changing from https://canvas.instructure.com/api/lti/authorize_redirect to https://sso.canvaslms.com/api/lti/authorize_redirect. The reasoning and scope of this change is detailed in *this Canvas Community article*, and additional information is available in our API docs. This change is small, but requires configuration change on the tool side for every LTI 1.3 tool that is installed in Canvas.',
+        {
+          date: formattedDate,
+          wrappers: [linkMarkup],
+        }
+      )
+      const thirdParagraph = I18n.t(
+        '*For Canvas Admins:* No actions or configuration changes are required on your part. You can ask developers of 1.3 tools that you have installed about the status of their needed changes.',
+        {wrappers: [`<strong>$1</strong>`]}
+      )
+
+      return makeAlertMsg('preFlipText', firstParagraph, thirdParagraph)
+    } else {
+      const firstParagraph = I18n.t(
+        'As of %{date}, the LTI 1.3 OIDC Auth endpoint has changed from https://canvas.instructure.com/api/lti/authorize_redirect to https://sso.canvaslms.com/api/lti/authorize_redirect. The reasoning and scope of this change is detailed in *this Canvas Community article*, and additional information is available in our API docs. This change is small and will not take very long, but requires configuration change on the tool side for every LTI 1.3 tool that is installed in Canvas.',
+        {
+          date: formattedDate,
+          wrappers: [linkMarkup],
+        }
+      )
+      const thirdParagraph = I18n.t(
+        '*For Canvas Admins:* No actions or configuration changes are required on your part. You can confirm with developers of 1.3 tools that you have installed that they have made these changes.',
+        {wrappers: [`<strong>$1</strong>`]}
+      )
+
+      return makeAlertMsg('postFlipText', firstParagraph, thirdParagraph)
+    }
+  }
+
   /**
    * Due to some annoying accessibility issues related to modal focus
    * returning and screenreader issues, we have to use a setTimeout here
@@ -176,6 +235,13 @@ class DeveloperKeysApp extends React.Component {
         <View as="div" margin="0 0 small 0" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
+        {ENV?.FEATURES?.dev_key_oidc_alert && (
+          <div data-testid="OIDC_warning">
+            <Alert variant="warning" margin="small">
+              {this.buildDevKeyOIDCText(ENV.FEATURES)}
+            </Alert>
+          </div>
+        )}
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}

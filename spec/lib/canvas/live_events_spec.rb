@@ -67,6 +67,7 @@ describe Canvas::LiveEvents do
       root_account_uuid: @course.root_account.uuid,
       root_account_id: @course.root_account.global_id.to_s,
       root_account_lti_guid: @course.root_account.lti_guid.to_s,
+      context_account_id: @course.account&.global_id&.to_s,
       context_id: @course.global_id.to_s,
       context_type: "Course"
     )
@@ -75,7 +76,7 @@ describe Canvas::LiveEvents do
   describe ".amended_context" do
     it "pulls the context from the canvas context" do
       LiveEvents.set_context(nil)
-      course = course_model
+      course = course_model(sis_source_id: "some-course-sis-id")
       amended_context = Canvas::LiveEvents.amended_context(course)
 
       context_id = course.global_id
@@ -86,7 +87,9 @@ describe Canvas::LiveEvents do
 
       expect(amended_context).to eq(
         {
+          context_account_id: course.account.global_id,
           context_id: context_id,
+          context_sis_source_id: "some-course-sis-id",
           context_type: context_type,
           root_account_id: root_account_id,
           root_account_uuid: root_account_uuid.to_s,
@@ -100,7 +103,12 @@ describe Canvas::LiveEvents do
       LiveEvents.set_context(nil)
       user = user_model
       amended_context = Canvas::LiveEvents.amended_context(user)
-      expect(amended_context).to eq({ context_id: user.global_id, context_type: "User", compact_live_events: true })
+      expect(amended_context).to eq({
+                                      context_account_id: nil,
+                                      context_id: user.global_id,
+                                      context_type: "User",
+                                      compact_live_events: true
+                                    })
     end
   end
 
@@ -811,6 +819,7 @@ describe Canvas::LiveEvents do
       }.compact!,
                    {
                      compact_live_events: true,
+                     context_account_id: context.account&.global_id&.to_s,
                      context_type: context.class.to_s,
                      context_id: "1"
                    }).once

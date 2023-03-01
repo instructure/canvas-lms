@@ -890,11 +890,8 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
       "primary",
       ActiveRecord::Base.configurations.configs_for(env_name: "test", name: "primary").configuration_hash.merge(max_runtime: 30)
     )
-    if Rails.version < "7.0"
-      ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config)
-    else
-      ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config, :primary, :test)
-    end
+
+    ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config, :primary, :test)
   end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
 

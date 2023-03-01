@@ -60,7 +60,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
               </Cell>
               <Cell>
                 <>
-                  {feature.feature_flag.hidden && (
+                  {feature.feature_flag.hidden && !feature.shadow && (
                     <Tooltip
                       isShowingContent={feature.feature === visibleTooltip}
                       onShowContent={() => setVisibleTooltip(feature.feature)}
@@ -77,6 +77,22 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                       }
                     >
                       <Pill margin="0 x-small">{I18n.t('Hidden')}</Pill>
+                    </Tooltip>
+                  )}
+                  {feature.shadow && (
+                    <Tooltip
+                      renderTip={
+                        <View as="div" width="600px">
+                          {I18n.t(
+                            `This feature option is only visible to users with Site Admin access. It is similar to
+                          "Hidden", but end users will not see it even if enabled by a Site Admin user.`
+                          )}
+                        </View>
+                      }
+                    >
+                      <Pill color="alert" margin="0 x-small">
+                        {I18n.t('Shadow')}
+                      </Pill>
                     </Tooltip>
                   )}
                   {feature.beta && (

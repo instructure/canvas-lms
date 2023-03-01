@@ -889,6 +889,12 @@ ms:
         default: 
           lti_reports: 
             text: "Laporan ini menyediakan eksport data yang menunjukkan maklumat penggunaan LTI (Saling Kendali Alat Pembelajaran)"
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Penggal
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -3442,6 +3448,7 @@ ms:
   audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Kandungan audio tidak disokong oleh peranti atau aplikasi anda."
   audio_dd489fcc: Audio
+  audio_file_bf3ece7e: "Fail Audio"
   audio_player_for_label_dd9a6819: "Pemain audio untuk %{label}"
   august_781433e8: Ogos
   australia_61_eb9bb701: "Australia (+61)"
@@ -4536,6 +4543,7 @@ ms:
   cluster_cluster_b57fe99a: "Kluster: %{cluster}"
   cluster_f407976: Kluster
   code_93e9abbb: kod
+  code_file_424dc478: "Fail Kod"
   code_is_case_sensitive_d8175cad: "Kod adalah sensitif huruf."
   cog_icon_69bdffd5: "Ikon kog"
   col_is_sorted_ascending_cc5152cc: "%{col} diisih menaik"
@@ -4582,6 +4590,7 @@ ms:
     errors: 
       cannot_load_collaboration: "Tidak dapat memuatkan kolaborasi"
       create_failed: "Penciptaan kolaborasi gagal"
+      no_masquerading_on_collaboration: "Melihat kolaborasi ketika bertindak sebagai pengguna lain tidak dibenarkan."
       no_name: "Sila masukkan nama untuk kolaborasi ini"
       not_enabled: "Kolaborasi tidak didayakan untuk laman Canvas ini"
       title_too_long: "Sila gunakan %{maxLength} aksara atau kurang untuk nama. Gunakan penerangan untuk kandungan tambahan."
@@ -7601,6 +7610,10 @@ ms:
   display_totals_for_all_grading_periods_option_4a72586: "Paparkan jumlah untuk Semua pilihan Tempoh Penggredan"
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Paparkan Nilai"
+  displayname_loaded_14d71a0a: "%{displayName} dimuatkan"
+  displayname_loading_in_progress_2be325fd: "Pemuatan %{displayName} sedang berjalan"
+  displayname_loading_pending_3aa2723e: "Pemuatan %{displayName} belum selesai"
+  displayname_loading_success_8177d735: "Pemuatan %{displayName} berjaya"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Paparkan konfeti untuk guru yang melaksanakan pengesahihan pautan pada
       kursus dan tiada isu ditemui.
@@ -7617,6 +7630,7 @@ ms:
   do_nothing_9672b478: "Tidak Perlu Lakukan Apa-apa"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Fail Dokumen"
   document_to_annotate_d37b93bc: "Dokumen untuk dianotasi"
   docviewer_apple_iwork_file_support_dc772b31: "Sokongan fail Docviewer Apple iWork"
   docviewer_area_created_37502a31: "Kawasan docviewer dicipta"
@@ -7953,6 +7967,7 @@ ms:
   enabled_links_be110215: "Pautan Didayakan"
   enabled_web_services_f620b2be: "Perkhidmatan Web Didayakan"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Mendayakan dialog Mesej Pelajar Yang... direka bentuk semula yang membolehkan mesej dihantar kepada pemerhati di samping pelajar."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Membolehkan akses kepada API Umum Kuiz Baharu: API Item Kuiz"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Membolehkan akses kepada API Umum Kuiz Baharu melalui Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Mendayakan paparan laporan plagiat dan skor keserupaan dalam dulang serahan Buku Gred Baharu."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Mendayakan titik akhir API baharu untuk data pengguna dan kursus yang disediakan oleh Analisis Baharu."
@@ -8423,6 +8438,7 @@ ms:
       exclusion: disimpan
       greater_than: "mesti lebih besar daripada %{count}"
       greater_than_or_equal_to: "mesti lebih besar atau sama dengan %{count}"
+      in: "mestilah dalam %{count}"
       inclusion: "tidak termasuk dalam senarai"
       invalid: "adalah tidak sah"
       less_than: "mesti kurang daripada %{count}"
@@ -8550,6 +8566,7 @@ ms:
   exceeded_the_maximum_length_number_characters_2d25611e: "Melebihi kepanjangan maksimum (%{number} aksara)"
   exceeds_expectations_5910fc3a: "Melebihi Jangkaan"
   exceeds_mastery_1f995dce: "Melebihi Tahap Penguasaan"
+  excel_file_c6b9890: "Fail Excel"
   excelsior_student_activity_tracking_7a1ba44d: "Penjejakan Aktiviti Pelajar Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Kecualikan mana-mana data yang belum lagi dikemas kini sejak tarikh diberikan"
   excuse_this_assignment_for_the_selected_student_af04e132: "Tugasan Ini Dimaarkan untuk Pelajar yang Dipilih"
@@ -8830,6 +8847,7 @@ ms:
   file_storage_32477f6: "Storan Fail"
   file_tree_collapsed_d4b0ae96: "Pepohon fail dikuncupkan"
   file_tree_expanded_a1d20c4a: "Pepohon fail dikembangkan"
+  file_type_fd1ba7ee: "Jenis Fail"
   file_upload_9cae6da5: "Muat Naik Fail"
   file_upload_failed_af22dd91: "Muat naik fail gagal"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Muat naik fail, file_url, atau content_export_id diperlukan"
@@ -8955,6 +8973,7 @@ ms:
   flags_ce30e8e3: Bendera
   flash_6afbf65a: Denyar
   flash_ab3ad95e: denyar
+  flash_file_cbcadc71: "Fail Flash"
   flv_15e62834: FLV
   folder: 
     default_folder_name: "Folder Baharu"
@@ -8964,6 +8983,7 @@ ms:
   folder_705fd2d7: Folder
   folder_browsing_tree_1f00a3ae: "Pepohon Semak Lalu Folder"
   folder_icon_29017021: "Ikon Folder"
+  folder_locked_b91cd0c4: "Folder Dikunci"
   folder_tree_fbab0726: "Pepohon Folder"
   folders: 
     event_updated: "Acara berjaya dikemas kini."
@@ -10077,6 +10097,7 @@ ms:
   howard_assignments_report_f3254802: "Laporan Tugasan Howard"
   however_if_these_additional_permissions_are_enable_35d3082c: "Walau bagaimanapupn, jika keizinan tambahan ini didayakan, tetapi Halaman - kemas kini keizinan tidak didayakan, pengguna masih boleh melaraskan tetapan kunci kandungan pada setiap halaman dalam Kursus Induk Cetakan Biru."
   html_fc8563c6: html
+  html_file_62393d3f: "Fail HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "Maklum Balas HTTP: %{code}"
@@ -10283,6 +10304,7 @@ ms:
   ilumno_grade_export_251bc4b5: "Eksport Gred Ilumno"
   image_8ad06: Imej
   image_c1c98202: imej
+  image_file_2b538bc: "Fail Imej"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id bukan ID yang sah"
   image_search_b0944fc2: "Carian Imej"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url dan image_id tidak boleh ditetapkan serentak."
@@ -10600,6 +10622,7 @@ ms:
   invite_students_a4873a50: "Jemput Pelajar"
   ip_filter_is_not_valid_152a46d8: "Penapis IP tidak sah."
   ireland_353_3cd32cc0: "Ireland (+353)"
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   isolated_entry_post_error_page_2a447d08: "Halaman Ralat Siaran Masukan Terasing"
   isolated_entry_query_error_f0bfae18: "Ralat pertanyaan Masukan Terasing"
@@ -11133,6 +11156,8 @@ ms:
   loading_grades_for_coursename_26784c2d: "Memuatkan gred untuk %{courseName}"
   loading_grading_periods_c635d96: "Memuatkan tempoh penggredan..."
   loading_grading_periods_for_coursename_bbe46919: "Memuatkan tempoh penggredan untuk %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Memuatkan Skema Penggredan..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Pemuatan Skema Penggredan Gagal.  Sila Cuba Semula."
   loading_group_f1647ebb: "Memuatkan %{group}"
   loading_grouptitle_dba362d2: "Memuatkan %{groupTitle}."
   loading_homeroom_course_name_9f63923d: "Memuatkan Nama Kursus Kelas Umum"
@@ -13639,6 +13664,7 @@ ms:
   new_quizzes_migration_required_7854aa1a: "Penghijrahan Kuiz Baharu diperlukan"
   new_quizzes_on_the_quizzes_page_b21f338d: "Kuiz Baharu pada halaman Kuiz"
   new_quizzes_public_api_18d95321: "API Umum Kuiz Baharu"
+  new_quizzes_public_api_quiz_items_16bc741d: "API Umum Kuiz Baharu: Item Kuiz"
   new_quizzes_service_jwt_refresh_ca28ca8: "Kuiz Baharu Segar Semula JWT Perkhidmatan"
   new_quizzes_site_admin_service_user_a331233a: "Kuiz Baharu Pengguna Perkhidmatan Pentadbir Laman Web"
   new_quizzes_submission_274b5c57: "Serahan Kuiz Baharu"
@@ -13684,6 +13710,7 @@ ms:
   next_month_749b1778: "Bulan Seterusnya"
   next_month_b55a387c: "Bulan seterusnya"
   next_page_d2a39853: "Halaman Seterusnya"
+  next_peer_review_3d05ef23: "Tinjauan Semula Setara Seterusnya"
   next_question_f37bac25: "Soalan Seterusnya"
   next_run_at_635de64a: "Pelaksanaan seterusnya pada"
   next_steps_ce0f0d0c: "Langkah Seterusnya"
@@ -14683,6 +14710,7 @@ ms:
   pause_auto_refresh_9bd773ca: "Jedakan segar semula automatik"
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "Fail PDF"
   peer_632472b7: "Setara:"
   peer_review_74f26a13: "Tinjauan Semula Setara"
   peer_review_assignment_7d314c59: "Tugasan Tinjauan Semula Setara"
@@ -14692,6 +14720,7 @@ ms:
   peer_review_for_assignment_ce72fc52: "Tinjauan Semula Setara untuk %{assignment}"
   peer_review_for_name_bcffa32f: "Tinjauan Semula Setara untuk %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Tinjauan semula setara untuk %{name} Tarikh Siap: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Gesaan Tinjauan Semula Setara"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Sokongan Tinjauan Semula Setara dalam Peningkatan Tugasan"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Tugasan tinjauan semula setara belum lagi dikendalikan mengikut aliran tugasan baharu. Pergi ke halaman cipta tugasan legasi?"
   peer_reviews_api: 
@@ -15322,6 +15351,7 @@ ms:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Menyiarkan gred akan menyegar semula pelayar anda. Proses ini mungkin mengambil sedikit masa."
   posting_to_students_eaa57964: "Menyiarkan kepada Pelajar"
   powered_by_instructure_504d676d: "Dikuasakan oleh Instructure"
+  powerpoint_file_c4cb12af: "Fail PowerPoint"
   ppt_534cb87: PPT
   ppt_9393890d: ppt
   practice_quiz_19a8505d: "Berlatih Kuiz"
@@ -18180,6 +18210,7 @@ ms:
                                     Sila berhubung melalui #canvas-sre dalam Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "Pengguna SFTP telah dicipta. Masa yang diambil boleh menjangkau empat jam untuk pengguna ini sebelum mula berfungsi."
   sftp_user_management_19868cb3: "Pengurusan Pengguna SFTP"
+  shadow_e98b5937: Bayang
   shard_5d340495: Serpihan
   shard_id_optional_382e5dda: "ID Serpihan (pilihan)"
   shard_shard_95c57736: "Serpihan: %{shard}"
@@ -18855,6 +18886,7 @@ ms:
   sort_15eac63f: Isih
   sort_by_72dbba9c: "Isih mengikut"
   sort_by_e75f9e3e: "Isih Mengikut"
+  sort_ordertype_by_sortby_a0dd1c8: "Isih %{orderType} mengikut %{sortBy}"
   sort_outcome_column_c53702ed: "Isih Lajur Hasil"
   sort_students_1a561e98: "Isih Pelajar"
   sortable_name_73f707cf: "Nama Boleh Diisih"
@@ -19131,6 +19163,7 @@ ms:
       pada hasil pembelajaran kursus. Hasil dipersembahkan dalam format yang menyerupai Buku Gred
       dan kemajuan dipaparkan dalam bentuk skor angka dan sebagai dikuasai/hampir
       menguasai/pemulihan.
+  student_outcome_result_b26b7ab4: "Keputusan Hasil Pelajar"
   student_pace_2200bf85: "Pergerakan Pelajar"
   student_page_history_ce86b3c2: "Sejarah Halaman Pelajar"
   student_paired_successfully_a88def61: "Pelajar berjaya dipasangkan"
@@ -19144,6 +19177,7 @@ ms:
   student_sis_id_abe6b292: "id sis pelajar"
   student_student_number_5c98bd2d: "Pelajar %{student_number}"
   student_studentnumber_f398d9c2: "Pelajar %{studentNumber}"
+  student_submission_report_af01e697: "Laporan Serahan Pelajar"
   student_submissions_910da1b3: "Serahan Pelajar"
   student_submissions_report_prospect_education_108daf59: "Laporan Serahan Pelajar (Prospect Education)"
   student_tour_38b735c8: "Lawatan Pelajar"
@@ -19708,6 +19742,7 @@ ms:
   text_entry_e1808b2f: "Masukan Teks"
   text_entry_submission_7b0ae0c5: "Serahan Masukan Teks"
   text_entry_submission_cannot_be_empty_3d187cae: "Serahan masukan teks tidak boleh kosong"
+  text_file_73d8d08c: "Fail Teks"
   text_input_d3480b8c: "Input teks"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Soalan Tiada Teks telah beralih ke Stimulus; sila tambah soalan supaya ia boleh terpapar dalam kuiz."
   thailand_66_5b3ef324: "Thailand (+66)"
@@ -19929,6 +19964,7 @@ ms:
   the_state_parameter_is_required_ffadf213: "Parameter negeri diperlukan"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Tab anotasi pelajar termasuk dokumen untuk tugasan. Tab dengan jenis serahan tambahan mungkin turut tersedia."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Pelajar yang perlu dilaporkan; dilalaikan ke id Canvas kecuali ditentukan sebagai SIS dalam student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Serahan belum tersedia."
   the_submitted_after_date_to_report_on_9d90f026: "Tarikh serahan selepas yang perlu dilaporkan"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Ciri Silibus membenarkan anda mengalu-alukan pengguna kursus dan berkongsi jangkaan
@@ -20170,6 +20206,9 @@ ms:
       Ciri ini memiliki keupayaan untuk menjadikan berbilang fail diserahkan bersama oleh
       alat pihak ketiga melalui API Perkhidmatan Tugasan dan Gred, fail-fail tersebut akan
       dikumpulkan sebagai satu serahan, bukan mencipta berbilang serahan berasingan.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Pilihan ciri ini hanya dapat dilihat oleh pengguna yang memiliki akses Pentadbir Tapak. Sama seperti
+                                "Tersembunyi", tetapi pengguna akhir tidak akan dapat melihatnya walaupun didayakan oleh pengguna Pentadbir Tapak.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Pilihan ciri ini hanya dapat dilihat oleh pengguna dengan akses sebagai Pentadbir Laman.
                                   Pengguna akhir tidak dapat melihatnya sehingga ia didayakan oleh pengguna bertaraf Pentadbir Laman.
@@ -20572,6 +20611,7 @@ ms:
   title_required_3ff5969: "Tajuk diperlukan"
   title_separator: ": "
   title_tray_ec9f7488: "Dulang %{title}"
+  title_unpublished_51ddbc6a: "%{title} (tidak diterbitkan)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" telah berjaya dicipta."
   title_was_successfully_updated_14b78676: "\"%{title}\" berjaya dikemas kini."
   titles: 
@@ -21185,7 +21225,9 @@ ms:
   upload_media_ce31135a: "Muat Naik Media"
   upload_not_available_for_this_folder_8f8623c6: "Muat naik tidak tersedia untuk folder ini"
   upload_percent_complete_d533d3e2: "Muat Naik Peratus Lengkap"
+  upload_progress_df577c48: "Perkembangan Muat Naik"
   upload_progress_for_name_39f03acf: "Muat naik kemajuan untuk %{name}"
+  upload_success_f51f3a39: "Muat Naik Berjaya"
   upload_successful_ca47465f: "Muat naik berjaya"
   upload_your_outcomes_bceeadbe: "Muat naik Hasil anda!"
   uploaded_285a2bfb: "Dimuat naik"
@@ -21247,6 +21289,7 @@ ms:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Gunakan koma bernoktah untuk memisahkan medan dalam eksport hamparan serasi"
   use_the_new_assignments_teacher_page_8add7e46: "Gunakan halaman guru tugasan baharu"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Gunakan alat luar Kolaborasi baharu yang mendayakan lebih banyak pilihan untuk alat yang boleh digunakan untuk kolaborasi"
+  use_this_grading_scheme_52aa4ecf: "Gunakan Skema Penggredan Ini"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Gunakan senarai ini untuk mengalih keluar pelajar yang ditetapkan. Tambah pelajar baharu dengan kotak kombo selepas senarai."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Gunakan panel ini untuk menyelesaikan masalah keputusan atau orang pendua yang tidak ditemui melalui carian anda."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Gunakan panel ini untuk mencari orang yang ingin anda tambahkan pada kursus ini."
@@ -21704,6 +21747,7 @@ ms:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Panduan Persidangan Video untuk Bilik Darjah Jauh"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Alat persidangan video membolehkan sambungan bersemuka antara guru dengan pelajar."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Kandungan video tidak disokong oleh peranti atau apl anda."
+  video_file_f7188ffe: "Fail Video"
   video_player_b371005: "Pemain Video"
   video_player_for_label_6a5fdb03: "Pemain video untuk %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -22224,9 +22268,16 @@ ms:
   you_have_changed_the_progression_requirements_for__6772bc89: "Anda telah mengubah syarat-syarat kemajuan untuk kursus aktif. Mungkin terdapat pelajar yang sudah memasuki modul ini dan modul lain yang bergantung padanya."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Anda telah melengkapkan tinjauan semula setara untuk %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Anda telah melengkap tinjauan semula setara untuk %{person} Terima kasih"
+  you_have_completed_your_peer_reviews_543ad84: "Anda telah melengkapkan Tinjauan Semula Setara!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Anda mempunyai baki 1 kalendar lagi"
     other: "Anda mempunyai baki %{count} kalendar lagi"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Anda mempunyai 1 lagi Tinjauan Semula Setara untuk dilengkapkan."
+    other: "Anda mempunyai %{count} lagi Tinjauan Semula Setara untuk dilengkapkan."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Anda mempunyai 1 Tinjauan Semula Setara untuk dilengkapkan."
+    other: "Anda mempunyai %{count} Tinjauan Semula Setara untuk dilengkapkan."
   you_have_count_submissions_to_grade_6c5b511a: "Anda mempunyai %{count} serahan untuk digredkan"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Anda telah mencipta komen yang belum disiarkan. Adakah anda mahu meneruskan dan menyimpan komen ini sebagai draf? (Anda boleh menyiarkan draf komen pada bila-bila masa.)"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Anda telah memasukkan gred yang tidak sah untuk pelajar ini. Semak nilai tersebut dan jenis penggredan, kemudian cuba semula."
@@ -22291,6 +22342,7 @@ ms:
   you_must_set_document_usage_rights_b4afa1e9: "Anda mesti menetapkan hak penggunaan dokumen"
   you_must_set_usage_rights_87fc1382: "Anda mesti menetapkan hak penggunaan"
   you_must_specify_a_usage_right_5eb57f87: "Anda mesti menyatakan hak penggunaan"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Anda mesti menyerahkan kerja anda sebelum dibenarkan membuat tinjauan semula setara."
   you_must_use_a_number_912ce4bd: "Anda mesti menggunakan nombor"
   you_must_use_a_positive_number_203b86fe: "Anda mesti menggunakan nombor positif"
   you_must_use_an_integer_78d2530f: "Anda mesti menggunakan integer"
@@ -22408,6 +22460,7 @@ ms:
   zero_activity_title: "Tiada Aktiviti"
   zip_26961da: ZIP
   zip_argument_error: "Muat naik ZIP memerlukan folder untuk menerima muat naik tersebut."
+  zip_file_3e736239: "Fail Zip"
   zip_file_description: "Pemalam penghijrahan untuk membuka pek arkib ZIP ke dalam fail kursus, kumpulan atau pengguna"
   zip_file_display: "Import Fail"
   zip_file_file_description: "Buka zip fail ZIP ke dalam folder"

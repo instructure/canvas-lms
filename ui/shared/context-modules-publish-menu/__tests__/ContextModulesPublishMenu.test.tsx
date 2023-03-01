@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,7 +19,6 @@
 
 import React from 'react'
 import {act, render} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
 
 // jest.mock('@canvas/do-fetch-api-effect')

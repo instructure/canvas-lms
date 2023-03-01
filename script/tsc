@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "./linter"
+
+linter_options = {
+  file_regex: %r{^ui/.*\.(?:ts|tsx)$},
+  linter_name: "tsc",
+  format: "tsc",
+  command: "node_modules/.bin/tsc -p tsconfig.json --noEmit",
+  campsite_mode: false,
+  boyscout_mode: false,
+  append_files_to_command: false,
+  severe_anywhere: true
+}
+
+eslint = Linter.new(linter_options)
+eslint.run

@@ -894,6 +894,7 @@ describe UserMerge do
           @lti_context_id_1 = Lti::Asset.opaque_identifier_for(@user1)
           @lti_id_1 = @user1.lti_id
           @uuid1 = @user1.uuid
+          course_with_student account: account1, user: @user1, active_all: true
         end
         @user2 = user_with_pseudonym
         @lti_id_2 = @user2.lti_id
@@ -916,11 +917,18 @@ describe UserMerge do
         expect(merge_items.find_by(item_type: "uuid").item).to eq @uuid2
       end
 
+      it "falls back on the old behavior if unique constraint check fails" do
+        # force a constraint violation by stubbing out the shadow record update
+        expect(@user1).to receive(:update_shadow_records_synchronously!).at_least(:once).and_return(nil)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        expect { UserMerge.from(@user1).into(@user2) }.not_to raise_error
+        expect(InstStatsd::Statsd).to have_received(:increment).with("user_merge.move_lti_ids.unique_constraint_failure")
+        expect(@user1.reload).to be_deleted
+        expect(@user1.lti_context_id).to eq @lti_context_id_1
+        expect(@user2.past_lti_ids.shard(@shard1).where(user_lti_context_id: @lti_context_id_1)).to exist
+      end
+
       it "doesn't move lti ids if the target user has enrollments" do
-        @shard1.activate do
-          account = Account.create!
-          course_with_student(account: account, user: @user1, active_all: true)
-        end
         course_with_student(user: @user2, active_all: true)
 
         UserMerge.from(@user1).into(@user2)

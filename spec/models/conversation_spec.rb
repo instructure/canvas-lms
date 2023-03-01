@@ -148,6 +148,20 @@ describe Conversation do
       expect(convo.participants.size).to eq 3 # includes the sender (though we don't show him in the ui)
     end
 
+    it "sets conversation_message_participant root_account_ids" do
+      course = course_factory
+      root_convo = Conversation.initiate([sender, recipient], false, context_type: "Course", context_id: course.id)
+      root_convo.add_message(sender, "test")
+      new_guy = user_factory
+
+      root_convo.add_participants(sender, [new_guy])
+      convo = new_guy.conversations.first
+      cmp = convo.conversation.conversation_messages.last.conversation_message_participants.where(user_id: new_guy.id).last
+
+      expect(cmp.root_account_ids).to eq(convo.root_account_ids)
+      expect(cmp.root_account_ids).not_to be(nil)
+    end
+
     it "only adds participants to messages the existing user has participants on" do
       root_convo = Conversation.initiate([sender, recipient], false)
       msgs = []
@@ -1062,6 +1076,18 @@ describe Conversation do
       expect(
         conversation.reload.conversation_message_participants.first.root_account_ids
       ).to eq [a1.id, a2.id].sort
+    end
+
+    it "sets conversation message participants on create" do
+      course = course_factory
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false, context_type: "Course", context_id: course.id)
+
+      conversation.add_message(users[0], "howdy partner")
+      cmp_root_account_ids = conversation.reload.conversation_message_participants.first.root_account_ids
+
+      expect(cmp_root_account_ids).to eq(conversation.root_account_ids)
+      expect(cmp_root_account_ids).not_to be(nil)
     end
 
     context "sharding" do

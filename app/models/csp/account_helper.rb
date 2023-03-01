@@ -177,6 +177,6 @@ module Csp::AccountHelper
   end
 
   def csp_logging_config
-    @config ||= YAML.safe_load(DynamicSettings.find(tree: :private, cluster: shard.database_server.id)["csp_logging.yml"] || "{}")
+    @config ||= Rails.application.credentials.csp_logging || {}
   end
 end

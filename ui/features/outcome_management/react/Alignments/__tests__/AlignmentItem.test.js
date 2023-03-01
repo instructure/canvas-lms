@@ -30,6 +30,7 @@ describe('AlignmentItem', () => {
     moduleUrl: '/courses/1/modules/1',
     moduleWorkflowState: 'active',
     assignmentContentType: 'Assignment',
+    assignmentWorkflowState: 'published',
     ...props,
   })
 
@@ -41,6 +42,13 @@ describe('AlignmentItem', () => {
   it('displays alignment title', () => {
     const {getByText} = render(<AlignmentItem {...defaultProps()} />)
     expect(getByText('Assignment 1')).toBeInTheDocument()
+  })
+
+  it('displays alignment title appended with (unpublished) if alignment is unpublished', () => {
+    const {getByText} = render(
+      <AlignmentItem {...defaultProps({assignmentWorkflowState: 'unpublished'})} />
+    )
+    expect(getByText('Assignment 1 (unpublished)')).toBeInTheDocument()
   })
 
   it('displays module title', () => {

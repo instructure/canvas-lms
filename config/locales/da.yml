@@ -1216,6 +1216,12 @@ da:
         default: 
           lti_reports: 
             text: "Denne rapport formilder en dataeksport, som viser brugsoplysninger om LTI (Learning Tool Interoperability)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Semester
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4798,6 +4804,7 @@ da:
   audio_1c89b0c8: lyd
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Lydindhold understøttes ikke af din enhed eller app."
   audio_dd489fcc: Lyd
+  audio_file_bf3ece7e: Lydfil
   audio_player_for_label_dd9a6819: "Audioafspiller til %{label}"
   august_781433e8: August
   australia_61_eb9bb701: "Australien (+61)"
@@ -6280,6 +6287,7 @@ da:
   cluster_cluster_b57fe99a: "Klynge: %{cluster}"
   cluster_f407976: Klynge
   code_93e9abbb: kode
+  code_file_424dc478: Kodefil
   code_is_case_sensitive_d8175cad: "Kode er afhængig af store og små bogstaver"
   cog_icon_69bdffd5: Tandhjuls-ikon
   col_is_sorted_ascending_cc5152cc: "%{col} er sorteret i stigende rækkefølge"
@@ -6336,6 +6344,7 @@ da:
     errors: 
       cannot_load_collaboration: "Kan ikke indlæse samarbejde"
       create_failed: "Oprettelse af samarbejde mislykkedes"
+      no_masquerading_on_collaboration: "Det er ikke tilladt at se et samarbejde, mens du fungerer som en anden bruger."
       no_name: "Indtast et navn til dette samarbejde."
       not_enabled: "Samarbejder er ikke aktiveret til denne Canvas-side"
       title_too_long: "Brug %{maxLength} tegn eller mindre til navnet. Brug beskrivelsen for yderligere indhold."
@@ -10475,6 +10484,10 @@ da:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Vis værdier"
   displaying_to_students_b1e92058: "Vises til studerende"
+  displayname_loaded_14d71a0a: "%{displayName} indlæst"
+  displayname_loading_in_progress_2be325fd: "%{displayName} indlæsning i gang"
+  displayname_loading_pending_3aa2723e: "%{displayName} indlæsning afventer"
+  displayname_loading_success_8177d735: "%{displayName} blev indlæst"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Viser konfetti for lærere, der bruger linkvalideratoren på
       et fag, og der ikke findes nogen problemer.
@@ -10495,6 +10508,7 @@ da:
   do_nothing_9672b478: "Gør intet"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: Dokumentfil
   document_to_annotate_d37b93bc: "Dokument, der skal gives anmærkning"
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork filunderstøttelse"
   docviewer_area_created_37502a31: "Docviewer-område oprettet"
@@ -10990,6 +11004,7 @@ da:
   enabled_unlocked_8d3a5df7: "Aktiveret (ulåst)"
   enabled_web_services_f620b2be: "Aktiverede webtjenester"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Aktiverer en nydesignet dialogboks med besked til studerende, der giver mulighed for også at sende beskeder til observatører."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Giver adgang til New Quizzes Public API: Quiz Items API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Giver adgang til New Quizzes Public API via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer visning af plagieringsrapporter og lighedsresultater i den nye afleveringsbakke i karakteroversigten."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Gør det muligt at anvende vigtige datoer til opgaver, kalenderbegivenheder og andet."
@@ -11581,6 +11596,7 @@ da:
       exclusion: "er reserveret"
       greater_than: "skal være større end %{count}"
       greater_than_or_equal_to: "skal være større end eller lig med %{count}"
+      in: "skal være i %{count}"
       inclusion: "er ikke inkluderet på listen"
       invalid: "er ugyldig"
       less_than: "skal være mindre end %{count}"
@@ -11715,6 +11731,7 @@ da:
   exceeded_the_maximum_length_number_characters_2d25611e: "Overskredet den maksimale længde (%{number} tegn)"
   exceeds_expectations_5910fc3a: "Overstiger forventningerne"
   exceeds_mastery_1f995dce: "Overstiger opfyldelse af læringsmål"
+  excel_file_c6b9890: Excel-fil
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior aktivitetssporing for studerende"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Ekskluder alle data, der ikke er blevet opdateret siden den givne dato"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Udelad opgaver med karakteren 0."
@@ -12212,6 +12229,7 @@ da:
   file_storage_32477f6: Fillagring
   file_tree_collapsed_d4b0ae96: "Filtræ skjult"
   file_tree_expanded_a1d20c4a: "Filtræ vist"
+  file_type_fd1ba7ee: Filtype
   file_upload_9cae6da5: Filoverførsel
   file_upload_failed_af22dd91: "Filupload mislykkedes"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Filupload, file_url eller content_export_id er påkrævet"
@@ -12393,6 +12411,7 @@ da:
   flags_tab_updates_c4c209f1: "Opdateringer af fanen Flag"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: Flash-fil
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr viser SafeSearch billeder inden for Creative Commons Public Domain.
@@ -12409,6 +12428,7 @@ da:
   folder_705fd2d7: mappe
   folder_browsing_tree_1f00a3ae: Mappestruktur
   folder_icon_29017021: Mappe-ikon
+  folder_locked_b91cd0c4: "Mappe låst"
   folder_tree_fbab0726: Mappetræ
   folders: 
     event_updated: "Begivenhed blev opdateret."
@@ -14393,6 +14413,7 @@ da:
   html5_media_recorder_in_rce_bb59b78f: "HTML5 Media Recorder i RCE"
   html_editor_fb2ab713: HTML-editor
   html_fc8563c6: html
+  html_file_62393d3f: HTML-filer
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP-svar: %{code}"
@@ -14773,6 +14794,7 @@ da:
   ilumno_grade_export_251bc4b5: "Ilumno karakter-eksport"
   image_8ad06: Billede
   image_c1c98202: billede
+  image_file_2b538bc: Billedfil
   image_id_is_not_a_valid_id_7dd6bad6: "image_id er ikke et gyldigt id"
   image_search_b0944fc2: Billedsøgning
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url og image_id kan ikke begge blive indstillet."
@@ -15238,6 +15260,7 @@ da:
   ireland_353_3cd32cc0: "Irland (+353)"
   ireland_f7bb9899: Irland
   irish_567e109f: Irsk
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " bruger en gratis version af BigBlueButton, der giver mulighed for 10 samtidige videokonferencer, hver med 1 vært og op til 24 deltagere. Optagelser gemmes i 7 dage."
   isolated_entry_post_error_page_2a447d08: "Side for isoleret fejl ved opslag af post"
@@ -15870,6 +15893,8 @@ da:
   loading_grades_for_coursename_26784c2d: "Indlæser karakterer for %{courseName}"
   loading_grading_periods_c635d96: "Indlæser karakterperioder ..."
   loading_grading_periods_for_coursename_bbe46919: "Indlæser karakterperioder for %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Indlæser karaktersystemer ..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Indlæsning af karaktersystemer mislykkedes.  Prøv igen."
   loading_group_f1647ebb: "Indlæser %{group}"
   loading_grouptitle_dba362d2: "Indlæser %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Indlæser indhold af Homeroom-besked"
@@ -19039,6 +19064,7 @@ da:
   new_quizzes_migration_required_7854aa1a: "New Quizzes-overførsel påkrævet"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på siden Tests"
   new_quizzes_public_api_18d95321: "New Quizzes Public API"
+  new_quizzes_public_api_quiz_items_16bc741d: "New Quizzes Public API: Test-elementer"
   new_quizzes_service_jwt_refresh_ca28ca8: "New Quizzes-tjeneste JWT opdatering"
   new_quizzes_site_admin_service_user_a331233a: "Site admin servicebruger i New Quizzes"
   new_quizzes_submission_274b5c57: "New Quizzes-aflevering"
@@ -19091,6 +19117,7 @@ da:
   next_month_749b1778: "Næste måned"
   next_month_b55a387c: "Næste måned"
   next_page_d2a39853: "Næste side"
+  next_peer_review_3d05ef23: "Næste peer review"
   next_question_f37bac25: "Næste spørgsmål"
   next_run_at_635de64a: "Næste process"
   next_steps_ce0f0d0c: "Næste trin"
@@ -20348,6 +20375,7 @@ da:
     exception: "Vi beklager, der opstod en fejl, prøv igen senere."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDF-filer
   peer_632472b7: "Peer:"
   peer_review_74f26a13: "Peer review"
   peer_review_assignment_7d314c59: "Peer review-opgave"
@@ -20357,6 +20385,7 @@ da:
   peer_review_for_assignment_ce72fc52: "Peer review for %{assignment}"
   peer_review_for_name_bcffa32f: "Peer-review for %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peer-review for %{name}, der skal afleveres: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Peer review-prompt"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Peer review-support i opgaveforbedringer"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Peer review-opgaver anvendes endnu ikke i det nye opgave-flow. Gå til den ældre Opret opgave-side?"
   peer_reviewed_graded_discussion_b339df5b: "Diskussion med peer review og karakter:"
@@ -21108,6 +21137,7 @@ da:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "At slå karakterer op opdaterer din browser. Det kan tage et øjeblik."
   posting_to_students_eaa57964: "Sender til studerende"
   powered_by_instructure_504d676d: "Powered by Instructure"
+  powerpoint_file_c4cb12af: "PowerPoint fil"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24818,6 +24848,7 @@ da:
                                     Tag kontakt i #canvas-sre i Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP-bruger er blevet oprettet. Det kan tage op til fire timer for denne bruger at begynde at fungere."
   sftp_user_management_19868cb3: SFTP-brugerstyring
+  shadow_e98b5937: Skygge
   shard_5d340495: Shard
   shard_id_optional_382e5dda: "Shard-ID (valgfrit)"
   shard_shard_95c57736: "Shard: %{shard}"
@@ -25909,6 +25940,7 @@ da:
   sort_by_72dbba9c: "Sorter efter"
   sort_by_e75f9e3e: "Sorter efter"
   sort_courses_cf94b8d4: "Sorter fag"
+  sort_ordertype_by_sortby_a0dd1c8: "Sorter %{orderType} efter %{sortBy}"
   sort_outcome_column_c53702ed: "Sorter kolonne med læringsudbytter"
   sort_students_1a561e98: "Sorter studerende"
   sortable_name_73f707cf: "Sorterbart navn"
@@ -26235,6 +26267,7 @@ da:
       på læringsudbyttet i faget. Læringsudbytterne præsenteres i et Karakteroversigt-lignende
       format, og fremskridt vises både som en numerisk resultat og som behersker / nær
       beherskelse / middelmådig.
+  student_outcome_result_b26b7ab4: "Studerendes læringsudbytte-resultat"
   student_pace_2200bf85: "Tempo for studerende"
   student_page_history_ce86b3c2: "Studerendes sidehistorik"
   student_page_history_pages_update_ae55fa03: "Studerendes sidehistorik (Sider - opdater)"
@@ -26252,6 +26285,7 @@ da:
   student_sis_id_abe6b292: "studerende SIS-ID"
   student_student_number_5c98bd2d: "Studerende %{student_number}"
   student_studentnumber_f398d9c2: "Studerende %{studentNumber}"
+  student_submission_report_af01e697: "Studerendes afleveringsrapport"
   student_submissions_910da1b3: "Studerendes afleveringer"
   student_submissions_report_prospect_education_108daf59: "Rapport over studerendes afleveringer (Prospect Education)"
   student_summary: 
@@ -26925,6 +26959,7 @@ da:
   text_entry_e1808b2f: Tekstindlæg
   text_entry_submission_7b0ae0c5: "Indsendelse af tekstindtastning"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstaflevering kan ikke være tom"
+  text_file_73d8d08c: Tekstfil
   text_input_d3480b8c: Tekstindtastning
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Tekst Intet spørgsmål er flyttet til en Stimulus. Tilføj venligst et spørgsmål, så det kan vises i testen."
   thai_8f9bc548: Thai
@@ -27231,6 +27266,7 @@ da:
   the_state_parameter_is_required_ffadf213: "Regionsparameteret er påkrævet"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fanen til studerendes anmærkninger inkluderer opgavens dokument. Faner med yderligere afleveringsformer kan også være tilgængelige."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Den studerende at oprette rapport om; er som standard Canvas-ID, medmindre det angives som SIS i student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Afleveringen er ikke tilgængelig endnu."
   the_submitted_after_date_to_report_on_9d90f026: "Indsendt efter-datoen at oprette rapport om"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Læseplanen giver dig mulighed for at byde dine brugere af faget velkommen og dele forventningerne
@@ -27566,6 +27602,9 @@ da:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Denne funktion får afleveringsfilens upload-api til at tjekke filtypen i forhold til
       de tilladte udvidelser for den tilknyttede opgave.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Denne funktionsindstilling er kun synlig for brugere med site admin-adgang. Det er næsten det samme som
+                                "Skjult", men slutbrugere vil ikke se det, selvom det er aktiveret af en site admin-bruger.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Denne funktionsindstilling er kun synlig for brugere med webstedsadministratoradgang.
                                   Slutbrugere vil ikke se det, før det er aktiveret af en webstedsadministratorbruger.
@@ -28071,6 +28110,7 @@ da:
   title_required_3ff5969: "Titel påkrævet"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} bakke"
+  title_unpublished_51ddbc6a: "%{title} (ikke offentliggjort)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" blev oprettet."
   title_was_successfully_updated_14b78676: "\"%{title}\" blev opdateret."
   titles: 
@@ -29198,7 +29238,9 @@ da:
   upload_media_ce31135a: "Upload medier"
   upload_not_available_for_this_folder_8f8623c6: "Upload ikke tilgængelig for denne mappe"
   upload_percent_complete_d533d3e2: "Upload procent fuldført"
+  upload_progress_df577c48: Upload-status
   upload_progress_for_name_39f03acf: "Upload fremskridt for %{name}"
+  upload_success_f51f3a39: "Upload vellykket."
   upload_successful_ca47465f: "Vellykket upload"
   upload_your_outcomes_bceeadbe: "Upload dine læringsudbytter!"
   uploaded_285a2bfb: Uploadet
@@ -29285,6 +29327,7 @@ da:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Brug det nye test LTI-værktøj i stedet for normale canvas-test"
   use_the_new_scheduler_1273b832: "Benyt det nye planlægningsværktør"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Brug denne konfiguration til registrering af forælder/observatør"
+  use_this_grading_scheme_52aa4ecf: "Brug dette karaktersystem"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Brug denne liste til at fjerne tildelte studerende. Tilføj nye studerende med kombinationsfelt efter listen."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Brug dette panel til at løse duplikerede resultater eller deltagere, der ikke findes med din søgning."
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Brug dette panel til at løse dubletter eller folk, der ikke findes med din søgning."
@@ -29848,6 +29891,7 @@ da:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Video-konferencevejledninger til klasseværelser på afstand"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Videokonferenceværktøjer muliggør ansigt til ansigt-forbindelse mellem lærere og studerende."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoindhold understøttes ikke af din enhed eller app."
+  video_file_f7188ffe: Video-fil
   video_player_b371005: Videoafspiller
   video_player_for_label_6a5fdb03: "Videoafspiller til %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -30533,9 +30577,16 @@ da:
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ændret udviklingskravet for et aktivt fag. Der findes muligvis studerende, som allerede er nået frem til dette modul og til andre, som afhænger heraf."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Du er gennemført et peer review for %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Du har gennemført et peer review for %{person} Tak"
+  you_have_completed_your_peer_reviews_543ad84: "Du har gennemført dine peer reviews!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Du har 1 kalender tilbage"
     other: "Du har %{count} kalendere tilbage"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Du har 1 peer review mere, der skal gennemføres."
+    other: "Du har %{count} flere peer reviews, der skal genemføres."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Du har 1 peer review, der skal gennemføres."
+    other: "Du har %{count} peer reviews, der skal gennemføres."
   you_have_count_peer_reviews_to_complete_52e065e: "Du har %{count} peer reviews, der skal fuldføres"
   you_have_count_submissions_to_grade_6c5b511a: "Du har %{count} afleveringer, der skal bedømmes"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Du har oprettet en kommentar, der ikke er blevet sendt. Vil du fortsætte og gemme denne kommentar som et udkast? (Du kan til enhver tid slå udkast til kommentarer op.)"
@@ -30619,6 +30670,7 @@ da:
   you_must_set_usage_rights_87fc1382: "Du skal angive brugsrettigheder"
   you_must_specify_a_usage_right_5eb57f87: "Du skal specificere en brugsrettighed."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Du skal angive, om Microsoft Teams-synkronisering skal aktiveres eller deaktiveres"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Du skal indsende dit eget arbejde, før du kan gennemgå andres arbejde."
   you_must_use_a_number_912ce4bd: "Du skal bruge et tal"
   you_must_use_a_positive_number_203b86fe: "Du skal bruge et positivt tal"
   you_must_use_an_integer_78d2530f: "Du skal bruge et heltal"
@@ -30761,6 +30813,7 @@ da:
   zero_activity_title: "Ingen aktivitet"
   zip_26961da: zip
   zip_argument_error: "Der kræves en .zip-mappe, som man skal uploade til"
+  zip_file_3e736239: Zip-fil
   zip_file_description: "Overførsels-plugin til udpakning af .zip-arkiver ind i fag, gruppe eller brugerfiler"
   zip_file_display: Filimport
   zip_file_file_description: "Pak .zip-filen ud i mappen"

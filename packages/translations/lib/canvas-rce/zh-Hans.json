@@ -151,6 +151,7 @@
   "describe_the_icon_f6a18823": { "message": "（描述图标）" },
   "describe_the_type_ff448da5": { "message": "（描述{ TYPE }）" },
   "describe_the_video_2fe8f46a": { "message": "（视频说明）" },
+  "description_436c48d7": { "message": "说明" },
   "details_98a31b68": { "message": "详情" },
   "diagonal_dots_7d71b57e": { "message": "斜点" },
   "diamond_b8dfe7ae": { "message": "菱形" },
@@ -229,6 +230,7 @@
   "extracurricular_icon_67c8ca42": { "message": "课外图标" },
   "f_function_fe422d65": { "message": "F（函数）" },
   "failed_getting_file_contents_e9ea19f4": { "message": "文件内容获取失败" },
+  "file_name_8fd421ff": { "message": "文件名称" },
   "file_storage_quota_exceeded_b7846cd1": { "message": "超出文件存储大小限制" },
   "file_url_c12b64be": { "message": "文件URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename }文件图标" },
@@ -542,6 +544,7 @@
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "按 Shift-O 打开精美 HTML 编辑器。"
   },
+  "shortcut_911d6255": { "message": "快捷方式" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma（变体）" },
   "single_color_image_4e5d4dbc": { "message": "单色图像" },

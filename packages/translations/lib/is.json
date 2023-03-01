@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "(Lýsa myndbandinu)"
     },
+    "description_436c48d7": {
+        "message": "Lýsing"
+    },
     "details_98a31b68": {
         "message": "Upplýsingar"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Shift-O til að opna pretty html ritilinn."
+    },
+    "shortcut_911d6255": {
+        "message": "Flýtileið"
     },
     "show_all_ae37d610": {
         "message": "Sýna allt"

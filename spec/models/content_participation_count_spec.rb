@@ -211,6 +211,14 @@ describe ContentParticipationCount do
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
+    it "counts unread for automatically posted submissions that have no posted_at" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      student2 = User.create!
+      @submission = @assignment.update_submission(@student, { commenter: student2, comment: "good!" }).first
+      expect(@submission.reload.posted_at).to be nil
+      expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
+    end
+
     context "muted assignments" do
       it "ignores counts from muted assignments" do
         @assignment.grade_student(@student, grade: 3, grader: @teacher)

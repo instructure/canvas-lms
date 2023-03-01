@@ -19,9 +19,11 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import CommentContent from './CommentContent'
 import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '@canvas/error-boundary'
+// @ts-ignore
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
+// @ts-ignore
 import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -35,11 +37,22 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
 import {bool} from 'prop-types'
+import PeerReviewPromptModal, {PeerReviewSubheader} from '../PeerReviewPromptModal'
+import {
+  getRedirectUrlToFirstPeerReview,
+  assignedAssessmentsCount,
+  availableAndUnavailableCounts,
+} from '../../helpers/PeerReviewHelpers'
 
 const I18n = useI18nScope('assignments_2')
+const COMPLETED_WORKFLOW_STATE = 'completed'
+export const COMPLETED_PEER_REVIEW_TEXT = I18n.t('You have completed your Peer Reviews!')
+
+const {Item: FlexItem} = Flex as any
 
 export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
+  const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
 
   const queryVariables = {
     submissionId: props.submission.id,
@@ -50,10 +63,15 @@ export default function CommentsTrayBody(props) {
     variables: queryVariables,
   })
 
+  const {reviewerSubmission} = props
+  const {assignedAssessments = []} = reviewerSubmission ?? {}
+  const {availableCount, unavailableCount} = availableAndUnavailableCounts(assignedAssessments)
+
   const loadMoreComments = async () => {
     setIsFetchingMoreComments(true)
     await fetchMore({
       variables: {
+        // @ts-ignore
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
         ...queryVariables,
       },
@@ -70,6 +88,61 @@ export default function CommentsTrayBody(props) {
       },
     })
     setIsFetchingMoreComments(false)
+  }
+
+  const handlePeerReviewPromptModal = () => {
+    const matchingAssessment = assignedAssessments.find(x => x.assetId === props.submission._id)
+    if (!matchingAssessment) return
+
+    const {workflowState: previousWorkflowState} = matchingAssessment
+    if (previousWorkflowState !== COMPLETED_WORKFLOW_STATE) {
+      matchingAssessment.workflowState = COMPLETED_WORKFLOW_STATE
+    }
+    const remainingReviewCounts = assignedAssessmentsCount(assignedAssessments)
+    if (!remainingReviewCounts && previousWorkflowState === COMPLETED_WORKFLOW_STATE) return
+
+    setPeerReviewModalOpen(true)
+  }
+
+  const peerReviewHeaderText = (): string[] => {
+    const headerText =
+      availableCount > 0
+        ? headerTextTemplate(availableCount)
+        : unavailableCount > 0
+        ? headerTextTemplate(unavailableCount)
+        : COMPLETED_PEER_REVIEW_TEXT
+    return [headerText]
+  }
+
+  const headerTextTemplate = (count: number): string => {
+    return I18n.t(
+      {
+        one: 'You have 1 more Peer Review to complete.',
+        other: 'You have %{count} more Peer Reviews to complete.',
+      },
+      {count}
+    )
+  }
+
+  const peerReviewSubHeaderText = (): PeerReviewSubheader[] => {
+    if (!availableCount && unavailableCount) {
+      return [
+        {
+          props: {size: 'medium'},
+          text: I18n.t('The submission is not available just yet.'),
+        },
+        {
+          props: {size: 'medium'},
+          text: I18n.t('Please check back soon.'),
+        },
+      ]
+    }
+
+    return []
+  }
+
+  const peerReviewButtonText = (): string | null => {
+    return availableCount || unavailableCount ? I18n.t('Next Peer Review') : null
   }
 
   const {allowChangesToSubmission} = useContext(StudentViewContext)
@@ -102,7 +175,7 @@ export default function CommentsTrayBody(props) {
       }
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
-        <Flex.Item shouldGrow={true}>
+        <FlexItem shouldGrow={true}>
           {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length === 0 && (
             <SVGWithTextPlaceholder
               text={hiddenCommentsMessage}
@@ -132,26 +205,48 @@ export default function CommentsTrayBody(props) {
             assignment={props.assignment}
             submission={props.submission}
             isPeerReviewEnabled={props.isPeerReviewEnabled}
+            reviewerSubmission={props.reviewerSubmission}
           />
-        </Flex.Item>
+        </FlexItem>
 
         {allowChangesToSubmission && (
           <Flex as="div" direction="column">
             {gradeAsGroup && (
-              <Flex.Item padding="x-small medium">
+              <FlexItem padding="x-small medium">
                 <Text as="div">{I18n.t('All comments are sent to the whole group.')}</Text>
-              </Flex.Item>
+              </FlexItem>
             )}
 
-            <Flex.Item padding="x-small medium">
+            <FlexItem padding="x-small medium">
               <CommentTextArea
                 assignment={props.assignment}
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
+                onSendCommentSuccess={() => {
+                  if (props.isPeerReviewEnabled) {
+                    handlePeerReviewPromptModal()
+                  }
+                }}
               />
-            </Flex.Item>
+            </FlexItem>
           </Flex>
         )}
+
+        <PeerReviewPromptModal
+          headerText={peerReviewHeaderText()}
+          headerMargin={
+            availableCount === 0 && unavailableCount === 0 ? 'small 0 x-large' : 'small 0 0'
+          }
+          subHeaderText={peerReviewSubHeaderText()}
+          peerReviewButtonText={peerReviewButtonText()}
+          peerReviewButtonDisabled={availableCount === 0}
+          open={peerReviewModalOpen}
+          onClose={() => setPeerReviewModalOpen(false)}
+          onRedirect={() => {
+            const url = getRedirectUrlToFirstPeerReview(assignedAssessments)
+            if (url) window.location.assign(url)
+          }}
+        />
       </Flex>
     </ErrorBoundary>
   )

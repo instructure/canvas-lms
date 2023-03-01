@@ -61,11 +61,15 @@ class ContentParticipation < ActiveRecord::Base
     participant
   end
 
+  def self.content_posted?(content)
+    content.assignment.post_manually? ? content.posted? : true
+  end
+
   def update_participation_count
     return unless saved_change_to_workflow_state?
 
     offset = if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-               content.posted? ? unread_count_offset : 0
+               ContentParticipation.content_posted?(content) ? unread_count_offset : 0
              else
                ((workflow_state == "unread") ? 1 : -1)
              end
@@ -117,7 +121,7 @@ class ContentParticipation < ActiveRecord::Base
   def self.update_existing_participation_item(participations, workflow_state, content_item, content)
     participant = participations.find { |p| p.content_item == content_item }
 
-    return participant if participant.nil? || !content.posted? || same_workflow_state?(participant, workflow_state)
+    return participant if participant.nil? || !content_posted?(content) || same_workflow_state?(participant, workflow_state)
 
     participations -= [participant]
 

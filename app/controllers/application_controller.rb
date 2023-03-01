@@ -316,7 +316,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
     account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
-    course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting
+    course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting dev_key_oidc_alert
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -2866,14 +2866,8 @@ class ApplicationController < ActionController::Base
 
   def setup_live_events_context
     proc = lambda do
-      ctx = {}
-
       benchmark("setup_live_events_context") do
-        if @domain_root_account
-          ctx[:root_account_uuid] = @domain_root_account.uuid
-          ctx[:root_account_id] = @domain_root_account.global_id
-          ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
-        end
+        ctx = Canvas::LiveEvents.base_context_attributes(@context, @domain_root_account)
 
         if @current_pseudonym
           ctx[:user_login] = @current_pseudonym.unique_id
@@ -2885,10 +2879,6 @@ class ApplicationController < ActionController::Base
         ctx[:time_zone] = @current_user.time_zone if @current_user
         ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
         ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
-        ctx[:context_type] = @context.class.to_s if @context
-        ctx[:context_id] = @context.global_id if @context
-        ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-        ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
 
         if @context_membership
           ctx[:context_role] =
@@ -2920,9 +2910,9 @@ class ApplicationController < ActionController::Base
         end
 
         StringifyIds.recursively_stringify_ids(ctx)
-      end
 
-      ctx
+        ctx
+      end
     end
     LiveEvents.set_context(proc)
   end

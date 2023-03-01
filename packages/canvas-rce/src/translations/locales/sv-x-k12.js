@@ -186,6 +186,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(beskriv ikonen)" },
   "describe_the_type_ff448da5": { "message": "(Beskriv { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Beskriv videon)" },
+  "description_436c48d7": { "message": "Beskrivning" },
   "details_98a31b68": { "message": "Detaljer" },
   "diagonal_dots_7d71b57e": { "message": "Diagonala punkter" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
@@ -274,6 +275,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Det gick inte att hämta filinnehåll"
   },
+  "file_name_8fd421ff": { "message": "Filnamn" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Kvoten för fillagring har överskridits"
   },
@@ -639,6 +641,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Tryck på Skift+O för att öppna den nätta HTML-redigeraren."
   },
+  "shortcut_911d6255": { "message": "Genväg" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enfärgsbild" },

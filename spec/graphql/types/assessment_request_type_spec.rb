@@ -53,6 +53,10 @@ describe Types::AssessmentRequestType do
     expect(submission_type.resolve("assignedAssessments { assetSubmissionType }").first).to eq @submission.submission_type
   end
 
+  it "works for asset_id" do
+    expect(submission_type.resolve("assignedAssessments { assetId }").first).to eq @assessment_request.asset_id.to_s
+  end
+
   describe "with anonymous peer review disabled" do
     it "works for user" do
       expect(submission_type.resolve("assignedAssessments { user { _id } }").first).to eq @assessment_request.user.id.to_s

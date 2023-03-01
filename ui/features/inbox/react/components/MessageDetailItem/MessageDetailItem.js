@@ -85,12 +85,12 @@ export const MessageDetailItem = ({...props}) => {
                   />
                 </Flex.Item>
                 <Flex.Item>
-                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                  <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {props.contextName}
                   </Text>
                 </Flex.Item>
                 <Flex.Item>
-                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                  <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {createdAt}
                   </Text>
                 </Flex.Item>
@@ -108,6 +108,7 @@ export const MessageDetailItem = ({...props}) => {
             )}
           </Flex>
           <Text
+            wrap="break-word"
             size={responsiveProps.messageBody}
             dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body)}}
           />

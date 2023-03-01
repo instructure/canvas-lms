@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from 'react-dom'
+import type {GradebookSettingsModalProps} from './components/GradebookSettingsModal'
 
 async function loadAssignmentPostingPolicyTray() {
   return (await import('../AssignmentPostingPolicyTray/index')).default
@@ -73,7 +74,7 @@ const AsyncComponents = {
     render(<GradeDetailTray {...props} />, $container)
   },
 
-  async renderGradebookSettingsModal(props, $container) {
+  async renderGradebookSettingsModal(props: GradebookSettingsModalProps, $container: HTMLElement) {
     const GradebookSettingsModal = await loadGradebookSettingsModal()
     render(<GradebookSettingsModal key="grade_details_tray" {...props} />, $container)
   },

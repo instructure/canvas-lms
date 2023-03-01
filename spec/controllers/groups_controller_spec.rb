@@ -176,14 +176,14 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
 
         it "does not hide group if you are a group member" do
-          # Group with the restricted user
+          # Group with a section_restricted user
           group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
-          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.add_user(@section_restricted_student_2)
           group_with_section_restricted_user.save
 
           # Group with student from another section
@@ -197,9 +197,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to eql(2)
+          expect(assigns[:groups].length).to eql(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
       end
 
@@ -226,8 +226,8 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category_non_restricted.groups.map(&:id).sort)
         end
       end
 
@@ -257,8 +257,8 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
 
         it "does not remove empty groups" do
@@ -272,8 +272,8 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(1)
+          expect(assigns[:groups][0].id).to eql(group_with_user_in_different_section.id)
         end
 
         it "does not remove full groups if users have the same section as the current user" do
@@ -289,8 +289,8 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user_2.id)
         end
 
         it "does not show groups with students from other sections to section restricted students" do
@@ -309,8 +309,8 @@ describe GroupsController do
 
           expect(response).to be_successful
           expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
           expect(assigns[:groups].length).to eql(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
       end
     end

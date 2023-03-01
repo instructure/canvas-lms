@@ -368,6 +368,9 @@
     "record_7c9448b": {
         "message": "Ηχογράφηση"
     },
+    "recording_98da6bda": {
+        "message": "Εγγράφεται"
+    },
     "red_8258edf3": {
         "message": "Κόκκινο"
     },
@@ -397,6 +400,9 @@
     },
     "star_8d156e09": {
         "message": " "
+    },
+    "start_over_f7552aa9": {
+        "message": "Ξεκινήστε Ξανά"
     },
     "submit_a3cc6859": {
         "message": "Υποβολή"
@@ -457,6 +463,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Δικαίωμα Χρήσης:"
+    },
+    "video_player_b371005": {
+        "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
     },
     "view_ba339f93": {
         "message": "Προβολή"

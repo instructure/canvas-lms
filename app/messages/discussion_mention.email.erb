@@ -1,5 +1,6 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_entry.discussion_topic_id, anchor: "entry-#{asset.discussion_entry_id}") %>
+<%# TODO: once react_discussions_post is no longer feature_flag_dependent, remove the anchor param %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_entry.discussion_topic_id, anchor: "entry-#{asset.discussion_entry_id}", entry_id: asset.discussion_entry_id) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -15,4 +16,3 @@
 <% else %>
   <%= t("Join the conversation using this link: %{link}.", link: content(:link)) %>
 <% end %>
-

@@ -91,7 +91,7 @@ class Collaboration < ActiveRecord::Base
 
     given do |user, session|
       user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
-        context.grants_right?(user, session, :manage_coure_content_delete)
+        context.grants_right?(user, session, :manage_course_content_delete)
     end
     can :read and can :delete
 

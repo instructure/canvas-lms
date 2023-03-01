@@ -270,7 +270,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   rescue ActiveRecord::RecordNotUnique
     self.class.uncached do
-      pseudonyms.active.by_unique_id(unique_id).take!
+      pseudonyms.active_only.by_unique_id(unique_id).take!
     end
   end
 

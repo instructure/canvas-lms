@@ -324,6 +324,36 @@ describe Login::SamlController do
     expect(p.user.short_name).to eq "Cody Cutrer"
   end
 
+  it "skips JIT user provisioning for suspended pseudonyms" do
+    account = account_with_saml
+    user = user_with_pseudonym(active_all: 1, account: account)
+    user.pseudonyms.last.update!(workflow_state: "suspended")
+
+    ap = account.authentication_providers.first
+    ap.update_attribute(:jit_provisioning, true)
+    ap.federated_attributes = { "sis_user_id" => "urn:oid" }
+    ap.save!
+
+    response = SAML2::Response.new
+    response.issuer = SAML2::NameID.new("saml_entity")
+    response.assertions << (assertion = SAML2::Assertion.new)
+    assertion.subject = SAML2::Subject.new
+    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+    assertion.statements << SAML2::AttributeStatement.new(
+      [SAML2::Attribute.create("urn:oid", "some_unique_id")]
+    )
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [response, nil]
+    )
+    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+
+    post :create, params: { SAMLResponse: "foo" }
+    expect(response).to redirect_to(login_url)
+    expect(flash[:delegated_message]).to_not be_nil
+    expect(session[:saml_unique_id]).to be_nil
+  end
+
   it "updates federated attributes" do
     account = account_with_saml
     user_with_pseudonym(active_all: 1, account: account)

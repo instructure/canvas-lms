@@ -91,7 +91,10 @@ class StatusesModal extends React.Component<Props, State> {
   handleColorPickerAfterClose = status => () => {
     this.setState({openPopover: null}, () => {
       // eslint-disable-next-line react/no-find-dom-node
-      ReactDOM.findDOMNode(this.colorPickerButtons[status])?.focus()
+      const element = ReactDOM.findDOMNode(this.colorPickerButtons[status])
+      if (element instanceof HTMLButtonElement) {
+        element.focus()
+      }
     })
   }
 

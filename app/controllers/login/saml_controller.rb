@@ -125,14 +125,16 @@ class Login::SamlController < ApplicationController
 
     reset_session_for_login
 
-    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
+    pseudonym =
+      @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac, include_suspended: true)
+
     if !pseudonym && aac.jit_provisioning?
       pseudonym = aac.provision_user(unique_id, provider_attributes)
-    elsif pseudonym
+    elsif pseudonym && !pseudonym.suspended?
       aac.apply_federated_attributes(pseudonym, provider_attributes)
     end
 
-    if pseudonym && (user = pseudonym.login_assertions_for_user)
+    if pseudonym && !pseudonym.suspended? && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user
       @domain_root_account.pseudonyms.scoping do
         PseudonymSession.create!(pseudonym, false)

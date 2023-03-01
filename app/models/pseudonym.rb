@@ -178,10 +178,11 @@ class Pseudonym < ActiveRecord::Base
                .order("authentication_provider_id NULLS LAST").first
   end
 
-  def self.for_auth_configuration(unique_id, aac)
+  def self.for_auth_configuration(unique_id, aac, include_suspended: false)
     auth_id = aac.try(:auth_provider_filter)
-    active_only.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
-               .order("authentication_provider_id NULLS LAST").take
+    scope = include_suspended ? active : active_only
+    scope.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
+         .order("authentication_provider_id NULLS LAST").take
   end
 
   def audit_log_update
@@ -515,18 +516,12 @@ class Pseudonym < ActiveRecord::Base
   end
   alias_method :has_changes_to_save?, :changed?
 
-  if Rails.version < "7.0"
-    def attribute_names_for_partial_writes
-      strip_inferred_authentication_provider(super)
-    end
-  else
-    def attribute_names_for_partial_inserts
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_inserts
+    strip_inferred_authentication_provider(super)
+  end
 
-    def attribute_names_for_partial_updates
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_updates
+    strip_inferred_authentication_provider(super)
   end
 
   def strip_inferred_authentication_provider(attribute_names)

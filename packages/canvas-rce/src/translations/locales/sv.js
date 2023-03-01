@@ -23,6 +23,7 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
   },
+  "description_436c48d7": { "message": "Beskrivning" },
   "icon_215a1dc6": { "message": "Ikon" },
   "links_to_an_external_site_de74145d": {
     "message": "Länkar till en externa sida."

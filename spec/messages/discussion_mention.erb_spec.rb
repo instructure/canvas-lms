@@ -23,8 +23,8 @@ require_relative "messages_helper"
 describe "discussion_mention" do
   before :once do
     discussion_topic_model
-    entry = @topic.discussion_entries.create!(user: user_model)
-    @object = entry.mentions.create!(user: @user, root_account: entry.root_account)
+    @entry = @topic.discussion_entries.create!(user: user_model)
+    @object = @entry.mentions.create!(user: @user, root_account: @entry.root_account)
   end
 
   let(:asset) { @object }
@@ -34,23 +34,52 @@ describe "discussion_mention" do
 
   context ".email" do
     let(:path_type) { :email }
+    let(:long_comment_instruction_html) do
+      "Comment by replying to this message, or join the conversation using the link below. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
+    end
+    let(:long_comment_instruction_plain) do
+      "Comment by replying to this message, or join the conversation using this link:"
+    end
 
-    it "renders" do
+    it "renders emal" do
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
-      expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
     end
 
     it "renders correct footer if replies are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq true
+      expect(msg.body).to include long_comment_instruction_plain
+      expect(msg.html_body).to include long_comment_instruction_html
     end
 
     it "renders correct footer if replies are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq false
+      expect(msg.body).not_to include long_comment_instruction_plain
+      expect(msg.html_body).not_to include long_comment_instruction_html
+      expect(msg.html_body).to include "Join the conversation using the link below."
+      expect(msg.body).to include "Join the conversation using this link:"
+    end
+  end
+
+  context "summary" do
+    let(:path_type) { :summary }
+
+    it "renders summary" do
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
+      expect(msg.subject).to include "You have been mentioned in #{@entry.title}: #{@course.name}"
+    end
+  end
+
+  context "twitter" do
+    let(:path_type) { :twitter }
+
+    it "renders twitter" do
+      msg = generate_message(notification_name, path_type, asset)
+      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
+      expect(msg.body).to include "Canvas Alert - Mention: #{@entry.title}, #{@course.name}."
     end
   end
 end

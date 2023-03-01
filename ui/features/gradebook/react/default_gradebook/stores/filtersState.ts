@@ -175,10 +175,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    if (
-      typeof initialColumnFilterSettings.grading_period_id === 'string' &&
-      initialColumnFilterSettings.grading_period_id !== '0'
-    ) {
+    if (typeof initialColumnFilterSettings.grading_period_id === 'string') {
       appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,

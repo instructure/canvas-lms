@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "（ビデオを説明する）"
     },
+    "description_436c48d7": {
+        "message": "説明"
+    },
     "details_98a31b68": {
         "message": "詳細"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Shift-Oでpretty HTMLエディタを開きます。"
+    },
+    "shortcut_911d6255": {
+        "message": "ショートカット"
     },
     "show_all_ae37d610": {
         "message": "すべて表示する"

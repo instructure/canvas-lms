@@ -45,6 +45,7 @@ describe FeatureFlags do
                                                          "hidden_feature" => Feature.new(feature: "hidden_feature", applies_to: "Course", state: "hidden"),
                                                          "hidden_root_opt_in_feature" => Feature.new(feature: "hidden_feature", applies_to: "Course", state: "hidden", root_opt_in: true),
                                                          "hidden_user_feature" => Feature.new(feature: "hidden_user_feature", applies_to: "User", state: "hidden"),
+                                                         "shadow_feature" => Feature.new(feature: "shadow_feature", applies_to: "Course", state: "on", shadow: true),
                                                          "disabled_feature" => Feature::DISABLED_FEATURE
                                                        })
     allow(analytics_service).to receive(:persist_feature_evaluation)
@@ -102,7 +103,8 @@ describe FeatureFlags do
         "Feature double",
         feature: "some_feature",
         visible_on: ->(_) { return false },
-        state: "allowed"
+        state: "allowed",
+        shadow?: false
       )
       expect(feature).to receive(:applies_to_object).and_return(true)
       allow(Feature.definitions).to receive(:[]).and_call_original
@@ -317,6 +319,13 @@ describe FeatureFlags do
         it "does not find the feature on a root account without a flag" do
           expect(account_model.lookup_feature_flag("hidden_feature")).to be_nil
         end
+      end
+    end
+
+    describe "shadow" do
+      it "does not find the feature unless site admin" do
+        expect(t_root_account.lookup_feature_flag("shadow_feature", include_shadowed: false)).to be_nil
+        expect(t_root_account.lookup_feature_flag("shadow_feature", include_shadowed: true)).to be_default
       end
     end
 

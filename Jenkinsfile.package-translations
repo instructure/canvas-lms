@@ -42,7 +42,7 @@ pipeline {
       steps {
         withCredentials([
           sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_FILE', usernameVariable: 'SSH_USERNAME'),
-          usernamePassword(credentialsId: 'CANVAS_TRANSIFEX_CREDENTIALS', usernameVariable: 'TRANSIFEX_USERNAME', passwordVariable: 'TRANSIFEX_PASSWORD'),
+          string(credentialsId: 'CANVAS_TRANSIFEX_TOKEN', variable: 'TRANSIFEX_TOKEN'),
           string(credentialsId: 'NPM_PRIVATE_PASSWORD', variable: 'NPM_PRIVATE_PASSWORD')
         ]) {
           sh 'build/new-jenkins/package-translations/sync-translations.sh'

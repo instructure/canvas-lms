@@ -912,6 +912,12 @@ th:
         default: 
           lti_reports: 
             text: "รายงานนี้ระบุการส่งออกข้อมูลที่แสดงข้อมูลการใช้งาน LTI (Learning Tool Interoperability)"
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: เทอม
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -3516,6 +3522,7 @@ th:
   audio_1c89b0c8: เสียง
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: ข้อมูลเสียงไม่รองรับโดยอุปกรณ์ของคุณหรือแอพ
   audio_dd489fcc: เสียง
+  audio_file_bf3ece7e: ไฟล์เสียง
   audio_player_for_label_dd9a6819: "เครื่องเล่นเสียงสำหรับ %{label}"
   august_781433e8: สิงหาคม
   australia_61_eb9bb701: "ออสเตรเลีย (+61)"
@@ -4648,6 +4655,7 @@ th:
   cluster_cluster_b57fe99a: "คลัสเตอร์: %{cluster}"
   cluster_f407976: คลัสเตอร์
   code_93e9abbb: รหัส
+  code_file_424dc478: ไฟล์โค้ด
   code_is_case_sensitive_d8175cad: รหัสจะต้องตรงตามตัวพิมพ์
   cog_icon_69bdffd5: ไอคอนรูปเฟือง
   col_is_sorted_ascending_cc5152cc: "%{col} จัดเรียงแบบน้อยไปมาก"
@@ -4694,6 +4702,7 @@ th:
     errors: 
       cannot_load_collaboration: ไม่สามารถโหลดความร่วมมือ
       create_failed: จัดทำความร่วมมือล้มเหลว
+      no_masquerading_on_collaboration: การเปิดดูการประสานงานขณะรับบทบาทผู้ใช้อื่นไม่สามารถทำได้
       no_name: กรุณากรอกชื่อสำหรับความร่วมมือนี้
       not_enabled: "ความร่วมมือไม่ได้ถูกเปิดใช้งานสำหรับไซต์ Canvas นี้"
       title_too_long: "กรุณาใช้ไม่เกิน %{maxLength} ตัวอักษรเพื่อระบุชื่อ ใช้รายละเอียดดังกล่าวสำหรับเนื้อหาเพิ่มเติม"
@@ -7831,6 +7840,10 @@ th:
   display_totals_for_all_grading_periods_option_4a72586: แสดงยอดรวมสำหรับตัวเลือกระยะเวลาการให้เกรดทั้งหมด
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: แสดงค่า
+  displayname_loaded_14d71a0a: "%{displayName} โหลดแล้ว"
+  displayname_loading_in_progress_2be325fd: "%{displayName} กำลังโหลด"
+  displayname_loading_pending_3aa2723e: "%{displayName} รอการโหลด"
+  displayname_loading_success_8177d735: "%{displayName} โหลดเสร็จสิ้น"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       แสดงความยินดีสำหรับผู้สอนที่เรียกใช้ระบบตรวจสอบลิงค์
       กับบทเรียนแล้วไม่พบปัญหา
@@ -7847,6 +7860,7 @@ th:
   do_nothing_9672b478: ไม่ทำอะไรเลย
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "ไฟล์ Doc"
   document_to_annotate_d37b93bc: เอกสารที่จะทำหมายเหตุกำกับ
   docviewer_apple_iwork_file_support_dc772b31: "การรองรับไฟล์ Docviewer Apple iWork"
   docviewer_area_created_37502a31: "จัดทำพื้นที่สำหรับ Docviewer แล้ว"
@@ -8225,6 +8239,7 @@ th:
   enabled_links_be110215: ลิงค์ที่เปิดใช้งาน
   enabled_web_services_f620b2be: เปิดใช้งานบริการทางเว็บแล้ว
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "เปิดใช้งาน ส่งข้อความถึงผู้เรียนที่... รูปแบบใหม่เพื่อให้สามารถส่งข้อความถึงผู้สังเกตการณ์นอกเหนือจากผู้เรียน"
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "เปิดใช้งานสิทธิ์สืบค้น API สาธารณะสำหรับแบบทดสอบใหม่ (New Quizzes Public API) API รายการแบบทดสอบ"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "เปิดใช้งานสิทธิ์สืบค้น API สาธารณะสำหรับแบบทดสอบใหม่ (New Quizzes Public API) ผ่าน Canvas"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: เปิดใช้งานการจัดแสดงรายงานการคัดลอกผลงานคะแนนความใกล้เคียงในถาดรายการจัดส่งสมุดบันทึกเกรดใหม่
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "เปิดใช้งานวันที่สำคัญที่จะปรับใช้กับภารกิจ กิจกรรมในปฏิทินและรายการอื่น ๆ"
@@ -8708,6 +8723,7 @@ th:
       exclusion: สงวนไว้
       greater_than: "จะต้องมากกว่า %{count}"
       greater_than_or_equal_to: "จะต้องมากกว่าหรือเท่ากับ %{count}"
+      in: "จะต้องอยู่ภายใน %{count}"
       inclusion: มีรวมอยู่ในรายการ
       invalid: ไม่ถูกต้อง
       less_than: "จะต้องน้อยกว่า %{count}"
@@ -8838,6 +8854,7 @@ th:
   exceeded_the_maximum_length_number_characters_2d25611e: "เกินความยาวสูงสุดที่กำหนด (%{number} ตัวอักษร)"
   exceeds_expectations_5910fc3a: เกินความคาดหวัง
   exceeds_mastery_1f995dce: สูงกว่าเกณฑ์ความเชี่ยวชาญ
+  excel_file_c6b9890: "ไฟล์ Excel"
   excelsior_student_activity_tracking_7a1ba44d: "การติดตามกิจกรรมผู้เรียนของ Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: ไม่รวมข้อมูลที่ไม่ได้รับการอัพเดตนับตั้งแต่วันที่ระบุ
   exclude_assignments_graded_with_a_0_score_5c853dc4: "แยกภารกิจที่ให้เกรดคะแนนเป็น 0"
@@ -9136,6 +9153,7 @@ th:
   file_storage_32477f6: พื้นที่จัดเก็บไฟล์
   file_tree_collapsed_d4b0ae96: ย่อโครงสร้างทรีของไฟล์แล้ว
   file_tree_expanded_a1d20c4a: ขยายโครงสร้างทรีของไฟล์แล้ว
+  file_type_fd1ba7ee: ประเภทไฟล์
   file_upload_9cae6da5: การอัพโหลดไฟล์
   file_upload_failed_af22dd91: อัพโหลดไฟล์ล้มเหลว
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "อัพโหลดไฟล์, file_url, หรือต้องระบุ content_export_id"
@@ -9269,6 +9287,7 @@ th:
   flags_tab_updates_c4c209f1: การอัพเดตแท็บหมายเหตุกำกับ
   flash_6afbf65a: แฟลช
   flash_ab3ad95e: แฟลช
+  flash_file_cbcadc71: ไฟล์แฟลช
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr แสดงภาพ SafeSearch ภายในโดเมนสาธารณะของ Creative Commons
@@ -9284,6 +9303,7 @@ th:
   folder_705fd2d7: โฟลเดอร์
   folder_browsing_tree_1f00a3ae: ทรีเรียกดูโฟลเดอร์
   folder_icon_29017021: ไอคอนโฟลเดอร์
+  folder_locked_b91cd0c4: โฟลเดอร์ถูกล็อคไว้
   folder_tree_fbab0726: โครงสร้างโฟลเดอร์
   folders: 
     event_updated: อัพเดตกิจกรรมเสร็จสิ้น
@@ -10445,6 +10465,7 @@ th:
   however_if_these_additional_permissions_are_enable_35d3082c: "ทั้งนี้หากสิทธิ์อนุญาตเพิ่มเติมเหล่านี้ถูกเปิดใช้งาน แต่ไม่ได้เปิดใช้ เพจ - สิทธิ์อนุญาตในการอัพเดต ผู้ใช้ยังสามารถปรับค่าปรับตั้งการล็อคเนื้อหาสำหรับแต่ละเพจได้ในบทเรียนพิมพ์เขียวหลัก"
   html_editor_fb2ab713: "HTML Editor"
   html_fc8563c6: html
+  html_file_62393d3f: "ไฟล์ HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "การตอบกลับของ HTTP: %{code}"
@@ -10682,6 +10703,7 @@ th:
   ilumno_grade_export_251bc4b5: "การส่งออกเกรดของ Ilumno"
   image_8ad06: ภาพ
   image_c1c98202: ภาพ
+  image_file_2b538bc: ไฟล์ภาพ
   image_id_is_not_a_valid_id_7dd6bad6: "image_id ไม่ใช่ ID ที่ถูกต้อง"
   image_search_b0944fc2: การค้นหาภาพ
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url และ image_id ไม่สามารถกำหนดค่าร่วมกันได้"
@@ -11021,6 +11043,7 @@ th:
   ip_filter_is_not_valid_152a46d8: "ตัวกรอง IP ไม่ถูกต้อง"
   ireland_353_3cd32cc0: "ไอร์แลนด์ (+353)"
   irish_567e109f: ไอร์แลนด์
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   isolated_entry_post_error_page_2a447d08: เพจข้อผิดพลาดการโพสต์รายการแยกเฉพาะ
   isolated_entry_query_error_f0bfae18: ข้อผิดพลาดการสืบค้นรายการแยกเฉพาะ
@@ -11585,6 +11608,8 @@ th:
   loading_grades_for_coursename_26784c2d: "กำลังโหลดเกรดสำหรับ %{courseName}"
   loading_grading_periods_c635d96: กำลังโหลดระยะเวลาการให้เกรด...
   loading_grading_periods_for_coursename_bbe46919: "กำลังโหลดระยะเวลาการให้เกรดสำหรับ %{courseName}"
+  loading_grading_schemes_dc26ebd3: กำลังโหลดรูปแบบการให้เกรด...
+  loading_grading_schemes_failed_please_try_again_269918df: "โหลดรูปแบบการให้เกรดล้มเหลว  กรุณาลองใหม่อีกครั้ง"
   loading_group_f1647ebb: "กำลังโหลด %{group}"
   loading_grouptitle_dba362d2: "กำลังโหลด %{groupTitle}."
   loading_homeroom_course_name_9f63923d: กำลังโหลดชื่อบทเรียนช่วงโฮมรูม
@@ -14147,6 +14172,7 @@ th:
   new_quizzes_migration_required_7854aa1a: ต้องโอนย้ายแบบทดสอบใหม่
   new_quizzes_on_the_quizzes_page_b21f338d: แบบทดสอบใหม่ในเพจแบบทดสอบ
   new_quizzes_public_api_18d95321: "API สาธารณะแบบทดสอบใหม่"
+  new_quizzes_public_api_quiz_items_16bc741d: "API สาธารณะแบบทดสอบใหม่ รายการแบบทดสอบ"
   new_quizzes_service_jwt_refresh_ca28ca8: "รีเฟรช JWT บริการสำหรับแบบทดสอบใหม่"
   new_quizzes_site_admin_service_user_a331233a: ผู้ใช้บริการผู้ดูแลไซต์สำหรับแบบทดสอบใหม่
   new_quizzes_submission_274b5c57: ผลงานการจัดส่งแบบทดสอบใหม่
@@ -14193,6 +14219,7 @@ th:
   next_month_749b1778: เดือนถัดไป
   next_month_b55a387c: เดือนถัดไป
   next_page_d2a39853: เพจถัดไป
+  next_peer_review_3d05ef23: ความคิดเห็นจากผู้ที่เกี่ยวข้องถัดไป
   next_question_f37bac25: คำถามถัดไป
   next_run_at_635de64a: ดำเนินการครั้งถัดไปเมื่อ
   next_steps_ce0f0d0c: ขั้นต่อไป
@@ -15214,6 +15241,7 @@ th:
   pause_auto_refresh_9bd773ca: หยุดการรีเฟรชอัตโนมัติชั่วคราว
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "ไฟล์ PDF"
   peer_632472b7: "เพื่อนร่วมงาน:"
   peer_review_74f26a13: ความคิดเห็นจากผู้เกี่ยวข้อง
   peer_review_assignment_7d314c59: ภารกิจความคิดเห็นจากผู้เกี่ยวข้อง
@@ -15223,6 +15251,7 @@ th:
   peer_review_for_assignment_ce72fc52: "ความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{assignment}"
   peer_review_for_name_bcffa32f: "ความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "ความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{name} ครบกำหนด: %{dueAtText}"
+  peer_review_prompt_571c5d22: การแจ้งขอความคิดเห็นจากผู้เกี่ยวข้อง
   peer_review_support_in_assignment_enhancements_b1df2b76: "บริการรองรับสำหรับความคิดเห็นจากผู้เกี่ยวข้องในส่วนการปรับปรุงสำหรับภารกิจ (Assignment Enhancements)"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "ภารกิจความคิดเห็นจากผู้เกี่ยวข้องยังไม่ได้มีการจัดการในกระบวนการสำหรับภารกิจใหม่ ไปที่เพจเดิมสำหรับการจัดทำภารกิจหรือไม่"
   peer_reviews_api: 
@@ -15863,6 +15892,7 @@ th:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "การแจ้งเกรดจะเป็นการรีเฟรชเบราเซอร์ของคุณ อาจต้องใช้เวลาครู่หนึ่ง"
   posting_to_students_eaa57964: กำลังแจ้งไปยังผู้เรียน
   powered_by_instructure_504d676d: "โดย Instructure"
+  powerpoint_file_c4cb12af: "ไฟล์ PowerPoint"
   ppt_534cb87: PPT
   ppt_9393890d: ppt
   practice_quiz_19a8505d: แบบฝึกหัด
@@ -18799,6 +18829,7 @@ th:
                                     กรุณาติดต่อใน #canvas-sre ใน Slack
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "ผู้ใช้ SFTP ถูกจัดทำแล้ว อาจต้องใช้เวลาสูงสุดสี่ชั่วโมงเพื่อให้ผู้ใช้นี้เริ่มใช้งานได้"
   sftp_user_management_19868cb3: "การจัดการผู้ใช้ SFTP"
+  shadow_e98b5937: เงา
   shard_5d340495: Shard
   shard_id_optional_382e5dda: "Shard ID (เผื่อเลือก)"
   shard_shard_95c57736: "Shard: %{shard}"
@@ -19483,6 +19514,7 @@ th:
   sort_15eac63f: จัดเรียง
   sort_by_72dbba9c: จัดเรียงจาก
   sort_by_e75f9e3e: จัดเรียงจาก
+  sort_ordertype_by_sortby_a0dd1c8: "เรียง %{orderType} จาก %{sortBy}"
   sort_outcome_column_c53702ed: จัดเรียงคอลัมน์ผลลัพธ์
   sort_students_1a561e98: จัดเรียงผู้เรียน
   sortable_name_73f707cf: ชื่อที่จัดเรียงได้
@@ -19771,6 +19803,7 @@ th:
       สำหรับผลการเรียนของบทเรียน ผลลัพธ์จะแสดงในรูปแบบคล้ายกับสมุดบันทึกเกรด
       โดยสถานะจะปรากฏขึ้นทั้งเป็นคะแนนตัวเลขและระดับความเชี่ยวชาญ/
       เกือบเชี่ยวชาญ/ต้องปรับปรุง
+  student_outcome_result_b26b7ab4: ผลลัพธ์ของผู้เรียน
   student_pace_2200bf85: ลำดับการเรียนรู้ของผู้เรียน
   student_page_history_ce86b3c2: ประวัติเพจผู้เรียน
   student_paired_successfully_a88def61: เข้าคู่ผู้เรียนเสร็จสิ้น
@@ -19785,6 +19818,7 @@ th:
   student_sis_id_abe6b292: "SIS ID ผู้เรียน"
   student_student_number_5c98bd2d: "ผู้เรียน %{student_number}"
   student_studentnumber_f398d9c2: "ผู้เรียน %{studentNumber}"
+  student_submission_report_af01e697: รายงานผลงานจัดส่งของผู้เรียน
   student_submissions_910da1b3: ผลงานจัดส่งของผู้เรียน
   student_submissions_report_prospect_education_108daf59: "รายงานผลงานจัดส่งของผู้เรียน (Prospect Education)"
   student_tour_38b735c8: ทัวร์ของผู้เรียน
@@ -20355,6 +20389,7 @@ th:
   text_entry_e1808b2f: การกรอกข้อความ
   text_entry_submission_7b0ae0c5: การจัดส่งข้อความ
   text_entry_submission_cannot_be_empty_3d187cae: การจัดส่งแบบข้อความจะปล่อยว่างไม่ได้
+  text_file_73d8d08c: ไฟล์ข้อความ
   text_input_d3480b8c: ข้อมูลตัวอักษร
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "ข้อความไม่มีคำถาม (Text No Question) ถูกย้ายไปยังปัจจัยกระตุ้น (Stimulus) กรุณาเพิ่มคำถามเพื่อให้สามารถจัดแสดงภายในแบบทดสอบ"
   thai_8f9bc548: ไทย
@@ -20593,6 +20628,7 @@ th:
   the_state_parameter_is_required_ffadf213: ต้องระบุพารามิเตอร์สถานะ
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "แท็บหมายเหตุกำกับสำหรับผู้เรียนครอบคลุมเอกสารสำหรับภารกิจ แท็บที่มีประเภทการจัดส่งเพิ่มเติมจะมีจัดไว้ด้วยเช่นกัน"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "ผู้เรียนที่จะแจ้ง; ปรับค่าเริ่มต้นเป็น Canvas id ยกแต่หากระบุเป็น SIS ใน student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: ผลงานจัดส่งนี้ยังไม่พร้อมใช้งาน
   the_submitted_after_date_to_report_on_9d90f026: จัดส่งหลังวันที่ที่จะแจ้ง
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       หลักสูตร ช่วยให้คุณสามารถต้อนรับผู้ใช้บทเรียนของคุณและแชร์ส่วนความคาดหวังต่าง ๆ
@@ -20850,6 +20886,9 @@ th:
       คุณสมบัตินี้มีไว้เพื่อเวลาที่มีการจัดส่งหลาย ๆ ไฟล์พร้อมกันผ่าน
       เครื่องมือจากภายนอกโดยใช้ API ภารกิจและบริการเกี่ยวกับเกรดจะมี
       การจัดกลุ่มเป็นผลงานจัดส่งเดียวแทนที่จะเป็นผลงานจัดส่งแยกกันหลายชุด
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      ตัวเลือกคุณสมบัตินี้แสดงผลเฉพาะกับผู้ใช้ที่มีสิทธิ์ดูแลไซต์ (Site Admin) จะคล้าย ๆ กับ
+                                "ซ่อนไว้” แต่ผู้ใช้ปลายทางจะไม่เห็นแม้ว่าจะเปิดใช้งานโดยผู้ใช้ที่เป็นผู้ดูแลไซต์ (Site Admin)
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       ตัวเลือกคุณสมบัตินี้จะแสดงเฉพาะกับผู้ใช้ที่มีสิทธิ์เป็นผู้ดูแลไซต์ (Site Admin)
                                   ผู้ใช้ปลายทางจะไม่เห็นข้อมูลนี้จนกว่าผู้ดูแลไซต์ (Site Admin) จะเปิดใช้งาน
@@ -21282,6 +21321,7 @@ th:
   title_required_3ff5969: ต้องระบุชื่อ
   title_separator: ": "
   title_tray_ec9f7488: "ถาดข้อมูล %{title}"
+  title_unpublished_51ddbc6a: "%{title} (เลิกเผยแพร่แล้ว)"
   title_was_successfully_created_f2a07c56: "จัดทำ \"%{title}\" เสร็จสิ้น"
   title_was_successfully_updated_14b78676: "\"%{title}\" อัพเดตเสร็จสิ้น"
   titles: 
@@ -21940,7 +21980,9 @@ th:
   upload_media_ce31135a: อัพโหลดสื่อ
   upload_not_available_for_this_folder_8f8623c6: ไม่สามารถอัพโหลดได้สำหรับโฟลเดอร์นี้
   upload_percent_complete_d533d3e2: อัพโหลดเปอร์เซ็นต์ที่เสร็จสิ้น
+  upload_progress_df577c48: สถานะการอัพโหลด
   upload_progress_for_name_39f03acf: "สถานะการอัพโหลดสำหรับ %{name}"
+  upload_success_f51f3a39: อัพโหลดเสร็จสิ้น
   upload_successful_ca47465f: อัพโหลดเสร็จสิ้น
   upload_your_outcomes_bceeadbe: อัพโหลดผลลัพธ์ของคุณ!
   uploaded_285a2bfb: อัพโหลดแล้ว
@@ -22003,6 +22045,7 @@ th:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: ใช้อัฒภาคเพื่อแยกฟิลด์ในการส่งออกกระดาษคำนวณที่รองรับ
   use_the_new_assignments_teacher_page_8add7e46: ใช้เพจผู้สอนในภารกิจใหม่
   use_the_new_collaborations_external_tool_enabling__5f0ed73: ใช้เครื่องมือความร่วมมือใหม่จากภายนอกเพื่อเสริมตัวเลือกสำหรับเครื่องมือในการประสานความร่วมมือ
+  use_this_grading_scheme_52aa4ecf: ใช้รูปแบบการให้เกรดนี้
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "ใช้รายการนี้เพื่อลบผู้เรียนที่จัดสรร เพิ่มผู้เรียนใหม่พร้อมกล่องคอมโบต่อจากรายการ"
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: ใช้แผงข้อมูลนี้เพื่อแก้ไขผลลัพธ์ซ้ำซ้อนหรือปัญหาไม่พบบุคคลจากการค้นหาของคุณ
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: ใช้แผงข้อมูลนี้เพื่อต
@@ -22466,6 +22509,7 @@ th:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: คู่มือการประชุมสายวิดีโอสำหรับห้องเรียนทางไกล
   video_conferencing_tools_enable_face_to_face_conne_144420a5: เครื่องมือประชุมสายวิดีโอจะช่วยให้สามารถเชื่อมต่อแบบตัวต่อตัวระหว่างผู้สอนและผู้เรียน
   video_content_is_not_supported_by_your_device_or_a_25214f57: ข้อมูลวิดีโอไม่รองรับโดยอุปกรณ์ของคุณหรือแอพ
+  video_file_f7188ffe: ไฟล์วิดีโอ
   video_player_b371005: เครื่องเล่นวิดีโอ
   video_player_for_label_6a5fdb03: "เครื่องเล่นวิดีโอสำหรับ %{label}"
   vietnam_84_e50a2a44: "เวียดนาม (+84)"
@@ -23025,9 +23069,16 @@ th:
   you_have_changed_the_progression_requirements_for__6772bc89: "คุณแก้ไขเงื่อนไขความคืบหน้าสำหรับบทเรียนที่ใช้อยู่ อาจมีผู้เรียนที่มีความคืบหน้าในหน่วยการเรียนนี้แล้ว และหน่วยการเรียนอื่นที่เชื่อมโยงกัน"
   you_have_completed_a_peer_review_for_name_4dd2264b: "คุณผ่านการแสดงความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{name} แล้ว"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "คุณผ่านการแสดงความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{person} แล้ว ขอขอบคุณ"
+  you_have_completed_your_peer_reviews_543ad84: "คุณขอความคิดเห็นจากผู้เกี่ยวข้อง (Peer Review) เสร็จสิ้น!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "คุณเหลืออีก 1 วันปฏิทิน"
     other: "คุณเหลืออีก %{count} วันปฏิทิน"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "คุณมีอีก 1 ความเห็นจากผู้เกี่ยวข้อง (Peer Review) ที่ต้องดำเนินการ"
+    other: "คุณมีอีก %{count} ความคิดเห็นจากผู้เกี่ยวข้อง (Peer Review) ที่จะดำเนินการให้เสร็จสิ้น"
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "คุณมี 1 ความคิดเห็นจากผู้เกี่ยวข้องที่จะต้องดำเนินการให้เสร็จสิ้น"
+    other: "คุณมี %{count} ความคิดเห็นจากผู้เกี่ยวข้อง (Peer Review) ที่ต้องดำเนินการให้เสร็จสิ้น"
   you_have_count_peer_reviews_to_complete_52e065e: "คุณมี %{count} ความคิดเห็นจากผู้เกี่ยวข้องที่จะต้องกรอก"
   you_have_count_submissions_to_grade_6c5b511a: "คุณมี %{count} ผลงานจัดส่งที่จะให้เกรด"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "คุณจัดทำความเห็นที่ไม่ได้มีการโพสต์ไว้ ต้องการดำเนินการต่อและบันทึกความเห็นนี้เป็นฉบับร่างหรือไม่ (คุณสามารถโพสต์ความเห็นร่างได้ทุกเมื่อ)"
@@ -23097,6 +23148,7 @@ th:
   you_must_set_document_usage_rights_b4afa1e9: คุณจะต้องกำหนดสิทธิ์ใช้งานเอกสาร
   you_must_set_usage_rights_87fc1382: คุณจะต้องกำหนดสิทธิ์การใช้งาน
   you_must_specify_a_usage_right_5eb57f87: คุณจะต้องระบุสิทธิ์การใช้งาน
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: คุณจะต้องส่งผลงานของคุณเองก่อนสามารถพิจารณาผลงานของผู้เกี่ยวข้องกับคุณ
   you_must_use_a_number_912ce4bd: คุณจะต้องใช้ตัวเลข
   you_must_use_a_positive_number_203b86fe: คุณจะต้องใช้จำนวนเต็มบวก
   you_must_use_an_integer_78d2530f: คุณจะต้องใช้จำนวนเต็ม
@@ -23223,6 +23275,7 @@ th:
   zero_activity_title: กิจกรรมเป็นศูนย์
   zip_26961da: zip
   zip_argument_error: "การอัพโหลดไฟล์ .zip จะต้องใช้โฟลเดอร์ในการอัพโหลด"
+  zip_file_3e736239: "ไฟล์ Zip"
   zip_file_description: "ปลั๊กอินโอนย้ายสำหรับคัดแยกไฟล์ .zip เป็นไฟล์ของบทเรียน กลุ่มหรือผู้ใช้"
   zip_file_display: การนำเข้าไฟล์ข้อมูล
   zip_file_file_description: "คัดแยกไฟล์ .zip ไปยังโฟลเดอร์"

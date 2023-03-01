@@ -988,6 +988,12 @@ fi:
         default: 
           lti_reports: 
             text: "Tämä raportti tarjoaa tietojen viennin, joka näyttää LTI:n (Learning Tool Interoperability, oppimistyökalun yhteensopivuus) käyttötiedot."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Lukukausi
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4192,6 +4198,7 @@ fi:
   audio_1c89b0c8: ääni
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Laitteesi tai sovelluksesi ei tue äänisisältöä."
   audio_dd489fcc: Ääni
+  audio_file_bf3ece7e: Äänitiedosto
   audio_player_for_label_dd9a6819: "Äänisoitin kohteelle %{label}"
   august_781433e8: Elokuu
   australia_61_eb9bb701: "Australia (+61)"
@@ -5487,6 +5494,7 @@ fi:
   cluster_cluster_b57fe99a: "Klusteri: %{cluster}"
   cluster_f407976: Klusteri
   code_93e9abbb: koodi
+  code_file_424dc478: Kooditiedosto
   code_is_case_sensitive_d8175cad: "Koodissa kirjainkoolla on merkitystä."
   cog_icon_69bdffd5: Cog-kuvake
   col_is_sorted_ascending_cc5152cc: "%{col} lajitelllaan nousevassa järjestyksessä"
@@ -5533,6 +5541,7 @@ fi:
     errors: 
       cannot_load_collaboration: "Yhteistyötiedoston lataus ei onnistu"
       create_failed: "Yhteistyötiedoston luonti epäonnistui"
+      no_masquerading_on_collaboration: "Yhteistyötiedoston tarkastelu toisen käyttäjän nimissä ei ole luvallista."
       no_name: "Kirjoita tälle yhteistyötiedostolle nimi."
       not_enabled: "Yhteistyötiedostoja ei ole otettu käyttöön tälle Canvas-sivustolle"
       title_too_long: "Käytä nimelle %{maxLength} merkkiä tai vähemmän. Käytä lisäsisällön kuvausta."
@@ -8979,6 +8988,10 @@ fi:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Näytettävät arvot"
   displaying_to_students_b1e92058: "Näytetään opiskelijoille"
+  displayname_loaded_14d71a0a: "%{displayName} ladattu"
+  displayname_loading_in_progress_2be325fd: "%{displayName} lataus käynnissä"
+  displayname_loading_pending_3aa2723e: "%{displayName} lataus odottaa"
+  displayname_loading_success_8177d735: "%{displayName} lataus onnistui"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Näyttää konfetin opettajille, jotka pyörittävät linkin vahvistajaa
       kurssilla eikä ongelmia löydy.
@@ -8995,6 +9008,7 @@ fi:
   do_nothing_9672b478: "Älä tee mitään"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: Doc-tiedosto
   document_to_annotate_d37b93bc: "Huomautuksilla merkitty"
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork -tiedoston tuki"
   docviewer_area_created_37502a31: "DocViewer-alue luotu"
@@ -9430,6 +9444,7 @@ fi:
   enabled_unlocked_8d3a5df7: "Käytössä (lukitus avattu)"
   enabled_web_services_f620b2be: "Käytössä olevat verkkopalvelut"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Ottaa käyttöön uudelleen osoitetun viestin opiskelijoille, jotka....valintaruutu, jonka avulla havainnoitsijoille voidaan lähettää viestejä opiskelijoiden lisäksi."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Mahdollistaa käyttöoikeuden uusien kyselyiden julkiseen API:in: Kyselykohteiden API."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Mahdollistaa käyttöoikeuden uusien kyselyiden julkiseen sovellusliittymään Canvasin kautta."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ottaa käyttöön plagiointiraportit ja samankaltaisuuden pisteet uuden arvosanakirjan tehtäväpalautuspaneelissa."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Mahdollistaa tärkeiden päivämäärien soveltamisen tehtäviin, kalenteritapahtumiin ja muihin."
@@ -9989,6 +10004,7 @@ fi:
       exclusion: "on varattu"
       greater_than: "täytyy olla suurempi kuin %{count}"
       greater_than_or_equal_to: "täytyy olla suurempi tai yhtä suuri kuin %{count}"
+      in: "täytyy olla %{count}"
       inclusion: "ei sisälly luetteloon"
       invalid: "on virheellinen"
       less_than: "täytyy olla vähemmän kuin %{count}"
@@ -10123,6 +10139,7 @@ fi:
   exceeded_the_maximum_length_number_characters_2d25611e: "Maksimipituus ylitetty (%{number} merkkiä)"
   exceeds_expectations_5910fc3a: "On ylittänyt odotukset"
   exceeds_mastery_1f995dce: "Erinomainen osaaminen"
+  excel_file_c6b9890: Excel-tiedosto
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Student Activity Tracking"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Lue pois kaikki tiedot, joita ei ole päivitetty määritetyn päivän jälkeen"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Jätä pois tehtävät, joille on annettu arvosanaksi 0"
@@ -10454,6 +10471,7 @@ fi:
   file_storage_32477f6: "Tiedostojen tallennustila"
   file_tree_collapsed_d4b0ae96: "Tiedostopuu kutistettu"
   file_tree_expanded_a1d20c4a: "Tiedostopuu laajennettu"
+  file_type_fd1ba7ee: Tiedostotyyppi
   file_upload_9cae6da5: "Tiedoston lataus"
   file_upload_failed_af22dd91: "Tiedoston lataus epäonnistui"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Tiedoston lataus, file_url tai content_export_id vaaditaan"
@@ -10595,6 +10613,7 @@ fi:
   flags_tab_updates_c4c209f1: "Merkit, jotka täytyy tarkistaa"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: Flash-tiedosto
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr näyttää SafeSearch Creative Commons- lisenssillä vapaasti julkiseen käyttöön lisensoituja kuvia.
@@ -10610,6 +10629,7 @@ fi:
   folder_705fd2d7: Kansio
   folder_browsing_tree_1f00a3ae: "Kansion selauspuu"
   folder_icon_29017021: Kansiokuvake
+  folder_locked_b91cd0c4: "Kansio lukittu"
   folder_tree_fbab0726: Kansiopuu
   folders: 
     event_updated: "Tapahtuman päivitys onnistui."
@@ -12015,6 +12035,7 @@ fi:
   html5_media_recorder_in_rce_bb59b78f: "HTML5-mediatallennin RCE:ssä"
   html_editor_fb2ab713: HTML-editori
   html_fc8563c6: html
+  html_file_62393d3f: HTML-tiedosto
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP-vastaus: %{code}"
@@ -12379,6 +12400,7 @@ fi:
   ilumno_grade_export_251bc4b5: "Ilumno-arvosanan vienti"
   image_8ad06: Kuva
   image_c1c98202: kuva
+  image_file_2b538bc: Kuvatiedosto
   image_id_is_not_a_valid_id_7dd6bad6: "image_id ei ole voimassa oleva tunnus"
   image_search_b0944fc2: "Kuvan etsintä"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url ja image_id eivät voi olla valittuina samanaikaisesti."
@@ -12800,6 +12822,7 @@ fi:
   ip_filter_is_not_valid_152a46d8: "IP-suodatin ei ole kelvollinen."
   ireland_353_3cd32cc0: "Irlanti (+353)"
   irish_567e109f: iiri
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " käyttää BigBlueButton-sovelluksen ilmaista versiota, joka tarjoaa 10 samanaikaista videokonferenssia, joista jokaisessa on 1 isäntä ja enintään 24 osallistujaa. Nauhoitukset säilytetään 7 päivää."
   isolated_entry_post_error_page_2a447d08: "Eristetty merkinnän lähettämisen virhesivu"
@@ -13392,6 +13415,8 @@ fi:
   loading_grades_for_coursename_26784c2d: "Arvosanoja ladataan kohteelle %{courseName}"
   loading_grading_periods_c635d96: "Ladataan arvosanojen antojaksoja..."
   loading_grading_periods_for_coursename_bbe46919: "Ladataan arvosanan antojaksoa kohteelle %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Ladataan arvosanojen antoasteikkoja..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Arvosanojen antoasteikkojen lataus epäonnistui.  Yritä uudelleen"
   loading_group_f1647ebb: "Ladataan %{group}"
   loading_grouptitle_dba362d2: "Ladataan %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Ladataan Homeroomin ilmoituksen sisältöä"
@@ -16072,6 +16097,7 @@ fi:
   new_quizzes_migration_required_7854aa1a: "Uusien testien tuonti vaaditaan"
   new_quizzes_on_the_quizzes_page_b21f338d: "Uudet testit Testit-sivulla"
   new_quizzes_public_api_18d95321: "Uusien kyselyiden julkinen sovellusliittymä"
+  new_quizzes_public_api_quiz_items_16bc741d: "Uusien kyselyiden julkinen API: Kyselykohteet"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uusien testitulosten JWT-virkistys"
   new_quizzes_site_admin_service_user_a331233a: "Uuden testisivuston järjestelmäkäyttäjän palvelukäyttäjä"
   new_quizzes_submission_274b5c57: "Uusien testien lähetys"
@@ -16120,6 +16146,7 @@ fi:
   next_month_749b1778: "Seuraava kuukausi"
   next_month_b55a387c: "Seuraava kuukausi"
   next_page_d2a39853: "Seuraava sivu"
+  next_peer_review_3d05ef23: "Seuraava vertaisarviointi"
   next_question_f37bac25: "Seuraava kysymys"
   next_run_at_635de64a: "Seuraava ajo"
   next_steps_ce0f0d0c: "Seuraavat vaiheet"
@@ -17276,6 +17303,7 @@ fi:
   pause_auto_refresh_9bd773ca: "Keskeytä automaattinen päivitys"
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: PDF-tiedosto
   peer_632472b7: "Kollega:"
   peer_review_74f26a13: Vertaisarviointi
   peer_review_assignment_7d314c59: "Vertaisarvioitava tehtävä"
@@ -17285,6 +17313,7 @@ fi:
   peer_review_for_assignment_ce72fc52: "Vertaisarviointi kohteelle %{assignment}"
   peer_review_for_name_bcffa32f: "Vertaisarviointi kohteelle %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Vertaisarviointi kohteelle %{name} Määräpäivä: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Vertaisarvioinnin ponnahdusvalikko"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Kollegoiden tarkastelun tuki tehtävien tehostuksessa"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Vertaisarvioitavia tehtäviä ei vielä käsitellä uudessa tehtävätoiminnossa. Siirrytäänkö vanhalle tehtävänluontisivulle?"
   peer_reviews_api: 
@@ -17960,6 +17989,7 @@ fi:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Arvosanojen lähettäminen päivittää selaimesi. Tämä saattaa kestää hetken."
   posting_to_students_eaa57964: "Lähetetään opiskelijoille"
   powered_by_instructure_504d676d: "Powered By Instructure"
+  powerpoint_file_c4cb12af: "PowerPoint Tiedosto"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -21179,6 +21209,7 @@ fi:
                                     Ota yhteyttä #canvas-sre:hen Slackissa.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP-käyttäjä on luotu. Tälle käyttäjälle voi kestää jopa neljä tuntia ennen kuin avain alkaa toimia."
   sftp_user_management_19868cb3: "SFTP-käyttäjän hallinta"
+  shadow_e98b5937: Varjo
   shard_5d340495: Sirpale
   shard_id_optional_382e5dda: "Sirun tunnus (valinnainen)"
   shard_shard_95c57736: "Säie: %{shard}"
@@ -22021,6 +22052,7 @@ fi:
   sort_by_72dbba9c: Lajitteluperuste
   sort_by_e75f9e3e: Lajitteluperuste
   sort_courses_cf94b8d4: "Lajittele kursseja"
+  sort_ordertype_by_sortby_a0dd1c8: "Lajittelu %{orderType} lajitteluperuste %{sortBy}"
   sort_outcome_column_c53702ed: "Lajittele tulossarake"
   sort_students_1a561e98: "Lajittele opiskelijat"
   sortable_name_73f707cf: "Lajiteltava nimi"
@@ -22324,6 +22356,7 @@ fi:
       edistymistä kurssin osaamisen hallinnassa. Tulokset esitetään Arvosanakirjan kaltaisessa
       muodossa ja edistyminen näytetään sekä numeerisena pistemääränä, että hyvä osaaminen /tyydyttävä
       osaaminen/osaamisessa parannettavaa.
+  student_outcome_result_b26b7ab4: "Opiskelijan tulos"
   student_pace_2200bf85: "Opiskelijan tahditus"
   student_page_history_ce86b3c2: "Näytä sivuhistoria"
   student_page_history_pages_update_ae55fa03: "Opiskelijasivun historia (Sivut - Päivitys)"
@@ -22339,6 +22372,7 @@ fi:
   student_sis_id_abe6b292: "opiskelijan sis-tunnus"
   student_student_number_5c98bd2d: "Opiskelija %{student_number}"
   student_studentnumber_f398d9c2: "Opiskelija %{studentNumber}"
+  student_submission_report_af01e697: "Opiskelijan palautusraportti"
   student_submissions_910da1b3: "Opiskelijan palautukset"
   student_submissions_report_prospect_education_108daf59: "Opiskelijan palautusraportti (ehdokkaan koulutus)"
   student_tour_38b735c8: Opiskelijakierros
@@ -22954,6 +22988,7 @@ fi:
   text_entry_e1808b2f: "Tekstin syöttäminen"
   text_entry_submission_7b0ae0c5: "Tekstimerkinnän palautus"
   text_entry_submission_cannot_be_empty_3d187cae: "Tehtäväpalautuksen tekstikenttä ei voi olla tyhjä"
+  text_file_73d8d08c: Tekstitiedosto
   text_input_d3480b8c: "Tekstin syöttö"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Teksti Ei kysymystä on siirretty Stimulukseen, lisää kysymys, niin että se voi näkyä testissä."
   thai_8f9bc548: thai
@@ -23246,6 +23281,7 @@ fi:
   the_state_parameter_is_required_ffadf213: "Tilan parametri vaaditaan"
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Opiskelijan huomautusvälilehti sisältää tehtävän asiakirjan. Välilehdet, joissa on ylimääräisiä lähetystyyppejä, saattavat olla myös saatavissa."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Opiskelija, joka raportoidaan; oletukset Canvas-tunnukseen, ellei määritetty kuten SIS:ssä student_id_type"
+  the_submission_is_not_available_just_yet_b3c199c: "Tehtävien oalautus ei ole ihan vielä saatavilla."
   the_submitted_after_date_to_report_on_9d90f026: "Palautettu raportointipäivän jälkeen"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Opinto-ohjelma mahdollistaa kurssin käyttäjien toivottamisen tervetulleeksi ja odotuksista keskustelemisen
@@ -23549,6 +23585,9 @@ fi:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       Tämä ominaisuus saa lähetysten tiedostolatauksen apin tarkastamaan tiedostotyypin
       verrattuna liitetyn tehtävän sallittuihin tiedostotyyppeihin.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Tämä ominaisuus on näkyvissä vain käyttäjille, joilla on sivuston järjestelmävalvojan käyttöoikeudet. Se on samanlainen
+                                "Piilotettu", mutta loppukäyttäjät eivät näe sitä, vaikka sivuston järjestelmävalvoja ottaisi sen käyttöön.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Tämä ominaisuus on näkyvissä ainoastaan käyttäjille, joilla on sivuston järjestelmävalvojan käyttöoikeudet.
                                   Loppukäyttäjät eivät näe sitä ellei sivuston järjestelmänvalvoja ole ottanut sitä käyttöön.
@@ -24034,6 +24073,7 @@ fi:
   title_required_3ff5969: "Otsikko on pakollinen"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tietopaneeli"
+  title_unpublished_51ddbc6a: "%{title} (julkaisematon)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" luonti onnistui."
   title_was_successfully_updated_14b78676: "\"%{title}\" päivitys onnistui."
   titles: 
@@ -25087,7 +25127,9 @@ fi:
   upload_media_ce31135a: "Lataa mediaa"
   upload_not_available_for_this_folder_8f8623c6: "Lataus ei ole saatavissa tälle kansiolle"
   upload_percent_complete_d533d3e2: "Latausprosentti valmis"
+  upload_progress_df577c48: "Latauksen edistyminen"
   upload_progress_for_name_39f03acf: "Latauksen edistyminen kohteelle %{name}"
+  upload_success_f51f3a39: "Lataus onnistui"
   upload_successful_ca47465f: "Lataus onnistui"
   upload_your_outcomes_bceeadbe: "Lataa osaamistuloksesi!"
   uploaded_285a2bfb: Ladattu
@@ -25162,6 +25204,7 @@ fi:
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Käytä uutta yhteistöiden ulkoista työkalua, joka mahdollistaa enemmän asetuksia yhteistöiden työkaluille"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Käytä uutta tietovisan LTI-työkalua tavallisten canvas-kyselyiden sijasta"
   use_the_new_scheduler_1273b832: "Käytä uutta aikatauluttajaa"
+  use_this_grading_scheme_52aa4ecf: "Käytä tätä arvosanojen antoasteikkoa"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Poista valitut opiskelijat tämän listan avulla. Lisää uusia opiskelijoita yhdistelmäruudulla listan jälkeen."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Ratkaise tämän paneelin avulla tilanteet, joissa löytyy kaksinkertaisia tuloksia tai joissa et löydä henkilöä haullasi."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Hae tämän paneelin avulla henkilöitä, jotka haluat lisätä tälle kurssille."
@@ -25659,6 +25702,7 @@ fi:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Videokonferenssioppaat etäluokkahuoneille"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Videokonferenssityökalu mahdollistaa yhteyden kasvoista kasvoihin opettajien ja oppilaiden välillä."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Laitteesi tai sovelluksesi ei tue videosisältöä."
+  video_file_f7188ffe: Videotiedosto
   video_player_b371005: Videosoitin
   video_player_for_label_6a5fdb03: "Videonauhuri kohteelle %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -26287,9 +26331,16 @@ fi:
   you_have_changed_the_progression_requirements_for__6772bc89: "Olet muuttanut aktiivisen kurssin etenemisvaatimuksia. Osa opiskelijoista on ehkä edennyt tähän moduuliin ja muihin tästä riippuvaisiin moduuleihin."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Olet suorittanut vertaisarvioinnin kohteelle %{name}."
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Olet suorittanut vertaisarvioinnin kohteelle %{person}. Kiitos"
+  you_have_completed_your_peer_reviews_543ad84: "Olet suorittanut vertaisarviointisi!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Sinulla on 1 kalenteri jäljellä"
     other: "Sinulla on  %{count} kalenteria jäljellä"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Sinulla on  vielä yksi vertaisarviointi suoritettavana."
+    other: "Sinulla on  vielä %{count} vertaisarviointia suoritettavana."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Sinulla on  vielä yksi vertaisarviointi suoritettavana."
+    other: "Sinulla on %{count} viertaisarviointia suoritettavana."
   you_have_count_peer_reviews_to_complete_52e065e: "Sinulla on %{count} kollegan arvostelua suoritettavana"
   you_have_count_submissions_to_grade_6c5b511a: "Sinulla on %{count} tehtäväpalautusta arvioitavana"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Olet luonut kommentin, jota ei ole lähetetty. Haluatko jatkaa ja tallentaa tämän kommentin luonnoksena? (Voit lähettää luonnoskommentteja milloin tahansa.)"
@@ -26367,6 +26418,7 @@ fi:
   you_must_set_usage_rights_87fc1382: "Sinun täytyy määrittää käyttöoikeudet"
   you_must_specify_a_usage_right_5eb57f87: "Sinun täytyy määrittää käyttöoikeus."
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "Sinun täytyy määrittää, otetaanko Microsoft Teams -synkronisaatio käyttöön vai poistetaanko se käytöstä"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Sinun täytyy lähettää työsi ennen kuin arvioida kollegoitasi."
   you_must_use_a_number_912ce4bd: "Sinun täytyy käyttää numeroa"
   you_must_use_a_positive_number_203b86fe: "Sinun täytyy käyttää positiivista numeroa"
   you_must_use_an_integer_78d2530f: "Sinun pitäisi käyttää kokonaislukua"
@@ -26498,6 +26550,7 @@ fi:
   zero_activity_title: "Ei aktiviteetteja"
   zip_26961da: zip
   zip_argument_error: ".zip-tiedoston lataus vaatii kansion, johon tiedosto ladataan."
+  zip_file_3e736239: ZIP-tiedosto
   zip_file_description: "Siirron lisäosa .zip-arkistojen purkamiseksi kurssin, ryhmän tai käyttäjän tiedostoihin"
   zip_file_display: "Tiedoston tuonti"
   zip_file_file_description: "Pura .zip-tiedosto kansioon"

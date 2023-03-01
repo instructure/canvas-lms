@@ -192,6 +192,7 @@ const locale = {
   "describe_the_icon_f6a18823": { "message": "(Describa el ícono)" },
   "describe_the_type_ff448da5": { "message": "(Describir el { TYPE })" },
   "describe_the_video_2fe8f46a": { "message": "(Describir el video)" },
+  "description_436c48d7": { "message": "Descripción" },
   "details_98a31b68": { "message": "Detalles" },
   "diagonal_dots_7d71b57e": { "message": "Puntos diagonales" },
   "diamond_b8dfe7ae": { "message": "Diamante" },
@@ -280,6 +281,7 @@ const locale = {
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Error al obtener el contenido del archivo"
   },
+  "file_name_8fd421ff": { "message": "Nombre del archivo" },
   "file_storage_quota_exceeded_b7846cd1": {
     "message": "Capacidad de almacenamiento de archivos excedida"
   },
@@ -659,6 +661,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Mayúsc-O para abrir el editor html agradable."
   },
+  "shortcut_911d6255": { "message": "Atajo" },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variante)" },
   "single_color_image_4e5d4dbc": { "message": "Imagen de un solo color" },

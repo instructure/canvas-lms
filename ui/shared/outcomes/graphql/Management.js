@@ -392,6 +392,7 @@ export const SEARCH_OUTCOME_ALIGNMENTS = gql`
                   title
                   contentType
                   assignmentContentType
+                  assignmentWorkflowState
                   url
                   moduleName
                   moduleUrl

@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {func, number, oneOf, shape} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {SimilarityScore} from '../../../../../../api.d'
 
 import SimilarityIcon from '../../components/SimilarityIcon'
 
@@ -37,7 +37,12 @@ function tooltipText({similarityScore, status}) {
   return I18n.t('%{similarityScore}% similarity score', {similarityScore: formattedScore})
 }
 
-export default function SimilarityIndicator({elementRef, similarityInfo}) {
+type Props = {
+  elementRef: (element: HTMLButtonElement | null) => void
+  similarityInfo: SimilarityScore
+}
+
+export default function SimilarityIndicator({elementRef, similarityInfo}: Props) {
   const {similarityScore, status} = similarityInfo
 
   const Icon = () => <SimilarityIcon status={status} similarityScore={similarityScore} />
@@ -49,12 +54,4 @@ export default function SimilarityIndicator({elementRef, similarityInfo}) {
       </Tooltip>
     </div>
   )
-}
-
-SimilarityIndicator.propTypes = {
-  elementRef: func.isRequired,
-  similarityInfo: shape({
-    similarityScore: number,
-    status: oneOf(['error', 'pending', 'scored']).isRequired,
-  }).isRequired,
 }

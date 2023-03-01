@@ -3,7 +3,7 @@ developer_key_support_includes:
   state: hidden
   display_name: Developer Key Include Parameter Support
   description: |-
-    Provides a flag on the Devloper Key to support Include Parameters on API requests
+    Provides a flag on the Developer Key to support Include Parameters on API requests
   applies_to: SiteAdmin
 site_admin_keys_only:
   state: hidden
@@ -34,7 +34,7 @@ lti_platform_storage:
   display_name: LTI Platform Storage
   description: |-
     If enabled, allows new window.postMessage subjects for the LTI Platform
-    Storage spec, and sends reponse messages to all postMessage.
+    Storage spec, and sends response messages to all postMessage.
   applies_to: SiteAdmin
 lti_multiple_assignment_deep_linking:
   state: hidden
@@ -144,3 +144,15 @@ consistent_ags_ids_based_on_account_principal_domain:
     launch happens on or the API is accessed through. For schools with multiple
     domains, this ensures consistency in Line Item IDs.
   applies_to: RootAccount
+dev_key_oidc_alert:
+  state: hidden
+  display_name: OIDC Auth endpoint changes - show alert for upcoming changes
+  description: |-
+    If enabled, the user will see a warning Alert box near the top of the
+    Developer Keys page informing them of upcoming or completed OIDC Auth endpoint changes.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

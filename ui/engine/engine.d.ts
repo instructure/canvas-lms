@@ -18,6 +18,12 @@
 
 declare module '@canvas/i18n'
 declare module '@canvas/do-fetch-api-effect'
+
+// a little disappointed this has to be done by hand
+declare namespace Intl {
+  function getCanonicalLocales(locales: string | string[]): string[];
+  function Locale(locale: string): object;
+}
 declare module '*.json' {
   const value: {[key: string]: string};
   export default value;

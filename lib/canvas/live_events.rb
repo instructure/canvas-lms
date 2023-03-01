@@ -32,22 +32,31 @@ module Canvas::LiveEvents
     )
   end
 
-  def self.amended_context(canvas_context)
-    ctx = LiveEvents.get_context || {}
-    return ctx unless canvas_context
+  def self.base_context_attributes(canvas_context, root_account)
+    res = {}
 
-    ctx = ctx.merge({
-                      context_type: canvas_context.class.to_s,
-                      context_id: canvas_context.global_id
-                    })
-    if canvas_context.respond_to?(:root_account)
-      ctx.merge!({
-                   root_account_id: canvas_context.root_account.try(:global_id),
-                   root_account_uuid: canvas_context.root_account.try(:uuid),
-                   root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
-                 })
+    if canvas_context
+      res[:context_type] = canvas_context.class.to_s
+      res[:context_id] = canvas_context.global_id
+      res[:context_account_id] = Context.get_account_or_parent_account_global_id(canvas_context)
+      if canvas_context.respond_to?(:sis_source_id)
+        res[:context_sis_source_id] = canvas_context.sis_source_id
+      end
     end
-    ctx
+
+    if root_account
+      res[:root_account_uuid] = root_account&.uuid
+      res[:root_account_id] = root_account&.global_id
+      res[:root_account_lti_guid] = root_account&.lti_guid
+    end
+
+    res
+  end
+
+  def self.amended_context(canvas_context)
+    (LiveEvents.get_context || {}).merge(
+      base_context_attributes(canvas_context, canvas_context.try(:root_account))
+    )
   end
 
   def self.conversation_created(conversation)

@@ -17,12 +17,12 @@
  */
 module.exports = {
   assumptions: {
-    setPublicClassFields: true
+    setPublicClassFields: true,
   },
 
   env: {
     development: {
-      plugins: ['babel-plugin-typescript-to-proptypes']
+      plugins: ['babel-plugin-typescript-to-proptypes'],
     },
     production: {
       plugins: [
@@ -31,9 +31,9 @@ module.exports = {
         'minify-constant-folding',
         'minify-dead-code-elimination',
         'minify-guarded-expressions',
-        'transform-react-remove-prop-types'
-      ]
-    }
+        'transform-react-remove-prop-types',
+      ],
+    },
   },
 
   presets: [
@@ -44,28 +44,33 @@ module.exports = {
         useBuiltIns: 'entry',
         corejs: '3.20',
         modules: false,
-        // This is needed to fix a Safari < 16 bug
-        // https://github.com/babel/babel/issues/14289
-        // https://bugs.webkit.org/show_bug.cgi?id=236843
-        include: ['@babel/plugin-proposal-class-properties']
-      }
+        include: [
+          // This is needed to fix a Safari < 16 bug
+          // https://github.com/babel/babel/issues/14289
+          // https://bugs.webkit.org/show_bug.cgi?id=236843
+          '@babel/plugin-proposal-class-properties',
+
+          // This is needed because New Quizzes build isn't configured to handle the ?? operator
+          '@babel/plugin-proposal-nullish-coalescing-operator',
+        ],
+      },
     ],
     ['@babel/preset-react', {useBuiltIns: true}],
     [
       '@instructure/babel-preset-pretranslated-translations-package-format-message',
       {
         translationsDir: 'lib/canvas-rce',
-        extractDefaultTranslations: false
-      }
-    ]
+        extractDefaultTranslations: false,
+      },
+    ],
   ],
 
   plugins: [
     [
       'transform-inline-environment-variables',
       {
-        include: ['BUILD_LOCALE']
-      }
+        include: ['BUILD_LOCALE'],
+      },
     ],
 
     [
@@ -74,8 +79,8 @@ module.exports = {
         corejs: 3,
         helpers: true,
         useESModules: true,
-        regenerator: true
-      }
+        regenerator: true,
+      },
     ],
 
     ['@babel/plugin-proposal-decorators', {legacy: true}],
@@ -85,13 +90,13 @@ module.exports = {
       {
         ignore: () => false,
         postcssrc: require('@instructure/ui-postcss-config')()(),
-        themeablerc: {}
-      }
-    ]
+        themeablerc: {},
+      },
+    ],
   ],
 
   targets: {
     browsers: 'last 2 versions',
-    esmodules: true
-  }
+    esmodules: true,
+  },
 }

@@ -587,6 +587,9 @@
     "record_7c9448b": {
         "message": "הקלטה"
     },
+    "recording_98da6bda": {
+        "message": "מקליט"
+    },
     "red_8258edf3": {
         "message": "אדום"
     },
@@ -631,6 +634,9 @@
     },
     "star_8d156e09": {
         "message": "הוספת כוכבית"
+    },
+    "start_over_f7552aa9": {
+        "message": "התחל/י מהתחלה"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } ל { endDate }"
@@ -733,6 +739,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "זכויות שימוש"
+    },
+    "video_player_b371005": {
+        "message": "נגן הוידאו"
     },
     "view_ba339f93": {
         "message": "תצוגה"

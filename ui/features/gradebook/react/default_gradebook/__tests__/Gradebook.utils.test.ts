@@ -66,6 +66,7 @@ const unsubmittedSubmission: Submission = {
   redo_request: false,
   score: null,
   seconds_late: 0,
+  similarityInfo: null,
   submission_type: 'online_text_entry',
   submitted_at: new Date(),
   url: null,

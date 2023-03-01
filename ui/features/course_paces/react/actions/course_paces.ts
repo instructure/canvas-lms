@@ -308,8 +308,18 @@ const thunkActions = {
       const selectedContextType = CONTEXT_TYPE_MAP[getState().ui.selectedContextType]
       return Api.removePace(getState().coursePace)
         .then(() => {
+          const {page, searchTerm, sortBy, order} = getState().paceContexts
           dispatch(uiActions.hidePaceModal())
-          dispatch(paceContextsActions.fetchPaceContexts({contextType: selectedContextType}))
+
+          dispatch(
+            paceContextsActions.fetchPaceContexts({
+              contextType: selectedContextType,
+              page,
+              searchTerm,
+              sortBy,
+              orderType: order,
+            })
+          )
           showFlashSuccess(I18n.t('%{paceName} Pace removed', {paceName}))()
         })
         .catch(error => {

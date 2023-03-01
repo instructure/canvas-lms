@@ -44,6 +44,7 @@ export default class CommentTextArea extends Component {
     assignment: Assignment.shape,
     submission: Submission.shape,
     reviewerSubmission: Submission.shape,
+    onSendCommentSuccess: () => {},
   }
 
   state = {
@@ -186,6 +187,7 @@ export default class CommentTextArea extends Component {
           }
         }
       )
+      this.props.onSendCommentSuccess?.()
     })
   }
 

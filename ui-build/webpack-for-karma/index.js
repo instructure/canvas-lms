@@ -66,6 +66,8 @@ module.exports = {
           path.join(canvasDir, 'packages/jquery-selectmenu'),
           path.join(canvasDir, 'packages/mathml'),
           path.join(canvasDir, 'packages/defer-promise'),
+          path.resolve(canvasDir, 'packages/convert-case'),
+          path.resolve(canvasDir, 'packages/html-escape'),
           path.join(canvasDir, 'packages/persistent-array'),
           path.join(canvasDir, 'packages/slickgrid'),
           path.join(canvasDir, 'packages/with-breakpoints'),

@@ -224,6 +224,7 @@ describe PeerReviewsApiController, type: :request do
         "id" => @assessment_request.id,
         "submission_comments" => [
           {
+            "attempt" => nil,
             "author_id" => @student2.id,
             "author_name" => @student2.name,
             "comment" => comment.comment,
@@ -393,6 +394,7 @@ describe PeerReviewsApiController, type: :request do
             "id" => @assessment_request.id,
             "submission_comments" => [
               {
+                "attempt" => nil,
                 "author_id" => nil,
                 "author_name" => "Anonymous User",
                 "avatar_path" => User.default_avatar_fallback,

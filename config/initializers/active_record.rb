@@ -743,13 +743,13 @@ class ActiveRecord::Base
     if new_record?
       self.created_at = updated_at if touch
       self.id = self.class._insert_record(
-        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_inserts)
+        attributes_with_values(attribute_names_for_partial_inserts)
         .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
       )
       @new_record = false
     else
       update_columns(
-        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_updates)
+        attributes_with_values(attribute_names_for_partial_updates)
         .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
       )
     end
@@ -2071,26 +2071,18 @@ module MaxRuntimeConnectionPool
 end
 ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
 
-if Rails.version < "7.0"
-  ActiveRecord::Associations.send(:public, :clear_association_cache)
-else
-  module ClearableAssociationCache
-    def clear_association_cache
-      @association_cache = {}
-    end
+module ClearableAssociationCache
+  def clear_association_cache
+    @association_cache = {}
   end
-  # Ensure it makes it onto activerecord::base even if assocations are already attached to base
-  ActiveRecord::Associations.prepend(ClearableAssociationCache)
-  ActiveRecord::Base.prepend(ClearableAssociationCache)
 end
+# Ensure it makes it onto activerecord::base even if assocations are already attached to base
+ActiveRecord::Associations.prepend(ClearableAssociationCache)
+ActiveRecord::Base.prepend(ClearableAssociationCache)
 
 module VersionAgnosticPreloader
   def preload(records, associations, preload_scope = nil)
-    if Rails.version < "7.0"
-      ActiveRecord::Associations::Preloader.new.preload(records, associations, preload_scope)
-    else
-      ActiveRecord::Associations::Preloader.new(records: Array.wrap(records).compact, associations: associations, scope: preload_scope).call
-    end
+    ActiveRecord::Associations::Preloader.new(records: Array.wrap(records).compact, associations: associations, scope: preload_scope).call
   end
 end
 ActiveRecord::Associations.singleton_class.include(VersionAgnosticPreloader)

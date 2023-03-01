@@ -116,12 +116,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     before do
       submission = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
       url_grades.each do |h|
-        grade = "#{TextHelper.round_if_whole(h[:grade] * 100)}%"
+        grade = "#{TextHelper.round_if_whole(h[:grade] * 100)}%" if h[:grade]
         grade, score = assignment.compute_grade_and_score(grade, nil)
         submission.grade = grade
         submission.score = score
         submission.submission_type = "basic_lti_launch"
-        submission.workflow_state = "submitted"
+        submission.workflow_state = h[:workflow_state] || "submitted"
         submission.submitted_at = Time.zone.now
         submission.url = h[:url]
         submission.grader_id = -1
@@ -283,6 +283,49 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           expect(subject.grade_history.count).to be(1)
           expect(subject.grade_history.first[:url]).to eq("http://url2")
           expect(subject.grade_history.first[:score]).to eq(25)
+        end
+      end
+    end
+
+    context "when nil score is present" do
+      context "when all scores are nil" do
+        let(:url_grades) do
+          [
+            { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: nil },
+            { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: nil },
+          ]
+        end
+
+        it "returns an empty history" do
+          expect(subject.grade_history).to be_empty
+        end
+      end
+
+      context "when score is nil but also graded" do
+        let(:url_grades) do
+          [
+            { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: 0.88 },
+            { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: nil },
+            { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: nil, workflow_state: "graded" },
+          ]
+        end
+
+        it "returns mix of scores and scores with nil that have been graded" do
+          grade_history_response = subject.grade_history.map do |submission|
+            [submission[:url], submission[:score], submission[:grade]]
+          end
+
+          expect(grade_history_response.length).to eql 2
+          expect(grade_history_response).to eq(
+            url_grades.filter_map do |x|
+              next if x[:grade].blank? && x[:workflow_state] != "graded"
+
+              score = x[:grade] ? assignment.points_possible * x[:grade] : nil
+              grade = score ? score.to_s : nil
+
+              [x[:url], score, grade]
+            end
+          )
         end
       end
     end

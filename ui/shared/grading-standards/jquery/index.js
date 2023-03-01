@@ -201,9 +201,7 @@ $(document).ready(() => {
         .toggle()
       const $find = $(this).parents('.grading_standard').find('.find_grading_standard:visible')
       if ($find.length > 0 && !$find.hasClass('loaded')) {
-        $find
-          .find('.loading_message')
-          .text(I18n.t('status.loading_grading_standards', 'Loading Grading Standards...'))
+        $find.find('.loading_message').text(I18n.t('Loading Grading Schemes...'))
         const url = $find.find('.grading_standards_url').attr('href')
         $.ajaxJSON(
           url,
@@ -263,12 +261,7 @@ $(document).ready(() => {
           _data => {
             $find
               .find('.loading_message')
-              .text(
-                I18n.t(
-                  'errors.cannot_load_grading_standards',
-                  'Loading Grading Standards Failed.  Please Try Again'
-                )
-              )
+              .text(I18n.t('Loading Grading Schemes Failed.  Please Try Again'))
           }
         )
       }

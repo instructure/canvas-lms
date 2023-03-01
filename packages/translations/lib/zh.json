@@ -512,6 +512,9 @@
     "describe_the_video_2fe8f46a": {
         "message": "（视频说明）"
     },
+    "description_436c48d7": {
+        "message": "说明"
+    },
     "details_98a31b68": {
         "message": "详情"
     },
@@ -1888,6 +1891,9 @@
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "按 Shift-O 打开精美 HTML 编辑器。"
+    },
+    "shortcut_911d6255": {
+        "message": "快捷方式"
     },
     "show_all_ae37d610": {
         "message": "显示全部"

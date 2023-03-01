@@ -81,22 +81,26 @@ export default function CanvasMediaPlayer(props) {
   const containerRef = useRef(null)
   const mediaPlayerRef = useRef(null)
 
-  function boundingBox() {
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
+  const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement
+  const isEmbedded =
+    window.frameElement?.tagName === 'IFRAME' ||
+    window.location !== window.top.location ||
+    !containerRef.current
+
+  const boundingBox = useCallback(() => {
+    if (isFullscreen || isEmbedded) {
       return {
         width: window.innerWidth,
         height: window.innerHeight,
       }
-    } else if (window.frameElement?.tagName === 'IFRAME' || !containerRef.current) {
-      return {width: window.innerWidth, height: window.innerHeight}
-    } else {
-      // media_player_iframe_content.js includes a 16px top/bottom margin
-      return {
-        width: containerRef.current.clientWidth,
-        height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32),
-      }
     }
-  }
+
+    // media_player_iframe_content.js includes a 16px top/bottom margin
+    return {
+      width: containerRef.current.clientWidth,
+      height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32),
+    }
+  }, [isFullscreen, isEmbedded, containerRef])
 
   const handleLoadedMetadata = useCallback(
     event => {
@@ -112,7 +116,7 @@ export default function CanvasMediaPlayer(props) {
         props.resizeContainer
       )
     },
-    [props.resizeContainer, props.type]
+    [boundingBox, props.resizeContainer, props.type]
   )
 
   const handlePlayerSize = useCallback(
@@ -133,7 +137,7 @@ export default function CanvasMediaPlayer(props) {
         )
       }
     },
-    [props.type, props.resizeContainer, props.media_id]
+    [props.type, props.resizeContainer, props.media_id, boundingBox]
   )
 
   // should be false when in canvas proper, but true when in an LTI like New Quizzes

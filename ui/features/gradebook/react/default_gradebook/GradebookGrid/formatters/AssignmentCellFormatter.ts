@@ -25,7 +25,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 import type Gradebook from '../../Gradebook'
-import type {GradingStandard} from '../../gradebook.d'
+import type {GradingStandard} from '@canvas/grading/grading.d'
 
 const I18n = useI18nScope('gradebook')
 

@@ -63,18 +63,18 @@ export type Student = Readonly<{
   avatar_url?: string
   created_at: string
   email: null | string
-  first_name: string
   group_ids: string[]
   id: string
   integration_id: null | string
-  last_name: string
   login_id: string
-  name: string
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
 }> & {
   enrollments: Enrollment[]
+  first_name: string
+  last_name: string
+  name: string
 } & Partial<{
     computed_current_score: number
     computed_final_score: number
@@ -90,7 +90,7 @@ export type Student = Readonly<{
   }>
 
 export type StudentMap = {
-  [id: string]: Student
+  [studentId: string]: Student
 }
 
 export type StudentGroup = Partial<
@@ -242,7 +242,7 @@ export type Assignment = Readonly<{
   }>
 
 export type AssignmentMap = {
-  [id: string]: Assignment
+  [assignmentId: string]: Assignment
 }
 
 export type AssignmentGroup = Readonly<{
@@ -268,6 +268,17 @@ export type AssessmentRequest = Readonly<{
   available: boolean
   workflow_state?: string
 }>
+
+export type AssignedAssessments = {
+  assetId: string
+  workflowState: string
+  assetSubmissionType: string
+  anonymizedUser?: {
+    displayName: string
+    _id: string
+  }
+  anonymousId?: string
+}
 
 export type AttachmentData = Readonly<{
   attachment: Attachment
@@ -342,6 +353,11 @@ export type WorkflowState =
   | 'unsubmitted'
   | 'untaken'
 
+export type SimilarityScore = {
+  similarityScore: number
+  status: 'error' | 'pending' | 'scored'
+}
+
 export type Submission = Readonly<{
   anonymous_id: string
   assignment_id: string
@@ -357,13 +373,14 @@ export type Submission = Readonly<{
   has_postable_comments: boolean
   has_originality_report: boolean
   id: string
-  late_policy_status: null | string
+  late_policy_status: null | LatePolicyStatus
   late: boolean
   missing: boolean
   points_deducted: null | number
   redo_request: boolean
   score: null | number
   seconds_late: number
+  similarityInfo: null | SimilarityScore
   submission_type: SubmissionType
   url: null | string
   user_id: string
@@ -376,6 +393,7 @@ export type Submission = Readonly<{
   posted_at: null | Date
   rawGrade: string | null
   submitted_at: null | Date
+  assignedAssessments?: AssignedAssessments[]
 }
 
 export type UserSubmissionGroup = {
@@ -448,3 +466,5 @@ export type GradingPeriodSet = Readonly<{
 export type GradingPeriodSetGroup = {
   grading_period_sets: GradingPeriodSet[]
 }
+
+export type LatePolicyStatus = 'missing' | 'late' | 'extended'

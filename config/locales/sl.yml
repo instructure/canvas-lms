@@ -974,6 +974,12 @@ sl:
         default: 
           lti_reports: 
             text: "V tem poročilu je na voljo izvoz podatkov, v katerem so prikazane informacije o uporabi standarda LTI (Learning Tool Interoperability – interoperabilnost orodja za učenje)."
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: Semester
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -3937,6 +3943,7 @@ sl:
   audio_1c89b0c8: zvok
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Vaša naprava ali aplikacija ne podpira zvočne vsebine."
   audio_dd489fcc: Zvok
+  audio_file_bf3ece7e: "Zvočna datoteka"
   audio_player_for_label_dd9a6819: "Predvajalnik zvoka za %{label}"
   august_781433e8: Avgust
   australia_61_eb9bb701: "Avstralija (+61)"
@@ -5177,6 +5184,7 @@ sl:
   cluster_cluster_b57fe99a: "Gruča: %{cluster}"
   cluster_f407976: Gruča
   code_93e9abbb: koda
+  code_file_424dc478: "Datoteka s kodo"
   code_is_case_sensitive_d8175cad: "Za kodo velja razlikovanje malih in velikih črk."
   cog_icon_69bdffd5: "Ikona sprotnega menija"
   col_is_sorted_ascending_cc5152cc: "%{col} je razvrščeno naraščajoče."
@@ -5223,6 +5231,7 @@ sl:
     errors: 
       cannot_load_collaboration: "Skupinske naloge ni mogoče naložiti."
       create_failed: "Ustvarjanje skupinske naloge ni uspelo."
+      no_masquerading_on_collaboration: "Ogledovanje sodelovanja, medtem ko delujete kot drug uporabnik, ni dovoljeno."
       no_name: "Vnesite ime za to skupinsko nalogo."
       not_enabled: "Skupinske naloge za to mesto sistema Canvas niso omogočene."
       title_too_long: "Za ime uporabite največ %{maxLength} znakov. Za dodatno vsebino uporabite opis."
@@ -8565,6 +8574,10 @@ sl:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Prikaz vrednosti"
   displaying_to_students_b1e92058: "Prikazovanje študentom"
+  displayname_loaded_14d71a0a: "%{displayName} naloženo"
+  displayname_loading_in_progress_2be325fd: "%{displayName} nalaganje v teku"
+  displayname_loading_pending_3aa2723e: "%{displayName} čaka na nalaganje"
+  displayname_loading_success_8177d735: "%{displayName} nalaganje uspešno"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Prikaže konfete za izvajalce, ki poženejo funkcijo preverjanje povezav v
       predmetu, ta pa ne najde nobenih težav.
@@ -8581,6 +8594,7 @@ sl:
   do_nothing_9672b478: "Ne naredi ničesar"
   doc_50924b72: DOC
   doc_c63509f8: dokument
+  doc_file_b1d0042f: "Datoteka Doc"
   document_to_annotate_d37b93bc: "Dokument za dodajanje opomb"
   docviewer_apple_iwork_file_support_dc772b31: "Podpora za datoteke Docviewer Apple iWork"
   docviewer_area_created_37502a31: "Območje Docviewer je ustvarjeno"
@@ -8993,6 +9007,7 @@ sl:
   enabled_links_be110215: "Omogočene povezave"
   enabled_web_services_f620b2be: "Omogočene spletne storitve"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Omogoča preoblikovano pogovorno okno »Pošlji sporočilo študentom, ki ...«, ki poleg pošiljanja sporočil študentom omogoča tudi pošiljanje sporočil skritim bralcem."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Omogoča dostop do javnega API za nove kvize: API za elemente kviza."
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Omogoča dostop do javnega API za nove kvize prek sistema Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Omogoča prikaz poročil o plagiatorstvu in rezultate podobnosti v pladnju za oddajo"
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Omogočajo uporabo pomembnih datumov za naloge, koledarske dogodke in drugo."
@@ -9486,6 +9501,7 @@ sl:
       exclusion: "je rezervirano"
       greater_than: "mora biti večje od %{count}"
       greater_than_or_equal_to: "mora biti enako ali večje od %{count}"
+      in: "mora biti v %{count}"
       inclusion: "ni vključeno na seznam"
       invalid: "je neveljavno"
       less_than: "mora biti manjše od %{count}"
@@ -9618,6 +9634,7 @@ sl:
   exceeded_the_maximum_length_number_characters_2d25611e: "Presežena največja dolžina (%{number} znakov)"
   exceeds_expectations_5910fc3a: "Presega pričakovanja"
   exceeds_mastery_1f995dce: "Presega učne cilje."
+  excel_file_c6b9890: "Excelova datoteka"
   excelsior_student_activity_tracking_7a1ba44d: "Sledenje dejavnosti študentov Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Izključite vse podatke, ki niso bili posodobljeni od navedenega datuma"
   exclude_assignments_graded_with_a_0_score_5c853dc4: "Izključi naloge, ocenjene z oceno 0."
@@ -9939,6 +9956,7 @@ sl:
   file_storage_32477f6: "Prostor na disku za datoteke"
   file_tree_collapsed_d4b0ae96: "Datotečno drevo je strnjeno"
   file_tree_expanded_a1d20c4a: "Datotečno drevo je razširjeno"
+  file_type_fd1ba7ee: "Vrsta datoteke"
   file_upload_9cae6da5: "Nalaganje datotek"
   file_upload_failed_af22dd91: "Nalaganje datoteke ni uspelo"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Potrebno je nalaganje datoteke, file_url ali content_export_id"
@@ -10077,6 +10095,7 @@ sl:
   flags_tab_updates_c4c209f1: "Označi posodobitve zavihka"
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "Datoteka Flash"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr slike SafeSearch prikaže v Creative Commons z javnim dostopom.
@@ -10092,6 +10111,7 @@ sl:
   folder_705fd2d7: Mapa
   folder_browsing_tree_1f00a3ae: "Prikaz imenikov"
   folder_icon_29017021: "Ikona mape"
+  folder_locked_b91cd0c4: "Mapa je zaklenjena"
   folder_tree_fbab0726: "Drevo map"
   folders: 
     event_updated: "Dogodek je uspešno posodobljen."
@@ -11440,6 +11460,7 @@ sl:
   html5_media_recorder_in_rce_bb59b78f: "Snemalnik medijev HTML5 v RCE"
   html_editor_fb2ab713: "Urejevalnik HTML"
   html_fc8563c6: html
+  html_file_62393d3f: "Datoteka HTML"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "Odziv HTTP: %{code}"
@@ -11706,6 +11727,7 @@ sl:
   ilumno_grade_export_251bc4b5: "Izvoz ocen Ilumno"
   image_8ad06: Slika
   image_c1c98202: slika
+  image_file_2b538bc: "Slikovna datoteka"
   image_id_is_not_a_valid_id_7dd6bad6: "image_id ni veljaven ID."
   image_search_b0944fc2: "Iskanje slike"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url in image_id ne moreta biti nastavljeni hkrati."
@@ -12105,6 +12127,7 @@ sl:
   ip_filter_is_not_valid_152a46d8: "IP-filter ni veljaven."
   ireland_353_3cd32cc0: "Irska (+353)"
   irish_567e109f: irščina
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   isolated_entry_post_error_page_2a447d08: "Stran napake za objavo izoliranega vnosa"
   isolated_entry_query_error_f0bfae18: "Napaka poizvedbe izoliranega vnosa"
@@ -12684,6 +12707,8 @@ sl:
   loading_grades_for_coursename_26784c2d: "Nalaganje ocen za %{courseName}"
   loading_grading_periods_c635d96: "Nalaganje ocenjevalnih obdobij ..."
   loading_grading_periods_for_coursename_bbe46919: "Nalaganje ocenjevalnih obdobij za %{courseName}"
+  loading_grading_schemes_dc26ebd3: "Nalagam ocenjevalno shemo ..."
+  loading_grading_schemes_failed_please_try_again_269918df: "Nalaganje ocenjevalne sheme ni uspelo.  Poskusite znova."
   loading_group_f1647ebb: "Nalagam %{group}"
   loading_grouptitle_dba362d2: "Nalagam %{groupTitle}."
   loading_homeroom_course_name_9f63923d: "Nalagam ime matičnega predmeta"
@@ -15395,6 +15420,7 @@ sl:
   new_quizzes_migration_required_7854aa1a: "Potrebna je migracija v nove kvize"
   new_quizzes_on_the_quizzes_page_b21f338d: "Novi kvizi na strani Kvizi"
   new_quizzes_public_api_18d95321: "Javni API za nove kvize"
+  new_quizzes_public_api_quiz_items_16bc741d: "Javni API za nove kvize: Elementi kviza"
   new_quizzes_service_jwt_refresh_ca28ca8: "Osvežitev storitve JWT za nove kvize"
   new_quizzes_site_admin_service_user_a331233a: "Nov uporabnik storitve skrbnika mesta Kvizi"
   new_quizzes_submission_274b5c57: "Oddaja novih kvizov"
@@ -15442,6 +15468,7 @@ sl:
   next_month_749b1778: "Naslednji mesec"
   next_month_b55a387c: "Naslednji mesec"
   next_page_d2a39853: "Naslednja stran"
+  next_peer_review_3d05ef23: "Naslednje ocenjevanje kolegov"
   next_question_f37bac25: "Naslednje vprašanje"
   next_run_at_635de64a: "Naslednji zagon ob"
   next_steps_ce0f0d0c: "Naslednji koraki"
@@ -16548,6 +16575,7 @@ sl:
   pause_auto_refresh_9bd773ca: "Začasno zaustavi samodejno osveževanje"
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "Datoteka PDF"
   peer_632472b7: "Enakovredni uporabnik:"
   peer_review_74f26a13: "Ocenjevanje kolegov"
   peer_review_assignment_7d314c59: "Naloga ocenjevanja kolegov"
@@ -16557,6 +16585,7 @@ sl:
   peer_review_for_assignment_ce72fc52: "Ocenjevanje kolegov za %{assignment}"
   peer_review_for_name_bcffa32f: "Ocenjevanje kolegov za %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Ocenjevanje kolegov za %{name} Rok: %{dueAtText}"
+  peer_review_prompt_571c5d22: "Poziv za ocenjevanje kolegov"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Podpora za ocenjevanje kolegov pri izboljšavah nalog"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "V novem toku nalog naloge ocenjevanja kolegov še niso obravnavane. Se želite vrniti na starejšo različico strani za ustvarjanje nalog?"
   peer_reviews_api: 
@@ -17221,6 +17250,7 @@ sl:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Če objavite ocene, boste osvežili brskalnik. To lahko traja nekaj trenutkov."
   posting_to_students_eaa57964: "Pošiljam študentom"
   powered_by_instructure_504d676d: "Uporablja tehnologijo Instructure"
+  powerpoint_file_c4cb12af: "PowerPoint datoteka"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -20386,6 +20416,7 @@ sl:
                                     Pišite nam na #canvas-sre v Slacku.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "Uporabnik SFTP je bil ustvarjen. Lahko preteče do štiri ure, da bo uporabnik aktiviran."
   sftp_user_management_19868cb3: "Upravljanje uporabnikov SFTP"
+  shadow_e98b5937: "Prekrivanje seje"
   shard_5d340495: Drobec
   shard_id_optional_382e5dda: "ID drobca (izbirno)"
   shard_shard_95c57736: "Drobec: %{shard}"
@@ -21218,6 +21249,7 @@ sl:
   sort_by_72dbba9c: "Razvrsti glede na"
   sort_by_e75f9e3e: "Razvrsti po"
   sort_courses_cf94b8d4: "Razvrsti predmete"
+  sort_ordertype_by_sortby_a0dd1c8: "Razvrsti %{orderType} po %{sortBy}"
   sort_outcome_column_c53702ed: "Razvrsti stolpec z rezultati"
   sort_students_1a561e98: "Razvrsti študente"
   sortable_name_73f707cf: "Ime za razvrščanje"
@@ -21508,6 +21540,7 @@ sl:
       pri učnih ciljih predmeta. Učni izidi so predstavljeni v obliki, podobni redovalnici,
       napredek pa je prikazan v obliki numeričnega rezultata in v obliki opisa doseženi učni
       cilji/delno doseženi učni cilji/popravljanje.
+  student_outcome_result_b26b7ab4: "Rezultat izida študenta"
   student_pace_2200bf85: "Hitrosti napredovanja za študenta"
   student_page_history_ce86b3c2: "Zgodovina strani študenta"
   student_paired_successfully_a88def61: "Študent je bil uspešno povezan"
@@ -21522,6 +21555,7 @@ sl:
   student_sis_id_abe6b292: "sis id študenta"
   student_student_number_5c98bd2d: "Študent %{student_number}"
   student_studentnumber_f398d9c2: "Študent %{studentNumber}"
+  student_submission_report_af01e697: "Poročilo o oddaji študenta"
   student_submissions_910da1b3: "Oddaje študenta"
   student_submissions_report_prospect_education_108daf59: "Poročilo o oddajah študentov (Prospect Education)"
   student_tour_38b735c8: "Predstavitev za študente"
@@ -22109,6 +22143,7 @@ sl:
   text_entry_e1808b2f: "Vnos besedila"
   text_entry_submission_7b0ae0c5: "Oddaja vnesenega besedila"
   text_entry_submission_cannot_be_empty_3d187cae: "Oddaja vnesenega besedila ne sme biti prazna."
+  text_file_73d8d08c: "Besedilna datoteka"
   text_input_d3480b8c: "Besedilni vnos"
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Besedilo Ni vprašanja je bilo premaknjeno na spodbudo; dodajte vprašanje, da ga bo mogoče prikazati v kvizu."
   thai_8f9bc548: tajščina
@@ -22364,6 +22399,7 @@ sl:
   the_state_parameter_is_required_ffadf213: "Zahtevan je parameter stanja."
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Zavihek za opombe študentov vsebuje dokument za nalogo. Na voljo so lahko tudi zavihki z dodatnimi vrstami oddaj."
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Študent za poročanje; privzeto nastavljeno na ID Canvas, razen če je v student_id_type nastavljen kot SIS"
+  the_submission_is_not_available_just_yet_b3c199c: "Oddaja še ni na voljo."
   the_submitted_after_date_to_report_on_9d90f026: "Oddaja po datumu za poročanje"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Učni načrt predmeta vam omogoča, da pozdravite uporabnike v predmetu in s študenti podelite
@@ -22629,6 +22665,9 @@ sl:
       Ta funkcija omogoča, da bodo v primeru pošiljanja več datotek skupaj s strani
       orodje tretje osebe prek API za storitev za naloge in ocenjevanje,
       te združene v eno oddajo, namesto da bi bilo ustvarjenih več ločenih oddaj.
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      Ta dodatna funkcionalnost je vidna samo uporabnikom z dostopom skrbnika mesta. Podobno je
+                                »Skrito«, vendar ga končni uporabniki ne bodo videli, tudi če ga omogoči uporabnik, ki je skrbnik mesta.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Ta možnost funkcije je vidna samo uporabnikom z dostopom skrbnika spletnega mesta.
                                   Končni uporabniki ga ne bodo videli, dokler ga ne omogoči skrbnik spletnega mesta.
@@ -23081,6 +23120,7 @@ sl:
   title_required_3ff5969: "Zahtevan je naslov"
   title_separator: ": "
   title_tray_ec9f7488: "Trak %{title}"
+  title_unpublished_51ddbc6a: "%{title} (neobjavljeno)"
   title_was_successfully_created_f2a07c56: "»%{title}« je bil(a) uspešno ustvarjen(a)."
   title_was_successfully_updated_14b78676: "»%{title}« je bil(a) uspešno posodobljen(a)."
   titles: 
@@ -23903,7 +23943,9 @@ sl:
   upload_media_ce31135a: "Naloži medije"
   upload_not_available_for_this_folder_8f8623c6: "Za to mapo ni na voljo nalaganje"
   upload_percent_complete_d533d3e2: "Odstotek zaključenega nalaganja"
+  upload_progress_df577c48: "Poteka nalaganje"
   upload_progress_for_name_39f03acf: "Napredovanje nalaganja za %{name}"
+  upload_success_f51f3a39: "Nalaganje je uspelo"
   upload_successful_ca47465f: "Nalaganje je uspelo"
   upload_your_outcomes_bceeadbe: "Naložite svoje učne izide."
   uploaded_285a2bfb: Naloženo
@@ -23975,6 +24017,7 @@ sl:
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Uporabljajte novo zunanje orodje Skupinske naloge, ki nudi dodatne možnosti za sodelovanje."
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Namesto običajnih kvizov sistema Canvas uporabite novo orodje za kvize LTI."
   use_the_new_scheduler_1273b832: "Uporabite novi razporejevalnik."
+  use_this_grading_scheme_52aa4ecf: "Uporabi to ocenjevalno shemo"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "S tem seznamom odstranite dodeljene študente. Nove študente dodajajte s spustnim seznamom za seznamom."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "S to ploščo razrešite podvojene rezultate ali osebe, ki jih z iskanjem ne najdete."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "S to ploščo poiščite osebe, ki jih želite dodati temu predmetu."
@@ -24468,6 +24511,7 @@ sl:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Vodniki za videokonference za oddaljene učilnice"
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Orodja za videokonference omogočajo osebno povezavo med učitelji in učenci."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Vaša naprava ali aplikacija ne podpira vsebine videoposnetkov."
+  video_file_f7188ffe: Videodatoteka
   video_player_b371005: "Predvajalnik videoposnetkov"
   video_player_for_label_6a5fdb03: "Predvajalnik videoposnetkov za %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
@@ -25059,9 +25103,16 @@ sl:
   you_have_changed_the_progression_requirements_for__6772bc89: "Spremenili ste zahteve napredovanja za aktivni predmet. Morda obstajajo študenti, ki so že napredovali v ta modul in v druge, od njega odvisne module."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Zaključili ste ocenjevanje kolegov za %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Zaključili ste ocenjevanje kolega za %{person}. Hvala."
+  you_have_completed_your_peer_reviews_543ad84: "Ocenjevanje kolegov ste zaključili!"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Imate še 1 koledar"
     other: "Imate še %{count} koledarjev"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "Zaključiti morate še 1 ocenjevanje kolegov."
+    other: "Zaključiti morate še %{count} ocenjevanj kolegov."
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "Zaključiti morate 1 ocenjevanje kolegov."
+    other: "Zaključiti morate %{count} ocenjevanj kolegov."
   you_have_count_peer_reviews_to_complete_52e065e: "Za izvedbo imate %{count} ocenjevanj kolegov"
   you_have_count_submissions_to_grade_6c5b511a: "Za oceniti imate %{count} oddaj"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Ustvarili ste komentar, ki ni bil objavljen. Ali želite nadaljevati in ta komentar shraniti kot osnutek? (Osnutke komentarjev lahko objavite kadarkoli.)"
@@ -25133,6 +25184,7 @@ sl:
   you_must_set_document_usage_rights_b4afa1e9: "Določiti morate pravice uporabe dokumenta"
   you_must_set_usage_rights_87fc1382: "Določiti morate pravice uporabe"
   you_must_specify_a_usage_right_5eb57f87: "Določiti morate pravico uporabe."
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: "Preden lahko ocenite kolege, morate oddai svoje delo."
   you_must_use_a_number_912ce4bd: "Uporabiti morate število"
   you_must_use_a_positive_number_203b86fe: "Uporabiti morate pozitivno število"
   you_must_use_an_integer_78d2530f: "Uporabiti je treba celo število"
@@ -25261,6 +25313,7 @@ sl:
   zero_activity_title: "Ni aktivnosti."
   zip_26961da: zip
   zip_argument_error: "Pri nalaganju datoteke .zip mora obstajati mapa, v katero bo datoteka naložena."
+  zip_file_3e736239: "Datoteka .zip"
   zip_file_description: "Vtičnik migracij za raztezanje arhivov .zip v datoteke predmeta, skupine ali uporabnika."
   zip_file_display: "Uvoz datoteke"
   zip_file_file_description: "Razširi datoteko .zip v mapo"

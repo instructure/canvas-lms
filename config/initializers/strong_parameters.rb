@@ -54,15 +54,9 @@ module ArbitraryStrongishParams
         end
       else
         # Declaration { user: :name } or { user: [:name, :age, { address: ... }] }.
-        params[key] = if Rails.version < "7.0"
-                        each_element(value) do |element|
-                          element.permit(*Array.wrap(filter[key]))
-                        end
-                      else
-                        each_element(value, filter[key]) do |element|
-                          element.permit(*Array.wrap(filter[key]))
-                        end
-                      end
+        params[key] = each_element(value, filter[key]) do |element|
+          element.permit(*Array.wrap(filter[key]))
+        end
       end
     end
   end

@@ -18,6 +18,7 @@
 
 import SelectContentDialog from '@canvas/select-content-dialog'
 import $ from 'jquery'
+import _ from 'lodash'
 
 let fixtures = null
 let clickEvent = {}
@@ -184,45 +185,44 @@ const customParams = {
   referer: 'LTI test tool example',
 }
 
-const deepLinkingEvent = {
-  data: {
-    subject: 'LtiDeepLinkingResponse',
-    content_items: [
-      {
-        type: 'ltiResourceLink',
-        url: 'https://www.my-tool.com/launch-url',
-        title: 'My Tool',
-        new_tab: '0',
-        custom: customParams,
-        iframe: {
-          width: 123,
-          height: 456,
-        },
-      },
-    ],
-    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+const contentItem = {
+  type: 'ltiResourceLink',
+  url: 'https://www.my-tool.com/launch-url',
+  new_tab: '0',
+  custom: customParams,
+  iframe: {
+    width: 123,
+    height: 456,
   },
 }
+const makeDeepLinkingEvent = (additionalContentItemFields = {}) => {
+  return {
+    data: {
+      subject: 'LtiDeepLinkingResponse',
+      content_items: [
+        _.merge(additionalContentItemFields, contentItem)
+      ],
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+    }
+  }
+}
+const deepLinkingEventWithoutTitle = makeDeepLinkingEvent()
+const deepLinkingEvent = makeDeepLinkingEvent({ title: 'My Tool' })
 
 const assignmentId = '42'
-const deepLinkingEventWithAssignmentId = {
-  data: {
-    subject: 'LtiDeepLinkingResponse',
-    content_items: [
-      {
-        type: 'ltiResourceLink',
-        url: 'https://www.my-tool.com/launch-url',
-        title: 'My Tool',
-        new_tab: '0',
-        assignment_id: assignmentId,
-      },
-    ],
-    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
-  },
-}
+const deepLinkingEventWithAssignmentId = makeDeepLinkingEvent({
+  title: 'My Tool',
+  assignment_id: assignmentId
+})
 
 test('sets the tool url', async () => {
   await SelectContentDialog.deepLinkingResponseHandler(deepLinkingEvent)
+  const {url} = deepLinkingEvent.data.content_items[0]
+  equal($('#external_tool_create_url').val(), url)
+})
+
+test('sets the tool url without the optional title', async () => {
+  await SelectContentDialog.deepLinkingResponseHandler(deepLinkingEventWithoutTitle)
   const {url} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_url').val(), url)
 })

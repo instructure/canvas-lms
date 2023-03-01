@@ -273,7 +273,7 @@ class ContextController < ApplicationController
         add_body_class "not-editing"
 
         add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
-        add_crumb(@user.name, context_url(@context, :context_user_url, @user))
+        add_crumb(@user.short_name, context_url(@context, :context_user_url, @user))
         add_crumb(t("#crumbs.access_report", "Access Report"))
         set_active_tab "people"
 

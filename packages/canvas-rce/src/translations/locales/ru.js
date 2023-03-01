@@ -23,6 +23,7 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
   },
+  "description_436c48d7": { "message": "Описание" },
   "icon_215a1dc6": { "message": "Значок" },
   "links_to_an_external_site_de74145d": {
     "message": "Ссылки на внешний сайт."
@@ -31,6 +32,7 @@ const locale = {
   "minimize_video_20aa554b": { "message": "Уменьшить видео" },
   "replace_e61834a7": { "message": "Заменить" },
   "reset_95a81614": { "message": "Сброс" },
+  "start_over_f7552aa9": { "message": "Начать заново" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "Предварительный просмотр документа в данный момент обрабатывается. Повторите попытку позже."
   },

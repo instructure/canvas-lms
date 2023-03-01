@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import {divide, sum, sumBy} from './GradeCalculationHelper'
+import type {AssignmentGroupGrade} from './grading.d'
 
 function partition(collection, partitionFn) {
   const grouped = _.groupBy(collection, partitionFn)
@@ -311,7 +312,7 @@ function calculateGroupGrade(group, allSubmissions, opts) {
 //   final: <AssignmentGroup Grade *see above>
 //   scoreUnit: 'points'
 // }
-function calculate(allSubmissions, assignmentGroup, ignoreUnpostedAnonymous) {
+function calculate(allSubmissions, assignmentGroup, ignoreUnpostedAnonymous): AssignmentGroupGrade {
   const submissions = _.uniq(allSubmissions, 'assignment_id')
   return {
     assignmentGroupId: assignmentGroup.id,

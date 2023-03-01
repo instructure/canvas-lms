@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {groupBy, debounce} from 'lodash'
 
 import {Spinner} from '@instructure/ui-spinner'
@@ -40,6 +40,7 @@ const SEARCH_DELAY = 350
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
+  const [groupedFeatures, setGroupedFeatures] = useState()
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [stateFilter, setStateFilter] = useState('all')
@@ -77,17 +78,21 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
 
   const matchesFilters = x => matchesName(x.display_name) && matchesState(x.feature_flag)
 
-  const groupedFeatures = groupBy(
-    features.filter(
-      feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
-    ),
-    'applies_to'
-  )
-  if (groupedFeatures.Account || groupedFeatures.RootAccount) {
-    groupedFeatures.Account = (groupedFeatures.Account || []).concat(
-      groupedFeatures.RootAccount || []
+  useEffect(() => {
+    const groupings = groupBy(
+      features.filter(
+        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
+      ),
+      'applies_to'
     )
-  }
+
+    if (groupings.Account || groupings.RootAccount) {
+      groupings.Account = (groupings.Account || []).concat(groupings.RootAccount || [])
+    }
+
+    setGroupedFeatures(groupings)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hiddenFlags, disableDefaults, features, searchQuery, stateFilter])
 
   const categories = [
     {
@@ -175,7 +180,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
           </Flex>
 
           {categories.map(cat => {
-            if (!groupedFeatures[cat.id]?.length) {
+            if (!groupedFeatures?.[cat.id]?.length) {
               return null
             }
             return (

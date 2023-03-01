@@ -31,17 +31,74 @@ module OutcomesServiceAuthoritativeResultsHelper
 
   # Transforms an OS' hash of AuthoritativeResult collection into a
   # RollupScore collection
-  def rollup_scores(authoritative_results)
-    rollup_user_results convert_to_learning_outcome_results(authoritative_results)
+  def rollup_scores(authoritative_results, context, outcomes, users, assignments)
+    rollup_user_results convert_to_learning_outcome_results(authoritative_results, context, outcomes, users, assignments)
   end
 
   # Transforms an OS' hash AuthoritativeResult collection into a
   # LearningOutcomeResult collection
-  def convert_to_learning_outcome_results(authoritative_results)
+  def convert_to_learning_outcome_results(authoritative_results, context = nil, outcomes = nil, users = nil, assignments = nil)
+    outcomes_map = outcomes.index_by(&:id)
+    user_map = users.index_by(&:uuid)
+    assignments_map = assignments.index_by(&:id)
     authoritative_results.each_with_object([]) do |r, all_results|
-      result = convert_to_learning_outcome_result(r)
+      result = convert_to_learning_outcome_result_fast(r, context, outcomes_map, user_map, assignments_map)
       all_results.push(result) unless result.nil?
     end
+  end
+
+  def convert_to_learning_outcome_result_fast(authoritative_result, context, outcomes, users, assignments)
+    assignment = assignments[authoritative_result[:associated_asset_id].to_i]
+    outcome = outcomes[authoritative_result[:external_outcome_id].to_i]
+    student_user = users[authoritative_result[:user_uuid]]
+
+    root_account = context.root_account
+    alignment = ContentTag.new(
+      content: assignment,
+      tag_type: "learning_outcome",
+      learning_outcome_id: authoritative_result[:external_outcome_id],
+      context: context
+    )
+
+    # Retrieves the appropriate proficiency ratings for the outcome at the current context
+    proficiency = retrieve_proficiency(context, outcome)
+
+    possible = authoritative_result[:points_possible].to_f
+    score = authoritative_result[:points].to_f if authoritative_result[:points]
+
+    # timestamps are defaulted to submitted_at because OS doesn't store any other
+    submitted_at = authoritative_result[:submitted_at]
+
+    learning_outcome_result =
+      LearningOutcomeResult.new(
+        learning_outcome_id: authoritative_result[:external_outcome_id],
+        associated_asset: assignment,
+        # submission (aka artifact) is not needed for calculating rollup scores
+        title: "#{student_user.name}, #{assignment.name}", # title is needed; so we need the assignment (see rollup_score_aggregator_help:latest_result)
+        user: student_user,
+        user_uuid: student_user.uuid,
+        alignment: alignment,
+        context: context,
+        root_account: root_account,
+        possible: possible,
+        score: score,
+        # mastery is computed after the call for calculate_percent!
+        original_possible: possible,
+        original_score: score,
+        created_at: submitted_at,
+        updated_at: submitted_at,
+        submitted_at: submitted_at,
+        assessed_at: submitted_at
+      )
+
+    # Don't call calculate_percent! on the learning_outcome_result. That takes features not yet implemented in
+    # new quizzes into account (like outcome score scaling). Instead, percent should always be score / possible
+    learning_outcome_result.percent = calculate_percent(score, possible)
+
+    # this implementation ignores mastery as returned by the OS endpoint
+    calculate_mastery!(learning_outcome_result, proficiency)
+
+    learning_outcome_result
   end
 
   # Transforms an OS' hash AuthoritativeResult (AR) object into an

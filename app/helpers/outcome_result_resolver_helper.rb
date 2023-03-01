@@ -20,8 +20,8 @@
 module OutcomeResultResolverHelper
   include OutcomesServiceAuthoritativeResultsHelper
 
-  def resolve_outcome_results(authoritative_results, context)
-    results = convert_to_learning_outcome_results(authoritative_results)
+  def resolve_outcome_results(authoritative_results, context, outcomes, users, assignments)
+    results = convert_to_learning_outcome_results(authoritative_results, context, outcomes, users, assignments)
     rubric_results = LearningOutcomeResult.preload(:learning_outcome).active.where(context: context, association_type: "RubricAssociation")
     results.reject { |res| rubric_result?(res, rubric_results) }
   end

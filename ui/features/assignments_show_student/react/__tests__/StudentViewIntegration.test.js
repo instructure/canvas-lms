@@ -246,7 +246,7 @@ describe('student view integration tests', () => {
   })
 
   describe('peer reviews', () => {
-    function createGraphqlMocks() {
+    function createGraphqlMocks(reviewerOverrides = {}) {
       const mocks = [
         {
           query: STUDENT_VIEW_QUERY,
@@ -255,6 +255,7 @@ describe('student view integration tests', () => {
         {
           query: STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
           variables: {assignmentLid: '1', submissionID: '1', reviewerSubmissionID: '2'},
+          overrides: reviewerOverrides,
         },
         {
           query: SUBMISSION_HISTORIES_QUERY,
@@ -278,11 +279,26 @@ describe('student view integration tests', () => {
       return mockResults
     }
 
-    it('renders empty state when peer review mode is enabled but there are no submissions to review', async () => {
+    it('renders needs submission view when peer review mode is enabled and the reviewer has not submitted', async () => {
+      window.ENV.peer_review_mode_enabled = true
+      window.ENV.peer_review_available = true
+
+      const mocks = await createGraphqlMocks({Submission: {state: 'unsubmitted'}})
+      const {findByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
+        </MockedProvider>
+      )
+      expect(
+        await findByText('You must submit your own work before you can review your peers.')
+      ).toBeInTheDocument()
+    })
+
+    it('renders unavailible view when peer review mode is enabled and the reviewer has submitted but there are no submissions to review', async () => {
       window.ENV.peer_review_mode_enabled = true
       window.ENV.peer_review_available = false
 
-      const mocks = await createGraphqlMocks()
+      const mocks = await createGraphqlMocks({Submission: {state: 'submitted'}})
       const {findByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
@@ -293,7 +309,7 @@ describe('student view integration tests', () => {
       ).toBeInTheDocument()
     })
 
-    it('does not render empty state when peer review mode is disabled', async () => {
+    it('does not render unavailible or needs submission view when peer review mode is disabled', async () => {
       window.ENV.peer_review_mode_enabled = false
       window.ENV.peer_review_available = false
 
@@ -304,11 +320,14 @@ describe('student view integration tests', () => {
         </MockedProvider>
       )
       expect(
-        await queryByText('There are no submissions available to review just yet.')
+        queryByText('You must submit your own work before you can review your peers.')
+      ).not.toBeInTheDocument()
+      expect(
+        queryByText('There are no submissions available to review just yet.')
       ).not.toBeInTheDocument()
     })
 
-    it('does not render empty state when peer review mode is enabled and there are submissions to review', async () => {
+    it('does not render unavailible or needs submission view when peer review mode is enabled and there are submissions to review', async () => {
       window.ENV.peer_review_mode_enabled = true
       window.ENV.peer_review_available = true
 
@@ -319,7 +338,10 @@ describe('student view integration tests', () => {
         </MockedProvider>
       )
       expect(
-        await queryByText('There are no submissions available to review just yet.')
+        queryByText('You must submit your own work before you can review your peers.')
+      ).not.toBeInTheDocument()
+      expect(
+        queryByText('There are no submissions available to review just yet.')
       ).not.toBeInTheDocument()
     })
   })

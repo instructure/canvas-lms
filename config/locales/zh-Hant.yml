@@ -1216,6 +1216,12 @@ zh-Hant:
         default: 
           lti_reports: 
             text: "本報告提供導出數據，顯示 LTI（學習工具互操作性）的使用信息。"
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: 學期
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4798,6 +4804,7 @@ zh-Hant:
   audio_1c89b0c8: 音訊
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "您的設備或 app 不支援音頻内容。"
   audio_dd489fcc: 音頻
+  audio_file_bf3ece7e: 音訊檔案
   audio_player_for_label_dd9a6819: "%{label} 的音訊播放器"
   august_781433e8: 八月
   australia_61_eb9bb701: "澳大利亞 (+61)"
@@ -6281,6 +6288,7 @@ zh-Hant:
   cluster_cluster_b57fe99a: "群組：%{cluster}"
   cluster_f407976: 群集
   code_93e9abbb: 代碼
+  code_file_424dc478: 代碼檔案
   code_is_case_sensitive_d8175cad: 密碼會區分大小寫
   cog_icon_69bdffd5: 齒輪圖標
   col_is_sorted_ascending_cc5152cc: "%{col} 已升序排列"
@@ -6337,6 +6345,7 @@ zh-Hant:
     errors: 
       cannot_load_collaboration: 無法載入協作
       create_failed: 協作創建失敗
+      no_masquerading_on_collaboration: 不允許作為其他使用者時檢視協作。
       no_name: 請為此協作輸入名稱。
       not_enabled: "尚未為此 Canvas 網站啟用協作"
       title_too_long: "請為名稱使用 %{maxLength} 個或更少的字元。使用額外內容的描述。"
@@ -10483,6 +10492,10 @@ zh-Hant:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: 顯示值
   displaying_to_students_b1e92058: 向學生顯示
+  displayname_loaded_14d71a0a: "已載入 %{displayName}"
+  displayname_loading_in_progress_2be325fd: "正在載入 %{displayName} 中"
+  displayname_loading_pending_3aa2723e: "擱置 %{displayName} 載入"
+  displayname_loading_success_8177d735: "%{displayName} 載入成功"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       如教師針對
       課程執行連結驗證器，並且並無發現任何問題，則會顯示彩帶效果。
@@ -10501,6 +10514,7 @@ zh-Hant:
   do_nothing_9672b478: 什麼也不做
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Doc 檔案"
   document_to_annotate_d37b93bc: 要註釋的文件
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork 檔案支援"
   docviewer_area_created_37502a31: "已創建 Docviewer 區域"
@@ -10993,6 +11007,7 @@ zh-Hant:
   enabled_unlocked_8d3a5df7: 已啟用（已解鎖）
   enabled_web_services_f620b2be: "啟用的 Web 服務"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 啟用重新設計的「傳送訊息給以下學生...」對話，允許傳送訊息給學生以外的觀察者。
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "啟用存取新測驗公開 API：測驗項目 API。"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "啟用透過 Canvas 存取新測驗公開 API。"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 在新成績單提交項目托盤中啟用抄襲報告和相似度評分的顯示。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 啟用要套用到作業列表、行事曆活動和其他的重要日期。
@@ -11584,6 +11599,7 @@ zh-Hant:
       exclusion: 已保留
       greater_than: "必須大於 %{count}"
       greater_than_or_equal_to: "必須大於或等於 %{count}"
+      in: "必須在 %{count} 中"
       inclusion: 不包含在清單中
       invalid: 無效
       less_than: "必須小於 %{count}"
@@ -11718,6 +11734,7 @@ zh-Hant:
   exceeded_the_maximum_length_number_characters_2d25611e: "已超過最大長度（%{number} 個字元）"
   exceeds_expectations_5910fc3a: 超出預期
   exceeds_mastery_1f995dce: 超過掌握程度
+  excel_file_c6b9890: "Excel 檔案"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior 學生活動追蹤"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: 排除自指定日期起未更新的任何資料
   exclude_assignments_graded_with_a_0_score_5c853dc4: "排除已評分為 0 分的作業列表。"
@@ -12213,6 +12230,7 @@ zh-Hant:
   file_storage_32477f6: 檔案儲存
   file_tree_collapsed_d4b0ae96: 已收起檔案樹
   file_tree_expanded_a1d20c4a: 已展開檔案樹
+  file_type_fd1ba7ee: 檔案類型
   file_upload_9cae6da5: 檔案上傳
   file_upload_failed_af22dd91: 檔案上載失敗
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "需要檔案上傳、file_url 或 content_export_id"
@@ -12394,6 +12412,7 @@ zh-Hant:
   flags_tab_updates_c4c209f1: 標記標籤更新
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: "Flash 檔案"
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr 顯示 SafeSearch 個 Creative Common 共用網域內的圖像。
@@ -12410,6 +12429,7 @@ zh-Hant:
   folder_705fd2d7: 文件夾
   folder_browsing_tree_1f00a3ae: 文件夾瀏覽樹
   folder_icon_29017021: 文件夾圖標
+  folder_locked_b91cd0c4: 資料夾已鎖定
   folder_tree_fbab0726: 樹狀資件夾
   folders: 
     event_updated: 事件已成功更新。
@@ -14383,6 +14403,7 @@ zh-Hant:
   html5_media_recorder_in_rce_bb59b78f: "在 RCE 中的 HTML5 媒體錄製"
   html_editor_fb2ab713: "HTML 編輯器"
   html_fc8563c6: html
+  html_file_62393d3f: "HTML 檔案"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP 回應：%{code}"
@@ -14762,6 +14783,7 @@ zh-Hant:
   ilumno_grade_export_251bc4b5: "Ilumno 評分匯出"
   image_8ad06: 影像
   image_c1c98202: 影像
+  image_file_2b538bc: 影像檔案
   image_id_is_not_a_valid_id_7dd6bad6: "image_id 是一個無效的 ID"
   image_search_b0944fc2: 影像搜索
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url 和 image_id 無法同時設置。"
@@ -15227,6 +15249,7 @@ zh-Hant:
   ireland_353_3cd32cc0: "愛爾蘭 (+353)"
   ireland_f7bb9899: 愛爾蘭
   irish_567e109f: 愛爾蘭語
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " 正使用可同時提供 10 個視訊會議的免費版 BigBlueButton，每個會議有 1 個主持人和最多 24 個參加者。記錄儲存 7 天。"
   isolated_entry_post_error_page_2a447d08: 隔離的條目公佈錯誤頁面
@@ -15859,6 +15882,8 @@ zh-Hant:
   loading_grades_for_coursename_26784c2d: "載入 %{courseName} 的成績"
   loading_grading_periods_c635d96: 載入評分期中...
   loading_grading_periods_for_coursename_bbe46919: "載入 %{courseName} 的評分期"
+  loading_grading_schemes_dc26ebd3: 正在載入等級評分方式中...
+  loading_grading_schemes_failed_please_try_again_269918df: 載入等級評分方式失敗。請重試。
   loading_group_f1647ebb: "載入 %{group}"
   loading_grouptitle_dba362d2: "載入 %{groupTitle}。"
   loading_homeroom_announcement_content_1654f8c7: 載入主教室通告內容
@@ -19028,6 +19053,7 @@ zh-Hant:
   new_quizzes_migration_required_7854aa1a: 需要新測驗遷移
   new_quizzes_on_the_quizzes_page_b21f338d: 測驗頁面的新測驗
   new_quizzes_public_api_18d95321: "新測驗公開 API"
+  new_quizzes_public_api_quiz_items_16bc741d: "新測驗公開 API：測驗項目"
   new_quizzes_service_jwt_refresh_ca28ca8: "新測驗服務 JWT 刷新"
   new_quizzes_site_admin_service_user_a331233a: 新測驗網站管理員服務使用者
   new_quizzes_submission_274b5c57: 新測驗提交項目
@@ -19080,6 +19106,7 @@ zh-Hant:
   next_month_749b1778: 下個月
   next_month_b55a387c: 下個月
   next_page_d2a39853: 下一頁
+  next_peer_review_3d05ef23: 下一次同儕互評
   next_question_f37bac25: 下一道問題
   next_run_at_635de64a: 下次運行時間
   next_steps_ce0f0d0c: 接下來的步驟
@@ -20338,6 +20365,7 @@ zh-Hant:
     exception: 很抱歉，發生錯誤，請稍後再試一次。
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "PDF 檔案"
   peer_632472b7: 同儕：
   peer_review_74f26a13: 同儕互評
   peer_review_assignment_7d314c59: 同儕檢閱作業
@@ -20347,6 +20375,7 @@ zh-Hant:
   peer_review_for_assignment_ce72fc52: "%{assignment} 的同行審閱"
   peer_review_for_name_bcffa32f: "%{name} 的同儕互評"
   peer_review_for_name_due_dueattext_f5f6547d: "%{name} 的同儕互評截止日期：%{dueAtText}"
+  peer_review_prompt_571c5d22: 同儕互評提示
   peer_review_support_in_assignment_enhancements_b1df2b76: 作業強化中的同儕檢閱支援
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: 新作業流態尚未處理同儕檢閱作業。是否要前往舊版創建作業頁面？
   peer_reviewed_graded_discussion_b339df5b: 同儕評審評分討論：
@@ -21098,6 +21127,7 @@ zh-Hant:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: 公佈成績將重新整理您的瀏覽器。這可能需要一點時間。
   posting_to_students_eaa57964: 向學生公佈
   powered_by_instructure_504d676d: "由 Instructure 提供"
+  powerpoint_file_c4cb12af: "PowerPoint 檔案"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24808,6 +24838,7 @@ zh-Hant:
                                     請在 Slack 中的 #canvas-sre 中聯絡。
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "已建立 SFTP 使用者。此使用者開始運作可能花費最多四小時的時間。"
   sftp_user_management_19868cb3: "SFTP 使用者管理"
+  shadow_e98b5937: 陰影
   shard_5d340495: 碎片
   shard_id_optional_382e5dda: "碎片 ID（選用）"
   shard_shard_95c57736: "碎片：%{shard}"
@@ -25893,6 +25924,7 @@ zh-Hant:
   sort_by_72dbba9c: 排序規則為
   sort_by_e75f9e3e: 排序依據
   sort_courses_cf94b8d4: 將課程分類
+  sort_ordertype_by_sortby_a0dd1c8: "依據 %{sortBy} 將 %{orderType} 排序"
   sort_outcome_column_c53702ed: 將學習成果欄排序
   sort_students_1a561e98: 將學生排序
   sortable_name_73f707cf: 可排序的名稱
@@ -26219,6 +26251,7 @@ zh-Hant:
       課程學習成果的進度的方式。學習成果以類似成績單的
       格式呈現，而且進步以分數和精通/接近
       精通/補修的形式顯示。
+  student_outcome_result_b26b7ab4: 學生學習成果結果
   student_pace_2200bf85: 學生進度
   student_page_history_ce86b3c2: 學生頁面歷史記錄
   student_page_history_pages_update_ae55fa03: "學生頁面歷史記錄（內容頁 - 更新）"
@@ -26236,6 +26269,7 @@ zh-Hant:
   student_sis_id_abe6b292: "學生 SIS ID"
   student_student_number_5c98bd2d: "學生 %{student_number}"
   student_studentnumber_f398d9c2: "學生%{studentNumber}"
+  student_submission_report_af01e697: 學生提交項目報告
   student_submissions_910da1b3: 學生提交項目
   student_submissions_report_prospect_education_108daf59: 學生提交項目報告（預期的教育）
   student_summary: 
@@ -26909,6 +26943,7 @@ zh-Hant:
   text_entry_e1808b2f: 文字條目
   text_entry_submission_7b0ae0c5: 文字輸入提交
   text_entry_submission_cannot_be_empty_3d187cae: 文本條目的提交件不能為空白
+  text_file_73d8d08c: 文字檔案
   text_input_d3480b8c: 文本輸入
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "文字「沒有問題」已移動到激勵 (Stimulus)。請添加問題，使其可以在測驗中顯示。"
   thai_8f9bc548: 泰語
@@ -27215,6 +27250,7 @@ zh-Hant:
   the_state_parameter_is_required_ffadf213: 需要狀態參數
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: 學生註釋標籤包括作業的文件。有額外的提交類型的標籤可能也可以使用。
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "要報告的學生；預設為 Canvas ID，除非另外在 student_id_type 中指定為 SIS"
+  the_submission_is_not_available_just_yet_b3c199c: 提交項目尚無法使用。
   the_submitted_after_date_to_report_on_9d90f026: 在要報告的日期後提交
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       課程大綱能為課程使用者提供見解，並讓學生
@@ -27550,6 +27586,9 @@ zh-Hant:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       此功能可讓提交項目檔案上傳 API 針對
       相關作業所有允許擴展名檢查檔案類型。
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      僅限有網站管理員存取權限的使用者可以看到此功能選項。這種情況類似
+                                「隱藏」，但即使由網站管理員使用者啟用，終端使用者仍無法看到。
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       僅限有網站管理員存取權限的使用者可以看到此功能選項。
                                   網站管理員使用者啟用後，終端使用者才會看到該選項。
@@ -28055,6 +28094,7 @@ zh-Hant:
   title_required_3ff5969: 標題必填
   title_separator: "： "
   title_tray_ec9f7488: "%{title}收集箱"
+  title_unpublished_51ddbc6a: "%{title}（已取消發佈）"
   title_was_successfully_created_f2a07c56: "成功建立「%{title}」。"
   title_was_successfully_updated_14b78676: "成功更新「%{title}」。"
   titles: 
@@ -29184,7 +29224,9 @@ zh-Hant:
   upload_media_ce31135a: 上傳媒體
   upload_not_available_for_this_folder_8f8623c6: 此資料夾無法使用上載功能。
   upload_percent_complete_d533d3e2: 完成上傳百分比
+  upload_progress_df577c48: 上傳進度
   upload_progress_for_name_39f03acf: "上傳 %{name} 的進度"
+  upload_success_f51f3a39: 上傳成功
   upload_successful_ca47465f: 已成功上傳
   upload_your_outcomes_bceeadbe: 上傳您的學習成果！
   uploaded_285a2bfb: 已上傳
@@ -29271,6 +29313,7 @@ zh-Hant:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的測驗 LTI 工具來代替平常的 Canvas 測驗"
   use_the_new_scheduler_1273b832: 使用新的排程工具
   use_this_configuration_for_parent_observer_registr_e49f8f66: 使用此配置供父母/觀察者註冊
+  use_this_grading_scheme_52aa4ecf: 使用此等級評分方式
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: 以此列表去移除已點選學生。使用列表下方的組合框添加新學生。
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: 使用此面板可以解決您的搜尋中的重複結果或找不到的成員。
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: 使用此面板可以解決您的搜尋中的重複內容或找不到的成員。
@@ -29832,6 +29875,7 @@ zh-Hant:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: 遠端教室的視訊會議指南
   video_conferencing_tools_enable_face_to_face_conne_144420a5: 視像會議工具讓教師和學生可以進行面對面溝通。
   video_content_is_not_supported_by_your_device_or_a_25214f57: 您的設備或應用程式不支援視訊内容。
+  video_file_f7188ffe: 視訊檔案
   video_player_b371005: 視訊播放器
   video_player_for_label_6a5fdb03: "%{label} 的影片播放器"
   vietnam_84_e50a2a44: "越南 (+84)"
@@ -30514,9 +30558,16 @@ zh-Hant:
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某一活動課程的進度要求。可能有些學生的進度已達到此單元、以及基於單元的其他單元的進度要求。
   you_have_completed_a_peer_review_for_name_4dd2264b: "您已完成 %{name} 的同儕互評"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "您已完成 %{person} 的同儕評審。謝謝"
+  you_have_completed_your_peer_reviews_543ad84: 您已完成您的同儕互評！
   you_have_count_calendars_left_f0cbcac4: 
     one: "您還剩餘 %{count} 個行事曆"
     other: "您還剩餘 %{count} 個行事曆"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "您還有 %{count} 次同儕互評待完成。"
+    other: "您還有 %{count} 次同儕互評待完成。"
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "您有 %{count} 次同儕互評待完成。"
+    other: "您有 %{count} 次同儕互評待完成。"
   you_have_count_peer_reviews_to_complete_52e065e: "您有 %{count} 同儕互評待完成"
   you_have_count_submissions_to_grade_6c5b511a: "您有 %{count} 個提交項目要評分"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: 您已建立尚未公佈的評論。是否要繼續並將此評論另存為草稿？（您可以隨時公佈草稿評論。）
@@ -30600,6 +30651,7 @@ zh-Hant:
   you_must_set_usage_rights_87fc1382: 您必須設定使用權限
   you_must_specify_a_usage_right_5eb57f87: 您必須指定一項使用權
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "您必須指定是否啟用或停用「Microsoft Teams 同步」"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: 您必須在您可以互評同儕前提交您自己的工作。
   you_must_use_a_number_912ce4bd: 必須使用數字
   you_must_use_a_positive_number_203b86fe: 必須使用一個正數
   you_must_use_an_integer_78d2530f: 您必須使用整數
@@ -30742,6 +30794,7 @@ zh-Hant:
   zero_activity_title: 零活動
   zip_26961da: zip
   zip_argument_error: ".Zip  文檔的上傳需要上傳的目標文件夾。"
+  zip_file_3e736239: "Zip 檔案"
   zip_file_description: "用於將 .zip 存檔文件解壓縮到課程、群組或使用者文檔中的遷移外掛程式"
   zip_file_display: 文檔導入
   zip_file_file_description: "解壓縮 .zip 文檔至文件夾"

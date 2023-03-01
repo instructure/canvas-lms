@@ -489,6 +489,7 @@ class Enrollment < ActiveRecord::Base
     self.end_at = other.end_at
     self.course_section_id = other.course_section_id
     self.root_account_id = other.root_account_id
+    self.sis_batch_id = other.sis_batch_id
     self.skip_touch_user = other.skip_touch_user
     if skip_broadcasts
       save_without_broadcasting!
@@ -1290,6 +1291,7 @@ class Enrollment < ActiveRecord::Base
   scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
   scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
 
+  scope :active_by_date_or_completed, -> { joins(:enrollment_state).where("enrollment_states.state  IN ('active', 'completed')") }
   scope :active_by_date, -> { joins(:enrollment_state).where("enrollment_states.state = 'active'") }
   scope :invited_by_date, lambda {
                             joins(:enrollment_state).where(enrollment_states: { restricted_access: false })

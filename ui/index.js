@@ -90,7 +90,10 @@ function afterDocumentReady() {
   })
 
   isolate(loadNewUserTutorials)()
-  isolate(setupMathML)()
+
+  if (!ENV.FEATURES.explicit_latex_typesetting) {
+    isolate(setupMathML)()
+  }
 }
 
 function setupMathML() {

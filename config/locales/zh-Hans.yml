@@ -1216,6 +1216,12 @@ zh-Hans:
         default: 
           lti_reports: 
             text: 此报告提供显示LTI(学习工具的互操作性)使用信息的导出数据。
+    melbourne_grammer_school: 
+      student_submission_report_parameters: 
+        account_reports: 
+          default: 
+            parameters: 
+              header: 学期
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -4794,6 +4800,7 @@ zh-Hans:
   audio_1c89b0c8: 音频
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: 音频内容未获得您的设备或应用程序的支持。
   audio_dd489fcc: 音频
+  audio_file_bf3ece7e: 音频文件
   audio_player_for_label_dd9a6819: "%{label}的音频播放器"
   august_781433e8: 八月
   australia_61_eb9bb701: 澳大利亚(+61)
@@ -6275,6 +6282,7 @@ zh-Hans:
   cluster_cluster_b57fe99a: "群集：%{cluster}"
   cluster_f407976: 集群
   code_93e9abbb: 代码
+  code_file_424dc478: 代码文件
   code_is_case_sensitive_d8175cad: 代码对大小写敏感。
   cog_icon_69bdffd5: 齿轮图标
   col_is_sorted_ascending_cc5152cc: "%{col} 已按升序排序"
@@ -6331,6 +6339,7 @@ zh-Hans:
     errors: 
       cannot_load_collaboration: 无法加载协作
       create_failed: 协作创建失败
+      no_masquerading_on_collaboration: 不允许以其他用户的身份查看协作。
       no_name: 请输入此协作的名称。
       not_enabled: "协作尚未为此 Canvas 网站启用"
       title_too_long: "请将 %{maxLength} 个或更少字符用于名称。对于其它内容，请使用描述。"
@@ -10465,6 +10474,10 @@ zh-Hans:
   display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: 显示值
   displaying_to_students_b1e92058: 正在显示给学生
+  displayname_loaded_14d71a0a: "%{displayName} 已加载"
+  displayname_loading_in_progress_2be325fd: "%{displayName} 正在加载"
+  displayname_loading_pending_3aa2723e: "%{displayName} 待加载"
+  displayname_loading_success_8177d735: "%{displayName} 加载成功"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       向教师显示在
       课程上运行链接验证器且没有发现问题的礼花。
@@ -10485,6 +10498,7 @@ zh-Hans:
   do_nothing_9672b478: 不执行任何操作
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: "Doc 文件"
   document_to_annotate_d37b93bc: 需要注释的文档
   docviewer_apple_iwork_file_support_dc772b31: "Docviewer Apple iWork 文件支持"
   docviewer_area_created_37502a31: 已创建Docviewer区域
@@ -10979,6 +10993,7 @@ zh-Hans:
   enabled_unlocked_8d3a5df7: 已启用（未锁定）
   enabled_web_services_f620b2be: 已启用Web服务
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: 启用重新设计的“给...的学生发送消息”对话框，以便除了学生之外，还能给观察员发送消息。
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "允许访问新测验公共 API：测验项目 API。"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: 启用“通过Canvas访问新测验公开API”。
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 允许在新评分册提交项托盘中显示抄袭报告和相似度评分。
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: 启用对作业、日历事件和其他应用重要日期。
@@ -11570,6 +11585,7 @@ zh-Hans:
       exclusion: 已保留
       greater_than: "必须大于 %{count}"
       greater_than_or_equal_to: "必须大于或等于 %{count}"
+      in: "必须为 %{count}"
       inclusion: 未包含于列表中
       invalid: 无效
       less_than: "必须小于 %{count}"
@@ -11704,6 +11720,7 @@ zh-Hans:
   exceeded_the_maximum_length_number_characters_2d25611e: "超过最大长度（%{number} 个字符）"
   exceeds_expectations_5910fc3a: 超出预期
   exceeds_mastery_1f995dce: 超过掌握
+  excel_file_c6b9890: "Excel 文件"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior 学生活动记录"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: 排除所有在指定日期之后一直未更新的数据
   exclude_assignments_graded_with_a_0_score_5c853dc4: "排除 0 分作业。"
@@ -12201,6 +12218,7 @@ zh-Hans:
   file_storage_32477f6: 文件存储
   file_tree_collapsed_d4b0ae96: 文件树已折叠
   file_tree_expanded_a1d20c4a: 文件树已展开
+  file_type_fd1ba7ee: 文件类型
   file_upload_9cae6da5: 文件上传
   file_upload_failed_af22dd91: 文件上传失败
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "文件上传，file_url，或者需要 content_export_id"
@@ -12382,6 +12400,7 @@ zh-Hans:
   flags_tab_updates_c4c209f1: 标记标签更新
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
+  flash_file_cbcadc71: 闪存文件
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr 显示 Creative Commons Public Domain
@@ -12398,6 +12417,7 @@ zh-Hans:
   folder_705fd2d7: 文件夹
   folder_browsing_tree_1f00a3ae: 文件夹浏览树
   folder_icon_29017021: 文件夹图标
+  folder_locked_b91cd0c4: 文件夹已锁定
   folder_tree_fbab0726: 文件夹树
   folders: 
     event_updated: 事件已成功更新。
@@ -14374,6 +14394,7 @@ zh-Hans:
   html5_media_recorder_in_rce_bb59b78f: RCE中的HTML5媒体录制器
   html_editor_fb2ab713: "HTML 编辑器"
   html_fc8563c6: html
+  html_file_62393d3f: "HTML 文件"
   http_67e238b4: "http://"
   http_73849691: http
   http_response_code_832d6baa: "HTTP 响应：%{code}"
@@ -14751,6 +14772,7 @@ zh-Hans:
   ilumno_grade_export_251bc4b5: "Ilumno 评分导出"
   image_8ad06: 图像
   image_c1c98202: 图像
+  image_file_2b538bc: 图像文件
   image_id_is_not_a_valid_id_7dd6bad6: "image_id 不是有效的 ID"
   image_search_b0944fc2: 图像搜索
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url 和 image_id 无法同时设置"
@@ -15213,6 +15235,7 @@ zh-Hans:
   ireland_353_3cd32cc0: 爱尔兰(+353)
   ireland_f7bb9899: 爱尔兰
   irish_567e109f: 爱尔兰语
+  is_blueprint_8f793ba8: is_blueprint
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " 正使用 BigBlueButton 免费版，它允许同步进行 10 个视频会议，每个会议 1 个主持人和最多 24 个参与者。录制文件保存 7 天。"
   isolated_entry_post_error_page_2a447d08: “已隔离的条目”发布错误页面
@@ -15845,6 +15868,8 @@ zh-Hans:
   loading_grades_for_coursename_26784c2d: "正在加载 %{courseName} 的评分"
   loading_grading_periods_c635d96: 正在加载评分周期...
   loading_grading_periods_for_coursename_bbe46919: "正在加载 %{courseName} 的评分周期"
+  loading_grading_schemes_dc26ebd3: 正在加载评分方案...
+  loading_grading_schemes_failed_please_try_again_269918df: 加载评分方案失败。请重试
   loading_group_f1647ebb: "正在加载 %{group}"
   loading_grouptitle_dba362d2: "正在加载 %{groupTitle}。"
   loading_homeroom_announcement_content_1654f8c7: 正在加载指导教室公告内容
@@ -19014,6 +19039,7 @@ zh-Hans:
   new_quizzes_migration_required_7854aa1a: 要求新测验迁移
   new_quizzes_on_the_quizzes_page_b21f338d: 测验(Quizzes)页面上的新测验
   new_quizzes_public_api_18d95321: 新测验公开API
+  new_quizzes_public_api_quiz_items_16bc741d: "新测验公共 API：测验项目"
   new_quizzes_service_jwt_refresh_ca28ca8: 新测验服务JWT刷新
   new_quizzes_site_admin_service_user_a331233a: 新测验站点管理员服务用户
   new_quizzes_submission_274b5c57: 新测验提交
@@ -19066,6 +19092,7 @@ zh-Hans:
   next_month_749b1778: 下个月
   next_month_b55a387c: 下个月
   next_page_d2a39853: 下一页
+  next_peer_review_3d05ef23: 下一个同伴互评
   next_question_f37bac25: 下一个问题
   next_run_at_635de64a: 下一次运行时间
   next_steps_ce0f0d0c: 后续步骤
@@ -20321,6 +20348,7 @@ zh-Hans:
     exception: 抱歉，出现错误，请稍后重试。
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
+  pdf_file_d3fac21d: "PDF 文件"
   peer_632472b7: 同伴：
   peer_review_74f26a13: 同伴互评
   peer_review_assignment_7d314c59: 同伴互评作业
@@ -20330,6 +20358,7 @@ zh-Hans:
   peer_review_for_assignment_ce72fc52: "同侪评审 %{assignment}"
   peer_review_for_name_bcffa32f: "%{name}同学互评"
   peer_review_for_name_due_dueattext_f5f6547d: "%{name}同学互评到期日：%{dueAtText}"
+  peer_review_prompt_571c5d22: 同伴互评提示
   peer_review_support_in_assignment_enhancements_b1df2b76: 作业增强中的同伴互评支持
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: 新作业流中尚未处理同伴互评作业。要转到遗留项以创建作业页面吗？
   peer_reviewed_graded_discussion_b339df5b: 互评分讨论：
@@ -21081,6 +21110,7 @@ zh-Hans:
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: 发布评分将刷新您的浏览器。这可能需要片刻的时间。
   posting_to_students_eaa57964: 正在发布给学生
   powered_by_instructure_504d676d: "由 Instructure 提供支持"
+  powerpoint_file_c4cb12af: "PowerPoint 文件"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
   ppt_9393890d: ppt
@@ -24792,6 +24822,7 @@ zh-Hans:
                                     请在 Slack 中的 #canvas-sre 中联系相关人员。
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "SFTP 用户已创建。该用户可能需要最多 4 小时才能开始使用。"
   sftp_user_management_19868cb3: "SFTP 用户管理"
+  shadow_e98b5937: 阴影
   shard_5d340495: 已共享
   shard_id_optional_382e5dda: "分区 ID（可选）"
   shard_shard_95c57736: "分片：%{shard}"
@@ -25871,6 +25902,7 @@ zh-Hans:
   sort_by_72dbba9c: 排序
   sort_by_e75f9e3e: 排序
   sort_courses_cf94b8d4: 给课程排序
+  sort_ordertype_by_sortby_a0dd1c8: "按 %{sortBy} 为 %{orderType} 排序"
   sort_outcome_column_c53702ed: 对结果列排序
   sort_students_1a561e98: 对学生排序
   sortable_name_73f707cf: 可排序的名称
@@ -26199,6 +26231,7 @@ zh-Hans:
       查看有关课程学习结果的进度。结果以类似评分册的
       格式显示，进度显示为数字分数和已掌握/接近
       掌握/补课。
+  student_outcome_result_b26b7ab4: 学生成绩得分
   student_pace_2200bf85: 学生进度
   student_page_history_ce86b3c2: 学生页面历史记录
   student_page_history_pages_update_ae55fa03: "学生页面历史记录（页面 - 更新）"
@@ -26216,6 +26249,7 @@ zh-Hans:
   student_sis_id_abe6b292: "学生 sis id"
   student_student_number_5c98bd2d: "学生 %{student_number}"
   student_studentnumber_f398d9c2: "学生%{studentNumber}"
+  student_submission_report_af01e697: 学生提交报告
   student_submissions_910da1b3: 学生提交项
   student_submissions_report_prospect_education_108daf59: "学生提交项报告 (Prospect Education)"
   student_summary: 
@@ -26887,6 +26921,7 @@ zh-Hans:
   text_entry_e1808b2f: 文本输入
   text_entry_submission_7b0ae0c5: 文本输入提交
   text_entry_submission_cannot_be_empty_3d187cae: 文字输入的提交不能为空白。
+  text_file_73d8d08c: 文本文件
   text_input_d3480b8c: 文字输入
   text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Text No Question 已移动到 Stimulus；请添加问题，使其可以显示在测验中。"
   thai_8f9bc548: 泰语
@@ -27192,6 +27227,7 @@ zh-Hans:
   the_state_parameter_is_required_ffadf213: 需要状态参数
   the_student_annotation_tab_includes_the_document_f_4cc5cac8: 学生注释选项卡包括该作业的文档。可能也提供具有其他提交类型的选项卡。
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "要报告的学生；默认为 Canvas id，除非在 student_id_type 中指定为 SIS"
+  the_submission_is_not_available_just_yet_b3c199c: 暂时无法提交。
   the_submitted_after_date_to_report_on_9d90f026: 要报告的开始提交日期
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       教学大纲用于对课程用户表示欢迎，阐述对学生
@@ -27527,6 +27563,9 @@ zh-Hans:
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
       该功能使提交项文件上载api根据
       相关作业准许的扩展名检查文件类型。
+  this_feature_option_is_only_visible_to_users_with__248ec367: |-
+      此功能选项仅对具有站点管理员访问权限的用户可见。这类似于
+                                “隐藏”，但即使由站点管理员用户启用，最终用户也看不到它。
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       该功能选项仅对具有站点管理员访问权限的用户显示。
                                   在站点管理员用户启用该功能选项之前，最终用户将无法看到该选项。
@@ -28032,6 +28071,7 @@ zh-Hans:
   title_required_3ff5969: 标题是必填项
   title_separator: ": "
   title_tray_ec9f7488: "%{title}托盘"
+  title_unpublished_51ddbc6a: "%{title}（已取消发布）"
   title_was_successfully_created_f2a07c56: "“%{title}” 已创建成功。"
   title_was_successfully_updated_14b78676: "“%{title}” 已更新成功。"
   titles: 
@@ -29155,7 +29195,9 @@ zh-Hans:
   upload_media_ce31135a: 上传媒体
   upload_not_available_for_this_folder_8f8623c6: 无法上传此文件
   upload_percent_complete_d533d3e2: 上传完成百分比
+  upload_progress_df577c48: 上传进度
   upload_progress_for_name_39f03acf: "%{name} 的上传进度"
+  upload_success_f51f3a39: 上传成功
   upload_successful_ca47465f: 上传成功
   upload_your_outcomes_bceeadbe: 上传您的结果！
   uploaded_285a2bfb: 已上传
@@ -29242,6 +29284,7 @@ zh-Hans:
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的测验 LTI工具来代替平常的Canvas测验。"
   use_the_new_scheduler_1273b832: 使用新的调度器
   use_this_configuration_for_parent_observer_registr_e49f8f66: 为家长/观察员登记使用此配置
+  use_this_grading_scheme_52aa4ecf: 使用此评分方案
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: 使用该列表删除已分配的学生。利用列表后的组合框添加新学生。
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: 使用此面板解决您的搜索中重复的结果或无法找到的人。
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: 使用此面板解决您的搜索中重复的内容或无法找到的人。
@@ -29803,6 +29846,7 @@ zh-Hans:
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: 远程教室的视频会议指南
   video_conferencing_tools_enable_face_to_face_conne_144420a5: 通过视频会议工具，教师和学生可以面对面进行沟通。
   video_content_is_not_supported_by_your_device_or_a_25214f57: 视频内容不获得您的设备或应用程序的支持。
+  video_file_f7188ffe: 视频文件
   video_player_b371005: 视频播放器
   video_player_for_label_6a5fdb03: "%{label}的视频播放器"
   vietnam_84_e50a2a44: "越南 (+84)"
@@ -30482,9 +30526,16 @@ zh-Hans:
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某个活动课程的进度要求。可能有些学生的进度已达到此单元以及依赖此单元的其他单元。
   you_have_completed_a_peer_review_for_name_4dd2264b: "您已完成%{name}的同学互评"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "您已经对%{person}完成了互评。谢谢"
+  you_have_completed_your_peer_reviews_543ad84: 您已完成同伴互评！
   you_have_count_calendars_left_f0cbcac4: 
     one: "您还有 %{count} 个日历"
     other: "您还有 %{count} 个日历"
+  you_have_count_more_peer_reviews_to_complete_f7773c09: 
+    one: "您还有 %{count} 个同伴互评待完成。"
+    other: "您还有 %{count} 个同伴互评待完成。"
+  you_have_count_peer_reviews_to_complete_219498fb: 
+    one: "您有 %{count} 个同伴互评待完成。"
+    other: "您有 %{count} 个同伴互评待完成。"
   you_have_count_peer_reviews_to_complete_52e065e: "您需要完成 %{count} 个同伴互评"
   you_have_count_submissions_to_grade_6c5b511a: "您有%{count}个提交项等待评分"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: 您创建了未发布的评论。是否要继续并将该评论保存为草稿？（您可以随时发布草稿评论。）
@@ -30568,6 +30619,7 @@ zh-Hans:
   you_must_set_usage_rights_87fc1382: 必须设置使用权限
   you_must_specify_a_usage_right_5eb57f87: 您必须指定使用权限。
   you_must_specify_whether_to_enable_or_disable_micr_56c872c0: "必须指定是启用还是禁用 Microsoft Teams Sync"
+  you_must_submit_your_own_work_before_you_can_revie_2dea1448: 必须先提交自己的作业，然后才能进行同伴互评。
   you_must_use_a_number_912ce4bd: 您必须使用数字
   you_must_use_a_positive_number_203b86fe: 您必须使用正数
   you_must_use_an_integer_78d2530f: 必须使用整数
@@ -30710,6 +30762,7 @@ zh-Hans:
   zero_activity_title: 无活动
   zip_26961da: zip
   zip_argument_error: ".zip 上传需要目标上传文件夹。"
+  zip_file_3e736239: "Zip 文件"
   zip_file_description: "用于将 .zip 归档文件解压为课程、组或用户文件的迁移插件"
   zip_file_display: 文件导入
   zip_file_file_description: "将 .zip 文件解压为文件夹"
