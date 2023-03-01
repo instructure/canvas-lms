@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from '../../../format-message'
 import {ExternalToolsEnv, RceLtiToolInfo} from './ExternalToolsEnv'
 import {openToolDialogFor} from './dialog-helper'
 import {simpleCache} from '../../../util/simpleCache'
@@ -85,10 +84,9 @@ export class RceToolWrapper {
     return this.toolInfo.use_tray
   }
 
-  asButton() {
+  asToolbarButton() {
     return {
       type: 'button',
-      text: this.title,
       icon: this.iconId ?? undefined,
       tooltip: this.title,
       onAction: () => this.openDialog(),
@@ -105,7 +103,6 @@ export class RceToolWrapper {
   }
 
   openDialog(): void {
-    updateExternalToolMruButtonVisibility(this.env)
     addMruToolId(this.id, this.env)
     openToolDialogFor(this)
   }
@@ -158,19 +155,6 @@ const svgImageCache = simpleCache((imageUrl: string) => {
 
   return svg.outerHTML
 })
-
-export function updateExternalToolMruButtonVisibility(env: ExternalToolsEnv): void {
-  if (env.editor == null) return
-
-  const label = formatMessage('Apps')
-  const menubutton = env.editor.editorContainer.querySelector(
-    `.tox-tbtn--select[aria-label="${label}"]`
-  )
-  const button = env.editor.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)
-
-  menubutton?.setAttribute('aria-hidden', 'false')
-  button?.setAttribute('aria-hidden', 'true')
-}
 
 /**
  * Loads the list of most recently used external tool ids.
