@@ -1302,6 +1302,7 @@ DEPENDENCIES
   luminosity_contrast (= 0.2.1)
   mail (= 2.7.1)
   marginalia (= 1.11.1)
+  matrix (= 0.4.2)
   maxminddb (= 0.1.22)
   mechanize (= 2.7.7)
   mime-types (= 3.3.1)

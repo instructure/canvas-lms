@@ -31,7 +31,7 @@ import {
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProviderWithIntrospectionMatching as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithIntrospectionMatching'
 import React from 'react'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
@@ -1242,7 +1242,9 @@ describe('SubmissionManager', () => {
     beforeAll(async () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
-      const {unmount} = render(<TextEntry submission={{id: '1', _id: '1', state: 'unsubmitted'}} />)
+      const {unmount} = render(
+        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />
+      )
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
       })

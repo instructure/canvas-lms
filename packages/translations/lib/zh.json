@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "当前图像"
     },
+    "current_volume_level_c55ab825": {
+        "message": "当前音量"
+    },
     "custom_6979cd81": {
         "message": "自定义"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "菲律宾语"
+    },
+    "finish_bc343002": {
+        "message": "完成"
     },
     "finnish_4df2923d": {
         "message": "芬兰语"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "中等"
     },
+    "mic_a7f3d311": {
+        "message": "麦克风"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "麦克风已禁用"
+    },
     "middle_27dc1d5": {
         "message": "中间"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "未找到{ filterTerm }的结果"
+    },
+    "no_video_1ed00b26": {
+        "message": "无视频"
     },
     "none_3b5e34d2": {
         "message": "无"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "粘贴"
     },
+    "pause_12af3bb4": {
+        "message": "暂停"
+    },
     "peer_review_74f26a13": {
         "message": "同伴互评"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "像素"
     },
+    "play_1a47eaa7": {
+        "message": "播放"
+    },
     "play_media_comment_35257210": {
         "message": "播放媒体评论。"
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "播放{ name }的来自{ createdAt }的媒体评论。"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
     },
     "plus_d43cd4ec": {
         "message": "加号"
@@ -1689,6 +1713,9 @@
         "message": "预定义格式"
     },
     "preview_53003fd2": {
+        "message": "预览"
+    },
+    "preview_a3f8f854": {
         "message": "预览"
     },
     "preview_in_overlay_ed772c46": {
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "记录"
+    },
+    "recording_98da6bda": {
+        "message": "录制"
     },
     "red_8258edf3": {
         "message": "红色"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "保存"
     },
+    "save_media_cb9e786e": {
+        "message": "保存媒体"
+    },
     "schedule_preview_3bcda153": {
         "message": "日程规划预览"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "搜索"
     },
+    "select_audio_source_21043cd5": {
+        "message": "选择音频来源"
+    },
     "select_crop_shape_d441feeb": {
         "message": "选择裁剪形状"
     },
     "select_language_7c93a900": {
         "message": "选择语言"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "选择视频来源"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "已选择 { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "出了些问题。"
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "访问您的网络摄像头时出现问题。"
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "出错了，我不知道该给您看些什么。"
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "出了些问题"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "共享屏幕时遇到问题。"
     },
     "sort_by_e75f9e3e": {
         "message": "排序"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "星形标记"
+    },
+    "start_over_f7552aa9": {
+        "message": "重新开始"
+    },
+    "start_recording_9a65141a": {
+        "message": "开始录制"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } 至 { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "教学大纲"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "系统音频已启用"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "系统音频已禁用"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/箭头"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "无法通过键盘访问精美 HTML 编辑器。按 Shift O 打开原始 HTML 编辑器。"
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "所选文件超过 { maxSize } 字节限制"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "没有与此项目相关的分数"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "时间"
+    },
+    "timebar_a4d18443": {
+        "message": "进度条"
     },
     "title_ee03d132": {
         "message": "标题"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "取消发布"
+    },
+    "untitled_16aa4f2b": {
+        "message": "无标题"
     },
     "untitled_efdc2d7d": {
         "message": "无标题"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "视频选项托盘"
     },
+    "video_player_b371005": {
+        "message": "视频播放器"
+    },
     "video_player_for_9e7d373b": {
         "message": "的视频播放器 "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "查看字数和字符数"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "我们未发现正常工作的麦克风连接到设备。"
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "我们未发现正常工作的网络摄像头连接到设备。"
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "我们未发现正常工作的网络摄像头或麦克风连接到设备。"
+    },
+    "webcam_disabled_30c66986": {
+        "message": "网络摄像头已禁用"
+    },
+    "webcam_fe91b20f": {
+        "message": "网络摄像头"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "每周日程规划导航"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "您的图像已被压缩以用于 Icon Maker。小于 { size } KB 的图像将不会被压缩。"
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "您的麦克风在浏览器设置中被拦截。"
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "您的网络摄像头和麦克风在浏览器设置中被拦截。"
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "您的网络摄像头在浏览器设置中被拦截。"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "您的网络摄像头可能正在使用中。"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

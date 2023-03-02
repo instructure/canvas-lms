@@ -41,7 +41,7 @@ describe "submission_posted" do
     end
 
     it "includes 'graded' information if the submission has been graded" do
-      Timecop.freeze(Time.zone.local(2021, 12, 14, 13, 32, 8)) do
+      Timecop.freeze(Time.zone.local(Time.now.year - 1, 12, 14, 13, 32, 8)) do
         assignment.grade_student(student, score: 8, grader: teacher)
         asset.reload
         expect(message.body).to include "graded: Dec 14 at 1:32pm"

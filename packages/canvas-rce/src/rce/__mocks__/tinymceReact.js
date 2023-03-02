@@ -26,79 +26,15 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-
-class FakeEditor {
-  constructor(props) {
-    this.props = props
-    this.hidden = true
-    this._textareaId = props.id
-    this.readonly = undefined
-    this._eventHandlers = {}
-  }
-
-  execCommand(_cmd) {}
-
-  focus() {
-    this.getElement().focus()
-  }
-
-  getContainer() {
-    return this.getElement().parentElement
-  }
-
-  getElement() {
-    return document.getElementById(this._textareaId)
-  }
-
-  isHidden() {
-    return this.hidden
-  }
-
-  on(event, handler) {
-    this._eventHandlers[event] = handler
-  }
-
-  getBody() {}
-
-  getContent() {
-    return this.getElement().value
-  }
-
-  mode = {
-    set: mode => {
-      this.readonly = mode === 'readonly'
-    },
-  }
-
-  setContent(content) {
-    this.getElement().value = content
-    this._eventHandlers.change?.({
-      type: 'change',
-      target: this.getElement(),
-    })
-  }
-
-  selection = {
-    collapse: () => {},
-    select: () => {},
-  }
-
-  hide() {
-    this.hidden = true
-  }
-
-  show() {
-    this.hidden = false
-  }
-}
+import FakeEditor from '../__tests__/FakeEditor'
 
 export function Editor(props) {
   const editorRef = useRef(null)
   const textareaRef = useRef(null)
   const tinymceEditor = useRef(new FakeEditor(props))
+  window.tinymce.editors[0] = tinymceEditor.current
 
   useEffect(() => {
-    window.tinymce.editors[0] = tinymceEditor.current
     tinymceEditor.current.on('change', handleChange)
     props.onInit && props.onInit({}, tinymceEditor.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps

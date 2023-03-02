@@ -19,6 +19,7 @@
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 import CoursesListRow from '../CoursesListRow'
+import {renderRow} from '@canvas/util/react/testing/TableHelper'
 
 const props = {
   id: '1',
@@ -116,6 +117,6 @@ it('does not show add-enrollment when not allowed', () => {
 })
 
 it('shows the teacher count when needed', () => {
-  const wrapper = mount(<CoursesListRow {...props} teacher_count={3} teachers={null} />)
+  const wrapper = mount(renderRow(<CoursesListRow {...props} teacher_count={3} teachers={null} />))
   expect(wrapper.text()).toContain('3 teachers')
 })

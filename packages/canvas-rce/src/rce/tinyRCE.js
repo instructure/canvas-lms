@@ -25,7 +25,7 @@ import 'tinymce/themes/silver/theme'
 // w/o importing, webpack doesn't have them
 import 'tinymce/icons/default'
 
-// add tinymc plugins
+// add tinymce plugins
 import 'tinymce/plugins/autolink/plugin'
 import 'tinymce/plugins/autoresize/plugin'
 import 'tinymce/plugins/link/plugin'
@@ -45,6 +45,7 @@ import './plugins/instructure_condensed_buttons/plugin'
 import './plugins/instructure_equation/plugin'
 import './plugins/instructure_image/plugin'
 import './plugins/instructure_external_tools/plugin'
+import './plugins/instructure_rce_external_tools/plugin'
 import './plugins/instructure_record/plugin'
 import './plugins/instructure_links/plugin'
 import './plugins/instructure_documents/plugin'

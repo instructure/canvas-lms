@@ -752,7 +752,6 @@ describe('DiscussionTopicContainer', () => {
       it('renders when Discussion Podcast Feed is present', () => {
         const ln = document.createElement('link')
         ln.title = 'Discussion Podcast Feed'
-        ln.id = 'Discussion Podcast Feed'
         ln.type = 'application/rss+xml'
         ln.href = 'http://localhost:3000/feeds/topics/47/enrollment_mhumV2R51z5IsK.rss'
         document.head.append(ln)

@@ -19,6 +19,11 @@
 import $ from 'jquery'
 import RCEGlobals from '../../../RCEGlobals'
 
+const Delimiters = Object.freeze({
+  Inline: [['\\(', '\\)']], // effectively \( ... \) but we have to escape the first slash
+  Display: [['$$', '$$']],
+})
+
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
@@ -26,6 +31,11 @@ const localConfig = {
   },
   tex2jax: {
     ignoreClass: 'mathjax_ignore',
+    inlineMath: Delimiters.Inline,
+    displayMath: Delimiters.Display,
+  },
+  asciimath2jax: {
+    delimiters: [], // effectively disables this preprocessor
   },
   extensions: ['Safe.js'],
   Safe: {

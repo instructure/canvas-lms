@@ -3588,6 +3588,58 @@ describe DiscussionTopicsController, type: :request do
 
     expect(json.map { |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
   end
+
+  context "cross-sharding" do
+    specs_require_sharding
+
+    context "require initial post" do
+      before(:once) do
+        # In default shard, create the course and discussion topic
+        course_with_student(active_all: true)
+        @default_shard_student = @student
+        @context = @course
+        discussion_topic_model
+        @topic.require_initial_post = true
+        @topic.save
+
+        # Create a user on another shard
+        @shard1.activate do
+          @shard_student = user_factory(name: "shard1 student", active_all: true)
+        end
+
+        # Enroll shard student into the course on the default shard
+        @course.enroll_student(@shard_student, enrollment_state: "active")
+      end
+
+      describe "student" do
+        before do
+          user_session(@shard_student)
+        end
+
+        it "does not see entries before posting" do
+          @shard1.activate do
+            url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+            raw_api_call(:get, "#{url}/entries", controller: "discussion_topics_api",
+                                                 action: "entries", format: "json", course_id: @course.id.to_s,
+                                                 topic_id: @topic.id.to_s)
+          end
+          expect(response.body).to eq "require_initial_post"
+          expect(response.code).to eq "403"
+        end
+
+        it "sees entries after posting" do
+          @topic.reply_from(user: @shard_student, text: "Lorem ipsum dolor")
+          @shard1.activate do
+            url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+            api_call(:get, "#{url}/entries", controller: "discussion_topics_api",
+                                             action: "entries", format: "json", course_id: @course.id.to_s,
+                                             topic_id: @topic.id.to_s)
+          end
+          expect(response.status).to eq 200
+        end
+      end
+    end
+  end
 end
 
 def create_attachment(context, opts = {})

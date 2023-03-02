@@ -1041,8 +1041,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def user_ids_who_have_posted_and_admins
-    scope = DiscussionEntry.active.select(:user_id).distinct.where(discussion_topic_id: self)
-    ids = scope.pluck(:user_id)
+    ids = discussion_entries.active.select(:user_id).pluck(:user_id)
+    ids = ids.uniq
     ids += course.admin_enrollments.active.pluck(:user_id) if course.is_a?(Course)
     ids
   end

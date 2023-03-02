@@ -897,6 +897,25 @@ describe Canvas::LiveEvents do
       end
     end
 
+    context "when the assignment contains a value for 'asset_map'" do
+      before do
+        @assignment.asset_map = "https://www.instructure.com/asset-map.json"
+      end
+
+      it "includes the asset_map in the live event" do
+        expect_event(
+          "assignment_created",
+          hash_including(
+            {
+              assignment_id: @assignment.global_id.to_s,
+              asset_map: "https://www.instructure.com/asset-map.json"
+            }
+          )
+        )
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
     context "when the assignment is manually created in a blueprint child course" do
       before do
         master_template = MasterCourses::MasterTemplate.create!(course: course_model)

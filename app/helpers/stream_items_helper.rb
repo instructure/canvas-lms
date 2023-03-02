@@ -107,7 +107,8 @@ module StreamItemsHelper
     when "DiscussionEntry"
       polymorphic_path([item.context_type.underscore.to_sym, :discussion_topic],
                        "#{item.context_type.underscore}_id": Shard.short_id_for(item.context_id),
-                       id: Shard.short_id_for(item.data["discussion_topic_id"]))
+                       id: Shard.short_id_for(item.data["discussion_topic_id"]),
+                       entry_id: Shard.short_id_for(item.data["id"]))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"

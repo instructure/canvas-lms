@@ -348,9 +348,12 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
           end
         end
 
-        if migrating_user && needs_migration
-          MasterCourses::MasterMigration.start_new_migration!(template, migrating_user, retry_later: true)
-        end
+        next unless migrating_user && needs_migration
+
+        MasterCourses::MasterMigration.start_new_migration!(template,
+                                                            migrating_user,
+                                                            retry_later: true,
+                                                            priority: Setting.get("sis_blueprint_sync_priority", "25").to_i)
       end
     end
   end

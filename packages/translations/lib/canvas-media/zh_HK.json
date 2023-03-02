@@ -62,6 +62,9 @@
   "swedish_59a593ca": { "message": "瑞典語" },
   "tagalog_74906db7": { "message": "他加祿語" },
   "thai_8f9bc548": { "message": "泰語" },
+  "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+    "message": "選取的檔案超過 { maxSize } 位元組限制"
+  },
   "turkish_5b69578b": { "message": "土耳其語" },
   "ukrainian_945b00b7": { "message": "烏克蘭語" },
   "vietnamese_e7a76583": { "message": "緬甸語" },

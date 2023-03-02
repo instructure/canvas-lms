@@ -1399,10 +1399,7 @@ describe CommunicationChannelsController do
 
     let(:sns_developer_key) do
       allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
-      dk = DeveloperKey.default
-      dk.sns_arn = "apparn"
-      dk.save!
-      dk
+      DeveloperKey.default
     end
 
     let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
@@ -1431,10 +1428,7 @@ describe CommunicationChannelsController do
     context "has a push communication channel" do
       let(:second_sns_developer_key) do
         allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
-        dk = DeveloperKey.default
-        dk.sns_arn = "secondapparn"
-        dk.save!
-        dk
+        DeveloperKey.default
       end
 
       let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }

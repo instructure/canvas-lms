@@ -77,6 +77,32 @@ describe MasterCourses::MasterMigration do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:perform_exports).once
       run_jobs
     end
+
+    context "priority option" do
+      before :once do
+        course_factory
+        @template.add_child_course!(@course)
+      end
+
+      def assert_job_priority(priority)
+        export_job = Delayed::Job.where(tag: "MasterCourses::MasterMigration#perform_exports").last
+        expect(export_job.priority).to eq priority
+        run_job(export_job)
+
+        import_job = Delayed::Job.where(tag: "ContentMigration#import_content").last
+        expect(import_job.priority).to eq priority
+      end
+
+      it "defaults to Delayed::LOW_PRIORITY" do
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+        assert_job_priority(Delayed::LOW_PRIORITY)
+      end
+
+      it "honors the setting if present" do
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user, priority: 42)
+        assert_job_priority(42)
+      end
+    end
   end
 
   describe "perform_exports" do

@@ -143,6 +143,7 @@
   "crop_image_807ebb08": { "message": "قص صورة" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
+  "current_volume_level_c55ab825": { "message": "مستوى الصوت الحالي" },
   "custom_6979cd81": { "message": "مخصص" },
   "cyan_c1d5f68a": { "message": "سماوي" },
   "dagger_57e0f4e5": { "message": "Dagger" },
@@ -258,6 +259,7 @@
   "filename_text_preview_e41ca2d8": { "message": "معاينة النص { filename }" },
   "files_c300e900": { "message": "الملفات" },
   "files_index_af7c662b": { "message": "فهرس الملفات" },
+  "finish_bc343002": { "message": "إنهاء" },
   "flat_music_76d5a5c3": { "message": "Flat (موسيقى)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "شريط أدوات خيارات عنصر التركيز"
@@ -416,6 +418,8 @@
     "message": "جارٍ معالجة ملف الوسائط. الرجاء إعادة المحاولة لاحقًا."
   },
   "medium_5a8e9ead": { "message": "متوسط" },
+  "mic_a7f3d311": { "message": "الميكروفون" },
+  "microphone_disabled_15c83130": { "message": "تم تعطيل الميكروفون" },
   "middle_27dc1d5": { "message": "الأوسط" },
   "minimize_file_preview_da911944": { "message": "تصغير معاينة الملف" },
   "minimize_video_20aa554b": { "message": "تصغير الفيديو" },
@@ -456,6 +460,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "لم يتم العثور على نتائج لـ { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "لا يوجد مقطع فيديو" },
   "none_3b5e34d2": { "message": "بلا" },
   "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
   "not_equal_6e2980e6": { "message": "لا يساوي" },
@@ -495,6 +500,7 @@
   "parallel_d55d6e38": { "message": "موازي" },
   "partial_derivative_4a9159df": { "message": "جزئي (مشتق)" },
   "paste_5963d1c1": { "message": "لصق" },
+  "pause_12af3bb4": { "message": "إيقاف مؤقت" },
   "pentagon_17d82ea3": { "message": "خماسي" },
   "people_b4ebb13c": { "message": "أشخاص" },
   "percentage_34ab7c2c": { "message": "نسبة مئوية" },
@@ -510,9 +516,13 @@
   "pi_variant_10f5f520": { "message": "Pi (متغير)" },
   "pink_68ad45cb": { "message": "وردي" },
   "pixels_52ece7d1": { "message": "بكسل" },
+  "play_1a47eaa7": { "message": "تشغيل" },
   "play_media_comment_35257210": { "message": "تشغيل تعليق الوسائط." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "تشغيل تعليق الوسائط بواسطة { name } من { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
   },
   "plus_d43cd4ec": { "message": "موجب" },
   "plus_minus_f8be2e83": { "message": "موجب/سالب" },
@@ -522,6 +532,7 @@
   "precedes_equal_20701e84": { "message": "Precedes Equal" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
   "preview_53003fd2": { "message": "معاينة" },
+  "preview_a3f8f854": { "message": "معاينة" },
   "preview_in_overlay_ed772c46": { "message": "المعاينة بشكل متراكب" },
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
   "prime_917ea60e": { "message": "Prime" },
@@ -544,6 +555,7 @@
     "message": "الجزء الحقيقي (من العدد المركب)"
   },
   "record_7c9448b": { "message": "تسجيل" },
+  "recording_98da6bda": { "message": "جارٍ التسجيل" },
   "red_8258edf3": { "message": "أحمر" },
   "relationships_6602af70": { "message": "العلاقات" },
   "religion_icon_246e0be1": { "message": "أيقونة الدين" },
@@ -582,10 +594,13 @@
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
   },
   "save_11a80ec3": { "message": "حفظ" },
+  "save_media_cb9e786e": { "message": "حفظ الوسائط" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "بحث" },
+  "select_audio_source_21043cd5": { "message": "حدد مصدر الصوت" },
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
+  "select_video_source_1b5c9dbe": { "message": "حدد مصدر الفيديو" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } المحدد" },
   "set_minus_b46e9b88": { "message": "Set Minus" },
   "sharp_music_ab956814": { "message": "Sharp (موسيقي)" },
@@ -604,6 +619,9 @@
   "small_b070434a": { "message": "صغير" },
   "solid_circle_9f061dfc": { "message": "Solid Circle" },
   "something_went_wrong_89195131": { "message": "حدث خطأ ما." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "حدث خطأ ما أثناء الوصول إلى كاميرا الويب الخاصة بك."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
   },
@@ -611,6 +629,9 @@
     "message": "حدث خطأ ما. تحقق من الاتصال وأعد تحميل الصفحة وأعد المحاولة."
   },
   "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "حدث خطأ ما أثناء مشاركة شاشتك."
+  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "spades_suit_b37020c2": { "message": "Spades (Suit)" },
   "square_511eb3b3": { "message": "مربع" },
@@ -623,6 +644,8 @@
   "square_superset_3be8dae1": { "message": "Square Superset" },
   "square_superset_strict_fa4262e4": { "message": "Square Superset (Strict)" },
   "star_8d156e09": { "message": "نجمة" },
+  "start_over_f7552aa9": { "message": "البدء مرة أخرى" },
+  "start_recording_9a65141a": { "message": "بدء التسجيل" },
   "steel_blue_14296f08": { "message": "أزرق فولاذي" },
   "styles_2aa721ef": { "message": "الأنماط" },
   "submit_a3cc6859": { "message": "إرسال" },
@@ -649,6 +672,8 @@
     "message": "التبديل إلى محرر النص المنسق"
   },
   "syllabus_f191f65b": { "message": "المناهج" },
+  "system_audio_allowed_b2508f8c": { "message": "تم السماح لصوت النظام" },
+  "system_audio_disabled_c177bd13": { "message": "تم تمكين صوت النظام" },
   "tab_arrows_4cf5abfc": { "message": "ضغط/أسهم" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "أزرق مخضر" },
@@ -694,6 +719,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."
   },
+  "timebar_a4d18443": { "message": "Timebar" },
   "title_ee03d132": { "message": "العنوان" },
   "to_be_posted_when_d24bf7dc": { "message": "المقرر نشره: { when }" },
   "to_do_when_2783d78f": { "message": "قائمة مهام: { when }" },
@@ -715,6 +741,7 @@
   },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "غير منشور" },
+  "untitled_16aa4f2b": { "message": "بدون عنوان" },
   "untitled_efdc2d7d": { "message": "بدون عنوان" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Up And Left Diagonal Arrow"
@@ -787,6 +814,7 @@
   "vertical_dots_bfb21f14": { "message": "نقاط رأسية" },
   "video_options_24ef6e5d": { "message": "خيارات الفيديو" },
   "video_options_tray_3b9809a5": { "message": "علبة خيارات الفيديو" },
+  "video_player_b371005": { "message": "مشغل الفيديو" },
   "video_player_for_9e7d373b": { "message": "مشغل الفيديو لـ " },
   "video_player_for_title_ffd9fbc4": { "message": "مشغل الفيديو لـ { title }" },
   "view_ba339f93": { "message": "عرض" },
@@ -798,6 +826,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "عرض عدد الكلمات والأحرف"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "لم نتمكن من اكتشاف ميكروفون يعمل متصل بجهازك."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "لم نتمكن من اكتشاف كاميرا ويب تعمل متصلة بجهازك."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "لم نتمكن من اكتشاف كاميرا ويب أو ميكروفون يعملان متصلان بجهازك."
+  },
+  "webcam_disabled_30c66986": { "message": "تم تعطيل كاميرا الويب" },
+  "webcam_fe91b20f": { "message": "كاميرا الويب" },
   "white_87fa64fd": { "message": "أبيض" },
   "width_492fec76": { "message": "العرض" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -816,6 +855,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "تم ضغط صورتك لصانع الأيقونات. لن يتم ضغط الصور الأقل من { size } كيلوبايت."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "الميكروفون محظور في إعدادات المستعرض."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "كاميرا الويب والميكروفون محظوران في إعدادات المستعرض."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "كاميرا الويب محظورة في إعدادات المستعرض."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "قد تكون كاميرا الويب الخاصة بك قيد الاستخدام بالفعل."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },

@@ -197,4 +197,46 @@ describe WikiPagesController do
       end
     end
   end
+
+  describe "metrics" do
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    end
+
+    context "show" do
+      context "with edit rights" do
+        it "increments the count metric for a nonexistent page" do
+          course_with_teacher_logged_in(active_all: true)
+          bad_page_url = "something-that-doesnt-really-exist"
+          get "show", params: { course_id: @course.id, id: bad_page_url }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("wikipage.show.page_does_not_exist.with_edit_rights")
+        end
+
+        it "does not increment the count metric when page is deleted" do
+          course_with_teacher_logged_in(active_all: true)
+          @page = @course.wiki_pages.create!(title: "delete me")
+          @page.update(workflow_state: "deleted")
+          get "show", params: { course_id: @course.id, id: @page.url }
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("wikipage.show.page_does_not_exist.with_edit_rights")
+        end
+      end
+
+      context "without edit rights" do
+        it "increments the count metric for a nonexistent page" do
+          course_with_student_logged_in(active_all: true)
+          bad_page_url = "something-else-that-doesnt-really-exist"
+          get "show", params: { course_id: @course.id, id: bad_page_url }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("wikipage.show.page_does_not_exist.without_edit_rights")
+        end
+
+        it "does not increment the count metric when page is deleted" do
+          course_with_student_logged_in(active_all: true)
+          @page = @course.wiki_pages.create!(title: "delete me too")
+          @page.update(workflow_state: "deleted")
+          get "show", params: { course_id: @course.id, id: @page.url }
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("wikipage.show.page_does_not_exist.without_edit_rights")
+        end
+      end
+    end
+  end
 end

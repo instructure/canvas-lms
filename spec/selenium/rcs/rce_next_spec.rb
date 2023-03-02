@@ -1378,12 +1378,13 @@ describe "RCE next tests", ignore_js_errors: true do
       after { driver.local_storage.clear }
 
       it "shows course links after user files" do
+        get "/"
+        driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
+
         title = "Assignment-Title"
         @assignment = @course.assignments.create!(name: title)
 
         rce_wysiwyg_state_setup(@course)
-
-        driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
 
         click_course_links_toolbar_menuitem
         wait_for_ajaximations
