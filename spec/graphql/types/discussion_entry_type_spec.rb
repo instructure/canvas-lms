@@ -464,6 +464,37 @@ describe Types::DiscussionEntryType do
     expect(de_type.resolve("rootEntryParticipantCounts { unreadCount }")).to be_nil
   end
 
+  context "report type counts" do
+    before do
+      @topic = discussion_topic_model
+      names = %w[Chawn Drake Jason Caleb Allison Jewel Omar]
+      @users = names.map { |name| user_model(name: name) }
+
+      @entry = @topic.discussion_entries.create!(message: "entry", user: @users[0])
+
+      # User 0 can't report his own post.
+      (1..3).each { |i| @entry.update_or_create_participant(new_state: "read", current_user: @users[i], forced: true, report_type: "inappropriate", rating: 0) }
+      (4..5).each { |i| @entry.update_or_create_participant(new_state: "read", current_user: @users[i], forced: true, report_type: "offensive", rating: 0) }
+      @entry.update_or_create_participant(new_state: "read", current_user: @users[6], forced: true, report_type: "other", rating: 0)
+    end
+
+    it "returns counts and total if teacher" do
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @teacher)
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq 3
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq 2
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq 1
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
+    end
+
+    it "returns nil if student" do
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @user[0])
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq nil
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq nil
+    end
+  end
+
   it "returns a null message when entry is marked as deleted" do
     discussion_entry.destroy
     expect(discussion_entry_type.resolve("message")).to eq nil

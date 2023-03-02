@@ -700,4 +700,16 @@ class DiscussionEntry < ActiveRecord::Base
       user.short_name
     end
   end
+
+  def report_type_counts
+    counts = discussion_entry_participants.where.not(report_type: nil).group(:report_type).count
+
+    final_counts = {}
+    final_counts["inappropriate_count"] = counts["inappropriate"] || 0
+    final_counts["offensive_count"] = counts["offensive"] || 0
+    final_counts["other_count"] = counts["other"] || 0
+    final_counts["total"] = final_counts["inappropriate_count"] + final_counts["offensive_count"] + final_counts["other_count"]
+
+    final_counts
+  end
 end
