@@ -25,6 +25,10 @@ export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeader
 
   const studentSettingKey = currentColumnId === columnHeaderName ? settingKey : 'sortable_name'
 
+  const getSortKey = () => {
+    return columnId === 'student_firstname' ? 'name' : studentSettingKey
+  }
+
   return {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
@@ -63,10 +67,10 @@ export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeader
         gradebook.setSortRowsBySetting(columnId, 'login_id', direction)
       },
       onSortInAscendingOrder: () => {
-        gradebook.setSortRowsBySetting(columnId, studentSettingKey, 'ascending')
+        gradebook.setSortRowsBySetting(columnId, getSortKey(), 'ascending')
       },
       onSortInDescendingOrder: () => {
-        gradebook.setSortRowsBySetting(columnId, studentSettingKey, 'descending')
+        gradebook.setSortRowsBySetting(columnId, getSortKey(), 'descending')
       },
       // sort functions with additional sort options disabled
       onSortBySortableNameAscending: () => {

@@ -2512,6 +2512,50 @@ describe User do
       end
     end
 
+    describe "order_by_name" do
+      let_once :ids do
+        ids = []
+        ids << User.create!(name: "John Johnson")
+        ids << User.create!(name: "Jimmy Johns")
+        ids << User.create!(name: "Jimmy John")
+      end
+
+      context "given pg_collkey extension is present" do
+        before do
+          skip_unless_pg_collkey_present
+        end
+
+        it "sorts lexicographically" do
+          ascending_names = User.order_by_name.where(id: ids).map(&:name)
+          expect(ascending_names).to eq(["Jimmy John", "Jimmy Johns", "John Johnson"])
+        end
+
+        it "sorts support direction toggle" do
+          descending_names = User.order_by_name(direction: :descending)
+                                 .where(id: ids).map(&:name)
+          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+        end
+
+        it "sorts support direction toggle with a prior select" do
+          descending_names = User.select([:id, :name]).order_by_name(direction: :descending)
+                                 .where(id: ids).map(&:name)
+          expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
+        end
+
+        it "sorts by the current locale" do
+          I18n.with_locale(:es) do
+            expect(User.name_order_by_clause).to match(/'es'/)
+            expect(User.name_order_by_clause).not_to match(/'root'/)
+          end
+          I18n.with_locale(:en) do
+            # english has no specific sorting rules, so use root
+            expect(User.name_order_by_clause).not_to match(/'es'/)
+            expect(User.name_order_by_clause).to match(/'root'/)
+          end
+        end
+      end
+    end
+
     it "breaks ties with user id" do
       ids = Array.new(5) { User.create!(name: "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)

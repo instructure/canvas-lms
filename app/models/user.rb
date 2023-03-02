@@ -34,6 +34,12 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+  # this has to be before include Context to prevent a circular dependency in Course
+  def self.name_order_by_clause(table = nil)
+    col = table ? "#{table}.name" : "name"
+    best_unicode_collation_key(col)
+  end
+
   self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email
                             sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id gender birthdate]
 
@@ -334,6 +340,22 @@ class User < ActiveRecord::Base
 
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
+    sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
+    scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
+    if scope.select_values.empty?
+      scope = scope.select(arel_table[Arel.star])
+    end
+    if scope.select_values.present?
+      scope = scope.select(clause)
+    end
+    if scope.group_values.present?
+      scope = scope.group(clause)
+    end
+    scope
+  end
+
+  def self.order_by_name(options = {})
+    clause = name_order_by_clause
     sort_direction = options[:direction] == :descending ? "DESC" : "ASC"
     scope = order(Arel.sql("#{clause} #{sort_direction}")).order(Arel.sql("#{table_name}.id #{sort_direction}"))
     if scope.select_values.empty?

@@ -22,11 +22,11 @@ import CustomColumnHeaderRenderer from './CustomColumnHeaderRenderer'
 import StudentColumnHeader from './StudentColumnHeader'
 import StudentColumnHeaderRenderer from './StudentColumnHeaderRenderer'
 import StudentLastNameColumnHeader from './StudentLastNameColumnHeader'
-import StudentFirstNameColumnHeaderRenderer from './StudentFirstNameColumnHeaderRenderer'
 import TotalGradeColumnHeaderRenderer from './TotalGradeColumnHeaderRenderer'
 import TotalGradeOverrideColumnHeaderRenderer from './TotalGradeOverrideColumnHeaderRenderer'
 import type Gradebook from '../../Gradebook'
 import type GridSupport from '../GridSupport'
+import StudentFirstNameColumnHeader from './StudentFirstNameColumnHeader'
 
 export default class ColumnHeaderRenderer {
   gradebook: Gradebook
@@ -37,7 +37,7 @@ export default class ColumnHeaderRenderer {
     custom_column: CustomColumnHeaderRenderer
     student: StudentColumnHeaderRenderer
     student_lastname: StudentColumnHeaderRenderer
-    student_firstname: StudentFirstNameColumnHeaderRenderer
+    student_firstname: StudentColumnHeaderRenderer
     total_grade: TotalGradeColumnHeaderRenderer
     total_grade_override: TotalGradeOverrideColumnHeaderRenderer
   }
@@ -54,7 +54,11 @@ export default class ColumnHeaderRenderer {
         StudentLastNameColumnHeader,
         'student_lastname'
       ),
-      student_firstname: new StudentFirstNameColumnHeaderRenderer(gradebook),
+      student_firstname: new StudentColumnHeaderRenderer(
+        gradebook,
+        StudentFirstNameColumnHeader,
+        'student_firstname'
+      ),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
       total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook),
     }
