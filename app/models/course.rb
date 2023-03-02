@@ -57,8 +57,8 @@ class Course < ActiveRecord::Base
 
   belongs_to :linked_homeroom_course, class_name: "Course", foreign_key: "homeroom_course_id"
 
-  has_many :course_sections
-  has_many :active_course_sections, -> { where(workflow_state: "active") }, class_name: "CourseSection"
+  has_many :course_sections, inverse_of: :course
+  has_many :active_course_sections, -> { where(workflow_state: "active") }, class_name: "CourseSection", inverse_of: :course
   has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
 
   has_many :all_enrollments, class_name: "Enrollment", inverse_of: :course

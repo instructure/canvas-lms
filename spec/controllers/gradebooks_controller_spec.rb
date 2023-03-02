@@ -1197,18 +1197,19 @@ describe GradebooksController do
         before do
           category.create_groups(2)
           category2.create_groups(2)
+          @groupless_category = @course.group_categories.create!(name: "no groups!")
         end
 
         it "includes the student group categories for the course" do
           get :show, params: { course_id: @course.id }
-          expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id)
+          expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id)
         end
 
         it "does not include deleted group categories" do
           category2.destroy!
 
           get :show, params: { course_id: @course.id }
-          expect(group_categories_json.pluck("id")).to contain_exactly(category.id)
+          expect(group_categories_json.pluck("id")).to contain_exactly(category.id, @groupless_category.id)
         end
 
         it "includes the groups within each category" do
@@ -1216,6 +1217,13 @@ describe GradebooksController do
 
           category2_json = group_categories_json.find { |category_json| category_json["id"] == category2.id }
           expect(category2_json["groups"].pluck("id")).to match_array(category2.groups.pluck(:id))
+        end
+
+        it "includes an empty groups array for categories without groups" do
+          get :show, params: { course_id: @course.id }
+
+          groupless_json = group_categories_json.find { |cat| cat["id"] == @groupless_category.id }
+          expect(groupless_json["groups"]).to match_array([])
         end
       end
 
