@@ -126,6 +126,7 @@ describe('ImageSection', () => {
     editing: false,
     editor: {},
     onChange: jest.fn(),
+    cropperEnabled: false,
   }
 
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
@@ -347,7 +348,6 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {icon_maker_cropper: false}},
       })
       fireEvent.click(rendered.getByText('Add Image'))
     })
@@ -378,7 +378,7 @@ describe('ImageSection', () => {
 
     beforeEach(() => {
       const rendered = subject({
-        rcsConfig: {features: {icon_maker_cropper: true}},
+        cropperEnabled: true,
         settings: {size: Size.Small, shape: 'square'},
       })
 
@@ -512,7 +512,7 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {icon_maker_cropper: true}},
+        cropperEnabled: true,
       })
 
       fireEvent.click(rendered.getByText('Add Image'))
@@ -543,7 +543,7 @@ describe('ImageSection', () => {
     let getByTestId, getByText
 
     beforeEach(() => {
-      const rendered = subject({rcsConfig: {features: {icon_maker_cropper: true}}})
+      const rendered = subject({cropperEnabled: true})
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
