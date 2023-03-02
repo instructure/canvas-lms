@@ -101,7 +101,14 @@ function renderImageActionButtons({mode, collectionOpen}, dispatch, trayDispatch
   )
 }
 
-export const ImageOptions = ({state, settings, dispatch, mountNode, rcsConfig, trayDispatch}) => {
+export const ImageOptions = ({
+  state,
+  settings,
+  dispatch,
+  mountNode,
+  cropperEnabled,
+  trayDispatch,
+}) => {
   const [isImageActionFocused, setIsImageActionFocused] = useState(false)
   const imageActionRef = useCallback(
     el => {
@@ -158,7 +165,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, rcsConfig, t
             ref={imageActionRef}
             onFocus={() => setIsImageActionFocused(true)}
             onBlur={() => setIsImageActionFocused(false)}
-            rcsConfig={rcsConfig}
+            cropperEnabled={cropperEnabled}
           />
         )}
         {state.cropperOpen && (
@@ -199,7 +206,7 @@ ImageOptions.propTypes = {
     imageSettings: ImageSettingsPropTypes,
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
-  rcsConfig: PropTypes.object.isRequired,
+  cropperEnabled: PropTypes.bool.isRequired,
   trayDispatch: PropTypes.func.isRequired,
   mountNode: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
 }

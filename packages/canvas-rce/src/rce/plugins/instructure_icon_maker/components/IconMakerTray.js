@@ -95,7 +95,7 @@ function renderBody(
   editing,
   allowNameChange,
   nameRef,
-  rcsConfig,
+  cropperEnabled,
   canvasOrigin,
   isLoading
 ) {
@@ -111,7 +111,7 @@ function renderBody(
       editing={editing}
       allowNameChange={allowNameChange}
       nameRef={nameRef}
-      rcsConfig={rcsConfig}
+      cropperEnabled={cropperEnabled}
       canvasOrigin={canvasOrigin}
     />
   )
@@ -143,7 +143,7 @@ function renderFooter(
   )
 }
 
-export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrigin}) {
+export function IconMakerTray({editor, onUnmount, editing, cropperEnabled, canvasOrigin}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
@@ -349,7 +349,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
           editing,
           !replaceAll,
           nameRef,
-          rcsConfig,
+          cropperEnabled,
           canvasOrigin,
           isLoading
         )
@@ -376,7 +376,7 @@ IconMakerTray.propTypes = {
   editor: PropTypes.object.isRequired,
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
-  rcsConfig: PropTypes.object.isRequired,
+  cropperEnabled: PropTypes.bool.isRequired,
   canvasOrigin: PropTypes.string.isRequired,
 }
 

@@ -52,7 +52,7 @@ const filterSectionStateMetadata = state => {
   return {mode, image, imageName, icon, iconFillColor, cropperSettings}
 }
 
-export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigin}) => {
+export const ImageSection = ({settings, onChange, editor, cropperEnabled, canvasOrigin}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const Upload = React.lazy(() => import('./Upload'))
   const SingleColor = React.lazy(() => import('./SingleColor'))
@@ -192,7 +192,7 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
                 settings={settings}
                 dispatch={dispatch}
                 mountNode={getImageSection}
-                rcsConfig={rcsConfig}
+                cropperEnabled={cropperEnabled}
                 trayDispatch={onChange}
               />
             </Flex.Item>
@@ -241,7 +241,7 @@ export const ImageSection = ({settings, onChange, editor, rcsConfig, canvasOrigi
 ImageSection.propTypes = {
   settings: PropTypes.object.isRequired,
   editor: PropTypes.object.isRequired,
-  rcsConfig: PropTypes.object.isRequired,
+  cropperEnabled: PropTypes.bool.isRequired,
   onChange: PropTypes.func,
   canvasOrigin: PropTypes.string,
 }
