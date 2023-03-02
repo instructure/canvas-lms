@@ -21,7 +21,7 @@
 class CourseSection < ActiveRecord::Base
   include Workflow
 
-  belongs_to :course
+  belongs_to :course, inverse_of: :course_sections
   belongs_to :nonxlist_course, class_name: "Course"
   belongs_to :root_account, class_name: "Account"
   belongs_to :enrollment_term
