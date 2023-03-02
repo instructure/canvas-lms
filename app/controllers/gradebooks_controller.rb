@@ -487,7 +487,7 @@ class GradebooksController < ApplicationController
       sis_app_url: Setting.get("sis_app_url", nil),
       sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
-      student_groups: group_categories_json(@context.group_categories.active, @current_user, session, { include: ["groups"] }),
+      student_groups: gradebook_group_categories_json,
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil),
@@ -603,7 +603,7 @@ class GradebooksController < ApplicationController
       sis_app_url: Setting.get("sis_app_url", nil),
       sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
-      student_groups: group_categories_json(@context.group_categories.active, @current_user, session, { include: ["groups"] }),
+      student_groups: gradebook_group_categories_json,
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: "1"),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
@@ -1261,6 +1261,18 @@ class GradebooksController < ApplicationController
   helper_method :student_groups?
 
   private
+
+  def gradebook_group_categories_json
+    @context
+      .group_categories
+      .joins("LEFT JOIN #{Group.quoted_table_name} ON groups.group_category_id=group_categories.id AND groups.workflow_state <> 'deleted'")
+      .group("group_categories.id", "group_categories.name")
+      .pluck("group_categories.id", "group_categories.name", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name))"))
+      .map do |category_id, category_name, original_groups|
+        groups = original_groups.select { |g| g["id"] }.map(&:with_indifferent_access)
+        { id: category_id, name: category_name, groups: groups }.with_indifferent_access
+      end
+  end
 
   def valid_zip_upload_params?
     return true if params[:attachment_id].present?
