@@ -66,7 +66,7 @@ const ignoredErrors = [
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /Please update the following components: %s/,
+  /Please update the following components: %s/, // https://instructure.atlassian.net/browse/LS-3841
   /value provided is not in a recognized RFC2822 or ISO format/,
 ]
 global.console = {
