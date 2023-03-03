@@ -36,6 +36,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {DiscussionEntryVersion} from '../../../graphql/DiscussionEntryVersion'
 import {DiscussionEntryVersionHistory} from '../DiscussionEntryVersionHistory/DiscussionEntryVersionHistory'
+import {ReportsSummaryBadge} from '../ReportsSummaryBadge/ReportsSummaryBadge'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -147,6 +148,9 @@ export const AuthorInfo = props => {
                         data-testid="pill-container"
                       />
                     </Flex.Item>
+                    {props.reportTypeCounts && props.reportTypeCounts.total && (
+                      <ReportsSummaryBadge reportTypeCounts={props.reportTypeCounts} />
+                    )}
                   </Flex>
                 </Flex.Item>
               )}
@@ -227,6 +231,7 @@ AuthorInfo.propTypes = {
    */
   isTopicAuthor: PropTypes.bool,
   discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
+  reportTypeCounts: PropTypes.object,
   threadMode: PropTypes.bool,
   threadParent: PropTypes.bool,
 }

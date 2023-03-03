@@ -31,7 +31,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 
 const I18n = useI18nScope('discussion_topics_post')
 
-const REPORT_TYPES = [
+export const REPORT_TYPES = [
   {value: 'inappropriate', getLabel: () => I18n.t('Inappropriate')},
   {value: 'offensive', getLabel: () => I18n.t('Offensive, abusive')},
   {value: 'other', getLabel: () => I18n.t('Other')},

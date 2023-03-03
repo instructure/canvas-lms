@@ -281,6 +281,13 @@ export const getOptimisticResponse = ({
           nodes: [],
           __typename: 'DiscussionEntryVersionConnection',
         },
+        reportTypeCounts: {
+          inappropriateCount: 0,
+          offensiveCount: 0,
+          otherCount: 0,
+          total: 0,
+          __typename: 'DiscussionEntryReportTypeCounts',
+        },
         depth,
         __typename: 'DiscussionEntry',
       },
