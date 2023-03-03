@@ -31,6 +31,7 @@ import RCEWrapper, {
   parsePluginsToExclude,
 } from '../RCEWrapper'
 import RCEGlobals from '../RCEGlobals'
+import {jsdomInnerText} from '../../util/__tests__/jsdomInnerText'
 
 const textareaId = 'myUniqId'
 const canvasOrigin = 'https://canvas:3000'
@@ -298,7 +299,35 @@ describe('RCEWrapper', () => {
       })
     })
 
-    describe('insertImagePlaceholder', () => {
+    describe('insertImagePlaceholder (new)', () => {
+      // Full testing of placehodlers can be found in loadingPlaceholder.test.ts
+      it('can insert a placeholder', async () => {
+        jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+          rce_improved_placeholders: true,
+        })
+
+        const square =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'square.png',
+          domObject: {
+            preview: square,
+          },
+          contentType: 'image/png',
+          displayAs: 'link',
+        }
+
+        await rce.insertImagePlaceholder(props)
+
+        const placeholderElem = rce.editor.dom.doc.querySelector(
+          '*[data-placeholder-for=square\\.png]'
+        )
+
+        expect(jsdomInnerText(placeholderElem)).toContain('square.png')
+      })
+    })
+
+    describe('insertImagePlaceholder (legacy)', () => {
       function makePlaceholderMarkup(name, width = '10px', height = '10px', valign = 'middle') {
         return `
 <span
@@ -343,6 +372,9 @@ describe('RCEWrapper', () => {
       }
       afterEach(() => {
         restoreImage()
+      })
+      beforeEach(() => {
+        rce.props.features.rce_improved_placeholders = false
       })
 
       it('inserts a placeholder image with the proper metadata', async () => {
