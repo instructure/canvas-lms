@@ -196,8 +196,8 @@ unless $canvas_tasks_loaded
       task reset: [:environment, :load_config] do
         raise "Run with RAILS_ENV=test" unless Rails.env.test?
 
-        config = ActiveRecord::Base.configurations["test"]
-        queue = config["queue"]
+        config = ActiveRecord::Base.configurations.find_db_config("test")
+        queue = config.configuration_hash[:queue]
         ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
         ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
         Shard.default(reload: true) # make sure we know that sharding isn't set up yet
