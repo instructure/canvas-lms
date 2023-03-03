@@ -53,7 +53,7 @@ const ignoredErrors = [
   /contextType was defined as an instance property on %s/,
   /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
-  /Invalid prop `children` supplied to `(Option|View)`/,
+  /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
