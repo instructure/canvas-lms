@@ -127,6 +127,7 @@ describe('ImageSection', () => {
     editor: {},
     onChange: jest.fn(),
     cropperEnabled: false,
+    canvasOrigin: 'https://canvas.instructor.com',
   }
 
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
