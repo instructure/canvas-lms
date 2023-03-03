@@ -73,7 +73,7 @@ function renderSummary(assignedTo) {
 function renderDetail(assignedTo) {
   return (
     <View as="div" margin="small 0" data-testid="OverrideAssignTo">
-      <FormField label={I18n.t('Assign to:')} layout="stacked">
+      <FormField id="override_assign_to" label={I18n.t('Assign to:')} layout="stacked">
         <View as="div" borderWidth="small">
           {assignedTo.map(a => (
             <div key={a.lid} style={pillStyle}>
