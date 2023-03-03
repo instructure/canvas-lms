@@ -233,7 +233,7 @@ module Types
     def report_type_counts
       is_course_teacher = object.context.is_a?(Course) && object.context.user_is_instructor?(current_user)
       is_group_teacher = object.context.is_a?(Group) && object.context&.course&.user_is_instructor?(current_user)
-      return nil unless is_course_teacher || is_group_teacher || object.user == current_user
+      return nil unless is_course_teacher || is_group_teacher
 
       if object.deleted?
         nil

@@ -163,6 +163,7 @@ export const DiscussionEntryContainer = props => {
                     discussionEntryVersions={
                       props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
                     }
+                    reportTypeCounts={props.discussionEntry?.reportTypeCounts}
                     threadMode={threadMode}
                   />
                 </Flex.Item>
