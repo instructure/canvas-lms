@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {DeepPartialNullable} from '../../../../util/DeepPartialNullable'
 import {ExternalToolsEnv, externalToolsEnvFor} from '../ExternalToolsEnv'
-import {emptyOrNull} from '../../../../util/string-util'
+import {emptyAsNull} from '../../../../util/string-util'
 import {addParentFrameContextToUrl} from '../util/addParentFrameContextToUrl'
 import tinymce from 'tinymce'
 
@@ -178,7 +178,7 @@ export class RceLti11ContentItem {
           alt: this.text,
         })
       )
-    } else if (emptyOrNull(this.currentTinyMceSelection) != null && $link[0] != null) {
+    } else if (emptyAsNull(this.currentTinyMceSelection) != null && $link[0] != null) {
       $link[0].innerHTML = this.currentTinyMceSelection ?? ''
     } else {
       // don't inject tool provided content into the page HTML
@@ -190,8 +190,8 @@ export class RceLti11ContentItem {
 
   private generateLinkHtml() {
     return (
-      emptyOrNull(this.currentTinyMceSelection) ??
-      emptyOrNull(this.contentItem.text?.trim()) ??
+      emptyAsNull(this.currentTinyMceSelection) ??
+      emptyAsNull(this.contentItem.text?.trim()) ??
       this.contentItem?.title?.trim()
     )
   }

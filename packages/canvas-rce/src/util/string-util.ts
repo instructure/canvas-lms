@@ -16,8 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function emptyOrNull(str: string | null | undefined): string | null {
+/**
+ * Returns null if the string is null, undefined, or has length === 0
+ *
+ * @param str
+ */
+export function emptyAsNull(str: string | null | undefined): string | null {
   if (str == null) return null
+  if (str.length === 0) return null
+
+  return str
+}
+
+/**
+ * Returns null if the string is null, undefined, is empty, or contains only whitespace.
+ *
+ * Otherwise returns the string with leading and trailing whitespace removed.
+ *
+ * Useful for providing a default value for a string input:
+ *
+ * ```
+ * label.innerText = trimmedOrNull(input.value) ?? 'Default value'
+ * ```
+ *
+ * @param str
+ */
+export function trimmedOrNull(str: string | null | undefined): string | null {
+  if (str == null) return null
+
+  str = str.trim()
+
   if (str.length === 0) return null
 
   return str

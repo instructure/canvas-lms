@@ -72,6 +72,7 @@ import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
+import {removePlaceholder} from '../util/loadingPlaceholder'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -323,6 +324,7 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements = false,
       rce_better_paste = false,
       rce_new_external_tool_dialog_in_canvas = false,
+      rce_improved_placeholders = false,
       explicit_latex_typesetting = false,
       rce_show_studio_media_options = false,
     } = this.props.features
@@ -332,6 +334,7 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements,
       rce_better_paste,
       rce_new_external_tool_dialog_in_canvas,
+      rce_improved_placeholders,
       explicit_latex_typesetting,
       rce_show_studio_media_options,
     }
@@ -511,8 +514,15 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
   insertImagePlaceholder(fileMetaProps) {
+    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+      return import('../util/loadingPlaceholder').then(
+        async ({placeholderInfoFor, insertPlaceholder}) =>
+          insertPlaceholder(this.mceInstance(), await placeholderInfoFor(fileMetaProps))
+      )
+    }
+
+    // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
     const prom = new Promise((resolve, reject) => {
       let width, height
       let align = 'middle'
@@ -607,14 +617,19 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    const placeholder = this.mceInstance().dom.doc.querySelector(
-      `[data-placeholder-for="${encodeURIComponent(name)}"]`
-    )
-    if (placeholder) {
-      const editor = this.mceInstance()
-      editor.undoManager.ignore(() => {
-        editor.dom.remove(placeholder)
-      })
+    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+      // Note that this needs to be done synchronously, or the image inserting code doesn't work
+      removePlaceholder(this.mceInstance(), encodeURIComponent(name))
+    } else {
+      const placeholder = this.mceInstance().dom.doc.querySelector(
+        `[data-placeholder-for="${encodeURIComponent(name)}"]`
+      )
+      if (placeholder) {
+        const editor = this.mceInstance()
+        editor.undoManager.ignore(() => {
+          editor.dom.remove(placeholder)
+        })
+      }
     }
   }
 
