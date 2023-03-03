@@ -17740,7 +17740,7 @@ nb:
     new_announcement: 
       email: 
         html: 
-          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli setet av alle i emnet."
+          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli sett av alle i emnet."
           attached_file: "Vedlagt fil"
           link: "Vis kunngjøring"
         labels: 
