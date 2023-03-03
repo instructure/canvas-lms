@@ -608,6 +608,7 @@
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
   "save_11a80ec3": { "message": "Save" },
+  "save_copy_ca63944e": { "message": "Save Copy" },
   "save_media_cb9e786e": { "message": "Save Media" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Search" },
