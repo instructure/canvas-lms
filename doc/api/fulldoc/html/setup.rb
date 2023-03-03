@@ -131,6 +131,17 @@ module YARD::Templates::Helpers::HtmlHelper
     str.tr(" ", "_").underscore
   end
 
+  def make_api_doc_anchors(hash, options)
+    anchors = []
+    hash.each do |key, val|
+      link = url_for(key.to_s)
+      klass = []
+      klass << "current" if key == options[:object]
+      anchors << "<a class=\"#{klass.join(" ")}\" href=\"#{link}\">#{val}</a>"
+    end
+    anchors
+  end
+
   def url_for_file(filename, anchor = nil)
     link = filename.filename
     link += (anchor ? "#" + urlencode(anchor) : "")
