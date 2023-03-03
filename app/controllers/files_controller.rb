@@ -140,7 +140,7 @@ class FilesController < ApplicationController
     assessment_question_show image_thumbnail show_thumbnail
     create_pending s3_success show api_create api_create_success api_create_success_cors
     api_show api_index destroy api_update api_file_status public_url api_capture icon_metadata
-    reset_verifier
+    reset_verifier show_relative
   ]
 
   before_action :open_limited_cors, only: [:show]
@@ -558,13 +558,49 @@ class FilesController < ApplicationController
     render json: attachment_json(@attachment, @current_user, session, params)
   end
 
+  def context_for_file_after_user_merge(search_context, file_id)
+    # Users can create links that look like /users/:user_id/files/:file_id in the RCE. Then
+    # after the user is merged, that old user context is no longer correct for the file attchment
+    # and they'll get a 404 trying to access the file.
+    # So we have two choices: fix all of the links in their html content or make their old file
+    # links work. I hate both options, but making their old file links work was less complicated.
+    # To do that, we find the context that the files have been moved to. This is normally the
+    # active user they were merged to or the last user they were merged into before a cross-shard
+    # merge (in which case we copy the files instead of moving them and the file ID we're looking
+    # for is now associated to a past user), but the files don't get moved to the new user during
+    # a merge if there's a duplicate, so it could be on any user in the chain on the current shard
+    search_context.shard.activate do
+      User.from(<<~SQL.squish).joins(<<~SQL2.squish).where(attachments: { id: file_id }).first || search_context
+        (WITH RECURSIVE user_mergers AS (
+          SELECT umd.from_user_id, umd.user_id
+          FROM #{UserMergeData.quoted_table_name} umd
+          WHERE umd.from_user_id=#{User.connection.quote(search_context.id)} AND umd.workflow_state = 'active'
+          UNION
+          SELECT umd.from_user_id, umd.user_id
+          FROM #{UserMergeData.quoted_table_name} umd
+          INNER JOIN user_mergers ON user_mergers.user_id=umd.from_user_id
+          WHERE umd.workflow_state = 'active' AND umd.user_id < #{Shard::IDS_PER_SHARD}
+        ) SELECT * FROM user_mergers) AS user_mergers
+      SQL
+        INNER JOIN #{User.quoted_table_name} ON users.id = user_mergers.user_id
+        INNER JOIN #{Attachment.quoted_table_name} ON attachments.context_type = 'User' AND attachments.context_id = users.id
+      SQL2
+    end
+  end
+
   def show
     GuardRail.activate(:secondary) do
       params[:id] ||= params[:file_id]
-      get_context
+
+      get_context(user_scope: merged_user_scope)
+
+      if @context.is_a?(User) && @context.deleted?
+        @context = context_for_file_after_user_merge(@context, params[:id])
+      end
+
       # NOTE: the /files/XXX URL implicitly uses the current user as the
       # context, even though it doesn't search for the file using
-      # @current_user.attachments.find , since it might not actually be a user
+      # @current_user.attachments.find, since it might not actually be a user
       # attachment.
       # this implicit context magic happens in ApplicationController#get_context
       if @context.nil? || @current_user.nil? || @context == @current_user
@@ -725,6 +761,8 @@ class FilesController < ApplicationController
   protected :render_attachment
 
   def show_relative
+    require_context(user_scope: merged_user_scope)
+
     path = params[:file_path]
     file_id = params[:file_id]
     file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
@@ -1494,6 +1532,14 @@ class FilesController < ApplicationController
     return unless params[:replacement_chain_context_id].present?
 
     api_find(Course.active, params[:replacement_chain_context_id])
+  end
+
+  def merged_user_scope
+    if params[:user_id].present?
+      Shard.shard_for(params[:user_id]).activate do
+        User.active.or(User.where.not(merged_into_user_id: nil))
+      end
+    end
   end
 
   def log_attachment_access(attachment)
