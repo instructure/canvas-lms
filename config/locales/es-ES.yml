@@ -6642,7 +6642,7 @@ es-ES:
       invitation_accepted: "¡Invitación aceptada!  Bienvenido a %{course}."
       invitation_cancelled: "Invitación cancelada."
       login_to_accept: "Necesitarás iniciar sesión antes de aceptar la inscripción."
-      preview_course: "Has sido invitado a unirte a esta asignatura.  Puedes echar un vistazo, pero deberás aceptar la invitación de inscripción antes de poder participar."
+      preview_course: "Te han invitado a unirte a esta asignatura.  Puedes echar un vistazo, pero deberás aceptar la invitación de inscripción antes de poder participar."
       reset_test_student: "Se ha restablecido el estudiante de prueba."
       unconcluded: "Asignatura no finalizada"
       updated: "Se ha actualizado la asignatura."
@@ -12972,7 +12972,7 @@ es-ES:
       email: 
         details: "Es necesario que te registres en Canvas para poder participar en la clase.  Para comenzar, visita la página de la asignatura aquí:"
         html: 
-          body: "Has sido invitado a participar en una clase en %{account}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
+          body: "Te han invitado a participar en una clase en %{account}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
           details: "Es necesario que te registres en Canvas para poder participar en la clase."
           email: "Correo electrónico"
           name: Nombre
@@ -13222,23 +13222,23 @@ es-ES:
         body_course: "Alerta de Canvas: Nuevo grupo: %{group} para la asignatura %{course}"
     new_context_group_membership_invitation: 
       email: 
-        body_account: "Has sido invitado a unirte al grupo %{group} para la cuenta %{account}."
-        body_course: "Has sido invitado a unirte al grupo %{group} para la asignatura %{course}."
+        body_account: "Te han invitado a unirte al grupo %{group} para la cuenta %{account}."
+        body_course: "Te han invitado a unirte al grupo %{group} para la asignatura %{course}."
         html: 
-          body_account: "Has sido invitado a unirte al grupo %{group} para la cuenta %{account}."
-          body_course: "Has sido invitado a unirte al grupo %{group} para la asignatura %{course}."
+          body_account: "Te han invitado a unirte al grupo %{group} para la cuenta %{account}."
+          body_course: "Te han invitado a unirte al grupo %{group} para la asignatura %{course}."
           details: "Puedes ver el grupo haciendo clic aquí"
           subject: "Nuevo miembro en el grupo para %{course_or_account}"
           title: "Nuevo miembro en el grupo: %{group_name}"
         subject: "Nuevo miembro en el grupo para %{course_or_account}"
         title: "Nuevo miembro en el grupo: %{group_name}"
       sms: 
-        body_account: "Has sido invitado a unirte al grupo %{group} para la cuenta %{account}."
-        body_course: "Has sido invitado a unirte al grupo %{group} para la asignatura %{course}."
+        body_account: "Te han invitado a unirte al grupo %{group} para la cuenta %{account}."
+        body_course: "Te han invitado a unirte al grupo %{group} para la asignatura %{course}."
         details: "Más información en %{url}"
       summary: 
-        body_account: "Has sido invitado a unirte al grupo %{group} para la cuenta %{account}."
-        body_course: "Has sido invitado a unirte al grupo %{group} para la asignatura %{course}."
+        body_account: "Te han invitado a unirte al grupo %{group} para la cuenta %{account}."
+        body_course: "Te han invitado a unirte al grupo %{group} para la asignatura %{course}."
         subject: "Nuevo miembro en el grupo para %{course_or_account}"
       twitter: 
         body_account: "Alerta de Canvas: Invitación: %{group} para la cuenta %{account}"
@@ -13420,14 +13420,14 @@ es-ES:
     page_unpublished_module: "Esta página es parte de un contenido sin publicar y aún no está disponible."
     peer_review_invitation: 
       email: 
-        body: "Has sido invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace que aparece a continuación para revisar con ellos."
+        body: "Te han invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace que aparece a continuación para revisar con ellos."
         html: 
           link_message: "Haz clic aquí para realizar la revisión"
         subject: "Revisor asignado para %{reviewee}"
       sms: 
         more_info: "Más información en %{url}"
       twitter: 
-        body: "Has sido invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace que aparece a continuación para revisar con ellos."
+        body: "Te han invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace que aparece a continuación para revisar con ellos."
     pseudonym_registration: 
       email: 
         body: "Te has registrado para una cuenta de Canvas en %{account}  Antes de poder iniciar sesión y comenzar a usar Canvas, tendrás que finalizar el proceso de configuración."
@@ -13742,18 +13742,18 @@ es-ES:
     visit_modules_page: "*Visita la página de contenidos de la asignatura para obtener información sobre cómo desbloquear este contenido.*"
     web_conference_invitation: 
       email: 
-        body: "Has sido invitado a participar en una conferencia online, %{title} para %{name}."
+        body: "Te han invitado a participar en una conferencia online, %{title} para %{name}."
         details_link: "Puedes ver los detalles aquí: %{link}"
         html: 
-          body: "Has sido invitado a participar en una conferencia online, %{title} para %{name}."
+          body: "Te han invitado a participar en una conferencia online, %{title} para %{name}."
           details_link: "Haz clic aquí para ver los detalles"
           subject: "Invitación a conferencia online: %{name}"
         subject: "Invitación a conferencia online: %{name}"
       sms: 
-        body: "Has sido invitado a unirte a una conferencia online, %{title} para %{name}."
+        body: "Te han invitado a unirte a una conferencia online, %{title} para %{name}."
         link_message: "Más información en %{url}"
       summary: 
-        body: "Has sido invitado a participar en una conferencia online, %{title} para %{name}."
+        body: "Te han invitado a participar en una conferencia online, %{title} para %{name}."
         subject: "Invitación a conferencia online: %{name}"
       twitter: 
         tweet: "Alerta de Canvas: Invitar: asistir %{title}, %{name}"
@@ -18982,7 +18982,7 @@ es-ES:
       buttons: 
         accept: Aceptar
         decline: Rechazar
-      invitation_text: "Has sido invitado a unirte a [%{course}](%{link_to_course}) con el siguiente rol de usuario: %{role_name}"
+      invitation_text: "Te han invitado a unirte a [%{course}](%{link_to_course}) con el siguiente rol de usuario: %{role_name}"
     error_form: 
       message_failed: "No se ha enviado el informe.  Inténtalo de nuevo."
       message_sent: "¡Gracias por tu ayuda!  Nos pondremos a trabajar en este tema inmediatamente."
@@ -19084,11 +19084,11 @@ es-ES:
         modules: Contenidos
     invitation: 
       accept_or_reject: "Cuando estés preparado, puedes aceptar o rechazar la invitación."
-      body_designer: "Has sido invitado a unirte a %{course} como **diseñador** para la cuenta de usuario **%{email_address}**."
-      body_observer: "Has sido invitado a unirte a %{course} como **observador** para la cuenta de usuario **%{email_address}**."
-      body_student: "Has sido invitado a unirte a %{course} como **estudiante** para la cuenta de usuario **%{email_address}**."
-      body_ta: "Has sido invitado a unirte a %{course} como **profesor auxiliar** para la cuenta de usuario **%{email_address}**."
-      body_teacher: "Has sido invitado a unirte a %{course} como **profesor** para la cuenta de **%{email_address}**."
+      body_designer: "Te han invitado a unirte a %{course} como **diseñador** para la cuenta de usuario **%{email_address}**."
+      body_observer: "Te han invitado a unirte a %{course} como **observador** para la cuenta de usuario **%{email_address}**."
+      body_student: "Te han invitado a unirte a %{course} como **estudiante** para la cuenta de usuario **%{email_address}**."
+      body_ta: "Te han invitado a unirte a %{course} como **profesor auxiliar** para la cuenta de usuario **%{email_address}**."
+      body_teacher: "Te han invitado a unirte a %{course} como **profesor** para la cuenta de **%{email_address}**."
       buttons: 
         accept: "Aceptar la invitación"
         reject: "Rechazar la invitación"
@@ -23345,14 +23345,14 @@ es-ES:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "Te has inscrito en la asignatura, %{course},"
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Te has inscrito en la asignatura, %{course}. Rol en la asignatura: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Se te ha dado un rol de cuenta para la cuenta de %{account} en %{website}. Tipo de rol: %{role_type}."
-  you_ve_been_invited_to_course_90764f1: "Has sido invitado a %{course}."
-  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Has sido invitado a participar en una clase en %{account}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
-  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Has sido invitado a participar en una clase en %{website}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
-  you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Has sido invitado a participar en la asignatura, %{course}. Rol en la asignatura: %{role_type}"
-  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Has sido invitado a una revisión entre compañeros de %{reviewee}."
-  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Has sido invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace para revisarlos: %{link}."
-  you_ve_been_invited_to_the_course_course_2aac8140: "Has sido invitado a esta asignatura, %{course}."
-  you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Has sido invitado a esta asignatura, %{course}. Rol en la asignatura: %{role_type}"
+  you_ve_been_invited_to_course_90764f1: "Te han invitado a %{course}."
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Te han invitado a participar en una clase en %{account}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Te han invitado a participar en una clase en %{website}. La clase se llama %{course}. Rol en la asignatura: %{role_type}"
+  you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Te han invitado a participar en la asignatura, %{course}. Rol en la asignatura: %{role_type}"
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Te han invitado a una revisión entre compañeros de %{reviewee}."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Te han invitado a una revisión entre compañeros de %{reviewee}. Sigue el enlace para revisarlos: %{link}."
+  you_ve_been_invited_to_the_course_course_2aac8140: "Te han invitado a esta asignatura, %{course}."
+  you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Te han invitado a esta asignatura, %{course}. Rol en la asignatura: %{role_type}"
   you_ve_been_mentioned_discussion_topic_by_user_nam_60649d56: "Has sido mencionado en: %{discussion_topic} por %{user_name}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Se te ha recordado evaluar %{rubric}, %{context}."
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Has actualizado el criterio de puntuaciones; esto afectará a todos los estudiantes evaluados anteriormente con esta competencia"
