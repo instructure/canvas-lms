@@ -140,6 +140,10 @@ class ConversationBatch < ActiveRecord::Base
     tags
   end
 
+  def self.created_as_template?(message:)
+    message.conversation_id.blank?
+  end
+
   def self.generate(root_message, recipients, mode = :async, options = {})
     batch = new
     batch.mode = mode
