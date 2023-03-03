@@ -1,0 +1,57 @@
+{
+  "title": "LTI 1.3 Test Tool",
+  "scopes": [
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+    "https://canvas.instructure.com/lti/feature_flags/scope/show",
+    "https://canvas.instructure.com/lti-ags/progress/scope/show",
+    "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",
+    "https://canvas.instructure.com/lti/public_jwk/scope/update",
+    "https://canvas.instructure.com/lti/data_services/scope/create",
+    "https://canvas.instructure.com/lti/data_services/scope/update",
+    "https://canvas.instructure.com/lti/data_services/scope/list",
+    "https://canvas.instructure.com/lti/data_services/scope/destroy",
+    "https://canvas.instructure.com/lti/data_services/scope/show",
+    "https://canvas.instructure.com/lti/data_services/scope/list_event_types"
+  ],
+  "extensions": [
+    {
+      "domain": "https://www.lti13testtool.docker",
+      "tool_id": "LTI 1.3 Test Tool",
+      "platform": "canvas.instructure.com",
+      "settings": {
+        "text": "LTI 1.3 Test Tool Extension text",
+        "icon_url": "https://static.thenounproject.com/png/131630-200.png",
+        "placements": [
+          {
+            "text": "LTI 1.3 Test Tool",
+            "enabled": true,
+            "icon_url": "https://static.thenounproject.com/png/131630-200.png",
+            "placement": "course_navigation",
+            "message_type": "LtiResourceLinkRequest",
+            "target_link_uri": "https://www.lti13testtool.docker/launch?placement=course_navigation",
+            "canvas_icon_class": "icon-lti"
+          }
+        ],
+        "selection_width": 500,
+        "selection_height": 500
+      },
+      "privacy_level": "public"
+    }
+  ],
+  "public_jwk": {
+    "e": "AQAB",
+    "n": "2OPlQ6DcXrFo8e5PSkK1fHw0MVcQjDwzhy8aD0eVZMIpFIGLEyXJgI5ah3SiB7O7McAK-lwfK5dhSOSF-4nHvLd9YNctyJ3x0j0q3VV1q2vL8W4clsoZAPB213Nzf024aGCpJIq8XZeEjz20DyLjY_EqhOqFTT71T27sRLBpidSx1sbAYcdvOJYPT-KOT6oe6YMlLM22EUuL41Hd78zlPjKYCugZw4a_LYHjEVZpE8NQWDl6O-aUOxbl0tzzBsZsHYhUz40YVUZH56-AufJRSApZHLYBjREhuDqcvTc9QM_7dw-4mRAWc6k7RxutCZ8e9CwcYSgIjusjoS0GzPFFKQ",
+    "alg": "RS256",
+    "kid": "cucywOugeQamqZCfI_Bu0b6Zs6USBLjXKvf9CdZ_Jqg",
+    "kty": "RSA",
+    "use": "sig"
+  },
+  "description": "1.3 Test Tool",
+  "custom_fields": {
+    "user_id": "$Canvas.user.id"
+  },
+  "target_link_uri": "https://www.lti13testtool.docker/launch",
+  "oidc_initiation_url": "https://www.lti13testtool.docker/login"
+}

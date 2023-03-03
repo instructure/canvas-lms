@@ -379,6 +379,12 @@ module AccountReports
                 description: "Include deleted objects"
               }
             }
+          },
+          "developer_key_report_csv" => {
+            title: proc { I18n.t("Developer Keys Report") },
+            parameters_partial: false,
+            description_partial: true,
+            parameters: {}
           }
         }
       end

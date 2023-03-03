@@ -1,0 +1,39 @@
+<p><%= t(%{This report provides a list of all Developer Keys available to the institution.
+These keys can either be installed directly in the root account the report is run from
+or can be inherited from parent root accounts. Developer Keys can either be API or LTI
+keys.})%>
+<%= t(%{For more information, see the *Canvas API documentation*.}, wrapper: '<a href="https://canvas.instructure.com/doc/api/file.developer_keys.html" target="_blank" class="external">\1</a>') %>
+</p>
+
+<h3><%= t("Example") %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t("Global ID") %></th>
+    <th><%= t("Key Name") %></th>
+    <th><%= t("Inherited from Parent Account") %></th>
+    <th><%= t("Contact Info") %></th>
+    <th><%= t("Key Type") %></th>
+    <th><%= t("Permitted API Endpoints") %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>10000000000004</td>
+    <td>A Sample API Key</td>
+    <td>false</td>
+    <td>test_key@example.com</td>
+    <td>API Key</td>
+    <td>"[""url:POST|/api/v1/courses/:course_id/quizzes/:quiz_id/reports"", ""url:DELETE|/api/v1/courses/:course_id/quizzes/:quiz_id/reports/:id"", ""url:GET|/api/v1/courses/:course_id/quizzes/:quiz_id/reports"", ""url:GET|/api/v1/courses/:course_id/quizzes/:quiz_id/reports/:id"", ""url:GET|/api/v1/courses/:course_id/quizzes/:quiz_id/statistics"", ""url:POST|/api/v1/accounts/:account_id/admins"", ""url:DELETE|/api/v1/accounts/:account_id/admins/:user_id"", ""url:GET|/api/v1/accounts/:account_id/admins""]"</td>
+  </tr>
+  <tr>
+    <td>10000000000014</td>
+    <td>A Sample LTI Key</td>
+    <td>true</td>
+    <td>lti_key@example.com</td>
+    <td>LTI Key</td>
+    <td>"[""https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"", ""https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"", ""https://purl.imsglobal.org/spec/lti-ags/scope/score"", ""https://canvas.instructure.com/lti/feature_flags/scope/show"", ""https://canvas.instructure.com/lti-ags/progress/scope/show"", ""https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"", ""https://canvas.instructure.com/lti/public_jwk/scope/update"", ""https://canvas.instructure.com/lti/data_services/scope/create"", ""https://canvas.instructure.com/lti/data_services/scope/update"", ""https://canvas.instructure.com/lti/data_services/scope/list"", ""https://canvas.instructure.com/lti/data_services/scope/destroy"", ""https://canvas.instructure.com/lti/data_services/scope/show"", ""https://canvas.instructure.com/lti/data_services/scope/list_event_types""]"</td>
+  </tr>
+  </tbody>
+</table>
