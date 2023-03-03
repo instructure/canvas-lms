@@ -50,7 +50,6 @@ const ignoredErrors = [
   /\[object Object\]/,
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /Cannot read property 'activeElement' of undefined/,
   /contextType was defined as an instance property on %s/,
   /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
