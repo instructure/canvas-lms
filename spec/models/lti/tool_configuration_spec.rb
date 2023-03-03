@@ -550,5 +550,13 @@ module Lti
         end
       end
     end
+
+    describe "placements" do
+      subject { tool_configuration.placements }
+
+      it "returns the appropriate placements" do
+        expect(subject).to eq(settings["extensions"].first["settings"]["placements"])
+      end
+    end
   end
 end
