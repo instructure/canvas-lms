@@ -68,10 +68,10 @@ describe('RCE Plugins > CanvasContentTray', () => {
       containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
       contextId: storeInitialState.contextId,
       contextType: storeInitialState.contextType,
-      canvasOrigin: storeInitialState.canvasOrigin,
       source: fakeSource,
       themeUrl: 'http://localhost/tinymce-theme.swf',
       storeProps: storeInitialState,
+      canvasOrigin: 'http://canvas:3000',
       ...override,
     }
     return props

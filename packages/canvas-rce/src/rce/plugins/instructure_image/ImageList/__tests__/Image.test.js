@@ -37,6 +37,7 @@ describe('RCE "Images" Plugin > Image', () => {
         thumbnail_url: 'http://canvas.rce/images/thumbnail/example.png',
       },
       onClick: jest.fn(),
+      canvasOrigin: 'https://canvas.instructor.com',
     }
   })
 
