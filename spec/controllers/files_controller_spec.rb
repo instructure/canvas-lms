@@ -481,6 +481,79 @@ describe FilesController do
       end
     end
 
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @merge_user_2 = student_in_course(name: "Merge User 2", active_all: true).user
+
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "finds file in merged-to user's context" do
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @student.id
+      end
+
+      it "finds file in merged-from user's context when merged-to user already had the file" do
+        @user_2_file = attachment_model(context: @merge_user_2, md5: "hi")
+
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @merge_user_1.id
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "finds file in intermediate user's context if merge has happened cross-shard" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+          expect(response).to be_successful
+          expect(@user_1_file.reload.context_type).to eq "User"
+          expect(@user_1_file.context_id).to eq @merge_user_2.id
+        end
+
+        it "finds files correctly when given a non-native user ID" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          @shard1.activate do
+            get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+            expect(response).to be_successful
+            expect(@user_1_file.reload.context_type).to eq "User"
+            expect(@user_1_file.context_id).to eq @merge_user_2.id
+          end
+        end
+      end
+    end
+
     describe "as a student" do
       before do
         user_session(@student)
@@ -805,6 +878,33 @@ describe FilesController do
       it "renders unauthorized if the file doesn't exist" do
         get "show_relative", params: { course_id: @course.id, file_path: "course files/nope" }
         assert_unauthorized
+      end
+    end
+
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "allows access to files from a user who was merged into another user (happens with cross-shard merge)" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account: account)
+          end
+          UserMerge.from(@merge_user_1).into(@student)
+          run_jobs
+
+          get "show_relative", params: { user_id: @merge_user_1.id, file_id: @user_1_file.id, file_path: @user_1_file.full_path, verifier: @user_1_file.uuid }
+          expect(response).to be_redirect
+        end
       end
     end
 
