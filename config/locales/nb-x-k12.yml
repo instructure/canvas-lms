@@ -15718,7 +15718,7 @@ nb-x-k12:
     new_announcement: 
       email: 
         html: 
-          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på beskjeden, som vil bli setet av alle i faget."
+          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på beskjeden, som vil bli sett av alle i faget."
           attached_file: "Vedlagt fil"
           link: "Vis beskjed"
         labels: 
