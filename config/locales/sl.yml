@@ -5600,7 +5600,7 @@ sl:
       recording: "1 snemanje"
       recordings: "%{recordingCount} Snemanja"
       settings: Nastavitve
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           Ali ste prepričani, da želite končati to konferenco?
