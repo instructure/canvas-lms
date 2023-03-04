@@ -5102,7 +5102,7 @@ es-ES:
       recording: "1 grabación"
       recordings: "%{recordingCount} grabaciones"
       settings: Configuraciones
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           ¿Estás seguro de que quieres finalizar esta conferencia?
