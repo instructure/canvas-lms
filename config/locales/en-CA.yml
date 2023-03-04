@@ -6333,7 +6333,7 @@ en-CA:
       recording: "1 Recording"
       recordings: "%{recordingCount} Recordings"
       settings: Settings
-      type: "%{type}"
+      type: "%{translated_type}"
       view: View
     confirm: 
       close: |-
