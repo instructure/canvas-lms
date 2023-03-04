@@ -6838,7 +6838,7 @@ pl:
       recording: "1 nagranie"
       recordings: "Liczba nagrań: %{recordingCount}"
       settings: Ustawienia
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Pokaż
     confirm: 
       close: |-
