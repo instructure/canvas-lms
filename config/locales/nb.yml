@@ -6745,7 +6745,7 @@ nb:
       recording: "1 opptak"
       recordings: "%{recordingCount} opptak"
       settings: Innstillinger
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Vis
     confirm: 
       close: |-
