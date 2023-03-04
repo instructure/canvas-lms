@@ -6699,7 +6699,7 @@ de:
       recording: "1 Aufzeichnung"
       recordings: "%{recordingCount} Aufzeichnungen"
       settings: Einstellungen
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Ansehen
     confirm: 
       close: |-
