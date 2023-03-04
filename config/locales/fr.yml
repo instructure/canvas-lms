@@ -6749,7 +6749,7 @@ fr:
       recording: "1 enregistrement"
       recordings: "%{recordingCount} enregistrements"
       settings: Paramètres
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Afficher
     confirm: 
       close: |-
