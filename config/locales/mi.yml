@@ -6740,7 +6740,7 @@ mi:
       recording: "1 Hopu"
       recordings: "%{recordingCount} Ngā Hopukanga"
       settings: "Ngā Tautuhinga"
-      type: "%{type}momo"
+      type: "%{translated_type}"
       view: Tirohia
     confirm: 
       close: |-
@@ -6788,7 +6788,7 @@ mi:
       start: Tīmata
       sync: "Tukutahi Kaitāri"
       to: kī
-      type: "%{type}momo"
+      type: "%{type} momo"
       view: Tirohia
     no_concluded_conferences: "E kore ngāhuinga kua oti"
     no_new_conferences: "E kore hui hou"
