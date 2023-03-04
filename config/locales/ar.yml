@@ -6916,7 +6916,7 @@ ar:
       recording: "تسجيل واحد"
       recordings: "%{recordingCount} تسجيل/تسجيلات"
       settings: إعدادات
-      type: "%{type}"
+      type: "%{translated_type}"
       view: عرض
     confirm: 
       close: |-
