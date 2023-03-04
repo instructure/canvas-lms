@@ -6749,7 +6749,7 @@ es:
       recording: "1 grabación"
       recordings: "%{recordingCount} grabaciones"
       settings: Configuraciones
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Vista
     confirm: 
       close: |-
