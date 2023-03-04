@@ -6463,7 +6463,7 @@ ht:
       recording: "1 Anrejistreman"
       recordings: "%{recordingCount} Anrejistreman"
       settings: Paramèt
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Afiche
     confirm: 
       close: |-
