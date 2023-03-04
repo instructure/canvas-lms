@@ -5914,7 +5914,7 @@ fi:
       recording: "1 Nauhoitus"
       recordings: "%{recordingCount} Nauhoitukset"
       settings: Asetukset
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           Haluatko varmasti lopettaa tämän verkkotapaamisen?
