@@ -6836,7 +6836,7 @@ ru:
       recording: "1 запись"
       recordings: "%{recordingCount} записей"
       settings: Настройки
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Просмотреть
     confirm: 
       close: |-
