@@ -5062,7 +5062,7 @@ th:
       recording: "1 ผลงานบันทึก"
       recordings: "%{recordingCount} ผลงานบันทึก"
       settings: ค่าปรับตั้ง
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           แน่ใจว่าต้องการสิ้นสุดการประชุมนี้หรือไม่
