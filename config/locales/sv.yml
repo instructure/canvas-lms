@@ -6749,7 +6749,7 @@ sv:
       recording: "1 Inspelning"
       recordings: "%{recordingCount} inspelningar"
       settings: Inställningar
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Visa
     confirm: 
       close: |-
