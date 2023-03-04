@@ -5051,7 +5051,7 @@ vi:
       recording: "1 Đang ghi âm"
       recordings: "%{recordingCount} Các bản ghi âm"
       settings: "Cài Đặt"
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           Bạn có chắc chắn muốn kết thúc hội nghị này không?
