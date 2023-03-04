@@ -6406,7 +6406,7 @@ is:
       recording: "1 upptaka"
       recordings: "%{recordingCount} upptökur"
       settings: Stillingar
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Skoða
     confirm: 
       close: |-
