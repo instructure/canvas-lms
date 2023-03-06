@@ -20,17 +20,24 @@
 class MediaTrack < ActiveRecord::Base
   belongs_to :user
   belongs_to :media_object, touch: true
+  belongs_to :attachment
+  before_validation :add_attachment_id
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
   validates :locale, format: { with: /\A[A-Za-z\-]+\z/ }
   validates :content, presence: true
+  validates :locale, uniqueness: { scope: :attachment_id }, unless: proc { |mt| mt.attachment_id.blank? }
 
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
     message: "TTML tracks are not allowed because they are susceptible to xss attacks"
   }
+
+  def add_attachment_id
+    self.attachment_id = media_object.attachment_id
+  end
 
   def webvtt_content
     read_attribute(:webvtt_content) || content
