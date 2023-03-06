@@ -181,20 +181,21 @@ test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters
     navigate() {},
   })
   this.gradebook.renderActionMenu()
-  const importButtonText = document
-    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[0]
-    .innerText.trim()
-  const exportButtonText = document
-    .querySelectorAll('[data-component="EnhancedActionMenu"] Button')[1]
+  const importButtonText = this.gradebook.props.enhancedActionMenuNode
+    .querySelectorAll('Button')[0]
     .innerText.trim()
   equal(importButtonText, 'Import')
+
+  const exportButtonText = this.gradebook.props.enhancedActionMenuNode
+    .querySelectorAll('Button')[1]
+    .innerText.trim()
   equal(exportButtonText, 'Export')
 })
 
 test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters is disabled', function () {
   this.gradebook.renderActionMenu()
-  const buttonText = document
-    .querySelectorAll('[data-component="ActionMenu"] Button')[0]
+  const buttonText = this.gradebook.props.actionMenuNode
+    .querySelectorAll('Button')[0]
     .innerText.trim()
   equal(buttonText, 'Actions')
 })
