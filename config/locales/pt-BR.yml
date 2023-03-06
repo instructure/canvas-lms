@@ -6740,7 +6740,7 @@ pt-BR:
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
       settings: Configurações
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Exibir
     confirm: 
       close: |-

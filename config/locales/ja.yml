@@ -6745,7 +6745,7 @@ ja:
       recording: "1 件の記録"
       recordings: "%{recordingCount} 件の記録"
       settings: 設定
-      type: "%{type}"
+      type: "%{translated_type}"
       view: 表示
     confirm: 
       close: |-

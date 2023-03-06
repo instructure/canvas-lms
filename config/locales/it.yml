@@ -6318,7 +6318,7 @@ it:
       recording: "1 registrazione"
       recordings: "%{recordingCount} Registrazioni"
       settings: Impostazioni
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Visualizza
     confirm: 
       close: |-

@@ -6736,7 +6736,7 @@ zh-Hans:
       recording: "1 个录音"
       recordings: "%{recordingCount} 个录音"
       settings: 设置
-      type: "%{type}"
+      type: "%{translated_type}"
       view: 查看
     confirm: 
       close: |-

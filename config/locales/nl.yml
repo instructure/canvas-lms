@@ -6740,7 +6740,7 @@ nl:
       recording: "1 opname"
       recordings: "%{recordingCount} opnames"
       settings: Instellingen
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Bekijken
     confirm: 
       close: |-

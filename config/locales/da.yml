@@ -6743,7 +6743,7 @@ da:
       recording: "1 optagelse"
       recordings: "%{recordingCount} optagelser"
       settings: Indstillinger
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Vis
     confirm: 
       close: |-

@@ -6749,7 +6749,7 @@ zh-Hant:
       recording: "1 個記錄"
       recordings: "%{recordingCount} 個記錄"
       settings: 設置
-      type: "%{type}"
+      type: "%{translated_type}"
       view: 檢視
     confirm: 
       close: |-

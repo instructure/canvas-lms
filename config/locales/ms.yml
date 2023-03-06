@@ -4941,7 +4941,7 @@ ms:
       recording: "1 Rakaman"
       recordings: "%{recordingCount} Rakaman"
       settings: Tetapan
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           Adakah anda pasti anda ingin menamatkan persidangan ini?

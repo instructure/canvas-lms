@@ -6745,7 +6745,7 @@ nb:
       recording: "1 opptak"
       recordings: "%{recordingCount} opptak"
       settings: Innstillinger
-      type: "%{type}"
+      type: "%{translated_type}"
       view: Vis
     confirm: 
       close: |-
@@ -17740,7 +17740,7 @@ nb:
     new_announcement: 
       email: 
         html: 
-          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli setet av alle i emnet."
+          announcement_info: "Svar på denne e-posten vil bli lagt ut som et svar på kunngjøringen, som vil bli sett av alle i emnet."
           attached_file: "Vedlagt fil"
           link: "Vis kunngjøring"
         labels: 

@@ -6193,7 +6193,7 @@ cy:
       recording: "1 Recordiad"
       recordings: "%{recordingCount} Recordiad"
       settings: Gosodiadau
-      type: "%{type}"
+      type: "%{translated_type}"
     confirm: 
       close: |-
           Ydych chi’n siŵr eich bod am ddod â’r gynhadledd hon i ben?
