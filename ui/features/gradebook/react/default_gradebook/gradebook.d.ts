@@ -147,7 +147,6 @@ export type GradebookOptions = {
   show_total_grade_as_points: boolean
   sis_app_token: null | string
   sis_app_url: null | string
-  sis_name: null | string
   sis_name: string
   speed_grader_enabled: boolean
   student_groups: StudentGroupCategoryMap

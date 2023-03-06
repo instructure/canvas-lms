@@ -20,6 +20,7 @@
 import Gradebook from '../Gradebook'
 import type {GradebookProps} from '../Gradebook'
 import GradebookGrid from '../GradebookGrid/index'
+import PostGradesStore from '../../SISGradePassback/PostGradesStore'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
@@ -29,6 +30,14 @@ import {camelize} from 'convert-case'
 const performance_controls = {
   students_chunk_size: 2, // students per page
 }
+
+const postGradesStore = PostGradesStore({
+  course: {id: '1', sis_id: null},
+  selected: {
+    id: '1',
+    type: 'course',
+  },
+})
 
 export const defaultGradebookEnv = {
   allow_apply_score_to_ungraded: false,
@@ -131,6 +140,7 @@ export const defaultGradebookProps: GradebookProps = {
   recentlyLoadedCustomColumnData: null,
   reloadStudentData: () => {},
   reorderCustomColumns: () => Promise.resolve(),
+  postGradesStore,
   settingsModalButtonContainer: document.createElement('div'),
   sisOverrides: [],
   studentIds: [],

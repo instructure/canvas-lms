@@ -19,6 +19,7 @@
 import React, {useRef, useEffect, useCallback} from 'react'
 import shallow from 'zustand/shallow'
 import {camelize} from 'convert-case'
+import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import Gradebook from './Gradebook'
 import {findFilterValuesOfType} from './Gradebook.utils'
 import type {GradebookOptions} from './gradebook.d'
@@ -48,6 +49,11 @@ export default function GradebookData(props: Props) {
   const dispatch = useRef(
     new RequestDispatch({
       activeRequestLimit: performanceControls.current.activeRequestLimit,
+    })
+  )
+  const postGradesStore = useRef(
+    PostGradesStore({
+      course: {id: props.gradebookEnv.context_id, sis_id: props.gradebookEnv.context_sis_id},
     })
   )
   const courseId = props.gradebookEnv.context_id
@@ -198,6 +204,7 @@ export default function GradebookData(props: Props) {
       isStudentIdsLoading={isStudentIdsLoading}
       isSubmissionDataLoaded={isSubmissionDataLoaded}
       modules={modules}
+      postGradesStore={postGradesStore.current}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
       sisOverrides={sisOverrides}
       recentlyLoadedStudents={recentlyLoadedStudents}
@@ -205,9 +212,6 @@ export default function GradebookData(props: Props) {
       reloadStudentData={reloadStudentData}
       reorderCustomColumns={reorderCustomColumns}
       studentIds={studentIds}
-      // when the rest of DataLoader is moved we can remove these
-      performanceControls={performanceControls.current}
-      dispatch={dispatch.current}
       updateColumnOrder={updateColumnOrder}
     />
   )

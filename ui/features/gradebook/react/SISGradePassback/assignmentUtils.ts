@@ -37,7 +37,7 @@ const assignmentUtils = {
     please_ignore: boolean
     original_error: boolean
   } {
-    const a: PartialAssignment = _.pick<PartialAssignment, PartialAssignment>(assignment, [
+    const a: PartialAssignment = _.pick(assignment, [
       'id',
       'name',
       'due_at',
@@ -71,7 +71,7 @@ const assignmentUtils = {
     }
   },
 
-  notUniqueName(assignments: AssignmentWithOverride[], a: AssignmentWithOverride) {
+  notUniqueName(assignments: PartialAssignment[], a: AssignmentWithOverride) {
     const fn = _.partial(assignmentUtils.namesMatch, a)
     return assignments.some(fn)
   },
@@ -185,7 +185,7 @@ const assignmentUtils = {
     return _.filter(assignments, a => a.needs_grading_count > 0)
   },
 
-  hasError(assignments: AssignmentWithOverride[], a: AssignmentWithOverride) {
+  hasError(assignments: PartialAssignment[], a: AssignmentWithOverride) {
     // //Decided to ignore
     if (a.please_ignore) return false
 

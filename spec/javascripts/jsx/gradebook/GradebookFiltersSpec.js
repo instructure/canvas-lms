@@ -24,6 +24,7 @@ import {
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
+import PostGradesStore from 'ui/features/gradebook/react/SISGradePassback/PostGradesStore'
 
 const $fixtures = document.getElementById('fixtures')
 
@@ -422,11 +423,16 @@ QUnit.module('Gradebook#updateCurrentSection', {
   setup() {
     this.server = sinon.fakeServer.create({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
+    this.postGradesStore = PostGradesStore({
+      course: {id: '1', sis_id: null},
+      selected: {id: '1', type: 'course'},
+    })
+    this.postGradesStore.setSelectedSection = sinon.stub()
 
-    this.gradebook = createGradebook({settings_update_url: '/settingUrl'})
-    this.gradebook.postGradesStore = {
-      setSelectedSection: sinon.stub(),
-    }
+    this.gradebook = createGradebook({
+      settings_update_url: '/settingUrl',
+      postGradesStore: this.postGradesStore,
+    })
     sinon.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
     sandbox.stub(this.gradebook, 'updateSectionFilterVisibility')
   },
@@ -443,12 +449,12 @@ test('updates the filter setting with the given section id', function () {
 
 test('sets the selected section on the post grades store', function () {
   this.gradebook.updateCurrentSection('2001')
-  strictEqual(this.gradebook.postGradesStore.setSelectedSection.callCount, 1)
+  strictEqual(this.postGradesStore.setSelectedSection.callCount, 3)
 })
 
 test('includes the selected section when updating the post grades store', function () {
   this.gradebook.updateCurrentSection('2001')
-  const [sectionId] = this.gradebook.postGradesStore.setSelectedSection.firstCall.args
+  const [sectionId] = this.postGradesStore.setSelectedSection.thirdCall.args
   strictEqual(sectionId, '2001')
 })
 

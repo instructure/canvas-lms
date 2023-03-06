@@ -157,7 +157,6 @@ QUnit.module('Menus', {
       navigate() {},
     })
     this.gradebook.postGradesLtis = []
-    this.gradebook.postGradesStore = {}
   },
 
   teardown() {

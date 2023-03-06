@@ -28,8 +28,6 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import ErrorBoundary from '@canvas/error-boundary'
 // @ts-ignore
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import type {RequestDispatch} from '@canvas/network'
-import type PerformanceControls from './PerformanceControls'
 import type {ActionMenuProps} from './components/ActionMenu'
 import type {SubmissionTrayProps} from './components/SubmissionTray'
 import type {
@@ -245,7 +243,6 @@ export type GradebookProps = {
     customColumnId: string
     columnData: CustomColumnData[]
   }
-  dispatch: RequestDispatch
   fetchFinalGradeOverrides: () => Promise<void>
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
@@ -269,7 +266,7 @@ export type GradebookProps = {
   isSubmissionDataLoaded: boolean
   locale: string
   modules: Module[]
-  performanceControls: PerformanceControls
+  postGradesStore: ReturnType<typeof PostGradesStore>
   recentlyLoadedAssignmentGroups: {
     assignmentGroups: AssignmentGroup[]
     gradingPeriodIds?: string[]
@@ -421,8 +418,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   assignments: AssignmentMap = {}
 
-  postGradesStore: ReturnType<typeof PostGradesStore>
-
   submissionStateMap!: SubmissionStateMap
 
   studentGroupCategoriesById: StudentGroupCategoryMap = {}
@@ -492,15 +487,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.setAssignmentGroups({})
     this.courseContent.students = new StudentDatastore(this.students, this.studentViewStudents)
 
-    this.postGradesStore = PostGradesStore({
-      course: {
-        id: this.options.context_id,
-        sis_id: this.options.context_sis_id,
-      },
-    })
-    this.postGradesStore.addChangeListener(this.updatePostGradesFeatureButton)
+    this.props.postGradesStore.addChangeListener(this.updatePostGradesFeatureButton)
     const sectionId = this.getFilterRowsBySetting('sectionId')
-    this.postGradesStore.setSelectedSection(sectionId)
+    this.props.postGradesStore.setSelectedSection(sectionId)
 
     this.initPostGradesLtis()
     this.checkForUploadComplete()
@@ -539,7 +528,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.teacherNotesNotYetLoaded =
       this.getTeacherNotesColumn() == null || this.getTeacherNotesColumn()!.hidden || false
     this.setSections(this.options.sections)
-    this.postGradesStore.setSections(this.sections)
+    this.props.postGradesStore.setSections(this.sections)
     if (!this.getSelectedSecondaryInfo()) {
       if (this.sections_enabled) {
         this.gridDisplaySettings.selectedSecondaryInfo = 'section'
@@ -648,7 +637,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
     }
-    this.postGradesStore.setGradeBookAssignments(this.assignments)
+    this.props.postGradesStore.setGradeBookAssignments(this.assignments)
   }
 
   // dependencies - gridReady
@@ -1510,7 +1499,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const currentSection = this.getFilterRowsBySetting('sectionId')
     if (currentSection !== sectionId) {
       this.setFilterRowsBySetting('sectionId', sectionId)
-      this.postGradesStore.setSelectedSection(sectionId)
+      this.props.postGradesStore.setSelectedSection(sectionId)
       return this.saveSettings({}).then(() => {
         this.updateSectionFilterVisibility()
         return this.props.reloadStudentData()
@@ -1739,7 +1728,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   updatePostGradesFeatureButton = () => {
     this.disablePostGradesFeature =
-      !this.postGradesStore.hasAssignments() || !this.postGradesStore.selectedSISId()
+      !this.props.postGradesStore.hasAssignments() || !this.props.postGradesStore.selectedSISId()
     return this.gridReady.promise.then(() => {
       this.renderActionMenu()
     })
@@ -1961,7 +1950,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         enabled: this.options.post_grades_feature && !this.disablePostGradesFeature,
         returnFocusTo: focusReturnPoint,
         label: this.options.sis_name,
-        store: this.postGradesStore,
+        store: this.props.postGradesStore,
       },
       publishGradesToSis: {
         isEnabled: this.options.publish_to_sis_enabled,
