@@ -1238,28 +1238,6 @@ class GradebooksController < ApplicationController
     redirect_to polymorphic_url([@context, :gradebook])
   end
 
-  def visible_modules?
-    @visible_modules ||= @context.modules_visible_to(@current_user).any?
-  end
-  helper_method :visible_modules?
-
-  def multiple_sections?
-    @multiple_sections ||= @context.multiple_sections?
-  end
-  helper_method :multiple_sections?
-
-  def multiple_assignment_groups?
-    @multiple_assignment_groups ||= @context.assignment_groups.many?
-  end
-  helper_method :multiple_assignment_groups?
-
-  def student_groups?
-    return @student_groups if defined?(@student_groups)
-
-    @student_groups = @context.groups.any?
-  end
-  helper_method :student_groups?
-
   private
 
   def gradebook_group_categories_json
