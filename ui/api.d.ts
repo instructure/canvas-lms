@@ -248,6 +248,7 @@ export type AssignmentMap = {
 }
 
 export type AssignmentGroup = Readonly<{
+  assignments: Assignment[]
   group_weight: number
   id: string
   integration_data: unknown
@@ -255,9 +256,7 @@ export type AssignmentGroup = Readonly<{
   position: number
   rules: unknown
   sis_source_id: null | string
-}> & {
-  assignments: Assignment[]
-}
+}>
 
 export type AssignmentGroupMap = {
   [id: string]: AssignmentGroup
@@ -436,8 +435,15 @@ export type Submission = Readonly<{
   final_provisional_grade?: string
 }
 
+export type AssignmentUserSubmissionMap = {
+  [assignmentId: string]: {
+    [userId: string]: Submission
+  }
+}
+
 export type UserSubmissionGroup = {
   user_id: string
+  section_id: string
   submissions: Submission[]
 }
 
