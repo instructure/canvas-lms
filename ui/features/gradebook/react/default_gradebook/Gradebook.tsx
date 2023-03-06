@@ -733,7 +733,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.assignmentGroups[group.id] = group
       }
 
-      group.assignments = group.assignments || []
+      // @ts-ignore
+      group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
         assignment.due_at = tz.parse(assignment.due_at)

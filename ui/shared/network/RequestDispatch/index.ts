@@ -130,7 +130,7 @@ export default class RequestDispatch {
     return request.deferred.promise
   }
 
-  getJSON<T>(url: string, params?) {
+  getJSON<T>(url: string, params?): Promise<T> {
     const request = {
       deferred: deferPromise<T>(),
       start: () => {},
