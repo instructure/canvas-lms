@@ -173,6 +173,7 @@ const HeaderInputs = props => {
             }
             input={
               <AddressBookContainer
+                includeCommonCourses={true}
                 width="100%"
                 open={props.addressBookContainerOpen}
                 onSelectedIdsChange={ids => {

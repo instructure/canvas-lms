@@ -19,7 +19,10 @@
 import PropTypes from 'prop-types'
 import React, {useMemo, useState, useEffect} from 'react'
 import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../../components/AddressBook/AddressBook'
-import {ADDRESS_BOOK_RECIPIENTS} from '../../../graphql/Queries'
+import {
+  ADDRESS_BOOK_RECIPIENTS,
+  ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
+} from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
 
 export const AddressBookContainer = props => {
@@ -53,19 +56,24 @@ export const AddressBookContainer = props => {
     return () => clearInterval(interval)
   }, [inputValue, searchTerm, setSearchTerm])
 
-  const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
-    skip: !isMenuOpen,
-    variables: {
-      context:
-        filterHistory[filterHistory.length - 1]?.context?.contextID ||
-        props.courseContextCode ||
-        null,
-      search: searchTerm,
-      userID,
-      courseContextCode: props.courseContextCode,
-    },
-    notifyOnNetworkStatusChange: true,
-  })
+  const addressBookRecipientsQuery = useQuery(
+    props.includeCommonCourses
+      ? ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES
+      : ADDRESS_BOOK_RECIPIENTS,
+    {
+      skip: !isMenuOpen,
+      variables: {
+        context:
+          filterHistory[filterHistory.length - 1]?.context?.contextID ||
+          props.courseContextCode ||
+          null,
+        search: searchTerm,
+        userID,
+        courseContextCode: props.courseContextCode,
+      },
+      notifyOnNetworkStatusChange: true,
+    }
+  )
   const {loading, data} = addressBookRecipientsQuery
 
   useEffect(() => {
@@ -187,7 +195,9 @@ export const AddressBookContainer = props => {
         _id: u._id,
         id: u.id,
         name: u.name,
-        commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection),
+        commonCoursesInfo: props.includeCommonCourses
+          ? getCommonCoursesInformation(u.commonCoursesConnection)
+          : [],
         observerEnrollments: u?.observerEnrollmentsConnection?.nodes || [],
         itemType: USER_TYPE,
       }
@@ -222,7 +232,7 @@ export const AddressBookContainer = props => {
     }
 
     return {contextData, userData}
-  }, [loading, data, filterHistory, searchTerm])
+  }, [loading, data, filterHistory, searchTerm, props.includeCommonCourses])
 
   const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
     if (isContext) {
@@ -308,6 +318,7 @@ AddressBookContainer.propTypes = {
    * bool which determines if "select all" in a context menu appears
    */
   hasSelectAllFilterOption: PropTypes.bool,
+  includeCommonCourses: PropTypes.bool,
   addressBookMessages: PropTypes.array,
   courseContextCode: PropTypes.string,
   /**
@@ -321,6 +332,7 @@ AddressBookContainer.defaultProps = {
   onInputValueChange: () => {},
   hasSelectAllFilterOption: false,
   courseContextCode: '',
+  includeCommonCourses: false,
   open: false,
 }
 
