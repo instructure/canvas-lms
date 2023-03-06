@@ -28,12 +28,15 @@ import {RequestDispatch} from '@canvas/network'
 import useStore from './stores/index'
 
 type Props = {
+  actionMenuNode: HTMLSpanElement
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
+  enhancedActionMenuNode: HTMLSpanElement
   flashMessageContainer: HTMLElement
   gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
+  gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   hideGrid?: false

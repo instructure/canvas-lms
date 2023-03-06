@@ -103,6 +103,7 @@ export const defaultGradebookEnv = {
 }
 
 export const defaultGradebookProps: GradebookProps = {
+  actionMenuNode: document.createElement('span'),
   appliedFilters: [],
   applyScoreToUngradedModalNode: document.createElement('div'),
   colors: {
@@ -115,6 +116,7 @@ export const defaultGradebookProps: GradebookProps = {
   },
   customColumns: [],
   dispatch: new RequestDispatch(),
+  enhancedActionMenuNode: document.createElement('span'),
   fetchGradingPeriodAssignments: () => Promise.resolve({}),
   fetchStudentIds: () => Promise.resolve([]),
   flashAlerts: [],
@@ -124,6 +126,7 @@ export const defaultGradebookProps: GradebookProps = {
   gradebookMenuNode: document.createElement('div'),
   gradingPeriodAssignments: {},
   gradingPeriodsFilterContainer: document.createElement('div'),
+  gradebookSettingsModalContainer: document.createElement('span'),
   gridColorNode: document.createElement('div'),
   hideGrid: true,
   isFiltersLoading: false,
@@ -156,7 +159,9 @@ export function createGradebook(
     gradebook_is_editable?: any
     gradebookGridNode?: HTMLElement
   } = {}
-) {
+): Gradebook & {
+  props: GradebookProps
+} {
   const performanceControls = new PerformanceControls({
     ...performance_controls,
     ...camelize(options.performance_controls),
@@ -206,20 +211,14 @@ export function setFixtureHtml($fixture) {
     <div id="application">
       <div id="wrapper">
         <div data-component="GridColor"></div>
-        <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
-        <span data-component="ViewOptionsMenu"></span>
-        <span data-component="ActionMenu"></span>
         <div id="assignment-group-filter-container"></div>
         <div id="grading-periods-filter-container"></div>
         <div id="modules-filter-container"></div>
         <div id="sections-filter-container"></div>
         <div id="student-group-filter-container"></div>
-        <span data-component="EnhancedActionMenu"></span>
         <div id="search-filter-container">
           <input type="text" />
         </div>
-        <div id="gradebook-settings-modal-button-container"></div>
-        <div data-component="GradebookSettingsModal"></div>
         <div id="hide-assignment-grades-tray"></div>
         <div id="post-assignment-grades-tray"></div>
         <div id="assignment-posting-policy-tray"></div>

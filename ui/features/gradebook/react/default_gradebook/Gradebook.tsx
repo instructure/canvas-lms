@@ -235,6 +235,8 @@ export function Portal({node, children}: {node: HTMLElement; children: React.Rea
 }
 
 export type GradebookProps = {
+  actionMenuNode: HTMLSpanElement
+  enhancedActionMenuNode: HTMLSpanElement
   appliedFilters: Filter[]
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
@@ -253,6 +255,7 @@ export type GradebookProps = {
   gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
+  gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
@@ -1707,7 +1710,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         name: lti.name,
         onSelect: () => {
           const postGradesDialog = new PostGradesFrameDialog({
-            returnFocusTo: document.querySelector("[data-component='ActionMenu'] button"),
+            returnFocusTo: this.props.actionMenuNode.querySelector('button'),
             baseUrl: lti.data_url,
           })
           // 10 ms delay left over from original coffeescript implementation
@@ -1937,7 +1940,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getActionMenuProps = () => {
     let attachmentData: AttachmentData
-    const focusReturnPoint = document.querySelector("[data-component='ActionMenu'] button")
+    const focusReturnPoint = this.props.actionMenuNode.querySelector('button')
     const actionMenuProps: ActionMenuProps = {
       gradebookIsEditable: this.options.gradebook_is_editable,
       contextAllowsGradebookUploads: this.options.context_allows_gradebook_uploads,
@@ -1989,13 +1992,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   renderActionMenu = (): void => {
-    const componentId = this.options.enhanced_gradebook_filters
-      ? 'EnhancedActionMenu'
-      : 'ActionMenu'
-    const component = this.options.enhanced_gradebook_filters ? EnhancedActionMenu : ActionMenu
-    const mountPoint = document.querySelector(`[data-component='${componentId}']`)
     const props = this.getActionMenuProps()
-    renderComponent(component, mountPoint, props)
+    if (this.options.enhanced_gradebook_filters) {
+      renderComponent(EnhancedActionMenu, this.props.enhancedActionMenuNode, props)
+    } else {
+      renderComponent(ActionMenu, this.props.actionMenuNode, props)
+    }
   }
 
   renderFilters = () => {
@@ -2035,13 +2037,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     if (this.options.enhanced_gradebook_filters) {
-      _.extend(props, this.gradebookSettingsModalViewOptionsProps())
+      Object.assign(props, this.gradebookSettingsModalViewOptionsProps())
     }
 
-    const $container = document.querySelector("[data-component='GradebookSettingsModal']")
-    if ($container instanceof HTMLElement) {
-      AsyncComponents.renderGradebookSettingsModal(props, $container)
-    }
+    AsyncComponents.renderGradebookSettingsModal(props, this.props.gradebookSettingsModalContainer)
   }
 
   gradebookSettingsModalViewOptionsProps = () => {
