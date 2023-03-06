@@ -179,6 +179,7 @@ class ContextModulesApiController < ApplicationController
         opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
       end
 
+      opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
       render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
@@ -214,7 +215,9 @@ class ContextModulesApiController < ApplicationController
       includes = Array(params[:include])
       ActiveRecord::Associations.preload(mod, content_tags: :content) if includes.include?("items")
       prog = @student ? mod.evaluate_for(@student) : nil
-      render json: module_json(mod, @student || @current_user, session, prog, includes)
+
+      opts = { can_view_published: @context.grants_right?(@current_user, session, :read_as_admin) }
+      render json: module_json(mod, @student || @current_user, session, prog, includes, opts)
     end
   end
 
