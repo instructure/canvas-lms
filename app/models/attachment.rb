@@ -78,6 +78,7 @@ class Attachment < ActiveRecord::Base
   has_one :account_report, inverse_of: :attachment
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
+  has_many :media_tracks
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
   has_many :attachment_associations
