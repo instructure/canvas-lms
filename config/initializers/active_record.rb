@@ -757,7 +757,7 @@ class ActiveRecord::Base
   end
 
   def self.override_db_configs(override)
-    configurations.configs_for.each do |config|
+    configurations.configurations.each do |config|
       config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
     end
     clear_all_connections!(nil)
