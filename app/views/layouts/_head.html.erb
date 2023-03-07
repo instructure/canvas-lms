@@ -22,9 +22,9 @@
   <% if @sentry_trace.present? %>
   <meta name="sentry-trace" content="<%= @sentry_trace %>"/>
   <% end %>
-  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Regular.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonmyous' }) %>
-  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Bold.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonmyous' }) %>
-  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonmyous' }) %>
+  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Regular.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
+  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Bold.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
+  <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= stylesheet_link_tag(css_url_for('fonts')) %>
   <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
     <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
