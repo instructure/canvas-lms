@@ -100,6 +100,12 @@ describe "editing a quiz" do
 
         expect { @quiz.quiz_questions.count }.to become(1)
       end
+
+      it "shows the speed grader link" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        f(".al-trigger").click
+        expect(f(".speed-grader-link-quiz")).to be_displayed
+      end
     end
 
     context "when the quiz isn't published" do
