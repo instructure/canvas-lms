@@ -171,6 +171,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Pangkas Imej" },
   "cup_product_14174434": { "message": "Produk Cawan" },
   "current_image_f16c249c": { "message": "Imej Semasa" },
+  "current_volume_level_c55ab825": { "message": "Tahap Volum Semasa" },
   "custom_6979cd81": { "message": "Tersuai" },
   "cyan_c1d5f68a": { "message": "Sian" },
   "dagger_57e0f4e5": { "message": "Pisau Belati" },
@@ -288,6 +289,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Fail" },
   "files_index_af7c662b": { "message": "Indeks Fail" },
+  "finish_bc343002": { "message": "Selesai" },
   "flat_music_76d5a5c3": { "message": "Flat (Muzik)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Bar alat pilihan elemen fokus"
@@ -454,6 +456,8 @@ const locale = {
     "message": "Fail media sedang diproses. Sila cuba semula kemudian."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "microphone_disabled_15c83130": { "message": "Mikrofon Dinyahdayakan" },
   "middle_27dc1d5": { "message": "Tengah" },
   "minimize_file_preview_da911944": { "message": "Kecilkan Pratonton Fail" },
   "minimize_video_20aa554b": { "message": "Kecilkan Video" },
@@ -494,6 +498,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tiada hasil ditemui untuk { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Tiada Video" },
   "none_3b5e34d2": { "message": "Tiada" },
   "none_selected_b93d56d2": { "message": "Tiada Yang Dipilih" },
   "not_equal_6e2980e6": { "message": "Tidak Sama Dengan" },
@@ -533,6 +538,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Selari" },
   "partial_derivative_4a9159df": { "message": "Separa (Terbitan)" },
   "paste_5963d1c1": { "message": "Tampal" },
+  "pause_12af3bb4": { "message": "Jedakan" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Orang" },
   "percentage_34ab7c2c": { "message": "Peratusan" },
@@ -548,9 +554,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (Varian)" },
   "pink_68ad45cb": { "message": "Merah jambu" },
   "pixels_52ece7d1": { "message": "Piksel" },
+  "play_1a47eaa7": { "message": "Mainkan" },
   "play_media_comment_35257210": { "message": "Mainkan komen main." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Mainkan komen media oleh { name } dari { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Sila benarkan Canvas mengakses mikrofon dan kamera web anda."
   },
   "plus_d43cd4ec": { "message": "Tambah" },
   "plus_minus_f8be2e83": { "message": "Tambah/Tolak" },
@@ -560,6 +570,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Mendahului Sama Dengan" },
   "preformatted_d0670862": { "message": "Sedia Terformat" },
   "preview_53003fd2": { "message": "Pratonton" },
+  "preview_a3f8f854": { "message": "PRATONTON" },
   "preview_in_overlay_ed772c46": { "message": "Pratonton dalam tindihan" },
   "preview_inline_9787330": { "message": "Pratonton dalam sebaris" },
   "prime_917ea60e": { "message": "Perdana" },
@@ -582,6 +593,7 @@ const locale = {
     "message": "Bahagian Sebenar (Nombor Kompleks)"
   },
   "record_7c9448b": { "message": "Rakam" },
+  "recording_98da6bda": { "message": "Merakam" },
   "red_8258edf3": { "message": "Merah" },
   "relationships_6602af70": { "message": "Hubungan" },
   "religion_icon_246e0be1": { "message": "Ikon Agama" },
@@ -624,10 +636,13 @@ const locale = {
     "message": "Sayangnya, editor HTML rapi tidak dapat diakses dengan papan kekunci. Dapatkan akses kepada editor HTML mentah di sini."
   },
   "save_11a80ec3": { "message": "Simpan" },
+  "save_media_cb9e786e": { "message": "Simpan Media" },
   "script_l_42a7b254": { "message": "Skrip L" },
   "search_280d00bd": { "message": "Cari" },
+  "select_audio_source_21043cd5": { "message": "Pilih sumber audio" },
   "select_crop_shape_d441feeb": { "message": "Pilih bentuk pangkasan" },
   "select_language_7c93a900": { "message": "Pilih Bahasa" },
+  "select_video_source_1b5c9dbe": { "message": "Pilih sumber video" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } dipilih" },
   "set_minus_b46e9b88": { "message": "Tetapkan Tolak" },
   "sharp_music_ab956814": { "message": "Tajam (Muzik)" },
@@ -648,6 +663,9 @@ const locale = {
   "small_b070434a": { "message": "Kecil" },
   "solid_circle_9f061dfc": { "message": "Bulatan Satu Warna" },
   "something_went_wrong_89195131": { "message": "Sesuatu tidak kena." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Sesuatu tidak kena semasa mengakses kamera web anda."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Sesuatu tidak kena dan saya tidak pasti perkara yang patut ditunjukkan."
   },
@@ -655,6 +673,9 @@ const locale = {
     "message": "Sesuatu tidak kena. Semak sambungan anda, muatkan semula halaman dan cuba semula."
   },
   "something_went_wrong_d238c551": { "message": "Sesuatu tidak kena" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Sesuatu tidak kena semasa berkongsi skrin anda."
+  },
   "sort_by_e75f9e3e": { "message": "Isih Mengikut" },
   "spades_suit_b37020c2": { "message": "Penyodok (Sut)" },
   "square_511eb3b3": { "message": "Segi empat" },
@@ -667,6 +688,8 @@ const locale = {
   "square_superset_3be8dae1": { "message": "Superset Kuasa Dua" },
   "square_superset_strict_fa4262e4": { "message": "Subset Kuasa Dua (Wajar)" },
   "star_8d156e09": { "message": "Bintangkan" },
+  "start_over_f7552aa9": { "message": "Mulakan Semula" },
+  "start_recording_9a65141a": { "message": "Mulakan Rakaman" },
   "steel_blue_14296f08": { "message": "Biru Keluli" },
   "styles_2aa721ef": { "message": "Gaya" },
   "submit_a3cc6859": { "message": "Serahkan" },
@@ -695,6 +718,8 @@ const locale = {
     "message": "Tukar kepada editor teks beraneka"
   },
   "syllabus_f191f65b": { "message": "Silibus" },
+  "system_audio_allowed_b2508f8c": { "message": "Audio Sistem Dibenarkan" },
+  "system_audio_disabled_c177bd13": { "message": "Audio Sistem Dinyahdayakan" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Panah" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Teal" },
@@ -740,6 +765,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Walaupun video anda akan mempunyai tajuk yang betul dalam pelayar, kami gagal membuat kemas kini dalam pangkalan data."
   },
+  "timebar_a4d18443": { "message": "Bar Masa" },
   "title_ee03d132": { "message": "Tajuk" },
   "to_be_posted_when_d24bf7dc": { "message": "Untuk Disiarkan: { when }" },
   "to_do_when_2783d78f": { "message": "Untuk Dilakukan: { when }" },
@@ -761,6 +787,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Kesatuan" },
   "unpublished_dfd8801": { "message": "dinyahterbitkan" },
+  "untitled_16aa4f2b": { "message": "Tidak bertajuk" },
   "untitled_efdc2d7d": { "message": "tidak bertajuk" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Panah Barat Laut" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Panah Timur Laut" },
@@ -831,6 +858,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Titik Menegak" },
   "video_options_24ef6e5d": { "message": "Pilihan Video" },
   "video_options_tray_3b9809a5": { "message": "Dulang Pilihan Video" },
+  "video_player_b371005": { "message": "Pemain Video" },
   "video_player_for_9e7d373b": { "message": "Pemain video untuk  " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Pemain video untuk { title }"
@@ -846,6 +874,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Lihat bilangan perkataan dan aksara"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Kami tidak dapat mengesan mikrofon berfungsi yang disambungkan dengan peranti anda."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Kami tidak dapat mengesan kamera web berfungsi yang disambungkan dengan peranti anda."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Kami tidak dapat mengesan kamera web atau mikrofon berfungsi yang disambungkan dengan peranti anda."
+  },
+  "webcam_disabled_30c66986": { "message": "Kamera Web Dinyahdayakan" },
+  "webcam_fe91b20f": { "message": "Kamera Web" },
   "white_87fa64fd": { "message": "Putih" },
   "width_492fec76": { "message": "Lebar" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -864,6 +903,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Imej anda telah dimampatkan untuk Pembuat Ikon. Imej yang kurang daripada { size } KB tidak akan dimampatkan."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Mikrofon anda disekat dalam tetapan pelayar."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Kamera web dan mikrofon anda disekat dalam tetapan pelayar."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Kamera web anda disekat dalam tetapan pelayar."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Kamera web anda mungkin sudah digunakan."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zum" },

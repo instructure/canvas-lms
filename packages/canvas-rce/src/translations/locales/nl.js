@@ -174,6 +174,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Afbeelding bijsnijden" },
   "cup_product_14174434": { "message": "Cup-product" },
   "current_image_f16c249c": { "message": "Huidige afbeelding" },
+  "current_volume_level_c55ab825": { "message": "Huidig volumeniveau" },
   "custom_6979cd81": { "message": "Aangepast" },
   "cyan_c1d5f68a": { "message": "Cyaan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
@@ -295,6 +296,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Bestanden" },
   "files_index_af7c662b": { "message": "Bestandsoverzicht" },
+  "finish_bc343002": { "message": "Voltooien" },
   "flat_music_76d5a5c3": { "message": "Mol (muziek)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Werkbalk met focus-elementopties"
@@ -463,6 +465,8 @@ const locale = {
     "message": "Verwerken van mediabestand. Probeer het later opnieuw."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mic" },
+  "microphone_disabled_15c83130": { "message": "Microfoon uitgeschakeld" },
   "middle_27dc1d5": { "message": "Midden" },
   "minimize_file_preview_da911944": {
     "message": "Voorbeeld van bestand minimaliseren"
@@ -507,6 +511,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Geen resultaten gevonden voor { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Geen video" },
   "none_3b5e34d2": { "message": "Geen" },
   "none_selected_b93d56d2": { "message": "Geen geselecteerd" },
   "not_equal_6e2980e6": { "message": "Niet gelijk" },
@@ -548,6 +553,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiële afgeleide" },
   "paste_5963d1c1": { "message": "Plakken" },
+  "pause_12af3bb4": { "message": "Onderbreken" },
   "pentagon_17d82ea3": { "message": "Vijfhoek" },
   "people_b4ebb13c": { "message": "Personen" },
   "percentage_34ab7c2c": { "message": "Percentage" },
@@ -567,9 +573,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Roze" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "play_1a47eaa7": { "message": "Afspelen" },
   "play_media_comment_35257210": { "message": "Media-opmerking afspelen." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Media-opmerking van { name } afspelen die gemaakt is op { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Geef Canvas toegang tot je microfoon en webcam."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plusminus" },
@@ -579,6 +589,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Gaat vooraf aan gelijk" },
   "preformatted_d0670862": { "message": "Voorgeformatteerd" },
   "preview_53003fd2": { "message": "Voorbeeld" },
+  "preview_a3f8f854": { "message": "VOORBEELD" },
   "preview_in_overlay_ed772c46": { "message": "Voorbeeld in overlay" },
   "preview_inline_9787330": { "message": "Voorbeeld inline" },
   "prime_917ea60e": { "message": "Priem" },
@@ -601,6 +612,7 @@ const locale = {
     "message": "Reëel deel (van complex getal)"
   },
   "record_7c9448b": { "message": "Opnemen" },
+  "recording_98da6bda": { "message": "Bezig met opnemen" },
   "red_8258edf3": { "message": "Rood" },
   "relationships_6602af70": { "message": "Relaties" },
   "religion_icon_246e0be1": { "message": "Religiepictogram" },
@@ -643,10 +655,13 @@ const locale = {
     "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
   },
   "save_11a80ec3": { "message": "Opslaan" },
+  "save_media_cb9e786e": { "message": "Media opslaan" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Zoeken" },
+  "select_audio_source_21043cd5": { "message": "Audiobron selecteren" },
   "select_crop_shape_d441feeb": { "message": "Bijsnijvorm selecteren" },
   "select_language_7c93a900": { "message": "Taal selecteren" },
+  "select_video_source_1b5c9dbe": { "message": "Videobron selecteren" },
   "selected_linkfilename_c093b1f2": {
     "message": "Geselecteerd { linkFileName }"
   },
@@ -669,6 +684,9 @@ const locale = {
   "small_b070434a": { "message": "Klein" },
   "solid_circle_9f061dfc": { "message": "Dichte cirkel" },
   "something_went_wrong_89195131": { "message": "Er is iets misgegaan." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Er is iets misgegaan met de toegang tot je webcam."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Er is iets misgegaan en ik weet niet wat ik je moet laten zien."
   },
@@ -676,6 +694,9 @@ const locale = {
     "message": "Er is iets misgegaan. Controleer je verbinding, laad de pagina opnieuw en probeer het nog eens."
   },
   "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Er is iets fout gegaan bij het delen van je scherm."
+  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "spades_suit_b37020c2": { "message": "Schoppen (speelkaart)" },
   "square_511eb3b3": { "message": "Vierkant" },
@@ -692,6 +713,8 @@ const locale = {
     "message": "Superset van vierkantswortel (strikt)"
   },
   "star_8d156e09": { "message": "Ster" },
+  "start_over_f7552aa9": { "message": "Opnieuw starten" },
+  "start_recording_9a65141a": { "message": "Opname starten" },
   "steel_blue_14296f08": { "message": "Staalblauw" },
   "styles_2aa721ef": { "message": "Stijlen" },
   "submit_a3cc6859": { "message": "Inleveren" },
@@ -720,6 +743,8 @@ const locale = {
     "message": "Overschakelen naar de Rich Text Editor"
   },
   "syllabus_f191f65b": { "message": "Syllabus" },
+  "system_audio_allowed_b2508f8c": { "message": "Systeemaudio toegestaan" },
+  "system_audio_disabled_c177bd13": { "message": "Systeemaudio uitgeschakeld" },
   "tab_arrows_4cf5abfc": { "message": "TAB/pijlen" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Groenblauw" },
@@ -769,6 +794,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
   },
+  "timebar_a4d18443": { "message": "Tijdbalk" },
   "title_ee03d132": { "message": "Titel" },
   "to_be_posted_when_d24bf7dc": { "message": "Nog te plaatsen: { when }" },
   "to_do_when_2783d78f": { "message": "To-do: { when }" },
@@ -792,6 +818,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Vereniging" },
   "unpublished_dfd8801": { "message": "niet-gepubliceerd" },
+  "untitled_16aa4f2b": { "message": "Zonder titel" },
   "untitled_efdc2d7d": { "message": "zonder titel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Pijl omhoog en links diagonaal"
@@ -866,6 +893,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Verticale punten" },
   "video_options_24ef6e5d": { "message": "Video-opties" },
   "video_options_tray_3b9809a5": { "message": "Gebied met video-opties" },
+  "video_player_b371005": { "message": "Videospeler" },
   "video_player_for_9e7d373b": { "message": "Videospeler voor " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videospeler voor { title }"
@@ -879,6 +907,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Aantal woorden en tekens bekijken"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "We kunnen geen werkende microfoon detecteren die op je apparaat is aangesloten."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "We kunnen geen werkende webcam detecteren die op je apparaat is aangesloten."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "We kunnen geen werkende webcam of microfoon detecteren die op je apparaat is aangesloten."
+  },
+  "webcam_disabled_30c66986": { "message": "Webcam uitgeschakeld" },
+  "webcam_fe91b20f": { "message": "Webcam" },
   "white_87fa64fd": { "message": "Wit" },
   "width_492fec76": { "message": "Breedte" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -897,6 +936,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Je afbeelding is gecomprimeerd voor Icon Maker. Afbeeldingen kleiner dan { size } KB worden niet gecomprimeerd."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Je microfoon is geblokkeerd in de browserinstellingen."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Je webcam en microfoon zijn geblokkeerd in de browserinstellingen."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Je webcam is geblokkeerd in de browserinstellingen."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Mogelijk is je webcam al in gebruik."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },

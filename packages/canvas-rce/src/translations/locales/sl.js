@@ -180,6 +180,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Obreži sliko" },
   "cup_product_14174434": { "message": "Izdelek za skodelico" },
   "current_image_f16c249c": { "message": "Trenutna slika" },
+  "current_volume_level_c55ab825": { "message": "Trenutna raven glasnosti" },
   "custom_6979cd81": { "message": "Po meri" },
   "cyan_c1d5f68a": { "message": "Cijan" },
   "dagger_57e0f4e5": { "message": "Bodalo" },
@@ -297,6 +298,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Datoteke" },
   "files_index_af7c662b": { "message": "Kazalo datotek" },
+  "finish_bc343002": { "message": "Dokončaj" },
   "flat_music_76d5a5c3": { "message": "Ravno (glasba)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Orodna vrstica za izostritev možnosti elementov"
@@ -459,6 +461,8 @@ const locale = {
     "message": "Predstavnostna datoteka je v obdelavi. Poskusite znova pozneje."
   },
   "medium_5a8e9ead": { "message": "Srednja" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "microphone_disabled_15c83130": { "message": "Mikrofon onemogočen" },
   "middle_27dc1d5": { "message": "Sredina" },
   "minimize_file_preview_da911944": {
     "message": "Minimiziraj predogled datoteke"
@@ -503,6 +507,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ni najdenih rezultatov za { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ni videoposnetek" },
   "none_3b5e34d2": { "message": "Brez" },
   "none_selected_b93d56d2": { "message": "Nobena ni izbrana" },
   "not_equal_6e2980e6": { "message": "Ni enako" },
@@ -542,6 +547,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Vzporedno" },
   "partial_derivative_4a9159df": { "message": "Delno (izpeljanka)" },
   "paste_5963d1c1": { "message": "Prilepi" },
+  "pause_12af3bb4": { "message": "Začasna zaustavitev" },
   "pentagon_17d82ea3": { "message": "Peterokotnik" },
   "people_b4ebb13c": { "message": "Sodelujoči" },
   "percentage_34ab7c2c": { "message": "Odstotek" },
@@ -557,11 +563,15 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (različica)" },
   "pink_68ad45cb": { "message": "Rožnato" },
   "pixels_52ece7d1": { "message": "Slikovne pike" },
+  "play_1a47eaa7": { "message": "Predvajaj" },
   "play_media_comment_35257210": {
     "message": "Predvajaj komentar v obliki medija."
   },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Predvajaj komentar v obliki medija { name }, ki je bil ustvarjen ob/dne { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Sistemu Canvas dovolite dostop do mikrofona in spletne kamere."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/minus" },
@@ -571,6 +581,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Predhodnik enakosti" },
   "preformatted_d0670862": { "message": "Predoblikovano" },
   "preview_53003fd2": { "message": "Predogled" },
+  "preview_a3f8f854": { "message": "PREDOGLED" },
   "preview_in_overlay_ed772c46": {
     "message": "Predogled v prekrivnem elementu"
   },
@@ -595,6 +606,7 @@ const locale = {
     "message": "Realni del (kompleksnega števila)"
   },
   "record_7c9448b": { "message": "Posnemi" },
+  "recording_98da6bda": { "message": "Snemanje" },
   "red_8258edf3": { "message": "Rdeče" },
   "relationships_6602af70": { "message": "Razmerja" },
   "religion_icon_246e0be1": { "message": "Ikona religije" },
@@ -641,10 +653,13 @@ const locale = {
     "message": "Žal urejevalnik Pretty HTML Editor ni dostopen s tipkovnico. Tukaj lahko dostopate do surovega urejevalnika HTML."
   },
   "save_11a80ec3": { "message": "Shrani" },
+  "save_media_cb9e786e": { "message": "Shrani medije" },
   "script_l_42a7b254": { "message": "Skript L" },
   "search_280d00bd": { "message": "Iskanje" },
+  "select_audio_source_21043cd5": { "message": "Izberi zvočni vir" },
   "select_crop_shape_d441feeb": { "message": "Izberite obliko izrezovanja" },
   "select_language_7c93a900": { "message": "Izberite jezik" },
+  "select_video_source_1b5c9dbe": { "message": "Izberi videovir" },
   "selected_linkfilename_c093b1f2": { "message": "Izbrano { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Nastavi minus" },
   "sharp_music_ab956814": { "message": "Ostro (glasba)" },
@@ -663,6 +678,9 @@ const locale = {
   "small_b070434a": { "message": "Majhna" },
   "solid_circle_9f061dfc": { "message": "Sklenjen krog" },
   "something_went_wrong_89195131": { "message": "Prišlo je do težav." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Pri dostopu do vaše spletne kamere je prišlo do težav."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Prišlo je do težav in ne vem, kaj vam naj prikažem."
   },
@@ -670,6 +688,9 @@ const locale = {
     "message": "Prišlo je do težav. Preverite povezavo, osvežite stran in poskusite znova."
   },
   "something_went_wrong_d238c551": { "message": "Prišlo je do težav" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Pri souporabi zaslon je prišlo je do težave."
+  },
   "sort_by_e75f9e3e": { "message": "Razvrsti po" },
   "spades_suit_b37020c2": { "message": "Piki (obleka)" },
   "square_511eb3b3": { "message": "Kvadrat" },
@@ -686,6 +707,8 @@ const locale = {
     "message": "Kvadratna nadmnožica (strogo)"
   },
   "star_8d156e09": { "message": "Zvezdica" },
+  "start_over_f7552aa9": { "message": "Začnite znova" },
+  "start_recording_9a65141a": { "message": "Zaženi snemanje" },
   "steel_blue_14296f08": { "message": "Kovinsko modra" },
   "styles_2aa721ef": { "message": "Slogi" },
   "submit_a3cc6859": { "message": "Pošlji" },
@@ -714,6 +737,8 @@ const locale = {
     "message": "Preklopi v urejevalnik obogatenega besedila"
   },
   "syllabus_f191f65b": { "message": "Učni načrt" },
+  "system_audio_allowed_b2508f8c": { "message": "Zvok sistema omogočen" },
+  "system_audio_disabled_c177bd13": { "message": "Zvok sistema onemogočen" },
   "tab_arrows_4cf5abfc": { "message": "ZAVIHEK/puščične tipke" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Zelenomodra" },
@@ -759,6 +784,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Čeprav bo vaš videoposnetek v brskalniku imel pravilen naslov, ga v zbirki podatkov nismo uspeli posodobiti."
   },
+  "timebar_a4d18443": { "message": "Časovna premica" },
   "title_ee03d132": { "message": "Naslov" },
   "to_be_posted_when_d24bf7dc": { "message": "Za objavo: { when }" },
   "to_do_when_2783d78f": { "message": "Čakajoča opravila: { when }" },
@@ -782,6 +808,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Unija" },
   "unpublished_dfd8801": { "message": "neobjavljeno" },
+  "untitled_16aa4f2b": { "message": "Brez naslova" },
   "untitled_efdc2d7d": { "message": "brez naslova" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Diagonalna puščica navzdol in levo"
@@ -858,6 +885,7 @@ const locale = {
   "video_options_tray_3b9809a5": {
     "message": "Vrstica z možnostmi videoposnetka"
   },
+  "video_player_b371005": { "message": "Predvajalnik videoposnetkov" },
   "video_player_for_9e7d373b": { "message": "Predvajalnik videoposnetkov za " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Predvajalnik videoposnetkov za { title }"
@@ -871,6 +899,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Prikaži štetje besed in znakov"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Delujočega mikrofona, priključenega na napravo, ni bilo mogoče zaznati."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Delujoče spletne kamere, priključene na napravo, ni bilo mogoče zaznati."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Delujoče spletne kamere ali mikrofona, priključenih na napravo, ni bilo mogoče zaznati."
+  },
+  "webcam_disabled_30c66986": { "message": "Spletna kamera onemogočena" },
+  "webcam_fe91b20f": { "message": "Spletna kamera" },
   "white_87fa64fd": { "message": "Belo" },
   "width_492fec76": { "message": "Širina" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -889,6 +928,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Vaša slika je bila stisnjena za Icon Maker. Slike, manjše od { size } KB ne bodo stisnjene."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Vaš mikrofon je blokiran v nastavitvah brskalnika."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Vaša spletna kamera in mikrofon sta blokirana v nastavitvah brskalnika."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Vaša spletna kamera je blokirana v nastavitvah brskalnika."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Vaša spletna kamera je morda že v uporabi."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Povečava" },

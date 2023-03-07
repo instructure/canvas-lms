@@ -180,6 +180,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Retalla la imatge" },
   "cup_product_14174434": { "message": "Producte amb tassa" },
   "current_image_f16c249c": { "message": "Imatge actual" },
+  "current_volume_level_c55ab825": { "message": "Nivell de volum actual" },
   "custom_6979cd81": { "message": "Personalitzat" },
   "cyan_c1d5f68a": { "message": "Cian" },
   "dagger_57e0f4e5": { "message": "Daga" },
@@ -301,6 +302,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Fitxers" },
   "files_index_af7c662b": { "message": "Índex de fitxers" },
+  "finish_bc343002": { "message": "Finalitza" },
   "flat_music_76d5a5c3": { "message": "Bemoll (música)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Barra d''eines d''opcions de focus d''element"
@@ -473,6 +475,8 @@ const locale = {
     "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
   },
   "medium_5a8e9ead": { "message": "Mitjà" },
+  "mic_a7f3d311": { "message": "Micròfon" },
+  "microphone_disabled_15c83130": { "message": "S’ha desactivat el micròfon" },
   "middle_27dc1d5": { "message": "Centre" },
   "minimize_file_preview_da911944": {
     "message": "Minimitza la visualització prèvia del fitxer"
@@ -517,6 +521,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No s''ha trobat cap resultat per a { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "No hi ha cap vídeo" },
   "none_3b5e34d2": { "message": "Cap" },
   "none_selected_b93d56d2": { "message": "No se’n ha seleccionat cap" },
   "not_equal_6e2980e6": { "message": "No és igual que" },
@@ -560,6 +565,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Paral·lel" },
   "partial_derivative_4a9159df": { "message": "Parcial (derivat)" },
   "paste_5963d1c1": { "message": "Enganxa" },
+  "pause_12af3bb4": { "message": "Posa en pausa" },
   "pentagon_17d82ea3": { "message": "Pentàgon" },
   "people_b4ebb13c": { "message": "Persones" },
   "percentage_34ab7c2c": { "message": "Percentatge" },
@@ -577,11 +583,15 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Píxels" },
+  "play_1a47eaa7": { "message": "Reprodueix" },
   "play_media_comment_35257210": {
     "message": "Reprodueix el comentari multimèdia."
   },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Reprodueix el comentari multimèdia de { name } enviat el { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Permeteu que el Canvas accedeixi al micròfon i a la càmera web."
   },
   "plus_d43cd4ec": { "message": "Més" },
   "plus_minus_f8be2e83": { "message": "Més/menys" },
@@ -591,6 +601,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "El precedent és igual que" },
   "preformatted_d0670862": { "message": "Amb format previ" },
   "preview_53003fd2": { "message": "Visualització prèvia" },
+  "preview_a3f8f854": { "message": "VISUALITZACIÓ PRÈVIA" },
   "preview_in_overlay_ed772c46": {
     "message": "Visualització prèvia en superposició"
   },
@@ -615,6 +626,7 @@ const locale = {
     "message": "Porció real (d’un número complex)"
   },
   "record_7c9448b": { "message": "Enregistra" },
+  "recording_98da6bda": { "message": "S''està enregistrant" },
   "red_8258edf3": { "message": "Vermell" },
   "relationships_6602af70": { "message": "Relacions" },
   "religion_icon_246e0be1": { "message": "Icona de religió" },
@@ -657,12 +669,15 @@ const locale = {
     "message": "Malauradament, no es pot accedir a l’editor de dades HTML processades amb el teclat. Accediu a l’editor de dades HTML sense processar aquí."
   },
   "save_11a80ec3": { "message": "Desa" },
+  "save_media_cb9e786e": { "message": "Desa l’element multimèdia" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Cerca" },
+  "select_audio_source_21043cd5": { "message": "Selecciona una font d''àudio" },
   "select_crop_shape_d441feeb": {
     "message": "Selecciona l’opció Retalla la forma"
   },
   "select_language_7c93a900": { "message": "Selecciona l''idioma" },
+  "select_video_source_1b5c9dbe": { "message": "Selecciona una font de vídeo" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionat"
   },
@@ -685,6 +700,9 @@ const locale = {
   "small_b070434a": { "message": "Petita" },
   "solid_circle_9f061dfc": { "message": "Cercle sòlid" },
   "something_went_wrong_89195131": { "message": "Alguna cosa no ha anat bé." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Alguna cosa no ha anat bé en accedir a la càmera web."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
   },
@@ -692,6 +710,9 @@ const locale = {
     "message": "Alguna cosa no ha anat bé. Comproveu la connexió, torneu a carregar la pàgina i proveu-ho de nou."
   },
   "something_went_wrong_d238c551": { "message": "Alguna cosa no ha anat bé" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "S''ha produït un error en compartir la vostra pantalla."
+  },
   "sort_by_e75f9e3e": { "message": "Ordena per" },
   "spades_suit_b37020c2": { "message": "Piques (coll de cartes)" },
   "square_511eb3b3": { "message": "Quadrat" },
@@ -708,6 +729,8 @@ const locale = {
     "message": "Superconjunt quadrat (estricte)"
   },
   "star_8d156e09": { "message": "Marca amb una estrella" },
+  "start_over_f7552aa9": { "message": "Torna a començar" },
+  "start_recording_9a65141a": { "message": "Comença a enregistrar" },
   "steel_blue_14296f08": { "message": "Blau acer" },
   "styles_2aa721ef": { "message": "Estils" },
   "submit_a3cc6859": { "message": "Entrega" },
@@ -736,6 +759,12 @@ const locale = {
     "message": "Canvia a l’editor de text enriquit"
   },
   "syllabus_f191f65b": { "message": "Temari" },
+  "system_audio_allowed_b2508f8c": {
+    "message": "S’ha permès l’àudio del sistema"
+  },
+  "system_audio_disabled_c177bd13": {
+    "message": "S’ha desactivat l’àudio del sistema"
+  },
   "tab_arrows_4cf5abfc": { "message": "TAB/fletxes" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Verd blavós" },
@@ -781,6 +810,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Tot i que el títol del vídeo que es mostra al explorador és el correcte, no hem pogut actualitzar-lo a la base de dades."
   },
+  "timebar_a4d18443": { "message": "Barra temporal" },
   "title_ee03d132": { "message": "Títol" },
   "to_be_posted_when_d24bf7dc": { "message": "S''ha de publicar: { when }" },
   "to_do_when_2783d78f": { "message": "Tasques pendents: { when }" },
@@ -802,6 +832,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Unió" },
   "unpublished_dfd8801": { "message": "no publicat" },
+  "untitled_16aa4f2b": { "message": "Sense títol" },
   "untitled_efdc2d7d": { "message": "sense títol" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Fletxa ascendent esquerra en diagonal"
@@ -876,6 +907,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Punts verticals" },
   "video_options_24ef6e5d": { "message": "Opcions de vídeo" },
   "video_options_tray_3b9809a5": { "message": "Safata d''opcions de vídeo" },
+  "video_player_b371005": { "message": "Reproductor de vídeo" },
   "video_player_for_9e7d373b": { "message": "Reproductor de vídeo per a " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Reproductor de vídeo per a { title }"
@@ -891,6 +923,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Mostra els recomptes de paraules i caràcters"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "No hem pogut detectar cap micròfon actiu connectat al vostre dispositiu."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "No hem pogut detectar cap càmera web activa connectada al vostre dispositiu."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "No hem pogut detectar cap càmera web o micròfon actius connectats al vostre dispositiu."
+  },
+  "webcam_disabled_30c66986": { "message": "S’ha desactivat la càmera web" },
+  "webcam_fe91b20f": { "message": "Càmera web" },
   "white_87fa64fd": { "message": "Blanc" },
   "width_492fec76": { "message": "Amplada" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -909,6 +952,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "S’ha comprimit la imatge per a Icon Maker. No es comprimiran les imatges de menys de { size } kB."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "El micròfon està bloquejat a la configuració del navegador."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "La càmera web i el micròfon estan bloquejats a la configuració del navegador."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "La càmera web està bloquejada a la configuració del navegador."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "És possible que la càmera web ja s''estigui utilitzant."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },
