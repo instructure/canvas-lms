@@ -167,6 +167,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Klippa mynd" },
   "cup_product_14174434": { "message": "Stafafeldi (Cup Product)" },
   "current_image_f16c249c": { "message": "Núverandi mynd" },
+  "current_volume_level_c55ab825": { "message": "Núverandi stig hljóðstyrks" },
   "custom_6979cd81": { "message": "Sérsníða" },
   "cyan_c1d5f68a": { "message": "Blágrænn" },
   "dagger_57e0f4e5": { "message": "Tvíkross" },
@@ -284,6 +285,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Skrár" },
   "files_index_af7c662b": { "message": "Skráalisti" },
+  "finish_bc343002": { "message": "Ljúka" },
   "flat_music_76d5a5c3": { "message": "Flat (tónlist)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Valkostir tækjastiku fyrir fókuseiningu"
@@ -444,6 +446,8 @@ const locale = {
     "message": "Miðilsskrá er í vinnslu. Vinsamlegast reyndu aftur seinna."
   },
   "medium_5a8e9ead": { "message": "Meðal" },
+  "mic_a7f3d311": { "message": "Hljóðnemi" },
+  "microphone_disabled_15c83130": { "message": "Slökkt á hljóðnema" },
   "middle_27dc1d5": { "message": "Miðja" },
   "minimize_file_preview_da911944": { "message": "Lágmarka forskoðun skrár" },
   "minimize_video_20aa554b": { "message": "Minnka myndband" },
@@ -486,6 +490,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Engar niðurstöður fundust fyrir { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ekkert myndband" },
   "none_3b5e34d2": { "message": "Ekkert" },
   "none_selected_b93d56d2": { "message": "Ekkert valið" },
   "not_equal_6e2980e6": { "message": "Ekki jafnt" },
@@ -523,6 +528,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Samsíða" },
   "partial_derivative_4a9159df": { "message": "Hluti (afleitt)" },
   "paste_5963d1c1": { "message": "Líma" },
+  "pause_12af3bb4": { "message": "Gera hlé" },
   "pentagon_17d82ea3": { "message": "fimmhyrningur" },
   "people_b4ebb13c": { "message": "Fólk" },
   "percentage_34ab7c2c": { "message": "Hlutfall" },
@@ -538,9 +544,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pí (afbrigði)" },
   "pink_68ad45cb": { "message": "Bleikur" },
   "pixels_52ece7d1": { "message": "Punktar" },
+  "play_1a47eaa7": { "message": "Spila" },
   "play_media_comment_35257210": { "message": "Spila miðilsathugasemd." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Spila miðilsathugasemd eftir { name } frá { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Leyfðu Canvas að fá aðgang að hljóðnemanum og vefmyndavélinni."
   },
   "plus_d43cd4ec": { "message": "Plús" },
   "plus_minus_f8be2e83": { "message": "Plús/Mínus" },
@@ -550,6 +560,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Kemur á undan jafnt" },
   "preformatted_d0670862": { "message": "Forsniðnir" },
   "preview_53003fd2": { "message": "Forskoðun" },
+  "preview_a3f8f854": { "message": "FORSKOÐA" },
   "preview_in_overlay_ed772c46": { "message": "Forskoðun með yfirlagningu" },
   "preview_inline_9787330": { "message": "Forskoðun í línu" },
   "prime_917ea60e": { "message": "Frum" },
@@ -572,6 +583,7 @@ const locale = {
     "message": "Raunverulegur hluti (af flókinni tölu)"
   },
   "record_7c9448b": { "message": "Upptaka" },
+  "recording_98da6bda": { "message": "Upptaka" },
   "red_8258edf3": { "message": "Rauður" },
   "relationships_6602af70": { "message": "Sambönd" },
   "religion_icon_246e0be1": { "message": "Trúar tákn" },
@@ -612,10 +624,13 @@ const locale = {
     "message": "Því miður er ekki hægt að nota lyklaborð með pretty HTML ritlinum. Aðgangur að hráa HTML ritlinum hér."
   },
   "save_11a80ec3": { "message": "Vista" },
+  "save_media_cb9e786e": { "message": "Vista miðil" },
   "script_l_42a7b254": { "message": "Forskrift L" },
   "search_280d00bd": { "message": "Leita" },
+  "select_audio_source_21043cd5": { "message": "Velja hljóðskrá" },
   "select_crop_shape_d441feeb": { "message": "Veldu klippiform" },
   "select_language_7c93a900": { "message": "Velja tungumál" },
+  "select_video_source_1b5c9dbe": { "message": "Veldu myndband" },
   "selected_linkfilename_c093b1f2": { "message": "Valið { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Mínusmengi" },
   "sharp_music_ab956814": { "message": "Skarpt (tónlist)" },
@@ -634,6 +649,9 @@ const locale = {
   "small_b070434a": { "message": "Lítil" },
   "solid_circle_9f061dfc": { "message": "Heill hringur" },
   "something_went_wrong_89195131": { "message": "Eitthvað fór úrskeiðis." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Eitthvað misfórst við aðgang að vefmyndavélinni."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Eitthvað mistókst og ég veit ekki hvað ég á að sýna þér."
   },
@@ -641,6 +659,9 @@ const locale = {
     "message": "Eitthvað fór úrskeiðis. Athugaðu tenginguna þína, endurhlaða síðuna og reyndu aftur."
   },
   "something_went_wrong_d238c551": { "message": "Eitthvað mistókst" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Eitthvað fór úrskeiðis við að deila skjánum þínum."
+  },
   "sort_by_e75f9e3e": { "message": "Raða eftir" },
   "spades_suit_b37020c2": { "message": "Spaðar (búningur)" },
   "square_511eb3b3": { "message": "Ferningur" },
@@ -655,6 +676,8 @@ const locale = {
     "message": "Ferningsyfirmengi (strangt)"
   },
   "star_8d156e09": { "message": "Stjarna" },
+  "start_over_f7552aa9": { "message": "Byrja aftur frá byrjun" },
+  "start_recording_9a65141a": { "message": "Hefja upptöku" },
   "steel_blue_14296f08": { "message": "Stálblár" },
   "styles_2aa721ef": { "message": "Stílar" },
   "submit_a3cc6859": { "message": "Leggja fram" },
@@ -681,6 +704,8 @@ const locale = {
     "message": "Skipta í ríka textaritilinn"
   },
   "syllabus_f191f65b": { "message": "Kennsluáætlun" },
+  "system_audio_allowed_b2508f8c": { "message": "Kerfishljóð leyft" },
+  "system_audio_disabled_c177bd13": { "message": "Slökkt á kerfishljóði" },
   "tab_arrows_4cf5abfc": { "message": "TAB/örvar" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Grænblár" },
@@ -726,6 +751,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Þó að myndbandið sé með réttan titil í vafranum, uppfærðum við það ekki í gagnagrunninum."
   },
+  "timebar_a4d18443": { "message": "Tímaslá" },
   "title_ee03d132": { "message": "Titill" },
   "to_be_posted_when_d24bf7dc": { "message": "Verður birt: { when }" },
   "to_do_when_2783d78f": { "message": "Verkefni: { when }" },
@@ -747,6 +773,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Samtök" },
   "unpublished_dfd8801": { "message": "óbirt" },
+  "untitled_16aa4f2b": { "message": "Án titils" },
   "untitled_efdc2d7d": { "message": "ónefnt" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Upp og vinstri skáör" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Upp og hægri skáör" },
@@ -817,6 +844,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Lóðréttir punktar" },
   "video_options_24ef6e5d": { "message": "Myndbandsvalkostir" },
   "video_options_tray_3b9809a5": { "message": "Myndbandsvalkostabakki" },
+  "video_player_b371005": { "message": "Myndspilari" },
   "video_player_for_9e7d373b": { "message": "Myndbandsspilari fyrir " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Myndbandsspilari fyrir { title }"
@@ -830,6 +858,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Skoða orða- og stafatalingu"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Ekki greindist tengdur og virkur hljóðnemi í tækinu þínu."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Ekki greindist tengd og virk vefmyndavél í tækinu þínu."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Ekki greindist tengd og virk vefmyndavél eða hljóðnemi í tækinu þínu."
+  },
+  "webcam_disabled_30c66986": { "message": "Slökkt á vefmyndavél" },
+  "webcam_fe91b20f": { "message": "Vefmyndavél" },
   "white_87fa64fd": { "message": "Hvítur" },
   "width_492fec76": { "message": "Breidd" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -848,6 +887,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Myndinni þinni hefur verið þjappað saman fyrir Icon Maker. Myndir sem eru minni en { size } KB verða ekki þjappaðar."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Vafrastillingarnar útiloka hljóðnemann."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Vafrastillingarnar útiloka vefmyndavélina og hljóðnemann."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Vafrastillingarnar útiloka vefmyndavélina."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Verið getur að vefmyndavélin sé þegar í notkun."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },

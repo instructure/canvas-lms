@@ -158,6 +158,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "裁剪图像" },
   "cup_product_14174434": { "message": "上积" },
   "current_image_f16c249c": { "message": "当前图像" },
+  "current_volume_level_c55ab825": { "message": "当前音量" },
   "custom_6979cd81": { "message": "自定义" },
   "cyan_c1d5f68a": { "message": "青色" },
   "dagger_57e0f4e5": { "message": "剑号" },
@@ -259,6 +260,7 @@ const locale = {
   "filename_text_preview_e41ca2d8": { "message": "{ filename }文本预览" },
   "files_c300e900": { "message": "文件" },
   "files_index_af7c662b": { "message": "文件索引" },
+  "finish_bc343002": { "message": "完成" },
   "flat_music_76d5a5c3": { "message": "降调（音乐）" },
   "focus_element_options_toolbar_18d993e": { "message": "焦点元素选项工具栏" },
   "folder_tree_fbab0726": { "message": "文件夹树" },
@@ -399,6 +401,8 @@ const locale = {
     "message": "媒体文件正在处理中。请稍后再试。"
   },
   "medium_5a8e9ead": { "message": "中等" },
+  "mic_a7f3d311": { "message": "麦克风" },
+  "microphone_disabled_15c83130": { "message": "麦克风已禁用" },
   "middle_27dc1d5": { "message": "中间" },
   "minimize_file_preview_da911944": { "message": "最小化文件预览" },
   "minimize_video_20aa554b": { "message": "最小化视频" },
@@ -439,6 +443,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "未找到{ filterTerm }的结果"
   },
+  "no_video_1ed00b26": { "message": "无视频" },
   "none_3b5e34d2": { "message": "无" },
   "none_selected_b93d56d2": { "message": "未选中任何项" },
   "not_equal_6e2980e6": { "message": "不相等" },
@@ -476,6 +481,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "平行" },
   "partial_derivative_4a9159df": { "message": "偏（导数）" },
   "paste_5963d1c1": { "message": "粘贴" },
+  "pause_12af3bb4": { "message": "暂停" },
   "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "人员" },
   "percentage_34ab7c2c": { "message": "百分数" },
@@ -489,9 +495,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi（变体）" },
   "pink_68ad45cb": { "message": "粉红色" },
   "pixels_52ece7d1": { "message": "像素" },
+  "play_1a47eaa7": { "message": "播放" },
   "play_media_comment_35257210": { "message": "播放媒体评论。" },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "播放{ name }的来自{ createdAt }的媒体评论。"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "请允许 Canvas 访问您的麦克风和网络摄像头。"
   },
   "plus_d43cd4ec": { "message": "加号" },
   "plus_minus_f8be2e83": { "message": "加号/减号" },
@@ -501,6 +511,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "先于等于" },
   "preformatted_d0670862": { "message": "预定义格式" },
   "preview_53003fd2": { "message": "预览" },
+  "preview_a3f8f854": { "message": "预览" },
   "preview_in_overlay_ed772c46": { "message": "在图层中预览" },
   "preview_inline_9787330": { "message": "嵌入式预览" },
   "prime_917ea60e": { "message": "质" },
@@ -521,6 +532,7 @@ const locale = {
   "real_numbers_7c99df94": { "message": "实数" },
   "real_portion_of_complex_number_7dad33b5": { "message": "实部（复数）" },
   "record_7c9448b": { "message": "记录" },
+  "recording_98da6bda": { "message": "录制" },
   "red_8258edf3": { "message": "红色" },
   "relationships_6602af70": { "message": "关系" },
   "religion_icon_246e0be1": { "message": "宗教图标" },
@@ -555,10 +567,13 @@ const locale = {
     "message": "很抱歉，无法通过键盘访问精美 HTML 编辑器。在此处访问原始 HTML 编辑器"
   },
   "save_11a80ec3": { "message": "保存" },
+  "save_media_cb9e786e": { "message": "保存媒体" },
   "script_l_42a7b254": { "message": "花体 L" },
   "search_280d00bd": { "message": "搜索" },
+  "select_audio_source_21043cd5": { "message": "选择音频来源" },
   "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
   "select_language_7c93a900": { "message": "选择语言" },
+  "select_video_source_1b5c9dbe": { "message": "选择视频来源" },
   "selected_linkfilename_c093b1f2": { "message": "已选择 { linkFileName }" },
   "set_minus_b46e9b88": { "message": "设置负" },
   "sharp_music_ab956814": { "message": "升调（音乐）" },
@@ -577,6 +592,9 @@ const locale = {
   "small_b070434a": { "message": "小" },
   "solid_circle_9f061dfc": { "message": "实心圆" },
   "something_went_wrong_89195131": { "message": "出了些问题。" },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "访问您的网络摄像头时出现问题。"
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出错了，我不知道该给您看些什么。"
   },
@@ -584,6 +602,9 @@ const locale = {
     "message": "出了些问题。检查您的网络连接，重新加载页面并重试。"
   },
   "something_went_wrong_d238c551": { "message": "出了些问题" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "共享屏幕时遇到问题。"
+  },
   "sort_by_e75f9e3e": { "message": "排序" },
   "spades_suit_b37020c2": { "message": "黑桃（花色）" },
   "square_511eb3b3": { "message": "方形" },
@@ -596,6 +617,8 @@ const locale = {
   "square_superset_3be8dae1": { "message": "平方超集" },
   "square_superset_strict_fa4262e4": { "message": "平方超集（严格）" },
   "star_8d156e09": { "message": "星形标记" },
+  "start_over_f7552aa9": { "message": "重新开始" },
+  "start_recording_9a65141a": { "message": "开始录制" },
   "steel_blue_14296f08": { "message": "钢青色" },
   "styles_2aa721ef": { "message": "样式" },
   "submit_a3cc6859": { "message": "提交" },
@@ -620,6 +643,8 @@ const locale = {
     "message": "切换到富文本编辑器"
   },
   "syllabus_f191f65b": { "message": "教学大纲" },
+  "system_audio_allowed_b2508f8c": { "message": "系统音频已启用" },
+  "system_audio_disabled_c177bd13": { "message": "系统音频已禁用" },
   "tab_arrows_4cf5abfc": { "message": "TAB/箭头" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "青色" },
@@ -665,6 +690,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "虽然您的视频在浏览器里会有正确标题，但我们无法在数据库里更新。"
   },
+  "timebar_a4d18443": { "message": "进度条" },
   "title_ee03d132": { "message": "标题" },
   "to_be_posted_when_d24bf7dc": { "message": "待发布：{ when }" },
   "to_do_when_2783d78f": { "message": "待办事项：{ when }" },
@@ -686,6 +712,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "并集" },
   "unpublished_dfd8801": { "message": "取消发布" },
+  "untitled_16aa4f2b": { "message": "无标题" },
   "untitled_efdc2d7d": { "message": "无标题" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "左上斜箭头" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "右上斜箭头" },
@@ -754,6 +781,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "竖点" },
   "video_options_24ef6e5d": { "message": "视频选项" },
   "video_options_tray_3b9809a5": { "message": "视频选项托盘" },
+  "video_player_b371005": { "message": "视频播放器" },
   "video_player_for_9e7d373b": { "message": "的视频播放器 " },
   "video_player_for_title_ffd9fbc4": { "message": "{ title }的视频播放器" },
   "view_ba339f93": { "message": "查看" },
@@ -761,6 +789,17 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": { "message": "查看键盘快捷键" },
   "view_title_description_67940918": { "message": "查看{ title }说明" },
   "view_word_and_character_counts_a743dd0c": { "message": "查看字数和字符数" },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "我们未发现正常工作的麦克风连接到设备。"
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "我们未发现正常工作的网络摄像头连接到设备。"
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "我们未发现正常工作的网络摄像头或麦克风连接到设备。"
+  },
+  "webcam_disabled_30c66986": { "message": "网络摄像头已禁用" },
+  "webcam_fe91b20f": { "message": "网络摄像头" },
   "white_87fa64fd": { "message": "白色" },
   "width_492fec76": { "message": "宽度" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -779,6 +818,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "您的图像已被压缩以用于 Icon Maker。小于 { size } KB 的图像将不会被压缩。"
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "您的麦克风在浏览器设置中被拦截。"
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "您的网络摄像头和麦克风在浏览器设置中被拦截。"
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "您的网络摄像头在浏览器设置中被拦截。"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "您的网络摄像头可能正在使用中。"
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "缩放" },

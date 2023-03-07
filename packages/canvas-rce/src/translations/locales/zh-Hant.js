@@ -158,6 +158,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "裁剪影像" },
   "cup_product_14174434": { "message": "杯子產品" },
   "current_image_f16c249c": { "message": "目前的圖像" },
+  "current_volume_level_c55ab825": { "message": "目前音量" },
   "custom_6979cd81": { "message": "自訂" },
   "cyan_c1d5f68a": { "message": "青色" },
   "dagger_57e0f4e5": { "message": "劍號" },
@@ -259,6 +260,7 @@ const locale = {
   "filename_text_preview_e41ca2d8": { "message": "{ filename } 文字預覽" },
   "files_c300e900": { "message": "檔案" },
   "files_index_af7c662b": { "message": "檔案索引" },
+  "finish_bc343002": { "message": "完成" },
   "flat_music_76d5a5c3": { "message": "♭（音樂）" },
   "focus_element_options_toolbar_18d993e": { "message": "聚焦元素選項工具欄" },
   "folder_tree_fbab0726": { "message": "樹狀資件夾" },
@@ -401,6 +403,8 @@ const locale = {
     "message": "正在處理媒體檔案中。請稍後重試。"
   },
   "medium_5a8e9ead": { "message": "中" },
+  "mic_a7f3d311": { "message": "麥克風" },
+  "microphone_disabled_15c83130": { "message": "停用麥克風" },
   "middle_27dc1d5": { "message": "中間" },
   "minimize_file_preview_da911944": { "message": "最小化文檔預覽" },
   "minimize_video_20aa554b": { "message": "最小化視訊" },
@@ -441,6 +445,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"
   },
+  "no_video_1ed00b26": { "message": "無影片" },
   "none_3b5e34d2": { "message": "無" },
   "none_selected_b93d56d2": { "message": "未選擇任何項目" },
   "not_equal_6e2980e6": { "message": "不等於" },
@@ -478,6 +483,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "平行" },
   "partial_derivative_4a9159df": { "message": "部份（導數）" },
   "paste_5963d1c1": { "message": "貼上" },
+  "pause_12af3bb4": { "message": "暫停" },
   "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "成員" },
   "percentage_34ab7c2c": { "message": "百分比" },
@@ -491,9 +497,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "π（變量）" },
   "pink_68ad45cb": { "message": "粉紅色" },
   "pixels_52ece7d1": { "message": "像素" },
+  "play_1a47eaa7": { "message": "播放" },
   "play_media_comment_35257210": { "message": "播放媒體評論。" },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "播放{ name }於{ createdAt }創建的媒體評論。"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
   },
   "plus_d43cd4ec": { "message": "+" },
   "plus_minus_f8be2e83": { "message": "+/-" },
@@ -503,6 +513,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "等於之前" },
   "preformatted_d0670862": { "message": "已預先格式化" },
   "preview_53003fd2": { "message": "預覽" },
+  "preview_a3f8f854": { "message": "預覽" },
   "preview_in_overlay_ed772c46": { "message": "覆蓋預覽" },
   "preview_inline_9787330": { "message": "預覽內嵌" },
   "prime_917ea60e": { "message": "質數" },
@@ -525,6 +536,7 @@ const locale = {
     "message": "實數部份（複數的）"
   },
   "record_7c9448b": { "message": "錄製" },
+  "recording_98da6bda": { "message": "正在錄製" },
   "red_8258edf3": { "message": "紅色" },
   "relationships_6602af70": { "message": "關聯" },
   "religion_icon_246e0be1": { "message": "宗教圖示" },
@@ -559,10 +571,13 @@ const locale = {
     "message": "很遺憾，美觀 HTML 編輯器無法用鍵盤存取。在這裡存取原始 HTML 編輯器。"
   },
   "save_11a80ec3": { "message": "儲存" },
+  "save_media_cb9e786e": { "message": "儲存媒體" },
   "script_l_42a7b254": { "message": "指令集 L" },
   "search_280d00bd": { "message": "搜尋" },
+  "select_audio_source_21043cd5": { "message": "選擇音訊資源" },
   "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
   "select_language_7c93a900": { "message": "選擇語言" },
+  "select_video_source_1b5c9dbe": { "message": "選擇視訊資源" },
   "selected_linkfilename_c093b1f2": { "message": "已選定 { linkFileName }" },
   "set_minus_b46e9b88": { "message": "設定 -" },
   "sharp_music_ab956814": { "message": "#（音樂）" },
@@ -581,6 +596,9 @@ const locale = {
   "small_b070434a": { "message": "小" },
   "solid_circle_9f061dfc": { "message": "實心圓圈" },
   "something_went_wrong_89195131": { "message": "出現問題。" },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "存取網路攝影機出現問題。"
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出現問題；我不知道應該展示什麼內容。"
   },
@@ -588,6 +606,9 @@ const locale = {
     "message": "出現問題。請檢查您的連線，重新載入頁面，然後再試一次。"
   },
   "something_went_wrong_d238c551": { "message": "似乎出問題了" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "分享您的畫面時發生錯誤。"
+  },
   "sort_by_e75f9e3e": { "message": "排序依據" },
   "spades_suit_b37020c2": { "message": "黑桃（花色）" },
   "square_511eb3b3": { "message": "正方形" },
@@ -600,6 +621,8 @@ const locale = {
   "square_superset_3be8dae1": { "message": "平方母集合" },
   "square_superset_strict_fa4262e4": { "message": "平方母集合（嚴格）" },
   "star_8d156e09": { "message": "星形" },
+  "start_over_f7552aa9": { "message": "重新開始" },
+  "start_recording_9a65141a": { "message": "開始錄製" },
   "steel_blue_14296f08": { "message": "鋼鐵藍" },
   "styles_2aa721ef": { "message": "樣式" },
   "submit_a3cc6859": { "message": "提交" },
@@ -624,6 +647,8 @@ const locale = {
     "message": "切換到多種格式的文字編輯器"
   },
   "syllabus_f191f65b": { "message": "課程大綱" },
+  "system_audio_allowed_b2508f8c": { "message": "允許系統音訊" },
+  "system_audio_disabled_c177bd13": { "message": "停用系統音訊" },
   "tab_arrows_4cf5abfc": { "message": "TAB/箭頭" },
   "tau_880974b7": { "message": "τ" },
   "teal_f729a294": { "message": "深青色" },
@@ -669,6 +694,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "雖然您的影片在瀏覽器中有正確的標題，但我們無法在資料庫中將其更新。"
   },
+  "timebar_a4d18443": { "message": "時間欄" },
   "title_ee03d132": { "message": "標題" },
   "to_be_posted_when_d24bf7dc": { "message": "待公佈：{ when }" },
   "to_do_when_2783d78f": { "message": "待辦事項：{ when }" },
@@ -690,6 +716,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "聯集" },
   "unpublished_dfd8801": { "message": "未發佈" },
+  "untitled_16aa4f2b": { "message": "無標題" },
   "untitled_efdc2d7d": { "message": "無標題" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "向上和向左對角箭頭" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "向上和向右對角箭頭" },
@@ -758,6 +785,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "垂直點" },
   "video_options_24ef6e5d": { "message": "影片選項" },
   "video_options_tray_3b9809a5": { "message": "影片選項收集箱" },
+  "video_player_b371005": { "message": "影片播放器" },
   "video_player_for_9e7d373b": { "message": "影片播放器，標題為 " },
   "video_player_for_title_ffd9fbc4": { "message": "{ title } 的影片播放器" },
   "view_ba339f93": { "message": "檢視" },
@@ -767,6 +795,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "檢視文字和字元計數"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "我們偵測不到與您的裝置連線的工作中麥克風。"
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "我們偵測不到與您的裝置連線的工作中攝影機。"
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "我們偵測不到與您的裝置連線的工作中攝影機或麥克風。"
+  },
+  "webcam_disabled_30c66986": { "message": "停用網路攝影機" },
+  "webcam_fe91b20f": { "message": "網路攝影機" },
   "white_87fa64fd": { "message": "白色" },
   "width_492fec76": { "message": "寬度" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -785,6 +824,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "您的影像已壓縮用於圖示製作者。將不壓縮小於 { size } KB 的影像。"
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "您的麥克風在瀏覽器設定中遭到封鎖。"
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "您的攝影機麥克風在瀏覽器設定中遭到封鎖。"
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "您的攝影機在瀏覽器設定中遭到封鎖。"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "您的網路攝影機可能已在使用中。"
   },
   "zeta_5ef24f0e": { "message": "θ" },
   "zoom_f3e54d69": { "message": "縮放" },

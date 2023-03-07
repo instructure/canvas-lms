@@ -172,6 +172,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Beskær billede" },
   "cup_product_14174434": { "message": "Cup product" },
   "current_image_f16c249c": { "message": "Nuværende billede" },
+  "current_volume_level_c55ab825": { "message": "Nuværende lydstyrke" },
   "custom_6979cd81": { "message": "Brugerdefineret" },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Kors" },
@@ -289,6 +290,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filoversigt" },
+  "finish_bc343002": { "message": "Færdig" },
   "flat_music_76d5a5c3": { "message": "Sænket (musik)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Værktøjslinje med indstillinger for fokuselement"
@@ -453,6 +455,8 @@ const locale = {
     "message": "Mediefil behandles. Prøv igen senere."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "microphone_disabled_15c83130": { "message": "Mikrofon deaktiveret" },
   "middle_27dc1d5": { "message": "I midten" },
   "minimize_file_preview_da911944": {
     "message": "Minimer fil-forhåndsvisning"
@@ -495,6 +499,7 @@ const locale = {
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultater fundet for { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ingen video" },
   "none_3b5e34d2": { "message": "Ingen" },
   "none_selected_b93d56d2": { "message": "Ingen valgt" },
   "not_equal_6e2980e6": { "message": "Ikke lig" },
@@ -534,6 +539,7 @@ const locale = {
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Delvis (afledt)" },
   "paste_5963d1c1": { "message": "Sæt ind" },
+  "pause_12af3bb4": { "message": "Pause" },
   "pentagon_17d82ea3": { "message": "Femkant" },
   "people_b4ebb13c": { "message": "Deltagere" },
   "percentage_34ab7c2c": { "message": "Procentdel" },
@@ -549,9 +555,13 @@ const locale = {
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Lyserød" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "play_1a47eaa7": { "message": "Afspil" },
   "play_media_comment_35257210": { "message": "Afspil medie kommentar." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Afspil mediekommentar af { name } fra { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Lad Canvas få adgang til din mikrofon og webcam."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/minus" },
@@ -561,6 +571,7 @@ const locale = {
   "precedes_equal_20701e84": { "message": "Kommer før lig med" },
   "preformatted_d0670862": { "message": "Præformatteret" },
   "preview_53003fd2": { "message": "Eksempel" },
+  "preview_a3f8f854": { "message": "FORHÅNDSVISNING" },
   "preview_in_overlay_ed772c46": { "message": "Overlejret forhåndsvisning" },
   "preview_inline_9787330": { "message": "Indbygget forhåndsvisning" },
   "prime_917ea60e": { "message": "Forbered" },
@@ -583,6 +594,7 @@ const locale = {
     "message": "Reel del (af komplekst tal)"
   },
   "record_7c9448b": { "message": "Optag" },
+  "recording_98da6bda": { "message": "Optagelse" },
   "red_8258edf3": { "message": "Rød" },
   "relationships_6602af70": { "message": "Forhold" },
   "religion_icon_246e0be1": { "message": "Religion-ikon" },
@@ -627,10 +639,13 @@ const locale = {
     "message": "Desværre er det pæne HTML-redigeringsværktøj ikke tilgængeligt på tastaturet. Få adgang til det rå HTML-redigeringsværktøj her."
   },
   "save_11a80ec3": { "message": "Gem" },
+  "save_media_cb9e786e": { "message": "Gem medier" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Søg" },
+  "select_audio_source_21043cd5": { "message": "Vælg lydkilde" },
   "select_crop_shape_d441feeb": { "message": "Vælg beskæringsform" },
   "select_language_7c93a900": { "message": "Vælg sprog" },
+  "select_video_source_1b5c9dbe": { "message": "Vælg videokilde" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Mængde minus" },
   "sharp_music_ab956814": { "message": "Hævet (musik)" },
@@ -651,6 +666,9 @@ const locale = {
   "small_b070434a": { "message": "Lille" },
   "solid_circle_9f061dfc": { "message": "Farvet cirkel" },
   "something_went_wrong_89195131": { "message": "Noget gik galt." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Noget gik galt ved adgang til dit webcam."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Der gik noget galt, og jeg ved ikke, hvad jeg skal vise dig."
   },
@@ -658,6 +676,9 @@ const locale = {
     "message": "Noget gik galt. Tjek din forbindelse, genindlæs siden, og prøv igen."
   },
   "something_went_wrong_d238c551": { "message": "Noget gik galt" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Noget gik galt under deling af din skærm."
+  },
   "sort_by_e75f9e3e": { "message": "Sorter efter" },
   "spades_suit_b37020c2": { "message": "Spar (kulør)" },
   "square_511eb3b3": { "message": "Kvadrat" },
@@ -674,6 +695,8 @@ const locale = {
     "message": "Kvadratisk overmængde (streng)"
   },
   "star_8d156e09": { "message": "Giv stjerne" },
+  "start_over_f7552aa9": { "message": "Start forfra" },
+  "start_recording_9a65141a": { "message": "Start optagelse" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stile" },
   "submit_a3cc6859": { "message": "Aflever" },
@@ -702,6 +725,8 @@ const locale = {
     "message": "Skift til Rich Text Editor"
   },
   "syllabus_f191f65b": { "message": "Fagplan" },
+  "system_audio_allowed_b2508f8c": { "message": "Systemlyd tilladt" },
+  "system_audio_disabled_c177bd13": { "message": "Systemlyd deaktiveret" },
   "tab_arrows_4cf5abfc": { "message": "TAB / pile" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Grønblå" },
@@ -747,6 +772,7 @@ const locale = {
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Selvom din video har den rigtige titel i browseren, kunne vi ikke opdatere den i databasen."
   },
+  "timebar_a4d18443": { "message": "Tidslinje" },
   "title_ee03d132": { "message": "Titel" },
   "to_be_posted_when_d24bf7dc": { "message": "Skal slås op: { when }" },
   "to_do_when_2783d78f": { "message": "Opgaveliste: { when }" },
@@ -768,6 +794,7 @@ const locale = {
   },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "Ikke offentliggjort" },
+  "untitled_16aa4f2b": { "message": "Uden titel" },
   "untitled_efdc2d7d": { "message": "uden titel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Op og venstre diagonal pil"
@@ -842,6 +869,7 @@ const locale = {
   "vertical_dots_bfb21f14": { "message": "Lodrette prikker" },
   "video_options_24ef6e5d": { "message": "Videoindstillinger" },
   "video_options_tray_3b9809a5": { "message": "Bakke for videoindstillinger" },
+  "video_player_b371005": { "message": "Videoafspiller" },
   "video_player_for_9e7d373b": { "message": "Videoafspiller til " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videoafspiller til { title }"
@@ -853,6 +881,17 @@ const locale = {
   "view_word_and_character_counts_a743dd0c": {
     "message": "Se antal ord og tegn"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Vi kunne ikke registrere en fungerende mikrofon tilsluttet til din enhed."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Vi kunne ikke registrere et fungerende webcam tilsluttet til din enhed."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Vi kunne ikke registrere et fungerende webkamera eller en mikrofon tilsluttet din enhed."
+  },
+  "webcam_disabled_30c66986": { "message": "Webcam deaktiveret" },
+  "webcam_fe91b20f": { "message": "Webcam" },
   "white_87fa64fd": { "message": "Hvid" },
   "width_492fec76": { "message": "Bredde" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -871,6 +910,18 @@ const locale = {
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Dit billede er blevet komprimeret til Icon Maker. Billeder mindre end { size } KB vil ikke blive komprimeret."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Din mikrofon er blokeret i browserindstillingerne."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Dit webcam og din mikrofon er blokeret i browserindstillingerne."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Dit webcam er blokeret i browserindstillingerne."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Dit webcam kan allerede være i brug."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },
