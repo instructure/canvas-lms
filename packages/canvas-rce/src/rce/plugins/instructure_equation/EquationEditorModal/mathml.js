@@ -24,13 +24,18 @@ const Delimiters = Object.freeze({
   Display: [['$$', '$$']],
 })
 
+export const MathJaxDirective = Object.freeze({
+  Ignore: 'mathjax_ignore',
+  Process: 'mathjax_process',
+})
+
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
     extensions: ['autoload-all.js'],
   },
   tex2jax: {
-    ignoreClass: 'mathjax_ignore',
+    ignoreClass: MathJaxDirective.Ignore,
     inlineMath: Delimiters.Inline,
     displayMath: Delimiters.Display,
   },
@@ -55,6 +60,12 @@ const mathml = {
       return
     }
     if (!this.isMathJaxLoaded()) {
+      // Statically declare this in the localConfig above as part of MAT-1219
+      if (RCEGlobals.getFeatures()?.explicit_latex_typesetting) {
+        localConfig.elements = document.getElementsByClassName(MathJaxDirective.Process)
+        localConfig.tex2jax.processClass = MathJaxDirective.Process
+      }
+
       const locale = RCEGlobals.getConfig()?.locale || 'en'
       // signal local config to mathjax as it loads
       window.MathJax = localConfig
@@ -133,7 +144,7 @@ const mathml = {
     } else {
       // Make sure we always call the callback if it is loaded already and make sure we
       // also reprocess the page since chances are if we are requesting MathJax again,
-      // something has changed on the page and needs to gReprocess(document.body)et pulled into the MathJax ecosystem
+      // something has changed on the page and needs to get pulled into the MathJax ecosystem
       // window.MathJax.Hub.Reprocess([document.body])
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub])
       cb?.()
@@ -191,6 +202,13 @@ const mathml = {
   isMathJaxIgnored(elem) {
     if (!elem) return true
 
+    if (
+      RCEGlobals.getFeatures()?.explicit_latex_typesetting &&
+      !elem.classList.contains(MathJaxDirective.Process)
+    ) {
+      return true
+    }
+
     // ignore disconnected elements
     if (!document.body.contains(elem)) return true
 
@@ -201,8 +219,8 @@ const mathml = {
 
     // check if elem is a child of something we're ignoring
     while (elem !== document.body) {
-      // child of .mathjax_ignore?
-      if (elem.classList.contains('mathjax_ignore')) {
+      // child of ignored element?
+      if (elem.classList.contains(MathJaxDirective.Ignore)) {
         return true
       }
 

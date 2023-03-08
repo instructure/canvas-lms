@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mathml, {mathImageHelper} from '../mathml'
+import mathml, {mathImageHelper, MathJaxDirective} from '../mathml'
 import RCEGlobals from '../../../../RCEGlobals'
 
 let stub = null
 describe('MathML and MathJax it', () => {
   beforeEach(() => {
-    const mathElem = document.createElement('math')
-    mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
-    document.body.innerHTML = mathElem.outerHTML
     RCEGlobals.getConfig = jest.fn().mockReturnValue({locale: 'en'})
   })
 
@@ -84,6 +81,30 @@ describe('MathML and MathJax it', () => {
     }
     mathml.reloadElement('content')
     expect(window.MathJax.Hub.Queue).toHaveBeenCalledTimes(1)
+  })
+
+  describe('explicit_latex_typesetting', () => {
+    let elem
+
+    beforeEach(() => {
+      elem = document.createElement('span')
+      elem.classList.add(MathJaxDirective.Process)
+      document.body.appendChild(elem)
+    })
+
+    it('does not modify localConfig when disabled', () => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: false})
+      mathml.loadMathJax('bogus')
+      expect(window.MathJax).not.toHaveProperty('elements')
+      expect(window.MathJax.tex2jax).not.toHaveProperty('processClass')
+    })
+
+    it('modifies localConfig when enabled', () => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: true})
+      mathml.loadMathJax('bogus')
+      expect(window.MathJax.elements).toContain(elem)
+      expect(window.MathJax.tex2jax.processClass).toEqual(MathJaxDirective.Process)
+    })
   })
 })
 
@@ -232,10 +253,10 @@ describe('isMathJaxIgnored', () => {
     expect(mathml.isMathJaxIgnored(elem)).toBeTruthy()
   })
 
-  it('ignores descendents of .mathjax_ignore', () => {
+  it('ignores descendents of ignored elements', () => {
     const root = document.body
     const ignored = document.createElement('span')
-    ignored.setAttribute('class', 'mathjax_ignore')
+    ignored.setAttribute('class', MathJaxDirective.Ignore)
     root.appendChild(ignored)
     const elem = document.createElement('span')
     elem.textContent = 'ignore me'
@@ -251,5 +272,30 @@ describe('isMathJaxIgnored', () => {
 
   it('handles missing element', () => {
     expect(mathml.isMathJaxIgnored()).toBeTruthy()
+  })
+
+  it('by default does not ignore elements without the process directive class', () => {
+    const elem = document.createElement('span')
+    document.body.appendChild(elem)
+    expect(mathml.isMathJaxIgnored(elem)).toBeFalsy()
+  })
+
+  describe('when explicit_latex_typesetting is on', () => {
+    beforeEach(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({explicit_latex_typesetting: true})
+    })
+
+    it('ignores elements without the process directive class', () => {
+      const elem = document.createElement('span')
+      document.body.appendChild(elem)
+      expect(mathml.isMathJaxIgnored(elem)).toBeTruthy()
+    })
+
+    it('does not ignore elements with the process directive class', () => {
+      const elem = document.createElement('span')
+      document.body.appendChild(elem)
+      elem.classList.add(MathJaxDirective.Process)
+      expect(mathml.isMathJaxIgnored(elem)).toBeFalsy()
+    })
   })
 })
