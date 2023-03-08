@@ -52,7 +52,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSISName: ENV.SIS_NAME,
       postToSIS:
         this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
-      datePickerFormat: 'medium_with_weekday',
+      datePickerFormat: 'full_with_weekday',
       important_dates: this.event.important_dates,
     })
     this.currentContextInfo = null
