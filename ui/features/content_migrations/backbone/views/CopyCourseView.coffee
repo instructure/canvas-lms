@@ -25,10 +25,9 @@ export default class CopyCourseView extends MigrationView
   @child 'dateShift', '.dateShift'
   @child 'selectContent', '.selectContent'
   @child 'importQuizzesNext', '.importQuizzesNext'
-  @child 'importBlueprintSettings', '.importBlueprintSettings'
 
   initialize: ->
     super
     @courseFindSelect.on 'course_changed', (course) =>
       @dateShift.updateNewDates(course)
-      @importBlueprintSettings.courseSelected(course)
+      @selectContent.courseSelected(course)

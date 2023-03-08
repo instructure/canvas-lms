@@ -5,6 +5,10 @@
   </label>
 </div>
 
+{{#if ENV.BLUEPRINT_ELIGIBLE_IMPORT}}
+   <div class="importBlueprintSettings" style="margin-left: 2em"></div>
+{{/if}}
+
 <div class="radio">
   <label>
     <input type="radio" name="selective_import" value=true>
