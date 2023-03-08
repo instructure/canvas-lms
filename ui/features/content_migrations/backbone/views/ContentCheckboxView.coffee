@@ -102,6 +102,7 @@ export default class ContentCheckboxView extends Backbone.View
     attachments:                  "icon-document"
     assignment_groups:            "icon-folder"
     folders:                      "icon-folder"
+    blueprint_settings:           "icon-settings"
 
   # This retrieves the iconClass out of the iconClasses object map
   # @api private

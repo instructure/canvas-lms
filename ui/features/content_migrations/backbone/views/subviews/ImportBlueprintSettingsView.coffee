@@ -22,6 +22,7 @@ export default class ImportBlueprintSettingsView extends Backbone.View
   template: template
 
   @optionProperty 'blueprintSelected'
+  allContent = false
 
   els:
     '#importBlueprintSettingsContainer': '$container'
@@ -30,10 +31,14 @@ export default class ImportBlueprintSettingsView extends Backbone.View
     'change #importBlueprintSettingsCheckbox': 'updateSetting'
 
   afterRender: =>
-    @$container.showIf(@blueprintSelected)
+    @$container.showIf(@blueprintSelected && @allContent)
 
   courseSelected: (course) =>
     @blueprintSelected = course.blueprint
+    @render()
+
+  importTypeSelected: (selective) =>
+    @allContent = !selective
     @render()
 
   updateSetting: (event) =>
