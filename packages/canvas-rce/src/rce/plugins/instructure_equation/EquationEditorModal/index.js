@@ -35,8 +35,10 @@ import * as advancedPreference from './advancedPreference'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
-import mathml from './mathml'
+import mathml, {MathJaxDirective} from './mathml'
 import styles from './styles'
+
+import RCEGlobals from '../../../RCEGlobals'
 
 // Import the <math-field> container and all
 // the relevant math fonts from mathlive
@@ -319,7 +321,15 @@ export default class EquationEditorModal extends Component {
               </Flex>
             </div>
             <div style={{display: this.state.advanced ? null : 'none', marginTop: '1em'}}>
-              <span data-testid="mathml-preview-element" ref={this.previewElement} />
+              <span
+                data-testid="mathml-preview-element"
+                ref={this.previewElement}
+                className={
+                  RCEGlobals.getFeatures()?.explicit_latex_typesetting
+                    ? MathJaxDirective.Process
+                    : null
+                }
+              />
             </div>
           </div>
         </Modal.Body>
