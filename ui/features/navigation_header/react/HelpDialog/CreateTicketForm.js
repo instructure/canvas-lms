@@ -164,6 +164,8 @@ class CreateTicketForm extends React.Component {
             value={window.ENV.context_asset_string}
           />
           <input type="hidden" name="error[user_roles]" value={window.ENV.current_user_roles} />
+          {/* this is a honeypot field. it's hidden via css, but spambots don't know that. */}
+          <input className="hidden" name="error[username]" />
 
           <div className="ic-HelpDialog__form-actions">
             <button type="button" className="Button" onClick={this.handleCancelClick}>
