@@ -71,7 +71,6 @@ QUnit.module('EditAssignmentDetails', {
       startDate() {
         return fcUtil.wrap('2015-08-07T17:00:00Z')
       },
-      allDay: false,
     }
     fakeENV.setup()
   },
@@ -109,21 +108,15 @@ const nameLengthHelper = function (
     []
   )
 }
-test('should initialize input with start date', function () {
+test('should initialize input with start date and time', function () {
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
+  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 5:00pm')
 })
 
 test('should have blank input when no start date', function () {
   this.event.startDate = () => null
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), '')
-})
-
-test('should include start date only if all day', function () {
-  this.event.allDay = true
-  const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
 })
 
 test('should treat start date as fudged', function () {
@@ -135,7 +128,7 @@ test('should treat start date as fudged', function () {
     formats: getI18nFormats(),
   })
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
+  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 1:00pm')
 })
 
 test('should localize start date', function () {
@@ -150,7 +143,7 @@ test('should localize start date', function () {
     },
   })
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'ven. 7 août 2015')
+  equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')
 })
 
 test('requires name to save assignment event', function () {
