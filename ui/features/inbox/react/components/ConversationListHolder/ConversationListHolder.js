@@ -208,28 +208,21 @@ export const ConversationListHolder = ({
   // Render individual menu items
   const renderMenuItem = (conversation, isLast) => {
     return (
-      <View
-        key={`conversation-${conversation._id}`}
-        elementRef={el => {
-          if (isLast) {
-            onItemRefSet(el)
-          }
-        }}
-      >
-        <ConversationListItem
-          id={conversation._id}
-          conversation={conversation}
-          isStarred={conversation?.label === 'starred'}
-          isSelected={selectedMessages.includes(conversation._id)}
-          isUnread={conversation?.workflowState === 'unread'}
-          onSelect={handleItemSelection}
-          onStar={props.onStar}
-          key={conversation._id}
-          onMarkAsRead={props.onMarkAsRead}
-          onMarkAsUnread={props.onMarkAsUnread}
-          textSize={props.textSize}
-        />
-      </View>
+      <ConversationListItem
+        id={conversation._id}
+        conversation={conversation}
+        isStarred={conversation?.label === 'starred'}
+        isSelected={selectedMessages.includes(conversation._id)}
+        isUnread={conversation?.workflowState === 'unread'}
+        onSelect={handleItemSelection}
+        onStar={props.onStar}
+        key={conversation._id}
+        onMarkAsRead={props.onMarkAsRead}
+        onMarkAsUnread={props.onMarkAsUnread}
+        textSize={props.textSize}
+        isLast={isLast}
+        setRef={onItemRefSet}
+      />
     )
   }
 
