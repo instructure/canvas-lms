@@ -52,4 +52,6 @@ export function openToolDialogFor(toolHelper: RceToolWrapper): void {
       dialogRef.current?.open(toolHelper)
     }
   )
+
+  env.rceWrapper?._forceCloseFloatingToolbar(false)
 }
