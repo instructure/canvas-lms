@@ -21,15 +21,18 @@ import moment from 'moment-timezone'
 import {Day} from '../index'
 
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
+const defaultProps = {registerAnimatable: jest.fn}
 
 it('renders the base component with required props', () => {
-  const wrapper = shallow(<Day timeZone="America/Denver" day="2017-04-25" />)
+  const wrapper = shallow(<Day {...defaultProps} timeZone="America/Denver" day="2017-04-25" />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
   const today = moment()
-  const wrapper = shallow(<Day timeZone="America/Denver" day={today.format('YYYY-MM-DD')} />)
+  const wrapper = shallow(
+    <Day {...defaultProps} timeZone="America/Denver" day={today.format('YYYY-MM-DD')} />
+  )
   const friendlyName = wrapper.find('Heading').first().childAt(0)
   const fullDate = wrapper.find('Heading').first().childAt(1)
 
@@ -39,7 +42,9 @@ it('renders the friendly name in large text and rest of the date on a second lin
 
 it('renders the full date with friendly name on one line when it is not today', () => {
   const yesterday = moment().subtract(1, 'days')
-  const wrapper = shallow(<Day timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} />)
+  const wrapper = shallow(
+    <Day {...defaultProps} timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} />
+  )
   const fullDate = wrapper.find('Heading').first().childAt(0)
 
   expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
@@ -48,7 +53,12 @@ it('renders the full date with friendly name on one line when it is not today', 
 it('renders missing assignments if showMissingAssignments is true and it is today', () => {
   const today = moment()
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day={today.format('YYYY-MM-DD')} showMissingAssignments />
+    <Day
+      {...defaultProps}
+      timeZone="America/Denver"
+      day={today.format('YYYY-MM-DD')}
+      showMissingAssignments={true}
+    />
   )
   expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeTruthy()
 })
@@ -56,14 +66,21 @@ it('renders missing assignments if showMissingAssignments is true and it is toda
 it('does not render missing assignments if it is not today', () => {
   const yesterday = moment().subtract(1, 'days')
   const wrapper = shallow(
-    <Day timeZone="America/Denver" day={yesterday.format('YYYY-MM-DD')} showMissingAssignments />
+    <Day
+      {...defaultProps}
+      timeZone="America/Denver"
+      day={yesterday.format('YYYY-MM-DD')}
+      showMissingAssignments={true}
+    />
   )
   expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeFalsy()
 })
 
 it('only renders the year when the date is not in the current year', () => {
   const lastYear = moment().subtract(1, 'year')
-  const wrapper = shallow(<Day timeZone="America/Denver" day={lastYear.format('YYYY-MM-DD')} />)
+  const wrapper = shallow(
+    <Day {...defaultProps} timeZone="America/Denver" day={lastYear.format('YYYY-MM-DD')} />
+  )
   const fullDate = wrapper.find('Heading').first().childAt(0)
 
   expect(fullDate.text()).toBe(lastYear.format('dddd, MMMM D, YYYY'))
@@ -78,8 +95,8 @@ it('renders grouping correctly when having itemsForDay', () => {
       context: {
         type: 'Course',
         id: 128,
-        url: 'http://www.non_default_url.com'
-      }
+        url: 'http://www.non_default_url.com',
+      },
     },
     {
       title: 'San Juan',
@@ -87,8 +104,8 @@ it('renders grouping correctly when having itemsForDay', () => {
       context: {
         type: 'Course',
         id: 256,
-        url: 'http://www.non_default_url.com'
-      }
+        url: 'http://www.non_default_url.com',
+      },
     },
     {
       title: 'Roll for the Galaxy',
@@ -96,21 +113,22 @@ it('renders grouping correctly when having itemsForDay', () => {
       context: {
         type: 'Course',
         id: 256,
-        url: 'http://www.non_default_url.com'
-      }
+        url: 'http://www.non_default_url.com',
+      },
     },
     {
       title: 'Same id, different type',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Group',
-        id: 256
-      }
-    }
+        id: 256,
+      },
+    },
   ]
 
   const wrapper = shallow(
     <Day
+      {...defaultProps}
       timeZone={TZ}
       day="2017-04-25"
       itemsForDay={items}
@@ -128,32 +146,32 @@ it('groups itemsForDay that have no context into the "Notes" category', () => {
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 128
-      }
+        id: 128,
+      },
     },
     {
       title: 'San Juan',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 256
-      }
+        id: 256,
+      },
     },
     {
       title: 'Roll for the Galaxy',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 256
-      }
+        id: 256,
+      },
     },
     {
-      title: 'Get work done!'
-    }
+      title: 'Get work done!',
+    },
   ]
 
   const wrapper = shallow(
-    <Day timeZone={TZ} day="2017-04-25" itemsForDay={items} currentUser={user} />
+    <Day {...defaultProps} timeZone={TZ} day="2017-04-25" itemsForDay={items} currentUser={user} />
   )
   expect(wrapper).toMatchSnapshot()
 })
@@ -166,17 +184,17 @@ it('groups itemsForDay that come in on prop changes', () => {
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 128
-      }
+        id: 128,
+      },
     },
     {
       title: 'San Juan',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 256
-      }
-    }
+        id: 256,
+      },
+    },
   ]
 
   const wrapper = shallow(
@@ -197,12 +215,12 @@ it('groups itemsForDay that come in on prop changes', () => {
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {
         type: 'Course',
-        id: 256
-      }
+        id: 256,
+      },
     },
     {
-      title: 'Get work done!'
-    }
+      title: 'Get work done!',
+    },
   ])
 
   wrapper.setProps({itemsForDay: newItemsForDay})
@@ -213,6 +231,7 @@ it('renders even when there are no items', () => {
   const date = moment.tz('Asia/Tokyo').add(13, 'days')
   const wrapper = shallow(
     <Day
+      {...defaultProps}
       timeZone="Asia/Tokyo"
       day={date.format('YYYY-MM-DD')}
       itemsForDay={[]}
@@ -232,15 +251,15 @@ it('registers itself as animatable', () => {
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {id: 128},
       id: '1',
-      uniqueId: 'first'
+      uniqueId: 'first',
     },
     {
       title: 'jkl',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {id: 256},
       id: '2',
-      uniqueId: 'second'
-    }
+      uniqueId: 'second',
+    },
   ]
   const secondItems = [
     {
@@ -248,15 +267,15 @@ it('registers itself as animatable', () => {
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {id: 128},
       id: '3',
-      uniqueId: 'third'
+      uniqueId: 'third',
     },
     {
       title: 'uiop',
       date: moment.tz('2017-04-25T23:59:00Z', TZ),
       context: {id: 256},
       id: '4',
-      uniqueId: 'fourth'
-    }
+      uniqueId: 'fourth',
+    },
   ]
   const wrapper = mount(
     <Day
