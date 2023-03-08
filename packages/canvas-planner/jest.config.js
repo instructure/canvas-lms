@@ -18,8 +18,8 @@
 
 module.exports = {
   transform: {
-    '^.+\\.(js)$': ['babel-jest', { configFile: require.resolve('./babel.config.cjs.js') }],
-    '^.+\\.(css)$': '<rootDir>/jest-themeable-styles'
+    '^.+\\.(js)$': ['babel-jest', {configFile: require.resolve('./babel.config.cjs.js')}],
+    '^.+\\.(css)$': '<rootDir>/jest-themeable-styles',
   },
   reporters: [
     'default',
@@ -28,12 +28,12 @@ module.exports = {
       {
         suiteName: 'Canvas Planner Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage',
-        outputName: 'canvas-planner-junit.xml'
-      }
-    ]
+        outputName: 'canvas-planner-junit.xml',
+      },
+    ],
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupFiles: ['jest-canvas-mock', './jest-env.js'],
+  setupFiles: ['jest-canvas-mock', './jest-env.js', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib'],
   testRegex: '/__tests__/.*\\.(test|spec)\\.js$',
@@ -45,8 +45,8 @@ module.exports = {
       branches: 80,
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
-  testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js'
+  testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
 }
