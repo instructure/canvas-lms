@@ -532,6 +532,22 @@ window.modules = (function () {
         $item = $('#context_module_item_blank').clone(true).removeAttr('id')
         modules.evaluateItemCyoe($item, data)
       }
+      const speedGraderId = `${data.type}-${data.content_id}`
+      const $speedGrader = $item.find('#speed-grader-container-blank')
+      $speedGrader.attr('id', 'speed-grader-container-' + speedGraderId)
+
+      const isPublished = data.published
+      const isAssignmentOrQuiz =
+        data.content_type === 'Assignment' || data.content_type === 'Quizzes::Quiz'
+      const isPublishedGradedDiscussion =
+        isPublished && data.graded === '1' && data.content_type === 'DiscussionTopic'
+
+      const $speedGraderLinkContainer = $item.find('.speed-grader-link-container')
+
+      if ((isPublished && isAssignmentOrQuiz) || isPublishedGradedDiscussion) {
+        $speedGraderLinkContainer.removeClass('hidden')
+      }
+
       $item.addClass(data.type + '_' + data.id)
       $item.addClass(data.quiz_lti ? 'lti-quiz' : data.type)
       if (data.is_duplicate_able) {
@@ -542,7 +558,7 @@ window.modules = (function () {
       $item.fillTemplateData({
         data,
         id: 'context_module_item_' + data.id,
-        hrefValues: ['id', 'context_module_id', 'content_id'],
+        hrefValues: ['id', 'context_module_id', 'content_id', 'content_type', 'assignment_id'],
       })
       for (let idx = 0; idx < 10; idx++) {
         $item.removeClass('indent_' + idx)
@@ -1151,6 +1167,7 @@ modules.initModuleManagement = function (duplicate) {
     $('.requirement-count-radio').show()
     $('#context_module_requirement_count_').change()
   })
+
   $('#completion_criterion_option .id').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
     const data = $('#context_module_item_' + $(this).val()).getTemplateData({
@@ -1174,6 +1191,7 @@ modules.initModuleManagement = function (duplicate) {
     $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
     $option.find('.type').change()
   })
+
   $('#completion_criterion_option .type').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
 
@@ -1338,6 +1356,7 @@ modules.initModuleManagement = function (duplicate) {
         },
       })
   })
+
   $('.outdent_item_link,.indent_item_link').live('click', function (event, elem, activeElem) {
     event.preventDefault()
     const $elem = $(elem)
@@ -1372,6 +1391,7 @@ modules.initModuleManagement = function (duplicate) {
       }
     })
   })
+
   $('.edit_item_link').live('click', function (event) {
     event.preventDefault()
     const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
@@ -1402,9 +1422,11 @@ modules.initModuleManagement = function (duplicate) {
       })
       .fixDialogButtons()
   })
+
   $('#edit_item_form .cancel_button').click(_event => {
     $('#edit_item_form').dialog('close')
   })
+
   $('#edit_item_form').formSubmit({
     beforeSubmit(data) {
       if (data['content_tag[title]'] == '') {
@@ -1678,6 +1700,7 @@ modules.initModuleManagement = function (duplicate) {
       options.close = function () {
         $trigger.focus()
       }
+
       options.submit = generate_submit(id)
       INST.selectContentDialog(options)
     }

@@ -61,14 +61,18 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Unpublished Quiz")
       expect(f("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish")).to be_displayed
+      expect(f(".speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
     it "adds a published quiz to a module", priority: "1" do
       @pub_quiz = Quizzes::Quiz.create!(context: @course, title: "Published Quiz")
+      @pub_quiz.workflow_state = "published"
+      @pub_quiz.save!
       @mod.add_item(type: "quiz", id: @pub_quiz.id)
       go_to_modules
       verify_module_title("Published Quiz")
       expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+      expect(f(".speed-grader-link-container")).to be_present
     end
 
     it "shows due date on a quiz in a module", priority: "2" do
@@ -86,6 +90,7 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Unpublished Assignment")
       expect(f("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish")).to be_displayed
+      expect(f(".speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
     it "adds a published assignment to a module", priority: "1" do
@@ -94,6 +99,7 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Published Assignment")
       expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+      expect(f(".speed-grader-link-container")).to be_present
     end
 
     it "adds an non-graded unpublished discussion to a module", priority: "1" do
