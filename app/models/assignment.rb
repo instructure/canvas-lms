@@ -3082,8 +3082,8 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  scope :expecting_submission, lambda {
-    where.not(submission_types: [nil, ""] + %w[none not_graded on_paper wiki_page])
+  scope :expecting_submission, lambda { |additional_excludes: []|
+    where.not(submission_types: [nil, ""] + Array(additional_excludes) + %w[none not_graded on_paper wiki_page])
   }
 
   scope :gradeable, -> { where.not(submission_types: %w[not_graded wiki_page]) }

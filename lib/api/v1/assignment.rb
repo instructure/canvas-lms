@@ -890,22 +890,14 @@ module Api::V1::Assignment
     vericite_settings.to_unsafe_h
   end
 
-  def submissions_hash(include_params, assignments, submissions_for_user = nil)
+  def submissions_hash(include_params, assignments)
     return {} unless include_params.include?("submission")
 
     has_observed_users = include_params.include?("observed_users")
-
-    subs_list = if submissions_for_user
-                  assignment_ids = assignments.to_set(&:id)
-                  submissions_for_user.select do |s|
-                    assignment_ids.include?(s.assignment_id)
-                  end
-                else
-                  users = current_user_and_observed(include_observed: has_observed_users)
-                  @context.submissions
-                          .where(assignment_id: assignments.map(&:id))
-                          .for_user(users)
-                end
+    users = current_user_and_observed(include_observed: has_observed_users)
+    subs_list = @context.submissions
+                        .where(assignment_id: assignments.map(&:id))
+                        .for_user(users)
 
     if has_observed_users
       # assignment id -> array. even if <2 results for a given

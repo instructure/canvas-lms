@@ -1327,23 +1327,22 @@ class ApplicationController < ActionController::Base
   end
 
   def get_upcoming_assignments(course)
-    assignments = AssignmentGroup.visible_assignments(
+    visible_assignments = AssignmentGroup.visible_assignments(
       @current_user,
       course,
       course.assignment_groups.active
-    ).to_a
+    )
 
     log_course(course)
-
-    assignments.map! { |a| a.overridden_for(@current_user) }
-    sorted = SortsAssignments.by_due_date({
-                                            assignments: assignments,
-                                            user: @current_user,
-                                            session: session,
-                                            upcoming_limit: 1.week.from_now
-                                          })
-
-    sorted.upcoming.call.sort
+    sorter = SortsAssignments.new(
+      assignments_scope: visible_assignments,
+      user: @current_user,
+      session: session,
+      course: course
+    )
+    sorter.assignments(:upcoming) do |assignments|
+      assignments.group("assignments.id").order("MIN(submissions.cached_due_date) ASC").to_a
+    end
   end
 
   def log_course(course)

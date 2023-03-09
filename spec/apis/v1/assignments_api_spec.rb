@@ -608,6 +608,7 @@ describe AssignmentsApiController, type: :request do
 
     describe "assignment bucketing" do
       before :once do
+        @now = Time.zone.now
         course_with_student(active_all: true)
         @student1 = @user
         @section = @course.course_sections.create!(name: "test section")
@@ -619,17 +620,17 @@ describe AssignmentsApiController, type: :request do
         student_in_section(@section2, user: @student2)
 
         # names based on student 1's due dates
-        @past_assignment = @course.assignments.create!(title: "past", only_visible_to_overrides: true, due_at: (Time.now - 10.days))
-        create_section_override_for_assignment(@past_assignment, { course_section: @section, due_at: (Time.now - 10.days) })
+        @past_assignment = @course.assignments.create!(title: "past", only_visible_to_overrides: true, due_at: 10.days.ago(@now))
+        create_section_override_for_assignment(@past_assignment, { course_section: @section, due_at: 10.days.ago(@now) })
 
         @overdue_assignment = @course.assignments.create!(title: "overdue", only_visible_to_overrides: true, submission_types: "online")
-        create_section_override_for_assignment(@overdue_assignment, { course_section: @section, due_at: (Time.now - 10.days) })
+        create_section_override_for_assignment(@overdue_assignment, { course_section: @section, due_at: 10.days.ago(@now) })
 
         @far_future_assignment = @course.assignments.create!(title: "far future", only_visible_to_overrides: true)
-        create_section_override_for_assignment(@far_future_assignment, { course_section: @section, due_at: (Time.now + 30.days) })
+        create_section_override_for_assignment(@far_future_assignment, { course_section: @section, due_at: 30.days.from_now(@now) })
 
         @upcoming_assignment = @course.assignments.create!(title: "upcoming", only_visible_to_overrides: true)
-        create_section_override_for_assignment(@upcoming_assignment, { course_section: @section, due_at: (Time.now + 1.day) })
+        create_section_override_for_assignment(@upcoming_assignment, { course_section: @section, due_at: 1.day.from_now(@now) })
 
         @undated_assignment = @course.assignments.create!(title: "undated", only_visible_to_overrides: true)
         override = create_section_override_for_assignment(@undated_assignment, { course_section: @section, due_at: nil })
@@ -637,8 +638,8 @@ describe AssignmentsApiController, type: :request do
         override.save
 
         # student2 overrides
-        create_section_override_for_assignment(@past_assignment, { course_section: @section2, due_at: (Time.now - 10.days) })
-        create_section_override_for_assignment(@far_future_assignment, { course_section: @section2, due_at: (Time.now - 10.days) })
+        create_section_override_for_assignment(@past_assignment, { course_section: @section2, due_at: 10.days.ago(@now) })
+        create_section_override_for_assignment(@far_future_assignment, { course_section: @section2, due_at: 10.days.ago(@now) })
       end
 
       before do
@@ -659,14 +660,14 @@ describe AssignmentsApiController, type: :request do
         expect(json["errors"]["bucket"].first["message"]).to eq "bucket name must be one of the following: past, overdue, undated, ungraded, unsubmitted, upcoming, future"
       end
 
-      def assignment_index_bucketed_api_call(bucket)
+      def assignment_index_bucketed_api_call(bucket, opts = {})
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/assignments.json",
                  { controller: "assignments_api",
                    action: "index",
                    format: "json",
                    course_id: @course.id.to_s,
-                   bucket: bucket })
+                   bucket: bucket }.merge(opts))
       end
 
       def assert_call_gets_assignments(bucket, assignments)
@@ -706,15 +707,37 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "as a teacher" do
-        it "uses default assignment dates" do
-          teacher = @course.teachers.first
-          user_session(teacher)
-          @user = teacher
+        before do
+          @teacher = @course.teachers.first
+          user_session(@teacher)
+          @user = @teacher
+        end
 
+        it "includes assignments in buckets if any assigned students meet the criteria" do
           assert_calls_get_assignments(
-            past: [@past_assignment],
-            undated: [@upcoming_assignment, @undated_assignment, @overdue_assignment, @far_future_assignment]
+            past: [@past_assignment, @overdue_assignment, @far_future_assignment],
+            undated: [@undated_assignment]
           )
+        end
+
+        it "supports sorting bucketed assignments by name" do
+          @course.assignments.create!(title: "z", due_at: 2.days.from_now(@now))
+          @course.assignments.create!(title: "a", due_at: 3.days.from_now(@now))
+          assignments_json = assignment_index_bucketed_api_call(:upcoming, order_by: :name)
+          expect(assignments_json.pluck("name")).to eq %w[a upcoming z]
+        end
+
+        it "supports sorting bucketed assignments by latest due date, ascending" do
+          z_assignment = @course.assignments.create!(title: "z")
+          create_adhoc_override_for_assignment(z_assignment, @student1, due_at: 1.hour.from_now(@now))
+          create_adhoc_override_for_assignment(z_assignment, @student2, due_at: 2.hours.from_now(@now))
+
+          a_assignment = @course.assignments.create!(title: "a")
+          create_adhoc_override_for_assignment(a_assignment, @student1, due_at: 1.hour.ago(@now))
+          create_adhoc_override_for_assignment(a_assignment, @student2, due_at: 2.days.from_now(@now))
+
+          assignments_json = assignment_index_bucketed_api_call(:upcoming, order_by: :due_at)
+          expect(assignments_json.pluck("name")).to eq %w[z upcoming a]
         end
       end
 
@@ -741,7 +764,7 @@ describe AssignmentsApiController, type: :request do
           )
         end
 
-        it "treats multi-student observers like course observers" do
+        it "includes assignments in buckets if any observed students meet the criteria" do
           @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section, enrollment_state: "active", allow_multiple_enrollments: true)
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
           @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section, enrollment_state: "active", allow_multiple_enrollments: true)
@@ -750,21 +773,9 @@ describe AssignmentsApiController, type: :request do
           assert_calls_get_assignments(
             future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
             upcoming: [@upcoming_assignment],
-            past: [@past_assignment, @overdue_assignment],
+            past: [@past_assignment, @overdue_assignment, @far_future_assignment],
             undated: [@undated_assignment],
-            overdue: []
-          )
-        end
-
-        it "uses sections dates when observing a whole course" do
-          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section, enrollment_state: "active")
-
-          assert_calls_get_assignments(
-            future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
-            upcoming: [@upcoming_assignment],
-            past: [@past_assignment, @overdue_assignment],
-            undated: [@undated_assignment],
-            overdue: []
+            overdue: [@overdue_assignment]
           )
         end
       end

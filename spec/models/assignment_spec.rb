@@ -635,6 +635,43 @@ describe Assignment do
     end
   end
 
+  describe "scope: expecting_submission" do
+    it "includes assignments expecting online submissions" do
+      assignment_model(submission_types: "online_text_entry,online_url,online_upload", course: @course)
+      expect(Assignment.expecting_submission).not_to be_empty
+    end
+
+    it "includes submissions for assignments expecting external_tool submissions" do
+      assignment_model(submission_types: "external_tool", course: @course)
+      expect(Assignment.expecting_submission).not_to be_empty
+    end
+
+    it "optionally excludes other assignment types" do
+      assignment_model(submission_types: "external_tool", course: @course)
+      expect(Assignment.expecting_submission(additional_excludes: "external_tool")).to be_empty
+    end
+
+    it "excludes submissions for assignments expecting on_paper submissions" do
+      assignment_model(submission_types: "on_paper", course: @course)
+      expect(Assignment.expecting_submission).to be_empty
+    end
+
+    it "excludes submissions for assignments expecting wiki_page submissions" do
+      assignment_model(submission_types: "wiki_page", course: @course)
+      expect(Assignment.expecting_submission).to be_empty
+    end
+
+    it "excludes submissions for assignments not expecting submissions" do
+      assignment_model(submission_types: "none", course: @course)
+      expect(Assignment.expecting_submission).to be_empty
+    end
+
+    it "excludes submissions for not graded assignments" do
+      assignment_model(submission_types: "not_graded", course: @course)
+      expect(Assignment.expecting_submission).to be_empty
+    end
+  end
+
   describe "#visible_to_students_in_course_with_da" do
     let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
     let(:visible_assignments) do
