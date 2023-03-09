@@ -216,7 +216,7 @@ class ApplicationController < ActionController::Base
           current_user_visited_tabs: @current_user&.get_preference(:visited_tabs),
           discussions_reporting: react_discussions_post_enabled_for_preferences_use?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-          group_information: @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category ? @context.group_category.groups.pluck(:id, :name).map { |item| { id: item[0], label: item[1] } } : nil,
+          group_information: group_information,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           help_link_name: help_link_name,
@@ -310,6 +310,18 @@ class ApplicationController < ActionController::Base
     @js_env
   end
   helper_method :js_env
+
+  def group_information
+    if @context.is_a?(Group) &&
+       can_do(@context, @current_user, :manage) &&
+       @context.group_category &&
+       @context.group_category.groups &&
+       @context.group_category.groups.active
+
+      @context.group_category.groups.active.sort_by(&:name).pluck(:id, :name).map { |item| { id: item[0], label: item[1] } }
+    end
+  end
+  private :group_information
 
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time

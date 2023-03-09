@@ -151,6 +151,25 @@ RSpec.describe ApplicationController do
           end
         end
 
+        context "group_information" do
+          before do
+            course_with_user("TeacherEnrollment", user: @user, active_all: true)
+            @group_category = @course.group_categories.create!(name: "Group Category")
+            @group_1 = @course.groups.create!(group_category: @group_category, name: "group 1")
+            @group_2 = @course.groups.create!(group_category: @group_category, name: "group 2")
+            @group_10 = @course.groups.create!(group_category: @group_category, name: "group 10")
+            @group_zed = @course.groups.create!(group_category: @group_category, name: "group zed")
+          end
+
+          it "contains active group names sorted by name" do
+            @group_zed.workflow_state = "deleted"
+            @group_zed.save!
+            controller.instance_variable_set(:@context, @group_1)
+            group_names = controller.js_env[:group_information].pluck(:label)
+            expect(group_names).to eq ["group 1", "group 10", "group 2"]
+          end
+        end
+
         context "current_user_is_student" do
           before do
             course_with_user("TeacherEnrollment", user: @user, active_all: true)
