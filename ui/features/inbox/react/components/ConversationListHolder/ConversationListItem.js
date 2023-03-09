@@ -200,7 +200,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text weight="normal" size={props.textSize}>
-                    {truncateText(props.conversation.subject)}
+                    {truncateText(props.conversation.subject || I18n.t('(No subject)'))}
                   </Text>
                 </Grid.Col>
               </Grid.Row>
