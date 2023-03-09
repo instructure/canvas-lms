@@ -193,14 +193,17 @@ const ConversationListContainer = ({
           mobile: {
             textSize: 'x-small',
             datatestid: 'list-items-mobile',
+            truncateSize: 90,
           },
           tablet: {
             textSize: 'x-small',
             datatestid: 'list-items-tablet',
+            truncateSize: 40,
           },
           desktop: {
             textSize: 'small',
             datatestid: 'list-items-desktop',
+            truncateSize: 40,
           },
         }}
         render={responsiveProps => (
@@ -221,6 +224,7 @@ const ConversationListContainer = ({
             isLoadingMoreMenuData={isLoadingMoreData}
             isLoading={conversationsQuery.loading || submissionCommentsQuery.loading}
             isError={conversationsQuery.error || submissionCommentsQuery.error}
+            truncateSize={responsiveProps.truncateSize}
           />
         )}
       />

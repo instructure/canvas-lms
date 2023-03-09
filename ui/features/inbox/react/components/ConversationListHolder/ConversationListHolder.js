@@ -222,6 +222,7 @@ export const ConversationListHolder = ({
         textSize={props.textSize}
         isLast={isLast}
         setRef={onItemRefSet}
+        truncateSize={props.truncateSize}
       />
     )
   }
@@ -309,6 +310,7 @@ ConversationListHolder.propTypes = {
    */
   hasMoreMenuData: PropTypes.bool,
   isError: PropTypes.object,
+  truncateSize: PropTypes.number,
 }
 
 ConversationListHolder.defaultProps = {
