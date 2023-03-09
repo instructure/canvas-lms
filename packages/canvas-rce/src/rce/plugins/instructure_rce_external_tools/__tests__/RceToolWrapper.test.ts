@@ -23,6 +23,7 @@ import {
 } from '../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../ExternalToolsEnv'
+import {IconLtiLine, IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
 describe('RceExternalToolHelper', () => {
   describe('buttonConfig', () => {
@@ -32,7 +33,7 @@ describe('RceExternalToolHelper', () => {
       fakeEditor = createDeepMockProxy<ExternalToolsEditor>()
     })
 
-    it('transforms button data for tiymce', () => {
+    it('transforms button data for tinymce', () => {
       const button = {
         id: 'b0',
         name: 'some tool',
@@ -53,6 +54,70 @@ describe('RceExternalToolHelper', () => {
           image: expect.stringContaining(button.icon_url),
         })
       )
+    })
+
+    describe('instui icon resolution', () => {
+      it('handles icons prefixed with icon-', () => {
+        const result = new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            id: 'b0',
+            name: 'some tool',
+            description: 'this is a cool tool',
+            favorite: true,
+            canvas_icon_class: 'icon-lti',
+          },
+          []
+        )
+        expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
+        expect(result.iconId).toEqual('lti_tool_b0')
+      })
+
+      it('handles icons prefixed with icon_', () => {
+        const result = new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            id: 'b0',
+            name: 'some tool',
+            description: 'this is a cool tool',
+            favorite: true,
+            canvas_icon_class: 'icon_lti',
+          },
+          []
+        )
+        expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
+        expect(result.iconId).toEqual('lti_tool_b0')
+      })
+
+      it('handles icons without prefixes', () => {
+        const result = new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            id: 'b0',
+            name: 'some tool',
+            description: 'this is a cool tool',
+            favorite: true,
+            canvas_icon_class: 'lti',
+          },
+          []
+        )
+        expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
+        expect(result.iconId).toEqual('lti_tool_b0')
+      })
+    })
+
+    it('uses a default icon when nothing else is provided', () => {
+      const button = {
+        id: 'b0',
+        name: 'some tool',
+        description: 'this is a cool tool',
+        favorite: true,
+        canvas_icon_class: 'invalid-icon',
+      }
+
+      const result = new RceToolWrapper(externalToolsEnvFor(fakeEditor), button, [])
+      expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiSolid.src)
+      expect(result.iconId).toEqual('lti_tool_b0')
     })
 
     it('uses button icon_url if there is no icon_class', () => {
@@ -92,20 +157,6 @@ describe('RceExternalToolHelper', () => {
         []
       )
       expect(config.title).toEqual('SomeName')
-    })
-
-    it('passes through class names', function () {
-      const config = new RceToolWrapper(
-        externalToolsEnvFor(fakeEditor),
-        {
-          name: 'SomeName',
-          id: '_SomeId',
-          canvas_icon_class: 'some_icon',
-        },
-        []
-      )
-      expect(config.iconId).toEqual('some_icon')
-      expect(config.image).toEqual(undefined)
     })
 
     it('uses image if provided, overriding icon class', function () {
