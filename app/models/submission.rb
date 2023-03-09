@@ -2064,6 +2064,7 @@ class Submission < ActiveRecord::Base
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active) }
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
+  scope :not_submitted_or_graded, -> { where(submission_type: nil).where("(submissions.score IS NULL OR submissions.workflow_state <> 'graded') AND submissions.excused IS NOT TRUE") }
 
   scope :ungraded, -> { where(grade: nil).preload(:assignment) }
 

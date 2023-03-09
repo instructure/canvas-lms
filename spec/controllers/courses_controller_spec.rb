@@ -1249,117 +1249,160 @@ describe CoursesController do
         @c2 = @s2.add_comment(author: @teacher, comment: "some comment2")
       end
 
-      before do
-        user_session(@me)
+      context "as a teacher" do
+        before do
+          @course1.update!(default_view: "assignments")
+          student_in_course(active_all: true, course: @course1)
+          @assignment = @course1.assignments.create!(due_at: 1.day.from_now)
+          user_session(@teacher)
+        end
+
+        it "shows unpublished upcoming assignments" do
+          @assignment.unpublish
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments)).to include @assignment
+        end
+
+        it "does not show duplicate upcoming assignments" do
+          create_adhoc_override_for_assignment(@assignment, @me, due_at: 2.days.from_now)
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments).count).to eq 1
+        end
+
+        it "includes assignments where at least one assigned student has the assignment upcoming" do
+          create_adhoc_override_for_assignment(@assignment, @me, due_at: 1.day.ago)
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments)).to include @assignment
+        end
+
+        it "excludes assignments where no assigned students have the assignment upcoming" do
+          @assignment.update!(only_visible_to_overrides: true)
+          create_adhoc_override_for_assignment(@assignment, @me, due_at: 1.day.ago)
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments)).not_to include @assignment
+        end
+
+        it "sorts assignments by their earliest upcoming due date, ascending" do
+          create_adhoc_override_for_assignment(@assignment, @me, due_at: 3.days.from_now)
+          later_assignment = @course1.assignments.create!(due_at: 2.days.from_now)
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments)).to eq [@assignment, later_assignment]
+        end
       end
 
-      it "works for module view" do
-        @course1.default_view = "modules"
-        @course1.save
-        get "show", params: { id: @course1.id }
-        expect(assigns(:recent_feedback).count).to eq 1
-        expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
-      end
+      context "as a student" do
+        before do
+          user_session(@me)
+        end
 
-      it "works for assignments view" do
-        @course1.default_view = "assignments"
-        @course1.save!
-        get "show", params: { id: @course1.id }
-        expect(assigns(:recent_feedback).count).to eq 1
-        expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
-      end
+        it "works for module view" do
+          @course1.default_view = "modules"
+          @course1.save
+          get "show", params: { id: @course1.id }
+          expect(assigns(:recent_feedback).count).to eq 1
+          expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
+        end
 
-      it "disables management and set env urls on assignment homepage" do
-        @course1.default_view = "assignments"
-        @course1.save!
-        get "show", params: { id: @course1.id }
-        expect(controller.js_env[:URLS][:new_assignment_url]).not_to be_nil
-        expect(controller.js_env[:PERMISSIONS][:manage]).to be_falsey
-      end
+        it "works for assignments view" do
+          @course1.default_view = "assignments"
+          @course1.save!
+          get "show", params: { id: @course1.id }
+          expect(assigns(:recent_feedback).count).to eq 1
+          expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
+        end
 
-      it "sets ping_url" do
-        get "show", params: { id: @course1.id }
-        expect(controller.js_env[:ping_url]).not_to be_nil
-      end
+        it "disables management and set env urls on assignment homepage" do
+          @course1.default_view = "assignments"
+          @course1.save!
+          get "show", params: { id: @course1.id }
+          expect(controller.js_env[:URLS][:new_assignment_url]).not_to be_nil
+          expect(controller.js_env[:PERMISSIONS][:manage]).to be_falsey
+        end
 
-      it "does not show unpublished assignments to students" do
-        @course1.default_view = "assignments"
-        @course1.save!
-        @a1a = @course1.assignments.new(title: "some assignment course 1", due_at: 1.day.from_now)
-        @a1a.save
-        @a1a.unpublish
-        get "show", params: { id: @course1.id }
-        expect(assigns(:upcoming_assignments).map(&:id).include?(@a1a.id)).to be_falsey
-      end
+        it "sets ping_url" do
+          get "show", params: { id: @course1.id }
+          expect(controller.js_env[:ping_url]).not_to be_nil
+        end
 
-      it "works for wiki view" do
-        @course1.default_view = "wiki"
-        @course1.save
-        get "show", params: { id: @course1.id }
-        expect(assigns(:recent_feedback).count).to eq 1
-        expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
-      end
+        it "does not show unpublished assignments to students" do
+          @course1.default_view = "assignments"
+          @course1.save!
+          @a1a = @course1.assignments.new(title: "some assignment course 1", due_at: 1.day.from_now)
+          @a1a.save
+          @a1a.unpublish
+          get "show", params: { id: @course1.id }
+          expect(assigns(:upcoming_assignments).map(&:id).include?(@a1a.id)).to be_falsey
+        end
 
-      it "works for wiki view with draft state enabled" do
-        @course1.wiki_pages.create!(title: "blah").set_as_front_page!
-        @course1.reload
-        @course1.default_view = "wiki"
-        @course1.save!
-        get "show", params: { id: @course1.id }
-        expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({ read: true })
-        expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({ read: true })
-        expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
-      end
+        it "works for wiki view" do
+          @course1.default_view = "wiki"
+          @course1.save
+          get "show", params: { id: @course1.id }
+          expect(assigns(:recent_feedback).count).to eq 1
+          expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
+        end
 
-      it "works for wiki view with home page announcements enabled" do
-        @course1.wiki_pages.create!(title: "blah").set_as_front_page!
-        @course1.reload
-        @course1.default_view = "wiki"
-        @course1.show_announcements_on_home_page = true
-        @course1.home_page_announcement_limit = 3
-        @course1.save!
-        get "show", params: { id: @course1.id }
-        expect(controller.js_env[:COURSE_HOME]).to be_truthy
-        expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
-        expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(3)
-      end
+        it "works for wiki view with draft state enabled" do
+          @course1.wiki_pages.create!(title: "blah").set_as_front_page!
+          @course1.reload
+          @course1.default_view = "wiki"
+          @course1.save!
+          get "show", params: { id: @course1.id }
+          expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({ read: true })
+          expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({ read: true })
+          expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
+        end
 
-      it "does not show announcements for public users" do
-        @course1.wiki_pages.create!(title: "blah").set_as_front_page!
-        @course1.reload
-        @course1.default_view = "wiki"
-        @course1.show_announcements_on_home_page = true
-        @course1.home_page_announcement_limit = 3
-        @course1.is_public = true
-        @course1.save!
-        remove_user_session
-        get "show", params: { id: @course1.id }
-        expect(response).to be_successful
-        expect(controller.js_env[:COURSE_HOME]).to be_truthy
-        expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_falsey
-      end
+        it "works for wiki view with home page announcements enabled" do
+          @course1.wiki_pages.create!(title: "blah").set_as_front_page!
+          @course1.reload
+          @course1.default_view = "wiki"
+          @course1.show_announcements_on_home_page = true
+          @course1.home_page_announcement_limit = 3
+          @course1.save!
+          get "show", params: { id: @course1.id }
+          expect(controller.js_env[:COURSE_HOME]).to be_truthy
+          expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
+          expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(3)
+        end
 
-      it "works for syllabus view" do
-        @course1.default_view = "syllabus"
-        @course1.save
-        get "show", params: { id: @course1.id }
-        expect(assigns(:recent_feedback).count).to eq 1
-        expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
-      end
+        it "does not show announcements for public users" do
+          @course1.wiki_pages.create!(title: "blah").set_as_front_page!
+          @course1.reload
+          @course1.default_view = "wiki"
+          @course1.show_announcements_on_home_page = true
+          @course1.home_page_announcement_limit = 3
+          @course1.is_public = true
+          @course1.save!
+          remove_user_session
+          get "show", params: { id: @course1.id }
+          expect(response).to be_successful
+          expect(controller.js_env[:COURSE_HOME]).to be_truthy
+          expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_falsey
+        end
 
-      it "works for feed view" do
-        @course1.default_view = "feed"
-        @course1.save
-        get "show", params: { id: @course1.id }
-        expect(assigns(:recent_feedback).count).to eq 1
-        expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
-      end
+        it "works for syllabus view" do
+          @course1.default_view = "syllabus"
+          @course1.save
+          get "show", params: { id: @course1.id }
+          expect(assigns(:recent_feedback).count).to eq 1
+          expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
+        end
 
-      it "only shows recent feedback if user is student in specified course" do
-        course_with_teacher(active_all: true, user: @student)
-        @course3 = @course
-        get "show", params: { id: @course3.id }
-        expect(assigns(:show_recent_feedback)).to be_falsey
+        it "works for feed view" do
+          @course1.default_view = "feed"
+          @course1.save
+          get "show", params: { id: @course1.id }
+          expect(assigns(:recent_feedback).count).to eq 1
+          expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
+        end
+
+        it "only shows recent feedback if user is student in specified course" do
+          course_with_teacher(active_all: true, user: @student)
+          @course3 = @course
+          get "show", params: { id: @course3.id }
+          expect(assigns(:show_recent_feedback)).to be_falsey
+        end
       end
     end
 

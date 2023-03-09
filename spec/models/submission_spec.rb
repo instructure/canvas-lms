@@ -4066,6 +4066,32 @@ describe Submission do
     end
   end
 
+  describe "scope: not_submitted_or_graded" do
+    before do
+      @assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      @submission = @assignment.submissions.find_by(user: @student)
+    end
+
+    it "includes submissions where the student has not submitted and has not been graded" do
+      expect(Submission.not_submitted_or_graded).to include @submission
+    end
+
+    it "excludes submissions where the student has submitted" do
+      @assignment.submit_homework(@student, body: "hi")
+      expect(Submission.not_submitted_or_graded).not_to include @submission
+    end
+
+    it "excludes submissions where the student has been graded" do
+      @assignment.grade_student(@student, grader: @teacher, grade: 10)
+      expect(Submission.not_submitted_or_graded).not_to include @submission
+    end
+
+    it "excludes excused submissions" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect(Submission.not_submitted_or_graded).not_to include @submission
+    end
+  end
+
   describe "scope: postable" do
     subject(:submissions) { assignment.submissions.postable }
 

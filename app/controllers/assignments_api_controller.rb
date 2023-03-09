@@ -833,13 +833,14 @@ class AssignmentsApiController < ApplicationController
       include_params = Array(params[:include])
 
       if params[:bucket]
-        return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
-
-        users = current_user_and_observed(
-          include_observed: include_params.include?("observed_users")
-        )
-        submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
-        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
+        args = { assignments_scope: scope, user: @current_user, session: session, course: @context }
+        args[:requested_user] = user if @current_user != user
+        sorter = SortsAssignments.new(**args)
+        begin
+          scope = sorter.assignments(params[:bucket].to_sym)
+        rescue SortsAssignments::InvalidBucketError
+          return invalid_bucket_error
+        end
       end
 
       scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
@@ -877,7 +878,7 @@ class AssignmentsApiController < ApplicationController
         return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(",")}" }, status: :bad_request
       end
 
-      submissions = submissions_hash(include_params, assignments, submissions_for_user)
+      submissions = submissions_hash(include_params, assignments)
 
       include_all_dates = include_params.include?("all_dates")
       include_override_objects = include_params.include?("overrides") && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
