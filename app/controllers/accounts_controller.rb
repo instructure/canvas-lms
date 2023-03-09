@@ -1788,6 +1788,7 @@ class AccountsController < ApplicationController
                                    :turnitin_host, :turnitin_account_id,
                                    :users_can_edit_name, :users_can_edit_profile, :users_can_edit_comm_channels,
                                    { usage_rights_required: [:value, :locked] }.freeze,
+                                   { restrict_quantitative_data: [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,

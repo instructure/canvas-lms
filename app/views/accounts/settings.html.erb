@@ -292,6 +292,26 @@
                   <% end %>
                 <% end %>
 
+                <% unless !@account.feature_enabled?(:restrict_quantitative_data) %>
+                  <%= settings.fields_for :restrict_quantitative_data do |r| %>
+                    <% hash = @account.restrict_quantitative_data %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                        <%= r.label :value, t("Restrict view of quantitative data") %>
+                      </td>
+                    </tr>
+                    <% unless disabled %>
+                      <tr>
+                        <td colspan="2" class="sub_checkbox">
+                          <%= r.check_box :locked, :checked => hash[:locked] %>
+                          <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+
                 <%= settings.fields_for :lock_all_announcements do |r| %>
                   <% hash = @account.lock_all_announcements %>
                   <% disabled = hash[:locked] && hash[:inherited] %>

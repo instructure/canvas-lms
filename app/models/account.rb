@@ -260,6 +260,7 @@ class Account < ActiveRecord::Base
 
   add_setting :global_includes, root_only: true, boolean: true, default: false
   add_setting :sub_account_includes, boolean: true, default: false
+  add_setting :restrict_quantitative_data, boolean: true, default: false, inheritable: true
 
   # Microsoft Sync Account Settings
   add_setting :microsoft_sync_enabled, root_only: true, boolean: true, default: false
@@ -422,6 +423,10 @@ class Account < ActiveRecord::Base
 
   def usage_rights_required?
     usage_rights_required[:value]
+  end
+
+  def restrict_quantitative_data?
+    restrict_quantitative_data[:value]
   end
 
   def allow_global_includes?
