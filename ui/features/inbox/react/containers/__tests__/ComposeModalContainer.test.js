@@ -220,6 +220,16 @@ describe('ComposeModalContainer', () => {
       expect(selectOptions.length).toBeGreaterThan(0)
     })
 
+    it('removes enrollment duplicates that come from graphql', async () => {
+      const component = setup()
+
+      const select = await component.findByTestId('course-select')
+      fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
+
+      const selectOptions = await component.findAllByText('Flying The Blackbird')
+      expect(selectOptions.length).toBe(1)
+    })
+
     it('does not render All Courses option', async () => {
       const {findByTestId, queryByText} = setup()
       const courseDropdown = await findByTestId('course-select')

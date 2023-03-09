@@ -394,6 +394,20 @@ export const handlers = [
               assetString: 'course_198',
             }),
           }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '198',
+              contextName: 'Flying The Blackbird',
+              assetString: 'course_198',
+            }),
+          }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '198',
+              contextName: 'Flying The Blackbird',
+              assetString: 'course_198',
+            }),
+          }),
         ],
         __typename: 'User',
       },

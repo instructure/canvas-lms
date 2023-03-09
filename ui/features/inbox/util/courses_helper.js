@@ -20,10 +20,10 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
   if (!enrollments || !favoriteCourses) {
     return []
   }
-  return enrollments
+  const coursesWithoutFavorites = enrollments
     .map(c => {
       return {
-        id: c.course.id,
+        id: c.course._id,
         contextName: c.course.contextName,
         assetString: c.course.assetString,
       }
@@ -38,4 +38,13 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
       }
       return !isMatch
     })
+
+  const uniqCourses = {}
+  coursesWithoutFavorites.forEach(course => {
+    if (!(course.assetString in uniqCourses)) {
+      uniqCourses[course.assetString] = course
+    }
+  })
+
+  return Object.keys(uniqCourses).map(assetString => uniqCourses[assetString])
 }
