@@ -71,7 +71,10 @@ export const GroupNavigationSelector = props => {
     setIsShowingOptions(false)
     const path = window.location.pathname.split('/')
     path[2] = id
-    window.location = path.join('/')
+
+    // we don't want anything after index 4 (i.e. a specific discussion or announcement)
+    const newPath = path.length >= 5 ? path.slice(0, 4) : path
+    window.location = newPath.join('/')
   }
 
   return (
@@ -91,6 +94,7 @@ export const GroupNavigationSelector = props => {
         {props.options.map(option => {
           return (
             <Select.Option
+              data-testid={`group-id-${option.id}`}
               id={option.id}
               key={option.id}
               isHighlighted={option.id === highlightedOptionId}
