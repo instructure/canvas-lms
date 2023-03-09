@@ -33,6 +33,7 @@
     'duplicate' => "<i class='icon-copy-course'></i>".html_safe,
     'copy_to' => "<i class='icon-duplicate'></i>".html_safe,
     'send_to' => "<i class='icon-user'></i>".html_safe,
+    'speed_grader' => "<i class='icon-speed-grader'></i>".html_safe,
   }
 
   menu_type_to_class = {
@@ -239,69 +240,143 @@
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('Manage %{item_name}', {item_name: module_item && module_item.title ? module_item.title : 'item'})  %></span>
           </a>
-
-          <ul class="al-options">
-            <% if @can_edit || module_item.nil? %>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
-              <li role="presentation">
-                <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
-                  aria-label="<%= t('Move this item') %>"
-                  class="move_module_item_link icon-updown"
-                  title="<%= t('Move this item') %>"
-                ><%= t("Move to...") %></a>
-              </li>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
-            <%end%>
-            <% if @can_add || module_item.nil? %>
-              <% if module_item && module_item.quiz_lti && module_item_new_quizzes_build_button_enabled? %>
-                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>?build=true" title="<%= t('Build quiz') %>"><%= @module_item_image_tags['quiz'] %> <%= t('Build') %></a></li>
+          <% if Account.site_admin.feature_enabled?(:additional_speedgrader_links) %>
+            <ul class="al-options">
+              <% if @can_edit || module_item.nil? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
+              <% end %>
+              <% if @can_add || module_item.nil? %>
+                <% if module_item && module_item.quiz_lti && module_item_new_quizzes_build_button_enabled? %>
+                  <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>?build=true" title="<%= t('Build quiz') %>"><%= @module_item_image_tags['quiz'] %> <%= t('Build') %></a></li>
+                <%end%>
+              <% end %>
+              <% if @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)%>
+                <% speed_grader_id = module_item ? "#{module_item.content_type_class}-#{module_item.content_id}" : "blank" %>
+                <li id="<%="speed-grader-container-#{speed_grader_id}"%>" role='presentation' class="speed-grader-link-container <%= item_data[:published_status] == 'published' ? '' : 'hidden' %>">
+                  <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
+                </li>
+              <% end %>
+              <% if @can_add || module_item.nil? %>
+                <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
+              <% end %>
+              <% if @can_delete || module_item.nil? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+              <% end %>
+              <% if @can_edit || module_item.nil? %>
+                <li role="presentation">
+                  <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    aria-label="<%= t('Move this item') %>"
+                    class="move_module_item_link icon-updown"
+                    title="<%= t('Move this item') %>"
+                  ><%= t("Move to...") %></a>
+                </li>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
               <%end%>
-              <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
-            <%end%>
-            <% if @can_delete || module_item.nil? %>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
-            <% end %>
-            <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
-              <li role="presentation">
-                <a
-                  href="#"
-                  class="module_item_send_to"
-                  data-content-id="<%= module_item&.content_id.to_s %>"
-                  data-content-type="<%= module_item&.direct_share_type %>"
-                  title="<%= t("Send this module item to another user...") %>"
-                  aria-label="<%= t("Send this module item to another user...") %>"
-                  ><%= @module_item_image_tags['send_to'] %> <%= t('Send To...') %>
-                </a>
-              </li>
-              <li role="presentation">
-                <a
-                  href="#"
-                  class="module_item_copy_to"
-                  data-select-id="<%= module_item&.content_id.to_s %>"
-                  data-select-class="<%= module_item&.direct_share_select_class %>"
-                  title="<%= t('Copy this module item to a course...') %>"
-                  aria-label="<%= t('Copy this module item to a course...') %>"
-                  ><%= @module_item_image_tags['copy_to'] %> <%= t('Copy To...') %>
-                </a>
-              </li>
-            <% end %>
-            <% if @can_view || module_item.nil? %>
-              <% menu_type_to_class.each do |menu_type, content_class| %>
-                <% if !module_item || module_item.content.is_a?(content_class) %>
-                  <%
-                    launch_options = {}
-                    if menu_type == :file_menu
-                      launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
-                    else
-                      launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
-                    end
-                  %>
-                  <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+              <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
+                <li role="presentation">
+                  <a
+                    href="#"
+                    class="module_item_send_to"
+                    data-content-id="<%= module_item&.content_id.to_s %>"
+                    data-content-type="<%= module_item&.direct_share_type %>"
+                    title="<%= t("Send this module item to another user...") %>"
+                    aria-label="<%= t("Send this module item to another user...") %>"
+                    ><%= @module_item_image_tags['send_to'] %> <%= t('Send To...') %>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a
+                    href="#"
+                    class="module_item_copy_to"
+                    data-select-id="<%= module_item&.content_id.to_s %>"
+                    data-select-class="<%= module_item&.direct_share_select_class %>"
+                    title="<%= t('Copy this module item to a course...') %>"
+                    aria-label="<%= t('Copy this module item to a course...') %>"
+                    ><%= @module_item_image_tags['copy_to'] %> <%= t('Copy To...') %>
+                  </a>
+                </li>
+              <% end %>
+              <% if @can_view || module_item.nil? %>
+                <% menu_type_to_class.each do |menu_type, content_class| %>
+                  <% if !module_item || module_item.content.is_a?(content_class) %>
+                    <%
+                      launch_options = {}
+                      if menu_type == :file_menu
+                        launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
+                      else
+                        launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
+                      end
+                    %>
+                    <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+                  <% end %>
                 <% end %>
               <% end %>
-            <% end %>
-          </ul>
+            </ul>
+          <% else %>
+            <ul class="al-options">
+              <% if @can_edit || module_item.nil? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
+                <li role="presentation">
+                  <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    aria-label="<%= t('Move this item') %>"
+                    class="move_module_item_link icon-updown"
+                    title="<%= t('Move this item') %>"
+                  ><%= t("Move to...") %></a>
+                </li>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+              <%end%>
+              <% if @can_add || module_item.nil? %>
+                <% if module_item && module_item.quiz_lti && module_item_new_quizzes_build_button_enabled? %>
+                  <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>?build=true" title="<%= t('Build quiz') %>"><%= @module_item_image_tags['quiz'] %> <%= t('Build') %></a></li>
+                <%end%>
+                <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
+              <%end%>
+              <% if @can_delete || module_item.nil? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+              <% end %>
+              <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
+                <li role="presentation">
+                  <a
+                    href="#"
+                    class="module_item_send_to"
+                    data-content-id="<%= module_item&.content_id.to_s %>"
+                    data-content-type="<%= module_item&.direct_share_type %>"
+                    title="<%= t("Send this module item to another user...") %>"
+                    aria-label="<%= t("Send this module item to another user...") %>"
+                    ><%= @module_item_image_tags['send_to'] %> <%= t('Send To...') %>
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a
+                    href="#"
+                    class="module_item_copy_to"
+                    data-select-id="<%= module_item&.content_id.to_s %>"
+                    data-select-class="<%= module_item&.direct_share_select_class %>"
+                    title="<%= t('Copy this module item to a course...') %>"
+                    aria-label="<%= t('Copy this module item to a course...') %>"
+                    ><%= @module_item_image_tags['copy_to'] %> <%= t('Copy To...') %>
+                  </a>
+                </li>
+              <% end %>
+              <% if @can_view || module_item.nil? %>
+                <% menu_type_to_class.each do |menu_type, content_class| %>
+                  <% if !module_item || module_item.content.is_a?(content_class) %>
+                    <%
+                      launch_options = {}
+                      if menu_type == :file_menu
+                        launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
+                      else
+                        launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
+                      end
+                    %>
+                    <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </ul>
+          <% end %>
         </div>
       </div>
     <% end %>
