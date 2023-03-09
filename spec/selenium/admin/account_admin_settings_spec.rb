@@ -53,6 +53,36 @@ describe "root account basic settings" do
     expect(Account.default.reload.settings[:kill_joy]).to eq true
   end
 
+  context "with restrict_quantitative_data" do
+    before :once do
+      account.enable_feature!(:restrict_quantitative_data)
+    end
+
+    it "lets admins enable restrict_quantitative_data on root account settings", ignore_js_errors: true do
+      account.settings[:restrict_quantitative_data] = { value: false, locked: false }
+      account.save!
+
+      user_session(@admin)
+      get account_settings_url
+      f("#account_settings_restrict_quantitative_data_value").click
+      submit_form("#account_settings")
+      wait_for_ajaximations
+      expect(Account.default.reload.settings[:restrict_quantitative_data][:value]).to eq true
+    end
+
+    it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
+      account.settings[:restrict_quantitative_data] = { value: false, locked: false }
+      account.save!
+
+      user_session(@admin)
+      get account_settings_url
+      f("#account_settings_restrict_quantitative_data_locked").click
+      submit_form("#account_settings")
+      wait_for_ajaximations
+      expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to eq true
+    end
+  end
+
   context "editing slack API key" do
     before :once do
       account_admin_user(account: Account.site_admin)
