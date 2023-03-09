@@ -1,4 +1,4 @@
-# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
+# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
 
 FROM starlord.inscloudgate.net/jenkins/core:focal
 SHELL ["/usr/bin/bash", "-c"]
