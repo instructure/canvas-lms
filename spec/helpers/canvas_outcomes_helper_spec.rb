@@ -462,6 +462,20 @@ describe CanvasOutcomesHelper do
               stub_get_lmgb_results("associated_asset_id_list=1,2,3,4&associated_asset_type=assign.type&external_outcome_id_list=1,2,3,4&user_uuid_list=#{one_user_uuid}&per_page=200&page=2").to_return(status: 200, body: '{"results":[{"result_200":"stuff200"}]}', headers: { "Per-Page" => 200, "Total" => 201 })
               expect(subject.get_lmgb_results(@course, "1,2,3,4", "assign.type", "1,2,3,4", one_user_uuid)).to eq get_results(201)
             end
+
+            it "there are authoritative results" do
+              a = new_quizzes_assignment(course: @course, title: "New Quiz")
+              outcome = outcome_model(context: @course)
+              stub_get_lmgb_results("associated_asset_id_list=#{a.id}&associated_asset_type=canvas.assignment.quizzes&external_outcome_id_list=#{outcome.id}&per_page=1&page=1").to_return(status: 200, body: get_response(1), headers: { "Per-Page" => 1, "Total" => 201 })
+              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to eq true
+            end
+
+            it "there are no authoritative results" do
+              a = new_quizzes_assignment(course: @course, title: "New Quiz")
+              outcome = outcome_model(context: @course)
+              stub_get_lmgb_results("associated_asset_id_list=#{a.id}&associated_asset_type=canvas.assignment.quizzes&external_outcome_id_list=#{outcome.id}&per_page=1&page=1").to_return(status: 200, body: '{"results":[]}', headers: { "Per-Page" => 1, "Total" => 0 })
+              expect(subject.outcome_has_authoritative_results?(outcome, @course)).to eq false
+            end
           end
         end
 

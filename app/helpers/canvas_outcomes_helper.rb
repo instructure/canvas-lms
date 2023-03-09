@@ -88,57 +88,83 @@ module CanvasOutcomesHelper
     total_pages = 1
     all_results = []
     loop do
-      pagination_params = {
-        per_page: per_page,
-        page: page_num
-      }
-
-      retry_count = 0
-      params = params.merge(pagination_params)
-      begin
-        response = CanvasHttp.get(
-          build_request_url(protocol, domain, endpoint, params),
-          {
-            "Authorization" => jwt
-          }
-        )
-      rescue
-        retry_count += 1
-        retry if retry_count < MAX_RETRIES
-        raise OSFetchError, "Failed to fetch results for context #{context.id} #{params}"
-      end
-
-      if /^2/.match?(response.code.to_s)
-        per_page = response.header["Per-Page"].to_i
-        total_pages = (response.header["Total"].to_f / per_page).ceil
-        begin
-          results = JSON.parse(response.body).deep_symbolize_keys[:results]
-          break if results.empty?
-
-          results.each do |result|
-            next if result[:attempts].nil?
-
-            result[:attempts].each do |attempt|
-              # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
-              # to parse the result returned from outcome service
-              next unless attempt[:metadata].is_a? String
-
-              attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
-              attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
-            end
-          end
-          all_results.concat(results)
-        rescue
-          raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
-        end
-      else
-        raise OSFetchError, "Error retrieving results from Outcomes Service: #{response.body}"
-      end
+      results, total_pages = get_request_page(context, domain, endpoint, jwt, params, page_num, per_page).values_at(:results, :total_pages)
+      all_results.concat(results)
       break if page_num >= total_pages
 
       page_num += 1
     end
     all_results
+  end
+
+  def get_request_page(context, domain, endpoint, jwt, params, page_num, per_page = 200)
+    retry_count = 0
+    pagination_params = {
+      per_page: per_page,
+      page: page_num
+    }
+    params = params.merge(pagination_params)
+
+    begin
+      response = CanvasHttp.get(
+        build_request_url(protocol, domain, endpoint, params),
+        {
+          "Authorization" => jwt
+        }
+      )
+    rescue
+      retry_count += 1
+      retry if retry_count < MAX_RETRIES
+      raise OSFetchError, "Failed to fetch results for context #{context.id} #{params}"
+    end
+
+    if /^2/.match?(response.code.to_s)
+      per_page = response.header["Per-Page"].to_i
+      total_pages = (response.header["Total"].to_f / per_page).ceil
+      begin
+        results = JSON.parse(response.body).deep_symbolize_keys[:results]
+        results.each do |result|
+          next if result[:attempts].nil?
+
+          result[:attempts].each do |attempt|
+            # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
+            # to parse the result returned from outcome service
+            next unless attempt[:metadata].is_a? String
+
+            attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
+            attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
+          end
+        end
+        { results: results, total_pages: total_pages }
+      rescue
+        raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
+      end
+    else
+      raise OSFetchError, "Error retrieving results from Outcomes Service: #{response.body}"
+    end
+  end
+
+  def outcome_has_authoritative_results?(outcome, context)
+    assignments = Assignment.active.where(context: context).quiz_lti
+
+    return false if assignments.blank?
+
+    assignment_ids = assignments.pluck(:id).join(",")
+    assignment_type = "canvas.assignment.quizzes"
+    params = {
+      associated_asset_id_list: assignment_ids,
+      associated_asset_type: assignment_type,
+      external_outcome_id_list: outcome.id,
+    }
+    domain, jwt = extract_domain_jwt(
+      context.root_account,
+      "lmgb_results.show",
+      **params
+    )
+
+    return true if get_request_page(context, domain, "api/authoritative_results", jwt, params, 1, 1)[:results].count > 0
+
+    false
   end
 
   def set_outcomes_alignment_js_env(artifact, context, props)
