@@ -556,6 +556,26 @@ pipeline {
                   }
                 }
 
+                extendedStage('ARM64 Builder')
+                  .hooks(buildSummaryReportHooks.call())
+                  .nodeRequirements(label: 'docker-arm64')
+                  .required(configuration.isChangeMerged())
+                  .queue(rootStages) {
+                    setupStage()
+                    // Rebase is fortunately not needed - since this only runs in post-merge
+                    buildDockerImageStage.patchsetImage('', '-arm64')
+
+                    // Wait for the AMD64 manifest to be available - then augment it with this ARM64 one
+                    sh """#!/bin/bash -ex
+                    while ! docker manifest inspect $PATCHSET_TAG; do
+                      sleep 10
+                    done
+
+                    docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+                    docker manifest push $PATCHSET_TAG
+                    """
+                  }
+
                 extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   def nestedStages = [:]
 
