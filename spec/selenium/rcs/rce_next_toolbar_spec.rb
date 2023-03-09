@@ -396,8 +396,6 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       end
 
       it "redirects focus in the equation editor" do
-        skip("MAT-1248")
-
         def active_element
           driver.execute_script("return document.activeElement") # rubocop:disable Specs/NoExecuteScript
         end
