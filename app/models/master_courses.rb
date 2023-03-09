@@ -30,7 +30,7 @@ module MasterCourses
   ].freeze
 
   CONTENT_TYPES_FOR_DELETIONS = (ALLOWED_CONTENT_TYPES - ["Wiki"]).freeze
-  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["ContentTag", "Wiki"] + ["Folder"]).freeze
+  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["Wiki"] + ["Folder"]).freeze
 
   MIGRATION_ID_PREFIX = "mastercourse_"
 
