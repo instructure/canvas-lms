@@ -211,11 +211,11 @@ function hasPoints(key, data) {
 }
 function windowResize() {
   const $frame = $('#preview_frame')
-  const top = $frame.offset().top
-  const height = $(window).height() - top
+  const margin_top = 20
+  const height = window.screen.height - margin_top
   $frame.height(height)
   $('#rubric_holder').css({maxHeight: height - 50, overflow: 'auto', zIndex: 5})
-  $('.comments').height(height)
+  $('.comments').css({maxHeight: height})
 }
 
 function insertEmoji(emoji) {
