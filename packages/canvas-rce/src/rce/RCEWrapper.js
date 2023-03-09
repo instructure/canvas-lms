@@ -66,6 +66,7 @@ import {
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
+import {determineOSDependentKey} from './userOS'
 
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
@@ -1077,7 +1078,9 @@ class RCEWrapper extends React.Component {
     if (this.iframe) {
       this.iframe.setAttribute(
         'title',
-        formatMessage('Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.')
+        formatMessage('Rich Text Area. Press {OSKey}+F8 for Rich Content Editor shortcuts.', {
+          OSKey: determineOSDependentKey(),
+        })
       )
     }
 
