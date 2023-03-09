@@ -319,6 +319,9 @@
   "hide_title_description_caf092ef": {
     "message": "Hide { title } description"
   },
+  "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+    "message": "Highlight an element to activate the element options toolbar"
+  },
   "home_351838cd": { "message": "Home" },
   "html_code_editor_fd967a44": { "message": "html code editor" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
@@ -619,6 +622,7 @@
   "selected_linkfilename_c093b1f2": { "message": "Selected { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Set Minus" },
   "sharp_music_ab956814": { "message": "Sharp (Music)" },
+  "shift_arrows_4d5785fe": { "message": "SHIFT+Arrows" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O to open the pretty html editor."
   },
