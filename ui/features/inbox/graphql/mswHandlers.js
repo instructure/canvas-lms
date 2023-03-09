@@ -185,7 +185,7 @@ export const handlers = [
             _id: '2697',
             id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjk3',
             createdAt: '2021-03-16T12:09:23-06:00',
-            body: 'this is a message for the inbox',
+            body: 'this is a message for the inbox that is longer than the 90 characters that should be the max text length before truncation',
             author: User.mock({_id: '1', name: 'Charles Xavier'}),
             recipients: [User.mock({_id: '1', name: 'Charels Xavier'})],
           }),

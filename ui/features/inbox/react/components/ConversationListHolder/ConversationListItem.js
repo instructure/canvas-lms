@@ -33,7 +33,6 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState, useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
@@ -44,9 +43,15 @@ const I18n = useI18nScope('conversations_2')
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
   const {setMessageOpenEvent, isSubmissionCommentsType} = useContext(ConversationContext)
-  // The TruncateText Component doesn't perform well with more than a few paragraphs of words.
-  // This text length keeps the component working fast
-  const MAX_TEXT_LENGTH = 180
+
+  // The Instui TruncateText component doesn't work well. it causes major Performance issues
+  const truncateText = text => {
+    if (text.length > props.truncateSize) {
+      return text.slice(0, props.truncateSize) + '...'
+    } else {
+      return text
+    }
+  }
 
   const handleConversationClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -185,7 +190,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text weight="bold" size={props.textSize}>
-                    <TruncateText>{props.conversation.participantString}</TruncateText>
+                    {truncateText(props.conversation.participantString)}
                   </Text>
                 </Grid.Col>
               </Grid.Row>
@@ -195,9 +200,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text weight="normal" size={props.textSize}>
-                    <TruncateText>
-                      {props.conversation.subject?.slice(0, MAX_TEXT_LENGTH)}
-                    </TruncateText>
+                    {truncateText(props.conversation.subject)}
                   </Text>
                 </Grid.Col>
               </Grid.Row>
@@ -206,10 +209,8 @@ export const ConversationListItem = ({...props}) => {
                   <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
                 </Grid.Col>
                 <Grid.Col>
-                  <Text color="secondary" size={props.textSize}>
-                    <TruncateText>
-                      {props.conversation.lastMessageContent?.slice(0, MAX_TEXT_LENGTH)}
-                    </TruncateText>
+                  <Text color="secondary" size={props.textSize} data-testid="last-message-content">
+                    {truncateText(props.conversation.lastMessageContent)}
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
@@ -272,6 +273,7 @@ export const ConversationListItem = ({...props}) => {
     isSubmissionCommentsType,
     props.conversation._id,
     props.isLast,
+    props.truncateSize,
   ])
 }
 
@@ -286,4 +288,5 @@ ConversationListItem.propTypes = {
   onMarkAsRead: PropTypes.func,
   onMarkAsUnread: PropTypes.func,
   textSize: PropTypes.string,
+  truncateSize: PropTypes.number,
 }
