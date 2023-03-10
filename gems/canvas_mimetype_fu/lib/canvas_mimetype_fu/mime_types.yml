@@ -255,6 +255,7 @@ karbon: application/x-karbon
 kcm: application/vnd.nervana
 kdc: image/x-kodak-kdc
 kdelnk: application/x-desktop
+key: application/vnd.apple.keynote
 kfo: application/x-kformula
 kia: application/vnd.kidspiration
 kil: application/x-killustrator
@@ -367,6 +368,7 @@ nim: video/vnd.nokia.interleaved-multimedia
 not: text/x-mup
 nsc: application/x-netshow-channel
 nsv: video/x-nsv
+numbers: application/vnd.apple.numbers
 o: application/x-object
 obj: application/x-tgif
 ocl: text/x-ocl
@@ -406,6 +408,7 @@ p12: application/x-pkcs12
 p7c: application/pkcs7-mime
 p7m: application/pkcs7-mime
 p7s: application/pkcs7-signature
+pages: application/vnd.apple.pages
 pak: application/x-pak
 par2: application/x-par2
 pas: text/x-pascal

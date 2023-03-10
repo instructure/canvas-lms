@@ -22,6 +22,8 @@ import {
   isVideo,
   isAudio,
   isText,
+  isIWork,
+  getIWorkType,
   mediaPlayerURLFromFile,
 } from '../fileTypeUtils'
 
@@ -63,6 +65,48 @@ describe('fileTypeUtils', () => {
     it('detects text types', () => {
       expect(isText('text')).toBe(true)
       expect(isText('text/html')).toBe(true)
+    })
+  })
+
+  describe('isIWork', () => {
+    it('detects all iWork types', () => {
+      expect(isIWork('test.pages')).toBe(true)
+      expect(isIWork('test.key')).toBe(true)
+      expect(isIWork('test.numbers')).toBe(true)
+    })
+
+    it('does not match on non iWork file names', () => {
+      expect(isIWork('bad.pages.test')).toBe(false)
+      expect(isIWork('nota.keyfile')).toBe(false)
+      expect(isIWork('.numbersisnotthisfiletype')).toBe(false)
+    })
+
+    it('ignores case', () => {
+      expect(isIWork('TEST.PAGES')).toBe(true)
+      expect(isIWork('TEST.KEY')).toBe(true)
+      expect(isIWork('TEST.NUMBERS')).toBe(true)
+    })
+  })
+
+  describe('getIWorkType', () => {
+    it('returns the proper type for iWork files', () => {
+      expect(getIWorkType('test.pages')).toEqual('application/vnd.apple.pages')
+      expect(getIWorkType('test.key')).toEqual('application/vnd.apple.keynote')
+      expect(getIWorkType('test.numbers')).toEqual('application/vnd.apple.numbers')
+    })
+
+    it('ignores case', () => {
+      expect(getIWorkType('TEST.PAGES')).toEqual('application/vnd.apple.pages')
+      expect(getIWorkType('TEST.KEY')).toEqual('application/vnd.apple.keynote')
+      expect(getIWorkType('TEST.NUMBERS')).toEqual('application/vnd.apple.numbers')
+    })
+
+    it('returns empty string if there is no extension in filename', () => {
+      expect(getIWorkType('badfilename')).toEqual('')
+    })
+
+    it('returns empty string if the extension is not iWork', () => {
+      expect(getIWorkType('test.txt')).toEqual('')
     })
   })
 

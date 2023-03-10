@@ -48,7 +48,14 @@ import {
 } from '@instructure/canvas-media'
 
 import formatMessage from '../../../../format-message'
-import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
+import {
+  getIconFromType,
+  isAudioOrVideo,
+  isImage,
+  isText,
+  isIWork,
+  getIWorkType,
+} from '../fileTypeUtils'
 
 function isPreviewableAudioOrVideo(type) {
   return isPreviewable(type) && isAudioOrVideo(type)
@@ -80,7 +87,12 @@ function readFile(theFile) {
       const sources = [{label: theFile.name, src: URL.createObjectURL(theFile), type: theFile.type}]
       resolve(sources)
     } else {
-      const icon = getIconFromType(theFile.type)
+      let type = theFile.type
+      // Native JS File API returns empty string if it can't determine the type
+      if (type === '' && isIWork(theFile.name)) {
+        type = getIWorkType(theFile.name)
+      }
+      const icon = getIconFromType(type)
       resolve(icon)
     }
   })

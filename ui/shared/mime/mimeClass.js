@@ -67,6 +67,7 @@ const mimeClasses = {
       'application/rtf',
       'application/vnd.oasis.opendocument.text',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.apple.pages',
     ],
   },
   flash: {
@@ -94,6 +95,7 @@ const mimeClasses = {
     mimeTypes: [
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       'application/vnd.ms-powerpoint',
+      'application/vnd.apple.keynote',
     ],
   },
   pdf: {
@@ -134,6 +136,7 @@ const mimeClasses = {
       'text/csv',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
+      'application/vnd.apple.numbers',
     ],
   },
   zip: {
