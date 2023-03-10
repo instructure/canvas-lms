@@ -1299,6 +1299,14 @@ describe ContextExternalTool do
       tools
     end
 
+    context "when preferred_tool_id contains a sql injection" do
+      let(:preferred_tool_id) { "123\npsql syntax error" }
+
+      it "does not raise an error" do
+        expect { subject }.not_to raise_error
+      end
+    end
+
     context "when tool is deleted" do
       before do
         tool1.destroy
