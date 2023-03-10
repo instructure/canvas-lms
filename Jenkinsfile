@@ -621,13 +621,6 @@ pipeline {
                 extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   def nestedStages = [:]
 
-                  extendedStage('CDC Schema Check')
-                    .hooks(buildSummaryReportHooks.call())
-                    .required(filesChangedStage.hasMigrationFiles(buildConfig))
-                    .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
-                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                    ])
-
                   extendedStage('Contract Tests')
                     .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
