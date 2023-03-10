@@ -24,6 +24,7 @@ import ProgressBar from '@canvas/progress/react/components/ProgressBar'
 import mimeClass from '@canvas/mime/mimeClass'
 import UploadQueue from '../modules/UploadQueue'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {isIWork, getIWorkType} from '@instructure/canvas-rce/es/rce/plugins/shared/fileTypeUtils'
 
 const I18n = useI18nScope('files_upload_progress')
 
@@ -92,6 +93,16 @@ class UploadProgress extends React.Component {
     this.setState({messages: {}, progress: 0})
   }
 
+  getFileType() {
+    let type = this.props.uploader.getFileType()
+    const name = this.props.uploader.getFileName()
+    // Native JS File API returns empty string if it can't determine the type
+    if (type === '' && isIWork(name)) {
+      type = getIWorkType(name)
+    }
+    return type
+  }
+
   renderProgressBar() {
     if (this.props.uploader.error) {
       const errorMessage = this.props.uploader.error.message
@@ -131,9 +142,7 @@ class UploadProgress extends React.Component {
         <div className="col-xs-6">
           <div className="media ellipsis">
             <span className="pull-left">
-              <i
-                className={`media-object mimeClass-${mimeClass(this.props.uploader.getFileType())}`}
-              />
+              <i className={`media-object mimeClass-${mimeClass(this.getFileType())}`} />
             </span>
             <span className="media-body">{this.props.uploader.getFileName()}</span>
           </div>

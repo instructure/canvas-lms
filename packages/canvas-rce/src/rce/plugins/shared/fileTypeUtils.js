@@ -36,14 +36,17 @@ export function getIconFromType(type) {
   }
   switch (type) {
     case 'application/msword':
+    case 'application/vnd.apple.pages':
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
       return IconMsWordLine
     case 'application/vnd.ms-powerpoint':
+    case 'application/vnd.apple.keynote':
     case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
       return IconMsPptLine
     case 'application/pdf':
       return IconPdfLine
     case 'application/vnd.ms-excel':
+    case 'application/vnd.apple.numbers':
     case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
       return IconMsExcelLine
     default:
@@ -69,6 +72,26 @@ export function isAudio(type) {
 
 export function isText(type) {
   return /^text/.test(type)
+}
+
+export function isIWork(filename) {
+  return [/.pages$/i, /.key$/i, /.numbers$/i].some(regex => regex.test(filename))
+}
+
+export function getIWorkType(filename) {
+  const tokens = filename.split('.')
+  if (tokens.length <= 1) return ''
+  const lastToken = tokens[tokens.length - 1]
+  switch (lastToken.toLowerCase()) {
+    case 'pages':
+      return 'application/vnd.apple.pages'
+    case 'key':
+      return 'application/vnd.apple.keynote'
+    case 'numbers':
+      return 'application/vnd.apple.numbers'
+    default:
+      return ''
+  }
 }
 
 export function mediaPlayerURLFromFile(file, canvasOrigin) {
