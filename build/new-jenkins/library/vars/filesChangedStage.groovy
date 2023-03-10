@@ -33,10 +33,6 @@ def hasGroovyFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('groovyFiles')
 }
 
-def hasMigrationFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('migrationFiles')
-}
-
 def hasSpecFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('specFiles')
 }
@@ -73,7 +69,6 @@ def preBuild(stageConfig) {
   stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
   stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
   stageConfig.value('graphqlFiles', git.changedFiles(['app/graphql'], 'HEAD^'))
-  stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
   stageConfig.value('addedOrDeletedSpecFiles', sh(script: 'git diff --name-only --diff-filter=AD HEAD^..HEAD | grep "_spec.rb"', returnStatus: true) == 0)
 
   dir(env.LOCAL_WORKDIR) {
