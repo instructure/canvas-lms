@@ -262,7 +262,7 @@ export type FilterType =
 export type Filter = {
   id: string
   type?: FilterType
-  value?: string
+  value?: string | null
   created_at: string
 }
 
