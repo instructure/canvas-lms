@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.6.15 - 2023-03-10
+
+### Changed
+
+- Fixed copy/paste from Microsoft Word into the RCE
+- Support enhanced copy/paste in a User (vs Course or Group) context
+- Fix double-pasting of plain text
+- Fix access permissions for links to course files in the RCE, primarily in support of inline preview within new quizzes
+- When the canvas JWT expires the RCE calls Canvas to refresh it. The refreshed JWT is now saved so we don't re-refrseh with every api request.
+- Updated keyboard shortcuts dialog and removed the Alt-0 shortcut that opens it
+- Limit mathjax delimiters to `\(...\)` and `$$...$$`
+
+### Added
+
+- Moved code supporting LTI tools embedded in the RCE from Canvas to the canvas-rce repo
+
 ## 5.6.14 - 2023-02-03
 
 ### Changed
