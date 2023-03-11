@@ -124,15 +124,15 @@ export default function FilterNav({
       name: I18n.t('Sections'),
       parentId: 'savedFilterPresets',
       isSelected: appliedFilters.some(c => c.type === 'section'),
-      items: sections.map(a => ({
-        id: a.id,
-        name: a.name,
-        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
+      items: sections.map(s => ({
+        id: s.id,
+        name: s.name,
+        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
         onToggle: () => {
           const filter: Filter = {
             id: uuid.v4(),
             type: 'section',
-            value: a.id,
+            value: s.id,
             created_at: new Date().toISOString(),
           }
           toggleFilter(filter)

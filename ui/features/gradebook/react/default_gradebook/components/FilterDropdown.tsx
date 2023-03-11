@@ -100,7 +100,7 @@ const FilterDropdown = ({
         <View margin="0 small 0 0">
           <IconArrowOpenStartLine />
         </View>
-        <TruncateText>{I18n.t('Back')}</TruncateText>
+        {I18n.t('Back')}
       </Flex>
     </MenuItem>
   )
@@ -141,7 +141,7 @@ const FilterDropdown = ({
                 {items.map(a => {
                   return (
                     <MenuItem key={a.id} as="div">
-                      <TruncateText>{a.name}</TruncateText>
+                      <TruncateText position="middle">{a.name}</TruncateText>
                     </MenuItem>
                   )
                 })}
@@ -177,7 +177,7 @@ const FilterDropdown = ({
                     selected={item.isSelected}
                   >
                     <Flex as="div" justifyItems="space-between">
-                      <TruncateText>{item.name}</TruncateText>
+                      <TruncateText position="middle">{item.name}</TruncateText>
                       {((item.items?.length || 0) > 0 || (item.itemGroups?.length || 0) > 0) && (
                         <View margin="0 0 0 small">
                           <IconArrowOpenEndLine />
@@ -228,7 +228,7 @@ const FilterDropdown = ({
                       return (
                         <MenuItem key={item.id} as="div">
                           <Flex as="div" justifyItems="space-between">
-                            <TruncateText>{item.name}</TruncateText>
+                            <TruncateText position="middle">{item.name}</TruncateText>
                           </Flex>
                         </MenuItem>
                       )
