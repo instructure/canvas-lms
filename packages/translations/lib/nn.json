@@ -29,6 +29,9 @@
     "add_to_do_7def3c37": {
         "message": "Legg til gjeremål"
     },
+    "additional_considerations_f3801683": {
+        "message": "Ekstra omsyn"
+    },
     "address_3159962f": {
         "message": "Adresse:"
     },
@@ -484,6 +487,9 @@
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Dekortativt ikon"
+    },
+    "decorative_image_fde98579": {
+        "message": "Dekorativt bilde"
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativt { TYPE_UPPER }"
@@ -1430,6 +1436,9 @@
     "new_opportunities_7d349c4d": {
         "message": "Nye val"
     },
+    "next_40e12421": {
+        "message": "Neste"
+    },
     "next_month_749b1778": {
         "message": "Neste månad"
     },
@@ -1687,6 +1696,9 @@
     },
     "preformatted_d0670862": {
         "message": "Førehandsformatert"
+    },
+    "prev_f82cbc48": {
+        "message": "Førre"
     },
     "preview_53003fd2": {
         "message": "Førehandsvising"
