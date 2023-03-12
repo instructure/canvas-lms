@@ -29,6 +29,9 @@
     "add_to_do_7def3c37": {
         "message": "Teendő hozzáadása"
     },
+    "additional_considerations_f3801683": {
+        "message": "További szempontok"
+    },
     "address_3159962f": {
         "message": "Cím:"
     },
@@ -1430,6 +1433,9 @@
     "new_opportunities_7d349c4d": {
         "message": "Új lehetőségek"
     },
+    "next_40e12421": {
+        "message": "Következő"
+    },
     "next_month_749b1778": {
         "message": "Következő hónap"
     },
@@ -1687,6 +1693,9 @@
     },
     "preformatted_d0670862": {
         "message": "Előre formázott"
+    },
+    "prev_f82cbc48": {
+        "message": "Előző"
     },
     "preview_53003fd2": {
         "message": "Előnézet"
