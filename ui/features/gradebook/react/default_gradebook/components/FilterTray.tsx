@@ -57,6 +57,7 @@ export default function FilterTray({
   studentGroupCategories,
 }: FilterTrayProps) {
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
+  const stagedFilterPresetName = useStore(state => state.stagedFilterPresetName)
   const updateFilterPreset = useStore(state => state.updateFilterPreset)
   const deleteFilterPreset = useStore(state => state.deleteFilterPreset)
   const applyFilters = useStore(state => state.applyFilters)
@@ -124,7 +125,7 @@ export default function FilterTray({
             applyFilters={applyFilters}
             assignmentGroups={assignmentGroups}
             filterPreset={{
-              name: '',
+              name: stagedFilterPresetName,
               filters: appliedFilters,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
@@ -133,8 +134,15 @@ export default function FilterTray({
             gradingPeriods={gradingPeriods}
             modules={modules}
             onCreate={(filterPreset: PartialFilterPreset) => {
-              saveStagedFilter(filterPreset)
               setExpandedFilterPresetId(null)
+              return saveStagedFilter(filterPreset).then(success => {
+                if (success) {
+                  setExpandedFilterPresetId(null)
+                } else {
+                  setExpandedFilterPresetId('new')
+                }
+                return success
+              })
             }}
             onToggle={() =>
               setExpandedFilterPresetId(expandedFilterPresetId === 'new' ? null : 'new')
@@ -152,17 +160,27 @@ export default function FilterTray({
                 applyFilters={applyFilters}
                 assignmentGroups={assignmentGroups}
                 filterPreset={filterPreset}
-                isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
                 gradingPeriods={gradingPeriods}
+                isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
+                isExpanded={expandedFilterPresetId === filterPreset.id}
                 modules={modules}
-                onUpdate={updateFilterPreset}
                 onDelete={() => deleteFilterPreset(filterPreset)}
                 onToggle={() =>
                   setExpandedFilterPresetId(
                     expandedFilterPresetId === filterPreset.id ? null : filterPreset.id
                   )
                 }
-                isExpanded={expandedFilterPresetId === filterPreset.id}
+                onUpdate={updatedFilterPreset => {
+                  setExpandedFilterPresetId(null)
+                  return updateFilterPreset(updatedFilterPreset).then(success => {
+                    if (success) {
+                      setExpandedFilterPresetId(null)
+                    } else {
+                      setExpandedFilterPresetId(updatedFilterPreset.id)
+                    }
+                    return success
+                  })
+                }}
                 sections={sections}
                 studentGroupCategories={studentGroupCategories}
               />
