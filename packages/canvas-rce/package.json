@@ -88,6 +88,7 @@
     "@instructure/ui-flex": "^7",
     "@instructure/ui-focusable": "^7",
     "@instructure/ui-form-field": "^7",
+    "@instructure/ui-grid": "^7",
     "@instructure/ui-heading": "^7",
     "@instructure/ui-icons": "^7",
     "@instructure/ui-img": "^7",
@@ -141,6 +142,8 @@
     "moment-timezone": "^0.5.13",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
+    "react-aria-live": "^1.0.4",
+    "react-color": "^2.13.4",
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",
     "react-draggable": "^3.3.0",
     "react-redux": "^5",
@@ -150,9 +153,9 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^4.1.4",
     "text-field-edit": "^3.2.0",
-    "uri-js": "^4.2.2"
+    "uri-js": "^4.2.2",
+    "wcag-element-contrast": "^1.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -196,6 +199,7 @@
     "moxios": "^0.4",
     "nyc": "^13",
     "prettier": "^2.2.1",
+    "prevent-default": "^1.0.0",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
     "sinon": "^7",
