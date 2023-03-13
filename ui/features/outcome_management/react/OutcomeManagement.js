@@ -69,10 +69,8 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
   const contextValues = getContext(isMobileView)
-  const {accountLevelMasteryScalesFF, outcomeAlignmentSummaryFF, canManage, contextType} =
-    contextValues.env
-  const shouldDisplayAlignmentsTab =
-    improvedManagement && outcomeAlignmentSummaryFF && canManage && contextType === 'Course'
+  const {accountLevelMasteryScalesFF, canManage, contextType} = contextValues.env
+  const shouldDisplayAlignmentsTab = improvedManagement && canManage && contextType === 'Course'
   const alignmentTabIndex = accountLevelMasteryScalesFF ? 3 : 1
 
   const onSetImportRef = useCallback(node => {

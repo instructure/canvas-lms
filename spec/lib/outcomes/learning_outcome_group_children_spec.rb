@@ -185,7 +185,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
       subject { described_class.new(course) }
 
       before do
-        course.account.enable_feature!(:outcome_alignment_summary)
+        course.account.enable_feature!(:improved_outcomes_management)
         cg2.add_outcome o7
       end
 
@@ -204,7 +204,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         end
 
         it "returns the total outcomes without filtering if the FF is disabled" do
-          course.account.disable_feature!(:outcome_alignment_summary)
+          course.account.disable_feature!(:improved_outcomes_management)
           expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 3
           expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 3
         end
@@ -510,7 +510,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
       subject { described_class.new(course) }
 
       before do
-        course.account.enable_feature!(:outcome_alignment_summary)
+        course.account.enable_feature!(:improved_outcomes_management)
         o3.align(assignment_model, course)
         cg1.add_outcome o4
       end
@@ -534,7 +534,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       it "doesn't filter when the FF is disabled" do
-        course.account.disable_feature!(:outcome_alignment_summary)
+        course.account.disable_feature!(:improved_outcomes_management)
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
                           .map(&:learning_outcome_content).map(&:id)
         expect(outcomes).to eql([o3.id, o4.id, o8.id])

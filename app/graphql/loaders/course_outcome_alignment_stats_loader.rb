@@ -23,7 +23,7 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
 
   def perform(courses)
     courses.each do |course|
-      unless course_valid?(course) && outcome_alignment_summary_enabled?(course)
+      unless course_valid?(course) && improved_outcomes_management_enabled?(course)
         fulfill(course, nil) unless fulfilled?(course)
         return
       end

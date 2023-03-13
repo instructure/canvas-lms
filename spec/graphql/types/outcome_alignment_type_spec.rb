@@ -36,7 +36,7 @@ describe Types::OutcomeAlignmentType do
       assignment: @discussion
     )
     @module = @course.context_modules.create!(name: "module")
-    @course.account.enable_feature!(:outcome_alignment_summary)
+    @course.account.enable_feature!(:improved_outcomes_management)
   end
 
   let(:graphql_context) { { current_user: @admin } }
