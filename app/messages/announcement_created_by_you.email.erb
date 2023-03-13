@@ -5,7 +5,7 @@
   <%= before_label asset.title %> <%= asset.context.name %>
 <% end %>
 
-You created this Announcement:
+<%= t "You created this Announcement:" %>
 
 <%= html_to_text(asset.message, :base_url => dashboard_url) %>
 
