@@ -622,9 +622,6 @@ const locale = {
   "rho_a0244a36": { "message": "Ro" },
   "rho_variant_415245cd": { "message": "Ro (različica)" },
   "rich_content_editor_2708ef21": { "message": "Urejevalnik" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Območje besedila Pritisnite ALT+0 za bližnjico do urejevalnika."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Desni kotni oklepaj" },
   "right_arrow_35e0eddf": { "message": "Puščica desno" },
   "right_arrow_with_hook_29d92d31": { "message": "Puščica desno s kljukico" },

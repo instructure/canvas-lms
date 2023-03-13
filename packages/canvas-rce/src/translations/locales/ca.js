@@ -642,9 +642,6 @@ const locale = {
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (variant)" },
   "rich_content_editor_2708ef21": { "message": "Editor de contingut enriquit" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Àrea de text enriquit. Premeu ALT+0 per accedir a les dreceres de l’editor de contingut enriquit."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Parèntesi angular dret" },
   "right_arrow_35e0eddf": { "message": "Fletxa dreta" },
   "right_arrow_with_hook_29d92d31": { "message": "Fletxa dreta amb ganxo" },

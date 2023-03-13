@@ -617,9 +617,6 @@ const locale = {
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (Tauke)" },
   "rich_content_editor_2708ef21": { "message": "Ētita Ihirangi Whai Rawa" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Horahanga Kupu Taunaki. Pēhia te ALT+0 mo Taonga Ihirangi Etita pokatata."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Taiapa Koki Matau" },
   "right_arrow_35e0eddf": { "message": "Pere Matau" },
   "right_arrow_with_hook_29d92d31": { "message": "Pere Matau Me te Matau" },

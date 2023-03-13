@@ -600,9 +600,6 @@ const locale = {
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (Variant)" },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Right Angle Bracket" },
   "right_arrow_35e0eddf": { "message": "Right Arrow" },
   "right_arrow_with_hook_29d92d31": { "message": "Right Arrow With Hook" },

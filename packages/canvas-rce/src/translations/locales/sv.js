@@ -32,6 +32,7 @@ const locale = {
     "message": "Minimera förhandsvisning av fil"
   },
   "minimize_video_20aa554b": { "message": "Minimera video" },
+  "next_40e12421": { "message": "Nästa" },
   "replace_e61834a7": { "message": "Ersätt" },
   "reset_95a81614": { "message": "Återställ" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {

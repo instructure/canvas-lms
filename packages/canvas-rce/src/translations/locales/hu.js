@@ -28,6 +28,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Másik hozzáadása" },
   "add_cc_subtitles_55f0394e": { "message": "Felirat hozzáadása" },
   "add_image_60b2de07": { "message": "Kép hozzáadása" },
+  "additional_considerations_f3801683": { "message": "További szempontok" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "alignment_and_lists_5cebcb69": { "message": "Igazítások és listák" },
   "all_4321c3a1": { "message": "Összes" },
@@ -485,6 +486,7 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Beágyazott nagyobb, mint" },
   "nested_less_than_27d17e58": { "message": "Beágyazott kevesebb, mint" },
+  "next_40e12421": { "message": "Következő" },
   "no_changes_to_save_d29f6e91": { "message": "Nincs mentendő módosítás." },
   "no_e16d9132": { "message": "Nem" },
   "no_file_chosen_9a880793": { "message": "Nincs fájl kiválasztva" },
@@ -565,6 +567,7 @@ const locale = {
   "precedes_196b9aef": { "message": "Megelőzi" },
   "precedes_equal_20701e84": { "message": "Megelőzi az egyenlőt" },
   "preformatted_d0670862": { "message": "Előre formázott" },
+  "prev_f82cbc48": { "message": "Előző" },
   "preview_53003fd2": { "message": "Előnézet" },
   "preview_a3f8f854": { "message": "ELŐNÉZET" },
   "preview_in_overlay_ed772c46": { "message": "Előnézet a fedvényben" },
@@ -605,9 +608,6 @@ const locale = {
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (változat)" },
   "rich_content_editor_2708ef21": { "message": "Vizuális szövegszerkesztő" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Rich Text terület. A Rich Content Editor parancsikonjaihoz nyomja meg az ALT+0 billentyűkombinációt."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Jobb csúcsos zárójel" },
   "right_arrow_35e0eddf": { "message": "Jobb nyíl" },
   "right_arrow_with_hook_29d92d31": { "message": "Jobbra Nyíl Horoggal" },
