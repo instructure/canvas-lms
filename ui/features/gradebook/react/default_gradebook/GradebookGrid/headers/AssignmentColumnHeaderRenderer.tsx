@@ -180,7 +180,6 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
 
     showMessageStudentsWithObserversDialog:
       gradebook.options.show_message_students_with_observers_dialog,
-    showUnpostedMenuItem: gradebook.options.new_gradebook_development_enabled,
 
     sortBySetting: {
       direction: sortRowsBySetting.direction,
@@ -197,9 +196,6 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       },
       onSortByMissing: () => {
         gradebook.setSortRowsBySetting(columnId, 'missing', 'ascending')
-      },
-      onSortByUnposted: () => {
-        gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending')
       },
       settingKey: sortRowsBySetting.settingKey,
     },

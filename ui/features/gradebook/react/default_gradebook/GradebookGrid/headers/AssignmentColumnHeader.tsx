@@ -118,12 +118,10 @@ export type AssignmentColumnHeaderProps = {
     onSortByGradeDescending: () => void
     onSortByLate: () => void
     onSortByMissing: () => void
-    onSortByUnposted: () => void
     settingKey: string
   }
   submissionsLoaded: boolean
   showMessageStudentsWithObserversDialog: boolean
-  showUnpostedMenuItem: boolean
   onSendMessageStudentsWho: (args: {recipientsIds: string[]; subject: string; body: string}) => void
   userId: string
 }
@@ -376,16 +374,6 @@ export default class AssignmentColumnHeader extends ColumnHeader<
             >
               {I18n.t('Late')}
             </MenuItem>
-
-            {this.props.showUnpostedMenuItem && (
-              <MenuItem
-                selected={selectedSortSetting === 'unposted'}
-                disabled={sortBySetting.disabled}
-                onSelect={sortBySetting.onSortByUnposted}
-              >
-                {I18n.t('Unposted')}
-              </MenuItem>
-            )}
           </MenuGroup>
         </Menu>
 

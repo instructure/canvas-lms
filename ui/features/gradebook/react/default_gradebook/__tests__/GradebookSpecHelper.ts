@@ -87,7 +87,6 @@ export const defaultGradebookEnv = {
   hideTotal: false,
   latePolicyStatusDisabled: false,
   locale: 'en',
-  new_gradebook_development_enabled: true,
   outcome_gradebook_enabled: false,
   performanceControls: new PerformanceControls(),
   post_grades_ltis: [],
