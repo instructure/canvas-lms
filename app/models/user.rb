@@ -2241,9 +2241,10 @@ class User < ActiveRecord::Base
                              .order("submissions.created_at DESC")
                              .limit(limit).to_a
 
-          submissions += Submission.active.posted.where(user_id: self)
+          submissions += Submission.active.where(user_id: self)
                                    .where(course_id: course_ids)
-                                   .joins(:assignment)
+                                   .where("submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE")
+                                   .joins(:assignment, assignment: [:post_policy])
                                    .where(assignments: { workflow_state: "published" })
                                    .where("last_comment_at > ?", start_at)
                                    .limit(limit).order("last_comment_at").to_a
