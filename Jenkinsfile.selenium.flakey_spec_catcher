@@ -52,11 +52,11 @@ def setupNode() {
   sh 'rm -vrf ./tmp'
   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
 
-  checkoutRepo('canvas-lms', refspecToCheckout, 2)
+  checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 2)
 
   if (env.IS_PLUGIN == '1') {
     dir(env.LOCAL_WORKDIR) {
-      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
+      checkoutFromGit(gerritProjectUrl(), refspec: env.GERRIT_REFSPEC, depth: 2)
     }
   }
 
