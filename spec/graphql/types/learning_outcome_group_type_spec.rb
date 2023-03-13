@@ -79,7 +79,7 @@ describe Types::LearningOutcomeGroupType do
       @course_outcome1 = outcome_model(context: @course1, short_description: "CCC")
       @course_outcome2 = outcome_model(context: @course1, short_description: "DDD")
       @course_outcome2.align(assignment_model, @course1)
-      @course1.account.enable_feature!(:outcome_alignment_summary)
+      @course1.account.enable_feature!(:improved_outcomes_management)
     end
 
     let(:course_outcome_group_type) { GraphQLTypeTester.new(@course1.root_outcome_group, current_user: @admin) }

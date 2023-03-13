@@ -167,7 +167,7 @@ describe Types::LearningOutcomeType do
       @alignment1_id = ["D", @alignment1.id].join("_")
       @alignment2_id = ["D", @alignment2.id].join("_")
       @alignment3_id = ["D", @alignment3.id].join("_")
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     context "for users with Admin role" do

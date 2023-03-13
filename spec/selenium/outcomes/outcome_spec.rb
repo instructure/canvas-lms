@@ -215,6 +215,7 @@ describe "outcomes" do
     describe "with improved_outcome_management enabled" do
       before do
         enable_improved_outcomes_management(Account.default)
+        enable_account_level_mastery_scales(Account.default)
       end
 
       it "creates an initial outcome in the course level as a teacher" do
@@ -457,9 +458,8 @@ describe "outcomes" do
         end
       end
 
-      describe "with alignment_summary enabled" do
+      context "alignment summary tab" do
         before do
-          enable_alignment_summary(Account.default)
           context_outcome(@course, 3)
           @assignment = assignment_model(course: @course)
           @aligned_outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")

@@ -47,7 +47,7 @@ describe Loaders::OutcomeAlignmentLoader do
     @rubric.associate_with(@discussion_assignment, @course, purpose: "grading")
     @rubric.associate_with(@quiz1_assignment, @course, purpose: "grading")
 
-    @course.account.enable_feature!(:outcome_alignment_summary)
+    @course.account.enable_feature!(:improved_outcomes_management)
   end
 
   def base_url
@@ -76,8 +76,8 @@ describe Loaders::OutcomeAlignmentLoader do
     end
   end
 
-  it "resolves to nil if outcome alignment summary FF is disabled" do
-    @course.account.disable_feature!(:outcome_alignment_summary)
+  it "resolves to nil if improved outcomes management FF is disabled" do
+    @course.account.disable_feature!(:improved_outcomes_management)
 
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
