@@ -32,7 +32,6 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    NODE = configuration.node()
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby()
     RERUNS_RETRY = 0 // no reruns
