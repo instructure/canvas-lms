@@ -750,6 +750,12 @@ describe User do
         expect(student.recent_feedback(contexts: [post_policies_course])).not_to include submission
       end
     end
+
+    it "does include recent feedback for auto posted assignment that has last_comment_at but has no posted_at date" do
+      submission = auto_posted_assignment.submissions.find_by!(user: student)
+      submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
+      expect(student.recent_feedback(contexts: [post_policies_course])).not_to be_empty
+    end
   end
 
   describe "#alternate_account_for_course_creation?" do
