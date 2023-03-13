@@ -107,7 +107,7 @@ def postFn(status) {
       }
 
       if (isStartedByUser()) {
-        gerrit.submitVerified((status == 'SUCCESS' ? '+1' : '-1'), "${env.BUILD_URL}/build-summary-report/")
+        submitGerritReview((status == 'SUCCESS' ? '--verified +1' : '--verified -1'), "${env.BUILD_URL}/build-summary-report/")
       }
     }
 
@@ -355,20 +355,20 @@ pipeline {
                 // in the Build Parameters section.
                 // https://issues.jenkins.io/browse/JENKINS-28339
                 if (configuration.getBoolean('emulate-build-start', 'false')) {
-                  gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
+                  submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
                 if (configuration.skipCi()) {
                   currentBuild.result = 'NOT_BUILT'
-                  gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')
+                  submitGerritReview('--label Lint-Review=-2', 'Build not executed due to [skip-ci] flag')
                   error '[skip-ci] flag enabled: skipping the build'
                   return
                 } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
-                  gerrit.submitLintReview('-2', 'One or more build flags causes a subset of the build to be run')
+                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes a subset of the build to be run')
                 } else if (setupStage.hasGemOverrides()) {
-                  gerrit.submitLintReview('-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
+                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
                 } else {
-                  gerrit.submitLintReview('0')
+                  submitGerritReview('--label Lint-Review=0')
                 }
               }
 
@@ -534,7 +534,7 @@ pipeline {
                     .obeysAllowStages(false)
                     .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
                     .execute {
-                        gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
+                        submitGerritReview('--label Lint-Review=-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
 
                   extendedStage('Webpack Bundle Size Check')
