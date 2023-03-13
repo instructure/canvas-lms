@@ -23,53 +23,47 @@ describe('SubmissionAttempts', () => {
   const props: SubmissionAttemptsProps = {
     attempts: {
       1: [
-        // @ts-ignore
         {
           id: '1',
           comment: 'this is a comment',
-          created_at: Date(),
-          edited_at: Date(),
-          updated_at: Date(),
           is_read: false,
           author_name: 'user 123',
           display_updated_at: 'Saturday December 1st',
+          attachments: [],
         },
       ],
       3: [
-        // @ts-ignore
         {
           id: '5',
           comment: 'this is comment 3',
           is_read: false,
-          created_at: Date(),
-          edited_at: Date(),
-          updated_at: Date(),
           author_name: 'user 123',
           display_updated_at: 'Friday December 2nd',
+          attachments: [],
         },
-        // @ts-ignore
         {
           id: '6',
           comment: 'this is comment 5',
           is_read: false,
-          created_at: Date(),
-          edited_at: Date(),
-          updated_at: Date(),
           author_name: 'user 222',
           display_updated_at: 'Thursday December 11th',
+          attachments: [
+            {
+              id: '10',
+              mime_class: 'pdf',
+              display_name: 'test.pdf',
+            },
+          ],
         },
       ],
       2: [
-        // @ts-ignore
         {
           id: '2',
           comment: 'this is a comment 2',
           is_read: false,
-          created_at: Date(),
-          edited_at: Date(),
-          updated_at: Date(),
           author_name: 'user 333',
           display_updated_at: 'Saturday December 1st',
+          attachments: [],
         },
       ],
     },
@@ -90,5 +84,8 @@ describe('SubmissionAttempts', () => {
     expect(submissionCommentAuthors[0]).toHaveTextContent('- user 123')
     expect(submissionCommentAuthors[1]).toHaveTextContent('- user 222')
     expect(submissionCommentAuthors[2]).toHaveTextContent('- user 333')
+    const attachmentSection = queryAllByTestId('attachment-10')
+    expect(attachmentSection).toHaveLength(1)
+    expect(attachmentSection[0]).toHaveTextContent('test.pdf')
   })
 })

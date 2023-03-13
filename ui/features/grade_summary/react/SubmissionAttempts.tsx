@@ -24,15 +24,23 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import canvas from '@instructure/ui-themes'
-import {SubmissionComment} from '../../../api.d'
+import {Attachment, SubmissionComment} from '../../../api.d'
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
+import {Link} from '@instructure/ui-link'
+import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 
 const I18n = useI18nScope('grade_summary')
 
+type AttachmentProps = Pick<Attachment, 'id' | 'mime_class' | 'display_name' | 'url'>
+type SubmissionCommentProps = Pick<
+  SubmissionComment,
+  'id' | 'comment' | 'author_name' | 'is_read' | 'display_updated_at'
+> & {attachments: AttachmentProps[]}
+
 export type SubmissionAttemptsProps = {
   attempts: {
-    [key: string]: SubmissionComment[]
+    [key: string]: SubmissionCommentProps[]
   }
 }
 
@@ -74,14 +82,16 @@ export default function SubmissionAttempts({attempts}: SubmissionAttemptsProps) 
 }
 
 type SubmissionAttemptProps = {
-  comments?: SubmissionComment[]
+  comments?: SubmissionCommentProps[]
 }
 function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
+  if (!comments) return null
+
   const {borders, colors, spacing} = canvas.variables
 
   return (
     <>
-      {comments?.map((comment, i) => (
+      {comments.map((comment, i) => (
         <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
           <div
             style={{
@@ -95,7 +105,7 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
             <Text weight="bold" size="small">
               {I18n.t('%{display_updated_at}', {display_updated_at: comment.display_updated_at})}
             </Text>
-            {!comment?.is_read && (
+            {!comment.is_read && (
               <View
                 as="span"
                 position="absolute"
@@ -109,9 +119,25 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
           <View as="div" margin="0 medium 0 small">
             <Text size="small">{I18n.t('%{comment}', {comment: comment.comment})}</Text>
           </View>
+          {comment.attachments?.map(attachment => (
+            <View
+              as="div"
+              margin="0 medium 0 small"
+              key={attachment.id}
+              data-testid={`attachment-${attachment.id}`}
+            >
+              <Link
+                href={attachment.url}
+                isWithinText={false}
+                renderIcon={getIconByType(attachment.mime_class)}
+              >
+                {attachment.display_name}
+              </Link>
+            </View>
+          ))}
           <View as="div" textAlign="end" margin="0 medium 0 0">
             <Text weight="bold" size="small" data-testid="submission-comment-author">
-              - {I18n.t('%{display_name}', {display_name: comment?.author_name})}
+              - {I18n.t('%{display_name}', {display_name: comment.author_name})}
             </Text>
           </View>
         </Flex>

@@ -1262,7 +1262,7 @@ class Attachment < ActiveRecord::Base
     attachment_associations.create(context: context)
   end
 
-  def mime_class
+  def self.valid_content_types_hash
     # NOTE: keep this list in sync with what's in packages/canvas-rce/src/common/mimeClass.js
     {
       "text/html" => "html",
@@ -1323,7 +1323,15 @@ class Attachment < ActiveRecord::Base
       :"video/webm" => "video",
       :"video/avi" => "video",
       "application/x-shockwave-flash" => "flash"
-    }[content_type] || "file"
+    }
+  end
+
+  def self.mime_class(content_type)
+    valid_content_types_hash[content_type] || "file"
+  end
+
+  def mime_class
+    Attachment.mime_class(content_type)
   end
 
   def associated_with_submission?

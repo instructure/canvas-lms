@@ -306,6 +306,7 @@ export type Attachment = {
   submitter_id: string
   updated_at: string
   upload_status: string
+  url?: string
   view_inline_ping_url?: string
   viewed_at: string
   word_count: number
