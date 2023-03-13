@@ -280,7 +280,7 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('tinymce-a11y-checker')
+    this.a11yCheckerReady = import('../tinymce-a11y-checker/plugin')
       .then(a11yChecker => {
         const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
         a11yChecker.setLocale(locale)

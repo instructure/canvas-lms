@@ -32,14 +32,7 @@ const locale = {
   "minimize_video_20aa554b": { "message": "Уменьшить видео" },
   "next_40e12421": { "message": "Далее" },
   "replace_e61834a7": { "message": "Заменить" },
-  "reset_95a81614": { "message": "Сброс" },
-  "start_over_f7552aa9": { "message": "Начать заново" },
-  "the_document_preview_is_currently_being_processed__7d9ea135": {
-    "message": "Предварительный просмотр документа в данный момент обрабатывается. Повторите попытку позже."
-  },
-  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
-    "message": "Этот документ нельзя отобразить внутри Canvas."
-  }
+  "reset_95a81614": { "message": "Сброс" }
 }
 
 

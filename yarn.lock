@@ -8514,7 +8514,7 @@ bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
-bloody-offset@0.0.0, bloody-offset@^0.0.0:
+bloody-offset@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/bloody-offset/-/bloody-offset-0.0.0.tgz#ce9b898ac526c0aa39f02f02567fc0993069d629"
   integrity sha1-zpuJisUmwKo58C8CVn/AmTBp1ik=
@@ -24382,40 +24382,6 @@ tinycolor2@^1.4.1, tinycolor2@^1.4.2:
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
   integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
-tinymce-a11y-checker@^4.1.4:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-4.1.4.tgz#2ca10ab510f0b884d4a93d910c5b44464874d2fe"
-  integrity sha512-jinqdImz9GVLrPr8b98YRyb98mQCejj8PBKK/WGax+xl+Y8DWoVsV4KDjGsm5UHZ6z4Ldfj88QclkKRkaa0e/Q==
-  dependencies:
-    "@instructure/canvas-theme" "^7"
-    "@instructure/ui-a11y-content" "^7"
-    "@instructure/ui-alerts" "^7"
-    "@instructure/ui-buttons" "^7"
-    "@instructure/ui-checkbox" "^7"
-    "@instructure/ui-grid" "^7"
-    "@instructure/ui-heading" "^7"
-    "@instructure/ui-icons" "^7"
-    "@instructure/ui-link" "^7"
-    "@instructure/ui-popover" "^7"
-    "@instructure/ui-simple-select" "^7"
-    "@instructure/ui-spinner" "^7"
-    "@instructure/ui-text" "^7"
-    "@instructure/ui-text-area" "^7"
-    "@instructure/ui-text-input" "^7"
-    "@instructure/ui-themeable" "^7"
-    "@instructure/ui-themes" "^7"
-    "@instructure/ui-tray" "^7"
-    "@instructure/ui-view" "^7"
-    bloody-offset "^0.0.0"
-    format-message "^6"
-    format-message-generate-id "^6"
-    prevent-default "^1.0.0"
-    react "^16"
-    react-aria-live "^1.0.4"
-    react-color "^2.13.4"
-    react-dom "^16"
-    wcag-element-contrast "^1.0.1"
-
 tinymce@^5, tinymce@^5.6.2:
   version "5.8.1"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.8.1.tgz#f6ace70e47cf6b5b0a63f52cf38e4ae04a35ba58"
@@ -25666,7 +25632,7 @@ watchpack@^2.2.0, watchpack@^2.4.0:
 wcag-element-contrast@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wcag-element-contrast/-/wcag-element-contrast-1.0.2.tgz#5a90cb7cdc252979cf3e2bd27161e1bf9ad4c2f6"
-  integrity sha1-WpDLfNwlKXnPPivScWHhv5rUwvY=
+  integrity sha512-Pu8Uq48yWxwqSe2zrPeTQ8qzByADgnSu7z/i5L+WvsctaYVMHSl3mSeL8+kH2YYxvOp9RMrGO5gdvfVCq4nKbA==
 
 wcwidth@^1.0.1:
   version "1.0.1"
