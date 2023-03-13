@@ -616,9 +616,6 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Redigerare för formaterat innehåll"
   },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Höger hakparentes" },
   "right_arrow_35e0eddf": { "message": "Högerpil" },
   "right_arrow_with_hook_29d92d31": { "message": "Högerpil med krok" },

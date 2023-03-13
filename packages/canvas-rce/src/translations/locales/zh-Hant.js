@@ -550,9 +550,6 @@ const locale = {
   "rho_a0244a36": { "message": "ρ" },
   "rho_variant_415245cd": { "message": "ρ（變量）" },
   "rich_content_editor_2708ef21": { "message": "多種格式的內容編輯器" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "多種格式的文字區。請按 ALT+0 使用多種格式的內容編輯器捷徑。"
-  },
   "right_angle_bracket_d704e2d6": { "message": "右角括號" },
   "right_arrow_35e0eddf": { "message": "右箭頭" },
   "right_arrow_with_hook_29d92d31": { "message": "右箭頭與鉤號" },

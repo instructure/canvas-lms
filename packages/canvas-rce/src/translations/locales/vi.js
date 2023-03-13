@@ -24,7 +24,8 @@ const locale = {
     "message": "{ count, plural,\n  other {}\n}"
   },
   "description_436c48d7": { "message": "Mô tả" },
-  "icon_215a1dc6": { "message": "Biểu tượng" }
+  "icon_215a1dc6": { "message": "Biểu tượng" },
+  "next_40e12421": { "message": "Kế tiếp" }
 }
 
 

@@ -63,6 +63,7 @@ const locale = {
   },
   "custom_6979cd81": { "message": "ידני" },
   "cyan_c1d5f68a": { "message": "ירקרק-כחול" },
+  "decorative_image_fde98579": { "message": "תמונת קישוט" },
   "deep_purple_bb3e2907": { "message": "סגול כהה" },
   "delimiters_4db4840d": { "message": "מפסקים" },
   "description_436c48d7": { "message": "תיאור" },
@@ -118,6 +119,7 @@ const locale = {
   "modules_c4325335": { "message": "מודולים" },
   "my_files_2f621040": { "message": "הקבצים שלי" },
   "name_1aed4a1b": { "message": "שם" },
+  "next_40e12421": { "message": "הבא" },
   "no_e16d9132": { "message": "לא" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "אין תצוגה מקדימה לקובץ זה"
@@ -133,6 +135,7 @@ const locale = {
   "people_b4ebb13c": { "message": "אנשים " },
   "percentage_34ab7c2c": { "message": "אחוז" },
   "pink_68ad45cb": { "message": "ורוד" },
+  "prev_f82cbc48": { "message": "הקודם" },
   "preview_53003fd2": { "message": "תצוגה מקדימה" },
   "published_c944a23d": { "message": "פורסם" },
   "purple_7678a9fc": { "message": "סגול" },

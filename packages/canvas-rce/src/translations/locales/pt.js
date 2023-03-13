@@ -628,9 +628,6 @@ const locale = {
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (Variante)" },
   "rich_content_editor_2708ef21": { "message": "Editor de conteúdo avançado" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Área de Rich Text. Prima ALT+0 para obter atalhos do Editor de Conteúdo Rico."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Suporte de ângulo reto" },
   "right_arrow_35e0eddf": { "message": "Seta à direita" },
   "right_arrow_with_hook_29d92d31": { "message": "Seta à direita com gancho" },

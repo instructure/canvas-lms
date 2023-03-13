@@ -632,9 +632,6 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Editor de Contenido Enriquecido"
   },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Área del texto enriquecido. Presione ALT+0 para acceder a los atajos del Editor de contenido enriquecido."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Símbolo de menor" },
   "right_arrow_35e0eddf": { "message": "Flecha a la derecha" },
   "right_arrow_with_hook_29d92d31": {
