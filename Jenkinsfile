@@ -260,7 +260,6 @@ pipeline {
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
-    SKIP_CACHE = configuration.skipCache()
     RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
     GERRIT_CHANGE_ID = getChangeId()
 
@@ -279,8 +278,6 @@ pipeline {
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
     EXTERNAL_TAG = imageTag.externalTag()
 
-    ALPINE_MIRROR = configuration.alpineMirror()
-    NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
     FORCE_CRYSTALBALL = "${configuration.getBoolean('force-crystalball', '0') ? 1 : 0}"
