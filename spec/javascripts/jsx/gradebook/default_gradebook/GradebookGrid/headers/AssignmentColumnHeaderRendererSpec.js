@@ -722,20 +722,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       )
     })
 
-    test('shows the "unposted" menu setting when "new gradebook development" is enabled', () => {
-      buildGradebook()
-      gradebook.options.new_gradebook_development_enabled = true
-      render()
-      strictEqual(component.props.showUnpostedMenuItem, true)
-    })
-
-    test('does not show the "unposted" menu setting when "new gradebook development" is disabled', () => {
-      buildGradebook()
-      gradebook.options.new_gradebook_development_enabled = false
-      render()
-      strictEqual(component.props.showUnpostedMenuItem, false)
-    })
-
     test('includes the "Sort by" direction setting', () => {
       buildGradebook()
       render()
@@ -838,15 +824,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       render()
       component.props.sortBySetting.onSortByMissing()
       const expectedSetting = {columnId: column.id, direction: 'ascending', settingKey: 'missing'}
-      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
-    })
-
-    test('includes the onSortByUnposted callback', () => {
-      buildGradebook()
-      gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
-      render()
-      component.props.sortBySetting.onSortByUnposted()
-      const expectedSetting = {columnId: column.id, direction: 'ascending', settingKey: 'unposted'}
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
 

@@ -462,7 +462,6 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
-      new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
@@ -576,7 +575,6 @@ class GradebooksController < ApplicationController
       login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
-      new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
       outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
@@ -1275,16 +1273,6 @@ class GradebooksController < ApplicationController
       params[:version]
     else
       @current_user.preferred_gradebook_version
-    end
-  end
-
-  def new_gradebook_development_enabled?
-    # params[:new_gradebook_development] is a development-only convenience for engineers.
-    # This param should never be used outside of development.
-    if Rails.env.development? && params.include?(:new_gradebook_development)
-      params[:new_gradebook_development] == "true"
-    else
-      !!ENV["GRADEBOOK_DEVELOPMENT"]
     end
   end
 
