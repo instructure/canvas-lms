@@ -176,5 +176,12 @@ module Types
         )
       ) && enrollment.can_be_deleted_by(current_user, context[:course], context[:session])
     end
+
+    field :soft_concluded, Boolean, null: true
+    def soft_concluded
+      return nil unless enrollment.user == current_user
+
+      !enrollment.active?
+    end
   end
 end

@@ -307,6 +307,22 @@ const ComposeModalManager = props => {
     return <ModalSpinner label={I18n.t('Loading')} message={I18n.t('Loading Compose Modal')} />
   }
 
+  const filteredCourses = () => {
+    const courses = coursesQuery?.data?.legacyNode
+    if (courses) {
+      const softConcludedCourses = courses?.enrollments.filter(
+        enrollment => enrollment?.softConcluded
+      )
+      const softConcludedCoursesIds = softConcludedCourses?.map(e => e.course._id)
+      courses.favoriteCoursesConnection.nodes = courses?.favoriteCoursesConnection?.nodes.filter(
+        course => !softConcludedCoursesIds.includes(course?._id)
+      )
+      courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.softConcluded)
+    }
+
+    return courses
+  }
+
   return (
     <ComposeModalContainer
       addConversationMessage={data => {
@@ -328,7 +344,7 @@ const ComposeModalManager = props => {
           },
         })
       }}
-      courses={coursesQuery?.data?.legacyNode}
+      courses={filteredCourses()}
       createConversation={createConversation}
       isReply={props.isReply || props.isReplyAll}
       isForward={props.isForward}
