@@ -1750,6 +1750,12 @@ fr:
         value: Caractères
     site_admin_statistics: 
       page_title: "Statistiques pour %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Date d’activité :"
     statistics: 
       concluded_at: "terminée à %{at}"
       created_at: "créée à %{at}"
@@ -2185,6 +2191,7 @@ fr:
   add_scope_a5208f8b: "Ajouter une étendue"
   add_section_8b027a1c: "Ajouter une section"
   add_set_of_grading_periods_5b4d6e51: "Ajouter un ensemble de périodes de notation"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Ajouter SpeedGrader liens aux vues d’Index des quiz et des travaux"
   add_student_1152afc0: "Ajouter un élève"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Ajouter des élèves à l'aide d'une recherche par nom, groupe ou section de cours. Après avoir entré votre texte, naviguez dans les résultats à l'aide de la touche « flèche bas ». Sélectionnez un résultat avec la touche Entrée."
   add_students_tas_and_observers_to_your_course_e84692dd: "Ajoutez des élèves, des assistants ou des observateurs à votre cours"
@@ -3790,6 +3797,7 @@ fr:
   assessment_question_id_4eacadb3: "ID de question d’évaluation"
   assessment_title_7ab69b66: "Titre d’évaluation"
   assessment_type_81a73b9c: "Type d’évaluation"
+  assessments_6574e4fb: Évaluations
   asset_string_ddeaf719: "Chaîne de contenu"
   assign_eedf72bb: Attribuer
   assign_reviews_on_date_7e48ec50: "Attribuer des révisions à la date"
@@ -6381,6 +6389,8 @@ fr:
     google_drive: 
       file_not_found: "Fichier de collaboration introuvable"
     index: 
+      collaborations: 
+        explanation: "Les outils web gratuits en ligne sont parfaits pour permettre aux élèves d’effectuer des travaux de groupes, de prendre des notes partagées, etc. Les élèves et les enseignants peuvent paramétrer des collaborations de groupes."
       description_rs: |-
           Les outils en ligne gratuits tels que [Google Docs](%{google_url}) sont pour les étudiants, des sites fantastiques pour travailler sur des projets ou des essais de groupe, pour prendre des notes partagées, etc.
           L’enseignant *ou* les étudiants peuvent configurer des collaborations de groupes.
@@ -9422,6 +9432,7 @@ fr:
   customize_this_menu_efa72a9: "Personnaliser ce menu"
   cutoff_score_74254c89: "note de passage"
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Référence cyclique détectée lors de l’importation. %{vendor_guid}"
   czech_9aa2cbe4: Tchèque
   d2l_display: Desire2Learn
   d2l_file_description: "Format .zip d’exportation D2L"
@@ -10009,6 +10020,7 @@ fr:
       'Travaux différenciés' est une fonction qui permet de choisir sur quelle(s) section(s) ou à quel(s) étudiant(s) attribuer un travail.
       Les sections qui ne reçoivent pas un travail particulier, ne le verront pas dans le contenu de leurs cours et leurs notes finales seront 
       calculées sans ces points.
+  digital_badges_6dc10ade: "Badges virtuels"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Partage direct"
   disableWhileLoading: 
@@ -10106,6 +10118,7 @@ fr:
   discussion_mention_c70cb87a: "Mention de discussion"
   discussion_opened_for_comments_successfully_b320dc39: "La discussion s'est ouverte aux commentaires avec succès"
   discussion_pinned_successfully_f9c03d9f: "Discussion épinglée avec succès"
+  discussion_podcast_feed_d62cc56f: "Flux podcast de discussion"
   discussion_post_count_report_2da4c6c: "Rapport du nombre de messages pour la discussion"
   discussion_posts_c998c9ad: "Billets de discussions"
   discussion_redesign_description: "Cette fonctionnalité améliore l’expérience Canvas au niveau des discussions et annonces. Lorsque ce drapeau est activé, l'accès anticipé aux améliorations en cours s'affichera automatiquement à chaque nouvelle version. Pour de plus amples informations, consultez le *groupe d’utilisateurs sur le nouveau design des discussions/annonces* sur Canvas Community."
@@ -11013,7 +11026,7 @@ fr:
   enabled_unlocked_8d3a5df7: "Activé (déverrouillé)"
   enabled_web_services_f620b2be: "Services Web activés"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Active un nouveau design pour la boîte de dialogue « Envoyer un message aux étudiants qui... » permettant d’envoyer un message aux observateurs en plus des élèves."
-  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Active l’accès à l’API publique des Nouveaux quiz : API d’éléments de quiz"
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Active l’accès à l’API publique des Nouveaux quiz : API d’éléments de quiz"
   enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Active l’accès à l’API publique des nouveaux quiz via Canvas."
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Permet d'afficher les rapports de plagiat et les scores de similarité dans le menu de soumission du nouveau relevé de notes."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Permet d'appliquer des dates importantes aux travaux, aux événements du calendrier et autres."
@@ -15708,6 +15721,8 @@ fr:
             
                       Merci,
                       Assistance Canvas
+                      
+            Référence: %{ref}
         subject: "Échec de réponse au message : %{subject}"
       locked_topic: 
         body: |-
@@ -15822,6 +15837,7 @@ fr:
   live_event_tool_documentation_f6dcc3d7: "Documentation de l'outil d'événement en direct"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "L'abonnement aux événements live n'est pas configuré."
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Erreur de chargement des banques"
     loading_banks: "Chargement des banques..."
@@ -16445,6 +16461,7 @@ fr:
   medium_dark_skin_tone_5134edbc: "Teint moyen-sombre"
   medium_light_skin_tone_6c4a27fb: "Teint moyen-clair"
   medium_skin_tone_8608d74e: "Teint moyen"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Découvrez la Plateforme d'apprentissage d’Instructure"
   meets_expectations_bb179565: "Répond aux attentes"
   meets_mastery_754e1c06: "Niveau de maîtrise atteint"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} membres sur un maximum de %{max_membership}"
@@ -18816,6 +18833,7 @@ fr:
   multiple_due_dates_283dd861: "Dates limites multiples"
   multiple_due_dates_47416f7a: "(Plusieurs dates limite)"
   multiple_due_dates_6b0d75c6: "Dates d'échéance multiples"
+  multiple_grading_periods_grade_export_512bcd7f: "Exportation de notes sur plusieurs périodes de notation"
   multiple_microsoft_education_classes_already_exist_317ca726: "Plusieurs classes Microsoft education existent déjà pour le cours."
   multiple_modules_930713d4: "Multiples modules"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20496,6 +20514,12 @@ fr:
   play_media_comment_8614d30f: "Lire le commentaire multimédia"
   play_media_comment_by_name_from_createdat_515b3b: "Lancer le commentaire sur média par %{name} à partir de %{createdAt}."
   play_media_comment_fad7a166: "Lire le commentaire multimédia"
+  playback: 
+    notes: Remarques
+    podcast: Podcast
+    presentation: Présentation
+    statistics: Statistiques
+    video: Vidéo
   please_add_a_due_date_1d433d2: "Veuillez ajouter une date limite"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Veuillez ajouter au moins une réponse non vide."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Veuillez ajouter au moins une réponse non vide pour chaque variable."
@@ -23281,6 +23305,7 @@ fr:
   rce_mentions_in_discussions_82cd11e3: "Mentions RCE dans les discussions"
   rce_pretty_html_editor_d8faf2bb: "Éditeur HTML colorisé pour l'éditeur RCE"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Boîte de dialogue de l’éditeur d'équation amélioré du RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "Éditeur enrichi - Utiliser la nouvelle boîte de dialogue d'outil externe dans Canvas"
   rce_ux_improvements_e6c29eb4: "Améliorations de l’interface RCE"
   re_activate_user_f7d77c9a: "Réactiver l'utilisateur"
   re_reported_b9671073: "Rapporté à nouveau"
@@ -23624,6 +23649,7 @@ fr:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Afficher les deux listes de choses à faire pour les enseignants avec des élèves inscrits."
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Affiche les deux listes de choses à faire dans la barre latérale du tableau de bord lorsque les enseignants ont des élèves inscrits."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Modifie l’ordre de certaines options de menu pour rendre la présentation plus cohérente, et ajoute un lien vers SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Bouton Remplacer %{attachmentDisplayName}"
   replace_e61834a7: Remplacer
   replace_filename_png_button_cf5dc7c3: "Remplacer le bouton filename.jpg"
@@ -24082,6 +24108,7 @@ fr:
   rubrics_tutorial_tray_be65d10d: "Bac du didacticiel sur les barèmes"
   run_at_759b47d: "Exécuter à"
   run_at_92dd90df: "Exécuter le/à"
+  run_report_743fdf5f: "Exécuter le rapport"
   run_time_370dedb6: "Durée d’exécution"
   running_c5a4998d: "En cours"
   running_jobs_9861080e: "Tâches en cours"
@@ -26186,6 +26213,7 @@ fr:
   student_activity_and_performance_career_step_585731dc: "Performance et activité de l’élève – Étape de carrière"
   student_activity_and_performance_de2e0754: "Performance et activité de l’élève"
   student_activity_tracking_90bdd519: "Suivi de l'activité de l’élève"
+  student_analytics_614304ee: "Analyses d'élèves"
   student_annotation_assignments_are_not_currently_s_d840064b: "Les annotations des élèves ne sont pas prises en charge pour les travaux de groupe."
   student_annotation_documents_c0f5c4ec: "Documents d'annotation des élèves"
   student_annotation_f6810b5c: "Annotation d'élève"
@@ -27601,7 +27629,7 @@ fr:
       par rapport aux extensions autorisées pour le travail associé.
   this_feature_option_is_only_visible_to_users_with__248ec367: |-
       Cette fonctionnalité n’est visible qu'aux utilisateurs disposant d'un accès Administrateur de site. Elle est similaire à l’état
-                                « Masqué », mais les utilisateurs finaux ne le verront pas même en cas d'activation par un Administrateur de site.
+                                « Masqué », mais les utilisateurs finaux ne le verront pas même en cas d'activation par un Administrateur de site.
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Cette option de fonctionnalité n’est visible qu’aux utilisateurs disposant d'un accès administrateur de site.
                                   Les utilisateurs finaux ne la verront pas tant qu’elle n'aura pas été activée par un administrateur de site.
@@ -29322,6 +29350,7 @@ fr:
   use_the_new_assignments_teacher_page_8add7e46: "Utiliser la nouvelle page Travaux de l'enseignant"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Utilisez le nouvel outil externe Collaborations qui offre plus d'options aux outils à utiliser pour collaborer"
   use_the_new_document_annotation_tool_2cbc98d0: "Utiliser le nouvel outil d'annotation de document"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Utiliser la nouvelle boîte de dialogue d'outil externe lorsque l’éditeur de contenu enrichi est exécuté dans Canvas. La nouvelle boîte de dialogue est systématiquement utilisée dans les nouveaux quiz."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Utiliser la nouvelle interface pour la gestion des permissions"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilisez le nouvel outil LTI de questionnaire à la place des questionnaires Canvas habituels"
   use_the_new_scheduler_1273b832: "Utiliser le nouveau planificateur"
@@ -30570,7 +30599,7 @@ fr:
   you_have_changed_the_progression_requirements_for__6772bc89: "Vous avez changé les critères de progression pour un cours actif. Des étudiants ont peut-être déjà commencé ce module ou avancé dans d’autres qui dépendent de celui-ci."
   you_have_completed_a_peer_review_for_name_4dd2264b: "Vous avez terminé une revue de pair pour %{name}"
   you_have_completed_a_peer_review_for_person_thank__1371f37e: "Vous avez terminé une évaluation par un pair pour %{person}. Merci."
-  you_have_completed_your_peer_reviews_543ad84: "Vous avez terminé vos évaluations de pair !"
+  you_have_completed_your_peer_reviews_543ad84: "Vous avez terminé vos évaluations de pair !"
   you_have_count_calendars_left_f0cbcac4: 
     one: "Il vous reste 1 calendrier"
     other: "Il vous reste %{count} calendriers"
