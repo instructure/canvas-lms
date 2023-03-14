@@ -1809,7 +1809,8 @@ class AccountsController < ApplicationController
        restrict_student_future_view
        restrict_student_future_listing
        lock_all_announcements
-       sis_assignment_name_length_input]
+       sis_assignment_name_length_input
+       conditional_release]
   end
 
   def strong_account_params
