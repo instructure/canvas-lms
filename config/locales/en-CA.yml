@@ -1629,6 +1629,12 @@ en-CA:
         value: Characters
     site_admin_statistics: 
       page_title: "Statistics for %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Activity Date:"
     statistics: 
       concluded_at: "concluded %{at}"
       created_at: "created %{at}"
@@ -2047,6 +2053,7 @@ en-CA:
   add_scope_a5208f8b: "Add Scope"
   add_section_8b027a1c: "Add Section"
   add_set_of_grading_periods_5b4d6e51: "Add Set of Grading Periods"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Add SpeedGrader links to Assignments and Quizzes index views"
   add_student_1152afc0: "Add Student"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Add students by searching by name, course section or group. After entering text, navigate results by using the down arrow key. Select a result by using the Enter key."
   add_students_tas_and_observers_to_your_course_e84692dd: "Add Students, TAs, and Observers to your course"
@@ -3633,6 +3640,7 @@ en-CA:
   assessment_question_id_4eacadb3: "assessment question id"
   assessment_title_7ab69b66: "assessment title"
   assessment_type_81a73b9c: "assessment type"
+  assessments_6574e4fb: Assessments
   asset_string_ddeaf719: "Asset String"
   assign_eedf72bb: Assign
   assign_reviews_on_date_7e48ec50: "Assign Reviews on Date"
@@ -5990,6 +5998,8 @@ en-CA:
     google_drive: 
       file_not_found: "Collaboration file not found"
     index: 
+      collaborations: 
+        explanation: "Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc. Teachers or students can set up group collaborations."
       description_rs: |-
           Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
           Teacher *or* students can set up group collaborations.
@@ -6329,6 +6339,8 @@ en-CA:
   conference_was_deleted_30869390: "Conference was deleted"
   conferences: 
     concluded_conference: 
+      ? " delete"
+      : Delete
       delete: Delete
       recording: "1 Recording"
       recordings: "%{recordingCount} Recordings"
@@ -8702,6 +8714,7 @@ en-CA:
   customize_this_menu_efa72a9: "Customize this menu"
   cutoff_score_74254c89: "cutoff score"
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Cyclic reference detected when importing: %{vendor_guid}"
   czech_9aa2cbe4: Czech
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip format"
@@ -9270,6 +9283,7 @@ en-CA:
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Differentiate between system- and user-generated live events
       in the Canvas Data Services tool
+  digital_badges_6dc10ade: "Digital Badges"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
@@ -9367,6 +9381,7 @@ en-CA:
   discussion_mention_c70cb87a: "Discussion Mention"
   discussion_opened_for_comments_successfully_b320dc39: "Discussion opened for comments successfully"
   discussion_pinned_successfully_f9c03d9f: "Discussion pinned successfully"
+  discussion_podcast_feed_d62cc56f: "Discussion Podcast Feed"
   discussion_post_count_report_2da4c6c: "Discussion Post Count Report"
   discussion_posts_c998c9ad: "Discussion Posts"
   discussion_redesign_description: "This feature enhances the Canvas experience within Discussions and Announcements. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Discussions/Announcements Redesign user group* in the Canvas Community"
@@ -14170,6 +14185,8 @@ en-CA:
             
             Thank you,
             Canvas Support
+            
+            Reference: %{ref}
       locked_topic: 
         body: |-
             The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
@@ -14277,6 +14294,7 @@ en-CA:
   live_event_tool_documentation_f6dcc3d7: "Live Event Tool Documentation"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live events subscriptions service is not configured"
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Error loading banks"
     loading_banks: "Loading banks..."
@@ -14857,6 +14875,7 @@ en-CA:
   medium_dark_skin_tone_5134edbc: "Medium-Dark Skin Tone"
   medium_light_skin_tone_6c4a27fb: "Medium-Light Skin Tone"
   medium_skin_tone_8608d74e: "Medium Skin Tone"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Meet the Instructure Learning Platform:"
   meets_expectations_bb179565: "Meets Expectations"
   meets_mastery_754e1c06: "Meets Mastery"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} members out of maximum of %{max_membership}"
@@ -16923,6 +16942,7 @@ en-CA:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Multiple dropdowns, read surrounding text"
   multiple_due_dates_283dd861: "Multiple Due Dates"
   multiple_due_dates_47416f7a: "(Multiple Due Dates)"
+  multiple_grading_periods_grade_export_512bcd7f: "Multiple Grading Periods Grade Export"
   multiple_microsoft_education_classes_already_exist_317ca726: "Multiple Microsoft education classes already exist for the course."
   multiple_modules_930713d4: "Multiple Modules"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -18527,6 +18547,12 @@ en-CA:
   play_media_comment_8614d30f: "Play Media Comment"
   play_media_comment_by_name_from_createdat_515b3b: "Play media comment by %{name} from %{createdAt}."
   play_media_comment_fad7a166: "Play media comment"
+  playback: 
+    notes: Notes
+    podcast: Podcast
+    presentation: Presentation
+    statistics: Statistics
+    video: Video
   please_add_a_due_date_1d433d2: "Please add a due date"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Please add at least one non-blank answer."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Please add at least one non-blank answer for each variable."
@@ -20986,6 +21012,7 @@ en-CA:
   rce_mentions_in_discussions_82cd11e3: "RCE Mentions in Discussions"
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML Editor"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE's new and improved equation editor dialog"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Use New External Tool Dialog in Canvas"
   rce_ux_improvements_e6c29eb4: "RCE UX Improvements"
   re_activate_user_f7d77c9a: "Re-activate User"
   re_reported_b9671073: Re-Reported
@@ -21306,6 +21333,7 @@ en-CA:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Render both To Do lists for teachers with student enrollments"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Renders both To Do lists on the dashboard sidebar for teachers with student enrollments."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Reorders some menu options for more consistency and adds link to SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Replace %{attachmentDisplayName} button"
   replace_e61834a7: Replace
   replace_filename_png_button_cf5dc7c3: "Replace filename.png button"
@@ -21740,6 +21768,7 @@ en-CA:
   rubrics_tutorial_tray_be65d10d: "Rubrics Tutorial Tray"
   run_at_759b47d: "Run At"
   run_at_92dd90df: "Run at"
+  run_report_743fdf5f: "Run Report"
   run_time_370dedb6: "Run time"
   running_c5a4998d: Running
   running_jobs_9861080e: "Running jobs"
@@ -23626,6 +23655,7 @@ en-CA:
   student_activity_and_performance_career_step_585731dc: "Student Activity and Performance - Career Step"
   student_activity_and_performance_de2e0754: "Student Activity and Performance"
   student_activity_tracking_90bdd519: "Student Activity Tracking"
+  student_analytics_614304ee: "Student Analytics"
   student_annotation_assignments_are_not_currently_s_d840064b: "Student annotation assignments are not currently supported for group assignments"
   student_annotation_documents_c0f5c4ec: "Student Annotation Documents"
   student_annotation_f6810b5c: "Student Annotation"
@@ -26651,6 +26681,7 @@ en-CA:
   use_the_new_assignments_teacher_page_8add7e46: "Use the new assignments teacher page"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Use the new Collaborations external tool enabling more options for tools to use to collaborate"
   use_the_new_document_annotation_tool_2cbc98d0: "Use the new document annotation tool"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Use the new external tool dialog when the RCE is running in Canvas. The new dialog is always used in new quizzes."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Use the new interface for managing permissions"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool in place of regular canvas quizzes"
   use_the_new_scheduler_1273b832: "Use the new scheduler"

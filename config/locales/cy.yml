@@ -1530,6 +1530,12 @@ cy:
         value: Nodau
     site_admin_statistics: 
       page_title: "Ystadegau ar gyfer %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Dyddiad Gweithgarwch:"
     statistics: 
       concluded_at: "wedi dirwyn i ben %{at}"
       created_at: "wedi creu %{at}"
@@ -1951,6 +1957,7 @@ cy:
   add_scope_a5208f8b: "Ychwanegu Cwmpas"
   add_section_8b027a1c: "Ychwanegu Adran"
   add_set_of_grading_periods_5b4d6e51: "Ychwanegu Set o Gyfnodau Graddio"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Ychwanegu SpeedGrader dolenni at weddau mynegai Aseiniadau a Chwisiau."
   add_student_1152afc0: "Ychwanegu Myfyriwr"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Ychwanegu myfyrwyr drwy chwilio yn ôl enw, grŵp neu adran cwrs. Ar ôl rhoi’r testun, gallwch ddefnyddio’r fysell saeth i lawr i symud rhwng y canlyniadau. Dewiswch ganlyniad drwy ddefnyddio’r fysell Enter."
   add_students_tas_and_observers_to_your_course_e84692dd: "Ychwanegu Myfyrwyr, Cynorthwywyr Dysgu ac Arsyllwyr at eich cwrs"
@@ -3551,6 +3558,7 @@ cy:
   assessment_question_id_4eacadb3: "id cwestiwn yr asesiad"
   assessment_title_7ab69b66: "teitl yr asesiad"
   assessment_type_81a73b9c: "math o asesiad"
+  assessments_6574e4fb: Asesiadau
   asset_string_ddeaf719: "Llinyn Ased"
   assign_eedf72bb: Dyrannu
   assign_reviews_on_date_7e48ec50: "Dyrannu Adolygiadau ar y Dyddiad"
@@ -5852,6 +5860,8 @@ cy:
     google_drive: 
       file_not_found: "Heb ddod o hyd i ffeil cydweithrediad"
     index: 
+      collaborations: 
+        explanation: "Mae adnoddau am ddim ar y we yn lle gwych i fyfyrwyr weithio ar bapurau neu brosiectau grŵp, gwneud nodiadau ar y cyd ac ati. Mae athrawon neu fyfyrwyr yn gallu creu cydweithrediadau grŵp."
       description_rs: |-
           Mae adnoddau am ddim ar y we fel [Google Docs](%{google_url}) yn lle gwych i fyfyrwyr weithio ar bapurau neu brosiectau grŵp,
           gwneud nodiadau ar y cyd ac ati. Mae athrawon *neu* fyfyrwyr yn gallu creu cydweithrediadau grŵp.
@@ -8643,6 +8653,7 @@ cy:
   customize_this_menu_efa72a9: "Addasu’r ddewislen hon"
   cutoff_score_74254c89: "sgôr trothwy"
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Cyfeiriad cylchol wedi’i ganfod wrth fewngludo: %{vendor_guid}"
   czech_9aa2cbe4: Tsieceg
   d2l_display: Desire2Learn
   d2l_file_description: "Fformat .zip allgludo D2L"
@@ -9245,6 +9256,7 @@ cy:
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Gwahaniaethu rhwng digwyddiadau byw sy’n cael eu creu gan systemau ac sy’n cael eu creu gan ddefnyddwyr
       yn yr adnodd Gwasanaethau Data Canvas
+  digital_badges_6dc10ade: "Bathodynnau Digidol"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Rhannu Uniongyrchol"
   disableWhileLoading: 
@@ -9337,6 +9349,7 @@ cy:
   discussion_group_category_locked: "Does dim modd gosod categorïau grŵp yn uniongyrchol ar aseiniad trafodaeth, ond dylid eu gosod ar y drafodaeth yn lle"
   discussion_inline_grading_4631a62e: "Graddio Trafodaeth mewn llinell"
   discussion_mention_c70cb87a: "Sylw Trafodaeth"
+  discussion_podcast_feed_d62cc56f: "Ffrwd Podlediad - Trafodaeth"
   discussion_post_count_report_2da4c6c: "Adroddiad Nifer Post Trafodaeth"
   discussion_posts_c998c9ad: "Postiadau Trafodaeth"
   discussion_redesign_description: "Mae’r nodwedd hon yn gwella profiad Canvas o fewn Trafodaethau a Chyhoeddiadau. Pan fo’r fflag hon wedi’i galluogi, bydd mynediad cynnar at welliannau parhaus yn cael eu dangos yn awtomatig gyda phob rhyddhad. I gael y manylion llawn, gweler y *grŵp defnyddwyr Ailddylunio Trafodaethau/Cyhoeddiadau* yng Nghymuned Canvas."
@@ -14147,6 +14160,8 @@ cy:
             
             Diolch yn fawr,
             Tîm Cymorth Canvas
+            
+            Cyfeirnod: %{ref}
       locked_topic: 
         body: |-
             Doedd dim modd danfon y neges "%{subject}" oherwydd bod y pwnc trafod wedi’i gloi. Os ydych chi’n ceisio cysylltu â rhywun drwy Canvas, gallwch geisio mewngofnodi i’ch cyfrif ac anfon neges ato gan ddefnyddio’r adnodd Blwch Derbyn.
@@ -14257,6 +14272,7 @@ cy:
   live_event_tool_documentation_f6dcc3d7: "Dogfennau Adnodd Digwyddiadau Byw"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Dydy’r gwasanaeth tanysgrifiadau i ddigwyddiadau byw ddim wedi’i ffurfweddu"
   liveassessments_92d9edc0: "Asesiadau Byw"
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Gwall wrth lwytho banciau"
     loading_banks: "Wrthi’n llwytho banciau..."
@@ -14831,6 +14847,7 @@ cy:
   medium_dark_skin_tone_5134edbc: "Lliw Croen Canolig-Tywyll"
   medium_light_skin_tone_6c4a27fb: "Lliw Croen Canolig-Golau"
   medium_skin_tone_8608d74e: "Lliw Croen Canolig"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Dyma Lwyfan Dysgu Instructure:"
   meets_expectations_bb179565: "Bodloni Disgwyliadau"
   meets_mastery_754e1c06: "Wedi Meistroli"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} aelod o blith uchafswm o %{max_membership}"
@@ -16920,6 +16937,7 @@ cy:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Mwy nag un gwymplen, darllenwch y testun o’i amgylch"
   multiple_due_dates_283dd861: "Mwy nag un dyddiad erbyn"
   multiple_due_dates_47416f7a: "(Mwy nag un dyddiad erbyn)"
+  multiple_grading_periods_grade_export_512bcd7f: "Allgludo Graddau Mwy Nag Un Cyfnod Graddio"
   multiple_microsoft_education_classes_already_exist_317ca726: "Mae mwy nag un dosbarth addysg Microsoft eisoes yn bodoli ar gyfer y cwrs."
   multiple_modules_930713d4: "Mwy nag un Modiwl"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -18503,6 +18521,12 @@ cy:
   play_media_comment_8614d30f: "Chwarae Sylw ar Gyfryngau"
   play_media_comment_by_name_from_createdat_515b3b: "Chwarae sylw ar gyfryngau gan %{name} o %{createdAt}."
   play_media_comment_fad7a166: "Chwarae sylw ar gyfryngau"
+  playback: 
+    notes: Nodiadau
+    podcast: Podlediad
+    presentation: Cyflwyniad
+    statistics: Ystadegau
+    video: Fideo
   please_add_a_due_date_1d433d2: "Ychwanegwch ddyddiad erbyn"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ychwanegwch o leiaf un ateb heb fod lle gwag."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Ychwanegwch o leiaf un ateb heb fod lle gwag ar gyfer pob newidyn."
@@ -20988,6 +21012,7 @@ cy:
   rce_mentions_in_discussions_82cd11e3: "Sylwadau RCE mewn Trafodaethau"
   rce_pretty_html_editor_d8faf2bb: "Golygydd HTML Hardd RCE"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Deialog golygydd hafaliadau newydd a gwell RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Defnyddio Dialog Adnodd Allanol Newydd yn Canvas"
   rce_ux_improvements_e6c29eb4: "Gwelliannau RCE UX"
   re_activate_user_f7d77c9a: "Ail-ysgogi defnyddiwr"
   re_reported_b9671073: "Wedi’u riportio eto"
@@ -21320,6 +21345,7 @@ cy:
         minute: isaf
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Rendro rhestrau tasgau i’w gwneud ar gyfer athrawon gydag ymrestriadau myfyrwyr"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Rendro rhestrau tasgau i’w gwneud ar far ochr y dangosfwrdd ar gyfer athrawon gydag ymrestriadau myfyrwyr"
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Yn aildrefnu rhai opsiynau dewislen i gael rhagor o gysondeb ac yn ychwanegu dolen at SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Newid botwm %{attachmentDisplayName}"
   replace_e61834a7: Disodli
   replace_filename_png_button_cf5dc7c3: "Newid y botwm filename.png"
@@ -21763,6 +21789,7 @@ cy:
   rubrics_tutorial_tray_be65d10d: "Ardal Tiwtorial Cyfarwyddiadau Sgorio"
   run_at_759b47d: "Wedi rhedeg"
   run_at_92dd90df: "Wedi rhedeg am"
+  run_report_743fdf5f: "Rhedeg Adroddiad"
   run_time_370dedb6: "Amser rhedeg"
   running_c5a4998d: Rhedeg
   running_jobs_9861080e: "Tasgau sydd ar waith"
@@ -23629,6 +23656,7 @@ cy:
   student_activity_and_performance_career_step_585731dc: "Perfformiad a Gweithgareddau Myfyrwyr - Cam Gyrfa"
   student_activity_and_performance_de2e0754: "Perfformiad a Gweithgareddau Myfyrwyr"
   student_activity_tracking_90bdd519: "Tracio Gweithgareddau Myfyrwyr"
+  student_analytics_614304ee: "Dadansoddiadau Myfyrwyr"
   student_annotation_assignments_are_not_currently_s_d840064b: "Ar hyn o bryd nid yw aseiniadau grŵp yn gallu delio ag aseiniadau anodiad gan fyfyrwyr"
   student_annotation_documents_c0f5c4ec: "Dogfennau Anodiadau gan Fyfyriwr"
   student_annotation_f6810b5c: "Anodiad gan Fyfyriwr"
@@ -26673,6 +26701,7 @@ cy:
   use_the_new_assignments_student_page_944262af: "Defnyddiwch y dudalen aseiniadau newydd i fyfyrwyr"
   use_the_new_assignments_teacher_page_8add7e46: "Defnyddiwch y dudalen aseiniadau newydd i athrawon"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Defnyddio’r adnodd allanol newydd ar gyfer Cydweithrediadau, sy’n cynnig mwy o opsiynau i gydweithio"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Defnyddiwch y dialog adnodd allanol newydd pan fo RCE yn rhedeg yn Canvas. Mae’r dialog newydd yn cael ei ddefnyddio bob amser mewn cwisiau newydd."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Defnyddiwch y rhyngwyneb newydd i reoli hawliau"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Defnyddio’r adnodd LTI newydd ar gyfer cwisiau yn lle cwisiau arferol canvas"
   use_the_new_scheduler_1273b832: "Defnyddio’r trefnydd newydd"

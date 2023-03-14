@@ -639,7 +639,7 @@ fi:
         blank_placeholder: "-"
         event_type: 
           corrupted: "Tiedot eivät ole saatavilla"
-        no-abbreviation: e
+        no-abbreviation: "n"
         yes-abbreviation: k
       grade_change_logging_results: 
         Anonymous: Nimetön
@@ -1463,6 +1463,12 @@ fi:
     sis_integration_settings: 
       labels: 
         value: Merkit
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Aktiviteetin päivämäärä"
     statistics: 
       concluded_at: "viety päätökseen %{at}"
       created_at: "luotu %{at}"
@@ -1859,6 +1865,7 @@ fi:
   add_rubric_3636d9a6: "Lisää arviointitauluko"
   add_section_8b027a1c: "Lisää osio"
   add_set_of_grading_periods_5b4d6e51: "Lisää arvosanojen antojakso"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Lisää SpeedGrader linkkiä tehtävien ja kyselyiden indeksinäkymiin"
   add_student_1152afc0: "Lisää opiskelija"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Lisää opiskelijoita hakemalla nimen, kurssin osion tai ryhmän perusteella. Kun olet syöttänyt tekstin, navigoi tuloksissa alanuolinäppäimellä. Valitse tulos Enter-painikkeella."
   add_students_tas_and_observers_to_your_course_e84692dd: "Lisää opiskelijat, apuopettajat ja havaitsijat kurssillesi"
@@ -3368,6 +3375,7 @@ fi:
   assessment_question_id_4eacadb3: "arvioinnin kysymyksen tunnus"
   assessment_title_7ab69b66: "arvioinnin otsikko"
   assessment_type_81a73b9c: "arvioinnin tyyppi"
+  assessments_6574e4fb: Arvioinnit
   asset_string_ddeaf719: "Kohteen merkkijono"
   assign_eedf72bb: "Anna tehtäväksi"
   assign_reviews_on_date_7e48ec50: "Kohdista arvioinnit päivämäärällä"
@@ -5577,6 +5585,8 @@ fi:
     google_drive: 
       file_not_found: "Yhteistyötiedostoa ei löydy"
     index: 
+      collaborations: 
+        explanation: "Ilmaiset verkkotyökalut tarjoavat opiskelijoille kätevän tavan tehdä ryhmäprojekteja, -kirjoitelmia tai jaettuja muistiinpanoja yhteistyönä. Opettajat tai opiskelijat voivat luoda ryhmälle yhteistyöprojekteja."
       description_rs: |-
           Ilmaiset verkkotyökalut, kuten [Google Docs](%{google_url}) tarjoavat opiskelijoille kätevän tavan tehdä ryhmäprojekteja, -kirjoitelmia tai jaettuja muistiinpanoja yhteistyönä.
           Opettaja *tai* opiskelijat voivat luoda ryhmälle yhteistyöprojekteja.
@@ -8146,6 +8156,7 @@ fi:
   customize_this_menu_efa72a9: "Mukauta tätä valikkoa"
   cutoff_score_74254c89: "alin hyväksytty pistemäärä"
   cyan_c1d5f68a: Syaani
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Tuonnin yhteydessä havaittiin syklinen viite: %{vendor_guid}"
   czech_9aa2cbe4: tshekki
   d2l_display: Desire2Learn
   d2l_file_description: "D2L vienti .zip-muoto"
@@ -8628,6 +8639,7 @@ fi:
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Erottele järjestelmän ja käyttäjän luomat live-tapahtumat
       Canvas Data Services -työkalussa
+  digital_badges_6dc10ade: "Digitaaliset  tunnistimet"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Suora jakaminen"
   disableWhileLoading: 
@@ -8715,6 +8727,7 @@ fi:
   discussion_group_category_locked: "Ryhmäkategorioita ei voi määrittää suoraan keskustelutehtävissä, vaan ne tulisi määrittää keskustelussa"
   discussion_inline_grading_4631a62e: "Keskustelun inline arvosanojen anto"
   discussion_mention_c70cb87a: "Keskustelun maininta"
+  discussion_podcast_feed_d62cc56f: "Keskustelun Podcast-syöte"
   discussion_post_count_report_2da4c6c: "Keskusteluviestin määräraportti"
   discussion_posts_c998c9ad: Keskusteluviestit
   discussion_redesign_description: "Tämä ominaisuus tehostaa Canvas-kokemusta keskusteluissa ja ilmoituksissa. Kun tämä merkki on käytössä, jatkuvat kehitykset näkyvät automaattisesti jokaisen julkaisun kanssa. Lisätietoja on *keskustelut/ilmoitukset uudelleensuunnittelun käyttäjäryhmässä* Canvas-yhteisössä"
@@ -13247,6 +13260,8 @@ fi:
                       
                       Kiitos,
                       Canvas-tuki
+                      
+            Viitteen: %{ref}
       locked_topic: 
         body: |-
             Viestiä otsikolla "%{subject}" ei voitu toimittaa, koska keskustelun aihe on lukittu. Jos yrität ottaa yhteyttä johonkuhun Canvasin kautta, voit yrittää kirjautua tilillesi ja lähettää heille viestin Viestit-työkalun kautta.
@@ -13350,6 +13365,7 @@ fi:
   live_event_tool_documentation_f6dcc3d7: "Live-tapahtuman työkalun ohjeet"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live-tapahtumien tilauspalvelua ei ole määritetty"
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Virhe pankkeja ladattaessa"
     loading_banks: "Ladataan pankkeja..."
@@ -13919,6 +13935,7 @@ fi:
   medium_dark_skin_tone_5134edbc: "Keskitumma ihonväri"
   medium_light_skin_tone_6c4a27fb: "Keskivaalea ihonväri"
   medium_skin_tone_8608d74e: "Keskisävyinen ihonväri"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Tutustu Instructuren oppimisympäristöön:"
   meets_expectations_bb179565: "Täyttää odotukset"
   meets_mastery_754e1c06: "Hyvä osaaminen"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} jäsentä enintään %{max_membership} jäsenestä"
@@ -15872,6 +15889,7 @@ fi:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Useita pudotusvalikoita, lue ympäröivä teksti"
   multiple_due_dates_283dd861: "Useita määräpäiviä"
   multiple_due_dates_47416f7a: "(Useita määräpäiviä)"
+  multiple_grading_periods_grade_export_512bcd7f: "Usein arvosanojen antojaksojen arvosanojen vienti"
   multiple_microsoft_education_classes_already_exist_317ca726: "Useita Microsoft-koulutusluokkia on jo olemassa tälle kurssille."
   multiple_modules_930713d4: "Useita moduuleita"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -17410,6 +17428,12 @@ fi:
   play_media_comment_35257210: "Toista mediakommentti."
   play_media_comment_8614d30f: "Toista mediakommentti"
   play_media_comment_by_name_from_createdat_515b3b: "Toista mediakommentti %{name} kohteesta %{createdAt}."
+  playback: 
+    notes: Huomautukset
+    podcast: Podcast-lähetys
+    presentation: Esitys
+    statistics: Tilastot
+    video: Video
   please_add_a_due_date_1d433d2: "Lisää määräpäivä"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lisää ainakin yksi vastaus, joka ei ole tyhjä."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lisää vähintään yksi muu kuin tyhjä vastaus jokaiselle muuttujalle."
@@ -19810,6 +19834,7 @@ fi:
   rce_mentions_in_discussions_82cd11e3: "RCE-maininnat keskusteluissa"
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty -tekstieditori"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE:n uusi ja kehitetty kaavan muokkaustoiminnon keskusteluruutu"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Käytä uutta ulkoista työkalun  valintaikkunaa Canvasissa"
   rce_ux_improvements_e6c29eb4: "RCE UX -kehitykset"
   re_activate_user_f7d77c9a: "Aktivoi käyttäjä uudelleen"
   re_reported_b9671073: "Raportoitu uudelleen"
@@ -20122,6 +20147,7 @@ fi:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Luo molemmat tehtävälistat opettajille opiskelijoiden ilmoittautumisten kanssa"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Luo molemmat tehtävälistat koontinäytön sivupalkkiin opettajille opiskelijoiden ilmoittautumisten kanssa."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Järjestää joitakin valikkovaihtoehtoja paremman yhteneväisyyden saavuttamiseksi ja lisää linkin SpeedGraderiin."
   replace_attachmentdisplayname_button_94dd8ba1: "Vaihda %{attachmentDisplayName} -painike"
   replace_e61834a7: Korvaa
   replace_filename_png_button_cf5dc7c3: "Korvaa filename.png-painike"
@@ -20512,6 +20538,7 @@ fi:
   rubrics_tutorial_tray_be65d10d: "Rubriikkien opetusohjelman alue"
   run_at_759b47d: "Suorita kohteessa"
   run_at_92dd90df: "Suorita kohteessa"
+  run_report_743fdf5f: "Suorita raportti"
   run_time_370dedb6: Ajoaika
   running_c5a4998d: Suoritetaan
   running_jobs_9861080e: "Käynnissä olevat työtehtävät: "
@@ -22284,6 +22311,7 @@ fi:
   student_activity_and_performance_career_step_585731dc: "Opiskelijan aktiviteetti ja suoritusteho - ura-askel"
   student_activity_and_performance_de2e0754: "Opiskelijan aktiviteetti ja suoritusteho"
   student_activity_tracking_90bdd519: "Opiskelijan seuranta"
+  student_analytics_614304ee: Opiskelija-analyysi
   student_annotation_assignments_are_not_currently_s_d840064b: "Ryhmätehtäville ei parhaillaan tueta opiskelijan huomautustehtäviä"
   student_annotation_documents_c0f5c4ec: "Opiskelijan huomautusasiakirjat"
   student_annotation_f6810b5c: "Opiskelijan jättämä huomautus"
@@ -25202,6 +25230,7 @@ fi:
   use_the_new_assignments_student_page_944262af: "Käytä uusien tehtävien opiskelijan sivua"
   use_the_new_assignments_teacher_page_8add7e46: "Käytä uutta tehtävien opettajan sivua"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Käytä uutta yhteistöiden ulkoista työkalua, joka mahdollistaa enemmän asetuksia yhteistöiden työkaluille"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Käytä uutta ulkoista työkalun valintaikkunaa, kun RCE on käynnissä Canvasissa. Uutta dialogia käytetään aina uusissa testeissä."
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Käytä uutta tietovisan LTI-työkalua tavallisten canvas-kyselyiden sijasta"
   use_the_new_scheduler_1273b832: "Käytä uutta aikatauluttajaa"
   use_this_grading_scheme_52aa4ecf: "Käytä tätä arvosanojen antoasteikkoa"

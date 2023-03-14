@@ -778,7 +778,7 @@ is:
         event_type: 
           corrupted: "Upplýsingar ekki tiltækar"
         no-abbreviation: "n"
-        yes-abbreviation: "y"
+        yes-abbreviation: j
       grade_change_logging_results: 
         Anonymous: Nafnlaus
         Assignment: Verkefni
@@ -1672,6 +1672,12 @@ is:
         value: Stafir
     site_admin_statistics: 
       page_title: "Tölfræði fyrir %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Virknidagur:"
     statistics: 
       concluded_at: "lokið%{at}"
       created_at: "stofnað %{at}"
@@ -2095,6 +2101,7 @@ is:
   add_scope_a5208f8b: "Bæta við umfangi"
   add_section_8b027a1c: "Bæta við hluta"
   add_set_of_grading_periods_5b4d6e51: "Bæta við einkunnatímabilum"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Bæta SpeedGrader tenglum við yfirlit yfir verkefni og skyndipróf"
   add_student_1152afc0: "Bæta við nemanda"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Bæta við nemendum með leit eftir nafni, námskeiðshluta eða hópi. Eftir innfærslu texta, skoðaðu niðurstöður með lyklinum „ör niður“. Veldu niðurstöðu með Enter."
   add_students_tas_and_observers_to_your_course_e84692dd: "Bæta við nemendum, aðstoðarkennurum og skoðendum á námskeiðið"
@@ -3681,6 +3688,7 @@ is:
   assessment_question_id_4eacadb3: "auðkenni matsspurningar"
   assessment_title_7ab69b66: "titill mats"
   assessment_type_81a73b9c: "tegund mats"
+  assessments_6574e4fb: Möt
   asset_string_ddeaf719: Eignastrengur
   assign_eedf72bb: Úthluta
   assign_reviews_on_date_7e48ec50: "Úthluta skoðunum á dagsetningu"
@@ -6063,6 +6071,8 @@ is:
     google_drive: 
       file_not_found: "Samvinnuskrá fannst ekki"
     index: 
+      collaborations: 
+        explanation: "Ókeypis vefverkfæri á netinu eru frábær staður fyrir nemendur til að vinna hópverkefni eða ritgerðir, taka sameiginlegar glósur o.s.frv. Kennarar eða nemendur geta sett upp hópsamstarf."
       description_rs: |-
           Ókeypis veftól eins og [Google Docs](%{google_url}) eru tilvalin fyrir nemendur til að vinna að hópverkefnum eða ritgerðum, deila glósum, o.fl.
           Kennari *eða* nemendur geta sett upp hópsamvinnuverkefni.
@@ -8774,6 +8784,7 @@ is:
   customize_this_menu_efa72a9: "Sérsníða valmynd"
   cutoff_score_74254c89: lágmarkseinkunn
   cyan_c1d5f68a: Blágrænn
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Hringlaga tilvísun fannst við innflutning: %{vendor_guid}"
   czech_9aa2cbe4: Tékkneska
   d2l_display: Desire2Learn
   d2l_file_description: "D2L .zip fyrir útflutning"
@@ -9342,6 +9353,7 @@ is:
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Greindu á milli lifandi atburða sem gerðir eru af kerfi og notendum
       í gagnaþjónustuverkfæri Canvas
+  digital_badges_6dc10ade: "Stafræn merki"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Bein deiling"
   disableWhileLoading: 
@@ -9437,6 +9449,7 @@ is:
   discussion_mention_c70cb87a: "Umræðu áminning"
   discussion_opened_for_comments_successfully_b320dc39: "Opnun umræðu fyrir athugasemdum heppnaðist"
   discussion_pinned_successfully_f9c03d9f: "Umræða fest við heppnaðist"
+  discussion_podcast_feed_d62cc56f: "Hlaðvarpsstreymi umræðu"
   discussion_post_count_report_2da4c6c: "Umræða talningaskýrslu færslna"
   discussion_posts_c998c9ad: "Innlegg í umræðu"
   discussion_redesign_description: "Þessi eiginleiki eykur Canvas upplifunina innan Umræður og Tilkynningar. Þegar þetta merki er virkt, verður flýtiaðgangur að umbótum í vinnslu sýndur sjálfvirkt við hverja útgáfu. Fyrir nánari upplýsingar skoðið *Notendahópur endurhönnun Umræður/Tilkynningar* í Canvas samfélaginu"
@@ -14266,6 +14279,8 @@ is:
             
                       Takk fyrir
                       Canvas hjálparsveitin
+                      
+            Tilvísunarauðkenni: %{ref}
       locked_topic: 
         body: |-
             Skilaboðin með heitið "%{subject}" komust ekki til skila því umræðuefninu hefur verið læst. Ef þú ert að reyna að ná sambandi við einhvern gegnum Canvas geturðu reynt að skrá þinn inn í reikninginn þinn og senda viðkomandi skilaboð með Skilaboð-tólinu.
@@ -14373,6 +14388,7 @@ is:
   live_event_tool_documentation_f6dcc3d7: "Beinar útsendingar verkfæraskjöl"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Áskriftarþjónusta að beinum útsendingum er ekki stillt"
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Villa við að sækja spurningabanka"
     loading_banks: "Sæki spurningabanka..."
@@ -14953,6 +14969,7 @@ is:
   medium_dark_skin_tone_5134edbc: "Meðal-dökkur húðlitur"
   medium_light_skin_tone_6c4a27fb: "Meðal-ljós húðlitur"
   medium_skin_tone_8608d74e: "Meðal húðlitur"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Kynntu þér Instruct Learning Platform:"
   meets_expectations_bb179565: "Uppfyllir væntingar"
   meets_mastery_754e1c06: "Uppfyllir tileinkun"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} meðlimir af hámarkinu %{max_membership}"
@@ -17023,6 +17040,7 @@ is:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Margir fellilistar, lestu texta umhverfis"
   multiple_due_dates_283dd861: "Margir skiladagar"
   multiple_due_dates_47416f7a: "(Margir skiladagar)"
+  multiple_grading_periods_grade_export_512bcd7f: "Útflutningur einkunna fyrir mörg einkunnatímabil"
   multiple_microsoft_education_classes_already_exist_317ca726: "Margir Microsoft námsbekkir eru þegar til fyrir námskeiðið."
   multiple_modules_930713d4: "Margar námsefni"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -18634,6 +18652,12 @@ is:
   play_media_comment_8614d30f: "Spila miðilsathugasemd"
   play_media_comment_by_name_from_createdat_515b3b: "Spila miðilsathugasemd eftir %{name} frá %{createdAt}."
   play_media_comment_fad7a166: "Spila miðilsathugasemd"
+  playback: 
+    notes: Athugasemdir
+    podcast: Hlaðvarp
+    presentation: Kynning
+    statistics: Tölfræði
+    video: Myndband
   please_add_a_due_date_1d433d2: "Bættu við skiladegi"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Bættu við að minnsta kosti einu svari sem er ekki autt"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Bættu við að minnsta kosti einu svari fyrir hverja breytu sem er ekki autt"
@@ -21101,6 +21125,7 @@ is:
   rce_mentions_in_discussions_82cd11e3: "RCE nefnt í Umræðum"
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML-ritill"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Nýi og endurbætti jöfnuritstjóri RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Notaðu nýjan ytra verkfæraglugga í Canvas"
   rce_ux_improvements_e6c29eb4: "Umbætur á notendaupplifun RCE"
   re_activate_user_f7d77c9a: "Endurvirkja notanda"
   re_reported_b9671073: Endurtilkynnt
@@ -21422,6 +21447,7 @@ is:
         minute: mín.
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Lætur í té bæði minnislista fyrir kennara með innritun nema"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Lætur í té bæði minnislista á hliðarstiku mælaborðsins með innritun nema."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Endurröðun sumra valmyndavalkosta fyrir meiri samkvæmni og bætir tengli við SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Skipta út %{attachmentDisplayName} hnappur"
   replace_e61834a7: "Skipta út"
   replace_filename_png_button_cf5dc7c3: "Skipta út skráarheiti .png hnapps"
@@ -21857,6 +21883,7 @@ is:
   rubrics_tutorial_tray_be65d10d: "Matskvarða kennsluefnisbakki"
   run_at_759b47d: "Keyra á"
   run_at_92dd90df: "Keyra á"
+  run_report_743fdf5f: "Keyra skýrslu"
   run_time_370dedb6: Keyrslutími
   running_c5a4998d: Keyrir
   running_jobs_9861080e: "Störf í gangi"
@@ -23754,6 +23781,7 @@ is:
   student_activity_and_performance_career_step_585731dc: "Nemandavirkni og frammistaða - Ferilskref"
   student_activity_and_performance_de2e0754: "Nemandavirkni og frammistaða"
   student_activity_tracking_90bdd519: "Rakning virkni nemanda"
+  student_analytics_614304ee: "Greining nemanda"
   student_annotation_assignments_are_not_currently_s_d840064b: "Verkefni nemenda með athugasemdum eru ekki studd fyrir hópverkefni"
   student_annotation_documents_c0f5c4ec: "Skjöl nemenda með athugasemdum"
   student_annotation_f6810b5c: "Athugasemd nemanda"
@@ -26794,6 +26822,7 @@ is:
   use_the_new_assignments_teacher_page_8add7e46: "Nota nýju verkefna kennarasíðuna"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Nota nýja samvinnutólið til að opna á fleiri möguleika fyrir tól til að nota í samvinnu."
   use_the_new_document_annotation_tool_2cbc98d0: "Nota nýja athugasemdatólið fyrir skjöl"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Notaðu nýja ytri verkfæragluggann þegar RCE keyrir í Canvas. Nýi glugginn er alltaf notaður í nýjum prófum."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Notaðu nýja viðmótið til að halda utan um leyfi"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Nota nýja LTI próftólið í staðinn fyrir venjuleg Canvas-próf"
   use_the_new_scheduler_1273b832: "Nota nýja skipuleggjarann"

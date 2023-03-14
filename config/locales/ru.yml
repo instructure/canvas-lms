@@ -814,7 +814,7 @@ ru:
         blank_placeholder: "-"
         event_type: 
           corrupted: "Сведения недоступны"
-        no-abbreviation: н
+        no-abbreviation: "n"
         yes-abbreviation: д
       grade_change_logging_results: 
         Anonymous: Анонимно
@@ -1773,6 +1773,12 @@ ru:
         value: Символы
     site_admin_statistics: 
       page_title: "Статистика %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Дата активности:"
     statistics: 
       concluded_at: "закончен %{at}"
       created_at: "создано %{at}"
@@ -2214,6 +2220,7 @@ ru:
   add_scope_a5208f8b: "Добавить рамки"
   add_section_8b027a1c: "Добавить раздел"
   add_set_of_grading_periods_5b4d6e51: "Добавить несколько Оценочных периодов"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Добавьте ссылки SpeedGrader на представления указателей Задания и Тесты"
   add_student_1152afc0: "Добавить студента"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Добавить учащихся, выполнив поиск по имени, разделу курса или группе. После ввода текста используйте кнопку \"стрелка вниз\" для просмотра результатов. Выберите результат с помощью клавиши Enter."
   add_students_tas_and_observers_to_your_course_e84692dd: "Добавить в ваш курс учащихся, TA и наблюдателей"
@@ -3856,6 +3863,7 @@ ru:
   assessment_question_id_4eacadb3: "идентификатор вопроса проверки знаний"
   assessment_title_7ab69b66: "заголовок проверки знаний"
   assessment_type_81a73b9c: "тип проверки знаний"
+  assessments_6574e4fb: Тестирования
   asset_string_ddeaf719: "Строка ресурса"
   assign_eedf72bb: Назначить
   assign_reviews_on_date_7e48ec50: "Назначить рассмотрение на дату"
@@ -6475,6 +6483,8 @@ ru:
     google_drive: 
       file_not_found: "Файл совместных работ не найден"
     index: 
+      collaborations: 
+        explanation: "Бесплатные онлайновые веб-инструменты — отличное место для работы учащихся над групповыми проектами или докладами, ведения общих записей и т.д. Преподаватели или учащиеся могут организовать групповую совместную работу."
       description_rs: |-
           Бесплатные интернет-средства, такие как [Google Docs](%{google_url}), являются отличным местом для работы студентов с групповыми проектами или документами с использованием общих заметок и т.д.
           Учитель *или* студенты могут настраивать групповые совместные проекты.
@@ -9658,6 +9668,7 @@ ru:
   customize_this_menu_efa72a9: "Настроить это меню"
   cutoff_score_74254c89: "граничный балл"
   cyan_c1d5f68a: Голубой
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Обнаружена циклическая ссылка при импорте: %{vendor_guid}"
   czech_9aa2cbe4: Чешский
   d2l_display: Desire2Learn
   d2l_file_description: "Экспорт D2L в .zip формат"
@@ -10283,6 +10294,7 @@ ru:
       Дифференцированные Задания является функцией, позволяющей выбирать, к какому разделу (разделам) или отдельному студенту (студентам) относится задание.
       Разделы, по которым не дано задание, не указываются в содержании курса, и итоговая оценка
       рассчитывается без них.
+  digital_badges_6dc10ade: "Цифровые бейджи"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Прямое распространение"
   disableWhileLoading: 
@@ -10380,6 +10392,7 @@ ru:
   discussion_mention_c70cb87a: "Упоминание о дискуссии"
   discussion_opened_for_comments_successfully_b320dc39: "Обсуждение успешно открыто для комментариев"
   discussion_pinned_successfully_f9c03d9f: "Обсуждение успешно прикреплено"
+  discussion_podcast_feed_d62cc56f: "Канал подкастов обсуждения"
   discussion_post_count_report_2da4c6c: "Отчет о количестве сообщений в обсуждениях"
   discussion_posts_c998c9ad: "Сообщения обсуждения"
   discussion_redesign_description: "Эта функция повышает комфорт работы с Canvas в обсуждениях и объявлениях. Если этот флажок установлен, ранний доступ к текущим улучшениям будет отображаться автоматически в каждом выпуске. Более подробная информация содержится в можно найти в *в группе пользователей Перекомпоновка дискуссий/обсуждений* в сообществе Canvas."
@@ -16135,6 +16148,8 @@ ru:
             
                       Спасибо,
                       Служба поддержки Canvas
+                      
+            Ссылки: %{ref}
         subject: "Ошибка ответа на сообщение: %{subject}"
       locked_topic: 
         body: |-
@@ -16253,6 +16268,7 @@ ru:
   live_event_tool_documentation_f6dcc3d7: "Документация инструментария «живых» мероприятий"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Не задана конфигурация службы подписки на «живые» события"
   liveassessments_92d9edc0: "Интерактивные тестирования"
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Ошибка загрузки банков"
     loading_banks: "Загрузка банков..."
@@ -16878,6 +16894,7 @@ ru:
   medium_dark_skin_tone_5134edbc: "Полутемный тон скина"
   medium_light_skin_tone_6c4a27fb: "Полусветлый тон скина"
   medium_skin_tone_8608d74e: "Средний тон скина"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Встречайте учебную платформу Instructure:"
   meets_expectations_bb179565: "Соответствует ожиданиям"
   meets_mastery_754e1c06: "Соответствует проходному баллу"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} участника (-ов) превысили максимальное значение %{max_membership}"
@@ -19290,6 +19307,7 @@ ru:
   multiple_due_dates_283dd861: "Множественные даты выполнения"
   multiple_due_dates_47416f7a: "(несколько сроков выполнения)"
   multiple_due_dates_6b0d75c6: "Несколько сроков выполнения"
+  multiple_grading_periods_grade_export_512bcd7f: "Несколько периодов оценивания Экспорт оценок"
   multiple_microsoft_education_classes_already_exist_317ca726: "Для курса уже существует несколько учебных классов Microsoft."
   multiple_modules_930713d4: "Несколько модулей"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20984,6 +21002,12 @@ ru:
   play_media_comment_8614d30f: "Воспроизведение мультимедийного комментария"
   play_media_comment_by_name_from_createdat_515b3b: "Воспроизвести мультимедийный комментарии %{name} из %{createdAt}."
   play_media_comment_fad7a166: "Воспроизведение мультимедийного комментария"
+  playback: 
+    notes: Заметки
+    podcast: Подкаст
+    presentation: Презентация
+    statistics: Статистика
+    video: Видео
   please_add_a_due_date_1d433d2: "Пожалуйста, укажите срок выполнения"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Добавьте хотя бы один непустой ответ"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Добавьте хотя бы по одному непустому ответу для каждой переменной."
@@ -23855,6 +23879,7 @@ ru:
   rce_mentions_in_discussions_82cd11e3: "Упоминания RCE в обсуждениях"
   rce_pretty_html_editor_d8faf2bb: "Редактор RTCE Pretty HTML"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Новый и улучшенный диалог редактора уравнений RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Использование нового диалогового окна внешнего инструмента в Canvas"
   rce_ux_improvements_e6c29eb4: "Улучшения RCE UX"
   re_activate_user_f7d77c9a: "Реактивировать пользователя"
   re_reported_b9671073: "Повторно включено в отчет"
@@ -24216,6 +24241,7 @@ ru:
         minute: мин
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Обработать оба списка Задачи для преподавателей с зачислениями студентов"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Обрабатывает оба списка Задачи на боковой панели для преподавателей с зачислениями студентов."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Изменение порядка некоторых пунктов меню для большей последовательности и добавление ссылки на SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Заменить кнопку %{attachmentDisplayName}"
   replace_e61834a7: Заменить
   replace_filename_png_button_cf5dc7c3: "Заменить кнопку filename.png"
@@ -24693,6 +24719,7 @@ ru:
   rubrics_tutorial_tray_be65d10d: "Лоток справки о рубриках"
   run_at_759b47d: "Выполнить в"
   run_at_92dd90df: "Запустить в"
+  run_report_743fdf5f: "Выполнить отчет"
   run_time_370dedb6: "Время работы"
   running_c5a4998d: Выполняется
   running_jobs_9861080e: "Текущие задания"
@@ -26833,6 +26860,7 @@ ru:
   student_activity_and_performance_career_step_585731dc: "Активность и успеваемость студентов - Шаг карьеры"
   student_activity_and_performance_de2e0754: "Активность и успеваемость студентов"
   student_activity_tracking_90bdd519: "Отслеживание активности студентов"
+  student_analytics_614304ee: "Аналитика учащихся"
   student_annotation_assignments_are_not_currently_s_d840064b: "В настоящее время назначения аннотаций для студентов не поддерживаются для групповых назначений"
   student_annotation_documents_c0f5c4ec: "Документы с аннотациями для студентов"
   student_annotation_f6810b5c: "Аннотация учащегося"
@@ -30019,6 +30047,7 @@ ru:
   use_the_new_assignments_teacher_page_8add7e46: "Используйте новую страницу заданий для преподавателей"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Используйте новый внешний инструмент Сотрудничества, предоставляющий больше возможностей для использования инструментов для совместной работы"
   use_the_new_document_annotation_tool_2cbc98d0: "Использование нового инструмента для аннотаций документа"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Используйте новый диалог внешнего инструмента, когда RCE запущен в Canvas. Новый диалог всегда используется в новых тестах."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Используйте новый интерфейс для управления разрешениями"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Использовать новый инструмент теста LTI вместо обычных тестов canvas"
   use_the_new_scheduler_1273b832: "Использовать новый планировщик"

@@ -827,8 +827,8 @@ ar:
         blank_placeholder: "-"
         event_type: 
           corrupted: "التفاصيل غير متوفرة"
-        no-abbreviation: لا
-        yes-abbreviation: نعم
+        no-abbreviation: "n"
+        yes-abbreviation: "y"
       grade_change_logging_results: 
         Anonymous: مجهول
         Assignment: المهمة
@@ -1794,6 +1794,12 @@ ar:
         value: أحرف
     site_admin_statistics: 
       page_title: "إحصاءات خاصة بالحساب %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "تاريخ النشاط:"
     statistics: 
       concluded_at: "تم الانتهاء %{at}"
       created_at: "تم الإنشاء %{at}"
@@ -2241,6 +2247,7 @@ ar:
   add_scope_a5208f8b: "إضافة نطاق"
   add_section_8b027a1c: "إضافة قسم"
   add_set_of_grading_periods_5b4d6e51: "إضافة مجموعة فترات تقييم الدرجات"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "إضافة SpeedGrader من الروابط إلى مشاهدات فهرس المهام والاختبارات الموجزة"
   add_student_1152afc0: "إضافة طالب"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "إضافة الطلاب من خلال البحث بالاسم أو قسم المساق أو المجموعة. بعد إدخال النص، تنقل بين النتائج باستخدام مفتاح السهم لأسفل. حدد النتائج باستخدام مفتاح Enter."
   add_students_tas_and_observers_to_your_course_e84692dd: "أضف الطلاب ومساعدي المعلمين والمراقبين إلى مساقك"
@@ -3906,6 +3913,7 @@ ar:
   assessment_question_id_4eacadb3: "معرف سؤال التقييم"
   assessment_title_7ab69b66: "عنوان التقييم"
   assessment_type_81a73b9c: "نوع التقييم"
+  assessments_6574e4fb: التقييمات
   asset_string_ddeaf719: "سلسلة الأصل"
   assign_eedf72bb: تكليف
   assign_reviews_on_date_7e48ec50: "تاريخ تعيين المراجعات"
@@ -6555,6 +6563,8 @@ ar:
     google_drive: 
       file_not_found: "لم يتم العثور على ملف التعاون"
     index: 
+      collaborations: 
+        explanation: "تعتبر أدوات الويب المجانية مكانًا ممتازًا للطلاب للعمل في مشروعات أو أوراق المجموعة وتسجيل ملاحظات مشتركة، وما إلى ذلك. يمكن للمعلمين أو الطلاب إعداد علاقات تعاون المجموعة."
       description_rs: |-
           تعتبر أدوات الويب المجانية مثل [Google Docs](%{google_url}) مكان ممتاز للطلاب للعمل في مشروعات أو أوراق المجموعة وتسجيل ملاحظات مشتركة، إلخ
           يمكن للمعلمين *أو* الطلاب إعداد علاقات تعاون المجموعة.
@@ -9890,6 +9900,7 @@ ar:
   customize_this_menu_efa72a9: "تخصيص هذه القائمة"
   cutoff_score_74254c89: "أدنى درجة للاجتياز"
   cyan_c1d5f68a: سماوي
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "تم الكشف عن مرجع دوري عند الاستيراد: %{vendor_guid}"
   czech_9aa2cbe4: التشيكية
   d2l_display: Desire2Learn
   d2l_file_description: "تصدير D2L بتنسيق zip."
@@ -10553,6 +10564,7 @@ ar:
       المهام المتباينة عبارة عن ميزة تسمح باختيار القسم (الأقسام) أو الطالب (الطلبة) الذين تنطبق عليهم مهمة.
       الأقسام التي لم تكلف بمهمة لن تستطيع مشاهدتها في محتويات مساقاتها وسيتم حساب
       درجتها النهائية دون هذه النقاط.
+  digital_badges_6dc10ade: "الشارات الرقمية"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "مشاركة مباشرة"
   disableWhileLoading: 
@@ -10648,6 +10660,7 @@ ar:
   discussion_mention_c70cb87a: "إشارة النقاش"
   discussion_opened_for_comments_successfully_b320dc39: "تم فتح المناقشة للتعليق بنجاح"
   discussion_pinned_successfully_f9c03d9f: "تم تثبيت المناقشة بنجاح"
+  discussion_podcast_feed_d62cc56f: "موجز Podcast للمناقشة"
   discussion_post_count_report_2da4c6c: "تقرير عدد المنشورات في النقاش"
   discussion_posts_c998c9ad: "منشورات المناقشة"
   discussion_redesign_description: "تعزز هذه الميزة من تجربة Canvas داخل النقاشات والإعلانات. عند تمكين هذه العلامة، سيتم عرض الوصول المبكر للتحسينات الجارية تلقائيًا مع كل إصدار. للحصول على التفاصيل الكاملة، يرجى الاطلاع على *مجموعة مستخدم إعادة تصميم المناقشات/الإعلانات* في مجتمع Canvas"
@@ -16516,6 +16529,8 @@ ar:
             
             شكرًا،
             دعم Canvas
+            
+            المرجع: %{ref}
         subject: "فشل رد الرسالة: %{subject}"
       locked_topic: 
         body: |-
@@ -16638,6 +16653,7 @@ ar:
   live_event_tool_documentation_f6dcc3d7: "وثائق أداة الحدث المباشر"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "لم يتم تكوين خدمة اشتراكات الأحداث المباشرة"
   liveassessments_92d9edc0: "التقييمات المباشرة"
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "خطأ أثناء تحميل البنوك"
     loading_banks: "جارٍ تحميل البنوك..."
@@ -17265,6 +17281,7 @@ ar:
   medium_dark_skin_tone_5134edbc: "درجة لون داكنة متوسطة"
   medium_light_skin_tone_6c4a27fb: "درجة لون فاتحة متوسطة"
   medium_skin_tone_8608d74e: "درجة لون متوسطة"
+  meet_the_instructure_learning_platform_b1a3ff1b: "تعرف على منصة التعلم Instructure:"
   meets_expectations_bb179565: "يفي بالتوقعات"
   meets_mastery_754e1c06: "يلبي الإتقان"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "عدد %{member_count} من الأعضاء من إجمالي العدد الأقصى البالغ %{max_membership}"
@@ -19716,6 +19733,7 @@ ar:
   multiple_due_dates_283dd861: "تواريخ استحقاق متعددة"
   multiple_due_dates_47416f7a: "(تواريخ استحقاق متعددة)"
   multiple_due_dates_6b0d75c6: "تواريخ استحقاق عديدة"
+  multiple_grading_periods_grade_export_512bcd7f: "تصدير درجات لفترات التقييم المتعددة"
   multiple_microsoft_education_classes_already_exist_317ca726: "توجد بالفعل صفوف تعليم Microsoft متعددة للمساق."
   multiple_modules_930713d4: "وحدات متعددة"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -21418,6 +21436,12 @@ ar:
   play_media_comment_8614d30f: "تعليق تشغيل الوسائط"
   play_media_comment_by_name_from_createdat_515b3b: "تشغيل تعليق الوسائط بواسطة %{name} من %{createdAt}."
   play_media_comment_fad7a166: "تعليق تشغيل الوسائط"
+  playback: 
+    notes: الملاحظات
+    podcast: Podcast
+    presentation: "العرض التقديمي"
+    statistics: إحصاءات
+    video: فيديو
   please_add_a_due_date_1d433d2: "الرجاء إضافة تاريخ استحقاق"
   please_add_at_least_one_non_blank_answer_213c2c8e: "يرجى إضافة إجابة غير فارغة واحدة على الأقل."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "يرجى إضافة إجابة غير فارغة واحدة على الأقل لكل متغير."
@@ -24366,6 +24390,7 @@ ar:
   rce_mentions_in_discussions_82cd11e3: "إشارات RCE في المناقشات"
   rce_pretty_html_editor_d8faf2bb: "محرر HTML الأنيق لمحرر المحتوى المنسق"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "مربع حوار محرر معادلات جديد ومحسن لـ RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE استخدام مربع حوار أداة خارجية جديد في Canvas"
   rce_ux_improvements_e6c29eb4: "تحسينات تجربة مستخدم RCE"
   re_activate_user_f7d77c9a: "إلغاء تعطيل المستخدم"
   re_reported_b9671073: "تم إعادة الإبلاغ"
@@ -24745,6 +24770,7 @@ ar:
         minute: "الحد الأدنى"
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "عرض قوائم المهام للمعلمين مع تسجيلات الطلاب"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "يعرض قوائم المهام على الشريط الجانبي للوحة المعلومات للمعلمين مع تسجيلات الطلاب."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "لإعادة ترتيب بعض خيارات القائمة للمزيد من الاتساق ولإضافة رابط إلى SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "استبدال زر %{attachmentDisplayName}"
   replace_e61834a7: استبدال
   replace_filename_png_button_cf5dc7c3: "استبدال زر png لاسم الملف"
@@ -25239,6 +25265,7 @@ ar:
   rubrics_tutorial_tray_be65d10d: "علبة البرنامج التعليمي لمعايير التقييم"
   run_at_759b47d: "تم التشغيل في"
   run_at_92dd90df: "التشغيل في"
+  run_report_743fdf5f: "إنشاء تقرير"
   run_time_370dedb6: "وقت التشغيل"
   running_c5a4998d: "جارٍ التشغيل"
   running_jobs_9861080e: "جارٍ تشغيل المهام"
@@ -27407,6 +27434,7 @@ ar:
   student_activity_and_performance_career_step_585731dc: "نشاط الطالب وأداؤه - خطوة المسيرة المهنية"
   student_activity_and_performance_de2e0754: "نشاط الطالب وأداؤه"
   student_activity_tracking_90bdd519: "تعقب نشاط الطالب"
+  student_analytics_614304ee: "تحليلات الطالب"
   student_annotation_assignments_are_not_currently_s_d840064b: "مهام التعليقات التوضيحية للطالب غير مدعومة حاليًا للمهام الجماعية"
   student_annotation_documents_c0f5c4ec: "مستندات التعليقات التوضيحية لطالب"
   student_annotation_f6810b5c: "تعليق توضيحي لطالب"
@@ -30640,6 +30668,7 @@ ar:
   use_the_new_assignments_teacher_page_8add7e46: "استخدم صفحة المهام الجديدة للمعلم"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "استخدم الأداة الخارجية الجديدة للتعاونات التي توفر مزيد من الخيارات للأدوات التي تستخدم في التعاون"
   use_the_new_document_annotation_tool_2cbc98d0: "استخدم أداة التعليقات التوضيحية الجديدة للمستند"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "استخدم مربع حوار الأداة الخارجية الجديد عند تشغيل RCE في Canvas. يُستخدم مربع الحوار الجديد في الاختبارات الموجزة الجديدة."
   use_the_new_interface_for_managing_permissions_907e8e8f: "استخدام واجهة جديدة لإدارة الأذونات"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "استخدام أداة اختبار LTI الجديدة بدلاً من اختبارات Canvas"
   use_the_new_scheduler_1273b832: "استخدام المجدول الجديد"

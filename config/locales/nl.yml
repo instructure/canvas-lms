@@ -1750,6 +1750,12 @@ nl:
         value: Tekens
     site_admin_statistics: 
       page_title: "Statistieken voor %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Datum van activiteit:"
     statistics: 
       concluded_at: "voltooid %{at}"
       created_at: "aangemaakt %{at}"
@@ -2185,6 +2191,7 @@ nl:
   add_scope_a5208f8b: "Bereik toevoegen"
   add_section_8b027a1c: "Sectie toevoegen"
   add_set_of_grading_periods_5b4d6e51: "Set beoordelingsperiodes toevoegen"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Voeg SpeedGrader-links toe aan indexweergaven in Opdrachten en Toetsen"
   add_student_1152afc0: "Cursist toevoegen"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Voeg cursisten toe door te zoeken op naam, cursussectie of groep. Voer tekst in en bekijk de resultaten door de pijltoets omlaag te gebruiken. Selecteer een resultaat met de Enter-toets."
   add_students_tas_and_observers_to_your_course_e84692dd: "Cursisten, onderwijsassistenten en waarnemers toevoegen aan je cursus"
@@ -3792,6 +3799,7 @@ nl:
   assessment_question_id_4eacadb3: evaluatievraag-ID
   assessment_title_7ab69b66: evaluatietitel
   assessment_type_81a73b9c: evaluatietype
+  assessments_6574e4fb: Beoordelingen
   asset_string_ddeaf719: "Asset String"
   assign_eedf72bb: Toewijzen
   assign_reviews_on_date_7e48ec50: "Beoordelingen toewijzen op datum"
@@ -6379,6 +6387,8 @@ nl:
     google_drive: 
       file_not_found: "Bestand samenwerking niet gevonden"
     index: 
+      collaborations: 
+        explanation: "Gratis online webtools zijn een uitstekende plek voor cursisten om aan groepsprojecten of werkstukken te werken, om gedeelde notities te maken, enz. Docent of studenten kunnen groepsamenwerkingen opzetten."
       description_rs: |-
           Gratis online webtools zoals [Google Docs](%{google_url}) zijn een uitstekende plek voor cursisten om aan groepsprojecten of werkstukken te werken, om gedeelde notities te maken, enz.
           Docent *of* cursisten kunnen groepsamenwerkingen opzetten.
@@ -9410,6 +9420,7 @@ nl:
   customize_this_menu_efa72a9: "Dit menu aanpassen"
   cutoff_score_74254c89: afsluit-score
   cyan_c1d5f68a: Cyaan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Cyclische verwijzing gedetecteerd bij het importeren van: %{vendor_guid}"
   czech_9aa2cbe4: Tsjechisch
   d2l_display: Desire2Learn
   d2l_file_description: "D2L-exportindeling (.zip)"
@@ -9998,6 +10009,7 @@ nl:
       
       Secties waarbij geen opdracht wordt gegeven zullen dit niet in hun inhoud tonen en hun eindcijfer zal 
       zonder deze punten worden berekend.
+  digital_badges_6dc10ade: "Digitale badges"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Rechtstreeks delen"
   disableWhileLoading: 
@@ -10093,6 +10105,7 @@ nl:
   discussion_mention_c70cb87a: Discussievermelding
   discussion_opened_for_comments_successfully_b320dc39: "Discussie geopend voor opmerkingen"
   discussion_pinned_successfully_f9c03d9f: "Discussie is vastgezet"
+  discussion_podcast_feed_d62cc56f: "Podcast-feed voor discussie"
   discussion_post_count_report_2da4c6c: "Rapport over telling van discussieposts"
   discussion_posts_c998c9ad: Discussieberichten
   discussion_redesign_description: "Deze functie verbetert de Canvas-ervaring binnen Discussies en Aankondigingen. Wanneer deze vlag is ingeschakeld, wordt vroege toegang tot lopende verbeteringen automatisch weergegeven bij elke release. Zie voor alle details de *Discussies/Aankondigingen Nieuw ontwerp gebruikersgroep* in de Canvas Community"
@@ -15698,6 +15711,8 @@ nl:
             
                       Bedankt!
                       Canvas Ondersteuning
+                      
+            Referentie: %{ref}
         subject: "Antwoord op bericht mislukt: %{subject}"
       locked_topic: 
         body: |-
@@ -15812,6 +15827,7 @@ nl:
   live_event_tool_documentation_f6dcc3d7: "Documentatie bij tool voor live gebeurtenissen"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonneeservice voor live evenementen is niet geconfigureerd"
   liveassessments_92d9edc0: "Live beoordelingen"
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Fout bij het laden van banken"
     loading_banks: "Bezig met laden van toetsbanken..."
@@ -16435,6 +16451,7 @@ nl:
   medium_dark_skin_tone_5134edbc: "Medium-donkere huidskleur"
   medium_light_skin_tone_6c4a27fb: "Medium-lichte huidskleur"
   medium_skin_tone_8608d74e: "Medium huidskleur"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Ontdek het Instructure Learning Platform:"
   meets_expectations_bb179565: "Voldoet aan verwachtingen"
   meets_mastery_754e1c06: "Voldoende vakbeheersing"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} leden uit maximum van %{max_membership}"
@@ -18806,6 +18823,7 @@ nl:
   multiple_due_dates_283dd861: "Meerdere inleverdatums"
   multiple_due_dates_47416f7a: "(Meerdere inleverdatums)"
   multiple_due_dates_6b0d75c6: "Meerdere inleverdatums"
+  multiple_grading_periods_grade_export_512bcd7f: "Exporteren van meerdere beoordelingsperioden"
   multiple_microsoft_education_classes_already_exist_317ca726: "Er bestaan reeds meerdere Microsoft-onderwijsklassen voor de cursus."
   multiple_modules_930713d4: "Meerdere modules"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20483,6 +20501,12 @@ nl:
   play_media_comment_8614d30f: "Media-opmerking afspelen"
   play_media_comment_by_name_from_createdat_515b3b: "Speel media-opmerking door %{name} van %{createdAt} af."
   play_media_comment_fad7a166: "Media-opmerking afspelen"
+  playback: 
+    notes: Opmerkingen
+    podcast: Podcast
+    presentation: Presentatie
+    statistics: Statistieken
+    video: Video
   please_add_a_due_date_1d433d2: "Voeg een inleverdatum toe"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Tenminste een leeg antwoord toevoegen."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Tenminste een niet-leeg antwoord toevoegen voor elke variabele."
@@ -23270,6 +23294,7 @@ nl:
   rce_mentions_in_discussions_82cd11e3: "RCE-vermeldingen in Discussies"
   rce_pretty_html_editor_d8faf2bb: "RCE pretty HTML-editor"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE's nieuw en verbeterd vergelijkingseditor-dialoogvenster"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE-gebruik van nieuwe dialoogvenster van externe tool in Canvas"
   rce_ux_improvements_e6c29eb4: "Verbeteringen voor RCE UX"
   re_activate_user_f7d77c9a: "Gebruiker opnieuw activeren"
   re_reported_b9671073: "Opnieuw gemeld"
@@ -23613,6 +23638,7 @@ nl:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Geven beide Takenlijsten weer voor cursusleiders met ingeschreven cursisten"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Geeft beide Takenlijsten op de zijbalk van het dashboard weer voor cursusleiders met ingeschreven cursisten."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Sommige menuopties zijn ander gerangschikt voor meer consistentie en er zijn links toegevoegd aan SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName} knop vervangen"
   replace_e61834a7: Vervangen
   replace_filename_png_button_cf5dc7c3: "filename.png knop vervangen"
@@ -24071,6 +24097,7 @@ nl:
   rubrics_tutorial_tray_be65d10d: "Zelfstudiemenu Rubrieken"
   run_at_759b47d: "Uitvoeren op"
   run_at_92dd90df: "Uitvoeren op"
+  run_report_743fdf5f: "Rapport uitvoeren"
   run_time_370dedb6: Uitvoeringstijd
   running_c5a4998d: Uitvoeren
   running_jobs_9861080e: "Lopende taken"
@@ -26178,6 +26205,7 @@ nl:
   student_activity_and_performance_career_step_585731dc: "Activiteit en prestatie van cursist - Loopbaanstap"
   student_activity_and_performance_de2e0754: "Activiteit en prestatie van cursist"
   student_activity_tracking_90bdd519: "Volgen van cursistenactiviteit"
+  student_analytics_614304ee: Studentanalyse
   student_annotation_assignments_are_not_currently_s_d840064b: "Opdrachten met cursistaantekeningen worden momenteel niet ondersteund voor groepsopdrachten"
   student_annotation_documents_c0f5c4ec: "Documenten van cursistaantekeningen"
   student_annotation_f6810b5c: Cursistaantekening
@@ -29309,6 +29337,7 @@ nl:
   use_the_new_assignments_teacher_page_8add7e46: "Gebruik de pagina voor cursusleiders met nieuwe opdrachten"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Gebruik de nieuwe externe tool Samenwerkingen door meer opties voor tools in te schakelen om samen te werken"
   use_the_new_document_annotation_tool_2cbc98d0: "Gebruik de nieuwe tool om aantekeningen op documenten te maken"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Gebruik het nieuwe dialoogvenster van de externe tool wanneer RCE wordt uitgevoerd in Canvas. Het nieuwe dialoogvenster wordt altijd gebrtuikt in nieuwe toetsen."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Gebruik de nieuwe interface voor het beheren van machtigingen"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Gebruik de nieuwe toets LTI-tool in plaats van de gewone Canvas toetsen"
   use_the_new_scheduler_1273b832: "De nieuwe planner gebruiken"
