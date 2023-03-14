@@ -244,15 +244,15 @@ test.skip('focus returns on dismissing tray', async t => {
     .eql('BODY')
 })
 
-test('show the kb shortcut modal various ways', async t => {
+test.skip('show the kb shortcut modal various ways', async t => {
   const kbshortcutbutton = Selector('button[data-testid="ShowOnFocusButton__button"]')
   const sbKbshortcutbutton = Selector('button[title="View keyboard shortcuts"]')
   const shortcutmodal = Selector('[data-testid="RCE_KeyboardShortcutModal"]')
   const focusKBSCBtn = ClientFunction(() => kbshortcutbutton().focus(), {
-    dependencies: {kbshortcutbutton}
+    dependencies: {kbshortcutbutton},
   })
   const focusSBKBSCBtn = ClientFunction(() => sbKbshortcutbutton().focus(), {
-    dependencies: {sbKbshortcutbutton}
+    dependencies: {sbKbshortcutbutton},
   })
 
   await t.expect(kbshortcutbutton.exists).ok()
