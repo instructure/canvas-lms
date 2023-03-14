@@ -1446,6 +1446,12 @@ sl:
     sis_integration_settings: 
       labels: 
         value: Znaki
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Datum aktivnosti:"
     statistics: 
       concluded_at: "zaključeno %{at}"
       created_at: "ustvarjeno %{at}"
@@ -1831,6 +1837,7 @@ sl:
   add_scope_a5208f8b: "Dodaj obseg"
   add_section_8b027a1c: "Dodaj sekcijo"
   add_set_of_grading_periods_5b4d6e51: "Dodaj nabor ocenjevalnih obdobij"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Dodaj SpeedGrader povezav do pogledov nalog in kvizov"
   add_student_1152afc0: "Dodaj študenta"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Dodaj študente z iskanjem po imenu, sekciji predmeta ali skupini Po vnosu besedila se premikajte po rezultatih s puščično tipko za pomik navzdol. S tipko Enter izberite rezultat."
   add_students_tas_and_observers_to_your_course_e84692dd: "Svojemu predmetu dodajte študente, demonstratorje in skrite bralce"
@@ -3118,6 +3125,7 @@ sl:
   assessment_question_id_4eacadb3: "id vprašanja ocenjevanja"
   assessment_title_7ab69b66: "naslov ocenjevanja"
   assessment_type_81a73b9c: "vrsta ocenjevanja"
+  assessments_6574e4fb: Ocene
   asset_string_ddeaf719: "Niz sredstev"
   assign_eedf72bb: Dodeli
   assign_reviews_on_date_7e48ec50: "Dodeli preglede na datum"
@@ -5267,6 +5275,8 @@ sl:
     google_drive: 
       file_not_found: "Datoteke skupinske naloge ni mogoče najti."
     index: 
+      collaborations: 
+        explanation: "Brezplačna spletna orodja so odličen način za delo študentov pri projektih skupine ali pisnih izdelkih, za zapisovanje skupnih opomb itd. Skupinske naloge lahko pripravi izvajalec ali študenti."
       description_rs: |-
           Brezplačna spletna orodja, kot je storitev [Google Dokumenti](%{google_url}), so odličen način za delo študentov pri projektih skupine ali pisnih izdelkih, zapisovanje skupnih opomb itd.
           Skupinske naloge lahko pripravi izvajalec *ali* pa jih pripravijo študenti.
@@ -7782,6 +7792,7 @@ sl:
   customize_this_menu_efa72a9: "Prilagodi ta meni po meri"
   cutoff_score_74254c89: "spodnja meja za pozitivno oceno"
   cyan_c1d5f68a: Cijan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Pri uvozu je zaznano ciklični sklic: %{vendor_guid}"
   czech_9aa2cbe4: češčina
   d2l_display: Desire2Learn
   d2l_file_description: "Oblika zapisa datoteke D2L za izvoz"
@@ -8233,6 +8244,7 @@ sl:
   did_you_know_you_can_now_create_filter_presets_and_f0bc546e: "Ali ste vedeli, da lahko zdaj ustvarite prednastavitve filtrov in jih shranite za uporabo v prihodnje?"
   did_you_mean_id_241c900c: "Ali ste mislili? *%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Niste našli tega, kar ste iskali? Še poskušajte!"
+  digital_badges_6dc10ade: "Digitalne značke"
   diigo_993c4646: "Orodje Diigo"
   disableWhileLoading: 
     loading: "Nalaganje ..."
@@ -8307,6 +8319,7 @@ sl:
   discussion_group_category_locked: "Kategorije skupin ni mogoče nastaviti neposredno na nalogo, ampak na razpravo."
   discussion_inline_grading_4631a62e: "Ocenjevanje znotraj razprave"
   discussion_mention_c70cb87a: "Omemba razprave"
+  discussion_podcast_feed_d62cc56f: "Vir poddaj za razpravo"
   discussion_post_count_report_2da4c6c: "Poročilo o štetju objav v razpravi"
   discussion_posts_c998c9ad: "Objave v razpravi"
   discussion_redesign_description: "Ta funkcija izboljša izkušnjo s sistemom Canvas v menijih Razprave in Obvestila. Če je ta zastavica omogočena, bodo ob vsaki izdaji samodejno prikazan zgodnji dostop do trenutnih izboljšav. Za vse *podrobnosti si oglejte uporabniško skupino Prestrukturiranje razprav/obvestil* v Canvas Community"
@@ -12545,6 +12558,8 @@ sl:
             
                       Hvala,
                       ekipa za podporo Canvas
+                      
+            Sklica: %{ref}
       locked_topic: 
         body: |-
             Sporočila z naslovom »%{subject}« ni bilo mogoče dostaviti, ker je tema razprave zaklenjena. Če se želite obrniti na koga prek sistema Canvas, se lahko poskusite prijaviti v svoj račun in mu prek orodja za pošto pošljete sporočilo.
@@ -12646,6 +12661,7 @@ sl:
   live_event_tool_documentation_f6dcc3d7: "Dokumentacija orodja za dogodke v živo"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Storitev naročnine na dogodke v živo ni konfigurirana."
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Napaka pri nalaganju zbirk"
     loading_banks: "Nalaganje zbirk ..."
@@ -13197,6 +13213,7 @@ sl:
   medium_dark_skin_tone_5134edbc: "Srednjetemna polt"
   medium_light_skin_tone_6c4a27fb: "Srednjesvetla polt"
   medium_skin_tone_8608d74e: "Srednja polt"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Spoznajte učno platformo Instructure:"
   meets_expectations_bb179565: "Izpolnjuje pričakovanja"
   meets_mastery_754e1c06: "Dosega učne cilje."
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} članov od največ %{max_membership}"
@@ -15204,6 +15221,7 @@ sl:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Več spustnih menijev, preberite okoliško besedilo."
   multiple_due_dates_283dd861: "Več rokov"
   multiple_due_dates_47416f7a: "(Več rokov)"
+  multiple_grading_periods_grade_export_512bcd7f: "Izvoz ocene za več ocenjevalnih obdobij"
   multiple_microsoft_education_classes_already_exist_317ca726: "Za predmet že obstaja več izobraževalnih razredov Microsoft."
   multiple_modules_930713d4: "Več modulov"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -16678,6 +16696,12 @@ sl:
   play_media_comment_35257210: "Predvajaj komentar v obliki medija."
   play_media_comment_8614d30f: "Predvajaj komentar v obliki medija"
   play_media_comment_by_name_from_createdat_515b3b: "Predvajaj komentar v obliki medija %{name}, ki je bil ustvarjen ob/dne %{createdAt}."
+  playback: 
+    notes: Opombe
+    podcast: Poddaja
+    presentation: Predstavitev
+    statistics: "Statistični pregled"
+    video: Videoposnetek
   please_add_a_due_date_1d433d2: "Dodajte rok."
   please_add_at_least_one_non_blank_answer_213c2c8e: "Dodajte vsaj en neprazen odgovor."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Dodajte vsaj en neprazen odgovor za vsako spremenljivko."
@@ -19061,6 +19085,7 @@ sl:
   rce_mentions_in_discussions_82cd11e3: "Omembe RCE v razpravah"
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML Editor"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Novo in izboljšano pogovorno okno urejevalnika enačb RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE – v sistemu Canvas uporabi novo pogovorno okno zunanjega orodja"
   rce_ux_improvements_e6c29eb4: "Izboljšave RCE UX"
   re_activate_user_f7d77c9a: "Ponovno aktiviraj uporabnika"
   re_reported_b9671073: "Ponovno prijavljeno"
@@ -19360,6 +19385,7 @@ sl:
         minute: minute
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Upodobi oba seznama opravil za izvajalce z vpisi študentov"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Upodobi oba seznama opravil v stranski vrstici preglednice za izvajalce z vpisi študentov"
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Preureja nekatere možnosti menija za večjo doslednost in doda povezavo do SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Gumb za zamenjavo %{attachmentDisplayName}"
   replace_e61834a7: Zamenjaj
   replace_filename_png_button_cf5dc7c3: "Zamenjaj gumb filename.png"
@@ -19734,6 +19760,7 @@ sl:
   rubrics_tutorial_tray_be65d10d: "Trak vadnice za ocenjevalne vodnike"
   run_at_759b47d: "Zaženi ob"
   run_at_92dd90df: "Zaženi ob"
+  run_report_743fdf5f: "Zaženi poročilo"
   run_time_370dedb6: "Čas izvajanja"
   running_c5a4998d: Poteka
   running_jobs_9861080e: "Opravila v teku"
@@ -21474,6 +21501,7 @@ sl:
   student_activity_and_performance_career_step_585731dc: "Dejavnost in uspešnost študentov – karierni korak"
   student_activity_and_performance_de2e0754: "Dejavnost in uspešnost študenta"
   student_activity_tracking_90bdd519: "Spremljanje dejavnosti študenta"
+  student_analytics_614304ee: "Študentska analitika"
   student_annotation_assignments_are_not_currently_s_d840064b: "Naloge z opombami študentov pri skupinskih nalogah trenutno niso podprte"
   student_annotation_documents_c0f5c4ec: "Dokumenti z opombami študentov"
   student_annotation_f6810b5c: "Opomba študenta"
@@ -24015,6 +24043,7 @@ sl:
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Za ločevanje polj v izvozih redovalnice uporabite podpičja."
   use_the_new_assignments_teacher_page_8add7e46: "Uporabite stran učitelja za nove naloge"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Uporabljajte novo zunanje orodje Skupinske naloge, ki nudi dodatne možnosti za sodelovanje."
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Uporabi novo pogovorno okno zunanjega orodja, ko se v sistemu Canvas izvaja RCE. V novih kvizih je vedno uporabljeno novo pogovorno okno."
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Namesto običajnih kvizov sistema Canvas uporabite novo orodje za kvize LTI."
   use_the_new_scheduler_1273b832: "Uporabite novi razporejevalnik."
   use_this_grading_scheme_52aa4ecf: "Uporabi to ocenjevalno shemo"
