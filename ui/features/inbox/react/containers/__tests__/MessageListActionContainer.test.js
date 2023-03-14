@@ -95,6 +95,13 @@ describe('MessageListActionContainer', () => {
       expect(await queryByText('All Courses')).toBeInTheDocument()
     })
 
+    it('should render concluded courses option', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('Concluded Courses')).toBeInTheDocument()
+    })
+
     it('should call onCourseFilterSelect when course selected', async () => {
       const mock = jest.fn()
 

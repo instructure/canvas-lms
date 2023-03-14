@@ -386,6 +386,7 @@ export const handlers = [
               contextName: 'Fighting Magneto 202',
               assetString: 'course_197',
             }),
+            concluded: true,
           }),
           Enrollment.mock({
             course: Course.mock({
