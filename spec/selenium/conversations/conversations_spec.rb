@@ -210,6 +210,27 @@ describe "conversations new" do
         driver.switch_to.alert.accept
         expect(fj("span:contains('Message unarchived!')")).to be_present
       end
+
+      it "hides selected message while loading" do
+        other_student = User.create!(name: "Luke Skywalker")
+        @course.enroll_student(other_student).update_attribute(:workflow_state, "active")
+
+        conversation = other_student.initiate_conversation(
+          [@teacher],
+          nil,
+          subject: "Hello!",
+          context_type: "Course",
+          context_id: @course.id
+        )
+        conversation.add_message("Test")
+
+        get "/conversations"
+        ff("div[data-testid='conversation']")[0].click
+        f("input[data-testid='mailbox-select']").click
+        f("span[value='sent']").click
+
+        expect(fj("span:contains('No Conversations Selected')")).to be_present
+      end
     end
 
     context "conversation with a message from a hard-deleted user" do
