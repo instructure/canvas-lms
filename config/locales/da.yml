@@ -1749,6 +1749,12 @@ da:
         value: Tegn
     site_admin_statistics: 
       page_title: "Statistik for %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Aktivitetsdato:"
     statistics: 
       concluded_at: "afsluttet %{at}"
       created_at: "oprettet %{at}"
@@ -2184,6 +2190,7 @@ da:
   add_scope_a5208f8b: "Tilføj anvendelsesområde"
   add_section_8b027a1c: "Tilføj  sektion"
   add_set_of_grading_periods_5b4d6e51: "Tilføj sæt med karakterperioder"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Tilføj SpeedGrader-links til indeksvisninger for opgaver og test"
   add_student_1152afc0: "Tilføj studerende"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Tilføj studerende ved at søge efter navn, fagsektion eller gruppe. Når du har indtastet tekst, kan du navigere resultater ved at bruge pil ned. Vælg et resultat ved at bruge Enter-tasten."
   add_students_tas_and_observers_to_your_course_e84692dd: "Tilføj studerende, undervisningsassistenter og observatører til dit fag"
@@ -3790,6 +3797,7 @@ da:
   assessment_question_id_4eacadb3: "id for bedømmelsesspørgsmål"
   assessment_title_7ab69b66: bedømmelsestitel
   assessment_type_81a73b9c: bedømmelsestype
+  assessments_6574e4fb: Vurderinger
   asset_string_ddeaf719: "Aktivets streng"
   assign_eedf72bb: Tildel
   assign_reviews_on_date_7e48ec50: "Tildel evalueringer på dato"
@@ -6380,6 +6388,8 @@ da:
     google_drive: 
       file_not_found: "Samarbejdsfil ikke fundet"
     index: 
+      collaborations: 
+        explanation: "Gratis online webværktøjer er et alle tiders sted for de studerende til at arbejde på gruppeprojekter eller artikler, tage fælles noter osv. Lærere eller studerende kan konfigurere gruppesamarbejder."
       description_rs: |-
           Gratis online webværktøjer såsom [Google Docs](%{google_url}) er et suverænt sted for de studerende til at arbejde på gruppeprojekter eller artikler, tage fælles noter osv.
           Lærer *eller* studerende kan konfigurere gruppesamarbejder.
@@ -9414,6 +9424,7 @@ da:
   customize_this_menu_efa72a9: "Tilpas denne menu"
   cutoff_score_74254c89: minimumsscore
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Cyklisk reference fundet ved import: %{vendor_guid}"
   czech_9aa2cbe4: Tjekkisk
   d2l_display: Desire2Learn
   d2l_file_description: "D2L-eksport .zip-format"
@@ -10001,6 +10012,7 @@ da:
       Differentierede opgaver er en fuktioner, der gør det muligt at vælge hvilken sektion (-er) eller individuel (-le) studerende en opgave gælder for.
       Sektioner der ikke er givet en opgave vil ikke se det i deres kursus indhold og deres endelige karakter vil blive
       beregnet uden disse points.
+  digital_badges_6dc10ade: "Digitale badges"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Direkte deling"
   disableWhileLoading: 
@@ -10096,6 +10108,7 @@ da:
   discussion_mention_c70cb87a: "Diskussion omtale"
   discussion_opened_for_comments_successfully_b320dc39: "Diskussionen blev åbnet for kommentarer"
   discussion_pinned_successfully_f9c03d9f: "Diskussionen blev fastgjort"
+  discussion_podcast_feed_d62cc56f: "Diskussion Podcast Feed"
   discussion_post_count_report_2da4c6c: "Rapport over antal diskussionsopslag"
   discussion_posts_c998c9ad: Diskussionsopslag
   discussion_redesign_description: "Denne funktion forbedrer Canvas-oplevelsen inden for Diskussioner og Beskeder. Når dette flag er aktiveret, vises tidlig adgang til løbende forbedringer automatisk med hver frigivelse. For flere detaljer *se brugergruppen Diskussioner/Beskeder - nyt design* i Canvas Community."
@@ -15712,6 +15725,8 @@ da:
             
                       Tak,
                       Canvas Support
+                      
+            Reference: %{ref}
         subject: "Beskedsvar mislykkedes: %{subject}"
       locked_topic: 
         body: |-
@@ -15826,6 +15841,7 @@ da:
   live_event_tool_documentation_f6dcc3d7: "Dokumentation af live-begivenhed-værktøj"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Abonnementer til tjenesten for live-begivenheder er ikke konfigureret"
   liveassessments_92d9edc0: LiveAssessments
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Fejl under indlæsning af banker"
     loading_banks: "Indlæser banker ..."
@@ -16449,6 +16465,7 @@ da:
   medium_dark_skin_tone_5134edbc: "Mellem-mørk hudfarve"
   medium_light_skin_tone_6c4a27fb: "Mellem-lys hudfarve"
   medium_skin_tone_8608d74e: "Mellem hudfarve"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Mød Instructures læringsplatform:"
   meets_expectations_bb179565: "Opfylder forventningerne"
   meets_mastery_754e1c06: "Opfylder mål"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ud af maksimum %{max_membership}"
@@ -18820,6 +18837,7 @@ da:
   multiple_due_dates_283dd861: "Flere forfaldsdatoer"
   multiple_due_dates_47416f7a: "(Flere forfaldsdatoer)"
   multiple_due_dates_6b0d75c6: "Flere deadlines"
+  multiple_grading_periods_grade_export_512bcd7f: "Karaktereksport for flere karakterperioder"
   multiple_microsoft_education_classes_already_exist_317ca726: "Der findes allerede flere Microsoft-uddannelseskurser for faget."
   multiple_modules_930713d4: "Flere moduler"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20499,6 +20517,12 @@ da:
   play_media_comment_8614d30f: "Afspil mediekommentar"
   play_media_comment_by_name_from_createdat_515b3b: "Afspil mediekommentar af %{name} fra %{createdAt}."
   play_media_comment_fad7a166: "Afspil mediekommentar"
+  playback: 
+    notes: Noter
+    podcast: Podcast
+    presentation: Præsentation
+    statistics: Statistik
+    video: Video
   please_add_a_due_date_1d433d2: "Tilføj venligst en forfaldsdato"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Opret mindst et ikke-tomt svar."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Opret mindst et ikke-tomt svar for hver variabel."
@@ -23282,6 +23306,7 @@ da:
   rce_mentions_in_discussions_82cd11e3: "RCE-omtaler i diskussioner"
   rce_pretty_html_editor_d8faf2bb: "RCE pænt HTML-redigeringsværktøj"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE's nye og forbedrede dialog for redigeringsværktøjet til regnestykker"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE Brug ny ekstern værktøjsdialog i Canvas"
   rce_ux_improvements_e6c29eb4: "RCE UX-forbedringer"
   re_activate_user_f7d77c9a: "Genaktiver bruger"
   re_reported_b9671073: Genrapporteret
@@ -23625,6 +23650,7 @@ da:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Gengiv begge opgavelister for lærere med tilmeldinger fra studerende"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Gengiver begge opgavelister på oversigtens sidebjælke for lærere med tilmeldinger fra studerende."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Omarrangerer nogle menuindstillinger for nemmere brug og tilføjer link til SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Erstat %{attachmentDisplayName} knap"
   replace_e61834a7: Erstat
   replace_filename_png_button_cf5dc7c3: "Erstat filnavn.png-knap"
@@ -24083,6 +24109,7 @@ da:
   rubrics_tutorial_tray_be65d10d: "Selvstudiumområde for rubrikker"
   run_at_759b47d: Kør
   run_at_92dd90df: Kør
+  run_report_743fdf5f: "Kør rapport"
   run_time_370dedb6: Køretid
   running_c5a4998d: Kører
   running_jobs_9861080e: "Igangværende opgaver"
@@ -26191,6 +26218,7 @@ da:
   student_activity_and_performance_career_step_585731dc: "Studerendes aktivitet og præstation - Karrieretrin"
   student_activity_and_performance_de2e0754: "Studerendes aktivitet og præstation"
   student_activity_tracking_90bdd519: "Studerendes aktivitetssporing"
+  student_analytics_614304ee: "Analyse over studerende"
   student_annotation_assignments_are_not_currently_s_d840064b: "Studerendes opgaver med anmærkninger understøttes i øjeblikket ikke for gruppeopgaver"
   student_annotation_documents_c0f5c4ec: "Studerendes dokumenter med anmærkninger"
   student_annotation_f6810b5c: "Studerendes anmærkning"
@@ -29323,6 +29351,7 @@ da:
   use_the_new_assignments_teacher_page_8add7e46: "Brug den nye opgaveside for lærer"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Benyttelse af det nye eksterne samarbejdsværktøj aktiverer flere muligheder for værktøjer til brug for samarbejder"
   use_the_new_document_annotation_tool_2cbc98d0: "Benyt det nye dokument kommenteringsværktøj"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Brug den nye eksterne værktøjsdialog, når RCE kører i Canvas. Den nye dialog bruges altid i New Quizzes."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Brug den nye grænseflade til at administrere tilladelser"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Brug det nye test LTI-værktøj i stedet for normale canvas-test"
   use_the_new_scheduler_1273b832: "Benyt det nye planlægningsværktør"
