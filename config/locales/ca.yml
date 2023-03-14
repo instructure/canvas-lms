@@ -1437,6 +1437,12 @@ ca:
     sis_integration_settings: 
       labels: 
         value: Caràcters
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Data d’activitat:"
     statistics: 
       concluded_at: "finalitzat el %{at}"
       created_at: "creat el %{at}"
@@ -1830,6 +1836,7 @@ ca:
   add_rubric_3636d9a6: "Afegeix una rúbrica"
   add_section_8b027a1c: "Afegeix una secció"
   add_set_of_grading_periods_5b4d6e51: "Afegeix un conjunt de períodes de qualificació"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Afegiu enllaços a SpeedGrader a les visualitzacions de l’índex d’activitats i de proves"
   add_student_1152afc0: "Afegeix un estudiant"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Afegiu estudiants cercant per nom, secció de l'assignatura o grup. Després d'introduir el text, navegueu pels resultats amb la tecla de fletxa cap avall. Seleccioneu un resultat mitjançant la tecla Retorn."
   add_students_to_courses_4910cb33: "Afegeix estudiants a les assignatures"
@@ -3144,6 +3151,7 @@ ca:
   assessment_question_id_4eacadb3: "id de la pregunta d'avaluació"
   assessment_title_7ab69b66: "títol de l'avaluació"
   assessment_type_81a73b9c: "tipus d'avaluació"
+  assessments_6574e4fb: Avaluacions
   asset_string_ddeaf719: "Cadena d'actiu"
   assign_eedf72bb: Assigna
   assign_reviews_on_date_7e48ec50: "Assigna revisions a la data"
@@ -5174,6 +5182,8 @@ ca:
     google_drive: 
       file_not_found: "No s'ha trobat el fitxer de col·laboració"
     index: 
+      collaborations: 
+        explanation: "Les eines web en línia gratuïtes són un lloc excel·lent perquè els estudiants treballin en projectes o tasques de grup, prenguin apunts compartits, etc. Els professors o els estudiants poden configurar col·laboracions en grup."
       description_rs: |-
           Les eines en línia gratuïtes com el [Google Docs](%{google_url}) són un lloc excel·lent perquè els estudiants treballin en projectes o tasques de grup, prenguin apunts compartits, etc.
           El professor *o* els estudiants poden configurar col·laboracions en grup.
@@ -7663,6 +7673,7 @@ ca:
   customize_this_menu_efa72a9: "Personalitza aquest menú"
   cutoff_score_74254c89: "nota de tall"
   cyan_c1d5f68a: Cian
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "En fer la importació s’ha detectat una referència cíclica: %{vendor_guid}"
   czech_9aa2cbe4: Txec
   d2l_display: Desire2Learn
   d2l_file_description: "Format .zip d’exportació del D2L"
@@ -8117,6 +8128,7 @@ ca:
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Permet distingir entre els esdeveniments en directe generats pel sistema i per l'usuari
        a l'eina de Serveis de dades del Canvas
+  digital_badges_6dc10ade: "Insígnies digitals"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Comparteix directament"
   disableWhileLoading: 
@@ -8193,6 +8205,7 @@ ca:
   discussion_group_category_locked: "Les categories de grup no es poden establir directament en una activitat de fòrum, sinó que s'han d'establir al fòrum"
   discussion_inline_grading_4631a62e: "Nota en línia de fòrum"
   discussion_mention_c70cb87a: "Menció del fòrum"
+  discussion_podcast_feed_d62cc56f: "Canal de podcast de fòrum"
   discussion_post_count_report_2da4c6c: "Informe posterior al recompte de fòrums"
   discussion_posts_c998c9ad: "Publicacions als fòrums"
   discussion_redesign_description: "Aquesta característica millora l’experiència del Canvas als Fòrums i als Anuncis. Si s’habilita aquesta marca, l'accés previ a les millores en curs es mostrarà automàticament amb cada llançament. Per obtenir informació completa, consulteu el *grup d’usuaris de Redisseny de Fòrums i d’Anuncis* a la Canvas Community."
@@ -12353,6 +12366,8 @@ ca:
             
             Gràcies,
             Assistència tècnica del Canvas
+            
+            Referència: %{ref}
       locked_topic: 
         body: |-
             El missatge amb el títol "%{subject}" no s'ha pogut lliurar perquè el tema de debat està bloquejat. Si esteu intentant posar-vos en contacte amb algú mitjançant el Canvas, podeu provar d'iniciar la sessió al vostre usuari i enviar-los un missatge amb l'eina de la Safata d'entrada.
@@ -12453,6 +12468,7 @@ ca:
   live_event_tool_documentation_f6dcc3d7: "Documentació de l'eina Esdeveniments en directe"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "El servei de subscripcions a esdeveniments en directe no està configurat"
   liveassessments_92d9edc0: AvaluacionsEnDirecte
+  lms_7100682c: "Plataforma d'ensenyament virtual"
   load_bank: 
     error_loading_banks: "Error en carregar els bancs"
     loading_banks: "S'estan carregant els bancs..."
@@ -12974,6 +12990,7 @@ ca:
   medium_dark_skin_tone_5134edbc: "To de màscara semifosc"
   medium_light_skin_tone_6c4a27fb: "To de màscara semiclar"
   medium_skin_tone_8608d74e: "To de màscara mitjà"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Coneixeu la plataforma d’aprenentatge d’Instructure:"
   meets_expectations_bb179565: "Compleix les expectatives"
   meets_mastery_754e1c06: "Assoleix el domini"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} membres del màxim de %{max_membership}"
@@ -14898,6 +14915,7 @@ ca:
   multiple_dropdowns_read_surrounding_text_f61274b3: "Diversos desplegables, llegiu el text circumdant"
   multiple_due_dates_283dd861: "Dates de lliurament múltiples"
   multiple_due_dates_47416f7a: "(Diverses dates de lliurament)"
+  multiple_grading_periods_grade_export_512bcd7f: "Exportació de notes de diversos períodes de qualificació"
   multiple_microsoft_education_classes_already_exist_317ca726: "Ja existeixen diverses classes educatives de Microsoft per a l'assignatura."
   multiple_modules_930713d4: "Diversos continguts"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -16348,6 +16366,12 @@ ca:
   play_media_comment_35257210: "Reprodueix el comentari multimèdia."
   play_media_comment_8614d30f: "Reprodueix el comentari multimèdia"
   play_media_comment_by_name_from_createdat_515b3b: "Reprodueix el comentari multimèdia de %{name} enviat el %{createdAt}."
+  playback: 
+    notes: Comentaris
+    podcast: Podcast
+    presentation: Presentació
+    statistics: Estadístiques
+    video: Vídeo
   please_add_a_due_date_1d433d2: "Afegiu una data de lliurament"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Afegiu com a mínim una resposta que no estigui en blanc."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Afegiu com a mínim una resposta que no estigui en blanc per a cada variable."
@@ -18583,6 +18607,7 @@ ca:
   rce_mentions_in_discussions_82cd11e3: "Mencions a l’RCE als fòrums"
   rce_pretty_html_editor_d8faf2bb: "Editor d'HTML atractiu a l'RCE"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Diàleg de l'editor d’equacions nou i millorat de l’RCE, editor de contingut enriquit"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "L’editor de contingut enriquit (RCE) fa servir un nou quadre de diàleg d'eina externa al Canvas"
   rce_ux_improvements_e6c29eb4: "Millores d’RCE UX"
   re_activate_user_f7d77c9a: "Reactiva l'usuari"
   re_reported_b9671073: Reinformat
@@ -18881,6 +18906,7 @@ ca:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Reproduïu les dues llistes de tasques pendents per a professors amb inscripcions d’estudiants"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Reprodueix les dues llistes de tasques pendents a la barra lateral del panell de control per a professors amb inscripcions d’estudiants."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Reordena algunes opcions del menú per tenir més consistència i afegeix un enllaç a SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Substitueix el botó %{attachmentDisplayName}"
   replace_e61834a7: Substitueix
   replace_filename_png_button_cf5dc7c3: "Substitueix el botó filename.png"
@@ -19250,6 +19276,7 @@ ca:
   rubrics_tutorial_tray_be65d10d: "Safata de tutorial sobre les rúbriques"
   run_at_759b47d: "Executa el"
   run_at_92dd90df: "S’ha executat el"
+  run_report_743fdf5f: "Executa l'informe"
   run_time_370dedb6: "Temps d'execució"
   running_c5a4998d: "S'està executant"
   running_jobs_9861080e: "Tasques en execució"
@@ -20870,6 +20897,7 @@ ca:
   student_activity_and_performance_career_step_585731dc: "Activitat i rendiment de l’estudiant: un pas professional"
   student_activity_and_performance_de2e0754: "Activitat i rendiment de l’estudiant"
   student_activity_tracking_90bdd519: "Seguiment de l’activitat de l’estudiant"
+  student_analytics_614304ee: "Analítica de l’estudiant"
   student_annotation_assignments_are_not_currently_s_d840064b: "Actualment no s’admeten les activitats amb anotacions dels estudiants per a les activitats de grup"
   student_annotation_documents_c0f5c4ec: "Documents amb anotacions dels estudiants"
   student_annotation_f6810b5c: "Anotació de l'estudiant"
@@ -23530,6 +23558,7 @@ ca:
   use_the_new_assignments_student_page_944262af: "Permet utilitzar la nova pàgina per a estudiants de les tasques"
   use_the_new_assignments_teacher_page_8add7e46: "Permet utilitzar la nova pàgina del professor de les activitats"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Permet utilitzar la nova eina de col·laboracions externes, habilitant més opcions per a les eines que utilitzeu per col·laborar"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Utilitzeu el nou quadre de diàleg d’eina externa quan s'executi l’RCE al Canvas. Sempre s’utilitza el nou quadre de diàleg a les proves noves."
   use_this_grading_scheme_52aa4ecf: "Utilitzeu aquest esquema de qualificació"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Utilitzeu aquesta llista per suprimir estudiants assignats. Afegeix estudiants nous amb un quadre combinat després de la llista."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Utilitzeu aquesta subfinestra per resoldre els resultats duplicats o les persones que no trobeu amb la cerca."
@@ -24613,11 +24642,11 @@ ca:
     one: "Us queda 1 calendari."
     other: "Us queden %{count} calendaris."
   you_have_count_more_peer_reviews_to_complete_f7773c09: 
-    one: "Teniu 1 revisió entre companys més per completar."
-    other: "Teniu %{count} revisions entre companys més per completar."
+    one: "Teniu 1 revisió entre companys més per completar."
+    other: "Teniu %{count} revisions entre companys més per completar."
   you_have_count_peer_reviews_to_complete_219498fb: 
-    one: "Teniu 1 revisió entre companys per completar."
-    other: "Teniu %{count} revisions entre companys per completar."
+    one: "Teniu 1 revisió entre companys per completar."
+    other: "Teniu %{count} revisions entre companys per completar."
   you_have_count_peer_reviews_to_complete_52e065e: "Heu de completar %{count} revisions entre companys"
   you_have_count_submissions_to_grade_6c5b511a: "Teniu %{count} entregues per qualificar"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Heu creat un comentari que no s’ha publicat. Voleu continuar i desar aquest comentari com a esborrany? (Podeu publicar esborranys de comentaris en qualsevol moment.)"
