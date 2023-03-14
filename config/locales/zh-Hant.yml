@@ -1750,6 +1750,12 @@ zh-Hant:
         value: 性質
     site_admin_statistics: 
       page_title: "有關 %{account} 的統計資料"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: 活動日期：
     statistics: 
       concluded_at: "結束於 %{at}"
       created_at: "創建於 %{at}"
@@ -2185,6 +2191,7 @@ zh-Hant:
   add_scope_a5208f8b: 添加範圍
   add_section_8b027a1c: 添加班別
   add_set_of_grading_periods_5b4d6e51: 添加一組評分時段
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "添加 SpeedGrader 連結到作業列表和測驗索引視圖中"
   add_student_1152afc0: 添加學生
   add_students_by_searching_by_name_course_section_o_abb9e2f2: 以名字、課程班別或組別搜尋，再添加學生。輸入資料後，按「下方向」鍵確定輸入。用「Enter」鍵選擇結果。
   add_students_tas_and_observers_to_your_course_e84692dd: 添加學生，助教和觀察員到您的課程
@@ -3792,6 +3799,7 @@ zh-Hant:
   assessment_question_id_4eacadb3: "評估問題 ID"
   assessment_title_7ab69b66: 評估標題
   assessment_type_81a73b9c: 評估類型
+  assessments_6574e4fb: 評估
   asset_string_ddeaf719: 資產字串
   assign_eedf72bb: 分配任務
   assign_reviews_on_date_7e48ec50: 按照日期分配檢閱
@@ -6381,6 +6389,8 @@ zh-Hant:
     google_drive: 
       file_not_found: 協作文檔未找到
     index: 
+      collaborations: 
+        explanation: 免費的網上工具是學生進行群組專案、論文或分享筆記等的理想平台。教師或學生都可以設定群組協作。
       description_rs: |-
           免費的網上工具，例如 [Google Docs](%{google_url})，是學生進行群組任務、論文或分享筆記的理想平台。
           教師 *或* 學生均可以設置群組協作。
@@ -9422,6 +9432,7 @@ zh-Hant:
   customize_this_menu_efa72a9: 自定義此選單
   cutoff_score_74254c89: 合格分數線
   cyan_c1d5f68a: 青色
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "匯入時偵測到循環的參考：%{vendor_guid}"
   czech_9aa2cbe4: 捷克語
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 匯出 .zip 格式"
@@ -10009,6 +10020,7 @@ zh-Hant:
       自定義任務的特點是可以允許您選擇給特定的班次(s)或學生(s)安排特定的任務。
       未被安排特定任務的班次成員不會在課程内容中看到相關信息，
       特定任務的得分也不會計入那些班次的最後總分。
+  digital_badges_6dc10ade: 數位徽章
   diigo_993c4646: Diigo
   direct_share_80afd4a7: 直接共用
   disableWhileLoading: 
@@ -10104,6 +10116,7 @@ zh-Hant:
   discussion_mention_c70cb87a: 討論區提及
   discussion_opened_for_comments_successfully_b320dc39: 成功開啟討論區的評論
   discussion_pinned_successfully_f9c03d9f: 成功釘選討論區
+  discussion_podcast_feed_d62cc56f: 討論播客摘要
   discussion_post_count_report_2da4c6c: 討論區帖子計數報告
   discussion_posts_c998c9ad: 討論帖子
   discussion_redesign_description: "此功能提升討論區和通告內的 Canvas 體驗。啟用此標記後，每次發佈時自動顯示提早存取持續改善。如需完整詳細資料，請參閱「Canvas 社群」中的*「討論區/通告重新設計」*使用者群組。"
@@ -15701,6 +15714,8 @@ zh-Hant:
             
             謝謝！
             Canvas 支援部
+            
+            參考: %{ref}
         subject: "郵件回覆失敗：%{subject}"
       locked_topic: 
         body: |-
@@ -15815,6 +15830,7 @@ zh-Hant:
   live_event_tool_documentation_f6dcc3d7: 現場活動工具文件
   live_events_subscriptions_service_is_not_configure_8c6024e2: 尚未建立實時項目訂閱服務
   liveassessments_92d9edc0: 即時評估
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: 載入題庫時發生錯誤
     loading_banks: 正在載入題庫…
@@ -16438,6 +16454,7 @@ zh-Hant:
   medium_dark_skin_tone_5134edbc: 中暗色皮膚色調
   medium_light_skin_tone_6c4a27fb: 中淡色皮膚色調
   medium_skin_tone_8608d74e: 中色皮膚色調
+  meet_the_instructure_learning_platform_b1a3ff1b: 到達結構學習平台：
   meets_expectations_bb179565: 達到預期
   meets_mastery_754e1c06: 達到掌握程度
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最多 %{max_membership} 位成員中的 %{member_count} 位成員"
@@ -18809,6 +18826,7 @@ zh-Hant:
   multiple_due_dates_283dd861: 多個截止日期
   multiple_due_dates_47416f7a: （多個截止日期）
   multiple_due_dates_6b0d75c6: 多個截止日期
+  multiple_grading_periods_grade_export_512bcd7f: 多個評分期評分匯出
   multiple_microsoft_education_classes_already_exist_317ca726: "已存在課程的多個 Microsoft 教育班級。"
   multiple_modules_930713d4: 多個單元
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20489,6 +20507,12 @@ zh-Hant:
   play_media_comment_8614d30f: 播放媒體評論
   play_media_comment_by_name_from_createdat_515b3b: "播放%{name}於%{createdAt}創建的媒體評論。"
   play_media_comment_fad7a166: 播放媒體評論
+  playback: 
+    notes: 註釋
+    podcast: 播客
+    presentation: 簡報
+    statistics: 統計資料
+    video: 視訊
   please_add_a_due_date_1d433d2: 請加入截止日期
   please_add_at_least_one_non_blank_answer_213c2c8e: 請添加至少一個非空白答案。
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: 請為每一個變量添加至少一個非空白答案。
@@ -23275,6 +23299,7 @@ zh-Hant:
   rce_mentions_in_discussions_82cd11e3: "討論區中的 RCE 提及"
   rce_pretty_html_editor_d8faf2bb: "RCE 美觀 HTML 編輯器"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE 的新的與改善的方程式編輯器對話"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "在 Canvas 中的 RCE 使用新的外部工具對話"
   rce_ux_improvements_e6c29eb4: "RCE UX 改進"
   re_activate_user_f7d77c9a: 重新啟用使用者
   re_reported_b9671073: 重新報告
@@ -23618,6 +23643,7 @@ zh-Hant:
         minute: 分鐘
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: 呈現教師的兩份待辦事項清單與學生註冊
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: 在控制面板側欄上呈現教師的兩份待辦事項清單與學生註冊。
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "重新排列有些選單選項以達到更一致並添加連結到 SpeedGrader 中。"
   replace_attachmentdisplayname_button_94dd8ba1: "取代%{attachmentDisplayName}按鈕"
   replace_e61834a7: 替換
   replace_filename_png_button_cf5dc7c3: "取代 filename.png 按鈕"
@@ -24076,6 +24102,7 @@ zh-Hant:
   rubrics_tutorial_tray_be65d10d: 評分標準教程列表
   run_at_759b47d: 運行於
   run_at_92dd90df: 運行於
+  run_report_743fdf5f: 執行報告
   run_time_370dedb6: 運行時間
   running_c5a4998d: 運行
   running_jobs_9861080e: 正在執行的工作
@@ -26175,6 +26202,7 @@ zh-Hant:
   student_activity_and_performance_career_step_585731dc: "學生活動和表現 - 生涯步驟"
   student_activity_and_performance_de2e0754: 學生活動和表現
   student_activity_tracking_90bdd519: 學生活動追蹤
+  student_analytics_614304ee: 學生分析工具
   student_annotation_assignments_are_not_currently_s_d840064b: 學生註釋作業列表目前不支援群組作業列表
   student_annotation_documents_c0f5c4ec: 學生註釋文件
   student_annotation_f6810b5c: 學生註釋
@@ -29309,6 +29337,7 @@ zh-Hant:
   use_the_new_assignments_teacher_page_8add7e46: 使用新的作業教師頁面
   use_the_new_collaborations_external_tool_enabling__5f0ed73: 使用新協作外部工具，啟用更多工具選項用於協作
   use_the_new_document_annotation_tool_2cbc98d0: 使用新的文檔評註工具
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "RCE 正在 Canvas 中執行時，使用新的外部工具對話。新對話始終使用於新測驗中。"
   use_the_new_interface_for_managing_permissions_907e8e8f: 使用新的界面來管理權限
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的測驗 LTI 工具來代替平常的 Canvas 測驗"
   use_the_new_scheduler_1273b832: 使用新的排程工具
