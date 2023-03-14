@@ -210,38 +210,24 @@ def getSlackChannel() {
   return env.SLACK_CHANNEL_OVERRIDE ?: env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
 
-@groovy.transform.Field final static CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
-
 def getCanvasBuildsRefspec() {
-  def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+  def defaultValue = env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
 
-  if (env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
-    return env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
-  }
-
-  return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
+  return commitMessageFlag('canvas-builds-refspec') as String ?: defaultValue
 }
 
-@groovy.transform.Field final static CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
-  // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
-  if (env.GERRIT_BRANCH.contains('stable/')) {
-    def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+  def defaultBranch = env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
+  def defaultValue = "+refs/heads/$defaultBranch:refs/remotes/origin/$defaultBranch"
 
-    if ((commitMessage =~ CANVAS_LMS_REFSPEC_REGEX).find()) {
-      return configuration.canvasLmsRefspec()
-    }
-
-    return "+refs/heads/$GERRIT_BRANCH:refs/remotes/origin/$GERRIT_BRANCH"
-  }
-
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
+  return commitMessageFlag('canvas-lms-refspec') as String ?: defaultValue
 }
 // =========
 
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
+commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 
