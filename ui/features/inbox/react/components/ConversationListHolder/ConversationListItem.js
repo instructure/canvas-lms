@@ -103,7 +103,7 @@ export const ConversationListItem = ({...props}) => {
             data-testid="conversation"
             as="div"
             borderWidth="none none small none"
-            padding="small x-small"
+            padding="small medium small x-small"
           >
             <Grid
               data-testid="conversationListItem-Item"
@@ -215,7 +215,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col width="auto">
                   {!isSubmissionCommentsType && (
-                    <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
+                    <View textAlign="center" as="div" width={30} height={30}>
                       <div>
                         <IconButton
                           size="small"
