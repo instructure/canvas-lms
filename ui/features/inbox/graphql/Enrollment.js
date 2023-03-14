@@ -27,7 +27,7 @@ export const Enrollment = {
       course {
         ...Course
       }
-      softConcluded
+      concluded
     }
     ${Course.fragment}
   `,
@@ -35,13 +35,13 @@ export const Enrollment = {
   shape: shape({
     type: string,
     course: Course.shape,
-    softConcluded: bool,
+    concluded: bool,
   }),
 
-  mock: ({type = 'StudentEnrollment', course = Course.mock()} = {}, softConcluded = false) => ({
+  mock: ({type = 'StudentEnrollment', course = Course.mock(), concluded = false} = {}) => ({
     type,
     course,
-    softConcluded,
+    concluded,
     __typename: 'Enrollment',
   }),
 }

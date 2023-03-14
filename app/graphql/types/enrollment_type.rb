@@ -177,10 +177,21 @@ module Types
       ) && enrollment.can_be_deleted_by(current_user, context[:course], context[:session])
     end
 
-    field :soft_concluded, Boolean, null: true
-    def soft_concluded
+    field :concluded, Boolean, null: true
+    def concluded
       return nil unless enrollment.user == current_user
 
+      # restrict_enrollments_to_section_dates means that students enrollment is based on section dates
+      if enrollment.course_section.restrict_enrollments_to_section_dates
+        return enrollment.course_section.end_at < Time.zone.now
+      end
+
+      # restrict_enrollments_to_course_dates means that course participation is set to course
+      if enrollment.course.restrict_enrollments_to_course_dates
+        return true if enrollment.course.end_at < Time.zone.now
+      end
+
+      # Since teachers can access courses after the course is concluded, enrollment.active! is not enough for inbox purposes
       !enrollment.active?
     end
   end

@@ -47,10 +47,13 @@ const ComposeModalManager = props => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [modalError, setModalError] = useState(null)
 
+  // no-cache policy is required here to decouple the composeModalManager course query from the
+  // MessageListActionContainer course query. Otherwise the filtered courses get cached to both
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
       userID: ENV.current_user_id?.toString(),
     },
+    fetchPolicy: 'no-cache',
     skip: props.isReply || props.isReplyAll || props.isForward,
   })
 
@@ -310,14 +313,7 @@ const ComposeModalManager = props => {
   const filteredCourses = () => {
     const courses = coursesQuery?.data?.legacyNode
     if (courses) {
-      const softConcludedCourses = courses?.enrollments.filter(
-        enrollment => enrollment?.softConcluded
-      )
-      const softConcludedCoursesIds = softConcludedCourses?.map(e => e.course._id)
-      courses.favoriteCoursesConnection.nodes = courses?.favoriteCoursesConnection?.nodes.filter(
-        course => !softConcludedCoursesIds.includes(course?._id)
-      )
-      courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.softConcluded)
+      courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
     }
 
     return courses
