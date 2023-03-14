@@ -1365,6 +1365,12 @@ th:
     sis_integration_settings: 
       labels: 
         value: ตัวอักษร
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "วันที่ของกิจกรรม:"
     statistics: 
       concluded_at: "สรุปเมื่อ %{at}"
       created_at: "จัดทำเมื่อ %{at}"
@@ -1737,6 +1743,7 @@ th:
   add_rubric_3636d9a6: เพิ่มเกณฑ์การให้คะแนน
   add_section_8b027a1c: เพิ่มหัวข้อ
   add_set_of_grading_periods_5b4d6e51: เพิ่มชุดระยะเวลาการให้เกรด
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "เพิ่มลิงค์ SpeedGrader ไปยังมุมมองดัชนีภารกิจ (Assignments) และแบบทดสอบ (Quizzes)"
   add_student_1152afc0: เพิ่มผู้เรียน
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "เพิ่มผู้เรียนโดยการค้นหาชื่อ กลุ่มย่อยบทเรียนหรือกลุ่ม หลังจากกรอกข้อความ ให้ไปยังผลลัพธ์โดยใช้ปุ่มลูกศรลง เลือกผลลัพธ์โดยใช้ปุ่ม Enter"
   add_students_to_courses_4910cb33: เพิ่มผู้เรียนไปยังบทเรียน
@@ -2815,6 +2822,7 @@ th:
   assessment_question_id_4eacadb3: "Id คำถามสำหรับการประเมิน"
   assessment_title_7ab69b66: ชื่อการประเมิน
   assessment_type_81a73b9c: ประเภทการประเมิน
+  assessments_6574e4fb: การประเมิน
   asset_string_ddeaf719: ชุดอักขระทรัพยากร
   assign_eedf72bb: กำหนด
   assign_reviews_on_date_7e48ec50: กำหนดการพิจารณาในวันที่
@@ -4738,6 +4746,8 @@ th:
     google_drive: 
       file_not_found: ไม่พบไฟล์ความร่วมมือ
     index: 
+      collaborations: 
+        explanation: "เครื่องมือออนไลน์ฟรีทางเว็บสำหรับผู้เรียนในการทำโปรเจคต์กลุ่ม บันทึกข้อมูลแชร์ ฯลฯ ผู้สอนหรือผู้เรียนสามารถตั้งค่าการประสานงานในกลุ่มได้"
       description_rs: |-
           เครื่องมือเว็บออนไลน์ฟรี เช่น [Google Docs](%{google_url}) ถือเป็นเครื่องมือที่ยอดเยี่ยมสำหรับผู้เรียนในการโครงการเป็นกลุ่มหรือแบบเอกสาร การจดบันทึกแบบแชร์ร่วมกัน เป็นต้น
           ผู้สอน*หรือ*ผู้เรียนสามารถตั้งค่าความร่วมมือแบบกลุ่มได้
@@ -7085,6 +7095,7 @@ th:
   customize_this_menu_efa72a9: กำหนดค่าเมนูนี้
   cutoff_score_74254c89: คะแนนตามเกณฑ์
   cyan_c1d5f68a: ฟ้า
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "พบส่วนอ้างอิงแบบวัฏจักรขณะนำเข้า: %{vendor_guid}"
   czech_9aa2cbe4: เชก
   d2l_display: Desire2Learn
   d2l_file_description: "ฟอร์แมต .zip ข้อมูลส่งออก D2L"
@@ -7518,6 +7529,7 @@ th:
   did_you_know_you_can_now_create_filter_presets_and_f0bc546e: ทราบหรือไม่ว่าตอนนี้คุณสามารถจัดทำค่าตัวกรองสำเร็จและบันทึกไว้สำหรับใช้งานในภายหลังได้
   did_you_mean_id_241c900c: "คุณหมายถึง? *%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "ไม่พบสิ่งที่กำลังค้นหาใช่หรือไม่ พยายามต่อไป!"
+  digital_badges_6dc10ade: ตราสัญลักษณ์ดิจิตอล
   diigo_993c4646: Diigo
   disableWhileLoading: 
     loading: กำลังโหลด...
@@ -7583,6 +7595,7 @@ th:
   discussion_group_category_locked: "ไม่สามารถกำหนดหมวดหมู่ของกลุ่มได้โดยตรงในภารกิจสำหรับการพูดคุย แต่จะต้องกำหนดไว้ในการพูดคุยแทน"
   discussion_inline_grading_4631a62e: การให้เกรดในแถวสำหรับส่วนการพูดคุย
   discussion_mention_c70cb87a: การอ้างอิงสำหรับการพูดคุย
+  discussion_podcast_feed_d62cc56f: ฟีดพอดคาสต์สำหรับการพูดคุย
   discussion_post_count_report_2da4c6c: รายงานจำนวนโพสต์ส่วนการพูดคุย
   discussion_posts_c998c9ad: โพสต์การพูดคุย
   discussion_redesign_description: "คุณสมบัตินี้เป็นการปรับปรุงการใช้งาน Canvas ภายในส่วนการพูดคุยและประกาศ ขณะเปิดใช้งานหมายเหตุกำกับนี้ การสืบค้นส่วนการปรับปรุงเนื้อหาที่กำลังดำเนินการตั้งแต่เนิ่น ๆ จะมีแจ้งให้ทราบอัตโนมัติสำหรับทุกชุดเนื้อหาเผยแพร่ ดูรายละเอียดทั้งหมด*ได้จากกลุ่มผู้ใช้ การปรับรูปแบบการพูดคุย/ประกาศ*ในกลุ่ม Canvas"
@@ -11451,6 +11464,8 @@ th:
                       
                       ขอขอบคุณ
                       ฝ่าบบริการ Canvas
+                      
+            อ้างอิง: %{ref}
       locked_topic: 
         body: |-
             ข้อความ "%{subject}" ไม่สามารถจัดส่งได้เนื่องจากหัวข้อการพูดคุยถูกล็อคไว้ หากคุณพยายามติดต่อบุคคลผ่าน Canvas คุณสามารถลองล็อกอินไปยังบัญชีของคุณละส่งข้อความถึงโดยใช้เครื่องมือสำหรับกล่องจดหมาย
@@ -11549,6 +11564,7 @@ th:
   live_event_tool_documentation_f6dcc3d7: เอกสารกำกับเครื่องมือสำหรับกิจกรรมไลฟ์
   live_events_subscriptions_service_is_not_configure_8c6024e2: บริการสมัครกิจกรรมไล์ฟไม่ได้กำหนดค่าไว้
   liveassessments_92d9edc0: การประเมินแบบไลฟ์
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: มีข้อผิดพลาดในการโหลดแถวรายการ
     loading_banks: กำลังโหลดแถวรายการ...
@@ -12048,6 +12064,7 @@ th:
   medium_dark_skin_tone_5134edbc: สกินโทนคล้ำปานกลาง
   medium_light_skin_tone_6c4a27fb: สกินโทนสีอ่อนปานกลาง
   medium_skin_tone_8608d74e: สกินโทนระดับกลาง
+  meet_the_instructure_learning_platform_b1a3ff1b: "พบกับแพลตฟอร์มการเรียนรู้จาก Instructure:"
   meets_expectations_bb179565: เป็นไปตามความคาดหวัง
   meets_mastery_754e1c06: ผ่านเกณฑ์ความเชี่ยวชาญ
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "สมาชิก %{member_count} รายจากสูงสุด %{max_membership} ราย"
@@ -13963,6 +13980,7 @@ th:
   multiple_dropdowns_read_surrounding_text_f61274b3: "มีส่วนแสดงรายการหลายตัวเลือก อ่านข้อความแวดล้อม"
   multiple_due_dates_283dd861: วันครบกำหนดหลายรายการ
   multiple_due_dates_47416f7a: (วันครบกำหนดหลายรายการ)
+  multiple_grading_periods_grade_export_512bcd7f: การส่งออกเกรดสำหรับระยะเวลาการให้เกรดแบบหลายช่วง
   multiple_microsoft_education_classes_already_exist_317ca726: "มีชั้นเรียน Microsoft หลายชั้นเรียนอยู่แล้วในบทเรียน"
   multiple_modules_930713d4: หน่วยการเรียนหลายหน่วย
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -15340,6 +15358,12 @@ th:
   play_media_comment_35257210: เปิดเล่นความเห็นแบบสื่อ
   play_media_comment_8614d30f: เปิดเล่นความเห็นแบบสื่อ
   play_media_comment_by_name_from_createdat_515b3b: "เปิดเล่นความเห็นแบบสื่อโดย %{name} จาก %{createdAt}"
+  playback: 
+    notes: หมายเหตุ
+    podcast: พอดคาสต์
+    presentation: การนำเสนอ
+    statistics: สถิติ
+    video: วิดีโอ
   please_add_a_due_date_1d433d2: กรุณาเพิ่มวันครบกำหนด
   please_add_at_least_one_non_blank_answer_213c2c8e: กรุณาเพิ่มคำตอบแบบไม่ปล่อยว่างอย่างน้อยหนึ่งรายการ
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: กรุณาเพิ่มคำตอบแบบไม่ปล่อยว่างอย่างน้อยหนึ่งรายการสำหรับตัวแปรแต่ละตัว
@@ -17529,6 +17553,7 @@ th:
   rce_mentions_in_discussions_82cd11e3: "การอ้างอิง RCE ในการพูดคุย"
   rce_pretty_html_editor_d8faf2bb: "RCE HTML Editor ที่สวยงาม"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "กล่องโต้ตอบตัวแก้ไขสมการใหม่และที่มีการปรับปรุงของ RCE"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "RCE ใช้กล่องโต้ตอบเครื่องมือใหม่จากภายนอกใน Canvas"
   rce_ux_improvements_e6c29eb4: "การปรับปรุง RCE UX"
   re_activate_user_f7d77c9a: เปิดใช้งานผู้ใช้อีกครั้ง
   re_reported_b9671073: รายงานอีกครั้งแล้ว
@@ -17816,6 +17841,7 @@ th:
         minute: นาที
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "เรนเดอร์รายการ สิ่งที่ต้องทำ (To Do) ทั้งสองส่วนสำหรับผู้สอนที่มีการลงทะเบียนของผู้เรียน"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "เรนเดอร์รายการ สิ่งที่ต้องทำ (To Do) ทั้งสองส่วนที่แถบด้านข้างของแผงข้อมูลสำหรับผู้สอนที่มีการลงทะเบียนของผู้เรียน"
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "จัดลำดับตัวเลือกเมนูบางส่วนใหม่เพื่อให้สอดคล้องมากขึ้นและเพิ่มลิงค์ไปยัง SpeedGrader"
   replace_attachmentdisplayname_button_94dd8ba1: "แทนที่ปุ่ม %{attachmentDisplayName}"
   replace_e61834a7: แทนที่
   replace_filename_png_button_cf5dc7c3: "แทนที่ปุ่ม filename.png"
@@ -18165,6 +18191,7 @@ th:
   rubrics_tutorial_tray_be65d10d: ถาดข้อมูลแนะนำเกณฑ์การให้คะแนน
   run_at_759b47d: เรียกใช้เมื่อ
   run_at_92dd90df: เรียกใช้เมื่อ
+  run_report_743fdf5f: เรียกใช้รายงาน
   run_time_370dedb6: รันไทม์
   running_c5a4998d: กำลังดำเนินการ
   running_jobs_9861080e: งานที่กำลังดำเนินการ
@@ -19738,6 +19765,7 @@ th:
   student_activity_and_performance_career_step_585731dc: "กิจกรรมและผลสัมฤทธิ์ของผู้เรียน - ลำดับขั้นทางวิชาชีพ"
   student_activity_and_performance_de2e0754: กิจกรรมและผลสัมฤทธิ์ของผู้เรียน
   student_activity_tracking_90bdd519: การติดตามกิจกรรมของผู้เรียน
+  student_analytics_614304ee: ข้อมูลวิเคราะห์สำหรับผู้เรียน
   student_annotation_assignments_are_not_currently_s_d840064b: ภารกิจในการทำหมายเหตุกำกับของผู้เรียนไม่รองรับสำหรับภารกิจของกลุ่มในปัจจุบัน
   student_annotation_documents_c0f5c4ec: เอกสารการทำหมายเหตุกำกับของผู้เรียน
   student_annotation_f6810b5c: หมายเหตุกำกับสำหรับผู้เรียน
@@ -22045,6 +22073,7 @@ th:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: ใช้อัฒภาคเพื่อแยกฟิลด์ในการส่งออกกระดาษคำนวณที่รองรับ
   use_the_new_assignments_teacher_page_8add7e46: ใช้เพจผู้สอนในภารกิจใหม่
   use_the_new_collaborations_external_tool_enabling__5f0ed73: ใช้เครื่องมือความร่วมมือใหม่จากภายนอกเพื่อเสริมตัวเลือกสำหรับเครื่องมือในการประสานความร่วมมือ
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "ใช้กล่องโต้ตอบเครื่องมือใหม่จากภายนอกเมื่อ RCE ทำงานใน Canvas กล่องโต้ตอบใหม่จะถูกใช้ทุกครั้งในแบบทดสอบใหม่"
   use_this_grading_scheme_52aa4ecf: ใช้รูปแบบการให้เกรดนี้
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "ใช้รายการนี้เพื่อลบผู้เรียนที่จัดสรร เพิ่มผู้เรียนใหม่พร้อมกล่องคอมโบต่อจากรายการ"
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: ใช้แผงข้อมูลนี้เพื่อแก้ไขผลลัพธ์ซ้ำซ้อนหรือปัญหาไม่พบบุคคลจากการค้นหาของคุณ
