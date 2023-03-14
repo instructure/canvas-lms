@@ -482,11 +482,6 @@ class Submission < ActiveRecord::Base
     end
     can :grade
 
-    given do
-      can_autograde?
-    end
-    can :autograde
-
     given do |user, session|
       assignment.user_can_read_grades?(user, session)
     end
@@ -1663,7 +1658,10 @@ class Submission < ActiveRecord::Base
 
   def grader_can_grade?
     return true unless grade_changed?
-    return true if autograded? && grants_right?(nil, :autograde)
+    return true if autograded? && can_autograde?
+    # the grade permission is cached, which seems to be OK as the user's cache_key changes when
+    # an assignment is published. can_autograde? does not depend on a user so cannot be made
+    # into permission that would be cached.
     return true if grants_right?(grader, :grade)
 
     false
@@ -1701,7 +1699,6 @@ class Submission < ActiveRecord::Base
 
     can_autograde_status
   end
-  private :can_autograde?
 
   def can_autograde_symbolic_status
     return :not_applicable if deleted?
