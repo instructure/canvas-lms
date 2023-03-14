@@ -1750,6 +1750,12 @@ ja:
         value: 文字
     site_admin_statistics: 
       page_title: "%{account} の統計"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: アクティビティ日：
     statistics: 
       concluded_at: "終了日時 %{at}"
       created_at: "作成日時 %{at}"
@@ -2185,6 +2191,7 @@ ja:
   add_scope_a5208f8b: すべての範囲
   add_section_8b027a1c: セクションの追加
   add_set_of_grading_periods_5b4d6e51: 採点期間のセットを追加する
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: 課題と小テストのインデックスビューへのリンクSpeedGrader追加
   add_student_1152afc0: 受講者を追加
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "名前、コースセクション、またはグループで検索して受講者を追加します。テキストを入力した後、下向き矢印キーを使用して結果をナビゲートします。Enter キーを使用して結果を選択します。"
   add_students_tas_and_observers_to_your_course_e84692dd: 受講者、TA、およびオブザーバーをコースに追加する
@@ -3791,6 +3798,7 @@ ja:
   assessment_question_id_4eacadb3: "アセスメントの質問 ID"
   assessment_title_7ab69b66: アセスメントのタイトル
   assessment_type_81a73b9c: "アセスメント タイプ"
+  assessments_6574e4fb: アセスメント
   asset_string_ddeaf719: アセット文字列
   assign_eedf72bb: 割り当て
   assign_reviews_on_date_7e48ec50: レビュー割り当て日付
@@ -6384,6 +6392,8 @@ ja:
     google_drive: 
       file_not_found: コラボレーションファイルが見つかりません
     index: 
+      collaborations: 
+        explanation: 無料のオンラインウェブツールは、受講者がグループプロジェクトやレポートに取り組んだり、共有メモを取ったりするのに最適な場所です。教員または受講者がグループでの共同作業を設定することができます。
       description_rs: |-
           [Google Docs](%{google_url}) などの無料のオンライン Web ツールは、受講者にとって、グループ プロジェクトやグループ論文に参加したり、共有のメモを作成したりするための格好の場所です。
           教員 *または* 受講者は、グループによるコラボレーションをセットアップできます。
@@ -9415,6 +9425,7 @@ ja:
   customize_this_menu_efa72a9: このメニューをカスタマイズする
   cutoff_score_74254c89: "カットオフ スコア"
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "インポート時に周期的な参照が検出される：%{vendor_guid}"
   czech_9aa2cbe4: チェコ語
   d2l_display: Desire2Learn
   d2l_file_description: "D2L から .zip 形式でエクスポート"
@@ -10002,6 +10013,7 @@ ja:
       分化された課題は、セクション、または個々の学生のどちらに課題が適用されるか選択することのできる機能です。
       課題が与えられなかったセクションは、コース内容にそれを見る事ができず、最終評価は
       それらの得点以外が計算されます。
+  digital_badges_6dc10ade: デジタルバッジ
   diigo_993c4646: Diigo
   direct_share_80afd4a7: 直接共有
   disableWhileLoading: 
@@ -10097,6 +10109,7 @@ ja:
   discussion_mention_c70cb87a: ディスカッション言及
   discussion_opened_for_comments_successfully_b320dc39: ディスカッションコメントが正常に開かれました
   discussion_pinned_successfully_f9c03d9f: ディスカッションは正常に固定されました
+  discussion_podcast_feed_d62cc56f: "ディスカッションのポッドキャスト フィード"
   discussion_post_count_report_2da4c6c: ディスカッションの投稿数レポート
   discussion_posts_c998c9ad: ディスカッションへの投稿
   discussion_redesign_description: この機能は、ディスカッションとお知らせ内のCanvasエクスペリエンスを強化します。このフラグを有効にすると、リリースごとに継続的な改善点への早期アクセスが自動的に表示されます。詳細については、Canvasコミュニティの*ディスカッションと通知再設計ユーザーグループを参照してください*
@@ -15704,6 +15717,8 @@ ja:
             
                       今後ともよろしくお願いいたします。
                       Canvas サポート
+                      
+            参照: %{ref}
         subject: "メッセージの返信に失敗: %{subject}"
       locked_topic: 
         body: |-
@@ -15818,6 +15833,7 @@ ja:
   live_event_tool_documentation_f6dcc3d7: ライブイベントツールのドキュメント
   live_events_subscriptions_service_is_not_configure_8c6024e2: ライブイベントサブスクリプションサービスが設定されていません
   liveassessments_92d9edc0: LiveAssessments（ライブ評価）
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: バンクを読み込む際にエラーが発生しました
     loading_banks: バンクを読み込んでいます...
@@ -16441,6 +16457,7 @@ ja:
   medium_dark_skin_tone_5134edbc: やや暗い肌の色
   medium_light_skin_tone_6c4a27fb: やや薄い肌の色
   medium_skin_tone_8608d74e: 中くらいの濃さの肌の色
+  meet_the_instructure_learning_platform_b1a3ff1b: "Instructure Learning Platformのご紹介："
   meets_expectations_bb179565: 期待値を満たしている
   meets_mastery_754e1c06: 熟達を満たしている
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最大 %{max_membership} 人中 %{member_count} 人"
@@ -18812,6 +18829,7 @@ ja:
   multiple_due_dates_283dd861: 複数の締切日
   multiple_due_dates_47416f7a: （複数の期限）
   multiple_due_dates_6b0d75c6: 複数の期日
+  multiple_grading_periods_grade_export_512bcd7f: 複数回の成績評価期間成績のエクスポート
   multiple_microsoft_education_classes_already_exist_317ca726: "このコースには、すでに複数の Microsoft 教育クラスが存在します。"
   multiple_modules_930713d4: 複数のモジュール
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20490,6 +20508,12 @@ ja:
   play_media_comment_8614d30f: "メディア コメントの再生"
   play_media_comment_by_name_from_createdat_515b3b: "%{name}まで%{createdAt}からのメディアのコメントを再生します。"
   play_media_comment_fad7a166: "メディア コメントの再生"
+  playback: 
+    notes: メモ
+    podcast: ポッドキャスト
+    presentation: プレゼンテーション
+    statistics: 統計
+    video: ビデオ
   please_add_a_due_date_1d433d2: 期限を追加してください
   please_add_at_least_one_non_blank_answer_213c2c8e: "空白でない解答を少なくとも 1 つ追加してください。"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "各変数に空白でない解答を少なくとも 1 つ追加してください。"
@@ -23273,6 +23297,7 @@ ja:
   rce_mentions_in_discussions_82cd11e3: ディスカッションでのRCEの言及
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML Editor"
   rce_s_new_and_improved_equation_editor_dialog_380653be: RCEの新しく改良された数式エディタダイアログ
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: RCE、Canvasで新しい外部ツールダイアログを使用
   rce_ux_improvements_e6c29eb4: "RCE UX の改善"
   re_activate_user_f7d77c9a: ユーザーを再アクティブ化する
   re_reported_b9671073: 再報告
@@ -23616,6 +23641,7 @@ ja:
         minute: 最小
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "受講者が登録されている教員のTo Doリストを両方表示する"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "ダッシュボードのサイドバーに表示されるTo Doリストを、受講者が登録されている教員用に両方表示します。"
+  reorders_some_menu_options_for_more_consistency_an_90efff07: メニューの順序を変更し、SpeedGraderへのリンクを追加。
   replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName}ボタンを交換"
   replace_e61834a7: 置換
   replace_filename_png_button_cf5dc7c3: filename.png　ボタンを交換
@@ -24074,6 +24100,7 @@ ja:
   rubrics_tutorial_tray_be65d10d: ルーブリックチュートリアルトレイ
   run_at_759b47d: 実行された場所
   run_at_92dd90df: 実行場所：
+  run_report_743fdf5f: レポートの実行
   run_time_370dedb6: "実行時間 (h)"
   running_c5a4998d: 実行中
   running_jobs_9861080e: 実行中のジョブ
@@ -26177,6 +26204,7 @@ ja:
   student_activity_and_performance_career_step_585731dc: "受講者アクティビティと評定 - キャリアステップ"
   student_activity_and_performance_de2e0754: 受講者アクティビティと評定
   student_activity_tracking_90bdd519: 受講者アクティビティの追跡
+  student_analytics_614304ee: 受講者分析
   student_annotation_assignments_are_not_currently_s_d840064b: 受講者の注釈の課題は、現在、グループの割り当てではサポートされていません
   student_annotation_documents_c0f5c4ec: 受講者の注釈文書
   student_annotation_f6810b5c: 受講者の注釈
@@ -29313,6 +29341,7 @@ ja:
   use_the_new_assignments_teacher_page_8add7e46: 新しい課題の教員ページを使用する
   use_the_new_collaborations_external_tool_enabling__5f0ed73: 新しいコラボレーション外部ツールを使用し、コラボレーションに使用するためのツールにより多くのオプションを有効にしてください
   use_the_new_document_annotation_tool_2cbc98d0: 新しい文書注釈ツールを使用してください
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: RCEがCanvasで実行時に、新しい外部ツールダイアログを使用します。新しいダイアログは、新しい小テストで常に使用されます。
   use_the_new_interface_for_managing_permissions_907e8e8f: 新しいインターフェイスを使用してアクセス許可を管理します
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: 定期的なキャンバスクイズの代わりに、新しいクイズLTIツールを使用する
   use_the_new_scheduler_1273b832: 新しいスケジューラーを使う
