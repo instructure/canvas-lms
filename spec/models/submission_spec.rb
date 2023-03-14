@@ -2243,20 +2243,6 @@ describe Submission do
       end
     end
 
-    describe "can :autograde" do
-      before do
-        @submission = Submission.new
-      end
-
-      it "delegates to can_autograde?" do
-        [true, false].each do |value|
-          allow(@submission).to receive(:can_autograde?).and_return(value)
-
-          expect(@submission.grants_right?(nil, :autograde)).to eq(value)
-        end
-      end
-    end
-
     describe "can :read_grade" do
       before(:once) do
         @course = Course.create!
@@ -2483,14 +2469,14 @@ describe Submission do
 
     it 'returns true for published assignments with an autograder and when the assignment is not
         in a closed grading period' do
-      expect(@submission.grants_right?(nil, :autograde)).to be_truthy
+      expect(@submission.can_autograde?).to be_truthy
     end
 
     context "when assignment is unpublished" do
       before do
         allow(@assignment).to receive(:published?).and_return(false)
 
-        @status = @submission.grants_right?(nil, :autograde)
+        @status = @submission.can_autograde?
       end
 
       it "returns false" do
@@ -2506,7 +2492,7 @@ describe Submission do
       before do
         @submission.grader_id = 1
 
-        @status = @submission.grants_right?(nil, :autograde)
+        @status = @submission.can_autograde?
       end
 
       it "returns false" do
@@ -2523,7 +2509,7 @@ describe Submission do
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
 
-        @status = @submission.grants_right?(nil, :autograde)
+        @status = @submission.can_autograde?
       end
 
       it "returns false" do
@@ -6619,7 +6605,7 @@ describe Submission do
       expect(@submission).to receive(:grade_changed?).and_return(true)
 
       expect(@submission).to receive(:autograded?).and_return(true)
-      expect(@submission).to receive(:grants_right?).with(nil, :autograde).and_return(true)
+      expect(@submission).to receive(:can_autograde?).and_return(true)
 
       expect(@submission.grader_can_grade?).to be_truthy
     end
