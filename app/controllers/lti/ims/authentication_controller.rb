@@ -168,9 +168,15 @@ module Lti
 
       def launch_parameters
         @launch_parameters ||= id_token.merge({
-                                                state: oidc_params[:state],
-                                                lti_storage_target: Lti::PlatformStorage.lti_storage_target
-                                              })
+          state: oidc_params[:state],
+          lti_storage_target: lti_storage_target
+        }.compact)
+      end
+
+      def lti_storage_target
+        return nil unless decoded_jwt["include_storage_target"]
+
+        Lti::PlatformStorage.lti_storage_target
       end
 
       def id_token

@@ -2043,6 +2043,7 @@ class ApplicationController < ActionController::Base
                       context: @context,
                       return_url: @return_url,
                       expander: variable_expander,
+                      include_storage_target: !in_lti_mobile_webview?,
                       opts: opts.merge(
                         resource_link: @tag.associated_asset_lti_resource_link
                       )
@@ -2658,6 +2659,24 @@ class ApplicationController < ActionController::Base
 
   def mobile_device?
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+  end
+
+  # returns true only if request is (to launch an LTI tool) from a webview inside an iOS or Android app.
+  #   * android: all user agents since Lollipop include `wv)`
+  #       https://developer.chrome.com/docs/multidevice/user-agent/
+  #   * iOS: the embedded Safari view uses the same user agent as standard
+  #       mobile Safari, but will pass platform=mobile for all LTI tool
+  #       launches within that view. It's unfortunate that there isn't the
+  #       same confidence level as Android, so this will have to do
+  # returns false for:
+  #   * non-LTI-related iOS mobile app requests
+  #   * mobile browser requests (iOS Safari, Android Chrome)
+  #   * all non-mobile requests
+  def in_lti_mobile_webview?
+    in_android_app = request.user_agent.to_s =~ /wv\)/i
+    in_ios_app = params[:platform] == "mobile"
+
+    !!(mobile_device? && (in_android_app || in_ios_app))
   end
 
   def ms_office?
