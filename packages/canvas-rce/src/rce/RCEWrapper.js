@@ -324,6 +324,7 @@ class RCEWrapper extends React.Component {
       rce_better_paste = false,
       rce_new_external_tool_dialog_in_canvas = false,
       explicit_latex_typesetting = false,
+      rce_show_studio_media_options = false,
     } = this.props.features
 
     return {
@@ -332,6 +333,7 @@ class RCEWrapper extends React.Component {
       rce_better_paste,
       rce_new_external_tool_dialog_in_canvas,
       explicit_latex_typesetting,
+      rce_show_studio_media_options,
     }
   }
 

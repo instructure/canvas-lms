@@ -56,3 +56,11 @@ explicit_latex_typesetting:
     Instead of typesetting LaTeX anywhere, only typeset LaTeX where
     it is explicitly enabled.
   applies_to: SiteAdmin
+
+rce_show_studio_media_options:
+  state: hidden
+  display_name: Studio Media Options in RCE
+  description: |-
+   Allow users to resize Canvas Studio embedded media in the RCE via
+   a new Studio Media Options tray
+  applies_to: SiteAdmin
