@@ -346,17 +346,8 @@ describe "conversations new" do
             get "/conversations"
             f("button[data-testid='compose']").click
             f("input[placeholder='Select Course']").click
-            fj("li:contains('#{@course.name}')").click
-            ff("input[aria-label='Address Book']")[1].click
-            wait_for_ajaximations
-            fj("li:contains('Teachers')").click
-            wait_for_ajaximations
-            fj("li:contains('#{@teacher.name}')").click
-            f("textarea[data-testid='message-body']").send_keys "Message to Teacher in soft concluded course"
-            fj("button:contains('Send')").click
-            wait_for_ajaximations
-
-            expect(fj("div:contains('Course concluded, unable to send messages')")).to be_present
+            expect(f("body")).to contain_jqcss("span:contains('#{@group.name}')")
+            expect(f("body")).to_not contain_jqcss("li:contains('#{@course.name}')")
           end
 
           it "does not allow a teacher to create a new conversation when course is soft concluded" do
@@ -385,17 +376,7 @@ describe "conversations new" do
             get "/conversations"
             f("button[data-testid='compose']").click
             f("input[placeholder='Select Course']").click
-            fj("li:contains('#{@course.name}')").click
-            ff("input[aria-label='Address Book']")[1].click
-            wait_for_ajaximations
-            fj("li:contains('Students')").click
-            wait_for_ajaximations
-            fj("li:contains('#{@s1.name}')").click
-            f("textarea[data-testid='message-body']").send_keys "Message to Teacher in soft concluded course"
-            fj("button:contains('Send')").click
-            wait_for_ajaximations
-
-            expect(fj("div:contains('Course concluded, unable to send messages')")).to be_present
+            expect(f("body")).to_not contain_jqcss("li:contains('#{@course.name}')")
           end
         end
       end
