@@ -1750,6 +1750,12 @@ es:
         value: Caracteres
     site_admin_statistics: 
       page_title: "Estadísticas para %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Fecha de actividad:"
     statistics: 
       concluded_at: "finalizado %{at}"
       created_at: "creado %{at}"
@@ -2185,6 +2191,7 @@ es:
   add_scope_a5208f8b: "Agregar alcance"
   add_section_8b027a1c: "Agregar sección"
   add_set_of_grading_periods_5b4d6e51: "Agregar un conjunto de períodos de calificación"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Agregar SpeedGrader enlaces a las vistas indexadas de Tareas y Exámenes"
   add_student_1152afc0: "Agregar estudiante"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Agregue estudiantes buscando por nombre, sección del curso o grupo. Después de ingresar texto, navegue a través de los resultados con la tecla de la flecha hacia abajo. Seleccione un resultado con la tecla Entrar"
   add_students_tas_and_observers_to_your_course_e84692dd: "Agregar estudiantes, profesores auxiliares y observadores al curso"
@@ -3792,6 +3799,7 @@ es:
   assessment_question_id_4eacadb3: "Identificador de la pregunta de evaluación"
   assessment_title_7ab69b66: "título de la evaluación"
   assessment_type_81a73b9c: "tipo de evaluación"
+  assessments_6574e4fb: Evaluaciones
   asset_string_ddeaf719: "Hilo de activos"
   assign_eedf72bb: Asignar
   assign_reviews_on_date_7e48ec50: "Asignar revisiones en fecha"
@@ -6381,6 +6389,8 @@ es:
     google_drive: 
       file_not_found: "Archivo de colaboración no encontrado"
     index: 
+      collaborations: 
+        explanation: "Las herramientas web en línea gratuitas son un excelente recurso para que los estudiantes trabajen en proyectos o ensayos grupales, tomen notas compartidas, etc. Los profesores o los estudiantes pueden configurar colaboraciones grupales."
       description_rs: |-
           Las herramientas gratis en línea como [Google Docs](%{google_url}) son un lugar excelente para que los estudiantes trabajen en proyectos o artículos grupales, tomen notas compartidas, etc.
           El profesor *o* los estudiantes pueden establecer colaboraciones de grupo.
@@ -9422,6 +9432,7 @@ es:
   customize_this_menu_efa72a9: "Personalizar este menú"
   cutoff_score_74254c89: "puntaje mínimo de aprobación"
   cyan_c1d5f68a: Turquesa
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Se detectó una referencia cíclica al importar: %{vendor_guid}"
   czech_9aa2cbe4: Checo
   d2l_display: Desire2Learn
   d2l_file_description: "Formato .zip de exportación D2L"
@@ -10008,6 +10019,7 @@ es:
   differentiated_assignments_description: |-
       Las Tareas Diferenciadas es una función que permite elegir a cuál(es) sección(es) o estudiante(s) individual(es)  se aplica una tarea. 
       Las secciones a las que no se les asigne una tarea no la verán en el contenido de su curso y su calificación final se calculará sin esos puntos
+  digital_badges_6dc10ade: "Insignias digitales"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
@@ -10105,6 +10117,7 @@ es:
   discussion_mention_c70cb87a: "Mención en el foro de discusión"
   discussion_opened_for_comments_successfully_b320dc39: "Debate abierto para comentarios exitosamente"
   discussion_pinned_successfully_f9c03d9f: "Debate marcado exitosamente"
+  discussion_podcast_feed_d62cc56f: "Canal de pódcasts del feed"
   discussion_post_count_report_2da4c6c: "Reporte posconteo de la discusión"
   discussion_posts_c998c9ad: "Mensajes del foro de discusión"
   discussion_redesign_description: "Esta funcionalidad mejora la experiencia de Canvas dentro de los Foros de discusión y los Anuncios. Cuando esta marca esté habilitada, se mostrará el acceso temprano a las mejoras constantes automáticamente con cada versión. Para obtener los detalles completos, consulte el *Grupo de usuarios Foros de discusión/Rediseño de anuncios* en la Comunidad Canvas"
@@ -15705,6 +15718,8 @@ es:
                       
                       Gracias.
                       Asistencia técnica de Canvas
+                      
+            Referencia: %{ref}
         subject: "Respuesta al Mensaje Falló: %{subject}"
       locked_topic: 
         body: |-
@@ -15819,6 +15834,7 @@ es:
   live_event_tool_documentation_f6dcc3d7: "Documentos de la herramienta de eventos en vivo"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "El servicio de suscripción a eventos en vivo no está configurado"
   liveassessments_92d9edc0: "Evaluaciones en vivo"
+  lms_7100682c: "Sistema de gestión del aprendizaje"
   load_bank: 
     error_loading_banks: "Error cargando los bancos de preguntas"
     loading_banks: "Cargando bancos de preguntas..."
@@ -16442,6 +16458,7 @@ es:
   medium_dark_skin_tone_5134edbc: "Tono de piel oscuro medio"
   medium_light_skin_tone_6c4a27fb: "Tono de piel claro medio"
   medium_skin_tone_8608d74e: "Tono de piel medio"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Introducción a la plataforma de aprendizaje Instructure:"
   meets_expectations_bb179565: "Cumple con las expectativas"
   meets_mastery_754e1c06: "Reúne el dominio"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} miembros de un máximo de %{max_membership}"
@@ -18815,6 +18832,7 @@ es:
   multiple_due_dates_283dd861: "Varias fechas de entrega"
   multiple_due_dates_47416f7a: "(Fechas de entrega múltiples)"
   multiple_due_dates_6b0d75c6: "Varias horas límites"
+  multiple_grading_periods_grade_export_512bcd7f: "Exportación de calificación de varios períodos de calificación"
   multiple_microsoft_education_classes_already_exist_317ca726: "Ya existen múltiples clases de educación de Microsoft para el curso."
   multiple_modules_930713d4: "Varios módulos"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20495,6 +20513,12 @@ es:
   play_media_comment_8614d30f: "Reproduzca comentarios de multimedia"
   play_media_comment_by_name_from_createdat_515b3b: "Reproducir comentario de multimedia de %{name} desde %{createdAt}."
   play_media_comment_fad7a166: "Reproduzca comentarios de medios"
+  playback: 
+    notes: Notas
+    podcast: Pódcast
+    presentation: Presentación
+    statistics: Estadísticas
+    video: Video
   please_add_a_due_date_1d433d2: "Agregue una fecha de entrega"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Agregue al menos una respuesta que no esté en blanco."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Agregue al menos una respuesta que no esté en blanco para cada variable."
@@ -23278,6 +23302,7 @@ es:
   rce_mentions_in_discussions_82cd11e3: "Menciones de RCE en los foros de discusión"
   rce_pretty_html_editor_d8faf2bb: "Agradable Editor HTML del RCE"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Nuevo y mejorado diálogo del editor de ecuaciones del editor de contenido enriquecido (RCE)"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "El RCE usa el nuevo diálogo de herramientas externas en Canvas"
   rce_ux_improvements_e6c29eb4: "Mejoras del UX de RCE"
   re_activate_user_f7d77c9a: "Activar nuevamente al usuario"
   re_reported_b9671073: "Se volvió a reportar"
@@ -23621,6 +23646,7 @@ es:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Mostrar ambas listas de tareas por hacer para los profesores con inscripciones de estudiantes"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Mostrar ambas listas de tareas por hacer en la barra lateral del panel de control para los profesores con inscripciones de estudiantes."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Permite reordenar algunas opciones de menú para mayor uniformidad y agregar un enlace a SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Reemplazar el botón %{attachmentDisplayName}"
   replace_e61834a7: Reemplazar
   replace_filename_png_button_cf5dc7c3: "Reemplazar el botón filename.png"
@@ -24079,6 +24105,7 @@ es:
   rubrics_tutorial_tray_be65d10d: "Bandeja de tutoriales: rúbricas"
   run_at_759b47d: "Ejecutar en"
   run_at_92dd90df: "Ejecutar en"
+  run_report_743fdf5f: "Ejecutar el informe"
   run_time_370dedb6: "Horario de ejecución"
   running_c5a4998d: "En ejecución"
   running_jobs_9861080e: "Trabajos en curso"
@@ -26179,6 +26206,7 @@ es:
   student_activity_and_performance_career_step_585731dc: "Actividad y desempeño del estudiante - pasos de la carrera"
   student_activity_and_performance_de2e0754: "Actividad y desempeño del estudiante"
   student_activity_tracking_90bdd519: "Control de actividad del estudiante"
+  student_analytics_614304ee: "Analíticas del estudiante"
   student_annotation_assignments_are_not_currently_s_d840064b: "Actualmente, las tareas de anotaciones del estudiante no son compatibles con las tareas de grupos"
   student_annotation_documents_c0f5c4ec: "Documentos de anotaciones del estudiante"
   student_annotation_f6810b5c: "Comentario del estudiante"
@@ -29308,6 +29336,7 @@ es:
   use_the_new_assignments_teacher_page_8add7e46: "Usar la nueva página de tareas para profesores"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Utilizar la nueva herramienta externa de Colaboraciones permite más opciones de herramientas para utilizar para colaborar"
   use_the_new_document_annotation_tool_2cbc98d0: "Use la nueva herramienta de anotación del documento"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Use el nuevo diálogo de herramientas externas cuando se esté ejecutando el RCE en Canvas. El diálogo nuevo siempre se usa en nuevos exámenes."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Utilizar la nueva interfaz para administrar los permisos"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use la nueva herramienta de LTI de evaluación en lugar de las evaluaciones de Canvas regulares"
   use_the_new_scheduler_1273b832: "Usar el nuevo planificador"
