@@ -1747,6 +1747,12 @@ sv:
         value: Tecken
     site_admin_statistics: 
       page_title: "Statistik för %{account}"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: "Aktivitetsdatum:"
     statistics: 
       concluded_at: "avslutad %{at}"
       created_at: "skapad %{at}"
@@ -2182,6 +2188,7 @@ sv:
   add_scope_a5208f8b: "Lägg till omfattning"
   add_section_8b027a1c: "Lägg till sektion"
   add_set_of_grading_periods_5b4d6e51: "Lägg till en uppsättning bedömningsperioder"
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Lägg till SpeedGrader-länkar till indexvisningar för uppgifter och Quizzes"
   add_student_1152afc0: "Lägg till student"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Lägg till studenter genom att söka efter namn, kurssektion eller grupp. Efter att texten angetts, navigera till resultaten genom att använda nedåtpilen. Välj ett resultat genom att använda Enter-knappen."
   add_students_tas_and_observers_to_your_course_e84692dd: "Lägg till studenter, lärarassistenter och observatörer till din kurs"
@@ -3789,6 +3796,7 @@ sv:
   assessment_question_id_4eacadb3: "bedömningsfrågans id"
   assessment_title_7ab69b66: "bedömningens titel"
   assessment_type_81a73b9c: "typ av bedömning"
+  assessments_6574e4fb: Bedömningar
   asset_string_ddeaf719: Tillgångssträng
   assign_eedf72bb: Tilldela
   assign_reviews_on_date_7e48ec50: "Tilldela bedömningar efter datum"
@@ -6381,6 +6389,8 @@ sv:
     google_drive: 
       file_not_found: "Det gick inte att hitta samarbetsfil"
     index: 
+      collaborations: 
+        explanation: "Att använda gratis webbverktyg online är ett bra sätt för studenter att arbeta i gupp på projekt och uppsatser, dela anteckningar osv. Lärare och studenter kan skapa grupparbeten."
       description_rs: |-
           Gratis webbverktyg såsom [Google Dokument](%{google_url}) är en utmärkt plats där studenter kan arbeta med grupparbeten, uppsatser, dela anteckningar, m.m.
           Lärare *eller* studenter kan starta gruppsamarbeten.
@@ -9423,6 +9433,7 @@ sv:
   customize_this_menu_efa72a9: "Anpassa den här menyn"
   cutoff_score_74254c89: "Godkännande gräns"
   cyan_c1d5f68a: Cyan
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Cyklisk referens upptäcktes vid import: %{vendor_guid}"
   czech_9aa2cbe4: Tjeckiska
   d2l_display: Desire2Learn
   d2l_file_description: "ZIP-format för D2L-export"
@@ -10010,6 +10021,7 @@ sv:
       Särskillda Uppgifter är en funktion som låter en välja vilken sektion eller individuell elev en uppgift riktas mot.
       Sektioner som inte ges en uppgift kommer inte se det i sitt kursinnehåll och deras slutgiltiga betyg kommer
       räknas ut med de poängen.
+  digital_badges_6dc10ade: "Digitala märken"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: Direktdelning
   disableWhileLoading: 
@@ -10105,6 +10117,7 @@ sv:
   discussion_mention_c70cb87a: Diskussionsomnämnande
   discussion_opened_for_comments_successfully_b320dc39: "Diskussionen öppnades för kommentarer framgångsrikt"
   discussion_pinned_successfully_f9c03d9f: "Diskussionen fästes framgångsrikt"
+  discussion_podcast_feed_d62cc56f: "Diskussionens podcastflöde"
   discussion_post_count_report_2da4c6c: "Antalsrapport för diskussionsinlägg"
   discussion_posts_c998c9ad: Diskussionsinlägg
   discussion_redesign_description: "Den här funktionen ger en förbättrad Canvas-upplevelse i Diskussioner och Meddelanden. När den här flaggan är aktiverad kommer tidig åtkomst till pågående förbättringar att visas automatiskt i alla nya versioner. För fullständig information, se *användargruppen Ny design för Diskussioner/Meddelanden* i Canvas Community."
@@ -15717,6 +15730,8 @@ sv:
                       
                       Tack!
                       Canvas Support
+                      
+            Referens: %{ref}
         subject: "Meddelandesvar misslyckades: %{subject}"
       locked_topic: 
         body: |-
@@ -15831,6 +15846,7 @@ sv:
   live_event_tool_documentation_f6dcc3d7: "Dokumentation för livehändelseverktyg"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Prenumerationstjänsten för live evenemang har inte konfigurerats"
   liveassessments_92d9edc0: Livebedömningar
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: "Fel vid inläsning av frågebanker"
     loading_banks: "Läser in frågebanker ..."
@@ -16454,6 +16470,7 @@ sv:
   medium_dark_skin_tone_5134edbc: "Mellanmörk hudfärg"
   medium_light_skin_tone_6c4a27fb: "Mellanljus hudfärg"
   medium_skin_tone_8608d74e: "Mellantonad hudfärg"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Lär känna Instructure Learning Platform:"
   meets_expectations_bb179565: "Uppfyller förväntningarna"
   meets_mastery_754e1c06: "Möter måluppfyllelse"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av det maximala antalet %{max_membership}"
@@ -18825,6 +18842,7 @@ sv:
   multiple_due_dates_283dd861: "Flera inlämningsdatum"
   multiple_due_dates_47416f7a: "(flera inlämningsdatum)"
   multiple_due_dates_6b0d75c6: "Flera inlämningsdatum"
+  multiple_grading_periods_grade_export_512bcd7f: "Omdömesexport från flera omdömesperioder"
   multiple_microsoft_education_classes_already_exist_317ca726: "Det finns redan flera Microsoft-utbildningsklasser för kursen."
   multiple_modules_930713d4: "Flera moduler"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20505,6 +20523,12 @@ sv:
   play_media_comment_8614d30f: "Spela upp mediekommentar"
   play_media_comment_by_name_from_createdat_515b3b: "Spela upp mediekommentar av %{name} från %{createdAt}."
   play_media_comment_fad7a166: "Spela mediekommentar"
+  playback: 
+    notes: Anteckningar
+    podcast: Podcast
+    presentation: Presentation
+    statistics: Statistik
+    video: Video
   please_add_a_due_date_1d433d2: "Lägg till inlämningsdatum"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lägg till minst ett icke-blankt svar."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lägg till minst ett icke-blankt svar för varje variabel."
@@ -23286,6 +23310,7 @@ sv:
   rce_mentions_in_discussions_82cd11e3: "RCE-omnämnanden i diskussioner"
   rce_pretty_html_editor_d8faf2bb: "Nätt HTML-redigerare i innehållsredigeraren"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE:s nya och förbättrade dialogruta för ekvationsredigering"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: "Innehållsredigeraren – Använda ny dialogrutan för externa verktyg i Canvas"
   rce_ux_improvements_e6c29eb4: "RCE UX-förbättringar"
   re_activate_user_f7d77c9a: "Återaktivera användare"
   re_reported_b9671073: Återrapporterad
@@ -23629,6 +23654,7 @@ sv:
         minute: min
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Återge båda att göra-listorna för lärare med studentregistreringar"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Återge båda att göra-listorna i översiktens sidofält för lärare med studentregistreringar."
+  reorders_some_menu_options_for_more_consistency_an_90efff07: "Ändrar ordningsföljden för några menyalternativ för ökad enhetlighet och lägger till länkar i SpeedGrader."
   replace_attachmentdisplayname_button_94dd8ba1: "Knappen %{attachmentDisplayName} Byt ut"
   replace_e61834a7: Ersätt
   replace_filename_png_button_cf5dc7c3: "Knappen Byt filnamn.png"
@@ -24087,6 +24113,7 @@ sv:
   rubrics_tutorial_tray_be65d10d: "Självstudiefält för matriser"
   run_at_759b47d: "Kör kl."
   run_at_92dd90df: "Kör vid"
+  run_report_743fdf5f: "Kör rapport"
   run_time_370dedb6: Körningstid
   running_c5a4998d: Körs
   running_jobs_9861080e: "Kör jobb"
@@ -26187,6 +26214,7 @@ sv:
   student_activity_and_performance_career_step_585731dc: "Studentaktivitet och -prestation – karriärsteg"
   student_activity_and_performance_de2e0754: "Studentaktivitet och -prestation"
   student_activity_tracking_90bdd519: Studentaktivitetsspårning
+  student_analytics_614304ee: Studentanalys
   student_annotation_assignments_are_not_currently_s_d840064b: "Det går för närvarande inte att använda studentnoterade uppgifter för gruppuppgifter."
   student_annotation_documents_c0f5c4ec: "Studentnoterade dokument"
   student_annotation_f6810b5c: Studentnotering
@@ -29321,6 +29349,7 @@ sv:
   use_the_new_assignments_teacher_page_8add7e46: "Använd den nya uppgiftssidan för lärare"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Använd det nya externa samarbetsverktyget för att aktivera fler alternativ för verktyg som kan användas för samarbete"
   use_the_new_document_annotation_tool_2cbc98d0: "Använd det nya anteckningsverktyget"
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: "Använda den nya dialogrutan för externa verktyg när innehållsredigeraren körs i Canvas. Den nya dialogrutan används alltid i New Quizzes."
   use_the_new_interface_for_managing_permissions_907e8e8f: "Använd det nya gränssnittet för att hantera behörigheter/tillstånd"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Använd det nya quiz LTI-verktyget istället för vanliga canvas quizzes"
   use_the_new_scheduler_1273b832: "Använd den nya schemabokaren"
