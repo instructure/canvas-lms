@@ -263,11 +263,10 @@ class GroupsController < ApplicationController
                                    .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                    .eager_load(:group_category).preload(:root_account)
 
-    if params[:section_restricted] && @context.is_a?(Course)
-      is_current_user_section_restricted = @context.membership_for_user(@current_user).limit_privileges_to_course_section
-      is_current_user_a_student = @context.user_is_student?(@current_user)
-
-      if is_current_user_section_restricted && is_current_user_a_student
+    # run this only for students
+    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
+      is_current_user_section_restricted = @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
+      if is_current_user_section_restricted
         # Gets all groups in the context
         group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
         # Find all groups from that scope that can be limited from the section restriction parameter
