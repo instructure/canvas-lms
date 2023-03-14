@@ -1750,6 +1750,12 @@ zh-Hans:
         value: 字符
     site_admin_statistics: 
       page_title: "%{account} 的统计"
+    sj_valley_college: 
+      attendance_extract_report_parameters: 
+        custom_reports: 
+          start: 
+            parameters: 
+              header: 活动日期：
     statistics: 
       concluded_at: "结束于 %{at}"
       created_at: "创建于 %{at}"
@@ -2185,6 +2191,7 @@ zh-Hans:
   add_scope_a5208f8b: 添加范围
   add_section_8b027a1c: 添加班级
   add_set_of_grading_periods_5b4d6e51: 添加评分周期集
+  add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: 添加SpeedGrader链接到任务和测验索引视图
   add_student_1152afc0: 添加学生
   add_students_by_searching_by_name_course_section_o_abb9e2f2: 搜索姓名、班级或小组来添加学生。在输入文字后，使用向下箭头导航结果。使用回车键选择一个结果。
   add_students_tas_and_observers_to_your_course_e84692dd: "在您的课程中添加学生、TA 和观察者"
@@ -3790,6 +3797,7 @@ zh-Hans:
   assessment_question_id_4eacadb3: "评估问题 id"
   assessment_title_7ab69b66: 评估标题
   assessment_type_81a73b9c: 评估类型
+  assessments_6574e4fb: 评估
   asset_string_ddeaf719: 资产字符串
   assign_eedf72bb: 分配
   assign_reviews_on_date_7e48ec50: 分配审阅日期
@@ -6375,6 +6383,8 @@ zh-Hans:
     google_drive: 
       file_not_found: 没有找到协作文件
     index: 
+      collaborations: 
+        explanation: 免费在线web工具非常适合学生处理小组项目或文稿、记录共享笔记等。教师或学生可以设置小组协作。
       description_rs: |-
           [Google Docs](%{google_url})之类的的免费网站工具为学生提供了一个最佳方式，以完成小组作业或论文，分享笔记等。
           教师*或*学生可以设置小组协作。
@@ -9404,6 +9414,7 @@ zh-Hans:
   customize_this_menu_efa72a9: 自定义此菜单
   cutoff_score_74254c89: 截止分数
   cyan_c1d5f68a: 青色
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "在导入时检测到循环引用：%{vendor_guid}"
   czech_9aa2cbe4: 捷克语
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip 格式"
@@ -9991,6 +10002,7 @@ zh-Hans:
       可区分作业是一个适用于为班级或个别学生选择作业所启用的功能。
       没有分配作业的班级将不能在他们的课程内容中看见作业，以及这些分值将
       不计入他们的总分。
+  digital_badges_6dc10ade: 数字徽章
   diigo_993c4646: Diigo
   direct_share_80afd4a7: 直接共享
   disableWhileLoading: 
@@ -10086,6 +10098,7 @@ zh-Hans:
   discussion_mention_c70cb87a: 讨论提及
   discussion_opened_for_comments_successfully_b320dc39: 已成功打开评论的讨论
   discussion_pinned_successfully_f9c03d9f: 已成功固定讨论
+  discussion_podcast_feed_d62cc56f: 讨论播客动态消息
   discussion_post_count_report_2da4c6c: 讨论帖计数报告
   discussion_posts_c998c9ad: 讨论帖
   discussion_redesign_description: "此功能改进了讨论和公告的 Canvas 体验。启用此标记后，每次发布时将自动显示对持续改进的预先访问权限。有关完整详情，请参阅 Canvas 社区中的*讨论/公告重新设计用户组*"
@@ -15687,6 +15700,8 @@ zh-Hans:
             
             谢谢！
             Canvas 支持部门
+            
+            参考: %{ref}
         subject: "邮件回复失败: %{subject}"
       locked_topic: 
         body: |-
@@ -15801,6 +15816,7 @@ zh-Hans:
   live_event_tool_documentation_f6dcc3d7: 实时事件工具文档
   live_events_subscriptions_service_is_not_configure_8c6024e2: 未配置现场活动订阅服务
   liveassessments_92d9edc0: 实时评估
+  lms_7100682c: LMS
   load_bank: 
     error_loading_banks: 加载库时出错
     loading_banks: 正在加载库...
@@ -16424,6 +16440,7 @@ zh-Hans:
   medium_dark_skin_tone_5134edbc: 中度深色肤色
   medium_light_skin_tone_6c4a27fb: 中度浅色肤色
   medium_skin_tone_8608d74e: 中度肤色
+  meet_the_instructure_learning_platform_b1a3ff1b: 了解Instructure学习平台：
   meets_expectations_bb179565: 达到预期
   meets_mastery_754e1c06: 达到掌握
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最多 %{max_membership} 中的 %{member_count} 个成员"
@@ -18795,6 +18812,7 @@ zh-Hans:
   multiple_due_dates_283dd861: 多个到期日
   multiple_due_dates_47416f7a: （多个到期日期）
   multiple_due_dates_6b0d75c6: 多个截止日期
+  multiple_grading_periods_grade_export_512bcd7f: 多个评分期评分导出
   multiple_microsoft_education_classes_already_exist_317ca726: "该课程已存在多个 Microsoft 教育班级。"
   multiple_modules_930713d4: 多个单元
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -20472,6 +20490,12 @@ zh-Hans:
   play_media_comment_8614d30f: 播放媒体评论
   play_media_comment_by_name_from_createdat_515b3b: "播放%{name}的来自%{createdAt}的媒体评论。"
   play_media_comment_fad7a166: 播放媒体评论
+  playback: 
+    notes: 备注
+    podcast: 播客
+    presentation: 演示
+    statistics: 统计
+    video: 视频
   please_add_a_due_date_1d433d2: 请添加到期日期
   please_add_at_least_one_non_blank_answer_213c2c8e: 请至少添加一个非空白答案。
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: 请至少为每个变量添加一个非空白答案。
@@ -23255,6 +23279,7 @@ zh-Hans:
   rce_mentions_in_discussions_82cd11e3: 讨论中的RCE提及次数
   rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML 编辑器"
   rce_s_new_and_improved_equation_editor_dialog_380653be: "RCE 新增和改进的方程式编辑器对话框"
+  rce_use_new_external_tool_dialog_in_canvas_6acd1c8d: Canvas中的RCE使用新的外部工具对话框
   rce_ux_improvements_e6c29eb4: "RCE UX改进"
   re_activate_user_f7d77c9a: 重新激活用户
   re_reported_b9671073: 重新报告
@@ -23598,6 +23623,7 @@ zh-Hans:
         minute: 最小
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: 为有学生注册的教师显示两个待办事项列表
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: 在控制面板侧栏为有学生注册的教师显示两个待办事项列表。
+  reorders_some_menu_options_for_more_consistency_an_90efff07: 对一些菜单选项重新排序以提高一致性并在SpeedGrader中添加链接。
   replace_attachmentdisplayname_button_94dd8ba1: "替换%{attachmentDisplayName}按钮"
   replace_e61834a7: 替代
   replace_filename_png_button_cf5dc7c3: "重新放置 filename.png 按钮"
@@ -24055,6 +24081,7 @@ zh-Hans:
   rubrics_tutorial_tray_be65d10d: 评价量规教程托盘
   run_at_759b47d: 运行时间
   run_at_92dd90df: 运行时间
+  run_report_743fdf5f: 运行报告
   run_time_370dedb6: 运行时间
   running_c5a4998d: 正在运行
   running_jobs_9861080e: 运行的作业
@@ -26153,6 +26180,7 @@ zh-Hans:
   student_activity_and_performance_career_step_585731dc: "学生活动和表现 - 职业步骤"
   student_activity_and_performance_de2e0754: 学生活动和表现
   student_activity_tracking_90bdd519: 学生活动记录
+  student_analytics_614304ee: 学生分析工具
   student_annotation_assignments_are_not_currently_s_d840064b: 组作业目前不支持学生注释作业
   student_annotation_documents_c0f5c4ec: 学生注释文档
   student_annotation_f6810b5c: 学生注释
@@ -29280,6 +29308,7 @@ zh-Hans:
   use_the_new_assignments_teacher_page_8add7e46: 使用新作业教师页面
   use_the_new_collaborations_external_tool_enabling__5f0ed73: 使用新的协作外部工具，启动更多的选择工具进行协作
   use_the_new_document_annotation_tool_2cbc98d0: 使用新的文档注解工具
+  use_the_new_external_tool_dialog_when_the_rce_is_r_c5a7bfb0: 在Canvas中运行RCE时使用新的外部工具对话框。在新测验中始终使用新对话框。
   use_the_new_interface_for_managing_permissions_907e8e8f: 使用新的权限管理界面
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的测验 LTI工具来代替平常的Canvas测验。"
   use_the_new_scheduler_1273b832: 使用新的调度器
