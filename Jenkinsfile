@@ -40,6 +40,8 @@ def buildParameters = [
   string(name: 'CRYSTALBALL_MAP_S3_VERSION', value: "${env.CRYSTALBALL_MAP_S3_VERSION}")
 ]
 
+commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
+
 def getSummaryUrl() {
   return "${env.BUILD_URL}/build-summary-report"
 }
@@ -227,7 +229,6 @@ def getCanvasLmsRefspec() {
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 
