@@ -650,7 +650,9 @@ const CanvasInbox = () => {
                     overflowY="auto"
                     margin={responsiveProps.messageDetailMargin}
                   >
-                    {selectedConversations.length > 0 ? (
+                    {!conversationsQuery.loading &&
+                    !submissionCommentsQuery.loading &&
+                    selectedConversations.length > 0 ? (
                       <>
                         {matches.includes('mobile') && (
                           <View
