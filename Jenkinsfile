@@ -42,6 +42,13 @@ def buildParameters = [
 
 commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
 
+library "canvas-builds-library@${getCanvasBuildsRefspec()}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
+
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
+protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
+
 def getSummaryUrl() {
   return "${env.BUILD_URL}/build-summary-report"
 }
@@ -225,12 +232,6 @@ def getCanvasLmsRefspec() {
 }
 // =========
 
-library "canvas-builds-library@${getCanvasBuildsRefspec()}"
-loadLocalLibrary('local-lib', 'build/new-jenkins/library')
-
-configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
-protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
-
 pipeline {
   agent none
   options {
@@ -246,7 +247,7 @@ pipeline {
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
-    RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
+    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
     GERRIT_CHANGE_ID = getChangeId()
 
     // e.g. postgres-12-ruby-2.6

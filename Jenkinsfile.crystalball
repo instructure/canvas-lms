@@ -21,6 +21,8 @@
 library 'canvas-builds-library'
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+
 @groovy.transform.Field
 def rspecqNodeTotal = 50
 
@@ -106,9 +108,9 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'crystalball-map'
-    RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
+    RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
-    RSPECQ_MAX_REQUEUES = "${configuration.getInteger('rspecq-max-requeues')}"
+    RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPEC_PROCESSES = 6
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'

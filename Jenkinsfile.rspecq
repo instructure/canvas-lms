@@ -21,6 +21,8 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+
 @groovy.transform.Field
 def rspecqNodeTotal = 50
 @groovy.transform.Field
@@ -159,10 +161,10 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'test-queue'
     FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
-    RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
-    RSPEC_PROCESSES = "${configuration.getInteger('rspecq-processes')}"
-    RSPECQ_FILE_SPLIT_THRESHOLD = "${configuration.fileSplitThreshold()}"
-    RSPECQ_MAX_REQUEUES = "${configuration.getInteger('rspecq-max-requeues')}"
+    RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
+    RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
+    RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
     RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
