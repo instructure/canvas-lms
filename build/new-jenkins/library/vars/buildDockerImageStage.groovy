@@ -21,11 +21,11 @@ def getFuzzyTagSuffix() {
 }
 
 def getRailsLoadAllLocales() {
-  return configuration.isChangeMerged() ? 1 : (configuration.getBoolean('rails-load-all-locales', 'false') ? 1 : 0)
+  return configuration.isChangeMerged() ? 1 : commitMessageFlag('rails-load-all-locales').asBooleanInteger()
 }
 
 def handleDockerBuildFailure(imagePrefix, e) {
-  if (configuration.isChangeMerged() || configuration.getBoolean('upload-docker-image-failures', 'false')) {
+  if (configuration.isChangeMerged() || commitMessageFlag('upload-docker-image-failures') as Boolean) {
     // DEBUG: In some cases, such as the the image build failing only on Jenkins, it can be useful to be able to
     // download the last successful layer to debug locally. If we ever start using buildkit for the relevant
     // images, then this approach will have to change as buildkit doesn't save the intermediate layers as images.

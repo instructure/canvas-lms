@@ -104,7 +104,7 @@ def tearDownNode() {
 
   def destDir = "tmp/${env.CI_NODE_INDEX}"
   def srcDir = "${env.COMPOSE_PROJECT_NAME}_canvas_1:/usr/src/app"
-  def uploadDockerLogs = configuration.getBoolean('upload-docker-logs', 'false')
+  def uploadDockerLogs = commitMessageFlag('upload-docker-logs') as Boolean
 
   sh """#!/bin/bash
     set -ex

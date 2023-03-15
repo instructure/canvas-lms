@@ -50,7 +50,7 @@ def codeStage(stages) {
   { ->
     def codeEnvVars = [
       "PRIVATE_PLUGINS=${configuration.getString('canvas-lms-private-plugins')}",
-      "SKIP_ESLINT=${configuration.getBoolean('skip-eslint', 'false')}",
+      "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
     ]
 
     callableWithDelegate(queueTestStage())(stages,
@@ -129,7 +129,7 @@ def queueTestStage() {
       .queue(stages) {
         sh(opts.command)
 
-        if (configuration.getBoolean('force-failure-linters', 'false')) {
+        if (commitMessageFlag('force-failure-linters') as Boolean) {
           error 'lintersStage: force failing due to flag'
         }
       }
