@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+/* eslint-disable jest/valid-describe */
+// our own imported describe function confuses eslint
 
 import React from 'react'
 
@@ -22,6 +24,7 @@ import preventDefault from 'prevent-default'
 import {LiveAnnouncer, LiveMessage} from 'react-aria-live'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
@@ -45,6 +48,7 @@ import * as dom from '../utils/dom'
 import checkNode from '../node-checker'
 import formatMessage from '../../format-message'
 import {clearIndicators} from '../utils/indicate'
+import {getTrayHeight} from '../../rce/plugins/shared/trayUtils'
 
 // safari still doesn't support the standard api
 const FS_CHANGEEVENT = document.exitFullscreen ? 'fullscreenchange' : 'webkitfullscreenchange'
@@ -213,15 +217,17 @@ export default class Checker extends React.Component {
   }
 
   updateFormState = ({target}) => {
-    const formState = {...this.state.formState}
-    if (target.type === 'checkbox') {
-      formState[target.name] = target.checked
-    } else {
-      formState[target.name] = target.value
-    }
-    this.setState({
-      formState,
-      formStateValid: this.formStateValid(formState),
+    this.setState(prevState => {
+      const formState = {...prevState.formState}
+      if (target.type === 'checkbox') {
+        formState[target.name] = target.checked
+      } else {
+        formState[target.name] = target.value
+      }
+      return {
+        formState,
+        formStateValid: this.formStateValid(formState),
+      }
     })
   }
 
@@ -322,145 +328,156 @@ export default class Checker extends React.Component {
           onDismiss={() => this.handleClose()}
           placement="end"
           contentRef={e => (this.trayElement = e)}
+          size="regular"
+          theme={{regularWidth: '22em'}}
         >
-          <CloseButton
-            placement="start"
-            offset="x-small"
-            onClick={() => this.handleClose()}
-            buttonRef={ref => (this._closeButtonRef = ref)}
-          >
-            {formatMessage('Close Accessibility Checker')}
-          </CloseButton>
-          <View as="div" padding="x-large large">
-            <Heading level="h3" as="h2" margin="medium 0">
-              {' ' + formatMessage('Accessibility Checker')}
-            </Heading>
-            {this.state.errors.length > 0 && (
-              <View as="div">
-                <LiveMessage
-                  aria-live="polite"
-                  message={`
+          <Flex direction="column" height={getTrayHeight()}>
+            <Flex.Item as="header" padding="medium medium small">
+              <Flex direction="row">
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
+                  <Heading as="h2">{formatMessage('Accessibility Checker')}</Heading>
+                </Flex.Item>
+                <Flex.Item>
+                  <CloseButton
+                    placement="end"
+                    onClick={() => this.handleClose()}
+                    buttonRef={ref => (this._closeButtonRef = ref)}
+                  >
+                    {formatMessage('Close Accessibility Checker')}
+                  </CloseButton>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+            <Flex.Item as="div" padding="0 large large">
+              {this.state.errors.length > 0 && (
+                <View as="div">
+                  <LiveMessage
+                    aria-live="polite"
+                    message={`
                   ${issueNumberMessage}
                   ${describe(this.errorNode())}
                   ${this.errorMessage()}
                 `}
-                />
-                <View as="div" margin="large 0 medium 0">
-                  <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
-                    <GridRow>
-                      <GridCol>
-                        <Text weight="bold">{issueNumberMessage}</Text>
-                      </GridCol>
-                      <GridCol width="auto">
-                        <Popover
-                          on="click"
-                          show={this.state.showWhyPopover}
-                          shouldContainFocus={true}
-                          shouldReturnFocus={true}
-                        >
-                          <Popover.Trigger>
-                            <Button
-                              variant="icon"
-                              icon={IconQuestionLine}
-                              onDismiss={() => {
-                                this.setState({showWhyPopover: false})
-                              }}
-                              onClick={() => this.setState({showWhyPopover: true})}
-                            >
-                              <ScreenReaderContent>{formatMessage('Why')}</ScreenReaderContent>
-                            </Button>
-                          </Popover.Trigger>
-                          <Popover.Content>
-                            <View padding="medium" display="block" width="16rem">
-                              <CloseButton
-                                placement="end"
-                                offset="x-small"
-                                variant="icon"
-                                onClick={() => this.setState({showWhyPopover: false})}
-                              >
-                                {formatMessage('Close')}
-                              </CloseButton>
-                              <Text>
-                                <p>{rule.why()}</p>
-                                <p>
-                                  {rule.link && rule.link.length && (
-                                    <ApplyTheme
-                                      theme={{
-                                        [Link.theme]: {
-                                          textDecoration: 'underline',
-                                        },
-                                      }}
-                                    >
-                                      <Link href={rule.link} target="_blank">
-                                        {rule.linkText()}
-                                      </Link>
-                                    </ApplyTheme>
-                                  )}
-                                </p>
-                              </Text>
-                            </View>
-                          </Popover.Content>
-                        </Popover>
-                      </GridCol>
-                    </GridRow>
-                  </Grid>
-                </View>
-                <form onSubmit={preventDefault(() => this.fixIssue())}>
-                  <Text as="div">{this.errorMessage()}</Text>
-                  {rule.form().map(f => (
-                    <View as="div" key={f.dataKey} margin="medium 0 0">
-                      {this.renderField(f)}
-                    </View>
-                  ))}
-                  <View as="div" margin="medium 0">
+                  />
+                  <View as="div" margin="large 0 medium 0">
                     <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
                       <GridRow>
                         <GridCol>
-                          <Button
-                            onClick={() => this.prevError()}
-                            margin="0 small 0 0"
-                            aria-label="Previous"
-                          >
-                            {formatMessage('Prev')}
-                          </Button>
-                          <Button onClick={() => this.nextError()}>{formatMessage('Next')}</Button>
+                          <Text weight="bold">{issueNumberMessage}</Text>
                         </GridCol>
                         <GridCol width="auto">
-                          <Button
-                            type="submit"
-                            variant="primary"
-                            disabled={!this.state.formStateValid}
+                          <Popover
+                            on="click"
+                            show={this.state.showWhyPopover}
+                            shouldContainFocus={true}
+                            shouldReturnFocus={true}
                           >
-                            {formatMessage('Apply')}
-                          </Button>
+                            <Popover.Trigger>
+                              <Button
+                                variant="icon"
+                                icon={IconQuestionLine}
+                                onDismiss={() => {
+                                  this.setState({showWhyPopover: false})
+                                }}
+                                onClick={() => this.setState({showWhyPopover: true})}
+                              >
+                                <ScreenReaderContent>{formatMessage('Why')}</ScreenReaderContent>
+                              </Button>
+                            </Popover.Trigger>
+                            <Popover.Content>
+                              <View padding="medium" display="block" width="16rem">
+                                <CloseButton
+                                  placement="end"
+                                  offset="x-small"
+                                  variant="icon"
+                                  onClick={() => this.setState({showWhyPopover: false})}
+                                >
+                                  {formatMessage('Close')}
+                                </CloseButton>
+                                <Text>
+                                  <p>{rule.why()}</p>
+                                  <p>
+                                    {rule.link && rule.link.length && (
+                                      <ApplyTheme
+                                        theme={{
+                                          [Link.theme]: {
+                                            textDecoration: 'underline',
+                                          },
+                                        }}
+                                      >
+                                        <Link href={rule.link} target="_blank">
+                                          {rule.linkText()}
+                                        </Link>
+                                      </ApplyTheme>
+                                    )}
+                                  </p>
+                                </Text>
+                              </View>
+                            </Popover.Content>
+                          </Popover>
                         </GridCol>
                       </GridRow>
                     </Grid>
                   </View>
-                </form>
-              </View>
-            )}
-            {this.state.errors.length === 0 && !this.state.checking && (
-              <View>
-                <Text>
-                  <p>{formatMessage('No accessibility issues were detected.')}</p>
-                </Text>
-                <PlaceholderSVG />
-              </View>
-            )}
-            {this.state.checking && (
-              <div>
-                <LiveMessage
-                  message={formatMessage('Checking for accessibility issues')}
-                  aria-live="polite"
-                />
-                <Spinner
-                  title={formatMessage('Checking for accessibility issues')}
-                  margin="medium auto"
-                />
-              </div>
-            )}
-          </View>
+                  <form onSubmit={preventDefault(() => this.fixIssue())}>
+                    <Text as="div">{this.errorMessage()}</Text>
+                    {rule.form().map(f => (
+                      <View as="div" key={f.dataKey} margin="medium 0 0">
+                        {this.renderField(f)}
+                      </View>
+                    ))}
+                    <View as="div" margin="medium 0">
+                      <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
+                        <GridRow>
+                          <GridCol>
+                            <Button
+                              onClick={() => this.prevError()}
+                              margin="0 small 0 0"
+                              aria-label="Previous"
+                            >
+                              {formatMessage('Prev')}
+                            </Button>
+                            <Button onClick={() => this.nextError()}>
+                              {formatMessage('Next')}
+                            </Button>
+                          </GridCol>
+                          <GridCol width="auto">
+                            <Button
+                              type="submit"
+                              variant="primary"
+                              disabled={!this.state.formStateValid}
+                            >
+                              {formatMessage('Apply')}
+                            </Button>
+                          </GridCol>
+                        </GridRow>
+                      </Grid>
+                    </View>
+                  </form>
+                </View>
+              )}
+              {this.state.errors.length === 0 && !this.state.checking && (
+                <View>
+                  <Text>
+                    <p>{formatMessage('No accessibility issues were detected.')}</p>
+                  </Text>
+                  <PlaceholderSVG />
+                </View>
+              )}
+              {this.state.checking && (
+                <div>
+                  <LiveMessage
+                    message={formatMessage('Checking for accessibility issues')}
+                    aria-live="polite"
+                  />
+                  <Spinner
+                    title={formatMessage('Checking for accessibility issues')}
+                    margin="medium auto"
+                  />
+                </div>
+              )}
+            </Flex.Item>
+          </Flex>
         </Tray>
       </LiveAnnouncer>
     )
