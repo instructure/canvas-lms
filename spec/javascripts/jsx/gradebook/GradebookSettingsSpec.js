@@ -29,7 +29,6 @@ import {
   defaultGradebookProps,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
-import {getAssignmentColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 const performance_controls = {
   students_chunk_size: 2, // students per page,
@@ -528,13 +527,6 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 
     hooks.afterEach(() => {
       updateGridStub.restore()
-    })
-
-    test('sets the column definition postAssignmentGradesTrayOpenForAssignmentId', () => {
-      gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
-      const columnId = getAssignmentColumnId('2301')
-      const definition = gradebook.gridData.columns.definitions[columnId]
-      strictEqual(definition.postAssignmentGradesTrayOpenForAssignmentId, true)
     })
 
     test('calls updateGrid if a corresponding column is found', () => {

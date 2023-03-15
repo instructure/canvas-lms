@@ -183,6 +183,8 @@ class Submission < ActiveRecord::Base
   scope :for_course, ->(course) { where(course_id: course) }
   scope :for_assignment, ->(assignment) { where(assignment: assignment) }
 
+  scope :excused, -> { where(excused: true) }
+
   scope :missing, lambda {
     joins(:assignment)
       .where(<<~SQL.squish)

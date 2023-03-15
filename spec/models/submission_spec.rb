@@ -4042,6 +4042,43 @@ describe Submission do
     end
   end
 
+  describe "scope: excused" do
+    before :once do
+      submission_spec_model
+    end
+
+    it "includes submission when excused is true" do
+      @submission.update(excused: true)
+      expect(Submission.excused).to include @submission
+    end
+
+    it "does not include submission when excused is false" do
+      @submission.update(excused: false)
+      expect(Submission.excused).not_to include @submission
+    end
+
+    it "does not include the submission when excused is nil" do
+      @submission.update(excused: nil)
+      expect(Submission.excused).not_to include @submission
+    end
+  end
+
+  describe "scope: unposted" do
+    before :once do
+      submission_spec_model
+    end
+
+    it "includes submission when posted_at is nil" do
+      @submission.update(posted_at: nil, grade: 10, score: 10)
+      expect(Submission.unposted).to include @submission
+    end
+
+    it "does not include submission when posted_at is not nil" do
+      @submission.update(posted_at: Time.zone.now, grade: 10, score: 10)
+      expect(Submission.unposted).not_to include @submission
+    end
+  end
+
   describe "scope: missing" do
     context "not submitted" do
       before :once do
