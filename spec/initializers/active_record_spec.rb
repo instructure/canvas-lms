@@ -338,6 +338,58 @@ module ActiveRecord
           .to eq [user]
       end
     end
+
+    describe ".ignored_columns" do
+      before do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+
+        # If this test is the first one to run that requires User - preload User so that the correct
+        # accessors (getters / setters) already exist since the "ensure" block won't create them. In
+        # a real situation, we would first perform a rolling restart after having unset this key and
+        # finished pre-deploy migrations everywhere.
+        User.create!(name: "user u1")
+      end
+
+      after do
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store).and_call_original
+
+        reset_cache!
+        User.create!(name: "user u2")
+      end
+
+      def reset_cache!
+        Canvas::Reloader.reload!
+        User.reset_column_information
+      end
+
+      def set_ignored_columns_state!(columns, enabled)
+        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
+          {
+            "ignored_columns_disabled" => !enabled
+          }
+        )
+
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
+          {
+            "users" => columns
+          }
+        )
+
+        reset_cache!
+      end
+
+      it "ignores additional columns specified in Consul" do
+        set_ignored_columns_state!("name", true)
+        expect { User.create!(name: "user u2") }.to raise_exception(ActiveModel::UnknownAttributeError)
+      end
+
+      it "does not ignore additional columns if disabled" do
+        set_ignored_columns_state!("name", false)
+        expect(DynamicSettings).not_to receive(:find).with("activerecord/ignored_columns")
+        expect { User.create!(name: "user u2") }.not_to raise_exception
+      end
+    end
   end
 
   describe ".asset_string" do

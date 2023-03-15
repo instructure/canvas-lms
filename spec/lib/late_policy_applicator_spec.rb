@@ -45,9 +45,10 @@ describe LatePolicyApplicator do
       LatePolicyApplicator.for_course(@course)
     end
 
-    it "kicks off a singleton background job with an identifier based on the course id" do
+    it "kicks off a singleton-by-course + n_strand-by-root-account background job" do
       queueing_args = {
-        singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}"
+        singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}",
+        n_strand: ["LatePolicyApplicator", @course.root_account.global_id]
       }
 
       applicator_double = instance_double("LatePolicyApplicator")
@@ -108,9 +109,10 @@ describe LatePolicyApplicator do
       LatePolicyApplicator.for_assignment(@published_assignment)
     end
 
-    it "kicks off a singleton background job with an identifier based on the assignment id" do
+    it "kicks off a singleton-by-assignment + n_strand-by-root-account background job" do
       queueing_args = {
-        singleton: "late_policy_applicator:calculator:Assignment:#{@published_assignment.global_id}"
+        singleton: "late_policy_applicator:calculator:Assignment:#{@published_assignment.global_id}",
+        n_strand: ["LatePolicyApplicator", @published_assignment.root_account.global_id]
       }
 
       applicator_double = instance_double("LatePolicyApplicator")

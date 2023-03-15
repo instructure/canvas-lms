@@ -36,6 +36,19 @@ rce_better_paste:
     ci:
       state: allowed_on
 
+rce_new_external_tool_dialog_in_canvas:
+  state: hidden
+  display_name: RCE Use New External Tool Dialog in Canvas
+  description: Use the new external tool dialog when the RCE is running in Canvas. The new dialog is always used in new quizzes.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 explicit_latex_typesetting:
   state: hidden
   display_name: Explicit LaTeX Typesetting

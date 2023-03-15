@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Huidige afbeelding"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Huidig volumeniveau"
+    },
     "custom_6979cd81": {
         "message": "Aangepast"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "Filipijns"
+    },
+    "finish_bc343002": {
+        "message": "Voltooien"
     },
     "finnish_4df2923d": {
         "message": "Fins"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "Medium"
     },
+    "mic_a7f3d311": {
+        "message": "Mic"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Microfoon uitgeschakeld"
+    },
     "middle_27dc1d5": {
         "message": "Midden"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Geen resultaten gevonden voor { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Geen video"
     },
     "none_3b5e34d2": {
         "message": "Geen"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "Plakken"
     },
+    "pause_12af3bb4": {
+        "message": "Onderbreken"
+    },
     "peer_review_74f26a13": {
         "message": "Peerbeoordeling"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
+    "play_1a47eaa7": {
+        "message": "Afspelen"
+    },
     "play_media_comment_35257210": {
         "message": "Media-opmerking afspelen."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Media-opmerking van { name } afspelen die gemaakt is op { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Geef Canvas toegang tot je microfoon en webcam."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1690,6 +1714,9 @@
     },
     "preview_53003fd2": {
         "message": "Voorbeeld"
+    },
+    "preview_a3f8f854": {
+        "message": "VOORBEELD"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Voorbeeld in overlay"
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "Opnemen"
+    },
+    "recording_98da6bda": {
+        "message": "Bezig met opnemen"
     },
     "red_8258edf3": {
         "message": "Rood"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "Opslaan"
     },
+    "save_media_cb9e786e": {
+        "message": "Media opslaan"
+    },
     "schedule_preview_3bcda153": {
         "message": "Planningsvoorbeeld"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "Zoeken"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Audiobron selecteren"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Bijsnijvorm selecteren"
     },
     "select_language_7c93a900": {
         "message": "Taal selecteren"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Videobron selecteren"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Geselecteerd { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "Er is iets misgegaan."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Er is iets misgegaan met de toegang tot je webcam."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Er is iets misgegaan en ik weet niet wat ik je moet laten zien."
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Er is iets misgegaan"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Er is iets fout gegaan bij het delen van je scherm."
     },
     "sort_by_e75f9e3e": {
         "message": "Sorteren op"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "Ster"
+    },
+    "start_over_f7552aa9": {
+        "message": "Opnieuw starten"
+    },
+    "start_recording_9a65141a": {
+        "message": "Opname starten"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } tot { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "Syllabus"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "Systeemaudio toegestaan"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "Systeemaudio uitgeschakeld"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/pijlen"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "Het geselecteerde bestand overschrijdt de limiet van { maxSize } bytes"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Er zijn geen punten gekoppeld aan dit item."
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "Tijd"
+    },
+    "timebar_a4d18443": {
+        "message": "Tijdbalk"
     },
     "title_ee03d132": {
         "message": "Titel"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "niet-gepubliceerd"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Zonder titel"
     },
     "untitled_efdc2d7d": {
         "message": "zonder titel"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Gebied met video-opties"
     },
+    "video_player_b371005": {
+        "message": "Videospeler"
+    },
     "video_player_for_9e7d373b": {
         "message": "Videospeler voor "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Aantal woorden en tekens bekijken"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "We kunnen geen werkende microfoon detecteren die op je apparaat is aangesloten."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "We kunnen geen werkende webcam detecteren die op je apparaat is aangesloten."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "We kunnen geen werkende webcam of microfoon detecteren die op je apparaat is aangesloten."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webcam uitgeschakeld"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webcam"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigatie van wekelijkse planning"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Je afbeelding is gecomprimeerd voor Icon Maker. Afbeeldingen kleiner dan { size } KB worden niet gecomprimeerd."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Je microfoon is geblokkeerd in de browserinstellingen."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Je webcam en microfoon zijn geblokkeerd in de browserinstellingen."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Je webcam is geblokkeerd in de browserinstellingen."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Mogelijk is je webcam al in gebruik."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

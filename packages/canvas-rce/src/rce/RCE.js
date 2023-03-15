@@ -19,7 +19,12 @@
 import React, {forwardRef, useState} from 'react'
 import {arrayOf, bool, func, number, objectOf, oneOfType, shape, string} from 'prop-types'
 import formatMessage from '../format-message'
-import RCEWrapper, {editorOptionsPropType, ltiToolsPropType} from './RCEWrapper'
+import RCEWrapper from './RCEWrapper'
+import {
+  editorOptionsPropType,
+  externalToolsConfigPropType,
+  ltiToolsPropType,
+} from './RCEWrapperProps'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
@@ -197,6 +202,8 @@ RCE.propTypes = {
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)
   onContentChange: func, // f(content), don't mistake this as an indication RCE is a controlled component
+
+  externalToolsConfig: externalToolsConfigPropType,
 }
 
 RCE.defaultProps = {

@@ -1750,8 +1750,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.podcast_enabled
         content_for_head helpers.auto_discovery_link_tag(:rss,
                                                          feeds_topic_format_path(@topic.id, rss_context.feed_code, :rss),
-                                                         { title: t(:discussion_podcast_feed_title, "Discussion Podcast Feed"),
-                                                           id: "Discussion Podcast Feed" })
+                                                         { title: t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
       end
     end
   end

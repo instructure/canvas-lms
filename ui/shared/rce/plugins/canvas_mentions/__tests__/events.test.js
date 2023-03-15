@@ -18,7 +18,7 @@
 
 import {makeBodyEditable} from '../contentEditable'
 import {insertMentionFor} from '../edit'
-import FakeEditor from '@instructure/canvas-rce/src/rce/plugins/shared/__tests__/FakeEditor'
+import FakeEditor from './FakeEditor'
 import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onFocusedUserChange} from '../events'
 import ReactDOM from 'react-dom'
 

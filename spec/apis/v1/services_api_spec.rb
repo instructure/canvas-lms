@@ -192,6 +192,7 @@ describe "Services API", type: :request do
                                                url_for_high_contrast_tinymce_editor_css: [],
                                                url_to_what_gets_loaded_inside_the_tinymce_editor_css: [],
                                                FEATURES: nil,
+                                               LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
                                              })
     end
 
@@ -237,7 +238,8 @@ describe "Services API", type: :request do
                                 DEEP_LINKING_POST_MESSAGE_ORIGIN: an_instance_of_string,
                                 current_user_id: an_instance_of_integer,
                                 disable_keyboard_shortcuts: a_bool_value,
-                                editorButtons: editor_buttons_matcher
+                                editorButtons: editor_buttons_matcher,
+                                LTI_LAUNCH_FRAME_ALLOWANCES: a_not_empty_string_array
                               })
     end
   end

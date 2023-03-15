@@ -433,7 +433,7 @@ describe "BigBlueButton conferences" do
       end
 
       context "and the conference has recordings" do
-        before(:once) do
+        before do
           stub_request(:get, /getRecordings/)
             .with(query: bbb_fixtures[:get_recordings])
             .to_return(body: big_blue_button_mock_response("get_recordings", "two"))
@@ -441,8 +441,16 @@ describe "BigBlueButton conferences" do
         end
 
         it "includes list with recordings", priority: "2" do
+          @conference.ended_at = 2.days.ago
+          @conference.save!
           get conferences_index_page
-          verify_conference_includes_recordings
+          fj("a:contains('#{@conference.title}')").click
+
+          # if the first letter is capitalized, this means
+          # the helper method for translating was called
+          expect(fj("div.ig-details a:contains('Statistics')")).to be_truthy
+          expect(fj("div.ig-details a:contains('Presentation')")).to be_truthy
+          expect(fj("div.ig-details a:contains('Video')")).to be_truthy
         end
       end
 

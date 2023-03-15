@@ -48,7 +48,7 @@ module Services
         return nil if config.blank?
 
         @notification_sqs ||= begin
-          conf = Canvas::AWS.validate_v2_config(config, "notification_service.yml")
+          conf = Canvas::AWS.validate_v2_config(config, "notification_service")
           sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values))
           @queue_urls = {}
           QUEUE_NAME_KEYS.each do |key, queue_name_key|
@@ -69,7 +69,7 @@ module Services
       end
 
       def config
-        ConfigFile.load("notification_service").dup || {}
+        ConfigFile.load("notification_service").merge(Rails.application.credentials.notification_service_creds).dup || {}
       end
     end
   end

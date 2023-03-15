@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import {renderRow} from '@canvas/util/react/testing/TableHelper'
 
 import {BLACKOUT_DATES} from '../../../__tests__/fixtures'
 
@@ -29,17 +30,17 @@ const defaultProps = {
 
 describe('BlackoutDateRow', () => {
   it('renders the blackout date title', () => {
-    const {getByText} = render(<BlackoutDateRow {...defaultProps} />)
+    const {getByText} = render(renderRow(<BlackoutDateRow {...defaultProps} />))
     expect(getByText(defaultProps.blackoutDate.event_title)).toBeInTheDocument()
   })
 
   it('renders the duration of blackout date', () => {
-    const {container} = render(<BlackoutDateRow {...defaultProps} />)
+    const {container} = render(renderRow(<BlackoutDateRow {...defaultProps} />))
     expect(container.querySelectorAll('td')[1].textContent).toEqual('5')
   })
 
   it('renders the start and end dates', () => {
-    const {container} = render(<BlackoutDateRow {...defaultProps} />)
+    const {container} = render(renderRow(<BlackoutDateRow {...defaultProps} />))
     expect(container.querySelectorAll('td')[2].textContent).toEqual(
       'Mon, Mar 21, 2022 - Fri, Mar 25, 2022'
     )
@@ -48,7 +49,7 @@ describe('BlackoutDateRow', () => {
   it('renders just the start date for single day blackouts', () => {
     const props = {blackoutDate: {...defaultProps.blackoutDate}}
     props.blackoutDate.end_date = props.blackoutDate.start_date.clone()
-    const {container} = render(<BlackoutDateRow {...props} />)
+    const {container} = render(renderRow(<BlackoutDateRow {...props} />))
     const cells = container.querySelectorAll('td')
     expect(cells[2].textContent).toEqual('Mon, Mar 21, 2022')
     expect(cells[1].textContent).toEqual('1')
@@ -63,7 +64,7 @@ describe('BlackoutDateRow', () => {
       ENV.LOCALE = locale
     })
     it('localizes the projected dates', () => {
-      const {getByText} = render(<BlackoutDateRow {...defaultProps} />)
+      const {getByText} = render(renderRow(<BlackoutDateRow {...defaultProps} />))
       expect(getByText('Mon, 21 Mar 2022')).toBeInTheDocument()
       expect(getByText('Fri, 25 Mar 2022')).toBeInTheDocument()
     })

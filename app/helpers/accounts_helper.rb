@@ -19,6 +19,8 @@
 #
 
 module AccountsHelper
+  include SisImportHelper
+
   def show_last_batch
     @last_batch && !(@current_batch && @current_batch.importing?)
   end

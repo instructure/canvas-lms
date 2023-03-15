@@ -85,7 +85,8 @@ class ContextExternalTool < ActiveRecord::Base
   DISABLED_STATE = "disabled"
   QUIZ_LTI = "Quizzes 2"
   ANALYTICS_2 = "fd75124a-140e-470f-944c-114d2d93bb40"
-  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2 }.freeze
+  ADMIN_ANALYTICS = "admin-analytics"
+  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2, ADMIN_ANALYTICS => :admin_analytics }.freeze
   PREFERRED_LTI_VERSION = "1_3"
 
   workflow do
@@ -1042,10 +1043,11 @@ class ContextExternalTool < ActiveRecord::Base
   # in SQL as well.
   def self.find_and_order_tools(
     context,
-    preferred_tool_id, exclude_tool_id, preferred_client_id,
+    preferred_tool_id_param, exclude_tool_id, preferred_client_id,
     only_1_3: false
   )
     context.shard.activate do
+      preferred_tool_id = Shard.integral_id_for(preferred_tool_id_param)
       contexts = contexts_to_search(context)
       context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
@@ -1061,7 +1063,7 @@ class ContextExternalTool < ActiveRecord::Base
       ]
       # move preferred tool to the front when requested, and only if the id
       # is in an actual id format
-      if preferred_tool_id && Shard.integral_id_for(preferred_tool_id)
+      if preferred_tool_id
         order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}")
       end
 

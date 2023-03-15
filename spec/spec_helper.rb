@@ -989,6 +989,22 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
+module DeveloperKeyStubs
+  def get_special_key(default_key_name)
+    Shard.birth.activate do
+      @special_keys ||= {}
+
+      # TODO: we have to do this because tests run in transactions
+      testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+      testkey.auto_expire_tokens = false if testkey.new_record?
+      testkey.sns_arn = "arn:aws:s3:us-east-1:12345678910:foo/bar"
+      testkey.save! if testkey.changed?
+      return @special_keys[default_key_name] = testkey
+    end
+  end
+end
+DeveloperKey.singleton_class.prepend DeveloperKeyStubs
+
 def enable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "on"

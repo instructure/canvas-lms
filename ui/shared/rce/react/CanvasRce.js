@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+
 import React, {forwardRef, useCallback, useEffect, useState} from 'react'
 import {bool, func, number, object, objectOf, oneOfType, string} from 'prop-types'
 import {createChainedFunction} from '@instructure/ui-utils'
@@ -113,6 +115,13 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onContentChange={onContentChange}
       onInit={onInit}
       use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
+      externalToolsConfig={{
+        ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
+        isA2StudentView: window.ENV?.a2_student_view,
+        maxMruTools: window.ENV?.MAX_MRU_LTI_TOOLS,
+        resourceSelectionUrlOverride:
+          $('#context_external_tool_resource_selection_url').attr('href') || null,
+      }}
       {...rest}
     />
   )

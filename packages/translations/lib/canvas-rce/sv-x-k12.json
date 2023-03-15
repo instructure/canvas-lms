@@ -151,6 +151,7 @@
   "crop_image_807ebb08": { "message": "Beskär bilden" },
   "cup_product_14174434": { "message": "Kopprodukt" },
   "current_image_f16c249c": { "message": "Aktuell bild" },
+  "current_volume_level_c55ab825": { "message": "Aktuell volymnivå" },
   "custom_6979cd81": { "message": "Anpassa" },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
@@ -268,6 +269,7 @@
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filindex" },
+  "finish_bc343002": { "message": "Avsluta" },
   "flat_music_76d5a5c3": { "message": "Platt (Musik)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Verktygsfält för alternativ till fokuselement"
@@ -434,6 +436,8 @@
     "message": "Mediefilen behandlas. Försök igen senare."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "microphone_disabled_15c83130": { "message": "Mikrofonen är inaktiverad" },
   "middle_27dc1d5": { "message": "Mitten" },
   "minimize_file_preview_da911944": {
     "message": "Minimera förhandsvisning av fil"
@@ -476,6 +480,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
   },
+  "no_video_1ed00b26": { "message": "Ingen video" },
   "none_3b5e34d2": { "message": "Inga" },
   "none_selected_b93d56d2": { "message": "Inga valda" },
   "not_equal_6e2980e6": { "message": "Är inte lika med" },
@@ -517,6 +522,7 @@
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiell (derivat)" },
   "paste_5963d1c1": { "message": "Klistra in" },
+  "pause_12af3bb4": { "message": "Pausa" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Personer" },
   "percentage_34ab7c2c": { "message": "Procent" },
@@ -534,9 +540,13 @@
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixlar" },
+  "play_1a47eaa7": { "message": "Spela upp" },
   "play_media_comment_35257210": { "message": "Spela upp mediekommentar." },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Spela upp mediekommentar av { name } från { createdAt }."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Ge Canvas åtkomst till din mikrofon och webbkamera."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/minus" },
@@ -546,6 +556,7 @@
   "precedes_equal_20701e84": { "message": "Föregår lika med" },
   "preformatted_d0670862": { "message": "Förformaterad" },
   "preview_53003fd2": { "message": "Förhandsgranska" },
+  "preview_a3f8f854": { "message": "FÖRHANDSGRANSKA" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
   "prime_917ea60e": { "message": "Prim" },
@@ -568,6 +579,7 @@
     "message": "Imaginärdel (av komplexa nummer)"
   },
   "record_7c9448b": { "message": "Spela in" },
+  "recording_98da6bda": { "message": "Inspelning" },
   "red_8258edf3": { "message": "Röd" },
   "relationships_6602af70": { "message": "Relationer" },
   "religion_icon_246e0be1": { "message": "Religiös ikon" },
@@ -610,10 +622,13 @@
     "message": "Tyvärr fungerar inte tangentbordet i den nätta HTML-redigeraren. Öppna den råa HTML-redigeraren här."
   },
   "save_11a80ec3": { "message": "Spara" },
+  "save_media_cb9e786e": { "message": "Spara mediefiler" },
   "script_l_42a7b254": { "message": "Skript-L" },
   "search_280d00bd": { "message": "Sök" },
+  "select_audio_source_21043cd5": { "message": "Välj ljudkälla" },
   "select_crop_shape_d441feeb": { "message": "Välj beskärningsform" },
   "select_language_7c93a900": { "message": "Välj språk" },
+  "select_video_source_1b5c9dbe": { "message": "Välj videokälla" },
   "selected_linkfilename_c093b1f2": { "message": "Markerade { linkFileName }" },
   "set_minus_b46e9b88": { "message": "Uppsättning av minus" },
   "sharp_music_ab956814": { "message": "Korsförtecken (musik)" },
@@ -632,6 +647,9 @@
   "small_b070434a": { "message": "Liten" },
   "solid_circle_9f061dfc": { "message": "Solid cirkel" },
   "something_went_wrong_89195131": { "message": "Någonting gick fel." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Något gick fel vid försök att komma åt din webbkamera."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Något gick fel och jag vet inte vad jag ska visa dig."
   },
@@ -639,6 +657,9 @@
     "message": "Någonting gick fel. Kontrollera din anslutning, läs in sidan igen och försök igen."
   },
   "something_went_wrong_d238c551": { "message": "Något gick fel" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Något gick fel vid delning av skärmen."
+  },
   "sort_by_e75f9e3e": { "message": "Sortera efter" },
   "spades_suit_b37020c2": { "message": "Spader (kortlek)" },
   "square_511eb3b3": { "message": "Kvadrat" },
@@ -655,6 +676,8 @@
     "message": "Kvadratisk super set (strikt)"
   },
   "star_8d156e09": { "message": "Favoritmarkera" },
+  "start_over_f7552aa9": { "message": "Börja om" },
+  "start_recording_9a65141a": { "message": "Starta inspelning" },
   "steel_blue_14296f08": { "message": "Stålblå" },
   "styles_2aa721ef": { "message": "Stilar" },
   "submit_a3cc6859": { "message": "Spara" },
@@ -683,6 +706,8 @@
     "message": "Växla till innehållsredigeraren"
   },
   "syllabus_f191f65b": { "message": "Kursöversikt" },
+  "system_audio_allowed_b2508f8c": { "message": "Systemljud tillåts" },
+  "system_audio_disabled_c177bd13": { "message": "Systemljud inaktiverat" },
   "tab_arrows_4cf5abfc": { "message": "FLIK/Pilar" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Teal" },
@@ -728,6 +753,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Din video har korrekt titel i webbläsaren, men den uppdaterades inte i databasen."
   },
+  "timebar_a4d18443": { "message": "Tidsfält" },
   "title_ee03d132": { "message": "Titel" },
   "to_be_posted_when_d24bf7dc": { "message": "För publicering: { when }" },
   "to_do_when_2783d78f": { "message": "Att göra: { when }" },
@@ -749,6 +775,7 @@
   },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "avpublicerad" },
+  "untitled_16aa4f2b": { "message": "Namnlös" },
   "untitled_efdc2d7d": { "message": "namnlös" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Diagonal pil, uppåt och till vänster"
@@ -823,6 +850,7 @@
   "vertical_dots_bfb21f14": { "message": "Vertikala punkter" },
   "video_options_24ef6e5d": { "message": "Videoalternativ" },
   "video_options_tray_3b9809a5": { "message": "Alternativfält för videor" },
+  "video_player_b371005": { "message": "Videospelare" },
   "video_player_for_9e7d373b": { "message": "Videospelare för " },
   "video_player_for_title_ffd9fbc4": {
     "message": "Videospelare för { title }"
@@ -836,6 +864,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "Visa ord- och teckenräkning"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Det gick inte att identifiera en fungerande mikrofon kopplad till din enhet."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Det gick inte att identifiera en fungerande mikrofon kopplad till din enhet."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Det gick inte att identifiera en fungerande webbkamera eller mikrofon kopplad till din enhet."
+  },
+  "webcam_disabled_30c66986": { "message": "Webbkamera inaktiverad" },
+  "webcam_fe91b20f": { "message": "Webbkamera" },
   "white_87fa64fd": { "message": "Vit" },
   "width_492fec76": { "message": "Bredd" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -854,6 +893,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Din bild har komprimerats för ikonbyggaren. Bilder som är mindre än { size } kB komprimeras inte."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Din mikrofon är blockerad i webbläsarens inställningar."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Din webbkamera och mikrofon är blockerade i webbläsarens inställningar."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Din webbkamera är blockerad i webbläsarens inställningar."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Din webbkamera kanske redan används."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zooma" },

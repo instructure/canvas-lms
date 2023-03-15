@@ -311,6 +311,18 @@ describe BigBlueButtonConference do
       end
     end
 
+    it "includes translated type for playback format" do
+      allow(@bbb).to receive(:conference_key).and_return("12345")
+      response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
+      allow(@bbb).to receive(:send_request).and_return(response)
+      @bbb.recordings.each do |recording|
+        recording[:playback_formats].each do |format|
+          # turns video into Video, etc.
+          expect(format[:translated_type]).to eq(format[:type].upcase_first)
+        end
+      end
+    end
+
     describe "looking for recordings based on user setting" do
       before(:once) do
         @bbb = BigBlueButtonConference.new(user: user_factory, context: course_factory)

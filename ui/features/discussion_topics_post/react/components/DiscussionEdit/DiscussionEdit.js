@@ -224,7 +224,7 @@ export const DiscussionEdit = props => {
                         props.onSubmit(
                           rceContent,
                           includeReplyPreview,
-                          attachment?._id,
+                          attachment,
                           anonymousAuthorState
                         )
                       }

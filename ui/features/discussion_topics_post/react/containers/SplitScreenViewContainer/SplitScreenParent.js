@@ -242,9 +242,9 @@ export const SplitScreenParent = props => {
                     anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
-                    onSave={(message, _includeReplyPreview, fileId) => {
+                    onSave={(message, _includeReplyPreview, file) => {
                       if (props.onSave) {
-                        props.onSave(props.discussionEntry, message, fileId)
+                        props.onSave(props.discussionEntry, message, file)
                         setIsEditing(false)
                       }
                     }}

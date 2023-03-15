@@ -96,6 +96,32 @@ describe "reply attachment" do
       Account.site_admin.enable_feature! :react_discussions_post
     end
 
+    def add_a_reply_react(message = "message!", attachment = nil)
+      f("button[data-testid='discussion-topic-reply']").click
+      wait_for_ajaximations
+      type_in_tiny "textarea", message
+      if attachment.present?
+        _filename, fullpath, _data = get_file(attachment)
+        f("[data-testid='attachment-input']").send_keys(fullpath)
+      end
+
+      f("button[data-testid='DiscussionEdit-submit'").click
+      wait_for_ajaximations
+    end
+
+    it "replies to the discussion with attachment" do
+      file_attachment = "graded.png"
+      entry_text = "new entry"
+      Discussion.visit(@course, @topic)
+
+      add_a_reply_react(entry_text, file_attachment)
+      entry = DiscussionEntry.last
+
+      attachment_link = fj("a:contains('graded')")
+      expect(attachment_link).to be_truthy
+      expect(attachment_link.attribute("href")).to include("/files/#{entry.attachment.id}")
+    end
+
     it "can view and delete legacy reply attachments" do
       entry = @topic.discussion_entries.create!(
         user: @student,

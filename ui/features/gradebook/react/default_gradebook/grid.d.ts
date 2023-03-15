@@ -31,7 +31,7 @@ export type GridColumn = {id: string; cssClass: string; headerCssClass: string} 
   maxLength: number
   maxWidth: number
   minWidth: number
-  postAssignmentGradesTrayOpenForAssignmentId: string
+  postAssignmentGradesTrayOpenForAssignmentId: boolean
   resizable: boolean
   teacher_notes: string
   toolTip: string
@@ -113,4 +113,9 @@ export type GridDisplaySettings = {
   hideAssignmentGroupTotals: boolean
   hideAssignmentGroupTotals: boolean
   hideTotal: boolean
+}
+
+export type GridLocation = {
+  columnId: string
+  region: 'body' | 'header' | 'footer'
 }

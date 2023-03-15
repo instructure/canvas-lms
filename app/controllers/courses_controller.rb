@@ -1490,7 +1490,8 @@ class CoursesController < ApplicationController
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
-        manage: @context.grants_right?(@current_user, session, :manage)
+        manage: @context.grants_right?(@current_user, session, :manage),
+        edit_course_availability: @context.grants_right?(@current_user, session, :edit_course_availability)
       }
       if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
@@ -2714,6 +2715,9 @@ class CoursesController < ApplicationController
   # If a user has content management rights, but not full course editing rights, the only attribute
   # editable through this endpoint will be "syllabus_body"
   #
+  # If an account has set prevent_course_availability_editing_by_teachers, a teacher cannot change
+  # course[start_at], course[conclude_at], or course[restrict_enrollments_to_course_dates] here.
+  #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to move the course to.
   #
@@ -3192,9 +3196,12 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
+      course_availability_changed = (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+
+      return render_unauthorized_action if course_availability_changed && !@course.grants_right?(@current_user, :edit_course_availability)
 
       # Republish course paces if the course dates have been changed
-      if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+      if @course.account.feature_enabled?(:course_paces) && course_availability_changed
         @course.course_paces.find_each(&:create_publish_progress)
       end
       disable_conditional_release if changes[:conditional_release]&.last == false

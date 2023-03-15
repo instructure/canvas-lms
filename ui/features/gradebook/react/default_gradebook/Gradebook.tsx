@@ -78,14 +78,16 @@ import type {
 } from './gradebook.d'
 import type {
   CamelizedGradingPeriodSet,
+  CamelizedSubmission,
   FinalGradeOverrideMap,
   GradingScheme,
 } from '@canvas/grading/grading.d'
 import type {
+  ColumnFilterKey,
   GridColumn,
   GridData,
   GridDisplaySettings,
-  ColumnFilterKey,
+  GridLocation,
   RowFilterKey,
 } from './grid.d'
 import type GradebookGridType from './GradebookGrid/index'
@@ -764,7 +766,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   getGradingPeriodAssignments = (gradingPeriodId: string) =>
     this.courseContent.gradingPeriodAssignments[gradingPeriodId] || []
 
-  gotGradingPeriodAssignments = ({grading_period_assignments: gradingPeriodAssignments}) => {
+  gotGradingPeriodAssignments = ({
+    grading_period_assignments: gradingPeriodAssignments,
+  }: {
+    grading_period_assignments: GradingPeriodAssignmentMap
+  }) => {
     return (this.courseContent.gradingPeriodAssignments = gradingPeriodAssignments)
   }
 
@@ -1086,7 +1092,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.filterAssignmentByEndDate,
       this.filterAssignmentsBySubmissions,
     ]
-    const matchesAllFilters = assignment => assignmentFilters.every(filter => filter(assignment))
+    const matchesAllFilters = (assignment: Assignment) =>
+      assignmentFilters.every(filter => filter(assignment))
 
     return assignments.filter(matchesAllFilters)
   }
@@ -1357,8 +1364,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateRowCellsForStudentIds([...new Set(changedStudentIds)])
   }
 
-  submissionsForStudent = (student: GradebookStudent) => {
-    const allSubmissions = (function () {
+  submissionsForStudent = (student: GradebookStudent): Submission[] => {
+    const allSubmissions: Submission[] = (function () {
       const results: any = []
       for (const key in student) {
         if (key.match(ASSIGNMENT_KEY_REGEX)) {
@@ -1373,7 +1380,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!this.isFilteringColumnsByGradingPeriod()) {
       return allSubmissions
     }
-    return _.filter(allSubmissions, submission => {
+    return _.filter(allSubmissions, (submission: Submission) => {
       const studentPeriodInfo =
         this.effectiveDueDates[submission.assignment_id]?.[submission.user_id]
       return studentPeriodInfo && studentPeriodInfo.grading_period_id === this.gradingPeriodId
@@ -2087,6 +2094,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showSeparateFirstLastNames,
     statusColors: colors,
     viewUngradedAsZero,
+  }: {
+    columnSortSettings?: {criterion?: string; direction?: string}
+    hideAssignmentGroupTotals?: boolean
+    hideTotal?: boolean
+    showNotes: boolean
+    showUnpublishedAssignments?: boolean
+    showSeparateFirstLastNames?: boolean
+    statusColors?: StatusColors
+    viewUngradedAsZero?: boolean
   }): Promise<void | void[]> => {
     // We may have to save changes to more than one endpoint, depending on
     // which options have changed. Additionally, a couple options require us to
@@ -2187,6 +2203,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     showUnpublishedAssignments,
     viewUngradedAsZero,
     showSeparateFirstLastNames,
+  }: {
+    colors?: StatusColors
+    hideAssignmentGroupTotals?: boolean
+    hideTotal?: boolean
+    showUnpublishedAssignments?: boolean
+    viewUngradedAsZero?: boolean
+    showSeparateFirstLastNames?: boolean
   }) => {
     return this.saveSettings({
       colors,
@@ -2234,7 +2257,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  saveUpdatedTeacherNotesSetting = ({showNotes}) => {
+  saveUpdatedTeacherNotesSetting = ({showNotes}: {showNotes: boolean}) => {
     let promise
 
     const existingColumn = this.getTeacherNotesColumn()
@@ -2563,76 +2586,90 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       openSubmissionTray: this.openSubmissionTray,
     })
     this.gradebookGrid.gridSupport.initialize()
-    this.gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe((event, location) => {
-      if (
-        ['student', 'student_lastname'].includes(location.columnId) &&
-        location.region === 'body'
-      ) {
-        // In IE11, if we're navigating into the student column from a grade
-        // input cell with no text, this focus() call will select the <body>
-        // instead of the grades link.  Delaying the call (even with no actual
-        // delay) fixes the issue.
-        return setTimeout(() => {
-          if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
-          const ref1 = this.gradebookGrid?.gridSupport.state
-            .getActiveNode()
-            .querySelector('.student-grades-link')
-          return ref1 != null ? ref1.focus() : undefined
-        }, 0)
+    this.gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe(
+      (event: Event, location: GridLocation) => {
+        if (
+          ['student', 'student_lastname'].includes(location.columnId) &&
+          location.region === 'body'
+        ) {
+          // In IE11, if we're navigating into the student column from a grade
+          // input cell with no text, this focus() call will select the <body>
+          // instead of the grades link.  Delaying the call (even with no actual
+          // delay) fixes the issue.
+          return setTimeout(() => {
+            if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
+            const ref1 = this.gradebookGrid?.gridSupport.state
+              .getActiveNode()
+              .querySelector('.student-grades-link')
+            return ref1 != null ? ref1.focus() : undefined
+          }, 0)
+        }
       }
-    })
-    this.gradebookGrid.gridSupport.events.onKeyDown.subscribe((event, location) => {
-      let ref1
-      if (location.region === 'header') {
-        return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
-          ? ref1.handleKeyDown(event)
-          : undefined
+    )
+    this.gradebookGrid.gridSupport.events.onKeyDown.subscribe(
+      (event: Event, location: GridLocation) => {
+        let ref1
+        if (location.region === 'header') {
+          return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
+            ? ref1.handleKeyDown(event)
+            : undefined
+        }
       }
-    })
-    this.gradebookGrid.gridSupport.events.onNavigatePrev.subscribe((event, location) => {
-      let ref1
-      if (location.region === 'header') {
-        return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
-          ? ref1.focusAtStart()
-          : undefined
-      }
-    })
-    this.gradebookGrid.gridSupport.events.onNavigateNext.subscribe((event, location) => {
-      let ref1
-      if (location.region === 'header') {
-        return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
-          ? ref1.focusAtStart()
-          : undefined
-      }
-    })
-    this.gradebookGrid.gridSupport.events.onNavigateLeft.subscribe((event, location) => {
-      let ref1
-      if (location.region === 'header') {
-        return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
-          ? ref1.focusAtStart()
-          : undefined
-      }
-    })
-    this.gradebookGrid.gridSupport.events.onNavigateRight.subscribe((event, location) => {
-      let ref1
-      if (location.region === 'header') {
-        return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
-          ? ref1.focusAtStart()
-          : undefined
-      }
-    })
-    this.gradebookGrid.gridSupport.events.onNavigateUp.subscribe((event, location) => {
-      if (location.region === 'header') {
-        // As above, "delay" the call so that we properly focus the header cell
-        // when navigating from a grade input cell with no text.
-        return setTimeout(() => {
-          let ref1
+    )
+    this.gradebookGrid.gridSupport.events.onNavigatePrev.subscribe(
+      (event: Event, location: GridLocation) => {
+        let ref1
+        if (location.region === 'header') {
           return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
             ? ref1.focusAtStart()
             : undefined
-        }, 0)
+        }
       }
-    })
+    )
+    this.gradebookGrid.gridSupport.events.onNavigateNext.subscribe(
+      (event: Event, location: GridLocation) => {
+        let ref1
+        if (location.region === 'header') {
+          return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
+            ? ref1.focusAtStart()
+            : undefined
+        }
+      }
+    )
+    this.gradebookGrid.gridSupport.events.onNavigateLeft.subscribe(
+      (event: Event, location: GridLocation) => {
+        let ref1
+        if (location.region === 'header') {
+          return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
+            ? ref1.focusAtStart()
+            : undefined
+        }
+      }
+    )
+    this.gradebookGrid.gridSupport.events.onNavigateRight.subscribe(
+      (event: Event, location: GridLocation) => {
+        let ref1
+        if (location.region === 'header') {
+          return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
+            ? ref1.focusAtStart()
+            : undefined
+        }
+      }
+    )
+    this.gradebookGrid.gridSupport.events.onNavigateUp.subscribe(
+      (event: Event, location: GridLocation) => {
+        if (location.region === 'header') {
+          // As above, "delay" the call so that we properly focus the header cell
+          // when navigating from a grade input cell with no text.
+          return setTimeout(() => {
+            let ref1
+            return (ref1 = this.getHeaderComponentRef(location.columnId)) != null
+              ? ref1.focusAtStart()
+              : undefined
+          }, 0)
+        }
+      }
+    )
     return this.onGridInit()
   }
 
@@ -2659,7 +2696,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // The target cell will enter editing mode
-  onBeforeEditCell = (_event, obj: {item: Student; column: GridColumn}) => {
+  onBeforeEditCell = (_event: Event, obj: {item: Student; column: GridColumn}) => {
     let ref1
     if (
       obj.column.type === 'custom_column' &&
@@ -2677,7 +2714,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // The current cell editor has been changed and is valid
-  onCellChange = (_event, obj: {item: Student; column: GridColumn}) => {
+  onCellChange = (_event: Event, obj: {item: Student; column: GridColumn}) => {
     let col_id, url
     const {item, column} = obj
     if (column.type === 'custom_column' && column.field) {
@@ -2696,7 +2733,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Persisted Gradebook Settings
-  saveColumnWidthPreference = (id: string, newWidth) => {
+  saveColumnWidthPreference = (id: string, newWidth: number) => {
     const url = this.options.gradebook_column_size_settings_url
     return $.ajaxJSON(url, 'POST', {
       column_id: id,
@@ -3086,7 +3123,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (this.gradebookGrid?.grid == null) {
       return
     }
-    const columnIndex = this.gradebookGrid?.grid.getColumns().findIndex(column => column.id === id)
+    const columnIndex = this.gradebookGrid?.grid
+      .getColumns()
+      .findIndex((column: {id: string}) => column.id === id)
     if (columnIndex === -1) {
       return
     }
@@ -3393,7 +3432,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  reloadSubmission = (submission, student, proxyDetails) => {
+  reloadSubmission = (submission: Submission, student: Student | null, proxyDetails) => {
     for (const val in proxyDetails) {
       submission[val] = proxyDetails[val]
     }
@@ -3521,7 +3560,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       .catch(FlashAlert.showFlashError(I18n.t('There was a problem saving the comment')))
   }
 
-  apiUpdateSubmissionComment = (updatedComment, commentId: string) => {
+  apiUpdateSubmissionComment = (updatedComment: string, commentId: string) => {
     return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
       .then(response => {
         const {id, comment, editedAt} = response.data
@@ -3563,7 +3602,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateSubmissionComments(comments)
   }
 
-  setSubmissionCommentsLoaded = (loaded): void => {
+  setSubmissionCommentsLoaded = (loaded: boolean): void => {
     this.gridDisplaySettings.submissionTray.commentsLoaded = loaded
   }
 
@@ -3749,15 +3788,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  addPendingGradeInfo = (submission, gradeInfo) => {
+  addPendingGradeInfo = (submission: CamelizedSubmission, gradeInfo) => {
     if (!this.actionStates) throw new Error('actionStates not initialized')
     const {userId, assignmentId} = submission
-    const pendingGradeInfo = {assignmentId, userId, ...gradeInfo}
+    const pendingGradeInfo: PendingGradeInfo = {assignmentId, userId, ...gradeInfo}
     this.removePendingGradeInfo(submission)
     this.actionStates.pendingGradeInfo.push(pendingGradeInfo)
   }
 
-  removePendingGradeInfo = submission => {
+  removePendingGradeInfo = (submission: CamelizedSubmission) => {
     if (!this.actionStates) throw new Error('actionStates missing')
     this.actionStates.pendingGradeInfo = _.reject(
       this.actionStates.pendingGradeInfo,
@@ -4023,7 +4062,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  postAssignmentGradesTrayOpenChanged = ({assignmentId, isOpen}) => {
+  postAssignmentGradesTrayOpenChanged = ({
+    assignmentId,
+    isOpen,
+  }: {
+    assignmentId: string
+    isOpen: boolean
+  }) => {
     const columnId = getAssignmentColumnId(assignmentId)
     const definition = this.gridData.columns.definitions[columnId]
     if (!(definition && definition.type === 'assignment')) {
@@ -4370,7 +4415,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.apiUpdateSubmission(submissionData, gradeInfo)
   }
 
-  renderAnonymousSpeedGraderAlert = props => {
+  renderAnonymousSpeedGraderAlert = (props: {speedGraderUrl: string; onClose: () => void}) => {
     return renderComponent(AnonymousSpeedGraderAlert, anonymousSpeedGraderAlertMountPoint(), props)
   }
 

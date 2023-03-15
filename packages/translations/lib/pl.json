@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Bieżący obraz"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Bieżący poziom głośności"
+    },
     "custom_6979cd81": {
         "message": "Niestandardowe"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "Filipiński"
+    },
+    "finish_bc343002": {
+        "message": "Zakończ"
     },
     "finnish_4df2923d": {
         "message": "Fiński"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "Średni"
     },
+    "mic_a7f3d311": {
+        "message": "Mikrofon"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Wyłączono mikrofon"
+    },
     "middle_27dc1d5": {
         "message": "Środkowy"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Nie znaleziono wyników dla { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Brak wideo"
     },
     "none_3b5e34d2": {
         "message": "Brak"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "Wklej"
     },
+    "pause_12af3bb4": {
+        "message": "Pauza"
+    },
     "peer_review_74f26a13": {
         "message": "Recenzja drugiego uczestnika"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "Piksele"
     },
+    "play_1a47eaa7": {
+        "message": "Odtwórz"
+    },
     "play_media_comment_35257210": {
         "message": "Odtwórz komentarz multimedialny."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Odtwórz komentarz multimedialny { name } z { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Zezwól Canvas na łączenie się z kamerą sieciową i mikrofonem."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1690,6 +1714,9 @@
     },
     "preview_53003fd2": {
         "message": "Podgląd"
+    },
+    "preview_a3f8f854": {
+        "message": "PODGLĄD"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Podgląd w nakładce"
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "Nagraj"
+    },
+    "recording_98da6bda": {
+        "message": "Nagranie"
     },
     "red_8258edf3": {
         "message": "Czerwony"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "Zapisz"
     },
+    "save_media_cb9e786e": {
+        "message": "Zapisz multimedia"
+    },
     "schedule_preview_3bcda153": {
         "message": "Zaplanuj podgląd"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "Wyszukaj"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Wybierz źródło audio"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Wybierz przycięty fragment"
     },
     "select_language_7c93a900": {
         "message": "Wybierz język"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Wybierz źródło wideo"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Wybrano { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "Coś poszło nie tak."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Wystąpił problem z dostępem do kamery sieciowej."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Coś poszło nie tak"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Wystąpił błąd podczas udostępniania ekranu."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortuj wg"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "Gwiazdka"
+    },
+    "start_over_f7552aa9": {
+        "message": "Rozpocznij ponownie"
+    },
+    "start_recording_9a65141a": {
+        "message": "Rozpocznij nagrywanie"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } do { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "Program"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "Zezwolono na dźwięk systemu"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "Wyłączono dźwięk systemu"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/klawisze strzałek"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Naciśnij Shift O, aby otworzyć edytor html bez formatowania."
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "Rozmiar wybranego pliku przekracza limit { maxSize } bajtów"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Brak punktów powiązanych z tym elementem."
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "Czas"
+    },
+    "timebar_a4d18443": {
+        "message": "Oś czasu"
     },
     "title_ee03d132": {
         "message": "Tytuł"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "nieopublikowane"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Bez tytułu"
     },
     "untitled_efdc2d7d": {
         "message": "bez tytułu"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Panel opcji wideo"
     },
+    "video_player_b371005": {
+        "message": "Odtwarzacz wideo"
+    },
     "video_player_for_9e7d373b": {
         "message": "Odtwarzacz wideo dla "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Wyświetl liczbę słów i znaków"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "Nie udało się wykryć działającego mikrofonu podłączonego do urządzenia."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "Nie udało się wykryć działającej kamery podłączonej do urządzenia."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "Nie udało się wykryć działającej kamery ani mikrofonu podłączonych do urządzenia."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Wyłączono kamerę internetową"
+    },
+    "webcam_fe91b20f": {
+        "message": "Kamera sieciowa"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Nawigacja po harmonogramie tygodnia"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Obraz został skompresowany dla programu Icon Maker. Obrazy mniejsze niż { size } kB nie zostaną skompresowane."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Mikrofon został zablokowany w ustawieniach przeglądarki."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Mikrofon i kamera zostały zablokowane w ustawieniach przeglądarki."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Kamera została zablokowana w ustawieniach przeglądarki."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Kamera sieciowa może być już w użyciu."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

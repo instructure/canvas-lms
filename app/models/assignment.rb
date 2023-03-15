@@ -77,7 +77,21 @@ class Assignment < ActiveRecord::Base
 
   DEFAULT_POINTS_POSSIBLE = 0
 
-  attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress, :unposted_anonymous_submissions
+  DUPLICATED_IN_CONTEXT = "duplicated_in_context"
+
+  attr_accessor(
+    :asset_map,
+    :copying,
+    :grade_posting_in_progress,
+    :needs_update_cached_due_dates,
+    :previous_id,
+    :saved_by,
+    :skip_schedule_peer_reviews,
+    :unposted_anonymous_submissions,
+    :updated_submissions, # for testing
+    :user_submitted
+  )
+
   attr_reader :assignment_changed, :posting_params_for_notifications
   attr_writer :updating_user
 
@@ -716,7 +730,6 @@ class Assignment < ActiveRecord::Base
       .do_auto_peer_review
   end
 
-  attr_accessor :skip_schedule_peer_reviews
   alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
   def needs_auto_peer_reviews_scheduled?
     !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
@@ -1013,8 +1026,6 @@ class Assignment < ActiveRecord::Base
   def update_submissions_later
     delay_if_production.update_submissions if saved_change_to_points_possible?
   end
-
-  attr_accessor :updated_submissions # for testing
 
   def update_submissions
     @updated_submissions ||= []
@@ -1429,8 +1440,6 @@ class Assignment < ActiveRecord::Base
 
     scope.able_to_see_assignment_in_course_with_da(id, context.id)
   end
-
-  attr_accessor :saved_by
 
   def process_if_quiz
     if self.submission_types == "online_quiz"
@@ -3285,8 +3294,6 @@ class Assignment < ActiveRecord::Base
       AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &block)
     end
   end
-
-  attr_accessor :needs_update_cached_due_dates
 
   def update_cached_due_dates
     return unless update_cached_due_dates?

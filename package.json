@@ -185,6 +185,7 @@
     "use-debounce": "^3",
     "use-media-set": "^1.1",
     "uuid": "^3.2.1",
+    "webpack-retry-chunk-load-plugin": "^3.1.1",
     "yarn-deduplicate": "^3.0.1",
     "zustand": "^3.6.9"
   },

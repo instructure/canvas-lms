@@ -145,6 +145,7 @@
   "crop_image_807ebb08": { "message": "Bild zuschneiden" },
   "cup_product_14174434": { "message": "Cup-Produkt" },
   "current_image_f16c249c": { "message": "Aktuelles Bild" },
+  "current_volume_level_c55ab825": { "message": "Aktuelle Lautstärke" },
   "custom_6979cd81": { "message": "Angepasst" },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Kreuzzeichen" },
@@ -262,6 +263,7 @@
   },
   "files_c300e900": { "message": "Dateien" },
   "files_index_af7c662b": { "message": "Dateienindex" },
+  "finish_bc343002": { "message": "Beenden" },
   "flat_music_76d5a5c3": { "message": "Vermindert (Musik)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Symbolleiste für Element-Optionen fokussieren"
@@ -428,6 +430,8 @@
     "message": "Mediendatei wird verarbeitet. Versuchen Sie es später noch einmal."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "mic_a7f3d311": { "message": "Mikrofon" },
+  "microphone_disabled_15c83130": { "message": "Mikrofon deaktiviert" },
   "middle_27dc1d5": { "message": "Mitte" },
   "minimize_file_preview_da911944": { "message": "Dateivorschau minimieren" },
   "minimize_video_20aa554b": { "message": "Video minimieren" },
@@ -470,6 +474,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Es wurden keine Ergebnisse für { filterTerm } gefunden."
   },
+  "no_video_1ed00b26": { "message": "Kein Video" },
   "none_3b5e34d2": { "message": "Keine" },
   "none_selected_b93d56d2": { "message": "Keines ausgewählt" },
   "not_equal_6e2980e6": { "message": "Ungleich" },
@@ -511,6 +516,7 @@
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Teilweise (abgeleitet)" },
   "paste_5963d1c1": { "message": "Einfügen" },
+  "pause_12af3bb4": { "message": "Pause" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "Teilnehmer*innen" },
   "percentage_34ab7c2c": { "message": "Prozentsatz" },
@@ -530,9 +536,13 @@
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixel" },
+  "play_1a47eaa7": { "message": "Abspielen" },
   "play_media_comment_35257210": { "message": "Medienkommentar wiedergeben" },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "Medienkommentar durch { name } von { createdAt } wiedergeben."
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Bitte erlauben Sie Canvas, auf Ihr Mikrofon und Ihre Webcam zuzugreifen."
   },
   "plus_d43cd4ec": { "message": "Plus" },
   "plus_minus_f8be2e83": { "message": "Plus/Minus" },
@@ -542,6 +552,7 @@
   "precedes_equal_20701e84": { "message": "Vorrangig oder gleich" },
   "preformatted_d0670862": { "message": "Vorformatiert" },
   "preview_53003fd2": { "message": "Vorschau" },
+  "preview_a3f8f854": { "message": "VORSCHAU" },
   "preview_in_overlay_ed772c46": { "message": "Vorschau in Overlay" },
   "preview_inline_9787330": { "message": "Inlne-Vorschau" },
   "prime_917ea60e": { "message": "Primzahl" },
@@ -564,6 +575,7 @@
     "message": "Reeller Teil (einer komplexen Zahl)"
   },
   "record_7c9448b": { "message": "Aufnehmen" },
+  "recording_98da6bda": { "message": "Aufzeichnung" },
   "red_8258edf3": { "message": "Rot" },
   "relationships_6602af70": { "message": "Beziehungen" },
   "religion_icon_246e0be1": { "message": "Religionssymbol" },
@@ -608,10 +620,13 @@
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."
   },
   "save_11a80ec3": { "message": "Speichern" },
+  "save_media_cb9e786e": { "message": "Medien speichern" },
   "script_l_42a7b254": { "message": "Script L" },
   "search_280d00bd": { "message": "Suchen" },
+  "select_audio_source_21043cd5": { "message": "Audioquelle auswählen" },
   "select_crop_shape_d441feeb": { "message": "Zuschnittsform auswählen" },
   "select_language_7c93a900": { "message": "Sprache auswählen" },
+  "select_video_source_1b5c9dbe": { "message": "Videoquelle auswählen" },
   "selected_linkfilename_c093b1f2": {
     "message": "Ausgewählter { linkFileName }"
   },
@@ -632,6 +647,9 @@
   "small_b070434a": { "message": "Klein" },
   "solid_circle_9f061dfc": { "message": "Geschlossener Kreise" },
   "something_went_wrong_89195131": { "message": "Etwas ging schief." },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "Beim Zugriff auf Ihre Webcam ging etwas schief."
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Etwas ist schiefgelaufen und ich weiß nicht, was ich anzeigen soll."
   },
@@ -639,6 +657,9 @@
     "message": "Etwas ging schief. Überprüfen Sie Ihre Verbindung, laden Sie die Seite noch einmal und versuchen Sie es erneut."
   },
   "something_went_wrong_d238c551": { "message": "Etwas ging schief." },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "Beim Teilen Ihres Bildschirms trat ein Fehler auf."
+  },
   "sort_by_e75f9e3e": { "message": "Sortieren nach" },
   "spades_suit_b37020c2": { "message": "Pik (Spielkartenfarbe)" },
   "square_511eb3b3": { "message": "Viereck" },
@@ -655,6 +676,8 @@
     "message": "Quadratische Obermenge (Streng)"
   },
   "star_8d156e09": { "message": "Stern" },
+  "start_over_f7552aa9": { "message": "Nochmal beginnen" },
+  "start_recording_9a65141a": { "message": "Aufzeichnung starten" },
   "steel_blue_14296f08": { "message": "Stahlblau" },
   "styles_2aa721ef": { "message": "Styles" },
   "submit_a3cc6859": { "message": "Abgeben" },
@@ -683,6 +706,12 @@
     "message": "Zum Rich-Text-Editor wechseln"
   },
   "syllabus_f191f65b": { "message": "Kursplan" },
+  "system_audio_allowed_b2508f8c": {
+    "message": "Die Audiosignale des Systems sind erlaubt."
+  },
+  "system_audio_disabled_c177bd13": {
+    "message": "Die Audiosignale des Systems sind deaktiviert."
+  },
   "tab_arrows_4cf5abfc": { "message": "<TAB>/Pfeile" },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Blaugrün" },
@@ -728,6 +757,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Obwohl Ihr Video im Browser den korrekten Titel hat, konnten wir ihn in der Datenbank nicht aktualisieren."
   },
+  "timebar_a4d18443": { "message": "Zeitleiste" },
   "title_ee03d132": { "message": "Titel" },
   "to_be_posted_when_d24bf7dc": { "message": "Bereit für Post: { when }" },
   "to_do_when_2783d78f": { "message": "Zu erledigen: { when }" },
@@ -751,6 +781,7 @@
   },
   "union_e6b57a53": { "message": "Union" },
   "unpublished_dfd8801": { "message": "nicht veröffentlicht" },
+  "untitled_16aa4f2b": { "message": "Ohne Titel" },
   "untitled_efdc2d7d": { "message": "Ohne Titel" },
   "up_and_left_diagonal_arrow_e4a74a23": {
     "message": "Diagonaler Pfeil nach oben links"
@@ -827,6 +858,7 @@
   "vertical_dots_bfb21f14": { "message": "Vertikale Punkte" },
   "video_options_24ef6e5d": { "message": "Videooptionen" },
   "video_options_tray_3b9809a5": { "message": "Fach für Videooptionen" },
+  "video_player_b371005": { "message": "Videoplayer" },
   "video_player_for_9e7d373b": { "message": "Videoplayer für " },
   "video_player_for_title_ffd9fbc4": { "message": "Videoplayer für { title }" },
   "view_ba339f93": { "message": "Anzeigen" },
@@ -840,6 +872,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "Wort- und Zeichenanzahl anzeigen"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "Wir konnten kein funktionierendes mit Ihrem Gerät verbundenes Mikrofon erkennen."
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "Wir konnten keine funktionierende mit Ihrem Gerät verbundene Webcam erkennen."
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "Wir konnten an Ihrem Gerät weder eine funktionierende Webcam noch ein Mikrofon erkennen."
+  },
+  "webcam_disabled_30c66986": { "message": "Die Webcam ist deaktiviert." },
+  "webcam_fe91b20f": { "message": "Webcam" },
   "white_87fa64fd": { "message": "Weiß" },
   "width_492fec76": { "message": "Breite" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -858,6 +901,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "Ihr Bild wurde für Icon Maker komprimiert. Bilder mit einer Größe von weniger als { size } KB werden nicht komprimiert."
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "Ihr Mikrofon wird in den Browsereinstellungen blockiert."
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "Ihre Webcam und Ihr Mikrofon werden in den Browsereinstellungen blockiert."
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "Ihre Webcam wird in den Browsereinstellungen blockiert."
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Ihre Webcam wird möglicherweise bereits benutzt."
   },
   "zeta_5ef24f0e": { "message": "Zeta" },
   "zoom_f3e54d69": { "message": "Zoom" },

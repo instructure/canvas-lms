@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Whakapakoko o Nāianei"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Taumata o te rōrahi ōnāianei"
+    },
     "custom_6979cd81": {
         "message": "Tikanga"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "Filipino"
+    },
+    "finish_bc343002": {
+        "message": "Mutu"
     },
     "finnish_4df2923d": {
         "message": "Finnish"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "Kauwaka"
     },
+    "mic_a7f3d311": {
+        "message": "Mic"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Kua Monokia Te Hopuoro"
+    },
     "middle_27dc1d5": {
         "message": "Waenganui"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Kaore i kitea he hua mo { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Kaore Ataata"
     },
     "none_3b5e34d2": {
         "message": "Kaore"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "Whakapiri"
     },
+    "pause_12af3bb4": {
+        "message": "Okioki"
+    },
     "peer_review_74f26a13": {
         "message": "Hoa arotake"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "Ngā Pika"
     },
+    "play_1a47eaa7": {
+        "message": "Tākaro"
+    },
     "play_media_comment_35257210": {
         "message": "Purei korero pāpāho."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Whakatangihia nga korero pāpāho na { name } mai i { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Tēnā koa tukuna Canvas ki te whakauru i tō reooro me tō kāmera paetukutuku."
     },
     "plus_d43cd4ec": {
         "message": "Apiti atu"
@@ -1690,6 +1714,9 @@
     },
     "preview_53003fd2": {
         "message": "Arokite"
+    },
+    "preview_a3f8f854": {
+        "message": "AROKITE"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Arokite i roto i paparua"
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "Tāhopu"
+    },
+    "recording_98da6bda": {
+        "message": "Hopukanga"
     },
     "red_8258edf3": {
         "message": "Whero"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "Tiaki"
     },
+    "save_media_cb9e786e": {
+        "message": "Tiaki Pāpāho"
+    },
     "schedule_preview_3bcda153": {
         "message": "Pūwhakarite Arokite"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "Rapu"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Tīpakohia ororongo puna"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Tīpako tapahi āhua"
     },
     "select_language_7c93a900": {
         "message": "Tīpako Reo"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Tīpakohia ataata puna"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Tīpakohia { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "I hē tētahi mea."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "I hapa i te wā e uru ana i tō paetukutuku kāmera"
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "I raruraru tētahi mea me taku kore e mōhio he aha te mea hei whakātu ki a koe."
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "I raruraru tētahi mea"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "He hapa i te wā e tuari ana i tō mata."
     },
     "sort_by_e75f9e3e": {
         "message": "Wehewehe e"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "Whetū"
+    },
+    "start_over_f7552aa9": {
+        "message": "Tīmata Anō"
+    },
+    "start_recording_9a65141a": {
+        "message": "Timata te hopu ana"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } ki te { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "Marautanga"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "Punaha Oro Whakaaetia"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "Punaha Oro Monokia"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/ngā pere"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Te ataahua HTML kaore i te papa patopato whakauru. Pēhi Neke O ki te huaki mata html etita."
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "Ko te konae kua tohua he nui ake i te { maxSize } Tepe paita"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Kaore ngā koinga e hono ana ki tēnei tūemi"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "Wā"
+    },
+    "timebar_a4d18443": {
+        "message": "Tapareti"
     },
     "title_ee03d132": {
         "message": "taitara"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "kaore i pānuitia"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Taitara kore"
     },
     "untitled_efdc2d7d": {
         "message": "taitara kore"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Ataata Kōwhiringa Pereki"
     },
+    "video_player_b371005": {
+        "message": "Kaitākaro Ataata"
+    },
     "video_player_for_9e7d373b": {
         "message": "Kaitākaro Ataata mō "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Tatauhia nga kupu me nga tohu."
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "Kaore i kitea he orooro e mahi ana e hono ana ki tō pūrere."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "Kaore i kitea he ipurangi kāmera e hono ana ki tō pūrere."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "Kaore i kitea he ipurangi kāmera ara orooro hono ki tō pūrere."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webcam Monokia"
+    },
+    "webcam_fe91b20f": {
+        "message": "Paetukutuku Kāmera"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Ia wiki pūwhakarite whakaterenga"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Kua kōpekehia to ahua mo te Kaihanga Ata. Ko nga whakaahua iti iho I te { size } KB e kore e kōpeketia."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Kua aukatitia tō orooro i roto i te tautuhinga tirotiro."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Tō ipurangi kāmera me tō orooro kua aukatitia i roto i te tautuhinga tirotiro."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Tō ipurangi kāmera kua aukatitia i roto i te tirotiro tautuhinga."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Kei te whakamahia pea tō paetukutuku kāmera."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

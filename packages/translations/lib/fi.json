@@ -446,6 +446,9 @@
     "current_image_f16c249c": {
         "message": "Nykyinen kuva"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Nykyinen äänenvoimakkuuden taso"
+    },
     "custom_6979cd81": {
         "message": "Mukauta"
     },
@@ -841,6 +844,9 @@
     },
     "filipino_33339264": {
         "message": "filippiino"
+    },
+    "finish_bc343002": {
+        "message": "Lopeta"
     },
     "finnish_4df2923d": {
         "message": "suomi"
@@ -1346,6 +1352,12 @@
     "medium_5a8e9ead": {
         "message": "Tietoväline"
     },
+    "mic_a7f3d311": {
+        "message": "Mikrofoni"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Mikrofoni pois käytöstä"
+    },
     "middle_27dc1d5": {
         "message": "Kohtalainen"
     },
@@ -1465,6 +1477,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Ei videota"
     },
     "none_3b5e34d2": {
         "message": "Ei mitään"
@@ -1601,6 +1616,9 @@
     "paste_5963d1c1": {
         "message": "Liitä"
     },
+    "pause_12af3bb4": {
+        "message": "Keskeytä"
+    },
     "peer_review_74f26a13": {
         "message": "Vertaisarviointi"
     },
@@ -1649,11 +1667,17 @@
     "pixels_52ece7d1": {
         "message": "Pikselit"
     },
+    "play_1a47eaa7": {
+        "message": "Toista"
+    },
     "play_media_comment_35257210": {
         "message": "Toista mediakommentti."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Toista mediakommentti { name } kohteesta { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Anna Canvasin käyttää mikrofoniasi ja nettikameraasi."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1690,6 +1714,9 @@
     },
     "preview_53003fd2": {
         "message": "Esikatsele"
+    },
+    "preview_a3f8f854": {
+        "message": "ESIKATSELU"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Esikatselu asettelussa"
@@ -1753,6 +1780,9 @@
     },
     "record_7c9448b": {
         "message": "Nauhoita"
+    },
+    "recording_98da6bda": {
+        "message": "Nauhoitetaan"
     },
     "red_8258edf3": {
         "message": "Punainen"
@@ -1853,6 +1883,9 @@
     "save_11a80ec3": {
         "message": "Tallenna"
     },
+    "save_media_cb9e786e": {
+        "message": "Tallenna media"
+    },
     "schedule_preview_3bcda153": {
         "message": "Aikataulun esikatselu"
     },
@@ -1871,11 +1904,17 @@
     "search_280d00bd": {
         "message": "Hae"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Valitse äänilähde"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Valitse rajauksen muoto"
     },
     "select_language_7c93a900": {
         "message": "Valitse kieli"
+    },
+    "select_video_source_1b5c9dbe": {
+        "message": "Valitse videolähde"
     },
     "selected_linkfilename_c093b1f2": {
         "message": "Valittu { linkFileName }"
@@ -1937,6 +1976,9 @@
     "something_went_wrong_89195131": {
         "message": "Jotakin meni pieleen."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Jotakin meni pieleen, kun yritettiin käyttää verkkokameraa."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
     },
@@ -1945,6 +1987,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Jotakin meni pieleen."
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Jokin meni pieleen näyttösi jakamisen yhteydessä."
     },
     "sort_by_e75f9e3e": {
         "message": "Lajitteluperuste"
@@ -1984,6 +2029,12 @@
     },
     "star_8d156e09": {
         "message": "Tähti"
+    },
+    "start_over_f7552aa9": {
+        "message": "Aloita alusta"
+    },
+    "start_recording_9a65141a": {
+        "message": "Aloita nauhoitus"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } - { endDate }"
@@ -2066,6 +2117,12 @@
     "syllabus_f191f65b": {
         "message": "Opinto-ohjelma"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "Järjestelmän audio sallittu"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "Järjestelmän audio pois käytöstä"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB/Nuolet"
     },
@@ -2123,6 +2180,9 @@
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Kun painat Shift-O, tekstieditori avautuu."
     },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "Valittu tiedosto ylittää { maxSize } bittirajoituksen"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Tälle kohteelle ei ole osoitettu pisteitä"
     },
@@ -2170,6 +2230,9 @@
     },
     "time_2b5aac58": {
         "message": "Aika"
+    },
+    "timebar_a4d18443": {
+        "message": "Aikapalkki"
     },
     "title_ee03d132": {
         "message": "Otsikko"
@@ -2248,6 +2311,9 @@
     },
     "unpublished_dfd8801": {
         "message": "julkaisematon"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Nimetön"
     },
     "untitled_efdc2d7d": {
         "message": "Nimetön"
@@ -2381,6 +2447,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Videoasetusten ilmoitusalue"
     },
+    "video_player_b371005": {
+        "message": "Videosoitin"
+    },
     "video_player_for_9e7d373b": {
         "message": "Videonauhuri kohteelle "
     },
@@ -2410,6 +2479,21 @@
     },
     "view_word_and_character_counts_a743dd0c": {
         "message": "Tarkastele sanamäärää ja merkkien määrää"
+    },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "Emme havainneet toimivaa mikrofonia, joka olisi kytkettynä puhelimeen."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "Emme havainneet verkkokameraa, joka olisi kytkettynä puhelimeen."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "Emme havainneet toimivaa verkkokameraa tai mikrofonia, jotka olisivat kytkettynä laitteeseesi."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webkamera pois käytöstä"
+    },
+    "webcam_fe91b20f": {
+        "message": "Nettikamera"
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Viikkoaikataulun selaus"
@@ -2467,6 +2551,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Kuvasi on pakattu Icon Makeria varten. Alle { size } KB:n kokoisia kuvia ei pakata."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Mikrofonisi on estetty selainasetuksissa."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Mikrofonisi ja verkkokamerasi on lukittu selainasetuksissa."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Verkkokamerasi lukitaan selainasetuksissa."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Nettikamerasi saattaa olla jo käytössä."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

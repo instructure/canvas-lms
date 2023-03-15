@@ -153,6 +153,7 @@
   "crop_image_807ebb08": { "message": "画像の切り取り" },
   "cup_product_14174434": { "message": "カップ製品" },
   "current_image_f16c249c": { "message": "現在の画像" },
+  "current_volume_level_c55ab825": { "message": "現在の音量のレベル" },
   "custom_6979cd81": { "message": "カスタム" },
   "cyan_c1d5f68a": { "message": "シアン" },
   "dagger_57e0f4e5": { "message": "短剣" },
@@ -264,6 +265,7 @@
   },
   "files_c300e900": { "message": "ファイル" },
   "files_index_af7c662b": { "message": "ファイルのインデックス" },
+  "finish_bc343002": { "message": "フィニッシュ" },
   "flat_music_76d5a5c3": { "message": "フラット(音楽)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "フォーカス要素オプションツールバー"
@@ -420,6 +422,8 @@
     "message": "メディアファイルは処理中です。後ほどもう一度やり直してください。"
   },
   "medium_5a8e9ead": { "message": "中" },
+  "mic_a7f3d311": { "message": "マイク" },
+  "microphone_disabled_15c83130": { "message": "マイク無効" },
   "middle_27dc1d5": { "message": "中位" },
   "minimize_file_preview_da911944": {
     "message": "ファイル プレビューを最小化"
@@ -462,6 +466,7 @@
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "{ filterTerm }の結果が見つかりませんでした"
   },
+  "no_video_1ed00b26": { "message": "ビデオなし" },
   "none_3b5e34d2": { "message": "なし" },
   "none_selected_b93d56d2": { "message": "選択されたものなし" },
   "not_equal_6e2980e6": { "message": "≠" },
@@ -503,6 +508,7 @@
   "parallel_d55d6e38": { "message": "並列" },
   "partial_derivative_4a9159df": { "message": "部分(微分)" },
   "paste_5963d1c1": { "message": "貼り付け" },
+  "pause_12af3bb4": { "message": "一時停止" },
   "pentagon_17d82ea3": { "message": "ペンタゴン" },
   "people_b4ebb13c": { "message": "メンバー" },
   "percentage_34ab7c2c": { "message": "割合" },
@@ -520,9 +526,13 @@
   "pi_variant_10f5f520": { "message": "パイ(変形)" },
   "pink_68ad45cb": { "message": "ピンク" },
   "pixels_52ece7d1": { "message": "ピクセル" },
+  "play_1a47eaa7": { "message": "再生" },
   "play_media_comment_35257210": { "message": "メディア コメントの再生。" },
   "play_media_comment_by_name_from_createdat_c230123d": {
     "message": "{ name }まで{ createdAt }からのメディアのコメントを再生します。"
+  },
+  "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+    "message": "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
   },
   "plus_d43cd4ec": { "message": "プラス" },
   "plus_minus_f8be2e83": { "message": "プラス/マイナス" },
@@ -532,6 +542,7 @@
   "precedes_equal_20701e84": { "message": "優先・同等" },
   "preformatted_d0670862": { "message": "フォーマット済み" },
   "preview_53003fd2": { "message": "プレビュー" },
+  "preview_a3f8f854": { "message": "プレビュー" },
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
   "preview_inline_9787330": { "message": "インラインでのプレビュー" },
   "prime_917ea60e": { "message": "素数" },
@@ -554,6 +565,7 @@
     "message": "（複素数の）実数部分"
   },
   "record_7c9448b": { "message": "記録" },
+  "recording_98da6bda": { "message": "記録" },
   "red_8258edf3": { "message": "レッド" },
   "relationships_6602af70": { "message": "関係" },
   "religion_icon_246e0be1": { "message": "宗教学のアイコン" },
@@ -590,10 +602,13 @@
     "message": "残念ながら、pretty HTMLエディタはキーボードからはアクセスできません。生のHTMLエディタにはこちらからアクセスできます。"
   },
   "save_11a80ec3": { "message": "保存" },
+  "save_media_cb9e786e": { "message": "メディアを保存する" },
   "script_l_42a7b254": { "message": "スクリプト L" },
   "search_280d00bd": { "message": "検索" },
+  "select_audio_source_21043cd5": { "message": "音声源を選択" },
   "select_crop_shape_d441feeb": { "message": "クロップ形状の選択" },
   "select_language_7c93a900": { "message": "言語を選択する" },
+  "select_video_source_1b5c9dbe": { "message": "ビデオ源を選択" },
   "selected_linkfilename_c093b1f2": { "message": "選択された{ linkFileName }" },
   "set_minus_b46e9b88": { "message": "マイナス設定" },
   "sharp_music_ab956814": { "message": "シャープ (音楽)" },
@@ -612,6 +627,9 @@
   "small_b070434a": { "message": "小" },
   "solid_circle_9f061dfc": { "message": "一色の円" },
   "something_went_wrong_89195131": { "message": "問題が発生しました。" },
+  "something_went_wrong_accessing_your_webcam_6643b87e": {
+    "message": "ウェブカムにアクセス中にエラーが生じました。"
+  },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "何かがうまくいきませんでした。何を見せればいいのかわかりません。"
   },
@@ -619,6 +637,9 @@
     "message": "問題が発生しました。接続を確認し、ページを再読み込みして、もう一度やり直してください。"
   },
   "something_went_wrong_d238c551": { "message": "なにかが失敗しました" },
+  "something_went_wrong_while_sharing_your_screen_8de579e5": {
+    "message": "画面の共有中に問題が発生しました。"
+  },
   "sort_by_e75f9e3e": { "message": "分類する" },
   "spades_suit_b37020c2": { "message": "スペード (1組)" },
   "square_511eb3b3": { "message": "四角" },
@@ -631,6 +652,8 @@
   "square_superset_3be8dae1": { "message": "正方形上位集合" },
   "square_superset_strict_fa4262e4": { "message": "正方形部分集合 (厳密)" },
   "star_8d156e09": { "message": "スター" },
+  "start_over_f7552aa9": { "message": "最初からやり直し" },
+  "start_recording_9a65141a": { "message": "録画開始" },
   "steel_blue_14296f08": { "message": "スチールブルー" },
   "styles_2aa721ef": { "message": "スタイル" },
   "submit_a3cc6859": { "message": "提出" },
@@ -659,6 +682,8 @@
     "message": "リッチテキストエディタに切り替える"
   },
   "syllabus_f191f65b": { "message": "シラバス" },
+  "system_audio_allowed_b2508f8c": { "message": "システムオーディオを許可" },
+  "system_audio_disabled_c177bd13": { "message": "システムオーディオが無効" },
   "tab_arrows_4cf5abfc": { "message": "TAB/矢印" },
   "tau_880974b7": { "message": "タウ" },
   "teal_f729a294": { "message": "ティール" },
@@ -704,6 +729,7 @@
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "あなたのビデオのブラウザ内のタイトルは正しいものですが、データベース内でそれを更新できませんでした。"
   },
+  "timebar_a4d18443": { "message": "タイムバー" },
   "title_ee03d132": { "message": "タイトル" },
   "to_be_posted_when_d24bf7dc": { "message": "投稿するには:{ when }" },
   "to_do_when_2783d78f": { "message": "タスク：{ when }" },
@@ -727,6 +753,7 @@
   },
   "union_e6b57a53": { "message": "ユニオン" },
   "unpublished_dfd8801": { "message": "未公開" },
+  "untitled_16aa4f2b": { "message": "無題" },
   "untitled_efdc2d7d": { "message": "無題" },
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "上・左斜め矢印" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "上・右の対角線矢印" },
@@ -795,6 +822,7 @@
   "vertical_dots_bfb21f14": { "message": "垂直の点" },
   "video_options_24ef6e5d": { "message": "ビデオオプション" },
   "video_options_tray_3b9809a5": { "message": "ビデオオプショントレイ" },
+  "video_player_b371005": { "message": "ビデオプレーヤー" },
   "video_player_for_9e7d373b": { "message": "（）のビデオプレーヤー " },
   "video_player_for_title_ffd9fbc4": {
     "message": "{ title }のビデオプレーヤー"
@@ -808,6 +836,17 @@
   "view_word_and_character_counts_a743dd0c": {
     "message": "語数・文字数を表示"
   },
+  "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+    "message": "デバイスに接続されているオンになっているマイクを検出できませんでした。"
+  },
+  "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+    "message": "デバイスに接続されているオンになっているウェブカメラを検出できませんでした。"
+  },
+  "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+    "message": "デバイスに接続されているオンになっているウェブカメラやマイクを検出できませんでした。"
+  },
+  "webcam_disabled_30c66986": { "message": "ウェブカメラが無効" },
+  "webcam_fe91b20f": { "message": "ウェブカム" },
   "white_87fa64fd": { "message": "ホワイト" },
   "width_492fec76": { "message": "幅" },
   "width_and_height_must_be_numbers_110ab2e3": {
@@ -826,6 +865,18 @@
   },
   "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
     "message": "あなたの画像はIcon Maker用に圧縮されています。{ size }KB未満の画像は圧縮されません。"
+  },
+  "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+    "message": "ブラウザの設定でマイクがブロックされています。"
+  },
+  "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+    "message": "ブラウザの設定でウェブカメラとマイクがブロックされています。"
+  },
+  "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+    "message": "ブラウザの設定でウェブカメラがブロックされています。"
+  },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "あなたのウェブカメラは既に使用中かもしれません。"
   },
   "zeta_5ef24f0e": { "message": "ゼータ" },
   "zoom_f3e54d69": { "message": "Zoom" },
