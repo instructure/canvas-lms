@@ -51,10 +51,15 @@ ready(() => {
     "[data-component='GradebookSettingsModal']"
   ) as HTMLSpanElement
   const flashMessageContainer = document.getElementById('flash_message_holder') as HTMLDivElement
+  // AnonymousSpeedGraderAlert
+  const anonymousSpeedGraderAlertNode = document.querySelector(
+    '[data-component="AnonymousSpeedGraderAlert"]'
+  ) as HTMLSpanElement
 
   ReactDOM.render(
     <GradebookData
       actionMenuNode={actionMenuNode}
+      anonymousSpeedGraderAlertNode={anonymousSpeedGraderAlertNode}
       applyScoreToUngradedModalNode={applyScoreToUngradedModalNode}
       currentUserId={ENV.current_user_id as string}
       enhancedActionMenuNode={enhancedActionMenuNode}

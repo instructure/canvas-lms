@@ -29,9 +29,12 @@ import type {
   ModuleMap,
   Section,
   Student,
+  StudentGrade,
   StudentGroupCategoryMap,
   StudentMap,
 } from '../api.d'
+
+export type SortDirection = 'ascending' | 'descending'
 
 export type CourseSettingsType = {
   filter_speed_grader_by_student_group: boolean
@@ -60,8 +63,8 @@ export type GradebookSettings = {
   show_separate_first_last_names: 'false' | 'true'
   show_unpublished_assignments: 'false' | 'true'
   sort_rows_by_column_id: string
-  sort_rows_by_direction: 'ascending' | 'descending'
-  sort_rows_by_setting_key: string
+  sort_rows_by_direction: SortDirection
+  sort_rows_by_setting_key: SortRowsSettingKey
   student_column_display_as: 'last_first' | 'first_last'
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
@@ -164,7 +167,7 @@ export type GradebookOptions = {
 export type GradebookViewOptions = {
   columnSortSettings: {
     criterion: string
-    direction: 'ascending' | 'descending'
+    direction: SortDirection
   }
   hideTotal: boolean
   showNotes: boolean
@@ -232,11 +235,13 @@ export type ContentLoadStates = {
 }
 
 export type PendingGradeInfo = {
-  userId: string
-  assignmentId: string
+  assignmentId?: string
+  enteredAs?: string | null
   excused: boolean
+  grade: string | null
+  score: number | null
+  userId?: string
   valid: boolean
-  grade?: string
 }
 
 export type InitialActionStates = {
@@ -327,7 +332,7 @@ export type Lti = {
 
 export type ColumnOrderSettings = {
   customOrder?: string[]
-  direction?: 'ascending' | 'descending'
+  direction?: SortDirection
   freezeTotalGrade?: boolean | 'true'
   sortType: string
 }
@@ -349,12 +354,6 @@ export type FlashMessage = {
 
 export type AssignmentStudentMap = {
   [assignmentId: string]: StudentMap
-}
-
-export type StudentGrade = {
-  score: number
-  possible: number
-  submissions: any
 }
 
 // TODO: store student grades in separate map so that the
@@ -427,3 +426,16 @@ export type ProgressCamelized = {
   progressId: string
   workflowState: string
 }
+
+export type SortRowsSettingKey =
+  | 'excused'
+  | 'grade'
+  | 'integration_id'
+  | 'late'
+  | 'login_id'
+  | 'missing'
+  | 'name'
+  | 'sis_user_id'
+  | 'sortable_name'
+  | 'student_firstname'
+  | 'unposted'

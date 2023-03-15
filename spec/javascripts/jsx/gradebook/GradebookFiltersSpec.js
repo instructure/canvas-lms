@@ -51,8 +51,8 @@ test('renders the module select when not already rendered', function () {
   ok(this.container.children.length > 0, 'something was rendered')
 })
 
-test('does not render when modules do not exist', function () {
-  this.gradebook.setContextModules(undefined)
+test('does not render when modules are empty', function () {
+  this.gradebook.setContextModules([])
   this.gradebook.updateModulesFilterVisibility()
   strictEqual(this.container.children.length, 0, 'nothing was rendered')
 })

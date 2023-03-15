@@ -29,6 +29,7 @@ import useStore from './stores/index'
 
 type Props = {
   actionMenuNode: HTMLSpanElement
+  anonymousSpeedGraderAlertNode: HTMLSpanElement
   applyScoreToUngradedModalNode: HTMLElement
   currentUserId: string
   enhancedActionMenuNode: HTMLSpanElement

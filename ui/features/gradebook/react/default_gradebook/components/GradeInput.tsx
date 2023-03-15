@@ -21,6 +21,14 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+import type {PendingGradeInfo} from '../gradebook.d'
+import type {
+  CamelizedAssignment,
+  GradeEntryMode,
+  GradeResult,
+  GradingStandard,
+  SubmissionData,
+} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
@@ -34,7 +42,23 @@ type Message = {
   type: 'error' | 'hint'
 }
 
-function normalizeSubmissionGrade(props) {
+type Props = {
+  assignment: CamelizedAssignment
+  disabled: boolean
+  enterGradesAs: GradeEntryMode
+  gradingScheme: GradingStandard[] | null
+  onSubmissionUpdate: (submission: SubmissionData, gradeInfo: GradeResult) => void
+  pendingGradeInfo: PendingGradeInfo
+  submission: SubmissionData
+  submissionUpdating: boolean
+}
+
+type State = {
+  formattedGrade: string
+  grade: string
+}
+
+function normalizeSubmissionGrade(props: Props) {
   const {submission, assignment, enterGradesAs: formatType, gradingScheme} = props
   const gradeToNormalize = submission.enteredGrade
 
@@ -59,7 +83,7 @@ function normalizeSubmissionGrade(props) {
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
-function hasGradeChanged(props, state) {
+function hasGradeChanged(props: Props, state: {grade: string}) {
   if (props.pendingGradeInfo) {
     if (props.pendingGradeInfo.valid) {
       return false
@@ -72,7 +96,7 @@ function hasGradeChanged(props, state) {
   return normalizedEnteredGrade !== state.grade && props.submission.enteredGrade !== state.grade
 }
 
-function assignmentLabel(assignment, formatType) {
+function assignmentLabel(assignment: CamelizedAssignment, formatType: GradeEntryMode) {
   switch (formatType) {
     case 'points': {
       const points = I18n.n(assignment.pointsPossible, {
@@ -98,7 +122,7 @@ function assignmentLabel(assignment, formatType) {
   }
 }
 
-function stateFromProps(props) {
+function stateFromProps(props: Props) {
   let normalizedGrade
 
   if (props.enterGradesAs === 'passFail') {
@@ -120,35 +144,6 @@ function stateFromProps(props) {
   }
 }
 
-type Props = {
-  assignment: {
-    anonymizeStudents: boolean
-    gradingType: 'gpa_scale' | 'letter_grade' | 'not_graded' | 'pass_fail' | 'points' | 'percent'
-    pointsPossible: number
-  }
-  disabled: boolean
-  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
-  gradingScheme: Array<Array<string>>
-  onSubmissionUpdate: Function
-  pendingGradeInfo: {
-    excused: boolean
-    grade: string
-    valid: boolean
-  }
-  submission: {
-    enteredGrade: string
-    enteredScore: number
-    excused: boolean
-    id: string
-  }
-  submissionUpdating: boolean
-}
-
-type State = {
-  formattedGrade: string
-  grade: string
-}
-
 export default class GradeInput extends Component<Props, State> {
   static defaultProps = {
     disabled: false,
@@ -158,7 +153,7 @@ export default class GradeInput extends Component<Props, State> {
     submissionUpdating: false,
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.handleSelectChange = this.handleSelectChange.bind(this)
@@ -169,7 +164,7 @@ export default class GradeInput extends Component<Props, State> {
     this.state = stateFromProps(props)
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     const submissionChanged = this.props.submission.id !== nextProps.submission.id
     const submissionUpdated = this.props.submissionUpdating && !nextProps.submissionUpdating
 
@@ -199,14 +194,14 @@ export default class GradeInput extends Component<Props, State> {
     )
   }
 
-  handleTextChange(event) {
+  handleTextChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({
       formattedGrade: event.target.value,
       grade: event.target.value,
     })
   }
 
-  handleSelectChange(grade) {
+  handleSelectChange(grade: string) {
     this.setState({grade}, this.handleGradeChange)
   }
 
@@ -232,7 +227,7 @@ export default class GradeInput extends Component<Props, State> {
     const isDisabled = this.props.disabled
     const isBusy = this.props.submissionUpdating
 
-    let currentGradeInfo
+    let currentGradeInfo: PendingGradeInfo
     if (this.props.pendingGradeInfo) {
       currentGradeInfo = this.props.pendingGradeInfo
     } else if (this.props.submission.excused) {
@@ -274,7 +269,7 @@ export default class GradeInput extends Component<Props, State> {
     const score = this.props.submission.enteredScore
     if (this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid) {
       messages.push({type: 'error', text: I18n.t('This is not a valid grade')})
-    } else if (score < 0) {
+    } else if (typeof score === 'number' && score < 0) {
       messages.push({type: 'hint', text: I18n.t('This grade has negative points')})
     } else if (isUnusuallyHigh(score, this.props.assignment.pointsPossible)) {
       messages.push({type: 'hint', text: I18n.t('This grade is unusually high')})

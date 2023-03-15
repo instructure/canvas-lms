@@ -54,7 +54,10 @@ function labelForPostGradesAction(postGradesAction) {
   return I18n.t('No grades to post')
 }
 
-function labelForHideGradesAction(hideGradesAction) {
+function labelForHideGradesAction(hideGradesAction: {
+  hasGradesOrCommentsToHide: boolean
+  hasGradesOrPostableComments: boolean
+}) {
   if (hideGradesAction.hasGradesOrCommentsToHide) {
     return I18n.t('Hide grades')
   } else if (hideGradesAction.hasGradesOrPostableComments) {

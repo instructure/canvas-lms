@@ -27,15 +27,17 @@ import _ from 'lodash'
 import htmlEscape from 'html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
-  CustomColumn,
   ColumnSizeSettings,
+  CustomColumn,
   Filter,
-  FilterType,
   FilterPreset,
+  FilterType,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
+  GradebookStudentMap,
   GradingPeriodAssignmentMap,
   PartialFilterPreset,
+  SortRowsSettingKey,
   SubmissionFilterValue,
 } from './gradebook.d'
 import type {
@@ -48,7 +50,6 @@ import type {
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
-  StudentMap,
   Submission,
   SubmissionType,
 } from '../../../../api.d'
@@ -72,37 +73,44 @@ export function ensureAssignmentVisibility(assignment: Assignment, submission: S
   }
 }
 
-export function forEachSubmission(students: StudentMap, fn) {
+export function forEachSubmission(
+  students: GradebookStudentMap,
+  fn: (submission: Submission) => void
+) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
-        fn(student[key])
+        const submission = student[key] as Submission
+        fn(submission)
       }
     })
   })
 }
 
-export function getAssignmentGroupPointsPossible(assignmentGroup) {
-  return assignmentGroup.assignments.reduce(function (sum, assignment) {
+export function getAssignmentGroupPointsPossible(assignmentGroup: AssignmentGroup) {
+  return assignmentGroup.assignments.reduce(function (sum: number, assignment) {
     return sum + (assignment.points_possible || 0)
   }, 0)
 }
 
-export function getCourseFeaturesFromOptions(options) {
+export function getCourseFeaturesFromOptions(options: {
+  final_grade_override_enabled: boolean
+  allow_view_ungraded_as_zero: boolean
+}) {
   return {
     finalGradeOverrideEnabled: options.final_grade_override_enabled,
-    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero,
+    allowViewUngradedAsZero: Boolean(options.allow_view_ungraded_as_zero),
   }
 }
 
-export function getCourseFromOptions(options) {
+export function getCourseFromOptions(options: {context_id: string}) {
   return {
     id: options.context_id,
   }
 }
 
-export function getGradeAsPercent(grade) {
+export function getGradeAsPercent(grade: {score?: number | null; possible: number}) {
   if (grade.possible > 0) {
     // TODO: use GradeCalculationHelper.divide here
     return (grade.score || 0) / grade.possible
@@ -115,8 +123,10 @@ export function getStudentGradeForColumn(student, field: string) {
   return student[field] || {score: null, possible: 0}
 }
 
-export function htmlDecode(input) {
-  return input && new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
+export function htmlDecode(input?: string): string | null {
+  return input
+    ? new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
+    : null
 }
 
 export function isAdmin() {
@@ -141,8 +151,11 @@ export function onGridKeyDown(event, obj) {
   }
 }
 
-export function renderComponent(reactClass, mountPoint, props = {}, children: any = null) {
-  const component = React.createElement(reactClass, props, children)
+export function renderComponent(reactClass, mountPoint: Element | null, props = {}) {
+  if (mountPoint == null) {
+    throw new Error('mountPoint is required')
+  }
+  const component = React.createElement(reactClass, props)
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, mountPoint)
 }
@@ -182,7 +195,7 @@ export function getColumnTypeForColumnId(columnId: string): string {
   }
 }
 
-export function getDefaultSettingKeyForColumnType(columnType: string) {
+export function getDefaultSettingKeyForColumnType(columnType: string): SortRowsSettingKey {
   if (
     columnType === 'assignment' ||
     columnType === 'assignment_group' ||
@@ -459,9 +472,9 @@ export function otherGradingPeriodAssignmentIds(
 const createQueryString = ([key, val]: [
   string,
   string | number | boolean | string[] | SubmissionType[]
-]) => {
+]): string => {
   if (Array.isArray(val)) {
-    return val.map(v => createQueryString([`${key}[]`, v])).join('&')
+    return val.map(v => createQueryString([`${key}[]`, String(v)])).join('&')
   }
 
   return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`

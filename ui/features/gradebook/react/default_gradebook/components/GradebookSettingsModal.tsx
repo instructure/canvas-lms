@@ -113,7 +113,7 @@ export type GradebookSettingsModalProps = {
   gradedLateSubmissionsExist: boolean
   loadCurrentViewOptions?: () => GradebookViewOptions
   onCourseSettingsUpdated: (courseSettings: {allowFinalGradeOverride: boolean}) => void
-  onLatePolicyUpdate: (latePolicy: Partial<LatePolicyCamelized>) => void
+  onLatePolicyUpdate: (latePolicy: LatePolicyCamelized) => void
   onViewOptionsUpdated?: (viewOptions: GradebookViewOptions) => Promise<void | void[]>
   postPolicies: {
     coursePostPolicy: {
@@ -208,10 +208,11 @@ export default class GradebookSettingsModal extends React.Component<
       : updateLatePolicy
     return createOrUpdate(this.props.courseId, this.state.latePolicy.changes)
       .then(() => {
-        const latePolicy: Partial<LatePolicyCamelized> = {
+        // can be cast because state.latePolicy.data exists
+        const latePolicy = {
           ...(this.state.latePolicy.data || {}),
           ...this.state.latePolicy.changes,
-        }
+        } as LatePolicyCamelized
         return this.props.onLatePolicyUpdate(latePolicy)
       })
       .catch(this.onSaveLatePolicyFailure)
@@ -240,7 +241,7 @@ export default class GradebookSettingsModal extends React.Component<
       .catch(onSavePostPolicyFailure)
 
   saveViewOptions = () => {
-    const savedOptions = _.cloneDeep(this.state.viewOptions)
+    const savedOptions: GradebookViewOptions = _.cloneDeep(this.state.viewOptions)
     if (!this.props.onViewOptionsUpdated) {
       throw new Error('onViewOptionsUpdated is required to save view options')
     }

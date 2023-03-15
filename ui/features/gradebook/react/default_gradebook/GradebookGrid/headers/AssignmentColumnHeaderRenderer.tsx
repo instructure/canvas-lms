@@ -138,7 +138,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
     },
     getCurrentlyShownStudents,
 
-    onHeaderKeyDown: event => {
+    onHeaderKeyDown: (event: React.KeyboardEvent) => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {
