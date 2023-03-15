@@ -28,7 +28,6 @@ const ignoredErrors = [
   /A theme registry has already been initialized/,
   /Each child in a list should have a unique "key" prop/,
   /The prop `title` is marked as required/,
-  /The prop `toggleMissing` is marked as required/,
   /The prop `uniqueId` is marked as required/,
 ]
 const globalWarn = global.console.warn
