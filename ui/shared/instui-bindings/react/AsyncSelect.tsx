@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent} from 'react'
+import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent, useEffect} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -40,6 +40,7 @@ type Props = {
   noOptionsValue?: string
   renderLabel?: string | ReactNode
   onOptionSelected: (event, optionId: string) => void
+  onHighlightedOptionChange?: (optionId: string | null) => void
   onInputChange: (event, value) => void
   onBlur?: (event) => void
   onFocus?: (event) => void
@@ -61,6 +62,7 @@ export default function CanvasAsyncSelect({
   noOptionsLabel = '---',
   noOptionsValue = '',
   onOptionSelected = () => {},
+  onHighlightedOptionChange = () => {},
   onInputChange = () => {},
   onFocus = () => {},
   onBlur = () => {},
@@ -76,6 +78,11 @@ export default function CanvasAsyncSelect({
   const [announcement, setAnnouncement] = useState<ReactNode>('')
   const [hasFocus, setHasFocus] = useState(false)
   const [managedInputValue, setManagedInputValue] = useState('')
+
+  useEffect(() => {
+    onHighlightedOptionChange(highlightedOptionId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightedOptionId])
 
   function findOptionById(id: string): ReactElement {
     let option
