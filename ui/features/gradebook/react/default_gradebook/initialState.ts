@@ -21,15 +21,17 @@ import StudentDatastore from './stores/StudentDatastore'
 import type {
   ContentLoadStates,
   CourseContent,
+  CustomColumn,
   GradebookOptions,
   GradebookSettings,
   InitialActionStates,
   LatePolicyCamelized,
 } from './gradebook.d'
+import type {StatusColors} from './constants/colors'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
 import {camelize} from 'convert-case'
 
-export function getInitialGradebookContent(options) {
+export function getInitialGradebookContent(options: {teacher_notes: null | CustomColumn}) {
   return {
     customColumns: options.teacher_notes ? [options.teacher_notes] : [],
   }
@@ -37,7 +39,7 @@ export function getInitialGradebookContent(options) {
 
 export function getInitialGridDisplaySettings(
   settings: GradebookSettings,
-  colors
+  colors: StatusColors
 ): GridDisplaySettings {
   const selectedPrimaryInfo = studentRowHeaderConstants.primaryInfoKeys.includes(
     settings.student_column_display_as
@@ -100,7 +102,7 @@ export function getInitialGridDisplaySettings(
   }
 }
 
-export function getInitialContentLoadStates(options): ContentLoadStates {
+export function getInitialContentLoadStates(options: {has_modules: boolean}): ContentLoadStates {
   return {
     assignmentGroupsLoaded: false,
     contextModulesLoaded: !options.has_modules,

@@ -103,6 +103,7 @@ export const defaultGradebookEnv = {
 
 export const defaultGradebookProps: GradebookProps = {
   actionMenuNode: document.createElement('span'),
+  anonymousSpeedGraderAlertNode: document.createElement('span'),
   appliedFilters: [],
   applyScoreToUngradedModalNode: document.createElement('div'),
   colors: {

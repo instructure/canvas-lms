@@ -21,7 +21,7 @@ import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'
-import type {FormatGradeOptions} from './grading.d'
+import type {SubmissionData, FormatGradeOptions} from './grading.d'
 
 const I18n = useI18nScope('sharedGradeFormatHelper')
 
@@ -245,7 +245,7 @@ const GradeFormatHelper = {
   formatPointsOutOf,
 
   formatSubmissionGrade(
-    submission,
+    submission: SubmissionData,
     options: {version: string; defaultValue?: string; formatType?: string} = {version: 'final'}
   ) {
     if (submission.excused) {

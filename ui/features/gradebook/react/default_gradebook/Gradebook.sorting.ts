@@ -102,9 +102,9 @@ export function compareAssignmentPositions(
   return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
 }
 
-export function idSort(a: {id: string}, b: {id: string}, {asc = true}): number {
+export function idSort(a: {id: string}, b: {id: string}, ascending = true): number {
   return NumberCompare(Number(a.id), Number(b.id), {
-    descending: !asc,
+    descending: !ascending,
   })
 }
 
@@ -116,7 +116,7 @@ export function secondaryAndTertiarySort(
   let result
   result = localeSort(a.sortable_name || '', b.sortable_name || '', {asc})
   if (result === 0) {
-    result = idSort(a, b, {asc})
+    result = idSort(a, b, asc)
   }
   return result
 }

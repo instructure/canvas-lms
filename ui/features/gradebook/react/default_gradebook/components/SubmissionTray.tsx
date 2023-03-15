@@ -41,11 +41,17 @@ import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
-import type {GradingStandard, LatePolicyCamelized, PendingGradeInfo} from '../gradebook.d'
+import type {
+  GradingStandard,
+  LatePolicyCamelized,
+  PendingGradeInfo,
+  SerializedComment,
+} from '../gradebook.d'
 import {
   CamelizedAssignment,
   CamelizedSubmission,
-  SubmissionCommentCamelized,
+  GradeEntryMode,
+  GradeResult,
 } from '@canvas/grading/grading'
 
 import {Link} from '@instructure/ui-link'
@@ -84,10 +90,10 @@ export type SubmissionTrayProps = {
   }
   student: {
     id: string
-    avatarUrl?: string
+    avatarUrl?: string | null
     gradesUrl: string
     isConcluded: boolean
-    name: string
+    name: string | null
   }
   submission: CamelizedSubmission
   courseId: string
@@ -99,7 +105,7 @@ export type SubmissionTrayProps = {
   isInClosedGradingPeriod: boolean
   isInNoGradingPeriod: boolean
   isNotCountedForScore: boolean
-  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  enterGradesAs: GradeEntryMode
   isOpen: boolean
   isFirstStudent: boolean
   isLastStudent: boolean
@@ -109,19 +115,19 @@ export type SubmissionTrayProps = {
   onClose: () => void
   requireStudentGroupForSpeedGrader: boolean
   gradingScheme: null | GradingStandard[]
-  onGradeSubmission: (grade: string, excused: boolean) => void
+  onGradeSubmission: (submission: CamelizedSubmission, gradeInfo: GradeResult) => void
   onRequestClose: () => void
   selectNextAssignment: () => void
   selectPreviousAssignment: () => void
   selectNextStudent: () => void
   selectPreviousStudent: () => void
-  updateSubmission: (submission: any) => void
+  updateSubmission: (submission: CamelizedSubmission) => void
   updateSubmissionComment: (commentId: string, comment: string) => void
   createSubmissionComment: (comment: string) => void
   deleteSubmissionComment: (commentId: string) => void
   setProcessing: (processing: boolean) => void
   onAnonymousSpeedGraderClick: (speedGraderUrl: string) => void
-  submissionComments: SubmissionCommentCamelized[]
+  submissionComments: SerializedComment[]
   showSimilarityScore: boolean
   proxySubmissionsAllowed: boolean
   reloadSubmission: (student: any, submission: any, proxyDetails: any) => void

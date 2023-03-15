@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2012 - present Instructure, Inc.
+// Copyright (C) 2023 - present Instructure, Inc.
 //
 // This file is part of Canvas.
 //
@@ -33,34 +33,49 @@
 // # back on /courses/1/x
 // userSettings.contextRemove 'specialIds'
 
-import $ from 'jquery'
-import '@canvas/jquery/jquery.instructure_misc_helpers'
-
 const userSettings = {
-  globalEnv: window.ENV,
+  get: get('current_user_id'),
+  contextGet: get('current_user_id', 'context_asset_string'),
+  set: set('current_user_id'),
+  contextSet: set('current_user_id', 'context_asset_string'),
+  remove: remove('current_user_id'),
+  contextRemove: remove('current_user_id', 'context_asset_string'),
 }
 
-function addTokens(method, ...tokens) {
-  return function (key, value) {
-    const stringifiedValue = JSON.stringify(value)
-    const joinedTokens = tokens.map(token => userSettings.globalEnv[token]).join('_')
+function get(...tokens: string[]) {
+  return function <T>(key: string): T | undefined {
+    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
     try {
-      const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
+      const res = localStorage.getItem(`_${joinedTokens}_${key}`)
       if (res === 'undefined') return undefined
-      if (res) return JSON.parse(res)
+      if (res) return JSON.parse(res) as undefined
     } catch (_ex) {
       return undefined
     }
   }
 }
 
-;['get', 'set', 'remove'].forEach(method => {
-  userSettings[method] = addTokens(method, 'current_user_id')
-  userSettings[`context${$.capitalize(method)}`] = addTokens(
-    method,
-    'current_user_id',
-    'context_asset_string'
-  )
-})
+function set(...tokens: string[]) {
+  return function <T>(key: string, value: T) {
+    const stringifiedValue = JSON.stringify(value)
+    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
+    try {
+      localStorage.setItem(`_${joinedTokens}_${key}`, stringifiedValue)
+    } catch (_ex) {
+      // ignore
+    }
+  }
+}
+
+function remove(...tokens: string[]) {
+  return function (key: string) {
+    const joinedTokens = tokens.map(token => window.ENV[token]).join('_')
+    try {
+      localStorage.removeItem(`_${joinedTokens}_${key}`)
+    } catch (_ex) {
+      // ignore
+    }
+  }
+}
 
 export default userSettings

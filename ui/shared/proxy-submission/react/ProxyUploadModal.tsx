@@ -82,6 +82,13 @@ export type ProxyUploadModalProps = {
   reloadSubmission: (proxyDetails) => void
 }
 
+export type ProxyDetails = {
+  submission_type: 'online_upload'
+  proxy_submitter: string
+  workflow_state: 'submitted'
+  submitted_at: string
+}
+
 const elideString = title => {
   if (title.length > 21) {
     return `${title.substr(0, 9)}${I18n.t('...')}${title.substr(-9)}`
@@ -140,7 +147,7 @@ const ProxyUploadModal = ({
   }
 
   const reload = sub => {
-    const proxyDetails = {
+    const proxyDetails: ProxyDetails = {
       submission_type: 'online_upload',
       proxy_submitter: sub.proxySubmitter,
       workflow_state: 'submitted',

@@ -1404,7 +1404,7 @@ EG = {
       $(this).closest('.alert').hide()
     })
 
-    $('#eg_sort_by').val(userSettings.get('eg_sort_by'))
+    $('#eg_sort_by').val(userSettings.get('eg_sort_by') || '')
     $('#submit_same_score').click((e: JQuery.ClickEvent) => {
       // By passing true as the second argument, we're telling
       // handleGradeSubmit to use the existing previous submission score

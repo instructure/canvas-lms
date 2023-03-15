@@ -254,7 +254,11 @@ export type AssignmentGroup = Readonly<{
   integration_data: unknown
   name: string
   position: number
-  rules: unknown
+  rules: {
+    drop_lowest?: number
+    drop_highest?: number
+    never_drop?: string[]
+  }
   sis_source_id: null | string
 }>
 
@@ -364,10 +368,11 @@ export type WorkflowState =
   | 'deleted'
   | 'graded'
   | 'not_graded'
+  | 'pending_review'
   | 'published'
   | 'settings_only'
-  | 'pending_review'
   | 'submitted'
+  | 'unpublished'
   | 'unsubmitted'
   | 'untaken'
 
