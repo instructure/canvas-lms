@@ -21,7 +21,6 @@ import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import mentionWasInitiated from './mentionWasInitiated'
 import {makeMarkerEditable} from './contentEditable'
 import {onKeyDown, onKeyUp, onSetContent, onMouseDown, onMentionsExit} from './events'
-import {removeTriggerChar} from './edit'
 import {ARIA_ID_TEMPLATES, MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
@@ -54,10 +53,6 @@ export const pluginDefinition = {
     editor.on('KeyUp', onKeyUp)
     editor.on('MouseDown', onMouseDown)
     editor.on('Remove', e => onMentionsExit(e.target))
-    editor.on('Blur', e => {
-      removeTriggerChar(e.target)
-      onMentionsExit(e.target)
-    })
     editor.on('ViewChange', e => onMentionsExit(e.target))
   },
 }
