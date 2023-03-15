@@ -51,7 +51,6 @@ const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
   /contextType was defined as an instance property on %s/,
-  /Functions are not valid as a React child/, // https://instructure.atlassian.net/browse/LS-3837
   /Function components cannot be given refs/,
   /Invalid prop `children` supplied to `(Option)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453

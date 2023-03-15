@@ -35,6 +35,7 @@ import AddStudentModal from './AddStudentModal'
 import {parseObservedUsersList, parseObservedUsersResponse} from './utils'
 
 const I18n = useI18nScope('observer_options')
+const ADD_STUDENT_OPTION_ID = 'new-student-option'
 
 const ObserverOptions = ({
   observedUsersList,
@@ -53,6 +54,7 @@ const ObserverOptions = ({
   const [selectedUser, setSelectedUser] = useState(null)
   const [newStudentModalOpen, setNewStudentModalOpen] = useState(false)
   const isOnlyObserver = currentUserRoles?.every(r => r === 'user' || r === 'observer')
+  const [highlightedOption, setHighlightedOption] = useState(null)
 
   const updateObservedUser = useCallback(
     user => {
@@ -122,14 +124,16 @@ const ObserverOptions = ({
   const addStudentOption = (
     <CanvasAsyncSelect.Option
       key="new"
-      id="new-student-option"
+      id={ADD_STUDENT_OPTION_ID}
       value="new"
       renderBeforeLabel={props => <IconAddLine color={!props.isHighlighted ? 'brand' : null} />}
       // according to the documentation the next line should override the default color
       // on inst-ui 8.7.0, but it doesn't seem to work on inst-ui 7.9.0
       // themeOverride={{color: k5Theme.variables.colors.brand}}
     >
-      {props => <Text color={!props.isHighlighted ? 'brand' : null}>{I18n.t('Add Student')}</Text>}
+      <Text color={highlightedOption !== ADD_STUDENT_OPTION_ID ? 'brand' : null}>
+        {I18n.t('Add Student')}
+      </Text>
     </CanvasAsyncSelect.Option>
   )
 
@@ -168,8 +172,10 @@ const ObserverOptions = ({
       <View as="div" margin={margin}>
         <CanvasAsyncSelect
           autoFocus={!!autoFocus}
+          onHighlightedOptionChange={setHighlightedOption}
           data-testid="observed-student-dropdown"
           inputValue={selectSearchValue}
+          isLoading={false}
           renderLabel={
             <ScreenReaderContent>
               {renderLabel || I18n.t('Select a student to view')}
