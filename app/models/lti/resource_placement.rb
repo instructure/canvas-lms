@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require "lti_advantage"
 
 module Lti
   class ResourcePlacement < ActiveRecord::Base
@@ -36,44 +37,73 @@ module Lti
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
-    PLACEMENTS = %i[account_navigation
-                    similarity_detection
-                    assignment_edit
-                    assignment_menu
-                    assignment_index_menu
-                    assignment_group_menu
-                    assignment_selection
-                    assignment_view
-                    collaboration
-                    conference_selection
-                    course_assignments_menu
-                    course_home_sub_navigation
-                    course_navigation
-                    course_settings_sub_navigation
-                    discussion_topic_menu
-                    discussion_topic_index_menu
-                    editor_button
-                    file_menu
-                    file_index_menu
-                    global_navigation
-                    homework_submission
-                    link_selection
-                    migration_selection
-                    module_group_menu
-                    module_index_menu
-                    module_index_menu_modal
-                    module_menu
-                    module_menu_modal
-                    post_grades
-                    quiz_menu
-                    quiz_index_menu
-                    resource_selection
-                    submission_type_selection
-                    student_context_card
-                    tool_configuration
-                    user_navigation
-                    wiki_index_menu
-                    wiki_page_menu].freeze
+    PLACEMENTS_BY_MESSAGE_TYPE = {
+      LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
+        account_navigation
+        assignment_edit
+        assignment_group_menu
+        assignment_index_menu
+        assignment_menu
+        assignment_selection
+        assignment_view
+        collaboration
+        conference_selection
+        course_assignments_menu
+        course_home_sub_navigation
+        course_navigation
+        course_settings_sub_navigation
+        discussion_topic_index_menu
+        discussion_topic_menu
+        file_index_menu
+        file_menu
+        global_navigation
+        homework_submission
+        link_selection
+        migration_selection
+        module_group_menu
+        module_index_menu
+        module_index_menu_modal
+        module_menu_modal
+        module_menu
+        post_grades
+        quiz_index_menu
+        quiz_menu
+        resource_selection
+        similarity_detection
+        student_context_card
+        submission_type_selection
+        tool_configuration
+        user_navigation
+        wiki_index_menu
+        wiki_page_menu
+      ],
+      LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE => %i[
+        assignment_index_menu
+        assignment_menu
+        assignment_selection
+        collaboration
+        conference_selection
+        discussion_topic_index_menu
+        discussion_topic_menu
+        editor_button
+        file_menu
+        homework_submission
+        link_selection
+        migration_selection
+        module_index_menu
+        module_index_menu_modal
+        module_menu_modal
+        module_menu
+        quiz_index_menu
+        quiz_menu
+        resource_selection
+        submission_type_selection
+        wiki_index_menu
+        wiki_page_menu
+      ]
+    }.freeze
+
+    PLACEMENTS = PLACEMENTS_BY_MESSAGE_TYPE.values.flatten.uniq.freeze
 
     PLACEMENT_LOOKUP = {
       "Canvas.placements.accountNavigation" => ACCOUNT_NAVIGATION,
