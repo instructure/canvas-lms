@@ -26,7 +26,7 @@ def partitions = []
 def changedTests = ''
 @groovy.transform.Field
 def fscStatus = null
-final static FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
+final static FSC_TIMEOUT = commitMessageFlag('fsc-timeout') as Integer ?: 20
 
 def isPlugin() {
   return env.GERRIT_PROJECT == 'canvas-lms' ? '0' : '1'

@@ -23,7 +23,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
 
 def createDistribution(nestedStages) {
-  def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
+  def rspecqNodeTotal = commitMessageFlag('rspecq-ci-node-total') as Integer
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
@@ -35,16 +35,16 @@ def createDistribution(nestedStages) {
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
     'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('rspecq-max-requeues')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
-    "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
+    "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
+    "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
+    "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
   if(env.CRYSTALBALL_MAP == '1') {
     rspecqEnvVars = rspecqEnvVars + ['RSPECQ_FILE_SPLIT_THRESHOLD=9999', 'CRYSTALBALL_MAP=1']
   } else {
-    rspecqEnvVars = rspecqEnvVars + ["RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}"]
+    rspecqEnvVars = rspecqEnvVars + ["RSPECQ_FILE_SPLIT_THRESHOLD=${commitMessageFlag('rspecq-file-split-threshold') as Integer}"]
   }
 
   if(env.ENABLE_AXE_SELENIUM == '1') {
