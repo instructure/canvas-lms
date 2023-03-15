@@ -132,8 +132,7 @@ def shouldPatchsetRetrigger() {
   // NOTE: The IS_AUTOMATIC_RETRIGGER check is here to ensure that the parameter is properly defined for the triggering job.
   // If it isn't, we have the risk of triggering this job over and over in an infinite loop.
   return env.IS_AUTOMATIC_RETRIGGER == '0' && (
-    env.GERRIT_EVENT_TYPE == 'change-merged' ||
-    configuration.getBoolean('change-merged') && configuration.getBoolean('enable-automatic-retrigger', '0')
+    configuration.isChangeMerged() && (commitMessageFlag('enable-automatic-retrigger') as Boolean)
   )
 }
 
@@ -267,7 +266,7 @@ pipeline {
 
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    FORCE_CRYSTALBALL = "${configuration.getBoolean('force-crystalball', '0') ? 1 : 0}"
+    FORCE_CRYSTALBALL = "${commitMessageFlag('force-crystalball').asBooleanInteger()}"
 
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
@@ -338,7 +337,7 @@ pipeline {
                 // vote. Work around this by disabling the build start message and setting EMULATE_BUILD_START=1
                 // in the Build Parameters section.
                 // https://issues.jenkins.io/browse/JENKINS-28339
-                if (configuration.getBoolean('emulate-build-start', 'false')) {
+                if (commitMessageFlag("emulate-build-start") as Boolean) {
                   submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
@@ -362,7 +361,7 @@ pipeline {
               }
 
               // Ensure that all build flags are compatible.
-              if (configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
+              if (commitMessageFlag('change-merged') as Boolean && configuration.isValueDefault('build-registry-path')) {
                 error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
                 return
               }

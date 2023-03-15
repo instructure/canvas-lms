@@ -43,7 +43,7 @@ def computeTestCountNecessary() {
 
   summaryMessage = "Map: $mapVersion\n"
 
-  if (configuration.getBoolean('skip-crystalball', 'false')) {
+  if (commitMessageFlag('skip-crystalball') as Boolean) {
     summaryMessage += "Skip Crystalball Detected! - Running everything!"
     crystalballColor = 'danger'
     env.CRYSTALBALL_SPEC = '.'
