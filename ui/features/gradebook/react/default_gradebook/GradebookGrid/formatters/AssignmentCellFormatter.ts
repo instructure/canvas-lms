@@ -184,9 +184,7 @@ export default class AssignmentCellFormatter {
     _row: number,
     _cell: number,
     submission: SubmissionWithOriginalityReport,
-    columnDef: {
-      postAssignmentGradesTrayOpenForAssignmentId: string
-    },
+    columnDef: {},
     student: Student
   ) => {
     let submissionState
@@ -230,8 +228,7 @@ export default class AssignmentCellFormatter {
       submissionData.excused = pendingGradeInfo.excused
     }
 
-    const showUnpostedIndicator =
-      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isPostable(submission)
+    const showUnpostedIndicator = isPostable(submission)
 
     const options: Options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),

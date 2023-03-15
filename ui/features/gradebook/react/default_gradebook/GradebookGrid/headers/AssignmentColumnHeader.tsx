@@ -117,10 +117,12 @@ export type AssignmentColumnHeaderProps = {
     direction: string
     disabled: boolean
     isSortColumn: boolean
+    onSortByExcused: () => void
     onSortByGradeAscending: () => void
     onSortByGradeDescending: () => void
     onSortByLate: () => void
     onSortByMissing: () => void
+    onSortByUnposted: () => void
     settingKey: string
   }
   submissionsLoaded: boolean
@@ -376,6 +378,22 @@ export default class AssignmentColumnHeader extends ColumnHeader<
               onSelect={sortBySetting.onSortByLate}
             >
               {I18n.t('Late')}
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'excused'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByExcused}
+            >
+              {I18n.t('Excused')}
+            </MenuItem>
+
+            <MenuItem
+              selected={selectedSortSetting === 'unposted'}
+              disabled={sortBySetting.disabled}
+              onSelect={sortBySetting.onSortByUnposted}
+            >
+              {I18n.t('Unposted')}
             </MenuItem>
           </MenuGroup>
         </Menu>

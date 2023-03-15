@@ -2955,11 +2955,32 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   ) => {
     switch (settingKey) {
       case 'grade':
-        return this.sortRowsBy((a, b) => this.gradeSort(a, b, columnId, direction === 'ascending'))
+        this.sortRowsBy((a: GradebookStudent, b: GradebookStudent) =>
+          this.gradeSort(a, b, columnId, direction === 'ascending')
+        )
+        break
       case 'late':
-        return this.lateSort(columnId)
+        this.lateSort(columnId)
+        break
       case 'missing':
-        return this.missingSort(columnId)
+        this.missingSort(columnId)
+        break
+      case 'excused':
+        this.sortRowsWithFunction((row: GradebookStudent) => row[columnId].excused, {
+          asc: direction === 'ascending',
+        })
+        break
+      case 'unposted':
+        this.sortRowsWithFunction(
+          (row: GradebookStudent) =>
+            row[columnId].posted_at === null &&
+            ((row[columnId].score !== null && row[columnId].workflow_state === 'graded') ||
+              row[columnId].excused),
+          {
+            asc: direction === 'ascending',
+          }
+        )
+        break
     }
   }
 
@@ -4144,19 +4165,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  postAssignmentGradesTrayOpenChanged = ({
-    assignmentId,
-    isOpen,
-  }: {
-    assignmentId: string
-    isOpen: boolean
-  }) => {
+  postAssignmentGradesTrayOpenChanged = ({assignmentId}: {assignmentId: string}) => {
     const columnId = getAssignmentColumnId(assignmentId)
     const definition = this.gridData.columns.definitions[columnId]
     if (!(definition && definition.type === 'assignment')) {
       return
     }
-    definition.postAssignmentGradesTrayOpenForAssignmentId = isOpen
     return this.updateGrid()
   }
 

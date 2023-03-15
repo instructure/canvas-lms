@@ -49,7 +49,6 @@ export type GridColumn = {
       position: number
     }
   }>
-  postAssignmentGradesTrayOpenForAssignmentId: boolean
   resizable: boolean
   teacher_notes: string
   toolTip: string
