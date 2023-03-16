@@ -46,7 +46,6 @@ library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
-configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 
 def getSummaryUrl() {
@@ -357,7 +356,7 @@ pipeline {
               }
 
               // Ensure that all build flags are compatible.
-              if (commitMessageFlag('change-merged') as Boolean && configuration.isValueDefault('build-registry-path')) {
+              if (commitMessageFlag('change-merged') as Boolean && configuration.buildRegistryPath() == configuration.buildRegistryPathDefault()) {
                 error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
                 return
               }
