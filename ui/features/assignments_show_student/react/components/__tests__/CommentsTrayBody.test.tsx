@@ -20,7 +20,7 @@ import $ from 'jquery'
 import * as apollo from 'react-apollo'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CommentContent from '../CommentsTray/CommentContent'
-import CommentsTrayBody, {COMPLETED_PEER_REVIEW_TEXT} from '../CommentsTray/CommentsTrayBody'
+import CommentsTrayBody from '../CommentsTray/CommentsTrayBody'
 import {CREATE_SUBMISSION_COMMENT} from '@canvas/assignments/graphql/student/Mutations'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -29,6 +29,7 @@ import React from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import {COMPLETED_PEER_REVIEW_TEXT} from '../../helpers/PeerReviewHelpers'
 
 async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
   const variables = {
@@ -987,6 +988,28 @@ describe('CommentsTrayBody', () => {
       const props = await getDefaultPropsWithReviewerSubmission('completed')
       props.isPeerReviewEnabled = true
       props.reviewerSubmission.assignedAssessments[1].workflowState = 'completed'
+      const {findByPlaceholderText, getByText, queryByTestId} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+
+      expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not show peer review modal if assignment has a rubric', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const props = await getDefaultPropsWithReviewerSubmission('completed')
+      props.isPeerReviewEnabled = true
+      props.assignment.rubric = {}
       const {findByPlaceholderText, getByText, queryByTestId} = render(
         mockContext(
           <MockedProvider mocks={mocks}>
