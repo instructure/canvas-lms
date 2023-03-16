@@ -37,16 +37,18 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
 import {bool} from 'prop-types'
-import PeerReviewPromptModal, {PeerReviewSubheader} from '../PeerReviewPromptModal'
+import PeerReviewPromptModal from '../PeerReviewPromptModal'
 import {
   getRedirectUrlToFirstPeerReview,
   assignedAssessmentsCount,
   availableAndUnavailableCounts,
+  getPeerReviewHeaderText,
+  getPeerReviewSubHeaderText,
+  getPeerReviewButtonText,
 } from '../../helpers/PeerReviewHelpers'
 
 const I18n = useI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
-export const COMPLETED_PEER_REVIEW_TEXT = I18n.t('You have completed your Peer Reviews!')
 
 const {Item: FlexItem} = Flex as any
 
@@ -103,47 +105,6 @@ export default function CommentsTrayBody(props) {
     if (!remainingReviewCounts && previousWorkflowState === COMPLETED_WORKFLOW_STATE) return
 
     setPeerReviewModalOpen(true)
-  }
-
-  const peerReviewHeaderText = (): string[] => {
-    const headerText =
-      availableCount > 0
-        ? headerTextTemplate(availableCount)
-        : unavailableCount > 0
-        ? headerTextTemplate(unavailableCount)
-        : COMPLETED_PEER_REVIEW_TEXT
-    return [headerText]
-  }
-
-  const headerTextTemplate = (count: number): string => {
-    return I18n.t(
-      {
-        one: 'You have 1 more Peer Review to complete.',
-        other: 'You have %{count} more Peer Reviews to complete.',
-      },
-      {count}
-    )
-  }
-
-  const peerReviewSubHeaderText = (): PeerReviewSubheader[] => {
-    if (!availableCount && unavailableCount) {
-      return [
-        {
-          props: {size: 'medium'},
-          text: I18n.t('The submission is not available just yet.'),
-        },
-        {
-          props: {size: 'medium'},
-          text: I18n.t('Please check back soon.'),
-        },
-      ]
-    }
-
-    return []
-  }
-
-  const peerReviewButtonText = (): string | null => {
-    return availableCount || unavailableCount ? I18n.t('Next Peer Review') : null
   }
 
   const {allowChangesToSubmission} = useContext(StudentViewContext)
@@ -224,7 +185,7 @@ export default function CommentsTrayBody(props) {
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
                 onSendCommentSuccess={() => {
-                  if (props.isPeerReviewEnabled) {
+                  if (props.isPeerReviewEnabled && !props.assignment.rubric) {
                     handlePeerReviewPromptModal()
                   }
                 }}
@@ -234,12 +195,12 @@ export default function CommentsTrayBody(props) {
         )}
 
         <PeerReviewPromptModal
-          headerText={peerReviewHeaderText()}
+          headerText={getPeerReviewHeaderText(availableCount, unavailableCount)}
           headerMargin={
             availableCount === 0 && unavailableCount === 0 ? 'small 0 x-large' : 'small 0 0'
           }
-          subHeaderText={peerReviewSubHeaderText()}
-          peerReviewButtonText={peerReviewButtonText()}
+          subHeaderText={getPeerReviewSubHeaderText(availableCount, unavailableCount)}
+          peerReviewButtonText={getPeerReviewButtonText(availableCount, unavailableCount)}
           peerReviewButtonDisabled={availableCount === 0}
           open={peerReviewModalOpen}
           onClose={() => setPeerReviewModalOpen(false)}
