@@ -129,10 +129,32 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                   label={I18n.t('Add to Calendar')}
                   value="add_to_calendar"
                   onChange={event => {
-                    setAddToCalendar(event.target.checked)
-                    // due to calendar api, it sends invite to full course, thus invite_all must be checked
+                    const confirmMessage = I18n.t(
+                      'Checking Add to Calendar will invite all course members.'
+                    )
                     if (event.target.checked) {
-                      props.onSetInvitationOptions(['invite_all'])
+                      // eslint-disable-next-line no-alert
+                      if (window.confirm(confirmMessage)) {
+                        setAddToCalendar(event.target.checked)
+                        // due to calendar api, it sends invite to full course, thus invite_all must be checked
+                        if (event.target.checked) {
+                          props.onSetInvitationOptions(['invite_all'])
+                        }
+                      } else {
+                        // This does not stop the button click, however it will
+                        // prevent all the state changes it would have set off.
+                        // We cannot stop a button click. Thus we must re-click.
+                        // Ensures this code runs AFTER the browser handles click however it wants.
+                        setTimeout(() => {
+                          document
+                            .querySelector('input[type="checkbox"][value="add_to_calendar"]')
+                            .click()
+                          setAddToCalendar(false)
+                        }, 0)
+                      }
+                    } else {
+                      // You are unchecking.
+                      setAddToCalendar(false)
                     }
                   }}
                   disabled={props.hasBegun}

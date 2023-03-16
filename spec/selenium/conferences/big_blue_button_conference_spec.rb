@@ -247,6 +247,7 @@ describe "BigBlueButton conferences" do
       f("button[title='New Conference']").click
 
       force_click("input[value='add_to_calendar']")
+      driver.switch_to.alert.accept
       wait_for_ajaximations
 
       f("input[label='Start Date']").clear
@@ -261,6 +262,39 @@ describe "BigBlueButton conferences" do
       wc = WebConference.last
       expect(ce.web_conference_id).to eq wc.id
       expect(ce.start_at).to eq wc.start_at
+    end
+
+    it "does not invite all if add to calendar cancels" do
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      get conferences_index_page
+      new_conference_button.click
+
+      # unclick invite all course members
+      f("div#tab-attendees").click
+      expect(f("input[value='invite_all']").attribute("checked")).to be_truthy
+      fj("label:contains('Invite all course members')").click
+      expect(f("input[value='invite_all']").attribute("checked")).to be_falsey
+
+      # invite course members
+      f("[data-testid='address-input']").click
+      f("[data-testid='section-#{@section.id}']").click
+      expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
+
+      # click, then cancel add to calendar
+      f("div#tab-settings").click
+      force_click("input[value='add_to_calendar']")
+      driver.switch_to.alert.dismiss
+      wait_for_ajaximations
+
+      # ensure add to calendar remains unclicked
+      expect(f("input[type='checkbox'][value='add_to_calendar']").attribute("checked")).to be_falsey
+
+      # ensure invite all course members remains unclicked
+      # ensure course members still remain
+      f("div#tab-attendees").click
+      expect(f("input[value='invite_all']").attribute("checked")).to be_falsey
+      expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
     end
 
     it "disables unchangeable properties when conference has begun" do
