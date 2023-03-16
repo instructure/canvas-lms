@@ -434,7 +434,7 @@ class Enrollment < ActiveRecord::Base
     # we don't want to create a new observer enrollment if one exists
     self.class.unique_constraint_retry do
       enrollment = linked_enrollment_for(observer)
-      return true if enrollment && !enrollment.deleted?
+      return true if enrollment && !enrollment.deleted? && !enrollment.inactive?
       return false unless observer.can_be_enrolled_in_course?(course)
 
       enrollment ||= observer.observer_enrollments.build

@@ -56,6 +56,23 @@ describe UserObservationLink do
     expect(observer_enroll.reload).to_not be_deleted
   end
 
+  it 'restores inactive observer enrollments on "restore" (even if nothing about the observee changed)' do
+    # i'm like 66% sure someone will complain about this
+    stu_enroll = student_in_course(user: student)
+    stu_enroll.workflow_state = "active"
+    stu_enroll.save!
+
+    observer = user_with_pseudonym
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
+    observer_enroll = observer.observer_enrollments.first
+    observer_enroll.workflow_state = "inactive"
+    observer_enroll.save!
+
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
+    observer_enroll.reload
+    expect(observer_enroll.workflow_state).to eq "active"
+  end
+
   it "creates an observees when one does not exist" do
     observer = user_with_pseudonym
     re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
