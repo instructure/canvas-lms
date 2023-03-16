@@ -19,6 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 pipeline {
   agent none
@@ -37,7 +38,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode(configuration.nodeLabel()) {
+          protectedNode(nodeLabel()) {
             stage('Setup') {
               // always pull from gerrit refspec to test the changed docker dev code
               checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: env.GERRIT_REFSPEC, depth: 1)

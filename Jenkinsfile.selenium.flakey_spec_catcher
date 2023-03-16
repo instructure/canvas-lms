@@ -19,6 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 @groovy.transform.Field
 def partitions = []
@@ -211,7 +212,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: configuration.nodeLabel()).obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: nodeLabel()).obeysAllowStages(false).execute {
             def postBuildHandler = [
               onStageEnded: { stageName, stageConfig, result ->
                 cleanupFn(stageConfig.status())
@@ -254,7 +255,7 @@ pipeline {
                   def nodeNumber = (index).toString().padLeft(2, '0')
 
                   stages["flakey set $nodeNumber"] = {
-                    protectedNode(configuration.nodeLabel()) {
+                    protectedNode(nodeLabel()) {
                       withEnv([
                         "FSC_TESTS=${partitions[index].join(',')}",
                         "NODE_NUMBER=$nodeNumber"
