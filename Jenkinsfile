@@ -69,10 +69,8 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-// return false if the current patchset tag doesn't match the
-// mainline publishable tag. i.e. ignore pg-9.5 builds
 def isPatchsetPublishable() {
-  env.PATCHSET_TAG == env.PUBLISHABLE_TAG
+  env.PUBLISH_PATCHSET_IMAGE == "1"
 }
 
 def isPatchsetRetriggered() {
@@ -255,9 +253,6 @@ pipeline {
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = imageTag.patchset()
-
-    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PUBLISHABLE_TAG = imageTag.publishableTag()
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = imageTag.mergeTag()
