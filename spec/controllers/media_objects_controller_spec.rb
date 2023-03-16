@@ -88,6 +88,35 @@ describe MediaObjectsController do
         }
       )
     end
+
+    context "adheres to attachment permissions" do
+      before :once do
+        attachment_model(context: @course)
+      end
+
+      it "allows students access to MediaObject through attachment" do
+        user_session(@student)
+        @attachment.update(content_type: "video", media_entry_id: "maybe")
+
+        expect(@attachment.grants_right?(@student, :read)).to eql(true)
+
+        MediaObject.create!(user_id: @teacher, media_id: "maybe")
+        get "show", params: { attachment_id: @attachment.id }
+        assert_status(200)
+      end
+
+      it "disallows access for unauthorized user" do
+        user_model
+        user_session(@user)
+        @attachment.update(content_type: "video", media_entry_id: "maybe")
+
+        expect(@attachment.grants_right?(@user, :read)).to eql(false)
+
+        MediaObject.create!(user_id: @teacher, media_id: "maybe")
+        get "show", params: { attachment_id: @attachment.id }
+        assert_status(401)
+      end
+    end
   end
 
   describe "GET 'index'" do
@@ -695,7 +724,7 @@ describe MediaObjectsController do
       expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return(
         "http://test.host/thumbnail_redirect"
       )
-      get :media_object_thumbnail, params: { id: "0_notexist", width: 100, height: 100 }
+      get :media_object_thumbnail, params: { media_object_id: "0_notexist", width: 100, height: 100 }
 
       expect(response).to be_redirect
       expect(response.location).to eq "http://test.host/thumbnail_redirect"
