@@ -57,6 +57,15 @@
               <%= admin_show_rubric_title %>
             </a>
           </li>
+          <% if Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.published? && !!@assignment&.can_view_speed_grader?(@current_user) %>
+            <li role="presentation">
+              <% speed_grader_title = t(:speed_grader, "SpeedGrader™") %>
+              <a href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) %>" tabindex="-1" role="menuitem" class="speed-grader-link-quiz">
+                <i class="icon-speed-grader"><span class="screenreader-only"><%= speed_grader_title %></span></i>
+                <%= speed_grader_title %>
+              </a>
+            </li>
+          <% end %>
           <a href="<%= context_url(@context, :context_rubrics_url) %>" class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
         <% end %>
         <% unless is_locked %>
@@ -76,6 +85,5 @@
         <% end %>
       </ul>
     </div>
-
   </div>
 </div>

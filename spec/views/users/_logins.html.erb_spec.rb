@@ -182,5 +182,21 @@ describe "users/_logins" do
       doc = Nokogiri::HTML5(response)
       expect(doc.at_css(".screenreader-only")).to be_nil
     end
+
+    it "shows icon when authentication provider id is set to canvas" do
+      @account = Account.default
+      user_with_pseudonym(active_all: 1)
+      ap = @account.authentication_providers.first
+      @pseudonym.authentication_provider_id = ap
+      @pseudonym.save!
+
+      assign(:domain_root_account, @account)
+      assign(:current_user, @user)
+      assign(:user, @user)
+      render
+
+      doc = Nokogiri::HTML5(response)
+      expect(doc.at_css(".screenreader-only")).not_to be_nil
+    end
   end
 end

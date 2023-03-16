@@ -83,3 +83,8 @@ outcome_average_calculation:
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
   description: Allows users to use average as a calulcation method for a given outcome.
+outcome_alignment_summary_with_new_quizzes:
+  state: hidden
+  applies_to: Course
+  display_name: New Quizzes included on Outcome Alignment Summary Tab
+  description: New Quizzes outcome alignments are included on the Outcome Alignment Summary Tab, which provides a list of alignments for each outcome in a course.

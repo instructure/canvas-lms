@@ -34,7 +34,8 @@
       <% pseudonyms.each do |pseudonym| %>
         <tr class="login<%= ' blank' unless pseudonym %>" <%= raw %Q(style="display: none") unless pseudonym %>>
           <td class="sso-icon" <%= raw %Q(data-pseudonym-id="#{pseudonym.id}") if pseudonym %>>
-            <% if lookup_context.template_exists?("shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
+            <% icon_file_path = Rails.root.join("app/views/shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
+            <% if File.exists?(icon_file_path) %>
               <%= render(partial: "shared/svg/svg_icon_#{pseudonym.authentication_provider.auth_type}", formats: [:svg]) %>
               <span class="screenreader-only">
                 <%= t("This login is for %{provider}", provider: pseudonym.authentication_provider.class.display_name) %>

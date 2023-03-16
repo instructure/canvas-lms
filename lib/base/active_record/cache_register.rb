@@ -107,7 +107,7 @@ module ActiveRecord
           redis = Canvas::CacheRegister.redis(base_key, ::Shard.shard_for(global_id), prefer_multi_cache: prefer_multi_cache)
           full_key = "#{base_key}/#{key_type}"
           RequestCache.cache(full_key) do
-            now = Time.now.utc.to_s(cache_timestamp_format)
+            now = Time.now.utc.to_fs(cache_timestamp_format)
             # try to get the timestamp for the type, set it to now if it doesn't exist
             ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
             "#{model_name.cache_key}/#{global_id}-#{ts}"

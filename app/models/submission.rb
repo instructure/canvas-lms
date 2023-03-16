@@ -2795,9 +2795,9 @@ class Submission < ActiveRecord::Base
         a.rubric_association == assignment.rubric_association
     end
 
-    if assignment.anonymous_peer_reviews?
+    if assignment.anonymous_peer_reviews? && !grants_right?(viewing_user, :grade)
       filtered_assessments.each do |a|
-        if a.assessment_type == "peer_review"
+        if a.assessment_type == "peer_review" && viewing_user.id != a.assessor.id
           a.assessor = nil # hide peer reviewer's identity
         end
       end

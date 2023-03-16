@@ -58,7 +58,11 @@ const createView = function (quiz, options = {}) {
     DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false,
     new_quizzes_skip_to_build_module_button: options.new_quizzes_skip_to_build_module_button,
     quiz_lti_enabled: !!options.quiz_lti_enabled,
+    show_additional_speed_grader_link: true,
   }
+
+  ENV.context_asset_string = 'course_1'
+  ENV.SHOW_SPEED_GRADER_LINK = true
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
   view.$el.appendTo($('#fixtures'))
@@ -107,6 +111,44 @@ test('does not render admin if canManage and canDelete is false', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', permissions: {delete: false}})
   const view = createView(quiz, {canManage: false})
   equal(view.$('.ig-admin').length, 0)
+})
+
+test('renders link to speed grader if canManage and assignment_id', () => {
+  const quiz = createQuiz({id: 1, title: 'Pancake', assignment_id: '55'})
+  const view = createView(quiz, {canManage: true})
+  equal(view.$('.speed-grader-link').length, 1)
+})
+
+test('does NOT render speed grader link if no assignment_id', () => {
+  const quiz = createQuiz({id: 1, title: 'French Toast'})
+  const view = createView(quiz, {canManage: true})
+  equal(view.$('.speed-grader-link').length, 0)
+})
+
+test('hides speed grader link if quiz is not published', () => {
+  const quiz = createQuiz({id: 1, title: 'Crepe', assignment_id: '31', published: false})
+  const view = createView(quiz, {canManage: true})
+  ok(view.$('.speed-grader-link-container').attr('class').includes('hidden'))
+})
+
+test('speed grader link is correct', () => {
+  const quiz = createQuiz({id: 1, title: 'Waffle', assignment_id: '80'})
+  const view = createView(quiz, {canManage: true})
+  ok(
+    view
+      .$('.speed-grader-link')[0]
+      .href.includes('/courses/1/gradebook/speed_grader?assignment_id=80')
+  )
+})
+
+test('speed grader link is correct for new quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Waffle', assignment_id: '32', quiz_type: 'quizzes.next'})
+  const view = createView(quiz, {canManage: true})
+  ok(
+    view
+      .$('.speed-grader-link')[0]
+      .href.includes('/courses/1/gradebook/speed_grader?assignment_id=32')
+  )
 })
 
 test('renders Migrate Button if migrateQuizEnabled is true', () => {
@@ -723,14 +765,14 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
   })
 })
 
-QUnit.module('Blueprint Icon/Button', hooks => {
+QUnit.module('Blueprint Icon/Button', _hooks => {
   test('renders unlocked', () => {
     const quiz = createQuiz({
       id: 1,
       title: 'Foo',
       is_master_course_master_content: true,
       restricted_by_master_course: false,
-      can_update: true
+      can_update: true,
     })
     const view = createView(quiz, {canManage: true})
     equal(view.$('.lock-icon.btn-unlocked i.icon-blueprint').length, 1)
@@ -742,7 +784,7 @@ QUnit.module('Blueprint Icon/Button', hooks => {
       title: 'Foo',
       is_master_course_master_content: true,
       restricted_by_master_course: true,
-      can_update: true
+      can_update: true,
     })
     const view = createView(quiz, {canManage: true})
     equal(view.$('.lock-icon.lock-icon-locked i.icon-blueprint-lock').length, 1)

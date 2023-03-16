@@ -159,10 +159,12 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
           <Table caption={I18n.t('Content Items with Errors')}>
             <TableHead>
               <TableRow>
-                <TableColHeader>{I18n.t('Content Item Title')}</TableColHeader>
-                <TableColHeader>{I18n.t('Status')}</TableColHeader>
-                <TableColHeader>{I18n.t('Field')}</TableColHeader>
-                <TableColHeader>{I18n.t('Error')}</TableColHeader>
+                <TableColHeader id="content_item_title">
+                  {I18n.t('Content Item Title')}
+                </TableColHeader>
+                <TableColHeader id="status">{I18n.t('Status')}</TableColHeader>
+                <TableColHeader id="field">{I18n.t('Field')}</TableColHeader>
+                <TableColHeader id="error">{I18n.t('Error')}</TableColHeader>
               </TableRow>
             </TableHead>
             <TableBody>{contentItems.map(item => renderContentItem(item))}</TableBody>

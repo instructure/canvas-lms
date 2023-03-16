@@ -195,6 +195,39 @@ module PostgreSQLAdapterExtensions
     super
   end
 
+  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, **options)
+    super
+
+    add_guard_excessive_updates(table_name)
+  end
+
+  def add_guard_excessive_updates(table_name)
+    # Don't try to install this on rails-internal tables; they need to be created for
+    # internal_metadata to exist and this guard isn't really useful there either
+    return if ["schema_migrations", "internal_metadata"].include?(table_name)
+    # If the function doesn't exist yet it will be backfilled
+    return unless ::ActiveRecord::InternalMetadata[:guard_dangerous_changes_installed]
+
+    ["UPDATE", "DELETE"].each do |operation|
+      trigger_name = "guard_excessive_#{operation.downcase}s"
+      already_installed_sql = <<~SQL.squish
+        SELECT count(*) FROM pg_trigger
+          WHERE tgrelid = '#{quote_table_name(table_name)}'::regclass
+            AND tgname = '#{trigger_name}'
+      SQL
+      next if select_value(already_installed_sql).to_i.positive?
+
+      execute(<<~SQL.squish)
+        CREATE TRIGGER #{trigger_name}
+          AFTER #{operation}
+          ON #{quote_table_name(table_name)}
+          REFERENCING OLD TABLE AS oldtbl
+          FOR EACH STATEMENT
+          EXECUTE PROCEDURE #{quote_table_name("guard_excessive_updates")}();
+      SQL
+    end
+  end
+
   def quote(*args)
     value = args.first
     return value if value.is_a?(QuotedValue)

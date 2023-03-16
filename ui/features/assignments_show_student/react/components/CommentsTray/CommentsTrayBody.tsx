@@ -57,6 +57,7 @@ export default function CommentsTrayBody(props) {
   const queryVariables = {
     submissionId: props.submission.id,
     submissionAttempt: props.submission.attempt,
+    peerReview: props.isPeerReviewEnabled,
   }
 
   const {loading, error, data, fetchMore} = useQuery(SUBMISSION_COMMENT_QUERY, {

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`data returns the proper object 1`] = `
+Object {
+  "formatAsList": false,
+  "orderedStart": "1",
+}
+`;
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "checkbox": true,
+    "dataKey": "formatAsList",
+    "label": "Format as a list",
+  },
+]
+`;
+
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using lists"`;
+
+exports[`message returns the proper message 1`] = `"Lists should be formatted as lists."`;
+
+exports[`why returns the proper why message 1`] = `"When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information."`;

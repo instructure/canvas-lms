@@ -56,7 +56,7 @@ export default function (ed, document, type) {
             editor={ed}
             editing={type === EDIT_ICON_MAKER}
             onUnmount={handleUnmount}
-            rcsConfig={trayProps}
+            cropperEnabled={!!trayProps?.features?.icon_maker_cropper}
             canvasOrigin={bridge.canvasOrigin}
           />
         )}

@@ -45,7 +45,7 @@ fi
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/core:focal
 
 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper" "$WORKSPACE"

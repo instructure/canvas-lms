@@ -49,8 +49,8 @@ module Api::V1::ContextModule
       hash["state"] = progression.workflow_state
       hash["completed_at"] = progression.completed_at
     end
-    has_update_rights = context_module.grants_right?(current_user, :update)
-    hash["published"] = context_module.active? if has_update_rights
+    can_view_published = context_module.grants_right?(current_user, :update) || opts[:can_view_published]
+    hash["published"] = context_module.active? if can_view_published
     tags = context_module.content_tags_visible_to(@current_user, opts.slice(:observed_student_ids))
     count = tags.count
     hash["items_count"] = count
@@ -62,7 +62,7 @@ module Api::V1::ContextModule
       end
       item_includes = includes & ["content_details"]
       hash["items"] = tags.map do |tag|
-        module_item_json(tag, current_user, session, context_module, progression, item_includes, has_update_rights: has_update_rights)
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, can_view_published: can_view_published)
       end
     end
     hash
@@ -151,12 +151,12 @@ module Api::V1::ContextModule
       hash["completion_requirement"] = ch
     end
 
-    has_update_rights = if opts.key? :has_update_rights
-                          opts[:has_update_rights]
-                        else
-                          context_module.grants_right?(current_user, :update)
-                        end
-    hash["published"] = content_tag.active? if has_update_rights
+    can_view_published = if opts.key? :can_view_published
+                           opts[:can_view_published]
+                         else
+                           context_module.grants_right?(current_user, :update)
+                         end
+    hash["published"] = content_tag.active? if can_view_published
 
     hash["content_details"] = content_details(content_tag, current_user) if includes.include?("content_details")
 

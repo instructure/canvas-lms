@@ -82,6 +82,12 @@ export const DiscussionEntry = {
           ...DiscussionEntryVersion
         }
       }
+      reportTypeCounts {
+        inappropriateCount
+        offensiveCount
+        otherCount
+        total
+      }
       depth
     }
     ${Attachment.fragment}
@@ -137,6 +143,12 @@ export const DiscussionEntry = {
       deleted: bool,
     }),
     discussionEntryVersionsConnection: DiscussionEntryVersion.shape,
+    reportTypeCounts: shape({
+      inappropriateCount: number,
+      offensiveCount: number,
+      otherCount: number,
+      total: number,
+    }),
     depth: number,
   }),
 
@@ -188,6 +200,13 @@ export const DiscussionEntry = {
       ],
       __typename: 'DiscussionEntryVersionConnection',
     },
+    reportTypeCounts = {
+      inappropriateCount: 0,
+      offensiveCount: 0,
+      otherCount: 0,
+      total: 0,
+      __typename: 'DiscussionEntryReportTypeCounts',
+    },
     depth = 1,
   } = {}) => ({
     id,
@@ -213,6 +232,7 @@ export const DiscussionEntry = {
     parentId,
     quotedEntry,
     discussionEntryVersionsConnection,
+    reportTypeCounts,
     depth,
     __typename: 'DiscussionEntry',
   }),

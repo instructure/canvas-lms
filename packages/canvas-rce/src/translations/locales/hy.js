@@ -120,6 +120,7 @@ const locale = {
   "modules_c4325335": { "message": "Մոդուլներ" },
   "my_files_2f621040": { "message": "Իմ ֆայլերը" },
   "name_1aed4a1b": { "message": "Անուն" },
+  "next_40e12421": { "message": "Հաջորդը" },
   "no_e16d9132": { "message": "Ոչ" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"
@@ -132,6 +133,7 @@ const locale = {
   "people_b4ebb13c": { "message": "Մարդիկ" },
   "percentage_34ab7c2c": { "message": "Տոկոս" },
   "pink_68ad45cb": { "message": "Վարդագույն" },
+  "prev_f82cbc48": { "message": "Նախորդը" },
   "preview_53003fd2": { "message": "Նախնական դիտում" },
   "published_c944a23d": { "message": "հրապարակված" },
   "purple_7678a9fc": { "message": "Մանուշակագույն" },

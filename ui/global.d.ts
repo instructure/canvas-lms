@@ -25,22 +25,37 @@ declare global {
     readonly ENV?: any
     webkitSpeechRecognition: any
     jsonData: any
+    updateGrades: () => void
   }
 
   const ENV: any
 
   declare interface JQuery {
+    scrollTo: (y: number, x?: number) => void
     capitalize: (str: string) => string
+    change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
     decodeFromHex: (str: string) => string
+    disableWhileLoading: any
     encodeToHex: (str: string) => string
     fileSize: (size: number) => string
+    fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
     keycodes: any
     live: any
+    loadDocPreview: (options: {
+      height: string
+      id: string
+      mimeType: string
+      attachment_id: string
+      submission_id: any
+      attachment_view_inline_ping_url: string | undefined
+      attachment_preview_processing: boolean
+    }) => void
     mediaComment: any
+    mediaCommentThumbnail: (size?: 'normal' | 'small') => void
     queryParam: (name: string) => string
     raw: (str: string) => string
     showIf: (boolean) => void
@@ -51,7 +66,7 @@ declare global {
   }
 
   declare interface JQueryStatic {
-    subscribe: any
+    subscribe: (topic: string, callback: (...args: any[]) => void) => void
     ajaxJSON: (
       url: string,
       submit_type?: string,
@@ -61,7 +76,7 @@ declare global {
       options?: any
     ) => JQuery.JQueryXHR
     replaceTags: (string, string, string?) => string
-    raw: any
+    raw: (str: string) => string
     getScrollbarWidth: any
     datetimeString: any
     ajaxJSONFiles: any

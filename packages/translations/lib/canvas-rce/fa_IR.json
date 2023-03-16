@@ -1,5 +1,6 @@
 {
   "add_8523c19b": { "message": "افزودن" },
+  "additional_considerations_f3801683": { "message": "ملاحظات اضافی" },
   "all_4321c3a1": { "message": "همه" },
   "alpha_15d59033": { "message": "آلفا" },
   "an_error_occurred_making_a_network_request_d1bda348": {
@@ -114,6 +115,7 @@
   "modules_c4325335": { "message": "ماژول ها" },
   "my_files_2f621040": { "message": "فایل های من" },
   "name_1aed4a1b": { "message": "نام" },
+  "next_40e12421": { "message": "بعدی" },
   "no_e16d9132": { "message": "خیر" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
@@ -138,6 +140,7 @@
   "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
     "message": "لطفاً به Canvas اجازه دهید تا به میکروفون و وب کم شما دسترسی پیدا کند."
   },
+  "prev_f82cbc48": { "message": "قبلی" },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
   "preview_a3f8f854": { "message": "پیش نمایش" },
   "published_c944a23d": { "message": "منتشر شده" },

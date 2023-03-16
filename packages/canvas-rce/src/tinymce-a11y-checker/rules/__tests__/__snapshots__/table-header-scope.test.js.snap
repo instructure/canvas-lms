@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "dataKey": "scope",
+    "label": "Set header scope",
+    "options": Array [
+      Array [
+        "none",
+        "None",
+      ],
+      Array [
+        "row",
+        "Row",
+      ],
+      Array [
+        "col",
+        "Column",
+      ],
+      Array [
+        "rowgroup",
+        "Row group",
+      ],
+      Array [
+        "colgroup",
+        "Column group",
+      ],
+    ],
+  },
+]
+`;
+
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using scope attributes with tables"`;
+
+exports[`message returns the proper message 1`] = `"Tables headers should specify scope."`;
+
+exports[`why returns the proper message 1`] = `"Screen readers cannot interpret tables without the proper structure. Table headers provide direction and content scope."`;

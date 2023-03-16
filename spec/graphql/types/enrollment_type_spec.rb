@@ -22,7 +22,10 @@ require_relative "../graphql_spec_helper"
 
 describe Types::EnrollmentType do
   let_once(:enrollment) { student_in_course(active_all: true) }
+  let_once(:teacher_enrollment) { teacher_in_course(active_all: true) }
+
   let(:enrollment_type) { GraphQLTypeTester.new(enrollment, current_user: @student) }
+  let(:teacher_enrollment_type) { GraphQLTypeTester.new(teacher_enrollment, current_user: @teacher) }
 
   it "works" do
     expect(enrollment_type.resolve("_id")).to eq enrollment.id.to_s
@@ -116,6 +119,160 @@ describe Types::EnrollmentType do
       expect(
         enrollment_type.resolve("section { _id }")
       ).to eq enrollment.course_section.id.to_s
+    end
+  end
+
+  context "concluded" do
+    context "teacher enrollment" do
+      it "returns false if the enrollment is not completed" do
+        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns true if the date is past the enrollment term end at time" do
+        course = teacher_enrollment.course
+        course.enrollment_term.update_attribute :end_at, 1.day.ago
+        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns false if the date is before the enrollment term end at time" do
+        course = teacher_enrollment.course
+        course.enrollment_term.update_attribute :end_at, 5.days.from_now
+        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns false when section override is past course end date" do
+        course = teacher_enrollment.course
+        # Course is soft concluded
+        course.start_at = 2.days.ago
+        course.conclude_at = 1.day.ago
+        course.restrict_enrollments_to_course_dates = true
+
+        # Section override is past course end date
+        my_section = course.course_sections.first
+        my_section.start_at = 1.day.ago
+        my_section.end_at = 5.days.from_now
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+        course.save!
+
+        my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+
+        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns true when section override ends before course end date" do
+        course = teacher_enrollment.course
+        # Course is not soft concluded
+        course.start_at = 2.days.ago
+        course.conclude_at = 5.days.from_now
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+        # Section override is past course end date
+        my_section = course.course_sections.first
+        my_section.start_at = 2.days.ago
+        my_section.end_at = 1.day.ago
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+
+        my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+
+        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when enrollment is concluded" do
+        teacher_enrollment.complete!
+        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when course is soft_concluded" do
+        course = teacher_enrollment.course
+        course.start_at = 2.days.ago
+        course.conclude_at = 1.day.ago
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when course is hard_concluded" do
+        teacher_enrollment.course.complete!
+        expect(teacher_enrollment_type.resolve("concluded")).to eq true
+      end
+    end
+
+    context "student enrollment" do
+      it "returns false if the enrollment is not completed" do
+        expect(enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns true if the date is past the enrollment term end at time" do
+        course = enrollment.course
+        course.enrollment_term.update_attribute :end_at, 1.day.ago
+        expect(enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns false if the date is before the enrollment term end at time" do
+        course = enrollment.course
+        course.enrollment_term.update_attribute :end_at, 5.days.from_now
+        expect(enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns false when section override is past course end date" do
+        course = enrollment.course
+        # Course is soft concluded
+        course.start_at = 2.days.ago
+        course.conclude_at = 1.day.ago
+        course.restrict_enrollments_to_course_dates = true
+
+        # Section override is past course end date
+        my_section = course.course_sections.first
+        my_section.start_at = 1.day.ago
+        my_section.end_at = 5.days.from_now
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+        course.save!
+
+        my_section.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
+
+        expect(enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "returns true when section override ends before course end date" do
+        course = enrollment.course
+        # Course is not soft concluded
+        course.start_at = 2.days.ago
+        course.conclude_at = 5.days.from_now
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+        # Section override is past course end date
+        my_section = course.course_sections.first
+        my_section.start_at = 2.days.ago
+        my_section.end_at = 1.day.ago
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+
+        my_section.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
+
+        expect(enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when enrollment is concluded" do
+        enrollment.complete!
+        expect(enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when course is soft_concluded" do
+        course = enrollment.course
+        course.start_at = 2.days.ago
+        course.conclude_at = 1.day.ago
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+        expect(enrollment_type.resolve("concluded")).to eq true
+      end
+
+      it "returns true when course is hard_concluded" do
+        enrollment.course.complete!
+        expect(enrollment_type.resolve("concluded")).to eq true
+      end
     end
   end
 

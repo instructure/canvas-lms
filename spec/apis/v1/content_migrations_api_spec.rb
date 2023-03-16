@@ -212,6 +212,17 @@ describe ContentMigrationsController, type: :request do
       expect(json["settings"]["source_course_name"]).to eq @course.name
     end
 
+    it "does not return source course on unmatching root account ids" do
+      unmatched_course = Course.create!(root_account_id: Account.create!)
+      @migration.migration_type = "course_copy_importer"
+      @migration.source_course_id = unmatched_course.id
+      @migration.source_course = unmatched_course
+      @migration.save!
+
+      json = api_call(:get, @migration_url, @params)
+      expect(json["settings"]).to eq nil
+    end
+
     it "marks as failed if stuck in pre_processing" do
       @migration.workflow_state = "pre_processing"
       @migration.save!

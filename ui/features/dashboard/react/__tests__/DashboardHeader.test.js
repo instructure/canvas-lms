@@ -25,6 +25,9 @@ import {
   SHOW_K5_DASHBOARD_ROUTE,
   showK5DashboardResponse,
 } from '@canvas/observer-picker/react/__tests__/fixtures'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.useFakeTimers()
 

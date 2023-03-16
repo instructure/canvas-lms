@@ -828,6 +828,12 @@ RSpec.describe SubmissionComment do
         .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
+
+    it "does not update participation for a draft comment" do
+      expect(ContentParticipation).to_not receive(:create_or_update)
+        .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
+    end
   end
 
   describe "workflow_state" do

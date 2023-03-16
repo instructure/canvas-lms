@@ -38,6 +38,8 @@ describe "announcement_created_by_you" do
       expect(msg.subject).to eq "value for title: value for name"
       expect(msg.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(msg.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(msg.body).to include("You created this Announcement:")
+      expect(msg.html_body).to include("You created this Announcement:")
     end
   end
 

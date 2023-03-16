@@ -17,7 +17,7 @@
  */
 
 import type {GradebookStudent} from './gradebook.d'
-import type {SubmissionComment} from '@canvas/grading.grading.d'
+import type {SubmissionCommentCamelized} from '@canvas/grading/grading.d'
 import type {StatusColors} from './constants/colors'
 import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 
@@ -51,16 +51,34 @@ export type GridColumn = {id: string; cssClass: string; headerCssClass: string} 
   }>
 }>
 
-export type GridData = {
-  columns: {
-    definitions: {
-      // Add later: total_grade?: GridColumn
-      // Add later: total_grade_override?: GridColumn
-      [key: string]: GridColumn
-    }
-    frozen: string[]
-    scrollable: string[]
+export type GridDataColumns = {
+  definitions: {
+    // Add later: total_grade?: GridColumn
+    // Add later: total_grade_override?: GridColumn
+    [key: string]: GridColumn
   }
+  frozen: string[]
+  scrollable: string[]
+}
+
+export type GridDataColumnsWithObjects = {
+  definitions: {
+    [key: string]: GridColumn
+  }
+  frozen: {
+    id: string
+    customColumnId: string
+    type: 'custom_column'
+  }[]
+  scrollable: {
+    id: string
+    customColumnId: string
+    type: 'custom_column'
+  }[]
+}
+
+export type GridData = {
+  columns: GridDataColumns
   rows: GradebookStudent[]
 }
 
@@ -102,7 +120,7 @@ export type GridDisplaySettings = {
     open: boolean
     studentId: string
     assignmentId: string
-    comments: SubmissionComment[]
+    comments: SubmissionCommentCamelized[]
     commentsLoaded: boolean
     commentsUpdating: boolean
     editedCommentId: string | null

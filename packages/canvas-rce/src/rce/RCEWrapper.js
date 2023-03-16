@@ -66,11 +66,13 @@ import {
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {countShouldIgnore} from './plugins/instructure_wordcount/utils/countContent'
 import launchWordcountModal from './plugins/instructure_wordcount/clickCallback'
+import {determineOSDependentKey} from './userOS'
 
 import styles from '../skins/skin-delta.css'
 import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
 import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 import {rceWrapperPropTypes} from './RCEWrapperProps'
+import {removePlaceholder} from '../util/loadingPlaceholder'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -279,7 +281,7 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('tinymce-a11y-checker')
+    this.a11yCheckerReady = import('../tinymce-a11y-checker/plugin')
       .then(a11yChecker => {
         const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
         a11yChecker.setLocale(locale)
@@ -322,6 +324,9 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements = false,
       rce_better_paste = false,
       rce_new_external_tool_dialog_in_canvas = false,
+      rce_improved_placeholders = false,
+      explicit_latex_typesetting = false,
+      rce_show_studio_media_options = false,
     } = this.props.features
 
     return {
@@ -329,6 +334,9 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements,
       rce_better_paste,
       rce_new_external_tool_dialog_in_canvas,
+      rce_improved_placeholders,
+      explicit_latex_typesetting,
+      rce_show_studio_media_options,
     }
   }
 
@@ -506,8 +514,15 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
   insertImagePlaceholder(fileMetaProps) {
+    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+      return import('../util/loadingPlaceholder').then(
+        async ({placeholderInfoFor, insertPlaceholder}) =>
+          insertPlaceholder(this.mceInstance(), await placeholderInfoFor(fileMetaProps))
+      )
+    }
+
+    // wrap this in a promise primarily so specs can await on the placeholder to be in the DOM
     const prom = new Promise((resolve, reject) => {
       let width, height
       let align = 'middle'
@@ -602,14 +617,19 @@ class RCEWrapper extends React.Component {
   }
 
   removePlaceholders(name) {
-    const placeholder = this.mceInstance().dom.doc.querySelector(
-      `[data-placeholder-for="${encodeURIComponent(name)}"]`
-    )
-    if (placeholder) {
-      const editor = this.mceInstance()
-      editor.undoManager.ignore(() => {
-        editor.dom.remove(placeholder)
-      })
+    if (RCEGlobals.getFeatures().rce_improved_placeholders) {
+      // Note that this needs to be done synchronously, or the image inserting code doesn't work
+      removePlaceholder(this.mceInstance(), encodeURIComponent(name))
+    } else {
+      const placeholder = this.mceInstance().dom.doc.querySelector(
+        `[data-placeholder-for="${encodeURIComponent(name)}"]`
+      )
+      if (placeholder) {
+        const editor = this.mceInstance()
+        editor.undoManager.ignore(() => {
+          editor.dom.remove(placeholder)
+        })
+      }
     }
   }
 
@@ -993,14 +1013,8 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  handleExternalClick = event => {
-    // We want to respect previous focus, so no need to focus editor.
-    this._forceCloseFloatingToolbar(false)
-    // If the event is marked as defaultPrevented, don't focus anything.
-    // Event marked in StatusBar's "Switch pretty/raw HTML" button click to keep the text area focused.
-    if (!event.defaultPrevented) {
-      event.target.focus()
-    }
+  handleExternalClick = () => {
+    this._forceCloseFloatingToolbar()
     debounce(this.checkAccessibility, 1000)()
   }
 
@@ -1077,7 +1091,9 @@ class RCEWrapper extends React.Component {
     if (this.iframe) {
       this.iframe.setAttribute(
         'title',
-        formatMessage('Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.')
+        formatMessage('Rich Text Area. Press {OSKey}+F8 for Rich Content Editor shortcuts.', {
+          OSKey: determineOSDependentKey(),
+        })
       )
     }
 
@@ -1163,7 +1179,7 @@ class RCEWrapper extends React.Component {
     })
   }
 
-  _forceCloseFloatingToolbar = (focusEditor = true) => {
+  _forceCloseFloatingToolbar = () => {
     if (this._elementRef.current) {
       const moreButton = this._elementRef.current.querySelector(
         '.tox-toolbar-overlord .tox-toolbar__group:last-child button:last-child'
@@ -1171,10 +1187,8 @@ class RCEWrapper extends React.Component {
       if (moreButton?.getAttribute('aria-owns')) {
         // the floating toolbar is open
         moreButton.click() // close the floating toolbar
-        if (focusEditor) {
-          const editor = this.mceInstance() // return focus to the editor
-          editor?.focus()
-        }
+        const editor = this.mceInstance() // return focus to the editor
+        editor?.focus()
       }
     }
   }

@@ -38,9 +38,9 @@
       <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'),
       context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"),
         :id => "accessibility_warning", :class => "screenreader-only" %>
-      </div>
+    </div>
 
-      <div id="gradebook-toolbar" class="toolbar">
+    <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook-menus">
         <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
         <span data-component="ViewOptionsMenu"></span>
@@ -55,29 +55,13 @@
           </button>
         <% end %>
 
-        <% if multiple_assignment_groups? %>
-            <div class="gradebook-filter-container" id="assignment-group-filter-container"></div>
-        <% end %>
+        <div class="gradebook-filter-container" id="assignment-group-filter-container"></div>
+        <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
+        <div class="gradebook-filter-container" id="modules-filter-container"></div>
+        <div class="gradebook-filter-container" id="sections-filter-container"></div>
+        <div class="gradebook-filter-container" id="student-group-filter-container"></div>
 
-        <% if grading_periods? %>
-          <div class="gradebook-filter-container" id="grading-periods-filter-container"></div>
-        <% end %>
-
-        <% if visible_modules? %>
-          <div class="gradebook-filter-container" id="modules-filter-container"></div>
-        <% end %>
-
-        <% if multiple_sections? %>
-          <div class="gradebook-filter-container" id="sections-filter-container"></div>
-        <% end %>
-
-        <% if student_groups? %>
-          <div class="gradebook-filter-container" id="student-group-filter-container"></div>
-        <% end %>
-
-        <% if @context.feature_enabled?(:enhanced_gradebook_filters) %>
-          <span data-component="EnhancedActionMenu"></span>
-        <% end %>
+        <span data-component="EnhancedActionMenu"></span>
 
         <div class="gradebook_menu">
           <span id="gradebook-settings-modal-button-container"></span>

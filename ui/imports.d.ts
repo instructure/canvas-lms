@@ -42,7 +42,7 @@ interface MissingElementProps {
 }
 
 interface MissingThemeableProps {
-  theme?: object
+  theme?: Record<string, unknown>
 }
 
 declare module '@instructure/ui-buttons' {

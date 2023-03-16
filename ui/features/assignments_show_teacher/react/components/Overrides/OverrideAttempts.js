@@ -86,13 +86,17 @@ export default class OverrideAttempts extends React.Component {
       <Flex.Item data-testid="OverrideAttempts-Limit" margin="0 small 0 0">
         <Select
           readOnly={this.props.readOnly}
-          label={I18n.t('Attempts Allowed')}
+          renderLabel={I18n.t('Attempts Allowed')}
           selectedOption={attempts}
           onChange={this.onChangeAttemptsAllowed}
           allowEmpty={false}
         >
-          <option value="limited">{I18n.t('Limited')}</option>
-          <option value="unlimited">{I18n.t('Unlimited')}</option>
+          <Select.Option id="limited" key="limited" value="limited">
+            {I18n.t('Limited')}
+          </Select.Option>
+          <Select.Option id="unlimited" key="unlimited" value="unlimited">
+            {I18n.t('Unlimited')}
+          </Select.Option>
         </Select>
       </Flex.Item>
     )

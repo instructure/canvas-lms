@@ -15,7 +15,8 @@
     "noImplicitAny": false, // temporarily allows un-typed variables (and imports) to be automatically defined as "any",
     "baseUrl": "./ui", // recommended to be defined when using `paths`
     "paths": {
-      "@canvas/*": ["shared/*"] // lets TS follow an 'import Foo from @canvas/foo' statement
+      "@canvas/*": ["shared/*"], // lets TS follow an 'import Foo from @canvas/foo' statement
+      "@instructure/*": ["../packages/*"] // lets TS follow an 'import Foo from @instructure/bar' statement"
     }
   },
   "include": ["ui/**/*"],

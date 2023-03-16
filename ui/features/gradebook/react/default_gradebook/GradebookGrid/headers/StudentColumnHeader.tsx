@@ -104,6 +104,10 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     return I18n.t('Student Name Options')
   }
 
+  getHeaderTestId() {
+    return 'student-column-header'
+  }
+
   showDisplayAsViewOption() {
     return true
   }
@@ -264,7 +268,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
                 <View
                   className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
                   padding="0 0 0 small"
-                  data-testid="student-column-header"
+                  data-testid={this.getHeaderTestId()}
                 >
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {this.getColumnHeaderName()}

@@ -15,61 +15,25 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import React from 'react'
-import {Grid} from '@instructure/ui-grid'
-import {View} from '@instructure/ui-view'
-
-import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import ColumnHeader from './ColumnHeader'
+import StudentColumnHeader from './StudentColumnHeader'
 
 const I18n = useI18nScope('gradebook')
 
-type Props = {
-  addGradebookElement?: any
-  removeGradebookElement?: any
-  onHeaderKeyDown?: any
-}
-
-type State = {
-  hasFocus: boolean
-}
-
-export default class StudentFirstNameColumnHeader extends ColumnHeader<Props, State> {
-  static propTypes = {
-    ...ColumnHeader.propTypes,
+export default class StudentFirstNameColumnHeader extends StudentColumnHeader {
+  getColumnHeaderName(): string {
+    return I18n.t('Student First Name')
   }
 
-  static defaultProps = {
-    ...ColumnHeader.defaultProps,
+  getColumnHeaderOptions(): string {
+    return I18n.t('Student First Name Options')
   }
 
-  render() {
-    return (
-      <div
-        className={`Gradebook__ColumnHeaderContent ${this.state.hasFocus ? 'focused' : ''}`}
-        onBlur={this.handleBlur}
-        onFocus={this.handleFocus}
-      >
-        <div style={{flex: 1, minWidth: '1px'}}>
-          <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <Grid.Row>
-              <Grid.Col textAlign="start">
-                <View
-                  className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
-                  padding="0 0 0 small"
-                  data-testid="first-name-header"
-                >
-                  <Text fontStyle="normal" size="x-small" weight="bold">
-                    {I18n.t('Student First Name')}
-                  </Text>
-                </View>
-              </Grid.Col>
-            </Grid.Row>
-          </Grid>
-        </div>
-      </div>
-    )
+  showDisplayAsViewOption(): boolean {
+    return false
+  }
+
+  getHeaderTestId(): string {
+    return 'first-name-header'
   }
 }

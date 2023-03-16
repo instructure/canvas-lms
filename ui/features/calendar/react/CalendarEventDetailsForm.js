@@ -225,11 +225,18 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   }
 
   const addTimeToDate = time => {
+    // dateTime is set to the correct date but the incorrect time
+    // momentTime is set to the correct time but the incorrect date
+    // Setting the momentTime's date to the dateTime's date will give us the correct date and time. This will handle
+    // DST issues as well since the momentTime will be set to the correct time in the correct timezone.
     const dateTime = moment.tz(date, timezone)
+    if (!time) return dateTime
+
     const momentTime = moment.tz(time, timezone)
-    dateTime.add(momentTime.hours(), 'hour')
-    dateTime.add(momentTime.minutes(), 'minute')
-    return dateTime
+    momentTime.set('year', dateTime.year())
+    momentTime.set('month', dateTime.month())
+    momentTime.set('date', dateTime.date())
+    return momentTime
   }
 
   const screenReaderMessageCallback = msg => {

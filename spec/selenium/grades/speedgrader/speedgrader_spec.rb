@@ -1054,6 +1054,44 @@ describe "Speedgrader" do
       Speedgrader.select_option_submission_to_view("0")
       expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
     end
+
+    it "identifies the proxy submitter in the submission dropdown" do
+      Timecop.freeze(1.hour.ago) { submit_with_attachment }
+      resubmit_with_text
+      Account.site_admin.enable_feature!(:proxy_file_uploads)
+      teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      file_attachment = attachment_model(content_type: "application/pdf", context: @students.first)
+      submission = @assignment_for_course.submit_homework(@students.first, submission_type: "online_upload", attachments: [file_attachment])
+      @teacher.update!(short_name: "Test Teacher")
+      submission.update!(proxy_submitter: @teacher)
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      expect(Speedgrader.submission_to_view_dropdown).to include_text("(Test Teacher)")
+    end
+
+    it "identifies the proxy submitter in the submission details tray with only a single submission" do
+      Account.site_admin.enable_feature!(:proxy_file_uploads)
+      teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      file_attachment = attachment_model(content_type: "application/pdf", context: @students.first)
+      submission = @assignment_for_course.submit_homework(@students.first, submission_type: "online_upload", attachments: [file_attachment])
+      @teacher.update!(short_name: "Test Teacher")
+      submission.update!(proxy_submitter: @teacher)
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      expect(Speedgrader.submitter_info).to include_text("by Test Teacher")
+    end
   end
 
   context "speedgrader nav bar" do

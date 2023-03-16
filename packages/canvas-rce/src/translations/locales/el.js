@@ -118,6 +118,7 @@ const locale = {
   "modules_c4325335": { "message": "Ενότητες" },
   "my_files_2f621040": { "message": "Τα αρχεία μου" },
   "name_1aed4a1b": { "message": "Όνομα" },
+  "next_40e12421": { "message": "Επόμενο" },
   "no_e16d9132": { "message": "μη δημοσιευμένο" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."
@@ -130,6 +131,7 @@ const locale = {
   "people_b4ebb13c": { "message": "Κοινό" },
   "percentage_34ab7c2c": { "message": "Εκατοστιαία αναλογία" },
   "pink_68ad45cb": { "message": "Ροζ" },
+  "prev_f82cbc48": { "message": "Προηγούμενο" },
   "preview_53003fd2": { "message": "Προεπισκόπηση" },
   "published_c944a23d": { "message": "δημοσιευμένο/α" },
   "purple_7678a9fc": { "message": "Μοβ" },

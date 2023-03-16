@@ -539,6 +539,9 @@
     "new_activity_8b84847d": {
         "message": "Yeni Etkinlik"
     },
+    "next_40e12421": {
+        "message": "Sonraki"
+    },
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
     },
@@ -589,6 +592,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } puan"
+    },
+    "prev_f82cbc48": {
+        "message": "Önceki"
     },
     "preview_53003fd2": {
         "message": "Önizleme"

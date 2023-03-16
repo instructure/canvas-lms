@@ -1,0 +1,51 @@
+# to use this add docker-compose/selenium.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '3.2'
+services:
+
+## We list all of the different standalone containers as `selenium-hub` since Jenkins
+##  will use the actual hub + node configuration instead of a standalone for performance
+##  reasons. Listing all of them as selenium-hub saves a great deal of configuration issues
+
+## Chrome
+  selenium-hub:
+    image: selenium/standalone-chrome
+    # Use the seleniarm (not selenium) image on ARM architectures
+    # image: seleniarm/standalone-chromium
+    depends_on:
+      - canvas-web
+    environment:
+      SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
+    init: true
+    ports:
+      - "5901:5900"
+
+## Firefox
+  # selenium-hub:
+  #   image: selenium/standalone-firefox
+  #   # Use the seleniarm (not selenium) image on ARM architectures
+  #   # image: seleniarm/standalone-firefox
+  #   depends_on:
+  #     - canvas-web
+  #   environment:
+  #     SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
+  #   init: true
+  #   ports:
+  #     - "5900:5900"
+
+## Edge
+  # selenium-hub:
+  #   image: selenium/standalone-edge
+  #   depends_on:
+  #     - canvas-web
+  #   environment:
+  #     SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
+  #   init: true
+  #   ports:
+  #     - "5902:5900"
+
+networks:
+  default:
+    external: true
+    name: "inst_shared"

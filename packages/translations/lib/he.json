@@ -200,6 +200,9 @@
     "date_time_d9fbf2d7": {
         "message": "תאריך וזמן:"
     },
+    "decorative_image_fde98579": {
+        "message": "תמונת קישוט"
+    },
     "deep_purple_bb3e2907": {
         "message": "סגול כהה"
     },
@@ -476,6 +479,9 @@
     "new_opportunities_7d349c4d": {
         "message": "הזדמנויות חדשות"
     },
+    "next_40e12421": {
+        "message": "הבא"
+    },
     "next_month_749b1778": {
         "message": "החודש הבא"
     },
@@ -562,6 +568,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } נקודות"
+    },
+    "prev_f82cbc48": {
+        "message": "הקודם"
     },
     "preview_53003fd2": {
         "message": "תצוגה מקדימה"

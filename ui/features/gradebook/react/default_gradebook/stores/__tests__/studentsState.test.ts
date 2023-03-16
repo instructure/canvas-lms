@@ -36,7 +36,20 @@ const exampleData = {
 
   studentIds: ['1101', '1102', '1103'],
   students: [{id: '1101'}, {id: '1102'}, {id: '1103'}],
-  submissions: [{id: '2501'}, {id: '2502'}, {id: '2503'}],
+  submissions: [
+    {
+      user_id: '1101',
+      submissions: [{assignment_id: '2301', score: 7, user_id: '1101'}],
+    },
+    {
+      user_id: '1102',
+      submissions: [{assignment_id: '2301', score: 8, user_id: '1102'}],
+    },
+    {
+      user_id: '1103',
+      submissions: [{assignment_id: '2301', score: 9, user_id: '1103'}],
+    },
+  ],
 }
 
 const urls = {
@@ -48,11 +61,11 @@ const urls = {
 describe('Gradebook > fetchStudentIds', () => {
   const url = '/courses/0/gradebook/user_ids'
 
-  let exampleData
+  let exampleData_
   let network
 
   beforeEach(() => {
-    exampleData = {
+    exampleData_ = {
       studentIds: ['1101', '1102', '1103'],
     }
   })
@@ -86,7 +99,7 @@ describe('Gradebook > fetchStudentIds', () => {
 
     describe('when student ids have been prefetched', () => {
       beforeEach(() => {
-        const jsonString = JSON.stringify({user_ids: exampleData.studentIds})
+        const jsonString = JSON.stringify({user_ids: exampleData_.studentIds})
         const response = new Response(jsonString)
         setPrefetchedXHR('user_ids', Promise.resolve(response))
       })
@@ -150,8 +163,44 @@ describe('#loadStudentData()', () => {
     await promise1
     expect(store.getState().isStudentDataLoaded).toStrictEqual(true)
     expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
-    expect(store.getState().studentIds).toStrictEqual(['1101', '1102', '1103'])
-    expect(store.getState().recentlyLoadedStudents).toStrictEqual([{id: '1103'}])
-    expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([{id: '2503'}])
+    expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
+    expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
+    expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([
+      {
+        submissions: [
+          {
+            assignment_id: '2301',
+            score: 9,
+            user_id: '1103',
+          },
+        ],
+        user_id: '1103',
+      },
+    ])
+    expect(store.getState().studentList).toMatchObject([{id: '1101'}, {id: '1102'}, {id: '1103'}])
+    expect(store.getState().studentMap).toMatchObject({
+      1101: {id: '1101'},
+      1102: {id: '1102'},
+      1103: {id: '1103'},
+    })
+    expect(store.getState().assignmentUserSubmissionMap).toStrictEqual({
+      '2301': {
+        '1101': {
+          assignment_id: '2301',
+          score: 7,
+          user_id: '1101',
+        },
+        '1102': {
+          assignment_id: '2301',
+          score: 8,
+          user_id: '1102',
+        },
+        '1103': {
+          assignment_id: '2301',
+          score: 9,
+          user_id: '1103',
+        },
+      },
+    })
   })
 })

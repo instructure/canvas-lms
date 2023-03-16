@@ -502,6 +502,7 @@ const ProxyUploadModal = ({
             Close
           </Button>
           <Button
+            data-testid="proxySubmit"
             color="primary"
             type="submit"
             disabled={filesUploading || submitting}

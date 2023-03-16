@@ -265,6 +265,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     context "with selectable_outcomes_in_course_copy disabled" do
       before do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+        allow(@migration).to receive(:context).and_return(course_model)
       end
 
       it "lists top-level items" do
@@ -288,6 +289,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
         @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+        allow(@migration).to receive(:context).and_return(course_model)
       end
 
       it "lists top-level items" do
@@ -355,6 +357,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.calendar_events.create!.destroy
         @course.rubrics.create!.destroy
       end
+
+      before { allow(@migration).to receive(:context).and_return(course_model) }
 
       it "ignores in top-level list" do
         expect(formatter.get_content_list).to eq [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },

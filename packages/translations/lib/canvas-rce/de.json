@@ -554,7 +554,7 @@
   "preview_53003fd2": { "message": "Vorschau" },
   "preview_a3f8f854": { "message": "VORSCHAU" },
   "preview_in_overlay_ed772c46": { "message": "Vorschau in Overlay" },
-  "preview_inline_9787330": { "message": "Inlne-Vorschau" },
+  "preview_inline_9787330": { "message": "Inline-Vorschau" },
   "prime_917ea60e": { "message": "Primzahl" },
   "prime_numbers_13464f61": { "message": "Primzahlen" },
   "product_39cf144f": { "message": "Produkt" },
@@ -591,9 +591,6 @@
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (Variante)" },
   "rich_content_editor_2708ef21": { "message": "Rich-Content-Editor" },
-  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-    "message": "Rich-Text-Bereich. Drücken Sie <Alt>+0, um Tastaturkürzel im Rich-Content-Editor anzuzeigen."
-  },
   "right_angle_bracket_d704e2d6": { "message": "Eckige Klammer links" },
   "right_arrow_35e0eddf": { "message": "Pfeil nach rechts" },
   "right_arrow_with_hook_29d92d31": {

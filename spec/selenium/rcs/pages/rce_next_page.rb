@@ -938,6 +938,54 @@ module RCENextPage
     element_exists?(".assignment-title .MathJax_Preview")
   end
 
+  def equation_editor_modal_exists?
+    element_exists?("[aria-label='Equation Editor']")
+  end
+
+  def math_rendering_exists?
+    element_exists?("#MathJax-Element-1-Frame")
+  end
+
+  def equation_editor_button
+    possibly_hidden_toolbar_button('button[aria-label="Insert Math Equation"]')
+  end
+
+  def equation_editor_done_button
+    f("[data-testid='equation-editor-modal-done']")
+  end
+
+  def equation_editor_close_button
+    f("[data-testid='equation-editor-modal-close']")
+  end
+
+  def math_image
+    f(".equation_image")
+  end
+
+  def edit_math_image_button
+    find_button("Edit Equation")
+  end
+
+  def advanced_editor_toggle
+    parent_fxpath(advanced_editor_toggle_child)
+  end
+
+  def advanced_editor_toggle_child
+    f("[data-testid='advanced-toggle']")
+  end
+
+  def advanced_editor_textarea
+    f("[data-testid='advanced-editor']")
+  end
+
+  def basic_editor_textarea
+    f("[data-testid='math-field")
+  end
+
+  def first_math_symbol_button
+    find_from_element_fxpath(ff('[data-testid="math-symbol-icon"]')[0], "../../../../..")
+  end
+
   #=====================================================================================================================
   # Embed
 

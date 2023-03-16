@@ -274,6 +274,29 @@ describe('ConversationListContainer', () => {
   })
 
   describe('responsiveness', () => {
+    describe('mobile', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          mobile: {maxWidth: '67'},
+        }))
+      })
+
+      it('should emit correct test id for mobile', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('list-items-mobile')
+        expect(listItem).toBeTruthy()
+      })
+
+      it('should correctly truncate for mobile', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('last-message-content')
+
+        expect(listItem.textContent.length).toBe(93)
+      })
+    })
+
     describe('tablet', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
@@ -286,6 +309,14 @@ describe('ConversationListContainer', () => {
         expect(component.container).toBeTruthy()
         const listItem = await component.findByTestId('list-items-tablet')
         expect(listItem).toBeTruthy()
+      })
+
+      it('should correctly truncate for tablet', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('last-message-content')
+
+        expect(listItem.textContent.length).toBe(43)
       })
     })
 
@@ -301,6 +332,14 @@ describe('ConversationListContainer', () => {
         expect(component.container).toBeTruthy()
         const listItem = await screen.findByTestId('list-items-desktop')
         expect(listItem).toBeTruthy()
+      })
+
+      it('should correctly truncate for desktop', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('last-message-content')
+
+        expect(listItem.textContent.length).toBe(43)
       })
     })
   })

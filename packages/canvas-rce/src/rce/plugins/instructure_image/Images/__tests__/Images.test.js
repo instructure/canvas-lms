@@ -43,6 +43,7 @@ describe('RCE "Images" Plugin > Images', () => {
       sortBy: {sort: 'alphabetical', order: 'desc'},
       searchString: 'whereami?',
       onImageEmbed() {},
+      canvasOrigin: 'https://canvas.instructor.com',
     }
   })
 

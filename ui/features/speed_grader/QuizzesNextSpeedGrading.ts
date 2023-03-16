@@ -30,7 +30,7 @@
 // refreshGradesCb executes the normal speedGrader refresh grades
 // actions, plus whatever callback is passed in as an argument
 
-import type {Submission} from './jquery/speed_grader.d'
+import type {Submission} from '../../api.d'
 import $ from 'jquery'
 
 function sendPostMessage($iframe_holder, message) {

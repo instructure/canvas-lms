@@ -25,15 +25,12 @@ import type {
   GradingPeriodSet,
   GradingScheme,
   GradingStandard,
-  GradingType,
   Module,
   ModuleMap,
   Section,
   Student,
   StudentGroupCategoryMap,
   StudentMap,
-  SubmissionType,
-  WorkflowState,
 } from '../api.d'
 
 export type CourseSettingsType = {
@@ -130,7 +127,6 @@ export type GradebookOptions = {
   late_policy: LatePolicy | null
   login_handle_name: null | string
   message_attachment_upload_folder_id: string
-  new_gradebook_development_enabled: boolean
   outcome_gradebook_enabled: boolean
   performance_controls: PerformanceControlValues
   post_grades_feature: boolean
@@ -150,7 +146,6 @@ export type GradebookOptions = {
   show_total_grade_as_points: boolean
   sis_app_token: null | string
   sis_app_url: null | string
-  sis_name: null | string
   sis_name: string
   speed_grader_enabled: boolean
   student_groups: StudentGroupCategoryMap
@@ -267,7 +262,7 @@ export type FilterType =
 export type Filter = {
   id: string
   type?: FilterType
-  value?: string
+  value?: string | null
   created_at: string
 }
 
@@ -332,14 +327,9 @@ export type Lti = {
 
 export type ColumnOrderSettings = {
   customOrder?: string[]
-  direction: 'ascending' | 'descending'
+  direction?: 'ascending' | 'descending'
   freezeTotalGrade?: boolean | 'true'
   sortType: string
-}
-
-export type Progress = {
-  id: string
-  workflow_state: string
 }
 
 export type ProgressData = {
@@ -355,41 +345,6 @@ export type FlashMessage = {
   key: string
   message: string
   variant: string
-}
-
-// TODO: remove the need for this type
-export type SubmissionCamelized = {
-  anonymousId: string
-  assignmentId: string
-  assignmentVisible?: boolean
-  attempt: number | null
-  enteredGrade: string | null
-  enteredScore: number | null
-  excused: boolean
-  grade: string | null
-  gradeMatchesCurrentSubmission: boolean
-  cachedDueDate: string | null
-  drop?: boolean
-  gradeLocked: boolean
-  gradingPeriodId: string | null
-  gradingType: GradingType
-  hasPostableComments: boolean
-  hidden: boolean
-  id: string
-  latePolicyStatus: null | string
-  late: boolean
-  missing: boolean
-  pointsDeducted: number | null
-  postedAt: string | null
-  rawGrade: string | null
-  redoRequest: boolean
-  score: null | number
-  secondsLate: number | null
-  submissionType: SubmissionType
-  submittedAt: null | Date
-  url: null | string
-  userId: string
-  workflowState: WorkflowState
 }
 
 export type AssignmentStudentMap = {
@@ -446,10 +401,29 @@ export type AssignmentWithOverride = {
   name: string
   due_at: string
   please_ignore: boolean
+  recentlyUpdated: boolean
   hadOriginalErrors: boolean
+  overrides: unknown[]
+  original_error?: boolean
+  needs_grading_count: number
+  currentlySelected: {
+    id: string
+    type: string
+  }
+  selectedSectionForEveryone: string
   overrideForThisSection: {
     id: string
     course_section_id: string
     due_at: null | Date
   }
+}
+
+export type Progress = {
+  id: string
+  workflow_state: string
+}
+
+export type ProgressCamelized = {
+  progressId: string
+  workflowState: string
 }

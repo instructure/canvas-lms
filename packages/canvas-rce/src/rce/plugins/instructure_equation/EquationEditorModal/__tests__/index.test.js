@@ -19,9 +19,10 @@
 import React from 'react'
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
-import mathml from '../mathml'
+import mathml, {MathJaxDirective} from '../mathml'
 import advancedPreference from '../advancedPreference'
 import {MathfieldElement} from 'mathlive'
+import RCEGlobals from '../../../../RCEGlobals'
 
 jest.useFakeTimers()
 
@@ -61,12 +62,9 @@ const editInAdvancedMode = text => {
 }
 
 jest.mock('../mathml', () => {
-  const originalModule = jest.requireActual('../mathml').default
-
-  return {
-    ...originalModule,
-    processNewMathInElem: jest.fn(),
-  }
+  const module = jest.requireActual('../mathml')
+  module.default.processNewMathInElem = jest.fn()
+  return module
 })
 
 jest.mock('../advancedPreference', () => {
@@ -182,68 +180,88 @@ describe('EquationEditorModal', () => {
     })
   })
 
-  describe('correctly renders advanced preview when', () => {
-    let actualDebounceRate
-    const testDebounceRate = 100
-
-    beforeAll(() => {
-      actualDebounceRate = EquationEditorModal.debounceRate
-      EquationEditorModal.debounceRate = testDebounceRate
+  describe('advanced preview', () => {
+    it('is marked as MathJax should process', () => {
+      renderModal()
+      const shouldProcess = mathml.shouldProcess(advancedPreview())
+      expect(shouldProcess).toBe(true)
     })
 
-    afterAll(() => {
-      EquationEditorModal.debounceRate = actualDebounceRate
-    })
-
-    it('toggling from basic to advanced mode', async () => {
-      renderModal({originalLatex: {latex: r`\sqrt{x}`}})
-      toggleMode()
-      await waitFor(() => {
-        expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
-          <span
-            data-testid="mathml-preview-element"
-          >
-            \\(\\sqrt{x}\\)
-          </span>
-        `)
-      })
-    })
-
-    it('updating formula in advanced mode', async () => {
+    it('does not have process directive if explicit_latex_typsetting is off', () => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: false})
       renderModal({openAdvanced: true})
-      editInAdvancedMode('hello')
-      await act(async () => jest.runAllTimers())
-      await waitFor(() => {
-        expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
-          <span
-            data-testid="mathml-preview-element"
-          >
-            \\(hello\\)
-          </span>
-        `)
-      })
+      expect(advancedPreview()).not.toHaveClass(MathJaxDirective.Process)
     })
 
-    it('deleting formula in advanced editor', async () => {
-      renderModal({originalLatex: {latex: r`\LaTeX`, advancedOnly: true}})
-      editInAdvancedMode('')
-      await waitFor(() => {
-        expect(advancedPreview().innerHTML).toEqual('')
-      })
-    })
-
-    it('deleting formula in basic editor', async () => {
+    it('contains the process directive if explicit_latex_typesetting is on', () => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValueOnce({explicit_latex_typesetting: true})
       renderModal({openAdvanced: true})
-      editInAdvancedMode('updated in advanced mode')
-      toggleMode()
-      await waitFor(() => {
-        const value = basicEditor().getValue()
-        expect(value).toEqual('updated in advanced mode')
+      expect(advancedPreview()).toHaveClass(MathJaxDirective.Process)
+    })
+
+    describe('correctly renders when', () => {
+      let actualDebounceRate
+      const testDebounceRate = 100
+
+      beforeAll(() => {
+        actualDebounceRate = EquationEditorModal.debounceRate
+        EquationEditorModal.debounceRate = testDebounceRate
       })
-      basicEditor().setValue('')
-      toggleMode()
-      await waitFor(() => {
-        expect(advancedPreview().innerHTML).toEqual('')
+
+      afterAll(() => {
+        EquationEditorModal.debounceRate = actualDebounceRate
+      })
+
+      it('toggling from basic to advanced mode', async () => {
+        renderModal({originalLatex: {latex: r`\sqrt{x}`}})
+        toggleMode()
+        await waitFor(() => {
+          expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
+            <span
+              data-testid="mathml-preview-element"
+            >
+              \\(\\sqrt{x}\\)
+            </span>
+          `)
+        })
+      })
+
+      it('updating formula in advanced mode', async () => {
+        renderModal({openAdvanced: true})
+        editInAdvancedMode('hello')
+        await act(async () => jest.runAllTimers())
+        await waitFor(() => {
+          expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
+            <span
+              data-testid="mathml-preview-element"
+            >
+              \\(hello\\)
+            </span>
+          `)
+        })
+      })
+
+      it('deleting formula in advanced editor', async () => {
+        renderModal({originalLatex: {latex: r`\LaTeX`, advancedOnly: true}})
+        editInAdvancedMode('')
+        await waitFor(() => {
+          expect(advancedPreview().innerHTML).toEqual('')
+        })
+      })
+
+      it('deleting formula in basic editor', async () => {
+        renderModal({openAdvanced: true})
+        editInAdvancedMode('updated in advanced mode')
+        toggleMode()
+        await waitFor(() => {
+          const value = basicEditor().getValue()
+          expect(value).toEqual('updated in advanced mode')
+        })
+        basicEditor().setValue('')
+        toggleMode()
+        await waitFor(() => {
+          expect(advancedPreview().innerHTML).toEqual('')
+        })
       })
     })
   })
@@ -320,12 +338,6 @@ describe('EquationEditorModal', () => {
     renderModal({onModalDismiss: mockFn})
     fireEvent.click(screen.getByText('Close'))
     expect(mockFn).toHaveBeenCalled()
-  })
-
-  it('advanced preview is marked as MathJax should process', () => {
-    renderModal()
-    const shouldProcess = mathml.shouldProcess(advancedPreview())
-    expect(shouldProcess).toBe(true)
   })
 
   describe('advanced mode flag', () => {

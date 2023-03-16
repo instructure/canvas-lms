@@ -29,15 +29,10 @@ const defaultData = () => ({
 const indexContainer = document.createElement('div')
 document.body.appendChild(indexContainer)
 
-it('mounts permissions to container component', () => {
+it('mounts/unmounts permissions to container component', () => {
   app = createPermissionsIndex(indexContainer, defaultData())
   app.render()
   expect(document.querySelector('.permissions-v2__wrapper')).not.toBeNull()
-})
-
-it('unmounts permissions from container component', () => {
-  app = createPermissionsIndex(indexContainer, defaultData())
-  app.render()
   app.unmount()
   expect(document.querySelector('.permissions-v2__wrapper')).toBeNull()
 })

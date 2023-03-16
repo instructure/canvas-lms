@@ -78,6 +78,7 @@ const locale = {
   },
   "custom_6979cd81": { "message": "Звичай" },
   "cyan_c1d5f68a": { "message": "Зелено-синій колір" },
+  "decorative_image_fde98579": { "message": "Декоративне зображення" },
   "deep_purple_bb3e2907": { "message": "Темно-фіолетовий" },
   "delimiters_4db4840d": { "message": "Розділювачі" },
   "description_436c48d7": { "message": "Опис" },
@@ -142,6 +143,7 @@ const locale = {
   "modules_c4325335": { "message": "Розділи" },
   "my_files_2f621040": { "message": "Мої файли" },
   "name_1aed4a1b": { "message": "Ім''я" },
+  "next_40e12421": { "message": "Далі" },
   "no_e16d9132": { "message": "Ні" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Попередній перегляд  для цього файлу недоступний."
@@ -157,6 +159,7 @@ const locale = {
   "people_b4ebb13c": { "message": "Люди" },
   "percentage_34ab7c2c": { "message": "Відсоток" },
   "pink_68ad45cb": { "message": "Рожевий" },
+  "prev_f82cbc48": { "message": "Попередній" },
   "preview_53003fd2": { "message": "Попередній перегляд" },
   "published_c944a23d": { "message": "опубліковано" },
   "purple_7678a9fc": { "message": "Фіолетовий" },

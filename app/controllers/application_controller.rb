@@ -216,7 +216,7 @@ class ApplicationController < ActionController::Base
           current_user_visited_tabs: @current_user&.get_preference(:visited_tabs),
           discussions_reporting: react_discussions_post_enabled_for_preferences_use?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-          group_information: @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category ? @context.group_category.groups.pluck(:id, :name).map { |item| { id: item[0], label: item[1] } } : nil,
+          group_information: group_information,
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           help_link_name: help_link_name,
@@ -311,13 +311,25 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  def group_information
+    if @context.is_a?(Group) &&
+       can_do(@context, @current_user, :manage) &&
+       @context.group_category &&
+       @context.group_category.groups &&
+       @context.group_category.groups.active
+
+      @context.group_category.groups.active.sort_by(&:name).pluck(:id, :name).map { |item| { id: item[0], label: item[1] } }
+    end
+  end
+  private :group_information
+
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links lti_platform_storage scale_equation_images buttons_and_icons_cropper calendar_series
     account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
     course_paces_redesign course_paces_for_students rce_better_paste module_publish_menu explicit_latex_typesetting
-    dev_key_oidc_alert rce_new_external_tool_dialog_in_canvas
+    dev_key_oidc_alert rce_new_external_tool_dialog_in_canvas rce_show_studio_media_options rce_improved_placeholders
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -3008,86 +3020,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :should_show_migration_limitation_message
 
-  def uncached_k5_user?(user, course_ids: nil)
-    # Collect global ids of all accounts in current region with k5 enabled
-    global_k5_account_ids = []
-    Account.shard(user.in_region_associated_shards).root_accounts.active.non_shadow
-           .where("settings LIKE '%k5_accounts:\n- %'").select(:settings).each do |account|
-      account.settings[:k5_accounts]&.each do |k5_account_id|
-        global_k5_account_ids << Shard.global_id_for(k5_account_id, account.shard)
-      end
-    end
-    return false if global_k5_account_ids.blank?
-
-    provided_global_account_ids = course_ids.present? ? Course.where(id: course_ids).distinct.pluck(:account_id).map { |account_id| Shard.global_id_for(account_id) } : []
-
-    # See if the user has associations with any k5-enabled accounts on each shard
-    k5_associations = Shard.partition_by_shard(global_k5_account_ids) do |k5_account_ids|
-      if course_ids.present?
-        # Use only provided course_ids' account ids if passed
-        provided_account_ids = provided_global_account_ids.select { |account_id| Shard.shard_for(account_id) == Shard.current }.map { |global_id| Shard.local_id_for(global_id)[0] }
-        break true if (provided_account_ids & k5_account_ids).any?
-
-        provided_account_chain_ids = Account.multi_account_chain_ids(provided_account_ids)
-        break true if (provided_account_chain_ids & k5_account_ids).any?
-      else
-        # If course_ids isn't passed, check all their (non-observer and unlinked observer) enrollments and account_users
-        # i.e., ignore observer enrollments with a linked student - the observer picker filters out these courses
-        enrolled_courses_scope = user.enrollments.shard(Shard.current).new_or_active_by_date
-        enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type.or(enrolled_courses_scope.of_observer_type.where(associated_user_id: nil))
-        enrolled_course_ids = enrolled_courses_scope.select(:course_id)
-        enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
-
-        enrolled_account_ids += user.account_users.shard(Shard.current).active.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
-
-        enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
-        break true if (enrolled_account_chain_ids & k5_account_ids).any?
-      end
-    end
-    k5_associations == true
-  end
-
   def k5_disabled?
-    # Only admins and teachers can opt-out of being considered a k5 user
-    # Observers can't disable if they have a student selected in the picker
-    can_disable = @current_user.roles(@domain_root_account).any? { |role| %w[admin teacher].include?(role) } && !currently_observing?
-    can_disable && @current_user.elementary_dashboard_disabled?
-  end
-
-  def currently_observing?
-    @current_user.roles(@domain_root_account).include?("observer") &&
-      @selected_observed_user.present? &&
-      @selected_observed_user != @current_user
+    K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_disabled?
   end
 
   def k5_user?(check_disabled: true)
-    # unauthenticated users get classic canvas
-    return false unless @current_user
-
-    RequestCache.cache("k5_user", @current_user, @selected_observed_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
-      next false if check_disabled && k5_disabled?
-
-      user = @current_user
-      course_ids = nil
-      if currently_observing?
-        user = @selected_observed_user
-        # pass course_ids since we should only consider the subset of courses where the
-        # observer is observing the student when determining k5_user?
-        course_ids = @current_user
-                     .observer_enrollments
-                     .active_or_pending_by_date
-                     .where(associated_user: user)
-                     .shard(@current_user.in_region_associated_shards)
-                     .pluck(:course_id)
-      end
-
-      # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys(["k5_user3", course_ids].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
-        uncached_k5_user?(user, course_ids: course_ids)
-      end
-    end
+    K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled: check_disabled)
   end
   helper_method :k5_user?
 

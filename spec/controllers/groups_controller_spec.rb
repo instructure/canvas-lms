@@ -114,6 +114,24 @@ describe GroupsController do
       expect(assigns[:paginated_groups][8].name).to eql("44")
     end
 
+    it "does not 500 for admins that can view but cannot manage groups" do
+      a = Account.default
+      role = custom_account_role("groups-view-only", account: a)
+      a.role_overrides.create! role: role, permission: "manage_groups", enabled: false
+      a.role_overrides.create! role: role, permission: "read_roster", enabled: true
+      a.role_overrides.create! role: role, permission: "view_group_pages", enabled: true
+
+      my_admin = User.create!(name: "my admin")
+      a.account_users.create!(user: my_admin, role: role)
+
+      course_with_teacher(active_all: true)
+      user_session(my_admin)
+      category1 = @course.group_categories.create(name: "category 1")
+      @course.groups.create(name: "some group", group_category: category1)
+      get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+      expect(response.status).to eq 200
+    end
+
     it "don't filter out inactive students if json and param set" do
       course_with_teacher(active_all: true)
       students = create_users_in_course(@course, 2, return_type: :record)

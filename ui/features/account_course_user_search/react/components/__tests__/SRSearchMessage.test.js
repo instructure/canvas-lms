@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import SRSearchMessage from '../SRSearchMessage'
 
-let flashElements
+injectGlobalAlertContainers()
 
 const getProps = () => ({
   collection: {
@@ -37,16 +38,6 @@ const getProps = () => ({
     },
   },
   dataType: 'Course',
-})
-beforeEach(() => {
-  flashElements = document.createElement('div')
-  flashElements.setAttribute('id', 'flash_screenreader_holder')
-  flashElements.setAttribute('role', 'alert')
-  document.body.appendChild(flashElements)
-})
-
-afterEach(() => {
-  document.body.removeChild(flashElements)
 })
 
 it('returns noscript when the collection is loading', () => {

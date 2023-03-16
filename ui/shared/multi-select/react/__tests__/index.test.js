@@ -19,6 +19,9 @@
 import CanvasMultiSelect from '../index'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 describe('CanvasMultiSelect', () => {
   let props

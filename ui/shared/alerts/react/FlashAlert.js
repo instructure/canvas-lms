@@ -90,7 +90,7 @@ const isLoadingChunkError = a => {
 export default class FlashAlert extends React.Component {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
-    message: PropTypes.string.isRequired,
+    message: PropTypes.node.isRequired,
     error: PropTypes.instanceOf(Error),
     variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
     timeout: PropTypes.number,

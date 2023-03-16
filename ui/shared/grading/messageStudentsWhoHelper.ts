@@ -132,7 +132,7 @@ const MessageStudentsWhoHelper = {
       {
         text: I18n.t('Scored less than'),
         cutoff: true,
-        subjectFn: (assignment, cutoff) =>
+        subjectFn: (assignment, cutoff: number) =>
           I18n.t('Scored less than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
             cutoff: I18n.n(cutoff),
@@ -143,7 +143,7 @@ const MessageStudentsWhoHelper = {
       {
         text: I18n.t('Scored more than'),
         cutoff: true,
-        subjectFn: (assignment, cutoff) =>
+        subjectFn: (assignment, cutoff: number) =>
           I18n.t('Scored more than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
             cutoff: I18n.n(cutoff),

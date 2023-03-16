@@ -23,6 +23,12 @@ export type Lti13ContentItemJson =
   | ImageContentItemJson
   | LinkContentItemJson
   | ResourceLinkContentItemJson
+  | UnknownContentItemJson
+
+export type UnknownContentItemJson = DeepPartialNullable<{
+  type: string
+  [key: string]: any
+}>
 
 export type HtmlFragmentContentItemJson = DeepPartialNullable<{
   type: 'html'

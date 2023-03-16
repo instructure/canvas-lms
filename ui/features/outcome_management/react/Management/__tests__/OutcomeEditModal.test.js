@@ -29,6 +29,9 @@ import {
   setFriendlyDescriptionOutcomeMock,
 } from '@canvas/outcomes/mocks/Management'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.useFakeTimers()
 

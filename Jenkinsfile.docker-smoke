@@ -40,7 +40,7 @@ pipeline {
           protectedNode(configuration.nodeLabel()) {
             stage('Setup') {
               // always pull from gerrit refspec to test the changed docker dev code
-              checkoutRepo('canvas-lms', env.GERRIT_REFSPEC, 1)
+              checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: env.GERRIT_REFSPEC, depth: 1)
               sh '''#!/bin/bash
               cat <<EOF > docker-compose.local.jenkins.yml
 version: '2.3'

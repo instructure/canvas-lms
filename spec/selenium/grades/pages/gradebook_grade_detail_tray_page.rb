@@ -79,6 +79,26 @@ module Gradebook
       fj("a:contains('SpeedGrader')")
     end
 
+    def self.submit_for_student_button
+      f("button[data-testid='submit-for-student-button']")
+    end
+
+    def self.proxy_file_drop
+      f("#proxyInputFileDrop")
+    end
+
+    def self.proxy_submit_button
+      f("button[data-testid='proxySubmit']")
+    end
+
+    def self.proxy_submitter_name
+      f("span[data-testid='proxy_submitter_name']")
+    end
+
+    def self.proxy_date_time
+      f("span[data-testid='friendly-date-time']")
+    end
+
     def self.next_assignment_button
       f("#assignment-carousel .right-arrow-button-container button")
     end

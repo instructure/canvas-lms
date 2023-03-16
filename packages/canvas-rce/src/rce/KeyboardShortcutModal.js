@@ -78,6 +78,14 @@ export default function KeyboardShortcutModal(props) {
               </Table.Row>
               <Table.Row>
                 <Table.Cell>
+                  <Text weight="bold">{formatMessage('SHIFT+Arrows')}</Text>
+                </Table.Cell>
+                <Table.Cell>
+                  {formatMessage('Highlight an element to activate the element options toolbar')}
+                </Table.Cell>
+              </Table.Row>
+              <Table.Row>
+                <Table.Cell>
                   <Text weight="bold">CTRL+F9</Text>
                 </Table.Cell>
                 <Table.Cell>{formatMessage('Focus element options toolbar')}</Table.Cell>

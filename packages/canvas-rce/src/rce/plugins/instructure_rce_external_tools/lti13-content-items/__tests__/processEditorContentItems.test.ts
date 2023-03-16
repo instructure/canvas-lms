@@ -24,6 +24,7 @@ import {
   LinkContentItemJson,
   Lti13ContentItemJson,
   ResourceLinkContentItemJson,
+  UnknownContentItemJson,
 } from '../Lti13ContentItemJson'
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../../ExternalToolsEnv'
@@ -55,21 +56,38 @@ describe('processEditorContentItems', () => {
     width: 100,
     height: 200,
   }
+  const fileContentItem: UnknownContentItemJson = {
+    type: 'file',
+    some: 'prop',
+  }
+  const unsupportedContentItem: UnknownContentItemJson = {
+    type: 'unsupported',
+    some: 'prop',
+  }
   const htmlFragmentItem: HtmlFragmentContentItemJson = {
     type: 'html',
     html: '<a href="www.html.com">test</a>',
   }
-  const invalidContentItem = {type: 'banana'}
+
   const contentItems: Lti13ContentItemJson[] = [
     linkContentItem, // 1
-    invalidContentItem as Lti13ContentItemJson, // Testing bad data
+    unsupportedContentItem, // Testing bad data
     resourceLinkContentItem, // 2
     imageContentItem, // 3
     htmlFragmentItem, // 4
     resourceLinkContentItemWithUuid, // 5
   ]
+  const validContentItems = [
+    linkContentItem,
+    resourceLinkContentItem,
+    imageContentItem,
+    htmlFragmentItem,
+    resourceLinkContentItemWithUuid,
+  ]
   const editor = createDeepMockProxy<ExternalToolsEditor>()
   const rceWrapper = createDeepMockProxy<RCEWrapper>()
+
+  let showFlashAlertSpy: ReturnType<typeof jest.spyOn>
 
   beforeAll(() => {
     jest.spyOn(RCEWrapper, 'getByEditor').mockImplementation(e => {
@@ -78,24 +96,32 @@ describe('processEditorContentItems', () => {
         throw new Error('Wrong editor requested')
       }
     })
+
+    showFlashAlertSpy = jest.spyOn(
+      jest.requireActual('../../../../../common/FlashAlert'),
+      'showFlashAlert'
+    )
   })
 
   beforeEach(() => {
     editor.mockClear()
     rceWrapper.mockClear()
+    showFlashAlertSpy.mockClear()
   })
 
   describe('static', () => {
-    it('closes the dialog', async () => {
-      const ev = {data: {content_items: contentItems, subject: 'LtiDeepLinkingResponse'}}
+    it('handles an event with all valid content items by closing the dialog', async () => {
+      const ev = {data: {content_items: validContentItems, subject: 'LtiDeepLinkingResponse'}}
       const dialog = {close: jest.fn()}
       await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
       expect(dialog.close).toHaveBeenCalled()
+      expect(showFlashAlertSpy).not.toHaveBeenCalled()
     })
 
-    it('ignores non deep linking event types', async () => {
+    it('ignores messages without content_items', async () => {
       const ev = {data: {subject: 'OtherMessage'}}
       const dialog = {close: jest.fn()}
+
       await processEditorContentItems(
         // Bypass type checking to ensure it can handle bad data from javascript
         ev as any,
@@ -103,6 +129,64 @@ describe('processEditorContentItems', () => {
         dialog
       )
       expect(dialog.close).not.toHaveBeenCalled()
+    })
+
+    it('handles an event with all unsupported items, showing a warning once and closing the dialog', async () => {
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(
+        // Bypass type checking to ensure it can handle bad data from javascript
+        {
+          data: {
+            content_items: [
+              // Include two copies of the unsupported item to ensure that the warning is only shown once
+              fileContentItem,
+              unsupportedContentItem,
+            ],
+          },
+        },
+        externalToolsEnvFor(editor),
+        dialog
+      )
+      expect(dialog.close).toHaveBeenCalled()
+
+      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Could not insert content: "file" items are not currently supported in Canvas.',
+        type: 'warning',
+        err: null,
+      })
+    })
+
+    it('handles an event with some unsupported items, showing a warning once and closing the dialog', async () => {
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(
+        // Bypass type checking to ensure it can handle bad data from javascript
+        {
+          data: {
+            content_items: [
+              // Include two copies of the unsupported item to ensure that the warning is only shown once
+              unsupportedContentItem,
+              fileContentItem,
+
+              // Include a real content item, too
+              htmlFragmentItem,
+            ],
+          },
+        },
+        externalToolsEnvFor(editor),
+        dialog
+      )
+      expect(dialog.close).toHaveBeenCalled()
+
+      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message:
+          'Could not insert content: "unsupported" items are not currently supported in Canvas.',
+        type: 'warning',
+        err: null,
+      })
     })
   })
 

@@ -44,10 +44,10 @@ export type FilterTrayPresetProps = {
   isActive: boolean
   modules: Module[]
   onChange?: (filter: PartialFilterPreset) => void
-  onCreate?: (filter: PartialFilterPreset) => void
-  onUpdate?: (filter: FilterPreset) => Promise<void>
+  onCreate?: (filter: PartialFilterPreset) => Promise<boolean>
+  onUpdate?: (filter: FilterPreset) => Promise<boolean>
   onDelete?: () => void
-  onToggle: (boolean) => void
+  onToggle: (expanded: boolean) => void
   isExpanded: boolean
   sections: Section[]
   studentGroupCategories: StudentGroupCategoryMap
@@ -81,7 +81,7 @@ export default function FilterTrayPreset({
     setStagedFilters(filterPreset.filters)
   }, [filterPreset.filters])
 
-  const onChangeFilter = filter => {
+  const onChangeFilter = (filter: Filter) => {
     const otherFilters = stagedFilters.filter(c => c.id !== filter.id)
     if (otherFilters.find(c => c.type === filter.type)) {
       throw new Error('filter type already exists')
@@ -97,14 +97,19 @@ export default function FilterTrayPreset({
 
   const handleCreateFilter = () => {
     if (onCreate) {
-      onCreate({
+      return onCreate({
         ...filterPreset,
         name,
         filters: stagedFilters.filter(isFilterNotEmpty),
+      }).then(success => {
+        if (success) {
+          setName('')
+          setStagedFilters(filterPreset.filters)
+          setFilterPresetWasChanged(false)
+        } else {
+          setFilterPresetWasChanged(true)
+        }
       })
-      setName('')
-      setStagedFilters(filterPreset.filters)
-      setFilterPresetWasChanged(false)
     }
   }
 
@@ -115,11 +120,14 @@ export default function FilterTrayPreset({
         name,
         filters: stagedFilters.filter(isFilterNotEmpty),
       } as FilterPreset
-      onUpdate(updatedFilter)
-      setFilterPresetWasChanged(false)
-      if (isActive) {
-        applyFilters(stagedFilters.filter(isFilterNotEmpty))
-      }
+      return onUpdate(updatedFilter).then(success => {
+        if (success) {
+          setFilterPresetWasChanged(false)
+        }
+        if (isActive) {
+          applyFilters(stagedFilters.filter(isFilterNotEmpty))
+        }
+      })
     }
   }
 

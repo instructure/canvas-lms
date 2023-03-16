@@ -55,7 +55,6 @@ export function replace(selector, newHtml, editor = tinymce.activeEditor) {
 
 export function insertMentionFor(user, editor = tinymce.activeEditor) {
   if (!user || !user.shortName || !user.id) {
-    // eslint-disable-next-line no-console
     console.error('Error inserting mention for user:', user)
     return
   }
@@ -75,7 +74,7 @@ export function insertMentionFor(user, editor = tinymce.activeEditor) {
 /**
  * Removes the trigger char from the editor body
  */
-export function removeTriggerChar(editor) {
+function removeTriggerChar(editor) {
   const markerElem = editor.dom.select(MARKER_SELECTOR)[0]
   const parentElem = markerElem?.parentElement
   // xsslint safeString.identifier TRIGGER_CHAR

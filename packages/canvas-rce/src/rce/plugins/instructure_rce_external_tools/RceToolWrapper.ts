@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from '../../../format-message'
 import {ExternalToolsEnv, RceLtiToolInfo} from './ExternalToolsEnv'
 import {openToolDialogFor} from './dialog-helper'
 import {simpleCache} from '../../../util/simpleCache'
+import {instUiIconsArray} from '../../../util/instui-icon-helper'
+
+import {IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
 /**
  * Helper class for the connection between an external tool registration and a particular TinyMCE instance.
@@ -46,8 +48,7 @@ export class RceToolWrapper {
     private readonly toolInfo: RceLtiToolInfo,
     mruToolIds: string[]
   ) {
-    this.iconId =
-      toolInfo.icon_url != null ? registerToolIcon(env, toolInfo) : toolInfo.canvas_icon_class
+    this.iconId = registerToolIcon(env, toolInfo)
     this.isMruTool = mruToolIds.includes(String(toolInfo.id))
   }
 
@@ -83,10 +84,9 @@ export class RceToolWrapper {
     return this.toolInfo.use_tray
   }
 
-  asButton() {
+  asToolbarButton() {
     return {
       type: 'button',
-      text: this.title,
       icon: this.iconId ?? undefined,
       tooltip: this.title,
       onAction: () => this.openDialog(),
@@ -103,7 +103,6 @@ export class RceToolWrapper {
   }
 
   openDialog(): void {
-    updateExternalToolMruButtonVisibility(this.env)
     addMruToolId(this.id, this.env)
     openToolDialogFor(this)
   }
@@ -111,12 +110,32 @@ export class RceToolWrapper {
 
 function registerToolIcon(env: ExternalToolsEnv, toolInfo: RceLtiToolInfo): string | undefined {
   if (env.editor == null) return undefined
-  if (toolInfo.icon_url == null || toolInfo.icon_url === '') return undefined
 
   const iconId = 'lti_tool_' + String(toolInfo.id)
 
-  env.editor.ui.registry.addIcon(iconId, svgImageCache.get(toolInfo.icon_url))
+  const iconUrl = toolInfo.icon_url ?? ''
 
+  // We need to strip off the icon- or icon_ prefix from the icon class name to match instui icons
+  const iconGlyphName = (toolInfo.canvas_icon_class ?? '').replace(/^icon[-_]/, '')
+
+  if (iconUrl.length > 0) {
+    // Icon image provided
+    env.editor.ui.registry.addIcon(iconId, svgImageCache.get(iconUrl))
+    return iconId
+  } else if (iconGlyphName.length > 0) {
+    // InstUI icon used
+    const instUiIcon = instUiIconsArray.find(
+      it => it.variant === 'Line' && it.glyphName === iconGlyphName
+    )
+
+    if (instUiIcon != null) {
+      env.editor.ui.registry.addIcon(iconId, instUiIcon.src)
+      return iconId
+    }
+  }
+
+  // Fallback to default icon
+  env.editor.ui.registry.addIcon(iconId, IconLtiSolid.src)
   return iconId
 }
 
@@ -136,19 +155,6 @@ const svgImageCache = simpleCache((imageUrl: string) => {
 
   return svg.outerHTML
 })
-
-export function updateExternalToolMruButtonVisibility(env: ExternalToolsEnv): void {
-  if (env.editor == null) return
-
-  const label = formatMessage('Apps')
-  const menubutton = env.editor.editorContainer.querySelector(
-    `.tox-tbtn--select[aria-label="${label}"]`
-  )
-  const button = env.editor.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)
-
-  menubutton?.setAttribute('aria-hidden', 'false')
-  button?.setAttribute('aria-hidden', 'true')
-}
 
 /**
  * Loads the list of most recently used external tool ids.

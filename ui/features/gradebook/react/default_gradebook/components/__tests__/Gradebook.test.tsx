@@ -240,6 +240,7 @@ describe('student-names-filter', () => {
       integration_id: null,
       sis_import_id: null,
       login_id: '9088409122',
+      section_ids: [],
       last_name: '',
       first_name: 'Ganondorf',
       enrollments: [

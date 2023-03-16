@@ -224,6 +224,9 @@
     "date_time_d9fbf2d7": {
         "message": "Дата та час:"
     },
+    "decorative_image_fde98579": {
+        "message": "Декоративне зображення"
+    },
     "deep_purple_bb3e2907": {
         "message": "Темно-фіолетовий"
     },
@@ -509,6 +512,9 @@
     "new_opportunities_7d349c4d": {
         "message": "Нові можливості"
     },
+    "next_40e12421": {
+        "message": "Далі"
+    },
     "next_month_749b1778": {
         "message": "Наступний місяць"
     },
@@ -595,6 +601,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } балів"
+    },
+    "prev_f82cbc48": {
+        "message": "Попередній"
     },
     "preview_53003fd2": {
         "message": "Попередній перегляд"

@@ -40,6 +40,15 @@ def buildParameters = [
   string(name: 'CRYSTALBALL_MAP_S3_VERSION', value: "${env.CRYSTALBALL_MAP_S3_VERSION}")
 ]
 
+commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
+
+library "canvas-builds-library@${getCanvasBuildsRefspec()}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
+
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
+protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
+
 def getSummaryUrl() {
   return "${env.BUILD_URL}/build-summary-report"
 }
@@ -107,7 +116,7 @@ def postFn(status) {
       }
 
       if (isStartedByUser()) {
-        gerrit.submitVerified((status == 'SUCCESS' ? '+1' : '-1'), "${env.BUILD_URL}/build-summary-report/")
+        submitGerritReview((status == 'SUCCESS' ? '--verified +1' : '--verified -1'), "${env.BUILD_URL}/build-summary-report/")
       }
     }
 
@@ -130,8 +139,7 @@ def shouldPatchsetRetrigger() {
   // NOTE: The IS_AUTOMATIC_RETRIGGER check is here to ensure that the parameter is properly defined for the triggering job.
   // If it isn't, we have the risk of triggering this job over and over in an infinite loop.
   return env.IS_AUTOMATIC_RETRIGGER == '0' && (
-    env.GERRIT_EVENT_TYPE == 'change-merged' ||
-    configuration.getBoolean('change-merged') && configuration.getBoolean('enable-automatic-retrigger', '0')
+    configuration.isChangeMerged() && (commitMessageFlag('enable-automatic-retrigger') as Boolean)
   )
 }
 
@@ -210,40 +218,19 @@ def getSlackChannel() {
   return env.SLACK_CHANNEL_OVERRIDE ?: env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
 
-@groovy.transform.Field final static CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
-
 def getCanvasBuildsRefspec() {
-  def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+  def defaultValue = env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
 
-  if (env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
-    return env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
-  }
-
-  return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
+  return commitMessageFlag('canvas-builds-refspec') as String ?: defaultValue
 }
 
-@groovy.transform.Field final static CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
-  // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
-  if (env.GERRIT_BRANCH.contains('stable/')) {
-    def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+  def defaultBranch = env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
+  def defaultValue = "+refs/heads/$defaultBranch:refs/remotes/origin/$defaultBranch"
 
-    if ((commitMessage =~ CANVAS_LMS_REFSPEC_REGEX).find()) {
-      return configuration.canvasLmsRefspec()
-    }
-
-    return "+refs/heads/$GERRIT_BRANCH:refs/remotes/origin/$GERRIT_BRANCH"
-  }
-
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
+  return commitMessageFlag('canvas-lms-refspec') as String ?: defaultValue
 }
 // =========
-
-library "canvas-builds-library@${getCanvasBuildsRefspec()}"
-loadLocalLibrary('local-lib', 'build/new-jenkins/library')
-
-configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
-protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 
 pipeline {
   agent none
@@ -260,8 +247,7 @@ pipeline {
     BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
-    SKIP_CACHE = configuration.skipCache()
-    RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
+    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
     GERRIT_CHANGE_ID = getChangeId()
 
     // e.g. postgres-12-ruby-2.6
@@ -279,11 +265,9 @@ pipeline {
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
     EXTERNAL_TAG = imageTag.externalTag()
 
-    ALPINE_MIRROR = configuration.alpineMirror()
-    NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    FORCE_CRYSTALBALL = "${configuration.getBoolean('force-crystalball', '0') ? 1 : 0}"
+    FORCE_CRYSTALBALL = "${commitMessageFlag('force-crystalball').asBooleanInteger()}"
 
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
@@ -354,21 +338,21 @@ pipeline {
                 // vote. Work around this by disabling the build start message and setting EMULATE_BUILD_START=1
                 // in the Build Parameters section.
                 // https://issues.jenkins.io/browse/JENKINS-28339
-                if (configuration.getBoolean('emulate-build-start', 'false')) {
-                  gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
+                if (commitMessageFlag("emulate-build-start") as Boolean) {
+                  submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
                 if (configuration.skipCi()) {
                   currentBuild.result = 'NOT_BUILT'
-                  gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')
+                  submitGerritReview('--label Lint-Review=-2', 'Build not executed due to [skip-ci] flag')
                   error '[skip-ci] flag enabled: skipping the build'
                   return
                 } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
-                  gerrit.submitLintReview('-2', 'One or more build flags causes a subset of the build to be run')
+                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes a subset of the build to be run')
                 } else if (setupStage.hasGemOverrides()) {
-                  gerrit.submitLintReview('-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
+                  submitGerritReview('--label Lint-Review=-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
                 } else {
-                  gerrit.submitLintReview('0')
+                  submitGerritReview('--label Lint-Review=0')
                 }
               }
 
@@ -378,7 +362,7 @@ pipeline {
               }
 
               // Ensure that all build flags are compatible.
-              if (configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
+              if (commitMessageFlag('change-merged') as Boolean && configuration.isValueDefault('build-registry-path')) {
                 error 'Manually triggering the change-merged build path must be combined with a custom build-registry-path'
                 return
               }
@@ -534,7 +518,7 @@ pipeline {
                     .obeysAllowStages(false)
                     .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
                     .execute {
-                        gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
+                        submitGerritReview('--label Lint-Review=-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
 
                   extendedStage('Webpack Bundle Size Check')
@@ -571,6 +555,26 @@ pipeline {
                     parallel(stages)
                   }
                 }
+
+                extendedStage('ARM64 Builder')
+                  .hooks(buildSummaryReportHooks.call())
+                  .nodeRequirements(label: 'docker-arm64')
+                  .required(configuration.isChangeMerged())
+                  .queue(rootStages) {
+                    setupStage()
+                    // Rebase is fortunately not needed - since this only runs in post-merge
+                    buildDockerImageStage.patchsetImage('', '-arm64')
+
+                    // Wait for the AMD64 manifest to be available - then augment it with this ARM64 one
+                    sh """#!/bin/bash -ex
+                    while ! docker manifest inspect $PATCHSET_TAG; do
+                      sleep 10
+                    done
+
+                    docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+                    docker manifest push $PATCHSET_TAG
+                    """
+                  }
 
                 extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   def nestedStages = [:]
@@ -620,13 +624,6 @@ pipeline {
 
                 extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   def nestedStages = [:]
-
-                  extendedStage('CDC Schema Check')
-                    .hooks(buildSummaryReportHooks.call())
-                    .required(filesChangedStage.hasMigrationFiles(buildConfig))
-                    .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
-                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
-                    ])
 
                   extendedStage('Contract Tests')
                     .hooks(buildSummaryReportHooks.call())

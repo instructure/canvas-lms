@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`form returns the proper object 1`] = `
+Array [
+  Object {
+    "dataKey": "action",
+    "label": "Action to take:",
+    "options": Array [
+      Array [
+        "nothing",
+        "Leave as is",
+      ],
+      Array [
+        "elem-only",
+        "Change only this heading's level",
+      ],
+      Array [
+        "modify",
+        "Remove heading style",
+      ],
+    ],
+  },
+  Object {
+    "alert": true,
+    "dataKey": "alert",
+    "label": "Additional considerations",
+    "message": "You may need to adjust additional headings to maintain page hierarchy.",
+    "variant": "warning",
+  },
+]
+`;
+
+exports[`link returns the proper link 1`] = `"https://www.w3.org/TR/WCAG20-TECHS/H42.html"`;
+
+exports[`linkText returns the proper link text 1`] = `"Learn more about proper page heading structure"`;
+
+exports[`message returns the proper message 1`] = `"The first heading on a page should be an H2."`;
+
+exports[`why returns the proper why text 1`] = `"Webpages should only have a single H1, which is automatically used by the page's Title. The first heading in your content should be an H2."`;

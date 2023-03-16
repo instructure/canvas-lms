@@ -20,7 +20,8 @@
   "extends": ["plugin:testcafe/recommended"],
   "plugins": ["testcafe"],
   "rules": {
-    "import/order": "off"
+    "import/order": "off",
+    "promise/catch-or-return": ["error", { "allowThen": true }]
   },
   "ignorePatterns": ["scripts/installTranslations.js", "**/translations/**/*.js"],
   "overrides": [
