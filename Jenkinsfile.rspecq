@@ -160,7 +160,7 @@ pipeline {
     REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'test-queue'
-    FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
+    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
     RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)

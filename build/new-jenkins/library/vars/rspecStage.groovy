@@ -34,7 +34,7 @@ def createDistribution(nestedStages) {
   def rspecqEnvVars = baseEnvVars + [
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
     'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
-    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
+    "FORCE_FAILURE=${commitMessageFlag('force-failure-rspec').asBooleanInteger()}",
     "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
     "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
     "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",

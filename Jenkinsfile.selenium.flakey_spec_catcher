@@ -190,7 +190,7 @@ pipeline {
     IS_PLUGIN = isPlugin()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
-    FORCE_FAILURE = configuration.forceFailureFSC()
+    FORCE_FAILURE = commitMessageFlag('force-failure-fsc').asBooleanInteger()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = 'gems/.*/spec/,spec/contracts/,engines/.*/spec/,spec/selenium/performance/'

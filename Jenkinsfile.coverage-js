@@ -98,7 +98,7 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-js.yml'
-    FORCE_FAILURE = configuration.forceFailureJS()
+    FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
 
     KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
     PATCHSET_TAG = getPatchsetTag()

@@ -34,7 +34,7 @@ pipeline {
     COMPOSE_DOCKER_CLI_BUILD = 1
     COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
     DOCKER_BUILDKIT = 1
-    FORCE_FAILURE = configuration.forceFailureJS()
+    FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
     PROGRESS_NO_TRUNC = 1
     SELENIUM_NODE_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-node-chrome:107.0"
     SELENIUM_HUB_IMAGE = "starlord.inscloudgate.net/jenkins/selenium-hub:4.6"

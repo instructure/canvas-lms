@@ -105,7 +105,7 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'coverage'
-    FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
+    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
     RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
