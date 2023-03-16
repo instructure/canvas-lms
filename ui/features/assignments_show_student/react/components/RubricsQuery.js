@@ -39,7 +39,7 @@ export default function RubricsQuery(props) {
       courseID: props.assignment.env.courseId,
       submissionAttempt: props.submission.attempt,
     },
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
     onCompleted: data => {
       const parsedAssessments = data.submission?.rubricAssessmentsConnection?.nodes?.map(
         assessment => transformRubricAssessmentData(assessment)
