@@ -177,7 +177,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          def rspecNodeRequirements = [label: configuration.nodeLabel()]
+          def rspecNodeRequirements = [label: nodeLabel()]
           env.CRYSTALBALL_SPEC = '.'
 
           def postRunnerHandler = [

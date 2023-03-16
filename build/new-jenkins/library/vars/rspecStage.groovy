@@ -56,7 +56,7 @@ def createDistribution(nestedStages) {
   extendedStage('RSpecQ Reporter for Rspec')
     .envVars(rspecqEnvVars)
     .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
-    .nodeRequirements([label: configuration.nodeLabel()])
+    .nodeRequirements([label: nodeLabel()])
     .timeout(15)
     .queue(nestedStages, this.&runReporter)
 
@@ -64,7 +64,7 @@ def createDistribution(nestedStages) {
     extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode() }])
-      .nodeRequirements([label: configuration.nodeLabel()])
+      .nodeRequirements([label: nodeLabel()])
       .timeout(15)
       .queue(nestedStages, this.&runRspecqSuite)
   }

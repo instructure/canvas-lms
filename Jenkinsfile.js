@@ -73,7 +73,7 @@ pipeline {
 
             for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
               String index = i
-              extendedStage("Runner - Jest ${i}").hooks(stageHooks).nodeRequirements(label: configuration.nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+              extendedStage("Runner - Jest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
                 def tests = [:]
 
                 callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
@@ -82,7 +82,7 @@ pipeline {
               }
             }
 
-            extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: configuration.nodeLabel(), podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            extendedStage('Runner - Coffee').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
               def tests = [:]
 
               callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
@@ -90,7 +90,7 @@ pipeline {
               parallel(tests)
             }
 
-            extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: configuration.nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            extendedStage('Runner - Karma').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
               def tests = [:]
 
               callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
@@ -98,7 +98,7 @@ pipeline {
               parallel(tests)
             }
 
-            extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: configuration.nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+            extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
               def tests = [:]
 
               callableWithDelegate(jsStage.queuePackagesDistribution())(tests)
