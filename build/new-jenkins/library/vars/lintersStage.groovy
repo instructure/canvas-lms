@@ -49,7 +49,7 @@ def tearDownNode() {
 def codeStage(stages) {
   { ->
     def codeEnvVars = [
-      "PRIVATE_PLUGINS=${configuration.getString('canvas-lms-private-plugins')}",
+      "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
       "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
     ]
 
@@ -82,7 +82,7 @@ def masterBouncerStage(stages) {
 def bundleStage(stages, buildConfig) {
   { ->
     def bundleEnvVars = [
-      "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+      "PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"
     ]
 
     callableWithDelegate(queueTestStage())(stages,
@@ -97,7 +97,7 @@ def bundleStage(stages, buildConfig) {
 def yarnStage(stages, buildConfig) {
   { ->
     def yarnEnvVars = [
-      "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+      "PLUGINS_LIST=${commitMessageFlag('canvas-lms-plugins') as String}"
     ]
 
     callableWithDelegate(queueTestStage())(stages,
