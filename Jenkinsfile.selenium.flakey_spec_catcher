@@ -48,6 +48,10 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == 'canvas-lms' ? '.' : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
+def getMaxNodes() {
+  return commitMessageFlag('fsc-max-nodes').asType(Integer) ?: 10
+}
+
 def setupNode() {
   sh 'rm -vrf ./tmp'
   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
@@ -197,7 +201,7 @@ pipeline {
     // Assumption: non-selenium tests take 500ms / test
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
     FSC_REPEAT_FACTOR = 10
-    MAX_NODES = configuration.getString('fsc-max-nodes', '10')
+    MAX_NODES = getMaxNodes()
     RSPEC_PROCESSES = 3
     SELENIUM_RATIO = 20
     TESTS_PER_NODE = 200

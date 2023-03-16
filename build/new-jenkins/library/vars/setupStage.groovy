@@ -20,9 +20,13 @@ import groovy.transform.Field
 
 @Field final static OVERRIDABLE_GEMS = ['inst-jobs', 'switchman', 'switchman-inst-jobs']
 
+def getPinnedVersionFlag(name) {
+  return commitMessageFlag("pin-commit-$name") as String
+}
+
 def hasGemOverrides() {
   return OVERRIDABLE_GEMS.any { gem ->
-    return configuration.getString("pin-commit-$gem", "skip") != "skip"
+    return getPinnedVersionFlag(gem)
   }
 }
 
@@ -50,7 +54,7 @@ def call() {
   }
 
   OVERRIDABLE_GEMS.each { gem ->
-    if (configuration.getString("pin-commit-$gem", "skip") != "skip") {
+    if (getPinnedVersionFlag(gem)) {
       pluginsToPull.add([name: gem, version: _getPluginVersion(gem), target: "vendor/$gem"])
     }
   }
@@ -79,7 +83,8 @@ def _getCrystalballMap() {
 
 def _getPluginVersion(plugin) {
   if (env.GERRIT_BRANCH.contains('stable/')) {
-    return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
+    return commitMessageFlag("pin-commit-$plugin") as String ?: env.GERRIT_BRANCH
   }
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", 'master')
+
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : (commitMessageFlag("pin-commit-$plugin") as String ?: 'master')
 }

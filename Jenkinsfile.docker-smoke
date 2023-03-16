@@ -68,11 +68,11 @@ EOF
             stage('Copy App Directory') {
               sh """#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.getString('ruby')})"
+                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.ruby()})"
                  docker cp ./ "\$CONTAINER:/usr/src/app/"
                  docker start \$CONTAINER
                  docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
-                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.getString('ruby')}"
+                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.ruby()}"
                """
             }
 
