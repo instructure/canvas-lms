@@ -342,7 +342,7 @@ pipeline {
                   submitGerritReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
-                if (configuration.skipCi()) {
+                if (commitMessageFlag("skip-ci") as Boolean) {
                   currentBuild.result = 'NOT_BUILT'
                   submitGerritReview('--label Lint-Review=-2', 'Build not executed due to [skip-ci] flag')
                   error '[skip-ci] flag enabled: skipping the build'
@@ -535,7 +535,7 @@ pipeline {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
-                    def shouldRunJS = configuration.isChangeMerged() ||
+                    def shouldRunJS = configuration.isChangeMerged() || commitMessageFlag('force-failure-js') as Boolean ||
                       (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)))
 
                     extendedStage(JS_BUILD_IMAGE_STAGE)
@@ -640,7 +640,7 @@ pipeline {
 
                   extendedStage('Flakey Spec Catcher')
                     .hooks(buildSummaryReportHooks.call())
-                    .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
+                    .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || commitMessageFlag('force-failure-fsc') as Boolean)
                     .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
