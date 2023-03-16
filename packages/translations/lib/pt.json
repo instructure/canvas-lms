@@ -11,17 +11,8 @@
     "accessibility_checker_b3af1f6c": {
         "message": "Verificador de acessibilidade"
     },
-    "action_to_take_b626a99a": {
-        "message": "Ação a tomar:"
-    },
     "add_8523c19b": {
         "message": "Adicionar"
-    },
-    "add_a_caption_2a915239": {
-        "message": "Adicionar uma legenda"
-    },
-    "add_alt_text_for_the_image_48cd88aa": {
-        "message": "Adicionar texto alternativo para a imagem"
     },
     "add_another_f4e50d57": {
         "message": "Adicionar outro"
@@ -40,9 +31,6 @@
     },
     "address_3159962f": {
         "message": "Morada:"
-    },
-    "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
-        "message": "Ligações adjacentes com o mesmo URL devem ser uma única ligação."
     },
     "afrikaans_da0fe6ee": {
         "message": "Africano"
@@ -73,9 +61,6 @@
     },
     "alphabetical_55b5b4e0": {
         "message": "Alfabético"
-    },
-    "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
-        "message": "O texto do atributo Alt não deve conter mais de 120 caracteres."
     },
     "alt_text_611fb322": {
         "message": "Texto Alt"
@@ -287,21 +272,6 @@
     "centered_horizontal_dots_451c5815": {
         "message": "Pontos Horizontais Centrados"
     },
-    "change_alt_text_92654906": {
-        "message": "Alterar texto alternativo"
-    },
-    "change_heading_tag_to_paragraph_a61e3113": {
-        "message": "Alterar a etiqueta de título para o parágrafo"
-    },
-    "change_text_color_1aecb912": {
-        "message": "Mudar a cor do texto"
-    },
-    "check_accessibility_3c78211c": {
-        "message": "Verificar Acessibilidade"
-    },
-    "checking_for_accessibility_issues_fac18c6d": {
-        "message": "Verificar problemas de acessibilidade"
-    },
     "chi_54a32644": {
         "message": "Chi"
     },
@@ -353,9 +323,6 @@
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Feche um menu ou diálogo. Também retorna para a área do editor"
     },
-    "close_accessibility_checker_29d1c51e": {
-        "message": "Fechar Verificador de acessibilidade"
-    },
     "close_d634289d": {
         "message": "Fechar"
     },
@@ -382,12 +349,6 @@
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Seletor de Cores ({ colorName } selecionado)"
-    },
-    "column_e1ae5c64": {
-        "message": "Coluna"
-    },
-    "column_group_1c062368": {
-        "message": "Grupo de coluna"
     },
     "complex_numbers_a543d004": {
         "message": "Números complexos"
@@ -523,9 +484,6 @@
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Ícone decorativo"
-    },
-    "decorative_image_fde98579": {
-        "message": "Imagem decorativa"
     },
     "decorative_type_upper_f2c95e3": {
         "message": "Decorativo { TYPE_UPPER }"
@@ -697,9 +655,6 @@
     },
     "editor_statusbar_26ac81fc": {
         "message": "Barra de estado do editor"
-    },
-    "element_starting_with_start_91bf4c3b": {
-        "message": "Elemento a começar com { start }"
     },
     "embed_828fac4a": {
         "message": "Incluído"
@@ -896,9 +851,6 @@
     "finnish_4df2923d": {
         "message": "Finlandês"
     },
-    "fix_heading_hierarchy_f60884c4": {
-        "message": "Fixar hierarquia"
-    },
     "flat_music_76d5a5c3": {
         "message": "Plano (Música)"
     },
@@ -913,9 +865,6 @@
     },
     "format_4247a9c5": {
         "message": "Formato"
-    },
-    "format_as_a_list_142210c3": {
-        "message": "Formatar como uma lista"
     },
     "formatting_5b143aa8": {
         "message": "Formatação"
@@ -1028,15 +977,6 @@
     "hat_ea321e35": {
         "message": "Chapéu"
     },
-    "header_column_f27433cb": {
-        "message": "Coluna de cabeçalho"
-    },
-    "header_row_and_column_ec5b9ec": {
-        "message": "Cabeçalho linha e coluna"
-    },
-    "header_row_f33eb169": {
-        "message": "Linha de cabeçalho"
-    },
     "heading_2_5b84eed2": {
         "message": "Cabeçalho 2"
     },
@@ -1045,15 +985,6 @@
     },
     "heading_4_b2e74be7": {
         "message": "Cabeçalho 4"
-    },
-    "heading_levels_should_not_be_skipped_3947c0e0": {
-        "message": "Os níveis de título não devem ser ignorados."
-    },
-    "heading_starting_with_start_42a3e7f9": {
-        "message": "Título começando com { start }"
-    },
-    "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
-        "message": "Os títulos não devem conter mais de 120 caracteres."
     },
     "health_icon_8d292eb5": {
         "message": "Ícone de saúde"
@@ -1136,9 +1067,6 @@
     "image_c1c98202": {
         "message": "imagem"
     },
-    "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
-        "message": "Os nomes dos arquivos de imagem não devem ser usados ​​como o atributo alt descrevendo o conteúdo da imagem."
-    },
     "image_options_5412d02c": {
         "message": "Opções de imagem"
     },
@@ -1148,14 +1076,8 @@
     "image_to_crop_3a34487d": {
         "message": "Imagem a cortar"
     },
-    "image_with_filename_file_aacd7180": {
-        "message": "Imagem com nome de ficheiro { file }"
-    },
     "images_7ce26570": {
         "message": "Imagens"
-    },
-    "images_should_include_an_alt_attribute_describing__b86d6a86": {
-        "message": "As imagens devem incluir um atributo alt descrevendo o conteúdo da imagem."
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "Porção imaginária (de número complexo)"
@@ -1208,9 +1130,6 @@
     "irish_567e109f": {
         "message": "Irlandês"
     },
-    "issue_num_total_f94536cf": {
-        "message": "Questão { num }/{ total }"
-    },
     "italian_bd3c792d": {
         "message": "Italiano"
     },
@@ -1244,9 +1163,6 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Atalhos de teclado"
     },
-    "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
-        "message": "Os teclados navegam para ligações usando a tecla Tab. Dois links adjacentes que direcionam para o mesmo destino podem confundir os utilizadores de teclado."
-    },
     "korean_da812d9": {
         "message": "Coreano"
     },
@@ -1270,36 +1186,6 @@
     },
     "latvian_2bbb6aab": {
         "message": "Letão"
-    },
-    "learn_more_about_adjacent_links_2cb9762c": {
-        "message": "Saiba mais sobre ligações adjacentes"
-    },
-    "learn_more_about_color_contrast_c019dfb9": {
-        "message": "Saiba mais sobre o contraste de cores"
-    },
-    "learn_more_about_organizing_page_headings_8a7caa2e": {
-        "message": "Saiba mais sobre como organizar títulos de página"
-    },
-    "learn_more_about_table_headers_5f5ee13": {
-        "message": "Saiba mais sobre cabeçalhos de tabelas"
-    },
-    "learn_more_about_using_alt_text_for_images_5698df9a": {
-        "message": "Saiba mais sobre como usar o texto alternativo para imagens"
-    },
-    "learn_more_about_using_captions_with_tables_36fe496f": {
-        "message": "Saiba mais sobre como usar legendas com tabelas"
-    },
-    "learn_more_about_using_filenames_as_alt_text_264286af": {
-        "message": "Saiba mais sobre como usar nomes de ficheiros como texto alternativo"
-    },
-    "learn_more_about_using_lists_4e6eb860": {
-        "message": "Saiba mais sobre como usar listas"
-    },
-    "learn_more_about_using_scope_attributes_with_table_20df49aa": {
-        "message": "Saiba mais sobre como usar atributos de escopo com tabelas"
-    },
-    "leave_as_is_4facfe55": {
-        "message": "Deixe como está"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Suporte de ângulo esquerdo"
@@ -1352,17 +1238,11 @@
     "link_options_a16b758b": {
         "message": "Opções de Ligação"
     },
-    "link_with_text_starting_with_start_b3fcbe71": {
-        "message": "Ligação com texto a começar com { start }"
-    },
     "links_14b70841": {
         "message": "Links"
     },
     "links_to_an_external_site_de74145d": {
         "message": "Ligações para um sitio externo"
-    },
-    "lists_should_be_formatted_as_lists_f862de8d": {
-        "message": "As listas devem ser formatadas como listas."
     },
     "lithuanian_5adcbe24": {
         "message": "Lituano"
@@ -1472,9 +1352,6 @@
     "medium_5a8e9ead": {
         "message": "Médio"
     },
-    "merge_links_2478df96": {
-        "message": "Criar ligações"
-    },
     "mic_a7f3d311": {
         "message": "Mic"
     },
@@ -1574,14 +1451,8 @@
     "new_opportunities_7d349c4d": {
         "message": "Novas oportunidades"
     },
-    "next_40e12421": {
-        "message": "Próximo"
-    },
     "next_month_749b1778": {
         "message": "Próximo mês"
-    },
-    "no_accessibility_issues_were_detected_f8d3c875": {
-        "message": "Não foram detectados problemas de acessibilidade."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "Nenhuma alteração a guardar."
@@ -1597,9 +1468,6 @@
     },
     "no_grade_3b4d7f3e": {
         "message": "Sem classificação"
-    },
-    "no_headers_9bc7dc7f": {
-        "message": "Sem cabeçalho"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Não está disponível uma pré-visualização para este ficheiro."
@@ -1739,9 +1607,6 @@
     "paragraph_5e5ad8eb": {
         "message": "Parágrafo"
     },
-    "paragraph_starting_with_start_a59923f8": {
-        "message": "Parágrafo começando com { start }"
-    },
     "parallel_d55d6e38": {
         "message": "Paralelo"
     },
@@ -1847,9 +1712,6 @@
     "preformatted_d0670862": {
         "message": "Pré-formatado"
     },
-    "prev_f82cbc48": {
-        "message": "Voltar"
-    },
     "preview_53003fd2": {
         "message": "Visualização"
     },
@@ -1937,9 +1799,6 @@
     "reminder_date_4564d12d": {
         "message": "Lembrete: { date }"
     },
-    "remove_heading_style_5fdc8855": {
-        "message": "Remova estilo de cabeçalho"
-    },
     "replace_e61834a7": {
         "message": "Substituir"
     },
@@ -2012,12 +1871,6 @@
     "rotation_9699c538": {
         "message": "Rotação"
     },
-    "row_fc0944a7": {
-        "message": "Linha"
-    },
-    "row_group_979f5528": {
-        "message": "Grupo de linhas"
-    },
     "russian_1e3e197": {
         "message": "Russo"
     },
@@ -2035,24 +1888,6 @@
     },
     "science_8d92214a": {
         "message": "Ciência"
-    },
-    "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
-        "message": "Os leitores de ecrã não podem determinar o que é exibido numa imagem sem texto alternativo, e os nomes dos ficheiros geralmente são sem sentido de sequências de números e letras que não descrevem o contexto ou o significado."
-    },
-    "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
-        "message": "Os leitores de ecrã não podem determinar o que é exibido numa imagem sem texto alternativo, que descreve o conteúdo e o significado da imagem. O texto alternativo deve ser simples e conciso."
-    },
-    "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
-        "message": "Os leitores de ecrã não podem determinar o que é exibido numa imagem sem texto alternativo, que descreve o conteúdo e o significado da imagem."
-    },
-    "screen_readers_cannot_interpret_tables_without_the_bd861652": {
-        "message": "Os leitores de ecrã não podem interpretar tabelas sem a estrutura adequada. Os cabeçalhos de tabela fornecem escopo de direção e conteúdo."
-    },
-    "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
-        "message": "Os leitores de ecrã não podem interpretar tabelas sem a estrutura adequada. As legendas da tabela descrevem o contexto e a compreensão geral da tabela."
-    },
-    "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
-        "message": "Os leitores de ecrã não podem interpretar tabelas sem a estrutura adequada. Cabeçalhos de tabela fornecem orientação e visão geral do conteúdo."
     },
     "script_l_42a7b254": {
         "message": "Roteiro L"
@@ -2084,14 +1919,8 @@
     "serbian_7187f1f2": {
         "message": "Sérvio"
     },
-    "set_header_scope_8c548f40": {
-        "message": "Definir o alcance do cabeçalho"
-    },
     "set_minus_b46e9b88": {
         "message": "Definir Menos"
-    },
-    "set_table_header_cfab13a0": {
-        "message": "Definir cabeçalho da tabela"
     },
     "sharp_music_ab956814": {
         "message": "Afiada (Música)"
@@ -2107,12 +1936,6 @@
     },
     "show_my_grades_ebd08684": {
         "message": "Mostrar minhas classificações"
-    },
-    "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
-        "message": "Utilizadores vistos navegam nas páginas da Web rapidamente, procurando títulos em grande ou em negrito. Os utilizadores do leitor de ecrã dependem de cabeçalhos para a compreensão contextual. Os cabeçalhos devem usar a estrutura adequada."
-    },
-    "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
-        "message": "Utilizadores vistos navegam nas páginas da Web rapidamente, procurando títulos em grande ou em negrito. Os utilizadores do leitor de ecrã dependem de cabeçalhos para a compreensão contextual. Os cabeçalhos devem ser concisos dentro da estrutura adequada."
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -2300,21 +2123,6 @@
     "tab_arrows_4cf5abfc": {
         "message": "TAB/Setas"
     },
-    "table_header_starting_with_start_ffcabba6": {
-        "message": "Cabeçalho da tabela começando com { start }"
-    },
-    "table_starting_with_start_e7232848": {
-        "message": "Tabela começando com { start }"
-    },
-    "tables_headers_should_specify_scope_5abf3a8e": {
-        "message": "Os cabeçalhos das tabelas devem especificar o escopo."
-    },
-    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
-        "message": "As tabelas devem incluir uma legenda descrevendo o conteúdo da tabela."
-    },
-    "tables_should_include_at_least_one_header_48779eac": {
-        "message": "As tabelas devem incluir pelo menos um cabeçalho."
-    },
     "tagalog_74906db7": {
         "message": "Tagalo"
     },
@@ -2336,12 +2144,6 @@
     "text_color_acf75eb6": {
         "message": "Cor do texto"
     },
-    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
-        "message": "O texto é difícil de ler sem contraste suficiente entre o texto e o fundo, especialmente para aqueles com baixa visão."
-    },
-    "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
-        "message": "O texto maior que 18pt (ou em negrito 14pt) deve exibir uma relação mínima de contraste de 3:1."
-    },
     "text_optional_384f94f7": {
         "message": "Texto (opcional)"
     },
@@ -2350,9 +2152,6 @@
     },
     "text_size_887c2f6": {
         "message": "Tamanho do texto"
-    },
-    "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
-        "message": "O texto menor que 18pt (ou em negrito 14pt) deve exibir uma relação de contraste mínima de 4.5:1."
     },
     "thai_8f9bc548": {
         "message": "Tailandês"
@@ -2699,14 +2498,8 @@
     "welsh_42ab94b1": {
         "message": "Galês"
     },
-    "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
-        "message": "Quando a marcação é usada para formatar itens visualmente como uma lista, mas não indica o relacionamento da lista, os utilizadores podem ter dificuldade em navegar pelas informações."
-    },
     "white_87fa64fd": {
         "message": "Branco"
-    },
-    "why_523b3d8c": {
-        "message": "Por quê"
     },
     "width_492fec76": {
         "message": "Largura"
