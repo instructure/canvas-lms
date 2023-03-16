@@ -341,7 +341,10 @@ module Api::V1::Submission
     end
 
     if attempt.submission_type == "basic_lti_launch"
-      hash["external_tool_url"] = attempt.external_tool_url
+      unless params[:exclude_response_fields]&.include?("external_tool_url")
+        hash["external_tool_url"] = attempt.external_tool_url
+      end
+
       hash["url"] =
         retrieve_course_external_tools_url(
           context.id,
