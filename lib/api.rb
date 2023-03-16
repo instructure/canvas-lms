@@ -23,9 +23,19 @@ module Api
 
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
-  def api_find(collection, id, account: nil)
+  # if `writable` is true and a shadow record is found, the corresponding primary record will be returned
+  # otherwise a read-only shadow record will be returned, to avoid a silent failure when attempting to save it
+  def api_find(collection, id, account: nil, writable: infer_writable_from_request_method)
     result = api_find_all(collection, [id], account: account).first
     raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'") unless result
+
+    if result.shadow_record?
+      if writable
+        result.reload
+      else
+        result.readonly!
+      end
+    end
 
     result
   end
@@ -728,5 +738,11 @@ module Api
     end
 
     url
+  end
+
+  private
+
+  def infer_writable_from_request_method
+    respond_to?(:request) && %w[PUT POST PATCH DELETE].include?(request&.method)
   end
 end
