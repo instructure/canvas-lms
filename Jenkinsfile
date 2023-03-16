@@ -45,7 +45,7 @@ commitMessageFlag.setEnabled(env.GERRIT_EVENT_TYPE != 'change-merged')
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
 protectedNode.setReportUnhandledExceptions(!env.JOB_NAME.endsWith('Jenkinsfile'))
 

@@ -40,7 +40,7 @@ def call() {
     sh "rm -vrf ${env.LOCAL_WORKDIR}@tmp"
   }
 
-  gems = configuration.plugins()
+  gems = (commitMessageFlag('canvas-lms-plugins') as String).split(' ')
   echo "Plugin list: ${gems}"
   def pluginsToPull = []
   gems.each { gem ->
