@@ -275,6 +275,46 @@ describe('RceLti11ContentItem File Item', () => {
   })
 })
 
+describe('Studio LTI content items', () => {
+  describe('when the rce_show_studio_media_options flag is off', () => {
+    it('does not decorate studio iframes with appropriate attributes', () => {
+      const contentItem = RceLti11ContentItem.fromJSON(
+        exampleLti11ContentItems.lti_iframe_with_custom_json,
+        createDeepMockProxy<ExternalToolsEnv>(
+          {},
+          {
+            studioMediaOptionsEnabled: false,
+          }
+        )
+      )
+
+      equalHtmlIgnoringAttributeOrder(
+        contentItem.codePayload,
+        `<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+      )
+    })
+  })
+
+  describe('when the rce_show_studio_media_options flag is on', () => {
+    it('decorates studio iframes with appropriate attributes', () => {
+      const contentItem = RceLti11ContentItem.fromJSON(
+        exampleLti11ContentItems.lti_iframe_with_custom_json,
+        createDeepMockProxy<ExternalToolsEnv>(
+          {},
+          {
+            studioMediaOptionsEnabled: true,
+          }
+        )
+      )
+
+      equalHtmlIgnoringAttributeOrder(
+        contentItem.codePayload,
+        `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="false" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+      )
+    })
+  })
+})
+
 function normalizeAttributeOrder(html: string) {
   const container = document.createElement('div')
   container.innerHTML = html
