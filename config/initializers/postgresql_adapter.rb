@@ -23,6 +23,32 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  def configure_connection
+    super
+
+    @connection.set_notice_receiver do |result|
+      severity = result.result_error_field(PG::PG_DIAG_SEVERITY_NONLOCALIZED)
+      rails_severity = case severity
+                       when "WARNING", "NOTICE"
+                         :warn
+                       when "DEBUG"
+                         :debug
+                       when "INFO", "LOG"
+                         :info
+                       end
+      logger.send(rails_severity, "PG notice: " + result.result_error_message.strip)
+
+      primary_message = result.result_error_field(PG::PG_DIAG_MESSAGE_PRIMARY)
+      detail_message = result.result_error_field(PG::PG_DIAG_MESSAGE_DETAIL)
+      formatted_message = if detail_message
+                            primary_message + "\n" + detail_message
+                          else
+                            primary_message
+                          end
+      Sentry.capture_message(formatted_message, level: rails_severity)
+    end
+  end
+
   def receive_timeout_wrapper(&block)
     return yield unless @config[:receive_timeout]
 
