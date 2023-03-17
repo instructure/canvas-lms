@@ -557,6 +557,16 @@ RSpec.configure do |config|
     Canvas::Redis.redis_used = false
   end
 
+  if Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
+    config.before do
+      Prosopite.scan
+    end
+
+    config.after do
+      Prosopite.finish
+    end
+  end
+
   # ****************************************************************
   # There used to be a lot of factory methods here!
   # In an effort to move us toward a nicer test factory solution,
