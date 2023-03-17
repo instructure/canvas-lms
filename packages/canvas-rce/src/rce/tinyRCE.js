@@ -56,7 +56,7 @@ import './plugins/instructure_wordcount/plugin'
 import './plugins/instructure_paste/plugin'
 import './plugins/instructure_fullscreen/plugin'
 
-import '../tinymce-a11y-checker/plugin'
+import './plugins/tinymce-a11y-checker/plugin'
 
 // prevent tinymce from loading language scripts with explicit
 // language_url of 'none'
