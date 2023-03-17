@@ -47,7 +47,7 @@ class AuthenticationProvider < ActiveRecord::Base
     case type_name
     when "cas", "ldap", "saml"
       const_get(type_name.upcase)
-    when "apple", "clever", "facebook", "google", "microsoft", "saml_idp_discovery", "twitter"
+    when "apple", "clever", "facebook", "google", "microsoft", "saml_idp_discovery", "twitter", "alphacamp"
       const_get(type_name.classify)
     when "canvas"
       Canvas
@@ -111,7 +111,7 @@ class AuthenticationProvider < ActiveRecord::Base
   acts_as_list scope: { account: self, workflow_state: [nil, "active"] }
 
   def self.valid_auth_types
-    %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
+    %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter alphacamp].freeze
   end
 
   validates :auth_type,
