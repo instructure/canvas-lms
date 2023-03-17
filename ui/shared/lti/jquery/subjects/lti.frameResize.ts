@@ -26,7 +26,7 @@ const frameResize: LtiMessageHandler<{height: number | string; token: string}> =
 }) => {
   const toolResizer = new ToolLaunchResizer()
   let height: number | string = message.height as number | string
-  if (height <= 0) height = 1
+  if (Number(height) <= 0) height = 1
 
   const container = toolResizer
     .tool_content_wrapper(message.token || event.origin)
