@@ -808,7 +808,9 @@ CanvasRails::Application.routes.draw do
   get "login/openid_connect" => "login/openid_connect#new"
   get "login/openid_connect/:id" => "login/openid_connect#new", :as => :openid_connect_login
   get "login/twitter" => "login/twitter#new", :as => :twitter_login
+
   get "login/alphacamp" => "login/alphacamp#new", :as => :alphacamp_login
+  get "login/alphacamp_callback" => "login/alphacamp#sso_login"
 
   get "login/otp" => "login/otp#new", :as => :otp_login
   post "login/otp/sms" => "login/otp#send_via_sms", :as => :send_otp_via_sms

@@ -27,6 +27,8 @@ class HostUrlContainer
 end
 
 environment_configuration(defined?(config) && config) do |config|
+  config.hosts << "ac-canvas.local.aihao.tw"
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
