@@ -281,17 +281,6 @@ class RCEWrapper extends React.Component {
 
     this.handleContentTrayClosing = this.handleContentTrayClosing.bind(this)
 
-    this.a11yCheckerReady = import('../tinymce-a11y-checker/plugin')
-      .then(a11yChecker => {
-        const locale = this.language === 'zh-Hant' ? 'zh-HK' : this.language
-        a11yChecker.setLocale(locale)
-        this.checkAccessibility()
-      })
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.error('Failed initializing a11y checker', err)
-      })
-
     this.resizeObserver = new ResizeObserver(_entries => {
       this._handleFullscreenResize()
     })
@@ -1099,6 +1088,8 @@ class RCEWrapper extends React.Component {
 
     this._setupSelectionSaving(editor)
 
+    this.checkAccessibility()
+
     this.props.onInitted?.(editor)
   }
 
@@ -1424,20 +1415,17 @@ class RCEWrapper extends React.Component {
   }
 
   onA11yChecker = () => {
-    // eslint-disable-next-line promise/catch-or-return
-    this.a11yCheckerReady.then(() => {
-      const editor = this.mceInstance()
-      editor.execCommand(
-        'openAccessibilityChecker',
-        false,
-        {
-          mountNode: instuiPopupMountNode,
-        },
-        {
-          skip_focus: true,
-        }
-      )
-    })
+    const editor = this.mceInstance()
+    editor.execCommand(
+      'openAccessibilityChecker',
+      false,
+      {
+        mountNode: instuiPopupMountNode,
+      },
+      {
+        skip_focus: true,
+      }
+    )
   }
 
   checkAccessibility = () => {
@@ -1521,6 +1509,7 @@ class RCEWrapper extends React.Component {
           !isOnCanvasDomain || rceFeatures.rce_new_external_tool_dialog_in_canvas
             ? 'instructure_rce_external_tools'
             : 'instructure_external_tools',
+          'a11y_checker',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
