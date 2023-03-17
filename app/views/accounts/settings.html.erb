@@ -292,7 +292,7 @@
                   <% end %>
                 <% end %>
 
-                <% unless !@account.feature_enabled?(:restrict_quantitative_data) %>
+                <% unless !@account.root_account.feature_enabled?(:restrict_quantitative_data) %>
                   <%= settings.fields_for :restrict_quantitative_data do |r| %>
                     <% hash = @account.restrict_quantitative_data %>
                     <% disabled = hash[:locked] && hash[:inherited] %>
