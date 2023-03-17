@@ -71,7 +71,7 @@ class GuardExcessiveUpdates < ActiveRecord::Migration[7.0]
 
     ::ActiveRecord::InternalMetadata[:guard_dangerous_changes_installed] = "true"
 
-    ActiveRecord::Base.connection.tables.each do |table|
+    ActiveRecord::Base.connection.tables.grep_v(/^_/).each do |table|
       add_guard_excessive_updates(table)
     end
   end
