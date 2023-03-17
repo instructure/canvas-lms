@@ -23,6 +23,13 @@ import {instUiIconsArray} from '../../../util/instui-icon-helper'
 
 import {IconLtiSolid} from '@instructure/ui-icons/es/svg'
 
+export interface ExternalToolMenuItem {
+  type: 'menuitem'
+  text: string
+  icon?: string
+  onAction: () => void
+}
+
 /**
  * Helper class for the connection between an external tool registration and a particular TinyMCE instance.
  */
@@ -194,4 +201,17 @@ export function addMruToolId(toolId: string, env: ExternalToolsEnv): string[] {
   }
 
   return initialMruToolIds
+}
+
+export function buildToolMenuItems(
+  availableTools: RceToolWrapper[],
+  viewAllItem: ExternalToolMenuItem
+): ExternalToolMenuItem[] {
+  return [
+    ...availableTools
+      .filter(it => it.isMruTool)
+      .map(it => it.asMenuItem())
+      .sort((a, b) => a.text.localeCompare(b.text)),
+    viewAllItem,
+  ]
 }
