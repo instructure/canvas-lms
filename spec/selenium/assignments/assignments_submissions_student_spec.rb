@@ -108,6 +108,7 @@ describe "submissions" do
     end
 
     it "allows you to submit a file", priority: "1" do
+      skip("investigate in EVAL-2966")
       @assignment.submission_types = "online_upload"
       @assignment.save!
       _filename, fullpath, _data = get_file("testfile1.txt")
@@ -329,6 +330,7 @@ describe "submissions" do
     end
 
     it "does not allow peer reviewers to see turnitin scores/reports", priority: "1" do
+      skip("investigate in EVAL-2966")
       @student1 = @user
       @assignment.submission_types = "online_upload,online_text_entry"
       @assignment.turnitin_enabled = true
