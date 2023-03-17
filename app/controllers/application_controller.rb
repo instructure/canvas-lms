@@ -47,6 +47,17 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
+  if !Rails.env.production? && Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
+    around_action :n_plus_one_detection
+
+    def n_plus_one_detection
+      Prosopite.scan
+      yield
+    ensure
+      Prosopite.finish
+    end
+  end
+
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
   skip_before_action :activate_authlogic
