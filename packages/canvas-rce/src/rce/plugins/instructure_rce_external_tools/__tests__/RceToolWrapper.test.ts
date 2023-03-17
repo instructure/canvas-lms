@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {addMruToolId, RceToolWrapper} from '../RceToolWrapper'
+import {addMruToolId, buildToolMenuItems, RceToolWrapper} from '../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {IconLtiLine, IconLtiSolid} from '@instructure/ui-icons/es/svg'
@@ -48,7 +48,7 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: expect.stringContaining(button.icon_url),
-        }),
+        })
       )
     })
 
@@ -63,7 +63,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon-lti',
           },
-          [],
+          []
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -79,7 +79,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'icon_lti',
           },
-          [],
+          []
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -95,7 +95,7 @@ describe('RceExternalToolHelper', () => {
             favorite: true,
             canvas_icon_class: 'lti',
           },
-          [],
+          []
         )
         expect(fakeEditor.ui.registry.addIcon).toHaveBeenCalledWith('lti_tool_b0', IconLtiLine.src)
         expect(result.iconId).toEqual('lti_tool_b0')
@@ -133,13 +133,13 @@ describe('RceExternalToolHelper', () => {
           description: button.description,
           title: button.name,
           image: button.icon_url,
-        }),
+        })
       )
 
       expect(result).toEqual(
         expect.not.objectContaining({
           icon: expect.anything(),
-        }),
+        })
       )
     })
 
@@ -150,7 +150,7 @@ describe('RceExternalToolHelper', () => {
           name: 'SomeName',
           id: '_SomeId',
         },
-        [],
+        []
       )
       expect(config.title).toEqual('SomeName')
     })
@@ -164,7 +164,7 @@ describe('RceExternalToolHelper', () => {
           icon_url: 'example.com',
           canvas_icon_class: 'some_icon',
         },
-        [],
+        []
       )
       expect(config.iconId).toEqual('lti_tool__SomeId')
       expect(config.image).toEqual('example.com')
@@ -181,8 +181,8 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12'],
-        ).find(it => it.isMruTool)?.id,
+          ['12']
+        ).find(it => it.isMruTool)?.id
       ).toBe('12')
 
       expect(
@@ -195,8 +195,8 @@ describe('RceExternalToolHelper', () => {
               icon_url: 'example.com',
             },
           ],
-          ['12'],
-        ).find(it => it.isMruTool)?.id,
+          ['12']
+        ).find(it => it.isMruTool)?.id
       ).toBe('12')
     })
   })
@@ -258,6 +258,49 @@ describe('RceExternalToolHelper', () => {
       } finally {
         setItemMock.mockRestore()
       }
+    })
+  })
+  describe('buildToolMenuItems', () => {
+    const fakeEditor = createDeepMockProxy<ExternalToolsEditor>()
+    const availableTools: RceToolWrapper[] = []
+    beforeEach(() => {
+      availableTools.splice(
+        0,
+        0,
+        new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            id: '1',
+            name: 'BBB tool',
+            description: 'this is tool 1',
+            favorite: true,
+            icon_url: '/path/to/cool_icon',
+          },
+          ['1', '2']
+        ),
+        new RceToolWrapper(
+          externalToolsEnvFor(fakeEditor),
+          {
+            id: '2',
+            name: 'AAA tool',
+            description: 'this is tool 2',
+            favorite: false,
+            icon_url: '/path/to/cool_icon',
+          },
+          ['1', '2']
+        )
+      )
+    })
+    it('creates menu items in alpha order', () => {
+      const result = buildToolMenuItems(availableTools, {
+        type: 'menuitem',
+        text: 'view all',
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onAction: () => {},
+      })
+      expect(result[0].text).toEqual('AAA tool')
+      expect(result[1].text).toEqual('BBB tool')
+      expect(result[2].text).toEqual('view all')
     })
   })
 })
