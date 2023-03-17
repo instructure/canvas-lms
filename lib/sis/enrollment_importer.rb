@@ -341,6 +341,13 @@ module SIS
             @roll_back_data << data if data
           else
             @enrollments_to_update_sis_batch_ids << enrollment.id
+            # Make sure linked observer enrollments are added to be touched with sis_batch_id
+            linked_enrl = Enrollment.where.not(sis_batch_id: nil)
+                              .where(
+                                associated_user_id: enrollment.user_id,
+                                course_section_id: enrollment.course_section_id)
+                              .shard(Shard.shard_for(enrollment.course_id)).pluck(:id)
+            @enrollments_to_update_sis_batch_ids.push(*linked_enrl)
           end
           @success_count += 1
         end
