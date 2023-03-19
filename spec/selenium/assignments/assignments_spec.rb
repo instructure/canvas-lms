@@ -127,6 +127,19 @@ describe "assignments" do
       end
     end
 
+    it "shows speed grader link when published" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container")).to be_present
+    end
+
+    it "hides speed grader link when unpublished" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      @assignment.unpublish
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container").attribute("class")).to include("hidden")
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days

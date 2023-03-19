@@ -418,6 +418,8 @@ class AssignmentsController < ApplicationController
         user_has_google_drive
 
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
+        @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
+
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
