@@ -28,7 +28,7 @@ export const publishCourse = ({courseId}) => {
       course: {event: 'offer'},
     })
     .then(() => {
-      window.location.reload()
+      window.location.search += 'for_reload=1'
     })
     .catch(e => {
       if (e.response.status === 401 && e.response.data.status === 'unverified') {
