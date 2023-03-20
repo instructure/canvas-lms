@@ -20,7 +20,13 @@ import {SetState, GetState} from 'zustand'
 import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {Filter, FilterPreset, PartialFilterPreset} from '../gradebook.d'
+import type {
+  Filter,
+  FilterPreset,
+  GradebookFilterApiResponse,
+  PartialFilterPreset,
+  SubmissionFilterValue,
+} from '../gradebook.d'
 import {
   compareFilterSetByUpdatedDate,
   deserializeFilter,
@@ -62,7 +68,7 @@ export type InitialColumnFilterSettings = {
   assignment_group_id: null | string
   context_module_id: null | string
   grading_period_id: null | string
-  submissions: null | 'has-submissions' | 'has-ungraded-submissions'
+  submissions: null | SubmissionFilterValue
   start_date: null | string
   end_date: null | string
 }
@@ -143,7 +149,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (
-      ['has-ungraded-submissions', 'has-submissions'].includes(
+      ['has-ungraded-submissions', 'has-submissions', 'has-no-submissions'].includes(
         initialColumnFilterSettings.submissions || ''
       )
     ) {
@@ -213,7 +219,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     set({isFiltersLoading: true})
     const path = `/api/v1/courses/${get().courseId}/gradebook_filters`
     return doFetchApi({path})
-      .then(response => {
+      .then((response: {json: GradebookFilterApiResponse[]}) => {
         set({
           filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
           isFiltersLoading: false,
@@ -310,7 +316,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     })
 
     return GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
-      .then(response => {
+      .then((response: {json: GradebookFilterApiResponse}) => {
         const newFilter = deserializeFilter(response.json)
         set({
           filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),

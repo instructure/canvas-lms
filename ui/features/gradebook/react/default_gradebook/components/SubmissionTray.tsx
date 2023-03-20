@@ -52,7 +52,7 @@ import {
   CamelizedSubmission,
   GradeEntryMode,
   GradeResult,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 
 import {Link} from '@instructure/ui-link'
 

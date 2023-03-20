@@ -20,7 +20,6 @@ import React, {Component} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
 import type {PendingGradeInfo} from '../gradebook.d'
 import type {
   CamelizedAssignment,
@@ -40,22 +39,6 @@ const I18n = useI18nScope('gradebook')
 type Message = {
   text: string
   type: 'error' | 'hint'
-}
-
-type Props = {
-  assignment: CamelizedAssignment
-  disabled: boolean
-  enterGradesAs: GradeEntryMode
-  gradingScheme: GradingStandard[] | null
-  onSubmissionUpdate: (submission: SubmissionData, gradeInfo: GradeResult) => void
-  pendingGradeInfo: PendingGradeInfo
-  submission: SubmissionData
-  submissionUpdating: boolean
-}
-
-type State = {
-  formattedGrade: string
-  grade: string
 }
 
 function normalizeSubmissionGrade(props: Props) {
@@ -142,6 +125,22 @@ function stateFromProps(props: Props) {
     formattedGrade: normalizedGrade,
     grade: normalizedGrade,
   }
+}
+
+type Props = {
+  assignment: CamelizedAssignment
+  disabled: boolean
+  enterGradesAs: GradeEntryMode
+  gradingScheme: GradingStandard[] | null
+  onSubmissionUpdate: (submission: SubmissionData, gradeInfo: GradeResult) => void
+  pendingGradeInfo: PendingGradeInfo
+  submission: SubmissionData
+  submissionUpdating: boolean
+}
+
+type State = {
+  formattedGrade: string
+  grade: string
 }
 
 export default class GradeInput extends Component<Props, State> {
