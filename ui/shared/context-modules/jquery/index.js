@@ -1061,7 +1061,7 @@ modules.initModuleManagement = function (duplicate) {
         )
       }
 
-      if (window.ENV?.FEATURES?.new_math_equation_handling) {
+      if (window.ENV?.FEATURES?.explicit_latex_typesetting === false) {
         if (mathml.isMathMLOnPage()) {
           if (mathml.isMathJaxLoaded()) {
             mathml.reloadElement('content')

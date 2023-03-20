@@ -26,7 +26,6 @@ import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
-import mathml from 'mathml'
 import htmlEscape from 'html-escape'
 
 RichContentEditor.preloadRemoteModule()
@@ -283,15 +282,6 @@ const bindToEditSyllabus = function (course_summary_enabled) {
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
-      if (!ENV.FEATURES.new_math_equation_handling) {
-        if (mathml.isMathMLOnPage()) {
-          if (mathml.isMathJaxLoaded()) {
-            mathml.reloadElement('content')
-          } else {
-            mathml.loadMathJax(undefined)
-          }
-        }
-      }
     },
 
     error(data) {
