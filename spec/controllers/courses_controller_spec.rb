@@ -1088,6 +1088,12 @@ describe CoursesController do
       expect(assigns[:unauthorized_message]).not_to be_nil
     end
 
+    it "renders a flash with the appropriate param" do
+      user_session(@teacher)
+      get "show", params: { id: @course.id, for_reload: 1 }
+      expect(flash[:notice]).to match(/Course was successfully updated./)
+    end
+
     it "allows student view student to view unpublished courses" do
       @course.update_attribute :workflow_state, "claimed"
       user_session(@teacher)
