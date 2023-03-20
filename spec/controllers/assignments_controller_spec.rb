@@ -928,6 +928,12 @@ describe AssignmentsController do
           expect(assigns[:js_env][:belongs_to_unpublished_module]).to be(true)
         end
 
+        it "sets stickers_enabled in the ENV" do
+          @course.root_account.enable_feature!(:submission_stickers)
+          get :show, params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env][:stickers_enabled]).to be true
+        end
+
         context "peer reviews" do
           before do
             @assignment.update!(peer_reviews: true, submission_types: "text_entry")

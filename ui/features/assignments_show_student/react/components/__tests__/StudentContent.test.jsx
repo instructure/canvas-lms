@@ -76,8 +76,16 @@ function gradedOverrides() {
 }
 
 describe('Assignment Student Content View', () => {
+  let oldEnv
+
   beforeEach(() => {
+    oldEnv = window.ENV
+    window.ENV = {...window.ENV}
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
+  })
+
+  afterEach(() => {
+    window.ENV = oldEnv
   })
 
   it('renders the student header if the assignment is unlocked', async () => {
@@ -139,9 +147,46 @@ describe('Assignment Student Content View', () => {
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
+  it('renders a submission sticker when the flag is enabled and the student has a sticker', async () => {
+    window.ENV.stickers_enabled = true
+    const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
+    const {getByRole} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+
+    const sticker = getByRole('img', {name: 'A sticker with a picture of an apple.'})
+    expect(sticker).toBeInTheDocument()
+  })
+
+  it('does not render a submission sticker when the flag is enabled but there is not a sticker', async () => {
+    window.ENV.stickers_enabled = true
+    const props = await mockAssignmentAndSubmission()
+    const {queryByRole} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+
+    const sticker = queryByRole('img', {name: 'A sticker with a picture of an apple.'})
+    expect(sticker).not.toBeInTheDocument()
+  })
+
+  it('does not render a submission sticker when the flag is disabled', async () => {
+    window.ENV.stickers_enabled = false
+    const props = await mockAssignmentAndSubmission({Submission: {sticker: 'apple'}})
+    const {queryByRole} = render(
+      <MockedProvider>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
+    const sticker = queryByRole('button', {name: 'A sticker with a picture of an apple.'})
+    expect(sticker).not.toBeInTheDocument()
+  })
+
   describe('when the assignment does not expect digital submissions', () => {
     let props
-    let oldEnv
 
     beforeEach(async () => {
       oldEnv = window.ENV
@@ -337,8 +382,6 @@ describe('Assignment Student Content View', () => {
   describe('concluded enrollment notice', () => {
     const concludedMatch = /your enrollment in this course has been concluded/
 
-    let oldEnv
-
     beforeEach(() => {
       oldEnv = window.ENV
       window.ENV = {...window.ENV}
@@ -374,8 +417,6 @@ describe('Assignment Student Content View', () => {
   })
 
   describe('number of attempts', () => {
-    let oldEnv
-
     beforeEach(() => {
       oldEnv = window.ENV
       window.ENV = {...window.ENV}

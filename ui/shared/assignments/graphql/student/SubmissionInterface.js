@@ -50,6 +50,7 @@ export const SubmissionInterface = {
       resourceLinkLookupUuid
       score
       state
+      sticker
       submissionDraft {
         ...SubmissionDraft
       }
@@ -118,6 +119,7 @@ export const DefaultMocks = {
     originalityData: null,
     resourceLinkLookupUuid: null,
     state: 'unsubmitted',
+    sticker: null,
     submissionDraft: null,
     submissionStatus: 'unsubmitted',
     submissionType: null,

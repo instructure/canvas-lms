@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
+import SubmissionSticker from '@canvas/submission-sticker'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -39,6 +40,7 @@ import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('assignments_2_student_content')
 
@@ -153,20 +155,37 @@ function renderContentBaseOnAvailability(
 
     return (
       <>
-        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
-        {assignment.submissionTypes.includes('student_annotation') && (
-          <VisualOnFocusMessage
-            message={I18n.t(
-              'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+        <Flex alignItems="start">
+          <div style={{flexGrow: 1}}>
+            {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability(assignment)}
+            {assignment.submissionTypes.includes('student_annotation') && (
+              <VisualOnFocusMessage
+                message={I18n.t(
+                  'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+                )}
+              />
             )}
-          />
-        )}
-        <AssignmentToggleDetails description={assignment.description} />
-        {assignment.rubric && (
-          <Suspense fallback={<LoadingIndicator />}>
-            <RubricsQuery assignment={assignment} submission={submission} />
-          </Suspense>
-        )}
+
+            <AssignmentToggleDetails description={assignment.description} />
+
+            {assignment.rubric && (
+              <Suspense fallback={<LoadingIndicator />}>
+                <RubricsQuery assignment={assignment} submission={submission} />
+              </Suspense>
+            )}
+          </div>
+
+          {window.ENV.stickers_enabled && submission.sticker && (
+            <View as="div" padding="medium 0 medium medium">
+              <SubmissionSticker
+                confetti={window.ENV.CONFETTI_ENABLED}
+                submission={submission}
+                size="large"
+              />
+            </View>
+          )}
+        </Flex>
+
         {assignment.expectsSubmission ? (
           <ContentTabs
             assignment={assignment}
