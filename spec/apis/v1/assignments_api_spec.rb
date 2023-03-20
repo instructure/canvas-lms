@@ -6717,6 +6717,7 @@ describe AssignmentsApiController, type: :request do
         "late_policy_status" => nil,
         "points_deducted" => nil,
         "seconds_late" => 0,
+        "sticker" => nil,
         "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
         "extra_attempts" => nil
@@ -6762,6 +6763,7 @@ describe AssignmentsApiController, type: :request do
         "late_policy_status" => nil,
         "points_deducted" => nil,
         "seconds_late" => 0,
+        "sticker" => nil,
         "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
         "extra_attempts" => nil
