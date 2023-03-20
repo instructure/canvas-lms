@@ -182,12 +182,12 @@ module Types
       return nil unless enrollment.user == current_user
 
       # restrict_enrollments_to_section_dates means that students enrollment is based on section dates
-      if enrollment.course_section.restrict_enrollments_to_section_dates
+      if enrollment.course_section.restrict_enrollments_to_section_dates && !enrollment.course_section.end_at.nil?
         return enrollment.course_section.end_at < Time.zone.now
       end
 
       # restrict_enrollments_to_course_dates means that course participation is set to course
-      if enrollment.course.restrict_enrollments_to_course_dates
+      if enrollment.course.restrict_enrollments_to_course_dates && !enrollment.course.end_at.nil?
         return true if enrollment.course.end_at < Time.zone.now
       end
 
