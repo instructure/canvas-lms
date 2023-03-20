@@ -209,3 +209,16 @@ new_quiz_deleted_workflow_restore_pending_review_state:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+individual_gradebook_enhancements:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Individual Gradebook Enhancements
+  description: This feature introduces performance and maintenance enhancements 
+    to Individual Gradebook
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
