@@ -8490,6 +8490,36 @@ describe Submission do
     end
   end
 
+  describe "sticker removal" do
+    before(:once) do
+      @submission = Submission.find_by(user: @student)
+    end
+
+    it "removes the sticker when a new attempt is submitted" do
+      @submission.update!(sticker: "basketball")
+      @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "foo")
+      expect(@submission.reload.sticker).to be_nil
+    end
+
+    it "does not remove the sticker when the submission is updated but there's not a new attempt" do
+      @submission.update!(sticker: "basketball")
+      @assignment.grade_student(@student, score: 5, grader: @teacher)
+      expect(@submission.reload.sticker).to eq "basketball"
+    end
+
+    it "preserves previously awarded stickers in submission history" do
+      submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "foo")
+      submission.update!(sticker: "basketball")
+      Timecop.freeze(10.minutes.from_now) do
+        submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "bar")
+        submission.update!(sticker: "paintbrush")
+      end
+
+      sticker = submission.submission_history.find { |sub| sub.attempt == 1 }.sticker
+      expect(sticker).to eq "basketball"
+    end
+  end
+
   describe "#submission_drafts" do
     before(:once) do
       @submission = Submission.find_by(user: @student)

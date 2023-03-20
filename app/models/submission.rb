@@ -421,6 +421,7 @@ class Submission < ActiveRecord::Base
   before_save :check_reset_graded_anonymously
   before_save :set_root_account_id
   before_save :reset_redo_request
+  before_save :remove_sticker, if: :will_save_change_to_attempt?
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -3073,6 +3074,10 @@ class Submission < ActiveRecord::Base
 
   def graded_by_new_quizzes?
     cached_quiz_lti && autograded?
+  end
+
+  def remove_sticker
+    self.sticker = nil
   end
 
   def set_late_policy_attributes
