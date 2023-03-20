@@ -193,7 +193,6 @@ class EntryView extends Backbone.View
       @readMarker ?= new MarkAsReadWatcher this
       # this is throttled so calling it here is okay
       MarkAsReadWatcher.checkForVisibleEntries()
-    mathml.reloadElement(this.$el[0])
     publish 'userContent/change'
 
   filter: @::afterRender
