@@ -333,7 +333,9 @@ test_1,TC 101,Test Course 101,,term1,deleted
           [%(user_id,login_id,status
           user_1,user_1,active
           user_2,user_2,active)]
-        )
+        ) do |sis_batch|
+          sis_batch.update batch_mode: true
+        end
         @batch2 = create_csv_data(
           [%(course_id,short_name,long_name,term_id,status
           course_1,course_1,course_1,term_1,active
