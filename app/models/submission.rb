@@ -63,6 +63,58 @@ class Submission < ActiveRecord::Base
   }.freeze
 
   SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry].freeze
+  VALID_STICKERS = %w[
+    apple
+    basketball
+    bell
+    book
+    bookbag
+    briefcase
+    bus
+    calendar
+    chem
+    design
+    pencil
+    beaker
+    paintbrush
+    computer
+    column
+    pen
+    tablet
+    telescope
+    calculator
+    paperclip
+    composite_notebook
+    scissors
+    ruler
+    clock
+    globe
+    grad
+    gym
+    mail
+    microscope
+    mouse
+    music
+    notebook
+    page
+    panda1
+    panda2
+    panda3
+    panda4
+    panda5
+    panda6
+    panda7
+    panda8
+    panda9
+    presentation
+    science
+    science2
+    star
+    tag
+    tape
+    target
+    trophy
+  ].freeze
 
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
@@ -144,6 +196,7 @@ class Submission < ActiveRecord::Base
   validates :extra_attempts, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :late_policy_status, inclusion: %w[none missing late extended], allow_nil: true
   validates :cached_tardiness, inclusion: ["missing", "late"], allow_nil: true
+  validates :sticker, inclusion: { in: VALID_STICKERS }, allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
   validate :ensure_attempts_are_in_range, unless: :proxy_submission?
