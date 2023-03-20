@@ -179,6 +179,41 @@ describe Types::EnrollmentType do
         expect(teacher_enrollment_type.resolve("concluded")).to eq true
       end
 
+      it "does not errors out when course conclude_at is nil and returns correct value" do
+        course = teacher_enrollment.course
+
+        # Course is not soft concluded and has a nil conclude_at
+        course.start_at = 2.days.ago
+        course.conclude_at = nil
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+
+        course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+
+        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+      end
+
+      it "does not errors out when section end_at is nil and returns correct value" do
+        course = teacher_enrollment.course
+
+        # Course is not soft concluded and has a nil conclude_at
+        course.start_at = 2.days.ago
+        course.conclude_at = nil
+        course.restrict_enrollments_to_course_dates = true
+        course.save!
+
+        # Section end_at is nil
+        my_section = course.course_sections.first
+        my_section.start_at = 2.days.ago
+        my_section.end_at = nil
+        my_section.restrict_enrollments_to_section_dates = true
+        my_section.save!
+
+        my_section.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
+
+        expect(teacher_enrollment_type.resolve("concluded")).to eq false
+      end
+
       it "returns true when enrollment is concluded" do
         teacher_enrollment.complete!
         expect(teacher_enrollment_type.resolve("concluded")).to eq true
