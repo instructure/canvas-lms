@@ -1180,6 +1180,7 @@ describe "Submissions API", type: :request do
                           "missing" => false,
                           "late_policy_status" => nil,
                           "seconds_late" => 0,
+                          "sticker" => nil,
                           "points_deducted" => nil,
                           "extra_attempts" => nil
                         })
@@ -1313,6 +1314,7 @@ describe "Submissions API", type: :request do
     media_object(media_id: "54321", context: student1, user: student1)
     submit_homework(a1, student1, media_comment_id: "54321", media_comment_type: "video")
     sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(context: student1, folder: nil)] }
+    sub1.update!(sticker: "trophy")
 
     sub2a1 = attachment_model(context: student2, filename: "snapshot.png", content_type: "image/png")
     sub2 = submit_homework(a1, student2, url: "http://www.instructure.com") do |s|
@@ -1414,6 +1416,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil },
           { "id" => sub1.id,
@@ -1448,6 +1451,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil },
           { "id" => sub1.id,
@@ -1508,6 +1512,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => "trophy",
             "points_deducted" => nil,
             "extra_attempts" => nil }],
          "attempt" => 3,
@@ -1550,6 +1555,7 @@ describe "Submissions API", type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "seconds_late" => 0,
+         "sticker" => "trophy",
          "points_deducted" => nil },
        { "id" => sub2.id,
          "grade" => "F",
@@ -1619,6 +1625,7 @@ describe "Submissions API", type: :request do
             "missing" => false,
             "late_policy_status" => nil,
             "seconds_late" => 0,
+            "sticker" => nil,
             "points_deducted" => nil,
             "extra_attempts" => nil }],
          "attempt" => 1,
@@ -1661,6 +1668,7 @@ describe "Submissions API", type: :request do
          "missing" => false,
          "late_policy_status" => nil,
          "seconds_late" => 0,
+         "sticker" => nil,
          "points_deducted" => nil }]
     expect(json.sort_by { |h| h["user_id"] }).to eql(res.sort_by { |h| h["user_id"] })
   end
