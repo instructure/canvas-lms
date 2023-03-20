@@ -132,8 +132,7 @@ describe "blueprint courses assignments" do
 
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-      # when locked, the whole menu is removed
-      expect(assignment_header).not_to contain_css(".al-trigger")
+      expect(assignment_header).not_to contain_css(".assignment-delete-container")
     end
 
     it "shows the delete cog-menu options on the edit when not locked" do
