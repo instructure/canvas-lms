@@ -20,14 +20,21 @@
         {{/if}}
       </div>
       <div class="header-group-right">
-        {{#unless is_locked}} <!-- delete is only thing in menu, remove the whole thing if locked -->
-          <div class="admin-links">
-            <button class="al-trigger btn">
-              <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
-              <i class="icon-more" aria-hidden="true"></i>
-            </button>
-            <ul class="al-options">
-              <li>
+        <div class="admin-links">
+          <button class="al-trigger btn">
+            <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
+            <i class="icon-more" aria-hidden="true"></i>
+          </button>
+          <ul class="al-options">
+            {{#if showSpeedGraderLink}}
+              <li class="speed-grader-link-container">
+                <a class="icon-speed-grader" href="/courses/{{courseId}}/gradebook/speed_grader?assignment_id={{id}}">
+                  {{#t}}SpeedGrader{{/t}}
+                </a>
+              </li>
+            {{/if}}
+            {{#unless is_locked}}
+              <li class="assignment-delete-container">
               {{#if canDelete}}
                 <a href="#" class="delete_assignment_link">
               {{else}}
@@ -37,9 +44,9 @@
                   {{#t}}Delete{{/t}}
                 </a>
               </li>
-            </ul>
-          </div>
-        {{/unless}}
+            {{/unless}}
+          </ul>
+        </div>
       </div>
     </div>
 </div>
