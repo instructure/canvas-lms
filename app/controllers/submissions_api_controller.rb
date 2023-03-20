@@ -778,6 +778,9 @@ class SubmissionsApiController < ApplicationController
   #   Sets the late policy status to either "late", "missing", "extended", "none", or null.
   #     NB: "extended" values can only be set in the UI when the "UI features for 'extended' Submissions" Account Feature is on
   #
+  # @argument submission[sticker] [String, "apple"|"basketball"|"bell"|"book"|"bookbag"|"briefcase"|"bus"|"calendar"|"chem"|"design"|"pencil"|"beaker"|"paintbrush"|"computer"|"column"|"pen"|"tablet"|"telescope"|"calculator"|"paperclip"|"composite_notebook"|"scissors"|"ruler"|"clock"|"globe"|"grad"|"gym"|"mail"|"microscope"|"mouse"|"music"|"notebook"|"page"|"panda1"|"panda2"|"panda3"|"panda4"|"panda5"|"panda6"|"panda7"|"panda8"|"panda9"|"presentation"|"science"|"science2"|"star"|"tag"|"tape"|"target"|"trophy"]
+  #   Sets the sticker for the submission.
+  #
   # @argument submission[seconds_late_override] [Integer]
   #   Sets the seconds late if late policy status is "late"
   #
@@ -857,6 +860,11 @@ class SubmissionsApiController < ApplicationController
         if params[:submission].key?(:seconds_late_override)
           submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
         end
+
+        if params[:submission].key?(:sticker)
+          submission[:sticker] = params[:submission].delete(:sticker)
+        end
+
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @assignment.permits_moderation?(@current_user)
         if params[:submission][:submission_type] == "basic_lti_launch" && (!@submission.has_submission? || @submission.submission_type == "basic_lti_launch")
@@ -879,7 +887,9 @@ class SubmissionsApiController < ApplicationController
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
-      if submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
+
+      late_attrs_changed = submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
+      if late_attrs_changed || submission.key?(:sticker)
         excused = Canvas::Plugin.value_to_boolean(submission[:excuse])
         grade_group_students = !(@assignment.grade_group_students_individually || excused)
 
@@ -893,7 +903,8 @@ class SubmissionsApiController < ApplicationController
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
-          sub.grader = @current_user
+          sub.sticker = submission[:sticker] if submission.key?(:sticker)
+          sub.grader = @current_user if late_attrs_changed
           # If we've called Assignment#grade_student, it has already created a
           # new submission version on this request.
           previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
