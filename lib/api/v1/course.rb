@@ -47,6 +47,7 @@ module Api::V1::Course
     settings[:usage_rights_required] = course.usage_rights_required?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
+    settings[:restrict_quantitative_data] = course.restrict_quantitative_data
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:syllabus_course_summary] = course.syllabus_course_summary?
