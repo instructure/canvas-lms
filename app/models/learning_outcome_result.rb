@@ -173,6 +173,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       self.workflow_state = "deleted"
       # Update existing LearningOutcomeResult
       out_results.first.score = score
+      out_results.first.possible = possible
       out_results.first.save!
     end
   end
