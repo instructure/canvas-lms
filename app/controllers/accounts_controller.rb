@@ -1810,6 +1810,7 @@ class AccountsController < ApplicationController
     %i[restrict_student_past_view
        restrict_student_future_view
        restrict_student_future_listing
+       restrict_quantitative_data
        lock_all_announcements
        sis_assignment_name_length_input
        conditional_release]

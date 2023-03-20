@@ -2728,7 +2728,7 @@ class Course < ActiveRecord::Base
        allow_student_discussion_reporting organize_epub_by_content_type show_announcements_on_home_page
        home_page_announcement_limit enable_offline_web_export usage_rights_required
        restrict_student_future_view restrict_student_past_view restrict_enrollments_to_course_dates
-       homeroom_course course_color alt_name]
+       homeroom_course course_color alt_name restrict_quantitative_data]
   end
 
   def student_reporting?
@@ -3493,6 +3493,7 @@ class Course < ActiveRecord::Base
   add_setting :is_public_to_auth_users, boolean: true, default: false
   add_setting :overridden_course_visibility
 
+  add_setting :restrict_quantitative_data, boolean: true, inherited: true
   add_setting :restrict_student_future_view, boolean: true, inherited: true
   add_setting :restrict_student_past_view, boolean: true, inherited: true
 
