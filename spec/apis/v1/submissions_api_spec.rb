@@ -3368,6 +3368,29 @@ describe "Submissions API", type: :request do
         expect(json.dig("submission_comments", 0, "author_name")).to eq "Anonymous User"
       end
     end
+
+    it "handles updating the submission sticker" do
+      submission = @assignment.submission_for_student(@student)
+      expect do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            anonymous_id: submission.anonymous_id.to_s
+          },
+          {
+            submission: { sticker: "trophy" }
+          }
+        )
+      end.to change {
+        submission.reload.sticker
+      }.from(nil).to("trophy")
+    end
   end
 
   describe "#update" do
@@ -3556,6 +3579,72 @@ describe "Submissions API", type: :request do
       end.to change {
         submission.reload.versions.count
       }.by(1)
+    end
+
+    describe "stickers" do
+      let(:update_sticker_api_call) do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: { sticker: "trophy" }
+          }
+        )
+      end
+
+      it "handles updating the submission sticker" do
+        submission = @assignment.submission_for_student(@student)
+        expect { update_sticker_api_call }.to change {
+          submission.reload.sticker
+        }.from(nil).to("trophy")
+      end
+
+      it "does not update the grader when the sticker is set" do
+        submission = @assignment.submission_for_student(@student)
+        expect { update_sticker_api_call }.not_to change {
+          submission.reload.grader
+        }.from(nil)
+      end
+
+      context "group assignments" do
+        before do
+          @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
+          group_category = @course.group_categories.create!(name: "Category")
+          group = @course.groups.create!(name: "Group", group_category:)
+          group.add_user(@student, "accepted")
+          group.add_user(@student2, "accepted")
+          @assignment.update!(group_category:, grade_group_students_individually: false)
+        end
+
+        let(:student_submissions) do
+          @assignment.submissions.where(user: [@student, @student2])
+        end
+
+        it "assigns the sticker to all group members" do
+          expect { update_sticker_api_call }.to change {
+            student_submissions.pluck(:user_id, :sticker).to_h
+          }
+            .from({ @student.id => nil, @student2.id => nil })
+            .to({ @student.id => "trophy", @student2.id => "trophy" })
+        end
+
+        it "assigns the sticker to only one student if 'grade group students individually' is set" do
+          @assignment.update!(grade_group_students_individually: true)
+          expect { update_sticker_api_call }.to change {
+            student_submissions.pluck(:user_id, :sticker).to_h
+          }
+            .from({ @student.id => nil, @student2.id => nil })
+            .to({ @student.id => "trophy", @student2.id => nil })
+        end
+      end
     end
 
     context "grading scheme with numerics in names" do
