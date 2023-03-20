@@ -8307,6 +8307,26 @@ describe Submission do
     end
   end
 
+  describe "sticker validations" do
+    it "allows a nil sticker" do
+      submission = @assignment.submissions.first
+      submission.sticker = nil
+      expect(submission).to be_valid
+    end
+
+    it "does not allow a sticker that is not in the approved list" do
+      submission = @assignment.submissions.first
+      submission.sticker = "my_custom_sticker"
+      expect(submission).not_to be_valid
+    end
+
+    it "allows a sticker that is in the approved list" do
+      submission = @assignment.submissions.first
+      submission.sticker = "basketball"
+      expect(submission).to be_valid
+    end
+  end
+
   describe "extra_attempts validations" do
     it { is_expected.to validate_numericality_of(:extra_attempts).is_greater_than_or_equal_to(0).allow_nil }
 
