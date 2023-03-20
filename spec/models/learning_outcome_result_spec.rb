@@ -397,6 +397,7 @@ describe LearningOutcomeResult do
                                         }),
           user: student,
           score: 2,
+          possible: 9,
           learning_outcome_id: @outcome.id
         )
       end
@@ -406,6 +407,16 @@ describe LearningOutcomeResult do
         same_lor.save!
         expect(LearningOutcomeResult.find(@lor.id).workflow_state).to eq("active")
         expect(LearningOutcomeResult.find(same_lor.id).workflow_state).to eq("deleted")
+      end
+
+      it "updates score and possible if there is a previous one for the same user, learning outcome, and alignment" do
+        same_lor = @lor.clone
+        same_lor.score = 3
+        same_lor.possible = 10
+        same_lor.save!
+        @lor.reload
+        expect(@lor.score).to eq(3)
+        expect(@lor.possible).to eq(10)
       end
 
       it "creates a LearningOutcomeResult for the same user and learning outcome if there is none for the alignment" do
@@ -470,6 +481,25 @@ describe LearningOutcomeResult do
           same_lor.save!
           expect(LearningOutcomeResult.find(lor1.id).workflow_state).to eq("active")
           expect(LearningOutcomeResult.find(same_lor.id).workflow_state).to eq("deleted")
+        end
+
+        it "updates score and possible if there is a previous one for the same user, learning outcome, and associated asset" do
+          lor1 = LearningOutcomeResult.create(
+            alignment: @qb_alignment,
+            user: student,
+            score: 2,
+            possible: 9,
+            learning_outcome_id: @outcome.id,
+            associated_asset_id: @quiz1.id,
+            associated_asset_type: "Quizzes::Quiz"
+          )
+          same_lor = lor1.clone
+          same_lor.score = 3
+          same_lor.possible = 10
+          same_lor.save!
+          lor1.reload
+          expect(lor1.score).to eq(3)
+          expect(lor1.possible).to eq(10)
         end
       end
 
