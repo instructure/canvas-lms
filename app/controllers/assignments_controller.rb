@@ -287,7 +287,10 @@ class AssignmentsController < ApplicationController
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
-            js_env({ enrollment_state: active_enrollment&.state_based_on_date })
+            js_env({
+                     enrollment_state: active_enrollment&.state_based_on_date,
+                     stickers_enabled: @context.feature_enabled?(:submission_stickers)
+                   })
             rce_js_env
 
             render_a2_student_view(student: student_to_view)
