@@ -274,3 +274,13 @@ custom_gradebook_statuses:
       state: allowed_on
     development:
       state: allowed_on
+submission_stickers:
+  state: hidden
+  applies_to: Course
+  display_name: Submission Stickers
+  description: Allows teachers to attach stickers to student submissions.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
