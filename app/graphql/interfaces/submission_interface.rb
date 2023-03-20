@@ -200,6 +200,11 @@ module Interfaces::SubmissionInterface
     protect_submission_grades(:points_deducted)
   end
 
+  field :sticker, String, null: true
+  def sticker
+    protect_submission_grades(:sticker)
+  end
+
   field :excused,
         Boolean,
         "excused assignments are ignored when calculating grades",

@@ -28,7 +28,7 @@ describe Types::SubmissionType do
   end
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
-  let(:submission_type_peer_review) { GraphQLTypeTester.new(@submission, current_user: @student) }
+  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
@@ -72,6 +72,38 @@ describe Types::SubmissionType do
       @submission.update!(posted_at: now)
       posted_at = Time.zone.parse(submission_type.resolve("postedAt"))
       expect(posted_at).to eq now
+    end
+  end
+
+  describe "sticker" do
+    let(:sticker) { type.resolve("sticker") }
+
+    before { @submission.update!(sticker: "trophy") }
+
+    context "as a student" do
+      let(:type) { submission_type_for_student }
+
+      it "returns the sticker for posted submissions" do
+        expect(sticker).to eq "trophy"
+      end
+
+      it "does not return the sticker for unposted submissions" do
+        @assignment.hide_submissions
+        expect(sticker).to be_nil
+      end
+    end
+
+    context "as a teacher" do
+      let(:type) { submission_type }
+
+      it "returns the sticker for posted submissions" do
+        expect(sticker).to eq "trophy"
+      end
+
+      it "returns the sticker for unposted submissions" do
+        @assignment.hide_submissions
+        expect(sticker).to eq "trophy"
+      end
     end
   end
 
@@ -308,7 +340,7 @@ describe Types::SubmissionType do
     it "will only show comments written by the reviewer if peerReview is true" do
       comment3 = @submission.add_comment(author: @student, comment: "test3", attempt: 2)
       expect(
-        submission_type_peer_review.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
+        submission_type_for_student.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
       ).to eq [comment3.id.to_s]
     end
 
