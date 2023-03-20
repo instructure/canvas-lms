@@ -239,7 +239,8 @@ export function findFilterValuesOfType(type: FilterType, appliedFilters: Filter[
 export function findSubmissionFilterValue(appliedFilters: Filter[]) {
   const values = findFilterValuesOfType('submissions', appliedFilters)
   return (
-    values.length && ['has-ungraded-submissions', 'has-submissions'].includes(values[0])
+    values.length &&
+    ['has-ungraded-submissions', 'has-submissions', 'has-no-submissions'].includes(values[0])
       ? values[0]
       : undefined
   ) as SubmissionFilterValue
@@ -312,6 +313,8 @@ export const getLabelForFilter = (
       return I18n.t('Has ungraded submissions')
     } else if (filter.value === 'has-submissions') {
       return I18n.t('Has submissions')
+    } else if (filter.value === 'has-no-submissions') {
+      return I18n.t('Has no submissions')
     } else {
       throw new Error('invalid submissions filter value')
     }

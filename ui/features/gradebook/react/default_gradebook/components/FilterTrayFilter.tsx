@@ -24,7 +24,7 @@ import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
-import type {Filter} from '../gradebook.d'
+import type {Filter, SubmissionFilterValue} from '../gradebook.d'
 import type {
   AssignmentGroup,
   Module,
@@ -38,24 +38,34 @@ import natcompare from '@canvas/util/natcompare'
 const I18n = useI18nScope('gradebook')
 
 const {Option, Group: OptionGroup} = SimpleSelect as any
-const formatDate = date => tz.format(date, 'date.formats.medium')
+const formatDate = (date: Date) => tz.format(date, 'date.formats.medium') as string
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
-type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions' | '__EMPTY__', string]
+type SubmissionTypeOption = [SubmissionFilterValue | '__EMPTY__', string]
 
 const submissionTypeOptions: SubmissionTypeOption[] = [
   ['__EMPTY__', I18n.t('--')],
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
   ['has-submissions', I18n.t('Has submissions')],
+  ['has-no-submissions', I18n.t('Has no submissions')],
 ]
 
-const filterTypeLabels = {
+const filterTypeLabels: {
+  'assignment-group': string
+  'grading-period': string
+  module: string
+  section: string
+  'student-group': string
+  submissions: string
+  'start-date': string
+  'end-date': string
+} = {
   'assignment-group': I18n.t('Assignment Groups'),
   'grading-period': I18n.t('Grading Periods'),
   module: I18n.t('Modules'),
   section: I18n.t('Sections'),
   'student-group': I18n.t('Student Groups'),
-  submission: I18n.t('Submissions'),
+  submissions: I18n.t('Submissions'),
   'start-date': I18n.t('Start Date'),
   'end-date': I18n.t('End Date'),
 }
@@ -168,7 +178,7 @@ export default function ({
         <CanvasDateInput
           size="small"
           dataTestid="date-input"
-          renderLabel={dateLabels[filter.type!]}
+          renderLabel={dateLabels[filter.type as 'start-date' | 'end-date']}
           selectedDate={filter.value}
           formatDate={formatDate}
           interaction="enabled"

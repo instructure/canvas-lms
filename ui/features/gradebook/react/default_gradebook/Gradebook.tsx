@@ -1183,6 +1183,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           return submissions.some(s => doesSubmissionNeedGrading(s))
         } else if (filter === 'has-submissions') {
           return submissions.some(wasSubmitted)
+        } else if (filter === 'has-no-submissions') {
+          return submissions.every(s => !wasSubmitted(s))
         } else {
           return true
         }
@@ -3926,10 +3928,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Grid Display Settings Access Methods
   // Kept only for tests
   // TODO: Remove when moving tests to Jest
-  setFilterColumnsBySetting = (
-    filterKey: ColumnFilterKey,
-    value: null | 'has-ungraded-submissions' | 'has-submissions'
-  ) => {
+  setFilterColumnsBySetting = (filterKey: ColumnFilterKey, value: null | SubmissionFilterValue) => {
     this.gridDisplaySettings.filterColumnsBy[filterKey] = value
   }
 
@@ -4280,7 +4279,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       if (
         LatePolicyApplicator.processSubmission(submission, assignment, gradingStandard, latePolicy)
       ) {
-        return (studentsToInvalidate[submission.user_id] = true)
+        studentsToInvalidate[submission.user_id] = true
       }
     })
     const studentIds = [...new Set(Object.keys(studentsToInvalidate))]
@@ -4908,7 +4907,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      // submissions ('has-ungraded-submissions' | 'has-submissions')
+      // submissions ('has-ungraded-submissions' | 'has-submissions' | 'has-no-submissions')
       const prevSubmissionsFilter = findSubmissionFilterValue(prevProps.appliedFilters)
       const submissionFilter = findSubmissionFilterValue(this.props.appliedFilters)
       if (prevSubmissionsFilter !== submissionFilter) {

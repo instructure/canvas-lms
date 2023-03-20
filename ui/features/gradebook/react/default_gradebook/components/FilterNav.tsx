@@ -279,7 +279,7 @@ export default function FilterNav({
     items: [
       {
         id: 'savedFilterPresets',
-        name: 'Has Ungraded Submissions',
+        name: I18n.t('Has Ungraded Submissions'),
         isSelected: appliedFilters.some(
           c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
         ),
@@ -295,7 +295,7 @@ export default function FilterNav({
       },
       {
         id: '2',
-        name: 'Has Submissions',
+        name: I18n.t('Has Submissions'),
         isSelected: appliedFilters.some(
           c => c.type === 'submissions' && c.value === 'has-submissions'
         ),
@@ -304,6 +304,22 @@ export default function FilterNav({
             id: uuid.v4(),
             type: 'submissions',
             value: 'has-submissions',
+            created_at: new Date().toISOString(),
+          }
+          toggleFilter(filter)
+        },
+      },
+      {
+        id: '3',
+        name: I18n.t('Has No Submissions'),
+        isSelected: appliedFilters.some(
+          c => c.type === 'submissions' && c.value === 'has-no-submissions'
+        ),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid.v4(),
+            type: 'submissions',
+            value: 'has-no-submissions',
             created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
@@ -368,7 +384,7 @@ export default function FilterNav({
         endDate={endDate}
         isOpen={isDateModalOpen}
         onCloseDateModal={() => setIsDateModalOpen(false)}
-        onSelectDates={(startDateValue, endDateValue) => {
+        onSelectDates={(startDateValue: string | null, endDateValue: string | null) => {
           const startDateCondition: Filter = {
             id: uuid.v4(),
             type: 'start-date',

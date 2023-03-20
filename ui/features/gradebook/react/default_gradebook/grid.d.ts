@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {GradebookStudent, SerializedComment, SortRowsSettingKey} from './gradebook.d'
+import type {
+  GradebookStudent,
+  SubmissionFilterValue,
+  SerializedComment,
+  SortRowsSettingKey,
+} from './gradebook.d'
 import type {GradeEntryMode} from '@canvas/grading/grading.d'
 import type {StatusColors} from './constants/colors'
 import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
@@ -100,7 +105,7 @@ export type FilterColumnsOptions = {
   assignmentGroupId: null | string
   contextModuleId: null | string
   gradingPeriodId: null | string
-  submissions: null | 'has-ungraded-submissions' | 'has-submissions'
+  submissions: null | SubmissionFilterValue
   startDate: null | string
   endDate: null | string
 }

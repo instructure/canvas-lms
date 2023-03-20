@@ -49,7 +49,7 @@ export type GradebookSettings = {
     context_module_id: string | null
     end_date: string | null
     start_date: string | null
-    submissions: 'has-ungraded-submissions' | 'has-submissions' | null
+    submissions: SubmissionFilterValue | null
   }
   filter_rows_by: {
     section_id: string | null
@@ -271,7 +271,10 @@ export type Filter = {
   created_at: string
 }
 
-export type SubmissionFilterValue = 'has-ungraded-submissions' | 'has-submissions' | undefined
+export type SubmissionFilterValue =
+  | 'has-ungraded-submissions'
+  | 'has-submissions'
+  | 'has-no-submissions'
 
 export type FilterPreset = {
   id: string
