@@ -156,6 +156,7 @@ describe ExternalToolsController do
             lti_message_hint
             canvas_region
             client_id
+            deployment_id
             lti_storage_target
           ]
         end

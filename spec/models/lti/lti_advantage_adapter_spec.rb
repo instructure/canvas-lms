@@ -138,6 +138,7 @@ describe Lti::LtiAdvantageAdapter do
           lti_message_hint
           canvas_region
           client_id
+          deployment_id
           lti_storage_target
         ]
       end
@@ -156,6 +157,7 @@ describe Lti::LtiAdvantageAdapter do
           lti_message_hint
           canvas_region
           client_id
+          deployment_id
           lti_storage_target
         ]
       end
@@ -205,6 +207,10 @@ describe Lti::LtiAdvantageAdapter do
 
     it "sets the client_id to the developer key global id" do
       expect(login_message["client_id"]).to eq tool.global_developer_key_id
+    end
+
+    it "includes the deployment_id" do
+      expect(login_message["deployment_id"]).to eq tool.deployment_id
     end
 
     context "when the user has a past lti context id" do

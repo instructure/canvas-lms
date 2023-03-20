@@ -178,6 +178,7 @@ module Lti
         iss: Canvas::Security.config["lti_iss"],
         login_hint: login_hint,
         client_id: @tool.global_developer_key_id,
+        deployment_id: @tool.deployment_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
         canvas_region: @context.shard.database_server.config[:region] || "not_configured",
