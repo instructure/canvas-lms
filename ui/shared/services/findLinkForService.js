@@ -143,13 +143,7 @@ export function findLinkForService(service_type, callback) {
       })
     })
   }
-  $dialog
-    .find('.search_button')
-    .text(
-      service_type === 'delicious'
-        ? I18n.t('buttons.search_by_tag', 'Search by Tag')
-        : I18n.t('buttons.search', 'Search')
-    )
+  $dialog.find('.search_button').text(I18n.t('buttons.search', 'Search'))
   $dialog.find('form img').attr('src', `/images/${service_type}_small_icon.png`)
   let url = '/search/bookmarks?q=%7B%7B+query+%7D%7D&service_type=%7B%7B+service_type+%7D%7D'
   url = $.replaceTags(url, 'service_type', service_type)

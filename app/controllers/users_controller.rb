@@ -185,7 +185,6 @@ require "atom"
 #
 #
 class UsersController < ApplicationController
-  include Delicious
   include SearchHelper
   include SectionTabHelper
   include I18nUtilities
@@ -1280,8 +1279,6 @@ class UsersController < ApplicationController
     password = params[:user_service][:password]
     service = ServiceCredentials.new(user_name, password)
     case params[:user_service][:service]
-    when "delicious"
-      delicious_get_last_posted(service)
     when "diigo"
       Diigo::Connection.diigo_get_bookmarks(service)
     when "skype"
