@@ -27,7 +27,7 @@
 %>
 <%
   feedback_visibility_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-  assignments_2_student_enabled = @domain_root_account.feature_enabled?(:assignments_2_student)
+  assignments_2_student_enabled = @context.feature_enabled?(:assignments_2_student)
   js_env visibility_feedback_enabled: feedback_visibility_enabled
   js_env assignments_2_student_enabled: assignments_2_student_enabled 
 %>
