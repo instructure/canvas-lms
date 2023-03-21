@@ -259,11 +259,18 @@ describe FilesController do
       end
     end
 
-    it "authenticates via course if given an assignment id" do
-      user_session(@teacher)
-      assignment = @course.assignments.create!(name: "an assignment")
-      get "show", params: { assignment_id: assignment.id, id: @file.id }, format: :json
-      expect(response).to be_ok
+    it "doesn't allow an assignment_id to bypass other auth checks" do
+      assignment1 = @course.assignments.create!(name: "an assignment")
+
+      attachment_model(context: @teacher, uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"))
+
+      user_session(@student)
+
+      get "show", params: { id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
+
+      get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
     end
 
     describe "with verifiers" do

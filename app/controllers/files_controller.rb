@@ -1523,9 +1523,6 @@ class FilesController < ApplicationController
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).filter_map(&:context)
     return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
 
-    course = api_find(Assignment, params[:assignment_id]).course if params[:assignment_id].present?
-    return true if course&.grants_right?(user, session, access_type)
-
     authorized_action(attachment, user, access_type)
   end
 
