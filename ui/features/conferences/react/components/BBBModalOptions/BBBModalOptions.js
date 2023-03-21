@@ -247,6 +247,10 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
             <CheckboxGroup
               name="invitation_options"
               onChange={value => {
+                // make sure to uncheck remove_observers if invite_all is unchecked
+                if (!value.includes('invite_all') && value.indexOf('remove_observers') > -1) {
+                  value.splice(value.indexOf('remove_observers'), 1)
+                }
                 props.onSetInvitationOptions([...value])
               }}
               defaultValue={props.invitationOptions}
