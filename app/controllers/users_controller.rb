@@ -1308,7 +1308,7 @@ class UsersController < ApplicationController
   def bookmark_search
     @service = @current_user.user_services.where(type: "BookmarkService", service: params[:service_type]).first rescue nil
     res = nil
-    res = @service.find_bookmarks(params[:q]) if @service
+    res = @service.find_bookmarks if @service
     render json: res
   end
 
