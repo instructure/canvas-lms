@@ -28,6 +28,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  isGradedOrExcusedSubmissionUnposted,
   maxAssignmentCount,
   onGridKeyDown,
   otherGradingPeriodAssignmentIds,
@@ -109,6 +110,11 @@ const gradedSubmission: Submission = {
   rawGrade: '5',
   score: 5,
   workflow_state: 'graded',
+}
+
+const gradedPostedSubmission: Submission = {
+  ...gradedSubmission,
+  posted_at: new Date(),
 }
 
 describe('getGradeAsPercent', () => {
@@ -506,5 +512,19 @@ describe('otherGradingPeriodAssignmentIds', () => {
       otherGradingPeriodIds: ['2'],
       otherAssignmentIds: ['3', '4', '5', '6', '7', '8', '9', '10'],
     })
+  })
+})
+
+describe('isGradedOrExcusedSubmissionUnposted', () => {
+  it('returns true if submission is graded or excused but not posted', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(gradedSubmission)).toStrictEqual(true)
+  })
+
+  it('returns false if submission is graded or excused and posted', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(gradedPostedSubmission)).toStrictEqual(false)
+  })
+
+  it('returns false if submission is ungraded', () => {
+    expect(isGradedOrExcusedSubmissionUnposted(ungradedSubmission)).toStrictEqual(false)
   })
 })

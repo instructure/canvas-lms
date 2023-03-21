@@ -24,7 +24,7 @@ import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
-import type {Filter, SubmissionFilterValue} from '../gradebook.d'
+import type {Filter, FilterType, SubmissionFilterValue} from '../gradebook.d'
 import type {
   AssignmentGroup,
   Module,
@@ -48,27 +48,19 @@ const submissionTypeOptions: SubmissionTypeOption[] = [
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
   ['has-submissions', I18n.t('Has submissions')],
   ['has-no-submissions', I18n.t('Has no submissions')],
+  ['has-unposted-grades', I18n.t('Has unposted grades')],
 ]
 
-const filterTypeLabels: {
-  'assignment-group': string
-  'grading-period': string
-  module: string
-  section: string
-  'student-group': string
-  submissions: string
-  'start-date': string
-  'end-date': string
-} = {
-  'assignment-group': I18n.t('Assignment Groups'),
-  'grading-period': I18n.t('Grading Periods'),
-  module: I18n.t('Modules'),
-  section: I18n.t('Sections'),
-  'student-group': I18n.t('Student Groups'),
-  submissions: I18n.t('Submissions'),
-  'start-date': I18n.t('Start Date'),
-  'end-date': I18n.t('End Date'),
-}
+const filterTypeLabels = new Map<FilterType, string>([
+  ['assignment-group', I18n.t('Assignment Groups')],
+  ['grading-period', I18n.t('Grading Periods')],
+  ['module', I18n.t('Modules')],
+  ['section', I18n.t('Sections')],
+  ['student-group', I18n.t('Student Groups')],
+  ['submissions', I18n.t('Submissions')],
+  ['start-date', I18n.t('Start Date')],
+  ['end-date', I18n.t('End Date')],
+])
 
 export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
@@ -140,7 +132,7 @@ export default function ({
         <SimpleSelect
           data-testid="select-filter"
           key={filter.type} // resets dropdown when filter type is changed
-          renderLabel={filterTypeLabels[filter.type || 'assignment-group']}
+          renderLabel={filterTypeLabels.get(filter.type || 'assignment-group')}
           placeholder="--"
           size="small"
           value={filter.value || '_'}

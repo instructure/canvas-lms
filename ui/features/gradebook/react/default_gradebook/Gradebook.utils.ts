@@ -260,7 +260,12 @@ export function findSubmissionFilterValue(appliedFilters: Filter[]) {
   const values = findFilterValuesOfType('submissions', appliedFilters)
   return (
     values.length &&
-    ['has-ungraded-submissions', 'has-submissions', 'has-no-submissions'].includes(values[0])
+    [
+      'has-ungraded-submissions',
+      'has-submissions',
+      'has-no-submissions',
+      'has-unposted-grades',
+    ].includes(values[0])
       ? values[0]
       : undefined
   ) as SubmissionFilterValue
@@ -335,6 +340,8 @@ export const getLabelForFilter = (
       return I18n.t('Has submissions')
     } else if (filter.value === 'has-no-submissions') {
       return I18n.t('Has no submissions')
+    } else if (filter.value === 'has-unposted-grades') {
+      return I18n.t('Has unposted grades')
     } else {
       throw new Error('invalid submissions filter value')
     }
@@ -546,4 +553,11 @@ export function escapeStudentContent(student: Student) {
       enrollment.grades.html_url = htmlEscape.unescape(gradesUrl)
     }
   })
+}
+
+export function isGradedOrExcusedSubmissionUnposted(submission: Submission) {
+  return (
+    submission.posted_at === null &&
+    ((submission.score !== null && submission.workflow_state === 'graded') || submission.excused)
+  )
 }

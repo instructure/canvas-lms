@@ -149,9 +149,12 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (
-      ['has-ungraded-submissions', 'has-submissions', 'has-no-submissions'].includes(
-        initialColumnFilterSettings.submissions || ''
-      )
+      [
+        'has-ungraded-submissions',
+        'has-submissions',
+        'has-no-submissions',
+        'has-unposted-grades',
+      ].includes(initialColumnFilterSettings.submissions || '')
     ) {
       appliedFilters.push({
         id: uuid.v4(),

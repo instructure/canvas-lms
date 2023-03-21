@@ -206,6 +206,7 @@ import {
   hiddenStudentIdsForAssignment,
   htmlDecode,
   isAdmin,
+  isGradedOrExcusedSubmissionUnposted,
   onGridKeyDown,
   renderComponent,
   sectionList,
@@ -1185,6 +1186,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           return submissions.some(wasSubmitted)
         } else if (filter === 'has-no-submissions') {
           return submissions.every(s => !wasSubmitted(s))
+        } else if (filter === 'has-unposted-grades') {
+          return submissions.some(isGradedOrExcusedSubmissionUnposted)
         } else {
           return true
         }
@@ -2974,10 +2977,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         break
       case 'unposted':
         this.sortRowsWithFunction(
-          (row: GradebookStudent) =>
-            row[columnId].posted_at === null &&
-            ((row[columnId].score !== null && row[columnId].workflow_state === 'graded') ||
-              row[columnId].excused),
+          (row: GradebookStudent) => {
+            return isGradedOrExcusedSubmissionUnposted(row[columnId] as Submission)
+          },
           {
             asc: direction === 'ascending',
           }
@@ -4907,7 +4909,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      // submissions ('has-ungraded-submissions' | 'has-submissions' | 'has-no-submissions')
+      // submissions ('has-ungraded-submissions' | 'has-submissions' | 'has-no-submissions' | 'has-unposted-grades')
       const prevSubmissionsFilter = findSubmissionFilterValue(prevProps.appliedFilters)
       const submissionFilter = findSubmissionFilterValue(this.props.appliedFilters)
       if (prevSubmissionsFilter !== submissionFilter) {
