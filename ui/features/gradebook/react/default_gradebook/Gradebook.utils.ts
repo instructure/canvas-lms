@@ -34,6 +34,7 @@ import type {
   FilterType,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
+  GradebookStudent,
   GradebookStudentMap,
   GradingPeriodAssignmentMap,
   PartialFilterPreset,
@@ -53,14 +54,14 @@ import type {
   Submission,
   SubmissionType,
 } from '../../../../api.d'
-import type {GridColumn} from './grid'
+import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 
 const I18n = useI18nScope('gradebook')
 
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
-export function compareAssignmentDueDates(assignment1, assignment2) {
+export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: GridColumn) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
 
@@ -119,7 +120,7 @@ export function getGradeAsPercent(grade: {score?: number | null; possible: numbe
   }
 }
 
-export function getStudentGradeForColumn(student, field: string) {
+export function getStudentGradeForColumn(student: GradebookStudent, field: string) {
   return student[field] || {score: null, possible: 0}
 }
 
@@ -133,7 +134,16 @@ export function isAdmin() {
   return (ENV.current_user_roles || []).includes('admin')
 }
 
-export function onGridKeyDown(event, obj) {
+export function onGridKeyDown(
+  event: SlickGridKeyboardEvent,
+  obj: {
+    row: number | null
+    cell: number | null
+    grid: {
+      getColumns(): GridColumn[]
+    }
+  }
+) {
   if (obj.row == null || obj.cell == null) {
     return
   }
@@ -151,7 +161,11 @@ export function onGridKeyDown(event, obj) {
   }
 }
 
-export function renderComponent(reactClass, mountPoint: Element | null, props = {}) {
+export function renderComponent(
+  reactClass: any,
+  mountPoint: Element | null,
+  props = {}
+): HTMLElement | undefined {
   if (mountPoint == null) {
     throw new Error('mountPoint is required')
   }
@@ -160,7 +174,13 @@ export function renderComponent(reactClass, mountPoint: Element | null, props = 
   return ReactDOM.render(component, mountPoint)
 }
 
-export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
+export async function confirmViewUngradedAsZero({
+  currentValue,
+  onAccepted,
+}: {
+  currentValue: boolean
+  onAccepted: () => void
+}) {
   const showDialog = () =>
     showConfirmationDialog({
       body: I18n.t(
@@ -514,7 +534,7 @@ export function escapeStudentContent(student: Student) {
   const unescapedLastName = student.last_name
 
   // TODO: selectively escape fields
-  const escapedStudent = htmlEscape<Student>(student)
+  const escapedStudent: Student = htmlEscape<Student>(student)
   escapedStudent.name = unescapedName
   escapedStudent.sortable_name = unescapedSortableName
   escapedStudent.first_name = unescapedFirstName

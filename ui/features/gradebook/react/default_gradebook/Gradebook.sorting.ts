@@ -45,16 +45,10 @@ export function localeSort(
 }
 
 export function wrapColumnSortFn(
-  wrappedFn: (
-    a: Pick<GridColumn, 'id' | 'type' | 'object'>,
-    b: Pick<GridColumn, 'id' | 'type' | 'object'>
-  ) => number,
+  wrappedFn: (a: GridColumn, b: GridColumn) => number,
   direction = 'ascending'
 ) {
-  return function (
-    a: Pick<GridColumn, 'id' | 'type' | 'object'>,
-    b: Pick<GridColumn, 'id' | 'type' | 'object'>
-  ): number {
+  return function (a: GridColumn, b: GridColumn): number {
     if (b.type === 'total_grade_override') {
       return -1
     }
@@ -121,10 +115,7 @@ export function secondaryAndTertiarySort(
   return result
 }
 
-export function compareAssignmentNames(
-  a: Pick<GridColumn, 'object'>,
-  b: Pick<GridColumn, 'object'>
-): number {
+export function compareAssignmentNames(a: GridColumn, b: GridColumn): number {
   return localeSort(a.object?.name || '', b.object?.name || '')
 }
 
@@ -133,7 +124,9 @@ export function makeCompareAssignmentCustomOrderFn(sortOrder: {customOrder?: str
   let indexCounter: number
   let len: number
   let j: number
-  const sortMap = {}
+  const sortMap: {
+    [key: string]: number
+  } = {}
   indexCounter = 0
   const ref1 = sortOrder.customOrder || []
   for (j = 0, len = ref1.length; j < len; j++) {
@@ -141,18 +134,18 @@ export function makeCompareAssignmentCustomOrderFn(sortOrder: {customOrder?: str
     sortMap[String(assignmentId)] = indexCounter
     indexCounter += 1
   }
-  return (a: Pick<GridColumn, 'id' | 'object'>, b: Pick<GridColumn, 'id' | 'object'>): number => {
+  return (a: GridColumn, b: GridColumn): number => {
     let aIndex, bIndex
     // The second lookup for each index is to maintain backwards
     // compatibility with old gradebook sorting on load which only
     // considered assignment ids.
-    aIndex = sortMap[a?.id || '']
+    aIndex = sortMap[a.id || '']
     if (a.object != null) {
       if (aIndex == null) {
         aIndex = sortMap[String(a.object.id)]
       }
     }
-    bIndex = sortMap[b?.id || '']
+    bIndex = sortMap[b.id || '']
     if (b.object != null) {
       if (bIndex == null) {
         bIndex = sortMap[String(b.object.id)]
