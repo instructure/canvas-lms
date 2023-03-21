@@ -197,6 +197,28 @@ describe RoleOverridesController do
         expect(RoleOverride.pluck(:enabled)).to match_array [true, true, false]
       end
     end
+
+    describe "restrict_quantitative_data" do
+      before do
+        @account.root_account.enable_feature!(:restrict_quantitative_data)
+        @account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        @account.save!
+      end
+
+      it "permission has no overrides by default" do
+        expect(RoleOverride.where(permission: "restrict_quantitative_data").count).to eq 0
+      end
+
+      it "override permission to true for student enrolment" do
+        update_permissions({ "restrict_quantitative_data" => { enabled: true, locked: true } })
+        overrides = RoleOverride.where(permission: "restrict_quantitative_data")
+        expect(overrides.length).to eq 1
+        expect(overrides[0].permission).to eq "restrict_quantitative_data"
+        expect(overrides[0].enabled).to eq true
+        expect(overrides[0].locked).to eq true
+        expect(overrides[0].role_id).to eq @role.id
+      end
+    end
   end
 
   describe "create" do
