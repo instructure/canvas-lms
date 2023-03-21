@@ -3162,6 +3162,10 @@ describe CoursesController do
         Progress.destroy_all
         put "update", params: { id: @course.id, course: { restrict_enrollments_to_course_dates: false } }
         expect(Progress.find_by(context: @course_pace)).to be_queued
+        Progress.destroy_all
+        term = EnrollmentTerm.create!(start_at: 1.day.ago, end_at: 3.days.from_now, root_account: @course.account)
+        put "update", params: { id: @course.id, course: { term_id: term.id } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
       end
 
       it "does not republish course paces when dates have not changed" do
