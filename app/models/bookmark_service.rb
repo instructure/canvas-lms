@@ -40,7 +40,7 @@ class BookmarkService < UserService
     end
   end
 
-  def find_bookmarks(query)
+  def find_bookmarks
     if service == "diigo"
       last_get = Rails.cache.fetch("last_diigo_lookup") { Time.now - 60 }
       if Time.now - last_get < 8
@@ -49,10 +49,10 @@ class BookmarkService < UserService
       end
       Rails.cache.write("last_diigo_lookup", Time.now)
     end
-    bookmark_search(self, query)
+    bookmark_search(self)
   end
 
-  def bookmark_search(service, _query)
+  def bookmark_search(service)
     bookmarks = []
     case service.service
     when "diigo"

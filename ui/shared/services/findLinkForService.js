@@ -57,7 +57,6 @@ export function findLinkForService(service_type, callback) {
       `${
         "<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
         "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
-        "<input type='text' class='query' style='width: 230px;'/>" +
         "<button class='btn search_button' type='submit'>"
       }${htmlEscape(I18n.t('buttons.search', 'Search'))}</button></form>`
     )
@@ -89,8 +88,6 @@ export function findLinkForService(service_type, callback) {
         .empty()
         .append(htmlEscape(I18n.t('status.searching', 'Searching...')))
       lastLookup = new Date()
-      const query = $dialog.find('.query').val()
-      const url = $.replaceTags($dialog.data('reference_url'), 'query', query)
       $.ajaxJSON(
         url,
         'GET',
@@ -145,10 +142,10 @@ export function findLinkForService(service_type, callback) {
   }
   $dialog.find('.search_button').text(I18n.t('buttons.search', 'Search'))
   $dialog.find('form img').attr('src', `/images/${service_type}_small_icon.png`)
-  let url = '/search/bookmarks?q=%7B%7B+query+%7D%7D&service_type=%7B%7B+service_type+%7D%7D'
+  let url = '/search/bookmarks?service_type=%7B%7B+service_type+%7D%7D'
   url = $.replaceTags(url, 'service_type', service_type)
   $dialog.data('reference_url', url)
-  $dialog.find('.results').empty().end().find('.query').val('')
+  $dialog.find('.results').empty()
   $dialog.dialog({
     title: I18n.t('titles.bookmark_search', 'Bookmark Search: %{service_name}', {
       service_name: $.titleize(service_type),
