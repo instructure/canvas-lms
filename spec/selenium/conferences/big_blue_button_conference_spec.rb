@@ -297,6 +297,28 @@ describe "BigBlueButton conferences" do
       expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
     end
 
+    it "unchecks remove observers if invite_all is unchecked." do
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student)
+      get conferences_index_page
+      new_conference_button.click
+
+      # unclick invite all course members
+      f("div#tab-attendees").click
+      expect(f("input[value='invite_all']").attribute("checked")).to be_truthy
+      expect(f("input[value='remove_observers']").attribute("checked")).to be_falsey
+
+      # check remove observers
+      fj("label:contains('Remove all course observer members')").click
+      expect(f("input[value='remove_observers']").attribute("checked")).to be_truthy
+
+      # uncheck invite all
+      fj("label:contains('Invite all course members')").click
+      expect(f("input[value='invite_all']").attribute("checked")).to be_falsey
+      expect(f("input[value='remove_observers']").attribute("checked")).to be_falsey
+      expect(f("input[value='remove_observers']").attribute("disabled")).to be_truthy
+    end
+
     it "disables unchangeable properties when conference has begun" do
       conf = create_big_blue_button_conference
       conf.start_at = 2.hours.ago
