@@ -3022,6 +3022,7 @@ class CoursesController < ApplicationController
         return render_unauthorized_action
       end
 
+      term_id_param_was_sent = params[:course][:term_id] || params[:course][:enrollment_term_id]
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
       if enrollment_term_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
@@ -3205,7 +3206,8 @@ class CoursesController < ApplicationController
       return render_unauthorized_action if course_availability_changed && !@course.grants_right?(@current_user, :edit_course_availability)
 
       # Republish course paces if the course dates have been changed
-      if @course.account.feature_enabled?(:course_paces) && course_availability_changed
+      term_changed = (@course.enrollment_term_id != enrollment_term_id) && term_id_param_was_sent
+      if @course.account.feature_enabled?(:course_paces) && (course_availability_changed || term_changed)
         @course.course_paces.find_each(&:create_publish_progress)
       end
       disable_conditional_release if changes[:conditional_release]&.last == false
