@@ -287,6 +287,25 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
       },
+      restrict_quantitative_data: {
+        label: -> { t("Grades - view quantitative feedback") },
+        label_v2: -> { t("Grades - view quantitative feedback") },
+        available_to: %w[
+          StudentEnrollment
+          TaEnrollment
+          DesignerEnrollment
+          TeacherEnrollment
+          ObserverEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          AccountAdmin
+          AccountMembership
+        ],
+        acts_as_access_token_scope: true,
+        account_allows: ->(a) { a.root_account.feature_enabled?(:restrict_quantitative_data) && a.restrict_quantitative_data? }
+      },
       view_feature_flags: {
         label: -> { t("View feature options at an account level") },
         label_v2: -> { t("Feature Options - view") },
