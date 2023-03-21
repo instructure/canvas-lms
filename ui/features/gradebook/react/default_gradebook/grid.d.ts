@@ -26,6 +26,19 @@ import type {GradeEntryMode} from '@canvas/grading/grading.d'
 import type {StatusColors} from './constants/colors'
 import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 
+export type GridColumnObject = Partial<{
+  id: string
+  due_at: string | null
+  name: string
+  position: number
+  points_possible: number
+  module_ids: string[]
+  module_positions: number[]
+  assignment_group: {
+    position: number
+  }
+}>
+
 export type GridColumn = {
   id: string
   cssClass: string
@@ -42,18 +55,7 @@ export type GridColumn = {
   maxLength: number
   maxWidth: number
   minWidth: number
-  object: Partial<{
-    id: string
-    due_at: string | null
-    name: string
-    position: number
-    points_possible: number
-    module_ids: string[]
-    module_positions: number[]
-    assignment_group: {
-      position: number
-    }
-  }>
+  object: GridColumnObject
   resizable: boolean
   teacher_notes: string
   toolTip: string
@@ -147,4 +149,8 @@ export type GridDisplaySettings = {
 export type GridLocation = {
   columnId: string
   region: 'body' | 'header' | 'footer'
+}
+
+export type SlickGridKeyboardEvent = KeyboardEvent & {
+  originalEvent: {skipSlickGridDefaults?: boolean | undefined}
 }
