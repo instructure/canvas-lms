@@ -325,6 +325,22 @@ export default function FilterNav({
           toggleFilter(filter)
         },
       },
+      {
+        id: '4',
+        name: I18n.t('Has Unposted Grades'),
+        isSelected: appliedFilters.some(
+          c => c.type === 'submissions' && c.value === 'has-unposted-grades'
+        ),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid.v4(),
+            type: 'submissions',
+            value: 'has-unposted-grades',
+            created_at: new Date().toISOString(),
+          }
+          toggleFilter(filter)
+        },
+      },
     ],
   }
   dataMap.submissions = filterItems.submissions

@@ -255,14 +255,15 @@ export type FlashAlertType = {
 }
 
 export type FilterType =
-  | 'section'
-  | 'module'
   | 'assignment-group'
-  | 'grading-period'
-  | 'student-group'
-  | 'start-date'
   | 'end-date'
+  | 'grading-period'
+  | 'module'
+  | 'section'
+  | 'start-date'
+  | 'student-group'
   | 'submissions'
+  | 'unposted'
 
 export type Filter = {
   id: string
@@ -275,6 +276,7 @@ export type SubmissionFilterValue =
   | 'has-ungraded-submissions'
   | 'has-submissions'
   | 'has-no-submissions'
+  | 'has-unposted-grades'
 
 export type FilterPreset = {
   id: string
