@@ -167,7 +167,7 @@
     "react-modal": "^3",
     "react-popper": "^2.2.5",
     "react-redux": "^5.1.1",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^6.9.0",
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
     "react-use": "^17.3.1",
