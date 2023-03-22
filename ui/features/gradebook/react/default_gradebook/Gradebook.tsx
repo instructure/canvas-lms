@@ -41,6 +41,7 @@ import type {
   Course,
   DueDate,
   Enrollment,
+  MissingSubmission,
   Module,
   Section,
   SectionMap,
@@ -1177,8 +1178,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return true
     }
 
-    const submissions = this.submissionStateMap.getSubmissions(assignment.id)
-    const wasSubmitted = (s: Submission) => !['unsubmitted', 'deleted'].includes(s.workflow_state)
+    const submissions = this.submissionStateMap.getSubmissionsByAssignment(assignment.id)
+    const wasSubmitted = (s: Submission | MissingSubmission) =>
+      !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
 
     return (
       submissionFilters.length === 0 ||

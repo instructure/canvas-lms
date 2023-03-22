@@ -16,169 +16,64 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import GradingPeriodsHelper from './GradingPeriodsHelper'
 import type {Assignment, AssignmentMap, Student, Submission} from '../../api.d'
-
-type Cell = {
-  locked: boolean
-  hideGrade: boolean
-  inNoGradingPeriod?: boolean
-  inOtherGradingPeriod?: boolean
-  inClosedGradingPeriod?: boolean
-}
-
-type StudentSubmissionCellMap = {[studentId: string]: SubmissionCellMap}
-
-type SubmissionCellMap = {[assignmentId: string]: Cell}
-
-type StudentSubmissionMap = {
-  [studentId: string]: Submission
-}
-
-function submissionGradingPeriodInformation(assignment: Assignment, student: Student) {
-  const submissionInfo: {
-    grading_period_id?: null | string
-    in_closed_grading_period?: boolean
-  } = assignment.effectiveDueDates?.[student.id] || {}
-  return {
-    gradingPeriodID: submissionInfo.grading_period_id,
-    inClosedGradingPeriod: submissionInfo.in_closed_grading_period,
-  }
-}
-
-function hiddenFromStudent(assignment: Assignment, student: Student) {
-  if (assignment.only_visible_to_overrides) {
-    return !_.includes(assignment.assignment_visibility, student.id)
-  }
-  return false
-}
-
-function gradingPeriodInfoForCell(
-  assignment: Assignment,
-  student: Student,
-  selectedGradingPeriodID: string
-) {
-  const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
-  const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
-    assignment,
-    student
-  )
-  const inNoGradingPeriod = !gradingPeriodID
-  const inOtherGradingPeriod =
-    !!gradingPeriodID && specificPeriodSelected && selectedGradingPeriodID !== gradingPeriodID
-
-  return {
-    inNoGradingPeriod,
-    inOtherGradingPeriod,
-    inClosedGradingPeriod,
-  }
-}
-
-function cellMappingsForMultipleGradingPeriods(
-  assignment,
-  student,
-  selectedGradingPeriodID,
-  isAdmin
-) {
-  const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
-  const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
-    assignment,
-    student
-  )
-  const gradingPeriodInfo = gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID)
-  let cellMapping
-
-  if (specificPeriodSelected && (!gradingPeriodID || selectedGradingPeriodID !== gradingPeriodID)) {
-    cellMapping = {locked: true, hideGrade: true}
-  } else if (!isAdmin && inClosedGradingPeriod) {
-    cellMapping = {locked: true, hideGrade: false}
-  } else {
-    cellMapping = {locked: false, hideGrade: false}
-  }
-
-  return {...cellMapping, ...gradingPeriodInfo}
-}
-
-function cellMapForSubmission(
-  assignment: Assignment,
-  student: Student,
-  hasGradingPeriods: boolean,
-  selectedGradingPeriodID: string,
-  isAdmin: boolean
-): Cell {
-  if (!assignment.published || assignment.anonymize_students) {
-    return {locked: true, hideGrade: true}
-  } else if (assignment.moderated_grading && !assignment.grades_published) {
-    return {locked: true, hideGrade: false}
-  } else if (hiddenFromStudent(assignment, student)) {
-    return {locked: true, hideGrade: true}
-  } else if (hasGradingPeriods) {
-    return cellMappingsForMultipleGradingPeriods(
-      assignment,
-      student,
-      selectedGradingPeriodID,
-      isAdmin
-    )
-  } else {
-    return {locked: false, hideGrade: false}
-  }
-}
-
-function missingSubmission(student: Student, assignment: Assignment) {
-  const submission = {
-    assignment_id: assignment.id,
-    user_id: student.id,
-    excused: false,
-    late: false,
-    missing: false,
-    seconds_late: 0,
-  }
-  const dueDates: {
-    due_at?: null | string
-  } = assignment.effectiveDueDates?.[student.id] || {}
-  if (dueDates.due_at != null && new Date(dueDates.due_at) < new Date()) {
-    submission.missing = true
-  }
-  return submission
-}
+import {cellMapForSubmission, missingSubmission} from './SubmissionStateMap.utils'
+import type {
+  AssignmentSubmissionMap,
+  StudentSubmissionCellMap,
+  StudentSubmissionMap,
+} from './SubmissionStateMap.utils'
 
 class SubmissionStateMap {
   hasGradingPeriods: boolean
 
   isAdmin: boolean
 
-  submissionMap: {[studentId: string]: StudentSubmissionMap}
+  studentSubmissionMap: {[studentId: string]: StudentSubmissionMap} = {}
+
+  assignmentStudentSubmissionMap: {[assignmentId: string]: AssignmentSubmissionMap} = {}
 
   selectedGradingPeriodID?: string
 
-  submissionCellMap: StudentSubmissionCellMap
+  submissionCellMap: StudentSubmissionCellMap = {}
 
-  constructor({hasGradingPeriods, selectedGradingPeriodID, isAdmin}) {
+  constructor({
+    hasGradingPeriods,
+    selectedGradingPeriodID,
+    isAdmin,
+  }: {
+    hasGradingPeriods: boolean
+    selectedGradingPeriodID?: string
+    isAdmin: boolean
+  }) {
     this.hasGradingPeriods = hasGradingPeriods
     this.selectedGradingPeriodID = selectedGradingPeriodID
     this.isAdmin = isAdmin
-    this.submissionCellMap = {}
-    this.submissionMap = {}
+
+    this.getSubmissionsByStudentAndAssignmentIds =
+      this.getSubmissionsByStudentAndAssignmentIds.bind(this)
   }
 
   setup(students: Student[], assignments: AssignmentMap) {
-    students.forEach(student => {
-      this.submissionCellMap[student.id] = {}
-      this.submissionMap[student.id] = {}
-      _.each(assignments, assignment => {
-        this.setSubmissionCellState(
-          student,
-          assignment,
-          student[`assignment_${assignment.id}`] as Submission
-        )
-      })
+    Object.values(assignments).forEach(assignment => {
+      this.assignmentStudentSubmissionMap[assignment.id] ||= {}
     })
+
+    for (const student of students) {
+      this.submissionCellMap[student.id] = {}
+      this.studentSubmissionMap[student.id] = {}
+      Object.values(assignments).forEach(assignment => {
+        // @ts-ignore-error
+        const submission = student[`assignment_${assignment.id}`] as Submission
+        this.setSubmissionCellState(student, assignment, submission)
+      })
+    }
   }
 
-  setSubmissionCellState(student: Student, assignment: Assignment, submission: Submission) {
-    this.submissionMap[student.id][assignment.id] =
-      submission || missingSubmission(student, assignment)
+  setSubmissionCellState(student: Student, assignment: Assignment, submission?: Submission) {
+    const sub = submission || missingSubmission(student, assignment)
+    this.studentSubmissionMap[student.id][assignment.id] = sub
+    this.assignmentStudentSubmissionMap[assignment.id][student.id] = sub
 
     if (!this.selectedGradingPeriodID) {
       throw new Error('selectedGradingPeriodID is required')
@@ -194,24 +89,24 @@ class SubmissionStateMap {
   }
 
   getSubmission(userId: string, assignmentId: string) {
-    return (this.submissionMap[userId] || {})[assignmentId]
+    return (this.assignmentStudentSubmissionMap[assignmentId] || {})[userId]
   }
 
-  getSubmissions(assignmentId: string): Submission[] {
-    const submissionsByStudent = Object.values(this.submissionMap)
-    return submissionsByStudent.reduce(
-      (accumulator: Submission[], submissionsByUserId: StudentSubmissionMap) => {
-        const submissions = Object.values(submissionsByUserId).filter(
-          submission => submission.assignment_id === assignmentId
-        )
-        accumulator = [...accumulator, ...submissions]
-        return accumulator
-      },
-      []
-    )
+  getSubmissionsByAssignment(assignmentId: string) {
+    return Object.values(this.assignmentStudentSubmissionMap[assignmentId] || {})
   }
 
-  getSubmissionState({user_id: userId, assignment_id: assignmentId}) {
+  getSubmissionsByStudentAndAssignmentIds(userId: string, assignmentIds: string[]) {
+    return assignmentIds.map(assignmentId => this.getSubmission(userId, assignmentId))
+  }
+
+  getSubmissionState({
+    user_id: userId,
+    assignment_id: assignmentId,
+  }: {
+    user_id: string
+    assignment_id: string
+  }) {
     return (this.submissionCellMap[userId] || {})[assignmentId]
   }
 }
