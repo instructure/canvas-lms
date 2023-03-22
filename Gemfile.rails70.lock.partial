@@ -1077,7 +1077,7 @@ GEM
       rspec (~> 3.8)
     strscan (3.0.5)
     swearjar (1.4.0)
-    switchman (3.3.3)
+    switchman (3.3.7)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
@@ -1398,7 +1398,7 @@ DEPENDENCIES
   stackprof
   stormbreaker (= 0.0.8)
   stringify_ids!
-  switchman (= 3.3.3)
+  switchman (= 3.3.7)
   switchman-inst-jobs (= 4.0.13)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!
