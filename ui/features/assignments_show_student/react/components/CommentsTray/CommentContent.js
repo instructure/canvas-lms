@@ -59,6 +59,7 @@ export default function CommentContent(props) {
           variables: {
             submissionId: props.submission.id,
             submissionAttempt: props.submission.attempt,
+            peerReview: props.isPeerReviewEnabled,
           },
         }
 

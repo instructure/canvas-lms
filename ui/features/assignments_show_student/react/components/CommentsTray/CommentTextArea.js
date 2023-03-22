@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
+import {bool} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import UploadMedia from '@instructure/canvas-media'
@@ -44,6 +45,7 @@ export default class CommentTextArea extends Component {
     assignment: Assignment.shape,
     submission: Submission.shape,
     reviewerSubmission: Submission.shape,
+    isPeerReviewEnabled: bool,
     onSendCommentSuccess: () => {},
   }
 
@@ -62,6 +64,7 @@ export default class CommentTextArea extends Component {
       variables: {
         submissionId: this.props.submission.id,
         submissionAttempt: this.props.submission.attempt,
+        peerReview: this.props.isPeerReviewEnabled,
       },
     }
   }
