@@ -1274,6 +1274,18 @@ describe Attachment do
       @a = attachment_with_context(@course)
     end
 
+    it "returns replaced attachments when using the replaced_attachments association" do
+      @a.display_name = "a1"
+      @a.handle_duplicates(:overwrite)
+      expect(@a.replaced_attachments).to include @a1
+    end
+
+    it "excludes not-replaced attachments when using the replaced_attachments association" do
+      @a.display_name = "a1 fancy name"
+      @a.handle_duplicates(:overwrite)
+      expect(@a.replaced_attachments).not_to include @a1
+    end
+
     it "handles overwriting duplicates" do
       @a.display_name = "a1"
       deleted = @a.handle_duplicates(:overwrite)
