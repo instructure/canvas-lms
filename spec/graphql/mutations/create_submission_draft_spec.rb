@@ -89,6 +89,50 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     result.to_h.with_indifferent_access
   end
 
+  context "when an attachment has been replaced" do
+    before do
+      @attachments.first.update!(file_state: "deleted", replacement_attachment: @attachments.second)
+    end
+
+    it "returns the replacing attachment if the requested attachment has been replaced" do
+      result = run_mutation(
+        submission_id: @submission.id,
+        active_submission_type: "online_upload",
+        attempt: @submission.attempt,
+        file_ids: [@attachments.first.id]
+      )
+
+      expect(
+        result.dig(:data, :createSubmissionDraft, :errors)
+      ).to be nil
+
+      expect(
+        result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments, 0, :_id)
+      ).to eq @attachments.second.id.to_s
+    end
+
+    it "does not return duplicates when a replacing attachment and replaced attachment are both requested" do
+      result = run_mutation(
+        submission_id: @submission.id,
+        active_submission_type: "online_upload",
+        attempt: @submission.attempt,
+        file_ids: @attachments.pluck(:id)
+      )
+
+      expect(
+        result.dig(:data, :createSubmissionDraft, :errors)
+      ).to be nil
+
+      expect(
+        result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).length
+      ).to eq 1
+
+      expect(
+        result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments, 0, :_id)
+      ).to eq @attachments.second.id.to_s
+    end
+  end
+
   it "creates a new submission draft" do
     result = run_mutation(
       submission_id: @submission.id,
