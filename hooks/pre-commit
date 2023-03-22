@@ -11,8 +11,8 @@ SCRIPTPATH="$(
 CANVAS=$(dirname $SCRIPTPATH)
 
 if [ $(pwd -P) = $CANVAS ]; then
-  # if .ts or .tsx files have changed, run tsc
-  if git diff --cached --name-only | grep -qE '\.(ts|tsx)$'; then
+  # if .ts or .tsx files have changed (excluding those in packages/), run tsc
+  if git diff --cached --name-only | grep -vE '^packages/' | grep -qE '\.(ts|tsx)$'; then
     if [ -f node_modules/.bin/tsc ]; then
       echo 'Checking TypeScript...'
       node_modules/.bin/tsc -p tsconfig.json --noEmit
@@ -40,6 +40,21 @@ if [ $(pwd -P) = $CANVAS ]; then
     docker-compose exec -T web yarn run lint:staged ||
       echo "You should run yarn locally or check to make sure docker is running."
   fi
+
+  # per-package pre-commit hooks
+  git diff --cached --name-only | grep -E -o '^(packages/[^/]+)' | sort | uniq | while read -r PACKAGE; do
+    # check if CHANGED_PACKAGES/pre-commit-hook.sh exists and run it
+    if [ -f "$PACKAGE/pre-commit-hook.sh" ]; then
+      echo "Running pre-commit hook for $PACKAGE"
+
+      (cd "$PACKAGE" && "./pre-commit-hook.sh")
+
+      if [ $? -ne 0 ]; then
+        echo "Pre-commit hook for $PACKAGE failed, aborting commit"
+        exit 1
+      fi
+    fi
+  done || exit 1
 fi
 
 $CANVAS/script/rlint ${RLINT_ARGUMENTS:- --auto-correct-all}
