@@ -57,7 +57,7 @@ function makeExternalLinkIcon(forLink) {
   const dir = (forLink && window.getComputedStyle(forLink).direction) || 'ltr'
   const $icon = document.createElement('span')
   $icon.setAttribute('class', 'external_link_icon')
-  const style = `margin-inline-start: 5px; display: inline-block; ${
+  const style = `margin-inline-start: 5px; display: inline-block; text-indent: initial; ${
     dir === 'rtl' ? 'transform:scale(-1, 1)' : ''
   }`
   $icon.setAttribute('style', style)
