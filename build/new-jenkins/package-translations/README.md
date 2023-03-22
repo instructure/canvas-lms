@@ -17,3 +17,6 @@ format-message extract $(find src -name \"*.js\") -g underscored_crc32 -o locale
 ```
 
 The end result should be an `en.json` file containing the english strings extracted from the package inside a `locales` directory at the root of the package.
+
+You also need to add a `git add` line for your sub-package to `sync-strings.sh` so the output of `yarn installTranslations` (if there is any in your sub-package)
+gets committed by the build.
