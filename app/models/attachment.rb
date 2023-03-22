@@ -85,7 +85,8 @@ class Attachment < ActiveRecord::Base
   has_many :submissions, -> { active }
   has_many :attachment_associations
   belongs_to :root_attachment, class_name: "Attachment"
-  belongs_to :replacement_attachment, class_name: "Attachment"
+  belongs_to :replacement_attachment, class_name: "Attachment", inverse_of: :replaced_attachments
+  has_many :replaced_attachments, class_name: "Attachment", foreign_key: "replacement_attachment_id", inverse_of: :replacement_attachment
   has_one :sis_batch
   has_one :thumbnail, -> { where(thumbnail: "thumb") }, foreign_key: "parent_id"
   has_many :thumbnails, foreign_key: "parent_id"
