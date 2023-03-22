@@ -32,7 +32,7 @@ describe AuthenticationProvider::LDAP do
 
   describe "#test_ldap_search" do
     it "validates filter syntax" do
-      aac = AuthenticationProvider::LDAP.new
+      aac = AuthenticationProvider::LDAP.new(account: Account.new)
       aac.auth_type = "ldap"
       aac.ldap_filter = "bob"
       expect(aac.test_ldap_search).to be_falsey
@@ -42,6 +42,48 @@ describe AuthenticationProvider::LDAP do
       aac.ldap_filter = "(sAMAccountName={{login}})"
       expect(aac.test_ldap_search).to be_falsey
       expect(aac.errors.full_messages.join).not_to match(/Invalid filter syntax/)
+    end
+  end
+
+  describe "#auth_over_tls" do
+    let(:account) { Account.create }
+    let(:auth_provider) { account.authentication_providers.create(auth_type: "ldap", auth_over_tls: "false") }
+
+    context "when verify_ldap_certs is enabled" do
+      before do
+        account.set_feature_flag!(:verify_ldap_certs, "on")
+      end
+
+      it "returns simple_tls instead of a falsey value" do
+        expect(auth_provider.auth_over_tls).to eq("simple_tls")
+      end
+    end
+  end
+
+  describe "#ldap_connection" do
+    let(:account) { Account.create }
+    let(:auth_provider) { account.authentication_providers.create(auth_type: "ldap") }
+
+    context "when verify_ldap_certs is enabled" do
+      before do
+        account.set_feature_flag!(:verify_ldap_certs, "on")
+      end
+
+      it "uses default OpenSSL options" do
+        encryption_args = auth_provider.ldap_connection.instance_variable_get(:@encryption)
+        expect(encryption_args[:tls_options]).to eq(OpenSSL::SSL::SSLContext::DEFAULT_PARAMS)
+      end
+    end
+
+    context "when verify_ldap_certs is disabled" do
+      before do
+        account.set_feature_flag!(:verify_ldap_certs, "off")
+      end
+
+      it "doesn't verify anything" do
+        encryption_args = auth_provider.ldap_connection.instance_variable_get(:@encryption)
+        expect(encryption_args[:tls_options]).to eq({ verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false })
+      end
     end
   end
 
