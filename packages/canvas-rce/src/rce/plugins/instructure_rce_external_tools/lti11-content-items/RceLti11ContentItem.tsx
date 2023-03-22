@@ -26,6 +26,7 @@ import {
   StudioContentItemCustomJson,
   isStudioContentItemCustomJson,
   studioAttributesFrom,
+  displayStyleFrom,
 } from '../../shared/StudioLtiSupportUtils'
 
 export class RceLti11ContentItem {
@@ -112,14 +113,10 @@ export class RceLti11ContentItem {
   }
 
   private generateCodePayloadIframe(): string {
-    let studioAttributes = {}
-
-    if (
-      this.env?.studioMediaOptionsEnabled &&
-      isStudioContentItemCustomJson(this.contentItem.custom)
-    ) {
-      studioAttributes = studioAttributesFrom(this.contentItem.custom)
-    }
+    const studioAttributes =
+      this.env?.studioMediaOptionsEnabled && isStudioContentItemCustomJson(this.contentItem.custom)
+        ? studioAttributesFrom(this.contentItem.custom)
+        : null
 
     return $('<div/>')
       .append(
@@ -136,6 +133,7 @@ export class RceLti11ContentItem {
           .css({
             width: this.contentItem.placementAdvice?.displayWidth ?? '',
             height: this.contentItem.placementAdvice?.displayHeight ?? '',
+            display: displayStyleFrom(studioAttributes),
           })
           .attr({
             width: this.contentItem.placementAdvice?.displayWidth ?? '',

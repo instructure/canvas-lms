@@ -28,7 +28,7 @@ export interface StudioContentItemCustomJson {
   enableMediaOptions?: boolean
 }
 
-interface StudioMediaOptionsAttributes {
+export interface StudioMediaOptionsAttributes {
   'data-studio-resizable': boolean
   'data-studio-tray-enabled': boolean
   'data-studio-convertible-to-link': boolean
@@ -46,4 +46,25 @@ export function studioAttributesFrom(
     'data-studio-tray-enabled': customJson.enableMediaOptions ?? false,
     'data-studio-convertible-to-link': true,
   }
+}
+
+export function displayStyleFrom(
+  studioAttributes: StudioMediaOptionsAttributes | null
+): 'inline-block' | '' {
+  if (!studioAttributes) return ''
+
+  return studioAttributes['data-studio-resizable'] || studioAttributes['data-studio-tray-enabled']
+    ? 'inline-block'
+    : ''
+}
+
+export function isStudioEmbeddedMedia(element: Element): boolean {
+  // Borrowing this structure from isMediaElement in ContentSelection.js
+  const tinymceIframeShim = element.tagName === 'IFRAME' ? element.parentElement : element
+
+  if (tinymceIframeShim?.firstElementChild?.tagName !== 'IFRAME') {
+    return false
+  }
+
+  return tinymceIframeShim.getAttribute('data-mce-p-data-studio-tray-enabled') === 'true'
 }

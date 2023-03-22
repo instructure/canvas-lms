@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {studioAttributesFrom, StudioContentItemCustomJson} from '../StudioLtiSupportUtils'
+import {
+  displayStyleFrom,
+  isStudioEmbeddedMedia,
+  studioAttributesFrom,
+  StudioContentItemCustomJson,
+  StudioMediaOptionsAttributes,
+} from '../StudioLtiSupportUtils'
 
 describe('studioAttributesFrom', () => {
   it('uses the default values for missing attributes', () => {
@@ -56,5 +62,56 @@ describe('studioAttributesFrom', () => {
         "data-studio-tray-enabled": false,
       }
     `)
+  })
+})
+
+describe('displayStyleFrom', () => {
+  it('returns the empty string if studioAttributes is null', () => {
+    expect(displayStyleFrom(null)).toEqual('')
+  })
+
+  it('returns inline-block if data-studio-resizable is true', () => {
+    const studioAttributes: StudioMediaOptionsAttributes = {
+      'data-studio-convertible-to-link': true,
+      'data-studio-resizable': true,
+      'data-studio-tray-enabled': false,
+    }
+    expect(displayStyleFrom(studioAttributes)).toEqual('inline-block')
+  })
+
+  it('returns inline-block if data-studio-tray-enabled is true', () => {
+    const studioAttributes: StudioMediaOptionsAttributes = {
+      'data-studio-convertible-to-link': true,
+      'data-studio-resizable': false,
+      'data-studio-tray-enabled': true,
+    }
+    expect(displayStyleFrom(studioAttributes)).toEqual('inline-block')
+  })
+})
+
+describe('isStudioEmbeddedMedia', () => {
+  it('returns false if there is no parent element', () => {
+    const element = document.createElement('iframe')
+    expect(isStudioEmbeddedMedia(element)).toEqual(false)
+  })
+
+  it('returns false if the iframe is not the first child', () => {
+    const element = document.createElement('span')
+    element.innerHTML = '<span/><iframe/>'
+    expect(isStudioEmbeddedMedia(element)).toEqual(false)
+  })
+
+  it('returns false if data-studio-tray-enabled is false', () => {
+    const element = document.createElement('span')
+    element.innerHTML = '<iframe/>'
+    element.setAttribute('data-mce-p-data-studio-tray-enabled', 'false')
+    expect(isStudioEmbeddedMedia(element)).toEqual(false)
+  })
+
+  it('returns true if data-studio-tray-enabled is true', () => {
+    const element = document.createElement('span')
+    element.innerHTML = '<iframe/>'
+    element.setAttribute('data-mce-p-data-studio-tray-enabled', 'true')
+    expect(isStudioEmbeddedMedia(element)).toEqual(true)
   })
 })
