@@ -92,6 +92,8 @@ export default function GradebookData(props: Props) {
   const loadStudentData = useStore(state => state.loadStudentData)
   const isStudentDataLoaded = useStore(state => state.isStudentDataLoaded)
   const isSubmissionDataLoaded = useStore(state => state.isSubmissionDataLoaded)
+  const totalStudentsLoaded = useStore(state => state.totalStudentsLoaded)
+  const totalStudentsToLoad = useStore(state => state.totalStudentsToLoad)
 
   const sisOverrides = useStore(state => state.sisOverrides)
   const fetchSisOverrides = useStore(state => state.fetchSisOverrides)
@@ -192,7 +194,6 @@ export default function GradebookData(props: Props) {
       appliedFilters={appliedFilters}
       customColumns={customColumns}
       loadDataForCustomColumn={loadDataForCustomColumn}
-      recentlyLoadedCustomColumnData={recentlyLoadedCustomColumnData}
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
@@ -210,12 +211,15 @@ export default function GradebookData(props: Props) {
       modules={modules}
       postGradesStore={postGradesStore.current}
       recentlyLoadedAssignmentGroups={recentlyLoadedAssignmentGroups}
-      sisOverrides={sisOverrides}
+      recentlyLoadedCustomColumnData={recentlyLoadedCustomColumnData}
       recentlyLoadedStudents={recentlyLoadedStudents}
       recentlyLoadedSubmissions={recentlyLoadedSubmissions}
       reloadStudentData={reloadStudentData}
       reorderCustomColumns={reorderCustomColumns}
+      sisOverrides={sisOverrides}
+      totalStudentsLoaded={totalStudentsLoaded}
       studentIds={studentIds}
+      totalStudentsToLoad={totalStudentsToLoad}
       updateColumnOrder={updateColumnOrder}
     />
   )
