@@ -296,3 +296,47 @@ describe('student-names-filter', () => {
     expect(getByTestId('students-filter-select')).toBeDisabled()
   })
 })
+
+describe('ProgressBar for loading data', () => {
+  it('renders the progress bar', () => {
+    const {getByTestId} = render(
+      <Gradebook
+        {...defaultGradebookProps}
+        isSubmissionDataLoaded={false}
+        totalStudentsLoaded={0}
+        totalStudentsToLoad={11}
+      />
+    )
+
+    expect(getByTestId('gradebook-submission-progress-bar')).toBeInTheDocument()
+  })
+
+  it('do not render the progress bar if submission data loaded', () => {
+    const {queryByTestId} = render(
+      <Gradebook
+        {...defaultGradebookProps}
+        isSubmissionDataLoaded={true}
+        totalStudentsLoaded={0}
+        totalStudentsToLoad={11}
+      />
+    )
+
+    expect(queryByTestId('gradebook-submission-progress-bar')).not.toBeInTheDocument()
+  })
+
+  it('renders the progress bar with the correct screenreader label', () => {
+    const {getByRole} = render(
+      <Gradebook
+        {...defaultGradebookProps}
+        isSubmissionDataLoaded={false}
+        totalStudentsLoaded={0}
+        totalStudentsToLoad={11}
+      />
+    )
+
+    expect(getByRole('progressbar')).toHaveAttribute(
+      'aria-label',
+      'Loading Gradebook submissions for students 0 / 11'
+    )
+  })
+})

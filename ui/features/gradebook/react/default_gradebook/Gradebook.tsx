@@ -233,6 +233,7 @@ import {
   columnWidths,
 } from './initialState'
 import {ExportProgressBar} from './components/ExportProgressBar'
+import {ProgressBar} from '@instructure/ui-progress'
 import GradebookExportManager from '../shared/GradebookExportManager'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
@@ -294,6 +295,8 @@ export type GradebookProps = {
   settingsModalButtonContainer: HTMLElement
   sisOverrides: AssignmentGroup[]
   studentIds: string[]
+  totalStudentsLoaded: number
+  totalStudentsToLoad: number
   updateColumnOrder: (courseId: string, columnOrder: ColumnOrderSettings) => Promise<void>
   viewOptionsMenuNode: HTMLElement
 }
@@ -5073,6 +5076,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               />
             )}
         </div>
+        <View as="div">
+          {!this.props.isSubmissionDataLoaded && this.props.totalStudentsToLoad > 10 && (
+            <ProgressBar
+              data-testid="gradebook-submission-progress-bar"
+              margin="0 0 small"
+              screenReaderLabel={I18n.t('Loading Gradebook submissions for students')}
+              size="small"
+              valueMax={this.props.totalStudentsToLoad}
+              valueNow={this.props.totalStudentsLoaded}
+            />
+          )}
+        </View>
       </>
     )
   }

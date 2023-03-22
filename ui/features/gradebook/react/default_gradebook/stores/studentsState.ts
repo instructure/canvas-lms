@@ -33,17 +33,19 @@ import type {
 const I18n = useI18nScope('gradebook')
 
 export type StudentsState = {
-  studentIds: string[]
-  isStudentIdsLoading: boolean
-  isStudentDataLoaded: boolean
-  isSubmissionDataLoaded: boolean
+  assignmentUserSubmissionMap: AssignmentUserSubmissionMap
   fetchStudentIds: () => Promise<string[]>
+  isStudentDataLoaded: boolean
+  isStudentIdsLoading: boolean
+  isSubmissionDataLoaded: boolean
   loadStudentData: () => Promise<void>
   recentlyLoadedStudents: Student[]
   recentlyLoadedSubmissions: UserSubmissionGroup[]
+  studentIds: string[]
   studentList: Student[]
   studentMap: StudentMap
-  assignmentUserSubmissionMap: AssignmentUserSubmissionMap
+  totalStudentsLoaded: number
+  totalStudentsToLoad: number
 }
 
 export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): StudentsState => ({
@@ -64,6 +66,10 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
   studentMap: {},
 
   assignmentUserSubmissionMap: {},
+
+  totalStudentsToLoad: 0,
+
+  totalStudentsLoaded: 0,
 
   fetchStudentIds: () => {
     const dispatch = get().dispatch
@@ -139,6 +145,10 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
       studentIdsToLoad,
       performanceControls.studentsChunkSize
     )
+    set({
+      totalStudentsToLoad: studentIdsToLoad.length,
+      totalStudentsLoaded: 0,
+    })
 
     const gotChunkOfStudents = (students: Student[]) => {
       const studentMap = students.reduce(
@@ -175,6 +185,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
       set({
         recentlyLoadedSubmissions,
         assignmentUserSubmissionMap,
+        totalStudentsLoaded: get().totalStudentsLoaded + recentlyLoadedSubmissions.length,
       })
     }
 
