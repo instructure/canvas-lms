@@ -440,6 +440,15 @@ export type Submission = Readonly<{
   final_provisional_grade?: string
 }
 
+export type MissingSubmission = {
+  assignment_id: string
+  user_id: string
+  excused: boolean
+  late: boolean
+  missing: boolean
+  seconds_late: number
+} & Partial<Submission>
+
 export type AssignmentUserSubmissionMap = {
   [assignmentId: string]: {
     [userId: string]: Submission

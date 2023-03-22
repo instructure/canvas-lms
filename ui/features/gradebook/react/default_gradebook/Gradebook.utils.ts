@@ -45,6 +45,7 @@ import type {
   Assignment,
   AssignmentGroup,
   GradingPeriod,
+  MissingSubmission,
   Module,
   Section,
   Student,
@@ -386,12 +387,12 @@ export function doFiltersMatch(filters1: Filter[], filters2: Filter[]) {
 }
 
 // logic taken from needs_grading_conditions in submission.rb
-export function doesSubmissionNeedGrading(s: Submission) {
+export function doesSubmissionNeedGrading(s: Submission | MissingSubmission) {
   if (s.excused) return false
 
   if (s.workflow_state === 'pending_review') return true
 
-  if (!['submitted', 'graded'].includes(s.workflow_state)) return false
+  if (!['submitted', 'graded'].includes(s.workflow_state || '')) return false
 
   if (!s.grade_matches_current_submission) return true
 
@@ -555,7 +556,7 @@ export function escapeStudentContent(student: Student) {
   })
 }
 
-export function isGradedOrExcusedSubmissionUnposted(submission: Submission) {
+export function isGradedOrExcusedSubmissionUnposted(submission: Submission | MissingSubmission) {
   return (
     submission.posted_at === null &&
     ((submission.score !== null && submission.workflow_state === 'graded') || submission.excused)
