@@ -277,9 +277,13 @@ describe('RceLti11ContentItem File Item', () => {
 
 describe('Studio LTI content items', () => {
   describe('when the rce_show_studio_media_options flag is off', () => {
-    it('does not decorate studio iframes with appropriate attributes', () => {
+    it('does not decorate studio iframes with studio attributes', () => {
+      const itemData = {
+        ...exampleLti11ContentItems.lti_iframe,
+        ...{custom: {source: 'studio', resizable: true, enableMediaOptions: true}},
+      }
       const contentItem = RceLti11ContentItem.fromJSON(
-        exampleLti11ContentItems.lti_iframe_with_custom_json,
+        itemData,
         createDeepMockProxy<ExternalToolsEnv>(
           {},
           {
@@ -296,9 +300,13 @@ describe('Studio LTI content items', () => {
   })
 
   describe('when the rce_show_studio_media_options flag is on', () => {
-    it('decorates studio iframes with appropriate attributes', () => {
+    it('with custom params set to false', () => {
+      const itemData = {
+        ...exampleLti11ContentItems.lti_iframe,
+        ...{custom: {source: 'studio', resizable: false, enableMediaOptions: false}},
+      }
       const contentItem = RceLti11ContentItem.fromJSON(
-        exampleLti11ContentItems.lti_iframe_with_custom_json,
+        itemData,
         createDeepMockProxy<ExternalToolsEnv>(
           {},
           {
@@ -309,7 +317,28 @@ describe('Studio LTI content items', () => {
 
       equalHtmlIgnoringAttributeOrder(
         contentItem.codePayload,
-        `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="false" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+        `<iframe data-studio-convertible-to-link="true" data-studio-resizable="false" data-studio-tray-enabled="false" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px;" width="800" height="600"></iframe>`
+      )
+    })
+
+    it('with custom params set to true', () => {
+      const itemData = {
+        ...exampleLti11ContentItems.lti_iframe,
+        ...{custom: {source: 'studio', resizable: true, enableMediaOptions: true}},
+      }
+      const contentItem = RceLti11ContentItem.fromJSON(
+        itemData,
+        createDeepMockProxy<ExternalToolsEnv>(
+          {},
+          {
+            studioMediaOptionsEnabled: true,
+          }
+        )
+      )
+
+      equalHtmlIgnoringAttributeOrder(
+        contentItem.codePayload,
+        `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="true" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px; display: inline-block;" width="800" height="600"></iframe>`
       )
     })
   })

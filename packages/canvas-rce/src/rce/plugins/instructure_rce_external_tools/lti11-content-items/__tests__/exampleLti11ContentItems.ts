@@ -142,26 +142,6 @@ export const exampleLti11ContentItems = {
     canvasURL:
       '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
-  lti_iframe_with_custom_json: {
-    text: 'Arch Linux plain iframe',
-    title: 'Its like for your computer',
-    url: 'http://lti-tool-provider-example.dev/messages/blti',
-    placementAdvice: {
-      displayHeight: 600,
-      displayWidth: 800,
-      presentationDocumentTarget: 'iframe',
-    },
-    mediaType: 'application/vnd.ims.lti.v1.ltilink',
-    '@type': 'LtiLink',
-    '@id': 'http://lti-tool-provider-example.dev/messages/blti',
-    canvasURL:
-      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
-    custom: {
-      source: 'studio',
-      resizable: true,
-      enableMediaOptions: false,
-    },
-  },
   lti_window: {
     text: 'Arch Linux plain window',
     title: 'Its like for your computer',
