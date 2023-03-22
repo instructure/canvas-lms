@@ -21,6 +21,7 @@
 final static JS_BUILD_IMAGE_STAGE = 'Javascript (Build Image)'
 final static LINTERS_BUILD_IMAGE_STAGE = 'Linters (Build Image)'
 final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
+final static BUILD_DOCKER_IMAGE_STAGE = 'Build Docker Image'
 
 def buildParameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
@@ -425,7 +426,7 @@ pipeline {
                     .timeout(20)
                     .execute(buildDockerImageStage.&premergeCacheImage)
 
-                  extendedStage('Build Docker Image')
+                  extendedStage(BUILD_DOCKER_IMAGE_STAGE)
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(20)
@@ -550,24 +551,23 @@ pipeline {
                   }
                 }
 
-                extendedStage('ARM64 Builder')
+                extendedStage('ARM64 Builder - Container')
                   .hooks(buildSummaryReportHooks.call())
                   .nodeRequirements(label: 'docker-arm64')
                   .required(configuration.isChangeMerged())
                   .queue(rootStages) {
-                    setupStage()
-                    // Rebase is fortunately not needed - since this only runs in post-merge
-                    buildDockerImageStage.patchsetImage('', '-arm64')
+                    extendedStage('ARM64 Builder').execute {
+                      setupStage()
+                      // Rebase is fortunately not needed - since this only runs in post-merge
+                      buildDockerImageStage.patchsetImage('', '-arm64')
+                    }
 
-                    // Wait for the AMD64 manifest to be available - then augment it with this ARM64 one
-                    sh """#!/bin/bash -ex
-                    while ! docker manifest inspect $PATCHSET_TAG; do
-                      sleep 10
-                    done
-
-                    docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
-                    docker manifest push $PATCHSET_TAG
-                    """
+                    extendedStage('Augment Manifest').waitsFor(BUILD_DOCKER_IMAGE_STAGE, 'Builder').execute {
+                      sh """#!/bin/bash -ex
+                      docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+                      docker manifest push $PATCHSET_TAG
+                      """
+                    }
                   }
 
                 extendedStage("${filesChangedStage.STAGE_NAME} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(filesChangedStage.STAGE_NAME, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
