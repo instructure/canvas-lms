@@ -630,7 +630,7 @@ describe AccountsController do
         post "update", params: toggle_k5_params(@account.id, false)
         service = K5::UserService.new(@user, @account.root_account, nil)
         enable_cache(:redis_cache_store) do
-          expect(service).to receive(:uncached_k5_user?).twice
+          expect(service).to receive(:user_has_association?).twice
           service.send(:k5_user?)
           post "update", params: toggle_k5_params(@account.id, true)
           run_jobs

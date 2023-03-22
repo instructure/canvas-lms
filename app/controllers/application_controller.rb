@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include FullStoryHelper
+  include ObserverEnrollmentsHelper
 
   helper :all
 
@@ -3047,6 +3048,12 @@ class ApplicationController < ActionController::Base
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_user?(check_disabled: check_disabled)
   end
   helper_method :k5_user?
+
+  def use_classic_font?
+    observed_users(@current_user, session) if @current_user&.roles(@domain_root_account)&.include?("observer")
+    K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).use_classic_font?
+  end
+  helper_method :use_classic_font?
 
   def pull_context_course
     assignment_id = params[:variables][:assignmentLid]
