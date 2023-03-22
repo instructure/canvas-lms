@@ -184,6 +184,7 @@ export default function CommentsTrayBody(props) {
                 assignment={props.assignment}
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
+                isPeerReviewEnabled={props.isPeerReviewEnabled}
                 onSendCommentSuccess={() => {
                   if (props.isPeerReviewEnabled && !props.assignment.rubric) {
                     handlePeerReviewPromptModal()

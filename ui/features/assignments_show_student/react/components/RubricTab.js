@@ -82,6 +82,7 @@ export default function RubricTab(props) {
         <ToggleDetails
           defaultExpanded={true}
           fluidWidth={true}
+          data-testid="fill-out-rubric-toggle"
           summary={
             <Text weight="bold">
               {props.peerReviewModeEnabled ? I18n.t('Fill Out Rubric') : I18n.t('View Rubric')}
@@ -93,6 +94,7 @@ export default function RubricTab(props) {
               <CanvasSelect
                 label={I18n.t('Select Grader')}
                 value={displayedAssessment?._id}
+                data-testid="select-grader-dropdown"
                 onChange={(e, optionValue) => assessmentSelectorChanged(optionValue)}
               >
                 {props.assessments.map(assessment => (

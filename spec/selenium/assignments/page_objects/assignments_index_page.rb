@@ -154,6 +154,15 @@ module AssignmentsIndexPage
   def dialog_shift_date_radio_btn
     ff("input[type='radio']", batch_edit_dialog)[0]
   end
+
+  def peer_review_requests(assignment_id)
+    f("#assignment_student_peer_review_#{assignment_id}")
+  end
+
+  def assessment_request(index)
+    f("a[title='Required Peer Review #{index}']")
+  end
+
   #------------------------------ Actions --------------------------------
 
   def visit_assignments_index_page(course_id)
