@@ -340,22 +340,11 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       })
     })
 
-    test('builds rows when filtering with search', () => {
-      gradebook.filteredStudentIds = [1101]
+    test('builds rows', () => {
+      gradebook.searchFilteredStudentIds = [1101]
       sinon.spy(gradebook, 'buildRows')
       gradebook.gotChunkOfStudents(studentData)
       strictEqual(gradebook.buildRows.callCount, 1)
-    })
-
-    test('does not build rows when not filtering with search', () => {
-      sinon.spy(gradebook, 'buildRows')
-      gradebook.gotChunkOfStudents(studentData)
-      strictEqual(gradebook.buildRows.callCount, 0)
-    })
-
-    test('renders the grid when not filtering with search', () => {
-      gradebook.gotChunkOfStudents(studentData)
-      strictEqual(gradebook.gradebookGrid.render.callCount, 1)
     })
   })
 

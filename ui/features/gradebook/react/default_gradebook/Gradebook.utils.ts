@@ -57,6 +57,7 @@ import type {
 } from '../../../../api.d'
 import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
+import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 
 const I18n = useI18nScope('gradebook')
 
@@ -561,4 +562,106 @@ export function isGradedOrExcusedSubmissionUnposted(submission: Submission | Mis
     submission.posted_at === null &&
     ((submission.score !== null && submission.workflow_state === 'graded') || submission.excused)
   )
+}
+
+export const wasSubmitted = (s: Submission | MissingSubmission) =>
+  Boolean(s.submitted_at) && !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
+
+// filters should run either .some() or .every()
+export const categorizeSubmissionFilters = (appliedFilters: Filter[]) => {
+  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
+
+  const filtersNeedingSome = submissionFilters.filter(filter =>
+    ['has-ungraded-submissions', 'has-submissions', 'has-unposted-grades'].includes(filter)
+  )
+
+  const filtersNeedingEvery = submissionFilters.filter(filter =>
+    ['has-no-submissions'].includes(filter)
+  )
+
+  return {filtersNeedingSome, filtersNeedingEvery}
+}
+
+export function filterSubmissionByCategorizedFilters(
+  filters: string[],
+  submission: Submission | MissingSubmission
+) {
+  if (filters.length === 0) {
+    return true
+  }
+
+  return filters.every(filter => {
+    if (filter === 'has-ungraded-submissions') {
+      return doesSubmissionNeedGrading(submission)
+    } else if (filter === 'has-submissions') {
+      return wasSubmitted(submission)
+    } else if (filter === 'has-no-submissions') {
+      return !wasSubmitted(submission)
+    } else if (filter === 'has-unposted-grades') {
+      return isGradedOrExcusedSubmissionUnposted(submission)
+    } else {
+      return false
+    }
+  })
+}
+
+export function filterSubmissionsByCategorizedFilters(
+  filtersNeedingSome: string[],
+  filtersNeedingEvery: string[],
+  submissions: (Submission | MissingSubmission)[]
+) {
+  const hasMatch =
+    submissions.some(submission =>
+      filterSubmissionByCategorizedFilters(filtersNeedingSome, submission)
+    ) &&
+    submissions.every(submission =>
+      filterSubmissionByCategorizedFilters(filtersNeedingEvery, submission)
+    )
+
+  return hasMatch
+}
+
+export const filterStudentBySubmissionFn = (
+  appliedFilters: Filter[],
+  submissionStateMap: SubmissionStateMap,
+  assignmentIds: string[]
+) => {
+  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
+
+  return (student: Student) => {
+    if (submissionFilters.length === 0) {
+      return true
+    }
+
+    const submissions = submissionStateMap.getSubmissionsByStudentAndAssignmentIds(
+      student.id,
+      assignmentIds
+    )
+
+    // when sorting rows, we only use .some to determine visiblity
+    return filterSubmissionsByCategorizedFilters(submissionFilters, [], submissions)
+  }
+}
+
+export const filterAssignmentsBySubmissionsFn = (
+  appliedFilters: Filter[],
+  submissionStateMap: SubmissionStateMap
+) => {
+  const {filtersNeedingSome, filtersNeedingEvery} = categorizeSubmissionFilters(appliedFilters)
+
+  return (assignment: Assignment) => {
+    if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
+      return true
+    }
+
+    const submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+
+    const result = filterSubmissionsByCategorizedFilters(
+      filtersNeedingSome,
+      filtersNeedingEvery,
+      submissions
+    )
+
+    return result
+  }
 }

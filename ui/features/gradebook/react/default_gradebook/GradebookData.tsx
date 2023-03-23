@@ -40,7 +40,6 @@ type Props = {
   gradebookSettingsModalContainer: HTMLSpanElement
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
-  hideGrid?: false
   locale: string
   settingsModalButtonContainer: HTMLElement
   viewOptionsMenuNode: HTMLElement
@@ -201,7 +200,6 @@ export default function GradebookData(props: Props) {
       finalGradeOverrides={finalGradeOverrides}
       flashAlerts={flashMessages}
       gradingPeriodAssignments={gradingPeriodAssignments}
-      hideGrid={false}
       isCustomColumnsLoaded={isCustomColumnsLoaded}
       isFiltersLoading={isFiltersLoading}
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}

@@ -21,7 +21,7 @@ import type JQuery from 'jquery'
 import {deferPromise} from 'defer-promise'
 // @ts-ignore
 import _ from 'underscore'
-import {intersection} from 'lodash'
+import {intersection, isEqual} from 'lodash'
 import tz from '@canvas/timezone'
 import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
@@ -41,7 +41,6 @@ import type {
   Course,
   DueDate,
   Enrollment,
-  MissingSubmission,
   Module,
   Section,
   SectionMap,
@@ -188,9 +187,10 @@ import {
   buildStudentColumn,
   compareAssignmentDueDates,
   confirmViewUngradedAsZero,
-  doesSubmissionNeedGrading,
   ensureAssignmentVisibility,
   escapeStudentContent,
+  filterAssignmentsBySubmissionsFn,
+  filterStudentBySubmissionFn,
   findFilterValuesOfType,
   findSubmissionFilterValue,
   forEachSubmission,
@@ -214,13 +214,19 @@ import {
   testWidth,
 } from './Gradebook.utils'
 import {
+  DEFAULT_COLUMN_SORT_TYPE,
+  getColumnOrder,
+  hideAggregateColumns,
+  isInvalidSort,
+} from './GradebookGrid/Grid.utils'
+import {
   compareAssignmentNames,
   compareAssignmentPointsPossible,
   compareAssignmentPositions,
   idSort,
   isDefaultSortOrder,
-  makeCompareAssignmentCustomOrderFn,
   localeSort,
+  makeCompareAssignmentCustomOrderFn,
   secondaryAndTertiarySort,
   wrapColumnSortFn,
 } from './Gradebook.sorting'
@@ -275,7 +281,6 @@ export type GradebookProps = {
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
-  hideGrid?: boolean
   isCustomColumnsLoaded: boolean
   isFiltersLoading: boolean
   isGradingPeriodAssignmentsLoading: boolean
@@ -367,15 +372,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   sections: SectionMap = {}
 
-  userFilterTerm?: string
-
   filteredStudentIds: string[] = []
+
+  searchFilteredStudentIds: string[] = []
 
   assignmentGroups: AssignmentGroupMap = {}
 
   contentLoadStates: ContentLoadStates
 
   course: Course
+
+  searchFilteredAssignmentIds: string[] = []
 
   filteredAssignmentIds: string[] = []
 
@@ -444,8 +451,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   actionStates?: InitialActionStates
 
   gradebookColumnOrderSettings?: ColumnOrderSettings
-
-  defaultSortType = 'assignment_group'
 
   gridDisplaySettings: GridDisplaySettings
 
@@ -593,7 +598,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.gridData.columns.scrollable = columns.scrollable.map(function (column) {
           return column.id
         })
-        if (!_.isEqual(currentFrozenIds, updatedFrozenIds)) {
+        if (!isEqual(currentFrozenIds, updatedFrozenIds)) {
           currentFrozenColumns = currentFrozenIds.map(columnId => {
             return this.gridData.columns.definitions[columnId]
           })
@@ -615,7 +620,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             }
             return results
           })()
-          if (!_.isEqual(currentCustomColumnIds, updatedCustomColumnIds)) {
+          if (!isEqual(currentCustomColumnIds, updatedCustomColumnIds)) {
             // eslint-disable-next-line promise/catch-or-return
             this.props.reorderCustomColumns(updatedCustomColumnIds).then(() => {
               const colsById: {
@@ -641,7 +646,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  // called from ui/bundles/gradebook.js
   onShow = () => {
     $('.post-grades-button-placeholder').show()
     if (this.startedInitializing) {
@@ -727,6 +731,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.invalidateRowsForStudentIds([...new Set(studentIds)])
   }
 
+  updateFilterAssignmentIds = () => {
+    this.filteredAssignmentIds = this.filterAssignments(Object.values(this.assignments)).map(
+      assignment => assignment.id
+    )
+  }
+
   // Assignment Group Data & Lifecycle Methods
   updateAssignmentGroups = (assignmentGroups: AssignmentGroup[], gradingPeriodIds?: string[]) => {
     this.gotAllAssignmentGroups(assignmentGroups)
@@ -736,6 +746,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.renderFilters()
     this.updateColumnHeaders()
     this._updateEssentialDataLoaded()
+    this.updateFilterAssignmentIds()
   }
 
   gotAllAssignmentGroups = (assignmentGroups: AssignmentGroup[]) => {
@@ -875,7 +886,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   resetGrading = () => {
     this.initSubmissionStateMap()
-    return this.setupGrading(this.courseContent.students.listStudents())
+    this.setupGrading(this.courseContent.students.listStudents())
   }
 
   getSubmission = (studentId: string, assignmentId: string): Submission | undefined => {
@@ -939,39 +950,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // This is like studentsThatCanSeeAssignment, but returns only students
   // visible with the current filters, instead of all the students the
   // Gradebook knows about.
-  visibleStudentsThatCanSeeAssignment = (assignmentId: string) => {
-    const visibleStudentsIgnoringSearch: {[key: string]: Student} = _.pick(
+  visibleStudentsThatCanSeeAssignment = (assignmentId: string): StudentMap => {
+    const allStudentIds = this.courseContent.students.listStudentIds()
+
+    const visibleStudentsIgnoringSearch: StudentMap = _.pick(
       this.studentsThatCanSeeAssignment(assignmentId),
-      this.courseContent.students.listStudentIds()
+      allStudentIds
     )
 
-    return Object.fromEntries(
-      Object.entries(visibleStudentsIgnoringSearch).filter(([_id, student]) =>
-        this.rowFilter(student)
-      )
+    const fileredVisibleStudents = Object.values(visibleStudentsIgnoringSearch).filter(student =>
+      this.filteredStudentIds.includes(student.id)
     )
-  }
 
-  isInvalidSort = () => {
-    const sortSettings = this.gradebookColumnOrderSettings
-    if (
-      (sortSettings != null ? sortSettings.sortType : undefined) === 'custom' &&
-      !(sortSettings != null ? sortSettings.customOrder : undefined)
-    ) {
-      // This course was sorted by a custom column sort at some point but no longer has any stored
-      // column order to sort by
-      // let's mark it invalid so it reverts to default sort
-      return true
-    }
-    if (
-      (sortSettings != null ? sortSettings.sortType : undefined) === 'module_position' &&
-      this.courseContent.contextModules.length === 0
-    ) {
-      // This course was sorted by module_position at some point but no longer contains modules
-      // let's mark it invalid so it reverts to default sort
-      return true
-    }
-    return false
+    return Object.fromEntries(fileredVisibleStudents.map(student => [student.id, student]))
   }
 
   setColumnOrder = (order: ColumnOrderSettings) => {
@@ -979,7 +970,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.gradebookColumnOrderSettings = {
         direction: 'ascending',
         freezeTotalGrade: false,
-        sortType: this.defaultSortType,
+        sortType: DEFAULT_COLUMN_SORT_TYPE,
       }
     }
     if (!order) {
@@ -997,23 +988,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  getColumnOrder = (): ColumnOrderSettings => {
-    if (this.isInvalidSort() || !this.gradebookColumnOrderSettings) {
-      return {
-        direction: 'ascending',
-        freezeTotalGrade: false,
-        sortType: this.defaultSortType,
-      }
-    } else {
-      return this.gradebookColumnOrderSettings
-    }
-  }
-
   saveColumnOrder = () => {
-    if (!this.isInvalidSort()) {
+    if (!isInvalidSort(this.props.modules, this.gradebookColumnOrderSettings)) {
       const url = this.options.gradebook_column_order_settings_url
       $.ajaxJSON(url, 'POST', {
-        column_order: this.getColumnOrder(),
+        column_order: getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings),
       })
     }
   }
@@ -1096,20 +1075,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return true
     }
 
-    return this.filteredStudentIds?.includes(student.id)
+    return this.searchFilteredStudentIds.includes(student.id)
   }
 
   filterAssignments = (assignments: Assignment[]) => {
     const assignmentFilters = [
+      this.filterAssignmentBySearchInput,
       this.filterAssignmentBySubmissionTypes,
       this.filterAssignmentByPublishedStatus,
       this.filterAssignmentByAssignmentGroup,
       this.filterAssignmentByGradingPeriod,
       this.filterAssignmentByModule,
-      this.filterAssignmentBySearchInput,
       this.filterAssignmentByStartDate,
       this.filterAssignmentByEndDate,
-      this.filterAssignmentsBySubmissions,
+      filterAssignmentsBySubmissionsFn(this.props.appliedFilters, this.submissionStateMap),
     ]
     const matchesAllFilters = (assignment: Assignment) =>
       assignmentFilters.every(filter => filter(assignment))
@@ -1118,8 +1097,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterAssignmentBySearchInput = (assignment: Assignment) => {
-    if (this.filteredAssignmentIds?.length) {
-      return this.filteredAssignmentIds.includes(assignment.id)
+    if (this.searchFilteredAssignmentIds.length > 0) {
+      return this.searchFilteredAssignmentIds.includes(assignment.id)
     }
 
     return true
@@ -1171,35 +1150,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     const moduleIds = findFilterValuesOfType('module', this.props.appliedFilters)
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
-  }
-
-  filterAssignmentsBySubmissions = (assignment: Assignment) => {
-    const submissionFilters = findFilterValuesOfType('submissions', this.props.appliedFilters)
-
-    if (submissionFilters.length === 0) {
-      return true
-    }
-
-    const submissions = this.submissionStateMap.getSubmissionsByAssignment(assignment.id)
-    const wasSubmitted = (s: Submission | MissingSubmission) =>
-      !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
-
-    return (
-      submissionFilters.length === 0 ||
-      submissionFilters.some(filter => {
-        if (filter === 'has-ungraded-submissions') {
-          return submissions.some(s => doesSubmissionNeedGrading(s))
-        } else if (filter === 'has-submissions') {
-          return submissions.some(wasSubmitted)
-        } else if (filter === 'has-no-submissions') {
-          return submissions.every(s => !wasSubmitted(s))
-        } else if (filter === 'has-unposted-grades') {
-          return submissions.some(isGradedOrExcusedSubmissionUnposted)
-        } else {
-          return true
-        }
-      })
-    )
   }
 
   filterAssignmentByStartDate = (assignment: Assignment) => {
@@ -1254,18 +1204,49 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     ])
   }
 
+  filterStudents = (students: Student[]): Student[] => {
+    // If we're filtering by search term, we don't need to apply other frontend filters.
+    if (this.isFilteringRowsBySearchTerm()) {
+      return students.filter(student => this.searchFilteredStudentIds.includes(student.id))
+    }
+
+    const filteredStudents = students.filter(
+      filterStudentBySubmissionFn(
+        this.props.appliedFilters,
+        this.submissionStateMap,
+        this.filteredAssignmentIds
+      )
+    )
+
+    return filteredStudents
+  }
+
+  updateFilteredStudentIds = (): boolean => {
+    const oldStudentIds = this.filteredStudentIds
+    const students: Student[] = this.courseContent.students.listStudents()
+    const newStudentIds = this.filterStudents(students).map(s => s.id)
+    const hasChanged = !_.isEqual(oldStudentIds, newStudentIds)
+    if (hasChanged) {
+      this.filteredStudentIds = newStudentIds
+    }
+    return hasChanged
+  }
+
   // filter, sort, and build the dataset for slickgrid to read from, then
   // force a full redraw
   buildRows = () => {
+    this.updateFilteredStudentIds()
     this.gridData.rows.length = 0 // empty the list of rows
-    const students: Student[] = this.courseContent.students.listStudents()
-    for (const student of students) {
-      if (this.rowFilter(student)) {
-        this.gridData.rows.push(this.buildRow(student))
-        this.calculateStudentGrade(student) // TODO: this may not be necessary
+    for (const studentId of this.filteredStudentIds) {
+      const student = this.courseContent.students.student(studentId)
+      if (!student) {
+        throw new Error(`Student ${studentId} not found`)
       }
+      this.gridData.rows.push(this.buildRow(student))
+      this.calculateStudentGrade(student) // TODO: this may not be necessary
     }
-    return this.gradebookGrid?.invalidate()
+    this.gradebookGrid?.invalidate()
+    this.gradebookGrid?.render()
   }
 
   buildRow = (student: Student) =>
@@ -1306,9 +1287,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     changedStudentIds = [...new Set(changedStudentIds)]
     const students = changedStudentIds.map(this.student)
     this.setupGrading(students)
-    if (!this.props.hideGrid) {
-      this.updateColumns()
-    }
+    this.updateColumns()
+    this.buildRows()
   }
 
   student = (id: string): GradebookStudent => this.students[id] || this.studentViewStudents[id]
@@ -1316,13 +1296,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   updateSubmission = (
     submission: Partial<Submission> & Pick<Submission, 'user_id' | 'assignment_id'>
   ) => {
-    let assignment, name
     const student = this.student(submission.user_id)
     submission.submitted_at = tz.parse(submission.submitted_at)
-    submission.excused = !!submission.excused
-    submission.hidden = !!submission.hidden
+    submission.excused = Boolean(submission.excused)
+    submission.hidden = Boolean(submission.hidden)
     submission.rawGrade = submission.grade // save the unformatted version of the grade too
-    if ((assignment = this.assignments[submission.assignment_id])) {
+    const assignment = this.assignments[submission.assignment_id]
+    if (assignment) {
       submission.gradingType = assignment.grading_type
       if (submission.gradingType !== 'pass_fail') {
         submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
@@ -1331,7 +1311,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         })
       }
     }
-    const cell = student[(name = `assignment_${submission.assignment_id}`)] || (student[name] = {})
+    const name = `assignment_${submission.assignment_id}`
+    const cell = student[name] || (student[name] = {})
     return _.extend(cell, submission)
   }
 
@@ -1527,7 +1508,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (className.match(/cell|slick/)) {
       return
     }
-    return this.gradebookGrid?.gridSupport?.state.blur()
+    this.gradebookGrid?.gridSupport?.state.blur()
   }
 
   updateSectionFilterVisibility = () => {
@@ -1792,7 +1773,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   initHeader = () => {
     this.renderGradebookMenus()
     this.renderFilters()
-    this.arrangeColumnsBy(this.getColumnOrder(), true)
+    this.arrangeColumnsBy(
+      getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings),
+      true
+    )
     this.renderGradebookSettingsModal()
     return $('#keyboard-shortcuts').click(function () {
       const questionMarkKeyDown = $.Event('keydown', {
@@ -1832,7 +1816,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   getColumnSortSettingsViewOptionsMenuProps = () => {
-    const storedSortOrder = this.getColumnOrder()
+    const storedSortOrder = getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings)
     const criterion = isDefaultSortOrder(storedSortOrder.sortType)
       ? 'default'
       : storedSortOrder.sortType
@@ -2183,7 +2167,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const showUnpublishedChanged = oldShowUnpublished !== showUnpublishedAssignments
     const showSeparateFirstLastNamesChanged =
       oldShowSeparateFirstLastNames !== showSeparateFirstLastNames
-    const colorsChanged = !_.isEqual(this.state.gridColors, colors)
+    const colorsChanged = !isEqual(this.state.gridColors, colors)
     const hideAssignmentGroupTotalsChanged =
       oldHideAssignmentGroupTotals !== hideAssignmentGroupTotals
     const hideTotalChanged = oldHideTotal !== hideTotal
@@ -2229,7 +2213,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     direction?: SortDirection
   }) => {
     const newSortOrder = {direction, sortType: criterion}
-    const {freezeTotalGrade} = this.getColumnOrder()
+    const {freezeTotalGrade} = getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings)
 
     return this.props
       .updateColumnOrder(this.options.context_id, {
@@ -2381,20 +2365,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  onUserFilterInputStudents = (term: string) => {
-    this.userFilterTerm = term
-    return this.buildRows()
+  onFilterToStudents = (studentIds: string[]) => {
+    this.searchFilteredStudentIds = studentIds
+    this.buildRows()
   }
 
   onFilterToAssignments = (assignmentIds: string[]) => {
-    this.filteredAssignmentIds = assignmentIds
-    this.setVisibleGridColumns()
-    this.updateGrid()
-  }
-
-  onFilterToStudents = (studentIds: string[]) => {
-    this.filteredStudentIds = studentIds
-    this.buildRows()
+    this.searchFilteredAssignmentIds = assignmentIds
+    const hasChanged = this.setVisibleGridColumns()
+    if (hasChanged) {
+      this.updateGrid()
+    }
   }
 
   studentSearchMatcher = (
@@ -2415,8 +2396,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return !!sisId && sisId.toLowerCase() === term
   }
 
-  setVisibleGridColumns = () => {
-    let assignmentGroupId, ref1
+  getVisibleGridColumns = () => {
     let parentColumnIds = this.gridData.columns.frozen.filter(
       columnId => !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
     )
@@ -2429,12 +2409,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       column => !column.hidden
     )
     const customColumnIds = visibleCustomColumns.map(column => getCustomColumnId(column.id))
-    const assignments = this.filterAssignments(Object.values(this.assignments))
-    const scrollableColumns = assignments.map(
-      assignment => this.gridData.columns.definitions[getAssignmentColumnId(assignment.id)]
-    )
-    if (!this.hideAggregateColumns()) {
-      for (assignmentGroupId in this.assignmentGroups) {
+    this.updateFilterAssignmentIds()
+    const scrollableColumns = this.filteredAssignmentIds
+      .map(assignmentId => this.gridData.columns.definitions[getAssignmentColumnId(assignmentId)])
+      .filter(Boolean)
+    if (!hideAggregateColumns(this.gradingPeriodSet, this.gradingPeriodId)) {
+      for (const assignmentGroupId in this.assignmentGroups) {
         const column =
           this.gridData.columns.definitions[getAssignmentGroupColumnId(assignmentGroupId)]
         if (column) {
@@ -2446,7 +2426,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           scrollableColumns.push(column)
         }
       }
-      if (this.getColumnOrder().freezeTotalGrade) {
+      if (getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings).freezeTotalGrade) {
         if (!parentColumnIds.includes('total_grade')) {
           parentColumnIds.push('total_grade')
         }
@@ -2469,13 +2449,26 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
     }
-    if ((ref1 = this.gradebookColumnOrderSettings) != null ? ref1.sortType : undefined) {
-      scrollableColumns.sort(this.makeColumnSortFn(this.getColumnOrder()))
+    if (this.gradebookColumnOrderSettings?.sortType) {
+      scrollableColumns.sort(
+        this.makeColumnSortFn(getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings))
+      )
     }
-    this.gridData.columns.frozen = [...parentColumnIds, ...customColumnIds]
-    return (this.gridData.columns.scrollable = scrollableColumns.map(function (column) {
-      return column.id
-    }))
+    return {
+      frozen: [...parentColumnIds, ...customColumnIds],
+      scrollable: scrollableColumns.map(column => column.id),
+    }
+  }
+
+  setVisibleGridColumns = () => {
+    const {frozen, scrollable} = this.getVisibleGridColumns()
+    const hasChanged =
+      !isEqual(frozen, this.gridData.columns.frozen) ||
+      !isEqual(scrollable, this.gridData.columns.scrollable)
+    this.gridData.columns.frozen = frozen
+    this.gridData.columns.scrollable = scrollable
+    this.updateFilterAssignmentIds()
+    return hasChanged
   }
 
   updateGrid = () => {
@@ -3066,12 +3059,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   listInvalidAssignmentGroups = () => this.filteredContentInfo.invalidAssignmentGroups
 
+  // This is called from TotalGradeCellFormatter upon scrolling the grid
   listHiddenAssignments = (studentId: string) => {
     if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
       return []
     }
 
-    const assignmentsToConsider = this.filterAssignments(Object.values(this.assignments))
+    const assignmentsToConsider = this.filteredAssignmentIds.map(
+      assignmentId => this.assignments[assignmentId]
+    )
     return assignmentsToConsider.filter(assignment => {
       const submission = this.getSubmission(studentId, assignment.id)
       // Ignore anonymous assignments when deciding whether to show the
@@ -3126,16 +3122,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.toggleNotesColumn()
   }
 
-  hideAggregateColumns = () => {
-    if (this.gradingPeriodSet == null) {
-      return false
-    }
-    if (this.gradingPeriodSet.displayTotalsForAllGradingPeriods) {
-      return false
-    }
-    return !this.isFilteringColumnsByGradingPeriod()
-  }
-
   // SlickGrid Data Access Methods
   listRows = () => this.gridData.rows // currently the source of truth for filtered and sorted rows
 
@@ -3177,13 +3163,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   invalidateRowsForStudentIds = (studentIds: string[]) => {
     const rowIndices = this.listRowIndicesForStudentIds(studentIds)
-    for (let j = 0, len = rowIndices.length; j < len; j++) {
-      const rowIndex = rowIndices[j]
-      if (rowIndex != null) {
+    if (rowIndices.length > 0) {
+      for (const rowIndex of rowIndices) {
         this.gradebookGrid?.invalidateRow(rowIndex)
       }
+      if (this.props.isSubmissionDataLoaded) {
+        this.gradebookGrid?.render()
+      }
     }
-    this.gradebookGrid?.render()
   }
 
   updateTotalGradeColumn = () => {
@@ -3221,8 +3208,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // Gradebook Bulk UI Update Methods
   updateColumns = () => {
-    this.setVisibleGridColumns()
-    this.gradebookGrid?.updateColumns()
+    const hasChanged = this.setVisibleGridColumns()
+    if (hasChanged) {
+      this.gradebookGrid?.updateColumns()
+    }
     this.updateColumnHeaders()
   }
 
@@ -3296,7 +3285,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return columnId !== 'total_grade'
     })
     this.gridData.columns.scrollable.push('total_grade')
-    if (this.getColumnOrder().sortType === 'custom') {
+    if (
+      getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings).sortType === 'custom'
+    ) {
       this.saveCustomColumnOrder()
     } else {
       this.saveColumnOrder()
@@ -3939,6 +3930,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // TODO: Remove when moving tests to Jest
   setFilterColumnsBySetting = (filterKey: ColumnFilterKey, value: null | SubmissionFilterValue) => {
     this.gridDisplaySettings.filterColumnsBy[filterKey] = value
+    this.updateFilterAssignmentIds()
   }
 
   getFilterRowsBySetting = (filterKey: RowFilterKey): string | null =>
@@ -3972,8 +3964,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   isFilteringColumnsByGradingPeriod = () => this.gradingPeriodId !== '0'
 
-  isFilteringRowsBySearchTerm = () =>
-    this.filteredStudentIds != null && this.filteredStudentIds.length > 0
+  isFilteringRowsBySearchTerm = () => this.searchFilteredStudentIds.length > 0
 
   setCurrentGradingPeriod = () => {
     if (this.gradingPeriodSet == null) {
@@ -4924,6 +4915,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
 
       this.updateColumns()
+      this.buildRows()
     }
 
     // Until GradebookGrid is rendered reactively, it will need to be rendered
@@ -5020,23 +5012,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             </View>
           </div>
         )}
-        {!this.props.hideGrid && (
-          <ErrorBoundary
-            errorComponent={
-              <GenericErrorPage imageUrl={errorShipUrl} errorCategory="GradebookGrid" />
-            }
-          >
-            <Suspense fallback={<></>}>
-              <GradebookGrid
-                gradebook={this}
-                gridData={this.gridData}
-                gradebookGridNode={this.props.gradebookGridNode}
-                gradebookIsEditable={this.options.gradebook_is_editable}
-                onLoad={this.handleGridLoad}
-              />
-            </Suspense>
-          </ErrorBoundary>
-        )}
+        <ErrorBoundary
+          errorComponent={
+            <GenericErrorPage imageUrl={errorShipUrl} errorCategory="GradebookGrid" />
+          }
+        >
+          <Suspense fallback={<></>}>
+            <GradebookGrid
+              gradebook={this}
+              gridData={this.gridData}
+              gradebookGridNode={this.props.gradebookGridNode}
+              gradebookIsEditable={this.options.gradebook_is_editable}
+              onLoad={this.handleGridLoad}
+            />
+          </Suspense>
+        </ErrorBoundary>
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>

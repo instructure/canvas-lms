@@ -444,6 +444,7 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
     hooks.beforeEach(() => {
       gradebook.gotChunkOfStudents(allStudents)
       gradebook.courseContent.students.setStudentIds(['1101', '1102'])
+      gradebook.updateFilteredStudentIds()
     })
 
     test('includes students who can see the assignment when no filters are active', () => {
