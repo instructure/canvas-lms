@@ -34,6 +34,7 @@ admin_analytics:
       Learn more in the *Admin Analytics Hub* in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
+  beta: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
