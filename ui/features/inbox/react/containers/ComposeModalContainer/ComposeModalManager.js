@@ -314,6 +314,9 @@ const ComposeModalManager = props => {
     const courses = coursesQuery?.data?.legacyNode
     if (courses) {
       courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
+      courses.favoriteGroupsConnection.nodes = courses?.favoriteGroupsConnection?.nodes.filter(
+        group => group?.canMessage
+      )
     }
 
     return courses
