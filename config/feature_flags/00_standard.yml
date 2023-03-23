@@ -24,16 +24,16 @@ analytics_2:
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: true
 admin_analytics:
-  state: hidden
+  state: allowed
   applies_to: Account
   display_name: Admin Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
-    admin_analytics_description: Enabling displays Admin Analytics to show overviews of
-      courses and students. Learn more and give feedback by joining the
-      *New Analytics user group* in the Canvas community.
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
+     details on Canvas usage, Canvas course success, and student engagement.
+      Learn more in the *Admin Analytics Hub* in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
-  beta: true
+  root_opt_in: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
