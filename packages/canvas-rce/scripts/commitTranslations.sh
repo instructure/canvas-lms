@@ -14,11 +14,14 @@ push() {
   return $?
 }
 
+echo from canvas-rce/commitTranslations
+git status --porcelain src
+
 git checkout -q -B sync-translations-rce && \
   git add -A src && \
   git commit -m "[i18n] Update RCE translations." && \
   push
-  
+
 echo $OUTPUT
 
 git checkout -q $CURRENT_BRANCH
