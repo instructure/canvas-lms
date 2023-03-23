@@ -58,7 +58,7 @@ ready(() => {
     'message',
     event => {
       if (event?.data?.subject === 'reload_media' && media_id === event?.data?.media_object_id) {
-        window.location.reload()
+        document.getElementsByTagName('video')[0].load()
       }
     },
     false
