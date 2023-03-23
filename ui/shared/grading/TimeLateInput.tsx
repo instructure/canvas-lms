@@ -42,14 +42,17 @@ function defaultDurationLate(interval, secondsLate) {
 }
 
 export default function TimeLateInput(props) {
-  const numberInputLabel =
-    props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
-  const numberInputText =
-    props.lateSubmissionInterval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
-
   const [numberInputValue, setNumberInputValue] = useState(
     defaultDurationLate(props.lateSubmissionInterval, props.secondsLate)
   )
+
+  const numberInputLabel =
+    props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+
+  const numberInputText =
+    props.lateSubmissionInterval === 'day'
+      ? I18n.t('late_input.days', {one: 'Day', other: 'Days'}, {count: numberInputValue})
+      : I18n.t('late_input.hours', {one: 'Hour', other: 'Hours'}, {count: numberInputValue})
 
   if (!props.visible) {
     return null
