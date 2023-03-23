@@ -25,6 +25,7 @@ import {
 import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import PostGradesStore from 'ui/features/gradebook/react/SISGradePassback/PostGradesStore'
+import {hideAggregateColumns} from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/Grid.utils'
 
 const $fixtures = document.getElementById('fixtures')
 
@@ -614,7 +615,7 @@ QUnit.module('Gradebook#filterAssignments', {
 
 test('when filtering by assignments, only includes assignments in the filter', function () {
   this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
-  this.gradebook.filteredAssignmentIds = ['2301', '2304']
+  this.gradebook.searchFilteredAssignmentIds = ['2301', '2304']
   const assignments = this.gradebook.filterAssignments(this.assignments)
   propEqual(
     assignments.map(a => a.id),
@@ -1112,37 +1113,37 @@ QUnit.module('Gradebook#hideAggregateColumns', {
 test('returns false if there are no grading periods', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodSet = null
-  notOk(gradebook.hideAggregateColumns())
+  notOk(hideAggregateColumns(gradebook.gradingPeriodSet, gradebook.gradingPeriodId))
 })
 
 test('returns false if there are no grading periods, even if isAllGradingPeriods is true', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodSet = null
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
-  notOk(gradebook.hideAggregateColumns())
+  notOk(hideAggregateColumns(gradebook.gradingPeriodSet, gradebook.gradingPeriodId))
 })
 
 test('returns false if "All Grading Periods" is not selected', function () {
   const gradebook = this.createGradebook()
   gradebook.gradingPeriodId = '701'
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
-  notOk(gradebook.hideAggregateColumns())
+  notOk(hideAggregateColumns(gradebook.gradingPeriodSet, gradebook.gradingPeriodId))
 })
 
 test('returns true if "All Grading Periods" is selected', function () {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
-  ok(gradebook.hideAggregateColumns())
+  ok(hideAggregateColumns(gradebook.gradingPeriodSet, gradebook.gradingPeriodId))
 })
 
 test(
   'returns false if "All Grading Periods" is selected and the grading period set has' +
-    '"Display Totals for All Grading Periods option" enabled',
+    ' "Display Totals for All Grading Periods option" enabled',
   function () {
     const gradebook = this.createGradebook()
     gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
     gradebook.gradingPeriodSet.displayTotalsForAllGradingPeriods = true
-    notOk(gradebook.hideAggregateColumns())
+    notOk(hideAggregateColumns(gradebook.gradingPeriodSet, gradebook.gradingPeriodId))
   }
 )
 

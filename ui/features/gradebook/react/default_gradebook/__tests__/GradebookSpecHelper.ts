@@ -129,7 +129,6 @@ export const defaultGradebookProps: GradebookProps = {
   gradingPeriodsFilterContainer: document.createElement('div'),
   gradebookSettingsModalContainer: document.createElement('span'),
   gridColorNode: document.createElement('div'),
-  hideGrid: true,
   isFiltersLoading: false,
   isGradingPeriodAssignmentsLoading: false,
   isGridLoaded: false,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Assignment, AssignmentMap, Student, Submission} from '../../api.d'
+import type {Assignment, AssignmentMap, MissingSubmission, Student, Submission} from '../../api.d'
 import {cellMapForSubmission, missingSubmission} from './SubmissionStateMap.utils'
 import type {
   AssignmentSubmissionMap,
@@ -88,7 +88,7 @@ class SubmissionStateMap {
     )
   }
 
-  getSubmission(userId: string, assignmentId: string) {
+  getSubmission(userId: string, assignmentId: string): Submission | MissingSubmission | undefined {
     return (this.assignmentStudentSubmissionMap[assignmentId] || {})[userId]
   }
 
@@ -97,7 +97,9 @@ class SubmissionStateMap {
   }
 
   getSubmissionsByStudentAndAssignmentIds(userId: string, assignmentIds: string[]) {
-    return assignmentIds.map(assignmentId => this.getSubmission(userId, assignmentId))
+    return assignmentIds
+      .map(assignmentId => this.getSubmission(userId, assignmentId))
+      .filter(s => s) as (Submission | MissingSubmission)[]
   }
 
   getSubmissionState({

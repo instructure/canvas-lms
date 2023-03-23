@@ -127,7 +127,7 @@ export function cellMapForSubmission(
 }
 
 export function missingSubmission(student: Student, assignment: Assignment): MissingSubmission {
-  const submission = {
+  const submission: MissingSubmission = {
     assignment_id: assignment.id,
     user_id: student.id,
     excused: false,
