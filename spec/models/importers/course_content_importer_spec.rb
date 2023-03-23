@@ -677,6 +677,29 @@ describe Course do
     expect(migration.migration_issues.count).to eq 1 # should ignore the sanitized one
     expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
   end
+
+  describe "logging successes and failures" do
+    subject { Importers::CourseContentImporter.import_content(@course, {}, {}, migration) }
+
+    before { allow(InstStatsd::Statsd).to receive(:increment) }
+
+    before :once do
+      course_factory
+    end
+
+    let(:migration) { @course.content_migrations.create! }
+
+    it "logs import successes" do
+      subject
+      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_success").once
+    end
+
+    it "logs import failures" do
+      allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
+      expect { subject }.to raise_error("Something went wrong at the last minute")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_failure").once
+    end
+  end
 end
 
 def from_file_path(path, course)
