@@ -47,15 +47,12 @@ if [ ! -z "${SSH_USERNAME-}" ]; then
 
   gitdir=$(git rev-parse --git-dir); scp -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -p -P 29418 "${SSH_USERNAME}@gerrit.instructure.com:hooks/commit-msg" "${gitdir}/hooks/"
   # Commit any changes into a temp branch then push to gerrit
-  # you have to include a `git add` for each sub-package that gets new files out of installTranslations
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
   git checkout -q -B sync-translations-tmp && \
     git add -A packages/translations/lib && \
-    git add -A packages/canvas-rce/src/translations && \
-    git add -A packages/canvas-media/src/translations && \
     git commit -m "[i18n] Update package translations" && \
     git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
     git checkout -q "$CURRENT_BRANCH"
 
-  yarn wsrun --exclude-missing commitTranslations
+  yarn wsrun --serial --exclude-missing commitTranslations
 fi
