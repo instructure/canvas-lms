@@ -21,7 +21,7 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-commitMessageFlag.setDefaultValues(commitMessageFlagDefaults())
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
 
 @groovy.transform.Field
 def rspecqNodeTotal = 23
