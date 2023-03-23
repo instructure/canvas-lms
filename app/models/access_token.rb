@@ -44,7 +44,7 @@ class AccessToken < ActiveRecord::Base
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
-  resolves_root_account through: ->(instance) { instance.developer_key.root_account_id }
+  resolves_root_account through: :developer_key
 
   has_a_broadcast_policy
 
