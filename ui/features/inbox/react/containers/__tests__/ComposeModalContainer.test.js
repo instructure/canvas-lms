@@ -237,6 +237,22 @@ describe('ComposeModalContainer', () => {
       expect(await queryByText('All Courses')).not.toBeInTheDocument()
       await waitForApolloLoading()
     })
+
+    it('does not render concluded groups', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('concluded_group')).not.toBeInTheDocument()
+      await waitForApolloLoading()
+    })
+
+    it('does not render concluded courses', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('Fighting Magneto 202')).not.toBeInTheDocument()
+      await waitForApolloLoading()
+    })
   })
 
   describe('Create Conversation', () => {
