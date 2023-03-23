@@ -253,7 +253,11 @@ module Importers
 
       migration.trigger_live_events!
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
+      InstStatsd::Statsd.increment("content_migrations.import_success")
       migration.imported_migration_items
+    rescue Exception # rubocop:disable Lint/RescueException
+      InstStatsd::Statsd.increment("content_migrations.import_failure")
+      raise
     ensure
       ActiveRecord::Base.skip_touch_context(false)
     end
