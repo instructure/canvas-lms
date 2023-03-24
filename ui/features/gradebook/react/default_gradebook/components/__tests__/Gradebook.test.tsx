@@ -298,25 +298,12 @@ describe('student-names-filter', () => {
 })
 
 describe('ProgressBar for loading data', () => {
-  it('renders the progress bar', () => {
-    const {getByTestId} = render(
-      <Gradebook
-        {...defaultGradebookProps}
-        isSubmissionDataLoaded={false}
-        totalStudentsLoaded={0}
-        totalStudentsToLoad={11}
-      />
-    )
-
-    expect(getByTestId('gradebook-submission-progress-bar')).toBeInTheDocument()
-  })
-
   it('do not render the progress bar if submission data loaded', () => {
     const {queryByTestId} = render(
       <Gradebook
         {...defaultGradebookProps}
         isSubmissionDataLoaded={true}
-        totalStudentsLoaded={0}
+        totalSubmissionsLoaded={0}
         totalStudentsToLoad={11}
       />
     )
@@ -325,18 +312,26 @@ describe('ProgressBar for loading data', () => {
   })
 
   it('renders the progress bar with the correct screenreader label', () => {
+    const assignmentMap = {}
+
+    for (let i = 0; i < 200; i++) {
+      assignmentMap[i] = {}
+    }
+
     const {getByRole} = render(
       <Gradebook
         {...defaultGradebookProps}
+        assignmentMap={assignmentMap}
+        isGridLoaded={true}
         isSubmissionDataLoaded={false}
-        totalStudentsLoaded={0}
-        totalStudentsToLoad={11}
+        totalStudentsToLoad={300}
+        totalSubmissionsLoaded={0}
       />
     )
 
     expect(getByRole('progressbar')).toHaveAttribute(
       'aria-label',
-      'Loading Gradebook submissions for students 0 / 11'
+      'Loading Gradebook submissions 0 / 60000'
     )
   })
 })

@@ -44,7 +44,7 @@ export type StudentsState = {
   studentIds: string[]
   studentList: Student[]
   studentMap: StudentMap
-  totalStudentsLoaded: number
+  totalSubmissionsLoaded: number
   totalStudentsToLoad: number
 }
 
@@ -69,7 +69,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
 
   totalStudentsToLoad: 0,
 
-  totalStudentsLoaded: 0,
+  totalSubmissionsLoaded: 0,
 
   fetchStudentIds: () => {
     const dispatch = get().dispatch
@@ -147,7 +147,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
     )
     set({
       totalStudentsToLoad: studentIdsToLoad.length,
-      totalStudentsLoaded: 0,
+      totalSubmissionsLoaded: 0,
     })
 
     const gotChunkOfStudents = (students: Student[]) => {
@@ -185,7 +185,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
       set({
         recentlyLoadedSubmissions,
         assignmentUserSubmissionMap,
-        totalStudentsLoaded: get().totalStudentsLoaded + recentlyLoadedSubmissions.length,
+        totalSubmissionsLoaded: get().totalSubmissionsLoaded + flattenedSubmissions.length,
       })
     }
 
