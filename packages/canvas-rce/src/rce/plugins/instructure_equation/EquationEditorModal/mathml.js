@@ -19,11 +19,6 @@
 import $ from 'jquery'
 import RCEGlobals from '../../../RCEGlobals'
 
-const Delimiters = Object.freeze({
-  Inline: [['\\(', '\\)']], // effectively \( ... \) but we have to escape the first slash
-  Display: [['$$', '$$']],
-})
-
 export const MathJaxDirective = Object.freeze({
   Ignore: 'mathjax_ignore',
   Process: 'mathjax_process',
@@ -36,11 +31,6 @@ const localConfig = {
   },
   tex2jax: {
     ignoreClass: MathJaxDirective.Ignore,
-    inlineMath: Delimiters.Inline,
-    displayMath: Delimiters.Display,
-  },
-  asciimath2jax: {
-    delimiters: [], // effectively disables this preprocessor
   },
   extensions: ['Safe.js'],
   Safe: {
