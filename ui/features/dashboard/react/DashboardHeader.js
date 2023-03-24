@@ -41,6 +41,8 @@ import ObserverOptions from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('dashboard')
 
@@ -308,41 +310,47 @@ class DashboardHeader extends React.Component {
       (!observerMode() || this.state.selectedObserveeId === ENV.current_user_id)
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
-        <h1 className="ic-Dashboard-header__title">
-          <span className="hidden-phone">{I18n.t('Dashboard')}</span>
-        </h1>
-        <div className="ic-Dashboard-header__actions">
-          {observerMode() && (
-            <View as="div" maxWidth="16em" margin="0 small">
-              <ObserverOptions
-                currentUser={ENV.current_user}
-                currentUserRoles={ENV.current_user_roles}
-                observedUsersList={ENV.OBSERVED_USERS_LIST}
-                canAddObservee={ENV.CAN_ADD_OBSERVEE}
-                handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
-              />
-            </View>
-          )}
-          {this.props.planner_enabled && (
-            <div
-              id="dashboard-planner-header"
-              className="CanvasPlanner__HeaderContainer"
-              style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
-            />
-          )}
-          <div id="DashboardOptionsMenu_Container">
-            <DashboardOptionsMenu
-              view={this.state.currentDashboard}
-              planner_enabled={this.props.planner_enabled}
-              onDashboardChange={this.changeDashboard}
-              menuButtonRef={ref => {
-                this.menuButtonFocusable = ref
-              }}
-              canEnableElementaryDashboard={canEnableElementaryDashboard}
-            />
-          </div>
-          {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
-        </div>
+        <Flex direction="row" alignItems="center" justifyItems="space-between" width="100%">
+          <Flex.Item>
+            <Heading as="span" level="h1" className=".ic-Dashboard-header__title">
+              <span className="hidden-phone">{I18n.t('Dashboard')}</span>
+            </Heading>
+          </Flex.Item>
+          <Flex.Item>
+            <div className="ic-Dashboard-header__actions">
+              {observerMode() && (
+                <View as="div" maxWidth="16em" margin="0 small">
+                  <ObserverOptions
+                    currentUser={ENV.current_user}
+                    currentUserRoles={ENV.current_user_roles}
+                    observedUsersList={ENV.OBSERVED_USERS_LIST}
+                    canAddObservee={ENV.CAN_ADD_OBSERVEE}
+                    handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
+                  />
+                </View>
+              )}
+              {this.props.planner_enabled && (
+                <div
+                  id="dashboard-planner-header"
+                  className="CanvasPlanner__HeaderContainer"
+                  style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
+                />
+              )}
+              <div id="DashboardOptionsMenu_Container">
+                <DashboardOptionsMenu
+                  view={this.state.currentDashboard}
+                  planner_enabled={this.props.planner_enabled}
+                  onDashboardChange={this.changeDashboard}
+                  menuButtonRef={ref => {
+                    this.menuButtonFocusable = ref
+                  }}
+                  canEnableElementaryDashboard={canEnableElementaryDashboard}
+                />
+              </div>
+              {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
+            </div>
+          </Flex.Item>
+        </Flex>
       </div>
     )
   }

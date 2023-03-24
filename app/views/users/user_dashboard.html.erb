@@ -81,15 +81,16 @@ if k5_user?
 <% end %>
 
 <div id="dashboard" class="ic-dashboard-app">
+  <h1 class="screenreader-only"><%= dashboard_title %></h1>
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
   <% if k5_user? %>
     <div id="dashboard-app-container"></div>
   <% else %>
     <div id="dashboard_header_container" class="ic-Dashboard-header">
-      <h1 class="ic-Dashboard-header__title hidden-phone">
+      <div class="ic-Dashboard-header__title hidden-phone">
         <%= dashboard_title %>
-      </h1>
+      </div>
     </div>
     <% if planner_enabled? %>
       <div id="dashboard-planner" class="StudentPlanner__Container" style="display: <%= show_planner? ? 'block' : 'none' %>"></div>

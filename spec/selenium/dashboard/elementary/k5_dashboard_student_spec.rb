@@ -50,7 +50,7 @@ describe "student k5 dashboard" do
     it "provides the homeroom dashboard tabs on dashboard" do
       get "/"
 
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(grades_tab).to be_displayed
@@ -66,7 +66,7 @@ describe "student k5 dashboard" do
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
       wait_for_ajaximations
 
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
     end
   end
@@ -170,7 +170,7 @@ describe "student k5 dashboard" do
       driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
       wait_for_ajaximations
 
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
     end
   end
