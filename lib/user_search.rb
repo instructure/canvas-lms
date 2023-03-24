@@ -170,7 +170,7 @@ module UserSearch
       queries = [name_sql(users_scope, params)]
       if complex_search_enabled?
         queries << id_sql(users_scope, params) if @is_id
-        queries << ids_sql(users_scope, params) unless @is_id
+        queries << ids_sql(users_scope, params)
         queries << login_sql(users_scope, params) if @include_login
         queries << sis_sql(users_scope, params) if @include_sis
         queries << integration_sql(users_scope, params) if @include_integration
