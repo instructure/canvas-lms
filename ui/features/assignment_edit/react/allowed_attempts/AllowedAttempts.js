@@ -88,12 +88,12 @@ export default function AllowedAttempts({
         </select>
       </FormField>
 
-      <div hidden={!limited}>
+      <div hidden={!limited} style={{marginTop: '16px'}}>
         <NumberInput
           renderLabel={I18n.t('Number of Attempts')}
           name="allowed_attempts"
           display="inline-block"
-          width="200px"
+          width="220px"
           value={attemptsValue}
           interaction={locked ? 'disabled' : 'enabled'}
           messages={attemptsMessages}
