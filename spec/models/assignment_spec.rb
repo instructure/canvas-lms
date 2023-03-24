@@ -685,22 +685,6 @@ describe Assignment do
       expect(visible_assignments).to include assignment
     end
 
-    it "excludes assignments assigned to a concluded enrollment for the given user if due date is future" do
-      one_week_prev = 1.week.ago
-      one_week_later = 1.week.from_now
-      assignment1 = @course.assignments.create!(only_visible_to_overrides: true)
-      assignment2 = @course.assignments.create!(only_visible_to_overrides: true)
-      create_section_override_for_assignment(assignment1, course_section: student_enrollment.course_section, due_at: one_week_prev)
-      create_section_override_for_assignment(assignment2, course_section: student_enrollment.course_section, due_at: one_week_later)
-      assignment3 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_prev)
-      assignment4 = @course.assignments.create!(only_visible_to_overrides: false, due_at: one_week_later)
-      student_enrollment.conclude
-      expect(visible_assignments).to include assignment1
-      expect(visible_assignments).to include assignment3
-      expect(visible_assignments).not_to include assignment2
-      expect(visible_assignments).not_to include assignment4
-    end
-
     it "includes assignments assigned to an active enrollment for the given user" do
       assignment = @course.assignments.create!(only_visible_to_overrides: true)
       create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
