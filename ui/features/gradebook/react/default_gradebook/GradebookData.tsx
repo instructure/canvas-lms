@@ -92,7 +92,7 @@ export default function GradebookData(props: Props) {
   const loadStudentData = useStore(state => state.loadStudentData)
   const isStudentDataLoaded = useStore(state => state.isStudentDataLoaded)
   const isSubmissionDataLoaded = useStore(state => state.isSubmissionDataLoaded)
-  const totalStudentsLoaded = useStore(state => state.totalStudentsLoaded)
+  const totalSubmissionsLoaded = useStore(state => state.totalSubmissionsLoaded)
   const totalStudentsToLoad = useStore(state => state.totalStudentsToLoad)
 
   const sisOverrides = useStore(state => state.sisOverrides)
@@ -105,6 +105,7 @@ export default function GradebookData(props: Props) {
   const fetchGradingPeriodAssignments = useStore(state => state.fetchGradingPeriodAssignments)
   const loadAssignmentGroups = useStore(state => state.loadAssignmentGroups)
   const recentlyLoadedAssignmentGroups = useStore(state => state.recentlyLoadedAssignmentGroups)
+  const assignmentMap = useStore(state => state.assignmentMap)
 
   const currentGradingPeriodId = findFilterValuesOfType('grading-period', appliedFilters)[0]
   const gradingPeriodSet = props.gradebookEnv.grading_period_set
@@ -192,8 +193,8 @@ export default function GradebookData(props: Props) {
     <Gradebook
       {...props}
       appliedFilters={appliedFilters}
+      assignmentMap={assignmentMap}
       customColumns={customColumns}
-      loadDataForCustomColumn={loadDataForCustomColumn}
       fetchFinalGradeOverrides={fetchFinalGradeOverrides}
       fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
@@ -204,9 +205,11 @@ export default function GradebookData(props: Props) {
       isCustomColumnsLoaded={isCustomColumnsLoaded}
       isFiltersLoading={isFiltersLoading}
       isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
+      isGridLoaded={false}
       isModulesLoading={isModulesLoading}
       isStudentDataLoaded={isStudentDataLoaded}
       isStudentIdsLoading={isStudentIdsLoading}
+      loadDataForCustomColumn={loadDataForCustomColumn}
       isSubmissionDataLoaded={isSubmissionDataLoaded}
       modules={modules}
       postGradesStore={postGradesStore.current}
@@ -217,7 +220,7 @@ export default function GradebookData(props: Props) {
       reloadStudentData={reloadStudentData}
       reorderCustomColumns={reorderCustomColumns}
       sisOverrides={sisOverrides}
-      totalStudentsLoaded={totalStudentsLoaded}
+      totalSubmissionsLoaded={totalSubmissionsLoaded}
       studentIds={studentIds}
       totalStudentsToLoad={totalStudentsToLoad}
       updateColumnOrder={updateColumnOrder}

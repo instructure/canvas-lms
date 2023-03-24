@@ -251,6 +251,7 @@ export function Portal({node, children}: {node: HTMLElement; children: React.Rea
 export type GradebookProps = {
   actionMenuNode: HTMLSpanElement
   anonymousSpeedGraderAlertNode: HTMLSpanElement
+  assignmentMap: AssignmentMap
   enhancedActionMenuNode: HTMLSpanElement
   appliedFilters: Filter[]
   applyScoreToUngradedModalNode: HTMLElement
@@ -278,6 +279,7 @@ export type GradebookProps = {
   isCustomColumnsLoaded: boolean
   isFiltersLoading: boolean
   isGradingPeriodAssignmentsLoading: boolean
+  isGridLoaded: boolean
   isModulesLoading: boolean
   isStudentIdsLoading: boolean
   isStudentDataLoaded: boolean
@@ -296,7 +298,7 @@ export type GradebookProps = {
   settingsModalButtonContainer: HTMLElement
   sisOverrides: AssignmentGroup[]
   studentIds: string[]
-  totalStudentsLoaded: number
+  totalSubmissionsLoaded: number
   totalStudentsToLoad: number
   updateColumnOrder: (courseId: string, columnOrder: ColumnOrderSettings) => Promise<void>
   viewOptionsMenuNode: HTMLElement
@@ -476,7 +478,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradingPeriodId: this.getCurrentGradingPeriod(),
       gridColors: statusColors(this.props.gradebookEnv.colors),
       isEssentialDataLoaded: false,
-      isGridLoaded: false,
+      isGridLoaded: this.props.isGridLoaded,
       modules: [],
       sections: this.options.sections.length > 1 ? this.options.sections : [],
       isStatusesModalOpen: false,
@@ -5005,9 +5007,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           exportManager={this.state.exportManager}
         />
         {(!this.state.isGridLoaded || !this.state.isEssentialDataLoaded) && (
-          <View as="div" width="100%" textAlign="center">
-            <Spinner renderTitle={I18n.t('Loading Gradebook')} margin="large auto 0 auto" />
-          </View>
+          <div
+            style={{
+              width: '100%',
+              position: 'absolute',
+              top: '200px',
+              textAlign: 'center',
+            }}
+          >
+            <View as="div">
+              <Spinner renderTitle={I18n.t('Loading Gradebook')} margin="large auto 0 auto" />
+            </View>
+          </div>
         )}
         {!this.props.hideGrid && (
           <ErrorBoundary
@@ -5078,18 +5089,31 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               />
             )}
         </div>
-        <View as="div">
-          {!this.props.isSubmissionDataLoaded && this.props.totalStudentsToLoad > 10 && (
-            <ProgressBar
-              data-testid="gradebook-submission-progress-bar"
-              margin="0 0 small"
-              screenReaderLabel={I18n.t('Loading Gradebook submissions for students')}
-              size="small"
-              valueMax={this.props.totalStudentsToLoad}
-              valueNow={this.props.totalStudentsLoaded}
-            />
+        {this.state.isGridLoaded &&
+          !this.props.isSubmissionDataLoaded &&
+          Object.keys(this.props.assignmentMap).length * this.props.totalStudentsToLoad > 200 && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                width: '100%',
+                zIndex: 10, // over SlickGrid
+                left: '0',
+                right: '0',
+              }}
+            >
+              <ProgressBar
+                data-testid="gradebook-submission-progress-bar"
+                margin="0"
+                screenReaderLabel={I18n.t('Loading Gradebook submissions')}
+                size="x-small"
+                valueMax={
+                  Object.keys(this.props.assignmentMap).length * this.props.totalStudentsToLoad
+                }
+                valueNow={this.props.totalSubmissionsLoaded}
+              />
+            </div>
           )}
-        </View>
       </>
     )
   }
