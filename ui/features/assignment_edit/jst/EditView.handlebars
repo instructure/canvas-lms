@@ -65,9 +65,10 @@
       </label>
     </div>
 
-    <div class="form-column-right">
+    <div class="form-column-right" style="display: inline-flex">
       <input id="assignment_points_possible"
         name="points_possible"
+        style="width: 100%;"
         value="{{n pointsPossible}}"
         type="text"
         {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
