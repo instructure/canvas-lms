@@ -56,6 +56,9 @@
   "aleph_f4ffd155": {
     "message": "Aleph"
   },
+  "align_11050992": {
+    "message": "Align"
+  },
   "alignment_and_lists_5cebcb69": {
     "message": "Alignment and Lists"
   },
@@ -133,6 +136,9 @@
   },
   "arabic_c5c87acd": {
     "message": "Arabic"
+  },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "Are you sure you want to cancel? Changes you made may not be saved."
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Are you sure you want to delete this planner item?"
@@ -284,6 +290,9 @@
   "catalan_16f6b78f": {
     "message": "Catalan"
   },
+  "center_align_e68d9997": {
+    "message": "Center Align"
+  },
   "centered_dot_64d5e378": {
     "message": "Centered Dot"
   },
@@ -301,6 +310,15 @@
   },
   "change_text_color_1aecb912": {
     "message": "Change text color"
+  },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Changes you made may not be saved."
+  },
+  "characters_9d897d1c": {
+    "message": "Characters"
+  },
+  "characters_no_spaces_485e5367": {
+    "message": "Characters (no spaces)"
   },
   "check_accessibility_3c78211c": {
     "message": "Check Accessibility"
@@ -328,6 +346,9 @@
   },
   "circle_484abe63": {
     "message": "Circle"
+  },
+  "circle_unordered_list_9e3a0763": {
+    "message": "circle unordered list"
   },
   "clear_2084585f": {
     "message": "Clear"
@@ -425,6 +446,12 @@
   "copyright_holder_66ee111": {
     "message": "Copyright Holder:"
   },
+  "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+    "message": "Could not insert content: \"{ itemType }\" items are not currently supported in Canvas."
+  },
+  "count_40eced3b": {
+    "message": "Count"
+  },
   "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
     "message": "{ count, plural,\n     =0 {0 words}\n    one {1 word}\n  other {# words}\n}"
   },
@@ -458,6 +485,9 @@
   "course_images_f8511d04": {
     "message": "Course Images"
   },
+  "course_link_b369426": {
+    "message": "Course Link"
+  },
   "course_links_b56959b9": {
     "message": "Course Links"
   },
@@ -472,6 +502,9 @@
   },
   "create_icon_110d6463": {
     "message": "Create Icon"
+  },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Create Icon Maker Icon"
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
@@ -536,8 +569,17 @@
   "decorative_type_upper_f2c95e3": {
     "message": "Decorative { TYPE_UPPER }"
   },
+  "decrease_indent_d9cf469d": {
+    "message": "Decrease Indent"
+  },
   "deep_purple_bb3e2907": {
     "message": "Deep Purple"
+  },
+  "default_bulleted_unordered_list_47079da8": {
+    "message": "default bulleted unordered list"
+  },
+  "default_numerical_ordered_list_48dd3548": {
+    "message": "default numerical ordered list"
   },
   "definite_integral_fe7ffed1": {
     "message": "Definite Integral"
@@ -632,6 +674,9 @@
   "division_sign_72190870": {
     "message": "Division Sign"
   },
+  "document_678cd7bf": {
+    "message": "Document"
+  },
   "documents_81393201": {
     "message": "Documents"
   },
@@ -640,6 +685,9 @@
   },
   "double_dagger_faf78681": {
     "message": "Double Dagger"
+  },
+  "down_5831a426": {
+    "message": "Down"
   },
   "down_and_left_diagonal_arrow_40ef602c": {
     "message": "Down And Left Diagonal Arrow"
@@ -689,6 +737,9 @@
   "edit_course_link_5a5c3c59": {
     "message": "Edit Course Link"
   },
+  "edit_equation_f5279959": {
+    "message": "Edit Equation"
+  },
   "edit_existing_icon_maker_icon_5d0ebb3f": {
     "message": "Edit Existing Icon Maker Icon"
   },
@@ -712,6 +763,9 @@
   },
   "embed_code_314f1bd5": {
     "message": "Embed Code"
+  },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Embed content from External Tool"
   },
   "embed_image_1080badc": {
     "message": "Embed Image"
@@ -767,8 +821,14 @@
   "equals_sign_c51bdc58": {
     "message": "Equals Sign"
   },
+  "equation_1c5ac93c": {
+    "message": "Equation"
+  },
   "equation_editor_39fbc3f1": {
     "message": "Equation Editor"
+  },
+  "equilibrium_6ff3040b": {
+    "message": "Equilibrium"
   },
   "equivalence_class_7b0f11c0": {
     "message": "Equivalence Class"
@@ -815,6 +875,12 @@
   "extended_9a58dcb6": {
     "message": "Extended"
   },
+  "external_link_d3f9e62a": {
+    "message": "External Link"
+  },
+  "external_tool_frame_70b32473": {
+    "message": "External tool frame"
+  },
   "external_tools_6e77821": {
     "message": "External Tools"
   },
@@ -859,6 +925,9 @@
   },
   "failed_to_load_opportunities_52ab6404": {
     "message": "Failed to load opportunities"
+  },
+  "failed_to_retrieve_content_from_external_tool_5899c213": {
+    "message": "Failed to retrieve content from external tool"
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "Failed to save to do"
@@ -1016,6 +1085,9 @@
   "group_isomorphism_45b1458c": {
     "message": "Group Isomorphism"
   },
+  "group_link_63e626b3": {
+    "message": "Group Link"
+  },
   "group_links_9493129e": {
     "message": "Group Links"
   },
@@ -1094,6 +1166,9 @@
   "html_code_editor_fd967a44": {
     "message": "html code editor"
   },
+  "html_editor_fb2ab713": {
+    "message": "HTML Editor"
+  },
   "hungarian_fc7d30c9": {
     "message": "Hungarian"
   },
@@ -1136,6 +1211,9 @@
   "if_left_empty_link_text_will_display_as_course_lin_61087540": {
     "message": "If left empty link, text will display as course link name"
   },
+  "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+    "message": "If Usage Rights are required, the file will not publish until enabled in the Files page."
+  },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
   },
@@ -1172,6 +1250,9 @@
   "in_element_of_19ca2f33": {
     "message": "In (Element Of)"
   },
+  "increase_indent_6af90f7c": {
+    "message": "Increase Indent"
+  },
   "indefinite_integral_6623307e": {
     "message": "Indefinite Integral"
   },
@@ -1192,6 +1273,10 @@
   },
   "insert_link_6dc23cae": {
     "message": "Insert Link"
+  },
+  "insert_math_equation_57c6e767": {
+    "description": "Title for RCE button to insert a math equation",
+    "message": "Insert Math Equation"
   },
   "integers_336344e1": {
     "message": "Integers"
@@ -1313,6 +1398,12 @@
   "leave_as_is_4facfe55": {
     "message": "Leave as is"
   },
+  "left_3ea9d375": {
+    "message": "Left"
+  },
+  "left_align_43d95491": {
+    "message": "Left Align"
+  },
   "left_angle_bracket_c87a6d07": {
     "message": "Left Angle Bracket"
   },
@@ -1403,6 +1494,9 @@
   "loading_closed_captions_subtitles_failed_95ceef47": {
     "message": "loading closed captions/subtitles failed."
   },
+  "loading_external_tool_d839042c": {
+    "message": "Loading External Tool"
+  },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
@@ -1417,6 +1511,9 @@
   },
   "loading_past_items_ca499e75": {
     "message": "Loading past items"
+  },
+  "loading_placeholder_for_filename_792ef5e8": {
+    "message": "Loading placeholder for { fileName }"
   },
   "loading_planner_items_947a813d": {
     "message": "Loading planner items"
@@ -1522,6 +1619,9 @@
   },
   "modules_c4325335": {
     "message": "Modules"
+  },
+  "moving_image_to_crop_directionword_6f66cde2": {
+    "message": "Moving image to crop { directionWord }"
   },
   "mu_37223b8b": {
     "message": "Mu"
@@ -1730,6 +1830,9 @@
   "orange_81386a62": {
     "message": "Orange"
   },
+  "ordered_and_unordered_lists_cfadfc38": {
+    "message": "Ordered and Unordered Lists"
+  },
   "other_editor_shortcuts_may_be_found_at_404aba4a": {
     "message": "Other editor shortcuts may be found at"
   },
@@ -1931,6 +2034,9 @@
   "record_7c9448b": {
     "message": "Record"
   },
+  "record_upload_media_5fdce166": {
+    "message": "Record/Upload Media"
+  },
   "recording_98da6bda": {
     "message": "Recording"
   },
@@ -1951,6 +2057,9 @@
   },
   "remove_heading_style_5fdc8855": {
     "message": "Remove heading style"
+  },
+  "remove_link_d1f2f4d0": {
+    "message": "Remove Link"
   },
   "replace_e61834a7": {
     "message": "Replace"
@@ -1981,6 +2090,12 @@
   },
   "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
     "message": "Rich Text Area. Press { OSKey }+F8 for Rich Content Editor shortcuts."
+  },
+  "right_71ffdc4d": {
+    "message": "Right"
+  },
+  "right_align_39e7a32a": {
+    "message": "Right Align"
   },
   "right_angle_bracket_d704e2d6": {
     "message": "Right Angle Bracket"
@@ -2048,6 +2163,9 @@
   "save_media_cb9e786e": {
     "message": "Save Media"
   },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Saved Icon Maker Icons"
+  },
   "schedule_preview_3bcda153": {
     "message": "Schedule Preview"
   },
@@ -2099,6 +2217,9 @@
   "selected_linkfilename_c093b1f2": {
     "message": "Selected { linkFileName }"
   },
+  "selection_b52c4c5e": {
+    "message": "Selection"
+  },
   "serbian_7187f1f2": {
     "message": "Serbian"
   },
@@ -2126,8 +2247,20 @@
   "show_all_ae37d610": {
     "message": "Show All"
   },
+  "show_audio_options_b489926b": {
+    "message": "Show audio options"
+  },
+  "show_image_options_1e2ecc6b": {
+    "message": "Show image options"
+  },
+  "show_link_options_545338fd": {
+    "message": "Show link options"
+  },
   "show_my_grades_ebd08684": {
     "message": "Show My Grades"
+  },
+  "show_video_options_6ed3721a": {
+    "message": "Show video options"
   },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
     "message": "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
@@ -2186,6 +2319,9 @@
   "something_went_wrong_while_sharing_your_screen_8de579e5": {
     "message": "Something went wrong while sharing your screen."
   },
+  "sorry_we_don_t_support_multiple_files_fb9478b0": {
+    "message": "Sorry, we don''t support multiple files."
+  },
   "sort_by_e75f9e3e": {
     "message": "Sort By"
   },
@@ -2221,6 +2357,9 @@
   },
   "square_superset_strict_fa4262e4": {
     "message": "Square Superset (Strict)"
+  },
+  "square_unordered_list_b15ce93b": {
+    "message": "square unordered list"
   },
   "star_8d156e09": {
     "message": "Star"
@@ -2281,6 +2420,9 @@
   },
   "superscript_8cb349a2": {
     "message": "Superscript"
+  },
+  "superscript_and_subscript_37f94a50": {
+    "message": "Superscript and Subscript"
   },
   "superset_c4db8a7a": {
     "message": "Superset"
@@ -2390,6 +2532,9 @@
   "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
     "message": "The first heading on a page should be an H2."
   },
+  "the_following_content_is_partner_provided_ed1da756": {
+    "message": "The following content is partner provided"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"
   },
@@ -2398,6 +2543,9 @@
   },
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws"
+  },
+  "the_preceding_content_is_partner_provided_d753928c": {
+    "message": "The preceding content is partner provided"
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor."
@@ -2525,6 +2673,9 @@
   "ukrainian_945b00b7": {
     "message": "Ukrainian"
   },
+  "unable_to_determine_resource_selection_url_7867e060": {
+    "message": "Unable to determine resource selection url"
+  },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Unable to mark as complete."
   },
@@ -2546,6 +2697,12 @@
   "up_and_right_diagonal_arrow_935b902e": {
     "message": "Up And Right Diagonal Arrow"
   },
+  "up_c553575d": {
+    "message": "Up"
+  },
+  "upload_document_253f0478": {
+    "message": "Upload Document"
+  },
   "upload_file_fd2361b8": {
     "message": "Upload File"
   },
@@ -2555,8 +2712,14 @@
   "upload_media_ce31135a": {
     "message": "Upload Media"
   },
+  "upload_record_media_e4207d72": {
+    "message": "Upload/Record Media"
+  },
   "uploading_19e8a4e7": {
     "message": "Uploading"
+  },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "uppercase alphabetic ordered list"
   },
   "uppercase_delta_d4f4bc41": {
     "message": "Uppercase Delta"
@@ -2578,6 +2741,9 @@
   },
   "uppercase_psi_6395acbe": {
     "message": "Uppercase Psi"
+  },
+  "uppercase_roman_numeral_ordered_list_853f292b": {
+    "message": "uppercase Roman numeral ordered list"
   },
   "uppercase_sigma_dbb70e92": {
     "message": "Uppercase Sigma"
@@ -2681,6 +2847,9 @@
   "vietnamese_e7a76583": {
     "message": "Vietnamese"
   },
+  "view_all_e13bf0a6": {
+    "message": "View All"
+  },
   "view_ba339f93": {
     "message": "View"
   },
@@ -2746,6 +2915,12 @@
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki Home"
+  },
+  "word_count_c77fe3a6": {
+    "message": "Word Count"
+  },
+  "words_b448b7d5": {
+    "message": "Words"
   },
   "wreath_product_200b38ef": {
     "message": "Wreath Product"
