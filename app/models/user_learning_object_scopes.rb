@@ -185,7 +185,13 @@ module UserLearningObjectScopes
     objects_needing("Assignment", purpose, :student, params, cache_timeout,
                     limit: limit, **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
-      assignments = assignments.visible_to_students_in_course_with_da(id, opts[:course_ids]) if opts[:course_ids].present?
+
+      if opts[:course_ids].present?
+        active_enrollment_course_ids = Enrollment.where(Enrollment.active_student_conditions)
+                                                 .where(user_id: id, course_id: opts[:course_ids]).pluck(:course_id)
+        assignments = assignments.visible_to_students_in_course_with_da(id, active_enrollment_course_ids)
+      end
+
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
       if purpose == "submitting"
