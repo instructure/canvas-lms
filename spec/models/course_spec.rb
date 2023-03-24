@@ -7776,4 +7776,97 @@ describe Course do
       expect(completed_ids).to eq @ids_to_update
     end
   end
+
+  describe "restrict quantitative data" do
+    before do
+      @root = Account.default
+      @course = Account.default.courses.build
+      @course.update(root_account_id: @root.id)
+      @admin = account_admin_user
+      @teacher = user_model
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    describe "with no user" do
+      it "calls restrict_quantitative_data with no user" do
+        expect(@course.restrict_quantitative_data?).to eq nil
+      end
+    end
+
+    describe "with feature flag on" do
+      before do
+        @root.enable_feature!(:restrict_quantitative_data)
+      end
+
+      describe "with setting turned on" do
+        before do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+        end
+
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to eq true
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to eq true
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with setting turned off" do
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to eq false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to eq false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+    end
+
+    describe "with feature flag off" do
+      describe "with setting turned on" do
+        before do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+        end
+
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to eq false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to eq false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with setting turned off" do
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to eq false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to eq false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+    end
+  end
 end

@@ -427,6 +427,8 @@ class Assignment < ActiveRecord::Base
     )
   end
 
+  delegate :restrict_quantitative_data?, to: :course
+
   def group_category_changes_ok?
     return unless group_category_id_changed?
 

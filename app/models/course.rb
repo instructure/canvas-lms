@@ -3493,7 +3493,7 @@ class Course < ActiveRecord::Base
   add_setting :is_public_to_auth_users, boolean: true, default: false
   add_setting :overridden_course_visibility
 
-  add_setting :restrict_quantitative_data, boolean: true, inherited: true
+  add_setting :restrict_quantitative_data, boolean: true, default: false, inherited: true
   add_setting :restrict_student_future_view, boolean: true, inherited: true
   add_setting :restrict_student_past_view, boolean: true, inherited: true
 
@@ -3522,6 +3522,12 @@ class Course < ActiveRecord::Base
 
   def elementary_subject_course?
     !homeroom_course? && elementary_enabled?
+  end
+
+  def restrict_quantitative_data?(user = nil)
+    return unless user.is_a?(User)
+
+    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !account.grants_right?(user, :restrict_quantitative_data)
   end
 
   def friendly_name

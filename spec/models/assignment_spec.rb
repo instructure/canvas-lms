@@ -11040,4 +11040,143 @@ describe Assignment do
       expect(subject.error_code).to eq "MAX_GRADERS_REACHED"
     end
   end
+
+  describe "restrict_quantitative_data" do
+    before do
+      @root = Account.default
+
+      @sub_account = Account.create!(parent_account_id: @root.id)
+      @sub_course = Course.create!(name: "sub account course", account_id: @sub_account.id)
+
+      @admin = account_admin_user
+
+      @student_1 = user_model
+      @student_enrollment = @sub_course.enroll_student(@student_1, enrollment_state: :active)
+
+      @sub_course.reload
+
+      @course_assignment = Assignment.create!(context_id: @sub_course.id, context_type: "Course")
+      @course_assignment.reload
+    end
+
+    describe "with no user" do
+      it "calls restrict_quantitative_data with no user" do
+        expect(@course_assignment.restrict_quantitative_data?).to eq nil
+      end
+    end
+
+    describe "with feature flag on" do
+      before do
+        @root.enable_feature!(:restrict_quantitative_data)
+      end
+
+      describe "with root account setting on" do
+        before do
+          @root.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          @root.save!
+        end
+
+        it "inherits setting to sub account" do
+          expect(@sub_account.restrict_quantitative_data?).to eq true
+        end
+
+        it "inherits setting to course" do
+          expect(@sub_course.restrict_quantitative_data).to eq true
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq true
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with sub-account setting on" do
+        before do
+          @sub_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          @sub_account.save!
+        end
+
+        it "inherits setting to course" do
+          expect(@sub_course.restrict_quantitative_data).to eq true
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq true
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with course setting on" do
+        before do
+          @sub_course.settings = @sub_course.settings.merge(restrict_quantitative_data: true)
+          @sub_course.save!
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq true
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+    end
+
+    describe "with feature flag off" do
+      describe "with root account setting on" do
+        before do
+          @root.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          @root.save!
+        end
+
+        it "inherits setting to sub account" do
+          expect(@sub_account.restrict_quantitative_data?).to eq false
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq false
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with sub-account setting on" do
+        before do
+          @sub_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          @sub_account.save!
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq false
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+
+      describe "with course setting on" do
+        before do
+          @sub_course.settings = @sub_course.settings.merge(restrict_quantitative_data: true)
+          @sub_course.save!
+        end
+
+        it "restricts quantitative data by default for students" do
+          expect(@course_assignment.restrict_quantitative_data?(@student_1)).to eq false
+        end
+
+        it "does not restrict quantitative data by default for admins" do
+          expect(@course_assignment.restrict_quantitative_data?(@admin)).to eq false
+        end
+      end
+    end
+  end
 end

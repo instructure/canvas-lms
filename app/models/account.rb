@@ -428,7 +428,7 @@ class Account < ActiveRecord::Base
   end
 
   def restrict_quantitative_data?
-    restrict_quantitative_data[:value]
+    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data[:value]
   end
 
   def allow_global_includes?

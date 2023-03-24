@@ -304,7 +304,7 @@ class RoleOverride < ActiveRecord::Base
           AccountMembership
         ],
         acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:restrict_quantitative_data) && a.restrict_quantitative_data? }
+        account_allows: ->(a) { a.root_account.feature_enabled?(:restrict_quantitative_data) }
       },
       view_feature_flags: {
         label: -> { t("View feature options at an account level") },
