@@ -299,6 +299,14 @@
                     <tr>
                       <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
                         <%= r.label :value, t("Restrict view of quantitative data") %>
+                          <button class='Button Button--icon-action rqd_help_btn' type='button'>
+                            <i class='icon-info'></i>
+                            <span class='screenreader-only'><%= t(:rqd_screenreader, "About restrict quantitative data") %></span>
+                          </button>
+                          <div id="rqd_dialog" style="display: none;">
+                            <%= t(:rqd_help_message,
+                            "When selected, this setting will restrict user view of quantitative (numeric) grading data and limit assignment creation options for teachers. Users will only see qualitative data, which includes letter grades and comments. Admin can customize this setting further by adjusting permissions for user roles.") %>
+                          </div>
                       </td>
                     </tr>
                     <% unless disabled %>
