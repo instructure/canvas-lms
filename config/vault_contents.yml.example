@@ -29,6 +29,9 @@ development:
 #      inst_access_signature:
 #        private_key: <signing private key in base 64>
 #        encryption_public_key: <encryption public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
+#      linked_in_creds:
+#        api_key: <api_key>
+#        secret_key: <secret_key>
 #      notification_service_creds:
 #        access_key_id: <access_key_id>
 #        secret_access_key: <secret_access_key>
