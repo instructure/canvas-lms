@@ -107,6 +107,14 @@ function injectTinySkin() {
     // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
     document.createTextNode(skinCSS)
   )
+  // there's CSS from discussions that turns the instui Selectors bold
+  // and in classic quizzes that also mucks with padding
+  style.appendChild(
+    document.createTextNode(`
+      #discussion-edit-view .rce-wrapper input[readonly] {font-weight: normal;}
+      #quiz_edit_wrapper .rce-wrapper input[readonly] {font-weight: normal; padding-left: .75rem;}
+    `)
+  )
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
     document.head.querySelector('style') || // find any stylesheet
