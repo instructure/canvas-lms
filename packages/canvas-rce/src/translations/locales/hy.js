@@ -64,6 +64,7 @@ const locale = {
     "message": "\"Creative Commons\" լիցենզիա"
   },
   "cyan_c1d5f68a": { "message": "Cyan" },
+  "decrease_indent_d9cf469d": { "message": "Փոքրացնել Ներսի Տողագլուխը" },
   "deep_purple_bb3e2907": { "message": "Մուգ մանուշակագույն" },
   "delimiters_4db4840d": { "message": "Բաժանիչներ" },
   "description_436c48d7": { "message": "Նկարագրություն" },
@@ -72,6 +73,7 @@ const locale = {
   "discussions_a5f96392": { "message": "Քննարկումներ" },
   "discussions_index_6c36ced": { "message": "Քննարկումների ցուցիչ" },
   "done_54e3d4b6": { "message": "Պատրաստ է" },
+  "down_5831a426": { "message": "Ներքև" },
   "due_multiple_dates_cc0ee3f5": { "message": "Վերջնաժամկետ՝ մի քանի ամսաթիվ" },
   "edit_c5fbea07": { "message": "Խմբագրել" },
   "embed_image_1080badc": { "message": "Տեղադրել պատկերը" },
@@ -86,6 +88,7 @@ const locale = {
   "group_files_82e5dcdb": { "message": "Խմբի ֆայլեր" },
   "group_navigation_99f191a": { "message": "Խմբի նավարկում" },
   "home_351838cd": { "message": "Սկիզբ" },
+  "html_editor_fb2ab713": { "message": "HTML խմբագիր" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
   },
@@ -95,9 +98,13 @@ const locale = {
   "icon_215a1dc6": { "message": "Նշան" },
   "image_8ad06": { "message": "Պատկեր" },
   "images_7ce26570": { "message": "Պատկերներ" },
+  "increase_indent_6af90f7c": { "message": "Մեծացնել ներսի տողագլուխը" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Տեղադրել" },
   "insert_link_6dc23cae": { "message": "Տեղադրել հղումը" },
+  "insert_math_equation_57c6e767": {
+    "message": "Զետեղել մաթեմատիկական հավասարում"
+  },
   "invalid_file_type_881cc9b2": { "message": "Ֆայլի անընդունելի տեսակ" },
   "invalid_url_cbde79f": { "message": "Սխալ URL" },
   "keyboard_shortcuts_ed1844bd": { "message": "Արագ հասանելիության ստեղներ" },
@@ -170,6 +177,7 @@ const locale = {
   },
   "title_ee03d132": { "message": "Վերնագիր" },
   "unpublished_dfd8801": { "message": "չհրապարակված" },
+  "up_c553575d": { "message": "Վերև" },
   "upload_file_fd2361b8": { "message": "Բեռնել ֆայլը " },
   "uploading_19e8a4e7": { "message": "Բեռնում" },
   "url_22a5f3b8": { "message": "URL" },
