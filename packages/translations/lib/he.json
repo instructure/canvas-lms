@@ -44,6 +44,9 @@
     "apps_54d24a47": {
         "message": "אפליקציות"
     },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "האם בטוחים שרוצים לבטל? שינויים שבוצעו לא ישמרו"
+    },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "האם אתם בטוחים שברצונכם למחוק את פריט המתכנן הזה?"
     },
@@ -115,6 +118,12 @@
     },
     "canvas_planner_98ed106": {
         "message": "מתכנן קנבס"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "תיקונים שבצעת יתכן שלא ישמרו"
+    },
+    "characters_9d897d1c": {
+        "message": "תווים"
     },
     "choose_usage_rights_33683854": {
         "message": "בחירה של זכויות שימוש..."
@@ -203,6 +212,9 @@
     "decorative_image_fde98579": {
         "message": "תמונת קישוט"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "צמצום עימוד"
+    },
     "deep_purple_bb3e2907": {
         "message": "סגול כהה"
     },
@@ -247,6 +259,9 @@
     },
     "done_54e3d4b6": {
         "message": "בוצע"
+    },
+    "down_5831a426": {
+        "message": "מטה"
     },
     "due_5d7267be": {
         "message": "תאריך יעד:"
@@ -338,6 +353,9 @@
     "home_351838cd": {
         "message": "דף הבית"
     },
+    "html_editor_fb2ab713": {
+        "message": "עורך HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "קיבלתי הרשאות להשתמש בקובץ זה"
     },
@@ -356,6 +374,9 @@
     "images_7ce26570": {
         "message": "תמונות"
     },
+    "increase_indent_6af90f7c": {
+        "message": "הרחבת עימוד"
+    },
     "indigo_2035fc55": {
         "message": "אינדיגו"
     },
@@ -364,6 +385,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "הוספת קישור"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "הוספת נוסחה מתימטית"
     },
     "invalid_file_type_881cc9b2": {
         "message": "סוג קובץ לא חוקי"
@@ -632,6 +656,9 @@
     "search_280d00bd": {
         "message": "חיפוש"
     },
+    "selection_b52c4c5e": {
+        "message": "בחירה"
+    },
     "show_all_ae37d610": {
         "message": "הצגה של הכל"
     },
@@ -733,6 +760,9 @@
     },
     "unpublished_dfd8801": {
         "message": "לא פורסם"
+    },
+    "up_c553575d": {
+        "message": "מעלה"
     },
     "upload_file_fd2361b8": {
         "message": "העלאת קובץ"
