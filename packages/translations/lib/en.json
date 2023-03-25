@@ -2259,6 +2259,9 @@
   "show_my_grades_ebd08684": {
     "message": "Show My Grades"
   },
+  "show_studio_media_options_a0c748c6": {
+    "message": "Show Studio media options"
+  },
   "show_video_options_6ed3721a": {
     "message": "Show video options"
   },
@@ -2387,6 +2390,9 @@
   },
   "student_to_do_c018c835": {
     "message": "Student To Do"
+  },
+  "studio_media_options_ee504361": {
+    "message": "Studio Media Options"
   },
   "styles_2aa721ef": {
     "message": "Styles"

@@ -119,6 +119,9 @@
     "date_ee500367": {
         "message": "Ամսաթիվ"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Փոքրացնել Ներսի Տողագլուխը"
+    },
     "deep_purple_bb3e2907": {
         "message": "Մուգ մանուշակագույն"
     },
@@ -151,6 +154,9 @@
     },
     "done_54e3d4b6": {
         "message": "Պատրաստ է"
+    },
+    "down_5831a426": {
+        "message": "Ներքև"
     },
     "due_5d7267be": {
         "message": "Մինչև"
@@ -203,6 +209,9 @@
     "home_351838cd": {
         "message": "Սկիզբ"
     },
+    "html_editor_fb2ab713": {
+        "message": "HTML խմբագիր"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
     },
@@ -218,6 +227,9 @@
     "images_7ce26570": {
         "message": "Պատկերներ"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Մեծացնել ներսի տողագլուխը"
+    },
     "indigo_2035fc55": {
         "message": "Indigo"
     },
@@ -226,6 +238,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Տեղադրել հղումը"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Զետեղել մաթեմատիկական հավասարում"
     },
     "invalid_file_type_881cc9b2": {
         "message": "Ֆայլի անընդունելի տեսակ"
@@ -439,6 +454,9 @@
     },
     "unpublished_dfd8801": {
         "message": "չհրապարակված"
+    },
+    "up_c553575d": {
+        "message": "Վերև"
     },
     "upload_file_fd2361b8": {
         "message": "Բեռնել ֆայլը "
