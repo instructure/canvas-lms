@@ -25,6 +25,7 @@ const locale = {
   },
   "description_436c48d7": { "message": "Mô tả" },
   "icon_215a1dc6": { "message": "Biểu tượng" },
+  "insert_math_equation_57c6e767": { "message": "Insert Math Equation" },
   "next_40e12421": { "message": "Kế tiếp" }
 }
 

@@ -23,8 +23,14 @@ const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
   },
+  "decrease_indent_d9cf469d": { "message": "Уменьшить отступ" },
   "description_436c48d7": { "message": "Описание" },
+  "down_5831a426": { "message": "Вниз" },
   "icon_215a1dc6": { "message": "Значок" },
+  "increase_indent_6af90f7c": { "message": "Увеличить отступ" },
+  "insert_math_equation_57c6e767": {
+    "message": "Вставить математическое уравнение"
+  },
   "links_to_an_external_site_de74145d": {
     "message": "Ссылки на внешний сайт."
   },
@@ -39,7 +45,8 @@ const locale = {
   },
   "this_document_cannot_be_displayed_within_canvas_7aba77be": {
     "message": "Этот документ нельзя отобразить внутри Canvas."
-  }
+  },
+  "up_c553575d": { "message": "Вверх" }
 }
 
 
