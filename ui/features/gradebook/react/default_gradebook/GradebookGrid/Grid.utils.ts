@@ -18,7 +18,7 @@
 
 import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
 import type {Module} from '../../../../../api.d'
-import type {ColumnOrderSettings} from '../gradebook.d'
+import type {ColumnOrderSettings, GradebookStudent} from '../gradebook.d'
 
 export const DEFAULT_COLUMN_SORT_TYPE = 'assignment_group'
 
@@ -74,4 +74,24 @@ export function getColumnOrder(
   } else {
     return gradebookColumnOrderSettings
   }
+}
+
+export function listRowIndicesForStudentIds(
+  rows: GradebookStudent,
+  studentIds: string[]
+): number[] {
+  const rowIndicesByStudentId = rows.reduce(
+    (
+      map: {
+        [studentId: string]: number
+      },
+      row: GradebookStudent,
+      index: number
+    ) => {
+      map[row.id] = index
+      return map
+    },
+    {}
+  )
+  return studentIds.map(studentId => rowIndicesByStudentId[studentId])
 }
