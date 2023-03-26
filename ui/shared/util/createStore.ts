@@ -18,6 +18,17 @@
 
 import Backbone from '@canvas/backbone'
 
+export type CanvasStore<A> = {
+  setState(newState: Partial<A>): void
+  getState(): Partial<A>
+  clearState(): void
+  addChangeListener(listener: () => void)
+
+  removeChangeListener(listener: () => void)
+
+  emitChange(): void
+}
+
 /**
  * Creates a data store with some initial state.
  *
@@ -50,10 +61,9 @@ import Backbone from '@canvas/backbone'
  * });
  * ```
  */
-
-function createStore(initialState) {
+function createStore<A extends {}>(initialState: Partial<A>): CanvasStore<A> {
   const events = {...Backbone.Events}
-  let state = initialState || {}
+  let state: Partial<A> = initialState || {}
 
   return {
     setState(newState) {
@@ -61,7 +71,7 @@ function createStore(initialState) {
       this.emitChange()
     },
 
-    getState() {
+    getState(): Partial<A> {
       return state
     },
 
