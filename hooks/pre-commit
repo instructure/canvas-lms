@@ -15,7 +15,7 @@ if [ $(pwd -P) = $CANVAS ]; then
   if git diff --cached --name-only | grep -vE '^packages/' | grep -qE '\.(ts|tsx)$'; then
     if [ -f node_modules/.bin/tsc ]; then
       echo 'Checking TypeScript...'
-      node_modules/.bin/tsc -p tsconfig.json --noEmit
+      NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc -p tsconfig.json --noEmit
       if [ $? -ne 0 ]; then
         echo 'TypeScript errors found, aborting commit'
         exit 1
