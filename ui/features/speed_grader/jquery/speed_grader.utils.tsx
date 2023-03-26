@@ -190,7 +190,7 @@ export function initKeyCodes(
     keyCodes: 'j k p n c r g',
     ignore: 'input, textarea, embed, object',
   }
-  $window.keycodes(keycodeOptions, (event: JQuery.KeyDownEvent & {keyString: string}) => {
+  $window.keycodes(keycodeOptions, event => {
     event.preventDefault()
     event.stopPropagation()
     const {keyString} = event
