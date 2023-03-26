@@ -52,9 +52,9 @@ const patterns = [
   [/(octop|vir)us$/i, '$1i'],
   [/(ax|test)is$/i, '$1es'],
   [/s$/i, 's']
-]
+] as const
 
-const pluralize = function(string) {
+const pluralize = function(string: string) {
   string = string || ''
   if ($.inArray(string, skip) > 0) {
     return string
@@ -68,8 +68,8 @@ const pluralize = function(string) {
   return string + 's'
 }
 
-pluralize.withCount = function(count, string) {
-  return '' + count + ' ' + (count == 1 ? string : pluralize(string))
+pluralize.withCount = function(count: number, string: string) {
+  return '' + count + ' ' + (count === 1 ? string : pluralize(string))
 }
 
 export default pluralize
