@@ -218,6 +218,7 @@ import {
   getColumnOrder,
   hideAggregateColumns,
   isInvalidSort,
+  listRowIndicesForStudentIds,
 } from './GradebookGrid/Grid.utils'
 import {
   compareAssignmentNames,
@@ -837,7 +838,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     ])
     // eslint-disable-next-line promise/catch-or-return
     this.gridReady.promise.then(() => {
-      this.setupGrading(students)
+      const studentIds = this.setupGrading(students)
+      this.invalidateRowsForStudentIds(studentIds)
     })
     if (this.isFilteringRowsBySearchTerm()) {
       // When filtering, students cannot be matched until loaded. The grid must
@@ -858,7 +860,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  setupGrading = (students: GradebookStudent[]) => {
+  setupGrading = (students: GradebookStudent[]): string[] => {
     let assignment, assignment_id, j, len, name, ref1, student, submissionState
     // set up a submission for each student even if we didn't receive one
     this.submissionStateMap.setup(students, this.assignments)
@@ -881,12 +883,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     const studentIds: string[] = _.pluck(students, 'id')
     this.setAssignmentVisibility(studentIds)
-    this.invalidateRowsForStudentIds(studentIds)
+    return studentIds
   }
 
   resetGrading = () => {
     this.initSubmissionStateMap()
-    this.setupGrading(this.courseContent.students.listStudents())
+    const studentIds = this.setupGrading(this.courseContent.students.listStudents())
+    this.invalidateRowsForStudentIds(studentIds)
   }
 
   getSubmission = (studentId: string, assignmentId: string): Submission | undefined => {
@@ -1221,19 +1224,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return filteredStudents
   }
 
-  updateFilteredStudentIds = (): boolean => {
-    const oldStudentIds = this.filteredStudentIds
+  updateFilteredStudentIds = () => {
     const students: Student[] = this.courseContent.students.listStudents()
     const newStudentIds = this.filterStudents(students).map(s => s.id)
-    const hasChanged = !_.isEqual(oldStudentIds, newStudentIds)
-    if (hasChanged) {
-      this.filteredStudentIds = newStudentIds
-    }
-    return hasChanged
+    this.filteredStudentIds = newStudentIds
   }
 
-  // filter, sort, and build the dataset for slickgrid to read from, then
-  // force a full redraw
   buildRows = () => {
     this.updateFilteredStudentIds()
     this.gridData.rows.length = 0 // empty the list of rows
@@ -1242,16 +1238,47 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       if (!student) {
         throw new Error(`Student ${studentId} not found`)
       }
-      this.gridData.rows.push(this.buildRow(student))
-      this.calculateStudentGrade(student) // TODO: this may not be necessary
+      this.gridData.rows.push(student)
+      this.calculateStudentGrade(student)
     }
     this.gradebookGrid?.invalidate()
-    this.gradebookGrid?.render()
   }
 
-  buildRow = (student: Student) =>
-    // because student is current mutable, we need to retain the reference
-    student
+  updateRows = (changedStudentIds: string[] = []) => {
+    this.updateFilteredStudentIds()
+    const rows = this.gridData.rows
+    const rowCountChanged = this.filteredStudentIds.length !== rows.length
+    const indicesToUpdate: string[] = []
+
+    this.filteredStudentIds.forEach((studentId, index) => {
+      const student = this.courseContent.students.student(studentId)
+      if (!student) {
+        throw new Error(`Student ${studentId} not found`)
+      }
+      this.calculateStudentGrade(student)
+
+      if (index < rows.length) {
+        const hasChanged =
+          rows[index].id !== this.filteredStudentIds[index] || changedStudentIds.includes(studentId)
+        if (hasChanged) {
+          rows[index] = student
+          indicesToUpdate.push(String(index))
+        }
+      } else {
+        rows.push(student)
+      }
+    })
+
+    if (indicesToUpdate.length > 0) {
+      this.gradebookGrid?.invalidateRows(indicesToUpdate)
+    }
+    if (rowCountChanged) {
+      this.gradebookGrid?.updateRowCount()
+      this.gridData.rows.length = this.filteredStudentIds.length // truncate the array
+    }
+
+    this.gradebookGrid?.render()
+  }
 
   // Submission Data & Lifecycle Methods
   updateSubmissionsLoaded = (loaded: boolean) => {
@@ -1288,7 +1315,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const students = changedStudentIds.map(this.student)
     this.setupGrading(students)
     this.updateColumns()
-    this.buildRows()
+    this.updateRows(changedStudentIds)
   }
 
   student = (id: string): GradebookStudent => this.students[id] || this.studentViewStudents[id]
@@ -2367,7 +2394,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   onFilterToStudents = (studentIds: string[]) => {
     this.searchFilteredStudentIds = studentIds
-    this.buildRows()
+    this.updateRows()
   }
 
   onFilterToAssignments = (assignmentIds: string[]) => {
@@ -3033,8 +3060,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   updateStudentRow = (student: Student) => {
     const index = this.gridData.rows.findIndex(row => row.id === student.id)
     if (index !== -1) {
-      this.gridData.rows[index] = this.buildRow(student)
-      return this.gradebookGrid?.invalidateRow(index)
+      this.gridData.rows[index] = student
+      this.gradebookGrid?.invalidateRow(index)
     }
   }
 
@@ -3097,7 +3124,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
     const customColumnIds = visibleCustomColumns.map(column => getCustomColumnId(column.id))
     this.gridData.columns.frozen = [...parentColumnIds, ...customColumnIds]
-    return this.updateGrid()
+    this.updateGrid()
   }
 
   showNotesColumn = () => {
@@ -3125,23 +3152,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // SlickGrid Data Access Methods
   listRows = () => this.gridData.rows // currently the source of truth for filtered and sorted rows
 
-  listRowIndicesForStudentIds = (studentIds: string[]) => {
-    const rowIndicesByStudentId = this.listRows().reduce(
-      (
-        map: {
-          [rowId: string]: number
-        },
-        row: GradebookStudent,
-        index: number
-      ) => {
-        map[row.id] = index
-        return map
-      },
-      {}
-    )
-    return studentIds.map(studentId => rowIndicesByStudentId[studentId])
-  }
-
   // SlickGrid Update Methods
   updateRowCellsForStudentIds = (studentIds: string[]) => {
     let columnIndex, j, k, len, len1, rowIndex
@@ -3150,7 +3160,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
     // Update each row without entirely replacing the DOM elements.
     // This is needed to preserve the editor for the active cell, when present.
-    const rowIndices = this.listRowIndicesForStudentIds(studentIds)
+    const rowIndices = listRowIndicesForStudentIds(this.listRows(), studentIds)
     const columns = this.gradebookGrid?.grid.getColumns()
     for (j = 0, len = rowIndices.length; j < len; j++) {
       rowIndex = rowIndices[j]
@@ -3162,7 +3172,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   invalidateRowsForStudentIds = (studentIds: string[]) => {
-    const rowIndices = this.listRowIndicesForStudentIds(studentIds)
+    const rowIndices: number[] = listRowIndicesForStudentIds(this.listRows(), studentIds)
     if (rowIndices.length > 0) {
       for (const rowIndex of rowIndices) {
         this.gradebookGrid?.invalidateRow(rowIndex)
@@ -3196,7 +3206,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (columnIndex === -1) {
       return
     }
-    const ref1 = this.listRowIndicesForStudentIds(this.courseContent.students.listStudentIds())
+    const ref1 = listRowIndicesForStudentIds(
+      this.listRows(),
+      this.courseContent.students.listStudentIds()
+    )
     for (j = 0, len = ref1.length; j < len; j++) {
       rowIndex = ref1[j]
       if (rowIndex != null) {
@@ -3238,15 +3251,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // React Grid Component Rendering Methods
   updateColumnHeaders = (columnIds: string[] = []) => {
-    const ref1 = this.gradebookGrid?.gridSupport
-    return ref1 != null ? ref1.columns.updateColumnHeaders(columnIds) : undefined
+    this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(columnIds)
   }
 
   updateStudentColumnHeaders = () => {
     const columnIds: string[] = this.gridDisplaySettings.showSeparateFirstLastNames
       ? ['student_lastname', 'student_firstname']
       : ['student']
-    return this.updateColumnHeaders(columnIds)
+    this.updateColumnHeaders(columnIds)
   }
 
   // Column Header Helpers
@@ -4007,7 +4019,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.saveSettings()
     if (!skipRedraw) {
       this.buildRows()
-      return this.updateStudentColumnHeaders()
+      this.updateStudentColumnHeaders()
     }
   }
 
@@ -4034,7 +4046,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.saveSettings()
     if (!skipRedraw) {
       this.buildRows()
-      return this.updateStudentColumnHeaders()
+      this.updateStudentColumnHeaders()
     }
   }
 
@@ -4170,7 +4182,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!(definition && definition.type === 'assignment')) {
       return
     }
-    return this.updateGrid()
+    this.updateGrid()
   }
 
   // # Course Settings Access Methods
@@ -4915,7 +4927,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
 
       this.updateColumns()
-      this.buildRows()
+      this.updateRows()
     }
 
     // Until GradebookGrid is rendered reactively, it will need to be rendered

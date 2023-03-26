@@ -1532,14 +1532,6 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
   })
 })
 
-QUnit.module('Gradebook#listRowIndicesForStudentIds')
-
-test('returns a row index for each student id', () => {
-  const gradebook = createGradebook()
-  gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}]
-  deepEqual(gradebook.listRowIndicesForStudentIds(['1102', '1104']), [1, 3])
-})
-
 QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
   let gradebook
 

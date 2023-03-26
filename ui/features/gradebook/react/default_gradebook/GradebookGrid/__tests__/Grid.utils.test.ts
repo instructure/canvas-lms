@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getColumnOrder, isInvalidSort} from '../Grid.utils'
+import {getColumnOrder, isInvalidSort, listRowIndicesForStudentIds} from '../Grid.utils'
 import type {ColumnOrderSettings} from '../../gradebook.d'
 
 describe('isInvalidSort', () => {
@@ -206,4 +206,13 @@ describe('getColumnOrder', () => {
       })
     })
   })
+})
+
+describe('listRowIndicesForStudentIds', () => {
+  expect(
+    listRowIndicesForStudentIds(
+      [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}],
+      ['1102', '1104']
+    )
+  ).toStrictEqual([1, 3])
 })
