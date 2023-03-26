@@ -21,6 +21,6 @@ export default function splitAssetString(assetString = '', toPlural = true) {
   const match = assetString.match(/(.*)_(\d+)$/)
   if (match) {
     const contextType = toPlural ? pluralize(match[1]) : match[1]
-    return [contextType, match[2]]
+    return [contextType, match[2]] as const
   }
 }
