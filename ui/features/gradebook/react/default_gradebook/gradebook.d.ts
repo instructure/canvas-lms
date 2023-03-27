@@ -49,7 +49,7 @@ export type GradebookSettings = {
     context_module_id: string | null
     end_date: string | null
     start_date: string | null
-    submissions: SubmissionFilterValue | null
+    submissions: SubmissionFilterValue | null // affects rows too
   }
   filter_rows_by: {
     section_id: string | null
@@ -280,10 +280,16 @@ export type Filter = {
 }
 
 export type SubmissionFilterValue =
-  | 'has-ungraded-submissions'
-  | 'has-submissions'
+  | 'dropped'
+  | 'excused'
+  | 'extended'
   | 'has-no-submissions'
+  | 'has-submissions'
+  | 'has-ungraded-submissions'
   | 'has-unposted-grades'
+  | 'late'
+  | 'missing'
+  | 'resubmitted'
 
 export type FilterPreset = {
   id: string

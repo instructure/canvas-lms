@@ -234,6 +234,110 @@ function useFilterDropdownData({
       dataMap['student-groups'] = filterItems['student-groups']
     }
 
+    filterItems.status = {
+      id: 'status',
+      name: I18n.t('Status'),
+      parentId: 'savedFilterPresets',
+      isSelected: appliedFilters.some(
+        c =>
+          c.type === 'submissions' &&
+          ['late', 'missing', 'resubmitted', 'dropped', 'excused', 'extended'].includes(
+            c.value || ''
+          )
+      ),
+      items: [
+        {
+          id: '1',
+          name: I18n.t('Late'),
+          isSelected: appliedFilters.some(c => c.type === 'submissions' && c.value === 'late'),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'submissions',
+              value: 'late',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        },
+        {
+          id: '2',
+          name: I18n.t('Missing'),
+          isSelected: appliedFilters.some(c => c.type === 'submissions' && c.value === 'missing'),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'submissions',
+              value: 'missing',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        },
+        {
+          id: '3',
+          name: I18n.t('Resubmitted'),
+          isSelected: appliedFilters.some(
+            c => c.type === 'submissions' && c.value === 'resubmitted'
+          ),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'submissions',
+              value: 'resubmitted',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        },
+        {
+          id: '4',
+          name: I18n.t('Dropped'),
+          isSelected: appliedFilters.some(c => c.type === 'submissions' && c.value === 'dropped'),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'submissions',
+              value: 'dropped',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        },
+        {
+          id: '5',
+          name: I18n.t('Excused'),
+          isSelected: appliedFilters.some(c => c.type === 'submissions' && c.value === 'excused'),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid.v4(),
+              type: 'submissions',
+              value: 'excused',
+              created_at: new Date().toISOString(),
+            }
+            toggleFilter(filter)
+          },
+        },
+      ],
+    }
+    if (ENV.FEATURES.extended_submission_state) {
+      filterItems.status.items!.push({
+        id: '6',
+        name: I18n.t('Extended'),
+        isSelected: appliedFilters.some(c => c.type === 'submissions' && c.value === 'extended'),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid.v4(),
+            type: 'submissions',
+            value: 'extended',
+            created_at: new Date().toISOString(),
+          }
+          toggleFilter(filter)
+        },
+      })
+    }
+    dataMap.status = filterItems.status
+
     filterItems.submissions = {
       id: 'submissions',
       name: I18n.t('Submissions'),
@@ -244,7 +348,14 @@ function useFilterDropdownData({
           id: 'savedFilterPresets',
           name: I18n.t('Has Ungraded Submissions'),
           isSelected: appliedFilters.some(
-            c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
+            c =>
+              c.type === 'submissions' &&
+              [
+                'has-ungraded-submissions',
+                'has-submissions',
+                'has-no-submissions',
+                'has-unposted-grades',
+              ].includes(c.value || '')
           ),
           onToggle: () => {
             const filter: Filter = {

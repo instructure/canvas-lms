@@ -2954,11 +2954,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   missingSort = (columnId: string) => {
-    this.sortRowsWithFunction((row: GradebookStudent) => Boolean(row[columnId]?.missing))
+    // @ts-ignore
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].missing))
   }
 
   lateSort = (columnId: string) => {
-    this.sortRowsWithFunction((row: GradebookStudent) => row[columnId].late)
+    // @ts-ignore
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].late))
   }
 
   sortByStudentColumn = (settingKey: SortRowsSettingKey, direction: SortDirection) => {
@@ -4917,7 +4919,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      // submissions ('has-ungraded-submissions' | 'has-submissions' | 'has-no-submissions' | 'has-unposted-grades')
+      // submissions
       const prevSubmissionsFilter = findSubmissionFilterValue(prevProps.appliedFilters)
       const submissionFilter = findSubmissionFilterValue(this.props.appliedFilters)
       if (prevSubmissionsFilter !== submissionFilter) {
