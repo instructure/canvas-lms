@@ -22,6 +22,7 @@ import {Heading} from '@instructure/ui-heading'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
+import {Text} from '@instructure/ui-text'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -43,10 +44,21 @@ import formatMessage from '../../../../format-message'
 import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
-export default function VideoOptionsTray(props) {
-  const {videoOptions, onEntered, onExited, onRequestClose, onSave, open, trayProps, id} = props
+
+export default function VideoOptionsTray({
+  videoOptions,
+  onRequestClose,
+  onSave,
+  open,
+  trayProps,
+  onEntered = null,
+  onExited = null,
+  id = 'video-options-tray',
+  studioOptions = null,
+}) {
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -59,6 +71,10 @@ export default function VideoOptionsTray(props) {
   const [minWidth] = useState(MIN_WIDTH_VIDEO)
   const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
   const [minPercentage] = useState(MIN_PERCENTAGE)
+
+  const isStudio = !!studioOptions
+  const showDisplayOptions = !isStudio || studioOptions.convertibleToLink
+  const showSizeControls = !isStudio || studioOptions.resizable
 
   const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth, minPercentage})
   function handleTitleTextChange(event) {
@@ -142,7 +158,11 @@ export default function VideoOptionsTray(props) {
         <Tray
           key="video-options-tray"
           data-mce-component={true}
-          label={formatMessage('Video Options Tray')}
+          label={
+            isStudio
+              ? formatMessage('Canvas Studio Options Tray')
+              : formatMessage('Video Options Tray')
+          }
           mountNode={instuiPopupMountNode}
           onDismiss={onRequestClose}
           onEntered={onEntered}
@@ -158,7 +178,11 @@ export default function VideoOptionsTray(props) {
             <Flex.Item as="header" padding="medium">
               <Flex direction="row">
                 <Flex.Item shouldGrow={true} shouldShrink={true}>
-                  <Heading as="h2">{formatMessage('Video Options')}</Heading>
+                  <Heading as="h2">
+                    {isStudio
+                      ? formatMessage('Canvas Studio Options')
+                      : formatMessage('Video Options')}
+                  </Heading>
                 </Flex.Item>
                 <Flex.Item>
                   <CloseButton
@@ -174,75 +198,94 @@ export default function VideoOptionsTray(props) {
                 <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                   <Flex direction="column">
                     <Flex.Item padding="small">
-                      <TextArea
-                        aria-describedby="alt-text-label-tooltip"
-                        disabled={displayAs === 'link'}
-                        height="4rem"
-                        label={textAreaLabel}
-                        onChange={handleTitleTextChange}
-                        placeholder={formatMessage('(Describe the video)')}
-                        resize="vertical"
-                        value={titleText}
-                      />
-                    </Flex.Item>
-                    <Flex.Item margin="small none none none" padding="small">
-                      <RadioInputGroup
-                        description={formatMessage('Display Options')}
-                        name="display-video-as"
-                        onChange={handleDisplayAsChange}
-                        value={displayAs}
-                      >
-                        <RadioInput label={formatMessage('Embed Video')} value="embed" />
-                        <RadioInput
-                          label={formatMessage('Display Text Link (Opens in a new tab)')}
-                          value="link"
+                      {isStudio ? (
+                        <Flex direction="column">
+                          <Flex.Item>
+                            <Text weight="bold">{formatMessage('Media Title')}</Text>
+                          </Flex.Item>
+                          <Flex.Item padding="small none none small">{titleText}</Flex.Item>
+                        </Flex>
+                      ) : (
+                        <TextArea
+                          aria-describedby="alt-text-label-tooltip"
+                          disabled={displayAs === 'link'}
+                          height="4rem"
+                          label={textAreaLabel}
+                          onChange={handleTitleTextChange}
+                          placeholder={formatMessage('(Describe the video)')}
+                          resize="vertical"
+                          value={titleText}
                         />
-                      </RadioInputGroup>
-                    </Flex.Item>
-                    <Flex.Item margin="small none xx-small none">
-                      <View as="div" padding="small small xx-small small">
-                        <SimpleSelect
-                          id={`${id}-size`}
-                          disabled={displayAs !== 'embed'}
-                          renderLabel={formatMessage('Size')}
-                          messages={messagesForSize}
-                          assistiveText={formatMessage('Use arrow keys to navigate options.')}
-                          onChange={handleVideoSizeChange}
-                          value={videoSize}
-                        >
-                          {videoSizes.map(size => (
-                            <SimpleSelect.Option id={`${id}-size-${size}`} key={size} value={size}>
-                              {labelForImageSize(size)}
-                            </SimpleSelect.Option>
-                          ))}
-                        </SimpleSelect>
-                      </View>
-                      {videoSize === CUSTOM && (
-                        <View as="div" padding="xx-small small">
-                          <DimensionsInput
-                            dimensionsState={dimensionsState}
-                            disabled={displayAs !== 'embed'}
-                            minHeight={minHeight}
-                            minWidth={minWidth}
-                            minPercentage={minPercentage}
-                          />
-                        </View>
                       )}
                     </Flex.Item>
-                    <Flex.Item padding="small">
-                      <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
-                        <ClosedCaptionPanel
-                          subtitles={subtitles.map(st => ({
-                            locale: st.locale,
-                            file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
-                          }))}
-                          uploadMediaTranslations={Bridge.uploadMediaTranslations}
-                          userLocale={Bridge.userLocale}
-                          updateSubtitles={handleUpdateSubtitles}
-                          liveRegion={getLiveRegion}
-                        />
-                      </FormFieldGroup>
-                    </Flex.Item>
+                    {showDisplayOptions && (
+                      <Flex.Item margin="small none none none" padding="small">
+                        <RadioInputGroup
+                          description={formatMessage('Display Options')}
+                          name="display-video-as"
+                          onChange={handleDisplayAsChange}
+                          value={displayAs}
+                        >
+                          <RadioInput label={formatMessage('Embed Video')} value="embed" />
+                          <RadioInput
+                            label={formatMessage('Display Text Link (Opens in a new tab)')}
+                            value="link"
+                          />
+                        </RadioInputGroup>
+                      </Flex.Item>
+                    )}
+                    {showSizeControls && (
+                      <Flex.Item margin="small none xx-small none">
+                        <View as="div" padding="small small xx-small small">
+                          <SimpleSelect
+                            id={`${id}-size`}
+                            disabled={displayAs !== 'embed'}
+                            renderLabel={formatMessage('Size')}
+                            messages={messagesForSize}
+                            assistiveText={formatMessage('Use arrow keys to navigate options.')}
+                            onChange={handleVideoSizeChange}
+                            value={videoSize}
+                          >
+                            {videoSizes.map(size => (
+                              <SimpleSelect.Option
+                                id={`${id}-size-${size}`}
+                                key={size}
+                                value={size}
+                              >
+                                {labelForImageSize(size)}
+                              </SimpleSelect.Option>
+                            ))}
+                          </SimpleSelect>
+                        </View>
+                        {videoSize === CUSTOM && (
+                          <View as="div" padding="xx-small small">
+                            <DimensionsInput
+                              dimensionsState={dimensionsState}
+                              disabled={displayAs !== 'embed'}
+                              minHeight={minHeight}
+                              minWidth={minWidth}
+                              minPercentage={minPercentage}
+                            />
+                          </View>
+                        )}
+                      </Flex.Item>
+                    )}
+                    {!isStudio && (
+                      <Flex.Item padding="small">
+                        <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
+                          <ClosedCaptionPanel
+                            subtitles={subtitles.map(st => ({
+                              locale: st.locale,
+                              file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
+                            }))}
+                            uploadMediaTranslations={Bridge.uploadMediaTranslations}
+                            userLocale={Bridge.userLocale}
+                            updateSubtitles={handleUpdateSubtitles}
+                            liveRegion={getLiveRegion}
+                          />
+                        </FormFieldGroup>
+                      </Flex.Item>
+                    )}
                   </Flex>
                 </Flex.Item>
                 <Flex.Item
@@ -267,6 +310,7 @@ export default function VideoOptionsTray(props) {
     </StoreProvider>
   )
 }
+
 VideoOptionsTray.propTypes = {
   videoOptions: shape({
     titleText: string.isRequired,
@@ -286,9 +330,5 @@ VideoOptionsTray.propTypes = {
     jwt: string.isRequired,
   }),
   id: string,
-}
-VideoOptionsTray.defaultProps = {
-  onEntered: null,
-  onExited: null,
-  id: 'video-options-tray',
+  studioOptions: parsedStudioOptionsPropType,
 }
