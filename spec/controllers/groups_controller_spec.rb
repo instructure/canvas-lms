@@ -1040,28 +1040,54 @@ describe GroupsController do
 
   describe "POST create_file" do
     let(:course) { Course.create! }
-    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let(:group_category) { course.group_categories.create!(name: "just a category") }
     let(:group) { course.groups.create!(name: "just a group", group_category: group_category) }
     let(:assignment) { course.assignments.create!(title: "hi", submission_types: "online_upload") }
 
-    let(:request_params) do
-      { course_id: course.id, group_id: group.id, filename: "An attachment!", url: "http://nowhere" }
-    end
-    let(:progress) { Progress.last }
+    context "as a teacher" do
+      before do
+        user_session(teacher)
+      end
 
-    before do
-      user_session(teacher)
+      let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+      let(:progress) { Progress.last }
+      let(:request_params) do
+        { course_id: course.id, group_id: group.id, filename: "An attachment!", url: "http://nowhere" }
+      end
+
+      it "creates a Progress object with an assignment as the context when the assignment_id parameter is included" do
+        put "create_file", params: request_params.merge({ assignment_id: assignment.id })
+        expect(progress.context).to eq(assignment)
+      end
+
+      it "creates a Progress object with the current user as the context when no assignment parameter is included" do
+        put "create_file", params: request_params
+        expect(progress.context).to eq(teacher)
+      end
     end
 
-    it "creates a Progress object with an assignment as the context when the assignment_id parameter is included" do
-      put "create_file", params: request_params.merge({ assignment_id: assignment.id })
-      expect(progress.context).to eq(assignment)
-    end
+    context "as a student" do
+      before do
+        @student = course.enroll_student(User.create!, enrollment_state: "active").user
+        group.add_user(@student, "accepted")
+        user_session(@student)
+      end
 
-    it "creates a Progress object with the current user as the context when no assignment parameter is included" do
-      put "create_file", params: request_params
-      expect(progress.context).to eq(teacher)
+      let(:request_params) do
+        { group_id: group.id, assignment_id: assignment.id, filename: "An attachment!", url: "http://nowhere" }
+      end
+
+      let(:created_attachment) { group.attachments.first }
+
+      it "uses the 'submissions' folder for assignment submissions" do
+        put "create_file", params: request_params.merge(submit_assignment: true)
+        expect(created_attachment.folder).to eq group.submissions_folder
+      end
+
+      it "uses the default folder for non-submissions" do
+        put "create_file", params: request_params
+        expect(created_attachment.folder).to eq Folder.unfiled_folder(group)
+      end
     end
   end
 end
