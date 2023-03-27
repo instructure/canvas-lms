@@ -41,7 +41,7 @@ export async function placeholderInfoFor(
   if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
     const imageUrl =
       trimmedOrNull((fileMetaProps.domObject as {preview: string}).preview) ??
-      URL.createObjectURL(fileMetaProps.domObject)
+      URL.createObjectURL(fileMetaProps.domObject as File | Blob)
 
     return new Promise<PlaceholderInfo>((resolve, reject) => {
       const image = new Image()
