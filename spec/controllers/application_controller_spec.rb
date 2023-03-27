@@ -1124,6 +1124,7 @@ RSpec.describe ApplicationController do
                   target_link_uri
                   lti_message_hint
                   canvas_region
+                  canvas_environment
                   client_id
                   deployment_id
                   lti_storage_target

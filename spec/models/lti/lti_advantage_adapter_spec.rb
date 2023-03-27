@@ -134,6 +134,7 @@ describe Lti::LtiAdvantageAdapter do
         target_link_uri
         lti_message_hint
         canvas_region
+        canvas_environment
         client_id
         deployment_id
         lti_storage_target
@@ -185,6 +186,30 @@ describe Lti::LtiAdvantageAdapter do
 
     it 'sets the "canvas_region" to "not_configured"' do
       expect(login_message["canvas_region"]).to eq "not_configured"
+    end
+
+    it 'sets the "canvas_environment" to "prod"' do
+      expect(login_message["canvas_environment"]).to eq "prod"
+    end
+
+    context "when in beta" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      end
+
+      it 'sets "canvas_enviroment" to "beta"' do
+        expect(login_message["canvas_environment"]).to eq "beta"
+      end
+    end
+
+    context "when in test" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("test")
+      end
+
+      it 'sets "canvas_enviroment" to "test"' do
+        expect(login_message["canvas_environment"]).to eq "test"
+      end
     end
 
     it "accepts a student_id parameter" do
