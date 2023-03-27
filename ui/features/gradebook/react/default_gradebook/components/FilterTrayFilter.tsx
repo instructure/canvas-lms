@@ -49,6 +49,12 @@ const submissionTypeOptions: SubmissionTypeOption[] = [
   ['has-submissions', I18n.t('Has submissions')],
   ['has-no-submissions', I18n.t('Has no submissions')],
   ['has-unposted-grades', I18n.t('Has unposted grades')],
+  ['late', I18n.t('Late')],
+  ['missing', I18n.t('Missing')],
+  ['resubmitted', I18n.t('Resubmitted')],
+  ['dropped', I18n.t('Dropped')],
+  ['excused', I18n.t('Excused')],
+  ['extended', I18n.t('Extended')],
 ]
 
 const filterTypeLabels = new Map<FilterType, string>([

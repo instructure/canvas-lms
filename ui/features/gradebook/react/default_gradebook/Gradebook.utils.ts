@@ -267,6 +267,12 @@ export function findSubmissionFilterValue(appliedFilters: Filter[]) {
       'has-submissions',
       'has-no-submissions',
       'has-unposted-grades',
+      'late',
+      'missing',
+      'resubmitted',
+      'dropped',
+      'excused',
+      'extended',
     ].includes(values[0])
       ? values[0]
       : undefined
@@ -344,6 +350,18 @@ export const getLabelForFilter = (
       return I18n.t('Has no submissions')
     } else if (filter.value === 'has-unposted-grades') {
       return I18n.t('Has unposted grades')
+    } else if (filter.value === 'late') {
+      return I18n.t('Late')
+    } else if (filter.value === 'missing') {
+      return I18n.t('Missing')
+    } else if (filter.value === 'resubmitted') {
+      return I18n.t('Resubmitted')
+    } else if (filter.value === 'dropped') {
+      return I18n.t('Dropped')
+    } else if (filter.value === 'excused') {
+      return I18n.t('Excused')
+    } else if (filter.value === 'extended') {
+      return I18n.t('Extended')
     } else {
       throw new Error('invalid submissions filter value')
     }
@@ -570,11 +588,21 @@ export const wasSubmitted = (s: Submission | MissingSubmission) =>
   Boolean(s.submitted_at) && !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
 
 // filters should run either .some() or .every()
-export const categorizeSubmissionFilters = (appliedFilters: Filter[]) => {
+export const categorizeFilters = (appliedFilters: Filter[]) => {
   const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
 
   const filtersNeedingSome = submissionFilters.filter(filter =>
-    ['has-ungraded-submissions', 'has-submissions', 'has-unposted-grades'].includes(filter)
+    [
+      'dropped',
+      'excused',
+      'extended',
+      'has-submissions',
+      'has-ungraded-submissions',
+      'has-unposted-grades',
+      'late',
+      'missing',
+      'resubmitted',
+    ].includes(filter)
   )
 
   const filtersNeedingEvery = submissionFilters.filter(filter =>
@@ -584,10 +612,7 @@ export const categorizeSubmissionFilters = (appliedFilters: Filter[]) => {
   return {filtersNeedingSome, filtersNeedingEvery}
 }
 
-export function filterSubmissionByCategorizedFilters(
-  filters: string[],
-  submission: Submission | MissingSubmission
-) {
+export function filterSubmission(filters: string[], submission: Submission | MissingSubmission) {
   if (filters.length === 0) {
     return true
   }
@@ -601,6 +626,18 @@ export function filterSubmissionByCategorizedFilters(
       return !wasSubmitted(submission)
     } else if (filter === 'has-unposted-grades') {
       return isGradedOrExcusedSubmissionUnposted(submission)
+    } else if (filter === 'late') {
+      return Boolean(submission.late)
+    } else if (filter === 'missing') {
+      return Boolean(submission.missing)
+    } else if (filter === 'resubmitted') {
+      return submission.grade_matches_current_submission === false
+    } else if (filter === 'dropped') {
+      return Boolean(submission.drop)
+    } else if (filter === 'excused') {
+      return submission.excused
+    } else if (filter === 'extended') {
+      return submission.late_policy_status === 'extended'
     } else {
       return false
     }
@@ -613,12 +650,8 @@ export function filterSubmissionsByCategorizedFilters(
   submissions: (Submission | MissingSubmission)[]
 ) {
   const hasMatch =
-    submissions.some(submission =>
-      filterSubmissionByCategorizedFilters(filtersNeedingSome, submission)
-    ) &&
-    submissions.every(submission =>
-      filterSubmissionByCategorizedFilters(filtersNeedingEvery, submission)
-    )
+    submissions.some(submission => filterSubmission(filtersNeedingSome, submission)) &&
+    submissions.every(submission => filterSubmission(filtersNeedingEvery, submission))
 
   return hasMatch
 }
@@ -649,7 +682,7 @@ export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap
 ) => {
-  const {filtersNeedingSome, filtersNeedingEvery} = categorizeSubmissionFilters(appliedFilters)
+  const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(appliedFilters)
 
   return (assignment: Assignment) => {
     if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
