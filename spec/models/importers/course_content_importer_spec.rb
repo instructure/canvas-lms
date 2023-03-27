@@ -678,26 +678,42 @@ describe Course do
     expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
   end
 
-  describe "logging successes and failures" do
+  describe "metrics logging" do
     subject { Importers::CourseContentImporter.import_content(@course, {}, {}, migration) }
 
-    before { allow(InstStatsd::Statsd).to receive(:increment) }
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:timing)
+    end
 
     before :once do
       course_factory
     end
 
-    let(:migration) { @course.content_migrations.create! }
+    let(:migration) { @course.content_migrations.create! migration_type: "atypeofmigration" }
 
     it "logs import successes" do
       subject
       expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_success").once
     end
 
+    it "logs import duration" do
+      subject
+      expect(InstStatsd::Statsd).to have_received(:timing).with("content_migrations.import_duration", anything, {
+                                                                  tags: { migration_type: "atypeofmigration" }
+                                                                }).once
+    end
+
     it "logs import failures" do
       allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
       expect { subject }.to raise_error("Something went wrong at the last minute")
       expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_failure").once
+    end
+
+    it "Does not log duration on failures" do
+      allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
+      expect { subject }.to raise_error("Something went wrong at the last minute")
+      expect(InstStatsd::Statsd).to_not have_received(:timing).with("content_migrations.import_failure")
     end
   end
 end
