@@ -2660,6 +2660,7 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).to include :dashboard
           expect(assigns[:css_bundles].flatten).not_to include :k5_common
           expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_font
           expect(assigns[:js_env][:K5_USER]).to be_falsy
         end
       end
@@ -2678,8 +2679,17 @@ describe UsersController do
           expect(assigns[:js_bundles].flatten).not_to include :dashboard
           expect(assigns[:css_bundles].flatten).to include :k5_common
           expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_font
           expect(assigns[:css_bundles].flatten).not_to include :dashboard
           expect(assigns[:js_env][:K5_USER]).to be_truthy
+        end
+
+        it "does not include k5_font css bundle if use_classic_font? is true" do
+          allow(controller).to receive(:use_classic_font?).and_return(true)
+          @current_user = @user
+          get "user_dashboard"
+          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_font
         end
 
         context "ENV.INITIAL_NUM_K5_CARDS" do

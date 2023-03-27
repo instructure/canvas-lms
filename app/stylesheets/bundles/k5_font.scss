@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2023 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// These font overrides are in a separate css bundle so that they can be included
+// when using the K5+Elementary font setting, but not included when using the
+// K5+Classic font setting. Thus, overrides that are specific to K5 mode but not
+// related to font should probably go in a different k5_*.scss file.
+
+@import "base/environment";
+
+.ic-app-header__main-navigation,
+.ic-app-nav-toggle-and-crumbs,
+.ic-app-crumbs,
+.ic-app-course-menu,
+.ui-dialog,
+[role="dialog"],
+#main {
+  font-family: "Balsamiq Sans", $ic-font-family;
+
+  & h1, h2, h3, h4, h5, h6 {
+    font-family: "Balsamiq Sans", $ic-font-family;
+  }
+
+  & input, button, select, textarea {
+    font-family: "Balsamiq Sans", $ic-font-family;
+  }
+}
+
+// These overrides are only here because the Dashboard cards don't fully use InstUI.
+// Once they are on InstUI they can be removed
+.ic-DashboardCard__box {
+  font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  & h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+  }
+}

@@ -22,6 +22,10 @@ require_relative "../../helpers/k5_common"
 describe K5::EnablementService do
   include K5Common
 
+  before :once do
+    Account.site_admin.enable_feature! :k5_font_selection
+  end
+
   describe "set_k5_settings" do
     describe "enable_as_k5_account setting" do
       before :once do

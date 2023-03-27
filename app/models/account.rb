@@ -492,6 +492,8 @@ class Account < ActiveRecord::Base
   end
 
   def use_classic_font_in_k5?
+    return false unless Account.site_admin.feature_enabled? :k5_font_selection
+
     use_classic_font_in_k5[:value]
   end
 

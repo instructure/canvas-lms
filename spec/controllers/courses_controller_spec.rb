@@ -25,6 +25,7 @@ describe CoursesController do
 
   describe "GET 'index'" do
     before do
+      Account.site_admin.enable_feature! :k5_font_selection
       controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
@@ -76,7 +77,7 @@ describe CoursesController do
 
       get_index @student
       expect(assigns[:js_bundles].flatten).to include :k5_theme
-      expect(assigns[:css_bundles].flatten).to include :k5_theme
+      expect(assigns[:css_bundles].flatten).to include :k5_theme, :k5_font
     end
 
     it "does not set k5_theme when k5 is off" do
@@ -84,7 +85,17 @@ describe CoursesController do
 
       get_index @student
       expect(assigns[:js_bundles].flatten).not_to include :k5_theme
-      expect(assigns[:css_bundles].flatten).not_to include :k5_theme
+      expect(assigns[:css_bundles].flatten).not_to include :k5_theme, :k5_font
+    end
+
+    it "does not include k5_font css bundle if use_classic_font? is true" do
+      course_with_student_logged_in
+      toggle_k5_setting(@course.account)
+      toggle_classic_font_setting(@course.account)
+
+      get_index @student
+      expect(assigns[:css_bundles].flatten).to include :k5_theme
+      expect(assigns[:css_bundles].flatten).not_to include :k5_font
     end
 
     describe "homeroom courses" do
@@ -1709,6 +1720,7 @@ describe CoursesController do
 
     describe "when account is enabled as k5 account" do
       before :once do
+        Account.site_admin.enable_feature! :k5_font_selection
         toggle_k5_setting(@course.account)
       end
 
@@ -1728,7 +1740,19 @@ describe CoursesController do
         expect(assigns[:css_bundles].flatten).to include :k5_common
         expect(assigns[:css_bundles].flatten).to include :k5_course
         expect(assigns[:css_bundles].flatten).to include :k5_theme
+        expect(assigns[:css_bundles].flatten).to include :k5_font
         expect(assigns[:js_env][:K5_USER]).to be_truthy
+      end
+
+      it "does not include k5_font css bundle if account's use_classic_font_in_k5? is true, even if use_classic_font? is false" do
+        allow(controller).to receive(:use_classic_font?).and_return(false)
+        @course.account.settings[:use_classic_font_in_k5] = { value: true }
+        @course.account.save!
+        user_session(@student)
+
+        get "show", params: { id: @course.id }
+        expect(assigns[:css_bundles].flatten).to include :k5_theme
+        expect(assigns[:css_bundles].flatten).not_to include :k5_font
       end
 
       it "registers module-related js and css bundles and sets CONTEXT_MODULE_ASSIGNMENT_INFO_URL in js_env" do
