@@ -3527,7 +3527,7 @@ class Course < ActiveRecord::Base
   def restrict_quantitative_data?(user = nil)
     return unless user.is_a?(User)
 
-    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !account.grants_right?(user, :restrict_quantitative_data)
+    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !grants_right?(user, :restrict_quantitative_data)
   end
 
   def friendly_name
