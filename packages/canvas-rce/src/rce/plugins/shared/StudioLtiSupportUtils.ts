@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {bool, shape, InferType} from 'prop-types'
+
 /**
  * Interface for content item's 'custom' field, specifically for what is expected to come from Studio
  *
@@ -33,6 +35,13 @@ export interface StudioMediaOptionsAttributes {
   'data-studio-tray-enabled': boolean
   'data-studio-convertible-to-link': boolean
 }
+
+export const parsedStudioOptionsPropType = shape({
+  resizable: bool.isRequired,
+  convertibleToLink: bool.isRequired,
+})
+
+export type ParsedStudioOptions = InferType<typeof parsedStudioOptionsPropType>
 
 export function isStudioContentItemCustomJson(input: any): input is StudioContentItemCustomJson {
   return typeof input === 'object' && input.source === 'studio'
@@ -60,11 +69,20 @@ export function displayStyleFrom(
 
 export function isStudioEmbeddedMedia(element: Element): boolean {
   // Borrowing this structure from isMediaElement in ContentSelection.js
-  const tinymceIframeShim = element.tagName === 'IFRAME' ? element.parentElement : element
+  const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
 
   if (tinymceIframeShim?.firstElementChild?.tagName !== 'IFRAME') {
     return false
   }
 
   return tinymceIframeShim.getAttribute('data-mce-p-data-studio-tray-enabled') === 'true'
+}
+
+export function parseStudioOptions(element: Element | null): ParsedStudioOptions {
+  const tinymceIframeShim = element?.tagName === 'IFRAME' ? element?.parentElement : element
+  return {
+    resizable: tinymceIframeShim?.getAttribute('data-mce-p-data-studio-resizable') === 'true',
+    convertibleToLink:
+      tinymceIframeShim?.getAttribute('data-mce-p-data-studio-convertible-to-link') === 'true',
+  }
 }

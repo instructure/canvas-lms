@@ -19,6 +19,7 @@
 import {
   displayStyleFrom,
   isStudioEmbeddedMedia,
+  parseStudioOptions,
   studioAttributesFrom,
   StudioContentItemCustomJson,
   StudioMediaOptionsAttributes,
@@ -113,5 +114,62 @@ describe('isStudioEmbeddedMedia', () => {
     element.innerHTML = '<iframe/>'
     element.setAttribute('data-mce-p-data-studio-tray-enabled', 'true')
     expect(isStudioEmbeddedMedia(element)).toEqual(true)
+  })
+})
+
+describe('parseStudioOptions', () => {
+  it('returns falses for null', () => {
+    expect(parseStudioOptions(null)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('returns falses for missing studio attributes', () => {
+    const element = document.createElement('span')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 1', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'false')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 2', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'false')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: true,
+      convertibleToLink: false,
+    })
+  })
+
+  it('parses correct values for attributes 3', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'false')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'true')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: false,
+      convertibleToLink: true,
+    })
+  })
+
+  it('parses correct values for attributes 4', () => {
+    const element = document.createElement('span')
+    element.setAttribute('data-mce-p-data-studio-resizable', 'true')
+    element.setAttribute('data-mce-p-data-studio-convertible-to-link', 'true')
+    expect(parseStudioOptions(element)).toEqual({
+      resizable: true,
+      convertibleToLink: true,
+    })
   })
 })

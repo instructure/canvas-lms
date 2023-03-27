@@ -243,4 +243,55 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       })
     })
   })
+
+  describe('Studio Options Tray', () => {
+    beforeEach(() => {
+      props.studioOptions = {
+        resizable: true,
+        convertibleToLink: true,
+      }
+    })
+
+    it('is labeled with "Canvas Studio Options Tray"', () => {
+      const {getByLabelText} = render(<VideoOptionsTray {...props} />)
+      expect(getByLabelText('Canvas Studio Options Tray')).toBeInTheDocument()
+    })
+
+    it('the heading says "Canvas Studio Options"', () => {
+      const {getByText} = render(<VideoOptionsTray {...props} />)
+      expect(getByText('Canvas Studio Options')).toBeInTheDocument()
+    })
+
+    it('has a "Media Title" field', () => {
+      const {getByText} = render(<VideoOptionsTray {...props} />)
+      expect(getByText('Media Title')).toBeInTheDocument()
+    })
+
+    it('does not have closed caption controls', () => {
+      const {queryByText} = render(<VideoOptionsTray {...props} />)
+      expect(queryByText('Closed Captions/Subtitles')).not.toBeInTheDocument()
+    })
+
+    describe('when resizable is false', () => {
+      beforeEach(() => {
+        props.studioOptions.resizable = false
+      })
+
+      it('does not have size controls', () => {
+        const {queryByText} = render(<VideoOptionsTray {...props} />)
+        expect(queryByText('Size')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when convertibleToLink is false', () => {
+      beforeEach(() => {
+        props.studioOptions.convertibleToLink = false
+      })
+
+      it('does not have display controls', () => {
+        const {queryByText} = render(<VideoOptionsTray {...props} />)
+        expect(queryByText('Display Options')).not.toBeInTheDocument()
+      })
+    })
+  })
 })
