@@ -5,16 +5,30 @@
   "accessibility_checker_b3af1f6c": {
     "message": "Helppokäyttöisyyden tarkistus"
   },
+  "action_to_take_b626a99a": { "message": "Toimenpide, johon on ryhdyttävä:" },
   "add_8523c19b": { "message": "Lisää" },
+  "add_a_caption_2a915239": { "message": "Lisää selitys" },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Lisää alt-teksti kuvalle"
+  },
   "add_another_f4e50d57": { "message": "Lisää toinen" },
   "add_cc_subtitles_55f0394e": { "message": "Lisää CC/alaotsikko" },
   "add_image_60b2de07": { "message": "Lisää kuva" },
+  "additional_considerations_f3801683": {
+    "message": "Muuta huomioon otettavaa"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Sellaisten peräkkäisten linkkien, joilla on sama URL, pitäisi olla yksi linkki."
+  },
   "aleph_f4ffd155": { "message": "Aleph" },
   "alignment_and_lists_5cebcb69": { "message": "Kohdistukset ja luettelot" },
   "all_4321c3a1": { "message": "Kaikki" },
   "all_apps_a50dea49": { "message": "Kaikki sovellukset" },
   "alpha_15d59033": { "message": "Alpha" },
   "alphabetical_55b5b4e0": { "message": "Aakkosjärjestys" },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Määritetekstissä ei saa olla yli 120 merkkiä."
+  },
   "alt_text_611fb322": { "message": "Alt Text" },
   "amalg_coproduct_c589fb12": { "message": "Amalg (Sivutuote)" },
   "an_error_occured_reading_the_file_ff48558b": {
@@ -78,6 +92,18 @@
   "centered_horizontal_dots_451c5815": {
     "message": "Keskitetyt vaakasuuntaiset pisteet"
   },
+  "change_alt_text_92654906": { "message": "Vaihda alt-tekstiä" },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Vaihda otsikkotunniste kappaleeseen"
+  },
+  "change_only_this_heading_s_level_903cc956": {
+    "message": "Vaihda vain tämän otsikon taso"
+  },
+  "change_text_color_1aecb912": { "message": "Vaihda tekstin väriä" },
+  "check_accessibility_3c78211c": { "message": "Tarkista käytettävyys" },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Tarkistetaan käytettävyysongelmien varalta"
+  },
   "chi_54a32644": { "message": "Chi" },
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
   "choose_usage_rights_33683854": { "message": "Valitse käyttöoikeudet..." },
@@ -106,6 +132,9 @@
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Sulje valikko tai valintaikkuna Palauttaa sinut myös editorialueelle"
   },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Sulje käytettävyyden tarkistus"
+  },
   "close_d634289d": { "message": "Sulje" },
   "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
     "message": "Suljetun tekstitystiedoston täytyy olla alle { maxKb } kb"
@@ -122,6 +151,8 @@
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Värivalitsin ({ colorName } valittu)"
   },
+  "column_e1ae5c64": { "message": "Sarake" },
+  "column_group_1c062368": { "message": "Sarakeryhmä" },
   "complex_numbers_a543d004": { "message": "Monimutkaiset numerot" },
   "computer_1d7dfa6f": { "message": "Tietokone" },
   "congruent_5a244acd": { "message": "Yhdenmukainen" },
@@ -163,6 +194,7 @@
   "dagger_57e0f4e5": { "message": "Tikari" },
   "date_added_ed5ad465": { "message": "Lisäyspäivämäärä" },
   "decorative_icon_9a7f3fc3": { "message": "Koristekuvake" },
+  "decorative_image_fde98579": { "message": "Koristeellinen kuva" },
   "decorative_type_upper_f2c95e3": { "message": "Koriste { TYPE_UPPER }" },
   "deep_purple_bb3e2907": { "message": "Tumman violetti" },
   "definite_integral_fe7ffed1": { "message": "Ehdoton integraali" },
@@ -227,6 +259,9 @@
   "edit_icon_2c6b0e91": { "message": "Muokkaa kuvaketta" },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
   "editor_statusbar_26ac81fc": { "message": "Editorin tilapalkki" },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Elementti, joka alkaa { start }"
+  },
   "embed_828fac4a": { "message": "Upota" },
   "embed_code_314f1bd5": { "message": "Upota koodi" },
   "embed_image_1080badc": { "message": "Upota kuva" },
@@ -282,6 +317,7 @@
   "files_c300e900": { "message": "Tiedostot" },
   "files_index_af7c662b": { "message": "Tiedostojen indeksi" },
   "finish_bc343002": { "message": "Lopeta" },
+  "fix_heading_hierarchy_f60884c4": { "message": "Korjaa otsikon hierarkia" },
   "flat_music_76d5a5c3": { "message": "Flat (musiikki)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Tarkanne elementtien asetusten työkalupalkki"
@@ -289,6 +325,7 @@
   "folder_tree_fbab0726": { "message": "Kansiopuu" },
   "for_all_b919f972": { "message": "Kaikille" },
   "format_4247a9c5": { "message": "Muotoile" },
+  "format_as_a_list_142210c3": { "message": "Muotoile luettelona" },
   "formatting_5b143aa8": { "message": "Muotoillaan" },
   "forward_slash_3f90f35e": { "message": "Vinoviiva" },
   "found_auto_saved_content_3f6e4ca5": {
@@ -328,9 +365,21 @@
   "group_navigation_99f191a": { "message": "Ryhmän navigointi" },
   "h_bar_bb94deae": { "message": "H bar" },
   "hat_ea321e35": { "message": "Hattu" },
+  "header_column_f27433cb": { "message": "Otsikkosarake" },
+  "header_row_and_column_ec5b9ec": { "message": "Otsikon rivi ja sarake" },
+  "header_row_f33eb169": { "message": "Otsikkorivi" },
   "heading_2_5b84eed2": { "message": "Otsikko 2" },
   "heading_3_2c83de44": { "message": "Otsikko 3" },
   "heading_4_b2e74be7": { "message": "Otsikko 4" },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Otsikon tasoja ei saa ohittaa."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Otsikot, jotka alkavat { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Otsikoissa voi olla korkeintaan 120 merkkiä."
+  },
   "health_icon_8d292eb5": { "message": "Terveys-kuvake" },
   "hearts_suit_e50e04ca": { "message": "Sydämet (puku)" },
   "height_69b03e15": { "message": "Korkeus" },
@@ -338,6 +387,9 @@
   "hide_description_bfb5502e": { "message": "Piilota kuvaus" },
   "hide_title_description_caf092ef": {
     "message": "Piilota kohteen { title } kuvaus"
+  },
+  "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+    "message": "Korosta elementtejä aktivoidaksesi elmentin asetusten työkalupalkki"
   },
   "home_351838cd": { "message": "Aloitussivu" },
   "html_code_editor_fd967a44": { "message": "html-koodieditori" },
@@ -362,10 +414,19 @@
   },
   "image_8ad06": { "message": "Kuva" },
   "image_c1c98202": { "message": "kuva" },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Kuvan tiedostonimiä ei saa käyttää kuvan sisältöä kuvaavana alt-määritteenä."
+  },
   "image_options_5412d02c": { "message": "Kuva-asetukset" },
   "image_options_tray_90a46006": { "message": "Kuva-asetusten ilmoitusalue" },
   "image_to_crop_3a34487d": { "message": "Rajattava kuva" },
+  "image_with_filename_file_aacd7180": {
+    "message": "Kuva, jonka tiedostonimi on { file }"
+  },
   "images_7ce26570": { "message": "Kuvat" },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Kuvien pitäisi sisältää alt-määrite, joka kuvaa kuvan sisältöä-"
+  },
   "imaginary_portion_of_complex_number_2c733ffa": {
     "message": "Kuvitteellinen osa (tai monimutkainen numero)"
   },
@@ -383,13 +444,48 @@
   "invalid_file_type_881cc9b2": { "message": "Virheellinen tiedostotyyppi" },
   "invalid_url_cbde79f": { "message": "Virheellinen URL" },
   "iota_11c932a9": { "message": "Iota" },
+  "issue_num_total_f94536cf": { "message": "Ongelma { num }/{ total }" },
   "kappa_2f14c816": { "message": "Kappa" },
   "kappa_variant_eb64574b": { "message": "Kappa (muuttuja)" },
   "keyboard_shortcuts_ed1844bd": { "message": "Pikanäppäimet" },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Näppäimistöt navigoivat linkkeihin Välilehti-painikkeen avulla. Kaksi peräkkäistä linkkiä, jotka ohjaavat samaan päämäärään, voivat olla hämmentäviä näppäimistön käyttäjille."
+  },
   "lambda_4f602498": { "message": "Lambda" },
   "language_arts_icon_a798b0f8": { "message": "Kielen taiteiden kuvake" },
   "languages_icon_9d20539": { "message": "Kielien kuvake" },
   "large_9c5e80e7": { "message": "Suuri" },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Lue lisää vierekkäisistä linkeistä"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Lue lisää värikontrastista"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Lue lisää sivuotsikoiden organisoimisesta"
+  },
+  "learn_more_about_proper_page_heading_structure_d2959f2d": {
+    "message": "Lue lisää asianmukaisesta sivuotsikoiden rakenteesta"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Lue lisää taulukon otsikoista"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Lue lisää vaihtoehtoisen tekstin käyttämisestä"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Lue lisää kuvatekstien käytöstä taulukoiden kanssa"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Lue lisää tiedostonimien käytöstä vaihtoehtoisessa tekstissä"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Lue lisää listojen käyttämisestä"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Lue lisää laajuuden määritteiden käytöstä taulukoiden kanssa"
+  },
+  "leave_as_is_4facfe55": { "message": "Jätä sellaiseksi kuin on" },
   "left_angle_bracket_c87a6d07": { "message": "Vasen kulmakiinnike" },
   "left_arrow_4fde1a64": { "message": "Nuoli vasemmalle" },
   "left_arrow_with_hook_5bfcad93": { "message": "Vasen nuoli koukulla" },
@@ -413,9 +509,15 @@
   "light_blue_5374f600": { "message": "Vaaleansininen" },
   "link_7262adec": { "message": "Linkki" },
   "link_options_a16b758b": { "message": "Linkin asetukset" },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Linkki tekstillä, joka alkaa { start }"
+  },
   "links_14b70841": { "message": "Linkit" },
   "links_to_an_external_site_de74145d": {
     "message": "Linkittyy ulkoiselle sivustolle."
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Luettelot pitäisi muotoilla luetteloina."
   },
   "load_more_35d33c7": { "message": "Lataa lisää" },
   "loading_25990131": { "message": "Ladataan..." },
@@ -450,6 +552,7 @@
     "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
   },
   "medium_5a8e9ead": { "message": "Tietoväline" },
+  "merge_links_2478df96": { "message": "Yhdistä linkkejä" },
   "mic_a7f3d311": { "message": "Mikrofoni" },
   "microphone_disabled_15c83130": { "message": "Mikrofoni pois käytöstä" },
   "middle_27dc1d5": { "message": "Kohtalainen" },
@@ -484,9 +587,14 @@
   },
   "nested_greater_than_d852e60d": { "message": "on suurempi kuin" },
   "nested_less_than_27d17e58": { "message": "on pienempi kuin" },
+  "next_40e12421": { "message": "Seuraava" },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Ei havaittu käytettävyysongelmia."
+  },
   "no_changes_to_save_d29f6e91": { "message": "Ei tallennettavia muutoksia." },
   "no_e16d9132": { "message": "Ei" },
   "no_file_chosen_9a880793": { "message": "Ei valittua tiedostoa" },
+  "no_headers_9bc7dc7f": { "message": "Ei otsikoita" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Tälle tiedostolle ei ole saatavissa esikatselua."
   },
@@ -531,6 +639,9 @@
   },
   "pages_e5414c2c": { "message": "Sivut" },
   "paragraph_5e5ad8eb": { "message": "Kappale" },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Kappale, joka alkaa { start }"
+  },
   "parallel_d55d6e38": { "message": "Rungon suuntainen" },
   "partial_derivative_4a9159df": { "message": "Osittainen (johdannainen)" },
   "paste_5963d1c1": { "message": "Liitä" },
@@ -567,6 +678,7 @@
   "precedes_196b9aef": { "message": "Edeltää" },
   "precedes_equal_20701e84": { "message": "Edeltää yhtä suurta" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
+  "prev_f82cbc48": { "message": "Edellinen" },
   "preview_53003fd2": { "message": "Esikatsele" },
   "preview_a3f8f854": { "message": "ESIKATSELU" },
   "preview_in_overlay_ed772c46": { "message": "Esikatselu asettelussa" },
@@ -595,6 +707,7 @@
   "red_8258edf3": { "message": "Punainen" },
   "relationships_6602af70": { "message": "Suhteet" },
   "religion_icon_246e0be1": { "message": "Uskonnon kuvake" },
+  "remove_heading_style_5fdc8855": { "message": "Poista otsikkotyyli" },
   "replace_e61834a7": { "message": "Korvaa" },
   "reset_95a81614": { "message": "Nollaa" },
   "resize_ec83d538": { "message": "Muuta kokoa" },
@@ -607,6 +720,9 @@
   "rho_a0244a36": { "message": "Rho" },
   "rho_variant_415245cd": { "message": "Rho (muuttuja)" },
   "rich_content_editor_2708ef21": { "message": "Rikas sisältöeditori" },
+  "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+    "message": "Monipuolisen tekstieditorin sisältökenttä Paina { OSKey }+F8, jos haluat nähdä tekstimuotoilueditorin pikakuvakkeita."
+  },
   "right_angle_bracket_d704e2d6": { "message": "Oikea kulmakiinnike" },
   "right_arrow_35e0eddf": { "message": "Nuoli oikealle" },
   "right_arrow_with_hook_29d92d31": { "message": "Oikea nuoli koukulla" },
@@ -627,11 +743,32 @@
   "rotate_image_90_degrees_2ab77c05": { "message": "Käännä kuvaa -90 astetta" },
   "rotate_image_90_degrees_6c92cd42": { "message": "Käännä kuvaa 90 astetta" },
   "rotation_9699c538": { "message": "Pyöriminen" },
+  "row_fc0944a7": { "message": "Rivi" },
+  "row_group_979f5528": { "message": "Rivin ryhmä" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."
   },
   "save_11a80ec3": { "message": "Tallenna" },
+  "save_copy_ca63944e": { "message": "Tallenna kopio" },
   "save_media_cb9e786e": { "message": "Tallenna media" },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Näytönlukijat eivät voi määrittää, mikä näkyy kuvassa ilman vaihtoehtoista tekstiä, ja tiedostonimet ovat usein tarkoituksettomia numeroiden ja kirjaiminen merkkijonoja, jotka eivät kuvaa kontekstia tai tarkoitusta."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Näytönlukijat eivät voi määrittää, mitä kuvassa näkyy ilman vaihtoehtoista tekstiä, joka kuvaa kuvan sisällön ja tarkoituksen. Vaihtoehtoisen tekstin pitäisi olla yksinkertainen ja tiivis."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Näytönlukijat eivät voi määrittää, mitä kuvassa näkyy ilman vaihtoehtoista tekstiä, joka kuvaa kuvan sisällön ja tarkoituksen."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Näytönlukijat eivät voi tulkita taulukoita ilman asianmukaista rakennetta. Taulukon otsikot tarjoavat suunnan ja sisältöalueen."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Näytönlukijat eivät voi tulkita taulukoita ilman asianmukaista rakennetta. Taulukon tekstit kuvaavat kontekstin ja taulukon yleisen ymmärryksen."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Näytönlukijat eivät voi tulkita taulukoita ilman asianmukaista rakennetta. Taulukon otsikot tarjoavat sisällön suunnan ja yleiskatsauksen."
+  },
   "script_l_42a7b254": { "message": "Merkkijono L" },
   "search_280d00bd": { "message": "Hae" },
   "select_audio_source_21043cd5": { "message": "Valitse äänilähde" },
@@ -639,12 +776,21 @@
   "select_language_7c93a900": { "message": "Valitse kieli" },
   "select_video_source_1b5c9dbe": { "message": "Valitse videolähde" },
   "selected_linkfilename_c093b1f2": { "message": "Valittu { linkFileName }" },
+  "set_header_scope_8c548f40": { "message": "Määritä otsikon ala" },
   "set_minus_b46e9b88": { "message": "Aseta miinus" },
+  "set_table_header_cfab13a0": { "message": "Määritä taulukon otsikko" },
   "sharp_music_ab956814": { "message": "Terävä (musiikki)" },
+  "shift_arrows_4d5785fe": { "message": "SHIFT+Nuolet" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O avaa Pretty-tekstieditorin."
   },
   "shortcut_911d6255": { "message": "Oikotie" },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Näkevät käyttäjät selaavat verkkosivustoja nopeasti ja etsivät suuria tai lihavoituja otsikoita. Näytönlukijan käyttäjät nojaavat otsikkoihin ymmärtääkseen kontekstuaalisesti. Otsikoita pitäisi käyttää asianmukaisen rakenteen luomiseksi."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Näkevät käyttäjät selaavat verkkosivustoja nopeasti ja etsivät suuria tai lihavoituja otsikoita. Näytönlukijan käyttäjät nojaavat otsikkoihin ymmärtääkseen kontekstuaalisesti. Otsikoiden pitäisi olla tiiviitä ja asianmukaisessa rakenteessa."
+  },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (muuttuja)" },
   "single_color_image_4e5d4dbc": { "message": "Yksivärinen kuva" },
@@ -714,16 +860,43 @@
     "message": "Järjestelmän audio pois käytöstä"
   },
   "tab_arrows_4cf5abfc": { "message": "TAB/Nuolet" },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Taulukon otsikko, joka alkaa { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Taulukko, joka alkaa { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Taulukon otsikoiden pitäisi määrittää ala."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Taulukoiden pitäisi sisältää selitys, joka kuvaa taulukon sisältöä."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Taulukkojen pitäisi sisältää vähintään yksi otsikko."
+  },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Sinivihreä" },
   "text_7f4593da": { "message": "Teksti" },
   "text_background_color_16e61c3f": { "message": "Tekstin taustaväri" },
   "text_color_acf75eb6": { "message": "Tekstiväri" },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Teksti on vaikea lukea erityisesti huononäköisille, jos tekstin ja tausta välillä ei ole riittävää kontrastia."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "18pt:n (tai lihavoitu 14pt) kokoista tekstiä suurempi teksti pitäisi näyttää vähintään kontrastitasolla 3:1."
+  },
   "text_optional_384f94f7": { "message": "Teksti (valinnainen)" },
   "text_position_8df8c162": { "message": "Tekstin paikka" },
   "text_size_887c2f6": { "message": "Tekstikoko" },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "18pt:n (tai lihavoitu 14pt) kokoista tekstiä pitäisi näyttää vähintään kontrastitasolla 4.5:1."
+  },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "Asiakirjan esikatselua käsitellään parhaillaan. Yritä myöhemmin uudelleen."
+  },
+  "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+    "message": "Ensimmäisen otsikon sivulla pitäisi olla H2."
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiaali on vapaasti käytössä (public domain)."
@@ -890,7 +1063,14 @@
   },
   "webcam_disabled_30c66986": { "message": "Webkamera pois käytöstä" },
   "webcam_fe91b20f": { "message": "Nettikamera" },
+  "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+    "message": "Verkkosivustoilla pitäisi olla vain yksi H1, jota käytetään automaattisesti sivun otsikkona. Ensimmäisen otsikon sisällössäsi pitäisi olla H2."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Kun käytetään merkintää, joka visuaalisesti muotoilee kohteet luettelona, mutta ei ilmaise suhdetta, käyttäjillä saattaa olla vaikeuksia tietojen navigoinnissa."
+  },
   "white_87fa64fd": { "message": "Valkoinen" },
+  "why_523b3d8c": { "message": "Miksi..." },
   "width_492fec76": { "message": "Leveys" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Leveyden ja korkeuden täytyy olla numeroita"
@@ -902,6 +1082,9 @@
   "yes_dde87d5": { "message": "Kyllä" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Kuvakkeen tekijän ilmoitusalueella on tallentamattomia muutoksia. Haluatko jatkaa tallentamatta näitä muutoksia?"
+  },
+  "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+    "message": "Sinun täytyy ehkä säätää lisäotsikoita, jotta voit ylläpitää sivuhierarkian."
   },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Et voi ladata tyhjää tiedostoa."
