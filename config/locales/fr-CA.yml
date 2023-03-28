@@ -192,6 +192,8 @@ fr-CA:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un fichier nommé %{itemName} existe déjà dans ce dossier."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Un fichier nommé « %{name} » existe déjà. Désirez-vous remplacer le fichier existant?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Un fichier nommé « %{name} » existe déjà dans ce dossier. Désirez-vous remplacer le fichier existant?"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: "Il existe déjà un préréglage de filtre avec ces conditions."
+  a_filter_with_that_name_already_exists_9bba05bc: "Il existe déjà un filtre avec ce nom."
   a_front_page_is_required_fd57b80: "Une page d'accueil est requise"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Un logo de taille réelle qui apparait dans la barre latérale droite du tableau de bord de Canvas. La taille idéale est de 360 x 140 pixels. Les formats acceptés sont : SVG, PNG, JPEG et GIF"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Un dépôt de valeur/clé pratique d'un serveur d'information intéressante sur l'environnement de l'utilisateur effectuant une observation"
@@ -1694,7 +1696,7 @@ fr-CA:
         custom_reports: 
           start: 
             parameters: 
-              header: "Date d’activité :"
+              header: "Date d’activité :"
     statistics: 
       concluded_at: "terminée à %{at}"
       created_at: "créée à %{at}"
@@ -2182,6 +2184,9 @@ fr-CA:
       ont rebondi
   adds_additional_information_and_filtering_for_feat_3e55a058: "Ajoute des informations supplémentaires et filtre les balises de fonctionnalité"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Ajoute un paramètre de compte/cours pour une heure d’échéance par défaut pour les nouvelles tâches"
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      Ajoute un paramètre de compte pour sélectionner la police classique (Lato) ou élémentaire (Balsamiq Sans) dans Canvas pour les comptes
+      Elementary.
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Ajoute un sélecteur d’émoji qui permet aux élèves et aux enseignants d’ajouter des émojis à leurs commentaires lors de l’envoi de leurs tâches."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Ajoute les liens d’analyse sur le menu de paramètres de l'utilisateur."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Ajoute l’analyse à une carte de contexte de l’étudiant."
@@ -2365,6 +2370,7 @@ fr-CA:
   all_ungraded_artifacts_ec3ba09: "Tous les artefacts non notés"
   all_users_associated_with_this_course_6be8d492: "Tous les utilisateurs associés à ce cours"
   all_users_associated_with_this_institution_d29850be: "Tous les utilisateurs associés à cette institution"
+  all_version_history_fbf060a0: "Historique de toutes les versions"
   all_versions_student_submission_report_e4def68d: "Toutes les versions de rapport d’envoi des étudiants"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Toutes les pondérations doivent être supérieures ou égales à 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Autoriser un modérateur à réviser plusieurs notes indépendantes pour les envois sélectionnés"
@@ -2385,6 +2391,7 @@ fr-CA:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Permettre aux cartes du tableau de bord d’être triées pour chaque utilisateur."
   allow_final_grade_override_8cf4336b: "Autoriser le surclassement de la note finale"
   allow_final_grade_override_a21a79ee: "Autoriser le surclassement de la note finale"
+  allow_font_selection_in_c4e_accounts_7def31c6: "Autoriser la sélection de polices dans les comptes C4E"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Permettre à Apollo de mettre en cache les requêtes graphQL sur un navigateur d’utilisateur pour accélérer leur expérience"
   allow_for_key_keyname_b973f769: "Prévoyez une clé : %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Permettre aux utilisateurs du carnet de notes de visualiser et d’exporter les noms et prénoms des étudiants dans des colonnes séparées"
@@ -2430,6 +2437,9 @@ fr-CA:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Autoriser cet outil à accéder aux noms IMS et au service de dotation de rôle"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Autoriser les adresses courriel non confirmées lors de l'ajout d'utilisateurs"
   allow_users_to_comment_45b8f753: "Autoriser les utilisateurs à commenter"
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      Autoriser les utilisateurs à redimensionner les supports média intégrés de Canvas Studio dans le RCE par le biais
+      d’un nouveau plateau des options de support média Studio
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Permettre aux utilisateurs de soumettre un courriel supplémentaire lors de l’inscription."
   allowed_attempts_4e229caa: "Tentatives autorisées"
   allowed_domains_ee7868c8: "Domaines autorisés"
@@ -7083,7 +7093,7 @@ fr-CA:
       indent: 
         ? "n"
         : 
-          one: "Retrait 1 niveau"
+          one: "Retrait 1 niveau"
           other: "Retrait %{count} niveaux"
           zero: "Pas de retrait"
       labels: 
@@ -8981,7 +8991,7 @@ fr-CA:
   customize_this_menu_efa72a9: "Personnaliser ce menu"
   cutoff_score_74254c89: "note de passage"
   cyan_c1d5f68a: Cyan
-  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Référence cyclique détectée lors de l’importation : %{vendor_guid}"
+  cyclic_reference_detected_when_importing_vendor_gu_1ae4938c: "Référence cyclique détectée lors de l’importation : %{vendor_guid}"
   czech_9aa2cbe4: Tchèque
   d2l_display: Desire2Learn
   d2l_file_description: "Format .zip d’exportation D2L"
@@ -10521,6 +10531,7 @@ fr-CA:
   end_date_e0093ed7: "Date de fin"
   end_date_for_conference_eaff0807: "Date de fin de la conférence"
   end_date_from_cdd9d90: "Date de fin à partir de :"
+  end_date_must_be_after_start_date_2fea5383: "La date de fin doit se situer après la date de début"
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "La date/heure de fin doit être postérieure à la date/heure de début"
   end_date_to_8b17929d: "Date de fin (échéance) :"
   end_date_value_3d3e8906: "Date de fin %{value}"
@@ -11635,6 +11646,7 @@ fr-CA:
   fill_in_the_blank_answer_d83b83bb: "Réponse à compléter"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Remplissez les espaces vides en vous aidant du texte autour"
   fill_out_rubric_22d4eee5: "Remplir la rubrique"
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: "Remplissez la rubrique ci-dessous après avoir examiné l’envoi de l’étudiant pour terminer cette révision."
   filled_5d8c39e: Rempli
   filter_9df28e5b: "Filtre :"
   filter_announcements_by_unread_495eeeb3: "filtrer les annonces par état « non lu »"
@@ -11905,6 +11917,7 @@ fr-CA:
   go_to_settings_for_name_812308b5: "Aller aux paramètres de %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Aller aux statistiques de %{name}"
   go_to_subject_2745f0a4: "Aller à Objet"
+  go_to_the_new_course_af182b99: "Accédez au nouveau cours"
   go_to_topic_af6025fc: "Aller à la rubrique"
   good_284a7a8f: Bien
   good_score_b02f3587: "Bonne note"
@@ -14831,12 +14844,12 @@ fr-CA:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Impossible de remettre le message intitulé « %{subject} ».  Il a été envoyé à une adresse de messagerie inconnue. Si vous voulez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et de lui envoyer un message à l’aide de l’outil Boîte de réception.
+            Impossible de remettre le message intitulé « %{subject} ».  Il a été envoyé à une adresse de messagerie inconnue.  Si vous voulez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et de lui envoyer un message à l’aide de l’outil Boîte de réception.
             
-                      Merci,
-                      L’assistance technique Canvas
-                      
-            Référence: %{ref}
+            Merci,
+            L’assistance technique Canvas
+            
+            Référence: "%{ref}"
       locked_topic: 
         body: |-
             Le message intitulé « %{subject} » n’a pas pu être remis, car le sujet de discussion est verrouillé. Si vous souhaitez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et d’envoyer un message à cette personne avec l’outil Boîte de réception.
@@ -15533,7 +15546,7 @@ fr-CA:
   medium_dark_skin_tone_5134edbc: "Teinte de peau moyenne foncée"
   medium_light_skin_tone_6c4a27fb: "Teinte de peau moyenne à claire"
   medium_skin_tone_8608d74e: "Teinte de peau moyenne"
-  meet_the_instructure_learning_platform_b1a3ff1b: "Rencontrez la plateforme d’apprentissage d’Instructure :"
+  meet_the_instructure_learning_platform_b1a3ff1b: "Rencontrez la plateforme d’apprentissage d’Instructure :"
   meets_expectations_bb179565: "Répond aux attentes"
   meets_mastery_754e1c06: "Niveau de Maîtrise atteint"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} membres sur un maximum de %{max_membership}"
@@ -16840,6 +16853,7 @@ fr-CA:
           body: "Un nouveau fichier a été ajouté au cours %{name} :"
           link: "Cliquer pour afficher"
           subject: "Nouveau fichier ajouté : %{title}, %{name}"
+        link: "Vous pouvez le consulter ici"
         subject: "Nouveau fichier ajouté : %{title}, %{name}"
         view: "Vous pouvez le consulter ici"
       sms: 
@@ -16850,20 +16864,20 @@ fr-CA:
         body: "Alerte Canvas - Nouveau fichier : %{title} (%{size}) pour %{name} :"
     new_files_added: 
       email: 
-        body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name} :"
+        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
         html: 
           body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name} :"
           see_details: "Vous pouvez les voir ici"
-          subject: "%{count} nouveaux fichiers ajoutés au cours %{name} :"
+          subject: "%{count} nouveaux fichiers ajoutés au cours, %{name}"
         link: "Vous pouvez les voir ici"
-        subject: "%{count} nouveaux fichiers ajoutés au cours %{name} :"
+        subject: "%{count} nouveaux fichiers ajoutés au cours, %{name}"
       sms: 
         body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name}."
         link: "Informations complémentaires sur %{link}"
       summary: 
-        body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name}."
+        body: "%{count} nouveaux fichiers ajoutés pour %{name} :"
         link: "Vous pouvez les voir ici"
-        subject: "%{count} nouveaux fichiers ajoutés au cours %{name} :"
+        subject: "%{count} nouveaux fichiers ajoutés au cours, %{name}"
       twitter: 
         body: "Alerte Canvas - %{count} nouveaux fichiers pour %{name}"
     new_student_organized_group: 
@@ -17757,6 +17771,7 @@ fr-CA:
   nav_logo_background_ba33fb7f: "Arrière plan du logo de navigation"
   nav_text_94206145: "Texte de navigation"
   nav_text_active_a924ae88: "Texte de navigation activé"
+  navigate_to_speed_grader_for_name_f28cb5b1: "Accédez à SpeedGrader pour %{name}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "La navigation permet à l'utilisateur de voir le lien Personnes dans la Navigation du cours."
   navigation_menu_fd782ff8: "Menu de navigation"
   near_mastery_f25174a4: "Proche du niveau de maîtrise"
@@ -17838,6 +17853,7 @@ fr-CA:
   new_question_9107c469: "Nouvelle question"
   new_question_group_d9306280: "Nouveau groupe de questions"
   new_quiz_34aacba6: "Nouveau questionnaire"
+  new_quiz_items_3c850331: "Nouveaux éléments de questionnaire"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Nouveau compte de questionnaires et nouvelles banques d’éléments de niveau de cours"
   new_quizzes_assignment_build_button_72b6531a: "Bouton de Génération des tâches des nouveaux questionnaires"
   new_quizzes_banks_migrations_9ab4de4a: "Migration des banques de nouveaux questionnaires"
@@ -17847,10 +17863,12 @@ fr-CA:
   new_quizzes_description: "Cette fonctionnalité améliore l’expérience Canvas pour les questionnaires. Lorsque ce fanion est activé, l’outil Nouveaux questionnaires est disponible. Pour plus de détails, veuillez consulter le *groupe d’utilisateurs des Nouveaux questionnaires* dans la communauté Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Progression dans le module intégrée dans les nouveaux questionnaires"
   new_quizzes_importing_c167dce0: "Importation de nouveaux questionnaires"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Nouveaux questionnaires inclus dans l’onglet Résumé de l’alignement des résultats"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migration des nouveaux questionnaires lors de l’importation/copie du cours"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migration des nouveaux questionnaires activée par défaut"
   new_quizzes_migration_required_7854aa1a: "Migration des nouveaux questionnaires requise"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nouveaux questionnaires sur la page des questionnaires"
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "Les nouveaux alignements de résultats des questionnaires sont inclus dans l’onglet Résumé de l’alignement des résultats, qui fournit une liste des alignements pour chaque résultat d’un cours."
   new_quizzes_public_api_18d95321: "API publique des nouveaux questionnaires"
   new_quizzes_public_api_quiz_items_16bc741d: "API publique des nouveaux questionnaires : Éléments du questionnaire"
   new_quizzes_service_jwt_refresh_ca28ca8: "Actualisation des nouveaux questionnaires de JWT de service"
@@ -18026,6 +18044,7 @@ fr-CA:
   no_students_with_that_name_found_f6004da2: "Pas d'élève avec ce nom trouvé"
   no_subject_58b7941c: "Aucun sujet"
   no_subject_970aad80: "Aucun sujet"
+  no_subject_a8b6ceeb: "(sans objet)"
   no_submission_fb131a40: "Aucun envoi"
   no_submission_for_assignment_a9cb6fe2: "Pas d’envoi pour %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Pas d’envoi pour %{assignmentTitle}"
@@ -19296,6 +19315,7 @@ fr-CA:
   please_select_a_recipient_c9273f8e: "Veuillez choisir un destinataire."
   please_select_a_user_role_for_this_link_9fb4e655: "Veuillez saisir un rôle d'utilisateur pour ce lien."
   please_select_an_item_30c287ef: "Veuillez sélectionner un élément"
+  please_select_at_least_one_filter_aafaa1a7: "Veuillez sélectionner au moins un filtre."
   please_select_one_f931e883: "Veuillez sélectionner une option"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Veuillez spécifier s’il faut activer ou désactiver Microsoft Teams Sync."
   please_try_again_4c3d11b4: "Veuillez essayer de nouveau"
@@ -21316,6 +21336,8 @@ fr-CA:
         labels: 
           quiz_instructions: "Instructions du questionnaire"
           quiz_score: Note
+      quiz_edit_header: 
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 tentative supplémentaire possible"
@@ -22231,6 +22253,7 @@ fr-CA:
   restrict_instructors_from_changing_mastery_scales_5af13053: "Empêcher les instructeurs de modifier les échelles de maîtrise"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Empêcher les instructeurs de changer de méthode de calcul des compétences"
   restrict_push_notifications_to_select_types_941d9da3: "Restreindre les Notifications « push » à la sélection des types"
+  restrict_quantitative_data_72411674: "Restreindre les données quantitatives"
   restrict_sms_to_select_types_9dd6399c: "Restreindre les SMS à la sélection des types"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Empêcher les étudiants d'accéder aux cours après leurs dates de fin"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Empêcher les étudiants d'accéder aux cours avant leurs dates de début"
@@ -22240,6 +22263,7 @@ fr-CA:
   restrict_students_from_viewing_course_before_cours_cca659a4: "Empêche les étudiants de voir le cours avant la date de début du cours"
   restrict_students_from_viewing_course_before_term__3c4924f0: "Empêche les étudiants de voir le cours avant la date de début du trimestre"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Empêcher les étudiants de voir les futurs cours dans la liste des inscriptions"
+  restrict_view_of_quantitative_data_b6089ee9: "Restreindre l’affichage des données quantitatives"
   restricted_access_d3e99a39: "Accès restreint"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Vue restreinte pour les enseignants en LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Soumettre à nouveau à l'outil associé pour analyse de plagiat."
@@ -24407,6 +24431,7 @@ fr-CA:
   start_date_field_for_styleguide_8a8ab1d6: "Champ « Date de début » du guide stylistique"
   start_date_for_conference_1936e809: "Date de début de la conférence"
   start_date_from_20503757: "Date de début à partir de :"
+  start_date_must_be_before_end_date_a00be892: "La date de début doit être antérieure à la date de fin"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} à %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "La date/heure de début doit être antérieure à la date/heure de fin"
   start_date_to_1e6e6bbe: "Date de début (échéance) :"
@@ -24522,6 +24547,7 @@ fr-CA:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Rétroaction de l’étudiant requis dans les commentaires ci-dessus pour la réaffectation."
   student_filters_in_lmgb_13964502: "Filtres de l'étudiant dans LMGB"
   student_first_name_aaa42cbc: "Prénom de l’étudiant"
+  student_first_name_options_82f5685f: "Options du prénom de l’étudiant"
   student_grades_4cbc59a1: "Notes des étudiants"
   student_group_75b86a9f: "Groupes d’étudiants"
   student_group_filter_185fb085: "Filtre de groupe d’étudiant"
@@ -24638,6 +24664,7 @@ fr-CA:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Les étudiants pourront voir que les notes de cette tâche sont masquées."
   students_with_no_submissions_title: "Étudiants n’ayant rien envoyé"
   students_without_assessments_eb100e60: "Étudiants sans évaluation"
+  studio_media_options_in_rce_1118428b: "Options de support média Studio dans RCE"
   sub_account_daeadd0: Sous-compte
   sub_accounts: 
     alerts: 
@@ -24955,6 +24982,7 @@ fr-CA:
   suffix_294d5cc4: Suffixe
   suggestions_b8b03b9d: "Suggestions :"
   sum_of_all_files_in_mb_2b705055: "somme de tous les fichiers en Mo"
+  summary_of_report_types_d064d42b: "Résumé des types de rapport"
   summary_statistics_f74852a5: "Résumé des statistiques"
   sun_298d7c8b: Dim
   support: 
@@ -25377,6 +25405,8 @@ fr-CA:
   the_field_field_is_required_56512820: "Le champ « %{field} » est requis"
   the_field_field_must_have_no_spaces_d1c2fc37: "Le champ « %{field} » ne doit pas contenir d’espace"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "L’onglet Fichiers permet de partager des diapositives de conférence, des documents d’exemples, des aides à l’étude -- tout ce que vos étudiants sont susceptibles de télécharger. La mise en ligne et l’organisation de vos fichiers sont des tâches simples dans Canvas. Nous vous expliquerons comment."
+  the_first_max_displayed_files_are_listed_49cfd7a0: "Les %{max_displayed} premiers fichiers sont énumérés."
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "Les %{max_displayed} premiers fichiers sont énumérés ci-dessus. Cliquez ci-dessous pour voir tous les fichiers."
   the_following_content_is_partner_provided_ed1da756: "Le contenu suivant est fourni par le partenaire"
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Les domaines suivants ont été automatiquement ajoutés à votre
@@ -25862,6 +25892,7 @@ fr-CA:
                                   Les utilisateurs finaux ne la verront pas tant qu’elle n’aura pas été activée par un administrateur de site.
                                   Avant de l’activer pour une institution, assurez-vous de bien comprendre
                                   la fonctionnalité et les impacts possibles pour les utilisateurs.
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: "Cette fonctionnalité masquera toutes les valeurs quantitatives des utilisateurs"
   this_field_is_required_fa58c4a: "Ce champ est obligatoire"
   this_field_name_is_required_988caebc: "Le champ « %{name} » est obligatoire."
   this_field_name_is_required_b9196401: "Le champ « nom » est obligatoire."
@@ -27517,6 +27548,7 @@ fr-CA:
   use_experimental_features_before_they_are_generall_3dfaddd1: "Utiliser des fonctionnalités expérimentales avant qu'elles ne soient généralement activées en production"
   use_high_contrast_ui_a5917282: "Utiliser IU à contraste élevé"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Utiliser l'enregistreur HTML5 dans l'éditeur de contenu au lieu de Flash"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: "Utilisez des espaces réservés améliorés pour le contenu inséré dans le RCE."
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Utiliser MathMan pour convertir LaTeX en MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Utiliser MathMan pour convertir LaTeX en SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -27526,6 +27558,7 @@ fr-CA:
             Ajoutez des fichiers, des discussions, des tâches, des questionnaires et d’autres documents d’apprentissage.
             Exigez que les conditions préalables soient remplies avant de passer à un module ou à un élément
             de module suivant, ou verrouillez un module entier jusqu’à une date spécifique.
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: "Utilisez des espaces réservés nouveaux et mieux stylisés pour les images, vidéos et fichiers insérés dans le RCE."
   use_new_folder_tree_in_files_bc0ea09f: "Utiliser une nouvelle arborescence de dossiers pour les fichiers"
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Utilisez « Nouveaux questionnaires » comme moteur de questionnaire par défaut. Retire la possibilité de créer des questionnaires classiques."
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Utiliser l’Éditeur de texte enrichi avec la barre latérale améliorée partout"
@@ -28730,6 +28763,7 @@ fr-CA:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Vous ne pouvez pas définir une discussion groupée en tant qu'étudiant."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Vous ne pouvez pas utiliser une valeur supérieure au nombre de tâches"
   you_created_an_announcement_in_course_c49e3d70: "Vous avez créé une annonce dans %{course}"
+  you_created_this_announcement_42d745a7: "Vous avez créé cette annonce :"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Vous n'avez actuellement aucune discussion avec des commentaires fermés"
   you_currently_have_no_pinned_discussions_6f0078b8: "Vous n’avez actuellement aucune discussion épinglée"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Vous n'avez pas accès à l’annonce sélectionnée."
@@ -28915,6 +28949,7 @@ fr-CA:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Vous ne pourrez pas prévisualiser vos modifications"
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Vous ne recevrez aucune notification de %{contextType} pour le moment. Pour activer les notifications de %{contextType}, utilisez le bouton de bascule ci-dessus."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Vous ne recevrez aucune notification de cours pour le moment. Pour activer les notifications de cours, utilisez le bouton de bascule ci-dessus."
+  you_will_only_see_comments_written_by_you_f294cb9d: "Vous verrez uniquement vos propres commentaires."
   your_answer_8dad6ea4: "Votre réponse :"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Votre tâche %{assignment_name} est due le %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Votre tâche %{assignment_name} est due le %{due_at}. Cliquez sur le lien suivant pour consulter votre tâche et l’envoyer à temps :"
