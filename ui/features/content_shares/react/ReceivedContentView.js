@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, lazy, useCallback} from 'react'
+import React, {useEffect, useState, lazy} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 import ContentHeading from './ContentHeading'
@@ -47,29 +47,27 @@ export default function ReceivedContentView() {
 
   const sharesUrl = '/api/v1/users/self/content_shares'
 
-  const handleSetShares = useCallback(
-    data => {
-      setShares(data)
-      const message = I18n.t(
-        {
-          one: '1 shared item loaded.',
-          other: '%{count} shared items loaded.',
-        },
-        {count: data.length}
-      )
-      showFlashAlert({message, srOnly: true, type: 'info'})
-    },
-    [setShares]
-  )
-
   useFetchApi({
-    success: handleSetShares,
+    success: setShares,
     meta: setResponseMeta,
     error: setError,
     loading: setIsLoading,
     path: `${sharesUrl}/received`,
     params: {page: currentPage},
   })
+
+  useEffect(() => {
+    if (!isLoading) {
+      const message = I18n.t(
+        {
+          one: '1 shared item loaded.',
+          other: '%{count} shared items loaded.',
+        },
+        {count: shares.length}
+      )
+      showFlashAlert({message, srOnly: true, type: 'info'})
+    }
+  }, [shares, isLoading])
 
   function removeShareFromList(doomedShare) {
     setShares(shares.filter(share => share.id !== doomedShare.id))
