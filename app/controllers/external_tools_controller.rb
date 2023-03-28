@@ -337,6 +337,7 @@ class ExternalToolsController < ApplicationController
       @lti_launch.resource_url = launch_settings["launch_url"]
       @lti_launch.link_text =  launch_settings["tool_name"]
       @lti_launch.analytics_id = launch_settings["analytics_id"]
+      InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool&.lti_version, type: :sessionless_launch })
 
       render Lti::AppUtil.display_template("borderless")
       timing_meta.tags = { lti_version: tool&.lti_version }.compact
@@ -710,6 +711,8 @@ class ExternalToolsController < ApplicationController
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id
+    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :standard })
+
     lti_launch
   end
   protected :basic_lti_launch_request
@@ -752,6 +755,7 @@ class ExternalToolsController < ApplicationController
     )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id
+    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :content_item_selection })
 
     lti_launch
   end
@@ -786,6 +790,7 @@ class ExternalToolsController < ApplicationController
 
     expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
 
+    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: tool.lti_version, type: :content_item_selection_request })
     selection_request.generate_lti_launch(
       placement: placement,
       expanded_variables: expander.expanded_variables!(tool.set_custom_fields(placement)),
