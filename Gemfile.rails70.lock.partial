@@ -85,16 +85,6 @@ GIT
       thrift (~> 0.9.0)
 
 PATH
-  remote: engines
-  specs:
-    audits (0.1.0)
-      canvas_cassandra
-      dynamic_settings
-      event_stream
-      rails (>= 5.2.4.5)
-      switchman (>= 2.0.3)
-
-PATH
   remote: gems/canvas_cassandra
   specs:
     canvas_cassandra (0.1.0)
@@ -1185,7 +1175,6 @@ DEPENDENCIES
   after_transaction_commit (= 2.2.2)
   apollo-federation (= 1.1.5)
   attachment_fu!
-  audits!
   authlogic (= 6.4.2)
   autoextend!
   aws-sdk-dynamodb (~> 1.83)

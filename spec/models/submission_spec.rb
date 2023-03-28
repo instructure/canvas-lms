@@ -1745,8 +1745,7 @@ describe Submission do
     end
 
     it "inserts a grade change audit record if grade changed" do
-      # once for Cassandra, once for Postgres
-      expect(Auditors::GradeChange::Stream).to receive(:insert).twice
+      expect(Auditors::GradeChange::Stream).to receive(:insert)
       submission.score = 11
       submission.save!
     end

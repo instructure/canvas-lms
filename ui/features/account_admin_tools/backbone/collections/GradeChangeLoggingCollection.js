@@ -20,12 +20,7 @@ import PaginatedCollection from '@canvas/pagination/backbone/collections/Paginat
 
 export default class GradeChangeLoggingCollection extends PaginatedCollection {
   url() {
-    // TODO remove this check after OSS instances have been given a path to migrate from cassandra auditors
-    if (ENV.enhanced_grade_change_query) {
-      return '/api/v1/audit/grade_change'
-    } else {
-      return `/api/v1/audit/grade_change/${this.options.params.type}/${this.options.params.id}`
-    }
+    return '/api/v1/audit/grade_change'
   }
 }
 GradeChangeLoggingCollection.prototype.sideLoad = {

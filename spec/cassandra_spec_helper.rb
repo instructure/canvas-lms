@@ -36,12 +36,3 @@ shared_examples_for "cassandra page views" do
     truncate_cassandra(:page_views)
   end
 end
-
-shared_examples_for "cassandra audit logs" do
-  before do
-    unless CanvasCassandra::DatabaseBuilder.configured?("auditors")
-      skip "needs cassandra auditors configuration"
-    end
-    truncate_cassandra(:auditors)
-  end
-end

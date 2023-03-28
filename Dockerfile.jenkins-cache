@@ -18,9 +18,6 @@ RUN --mount=target=/tmp/src \
     gems/**/version.rb \
     gems/bundler_lockfile_extensions \
     gems/plugins/**/Gemfile.d \
-    engines/**/Gemfile \
-    engines/**/*.gemspec \
-    engines/**/version.rb \
     \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \

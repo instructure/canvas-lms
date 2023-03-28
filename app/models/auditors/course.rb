@@ -109,14 +109,10 @@ class Auditors::Course
     delegate :account, to: :course
   end
 
-  Stream = Audits.stream do
+  Stream = Auditors.stream do
     course_ar_type = Auditors::ActiveRecord::CourseRecord
-    backend_strategy -> { Audits.backend_strategy }
     active_record_type course_ar_type
-    database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
-    table :courses
     record_type Auditors::Course::Record
-    read_consistency_level -> { CanvasCassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :course do
       table :courses_by_course
@@ -219,21 +215,20 @@ class Auditors::Course
     event_record = nil
     course.shard.activate do
       event_record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
-      Auditors::Course::Stream.insert(event_record, { backend_strategy: :cassandra }) if Audits.write_to_cassandra?
-      Auditors::Course::Stream.insert(event_record, { backend_strategy: :active_record }) if Audits.write_to_postgres?
+      Auditors::Course::Stream.insert(event_record)
     end
     event_record
   end
 
   def self.for_course(course, options = {})
     course.shard.activate do
-      Auditors::Course::Stream.for_course(course, Audits.read_stream_options(options))
+      Auditors::Course::Stream.for_course(course, options)
     end
   end
 
   def self.for_account(account, options = {})
     account.shard.activate do
-      Auditors::Course::Stream.for_account(account, Audits.read_stream_options(options))
+      Auditors::Course::Stream.for_account(account, options)
     end
   end
 end

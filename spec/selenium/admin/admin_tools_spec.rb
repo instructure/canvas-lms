@@ -19,7 +19,6 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
-require_relative "../../cassandra_spec_helper"
 
 describe "admin_tools" do
   include_context "in-process server selenium tests"
@@ -208,8 +207,6 @@ describe "admin_tools" do
   end
 
   context "Logging" do
-    include_examples "cassandra audit logs"
-
     it "changes log types with dropdown" do
       load_admin_tools_page
       click_view_tab "logging"
@@ -301,8 +298,6 @@ describe "admin_tools" do
   end
 
   context "Authentication Logging" do
-    include_examples "cassandra audit logs"
-
     before do
       Timecop.freeze(8.seconds.ago) do
         Auditors::Authentication.record(@student.pseudonyms.first, "login")
@@ -332,8 +327,6 @@ describe "admin_tools" do
   end
 
   context "Grade Change Logging" do
-    include_examples "cassandra audit logs"
-
     before do
       Timecop.freeze(8.seconds.ago) do
         course_with_teacher(course: @course, user: user_with_pseudonym(name: "Teacher TestUser"))
@@ -413,8 +406,6 @@ describe "admin_tools" do
   end
 
   context "Course Logging" do
-    it_behaves_like "cassandra audit logs"
-
     before do
       course_with_teacher(course: @course, user: user_with_pseudonym(name: "Teacher TestUser"))
 

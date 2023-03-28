@@ -54,8 +54,6 @@ describe Api::V1::GradeChangeEvent do
   subject { GradeChangeEventTestHarness.new }
 
   before do
-    skip("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
-
     @request_id = SecureRandom.uuid
     allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
