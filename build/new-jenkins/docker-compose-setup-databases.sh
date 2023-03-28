@@ -7,7 +7,7 @@ parallel --will-cite ::: :
 DATABASE_PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
 
 create_cmd=""
-for keyspace in auditors global_lookups page_views; do
+for keyspace in page_views; do
   create_cmd+="CREATE KEYSPACE IF NOT EXISTS ${keyspace} WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };"
 done
 
@@ -16,7 +16,7 @@ docker-compose exec -T cassandra cqlsh -e "${create_cmd[@]}"
 docker-compose exec -T canvas bin/rails --trace db:migrate >> ./migrate.log
 docker-compose exec -T canvas bin/rake ci:reset_database RAILS_ENV=test CREATE_SHARDS=1
 
-for keyspace in auditors global_lookups page_views; do
+for keyspace in page_views; do
   seq 0 $DATABASE_PROCESSES | parallel "docker-compose exec -T cassandra bash -c 'cqlsh -e \"DESCRIBE KEYSPACE ${keyspace}\" | sed \"s/CREATE KEYSPACE ${keyspace}/CREATE KEYSPACE ${keyspace}{}/g ; s/CREATE TABLE ${keyspace}/CREATE TABLE ${keyspace}{}/g\" > ${keyspace}{} && cqlsh -f \"${keyspace}{}\"'"
 done
 

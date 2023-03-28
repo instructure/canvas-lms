@@ -38,8 +38,6 @@ describe Api::V1::CourseEvent do
   end
 
   before do
-    skip("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
-
     @request_id = SecureRandom.uuid
     allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 

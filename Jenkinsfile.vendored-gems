@@ -48,10 +48,6 @@ pipeline {
             extendedStage('Vendored Gems').obeysAllowStages(false).timeout(10).execute {
               sh 'build/new-jenkins/test-gems.sh'
             }
-
-            extendedStage('Engines').obeysAllowStages(false).timeout(10).execute {
-              sh 'build/new-jenkins/test-engines.sh'
-            }
           }
         }
       }

@@ -46,6 +46,11 @@ EventStream::Record = Struct.new(:attributes) do
     attributes["event_type"] ||= self.class.name.gsub("::#{self.class.name.demodulize}", "").demodulize.underscore
   end
 
+  # For cross-compatibility between cassandra and activerecord values
+  def uuid
+    id
+  end
+
   def request_id
     attributes["request_id"]
   end

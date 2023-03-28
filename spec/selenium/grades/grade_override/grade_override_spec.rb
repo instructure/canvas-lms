@@ -31,8 +31,6 @@ describe "Final Grade Override" do
   include GradebookHistorySetup
 
   before do
-    # needed until Jenkins starts using active record and cassandra is killed
-    allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
 
     course_with_teacher(course_name: "Grade Override", active_course: true, active_enrollment: true, name: "Dedicated Teacher1", active_user: true)
