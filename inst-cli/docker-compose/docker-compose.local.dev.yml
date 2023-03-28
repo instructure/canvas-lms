@@ -1,0 +1,133 @@
+version: '3.2'
+
+x-environment: &BASE-ENV
+  CANVAS_DATABASE_HOST: canvas-postgres
+  CANVAS_REDIS_HOST: canvas-redis
+  ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+  POSTGRES_PASSWORD: sekret
+  RAILS_ENV: development
+
+x-base-service: &BASE-SERVICE
+  build:
+    context: .
+  volumes:
+      - .:/usr/src/app
+      - api_docs:/usr/src/app/public/doc/api
+      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
+      - bundler:/home/docker/.bundle/
+      - canvas-docker-gems:/home/docker/.gem/
+      - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
+      - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
+      - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
+      - js-utils_es:/usr/src/app/packages/js-utils/es
+      - js-utils_lib:/usr/src/app/packages/js-utils/lib
+      - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
+      - k5uploader_es:/usr/src/app/packages/k5uploader/es
+      - k5uploader_lib:/usr/src/app/packages/k5uploader/lib
+      - k5uploader_node_modules:/usr/src/app/packages/k5uploader/node_modules
+      - locales:/usr/src/app/config/locales/generated
+      - log:/usr/src/app/log
+      - node_modules:/usr/src/app/node_modules
+      - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
+      - pacts:/usr/src/app/pacts
+      - public_dist:/usr/src/app/public/dist
+      - reports:/usr/src/app/reports
+      - styleguide:/usr/src/app/app/views/info
+      - tmp:/usr/src/app/tmp
+      - translations:/usr/src/app/public/javascripts/translations
+      - yardoc:/usr/src/app/.yardoc
+      - yarn-cache:/home/docker/.cache/yarn
+  env_file: .env
+  environment:
+    <<: *BASE-ENV
+  labels:
+      - "traefik.enable=true"
+
+services:
+  canvas-web:
+    <<: *BASE-SERVICE
+    environment:
+      <<: *BASE-ENV
+      CANVAS_DEV_DOMAIN: canvas-web.$INST_DOMAIN
+      CANVAS_PROD_DOMAIN: canvas-web.$INST_DOMAIN
+      HTTPS_METHOD: noredirect
+      # TODO: remove and replace instances with CANVAS_DEV_DOMAIN
+      VIRTUAL_HOST: .canvas-web.$INST_DOMAIN
+      # AR_QUERY_TRACE: 'true'
+      # AR_QUERY_TRACE_TYPE: 'all' # 'all', 'write', or 'read'
+      # AR_QUERY_TRACE_LINES: 10
+    depends_on:
+      - canvas-postgres
+      - canvas-redis
+    networks:
+      default:
+        aliases:
+          - canvas-web.$INST_DOMAIN
+
+  canvas-jobs:
+    <<: *BASE-SERVICE
+    command: bundle exec script/delayed_job run
+
+  canvas-webpack:
+    <<: *BASE-SERVICE
+    command: yarn run webpack
+
+  canvas-postgres:
+    build: ./docker-compose/postgres
+    env_file: .env
+    environment:
+      POSTGRES_PASSWORD: sekret
+    labels:
+        - "traefik.enable=true"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  canvas-redis:
+    image: redis:alpine
+    env_file: .env
+    labels:
+        - "traefik.enable=true"
+
+  canvas-githook-installer:
+    build:
+      context: .
+      dockerfile: 'Dockerfile.githook'
+    env_file: .env
+    volumes:
+      - ./.git:/tmp/.git
+      - ./hooks:/tmp/hooks
+      - ./script:/tmp/script
+
+networks:
+  default:
+    external: true
+    name: "inst_shared"
+
+volumes:
+  api_docs: {}
+  brandable_css_brands: {}
+  bundler: {}
+  canvas-docker-gems: {}
+  canvas-planner_node_modules: {}
+  canvas-planner_lib: {}
+  i18nliner_node_modules: {}
+  jest-moxios-utils_node_modules: {}
+  js-utils_es: {}
+  js-utils_lib: {}
+  js-utils_node_modules: {}
+  k5uploader_es: {}
+  k5uploader_lib: {}
+  k5uploader_node_modules: {}
+  locales: {}
+  log: {}
+  node_modules: {}
+  old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules: {}
+  pg_data: {}
+  pacts: {}
+  public_dist: {}
+  reports: {}
+  styleguide: {}
+  tmp: {}
+  translations: {}
+  yardoc: {}
+  yarn-cache: {}
