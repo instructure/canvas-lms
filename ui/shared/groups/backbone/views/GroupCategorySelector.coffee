@@ -146,7 +146,6 @@ export default class GroupCategorySelector extends Backbone.View
     sectionLabel: @sectionLabel
     fieldLabel: @fieldLabel
     lockedMessage: @lockedMessage
-    ariaChecked: if @parentModel.groupCategoryId() then 'true' else 'false'
 
     nested: @nested
     prefix: 'assignment' if @nested
