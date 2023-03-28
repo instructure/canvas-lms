@@ -194,6 +194,8 @@ sv:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med namnet %{itemName} finns redan i den här mappen."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Det finns redan en fil med namnet \"%{name}\". Vill du ersätta den befintliga filen?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Det finns redan en fil med namnet \"%{name}\" i den här mappen. Vill du ersätta den befintliga filen?"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: "Det finns redan ett förinställt filter med dessa villkor."
+  a_filter_with_that_name_already_exists_9bba05bc: "Ett filter med det namnet finns redan."
   a_front_page_is_required_fd57b80: "En framsida krävs"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logotyp i helstorlek som visas i höger sidofält på Canvas översikt. Idealisk storlek är 360 x 140 pixlar. Godkända format: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "En praktiskt nyckel/värde-dump som innehåller mycket intressant miljöinformation för den rapporterande användaren"
@@ -2249,6 +2251,9 @@ sv:
       inte levererat Canvas-aviseringar
   adds_additional_information_and_filtering_for_feat_3e55a058: "Lägger till ytterligare information och filtrering för funktionsflaggor"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Lägger till en konto-/kursinställning för en standardinlämningstid för nya uppgifter"
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      Lägger till en kontoinställning för val av klassiskt (Lato) eller elementärt (Balsamiq Sans) teckensnitt i Canvas for Elementary-
+      konton.
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Lägger till en emojiväljare som studenter och lärare kan använda för att lägga till emojier i inlämningskommentarer."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Lägger till analyslänk på menyn för användarinställningar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lägger till analys på en students kontextkort."
@@ -2433,6 +2438,7 @@ sv:
   all_ungraded_artifacts_ec3ba09: "Alla ej bedömda artefakter"
   all_users_associated_with_this_course_6be8d492: "Alla användare som associeras till den här kursen"
   all_users_associated_with_this_institution_d29850be: "Alla användare som associeras till den här lärosätet"
+  all_version_history_fbf060a0: "Historik för alla versioner"
   all_versions_student_submission_report_e4def68d: "Rapport över alla versioner av studentinlämningar"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alla vikter måste vara större eller lika med 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillåt en annan kollega att se över flera oberoende bedömningar för valda inlämningar"
@@ -2454,6 +2460,7 @@ sv:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Låt översiktskort registreras för varje användare."
   allow_final_grade_override_8cf4336b: "Tillåt åsidosättning av slutbedömning"
   allow_final_grade_override_a21a79ee: "Tillåt åsidosättning av slutbedömning"
+  allow_font_selection_in_c4e_accounts_7def31c6: "Tillåt val av teckensnitt i C4E-konton"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Tillåt att Apollo cachelagrar graphQL-frågor i en användares webbläsare för att ge en snabbare upplevelse"
   allow_for_key_keyname_b973f769: "Tillåt för nyckel: %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Tillåt att användare av omdömesboken visar och exporterar studenters för- och efternamn i separata kolumner"
@@ -2500,6 +2507,9 @@ sv:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillåt det här verktyget att komma åt IMS-namnen och rollkonfigurationstjänsten"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Tillåt obekräftade e-postadresser när användare läggs till"
   allow_users_to_comment_45b8f753: "Tillåt användare att kommentera"
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      Tillåt att användare ändrar storleken på inbäddad Canvas Studio-media i innehållsredigeraren via
+      ett nytt Studio-mediealternativsfack
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Tillåt användare att skicka ytterligare ett e-postmeddelande vid registrering."
   allowed_attempts_4e229caa: "Tillåtna försök"
   allowed_domains_ee7868c8: "Tillåtna domäner"
@@ -7385,7 +7395,7 @@ sv:
         : 
           one: "Indrag 1 nivå"
           other: "Indrag %{count} nivåer"
-          zero: "Inget indrag"
+          zero: "Gör inte indrag"
       labels: 
         indent: Indrag
         new_tab: "Öppna i ny flik"
@@ -11053,6 +11063,7 @@ sv:
   end_date_e0093ed7: Slutdatum
   end_date_for_conference_eaff0807: "Slutdatum för konferens"
   end_date_from_cdd9d90: "Slutdatum från:"
+  end_date_must_be_after_start_date_2fea5383: "Slutdatumet måste infalla efter startdatumet"
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Slutdatum/-tid måste infalla efter startdatum/-tid"
   end_date_to_8b17929d: "Slutdatum till:"
   end_date_value_3d3e8906: "Slutdatum %{value}"
@@ -12325,6 +12336,7 @@ sv:
   fill_in_the_blank_answer_d83b83bb: "Fyll i det tomma svaret"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fyll i tomrummet, läs omgivande text"
   fill_out_rubric_22d4eee5: "Fyll i matris"
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: "Fyll i matrisen nedan efter att du har granskat studentens inlämning för att slutföra granskningen."
   filled_5d8c39e: Fylld
   filter_9df28e5b: "Filter:"
   filter_announcements_by_unread_495eeeb3: "filtrera meddelanden efter olästa"
@@ -12601,6 +12613,7 @@ sv:
   go_to_settings_for_name_812308b5: "Gå till inställningar för %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Gå till statistik för %{name}"
   go_to_subject_2745f0a4: "Gå till ämnet"
+  go_to_the_new_course_af182b99: "Gå till den nya kursen"
   go_to_topic_af6025fc: "Gå till ämnet"
   good_284a7a8f: Bra
   good_score_b02f3587: "Bra resultat"
@@ -15727,11 +15740,11 @@ sv:
       failure_message: 
         body: |-
             Det gick inte att leverera meddelandet ”%{subject}”.  Meddelandet skickades till en okänd e-postadress.  Om du försöker kontakta någon genom Canvas kan du försöka logga in på ditt konto och skicka ett meddelande till personen i fråga med inkorg-verktyget.
-                      
-                      Tack!
-                      Canvas Support
-                      
-            Referens: %{ref}
+            
+            Tack!
+            Canvas Support
+            
+            Referens: "%{ref}"
         subject: "Meddelandesvar misslyckades: %{subject}"
       locked_topic: 
         body: |-
@@ -17927,6 +17940,7 @@ sv:
           body: "En ny fil har lagts till i kursen %{name}:"
           link: "Klicka för att visa"
           subject: "Ny fil tillagd: %{title}, %{name}"
+        link: "Du kan visa den här"
         subject: "Ny fil tillagd: %{title}, %{name}"
         view: "Du kan visa den här"
       sms: 
@@ -17938,20 +17952,20 @@ sv:
         body: "Canvas-notis – Ny fil: %{title} (%{size}) för %{name}:"
     new_files_added: 
       email: 
-        body: "%{count} nya filer har lagts till i kursen %{name}:"
+        body: "%{count} nya filer har lagts till för %{name}:"
         html: 
           body: "%{count} nya filer har lagts till i kursen %{name}:"
           see_details: "Du kan visa dem här"
-          subject: "%{count} nya filer har lagts till i kursen %{name}:"
+          subject: "%{count} nya filer har lagts till i kursen %{name}"
         link: "Du kan visa dem här"
-        subject: "%{count} nya filer har lagts till i kursen %{name}:"
+        subject: "%{count} nya filer har lagts till i kursen %{name}"
       sms: 
         body: "%{count} nya filer har lagts till %{name}."
         link: "Mer information finns på %{link}"
       summary: 
-        body: "%{count} nya filer har lagts till %{name}."
+        body: "%{count} nya filer har lagts till för %{name}:"
         link: "Du kan visa dem här"
-        subject: "%{count} nya filer har lagts till i kursen %{name}:"
+        subject: "%{count} nya filer har lagts till i kursen %{name}"
       twitter: 
         body: "Canvas-notis – %{count} nya filer för %{name}"
     new_student_organized_group: 
@@ -18989,6 +19003,7 @@ sv:
   nav_logo_background_ba33fb7f: "Navigeringslogotypens bakgrund"
   nav_text_94206145: Navigeringstext
   nav_text_active_a924ae88: "Navigeringstext aktiv"
+  navigate_to_speed_grader_for_name_f28cb5b1: "Navigera till SpeedGrader för %{name}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering gör det möjligt för användaren att se länken Personer i kursnavigeringen."
   navigation_icon_45db938e: Navigationsikon
   navigation_menu_fd782ff8: Navigeringsmeny
@@ -19072,6 +19087,7 @@ sv:
   new_question_9107c469: "Ny fråga"
   new_question_group_d9306280: "Ny frågegrupp"
   new_quiz_34aacba6: "Ny quiz"
+  new_quiz_items_3c850331: "Nya quizobjekt"
   new_quiz_statistics_desc: "Aktivera den nya quiz-statistikssidan för en kurs"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes-konto och frågebanker på kursnivå"
   new_quizzes_assignment_build_button_72b6531a: "Versionsknapp för New Quizzes-uppgifter"
@@ -19082,10 +19098,12 @@ sv:
   new_quizzes_description: "Den här funktionen ger en förbättrad Canvas-upplevelse för quiz. När den här flaggan är aktiverad är verktyget New Quizzes tillgängligt. För fullständig information, se *användargruppen New Quizzes* i Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "Förlopp för inbäddad modul i New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes-import"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "New Quizzes inkluderat på fliken Sammanfattning av lärandemålsjusteringar"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av New Quizzes under import eller kopiering av kurs"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migrering av New Quizzes är aktiverat som standard"
   new_quizzes_migration_required_7854aa1a: "Migrering av New Quizzes krävs"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på sidan Quiz"
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "Lärandemålsjusteringar i New Quizzes inkluderas på fliken Sammanfattning av lärandemålsjusteringar, vilken tillhandahåller en lista över justeringar för varje lärandemål i kursen."
   new_quizzes_public_api_18d95321: "Offentlig API för New Quizzes"
   new_quizzes_public_api_quiz_items_16bc741d: "Offentlig API för New Quizzes: Quizobjekt"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uppdatering av New Quizzes Service JWT"
@@ -19266,6 +19284,7 @@ sv:
   no_students_with_that_name_found_f6004da2: "Inga studenter med det namnet hittades"
   no_subject_58b7941c: "Inget ämne"
   no_subject_970aad80: "Inget ämne"
+  no_subject_a8b6ceeb: "(inget ämne)"
   no_submission_fb131a40: "Ingen inlämning"
   no_submission_for_assignment_a9cb6fe2: "Ingen inlämning för %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Ingen inlämning för %{assignmentTitle}"
@@ -20573,6 +20592,7 @@ sv:
   please_select_a_recipient_c9273f8e: "Välj mottagare."
   please_select_a_user_role_for_this_link_9fb4e655: "Välj en användarroll för den här länken."
   please_select_an_item_30c287ef: "Vänligen välj ett föremål"
+  please_select_at_least_one_filter_aafaa1a7: "Välj minst ett filter."
   please_select_one_f931e883: "Välj ett alternativ"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Ange om du vill aktivera eller inaktivera Microsoft Teams Sync."
   please_try_again_4c3d11b4: "Försök igen"
@@ -22799,6 +22819,8 @@ sv:
         labels: 
           quiz_instructions: "Instruktioner för quiz"
           quiz_score: Poäng
+      quiz_edit_header: 
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "1 försök tillgängligt"
@@ -23800,6 +23822,7 @@ sv:
   restrict_instructors_from_changing_mastery_scales_5af13053: "Begränsa instruktörer från att ändra skalan för måluppfyllelse"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begränsa instruktörer från att ändra beräkningsmetoden för kompetens"
   restrict_push_notifications_to_select_types_941d9da3: "Begränsa Push-aviseringar till valda typer"
+  restrict_quantitative_data_72411674: "Begränsa kvantitativa data"
   restrict_sms_to_select_types_9dd6399c: "Begränsa SMS till utvalda typer"
   restrict_student_access: 
     button_text: 
@@ -23824,6 +23847,7 @@ sv:
   restrict_students_from_viewing_course_before_cours_cca659a4: "Hindra studenter från att se kursen före kursens startdatum"
   restrict_students_from_viewing_course_before_term__3c4924f0: "Hindra studenter från att se kursen före terminens startdatum"
   restrict_students_from_viewing_future_courses_in_e_67486caf: "Tillåt inte att studenter ser att se framtida kurser i inskrivningslistan"
+  restrict_view_of_quantitative_data_b6089ee9: "Begränsa vy över kvantitativa data"
   restricted_access_d3e99a39: "Begränsad tillgång"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Begränsad vy för lärare i LMGB."
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Skicka in till det associerade verktyget för plagiatanalys."
@@ -26130,6 +26154,7 @@ sv:
   start_date_field_for_styleguide_8a8ab1d6: "Startdatum fält för stilguide"
   start_date_for_conference_1936e809: "Startdatum för konferens"
   start_date_from_20503757: "Startdatum från:"
+  start_date_must_be_before_end_date_a00be892: "Startdatumet måste infalla före slutdatumet"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} till %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "Startdatum/-tid måste infalla före slutdatum/-tid"
   start_date_to_1e6e6bbe: "Startdatum till:"
@@ -26251,6 +26276,7 @@ sv:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Studentfeedback krävs i kommentarerna ovan för att omtilldela."
   student_filters_in_lmgb_13964502: "Studentfilter i LMGB"
   student_first_name_aaa42cbc: "Studentens förnamn"
+  student_first_name_options_82f5685f: "Alternativ för studentens förnamn"
   student_grades_4cbc59a1: "Studenters omdömen"
   student_group_75b86a9f: Studentgrupp
   student_group_filter_185fb085: Studentgruppfilter
@@ -26376,6 +26402,7 @@ sv:
   students_with_no_submissions_title: "Studenter utan inlämningar"
   students_without_assessments_eb100e60: "Studenter utan uppgifter"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} av %{totalStudentsEnrolled} elever"
+  studio_media_options_in_rce_1118428b: "Studio-mediealternativ i innehållsredigeraren"
   sub_account_daeadd0: Underkonto
   sub_accounts: 
     alerts: 
@@ -26701,6 +26728,7 @@ sv:
   suffix_294d5cc4: Suffix
   suggestions_b8b03b9d: "Förslag:"
   sum_of_all_files_in_mb_2b705055: "summa av alla filer i Mb"
+  summary_of_report_types_d064d42b: "Sammanfattning av rapporttyper"
   summary_statistics_f74852a5: Sammanfattningsstatistik
   sun_298d7c8b: Sön
   support: 
@@ -27135,6 +27163,8 @@ sv:
   the_field_field_is_required_56512820: "Fältet ”%{field}” är obligatoriskt"
   the_field_field_must_have_no_spaces_d1c2fc37: "Fältet ”%{field}” får inte innehålla några mellanslag"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Under menyn Filer delar du föreläsningsbilder, exempeldokument, studievägledning – allt som dina studenter kommer att vilja ladda ner.  Att ladda upp och organisera dina filer är enkelt i Canvas.  Vi kommer att visa dig hur."
+  the_first_max_displayed_files_are_listed_49cfd7a0: "De första %{max_displayed} filerna är listade."
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "De första %{max_displayed} filerna är listade ovan. Klicka nedan för att visa alla filer."
   the_following_content_is_partner_provided_ed1da756: "Följande innehåll har tillhandahållits av partner"
   the_following_domains_have_automatically_been_adde_2c7a1654: |-
       Följande domäner har automatiskt lagts till i din
@@ -27636,6 +27666,7 @@ sv:
                                   Slutanvändare kan inte se det förrän det aktiverats av en platsadministratör.
                                   Innan du aktiverar det för ett lärosäte ska du försäkra dig om att du till fullo förstår
                                   funktionen och dess påverkan på användare.
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: "Den här funktionen döljer alla kvantitativa värden från användare."
   this_field_is_required_fa58c4a: "Det här fältet är obligatoriskt"
   this_field_name_is_required_988caebc: "Det här fältet \"%{name}\" är obligatoriskt."
   this_field_name_is_required_b9196401: "Fältet \"namn\" är obligatoriskt."
@@ -29316,6 +29347,7 @@ sv:
   use_experimental_features_before_they_are_generall_3dfaddd1: "Använd experimentella funktioner innan de aktiveras i produktion"
   use_high_contrast_ui_a5917282: "Använd användargränssnitt med hög kontrast"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Använd HTML5-inspelare i innehållsredigeraren istället för Flash"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: "Använd förbättrade platshållare för infogat innehåll i innehållsredigeraren."
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Använd MathMan för att konvertera LaTeX till MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Använd MathMan för att konvertera LaTeX till SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -29325,6 +29357,7 @@ sv:
             Lägg till filer, diskussioner, uppgifter och annat lärmaterial.
             Ställ krav på att studenten ska ha genomfört vissa uppgifter innan hen kan gå vidare i en
             modul eller nästa moduldel, eller lås en hel modul till ett visst datum.
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: "Använd bättre och bättre formade platshållare för infogade bilder, videor och filer i innehållsredigeraren."
   use_new_folder_tree_in_files_bc0ea09f: "Använd nytt mappträd i filer"
   use_new_folder_tree_in_files_eb5a451b: "Använd ett nytt mappträd i filer"
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Använd New Quizzes som standardfrågemaskin. Tar bort förmågan att skapa klassiska quiz."
@@ -30578,6 +30611,7 @@ sv:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Du kan inte ställa in en gruppdiskussion som student."
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: "Du kan inte använda en högre siffra än antalet uppgifter"
   you_created_an_announcement_in_course_c49e3d70: "Du skapade ett anslag i %{course}"
+  you_created_this_announcement_42d745a7: "Du skapade det här meddelandet."
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Du har för närvarande inga diskussioner där möjligheten att kommentera har stängts av"
   you_currently_have_no_pinned_discussions_6f0078b8: "Du har för närvarande inga fästa diskussioner"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Du har inte åtkomst till det begärda anslaget."
@@ -30771,6 +30805,7 @@ sv:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du kommer inte att kunna förhandsgranska dina ändringar"
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "Du kommer inte att få några %{contextType}-aviseringar för närvarande. För att aktivera %{contextType}-aviseringar, använd reglaget ovan."
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "Du kommer inte att få kursaviseringar. Använd reglaget ovan om du vill aktivera kursaviseringar."
+  you_will_only_see_comments_written_by_you_f294cb9d: "Du kommer endast att se frågor som du skrivit."
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Din uppgift %{assignment_name} ska lämnas in den %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Din uppgift %{assignment_name} ska lämnas in den %{due_at}. Klicka på följande länk för att gå till din uppgift och lämna in den i tid:"
