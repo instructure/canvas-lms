@@ -177,6 +177,8 @@ th:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "ไฟล์ชื่อ %{itemName} มีอยู่แล้วในโฟลเดอร์นี้"
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "ไฟล์ชื่อ “%{name}” มีอยู่แล้ว ต้องการแทนที่ไฟล์ในปัจจุบันหรือไม่"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "ไฟล์ชื่อ “%{name}” มีอยู่แล้วในโฟลเดอร์นี้ ต้องการแทนที่ไฟล์ในปัจจุบันหรือไม่"
+  a_filter_preset_with_those_conditions_already_exis_43d3fe4e: ค่าตัวกรองสำเร็จภายใต้เงื่อนไขนี้มีอยู่แล้ว
+  a_filter_with_that_name_already_exists_9bba05bc: ตัวกรองชื่อนี้มีอยู่แล้ว
   a_front_page_is_required_fd57b80: ต้องมีหน้าแรก
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "โลโก้ขนาดปกติที่ปรากฏขึ้นที่แถบรายการด้านขวาในแผงข้อมูลของ Canvas ขนาดที่เหมาะที่สุดคือ 360 x 140 พิกเซล รูปแบบที่รองรับ: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: ส่วนกำจัดทิ้งคีย์/ค่าใช้งานสำหรับข้อมูลแวดล้อมที่น่าสนใจมากมายสำหรับผู้ใช้ที่แจ้งข้อมูล
@@ -1789,6 +1791,9 @@ th:
   address_use_as_wildcard_48f2cf60: "ที่อยู่ (ใช้ * เป็นอักขระแทน)"
   adds_additional_information_and_filtering_for_feat_3e55a058: เพิ่มข้อมูลเพิ่มเติมและการกรองหมายเหตุกำกับคุณสมบัติ
   adds_an_account_course_setting_for_a_default_due_t_9903738a: เพิ่มค่าปรับตั้งทางบัญชี/บทเรียนสำหรับเวลาครบกำหนดเบื้องต้นสำหรับภารกิจใหม่
+  adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
+      เพิ่มค่าปรับตั้งทางบัญชีเพื่อเลือกแบบอักษรแบบคลาสสิค (Lato) หรือพื้นฐาน (Balsamiq Sans) ใน Canvas บัญชี
+      ระดับประถม
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: เพิ่มระบบเลือกอีโมจิที่ผู้เรียนและผู้สอนสามารถเพิ่มอีโมจิไปยังความเห็นสำหรับผลงานจัดส่งของตน
   adds_analytics_link_on_the_user_settings_menu_3a048816: เพิ่มลิงค์วิเคราะห์ในเมนูค่าปรับตั้งของผู้ใช้
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: เพิ่มข้อมูลวิเคราะห์ไปยังการ์ดเนื้อหาของผู้เรียน
@@ -1951,6 +1956,7 @@ th:
   all_ungraded_artifacts_ec3ba09: ผลงานที่ไม่ได้ให้เกรดทั้งหมด
   all_users_associated_with_this_course_6be8d492: ผู้ใช้ทั้งหมดที่เชื่อมโยงกับบทเรียนนี้
   all_users_associated_with_this_institution_d29850be: ผู้ใช้ทั้งหมดที่เชื่อมโยงกับสถาบันนี้
+  all_version_history_fbf060a0: ประวัติทุกเวอร์ชั่น
   all_versions_student_submission_report_e4def68d: "รายงานผลงานจัดส่งสำหรับผู้เรียนในเวอร์ชั่นต่าง ๆ ทั้งหมด"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "น้ำหนักทั้งหมดจะต้องมากกว่าหรือเท่ากับ 0"
   allow_administrative_actions_in_courses_20c33fed: อนุญาตการจัดการในบทเรียน
@@ -1965,6 +1971,7 @@ th:
   allow_creation_only_in_the_manually_created_course_69f37f2e: อนุญาตให้จัดทำเฉพาะบัญชีย่อยบทเรียนที่จัดทำด้วยตัวเอง
   allow_final_grade_override_8cf4336b: อนุญาตการบอกล้างเกรดสรุป
   allow_final_grade_override_a21a79ee: อนุญาตอนุญาตการบอกล้างเกรดสรุป
+  allow_font_selection_in_c4e_accounts_7def31c6: "อนุญาตให้เลือกแบบอักษรในบัญชี C4E"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "อนุญาตให้ Apollo แคชส่วนการสืบค้น graphQL กับเบราเซอร์ของผู้ใช้เพื่อให้การใช้งานรวดเร็วยิ่งขึ้น"
   allow_for_key_keyname_b973f769: "อนุญาตสำหรับคีย์: %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: อนุญาตให้ผู้ใช้สมุดบันทึกเกรดสามารถดูและส่งออกชื่อและนามสกุลของผู้เรียนในคอลัมน์แยกต่างหาก
@@ -1994,6 +2001,9 @@ th:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "อนุญาตให้เครื่องมือนี้สามารถสืบค้นชื่อ IMS และบริการจัดสรรบทบาท"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: อนุญาตให้ใช้อีเมลแอดเดรสที่ไม่ได้ยืนยันเมื่อเพิ่มผู้ใช้
   allow_users_to_comment_45b8f753: อนุญาตให้ผู้ใช้แสดงความเห็น
+  allow_users_to_resize_canvas_studio_embedded_media_99c1a8bb: |-
+      อนุญาตให้ผู้ใช้ปรับขนาดมีเดียที่ผนวกไว้กับ Canvas Studio ใน RCE ผ่าน
+      ถาดตัวเลือกมีเดียใหม่ของ Studio
   allow_users_to_submit_an_additional_email_at_regis_75b54a9d: ผู้ใช้สามารถส่งอีเมลเพิ่มเติมขณะลงทะเบียน
   allowed_attempts_4e229caa: การดำเนินการที่อนุญาต
   allowed_domains_ee7868c8: โดเมนที่อนุญาต
@@ -8275,6 +8285,7 @@ th:
   end_date_e0093ed7: วันที่สิ้นสุด
   end_date_for_conference_eaff0807: วันที่สิ้นสุดสำหรับการประชุม
   end_date_from_cdd9d90: "วันที่สิ้นสุด จาก:"
+  end_date_must_be_after_start_date_2fea5383: วันที่สิ้นสุดต้องอยู่หลังจากวันที่เริ่มต้น
   end_date_time_must_be_later_than_start_date_time_aecc88f4: วันที่/เวลาสิ้นสุดจะต้องอยู่หลังจากวันที่/เวลาเริ่มต้น
   end_date_to_8b17929d: "วันที่สิ้นสุด ถึง:"
   end_date_value_3d3e8906: "วันที่สิ้นสุด %{value}"
@@ -9210,6 +9221,7 @@ th:
   fill_in_the_blank_answer_d83b83bb: คำตอบสำหรับกรอกในพื้นที่ว่าง
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "กรอกในพื้นที่ว่าง อ่านข้อความรอบ ๆ"
   fill_out_rubric_22d4eee5: กรอกเกณฑ์การให้คะแนน
+  fill_out_the_rubric_below_after_reviewing_the_stud_8eeb46c4: กรอกเกณฑ์การให้้คะแนนหลังจากพิจารณาผลงานจัดส่งของผู้เรียนเพื่อให้การพิจารณานี้เสร็จสิ้น
   filled_5d8c39e: เติมแล้ว
   filter_9df28e5b: "ตัวกรอง:"
   filter_assignment_category_63acaed4: กรองหมวดหมู่ภารกิจ
@@ -9446,6 +9458,7 @@ th:
   go_to_quoted_reply_6f4661e: ไปที่การตอบกลับที่นำเสนอ
   go_to_reply_36fe5f51: ไปที่การตอบกลับ
   go_to_subject_2745f0a4: ไปที่วิชา
+  go_to_the_new_course_af182b99: ไปที่บทเรียนใหม่
   go_to_topic_af6025fc: ไปที่หัวข้อ
   good_284a7a8f: ดี
   good_score_b02f3587: คะแนนดี
@@ -11461,10 +11474,10 @@ th:
       failure_message: 
         body: |-
             ข้อความ "%{subject}" ไม่สามารถจัดำส่งได้  ข้อความถูกส่งไปยังที่อยู่ของกล่องจดหมายที่ไม่รู้จัก  หากคุณพยายามติดต่อบุคคลผ่าน Canvas คุณสามารถลองล็อกอินไปยังบัญชีของคุณละส่งข้อความถึงโดยใช้เครื่องมือสำหรับกล่องจดหมาย
-                      
-                      ขอขอบคุณ
-                      ฝ่าบบริการ Canvas
-                      
+            
+            ขอขอบคุณ
+            ฝ่าบบริการ Canvas
+            
             อ้างอิง: %{ref}
       locked_topic: 
         body: |-
@@ -13280,6 +13293,7 @@ th:
           body: "ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
           link: คลิกเพื่อดู
           subject: "เพิ่มไฟล์ใหม่แล้ว: %{title}, %{name}"
+        link: คุณสามารถเปิดดูได้ที่นี่
         subject: "เพิ่มไฟล์ใหม่แล้ว: %{title}, %{name}"
         view: คุณสามารถเปิดดูได้ที่นี่
       sms: 
@@ -13290,20 +13304,20 @@ th:
         body: "การแจ้งเตือนจาก Canvas - ไฟล์ใหม่: %{title} (%{size}) สำหรับ %{name}:"
     new_files_added: 
       email: 
-        body: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
+        body: "%{count} ไฟล์ใหม่ถูกเพิ่มไปยัง %{name}:"
         html: 
           body: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
           see_details: คุณสามารถดูรายละเอียดได้ที่นี่
-          subject: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
+          subject: "%{count} ไฟล์ใหม่ถูกเพิ่มไปยังบทเรียน %{name}"
         link: คุณสามารถดูรายละเอียดได้ที่นี่
-        subject: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
+        subject: "%{count} ไฟล์ใหม่ถูกเพิ่มไปยังบทเรียน %{name}"
       sms: 
         body: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับ %{name}"
         link: "ข้อมูลเพิ่มเติมที่ %{link}"
       summary: 
-        body: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับ %{name}"
+        body: "%{count} ไฟล์ใหม่ถูกเพิ่มไปยัง %{name}:"
         link: คุณสามารถดูรายละเอียดได้ที่นี่
-        subject: "%{count} ไฟล์ใหม่ถูกเพิ่มเข้ามาสำหรับบทเรียน %{name}:"
+        subject: "%{count} ไฟล์ใหม่ถูกเพิ่มไปยังบทเรียน %{name}"
       twitter: 
         body: "การแจ้งเตือนจาก Canvas - %{count} ไฟล์ใหม่สำหรับ %{name}"
     new_student_organized_group: 
@@ -14112,6 +14126,7 @@ th:
   nav_logo_background_ba33fb7f: พื้นหลังโลโก้การสืบค้น
   nav_text_94206145: ข้อความส่วนการสืบค้น
   nav_text_active_a924ae88: ข้อความส่วนการสืบค้นใช้งาน
+  navigate_to_speed_grader_for_name_f28cb5b1: "ไปที่ Speed Grader สำหรับ %{name}"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "ส่วนการสืบค้นช่วยให้ผู้ใช้สามารถดูลิงค์ บุคคล ใน การสืบค้นเนื้อหาบทเรียน"
   navigation_menu_fd782ff8: เมนูสืบค้นเนื้อหา
   near_mastery_f25174a4: ใกล้เคียงระดับความเชี่ยวขาญ
@@ -14177,6 +14192,7 @@ th:
   new_question_9107c469: คำถามใหม่
   new_question_group_d9306280: กลุ่มคำถามใหม่
   new_quiz_34aacba6: แบบทดสอบใหม่
+  new_quiz_items_3c850331: รายการแบบทดสอบใหม่
   new_quizzes_account_and_course_level_item_banks_9152fb1: บัญชีแบบทดสอบและแถวรายการระดับบทเรียนใหม่
   new_quizzes_assignment_build_button_72b6531a: ปุ่มจัดทำภารกิจใหม่สำหรับแบบทดสอบ
   new_quizzes_banks_migrations_9ab4de4a: การโอนย้ายแถวแบบทดสอบใหม่
@@ -14185,10 +14201,12 @@ th:
   new_quizzes_dbda7e0a: แบบทดสอบใหม่
   new_quizzes_description: "คุณสมบัตินี้เป็นการปรับปรุงการใช้งาน Canvas ในการทำแบบทดสอบ หากเปิดใช้งานหมายเหตุกำกับนี้ไว้ เครื่องมือ แบบทดสอบใหม่ จะยังคงใช้การได้ ดูรายละเอียดทั้งหมดได้จาก*กลุ่มผู้ใช้แบบทดสอบใหม่* ในกลุ่ม Canvas"
   new_quizzes_embedded_module_progression_cd2307b6: สถานะในหน่วยการเรียนที่แทรกแบบทดสอบใหม่
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "แบบทดสอบใหม่ (New Quizzes) รวมอยู่ในแท็บสรุปการปรับประสานผลลัพธ์ (Outcome Alignment Summary)"
   new_quizzes_migration_during_course_import_copy_e9dd124e: การโอนย้ายแบบทดสอบใหม่ระหว่างการนำเข้า/ทำสำเนาบทเรียน
   new_quizzes_migration_enabled_by_default_5f9bcc81: การโอนย้ายแบบทดสอบใหม่ถูกเปิดใช้งานเป็นค่าเริ่มต้น
   new_quizzes_migration_required_7854aa1a: ต้องโอนย้ายแบบทดสอบใหม่
   new_quizzes_on_the_quizzes_page_b21f338d: แบบทดสอบใหม่ในเพจแบบทดสอบ
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "การปรับประสานผลลัพธ์แบบทดสอบใหม่ (New Quizzes) จะรวมอยู่ในแท็บสรุปการปรับประสานผลลัพธ์ (Outcome Alignment Summary) เพื่อระบุรายการปรับประสานต่าง ๆ สำหรับแต่ละผลลัพธ์ในบทเรียน"
   new_quizzes_public_api_18d95321: "API สาธารณะแบบทดสอบใหม่"
   new_quizzes_public_api_quiz_items_16bc741d: "API สาธารณะแบบทดสอบใหม่ รายการแบบทดสอบ"
   new_quizzes_service_jwt_refresh_ca28ca8: "รีเฟรช JWT บริการสำหรับแบบทดสอบใหม่"
@@ -14350,6 +14368,7 @@ th:
   no_students_with_that_name_found_f6004da2: ไม่พบผู้เรียนชื่อดังกล่าว
   no_subject_58b7941c: ไม่มีหัวเรื่อง
   no_subject_970aad80: ไม่มีหัวเรื่อง
+  no_subject_a8b6ceeb: (ไม่มีหัวเรื่อง)
   no_submission_fb131a40: ไม่มีผลงานจัดส่ง
   no_submission_for_assignment_a9cb6fe2: "ไม่มีผลงานจัดส่งสำหรับ %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "ไม่มีผลงานจัดส่งสำหรับ %{assignmentTitle}"
@@ -15399,6 +15418,7 @@ th:
   please_select_a_reason_for_reporting_this_reply_51719e8d: กรุณาเลือกสาเหตุที่แจ้งเหตุเกี่ยวกับการตอบกลับนี้
   please_select_a_recipient_c9273f8e: กรุณาเลือกผู้รับ
   please_select_a_user_role_for_this_link_9fb4e655: กรุณาเลือกบทบาทผู้ใช้สำหรับลิงค์นี้
+  please_select_at_least_one_filter_aafaa1a7: กรุณาเลือกตัวกรองอย่างน้อยหนึ่งรายการ
   please_select_one_f931e883: กรุณาเลือกหนึ่งข้อ
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "กรุณาระบุว่าจะเปิดใช้หรือปิดใช้งาน Microsoft Teams Sync"
   please_try_another_search_term_8f7b5d69: กรุณาลองคำค้นหาอื่น
@@ -17132,6 +17152,8 @@ th:
         labels: 
           quiz_instructions: คำแนะนำสำหรับแบบทดสอบ
           quiz_score: คะแนน
+      quiz_edit_header: 
+        speed_grader: SpeedGrader™
       quiz_right_side: 
         attempts_left: 
           one: "ใช้ได้อีก 1 ครั้ง"
@@ -17970,6 +17992,7 @@ th:
   restore_courses_182e162e: กู้คืนบทเรียน
   restored_course_association_course_c9e16045: "กู้คืนการเชื่อมโยงบทเรียน %{course} แล้ว"
   restoring_122bdbbf: "กำลังกู้คืน "
+  restrict_quantitative_data_72411674: จำกัดข้อมูลเชิงปริมาณ
   restrict_students_from_accessing_courses_after_end_7dd66bce: จำกัดผู้เรียนจากการสืบค้นบทเรียนหลังวันที่สิ้นสุด
   restrict_students_from_accessing_courses_before_st_f7c22c00: จำกัดผู้เรียนจากการสืบค้นบทเรียนก่อนวันที่เริ่มต้น
   restrict_students_from_annotating_6c28ab9b: จำกัดผู้เรียนจากการทำหมายเหตุกำกับ
@@ -17978,6 +18001,7 @@ th:
   restrict_students_from_viewing_course_before_cours_cca659a4: จำกัดผู้เรียนจากการดูบทเรียนก่อนวันที่เริ่มต้นบทเรียน
   restrict_students_from_viewing_course_before_term__3c4924f0: จำกัดผู้เรียนจากการดูบทเรียนก่อนวันที่เริ่มต้นเทอม
   restrict_students_from_viewing_future_courses_in_e_67486caf: จำกัดผู้เรียนไม่ให้ดูบทเรียนในอนาคตในรายการการลงทะเบียน
+  restrict_view_of_quantitative_data_b6089ee9: จำกัดมุมมองข้อมูลเชิงปริมาณ
   restricted_view_for_teachers_in_lmgb_52c78a62: "มุมมองแบบจำกัดสำหรับผู้สอนใน LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: ส่งใหม่ไปยังเครื่องมือที่เชื่อมโยงไว้สำหรับการวิเคราะห์การคัดลอกผลงาน
   resubmit_to_tool_name_1cf02a31: "จัดส่งใหม่ไปยัง %{tool_name}"
@@ -19692,6 +19716,7 @@ th:
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_for_conference_1936e809: วันที่เริ่มต้นสำหรับการประชุม
   start_date_from_20503757: "วันที่เริ่มต้น จาก:"
+  start_date_must_be_before_end_date_a00be892: วันที่เริ่มต้นจะต้องอยู่ก่อนวันที่สิ้นสุด
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} ถึง %{end_time}"
   start_date_time_must_be_before_the_end_date_time_6be0c57f: "วันที่/เวลาเริ่มต้น (Start Date/Time) จะต้องอยู่ก่อนวันที่/เวลาสิ้นสุด (End Date/Time)"
   start_date_to_1e6e6bbe: "วันที่เริ่มต้น ถึง:"
@@ -19796,6 +19821,7 @@ th:
   student_extensions_d35a907: การต่อเวลาสำหรับผู้เรียน
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: ต้องมีข้อเสนอแนะของผู้เรียนในความเห็นด้านบนเพื่อจัดสรรใหม่
   student_first_name_aaa42cbc: ชื่อผู้เรียน
+  student_first_name_options_82f5685f: ตัวเลือกชื่อผู้เรียน
   student_grades_4cbc59a1: เกรดของผู้เรียน
   student_group_75b86a9f: กลุ่มผู้เรียน
   student_group_filter_185fb085: ตัวกรองกลุ่มผู้เรียน
@@ -19902,6 +19928,7 @@ th:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: ผู้เรียนจะทราบได้ว่าเกรดสำหรับภารกิจนี้ถูกซ่อนไว้
   students_with_no_submissions_title: ผู้เรียนไม่มีผลงานจัดส่ง
   students_without_assessments_eb100e60: ผู้เรียนที่ไม่มีการประเมิน
+  studio_media_options_in_rce_1118428b: "ตัวเลือกมีเดียจาก Studio ใน RCE"
   sub_account_daeadd0: บัญชีย่อย
   sub_accounts: 
     alerts: 
@@ -20177,6 +20204,7 @@ th:
   successfully_updated_the_comment_946360d5: อัพเดตความเห็นเสร็จสิ้น
   suffix_294d5cc4: อักขระพ่วง
   sum_of_all_files_in_mb_2b705055: "จำนวนไฟล์ทั้งหมดเป็น MB"
+  summary_of_report_types_d064d42b: ข้อมูลสรุปประเภทรายงาน
   summary_statistics_f74852a5: สถิติสรุป
   sun_298d7c8b: อา.
   support: 
@@ -20538,6 +20566,8 @@ th:
   the_field_field_is_required_56512820: "ฟิลด์ \"%{field}\" เป็นฟิลด์บังคับ"
   the_field_field_must_have_no_spaces_d1c2fc37: "ฟิลด์ \"%{field}\" จะต้องไม่มีเคาะว่าง"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "แท็บ ไฟล์ เป็นที่สำหรับแชร์สไลด์การสอน เอกสารตัวอย่าง ความช่วยเหลือในการเรียน และข้อมูลต่าง ๆ ที่ผู้เรียนของคุณต้องการดาวน์โหลด  การอัพโหลดและกำหนดโครงสร้างไฟล์สามารถทำได้ง่าย ๆ ผ่าน Canvas  เราจะแสดงวิธีการให้คุณดู"
+  the_first_max_displayed_files_are_listed_49cfd7a0: "%{max_displayed} ไฟล์แรกจะถูกระบุไว้"
+  the_first_max_displayed_files_are_listed_above_cli_324d47b: "%{max_displayed} ไฟล์แรกจะถูกระบุไว้ด้านบน คลิกด้านล่างเพื่อดูไฟล์ทั้งหมด"
   the_following_content_is_partner_provided_ed1da756: เนื้อหาต่อไปนี้จัดหาโดยพันธมิตรของเรา
   the_following_domains_have_automatically_been_allo_cea27372: |-
       โดเมนต่อไปนี้ได้รับอนุญาตอัตโนมัติจากเครื่องมือที่มีอยู่แล้วในบัญชีผู้ใช้ของคุณ
@@ -20922,6 +20952,7 @@ th:
                                   ผู้ใช้ปลายทางจะไม่เห็นข้อมูลนี้จนกว่าผู้ดูแลไซต์ (Site Admin) จะเปิดใช้งาน
                                   ก่อนเปิดใช้งานสำหรับสถาบัน กรุณาตรวจสอบว่าคุณเข้าใจ
                                   การทำงานและผลกระทบที่อาจเกิดขึ้นกับผู้ใช้อย่างครบถ้วนแล้ว
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: คุณสมบัตินี้จะเป็นการซ่อนค่าเชิงปริมาณทั้งหมดจากผู้ใช้
   this_field_is_required_fa58c4a: นี่เป็นฟิลด์บังคับ
   this_field_name_is_required_988caebc: "ฟิลด์ \"%{name}\" เป็นฟิลด์บังคับ"
   this_field_name_is_required_b9196401: "ฟิลด์ “ชื่อ” เป็นฟิลด์บังคับ"
@@ -22052,6 +22083,7 @@ th:
   use_default_890939b7: ใช้ค่าเริ่มต้น
   use_experimental_features_before_they_are_generall_3dfaddd1: ใช้คุณสมบัติทดลองใช้งานก่อนจะมีการเปิดใช้งานจริง
   use_high_contrast_ui_a5917282: "ใช้ UI คอนทราสต์สูง"
+  use_improved_placeholders_for_inserted_content_in__433adfaa: "ใช้ตัวกำกับตำแหน่งที่ดีขึ้นสำหรับเนื้อหาที่ถูกแทรกไว้ใน RCE"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "ใช้ MathMan เพื่อแปลง LaTeX เป็น MathML หรือไม่"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "ใช้ MathMan เพื่อแปลง LaTeX เป็น SVG หรือไม่"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -22061,6 +22093,7 @@ th:
             เพิ่มไฟล์ การพูดคุย ภารกิจ แบบทดสอบและข้อมูลการเรียนรู้อื่น ๆ
             กำหนดเงื่อนไขเบื้องต้นที่จะต้องดำเนินการก่อนย้ายหน่วยการเรียนหรือ
             รายการในหน่วยการเรียนถัดไป หรือดูหน่วยการเรียนทั้งหมดจนถึงวันที่ที่กำหนด
+  use_new_and_better_styled_placeholders_for_inserte_d6110d00: "ใช้ตัวกำกับตำแหน่งใหม่ที่ดีกว่าเดิมสำหรับภาพ วิดีโอและไฟล์ที่มีการแทรกใน RCE"
   use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "ใช้แบบทดสอบใหม่ (New Quizzes) เป็นเอนจินแบบทดสอบเริ่มต้น ลบความสามารถในการจัดทำแบบทดสอบคลาสสิค"
   use_parent_account_setting_f25a721f: ใช้ค่าปรับตั้งของบัญชีต้นทาง
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
@@ -23074,6 +23107,7 @@ th:
   you_cannot_set_a_grouped_discussion_as_a_student_a20f363: คุณไม่สามารถกำหนดการพูดคุยที่จัดเป็นกลุ่มในฐานะผู้เรียนได้
   you_cannot_use_a_number_greater_than_the_number_of_af33e220: คุณไม่สามารถใช้เลขที่มากกว่าจำนวนภารกิจ
   you_created_an_announcement_in_course_c49e3d70: "คุณจัดทำประกาศไว้ใน %{course}"
+  you_created_this_announcement_42d745a7: "คุณจัดทำประกาศ (Announcement) นี้ไว้:"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: ปัจจุบันคุณไม่มีการพูดคุยที่มีความเห็นที่สรุปแล้ว
   you_currently_have_no_pinned_discussions_6f0078b8: ปัจจุบันคุณไม่มีการพูดคุยที่ปักหมุดไว้
   you_do_not_have_access_to_the_requested_announceme_a774d80a: คุณไม่สามารถสืบค้นประกาศที่ร้องขอ
@@ -23245,6 +23279,7 @@ th:
       หลังจากจัดทำแอพพลิเคชั่นของคุณ ให้จดคีย์ผู้บริโภคและข้อมูลลับผู้บริโภคไว้ แล้วกรอกไว้ที่นี่
   you_will_not_be_able_to_preview_your_changes_f7b868fb: คุณจะไม่สามารถแสดงตัวอย่างการเปลี่ยนแปลงของคุณ
   you_will_not_receive_any_course_notifications_at_t_7d9ce24f: "คุณจะไม่ได้รับการแจ้งข้อมูลบทเรียนใด ๆ ในตอนนี้ เปิดใช้งานการแจ้งข้อมูลบทเรียนโดยใช้ตัวเปิดปิดด้านบน"
+  you_will_only_see_comments_written_by_you_f294cb9d: คุณจะเห็นเฉพาะความเห็นที่คุณเขียนเท่านั้น
   your_answer_8dad6ea4: "คำตอบของคุณ:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "ภารกิจ %{assignment_name} ของคุณครบกำหนดเมื่อ %{due_at}"
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "ภารกิจ %{assignment_name} ของคุณครบกำหนดเมื่อ %{due_at} คลิกที่ลิงค์ด้านล่างเพื่อไปยังภารกิจของคุณแล้วดำเนินการตามกำหนดเวลา:"
