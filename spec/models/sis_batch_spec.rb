@@ -1418,6 +1418,57 @@ test_1,u1,student,active)
       expect(student_enrollment.reload.workflow_state).to eq "active"
       expect(observer_enrollment.reload.workflow_state).to eq "active"
     end
+
+    it "preserves observer enrollments linked to unchanged student enrollments" do
+      term = @account.enrollment_terms.first
+      course = @account.courses.create!(name: "c1", sis_source_id: "c1", workflow_state: "available", enrollment_term: term)
+      course.course_sections.create!(name: "s1", sis_source_id: "s1")
+      student = user_with_managed_pseudonym(account: @account, sis_user_id: "stu")
+      observer = user_with_managed_pseudonym(account: @account, sis_user_id: "obs")
+      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @account)
+
+      # set up some enrollments outside the batch term so we can verify they are untouched
+      other_term = @account.enrollment_terms.create!
+      @account.courses.create!(sis_source_id: "other_course", enrollment_term: other_term)
+      other_student = user_with_managed_pseudonym(account: @account, sis_user_id: "other_student")
+      other_observer = user_with_managed_pseudonym(account: @account, sis_user_id: "other_observer")
+      process_csv_data([<<~CSV])
+        course_id,user_id,role,associated_user_id,status
+        other_course,other_student,student,,active
+        other_course,other_observer,observer,other_student,active
+      CSV
+      other_sis_batch_id = other_observer.enrollments.take.sis_batch_id
+
+      implicit_observer_csv = <<~CSV
+        course_id,section_id,user_id,role,status
+        c1,s1,stu,student,active
+      CSV
+
+      explicit_observer_csv = <<~CSV
+        course_id,section_id,user_id,role,associated_user_id,status
+        c1,s1,stu,student,,active
+        c1,s1,obs,observer,stu,active
+      CSV
+
+      process_csv_data([implicit_observer_csv], batch_mode: true, batch_mode_term: term)
+      student_enrollment = student.enrollments.take
+      observer_enrollment = observer.enrollments.take
+      expect(student_enrollment).to be_active
+      expect(observer_enrollment).to be_active
+      expect(observer_enrollment.sis_batch_id).to be_nil
+
+      process_csv_data([explicit_observer_csv], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload).to be_active
+      expect(observer_enrollment.reload).to be_active
+      expect(observer_enrollment.sis_batch_id).not_to be_nil
+
+      process_csv_data([implicit_observer_csv], batch_mode: true, batch_mode_term: term)
+      expect(student_enrollment.reload).to be_active
+      expect(observer_enrollment.reload).to be_active
+
+      expect(other_student.enrollments.take.sis_batch_id).to eq other_sis_batch_id
+      expect(other_observer.enrollments.take.sis_batch_id).to eq other_sis_batch_id
+    end
   end
 
   describe "remove_previous_imports" do
