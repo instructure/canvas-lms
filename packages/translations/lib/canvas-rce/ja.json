@@ -3,16 +3,28 @@
     "message": "きれいなpretty HTMLエディタにアクセス"
   },
   "accessibility_checker_b3af1f6c": { "message": "アクセシビリティチェッカー" },
+  "action_to_take_b626a99a": { "message": "実行するアクション：" },
   "add_8523c19b": { "message": "追加" },
+  "add_a_caption_2a915239": { "message": "キャプションを追加" },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "画像の代替テキストを追加する"
+  },
   "add_another_f4e50d57": { "message": "もう 1 つ追加" },
   "add_cc_subtitles_55f0394e": { "message": "CC /字幕を追加" },
   "add_image_60b2de07": { "message": "画像を追加" },
+  "additional_considerations_f3801683": { "message": "さらなる考慮事項" },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "同じURLを持つ隣接リンクは1つのリンクでなければなりません。"
+  },
   "aleph_f4ffd155": { "message": "アレフ" },
   "alignment_and_lists_5cebcb69": { "message": "配置とリスト" },
   "all_4321c3a1": { "message": "すべて" },
   "all_apps_a50dea49": { "message": "すべてのアプリ" },
   "alpha_15d59033": { "message": "アルファ" },
   "alphabetical_55b5b4e0": { "message": "アルファベットで" },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "代替属性テキストは120文字を超えてはなりません。"
+  },
   "alt_text_611fb322": { "message": "Alt テキスト" },
   "amalg_coproduct_c589fb12": { "message": "アマルグ（共製品）" },
   "an_error_occured_reading_the_file_ff48558b": {
@@ -74,6 +86,20 @@
   "cap_product_3a5265a6": { "message": "キャップ製品" },
   "centered_dot_64d5e378": { "message": "中央の点" },
   "centered_horizontal_dots_451c5815": { "message": "中央の水平ドット" },
+  "change_alt_text_92654906": { "message": "代替テキストを変更" },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "見出しタグを段落に変更する"
+  },
+  "change_only_this_heading_s_level_903cc956": {
+    "message": "ヘッダーのレベルのみ変更する"
+  },
+  "change_text_color_1aecb912": { "message": "テキストの色を変更する" },
+  "check_accessibility_3c78211c": {
+    "message": "アクセシビリティをチェックする"
+  },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "アクセシビリティ問題をチェック"
+  },
   "chi_54a32644": { "message": "チ" },
   "choose_caption_file_9c45bc4e": {
     "message": "キャプションファイルを選択する"
@@ -104,6 +130,9 @@
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "メニューまたはダイアログを閉じます。またエディタエリアに戻ります"
   },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "アクセシビリティチェッカーを閉じる"
+  },
   "close_d634289d": { "message": "閉じる" },
   "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
     "message": "クローズドキャプションファイルは { maxKb } kb未満であること"
@@ -120,6 +149,8 @@
   "color_picker_colorname_selected_ad4cf400": {
     "message": "色を選択（{ colorName }が現在選択されている）"
   },
+  "column_e1ae5c64": { "message": "列" },
+  "column_group_1c062368": { "message": "列グループ" },
   "complex_numbers_a543d004": { "message": "複素数" },
   "computer_1d7dfa6f": { "message": "コンピュータ" },
   "congruent_5a244acd": { "message": "合同" },
@@ -159,6 +190,7 @@
   "dagger_57e0f4e5": { "message": "短剣" },
   "date_added_ed5ad465": { "message": "追加された日付" },
   "decorative_icon_9a7f3fc3": { "message": "装飾アイコン" },
+  "decorative_image_fde98579": { "message": "装飾の画像" },
   "decorative_type_upper_f2c95e3": { "message": "装飾的{ TYPE_UPPER }" },
   "deep_purple_bb3e2907": { "message": "ディープパープル" },
   "definite_integral_fe7ffed1": { "message": "定積分" },
@@ -215,6 +247,9 @@
   "edit_icon_2c6b0e91": { "message": "アイコンを編集する" },
   "edit_link_7f53bebb": { "message": "リンクの編集" },
   "editor_statusbar_26ac81fc": { "message": "エディタ ステータスバー" },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "{ start } で始まる要素"
+  },
   "embed_828fac4a": { "message": "埋め込み" },
   "embed_code_314f1bd5": { "message": "埋め込みコード" },
   "embed_image_1080badc": { "message": "画像の埋め込み" },
@@ -266,6 +301,9 @@
   "files_c300e900": { "message": "ファイル" },
   "files_index_af7c662b": { "message": "ファイルのインデックス" },
   "finish_bc343002": { "message": "フィニッシュ" },
+  "fix_heading_hierarchy_f60884c4": {
+    "message": "見出しヒエアルキーを修正する"
+  },
   "flat_music_76d5a5c3": { "message": "フラット(音楽)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "フォーカス要素オプションツールバー"
@@ -273,6 +311,7 @@
   "folder_tree_fbab0726": { "message": "フォルダツリー" },
   "for_all_b919f972": { "message": "全員に" },
   "format_4247a9c5": { "message": "形式" },
+  "format_as_a_list_142210c3": { "message": "リスト形式" },
   "formatting_5b143aa8": { "message": "フォーマット" },
   "forward_slash_3f90f35e": { "message": "前向きのスラッシュ" },
   "found_auto_saved_content_3f6e4ca5": {
@@ -310,9 +349,21 @@
   "group_navigation_99f191a": { "message": "グループ ナビゲーション" },
   "h_bar_bb94deae": { "message": "Hバー" },
   "hat_ea321e35": { "message": "帽子" },
+  "header_column_f27433cb": { "message": "ヘッダー列" },
+  "header_row_and_column_ec5b9ec": { "message": "ヘッダーの行と列" },
+  "header_row_f33eb169": { "message": "ヘッダー行" },
   "heading_2_5b84eed2": { "message": "見出し2" },
   "heading_3_2c83de44": { "message": "見出し3" },
   "heading_4_b2e74be7": { "message": "見出し4" },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "見出しレベルはスキップしないでください。"
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "{ start } で始まる見出し"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "見出しテキストは120文字を超えてはなりません。"
+  },
   "health_icon_8d292eb5": { "message": "健康のアイコン" },
   "hearts_suit_e50e04ca": { "message": "ハート（1組）" },
   "height_69b03e15": { "message": "高さ" },
@@ -320,6 +371,9 @@
   "hide_description_bfb5502e": { "message": "説明を非表示にする" },
   "hide_title_description_caf092ef": {
     "message": "{ title }説明を非表示にする"
+  },
+  "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+    "message": "エレメントをハイライトして、エレメントオプションツールバーを起動する"
   },
   "home_351838cd": { "message": "ホーム" },
   "html_code_editor_fd967a44": { "message": "Html コードエディタ" },
@@ -344,10 +398,19 @@
   },
   "image_8ad06": { "message": "画像" },
   "image_c1c98202": { "message": "画像" },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "画像ファイル名は、画像コンテンツを記述する alt 属性として使用しないでください。"
+  },
   "image_options_5412d02c": { "message": "画像オプション" },
   "image_options_tray_90a46006": { "message": "画像オプショントレイ" },
   "image_to_crop_3a34487d": { "message": "クロップする画像" },
+  "image_with_filename_file_aacd7180": {
+    "message": "ファイル名 { file } の画像"
+  },
   "images_7ce26570": { "message": "画像" },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "画像には、画像の内容を記述する alt 属性が含まれていなければなりません。"
+  },
   "imaginary_portion_of_complex_number_2c733ffa": {
     "message": "複素数の虚数部分"
   },
@@ -365,13 +428,42 @@
   "invalid_file_type_881cc9b2": { "message": "無効なファイル タイプです" },
   "invalid_url_cbde79f": { "message": "無効な URL" },
   "iota_11c932a9": { "message": "イオタ" },
+  "issue_num_total_f94536cf": { "message": "問題 { num }/{ total }" },
   "kappa_2f14c816": { "message": "カッパ" },
   "kappa_variant_eb64574b": { "message": "カッパ (変種)" },
   "keyboard_shortcuts_ed1844bd": { "message": "キーボード ショートカット" },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "キーボードは Tab キーを使用してリンクにナビゲートします。同じ宛先に向かう2つの隣接リンクがあると、キーボードユーザーに混乱を招く可能性があります。"
+  },
   "lambda_4f602498": { "message": "ラムダ" },
   "language_arts_icon_a798b0f8": { "message": "語学のアイコン" },
   "languages_icon_9d20539": { "message": "言語のアイコン" },
   "large_9c5e80e7": { "message": "大" },
+  "learn_more_about_adjacent_links_2cb9762c": { "message": "隣接リンクの詳細" },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "カラーコントラストの詳細"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "ページヘッダーの整理の詳細"
+  },
+  "learn_more_about_proper_page_heading_structure_d2959f2d": {
+    "message": "適切なページヘッダー構成についての詳細"
+  },
+  "learn_more_about_table_headers_5f5ee13": { "message": "表ヘッダーの詳細" },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "代替テキストを画像に使用する方法の詳細"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "表でキャプションを使用する方法の詳細"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "ファイル名を代替テキストに使用する方法の詳細"
+  },
+  "learn_more_about_using_lists_4e6eb860": { "message": "リスト使用の詳細" },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "表でスコープ属性を使用する方法の詳細"
+  },
+  "leave_as_is_4facfe55": { "message": "そのままにする" },
   "left_angle_bracket_c87a6d07": { "message": "左傾きブラケット" },
   "left_arrow_4fde1a64": { "message": "左の矢印" },
   "left_arrow_with_hook_5bfcad93": { "message": "左矢印フック付き" },
@@ -389,9 +481,15 @@
   "light_blue_5374f600": { "message": "ライトブルー" },
   "link_7262adec": { "message": "リンク" },
   "link_options_a16b758b": { "message": "リンクオプション" },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "{ start } で始まるテキストとのリンク"
+  },
   "links_14b70841": { "message": "リンク" },
   "links_to_an_external_site_de74145d": {
     "message": "外部サイトにリンクしています。"
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "リストはリスト形式にしなければなりません。"
   },
   "load_more_35d33c7": { "message": "もっと読み込む" },
   "loading_25990131": { "message": "読み込み中・・・" },
@@ -422,6 +520,7 @@
     "message": "メディアファイルは処理中です。後ほどもう一度やり直してください。"
   },
   "medium_5a8e9ead": { "message": "中" },
+  "merge_links_2478df96": { "message": "リンクをマージする" },
   "mic_a7f3d311": { "message": "マイク" },
   "microphone_disabled_15c83130": { "message": "マイク無効" },
   "middle_27dc1d5": { "message": "中位" },
@@ -456,9 +555,14 @@
   },
   "nested_greater_than_d852e60d": { "message": "ネストされた＞" },
   "nested_less_than_27d17e58": { "message": "ネストされた＜" },
+  "next_40e12421": { "message": "次へ" },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "アクセシビリティの問題は検出されませんでした。"
+  },
   "no_changes_to_save_d29f6e91": { "message": "保存する変更はありません。" },
   "no_e16d9132": { "message": "いいえ" },
   "no_file_chosen_9a880793": { "message": "ファイルが選択されていません" },
+  "no_headers_9bc7dc7f": { "message": "ヘッダーなし" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "このファイルでは、プレビューは利用できません。"
   },
@@ -505,6 +609,9 @@
   },
   "pages_e5414c2c": { "message": "ページ" },
   "paragraph_5e5ad8eb": { "message": "段落" },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "{ start } で始まる段落"
+  },
   "parallel_d55d6e38": { "message": "並列" },
   "partial_derivative_4a9159df": { "message": "部分(微分)" },
   "paste_5963d1c1": { "message": "貼り付け" },
@@ -541,6 +648,7 @@
   "precedes_196b9aef": { "message": "優先・先導する" },
   "precedes_equal_20701e84": { "message": "優先・同等" },
   "preformatted_d0670862": { "message": "フォーマット済み" },
+  "prev_f82cbc48": { "message": "前へ" },
   "preview_53003fd2": { "message": "プレビュー" },
   "preview_a3f8f854": { "message": "プレビュー" },
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
@@ -569,6 +677,7 @@
   "red_8258edf3": { "message": "レッド" },
   "relationships_6602af70": { "message": "関係" },
   "religion_icon_246e0be1": { "message": "宗教学のアイコン" },
+  "remove_heading_style_5fdc8855": { "message": "見出しスタイルを削除する" },
   "replace_e61834a7": { "message": "置換" },
   "reset_95a81614": { "message": "リセット" },
   "resize_ec83d538": { "message": "サイズ変更" },
@@ -581,6 +690,9 @@
   "rho_a0244a36": { "message": "ロー" },
   "rho_variant_415245cd": { "message": "ロー (変種)" },
   "rich_content_editor_2708ef21": { "message": "リッチ コンテンツ エディタ" },
+  "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+    "message": "リッチテキストエリア{ OSKey }+F8 を押すとリッチコンテンツエディタにショートカットできます。"
+  },
   "right_angle_bracket_d704e2d6": { "message": "直角ブラケット" },
   "right_arrow_35e0eddf": { "message": "右の矢印" },
   "right_arrow_with_hook_29d92d31": { "message": "右矢印フック付き" },
@@ -595,11 +707,32 @@
   "rotate_image_90_degrees_2ab77c05": { "message": "画像を90度回転させる" },
   "rotate_image_90_degrees_6c92cd42": { "message": "画像を90度回転させる" },
   "rotation_9699c538": { "message": "回転" },
+  "row_fc0944a7": { "message": "列" },
+  "row_group_979f5528": { "message": "列グループ" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "残念ながら、pretty HTMLエディタはキーボードからはアクセスできません。生のHTMLエディタにはこちらからアクセスできます。"
   },
   "save_11a80ec3": { "message": "保存" },
+  "save_copy_ca63944e": { "message": "コピーを保存する" },
   "save_media_cb9e786e": { "message": "メディアを保存する" },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "スクリーンリーダーは、代替テキストなしでは画像に表示される内容を判別することはできません。また、ファイル名は、しばいば文脈や意味を記述しない無意味な数字や文字列であることがあります。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "スクリーンリーダーは、画像の内容と意味を説明する代替テキストなしでは画像に表示される内容を判別することはできません。代替テキストは簡潔かつ簡潔でなければなりません。"
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "スクリーンリーダーは、画像の内容と意味を説明する代替テキストなしでは画像に表示される内容を判別することはできません。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "スクリーンリーダーは、適切な構造なしでは表を解釈できません。表のヘッダーは、方向と内容の範囲を提供します。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "スクリーンリーダーは、適切な構造なしでは表を解釈できません。表のキャプションは、表の文脈と一般的な理解を記述するものです。"
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "スクリーンリーダーは、適切な構造なしでは表を解釈できません。表のヘッダーは、コンテンツの方向と概要を提供します。"
+  },
   "script_l_42a7b254": { "message": "スクリプト L" },
   "search_280d00bd": { "message": "検索" },
   "select_audio_source_21043cd5": { "message": "音声源を選択" },
@@ -607,12 +740,21 @@
   "select_language_7c93a900": { "message": "言語を選択する" },
   "select_video_source_1b5c9dbe": { "message": "ビデオ源を選択" },
   "selected_linkfilename_c093b1f2": { "message": "選択された{ linkFileName }" },
+  "set_header_scope_8c548f40": { "message": "ヘッダースコープを設定する" },
   "set_minus_b46e9b88": { "message": "マイナス設定" },
+  "set_table_header_cfab13a0": { "message": "表のヘッダーを設定する" },
   "sharp_music_ab956814": { "message": "シャープ (音楽)" },
+  "shift_arrows_4d5785fe": { "message": "SHIFT+矢印" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-Oでpretty HTMLエディタを開きます。"
   },
   "shortcut_911d6255": { "message": "ショートカット" },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "視認ユーザーは大きく太字の見出しを探し、Webページをすばやく参照します。スクリーンリーダーのユーザーは、文脈に基づいた理解を行う際にヘッダーに依存しています。ヘッダーは適切な構造を使用しなければなりません。"
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "視認ユーザーは大きく太字の見出しを探し、Webページをすばやく参照します。スクリーンリーダーのユーザーは、文脈に基づいた理解を行う際にヘッダーに依存しています。ヘッダーは適切な構造内で簡潔でなければなりません。"
+  },
   "sigma_5c35e553": { "message": "シグマ" },
   "sigma_variant_8155625": { "message": "シグマ (バリエーション)" },
   "single_color_image_4e5d4dbc": { "message": "単色画像" },
@@ -682,16 +824,41 @@
   "system_audio_allowed_b2508f8c": { "message": "システムオーディオを許可" },
   "system_audio_disabled_c177bd13": { "message": "システムオーディオが無効" },
   "tab_arrows_4cf5abfc": { "message": "TAB/矢印" },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "{ start } で始まる表ヘッダー"
+  },
+  "table_starting_with_start_e7232848": { "message": "{ start } で始まる表" },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "表のヘッダーは範囲を指定しなければなりません。"
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "表には、表の内容を説明するキャプションが含まれていなければなりません。"
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "表には、少なくとも1つのヘッダーが含まれていなければなりません。"
+  },
   "tau_880974b7": { "message": "タウ" },
   "teal_f729a294": { "message": "ティール" },
   "text_7f4593da": { "message": "テキスト" },
   "text_background_color_16e61c3f": { "message": "テキスト背景の色" },
   "text_color_acf75eb6": { "message": "テキストカラー" },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "テキストは、テキストと背景との間に十分なコントラストがなければ、特に視力の弱い人にとっては読みにくくなります。"
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "18pt（または太字14pt）より大きいテキストは、3：1の最小コントラスト比で表示しなければなりません。"
+  },
   "text_optional_384f94f7": { "message": "テキスト (オプション)" },
   "text_position_8df8c162": { "message": "テキストの位置" },
   "text_size_887c2f6": { "message": "テキストのサイズ" },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "18pt（または太字14pt）より小きいテキストは、4.5：1の最小コントラスト比で表示しなければなりません。"
+  },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "文書のプレビューは現在処理中です。後ほどもう一度やり直してください。"
+  },
+  "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+    "message": "ページの最初のヘッダーはH2であるべきです。"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "この資料はパブリック ドメインです"
@@ -844,7 +1011,14 @@
   },
   "webcam_disabled_30c66986": { "message": "ウェブカメラが無効" },
   "webcam_fe91b20f": { "message": "ウェブカム" },
+  "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+    "message": "ウェブページのH1は1つだけであるべきで、これはページのタイトルに自動的に使用されます。コンテンツの最初のヘッダーはH2であるべきです。"
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "アイテムをリスト形式に視覚的にフォーマットするマークアップが使用されますが、リストの関係を示唆するものではなく、ユーザが情報をナビゲートするのは難しいかもしれません。"
+  },
   "white_87fa64fd": { "message": "ホワイト" },
+  "why_523b3d8c": { "message": "理由" },
   "width_492fec76": { "message": "幅" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "幅と高さは数字でなければなりません"
@@ -856,6 +1030,9 @@
   "yes_dde87d5": { "message": "はい" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Icon Makerトレイに未保存の変更があります。これらの変更を保存せずに続行しますか？"
+  },
+  "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+    "message": "ページの階層を維持するために、追加のヘッダーを調整する必要がある場合があります。"
   },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "空のファイルをアップロードすることはできません。"

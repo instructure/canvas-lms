@@ -11,8 +11,17 @@
     "accessibility_checker_b3af1f6c": {
         "message": "辅助功能检查器"
     },
+    "action_to_take_b626a99a": {
+        "message": "要执行的操作："
+    },
     "add_8523c19b": {
         "message": "添加"
+    },
+    "add_a_caption_2a915239": {
+        "message": "添加说明"
+    },
+    "add_alt_text_for_the_image_48cd88aa": {
+        "message": "为图像添加替换文本"
     },
     "add_another_f4e50d57": {
         "message": "新增"
@@ -29,8 +38,14 @@
     "add_to_do_7def3c37": {
         "message": "添加到待办事项"
     },
+    "additional_considerations_f3801683": {
+        "message": "其他考虑事项"
+    },
     "address_3159962f": {
         "message": "地址："
+    },
+    "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+        "message": "具有相同 URL 的相邻链接应该为一个单链接。"
     },
     "afrikaans_da0fe6ee": {
         "message": "南非语"
@@ -61,6 +76,9 @@
     },
     "alphabetical_55b5b4e0": {
         "message": "按字母顺序"
+    },
+    "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+        "message": "替换属性文本不得超过 120 个字符。"
     },
     "alt_text_611fb322": {
         "message": "Alt 文本"
@@ -272,6 +290,24 @@
     "centered_horizontal_dots_451c5815": {
         "message": "居中横点"
     },
+    "change_alt_text_92654906": {
+        "message": "更改替换文本"
+    },
+    "change_heading_tag_to_paragraph_a61e3113": {
+        "message": "更改段落的标题标签"
+    },
+    "change_only_this_heading_s_level_903cc956": {
+        "message": "仅更改此标题级别"
+    },
+    "change_text_color_1aecb912": {
+        "message": "更改文本颜色"
+    },
+    "check_accessibility_3c78211c": {
+        "message": "检查辅助功能"
+    },
+    "checking_for_accessibility_issues_fac18c6d": {
+        "message": "正在检查辅助功能问题"
+    },
     "chi_54a32644": {
         "message": "Chi"
     },
@@ -323,6 +359,9 @@
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "关闭菜单或对话框。并带您返回至编辑器区域"
     },
+    "close_accessibility_checker_29d1c51e": {
+        "message": "关闭辅助功能检查器"
+    },
     "close_d634289d": {
         "message": "关闭"
     },
@@ -349,6 +388,12 @@
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "颜色选取器（已选择 { colorName }）"
+    },
+    "column_e1ae5c64": {
+        "message": "列"
+    },
+    "column_group_1c062368": {
+        "message": "列组"
     },
     "complex_numbers_a543d004": {
         "message": "复数"
@@ -484,6 +529,9 @@
     },
     "decorative_icon_9a7f3fc3": {
         "message": "装饰性图标"
+    },
+    "decorative_image_fde98579": {
+        "message": "装饰图片"
     },
     "decorative_type_upper_f2c95e3": {
         "message": "装饰{ TYPE_UPPER }"
@@ -655,6 +703,9 @@
     },
     "editor_statusbar_26ac81fc": {
         "message": "编辑器状态栏"
+    },
+    "element_starting_with_start_91bf4c3b": {
+        "message": "以{ start }开始的元素"
     },
     "embed_828fac4a": {
         "message": "嵌入"
@@ -851,6 +902,9 @@
     "finnish_4df2923d": {
         "message": "芬兰语"
     },
+    "fix_heading_hierarchy_f60884c4": {
+        "message": "置顶标题层次结构"
+    },
     "flat_music_76d5a5c3": {
         "message": "降调（音乐）"
     },
@@ -865,6 +919,9 @@
     },
     "format_4247a9c5": {
         "message": "格式"
+    },
+    "format_as_a_list_142210c3": {
+        "message": "使用列表格式"
     },
     "formatting_5b143aa8": {
         "message": "格式化"
@@ -977,6 +1034,15 @@
     "hat_ea321e35": {
         "message": "帽"
     },
+    "header_column_f27433cb": {
+        "message": "标题列"
+    },
+    "header_row_and_column_ec5b9ec": {
+        "message": "标题行和列"
+    },
+    "header_row_f33eb169": {
+        "message": "标题行"
+    },
     "heading_2_5b84eed2": {
         "message": "标题 2"
     },
@@ -985,6 +1051,15 @@
     },
     "heading_4_b2e74be7": {
         "message": "标题 4"
+    },
+    "heading_levels_should_not_be_skipped_3947c0e0": {
+        "message": "不得跳过标题级别。"
+    },
+    "heading_starting_with_start_42a3e7f9": {
+        "message": "以{ start }开始的标题"
+    },
+    "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+        "message": "标题不得超过 120 个字符。"
     },
     "health_icon_8d292eb5": {
         "message": "健康图标"
@@ -1006,6 +1081,9 @@
     },
     "hide_title_description_caf092ef": {
         "message": "隐藏{ title }说明"
+    },
+    "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+        "message": "高亮显示一个元素以激活元素选项工具栏"
     },
     "hindi_9bcd4b34": {
         "message": "印地语"
@@ -1067,6 +1145,9 @@
     "image_c1c98202": {
         "message": "图像"
     },
+    "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+        "message": "不得使用图像文件名作为描述图像内容的替换属性。"
+    },
     "image_options_5412d02c": {
         "message": "图像选项"
     },
@@ -1076,8 +1157,14 @@
     "image_to_crop_3a34487d": {
         "message": "剪裁图像"
     },
+    "image_with_filename_file_aacd7180": {
+        "message": "文件名为{ file }的图像"
+    },
     "images_7ce26570": {
         "message": "图像"
+    },
+    "images_should_include_an_alt_attribute_describing__b86d6a86": {
+        "message": "图像应包括一个描述图像内容的替换属性。"
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "虚部（复数）"
@@ -1130,6 +1217,9 @@
     "irish_567e109f": {
         "message": "爱尔兰语"
     },
+    "issue_num_total_f94536cf": {
+        "message": "问题{ num }/{ total }"
+    },
     "italian_bd3c792d": {
         "message": "意大利语"
     },
@@ -1163,6 +1253,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "键盘捷径"
     },
+    "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+        "message": "键盘使用 Tab 键导航至链接。转至相同目的地的两个相邻链接可以对键盘用户造成混淆。"
+    },
     "korean_da812d9": {
         "message": "朝鲜语"
     },
@@ -1186,6 +1279,39 @@
     },
     "latvian_2bbb6aab": {
         "message": "拉脱维亚语"
+    },
+    "learn_more_about_adjacent_links_2cb9762c": {
+        "message": "详细了解相邻链接"
+    },
+    "learn_more_about_color_contrast_c019dfb9": {
+        "message": "详细了解色彩对比度"
+    },
+    "learn_more_about_organizing_page_headings_8a7caa2e": {
+        "message": "详细了解组织页面标题"
+    },
+    "learn_more_about_proper_page_heading_structure_d2959f2d": {
+        "message": "详细了解适当的页面标题结构"
+    },
+    "learn_more_about_table_headers_5f5ee13": {
+        "message": "详细了解表标题"
+    },
+    "learn_more_about_using_alt_text_for_images_5698df9a": {
+        "message": "详细了解为使用图片替换文本"
+    },
+    "learn_more_about_using_captions_with_tables_36fe496f": {
+        "message": "详细了解将标题与表格一起使用"
+    },
+    "learn_more_about_using_filenames_as_alt_text_264286af": {
+        "message": "详细了解使用文件名作为替换文本"
+    },
+    "learn_more_about_using_lists_4e6eb860": {
+        "message": "详细了解使用列表"
+    },
+    "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+        "message": "详细了解将范围属性与表格一起使用"
+    },
+    "leave_as_is_4facfe55": {
+        "message": "保持原状"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "左角括弧"
@@ -1238,11 +1364,17 @@
     "link_options_a16b758b": {
         "message": "链接选项"
     },
+    "link_with_text_starting_with_start_b3fcbe71": {
+        "message": "具有以{ start }开始的文本的链接"
+    },
     "links_14b70841": {
         "message": "链接"
     },
     "links_to_an_external_site_de74145d": {
         "message": "链接到外部网站。"
+    },
+    "lists_should_be_formatted_as_lists_f862de8d": {
+        "message": "列表应使用列表格式。"
     },
     "lithuanian_5adcbe24": {
         "message": "立陶宛语"
@@ -1352,6 +1484,9 @@
     "medium_5a8e9ead": {
         "message": "中等"
     },
+    "merge_links_2478df96": {
+        "message": "合并链接"
+    },
     "mic_a7f3d311": {
         "message": "麦克风"
     },
@@ -1451,8 +1586,14 @@
     "new_opportunities_7d349c4d": {
         "message": "新机会"
     },
+    "next_40e12421": {
+        "message": "下一步"
+    },
     "next_month_749b1778": {
         "message": "下个月"
+    },
+    "no_accessibility_issues_were_detected_f8d3c875": {
+        "message": "没有发现辅助功能问题。"
     },
     "no_changes_to_save_d29f6e91": {
         "message": "没有更改要保存。"
@@ -1468,6 +1609,9 @@
     },
     "no_grade_3b4d7f3e": {
         "message": "没有评分"
+    },
+    "no_headers_9bc7dc7f": {
+        "message": "无标题"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "没有预览可用于此文件。"
@@ -1607,6 +1751,9 @@
     "paragraph_5e5ad8eb": {
         "message": "段落"
     },
+    "paragraph_starting_with_start_a59923f8": {
+        "message": "以{ start }开始的段落"
+    },
     "parallel_d55d6e38": {
         "message": "平行"
     },
@@ -1712,6 +1859,9 @@
     "preformatted_d0670862": {
         "message": "预定义格式"
     },
+    "prev_f82cbc48": {
+        "message": "上一个"
+    },
     "preview_53003fd2": {
         "message": "预览"
     },
@@ -1799,6 +1949,9 @@
     "reminder_date_4564d12d": {
         "message": "提醒：{ date }"
     },
+    "remove_heading_style_5fdc8855": {
+        "message": "删除标题样式"
+    },
     "replace_e61834a7": {
         "message": "替换"
     },
@@ -1825,6 +1978,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "富内容编辑器"
+    },
+    "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+        "message": "富文本区域。按{ OSKey }+F8设置富内容编辑器快捷方式。"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "右角括弧"
@@ -1871,6 +2027,12 @@
     "rotation_9699c538": {
         "message": "旋转"
     },
+    "row_fc0944a7": {
+        "message": "行"
+    },
+    "row_group_979f5528": {
+        "message": "行组"
+    },
     "russian_1e3e197": {
         "message": "俄语"
     },
@@ -1880,6 +2042,9 @@
     "save_11a80ec3": {
         "message": "保存"
     },
+    "save_copy_ca63944e": {
+        "message": "保存副本"
+    },
     "save_media_cb9e786e": {
         "message": "保存媒体"
     },
@@ -1888,6 +2053,24 @@
     },
     "science_8d92214a": {
         "message": "科学"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+        "message": "如果没有替换文本，且文件名通常是不描述上下文或意义的无意义的数字和字母字符串，则屏幕读取器无法确定图像显示的内容。"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+        "message": "如果没有描述图像内容和意义的替换文本，则屏幕读取器无法确定图像显示的内容。替换文本应简单明了。"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+        "message": "如果没有描述图像内容和意义的替换文本，则屏幕读取器无法确定图像显示的内容。"
+    },
+    "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+        "message": "屏幕读取器无法解读不具有正确结构的表格。表格标题提供说明和内容范围。"
+    },
+    "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+        "message": "屏幕读取器无法解读不具有正确结构的表格。表格说明描述表格的上下文和对表格的一般理解。"
+    },
+    "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+        "message": "屏幕读取器无法解读不具有正确结构的表格。表格标题提供说明和内容概述。"
     },
     "script_l_42a7b254": {
         "message": "花体 L"
@@ -1919,11 +2102,20 @@
     "serbian_7187f1f2": {
         "message": "塞尔维亚语"
     },
+    "set_header_scope_8c548f40": {
+        "message": "设置标题范围"
+    },
     "set_minus_b46e9b88": {
         "message": "设置负"
     },
+    "set_table_header_cfab13a0": {
+        "message": "设置表格标题"
+    },
     "sharp_music_ab956814": {
         "message": "升调（音乐）"
+    },
+    "shift_arrows_4d5785fe": {
+        "message": "SHIFT+箭头键"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "按 Shift-O 打开精美 HTML 编辑器。"
@@ -1936,6 +2128,12 @@
     },
     "show_my_grades_ebd08684": {
         "message": "显示我的评分"
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+        "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应使用正确的结构。"
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+        "message": "视力好的用户快速浏览网页，查找大号字体或粗体标题。屏幕读取器用户依赖于标题了解上下文。标题应在正确的结构内保持简洁。"
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -2123,6 +2321,21 @@
     "tab_arrows_4cf5abfc": {
         "message": "TAB/箭头"
     },
+    "table_header_starting_with_start_ffcabba6": {
+        "message": "以{ start }开始的表格标题"
+    },
+    "table_starting_with_start_e7232848": {
+        "message": "以{ start }开始的表格"
+    },
+    "tables_headers_should_specify_scope_5abf3a8e": {
+        "message": "表格标题应确定范围。"
+    },
+    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+        "message": "表格应包括描述表格内容的说明。"
+    },
+    "tables_should_include_at_least_one_header_48779eac": {
+        "message": "表格应包括至少一个标题。"
+    },
     "tagalog_74906db7": {
         "message": "塔加拉族语"
     },
@@ -2144,6 +2357,12 @@
     "text_color_acf75eb6": {
         "message": "文本颜色"
     },
+    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+        "message": "文字和背景之间的对比度不足，因此文字阅读困难，尤其是对于视力较弱的人员而言。"
+    },
+    "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+        "message": "文字大于 18 磅（或粗体 14 磅）时显示的对比度应至少为 3:1。"
+    },
     "text_optional_384f94f7": {
         "message": "文本（可选）"
     },
@@ -2152,6 +2371,9 @@
     },
     "text_size_887c2f6": {
         "message": "文字大小"
+    },
+    "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+        "message": "文字小于 18 磅（或粗体 14 磅）时显示的对比度应至少为 4.5:1。"
     },
     "thai_8f9bc548": {
         "message": "泰语"
@@ -2164,6 +2386,9 @@
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "目前正在处理文档预览。请稍后再试。"
+    },
+    "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+        "message": "页面上的第一个标题应该是H2。"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "材料在公开域中"
@@ -2492,14 +2717,23 @@
     "webcam_fe91b20f": {
         "message": "网络摄像头"
     },
+    "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+        "message": "网页应仅具有一个H1，自动供页面标题使用。内容中的第一个标题应该是H2。"
+    },
     "weekly_schedule_navigation_6b042645": {
         "message": "每周日程规划导航"
     },
     "welsh_42ab94b1": {
         "message": "威尔士语"
     },
+    "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+        "message": "如果对使用列表格式显示的项目使用标记，但不指示列表关系，用户可能在浏览信息时会遇到困难。"
+    },
     "white_87fa64fd": {
         "message": "白色"
+    },
+    "why_523b3d8c": {
+        "message": "原因"
     },
     "width_492fec76": {
         "message": "宽度"
@@ -2536,6 +2770,9 @@
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "“图标编辑器”托盘中有未保存的更改。是否要继续操作而不保存这些更改？"
+    },
+    "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+        "message": "您可能需要调整其他标题以保持页面层次结构。"
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "无法上传空文件。"

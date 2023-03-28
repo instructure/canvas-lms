@@ -11,8 +11,17 @@
     "accessibility_checker_b3af1f6c": {
         "message": "المتحقق من إمكانية الوصول"
     },
+    "action_to_take_b626a99a": {
+        "message": "إجراء مقرر اتخاذه:"
+    },
     "add_8523c19b": {
         "message": "إضافة"
+    },
+    "add_a_caption_2a915239": {
+        "message": "إضافة تسمية توضيحية"
+    },
+    "add_alt_text_for_the_image_48cd88aa": {
+        "message": "إضافة نص بديل للصورة"
     },
     "add_another_f4e50d57": {
         "message": "إضافة محتوى"
@@ -29,8 +38,14 @@
     "add_to_do_7def3c37": {
         "message": "إضافة قائمة مهام"
     },
+    "additional_considerations_f3801683": {
+        "message": "الاعتبارات الإضافية"
+    },
     "address_3159962f": {
         "message": "العنوان:"
+    },
+    "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+        "message": "يجب أن تكون الروابط المتجاورة بنفس عنوان URL رابطًا فرديًا."
     },
     "afrikaans_da0fe6ee": {
         "message": "الأفريقانية"
@@ -61,6 +76,9 @@
     },
     "alphabetical_55b5b4e0": {
         "message": "أبجدي"
+    },
+    "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+        "message": "يجب ألا يتضمن نص السمة البديلة أكثر من 120 حرفًا."
     },
     "alt_text_611fb322": {
         "message": "النص البديل"
@@ -272,6 +290,24 @@
     "centered_horizontal_dots_451c5815": {
         "message": "نقاط أفقية مركزية"
     },
+    "change_alt_text_92654906": {
+        "message": "تغيير النص البديل"
+    },
+    "change_heading_tag_to_paragraph_a61e3113": {
+        "message": "تغيير علامة العنوان إلى فقرة"
+    },
+    "change_only_this_heading_s_level_903cc956": {
+        "message": "تغيير مستوى هذا العنوان فقط"
+    },
+    "change_text_color_1aecb912": {
+        "message": "تغيير لون النص"
+    },
+    "check_accessibility_3c78211c": {
+        "message": "التحقق من إمكانية الوصول"
+    },
+    "checking_for_accessibility_issues_fac18c6d": {
+        "message": "التحقق من مشاكل إمكانية الوصول"
+    },
     "chi_54a32644": {
         "message": "Chi"
     },
@@ -323,6 +359,9 @@
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
     },
+    "close_accessibility_checker_29d1c51e": {
+        "message": "إغلاق المتحقق من إمكانية الوصول"
+    },
     "close_d634289d": {
         "message": "إغلاق"
     },
@@ -349,6 +388,12 @@
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "أداة انتقاء اللون (تم تحديد { colorName })"
+    },
+    "column_e1ae5c64": {
+        "message": "عمود"
+    },
+    "column_group_1c062368": {
+        "message": "مجموعة العمود"
     },
     "complex_numbers_a543d004": {
         "message": "أعداد مركبة"
@@ -484,6 +529,9 @@
     },
     "decorative_icon_9a7f3fc3": {
         "message": "أيقونة زينة"
+    },
+    "decorative_image_fde98579": {
+        "message": "صورة تزيين"
     },
     "decorative_type_upper_f2c95e3": {
         "message": "{ TYPE_UPPER } زينة"
@@ -655,6 +703,9 @@
     },
     "editor_statusbar_26ac81fc": {
         "message": "شريط حالة المحرر"
+    },
+    "element_starting_with_start_91bf4c3b": {
+        "message": "عنصر يبدأ بـ { start }"
     },
     "embed_828fac4a": {
         "message": "تضمين"
@@ -851,6 +902,9 @@
     "finnish_4df2923d": {
         "message": "الفنلندية"
     },
+    "fix_heading_hierarchy_f60884c4": {
+        "message": "إصلاح هيكل العنوان"
+    },
     "flat_music_76d5a5c3": {
         "message": "Flat (موسيقى)"
     },
@@ -865,6 +919,9 @@
     },
     "format_4247a9c5": {
         "message": "التنسيق"
+    },
+    "format_as_a_list_142210c3": {
+        "message": "التنسيق في صورة قائمة"
     },
     "formatting_5b143aa8": {
         "message": "التنسيق"
@@ -977,6 +1034,15 @@
     "hat_ea321e35": {
         "message": "قبعة"
     },
+    "header_column_f27433cb": {
+        "message": "عمود الرأس"
+    },
+    "header_row_and_column_ec5b9ec": {
+        "message": "صف وعمود الرأس"
+    },
+    "header_row_f33eb169": {
+        "message": "صف الرأس"
+    },
     "heading_2_5b84eed2": {
         "message": "العنوان 2"
     },
@@ -985,6 +1051,15 @@
     },
     "heading_4_b2e74be7": {
         "message": "العنوان 4"
+    },
+    "heading_levels_should_not_be_skipped_3947c0e0": {
+        "message": "يجب ألا يتم تجاوز مستويات العنوان."
+    },
+    "heading_starting_with_start_42a3e7f9": {
+        "message": "يبدأ العنوان بـ { start }"
+    },
+    "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+        "message": "يجب ألا تتضمن العناوين أكثر من 120 حرفًا."
     },
     "health_icon_8d292eb5": {
         "message": "أيقونة الصحة"
@@ -1006,6 +1081,9 @@
     },
     "hide_title_description_caf092ef": {
         "message": "إخفاء وصف { title }"
+    },
+    "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+        "message": "تمييز عنصر لتنشيط شريط أدوات خيارات العناصر"
     },
     "hindi_9bcd4b34": {
         "message": "الهندية"
@@ -1067,6 +1145,9 @@
     "image_c1c98202": {
         "message": "صورة"
     },
+    "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+        "message": "يجب ألا يتم استخدام أسماء ملفات الصور كسمة ببديلة لوصف محتوى الصورة."
+    },
     "image_options_5412d02c": {
         "message": "خيارات الصورة"
     },
@@ -1076,8 +1157,14 @@
     "image_to_crop_3a34487d": {
         "message": "الصور المراد قصها"
     },
+    "image_with_filename_file_aacd7180": {
+        "message": "صورة باسم الملف { file }"
+    },
     "images_7ce26570": {
         "message": "الصور"
+    },
+    "images_should_include_an_alt_attribute_describing__b86d6a86": {
+        "message": "يجب أن تتضمن الصور سمة بديلة تصف محتوى الصورة."
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "الجزء التخيلي (من العدد المركب)"
@@ -1130,6 +1217,9 @@
     "irish_567e109f": {
         "message": "الأيرلندية"
     },
+    "issue_num_total_f94536cf": {
+        "message": "مشكلة { num }/{ total }"
+    },
     "italian_bd3c792d": {
         "message": "الإيطالية"
     },
@@ -1163,6 +1253,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "اختصارات لوحة المفاتيح"
     },
+    "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+        "message": "تنتقل لوحات المفاتيح إلى الروابط باستخدام المفتاح Tab. يمكن أن يسبب رابطان متجاوران يوجهان إلى نفس الوجهة في إرباك مستخدمي لوحة المفاتيح."
+    },
     "korean_da812d9": {
         "message": "الكورية"
     },
@@ -1186,6 +1279,39 @@
     },
     "latvian_2bbb6aab": {
         "message": "اللاتفية"
+    },
+    "learn_more_about_adjacent_links_2cb9762c": {
+        "message": "معرفة المزيد عن الارتباطات المتجاورة"
+    },
+    "learn_more_about_color_contrast_c019dfb9": {
+        "message": "معرفة المزيد عن تباين اللون"
+    },
+    "learn_more_about_organizing_page_headings_8a7caa2e": {
+        "message": "معرفة المزيد عن تنظيم عناوين الصفحات"
+    },
+    "learn_more_about_proper_page_heading_structure_d2959f2d": {
+        "message": "معرفة المزيد عن الهيكل الملائم لعناوين الصفحات"
+    },
+    "learn_more_about_table_headers_5f5ee13": {
+        "message": "معرفة المزيد عن رؤوس الجداول"
+    },
+    "learn_more_about_using_alt_text_for_images_5698df9a": {
+        "message": "معرفة المزيد عن استخدام النص البديل للصور"
+    },
+    "learn_more_about_using_captions_with_tables_36fe496f": {
+        "message": "معرفة المزيد عن استخدام التسميات التوضيحية مع الجداول"
+    },
+    "learn_more_about_using_filenames_as_alt_text_264286af": {
+        "message": "معرفة المزيد عن استخدام أسماء الملفات كنصوص بديلة"
+    },
+    "learn_more_about_using_lists_4e6eb860": {
+        "message": "معرفة المزيد عن استخدام القوائم"
+    },
+    "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+        "message": "معرفة المزيد عن استخدام سمات النطاق مع الجداول"
+    },
+    "leave_as_is_4facfe55": {
+        "message": "ترك كما هو"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Left Angle Bracket"
@@ -1238,11 +1364,17 @@
     "link_options_a16b758b": {
         "message": "خيارات الارتباط"
     },
+    "link_with_text_starting_with_start_b3fcbe71": {
+        "message": "رابط بنص يبدأ بـ { start }"
+    },
     "links_14b70841": {
         "message": "الارتباطات"
     },
     "links_to_an_external_site_de74145d": {
         "message": "ارتباطات إلى موقع خارجي."
+    },
+    "lists_should_be_formatted_as_lists_f862de8d": {
+        "message": "يجب تنسيق القوائم في صورة قوائم."
     },
     "lithuanian_5adcbe24": {
         "message": "الليتوانية"
@@ -1352,6 +1484,9 @@
     "medium_5a8e9ead": {
         "message": "متوسط"
     },
+    "merge_links_2478df96": {
+        "message": "دمج الروابط"
+    },
     "mic_a7f3d311": {
         "message": "الميكروفون"
     },
@@ -1451,8 +1586,14 @@
     "new_opportunities_7d349c4d": {
         "message": "الفرص الجديدة"
     },
+    "next_40e12421": {
+        "message": "التالي"
+    },
     "next_month_749b1778": {
         "message": "الشهر القادم"
+    },
+    "no_accessibility_issues_were_detected_f8d3c875": {
+        "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "لا توجد تغييرات للحفظ."
@@ -1468,6 +1609,9 @@
     },
     "no_grade_3b4d7f3e": {
         "message": "لا توجد أي درجة"
+    },
+    "no_headers_9bc7dc7f": {
+        "message": "بلا رؤوس"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "لا توجد معاينة متوفرة لهذا الملف."
@@ -1607,6 +1751,9 @@
     "paragraph_5e5ad8eb": {
         "message": "الفقرة"
     },
+    "paragraph_starting_with_start_a59923f8": {
+        "message": "فقرة تبدأ بـ { start }"
+    },
     "parallel_d55d6e38": {
         "message": "موازي"
     },
@@ -1712,6 +1859,9 @@
     "preformatted_d0670862": {
         "message": "منسق مسبقًا"
     },
+    "prev_f82cbc48": {
+        "message": "السابق"
+    },
     "preview_53003fd2": {
         "message": "معاينة"
     },
@@ -1799,6 +1949,9 @@
     "reminder_date_4564d12d": {
         "message": "التذكير: { date }"
     },
+    "remove_heading_style_5fdc8855": {
+        "message": "إزالة نمط العنوان"
+    },
     "replace_e61834a7": {
         "message": "استبدال"
     },
@@ -1825,6 +1978,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "محرر محتوى"
+    },
+    "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+        "message": "مساحة النص المنسق اضغط على { OSKey }+F8 لاختصارات محرر المحتوى المنسق."
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Right Angle Bracket"
@@ -1871,6 +2027,12 @@
     "rotation_9699c538": {
         "message": "تدوير"
     },
+    "row_fc0944a7": {
+        "message": "صف"
+    },
+    "row_group_979f5528": {
+        "message": "مجموعة الصف"
+    },
     "russian_1e3e197": {
         "message": "الروسية"
     },
@@ -1880,6 +2042,9 @@
     "save_11a80ec3": {
         "message": "حفظ"
     },
+    "save_copy_ca63944e": {
+        "message": "حفظ النسخ"
+    },
     "save_media_cb9e786e": {
         "message": "حفظ الوسائط"
     },
@@ -1888,6 +2053,24 @@
     },
     "science_8d92214a": {
         "message": "العلوم"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+        "message": "لا يمكن لقارئات الشاشة تحديد المعروض في صورة بدون نص بديل وفي الغالب تكون أسماء الملفات سلسلة بلا معنى من الأرقام والأحرف التي لا تصف السياق أو المعنى."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+        "message": "لا يمكن لقارئات الشاشة تحديد المعروض في صورة بدون نص بديل يصف محتوى الصورة ومعناها. يجب أن يكون النص البديل بسيطًا وموجزًا."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+        "message": "لا يمكن لقارئات الشاشة تحديد المعروض في صورة بدون نص بديل يصف محتوى الصورة ومعناها."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+        "message": "لا يمكن لقارئات الشاشة تفسير الجداول بدون بنية ملائمة. تزود رؤوس الجدول إرشادات ونطاقًا للمحتوى."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+        "message": "لا يمكن لقارئات الشاشة تفسير الجداول بدون بنية ملائمة. تصف التسميات التوضيحية للجدول السياق والفهم العام للجدول."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+        "message": "لا يمكن لقارئات الشاشة تفسير الجداول بدون بنية ملائمة. تزود رؤوس الجدول إرشادات ونظرة عامة على المحتوى."
     },
     "script_l_42a7b254": {
         "message": "Script L"
@@ -1919,11 +2102,20 @@
     "serbian_7187f1f2": {
         "message": "الصربية"
     },
+    "set_header_scope_8c548f40": {
+        "message": "تعيين نطاق الرأس"
+    },
     "set_minus_b46e9b88": {
         "message": "Set Minus"
     },
+    "set_table_header_cfab13a0": {
+        "message": "تعيين رأس الجدول"
+    },
     "sharp_music_ab956814": {
         "message": "Sharp (موسيقي)"
+    },
+    "shift_arrows_4d5785fe": {
+        "message": "SHIFT+أسهم"
     },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "اضغط على Shift-O لفتح محرر HTML الأنيق."
@@ -1936,6 +2128,12 @@
     },
     "show_my_grades_ebd08684": {
         "message": "إظهار درجاتي"
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+        "message": "يتصفح المستخدمون الذين يتمتعون بالقدرة على الإبصار صفحات الويب بشكل سريع، بحثًا عن عناوين كبيرة أو بخط عريض. ويعتمد مستخدمو قارئة الشاشة على الرؤوس لفهم السياق. يجب أن توظف الرؤوس البنية الملائمة."
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+        "message": "يتصفح المستخدمون الذين يتمتعون بالقدرة على الإبصار صفحات الويب بشكل سريع، بحثًا عن عناوين كبيرة أو بخط عريض. ويعتمد مستخدمو قارئة الشاشة على الرؤوس لفهم السياق. يجب أن تكون الرؤوس موجزة في نطاق البنية الملائمة."
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -2123,6 +2321,21 @@
     "tab_arrows_4cf5abfc": {
         "message": "ضغط/أسهم"
     },
+    "table_header_starting_with_start_ffcabba6": {
+        "message": "يبدأ رأس الجدول بـ { start }"
+    },
+    "table_starting_with_start_e7232848": {
+        "message": "يبدأ الجدول بـ { start }"
+    },
+    "tables_headers_should_specify_scope_5abf3a8e": {
+        "message": "يجب أن تحدد رؤوس الجداول نطاقًا."
+    },
+    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+        "message": "يجب أن تتضمن الجداول تسمية توضيحية تصف محتويات الجدول."
+    },
+    "tables_should_include_at_least_one_header_48779eac": {
+        "message": "يجب أن تتضمن الجداول رأسًا واحدًا على الأقل."
+    },
     "tagalog_74906db7": {
         "message": "التغالوغ"
     },
@@ -2144,6 +2357,12 @@
     "text_color_acf75eb6": {
         "message": "لون النص"
     },
+    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+        "message": "تصعب قراءة النص بدون درجة تباين كافية بين النص والخلفية، خاصةً لمن يعانون من ضعف الرؤية."
+    },
+    "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+        "message": "يجب أن يعرض النص الأكبر من 18 نقطة (أو 14 نقطة بخط عريض) معدل تباين لا يقل عن 3:1."
+    },
     "text_optional_384f94f7": {
         "message": "النص (اختياري)"
     },
@@ -2152,6 +2371,9 @@
     },
     "text_size_887c2f6": {
         "message": "حجم النص"
+    },
+    "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+        "message": "يجب أن يعرض النص الأصغر من 18 نقطة (أو 14 نقطة بخط عريض) معدل تباين لا يقل عن 4.5:1."
     },
     "thai_8f9bc548": {
         "message": "التايوانية"
@@ -2164,6 +2386,9 @@
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "تجري معالجة معاينة المستند حاليًا. الرجاء إعادة المحاولة لاحقًا."
+    },
+    "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+        "message": "يجب أن يكون أول عنوان في الصفحة هو H2."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "توجد المادة في المجال العام"
@@ -2492,14 +2717,23 @@
     "webcam_fe91b20f": {
         "message": "كاميرا الويب"
     },
+    "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+        "message": "يجب أن تقتصر صفحات الويب على H1 فردي، والذي يستخدمه عنوان الصفحة تلقائيًا. يجب أن يكون أول عنوان في المحتوى الخاص بك هو H2."
+    },
     "weekly_schedule_navigation_6b042645": {
         "message": "التنقل للجدول الأسبوعي"
     },
     "welsh_42ab94b1": {
         "message": "الويلزية"
     },
+    "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+        "message": "عند استخدام العلامة التي تنسق العناصر في صورة قوائم ولكنها لا تشير إلى علاقة القوائم، فقد يواجه المستخدمون صعوبة في التنقل بين المعلومات."
+    },
     "white_87fa64fd": {
         "message": "أبيض"
+    },
+    "why_523b3d8c": {
+        "message": "السبب"
     },
     "width_492fec76": {
         "message": "العرض"
@@ -2536,6 +2770,9 @@
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "لديك تغييرات غير محفوظة في علبة صانع الأيقونات. هل ترغب في المتابعة بدون حفظ هذه التغييرات؟"
+    },
+    "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+        "message": "قد تحتاج إلى تعديل عناوين إضافية للحفاظ على هرمية الصفحة."
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "لا يمكنك تحميل ملف فارغ."
