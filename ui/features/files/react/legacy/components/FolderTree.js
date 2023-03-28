@@ -67,7 +67,7 @@ export default {
     BBTreeBrowserView.remove(this.treeBrowserViewId)
   },
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.expandTillCurrentFolder(newProps)
   },
 
