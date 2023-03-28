@@ -81,7 +81,7 @@ export default {
     )
   },
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     setTimeout(this.startRecalculating)
   },
 
