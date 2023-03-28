@@ -221,6 +221,16 @@ describe AccountsController do
       expect(response).to be_successful
       expect(@subaccount.account_users.map(&:user)).to eq [@munda]
     end
+
+    it "allows re-adding an user to a sub account (updating user account association)" do
+      @subaccount = @account.sub_accounts.create!
+      @usr = user_with_pseudonym(account: @subaccount, active_all: 1, username: "usr@instructure.com")
+      @subaccount.account_users.create!(user_id: @usr.id, role_id: admin_role.id).destroy
+      post "add_account_user", params: { account_id: @subaccount.id, role_id: admin_role.id, user_list: "usr@instructure.com" }
+      expect(response).to be_successful
+      expect(@subaccount.account_users.map(&:user)).to be_include(@usr)
+      expect(@usr.user_account_associations.map(&:account)).to be_include(@subaccount)
+    end
   end
 
   describe "remove_account_user" do
