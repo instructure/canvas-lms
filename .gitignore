@@ -63,6 +63,7 @@ dump.rdb
 
 # user docker compose overrides
 docker-compose.local.*
+!/inst-cli/docker-compose/docker-compose.local.dev.yml
 # experimental api gateway config
 docker-compose/api-gateway.override.yml
 
