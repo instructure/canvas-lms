@@ -24,16 +24,30 @@ const locale = {
     "message": "Öppna den nätta versionen av HTML-redigeraren"
   },
   "accessibility_checker_b3af1f6c": { "message": "Tillgänglighetskontroll" },
+  "action_to_take_b626a99a": { "message": "Åtgärd att vidta:" },
   "add_8523c19b": { "message": "Lägg till" },
+  "add_a_caption_2a915239": { "message": "Lägg till bildtext" },
+  "add_alt_text_for_the_image_48cd88aa": {
+    "message": "Lägg till alternativtext för bilden"
+  },
   "add_another_f4e50d57": { "message": "Lägg till en till" },
   "add_cc_subtitles_55f0394e": { "message": "Lägg till CC/undertext" },
   "add_image_60b2de07": { "message": "Lägg till bild" },
+  "additional_considerations_f3801683": {
+    "message": "Ytterliggare hänsynstaganden"
+  },
+  "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+    "message": "Intilliggande länkar med samma webbadress ska vara en enda länk."
+  },
   "aleph_f4ffd155": { "message": "Aleph" },
   "alignment_and_lists_5cebcb69": { "message": "Justering och listor" },
   "all_4321c3a1": { "message": "Alla" },
   "all_apps_a50dea49": { "message": "Alla appar" },
   "alpha_15d59033": { "message": "Alfa" },
   "alphabetical_55b5b4e0": { "message": "Alfabetisk" },
+  "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+    "message": "Alternativ attributtext får inte innehålla mer än 120 tecken."
+  },
   "alt_text_611fb322": { "message": "Alternativ text" },
   "amalg_coproduct_c589fb12": { "message": "Amalg (samprod)" },
   "an_error_occured_reading_the_file_ff48558b": {
@@ -95,6 +109,18 @@ const locale = {
   "centered_horizontal_dots_451c5815": {
     "message": "Centrerade horisontella punkter"
   },
+  "change_alt_text_92654906": { "message": "Ändra alternativtext" },
+  "change_heading_tag_to_paragraph_a61e3113": {
+    "message": "Ändra rubriktagg till stycket"
+  },
+  "change_only_this_heading_s_level_903cc956": {
+    "message": "Ändra bara nivån för den här rubriken"
+  },
+  "change_text_color_1aecb912": { "message": "Ändra textfärg" },
+  "check_accessibility_3c78211c": { "message": "Kontrollera tillgänglighet" },
+  "checking_for_accessibility_issues_fac18c6d": {
+    "message": "Kontrollerar tillgänglighetsproblem"
+  },
   "chi_54a32644": { "message": "Chi" },
   "choose_caption_file_9c45bc4e": { "message": "Välj undertextfil" },
   "choose_usage_rights_33683854": {
@@ -125,6 +151,9 @@ const locale = {
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Stäng en meny eller dialogruta Tar dig också tillbaka till redigerarområdet"
   },
+  "close_accessibility_checker_29d1c51e": {
+    "message": "Stäng tillgänglighetskontrollen"
+  },
   "close_d634289d": { "message": "Stäng" },
   "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
     "message": "Undertextfilen får inte vara större än { maxKb } kb"
@@ -139,6 +168,8 @@ const locale = {
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Färgväljaren ({ colorName } valda)"
   },
+  "column_e1ae5c64": { "message": "Kolumn" },
+  "column_group_1c062368": { "message": "Kolumngrupp" },
   "complex_numbers_a543d004": { "message": "Komplexa nummer" },
   "computer_1d7dfa6f": { "message": "Dator" },
   "congruent_5a244acd": { "message": "Kongruent" },
@@ -178,6 +209,7 @@ const locale = {
   "dagger_57e0f4e5": { "message": "Dolk" },
   "date_added_ed5ad465": { "message": "Tillagt datum" },
   "decorative_icon_9a7f3fc3": { "message": "Dekorativ ikon" },
+  "decorative_image_fde98579": { "message": "Dekorativ bild" },
   "decorative_type_upper_f2c95e3": { "message": "Dekorativ { TYPE_UPPER }" },
   "deep_purple_bb3e2907": { "message": "Mörklila" },
   "definite_integral_fe7ffed1": { "message": "Bestämd integral" },
@@ -238,6 +270,9 @@ const locale = {
   "edit_icon_2c6b0e91": { "message": "Redigera ikon" },
   "edit_link_7f53bebb": { "message": "Redigera länk" },
   "editor_statusbar_26ac81fc": { "message": "Statusfält för redigeraren" },
+  "element_starting_with_start_91bf4c3b": {
+    "message": "Element som börjar med { start }"
+  },
   "embed_828fac4a": { "message": "Bädda in" },
   "embed_code_314f1bd5": { "message": "Inbäddad kod" },
   "embed_image_1080badc": { "message": "Bädda in bild" },
@@ -291,6 +326,7 @@ const locale = {
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filindex" },
   "finish_bc343002": { "message": "Avsluta" },
+  "fix_heading_hierarchy_f60884c4": { "message": "Fast rubrikhierarki" },
   "flat_music_76d5a5c3": { "message": "Platt (Musik)" },
   "focus_element_options_toolbar_18d993e": {
     "message": "Verktygsfält för alternativ till fokuselement"
@@ -298,6 +334,7 @@ const locale = {
   "folder_tree_fbab0726": { "message": "Mappträd" },
   "for_all_b919f972": { "message": "För alla" },
   "format_4247a9c5": { "message": "Format" },
+  "format_as_a_list_142210c3": { "message": "Formatera som lista" },
   "formatting_5b143aa8": { "message": "Formaterar" },
   "forward_slash_3f90f35e": { "message": "Snedstreck" },
   "found_auto_saved_content_3f6e4ca5": {
@@ -335,9 +372,21 @@ const locale = {
   "group_navigation_99f191a": { "message": "Gruppnavigering" },
   "h_bar_bb94deae": { "message": "H-streck" },
   "hat_ea321e35": { "message": "Keps" },
+  "header_column_f27433cb": { "message": "Rubrikkolumn" },
+  "header_row_and_column_ec5b9ec": { "message": "Rubrikrad och kolumn" },
+  "header_row_f33eb169": { "message": "Rubrikrad" },
   "heading_2_5b84eed2": { "message": "Rubrik 2" },
   "heading_3_2c83de44": { "message": "Rubrik 3" },
   "heading_4_b2e74be7": { "message": "Rubrik 4" },
+  "heading_levels_should_not_be_skipped_3947c0e0": {
+    "message": "Rubriknivåer bör inte hoppas över."
+  },
+  "heading_starting_with_start_42a3e7f9": {
+    "message": "Rubriker som börjar med { start }"
+  },
+  "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+    "message": "Rubrikerna får inte innehålla mer än 120 tecken."
+  },
   "health_icon_8d292eb5": { "message": "Hälsoikon" },
   "hearts_suit_e50e04ca": { "message": "Hjärter (kortspel)" },
   "height_69b03e15": { "message": "Höjd" },
@@ -345,6 +394,9 @@ const locale = {
   "hide_description_bfb5502e": { "message": "Dölj beskrivning" },
   "hide_title_description_caf092ef": {
     "message": "Dölj { title } beskrivning"
+  },
+  "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+    "message": "Markera ett element för att aktivera verktygsfältet för elementalternativ"
   },
   "home_351838cd": { "message": "Startsida" },
   "html_code_editor_fd967a44": { "message": "Redigerare för HTML-kod" },
@@ -371,10 +423,19 @@ const locale = {
   },
   "image_8ad06": { "message": "Bild" },
   "image_c1c98202": { "message": "bild" },
+  "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+    "message": "Bildfilnamn ska inte användas som alt attribut som beskriver bildinnehållet."
+  },
   "image_options_5412d02c": { "message": "Bildalternativ" },
   "image_options_tray_90a46006": { "message": "Alternativfält för bilder" },
   "image_to_crop_3a34487d": { "message": "Bild till beskärning" },
+  "image_with_filename_file_aacd7180": {
+    "message": "Bild med filnamn { file }"
+  },
   "images_7ce26570": { "message": "bilder" },
+  "images_should_include_an_alt_attribute_describing__b86d6a86": {
+    "message": "Bilder ska innehålla ett alt attribut som beskriver bildinnehållet."
+  },
   "imaginary_portion_of_complex_number_2c733ffa": {
     "message": "Imaginärdel (av komplexa nummer)"
   },
@@ -392,13 +453,48 @@ const locale = {
   "invalid_file_type_881cc9b2": { "message": "Ogiltig filtyp" },
   "invalid_url_cbde79f": { "message": "Ogiltig URL" },
   "iota_11c932a9": { "message": "Iota" },
+  "issue_num_total_f94536cf": { "message": "Problem { num }/{ total }" },
   "kappa_2f14c816": { "message": "Kappa" },
   "kappa_variant_eb64574b": { "message": "Kappa (variant)" },
   "keyboard_shortcuts_ed1844bd": { "message": "Kortkommandon" },
+  "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+    "message": "Tangentbord navigerar till länkar via Tab-tangenten. Två intilliggande länkar som leder till samma destination kan vara förvirrande för användare av tangentbord."
+  },
   "lambda_4f602498": { "message": "Lambda" },
   "language_arts_icon_a798b0f8": { "message": "Språkvetenskapsikon" },
   "languages_icon_9d20539": { "message": "Språkikon" },
   "large_9c5e80e7": { "message": "Stor" },
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Läs mer om intilliggande länkar"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Läs mer om färgkontrast"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Läs mer om att ordna sidrubriker"
+  },
+  "learn_more_about_proper_page_heading_structure_d2959f2d": {
+    "message": "Läs mer om korrekt struktur för sidrubrik"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Läs mer om tabellrubriker"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Läs mer om att använda alternativtext för bilder"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Läs mer om att använda rubriker med tabeller"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Läs mer om att använda filnamn som alternativtext"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Läs mer om att använda listor"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Läs mer om att använda omfångsattribut med tabeller"
+  },
+  "leave_as_is_4facfe55": { "message": "Lämna som det är" },
   "left_angle_bracket_c87a6d07": { "message": "Vänster hakparentes" },
   "left_arrow_4fde1a64": { "message": "Vänster pil" },
   "left_arrow_with_hook_5bfcad93": { "message": "Vänsterpil med krok" },
@@ -422,9 +518,15 @@ const locale = {
   "light_blue_5374f600": { "message": "Ljusblå" },
   "link_7262adec": { "message": "Länk" },
   "link_options_a16b758b": { "message": "Länkalternativ" },
+  "link_with_text_starting_with_start_b3fcbe71": {
+    "message": "Länk med text som börjar med { start }"
+  },
   "links_14b70841": { "message": "Länkar" },
   "links_to_an_external_site_de74145d": {
     "message": "Länkar till en extern sida."
+  },
+  "lists_should_be_formatted_as_lists_f862de8d": {
+    "message": "Listor ska formateras som listor."
   },
   "load_more_35d33c7": { "message": "Läs in mer" },
   "loading_25990131": { "message": "Läser in ..." },
@@ -457,6 +559,7 @@ const locale = {
     "message": "Mediefilen behandlas. Försök igen senare."
   },
   "medium_5a8e9ead": { "message": "Medium" },
+  "merge_links_2478df96": { "message": "Sammanfoga länkar" },
   "mic_a7f3d311": { "message": "Mikrofon" },
   "microphone_disabled_15c83130": { "message": "Mikrofonen är inaktiverad" },
   "middle_27dc1d5": { "message": "Mitten" },
@@ -491,9 +594,14 @@ const locale = {
   },
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
+  "next_40e12421": { "message": "Nästa" },
+  "no_accessibility_issues_were_detected_f8d3c875": {
+    "message": "Inga tillgänglighetsproblem upptäcktes."
+  },
   "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
+  "no_headers_9bc7dc7f": { "message": "Inga rubriker" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Förhandsvisning är inte tillgänglig för den här filen."
   },
@@ -540,6 +648,9 @@ const locale = {
   },
   "pages_e5414c2c": { "message": "Sidor" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
+  "paragraph_starting_with_start_a59923f8": {
+    "message": "Stycke som börjar med { start }"
+  },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiell (derivat)" },
   "paste_5963d1c1": { "message": "Klistra in" },
@@ -576,6 +687,7 @@ const locale = {
   "precedes_196b9aef": { "message": "Föregår" },
   "precedes_equal_20701e84": { "message": "Föregår lika med" },
   "preformatted_d0670862": { "message": "Förformaterad" },
+  "prev_f82cbc48": { "message": "Föregående" },
   "preview_53003fd2": { "message": "Förhandsgranska" },
   "preview_a3f8f854": { "message": "FÖRHANDSGRANSKA" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
@@ -604,6 +716,7 @@ const locale = {
   "red_8258edf3": { "message": "Röd" },
   "relationships_6602af70": { "message": "Relationer" },
   "religion_icon_246e0be1": { "message": "Religiös ikon" },
+  "remove_heading_style_5fdc8855": { "message": "Ta bort rubrikstil" },
   "replace_e61834a7": { "message": "Ersätt" },
   "reset_95a81614": { "message": "Återställ" },
   "resize_ec83d538": { "message": "Ändra storlek" },
@@ -615,6 +728,9 @@ const locale = {
   "rho_variant_415245cd": { "message": "Rho (variant)" },
   "rich_content_editor_2708ef21": {
     "message": "Redigerare för formaterat innehåll"
+  },
+  "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+    "message": "RTF-område. Tryck på { OSKey }+F8 för genvägar till innehållsredigeraren."
   },
   "right_angle_bracket_d704e2d6": { "message": "Höger hakparentes" },
   "right_arrow_35e0eddf": { "message": "Högerpil" },
@@ -636,11 +752,32 @@ const locale = {
   "rotate_image_90_degrees_2ab77c05": { "message": "Rotera bild -90 grader" },
   "rotate_image_90_degrees_6c92cd42": { "message": "Rotera bild 90 grader" },
   "rotation_9699c538": { "message": "Rotation" },
+  "row_fc0944a7": { "message": "Rad" },
+  "row_group_979f5528": { "message": "Radgrupp" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Tyvärr fungerar inte tangentbordet i den nätta HTML-redigeraren. Öppna den råa HTML-redigeraren här."
   },
   "save_11a80ec3": { "message": "Spara" },
+  "save_copy_ca63944e": { "message": "Spara kopia" },
   "save_media_cb9e786e": { "message": "Spara mediefiler" },
+  "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+    "message": "Skärmläsare kan inte avgöra vad som visas i en bild utan alternativtext, och filnamn är ofta meningslösa strängar av siffror och bokstäver som inte beskriver sammanhanget eller betydelsen."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+    "message": "Skärmläsare kan inte avgöra vad som visas i en bild utan alternativtext, som beskriver innehållet och innebörden av bilden. Alternativtext ska vara enkel och koncis."
+  },
+  "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+    "message": "Skärmläsare kan inte avgöra vad som visas i en bild utan alternativtext, som beskriver innehållet och innebörden av bilden."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+    "message": "Skärmläsare kan inte tolka tabeller utan rätt struktur. Tabellrubriker tillhandahåller riktning och innehållsomfattning."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+    "message": "Skärmläsare kan inte tolka tabeller utan rätt struktur. Tabellrubriker beskriver sammanhanget och den allmänna förståelsen av tabellen."
+  },
+  "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+    "message": "Skärmläsare kan inte tolka tabeller utan rätt struktur. Tabellrubriker tillhandahåller riktning och en överblick över innehållet."
+  },
   "script_l_42a7b254": { "message": "Skript-L" },
   "search_280d00bd": { "message": "Sök" },
   "select_audio_source_21043cd5": { "message": "Välj ljudkälla" },
@@ -648,12 +785,21 @@ const locale = {
   "select_language_7c93a900": { "message": "Välj språk" },
   "select_video_source_1b5c9dbe": { "message": "Välj videokälla" },
   "selected_linkfilename_c093b1f2": { "message": "Markerade { linkFileName }" },
+  "set_header_scope_8c548f40": { "message": "Ange rubrikens omfattning" },
   "set_minus_b46e9b88": { "message": "Uppsättning av minus" },
+  "set_table_header_cfab13a0": { "message": "Ange tabellrubrik" },
   "sharp_music_ab956814": { "message": "Korsförtecken (musik)" },
+  "shift_arrows_4d5785fe": { "message": "SKIFT + pilar" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Tryck på Skift+O för att öppna den nätta HTML-redigeraren."
   },
   "shortcut_911d6255": { "message": "Genväg" },
+  "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+    "message": "Seende användare bläddrar snabbt bland webbsidor och letar efter stora rubriker eller rubriker i fetstil. Användare av skärmläsare använder sig av rubriker för kontextuell förståelse. Rubriker ska använda rätt struktur."
+  },
+  "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+    "message": "Seende användare bläddrar snabbt bland webbsidor och letar efter stora rubriker eller rubriker i fetstil. Användare av skärmläsare använder sig av rubriker för kontextuell förståelse. Rubriker ska vara koncisa inom den korrekta strukturen."
+  },
   "sigma_5c35e553": { "message": "Sigma" },
   "sigma_variant_8155625": { "message": "Sigma (variant)" },
   "single_color_image_4e5d4dbc": { "message": "Enfärgsbild" },
@@ -727,16 +873,43 @@ const locale = {
   "system_audio_allowed_b2508f8c": { "message": "Systemljud tillåts" },
   "system_audio_disabled_c177bd13": { "message": "Systemljud inaktiverat" },
   "tab_arrows_4cf5abfc": { "message": "FLIK/Pilar" },
+  "table_header_starting_with_start_ffcabba6": {
+    "message": "Tabellrubrik som börjar med { start }"
+  },
+  "table_starting_with_start_e7232848": {
+    "message": "Tabell som börjar med { start }"
+  },
+  "tables_headers_should_specify_scope_5abf3a8e": {
+    "message": "Tabellrubriker ska specificera omfattning."
+  },
+  "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+    "message": "Tabeller ska innehålla en bildtext som beskriver innehållet i tabellen."
+  },
+  "tables_should_include_at_least_one_header_48779eac": {
+    "message": "Tabeller ska innehålla minst en rubrik."
+  },
   "tau_880974b7": { "message": "Tau" },
   "teal_f729a294": { "message": "Teal" },
   "text_7f4593da": { "message": "Text" },
   "text_background_color_16e61c3f": { "message": "Bakgrundsfärg för text" },
   "text_color_acf75eb6": { "message": "Textfärg" },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Texten är svår att läsa utan tillräcklig kontrast mellan text och bakgrund, speciellt för de med nedsatt syn."
+  },
+  "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+    "message": "Text som är större än 18pt (eller fetstil 14pt) bör ha ett kontrastförhållande på minst 3:1."
+  },
   "text_optional_384f94f7": { "message": "Text (valfritt)" },
   "text_position_8df8c162": { "message": "Textposition" },
   "text_size_887c2f6": { "message": "Textstorlek" },
+  "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+    "message": "Text som är mindre än 18pt (eller fet 14pt) bör ha ett kontrastförhållande på minst 4,5:1."
+  },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
     "message": "Förhandsvisningen av dokumentet bearbetas. Försök igen senare."
+  },
+  "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+    "message": "Den första rubriken på en sida ska vara i H2."
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet är i den offentliga domänen"
@@ -893,7 +1066,14 @@ const locale = {
   },
   "webcam_disabled_30c66986": { "message": "Webbkamera inaktiverad" },
   "webcam_fe91b20f": { "message": "Webbkamera" },
+  "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+    "message": "Webbsidor ska bara ha en enkel H1, som automatiskt används för sidans titel. Den första rubriken i ditt innehåll ska vara i H2."
+  },
+  "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+    "message": "Om markeringar används som visuellt formaterar objekt som listor men inte visar listans relation kan användare få svårt att navigera informationen."
+  },
   "white_87fa64fd": { "message": "Vit" },
+  "why_523b3d8c": { "message": "Varför" },
   "width_492fec76": { "message": "Bredd" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Bredd och höjd måste anges med siffror"
@@ -905,6 +1085,9 @@ const locale = {
   "yes_dde87d5": { "message": "Ja" },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Du har ändringar som inte har sparats i facket för ikonverktyget. Vill du fortsätta utan att spara dessa ändringar?"
+  },
+  "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+    "message": "Du måste eventuellt justera fler rubriker för att underhålla sidhierarkin."
   },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Du får inte ladda upp en tom fil"
