@@ -19,12 +19,6 @@ source "https://rubygems.org/"
 
 plugin "bundler_lockfile_extensions", path: "gems/bundler_lockfile_extensions"
 
-# Bundler's first pass parses the entire Gemfile and calls to additional sources
-# makes it actually go and retrieve metadata from them even though the plugin will
-# never exist there. Short-circuit it here if we're in the plugin-specific DSL
-# phase to prevent that from happening.
-return if method(:source).owner == ::Bundler::Plugin::DSL
-
 require File.expand_path("config/canvas_rails_switcher", __dir__)
 
 if Plugin.installed?('bundler_lockfile_extensions')
@@ -69,6 +63,12 @@ if Plugin.installed?('bundler_lockfile_extensions')
 
   BundlerLockfileExtensions.enable(lockfile_defs)
 end
+
+# Bundler's first pass parses the entire Gemfile and calls to additional sources
+# makes it actually go and retrieve metadata from them even though the plugin will
+# never exist there. Short-circuit it here if we're in the plugin-specific DSL
+# phase to prevent that from happening.
+return if method(:source).owner == ::Bundler::Plugin::DSL
 
 Dir[File.join(File.dirname(__FILE__), "gems/plugins/*/Gemfile.d/_before.rb")].each do |file|
   eval(File.read(file), nil, file) # rubocop:disable Security/Eval
