@@ -37,6 +37,13 @@ module SIS
 
       i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
         Enrollment.where(id: batch).update_all(sis_batch_id: @batch.id)
+        # update observer enrollments linked to the above if they have a sis_batch_id
+        Shard.partition_by_shard(batch) do |shard_enrollment_ids|
+          Enrollment.where.not(sis_batch_id: nil)
+                    .joins("INNER JOIN #{Enrollment.quoted_table_name} AS se ON enrollments.associated_user_id=se.user_id AND enrollments.course_section_id=se.course_section_id")
+                    .where(se: { id: shard_enrollment_ids })
+                    .update_all(sis_batch_id: @batch.id)
+        end
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
