@@ -824,6 +824,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:USAGE_RIGHTS_REQUIRED] = @context.try(:usage_rights_required?)
+      hash[:restrict_quantitative_data] = @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
 
       js_env(hash)
       conditional_release_js_env(@assignment)

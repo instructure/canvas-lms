@@ -102,3 +102,4 @@ export default class GradingTypeSelector extends Backbone.View
     freezeGradingType: _.includes(@parentModel.frozenAttributes(), 'grading_type') ||
                         @parentModel.inClosedGradingPeriod() || (@lockedItems?.points && @parentModel.isNotGraded()) || !@canEditGrades && @parentModel.gradedSubmissionsExist()
     gradingTypeMap: @gradingTypeMap()
+    restrictQuantitativeData: @parentModel.restrictQuantitativeData() || ENV.restrict_quantitative_data
