@@ -57,16 +57,13 @@ describe EportfoliosController do
 
       let(:fake_signing_secret) { "asdfasdfasdfasdfasdfasdfasdfasdf" }
       let(:fake_encryption_secret) { "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
-      let(:fake_secrets) do
-        {
-          "signing-secret" => fake_signing_secret,
-          "encryption-secret" => fake_encryption_secret
-        }
-      end
 
       before do
         allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
+
+        allow(Rails.application.credentials).to receive(:dig).and_call_original
+        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return(fake_signing_secret)
+        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return(fake_encryption_secret)
       end
 
       it "assigns variables" do
