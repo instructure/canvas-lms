@@ -19,7 +19,7 @@
 #
 
 describe I18n do
-  context "DontTrustI18nPluralizations" do
+  context "DontTrustPluralizations" do
     it "does not raise an exception for a bad pluralization entry" do
       missing_other_key = { en: { __pluralize_test: { one: "One thing" } } }
       I18n.backend.stub(missing_other_key) do
