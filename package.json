@@ -163,7 +163,7 @@
     "react-final-form": "^6.5.3",
     "react-identicons": "^1.2.5",
     "react-immutable-proptypes": "^2.1.0",
-    "react-lazy-load": "^3.0.13",
+    "react-lazy-load": "^4.0.1",
     "react-modal": "^3",
     "react-popper": "^2.2.5",
     "react-redux": "^5.1.1",
