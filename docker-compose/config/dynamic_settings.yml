@@ -13,9 +13,6 @@ development:
       address-book:
         app-host: "http://address-book.docker"
         secret: "opensesame"
-      canvas:
-        encryption-secret: "astringthatisactually32byteslong"
-        signing-secret: "astringthatisactually32byteslong"
       live-events:
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events

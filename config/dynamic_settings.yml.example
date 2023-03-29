@@ -11,8 +11,6 @@ development:
     canvas:
       # environment
       canvas:
-        encryption-secret: "astringthatisactually32byteslong"
-        signing-secret: "astringthatisactually32byteslong"
         # regexes for matching online meeting urls in calendar events
         # one per line. will get | or'd together to form the regex
         # that's eventually used.

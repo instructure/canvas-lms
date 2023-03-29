@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
-require "dynamic_settings"
 require "timecop"
 
 describe "RequestContext::Generator" do
@@ -146,25 +145,20 @@ describe "RequestContext::Generator" do
     end
 
     before do
-      # TODO: Probably shouldn't be stubbing this deep in a gem?
-      # Maybe we should be passing in a config'd secret to CanvasSecurity
-      # directly rather than monkeying with dynamic_settings.
       Thread.current[:context] = nil
-      DynamicSettings.reset_cache!
-      DynamicSettings.fallback_data = {
-        config: {
-          canvas: {
-            canvas: {
-              "signing-secret" => shared_secret
-            }
-          }
-        }
-      }
+
+      rails_app = instance_double("Rails::Application", credentials: {
+                                    canvas_security: {
+                                      signing_secret: shared_secret
+                                    }
+                                  })
+      allow(Rails).to receive(:application).and_return(rails_app)
+
       env["HTTP_X_REQUEST_CONTEXT_ID"] = CanvasSecurity.base64_encode(remote_request_context_id)
       env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = CanvasSecurity.base64_encode(remote_signature)
     end
 
-    after { DynamicSettings.fallback_data = {} }
+    after { allow(Rails).to receive(:application).and_call_original }
 
     def run_middleware
       _, headers, _msg = RequestContext::Generator.new(->(_) { [200, {}, []] }).call(env)
