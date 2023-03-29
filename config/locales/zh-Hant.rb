@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 {
-  "zh-Hans": {
+  "zh-Hant": {
     number: {
       nth: {
         ordinals: lambda do |_key, _options|
