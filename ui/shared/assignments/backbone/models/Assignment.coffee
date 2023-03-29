@@ -801,3 +801,5 @@ export default class Assignment extends Model
 
   quizzesRespondusEnabled: =>
     @get('require_lockdown_browser') && @isQuizLTIAssignment() && isStudent()
+
+  restrictQuantitativeData: => @get('restrict_quantitative_data')
