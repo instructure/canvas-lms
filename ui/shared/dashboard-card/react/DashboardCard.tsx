@@ -98,6 +98,7 @@ export type DashboardCardProps = {
   defaultView?: string
   pagesUrl?: string
   frontPageTitle?: string
+  onPublishedCourse?: (id: string) => void
 }
 
 export const DashboardCard = ({
@@ -128,6 +129,7 @@ export const DashboardCard = ({
   defaultView,
   pagesUrl,
   frontPageTitle,
+  onPublishedCourse = () => {},
 }: DashboardCardProps) => {
   const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
 
@@ -225,6 +227,10 @@ export const DashboardCard = ({
       .catch(() =>
         showFlashError(I18n.t('We were unable to remove this course from your favorites.'))
       )
+  }
+
+  const updatePublishedCourse = () => {
+    if (onPublishedCourse) onPublishedCourse(id)
   }
 
   // ===============
@@ -336,6 +342,7 @@ export const DashboardCard = ({
             pagesUrl={pagesUrl}
             frontPageTitle={frontPageTitle}
             courseId={id}
+            onSuccess={updatePublishedCourse}
           />
         )}
         {renderHeaderButton()}

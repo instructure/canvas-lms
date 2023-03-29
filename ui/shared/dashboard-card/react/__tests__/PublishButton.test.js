@@ -31,6 +31,7 @@ function createMockProps(opts = {}) {
     defaultView: 'modules',
     frontPageTitle: '',
     courseNickname: 'nickname',
+    onSuccess: null,
     ...opts,
   }
 }
@@ -59,7 +60,15 @@ describe('PublishButton', () => {
       const wrapper = mount(<PublishButton {...createMockProps()} />)
       apiClient.getModules.mockReturnValue(Promise.resolve({data: ['module1']}))
       await wrapper.find('button').simulate('click')
-      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0'})
+      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess: null})
+    })
+
+    it('publishes when modules do exist calling onSuccess callback', async () => {
+      const onSuccess = jest.fn()
+      const wrapper = mount(<PublishButton {...createMockProps({onSuccess})} />)
+      apiClient.getModules.mockReturnValue(Promise.resolve({data: ['module1']}))
+      await wrapper.find('button').simulate('click')
+      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess})
     })
 
     it('flashes an error when getModules fails', async () => {
@@ -80,7 +89,17 @@ describe('PublishButton', () => {
       const wrapper = mount(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
       wrapper.find('button').simulate('click')
       expect(apiClient.getModules).not.toHaveBeenCalled()
-      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0'})
+      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess: null})
+    })
+
+    it('calls publishCourse immediately with onSuccess callback', () => {
+      const onSuccess = jest.fn()
+      const wrapper = mount(
+        <PublishButton {...createMockProps({defaultView: 'assignments', onSuccess})} />
+      )
+      wrapper.find('button').simulate('click')
+      expect(apiClient.getModules).not.toHaveBeenCalled()
+      expect(apiClient.publishCourse).toHaveBeenCalledWith({courseId: '0', onSuccess})
     })
   })
 

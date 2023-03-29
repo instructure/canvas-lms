@@ -107,8 +107,10 @@ export default class DashboardCardBox extends React.Component {
       return newCard
     })
     this.setState(
-      {
-        courseCards: newCards,
+      () => {
+        return {
+          courseCards: newCards,
+        }
       },
       () => {
         MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id)
@@ -125,8 +127,10 @@ export default class DashboardCardBox extends React.Component {
     newCards[cardIndex].isFavorited = false
     newCards.splice(cardIndex, 1)
     this.setState(
-      {
-        courseCards: newCards,
+      () => {
+        return {
+          courseCards: newCards,
+        }
       },
       () => {
         if (newCards.length === 0) {
@@ -134,6 +138,17 @@ export default class DashboardCardBox extends React.Component {
         }
       }
     )
+  }
+
+  handlePublishedCourse = courseId => {
+    const cardIndex = this.state.courseCards.findIndex(card => card.id === courseId)
+    const newCards = this.state.courseCards.slice()
+    newCards[cardIndex].published = true
+    this.setState(() => {
+      return {
+        courseCards: newCards,
+      }
+    })
   }
 
   renderCard = card => {
@@ -159,6 +174,7 @@ export default class DashboardCardBox extends React.Component {
         image={card.image}
         hideColorOverlays={this.props.hideColorOverlays}
         onConfirmUnfavorite={this.handleRerenderCards}
+        onPublishedCourse={this.handlePublishedCourse}
         position={position}
         moveCard={this.moveCard}
         totalCards={this.state.courseCards.length}

@@ -59,6 +59,19 @@ describe('apiClient', () => {
       })
     })
 
+    it('calls onSuccess function on success if provided', done => {
+      moxios.stubRequest('/api/v1/courses/1', {
+        status: 200,
+        response: {},
+      })
+      const onSuccess = jest.fn()
+      apiClient.publishCourse({courseId: 1, onSuccess})
+      moxios.wait(() => {
+        expect(onSuccess).toHaveBeenCalled()
+        done()
+      })
+    })
+
     it('flashes registration message on 401', done => {
       moxios.stubRequest('/api/v1/courses/1', {
         status: 401,
