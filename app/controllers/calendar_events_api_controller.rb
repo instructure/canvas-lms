@@ -1174,7 +1174,7 @@ class CalendarEventsApiController < ApplicationController
           f.id = calendar_url_for(@context)
         end
         @events.each do |e|
-          feed.entries << e.to_atom
+          feed.entries << e.to_atom(exclude_description: !!e.try(:locked_for?, @current_user))
         end
         render plain: feed.to_xml
       end

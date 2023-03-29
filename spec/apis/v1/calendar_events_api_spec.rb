@@ -3523,6 +3523,31 @@ describe CalendarEventsApiController, type: :request do
       get "/feeds/calendars/user_garbage.ics"
       expect(response).to render_template("shared/unauthorized_feed")
     end
+
+    context "with atom" do
+      before :once do
+        @assignment.update(description: "assignment description")
+      end
+
+      it "does not include the assignment description if the student doesn't have permission to see it" do
+        @assignment.update(unlock_at: @assignment.due_at - 1.day)
+        expect(@assignment.locked_for?(@student)).to be_truthy
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).not_to include("assignment description")
+      end
+
+      it "includes the assignment description if the student has permission to see it" do
+        expect(@assignment.locked_for?(@student)).to be_falsey
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.atom", {
+                       controller: "calendar_events_api", action: "public_feed", format: "atom", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body).to include("assignment description")
+      end
+    end
   end
 
   context "save_selected_contexts" do

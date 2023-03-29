@@ -1590,17 +1590,21 @@ class Assignment < ActiveRecord::Base
   def to_atom(opts = {})
     extend ApplicationHelper
     author_name = context.present? ? context.name : t("atom_no_author", "No Author")
+    content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
+    unless opts[:exclude_description]
+      content += "<br/>#{description}<br/><br/>
+        <div>
+          #{description}
+        </div>
+      "
+    end
     Atom::Entry.new do |entry|
       entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
       entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
       entry.updated   = updated_at.utc
       entry.published = created_at.utc
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(due_at, :due_date)}<br/>#{description}<br/><br/>
-        <div>
-          #{description}
-        </div>
-      ")
+      entry.content   = Atom::Content::Html.new(content)
       entry.links << Atom::Link.new(rel: "alternate", href: direct_link)
       entry.authors << Atom::Person.new(name: author_name)
     end
