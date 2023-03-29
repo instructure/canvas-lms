@@ -301,7 +301,7 @@ export default class DeveloperKeyModal extends React.Component {
           open={developerKeyModalOpen}
           onDismiss={this.closeModal}
           size="fullscreen"
-          label={editing ? I18n.t('Create Developer Key') : I18n.t('Edit Developer Key')}
+          label={editing ? I18n.t('Edit Developer Key') : I18n.t('Create Developer Key')}
           shouldCloseOnDocumentClick={false}
         >
           <Modal.Header>
@@ -349,10 +349,11 @@ export default class DeveloperKeyModal extends React.Component {
             )}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.closeModal} margin="0 small 0 0">
+            <Button id="lti-key-cancel-button" onClick={this.closeModal} margin="0 small 0 0">
               {I18n.t('Cancel')}
             </Button>
             <Button
+              id="lti-key-save-button"
               onClick={isLtiKey ? this.saveLtiToolConfiguration : this.submitForm}
               color="primary"
               disabled={this.isSaving}
