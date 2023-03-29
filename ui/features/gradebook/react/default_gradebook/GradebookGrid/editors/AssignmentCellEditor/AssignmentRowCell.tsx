@@ -19,7 +19,6 @@
 import React, {Component} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -33,12 +32,10 @@ import type {CamelizedAssignment, GradeEntryMode} from '@canvas/grading/grading.
 const I18n = useI18nScope('gradebook')
 
 const themeOverrides = {
-  // @ts-ignore
   [IconButton.theme]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
-  // @ts-ignore
   [TextInput.theme]: {
     smallHeight: '27px',
   },

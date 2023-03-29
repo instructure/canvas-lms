@@ -17,12 +17,9 @@
  */
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
-// @ts-ignore
 import {Modal} from '@instructure/ui-modal'
-// @ts-ignore
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'

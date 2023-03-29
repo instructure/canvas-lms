@@ -97,7 +97,7 @@ export default function Layout(props) {
         as="div"
         margin="small 0"
         padding="0 medium"
-        // @ts-ignore
+        // @ts-expect-error
         id="AssignmentPostingPolicyTray__RadioInputGroup"
       >
         <RadioInputGroup
@@ -129,7 +129,7 @@ export default function Layout(props) {
         as="div"
         margin="medium 0 0"
         padding="0 medium"
-        // @ts-ignore
+        // @ts-expect-error
         id="AssignmentPostingPolicyTray__Buttons"
       >
         <Flex justifyItems="end">

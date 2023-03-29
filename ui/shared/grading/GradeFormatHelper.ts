@@ -21,7 +21,7 @@ import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'
-import type {SubmissionData, FormatGradeOptions} from './grading.d'
+import type {FormatGradeOptions, SubmissionData} from './grading.d'
 
 const I18n = useI18nScope('sharedGradeFormatHelper')
 

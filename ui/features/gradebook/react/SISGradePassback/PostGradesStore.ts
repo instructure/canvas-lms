@@ -100,7 +100,7 @@ const PostGradesStore = (initialState: {
     overrideForEveryone(a) {
       const overrides = this.allOverrideIds(a)
       const sections: string[] = _.keys(store.getState().sections)
-      // @ts-ignore
+      // @ts-expect-error
       const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = _.find(section_ids_with_no_overrides, o => {

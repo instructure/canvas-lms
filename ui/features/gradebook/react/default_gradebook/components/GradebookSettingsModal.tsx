@@ -37,7 +37,11 @@ import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
 import ViewOptionsTabPanel from './ViewOptionsTabPanel'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {confirmViewUngradedAsZero} from '../Gradebook.utils'
-import type {GradebookViewOptions, LatePolicyCamelized} from '../gradebook.d'
+import type {
+  GradebookViewOptions,
+  LatePolicyCamelized,
+  LatePolicyValidationErrors,
+} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
@@ -134,8 +138,8 @@ type State = {
   isOpen: boolean
   latePolicy: {
     changes: Partial<LatePolicyCamelized>
-    data?: Partial<LatePolicyCamelized>
-    validationErrors: {[key: string]: string}
+    data?: LatePolicyCamelized
+    validationErrors: LatePolicyValidationErrors
   }
   coursePostPolicy: {
     postManually: boolean
@@ -286,8 +290,8 @@ export default class GradebookSettingsModal extends React.Component<
 
   changeLatePolicy = (latePolicy: {
     changes: Partial<LatePolicyCamelized>
-    data: LatePolicyCamelized
-    validationErrors: {[key: string]: string}
+    data?: LatePolicyCamelized
+    validationErrors: LatePolicyValidationErrors
   }) => {
     this.setState({latePolicy})
   }

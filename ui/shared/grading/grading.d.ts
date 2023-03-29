@@ -25,6 +25,13 @@ import type {
   WorkflowState,
 } from '../../api.d'
 
+export type OriginalityData = {
+  reportUrl: string
+  score: number
+  status: string
+  state: string
+}
+
 export type PartialStudent = {
   id: string
   isInactive: boolean
@@ -44,24 +51,17 @@ export type PartialStudent = {
   }
 }
 
-export type OriginalityData = {
-  reportUrl: string
-  score: number
-  status: string
-  state: string
-}
-
 // TODO: remove the need for this type
 export type CamelizedStudent = {
-  id: string
-  name: string
-  displayName: string
-  sortableName: string
   avatarUrl: string
+  displayName: string
   enrollments: Enrollment[]
-  loaded: boolean
+  id: string
   initialized: boolean
   isConcluded: boolean
+  loaded: boolean
+  name: string
+  sortableName: string
   totalGrade: number
 }
 
@@ -75,6 +75,7 @@ export type SubmissionData = {
   grade: string | null
   late: boolean
   missing: boolean
+  pointsDeducted?: number | null
   resubmitted: boolean
   score: number | null
 }
@@ -157,9 +158,11 @@ export type SerializedGradingPeriod = {
 
 export type CamelizedAssignment = {
   allowedAttempts: number
+  anonymousGrading: boolean
   anonymizeStudents: boolean
   courseId: string
   dueAt: string | null
+  gradesPublished: boolean
   gradingType: GradingType
   groupSet?: {
     currentGroup: {
@@ -174,7 +177,7 @@ export type CamelizedAssignment = {
   pointsPossible: number
   postManually: boolean
   published: boolean
-  submissionTypes: string
+  submissionTypes: string[]
 }
 
 export type SubmissionOriginalityData = {
