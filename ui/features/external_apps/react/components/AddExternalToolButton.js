@@ -302,7 +302,13 @@ export default class AddExternalToolButton extends React.Component {
   render() {
     return (
       <View>
-        <Button color="primary" margin="x-small" renderIcon={IconAddLine} onClick={this.openModal}>
+        <Button
+          id="add-app-button"
+          color="primary"
+          margin="x-small"
+          renderIcon={IconAddLine}
+          onClick={this.openModal}
+        >
           <AccessibleContent alt={I18n.t('Add App')}>{I18n.t('App')}</AccessibleContent>
         </Button>
         <Modal
