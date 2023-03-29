@@ -16623,9 +16623,9 @@ ht:
         subject: "Alèt Canvas - Aktivite: %{event_title}, %{course_name}"
     new_file_added: 
       email: 
-        body: "Yo ajoute yon nouvo fichye pou kou , %{name} a:"
+        body: "Yo ajoute yon nouvo fichye pou kou, %{name} a:"
         html: 
-          body: "Yo ajoute yon nouvo fichye pou kou , %{name} a:"
+          body: "Yo ajoute yon nouvo fichye pou kou, %{name} a:"
           link: "Klike pou Afiche"
           subject: "Nouvo Fichye Ajoute: %{title}, %{name}"
         link: "Ou ka afiche li la"
