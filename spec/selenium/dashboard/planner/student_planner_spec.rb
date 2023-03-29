@@ -510,36 +510,6 @@ describe "student planner" do
       user_session(@student1)
     end
 
-    it "scrolls to the next new activity", priority: "1" do
-      skip("Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041")
-      go_to_list_view
-      expect(items_displayed.count).to eq 1
-      expect(scroll_height).to eq 0
-
-      new_activity_button.click
-      expect(items_displayed.count).to eq 5
-
-      next_item_y = item_top_position(1)
-      new_activity_button.click
-      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
-
-      next_item_y = item_top_position(0)
-      new_activity_button.click
-      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
-    end
-
-    it "shows any new activity above the current scroll position", priority: "1" do
-      skip("Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041")
-      go_to_list_view
-
-      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
-      new_activity_button.click
-      scroll_page_to_top
-      expect(planner_header_container).not_to contain_jqcss(new_activity_button_selector)
-      scroll_page_to_bottom
-      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
-    end
-
     it "collapses an item when marked as complete", priority: "1" do
       go_to_list_view
 
