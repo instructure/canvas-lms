@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import {deferPromise} from 'defer-promise'
-// @ts-ignore
 import _ from 'underscore'
 import {intersection, isEqual} from 'lodash'
 import tz from '@canvas/timezone'
@@ -106,10 +105,11 @@ import type GradebookGridType from './GradebookGrid/index'
 import type {StatusColors} from './constants/colors'
 import type {ProxyDetails} from '@canvas/proxy-submission/react/ProxyUploadModal'
 import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColumnHeader'
+import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-// @ts-ignore
+// @ts-expect-error
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-// @ts-ignore
+// @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -121,7 +121,7 @@ import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper
 import UserSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-// @ts-ignore
+// @ts-expect-error
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
@@ -164,7 +164,6 @@ import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {IconSettingsSolid} from '@instructure/ui-icons'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
@@ -2549,15 +2548,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       totalWidth = testWidth(label, columnWidths.total.min, columnWidths.total.max)
     }
     return {
-      id: 'total_grade',
-      field: 'total_grade',
-      toolTip: label,
-      minWidth: columnWidths.total.min,
-      maxWidth: columnWidths.total.max,
-      width: totalWidth,
       cssClass: 'total-cell total_grade',
+      field: 'total_grade',
       headerCssClass: 'total_grade',
+      id: 'total_grade',
+      maxWidth: columnWidths.total.max,
+      minWidth: columnWidths.total.min,
+      object: {},
+      toolTip: label,
       type: 'total_grade',
+      width: totalWidth,
     }
   }
 
@@ -2582,6 +2582,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       id: 'total_grade_override',
       maxWidth: columnWidths.total_grade_override.max,
       minWidth: columnWidths.total_grade_override.min,
+      object: {},
       propFactory: new TotalGradeOverrideCellPropFactory(this),
       toolTip: label,
       type: 'total_grade_override',
@@ -4585,7 +4586,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  showSimilarityScore = (_assignment: Assignment) => !!this.options.show_similarity_score
+  showSimilarityScore = (_assignment?: Assignment) => !!this.options.show_similarity_score
 
   viewUngradedAsZero = () =>
     !!(this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero)
@@ -4689,16 +4690,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     body,
     mediaFile,
     attachmentIds,
-  }: {
-    recipientsIds: string[]
-    subject: string
-    body: string
-    mediaFile: {
-      id: string
-      type: string
-    }
-    attachmentIds: string[]
-  }) => {
+  }: SendMessageArgs) => {
     return MessageStudentsWhoHelper.sendMessageStudentsWho(
       recipientsIds,
       subject,

@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-// @ts-ignore
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'

@@ -28,7 +28,7 @@ const skip = [
   'series',
   'fish',
   'sheep',
-  'jeans'
+  'jeans',
 ]
 const patterns = [
   [/person$/i, 'people'],
@@ -51,10 +51,10 @@ const patterns = [
   [/(alias|status)$/i, '$1es'],
   [/(octop|vir)us$/i, '$1i'],
   [/(ax|test)is$/i, '$1es'],
-  [/s$/i, 's']
+  [/s$/i, 's'],
 ] as const
 
-const pluralize = function(string: string) {
+const pluralize = function (string: string) {
   string = string || ''
   if ($.inArray(string, skip) > 0) {
     return string
@@ -68,7 +68,7 @@ const pluralize = function(string: string) {
   return string + 's'
 }
 
-pluralize.withCount = function(count: number, string: string) {
+pluralize.withCount = function (count: number, string: string) {
   return '' + count + ' ' + (count === 1 ? string : pluralize(string))
 }
 

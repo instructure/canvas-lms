@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type JQuery from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
+// @ts-expect-error
 import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submissions_form.handlebars'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
@@ -35,6 +36,8 @@ class ReuploadSubmissionsDialogManager {
     [assignmentId: string]: boolean
   }
 
+  reuploadForm: JQuery | null
+
   constructor(
     assignment: Assignment,
     reuploadUrlTemplate,
@@ -46,6 +49,7 @@ class ReuploadSubmissionsDialogManager {
     this.reuploadUrl = $.replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
     this.userAssetString = userAssetString
+    this.reuploadForm = null
   }
 
   isDialogEnabled() {
@@ -53,11 +57,11 @@ class ReuploadSubmissionsDialogManager {
   }
 
   getReuploadForm(cb) {
-    if (ReuploadSubmissionsDialogManager.reuploadForm) {
-      return ReuploadSubmissionsDialogManager.reuploadForm
+    if (this.reuploadForm) {
+      return this.reuploadForm
     }
 
-    ReuploadSubmissionsDialogManager.reuploadForm = $(
+    this.reuploadForm = $(
       re_upload_submissions_form({authenticityToken: authenticity_token()})
     ).dialog({
       width: 400,
@@ -73,7 +77,7 @@ class ReuploadSubmissionsDialogManager {
 
     setupSubmitHandler(this.userAssetString)
 
-    return ReuploadSubmissionsDialogManager.reuploadForm
+    return this.reuploadForm
   }
 
   showDialog(cb) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import axios from '@canvas/axios'
 
 const monitoringBase = ScoreToUngradedManager.DEFAULT_MONITORING_BASE_URL
 const workingProcess = {
-  progressId: 1,
+  progressId: '1',
   workflowState: 'running',
 }
 
@@ -93,6 +92,7 @@ describe('ScoreToUngradedManager', () => {
     beforeEach(() => {
       spy = jest
         .spyOn(GradebookApi, 'applyScoreToUngradedSubmissions')
+        // @ts-expect-error
         .mockResolvedValue({data: {id: 1, workflow_state: 'running'}})
     })
 

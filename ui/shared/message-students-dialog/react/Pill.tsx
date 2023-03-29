@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -32,6 +31,8 @@ const themeOverride = {
     defaultBackground: 'white',
   },
 }
+
+const {Item: FlexItem} = Flex as any
 
 const I18n = useI18nScope('pill')
 const ellipsis = () => I18n.t('…')
@@ -70,10 +71,10 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
 
   const contents = (
     <Flex as="div" margin="0 xx-small 0 0" justifyItems="space-between">
-      <Flex.Item size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
+      <FlexItem size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
         {renderText(text, truncatedText, textColor)}
-      </Flex.Item>
-      <Flex.Item>{renderIcon(selected)}</Flex.Item>
+      </FlexItem>
+      <FlexItem>{renderIcon(selected)}</FlexItem>
     </Flex>
   )
 

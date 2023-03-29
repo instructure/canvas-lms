@@ -103,6 +103,7 @@ export type GradebookOptions = {
   course_settings: CourseSettingsType
   course_url: string
   current_grading_period_id: string
+  currentUserId: string
   custom_column_datum_url: string
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
@@ -190,14 +191,20 @@ export type LatePolicy = {
 
 // TODO: remove the need for this type
 export type LatePolicyCamelized = {
-  lateSubmissionDeductionEnabled: boolean
   lateSubmissionDeduction: number
+  lateSubmissionDeductionEnabled: boolean
   lateSubmissionInterval: 'day' | 'hour'
-  lateSubmissionMinimumPercentEnabled: boolean
   lateSubmissionMinimumPercent: number
-  missingSubmissionDeductionEnabled: boolean
+  lateSubmissionMinimumPercentEnabled: boolean
   missingSubmissionDeduction: number
+  missingSubmissionDeductionEnabled: boolean
   newRecord?: boolean
+}
+
+export type LatePolicyValidationErrors = {
+  missingSubmissionDeduction?: string
+  lateSubmissionDeduction?: string
+  lateSubmissionMinimumPercent?: string
 }
 
 export type GradingPeriodAssignmentMap = {
@@ -403,7 +410,7 @@ export type SerializedComment = {
 export type AssignmentWithOverride = {
   id: string
   name: string
-  due_at: string
+  due_at: string | null
   please_ignore: boolean
   recentlyUpdated: boolean
   hadOriginalErrors: boolean
@@ -429,7 +436,7 @@ export type Progress = {
 
 export type ProgressCamelized = {
   progressId: string
-  workflowState: string
+  workflowState?: string
 }
 
 export type SortRowsSettingKey =

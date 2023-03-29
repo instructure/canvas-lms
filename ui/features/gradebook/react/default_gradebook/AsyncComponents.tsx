@@ -25,7 +25,7 @@ async function loadAssignmentPostingPolicyTray() {
 }
 
 async function loadCurveGradesDialog() {
-  // @ts-ignore
+  // @ts-expect-error
   return (await import('@canvas/grading/jquery/CurveGradesDialog.coffee')).default
 }
 
@@ -54,7 +54,7 @@ async function loadPostAssignmentGradesTray() {
 }
 
 async function loadSetDefaultGradeDialog() {
-  // @ts-ignore
+  // @ts-expect-error
   return (await import('@canvas/grading/jquery/SetDefaultGradeDialog.coffee')).default
 }
 

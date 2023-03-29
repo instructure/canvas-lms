@@ -19,12 +19,9 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-ignore
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
-// @ts-ignore
 import {IconEditSolid} from '@instructure/ui-icons'
-// @ts-ignore
 import {Grid} from '@instructure/ui-grid'
 import ColorPicker from '@canvas/color-picker'
 import {statusesTitleMap} from '../constants/statuses'

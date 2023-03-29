@@ -3,5 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.js"
+  "main": "./index.js",
+  "dependencies": {
+    "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS"
+  }
 }

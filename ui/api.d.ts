@@ -174,7 +174,6 @@ export type Assignment = Readonly<{
   html_url: string
   allowed_extensions: string[]
   annotatable_attachment_id: null | string
-  anonymize_students: boolean
   anonymous_grading: boolean
   anonymous_instructor_annotations: boolean
   anonymous_peer_reviews: boolean
@@ -221,7 +220,6 @@ export type Assignment = Readonly<{
   peer_reviews: boolean
   points_possible: number
   position: number
-  post_manually: boolean
   post_to_sis: boolean
   published: boolean
   require_lockdown_browser: boolean
@@ -234,7 +232,9 @@ export type Assignment = Readonly<{
   updated_at: string
   workflow_state: WorkflowState
 }> & {
+  anonymize_students: boolean
   assignment_visibility: string[]
+  post_manually: boolean
 } & Partial<{
     assignment_group: AssignmentGroup
     due_at: string | null

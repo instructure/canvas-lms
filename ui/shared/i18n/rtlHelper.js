@@ -31,7 +31,7 @@ function getDefaultDir() {
 
 /**
  * @param {Element} element, will use the <html> element by default
- * @returns {Booean}
+ * @returns {Boolean}
  */
 export function isRTL(element) {
   return getDirection(element) === 'rtl'
@@ -44,8 +44,8 @@ const flipped = {
 
 /**
  * works exactly like our sass helper named the same thing
- * @param {String} "left" or "right"
- * @param {ElementToCheck}, will use the <html> element by default
+ * @param {String} leftOrRight "left" or "right"
+ * @param {ElementToCheck} [element], will use the <html> element by default
  * @returns {String} 'left' or 'right' (or `undefined` if no DOM is present)
  */
 export function direction(leftOrRight, element) {
@@ -56,7 +56,7 @@ export function direction(leftOrRight, element) {
 
 /**
  * Return the direction ('ltr' or 'rtl') of an element
- * @param {Element} element, will use the <html> element by default
+ * @param {Element} [element], will use the <html> element by default
  * @returns {String} 'ltr' or 'rtl' (or `undefined` if no DOM is present)
  */
 export function getDirection(element) {

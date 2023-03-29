@@ -17,19 +17,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {GridColumnObject} from '../../default_gradebook/grid.d'
+
 const assignmentHelper = {
-  compareByDueDate(
-    a?: {
-      due_at?: string | null
-      name?: string
-    },
-    b?: {
-      due_at?: string | null
-      name?: string
-    }
-  ) {
-    let aDate = a.due_at == null ? null : new Date(a.due_at)
-    let bDate = b.due_at == null ? null : new Date(b.due_at)
+  compareByDueDate(a: GridColumnObject, b: GridColumnObject) {
+    let aDate: number | Date | null = a.due_at == null ? null : new Date(a.due_at)
+    let bDate: number | Date | null = b.due_at == null ? null : new Date(b.due_at)
     const aDateIsNull = aDate === null
     const bDateIsNull = bDate === null
     if (aDateIsNull && !bDateIsNull) {
@@ -41,8 +34,8 @@ const assignmentHelper = {
     aDate = +aDate
     bDate = +bDate
     if (aDate === bDate) {
-      const aName = a.name.toLowerCase()
-      const bName = b.name.toLowerCase()
+      const aName = a.name.toLowerCase() || ''
+      const bName = b.name.toLowerCase() || ''
       if (aName === bName) {
         return 0
       }

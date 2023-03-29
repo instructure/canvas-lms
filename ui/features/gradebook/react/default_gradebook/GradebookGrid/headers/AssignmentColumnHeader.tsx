@@ -34,11 +34,7 @@ import ColumnHeader from './ColumnHeader'
 import SecondaryDetailLine from './SecondaryDetailLine'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import type {
-  CamelizedAssignment,
-  CamelizedSubmission,
-  PartialStudent,
-} from '@canvas/grading/grading.d'
+import type {CamelizedAssignment, PartialStudent} from '@canvas/grading/grading.d'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
@@ -85,17 +81,11 @@ export type AssignmentColumnHeaderProps = {
     onSelect: (cb: any) => void
   }
   enterGradesAsSetting: any
-  getCurrentlyShownStudents: () => {
-    id: string
-    name: string
-    sortableName: string
-    isInactive: boolean
-    isTestStudent: boolean
-    submission: CamelizedSubmission
-  }[]
+  getCurrentlyShownStudents: () => PartialStudent[]
   hideGradesAction: {
+    hasGradesOrPostableComments: boolean
     hasGradesOrCommentsToHide: boolean
-    onSelect: () => void
+    onSelect: (cb: any) => void
   }
   messageAttachmentUploadFolderId: string
   onMenuDismiss: () => void
@@ -111,7 +101,7 @@ export type AssignmentColumnHeaderProps = {
     onSelect: (cb: any) => Promise<void>
   }
   showGradePostingPolicyAction: {
-    onSelect: (cb: any) => Promise<void>
+    onSelect: (cb: any) => void
   }
   sortBySetting: {
     direction: string
@@ -195,7 +185,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     // this is because the onToggle handler in ColumnHeader.js is going to get
     // called synchronously, before the SetState takes effect, and it needs to
     // know to skipFocusOnClose
-    // @ts-ignore
+    // @ts-expect-error
     this.state.skipFocusOnClose = true
 
     this.setState({skipFocusOnClose: true}, () => action.onSelect(this.focusAtEnd))
@@ -236,7 +226,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
   }
 
   showMessageStudentsWhoDialog = async () => {
-    // @ts-ignore
+    // @ts-expect-error
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
 

@@ -420,29 +420,31 @@ export function buildStudentColumn(
     ? parseInt(gradebookColumnSizeSetting, 10)
     : defaultWidth
   return {
-    id: columnId,
-    type: columnId,
-    width: studentColumnWidth,
     cssClass: 'meta-cell primary-column student',
     headerCssClass: 'primary-column student',
+    id: columnId,
+    object: {},
     resizable: true,
+    type: columnId,
+    width: studentColumnWidth,
   }
 }
 
 export function buildCustomColumn(customColumn: CustomColumn): GridColumn {
   const columnId = getCustomColumnId(customColumn.id)
   return {
-    id: columnId,
-    type: 'custom_column',
-    field: `custom_col_${customColumn.id}`,
-    width: 100,
-    cssClass: `meta-cell custom_column ${columnId}`,
-    headerCssClass: `custom_column ${columnId}`,
-    resizable: true,
-    editor: LongTextEditor,
-    customColumnId: customColumn.id,
     autoEdit: false,
+    cssClass: `meta-cell custom_column ${columnId}`,
+    customColumnId: customColumn.id,
+    editor: LongTextEditor,
+    field: `custom_col_${customColumn.id}`,
+    headerCssClass: `custom_column ${columnId}`,
+    id: columnId,
+    object: {},
     maxLength: 255,
+    resizable: true,
+    type: 'custom_column',
+    width: 100,
   }
 }
 
