@@ -60,7 +60,6 @@ const ignoredErrors = [
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /Render methods should be a pure function of props and state/, // https://instructure.atlassian.net/browse/LS-3840
   /The above error occurred in the <.*> component/,
-  /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/, // https://instructure.atlassian.net/browse/VICE-3378
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
